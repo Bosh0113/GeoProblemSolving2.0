@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="aff0d0e5-25a5-4ec8-944d-8482b099bdd3" name="Default Changelist" comment="" />
+    <list default="true" id="aff0d0e5-25a5-4ec8-944d-8482b099bdd3" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <ignored path="$PROJECT_DIR$/classes/" />
     <ignored path="$PROJECT_DIR$/target/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -19,7 +22,7 @@
         <entry file="file://$PROJECT_DIR$/src/main/resources/templates/example.html">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="589">
-              <caret line="31" column="5" lean-forward="true" selection-start-line="31" selection-start-column="5" selection-end-line="31" selection-end-column="5" />
+              <caret line="31" column="5" selection-start-line="31" selection-start-column="5" selection-end-line="31" selection-end-column="5" />
               <folding>
                 <element signature="n#style#0;n#i-input#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
               </folding>
@@ -93,7 +96,7 @@
     </option>
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/src/main/resources/templates/personalPage.html" root0="SKIP_INSPECTION" />
@@ -133,7 +136,7 @@
     <option name="width" value="1400" />
     <option name="height" value="830" />
   </component>
-  <component name="ProjectLevelVcsManager">
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <ConfirmationsSetting value="1" id="Add" />
   </component>
   <component name="ProjectView">
@@ -141,69 +144,41 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="PackagesPane" />
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
             <path>
               <item name="geoproblemsolving" type="b2602c69:ProjectViewProjectNode" />
-              <item name="GeoProblemSolving-static" type="462c0819:PsiDirectoryNode" />
+              <item name="GeoProblemSolving-back" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="geoproblemsolving" type="b2602c69:ProjectViewProjectNode" />
-              <item name="GeoProblemSolving-static" type="462c0819:PsiDirectoryNode" />
+              <item name="GeoProblemSolving-back" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="geoproblemsolving" type="b2602c69:ProjectViewProjectNode" />
-              <item name="GeoProblemSolving-static" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="geoproblemsolving" type="b2602c69:ProjectViewProjectNode" />
-              <item name="GeoProblemSolving-static" type="462c0819:PsiDirectoryNode" />
+              <item name="GeoProblemSolving-back" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="geoproblemsolving" type="b2602c69:ProjectViewProjectNode" />
-              <item name="GeoProblemSolving-static" type="462c0819:PsiDirectoryNode" />
+              <item name="GeoProblemSolving-back" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="main" type="462c0819:PsiDirectoryNode" />
               <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="geoproblemsolving" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="geoproblemsolving" type="b2602c69:ProjectViewProjectNode" />
-              <item name="GeoProblemSolving-static" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="geoproblemsolving" type="462c0819:PsiDirectoryNode" />
-              <item name="Controller" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="geoproblemsolving" type="b2602c69:ProjectViewProjectNode" />
-              <item name="GeoProblemSolving-static" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="geoproblemsolving" type="462c0819:PsiDirectoryNode" />
-              <item name="Dao" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="geoproblemsolving" type="b2602c69:ProjectViewProjectNode" />
-              <item name="GeoProblemSolving-static" type="462c0819:PsiDirectoryNode" />
+              <item name="GeoProblemSolving-back" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="main" type="462c0819:PsiDirectoryNode" />
               <item name="resources" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="geoproblemsolving" type="b2602c69:ProjectViewProjectNode" />
-              <item name="GeoProblemSolving-static" type="462c0819:PsiDirectoryNode" />
+              <item name="GeoProblemSolving-back" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="main" type="462c0819:PsiDirectoryNode" />
               <item name="resources" type="462c0819:PsiDirectoryNode" />
@@ -211,7 +186,7 @@
             </path>
             <path>
               <item name="geoproblemsolving" type="b2602c69:ProjectViewProjectNode" />
-              <item name="GeoProblemSolving-static" type="462c0819:PsiDirectoryNode" />
+              <item name="GeoProblemSolving-back" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="main" type="462c0819:PsiDirectoryNode" />
               <item name="resources" type="462c0819:PsiDirectoryNode" />
@@ -219,23 +194,17 @@
             </path>
             <path>
               <item name="geoproblemsolving" type="b2602c69:ProjectViewProjectNode" />
-              <item name="GeoProblemSolving-static" type="462c0819:PsiDirectoryNode" />
+              <item name="GeoProblemSolving-back" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="main" type="462c0819:PsiDirectoryNode" />
               <item name="webapp" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="geoproblemsolving" type="b2602c69:ProjectViewProjectNode" />
-              <item name="GeoProblemSolving-static" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="webapp" type="462c0819:PsiDirectoryNode" />
-              <item name="example" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
+      <pane id="PackagesPane" />
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -254,7 +223,7 @@
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
-    <property name="settings.editor.selected.configurable" value="preferences.keymap" />
+    <property name="settings.editor.selected.configurable" value="project.propVCSSupport.Mappings" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -295,17 +264,17 @@
       <workItem from="1562550004102" duration="35414000" />
       <workItem from="1562754549179" duration="14132000" />
       <workItem from="1562848514111" duration="30000" />
+      <workItem from="1562850116677" duration="763000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="79322000" />
+    <option name="totallyTimeSpent" value="80085000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="1432" y="-8" width="1936" height="1066" extended-state="6" />
-    <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.18123667" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.18283582" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Web" order="2" side_tool="true" />
       <window_info id="Designer" order="3" />
@@ -522,7 +491,7 @@
     <entry file="file://$PROJECT_DIR$/src/main/resources/templates/example.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="589">
-          <caret line="31" column="5" lean-forward="true" selection-start-line="31" selection-start-column="5" selection-end-line="31" selection-end-column="5" />
+          <caret line="31" column="5" selection-start-line="31" selection-start-column="5" selection-end-line="31" selection-end-column="5" />
           <folding>
             <element signature="n#style#0;n#i-input#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
           </folding>
