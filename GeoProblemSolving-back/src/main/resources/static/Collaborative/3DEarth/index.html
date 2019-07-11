@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- Use correct character set. -->
+  <meta charset="utf-8">
+  <!-- Tell IE to use the latest, best version. -->
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <!-- Make the application on mobile take up the full browser screen and disable user scaling. -->
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+  <title>3DEarth</title>
+  <script src="./Cesium/Cesium.js"></script>
+  <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+  <link href="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-fileinput/5.0.1/css/fileinput.min.css" media="all"
+    rel="stylesheet" type="text/css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-fileinput/5.0.1/js/fileinput.min.js"></script>
+  <style>
+    @import url(https://cesiumjs.org/Cesium/Build/Cesium/Widgets/widgets.css);
+    @import url(https://cesiumjs.org/Cesium/Build/Apps/Sandcastle/templates/bucket.css);
+
+    html,
+    body {
+      color: black
+    }
+
+    #cesiumContainer {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    #toolbar {
+      /* background: rgba(42, 42, 42, 0.8); */
+      padding: 4px;
+      border-radius: 4px;
+    }
+  </style>
+  <style>
+    td {
+      cursor: pointer;
+    }
+
+    button {
+      width: 120px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="cesiumContainer" class="fullSize"></div>
+  <div id="toolbar">
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#uploadModal">
+      Add Data
+    </button>
+    <br>
+    <br>
+    <button class="btn btn-info" type="button" data-toggle="collapse" data-target="#collapseLayer"
+      aria-expanded="false" aria-controls="collapseLayer">
+      Data Layer
+    </button>
+    <div class="collapse" id="collapseLayer" style="background: white;">
+      <div class="well">
+        <table class="table table-hover" id="dataTable">
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+          </tr>
+          <tbody id="dataTbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="uploadModal" tabindex="-1" role="dialog" aria-labelledby="uploadModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="uploadModalLabel">Upload Data</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <input id="inputData" type="file" class="file" data-show-preview="false" data-show-upload="false"
+            accept=".topojson,.json,.geojson,.czml,.kml,.kmz">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" onclick="addData()">Add</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="dataInfoModal" tabindex="-1" role="dialog" aria-labelledby="dataInfoModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="dataInfoModalLabel">Data Information</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <table class="table table-bordered">
+            <tr>
+              <th>Name</th>
+              <td id="tdDataName"></td>
+            </tr>
+            <tr>
+              <th>Type</th>
+              <td id="tdDataType"></td>
+            </tr>
+            <tr>
+              <th>Size</th>
+              <td id="tdDataSize"></td>
+            </tr>
+          </table>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" onclick="zoomToData()">Zoom To</button>
+          <button type="button" class="btn btn-danger" onclick="removeData()">Remove</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    var viewer = new Cesium.Viewer('cesiumContainer', {
+      timeline:false, //时间轴
+      animation:false, //动画控件
+      geocoder:false,
+      navigationHelpButton:false,
+      terrainProvider: Cesium.createWorldTerrain()
+    });
+    // viewer.scene.globe.enableLighting = true;//开启照明，即昼夜效果
+    // viewer.scene.globe.depthTestAgainstTerrain = true;
+    viewer._cesiumWidget._creditContainer.style.display = "none";
+    var dataList = [];
+    var selectedDataIndex = 0;
+    function addData() {
+      var files = $("#inputData").prop('files');
+      if (files.length == 0) {
+        confirm("no file be choose.");
+      }
+      else {
+        var reader = new FileReader();
+        var file = files[0];
+        reader.readAsDataURL(file);
+        reader.onload = function (e) {
+          var fullName = file.name;
+          var index = fullName.lastIndexOf(".");
+          var fileName = fullName.substring(0, index);
+          var suffix = fullName.substring(index + 1, fullName.length);
+          suffix=suffix.toLowerCase();
+          var fileSize = "";
+          if (file.size < 1024) {
+            fileSize = file.size + "B";
+          }
+          else if (file.size < 1024 * 1024) {
+            var sizeKB = file.size / 1024.00;
+            fileSize = sizeKB.toFixed(2) + "KB";
+          }
+          else if (file.size < 1024 * 1024 * 1024) {
+            var sizeMB = file.size / (1024.00 * 1024.00);
+            fileSize = sizeMB.toFixed(2) + "MB";
+          }
+          
+          if(suffix=='json'||suffix=='geojson'||suffix=='topojson'||suffix=='kml'||suffix=='kmz'||suffix=='czml'){
+            var dataObject;
+            if(suffix=='json'||suffix=='geojson'||suffix=='topojson'){
+              dataObject = new Cesium.GeoJsonDataSource();
+            }
+            else if(suffix=='kml'||suffix=='kmz'){
+              dataObject = new Cesium.KmlDataSource();
+            }
+            else if(suffix=='czml'){
+              dataObject = new Cesium.CzmlDataSource();
+            }
+            dataObject.load(e.target.result);
+            viewer.dataSources.add(dataObject);
+            var dataInfo = {
+              dataObject: dataObject,
+              dataName: fileName,
+              dataType: suffix,
+              dataSize: fileSize
+            };
+            dataList.push(dataInfo);
+            updateDataLayers();
+          }
+          else{
+            confirm("This file format is not supported.");
+          }
+        }
+        $('#uploadModal').modal('hide');
+      }
+    }
+
+    function updateDataLayers() {
+      $('#dataTbody').html('');
+      for (var i = 0; i < dataList.length; i++) {
+        var trD = document.createElement('tr');
+        trD.setAttribute("data-index", i);
+        trD.onclick = function () {
+          showDataInfoModal(this.dataset.index);
+        };
+        var td1 = document.createElement('td');
+        td1.innerHTML = i;
+        trD.append(td1);
+        var td2 = document.createElement('td');
+        td2.innerHTML = dataList[i].dataName;
+        trD.append(td2);
+        $('#dataTbody').append(trD);
+      }
+    }
+
+    function showDataInfoModal(index) {
+      selectedDataIndex = index;
+      var selectedDataInfo = dataList[index];
+      $('#tdDataName').html(selectedDataInfo.dataName);
+      $('#tdDataType').html(selectedDataInfo.dataType);
+      $('#tdDataSize').html(selectedDataInfo.dataSize);
+      $('#dataInfoModal').modal('show');
+    }
+
+    function zoomToData() {
+      viewer.zoomTo(dataList[selectedDataIndex].dataObject);
+      $('#dataInfoModal').modal('hide');
+    }
+
+    function removeData() {
+      viewer.dataSources.remove(dataList[selectedDataIndex].dataObject);
+      dataList.splice(selectedDataIndex, 1);
+      updateDataLayers(dataList);
+      $('#dataInfoModal').modal('hide');
+    }
+  </script>
+</body>
+
+</html>

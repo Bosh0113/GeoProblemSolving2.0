@@ -1,0 +1,60 @@
+.dialog{
+    min-width: 300px;
+}
+
+
+.right-button{
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+.left-words{
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.btn_width_90{
+    width: 90px;
+}
+
+.btn_width_60{
+    width: 60px;
+}
+
+.height-50{
+    height: 50px;
+}
+
+.height-40{
+    height: 40px;
+}
+
+
+.pl-48{
+    padding-left: 48px;
+}
+
+.pl-24{
+    padding-left: 24px;
+}
+
+.pt-15{
+    padding-top:15px;
+}
+.pt-10{
+    padding-top:10px;
+}
+.pt-5{
+    padding-top:5px;
+}
+
+.input-num{
+    width: 42px;
+}
+
+.short-bar{
+    height: 40px;
+    display: table-cell;
+    line-height: 40px;
+}
+
+ 

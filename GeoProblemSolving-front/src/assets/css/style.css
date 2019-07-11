@@ -1,0 +1,11 @@
+html {
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+  body{
+      min-height: 675px;
+      min-width: 1200px;
+      width: 100vw;
+      overflow: hidden;
+      padding-left: calc(100vw - 110%);
+  }

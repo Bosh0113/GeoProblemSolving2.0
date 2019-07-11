@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Example-static</title>
+    <meta http-equiv="Content-Type" content=" charset=UTF-8"/>
+    <script src="https://cdn.bootcss.com/vue/2.6.10/vue.min.js"></script>
+    <link href="https://cdn.bootcss.com/iview/3.4.2/styles/iview.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/iview/3.4.2/iview.min.js"></script>
+    <style>
+    .gender {
+        margin: 15px 0px;
+    }
+</style>
+    <template id="navigation">
+    <div>
+        <Tag color="primary">{{user.userName}}</Tag>
+        <Tag color="warning">{{user.email}}</Tag>
+        <p class="gender">{{user.gender}}</p>
+    </div>
+</template>
+    <script>
+    Vue.component('child-navigation', {
+        template: '#navigation',
+        props: ["user"],
+        data() {
+            return {}
+        }
+    })
+</script>
+</head>
+<body>
+<div id="exampleBody">
+    <child-navigation :user=User></child-navigation>
+    <h1>zbc</h1>
+    <h1>{{this.User.userName}}</h1>
+    <i-input v-model="User.userName" placeholder="Enter user's name..." style="width: 300px"/>
+</div>
+<script>
+    new Vue(
+        {
+            el: "#exampleBody",
+            data: {
+                User: {"userId":"17d49129-84b9-4795-8a78-5121d5ce0508","userName":"zbc","email":"zbc0113@163.com","password":"000000","mobilePhone":"13914797650","gender":"male","jobTitle":"Student","country":"China","city":"NanJing","organization":"NNU","joinedProjects":[{"title":"Test2","projectId":"4f8c1e15-5f7c-4a2a-ad66-c913ccd5648f"}],"manageProjects":[{"title":"Test3","projectId":"b5b957e0-63c3-4074-93b3-40fd4749230a"}],"introduction":"string","direction":"GIS","homePage":"","avatar":""}
+            },
+            created() {
+                console.log(this.User.userName);
+            }
+        }
+    )
+</script>
+</body>
+</html>

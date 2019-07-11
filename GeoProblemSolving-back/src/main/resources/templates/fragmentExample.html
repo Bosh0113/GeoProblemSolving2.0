@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <meta http-equiv="Content-Type" content=" charset=UTF-8"/>
+    <script src="https://cdn.bootcss.com/vue/2.6.10/vue.min.js"></script>
+    <link href="https://cdn.bootcss.com/iview/3.4.2/styles/iview.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/iview/3.4.2/iview.min.js"></script>
+</head>
+<body>
+<style th:fragment="navigation-css">
+    .gender {
+        margin: 15px 0px;
+    }
+</style>
+<template id="navigation" th:fragment="navigation-html">
+    <div>
+        <Tag color="primary">{{user.userName}}</Tag>
+        <Tag color="warning">{{user.email}}</Tag>
+        <p class="gender">{{user.gender}}</p>
+    </div>
+</template>
+<script th:fragment="navigation-js">
+    Vue.component('child-navigation', {
+        template: '#navigation',
+        props: ["user"],
+        data() {
+            return {}
+        }
+    })
+</script>
+</body>
+</html>
