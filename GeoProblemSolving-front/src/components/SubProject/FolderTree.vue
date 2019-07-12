@@ -431,28 +431,29 @@ export default {
       }
     },
     getSubProjectfileStruct() {
-      this.axios
-        .get(
-          "/GeoProblemSolving/subProject/getFileStrcut" +
-            "?subProjectId=" +
-            this.subProjectId
-        )
-        .then(res => {
-          if (res.data == "Offline") {
-            this.$store.commit("userLogout");
-            this.$router.push({ name: "Login" });
-          } else if (res.data != "Fail") {
-            var fileStruct = res.data;
-            this.subProjectFileStruct = fileStruct;
-            this.currentFolder = fileStruct;
-            this.enterFolder(this.currentFolder);
-          } else {
-            this.$Message.warning("Get sub-project's info fail.");
-          }
-        })
-        .catch(err => {
-          this.$Message.warning("Get sub-project's info fail.");
-        });
+      // ！！！！！！！！！！！！！！！！！！！！！！！！！！Beichen 留坑！！！！！！！！！！！！！！！！！！！！！！
+      // this.axios
+      //   .get(
+      //     "/GeoProblemSolving/subProject/getFileStrcut" +
+      //       "?subProjectId=" +
+      //       this.subProjectId
+      //   )
+      //   .then(res => {
+      //     if (res.data == "Offline") {
+      //       this.$store.commit("userLogout");
+      //       this.$router.push({ name: "Login" });
+      //     } else if (res.data != "Fail") {
+      //       var fileStruct = res.data;
+      //       this.subProjectFileStruct = fileStruct;
+      //       this.currentFolder = fileStruct;
+      //       this.enterFolder(this.currentFolder);
+      //     } else {
+      //       this.$Message.warning("Get subproject's info fail.");
+      //     }
+      //   })
+      //   .catch(err => {
+      //     this.$Message.warning("Get subproject's info fail.");
+      //   });
     },
     enterFolder(folder) {
       this.chooseFilesArray = [];
