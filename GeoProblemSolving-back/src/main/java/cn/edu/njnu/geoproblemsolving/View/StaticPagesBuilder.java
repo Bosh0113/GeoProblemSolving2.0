@@ -79,4 +79,31 @@ public class StaticPagesBuilder {
             System.out.println("personal page has been build success.");
         }catch (Exception ignored){}
     }
+
+    public void projectDetailPageBuilder(String projectId){
+            ClassLoaderTemplateResolver resolver = new ClassLoaderTemplateResolver();
+            resolver.setPrefix("templates/");//模板所在目录，相对于当前classloader的classpath。
+            resolver.setSuffix(".html");//模板文件后缀
+            TemplateEngine templateEngine = new TemplateEngine();
+            templateEngine.setTemplateResolver(resolver);
+
+            Context context = new Context();
+            Query queryProjectInfo = new Query(Criteria.where("projectId").is(projectId));
+            ProjectEntity projectEntity = mongoTemplate.findOne(queryProjectInfo,ProjectEntity.class);
+            context.setVariable("projectInfo",projectEntity);
+            context.setVariable("activeName","projects");
+
+            //渲染模板
+            String servicePath = System.getProperty("user.dir")+"\\src\\main\\webapp";
+            String htmlPath = servicePath+"\\project";
+            File temp = new File(htmlPath);
+            if (!temp.exists()) {
+                temp.mkdirs();
+            }
+            String htmlFile = htmlPath+"\\"+projectId+".html";
+            try{
+                FileWriter write = new FileWriter(htmlFile);
+                templateEngine.process("projectDetail", context, write);
+            }catch (Exception ignored){}
+    }
 }

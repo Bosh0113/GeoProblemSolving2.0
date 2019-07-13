@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Geo-ProblemSolving</title>
+    <meta http-equiv="Content-Type" content=" charset=UTF-8"/>
+    <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/vue/2.6.10/vue.min.js"></script>
+    <link href="https://cdn.bootcss.com/iview/3.4.2/styles/iview.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/iview/3.4.2/iview.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-avatar@2.1.7/dist/vue-avatar.min.js"></script>
+    <script th:replace="navigation::commonHeader-css"></script>
+    <script th:replace="navigation::commonHeader-html"></script>
+    <script th:replace="navigation::commonHeader-js"></script>
+    <style>
+        [v-cloak] {
+            display: none;
+        }
+    </style>
+    <style>
+        #projectDetailPage {
+            min-width: 1100px;
+        }
+
+        .projectMenuItem {
+            margin: 0px 0px 10px 0px;
+        }
+
+        .projectMenuItemTitle {
+            display: inline-block;
+            color: #2d8cf099;
+        }
+
+        .ivu-card-body {
+            display: flex;
+            flex-flow: column;
+            flex: 1;
+        }
+
+        .flex1 {
+            display: flex;
+            flex-flow: column;
+            flex: 1;
+        }
+
+        .projectDescriptionContent {
+            height: 160px;
+            overflow-y: auto;
+            text-indent: 2em;
+            padding: 0 5px;
+            word-break: break-word;
+        }
+        .projectIntroductionContent{
+            height: 180px;
+            overflow-y: auto;
+            text-indent: 2em;
+            padding: 0 5px;
+            word-break: break-word;
+        }
+    </style>
+</head>
+
+<body>
+<div id="projectDetailPage" v-cloak>
+    <child-navigation ref="navigationEl"></child-navigation>
+    <template>
+        <div :style="{height: contentPage}">
+            <div span="2" style="height: inherit;width: 90px;position: absolute;">
+                <i-menu active-name="projectDetail" @on-select="changeMenuItem" style="height: inherit;width: fit-content;">
+                    <menu-item name="projectDetail" class="projectMenuItem">
+                        <Icon type="ios-information-circle" title="Project detail" size="35"></Icon>
+                    </menu-item>
+                    <menu-item name="subProjects" class="projectMenuItem">
+                        <Icon type="md-git-branch" title="Subprojects" size="35"></Icon>
+                    </menu-item>
+                    <menu-item name="resources" class="projectMenuItem">
+                        <Icon type="ios-folder" title="Resources" size="35"></Icon>
+                    </menu-item>
+                </i-menu>
+            </div>
+            <div style="margin-left: 90px;height: inherit;min-height: fit-content;">
+                <div v-if="showMenuItem=='projectDetail'" style="height: inherit;min-height: fit-content;">
+                    <div style="background:#eee;padding: 20px;height: inherit;min-height: fit-content;">
+                        <Card :bordered="false" dis-hover style="height: -webkit-fill-available;display: flex;flex-flow: column;min-height: fit-content;">
+                            <div slot="title">
+                                <h1 class="projectMenuItemTitle">Project: </h1>
+                                <h1 style="display: inline-block;">{{projectInfo.title}}</h1>
+                            </div>
+                            <div class="flex1" style="min-height: fit-content;">
+                                <Row gutter="25" style="flex: 1;display: flex;flex-flow: initial">
+                                    <i-col span="16" style="display: flex;flex-flow: column">
+                                        <div style="border: solid 1px #eeeeee;flex: 1;padding: 20px;flex-flow: column;display: flex;">
+                                            <Row gutter="15" style="height: 200px;">
+                                                <i-col span="8">
+                                                    <div style="width: 200px;height: 200px;">
+                                                        <img :src="projectInfo.picture" style="height: inherit;width: inherit;" v-if="projectInfo.picture!=''&&projectInfo.picture!=undefined"
+                                                        />
+                                                        <avatar :username="projectInfo.title" :size="200" :title="projectInfo.title" :rounded="false" v-else></avatar>
+                                                    </div>
+                                                </i-col>
+                                                <i-col span="16">
+                                                    <div style="height: -webkit-fill-available;padding: 5px;">
+                                                        <h3>Description:</h3>
+                                                        <div class="projectDescriptionContent">{{projectInfo.description}}</div>
+                                                    </div>
+                                                </i-col>
+                                            </Row>
+                                            <div class="flex1" style="margin-top: 10px;">
+                                                <div style="flex: 1;min-height: 200px;padding: 5px;">
+                                                    <h3>Introduction:</h3>
+                                                    <div class="projectIntroductionContent">
+                                                        {{projectInfo.introduction}}
+                                                    </div>
+                                                </div>
+                                                <div style="min-height: 80px;max-height: 100px;border: solid 1px goldenrod;">
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </i-col>
+                                    <i-col span="8" style="display: flex;flex-flow: column">
+                                        <div style="border: solid 1px #eeeeee;flex: 1">
+                                            <h1>Content2</h1>
+                                        </div>
+                                    </i-col>
+                                </Row>
+                            </div>
+                        </Card>
+                    </div>
+                </div>
+                <div v-else-if="showMenuItem=='subProjects'" style="height: inherit;min-height: fit-content;">
+                    <div style="background:#eee;padding: 20px;height: inherit;">
+                        <Card :bordered="false" style="height: -webkit-fill-available;">
+                            <h1 slot="title" class="projectMenuItemTitle">Subprojects</h1>
+                            <div>
+                                Content
+                            </div>
+                        </Card>
+                    </div>
+                </div>
+                <div v-else-if="showMenuItem=='resources'" style="height: inherit;min-height: fit-content;">
+                    <div style="background:#eee;padding: 20px;height: inherit;">
+                        <Card :bordered="false" style="height: -webkit-fill-available;">
+                            <h1 slot="title" class="projectMenuItemTitle">Resources</h1>
+                            <div>
+                                Content
+                            </div>
+                        </Card>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+</div>
+<script>
+    var projectInfo = { "projectId": "b5b957e0-63c3-4074-93b3-40fd4749230a", "title": "Test3", "description": "string", "category": "General", "managerId": "17d49129-84b9-4795-8a78-5121d5ce0508", "managerName": "zbc", "introduction": "string", "members": [], "privacy": "Public", "tag": "", "picture": "", "createTime": "2019\/07\/05 17:14:58", "endTime": "" };
+</script>
+<script>
+    new Vue(
+        {
+            el: "#projectDetailPage",
+            components: {
+                'avatar': VueAvatar.Avatar
+            },
+            mounted() {
+                window.onresize = () => {
+                    return (() => {
+                        this.contentPage = window.innerHeight - 60 + 'px';
+                    })()
+                }
+            },
+            data() {
+                return {
+                    projectInfo: projectInfo,
+                    showMenuItem: "projectDetail",
+                    contentPage: window.innerHeight - 60 + 'px',
+                }
+            },
+            methods: {
+                sendNotice(recipientId) {
+                    this.$refs.navigationEl.sendMessage(recipientId);
+                },
+                changeMenuItem(name) {
+                    this.showMenuItem = name;
+                }
+            }
+        }
+    )
+</script>
+</body>
+</html>

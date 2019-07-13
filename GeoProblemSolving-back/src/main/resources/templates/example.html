@@ -10,6 +10,11 @@
     <script th:replace="fragmentExample::navigation-css"></script>
     <script th:replace="fragmentExample::navigation-html"></script>
     <script th:replace="fragmentExample::navigation-js"></script>
+    <style>
+        [v-cloak]{
+            display: none;
+        }
+    </style>
 </head>
 <body>
 <div id="exampleBody">
@@ -17,7 +22,7 @@
     <h1>{{this.User.userName}}</h1>
     <i-input v-model="User.userName" placeholder="Enter user's name..." style="width: 300px"/>
 </div>
-<script th:inline="javascript">
+<script th:inline="javascript"  v-cloak>
     var userInfo = [[${user}]];
     new Vue(
         {

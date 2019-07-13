@@ -23,7 +23,7 @@ public class ExampleStatic {
     @Autowired
     public ExampleStatic(MongoTemplate mongoTemplate){this.mongoTemplate = mongoTemplate;}
 
-    public void buildStaticHTML(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void buildStaticHTML(HttpServletResponse response) throws IOException {
         ServletOutputStream writer = response.getOutputStream();
         try {
             ClassLoaderTemplateResolver resolver = new ClassLoaderTemplateResolver();
@@ -38,7 +38,7 @@ public class ExampleStatic {
             context.setVariable("user", user);
 
             //渲染模板
-            String servicePath = request.getSession().getServletContext().getRealPath("/");
+            String servicePath = System.getProperty("user.dir")+"\\src\\main\\webapp";
             String htmlPath = servicePath+"/example";
             File temp = new File(htmlPath);
             if (!temp.exists()) {
