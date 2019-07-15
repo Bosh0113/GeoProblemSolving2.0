@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="https://www.thymeleaf.org">
+<html lang="en" xmlns:th="https://www.thymeleaf.org" xmlns:v-bind="http://www.w3.org/1999/xhtml">
 
 <head>
     <meta charset="UTF-8">
@@ -362,7 +362,7 @@
                                                 <i-col :lg="{span:11, offset:1}" :md="{span:22, offset:1}">
                                                     <div class="participatoryProjectCard" @click="goSingleProject(item.projectId)">
                                                         <Card style="height:320px;margin-top:20px;">
-                                                            <p slot="title" style="height:40x" class="projectsTitle">{{item.title}}</p>
+                                                            <p slot="title" style="height:40px" class="projectsTitle">{{item.title}}</p>
                                                             <i-button slot="extra" @click.stop="quitModalShow(item)">Quit</i-button>
                                                             <p style="height:200px;text-indent:2em;overflow-y:auto;word-break:break-word">{{item.introduction}}</p>
                                                             <br>
