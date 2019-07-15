@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head >
+    <header th:replace="common/head::commonHeader"></header>
+    <meta charset="UTF-8">
+    <title>Demo</title>
+    <script src="https://cdn.bootcss.com/vue/2.5.16/vue.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <!-- import stylesheet -->
+    <link href="https://cdn.bootcss.com/iview/2.14.0/styles/iview.css" rel="stylesheet">
+    <!-- import iView -->
+    <script src="https://cdn.bootcss.com/iview/2.14.0/iview.min.js"></script>
+    <script src="https://unpkg.com/ionicons@4.5.10-1/dist/ionicons.js"></script>
+    <link href="https://unpkg.com/ionicons@4.5.10-1/dist/css/ionicons.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/vue-avatar@2.1.7/dist/vue-avatar.min.js"></script>
+
+    <style scoped th:fragment="tab-style">
+        img {
+            width: 100%;
+            height: auto;
+        }
+        .projectTitle {
+            height: 16px;
+            line-height: 15px;
+            font-size: 16px;
+            max-width: 150px;
+            padding-left: 5px;
+            display: inline-block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .cardicon{
+            height:15px;
+            align-items:center;
+            display:flex;
+            justify-content:flex-start;
+            margin-top:10px
+        }
+        /*Modal*/
+
+        .ivu-modal-header{
+            padding: 15px 20px  0px 20px;
+            border-bottom: 0px solid #e9eaec; //下划线
+        }
+        .ivu-modal-header-inner{
+            font-size: 16px;
+        }
+
+
+        .btnCreate:hover,
+        .joinProjectBtn:hover {
+            background-color: #19be6b;
+            color: white;
+        }
+    </style>
+
+</head>
+<body>
+    <template id="tabContent" th:fragment="tab-card">
+        <div>
+        <div v-if="projectList.length > 0">
+            <div class="projectCard" v-for="(item,index) in projectList" :key="item.index"  style="width:95%;margin-right:5%"  >
+                <i-col :xs="{ span: 21, offset: 1 }"
+                       :md="{ span:5, offset: 1 }"
+                       :lg="{ span: 3, offset: 1}">
+                    <div @click="projectInfoModalShow(item)" style="cursor:pointer">
+                        <Card style="height:auto;margin:15px -15px">
+                            <!-- title-->
+                            <span slot="title" class="projectTitle" :title="item.title">{{item.title}}</span>
+
+                            <!-- 右上角的button-->
+                            <div class="operate" slot="extra" style="display:flex;align-items:center">
+                                <Icon type="icon ion-md-eye" :size="20" title="Public project"  v-show="!(item.isManager||item.isMember) && (item.privacy=='Public')" ></Icon>
+                                <Icon type="icon ion-md-lock" :size="20" title="Discoverable project"  v-show="!(item.isManager||item.isMember) && (item.privacy=='Discoverable')" ></Icon>
+                                <br/>
+                                <Icon type="md-person" :size="20" title="Managed or joined project" v-show="item.isMember||item.isManager" :id="item.projectId" ></Icon>
+                            </div>
+                            <!--  description-->
+                            <div style="display:flex;align-items:center;height:20px">
+                                <strong style="text-align: center">Description</strong>
+                                <p style="padding: 0 10px;word-break:break-word;overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 400px;" :title="item.description" >
+                                    {{item.description}}
+                                </p>
+                            </div>
+                            <!--  avatar-->
+                            <div style="height:200px;display:flex;justify-content:center;margin-top:10px">
+                                <img :src="item.picture" v-if="item.picture!=''&&item.picture!='undefined'" />
+                                <avatar :username="item.title" :size="200"  :title="item.title" :rounded="false"  v-else >  </avatar>
+                            </div>
+                            <!--managername -->
+                            <div  class="cardicon"  >
+                                <Icon type="icon ion-md-body" :size="15" Manager></Icon>
+                                <span style="height:20px;margin-left:5%">
+                                <strong>{{item.managerName}}</strong>
+                            </span>
+                            </div>
+                            <!--time-->
+                            <div class="cardicon" >
+                                <Icon type="icon ion-md-clock" :size="15" Time></Icon>
+                                <span style="height:20px;margin-left:5%">
+                                <strong>{{item.createTime.split(' ')[0]}}</strong>
+                            </span>
+                            </div>
+                            <!--tag -->
+                            <div class="cardicon" >
+                                <Icon type="icon ion-md-pricetags" :size="15" Tags></Icon>
+                                <strong style=" margin-left:5%; display: inline-block; overflow: hidden;  white-space: nowrap; text-overflow: ellipsis;" >
+                                    {{item.tag}}
+                                </strong>
+                            </div>
+                        </Card>
+                    </div>
+                </i-col>
+            </div>
+        </div>
+        <div v-else>
+            <i-col span="22" offset="1">
+                <Card :bordered="false" style="min-height: 500px">
+                    <div style="display:flex;justify-content:center">
+                        <Icon type="icon ion-md-alert" size="40" color="gray" ></Icon>
+                    </div>
+                    <br />
+                    <div style="display:flex;justify-content:center">
+                        <h2 style="text-align:center;width:50%">No more projects in this category.</h2>
+                    </div>
+                    <br />
+                    <div style="display:flex;justify-content:center">
+                        <h4 style="text-align:center;width:50%;color:lightblue">
+                            You can click the button right top to add a new project.
+                            <br />Enriching your description of the project and attracting more people to join in.
+                        </h4>
+                    </div>
+                </Card>
+            </i-col>
+        </div>
+
+        <Modal v-model="projectInfoModal" title="Project information"  width="700px" class="projectInfoModal">
+            <i-table stripe border :columns="columns" :data="projectInfoShow" :show-header="false"  ></i-table>
+            <div slot="footer">
+                <Alert  show-icon  style="float: left;width: fit-content;display: inline-block;"  v-show="!UserState">
+                    If you want to participate in the project, please login.
+                </Alert>
+                <i-button v-show="!UserState" type="success" @click="login">Log in</i-button>
+                <i-button
+                        v-show="!selectedProjectInfo.isMember&&!selectedProjectInfo.isManager && UserState && selectedProjectInfo.privacy=='Public'"
+                        type="success"
+                        title="Enter project directly"
+                        @click="enterProject(selectedProjectInfo)"
+                >Enter</i-button>
+                <i-button
+                        type="success"
+                        @click="joinApplyModalShow(selectedProjectInfo)"
+                        v-show="!selectedProjectInfo.isMember&&!selectedProjectInfo.isManager&&UserState"
+                        title="Apply to join the project"
+                >Apply</i-button>
+            </div>
+        </Modal>
+
+        <Modal v-model="applyJoinModal" title="Apply to join the project">
+            <i-form ref="applyValidate" :model="applyValidate" :rules="applyRuleValidate" :label-width="80">
+                <form-item label="Reason" prop="reason">
+                    <i-input
+                            v-model="applyValidate.reason"
+                            type="textarea"
+                            :rows="4"
+                            placeholder="Enter The Reason For Application ..."
+                    ></i-input>
+                </form-item>
+            </i-form>
+            <div slot="footer">
+                <i-button @click="applyJoinModal=false">Cancel</i-button>
+                <i-button type="success" @click="joinApply('applyValidate')">Apply</i-button>
+            </div>
+        </Modal>
+        </div>
+    </template>
+
+
+<script th:fragment="tab-component" th:inline="javascript">
+
+    Vue.component('tab-content',{
+        template:'#tabContent',
+        props: ["projectList"],
+        components:{
+            'avatar':VueAvatar.Avatar
+        },
+        data(){
+            return{
+                selectedProjectInfo: {},
+                projectInfoModal: false,//modal模态框
+                columns: [
+                    { title: "Key", key: "key", width: "150px" },
+                    { title: "Value", key: "value" , width: "618px"}
+                ],
+                projectInfoShow: [],
+                //加入项目
+                applyProjectInfo: {},
+                applyValidate: {
+                    reason: ""
+                },
+                applyRuleValidate: {
+                    reason: [
+                        { required: true, message: "Please enter the reason for application", trigger: "blur" },
+                        { type: "string", min: 5, message: "The reason no less than 10 characters", trigger: "blur" }
+                    ]
+                },
+                applyJoinModal: false,
+                // 记录已经申请的情况
+                haveApplied: false,
+                // 申请加入项目的模态框
+                applyJoinModal: false,
+                // // 申请加入公共项目的模态框
+                // publicApplyAssureModal: false
+            }
+        },
+
+        methods:{
+            projectInfoModalShow(projectInfo) {
+                if (projectInfo.isMember || projectInfo.isManager) {
+                    // this.$router.push({ path: `project/${projectInfo.projectId}` });
+                    window.location.href="/GeoProblemSolving/Projects/${projectInfo.projectId}"
+                } else {
+                    this.selectedProjectInfo = Object.assign({}, projectInfo);
+                    var category = "";
+                    if (projectInfo.category != "Human" &&  projectInfo.category != "GISRS"){category = projectInfo.category;}
+                    else if (projectInfo.category == "Human"){category = "Human-Activity";}
+                    else if (projectInfo.category == "GISRS"){category = "GIS & RS";}
+
+                    var membersName = "";
+                    var members = projectInfo.members;
+                    for (var i = 0; i < members.length; i++) {
+                        if (i == 0) {
+                            membersName = members[i].userName;
+                        } else {
+                            membersName = membersName + "," + members[i].userName;
+                        }
+                    }
+                    this.projectInfoShow = [
+                        {
+                            key: "Category",
+                            value: category
+                        },
+                        {
+                            key: "Title",
+                            value: projectInfo.title
+                        },
+                        {
+                            key: "Description",
+                            value: projectInfo.description
+                        },
+                        {
+                            key: "Introduction",
+                            value: projectInfo.introduction
+                        },
+                        {
+                            key: "Tag",
+                            value: projectInfo.tag
+                        },
+                        {
+                            key: "Manager",
+                            value: projectInfo.managerName
+                        },
+                        {
+                            key: "Members",
+                            value: membersName
+                        },
+                        {
+                            key: "Created Time",
+                            value: projectInfo.createTime
+                        }
+                    ];
+
+                    this.projectInfoModal = true;
+                }
+            },
+
+            login() {
+                window.location.href="/GeoProblemSolving/Login"
+            },
+
+            enterProject(projectInfo) {
+                window.location.href="/GeoProblemSolving/Projects/${projectInfo.projectId}"
+            },
+
+        }
+    });
+
+
+
+
+</script>
+
+</body>
+</html>
