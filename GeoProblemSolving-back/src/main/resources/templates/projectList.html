@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head >
+<!--    <header th:replace="navigation::commonHeader"></header>-->
+    <meta charset="UTF-8">
+    <title>Demo</title>
+    <!-- import Vue.js -->
+<!--    <script src="https://cdn.bootcss.com/vue/2.5.16/vue.min.js"></script>-->
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <!-- import stylesheet -->
+    <link href="https://cdn.bootcss.com/iview/2.14.0/styles/iview.css" rel="stylesheet">
+    <!-- import iView -->
+    <script src="https://cdn.bootcss.com/iview/2.14.0/iview.min.js"></script>
+    <script type="module" src="https://unpkg.com/ionicons@4.5.10-1/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule="" src="https://unpkg.com/ionicons@4.5.10-1/dist/ionicons/ionicons.js"></script>
+    <link href="https://unpkg.com/ionicons@4.5.10-1/dist/css/ionicons.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/vue-avatar@2.1.7/dist/vue-avatar.min.js"></script>
+
+    <script th:replace="TabContent :: tab-card"></script>
+
+    <style th:replace="TabContent :: tab-style"></style>
+    <style >
+        .picscreen {
+            position: relative;
+            transform: translateY(60px);
+        }
+
+        .picbg {
+            background-image: url("../static/images/b1.jpg");
+            background-size: cover;
+            position: absolute;
+            height: 280px;
+            width: 100%;
+            background-color: #8b8b8b;
+            top: 0;
+            left: 0;
+        }
+
+        .pictitle{
+            font-size: 2.8rem;
+            font-family: Georgia, sans-serif, serif;
+            color: #ffffff;
+            position: absolute;
+            top: 30px;
+            left: 100px;
+        }
+        .picdesc{
+            font-size: 1.2rem;
+            color: #f7faf7;
+            position: absolute;
+            top: 105px;
+            left: 100px;
+            display: block;
+        }
+        .project-start-btn{
+            position: absolute;
+            top: 200px;
+            left: 55%;
+            font-size: 1rem;
+            border-radius: 6px;
+            background-color: rgba(21, 88, 145, 0.4);
+            color: rgba(255,255,255,1);
+        }
+
+        .search-btn{
+            position: absolute;
+            top: 30px;
+            right: 50px;
+            font-size: 0.5rem;
+            width: 100px;
+            text-align:right;
+        }
+
+        /*Tabs--style*/
+        .tabs{
+            transform: translateY(340px);
+        }
+        .tabpane-syle{
+            font-size: 20px;
+            background-color: rgba(133, 115, 92, 0.1);
+            min-height: 500px;
+        }
+        .ivu-tabs-bar {
+            /*border-bottom: 1px solid #dddee1;*/
+            margin-bottom: 0px;
+        }
+        .ivu-tabs-nav-wrap {
+            text-align: center;
+            margin-bottom: 0;
+        }
+        .ivu-tabs-nav-scroll {
+            display: inline-block;
+        }
+        .ivu-tabs-tab{
+            font-size: 16px;
+        }
+
+
+
+        /* Loading动画的特效 */
+        .demo-spin-icon-load {
+            animation: ani-demo-spin 1s linear infinite;
+        }
+
+
+
+    </style>
+</head>
+<body>
+
+<div id="home">
+
+    <div class="picscreen" >
+        <div class="picbg"></div>
+        <div class="home-content">
+            <div>
+                <span class="pictitle">Projects</span>
+                <span class="picdesc">This is just an description.This is just an <br />description.This is just an description.This is just an description.</span>
+                <i-button class="project-start-btn" @click="newProject"  type="default" >Create a project</i-button>
+                <i-button class="search-btn" icon="icon ion-ios-search" @click=" ">Search...</i-button>
+            </div>
+        </div>
+    </div>
+    <!--    标签栏-->
+    <div class="tabs">
+        <Row>
+            <i-col>
+                <!-- loading-->
+                <Spin fix v-show="getFinish">
+                    <Icon type="icon ion-ios-loading" size="100" class="demo-spin-icon-load" color="yellowgreen"></Icon>
+                    <div>Loading</div>
+                </Spin>
+
+                <div class="pro-tab">
+                    <Tabs value="All" @on-click="filterProjects" >
+                        <tab-pane v-for="(type,index) in tabPaneType" :label="type.label" :name="type.name" :icon="type.icon"class="tabpane-syle">
+                            <tab-content  :project-list = projectShowList  @sendNotice="sendMessage" ></tab-content >
+                        </tab-pane>
+                    </Tabs>
+                </div>
+            </i-col>
+        </Row>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    window.onload=function () {
+        var List = [[${projects}]];
+        console.log(List);
+        new Vue({
+            el: '#home',
+            data: {
+                getFinish: false,
+                currentProjectList:  List,
+                projectShowList: List,
+                projectType:[],
+                currentTab:"All",
+                tabPaneType:[{  label:"All",name:"All",icon:"icon ion-md-list"},
+                    { label:"Terrestrial", name:"Terrestrial", icon:"icon ion-md-globe"},
+                    {label:"Coastal", name:"Coastal",icon:"icon ion-ios-boat"},
+                    {label:"Marine", name:"Marine", icon:"icon ion-ios-water"},
+                    {label:"Climate", name:"Climate", icon:"icon ion-ios-partly-sunny"},
+                    {label:"Ecological", name:"Ecological", icon:"icon ion-ios-leaf"},
+                    {label:"Geological", name:"Geological", icon:"icon ion-ios-analytics"},
+                    {label:"Human-Activity", name:"Human" ,icon:"icon ion-ios-people"},
+                    {label:"GIS & RS", name:"GISRS" ,icon:"icon ion-ios-globe"},
+                    {label:"General", name:"General", icon:"icon ion-ios-grid"}
+                 ]
+            },
+            methods: {
+                filterProjects(type) {
+                    var allProjectList = Object.assign([], this.currentProjectList);
+                    if (type != "All") {
+                        this.projectShowList = allProjectList.filter(function (project) {
+                            if (project.category == type) {
+                                return project;
+                            }
+                        });
+
+                    } else {
+                        this.projectShowList = allProjectList;
+                    }
+                    console.log(projectShowList);
+                },
+                newProject() {
+                    // if (!this.$store.getters.userState) {
+                    //     this.$router.push({ name: "Login" });
+                    // } else {
+                    //     this.$router.push({ name: "NewProject" });
+                    // }
+                },
+
+            }
+        })
+    }
+</script>
+
+<script th:replace="TabContent :: tab-component"  th:inline="javascript"></script>
+
+</body>
+</html>
