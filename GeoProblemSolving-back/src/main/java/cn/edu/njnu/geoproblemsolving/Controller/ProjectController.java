@@ -116,4 +116,10 @@ public class ProjectController {
         ProjectDaoImpl projectDao = new ProjectDaoImpl(mongoTemplate);
         return projectDao.uploadPicture(request);
     }
+
+    @RequestMapping(value = "/inquiryByPage", method = RequestMethod.GET)
+    public Object inquiryByPage(@RequestParam("category") String category, @RequestParam("page") int page, @RequestParam("pageSize") int pageSize){
+        ProjectDaoImpl projectDao = new ProjectDaoImpl(mongoTemplate);
+        return projectDao.inquiryByPage(category,page,pageSize);
+    }
 }
