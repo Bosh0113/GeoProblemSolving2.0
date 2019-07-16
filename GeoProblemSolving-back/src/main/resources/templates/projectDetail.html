@@ -57,14 +57,36 @@
             padding: 0 5px;
             word-break: break-word;
         }
+        .statistics{
+            width: 40%;
+            height: -webkit-fill-available;
+            display: inline-block;
+        }
+        .showCount{
+            font-size: 30px;
+            vertical-align: middle;
+            margin-left: 15px;
+        }
+        .changeEditColor:hover{
+            background-color: #2db7f5;
+            color: white;
+        }
+        .changeRemoveColor:hover{
+            background-color: #ed4014;
+            color: white;
+        }
+        .changeInviteColor:hover{
+            background-color: #19be6b;
+            color: white;
+        }
     </style>
 </head>
 
 <body>
-<div id="projectDetailPage" v-cloak>
+<div id="projectDetailPage"  v-cloak>
     <child-navigation ref="navigationEl"></child-navigation>
     <template>
-        <div :style="{height: contentPage}">
+        <div :style="{height: contentPageCSS}">
             <div span="2" style="height: inherit;width: 90px;position: absolute;">
                 <i-menu active-name="projectDetail" @on-select="changeMenuItem" style="height: inherit;width: fit-content;">
                     <menu-item name="projectDetail" class="projectMenuItem">
@@ -85,6 +107,18 @@
                             <div slot="title">
                                 <h1 class="projectMenuItemTitle">Project: </h1>
                                 <h1 style="display: inline-block;">{{projectInfo.title}}</h1>
+                            </div>
+                            <div slot="extra">
+                                <Poptip trigger="hover" content="Edit project information" placement="left">
+                                    <i-button style="margin: 0 5px;" class="changeEditColor">
+                                        <Icon type="ios-create" :size="20"></Icon>
+                                    </i-button>
+                                </Poptip>
+                                <Poptip trigger="hover" content="Remove project" placement="left">
+                                    <i-button style="margin: 0 5px;" class="changeRemoveColor">
+                                        <Icon type="md-close" :size="20"></Icon>
+                                    </i-button>
+                                </Poptip>
                             </div>
                             <div class="flex1" style="min-height: fit-content;">
                                 <Row gutter="25" style="flex: 1;display: flex;flex-flow: initial">
@@ -112,15 +146,60 @@
                                                         {{projectInfo.introduction}}
                                                     </div>
                                                 </div>
-                                                <div style="min-height: 80px;max-height: 100px;border: solid 1px goldenrod;">
-
+                                                <div style="min-height: 80px;max-height: 100px;text-align: center;">
+                                                    <div class="statistics">
+                                                        <div style="text-align: left;padding: 5px;">
+                                                            <p><strong>Privacy:</strong> {{projectInfo.privacy}}</p>
+                                                            <p><strong>Tag:</strong> {{projectInfo.tag}}</p>
+                                                            <p><strong>Manager:</strong> {{projectInfo.managerName}}</p>
+                                                            <p><strong>Create time:</strong> {{projectInfo.createTime}}</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="statistics">
+                                                        <div>
+                                                            <Icon type="md-git-branch" size="30"></Icon>
+                                                            <span class="showCount">3</span>
+                                                        </div>
+                                                        <div>
+                                                            <Icon type="md-contacts" size="30"></Icon>
+                                                            <span class="showCount">5</span>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </i-col>
                                     <i-col span="8" style="display: flex;flex-flow: column">
-                                        <div style="border: solid 1px #eeeeee;flex: 1">
-                                            <h1>Content2</h1>
+                                        <div style="border: solid 1px #eeeeee;" class="flex1">
+                                            <Card :bordered="false" dis-hover  >
+                                                <div slot="title">
+                                                    <h1>Participants</h1>
+                                                </div>
+                                                <div slot="extra">
+                                                    <Poptip trigger="hover" content="Invite members" placement="left">
+                                                        <i-button class="changeInviteColor">
+                                                            <Icon type="md-person-add" :size="20"></Icon>
+                                                        </i-button>
+                                                    </Poptip>
+                                                    <Poptip trigger="hover" content="Remove members" placement="left">
+                                                        <i-button style="margin: 0 0 0 5px;" class="changeRemoveColor">
+                                                            <Icon type="md-remove-circle" :size="20"></Icon>
+                                                        </i-button>
+                                                    </Poptip>
+                                                </div>
+                                                <div :style="{height: membersContentCSS}" style="overflow-y:auto;">
+                                                    <Card  style="background-color: #dcdee2;border-color: #c5c8ce">
+                                                        <div title="Manager">
+                                                            <h2 style="color: white">{{projectInfo.managerName}}</h2>
+                                                        </div>
+                                                    </Card>
+                                                    <Card  v-for="members in projectInfo.members" style="margin-top: 5px">
+                                                        <div title="Member">
+                                                            <h2>{{members.userName}}</h2>
+                                                        </div>
+                                                    </Card>
+                                                </div>
+                                            </Card>
                                         </div>
                                     </i-col>
                                 </Row>
@@ -129,7 +208,7 @@
                     </div>
                 </div>
                 <div v-else-if="showMenuItem=='subProjects'" style="height: inherit;min-height: fit-content;">
-                    <div style="background:#eee;padding: 20px;height: inherit;">
+                    <div style="background:#eee;padding: 10px;height: inherit;">
                         <Card :bordered="false" style="height: -webkit-fill-available;">
                             <h1 slot="title" class="projectMenuItemTitle">Subprojects</h1>
                             <div>
@@ -139,7 +218,7 @@
                     </div>
                 </div>
                 <div v-else-if="showMenuItem=='resources'" style="height: inherit;min-height: fit-content;">
-                    <div style="background:#eee;padding: 20px;height: inherit;">
+                    <div style="background:#eee;padding: 10px;height: inherit;">
                         <Card :bordered="false" style="height: -webkit-fill-available;">
                             <h1 slot="title" class="projectMenuItemTitle">Resources</h1>
                             <div>
@@ -151,9 +230,10 @@
             </div>
         </div>
     </template>
+    <div th:replace="navigation::commonFooter"></div>
 </div>
-<script>
-    var projectInfo = { "projectId": "b5b957e0-63c3-4074-93b3-40fd4749230a", "title": "Test3", "description": "string", "category": "General", "managerId": "17d49129-84b9-4795-8a78-5121d5ce0508", "managerName": "zbc", "introduction": "string", "members": [], "privacy": "Public", "tag": "", "picture": "", "createTime": "2019\/07\/05 17:14:58", "endTime": "" };
+<script th:inline="javascript">
+    var projectInfo = [[${projectInfo}]];
 </script>
 <script>
     new Vue(
@@ -163,9 +243,10 @@
                 'avatar': VueAvatar.Avatar
             },
             mounted() {
+                this.resizeContent();
                 window.onresize = () => {
                     return (() => {
-                        this.contentPage = window.innerHeight - 60 + 'px';
+                        this.resizeContent();
                     })()
                 }
             },
@@ -173,10 +254,21 @@
                 return {
                     projectInfo: projectInfo,
                     showMenuItem: "projectDetail",
-                    contentPage: window.innerHeight - 60 + 'px',
+                    contentPageCSS: '',
+                    membersContentCSS: '',
+
                 }
             },
             methods: {
+                resizeContent(){
+                    if(window.innerHeight>735){
+                        this.membersContentCSS = window.innerHeight - 260+'px';
+                        this.contentPageCSS = window.innerHeight - 60 + 'px';
+                    }else{
+                        this.membersContentCSS = '477px';
+                        this.contentPageCSS = 'fit-content';
+                    }
+                },
                 sendNotice(recipientId) {
                     this.$refs.navigationEl.sendMessage(recipientId);
                 },
