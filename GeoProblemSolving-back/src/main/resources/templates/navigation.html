@@ -57,14 +57,16 @@
 
         .userState {
             position: absolute;
-            margin-left: 85%;
             width: 15%;
             top: 0px;
             z-index: 1;
+            display: inline-block;
+            min-width: fit-content;
         }
 
         .navPart {
             width: 85%;
+            display: inline-block;
         }
 
         .menuItem a {
@@ -94,7 +96,7 @@
     </style>
     <template th:fragment="commonHeader-html" id="navigation">
         <div>
-            <header :style="absoluteStyle">
+            <header style="position:inherit;min-width: -webkit-fill-available;">
                 <img :src='window.location.origin+"/GeoProblemSolving/Images/OGMS.png"' id="logo" class="pic"
                      @click="goHome" style="cursor:pointer;margin-left:5%">
                 <div class="navPart">
@@ -113,43 +115,43 @@
                             <span>Help</span>
                         </menu-item>
                     </i-menu>
-                    <div class="userState">
-                        <i-menu mode="horizontal" theme="dark" @on-select="unlogin"
-                                :style="`z-index:0;background:`+headerBgColor"
-                                v-show="!userInfoNav.userState||userInfoNav.userState==undefined"
-                                class="menuItem">
-                            <menu-item name="login">
-                                <span>Login</span>
-                            </menu-item>
-                            <menu-item name="register">
-                                <span>Sign up</span>
-                            </menu-item>
-                        </i-menu>
+                </div>
+                <div class="userState">
+                    <i-menu mode="horizontal" theme="dark" @on-select="unlogin"
+                            :style="`z-index:0;background:`+headerBgColor"
+                            v-show="!userInfoNav.userState||userInfoNav.userState==undefined"
+                            class="menuItem">
+                        <menu-item name="login">
+                            <span>Login</span>
+                        </menu-item>
+                        <menu-item name="register">
+                            <span>Sign up</span>
+                        </menu-item>
+                    </i-menu>
 
-                        <i-menu mode="horizontal" theme="dark" @on-select="logged"
-                                :style="`z-index:0;background:`+headerBgColor" v-show="userInfoNav.userState"
-                                class="menuItem">
-                            <menu-item name="notification">
-                                <Badge :count="unreadNoticeCount" id="noticeBadge">
-                                    <Icon type="ios-notifications-outline" size="25"></Icon>
-                                </Badge>
-                            </menu-item>
-                            <menu-item name="personal" style="width:100px">
-                                <dropdown @on-click="changeSelect" placement="bottom-start">
-                                    <div @click="toPersonalPage">
-                                        <img v-if="userInfoNav.avatar!=''&&userInfoNav.avatar!=undefined&&userInfoNav.avatar!=null"
-                                             :title="userInfoNav.userName"
-                                             style="width:40px;height:40px;vertical-align:middle;">
-                                        <avatar :username="userInfoNav.userName" :size="40" style="margin-top:10px"
-                                                :title="userInfoNav.userName" v-else></avatar>
-                                    </div>
-                                    <dropdown-menu slot="list">
-                                        <dropdown-item name="logout">Log out</dropdown-item>
-                                    </dropdown-menu>
-                                </dropdown>
-                            </menu-item>
-                        </i-menu>
-                    </div>
+                    <i-menu mode="horizontal" theme="dark" @on-select="logged"
+                            :style="`z-index:0;background:`+headerBgColor" v-show="userInfoNav.userState"
+                            class="menuItem">
+                        <menu-item name="notification">
+                            <Badge :count="unreadNoticeCount" id="noticeBadge">
+                                <Icon type="ios-notifications-outline" size="25"></Icon>
+                            </Badge>
+                        </menu-item>
+                        <menu-item name="personal" style="width:100px">
+                            <dropdown @on-click="changeSelect" placement="bottom-start">
+                                <div @click="toPersonalPage">
+                                    <img v-if="userInfoNav.avatar!=''&&userInfoNav.avatar!=undefined&&userInfoNav.avatar!=null"
+                                         :title="userInfoNav.userName"
+                                         style="width:40px;height:40px;vertical-align:middle;">
+                                    <avatar :username="userInfoNav.userName" :size="40" style="margin-top:10px"
+                                            :title="userInfoNav.userName" v-else></avatar>
+                                </div>
+                                <dropdown-menu slot="list">
+                                    <dropdown-item name="logout">Log out</dropdown-item>
+                                </dropdown-menu>
+                            </dropdown>
+                        </menu-item>
+                    </i-menu>
                 </div>
             </header>
         </div>
@@ -184,9 +186,6 @@
                     });
                 },
                 computed: {
-                    absoluteStyle() {
-                        return "position:inherit";
-                    },
                     headerBgColor() {
                         return "";
                     }

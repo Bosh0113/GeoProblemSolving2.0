@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -470,6 +469,7 @@ public class ProjectDaoImpl implements IProjectDao {
         }
     }
 
+    @Override
     public Object inquiryByPage(String category, int page, int pageSize){
         try {
             Sort sort = new Sort(Sort.Direction.DESC,"createTime");
