@@ -9,6 +9,7 @@
     <link href="https://cdn.bootcss.com/iview/3.4.2/styles/iview.css" rel="stylesheet">
     <script src="https://cdn.bootcss.com/iview/3.4.2/iview.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue-avatar@2.1.7/dist/vue-avatar.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script th:replace="navigation::commonHeader-css"></script>
     <script th:replace="navigation::commonHeader-html"></script>
     <script th:replace="navigation::commonHeader-js"></script>
@@ -212,7 +213,9 @@
                         <Card :bordered="false" style="height: -webkit-fill-available;">
                             <h1 slot="title" class="projectMenuItemTitle">Subprojects</h1>
                             <div>
-                                Content
+                                <Card v-for="subProject in subProjectList">
+                                    <div>{{subProject.title}}</div>
+                                </Card>
                             </div>
                         </Card>
                     </div>
@@ -244,11 +247,8 @@
             },
             mounted() {
                 this.resizeContent();
-                window.onresize = () => {
-                    return (() => {
-                        this.resizeContent();
-                    })()
-                }
+                this.getAllSubProjects();
+                this.userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
             },
             data() {
                 return {
@@ -256,7 +256,7 @@
                     showMenuItem: "projectDetail",
                     contentPageCSS: '',
                     membersContentCSS: '',
-
+                    subProjects:[]
                 }
             },
             methods: {
@@ -268,13 +268,61 @@
                         this.membersContentCSS = '477px';
                         this.contentPageCSS = 'fit-content';
                     }
+                    window.onresize = () => {
+                        return (() => {
+                            this.resizeContent();
+                        })()
+                    }
                 },
                 sendNotice(recipientId) {
                     this.$refs.navigationEl.sendMessage(recipientId);
                 },
                 changeMenuItem(name) {
                     this.showMenuItem = name;
-                }
+                },
+                getAllSubProjects(){
+                    axios
+                    .get(
+                        "/GeoProblemSolving/subProject/inquiry"+"?key=projectId"+"&value="+this.projectInfo.projectId
+                    )
+                    .then(res=>{
+                        if (res.data == "Offline") {
+                            this.$store.commit("userLogout");
+                            this.$router.push({ name: "Login" });
+                        } else if (res.data == "None" || res.data == "Fail") {
+                            console.log(res.data);
+                        } else {
+                            this.subProjectList = res.data;
+                            this.identitySubProjects();
+                            console.log(this.subProjectList);
+                        }
+                    })
+                    .catch(err=>{console.log(err.data)});
+                },
+                identitySubProjects(){
+                    var subProjectInfo = Object.assign([],this.subProjectList);
+                    subProjectInfo.forEach(subProject => {
+                        subProject.isManager = this.managerIdentity(subProject.managerId);
+                        subProject.isMember = this.memberIdentity(subProject.members);
+                    });
+                },
+                managerIdentity(managerId){
+                    return managerId==this.userInfo.userId?true:false;
+                },
+                memberIdentity(members) {
+                    let isMember;
+                    for (let i = 0; i < members.length; i++) {
+                        if (members[i].userId === this.$store.getters.userId) {
+                        isMember = true;
+                        break;
+                        }
+                    }
+                    if (isMember) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                },
             }
         }
     )

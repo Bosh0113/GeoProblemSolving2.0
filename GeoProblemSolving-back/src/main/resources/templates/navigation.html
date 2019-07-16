@@ -164,6 +164,7 @@
                     'avatar': VueAvatar.Avatar
                 },
                 mounted() {
+                    var that = this;
                     $.ajax({
                         url: "/GeoProblemSolving/user/state",
                         type: "GET",
@@ -171,11 +172,11 @@
                         success: function (data) {
                             if (data) {
                                 data.userState = true;
-                                this.userInfoNav = data;
+                                that.userInfoNav = data;
                                 sessionStorage.setItem('userInfo', JSON.stringify(data));
-                                this.setTimer();
-                                this.initWebSocket();
-                                this.getUnreadNoticeCount();
+                                that.setTimer();
+                                that.initWebSocket();
+                                that.getUnreadNoticeCount();
                             } else {
                                 console.log("Not logged in");
                             }
@@ -250,7 +251,7 @@
                     getUnreadNoticeCount() {
                         this.unreadNoticeCount = 0;
                         //get请求发送的是用户id
-                        this.axios
+                        axios
                             .get(
                                 "/GeoProblemSolving/notice/inquiry" +
                                 "?key=recipientId" +
@@ -325,7 +326,7 @@
                     },
                     changeSelect(name) {
                         if (name == "logout") {
-                            this.axios
+                            axios
                                 .get("/GeoProblemSolving/user/logout")
                                 .then(res => {
                                     this.userInfoNav = {userName: ""};
