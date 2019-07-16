@@ -81,9 +81,9 @@ img {
 </style>
 <template>
   <div class="layout">
-    <div class="header">
+    <!-- <div class="header">
       <img src="@/assets/images/OGMS.png" id="logo" @click="goHome">
-    </div>
+    </div> -->
     <div class="content" ref="homePage" v-if="UserState===false" v-bind:style="contentStyle">
       <div class="loginDiv" v-bind:style="loginStyle">
         <div class="loginTitle">Log in</div>

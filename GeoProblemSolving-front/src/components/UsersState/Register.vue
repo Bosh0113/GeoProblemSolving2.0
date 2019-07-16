@@ -92,9 +92,9 @@
 <template>
   <div>
     <Layout>
-      <Header class="header">
+      <!-- <Header class="header">
         <img src="@/assets/images/OGMS.png" id="logo" @click="goHome" style="cursor:pointer">
-      </Header>
+      </Header> -->
       <Content>
         <Row class="Content" id="register">
           <Col :xs="{ span: 12, offset: 6 }" :lg="{ span: 12, offset: 6 }">

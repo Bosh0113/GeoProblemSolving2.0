@@ -1828,7 +1828,7 @@ export default {
       }
     },
     gotoWorkingPanel() {
-      this.$router.push(`./workspace`);
+      this.$router.push(`./stepCreation`);
     }
   }
 };
