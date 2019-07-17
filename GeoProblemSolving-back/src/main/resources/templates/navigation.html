@@ -95,63 +95,100 @@
         }
     </style>
     <template th:fragment="commonHeader-html" id="navigation">
-        <div>
+        <div style="position: fixed;z-index: 999;">
             <header style="position:inherit;min-width: -webkit-fill-available;">
                 <img :src='window.location.origin+"/GeoProblemSolving/Images/OGMS.png"' id="logo" class="pic"
                      @click="goHome" style="cursor:pointer;margin-left:5%">
-                <div class="navPart">
-                    <i-menu mode="horizontal" theme="dark" th:attr="active-name=${activeName}" @on-select="turnContent"
-                            :style="`z-index:0;background:headerBgColor`" width="auto">
-                        <menu-item name="home" class="menuItem" style="margin-left:35%">
-                            <span>Home</span>
-                        </menu-item>
-                        <menu-item name="projects" class="menuItem">
-                            <span>Projects</span>
-                        </menu-item>
-                        <menu-item name="resources" class="menuItem">
-                            <span>Resources</span>
-                        </menu-item>
-                        <menu-item name="help" class="menuItem">
-                            <span>Help</span>
-                        </menu-item>
-                    </i-menu>
+                <div v-if="useMenuCSS">
+                    <div class="navPart">
+                        <i-menu mode="horizontal" theme="dark" @on-select="turnContent"
+                                :style="`z-index:0;background:headerBgColor`" width="auto" active-name="projects">
+                            <menu-item name="home" class="menuItem" style="margin-left:35%">
+                                <span>Home</span>
+                            </menu-item>
+                            <menu-item name="projects" class="menuItem">
+                                <span>Projects</span>
+                            </menu-item>
+                            <menu-item name="resources" class="menuItem">
+                                <span>Resources</span>
+                            </menu-item>
+                            <menu-item name="help" class="menuItem">
+                                <span>Help</span>
+                            </menu-item>
+                        </i-menu>
+                    </div>
+                    <div class="userState">
+                        <i-menu mode="horizontal" theme="dark" @on-select="unlogin"
+                                :style="`z-index:0;background:`+headerBgColor"
+                                v-show="!userInfoNav.userState||userInfoNav.userState==undefined"
+                                class="menuItem">
+                            <menu-item name="login">
+                                <span>Login</span>
+                            </menu-item>
+                            <menu-item name="register">
+                                <span>Sign up</span>
+                            </menu-item>
+                        </i-menu>
+    
+                        <i-menu mode="horizontal" theme="dark" @on-select="logged"
+                                :style="`z-index:0;background:`+headerBgColor" v-show="userInfoNav.userState"
+                                class="menuItem">
+                            <menu-item name="notification">
+                                <Badge :count="unreadNoticeCount" id="noticeBadge">
+                                    <Icon type="ios-notifications-outline" size="25"></Icon>
+                                </Badge>
+                            </menu-item>
+                            <menu-item name="personal" style="width:100px">
+                                <dropdown @on-click="changeSelect" placement="bottom-start">
+                                    <div @click="toPersonalPage">
+                                        <img v-if="userInfoNav.avatar!=''&&userInfoNav.avatar!=undefined&&userInfoNav.avatar!=null"
+                                                :title="userInfoNav.userName"
+                                                style="width:40px;height:40px;vertical-align:middle;">
+                                        <avatar :username="userInfoNav.userName" :size="40" style="margin-top:10px"
+                                                :title="userInfoNav.userName" v-else></avatar>
+                                    </div>
+                                    <dropdown-menu slot="list">
+                                        <dropdown-item name="logout">Log out</dropdown-item>
+                                    </dropdown-menu>
+                                </dropdown>
+                            </menu-item>
+                        </i-menu>
+                    </div>
                 </div>
-                <div class="userState">
-                    <i-menu mode="horizontal" theme="dark" @on-select="unlogin"
-                            :style="`z-index:0;background:`+headerBgColor"
-                            v-show="!userInfoNav.userState||userInfoNav.userState==undefined"
-                            class="menuItem">
-                        <menu-item name="login">
-                            <span>Login</span>
-                        </menu-item>
-                        <menu-item name="register">
-                            <span>Sign up</span>
-                        </menu-item>
-                    </i-menu>
-
-                    <i-menu mode="horizontal" theme="dark" @on-select="logged"
-                            :style="`z-index:0;background:`+headerBgColor" v-show="userInfoNav.userState"
-                            class="menuItem">
-                        <menu-item name="notification">
-                            <Badge :count="unreadNoticeCount" id="noticeBadge">
-                                <Icon type="ios-notifications-outline" size="25"></Icon>
-                            </Badge>
-                        </menu-item>
-                        <menu-item name="personal" style="width:100px">
-                            <dropdown @on-click="changeSelect" placement="bottom-start">
-                                <div @click="toPersonalPage">
-                                    <img v-if="userInfoNav.avatar!=''&&userInfoNav.avatar!=undefined&&userInfoNav.avatar!=null"
-                                         :title="userInfoNav.userName"
-                                         style="width:40px;height:40px;vertical-align:middle;">
-                                    <avatar :username="userInfoNav.userName" :size="40" style="margin-top:10px"
-                                            :title="userInfoNav.userName" v-else></avatar>
-                                </div>
-                                <dropdown-menu slot="list">
-                                    <dropdown-item name="logout">Log out</dropdown-item>
-                                </dropdown-menu>
-                            </dropdown>
-                        </menu-item>
-                    </i-menu>
+                <div v-else>
+                    <i-menu mode="horizontal" theme="dark" style="z-index: 0;"></i-menu>
+                    <Dropdown style="position: fixed;top: 10px;right: 20px;">
+                        <i-button icon="md-menu" style="color: white;background-color: #808695"></i-button>
+                        <Dropdown-menu slot="list">
+                            <Dropdown-item>
+                                <a href="/GeoProblemSolving/home.html">Home</a>
+                            </Dropdown-item>
+                            <Dropdown-item>
+                                <a href="/GeoProblemSolving/projectList.html">Projects</a>
+                            </Dropdown-item>
+                            <Dropdown-item>
+                                <a href="/GeoProblemSolving/resources.html">Resources</a>
+                            </Dropdown-item>
+                            <Dropdown-item>
+                                <a href="/GeoProblemSolving/help.html">Help</a>
+                            </Dropdown-item>
+                            <Dropdown-item v-show="!userInfoNav.userState||userInfoNav.userState==undefined">
+                                <a href="/GeoProblemSolving/login.html">Login</a>
+                            </Dropdown-item>
+                            <Dropdown-item v-show="!userInfoNav.userState||userInfoNav.userState==undefined">
+                                <a href="/GeoProblemSolving/register.html">Sign up</a>
+                            </Dropdown-item>
+                            <Dropdown-item v-show="userInfoNav.userState">
+                                <a href="/GeoProblemSolving/notifications.html">Notification</a>
+                            </Dropdown-item>
+                            <Dropdown-item v-show="userInfoNav.userState">
+                                <a @click.native="toPersonalPage">Personal Page</a>
+                            </Dropdown-item>
+                            <Dropdown-item v-show="userInfoNav.userState">
+                                <a @click.native="logout">Log out</a>
+                            </Dropdown-item>
+                        </Dropdown-menu>
+                    </Dropdown>
                 </div>
             </header>
         </div>
@@ -199,20 +236,20 @@
                         timer: null,
                         //导航栏宽度
                         headerWidth: "",
-                        contentHeight: window.innerHeight - 120 + "px",
                         //用户
                         userInfoNav: {
                             userName: ""
                         },
-
+                        useMenuCSS: true
                     }
                 },
                 methods: {
-                    reSize() {
-                        if (window.innerHeight > 675) {
-                            this.contentHeight = window.innerHeight - 120 + "px";
-                        } else {
-                            this.contentHeight = 675;
+                    identityMenuCSS(){
+                        if(window.innerWidth<1100){
+                            this.useMenuCSS = false;
+                        }
+                        else{
+                            this.useMenuCSS = true;
                         }
                     },
                     turnContent(name) {
@@ -326,18 +363,21 @@
                     },
                     changeSelect(name) {
                         if (name == "logout") {
-                            axios
-                                .get("/GeoProblemSolving/user/logout")
-                                .then(res => {
-                                    this.userInfoNav = {userName: ""};
-                                    sessionStorage.removeItem("userInfo");
-                                    this.noticeSocket.close();
-                                    window.location.href = "/GeoProblemSolving/home.html";
-                                })
-                                .catch(err => {
-                                    confirm("logout fail!");
-                                });
+                            this.logout();
                         }
+                    },
+                    logout(){
+                        axios
+                        .get("/GeoProblemSolving/user/logout")
+                        .then(res => {
+                            this.userInfoNav = {userName: ""};
+                            sessionStorage.removeItem("userInfo");
+                            this.noticeSocket.close();
+                            window.location.href = "/GeoProblemSolving/home.html";
+                        })
+                        .catch(err => {
+                            confirm("logout fail!");
+                        });
                     }
                 }
             },
