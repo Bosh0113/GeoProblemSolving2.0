@@ -202,7 +202,7 @@
                                     </i-button>
                                 </Poptip>
                                 <Poptip trigger="hover" content="Remove project" placement="left">
-                                    <i-button style="margin: 0 5px;" class="changeRemoveColor">
+                                    <i-button style="margin: 0 5px;" class="changeRemoveColor" @click="deleteProjectShow()">
                                         <Icon type="md-close" :size="20"></Icon>
                                     </i-button>
                                 </Poptip>
@@ -474,6 +474,15 @@
                         <i-button @click="closeEditModel()" style="float:right;margin-right: 15px;">Cancel</i-button>
                     </div>
                 </Modal>
+                <Modal
+                  v-model="removeProjectModal"
+                  title="Delete warning "
+                  @on-ok="deleteProject"
+                  ok-text="Submit"
+                  cancel-text="Cancel"
+                >
+                  <p>Do you sure to delete this project?</p>
+                </Modal>
             </div>
         </div>
     </template>
@@ -730,10 +739,15 @@
                             if (res.data == "Offline") {
                                 this.$refs.navigationEl.logout("login");
                             } else if (res.data != "Fail") {
+                                var newProjectInfo = res.data;
                                 this.editProjectModal = false;
-                                this.projectInfo = res.data;
-                                console.log("修改回调结果：");
-                                console.log(res.data); //更新后的回调处理有待优化，应该根据返回的新信息重新更新前端数据并渲染，而不是再重新请求数据
+                                this.projectInfo = newProjectInfo;
+                                $('#projectTitle').html(newProjectInfo.title);
+                                $('#projectDescription').html(newProjectInfo.description);
+                                $('#projectIntroduction').html(newProjectInfo.introduction);
+                                $('#projectPrivacy').html(newProjectInfo.privacy);
+                                $('#projectCategory').html(newProjectInfo.category);
+                                $('#projectTag').html(newProjectInfo.tag);
                             }
                             })
                             .catch(err => {
@@ -743,6 +757,35 @@
                         this.$Message.warning("please check your form again!");
                         }
                     });
+                },
+                deleteProjectShow() {
+                    this.removeProjectModal = true;
+                },
+                deleteProject() {
+                    axios
+                    .get(
+                    "/GeoProblemSolving/project/delete?" +
+                        "projectId=" +
+                        this.projectInfo.projectId
+                    )
+                    .then(res => {
+                    if (res.data == "Offline") {
+                        this.$refs.navigationEl.logout("login");
+                    } else if (res.data == "Fail") {
+                        this.$Notice.error({
+                        title: "Error",
+                        desc: "Delete project fail."
+                        });
+                    }
+                    if (res.data == "Success") {
+                        this.$Notice.success({
+                        title: "Success",
+                        desc: "Delete project successfully."
+                        });
+                        window.location.href='/GeoProblemSolving/projectList.html';
+                    }
+                    })
+                    .catch(err => {});
                 },
             }
         }
