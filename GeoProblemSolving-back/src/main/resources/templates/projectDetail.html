@@ -2,8 +2,11 @@
 <html lang="en" xmlns:th="https://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Geo-ProblemSolving</title>
+    <title th:text="${projectInfo.title}+' | Geo-ProblemSolving'"></title>
     <meta http-equiv="Content-Type" content=" charset=UTF-8"/>
+    <meta name="description" th:attr="content=${projectInfo.description}">
+    <meta name="keywords" th:attr="content=${projectInfo.tag}">
+    <meta name="author" content="OpemGMS">
     <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdn.bootcss.com/vue/2.6.10/vue.min.js"></script>
     <link href="https://cdn.bootcss.com/iview/3.4.2/styles/iview.css" rel="stylesheet">
@@ -568,6 +571,7 @@
                     pictureUrl:"",
                     inputTag: "",
                     visible: false,
+                    removeProjectModal:false
                 }
             },
             methods: {
