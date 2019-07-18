@@ -363,17 +363,17 @@
                     },
                     changeSelect(name) {
                         if (name == "logout") {
-                            this.logout();
+                            this.logout("home");
                         }
                     },
-                    logout(){
+                    logout(page){
                         axios
                         .get("/GeoProblemSolving/user/logout")
                         .then(res => {
                             this.userInfoNav = {userName: ""};
                             sessionStorage.removeItem("userInfo");
                             this.noticeSocket.close();
-                            window.location.href = "/GeoProblemSolving/home.html";
+                            window.location.href = "/GeoProblemSolving/"+page+".html";
                         })
                         .catch(err => {
                             confirm("logout fail!");

@@ -108,6 +108,64 @@
         .subProjectCard .ivu-card-extra{
             top:10px;
         }
+        .demo-upload-list {
+            display: inline-block;
+            width: 60px;
+            height: 60px;
+            text-align: center;
+            line-height: 60px;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            overflow: hidden;
+            background: #fff;
+            position: relative;
+            box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+            margin-right: 4px;
+            }
+            .demo-upload-list img {
+            width: 100%;
+            height: 100%;
+            }
+            .demo-upload-list-cover {
+            display: none;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.6);
+            }
+            .demo-upload-list:hover .demo-upload-list-cover {
+            display: block;
+            }
+            .demo-upload-list-cover i {
+            color: #fff;
+            font-size: 20px;
+            cursor: pointer;
+            margin: 0 2px;
+            }
+            .uploadAvatar {
+            position: relative;
+            width: 58px;
+            height: 58px;
+            top: 0;
+            left: 0;
+            outline: none;
+            background-color: transparent;
+            opacity: 0;
+        }
+        .uploadBox {
+            display: inline-block;
+            width: 58px;
+            height: 58px;
+            line-height: 58px;
+            border-width: 0.75px;
+            border-style: dashed;
+            border-color: lightslategray;
+        }
+        .inline_style {
+            display: flex;
+        }
     </style>
 </head>
 
@@ -135,11 +193,11 @@
                         <Card :bordered="false" dis-hover style="height: -webkit-fill-available;display: flex;flex-flow: column;min-height: fit-content;">
                             <div slot="title">
                                 <h1 class="projectMenuItemTitle">Project: </h1>
-                                <h1 style="display: inline-block;max-width: 75%;vertical-align: top;" class="overEllipsis">{{projectInfo.title}}</h1>
+                                <h1 style="display: inline-block;max-width: 75%;vertical-align: top;" class="overEllipsis" id="projectTitle" th:text="${projectInfo.title}">Project title</h1>
                             </div>
                             <div slot="extra">
                                 <Poptip trigger="hover" content="Edit project information" placement="left">
-                                    <i-button style="margin: 0 5px;" class="changeEditColor">
+                                    <i-button style="margin: 0 5px;" class="changeEditColor" @click="editModelShow()">
                                         <Icon type="ios-create" :size="20"></Icon>
                                     </i-button>
                                 </Poptip>
@@ -166,7 +224,9 @@
                                                         <h3>Description:</h3>
                                                         <div class="projectDescriptionContent">
                                                             <vue-scroll :ops="scrollOps">
-                                                                {{projectInfo.description}}
+                                                                <div id="projectDescription" th:text="${projectInfo.description}">
+                                                                    Project description
+                                                                </div>
                                                             </vue-scroll>
                                                         </div>
                                                     </div>
@@ -177,15 +237,18 @@
                                                     <h3>Introduction:</h3>
                                                     <div class="projectIntroductionContent">
                                                         <vue-scroll :ops="scrollOps">
-                                                            {{projectInfo.introduction}}
+                                                            <div id="projectIntroduction" th:text="${projectInfo.introduction}">
+                                                                Project introduction
+                                                            </div>
                                                         </vue-scroll>
                                                     </div>
                                                 </div>
                                                 <div style="min-height: 80px;max-height: 100px;text-align: center;">
                                                     <div class="statistics">
                                                         <div style="text-align: left;padding: 5px;">
-                                                            <p><strong>Privacy:</strong> {{projectInfo.privacy}}</p>
-                                                            <p><strong>Tag:</strong> {{projectInfo.tag}}</p>
+                                                            <p><strong>Privacy:</strong><span id="projectPrivacy" th:text="${projectInfo.privacy}">Project privacy</span> </p>
+                                                            <p><strong>Category:</strong><span id="projectCategory" th:text="${projectInfo.category}">Project category</span></p>
+                                                            <p><strong>Tag:</strong><span id="projectTag" th:text="${projectInfo.tag}">Project tag</span></p>
                                                             <p><strong>Manager:</strong> {{projectInfo.managerName}}</p>
                                                             <p><strong>Create time:</strong> {{projectInfo.createTime}}</p>
                                                         </div>
@@ -248,6 +311,13 @@
                     <div style="background:#eee;padding: 10px;height: inherit;min-height: fit-content;">
                         <Card :bordered="false" style="height: -webkit-fill-available;min-height: fit-content;">
                                 <h1 slot="title" class="projectMenuItemTitle">Subprojects</h1>
+                                <div slot="extra">
+                                    <Poptip trigger="hover" content="Create subproject" placement="left">
+                                        <i-button style="margin: 0 5px;" class="changeInviteColor">
+                                            <Icon type="md-add-circle" :size="20"></Icon>
+                                        </i-button>
+                                    </Poptip>
+                                </div>
                                 <div :style="{height:subProjectsCSS}">
                                     <vue-scroll :ops="scrollOps">
                                         <div v-for="subProject in subProjectList" style="width: 25%;display: inline-block;padding: 5px;">
@@ -258,14 +328,14 @@
                                                     </strong>
                                                 </div>
                                                 <div slot="extra" >
-                                                    <Poptip trigger="hover" content="Invite members" placement="left">
-                                                        <i-button class="changeInviteColor" icon="md-person-add" size="small" shape="circle"></i-button>
+                                                    <Poptip trigger="hover" content="Change manager" placement="left">
+                                                        <i-button class="changeInviteColor" icon="ios-people" size="small" shape="circle"></i-button>
                                                     </Poptip>
-                                                    <Poptip trigger="hover" content="Invite members" placement="left">
-                                                        <i-button class="changeInviteColor" icon="md-person-add" size="small" shape="circle"></i-button>
+                                                    <Poptip trigger="hover" content="Edit information" placement="left">
+                                                        <i-button class="changeEditColor" icon="ios-create" size="small" shape="circle"></i-button>
                                                     </Poptip>
-                                                    <Poptip trigger="hover" content="Invite members" placement="left">
-                                                        <i-button class="changeInviteColor" icon="md-person-add" size="small" shape="circle"></i-button>
+                                                    <Poptip trigger="hover" content="Remove subproject" placement="left">
+                                                        <i-button class="changeRemoveColor" icon="md-close" size="small" shape="circle"></i-button>
                                                     </Poptip>
                                                 </div>
                                                 <div class="subProjectDes" :title="subProject.description">
@@ -302,6 +372,108 @@
                         </Card>
                     </div>
                 </div>
+                <Modal
+                    v-model="editProjectModal"
+                    title="Edit project"
+                    :mask-closable="false"
+                    width="900px"
+                    >
+                    <div>
+                        <i-form
+                        ref="projectEditForm"
+                        :model="projectEditForm"
+                        :rules="editProjectFormRuleValidate"
+                        :label-width="100"
+                        >
+                        <Form-item label="Category" prop="category">
+                            <Radio-group v-model="projectEditForm.category">
+                            <Radio label="Terrestrial">Terrestrial System</Radio>
+                            <Radio label="Coastal">Coastal System</Radio>
+                            <Radio label="Marine">Marine System</Radio>
+                            <Radio label="Climate">Climate System</Radio>
+                            <Radio label="Ecological">Ecological System</Radio>
+                            <Radio label="Geological">Geological System</Radio>
+                            <Radio label="Human">Human-Activity</Radio>
+                            <Radio label="GISRS">GIS & RS</Radio>
+                            <Radio label="General">General</Radio>
+                            </Radio-group>
+                        </Form-item>
+                        <Form-item label="Title" prop="title">
+                            <i-input v-model="projectEditForm.title" placeholder="Enter something..." ></i-input>
+                        </Form-item>
+                        <Form-item label="Description" prop="description">
+                            <i-input v-model="projectEditForm.description"></i-input>
+                        </Form-item>
+                        <Form-item label="Introduction" prop="introduction">
+                            <i-input v-model="projectEditForm.introduction" type="textarea" :rows="4"></i-input>
+                        </Form-item>
+                        <Form-item label="Tag" prop="tag">
+                            <i-input
+                            v-model="inputTag"
+                            placeholder="Enter some tag to introduce the project"
+                            style="margin-left:0.5%;width: 200px"
+                            @keyup.enter.native="addTag(inputTag)"
+                            ></i-input>
+                            <i-button
+                            icon="ios-add"
+                            type="dashed"
+                            size="small"
+                            style="margin-left:2.5%"
+                            @click="addTag(inputTag)"
+                            >Add Tag</i-button>
+                            <Tag
+                            color="primary"
+                            v-for="(tag,index) in projectEditForm.editTags"
+                            :key="index"
+                            closable
+                            @on-close="deleteTag(index)"
+                            >{{tag}}</Tag>
+                        </Form-item>
+                        <Form-item label="Privacy" prop="privacy">
+                            <Radio-group v-model="projectEditForm.privacy">
+                            <Radio
+                                label="Public"
+                                title="Other users can find the group and see who has membership."
+                            ></Radio>
+                            <Radio
+                                label="Discoverable"
+                                title="Other users can find this group, but membership information is hidden."
+                            ></Radio>
+                            <Radio label="Private" title="Other users can not find this group."></Radio>
+                            </Radio-group>
+                        </Form-item>
+                        <Form-item prop="image" label="Image" :label-width="100">
+                            <div class="inline_style">
+                            <div class="demo-upload-list" v-show="pictureUrl!=''">
+                                <div>
+                                    <img v-bind:src="pictureUrl" />
+                                    <div class="demo-upload-list-cover">
+                                        <Icon type="ios-eye-outline" @click.native="handleView()"></Icon>
+                                        <Icon type="ios-trash-outline" @click.native="handleRemove()"></Icon>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="uploadBox">
+                                <Icon type="ios-camera" size="20" style="position:absolute;margin:18px;"></Icon>
+                                <input
+                                @change="uploadPhoto($event)"
+                                type="file"
+                                class="uploadAvatar"
+                                accept="image/*"
+                                />
+                            </div>
+                            <Modal title="View Image" v-model="visible">
+                                <img :src="pictureUrl" v-if="visible" style="width: 100%" />
+                            </Modal>
+                            </div>
+                        </Form-item>
+                        </i-form>
+                    </div>
+                    <div slot="footer" style="display: inline-block">
+                        <i-button type="primary" @click="editProjectSubmit('projectEditForm')" style="float:right;">Submit</i-button>
+                        <i-button @click="closeEditModel()" style="float:right;margin-right: 15px;">Cancel</i-button>
+                    </div>
+                </Modal>
             </div>
         </div>
     </template>
@@ -334,7 +506,59 @@
                             background:"#808695"
                         }
                     },
-                    subProjectList:[]
+                    subProjectList:[],
+                    editProjectModal:false,
+                    projectEditForm: {
+                        description: "",
+                        introduction: "",
+                        title: "",
+                        privacy: "",
+                        category: "",
+                        editTags: ""
+                    },
+                    editProjectFormRuleValidate: {
+                        category: [
+                        {
+                            required: true,
+                            message: "The project description cannot be empty",
+                            trigger: "blur"
+                        }
+                        ],
+                        title: [
+                        {
+                            required: true,
+                            message: "The title cannot be empty and no more than 60 characters",
+                            trigger: "blur",
+                            max: 60
+                        }
+                        ],
+                        description: [
+                        {
+                            required: true,
+                            message:
+                            "The description cannot be empty and no more than 360 characters",
+                            trigger: "blur",
+                            max: 500
+                        }
+                        ],
+                        privacy: [
+                        {
+                            required: true,
+                            message: "The project privacy cannot be empty",
+                            trigger: "blur"
+                        }
+                        ],
+                        introduction: [
+                        {
+                            required: true,
+                            message: "The project introduction cannot be empty",
+                            trigger: "blur"
+                        }
+                        ]
+                    },
+                    pictureUrl:"",
+                    inputTag: "",
+                    visible: false,
                 }
             },
             methods: {
@@ -374,8 +598,7 @@
                     )
                     .then(res=>{
                         if (res.data == "Offline") {
-                            this.$store.commit("userLogout");
-                            this.$router.push({ name: "Login" });
+                            this.$refs.navigationEl.logout("login");
                         } else if (res.data == "None" || res.data == "Fail") {
                             console.log(res.data);
                         } else {
@@ -423,7 +646,104 @@
                         }
                     }
                     return membersStr;
-                }
+                },
+                editModelShow(){
+                    this.editProjectModal = true;
+                    let editProjectInfo = this.projectInfo;
+                    this.projectEditForm.title = editProjectInfo.title;
+                    this.projectEditForm.introduction = editProjectInfo.introduction;
+                    this.projectEditForm.description = editProjectInfo.description;
+                    this.projectEditForm.category = editProjectInfo.category;
+                    this.projectEditForm.privacy = editProjectInfo.privacy;
+                    this.pictureUrl = editProjectInfo.picture;
+
+                    var tags = editProjectInfo["tag"].split(",");
+                    if (tags[0] == "") {
+                        this.projectEditForm.editTags = [];
+                    } else {
+                        this.projectEditForm.editTags = tags;
+                    }
+                },
+                closeEditModel(){
+                    this.editProjectModal=false;
+                },
+                uploadPhoto(e) {
+                    // 利用fileReader对象获取file
+                    var file = e.target.files[0];
+                    var filesize = file.size;
+                    // 2,621,440   2M
+                    if (filesize > 2101440) {
+                        // 图片大于2MB
+                        this.$Message.error("size > 2MB");
+                    } else {
+                        var reader = new FileReader();
+                        reader.readAsDataURL(file);
+                        reader.onload = e => {
+                        // 读取到的图片base64 数据编码 将此编码字符串传给后台即可
+                        let formData = new FormData();
+                        formData.append("picture", file);
+                        axios
+                            .post("/GeoProblemSolving/project/picture", formData)
+                            .then(res => {
+                            if (res.data != "Fail") {
+                                this.pictureUrl = res.data;
+                                $('#choosePicture').val('');
+                            } else {
+                                this.$Message.error("upload picture Fail!");
+                            }
+                            })
+                            .catch();
+                        };
+                    }
+                },
+                handleView() {
+                    this.visible = true;
+                },
+                handleRemove() {
+                    this.pictureUrl = "";
+                },
+                addTag(tag) {
+                    if (tag != "") {
+                        this.projectEditForm.editTags.push(tag);
+                    }
+                    this.inputTag = "";
+                },
+                deleteTag(index) {
+                this.projectEditForm.editTags.splice(index, 1);
+                },
+                editProjectSubmit(form) {
+                    this.$refs[form].validate(valid => {
+                        if (valid) {
+                        let form = new URLSearchParams();
+                        form.append("title", this.projectEditForm.title);
+                        form.append("category", this.projectEditForm.category);
+                        form.append("introduction", this.projectEditForm.introduction);
+                        form.append("description", this.projectEditForm.description);
+                        form.append("tag", this.projectEditForm.editTags);
+                        form.append("privacy", this.projectEditForm.privacy);
+                        form.append("projectId", this.projectInfo.projectId);
+                        form.append("managerId", this.userInfo.userId);
+                        form.append("picture", this.pictureUrl);
+                        axios
+                            .post("/GeoProblemSolving/project/update ", form)
+                            .then(res => {
+                            if (res.data == "Offline") {
+                                this.$refs.navigationEl.logout("login");
+                            } else if (res.data != "Fail") {
+                                this.editProjectModal = false;
+                                this.projectInfo = res.data;
+                                console.log("修改回调结果：");
+                                console.log(res.data); //更新后的回调处理有待优化，应该根据返回的新信息重新更新前端数据并渲染，而不是再重新请求数据
+                            }
+                            })
+                            .catch(err => {
+                            console.log(err.data);
+                            });
+                        } else {
+                        this.$Message.warning("please check your form again!");
+                        }
+                    });
+                },
             }
         }
     )
