@@ -1,6 +1,9 @@
 /**
  * axio封装
  * 请求拦截、响应拦截、错误统一处理
+ *
+ * 参考自：vue中Axios的封装和API接口的管理
+ * 地址：https://juejin.im/post/5b55c118f265da0f6f1aa354#heading-10
  */
 
 import axios from 'axios';
