@@ -475,7 +475,7 @@ public class ProjectDaoImpl implements IProjectDao {
         try {
             //按时间排序
             Sort sort = new Sort(Sort.Direction.DESC,"createTime");
-            Pageable pageable = PageRequest.of(page,pageSize,sort);
+            Pageable pageable = PageRequest.of(page-1,pageSize,sort);
             //条件
             Criteria criteriaPublic = Criteria.where("privacy").is("Public");
             Criteria criteriaDiscoverable = Criteria.where("privacy").is("Discoverable");
@@ -493,6 +493,7 @@ public class ProjectDaoImpl implements IProjectDao {
             //返回JSON对象
             JSONObject result = new JSONObject();
             result.fluentPut("totalPage",totalPage);
+            result.fluentPut("count",count);
             result.fluentPut("projectList",projectEntities);
             return result;
 

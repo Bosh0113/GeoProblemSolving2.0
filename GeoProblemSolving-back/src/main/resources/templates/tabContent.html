@@ -69,8 +69,8 @@
 
                             <!-- 右上角的button-->
                             <div class="operate" slot="extra" style="display:flex;align-items:center">
-                                <Icon type="icon ion-md-eye" :size="20" title="Public project"  v-show="!(item.isManager||item.isMember) && (item.privacy=='Public')" ></Icon>
-                                <Icon type="icon ion-md-lock" :size="20" title="Discoverable project"  v-show="!(item.isManager||item.isMember) && (item.privacy=='Discoverable')" ></Icon>
+                                <Icon type="md-eye" :size="20" title="Public project"  v-show="!(item.isManager||item.isMember) && (item.privacy=='Public')" ></Icon>
+                                <Icon type="md-lock" :size="20" title="Discoverable project"  v-show="!(item.isManager||item.isMember) && (item.privacy=='Discoverable')" ></Icon>
                                 <br/>
                                 <Icon type="md-person" :size="20" title="Managed or joined project" v-show="item.isMember||item.isManager" :id="item.projectId" ></Icon>
                             </div>
@@ -88,21 +88,21 @@
                             </div>
                             <!--managername -->
                             <div  class="cardicon"  >
-                                <Icon type="icon ion-md-body" :size="15" Manager></Icon>
+                                <Icon type="md-body" :size="15" Manager></Icon>
                                 <span style="height:20px;margin-left:5%">
                                 <strong>{{item.managerName}}</strong>
                             </span>
                             </div>
                             <!--time-->
                             <div class="cardicon" >
-                                <Icon type="icon ion-md-clock" :size="15" Time></Icon>
+                                <Icon type="md-clock" :size="15" Time></Icon>
                                 <span style="height:20px;margin-left:5%">
                                 <strong>{{item.createTime.split(' ')[0]}}</strong>
                             </span>
                             </div>
                             <!--tag -->
                             <div class="cardicon" >
-                                <Icon type="icon ion-md-pricetags" :size="15" Tags></Icon>
+                                <Icon type="md-pricetags" :size="15" Tags></Icon>
                                 <strong style=" margin-left:5%; display: inline-block; overflow: hidden;  white-space: nowrap; text-overflow: ellipsis;" >
                                     {{item.tag}}
                                 </strong>

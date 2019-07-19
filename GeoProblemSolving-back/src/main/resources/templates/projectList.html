@@ -98,13 +98,13 @@
             font-size: 16px;
 
         }
-        .ivu-card{
-            margin-bottom:30px;
+        .ivu-row{
+            margin-bottom: 45px;
         }
 
         .pro-page{
             position: absolute;
-            bottom:  0px;
+            bottom:  75px;
             left:38%;
             font-size:14px;
         }
@@ -155,10 +155,11 @@
                     <tab-content  :project-list =  tabPageData ></tab-content >
                 </div>
             </i-col>
-            <div class="pro-page" >
-                <Page  ref="pages" :total="projectCount" :page-size="pageSize" :current="currentPage" size="small"  @on-change="changePage"   show-elevator show-total ></Page>
-            </div>
+
         </Row>
+        <div class="pro-page" >
+            <Page  ref="pages" :total="totalCount" :page-size="pageSize"  :current="currentPage" size="small"  @on-change="changePage"   show-elevator show-total ></Page>
+        </div>
         <div th:replace="navigation::commonFooter"></div>
     </div>
 
@@ -171,15 +172,16 @@
             data: {
                 getFinish: false,
                 currentProjectList:  List,
-                projectShowList: List,
+                projectShowList: List.slice(0,18),
                 projectType:[],
                 currentTab:"All",
                 //初始化信息总条数
-                projectCount:10,
-                currentPage:1,
+                //projectCount:10,
+                currentPage:1 ,
+                totalCount:List.length,
                 //每页显示多少条
-                pageSize:2,
-                tabPageData:List,
+                pageSize:18,
+                tabPageData:List.slice(0,18),
                 tabPaneType:[{  label:"All",name:"All",icon:"icon ion-md-list"},
                     { label:"Terrestrial", name:"Terrestrial", icon:"icon ion-md-globe"},
                     {label:"Coastal", name:"Coastal",icon:"icon ion-ios-boat"},
@@ -192,6 +194,7 @@
                     {label:"General", name:"General", icon:"icon ion-ios-grid"}
                 ],
             },
+
             methods: {
                 changeTab(type) {
                     this.currentTab=type;
@@ -201,39 +204,41 @@
                     });
 
                     if(type=="All"){
-                         //this.tabPageData=this.projectShowList;
                         this.tabPageData=Object.assign([], this.projectShowList);
-                        console.log( this.tabPageData);
                     }
                     else{
-                        console.log(type);
                         this.changePage(1);
                     }
                 },
                 changePage(index){
-                    axios
-                        .get("/GeoProblemSolving/project/inquiryByPage",{
-                            params:{
-                                category:this.currentTab,
-                                page:index,
-                                pageSize:this.pageSize,
-                            }
-                        })
-                        .then(res => {
-                            //结束等待
-                            console.log(res.data.projectList);
-                            this.getFinish = false;
-                            if (res.data === "None") {
-                                this.currentProjectList = [];
-                            } else {
-                                // this.judgeMember(res.data.projectList);
-                            }
-                            this.tabPageData = Object.assign([], res.data.projectList);
-                            console.log(  this.tabPageData);
-                        })
-                        .catch(err => {
-                            console.log(err.data);
-                        });
+                    if(this.currentTab=="All" && index==1){
+                        this.tabPageData=Object.assign([], this.projectShowList);
+                    }
+                    else{
+                        axios
+                            .get("/GeoProblemSolving/project/inquiryByPage",{
+                                params:{
+                                    category:this.currentTab,
+                                    page:index,
+                                    pageSize:this.pageSize,
+                                }
+                            })
+                            .then(res => {
+                                console.log(index);
+                                this.getFinish = false;
+                                if (res.data === "None") {
+                                    this.currentProjectList = [];
+                                } else {
+                                    //this.judgeMember(res.data.projectList);
+                                }
+                                this.tabPageData = Object.assign([], res.data.projectList);
+                                this.totalCount=res.data.count;
+                            })
+                            .catch(err => {
+                                console.log(err.data);
+                            });
+                    }
+
 
                 },
                 newProject() {
