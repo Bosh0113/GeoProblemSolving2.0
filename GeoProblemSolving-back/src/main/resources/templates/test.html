@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head >
+    <title>Demo</title>
+    <meta http-equiv="Content-Type" content=" charset=UTF-8" />
+<!--        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>-->
+    <script type="module" src="https://unpkg.com/ionicons@4.5.10-1/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule="" src="https://unpkg.com/ionicons@4.5.10-1/dist/ionicons/ionicons.js"></script>
+    <link href="https://unpkg.com/ionicons@4.5.10-1/dist/css/ionicons.min.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/vue/2.6.10/vue.min.js"></script>
+    <link href="https://cdn.bootcss.com/iview/3.4.2/styles/iview.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/iview/3.4.2/iview.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-avatar@2.1.7/dist/vue-avatar.min.js"></script>
+    <script src="https://cdn.bootcss.com/axios/0.19.0-beta.1/axios.min.js"></script>
+
+
+    <style scoped>
+        #logo {
+            position: absolute;
+            width: 129px;
+            height: 40px;
+            z-index: 1;
+            margin-top: 5px;
+            margin-left: 2.5%;
+            cursor: pointer;
+        }
+
+        .header span {
+            font-size: 15px;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        header {
+            height: 60px;
+            top: 0;
+            z-index: 100;
+            position: absolute;
+            width: 100%;
+            flex: 0 0 auto;
+            position: absolute;
+            min-width: 1200px;
+        }
+
+        .content {
+            flex: 1 0 auto;
+            margin-top: 60px;
+        }
+
+        footer {
+            background-color: #515a6e;
+            height: 60px;
+            width: 100%;
+            bottom: 0;
+            flex: 0 0 auto;
+        }
+
+        .userState {
+            position: absolute;
+            margin-left: 85%;
+            width: 15%;
+            top: 0px;
+            z-index: 1;
+        }
+
+        .navPart {
+            width: 85%;
+        }
+
+        .menuItem a {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: rgba(255, 255, 255, 1);
+        }
+
+        .userImg {
+            width: 40px;
+            height: 40px;
+            vertical-align: middle;
+        }
+
+        .footerTop {
+            text-align: center;
+            color: white;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .footerBottom {
+            text-align: center;
+            color: white;
+            font-size: 0.8em;
+        }
+    </style>
+
+    <template id="tabContent">
+        <div>
+            <div v-if="projectList.length > 0">
+                <div class="projectCard" v-for="(item,index) in projectList" :key="item.index"  style="width:95%;margin-right:5%"  >
+                    <i-col :xs="{ span: 21, offset: 1 }"
+                           :md="{ span:5, offset: 1 }"
+                           :lg="{ span: 3, offset: 1}">
+                        <div @click="projectInfoModalShow(item)" style="cursor:pointer">
+                            <Card style="height:auto;margin:15px -15px">
+                                <!-- title-->
+                                <span slot="title" class="projectTitle" :title="item.title">{{item.title}}</span>
+
+                                <!-- 右上角的button-->
+                                <div class="operate" slot="extra" style="display:flex;align-items:center">
+                                    <Icon type="icon ion-md-eye" :size="20" title="Public project"  v-show="!(item.isManager||item.isMember) && (item.privacy=='Public')" ></Icon>
+                                    <Icon type="icon ion-md-lock" :size="20" title="Discoverable project"  v-show="!(item.isManager||item.isMember) && (item.privacy=='Discoverable')" ></Icon>
+                                    <br/>
+                                    <Icon type="md-person" :size="20" title="Managed or joined project" v-show="item.isMember||item.isManager" :id="item.projectId" ></Icon>
+                                </div>
+                                <!--  description-->
+                                <div style="display:flex;align-items:center;height:20px">
+                                    <strong style="text-align: center">Description</strong>
+                                    <p style="padding: 0 10px;word-break:break-word;overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 400px;" :title="item.description" >
+                                        {{item.description}}
+                                    </p>
+                                </div>
+                                <!--  avatar-->
+                                <div style="height:200px;display:flex;justify-content:center;margin-top:10px">
+                                    <img :src="item.picture" v-if="item.picture!=''&&item.picture!='undefined'" />
+                                    <avatar :username="item.title" :size="200"  :title="item.title" :rounded="false"  v-else >  </avatar>
+                                </div>
+                                <!--managername -->
+                                <div  class="cardicon"  >
+                                    <Icon type="icon ion-md-body" :size="15" Manager></Icon>
+                                    <span style="height:20px;margin-left:5%">
+                                <strong>{{item.managerName}}</strong>
+                            </span>
+                                </div>
+                                <!--time-->
+                                <div class="cardicon" >
+                                    <Icon type="icon ion-md-clock" :size="15" Time></Icon>
+                                    <span style="height:20px;margin-left:5%">
+                                <strong>{{item.createTime.split(' ')[0]}}</strong>
+                            </span>
+                                </div>
+                                <!--tag -->
+                                <div class="cardicon" >
+                                    <Icon type="icon ion-md-pricetags" :size="15" Tags></Icon>
+                                    <strong style=" margin-left:5%; display: inline-block; overflow: hidden;  white-space: nowrap; text-overflow: ellipsis;" >
+                                        {{item.tag}}
+                                    </strong>
+                                </div>
+                            </Card>
+                        </div>
+                    </i-col>
+                </div>
+            </div>
+            <div v-else>
+                <i-col span="22" offset="1">
+                    <Card :bordered="false" style="min-height: 500px">
+                        <div style="display:flex;justify-content:center">
+                            <Icon type="icon ion-md-alert" size="40" color="gray" ></Icon>
+                        </div>
+                        <br />
+                        <div style="display:flex;justify-content:center">
+                            <h2 style="text-align:center;width:50%">No more projects in this category.</h2>
+                        </div>
+                        <br />
+                        <div style="display:flex;justify-content:center">
+                            <h4 style="text-align:center;width:50%;color:lightblue">
+                                You can click the button right top to add a new project.
+                                <br />Enriching your description of the project and attracting more people to join in.
+                            </h4>
+                        </div>
+                    </Card>
+                </i-col>
+            </div>
+
+        </div>
+    </template>
+    <style scoped>
+        img {
+            width: 100%;
+            height: auto;
+        }
+        .projectTitle {
+            height: 16px;
+            line-height: 15px;
+            font-size: 16px;
+            max-width: 150px;
+            padding-left: 5px;
+            display: inline-block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .cardicon{
+            height:15px;
+            align-items:center;
+            display:flex;
+            justify-content:flex-start;
+            margin-top:10px
+        }
+        /*Modal*/
+
+        .ivu-modal-header{
+            padding: 15px 20px  0px 20px;
+            border-bottom: 0px solid #e9eaec; //下划线
+        }
+        .ivu-modal-header-inner{
+            font-size: 16px;
+        }
+
+
+        .btnCreate:hover,
+        .joinProjectBtn:hover {
+            background-color: #19be6b;
+            color: white;
+        }
+    </style>
+    <script>
+        Vue.component('tab-content',{
+            template:'#tabContent',
+            props: ["projectList"],
+            components:{
+                'avatar':VueAvatar.Avatar
+            },
+            mounted(){
+                // console.log(this.projectList);
+            },
+            data(){
+                return{
+                    selectedProjectInfo: {},
+                    projectInfoModal: false,//modal模态框
+                    columns: [
+                        { title: "Key", key: "key", width: "150px" },
+                        { title: "Value", key: "value" , width: "618px"}
+                    ],
+                    projectInfoShow: [],
+                    //加入项目
+                    applyProjectInfo: {},
+                    applyValidate: {
+                        reason: ""
+                    },
+                    applyRuleValidate: {
+                        reason: [
+                            { required: true, message: "Please enter the reason for application", trigger: "blur" },
+                            { type: "string", min: 5, message: "The reason no less than 10 characters", trigger: "blur" }
+                        ]
+                    },
+                    applyJoinModal: false,
+                    // 记录已经申请的情况
+                    haveApplied: false,
+                    // 申请加入项目的模态框
+                    applyJoinModal: false,
+                    // // 申请加入公共项目的模态框
+                    // publicApplyAssureModal: false,
+                    UserState:false
+                }
+            },
+            methods:{
+                projectInfoModalShow(projectInfo) {
+                    if (projectInfo.isMember || projectInfo.isManager) {
+                        // this.$router.push({ path: `project/${projectInfo.projectId}` });
+                        window.location.href="/GeoProblemSolving/Projects/${projectInfo.projectId}";
+                        console.log(projectList);
+                    } else {
+                        console.log(projectList);
+                        this.selectedProjectInfo = Object.assign({}, projectInfo);
+                        var category = "";
+                        if (projectInfo.category != "Human" &&  projectInfo.category != "GISRS"){category = projectInfo.category;}
+                        else if (projectInfo.category == "Human"){category = "Human-Activity";}
+                        else if (projectInfo.category == "GISRS"){category = "GIS & RS";}
+
+                        var membersName = "";
+                        var members = projectInfo.members;
+                        for (var i = 0; i < members.length; i++) {
+                            if (i == 0) {
+                                membersName = members[i].userName;
+                            } else {
+                                membersName = membersName + "," + members[i].userName;
+                            }
+                        }
+                        this.projectInfoShow = [
+                            {
+                                key: "Category",
+                                value: category
+                            },
+                            {
+                                key: "Title",
+                                value: projectInfo.title
+                            },
+                            {
+                                key: "Description",
+                                value: projectInfo.description
+                            },
+                            {
+                                key: "Introduction",
+                                value: projectInfo.introduction
+                            },
+                            {
+                                key: "Tag",
+                                value: projectInfo.tag
+                            },
+                            {
+                                key: "Manager",
+                                value: projectInfo.managerName
+                            },
+                            {
+                                key: "Members",
+                                value: membersName
+                            },
+                            {
+                                key: "Created Time",
+                                value: projectInfo.createTime
+                            }
+                        ];
+
+                        this.projectInfoModal = true;
+                    }
+                },
+
+                login() {
+                    window.location.href="/GeoProblemSolving/Login"
+                },
+
+                enterProject(projectInfo) {
+                    window.location.href="/GeoProblemSolving/Projects/${projectInfo.projectId}"
+                },
+
+            }
+        })
+
+    </script>
+
+    <style >
+        [v-cloak]{
+            display: none;
+        }
+        .picscreen {
+            position: relative;
+            /*transform: translateY(60px);*/
+        }
+
+        .picbg {
+            background-image: url("../static/images/projectlistbg.jpg");
+            background-size: cover;
+            position: absolute;
+            height: 280px;
+            width: 100%;
+            background-color: #8b8b8b;
+            top: 0;
+            left: 0;
+        }
+
+        .pictitle{
+            font-size: 2.8rem;
+            font-family: Georgia, sans-serif, serif;
+            color: #ffffff;
+            position: absolute;
+            top: 30px;
+            left: 100px;
+        }
+        .picdesc{
+            font-size: 1.2rem;
+            color: #f7faf7;
+            position: absolute;
+            top: 105px;
+            left: 100px;
+            display: block;
+        }
+        .project-start-btn{
+            position: absolute;
+            top: 200px;
+            left: 55%;
+            font-size: 1rem;
+            border-radius: 6px;
+            background-color: rgba(21, 88, 145, 0.4);
+            color: rgba(255,255,255,1);
+        }
+
+        .search-btn{
+            position: absolute;
+            top: 30px;
+            right: 50px;
+            font-size: 0.5rem;
+            width: 100px;
+            text-align:right;
+        }
+
+        /*Tabs--style*/
+        .tabs{
+            transform: translateY(280px);
+        }
+        .tabpane-syle{
+            font-size: 20px;
+            background-color: rgba(133, 115, 92, 0.1);
+            min-height: 500px;
+        }
+        .ivu-tabs-bar {
+            /*border-bottom: 1px solid #dddee1;*/
+            margin-bottom: 0px;
+        }
+        .ivu-tabs-nav-wrap {
+            text-align: center;
+            margin-bottom:0px;
+        }
+        .ivu-tabs-nav-scroll {
+            display: inline-block;
+        }
+        .ivu-tabs-tab{
+            font-size: 16px;
+
+        }
+        .ivu-card{
+            margin-bottom:30px;
+        }
+
+        .pro-page{
+            position: absolute;
+            bottom:  0px;
+            left:38%;
+            font-size:14px;
+        }
+        /* Loading动画的特效 */
+        .demo-spin-icon-load {
+            animation: ani-demo-spin 1s linear infinite;
+        }
+    </style>
+</head>
+<body>
+<div id="vueBody" v-cloak>
+    <!--    <child-navigation ref="navigationEl"></child-navigation>-->
+    <div class="picscreen" >
+
+        <div class="picbg"></div>
+        <div class="home-content">
+            <div>
+                <span class="pictitle">Projects</span>
+                <span class="picdesc">This is just an description.This is just an <br />description.This is just an description.This is just an description.</span>
+                <i-button class="project-start-btn" @click="newProject"  type="default" >Create a project</i-button>
+                <i-button class="search-btn" icon="icon ion-ios-search" @click=" ">Search...</i-button>
+            </div>
+        </div>
+    </div>
+    <!--    标签栏-->
+    <div class="tabs">
+        <Row>
+            <i-col>
+                <!-- loading-->
+                <Spin fix v-show="getFinish">
+                    <Icon type="icon ion-ios-loading" size="100" class="demo-spin-icon-load" color="yellowgreen"></Icon>
+                    <div>Loading</div>
+                </Spin>
+
+                <div class="pro-tab">
+                    <Tabs v-model="currentTab" @on-click="changeTab"  >
+
+<!--                        <tab-pane v-for="(type,index) in tabPaneType" :label="type.label" :name="type.name" :icon="type.icon" class="tabpane-syle">-->
+<!--                            <tab-content  :project-list = projectShowList ></tab-content >-->
+<!--                        </tab-pane>-->
+<!--                     <Tabs  v-model="currentTab" @click.native="chooseCurrentType(currentTab)" >-->
+                        <tab-pane label="All" name="All" icon="icon ion-md-list"></tab-pane>
+                        <tab-pane label="Terrestrial"  name="Terrestrial" icon="icon ion-md-globe"></tab-pane>
+                        <tab-pane label="Coastal"  name="Coastal" icon="icon ion-ios-boat"></tab-pane>
+                        <tab-pane label="Marine"  name="Marine"  icon="icon ion-ios-water"></tab-pane>
+                        <tab-pane label="Climate"  name="Climate"  icon="icon ion-ios-partly-sunny"></tab-pane>
+                        <tab-pane label="Ecological"  name="Ecological"  icon="icon ion-ios-leaf"></tab-pane>
+                        <tab-pane label="Geological"  name="Geological"  icon="icon ion-ios-analytics"></tab-pane>
+                        <tab-pane label="Human-Activity"  name="Human"  icon="icon ion-ios-people"></tab-pane>
+                        <tab-pane label="GIS & RS"  name="GISRS"  icon="icon ion-ios-globe"></tab-pane>
+                        <tab-pane label="General"  name="General"  icon="icon ion-ios-grid"></tab-pane>
+                    </Tabs>
+                </div>
+                <div class="pro-content">
+                    <tab-content  :project-list = projectShowList ></tab-content >
+                </div>
+
+            </i-col>
+            <div class="pro-page" >
+                <Page  ref="pages" :total="projectCount" :page-size="pageSize" :current="currentPage" size="small"  @on-change="changePage"   show-elevator show-total ></Page>
+            </div>
+        </Row>
+
+    </div>
+
+    <div class="ProjectList">
+        <div v-show="currentProjectList==''&&currentProjectsStatus==2">
+        </div>
+    </div>
+
+</div>
+<script>
+    window.onload=function () {
+        var List = [{"projectId":"3f880f25-59e8-4ad2-a03d-4cfd4c867f78","title":"Participatory geoproblem solving","description":"Participatory geoproblem solving","category":"Human","managerId":"a9a5d60a-b7a4-4113-a523-c660a331b624","managerName":"mzy","introduction":"Participatory geo-problem solving","members":[{"userName":"luyuchen","userId":"1bfbe06c-be1e-40dc-bf13-bdd330ad607e"},{"userName":"zbc","userId":"172c8d44-6537-4e35-9ef7-068f1c48f67b"}],"privacy":"Public","tag":"participatory,collaboration","picture":"","createTime":"2019\/03\/27 22:51:04","endTime":""},{"projectId":"99f9f297-c945-4da0-9c69-024517a84c8d","title":"\u914D\u7F6E\u5F0F\u53EF\u89C6\u5316","description":"\u4E3A\u95E8\u6237\u7684DataItem\u7684\u6570\u636E\u8D44\u6E90\u63D0\u4F9B\u5728\u7EBF\u7684\u53EF\u4FBF\u6377\u7684\u3001\u53EF\u914D\u7F6E\u7684\u53EF\u89C6\u5316\u6548\u679C\u3002","category":"GISRS","managerId":"5a423517-3234-4205-a4ac-ce41b6c68bd0","managerName":"sunlingzhi","introduction":"\u4E3A\u95E8\u6237\u7684DataItem\u7684\u6570\u636E\u8D44\u6E90\u63D0\u4F9B\u5728\u7EBF\u7684\u53EF\u4FBF\u6377\u7684\u3001\u53EF\u914D\u7F6E\u7684\u53EF\u89C6\u5316\u6548\u679C\u3002","members":[],"privacy":"Public","tag":"\u53EF\u89C6\u5316,\u6570\u636E,UDX\u89C6\u56FE","picture":"","createTime":"2019\/03\/28 10:12:14","endTime":""},{"projectId":"93cc3106-f374-4436-8be1-0612c4234054","title":"VectorTile","description":"The building process of vector tile ","category":"GISRS","managerId":"dbbb1bd5-bb59-45c9-863a-062b967ecb4e","managerName":"Jingming","introduction":"The building process of vector tile ","members":[],"privacy":"Public","tag":"VectorTile","picture":"","createTime":"2019\/03\/30 11:06:35","endTime":""},{"projectId":"dc37a036-1ff7-4074-a42d-d064c525e770","title":"Online Saga GIS","description":"\u57FA\u4E8E saga GIS \u7684\u5728\u7EBF\u5730\u7406\u4FE1\u606F\u5206\u6790\u5E73\u53F0\u3002","category":"GISRS","managerId":"bf4950d6-4cdc-45af-9d0a-79eb8d90271a","managerName":"songjie","introduction":"\u672C\u8F6F\u4EF6\u662F\u5728\u9762\u5411\u670D\u52A1\u7684\u5206\u5E03\u5F0F\u6A21\u578B\u8D44\u6E90\u5171\u4EAB\u7684\u57FA\u7840\u4E0A\u4F7F\u7528\u6237\u80FD\u591F\u5728\u7EBF\u4F7F\u7528SAGA GIS\u5DE5\u5177\u5B9E\u73B0\u5730\u5B66\u5206\u6790\uFF0C\u907F\u514D\u96C6\u4E2D\u5F0F\u7684\u5EFA\u6A21\u4E0E\u6A21\u62DF\u73AF\u5883\u5E26\u6765\u7684\u5C01\u95ED\u6027\u5F0A\u7AEF\uFF0C\u5145\u5206\u5229\u7528\u5DF2\u6709\u7684\u6A21\u578B\u8D44\u6E90\uFF0C\u4FC3\u8FDB\u7F51\u7EDC\u7A7A\u95F4\u5F00\u653E\u5F0F\u5730\u7406\u5EFA\u6A21\u4E0E\u6A21\u62DF\u7406\u8BBA\u4E0E\u6280\u672F\u7684\u53D1\u5C55\uFF0C\u4E3A\u5730\u7406\u7814\u7A76\u8005\u63D0\u4F9B\u5F00\u653E\u3001\u9AD8\u6548\u7684\u5730\u7406\u95EE\u9898\u6C42\u89E3\u5E73\u53F0\u3002\n\u672C\u8F6F\u4EF6\u7684\u5730\u5B66\u5206\u6790\u529F\u80FD\u5305\u62EC\uFF1A\u6805\u683C\u3001\u77E2\u91CF\u6570\u636E\u7684\u5404\u79CD\u5904\u7406\uFF0C\u6C14\u5019\u76F8\u5173\u6570\u636E\u7684\u8BA1\u7B97\uFF0C\n\u9065\u611F\u5F71\u50CF\u5904\u7406\uFF0C\u7A7A\u95F4\u548C\u5730\u7406\u7EDF\u8BA1\u4EE5\u53CA\u5730\u5F62\u5206\u6790\u7B49\u3002\n","members":[{"userName":"yss123yss","userId":"faecf720-8462-4733-812e-d8ab276dca68"},{"userName":"zhangkai","userId":"26143ddf-9c89-413e-b8ca-502f1b35b606"}],"privacy":"Public","tag":"Geographic Information Analysis,Saga GIS","picture":"\/GeoProblemSolving\/project\/picture\/commen1065951.jpeg","createTime":"2019\/04\/20 11:27:23","endTime":""},{"projectId":"1a0271c3-ea65-4e9e-9526-be137041096e","title":"The simulation models of thr forest carbon cycle on a large sacle","description":"\u5730\u7403\u5316\u5B66\u6A21\u578B\u8FC7\u7A0B","category":"Ecological","managerId":"ce9e38f1-d4b2-4f8a-b461-2aae31c44b7a","managerName":"zzy","introduction":"\u5730\u7403\u5316\u5B66\u6A21\u578B\u8FC7\u7A0B","members":[],"privacy":"Public","tag":"","picture":"","createTime":"2019\/04\/22 15:19:56","endTime":""},{"projectId":"b473c6fc-9352-416e-9c0d-667e9ae87b83","title":"Thinking in Future GIS","description":"a collection of resource for future gis","category":"General","managerId":"bd077e63-478f-4ede-8a1e-ef7cf9827b11","managerName":"laowine","introduction":"this is a project attempting to discover the possible way to implement future GIS","members":[],"privacy":"Public","tag":"GIS ,Future GIS","picture":"\/GeoProblemSolving\/project\/picture\/worldtopobathymini254932.jpg","createTime":"2019\/04\/25 19:34:06","endTime":""},{"projectId":"f4501008-45de-4277-a257-00a369cb1f0d","title":"Solve","description":"Solve","category":"General","managerId":"d5418344-9d45-4d63-bb68-e60bef7da599","managerName":"sunlingzhi","introduction":"Solve","members":[],"privacy":"Public","tag":"","picture":"","createTime":"2019\/04\/25 22:15:33","endTime":""},{"projectId":"1b3d2d16-dd80-498f-bf9e-9a08fdda03a9","title":"Model-3's coupling and integrating","description":"Model-3, the third generation air quality model developed by the US EPA","category":"Climate","managerId":"b2847b1f-c19e-4a45-bd9d-27a78788056d","managerName":"Lingshan","introduction":"At present, Model-3, the third generation air quality model developed by the US EPA, is widely used in air pollution prediction. It requires different modules to simulate related air pollution processes, and the input\/output data of each model are complex and interrelated that hinder usage the model. So it is important to integrate the required models for air pollution simulation research.The project couples and integrates The Weather Research and Forecasting Model (WRF), Model of Emissions of Gases and Aerosols from Nature(MEGAN) and The Community Multiscale Air Quality Modeling System(CMAQ)","members":[{"userName":"yss123yss","userId":"faecf720-8462-4733-812e-d8ab276dca68"},{"userName":"mimi","userId":"ce9e38f1-d4b2-4f8a-b461-2aae31c44b7a"},{"userName":"laowine","userId":"bd077e63-478f-4ede-8a1e-ef7cf9827b11"}],"privacy":"Public","tag":"Atmosphere","picture":"\/GeoProblemSolving\/project\/picture\/Model3.jpg","createTime":"2019\/03\/28 11:06:45","endTime":""},{"projectId":"18622bde-468f-48cd-b3ab-528ccf0a0370","title":"\u5B9E\u73B0SEIMS\u6C34\u6587\u6A21\u578B\u3001\u4E8C\u7EF4\u5730\u8868\u5F84\u6D41\u6A21\u578B\u4EE5\u53CA\u5730\u4E0B\u7BA1\u7F51\u6A21\u578B\u7684\u8026\u5408","description":"\u6807\u9898\u4E2D\u63D0\u5230\u4E09\u4E2A\u4E0E\u6C34\u6587\u76F8\u5173\u7684\u6A21\u578B\u76F8\u4E92\u4E4B\u95F4\u90FD\u6709\u4E00\u5B9A\u7684\u5F71\u54CD\uFF0C\u4F8B\u5982\uFF1ASEIMS\u6A21\u578B\u6BCF\u6B21\u4E0B\u6E17\u6216\u84B8\u53D1\u64CD\u4F5C\uFF0C\u90FD\u4F1A\u5F71\u54CD\u5730\u8868\u5F84\u6D41\u6A21\u578B\uFF1B\u56E0\u6B64\u591A\u4E2A\u6A21\u578B\u5728\u8FD0\u884C\u8FC7\u7A0B\u4E2D\u53EF\u80FD\u5B58\u5728\u5927\u91CF\u7684\u6570\u636E\u4EA4\u4E92\u3002\u901A\u8FC7\u5B9E\u73B0\u4E09\u8005\u7684\u8026\u5408\uFF0C\u53EF\u66F4\u597D\u7684\u6A21\u62DF\u6C34\u6587\u72B6\u51B5\u3002","category":"Terrestrial","managerId":"e4cb1a18-7cc9-4192-8f0a-366d7a3ad07f","managerName":"XiaoDawei","introduction":"\u6B64\u6A21\u578B\u8026\u5408\u6848\u4F8B\u662F\u5341\u5206\u5178\u578B\u7684\u591A\u6A21\u578B\u8FD0\u884C\u8FC7\u7A0B\u4E2D\u7684\u8026\u5408\uFF0C\u5BF9\u4E8E\u5176\u4ED6\u7C7B\u4F3C\u9700\u6C42\u7684\u6A21\u578B\u8026\u5408\u6709\u5F88\u597D\u7684\u501F\u9274\u4F5C\u7528\u3002\u5982\u679C\u53EF\u4EE5\u63D0\u51FA\u901A\u7528\u7684\u89E3\u51B3\u65B9\u6848\uFF0C\u5C06\u6709\u5229\u4E8E\u5730\u7406\u5EFA\u6A21\u4E0E\u6A21\u62DF\u4E2D\u6A21\u578B\u96C6\u6210\u7684\u8F83\u597D\u5B9E\u73B0\u3002","members":[{"userName":"songjie","userId":"bf4950d6-4cdc-45af-9d0a-79eb8d90271a"},{"userName":"wangming","userId":"74524bac-5e38-477f-8b52-02eec95c753c"},{"userName":"yss123yss","userId":"faecf720-8462-4733-812e-d8ab276dca68"},{"userName":"mzy","userId":"a9a5d60a-b7a4-4113-a523-c660a331b624"},{"userName":"Chenkun","userId":"296a4d76-4718-43e9-a3df-29944c5733d9"}],"privacy":"Public","tag":"","picture":"\/GeoProblemSolving\/project\/picture\/SEIMS.png","createTime":"2019\/03\/28 13:18:45","endTime":""}];
+        // console.log(List);
+        new Vue({
+            el: '#vueBody',
+            data: {
+                getFinish: false,
+                currentTab:"All",
+                //初始化信息总条数
+                projectCount:10,
+                currentPage:1,
+                //每页显示多少条
+                pageSize:2,
+                //tabPageData
+                tabPageData:[],
+                currentProjectsStatus: 2,
+                currentProjectList:  List,
+                projectShowList: [],
+                projectType:[],
+
+                tabPaneType:[{  label:"All",name:"All",icon:"icon ion-md-list"},
+                    { label:"Terrestrial", name:"Terrestrial", icon:"icon ion-md-globe"},
+                    {label:"Coastal", name:"Coastal",icon:"icon ion-ios-boat"},
+                    {label:"Marine", name:"Marine", icon:"icon ion-ios-water"},
+                    {label:"Climate", name:"Climate", icon:"icon ion-ios-partly-sunny"},
+                    {label:"Ecological", name:"Ecological", icon:"icon ion-ios-leaf"},
+                    {label:"Geological", name:"Geological", icon:"icon ion-ios-analytics"},
+                    {label:"Human-Activity", name:"Human" ,icon:"icon ion-ios-people"},
+                    {label:"GIS & RS", name:"GISRS" ,icon:"icon ion-ios-globe"},
+                    {label:"General", name:"General", icon:"icon ion-ios-grid"}
+                ]
+            },
+            mounted:{
+
+            },
+            methods: {
+                ////该方法负责将选中的类别传递给显示的div
+                // chooseCurrentType(data) {
+                //     switch (data) {
+                //         case "All":
+                //             let allObject = { key: "category", value: "All" };
+                //             this.getSpecificTypeProjects(allObject);
+                //             break;
+                //         case "Terrestrial":
+                //             let terrestrialObject = { key: "category", value: "Terrestrial" };
+                //             this.getSpecificTypeProjects(terrestrialObject);
+                //             break;
+                //         case "Coastal":
+                //             let coastalObject = { key: "category", value: "Coastal" };
+                //             this.getSpecificTypeProjects(coastalObject);
+                //             break;
+                //         case "Marine":
+                //             let marineObject = { key: "category", value: "Marine" };
+                //             this.getSpecificTypeProjects(marineObject);
+                //             break;
+                //         case "Climate":
+                //             let climateObject = { key: "category", value: "Climate" };
+                //             this.getSpecificTypeProjects(climateObject);
+                //             break;
+                //         case "Ecological":
+                //             let ecologicalObject = { key: "category", value: "Ecological" };
+                //             this.getSpecificTypeProjects(ecologicalObject);
+                //             break;
+                //         case "Geological":
+                //             let geologicalObject = { key: "category", value: "Geological" };
+                //             this.getSpecificTypeProjects(geologicalObject);
+                //             break;
+                //         case "Human":
+                //             let humanObject = { key: "category", value: "Ecological" };
+                //             this.getSpecificTypeProjects(humanObject);
+                //             break;
+                //         case "GISRS":
+                //             let GISRSObject = { key: "category", value: "Ecological" };
+                //             this.getSpecificTypeProjects(GISRSObject);
+                //             break;
+                //         case "General":
+                //             let generalObject = { key: "category", value: "Ecological" };
+                //             this.getSpecificTypeProjects(generalObject);
+                //             break;
+                //
+                //     }
+                // },
+
+                // getTabProjects() {
+                //     this.getFinish = true;
+                //     // console.log("2");
+                //     axios
+                //         .get("/GeoProblemSolving/project/inquiryByPage",{
+                //         params:{
+                //                 category:this.currentTab,
+                //                 page:2,
+                //                 pageSize:2
+                //             }
+                //         })
+                //         .then(res => {                            //结束等待
+                //             this.getFinish = false;
+                //             if (res.data === "None") {
+                //                 this.currentProjectList = [];
+                //             } else {
+                //                 // this.judgeMember(res.data);
+                //                 // console.log(res.data)
+                //             }
+                //             this.projectShowList = Object.assign([], this.currentProjectList);
+                //             // this.$set(this, "currentProjectList", projectList);
+                //             console.log( this.projectShowList);
+                //         })
+                //         .catch(err => {
+                //             console.log(err.data);
+                //         });
+                // },
+
+                changeTab(type) {
+                    this.currentTab=type;
+                    this.currentPage=1;
+                    this.activePage=1;
+                    console.log(this.currentTab);
+                    this.$nextTick(function(){
+                        this.$refs['pages'].currentPage = 1;
+                    });
+                    this.changePage(1);
+                },
+                changePage(index){
+                    axios
+                        .get("/GeoProblemSolving/project/inquiryByPage",{
+                            params:{
+                                category:this.currentTab,
+                                page:index,
+                                pageSize:this.pageSize,
+                            }
+                        })
+                        .then(res => {                            //结束等待
+                            console.log(this.currentTab);
+                            this.getFinish = false;
+                            if (res.data === "None") {
+                                this.currentProjectList = [];
+                                this.currentProjectsStatus = 0;
+                            } else {
+                                this.judgeMember(res.data.projectList);
+                                this.currentProjectsStatus = 1;
+                            }
+                            this.projectShowList = Object.assign([], res.data.projectList);
+                            //this.projectShowList = Object.assign([],this.currentProjectList);
+                            console.log( this.projectShowList);
+                            // return this.projectShowList;
+
+                        })
+                        .catch(err => {
+                            console.log(err.data);
+                        });
+
+                },
+
+                // 判断是不是成员
+                judgeMember(list) {
+                    //这样的话拿到了用户的id与name
+                    let projectList = list;
+                    if (projectList.length != 0) {
+                        for (var i = 0; i < projectList.length; i++) {
+                            let managerId = projectList[i].managerId;
+                            let members = projectList[i].members;
+                            if (managerId == '') {
+                                projectList[i]["isManager"] = true;
+                            } else {
+                                projectList[i]["isManager"] = false;
+                            }
+                            if (members.length != 0) {
+                                for (var j = 0; j < members.length; j++) {
+                                    if (members[j].userId == '') {
+                                        projectList[i]["isMember"] = true;
+                                        break;
+                                    } else {
+                                        projectList[i]["isMember"] = false;
+                                    }
+                                }
+                            } else {
+                                projectList[i]["isMember"] = false;
+                            }
+                        }
+                       this.$set(this, "currentProjectList", projectList);
+                       // this.currentProjectList = Object.assign([],this.currentProjectList, projectList);
+                        console.log(this.currentProjectList)
+                    }
+                },
+
+                newProject() {
+                    // if (!this.$store.getters.userState) {
+                    //     this.$router.push({ name: "Login" });
+                    // } else {
+                    //     this.$router.push({ name: "NewProject" });
+                    // }
+                },
+
+            }
+        })
+    }
+</script>
+
+</body>
+</html>

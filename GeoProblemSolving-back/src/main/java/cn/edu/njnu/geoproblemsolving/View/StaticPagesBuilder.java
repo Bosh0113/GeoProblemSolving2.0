@@ -15,8 +15,12 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +34,6 @@ public class StaticPagesBuilder {
 
     public void personalPageBuilder(String userId){
         try {
-
             ClassLoaderTemplateResolver resolver = new ClassLoaderTemplateResolver();
             resolver.setPrefix("templates/");//模板所在目录，相对于当前classloader的classpath。
             resolver.setSuffix(".html");//模板文件后缀
@@ -78,5 +81,39 @@ public class StaticPagesBuilder {
             templateEngine.process("personalPage", context, write);
             System.out.println("personal page has been build success.");
         }catch (Exception ignored){}
+    }
+
+    public void projectListBuilder() {
+        try {
+            ClassLoaderTemplateResolver resolver = new ClassLoaderTemplateResolver();
+            resolver.setPrefix("templates/");//模板所在目录，相对于当前classloader的classpath。
+            resolver.setSuffix(".html");//模板文件后缀
+            TemplateEngine templateEngine = new TemplateEngine();
+            templateEngine.setTemplateResolver(resolver);
+
+            //构造上下文(Model)
+            Context context = new Context();
+            List<ProjectEntity> projects = mongoTemplate.findAll(ProjectEntity.class);
+            List<UserEntity> users = mongoTemplate.findAll(UserEntity.class);
+            context.setVariable("projects", projects);
+//            context.setVariable("users",users);
+
+//            context.setVariable("");
+
+            //渲染模板
+            String servicePath =System.getProperty("user.dir")+"\\src\\main\\webapp";
+            String htmlPath = servicePath+"/Projects";
+            File temp = new File(htmlPath);
+            if (!temp.exists()) {
+                temp.mkdirs();
+            }
+
+            String htmlFile = htmlPath+"/result.html";
+            System.out.println("Build File: "+htmlFile);
+            FileWriter write = new FileWriter(htmlFile);
+            templateEngine.process("projectList", context, write);
+            System.out.println("projectlist page has been build success.");
+        }catch (Exception ignored){}
+
     }
 }

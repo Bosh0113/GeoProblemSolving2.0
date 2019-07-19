@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @RestController
 @RequestMapping(value = "/static")
@@ -19,5 +21,14 @@ public class StaticPagesController {
     public void personalPage(@RequestParam("userId") String userId){
         StaticPagesBuilder staticPagesBuilder = new StaticPagesBuilder(mongoTemplate);
         staticPagesBuilder.personalPageBuilder(userId);
+    }
+
+
+    @RequestMapping(value = "/project/create", method = RequestMethod.GET)
+    public void BuildExampleHTML(){
+        StaticPagesBuilder projectStatic = new StaticPagesBuilder(mongoTemplate);
+        try {
+            projectStatic.projectListBuilder();
+        }catch (Exception ignored){}
     }
 }

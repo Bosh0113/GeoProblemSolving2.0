@@ -1,17 +1,15 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head >
-    <header th:replace="common/head::commonHeader"></header>
-    <meta charset="UTF-8">
     <title>Demo</title>
-    <script src="https://cdn.bootcss.com/vue/2.5.16/vue.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-    <!-- import stylesheet -->
-    <link href="https://cdn.bootcss.com/iview/2.14.0/styles/iview.css" rel="stylesheet">
-    <!-- import iView -->
-    <script src="https://cdn.bootcss.com/iview/2.14.0/iview.min.js"></script>
-    <script src="https://unpkg.com/ionicons@4.5.10-1/dist/ionicons.js"></script>
+    <meta http-equiv="Content-Type" content=" charset=UTF-8" />
+    <script type="module" src="https://unpkg.com/ionicons@4.5.10-1/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule="" src="https://unpkg.com/ionicons@4.5.10-1/dist/ionicons/ionicons.js"></script>
     <link href="https://unpkg.com/ionicons@4.5.10-1/dist/css/ionicons.min.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/vue/2.6.10/vue.min.js"></script>
+    <link href="https://cdn.bootcss.com/iview/3.4.2/styles/iview.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/iview/3.4.2/iview.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue-avatar@2.1.7/dist/vue-avatar.min.js"></script>
 
     <style scoped th:fragment="tab-style">
@@ -178,116 +176,117 @@
 
 
 <script th:fragment="tab-component" th:inline="javascript">
-
-    Vue.component('tab-content',{
-        template:'#tabContent',
-        props: ["projectList"],
-        components:{
-            'avatar':VueAvatar.Avatar
-        },
-        data(){
-            return{
-                selectedProjectInfo: {},
-                projectInfoModal: false,//modal模态框
-                columns: [
-                    { title: "Key", key: "key", width: "150px" },
-                    { title: "Value", key: "value" , width: "618px"}
-                ],
-                projectInfoShow: [],
-                //加入项目
-                applyProjectInfo: {},
-                applyValidate: {
-                    reason: ""
-                },
-                applyRuleValidate: {
-                    reason: [
-                        { required: true, message: "Please enter the reason for application", trigger: "blur" },
-                        { type: "string", min: 5, message: "The reason no less than 10 characters", trigger: "blur" }
-                    ]
-                },
-                applyJoinModal: false,
-                // 记录已经申请的情况
-                haveApplied: false,
-                // 申请加入项目的模态框
-                applyJoinModal: false,
-                // // 申请加入公共项目的模态框
-                // publicApplyAssureModal: false
-            }
-        },
-
-        methods:{
-            projectInfoModalShow(projectInfo) {
-                if (projectInfo.isMember || projectInfo.isManager) {
-                    // this.$router.push({ path: `project/${projectInfo.projectId}` });
-                    window.location.href="/GeoProblemSolving/Projects/${projectInfo.projectId}"
-                } else {
-                    this.selectedProjectInfo = Object.assign({}, projectInfo);
-                    var category = "";
-                    if (projectInfo.category != "Human" &&  projectInfo.category != "GISRS"){category = projectInfo.category;}
-                    else if (projectInfo.category == "Human"){category = "Human-Activity";}
-                    else if (projectInfo.category == "GISRS"){category = "GIS & RS";}
-
-                    var membersName = "";
-                    var members = projectInfo.members;
-                    for (var i = 0; i < members.length; i++) {
-                        if (i == 0) {
-                            membersName = members[i].userName;
-                        } else {
-                            membersName = membersName + "," + members[i].userName;
-                        }
-                    }
-                    this.projectInfoShow = [
-                        {
-                            key: "Category",
-                            value: category
-                        },
-                        {
-                            key: "Title",
-                            value: projectInfo.title
-                        },
-                        {
-                            key: "Description",
-                            value: projectInfo.description
-                        },
-                        {
-                            key: "Introduction",
-                            value: projectInfo.introduction
-                        },
-                        {
-                            key: "Tag",
-                            value: projectInfo.tag
-                        },
-                        {
-                            key: "Manager",
-                            value: projectInfo.managerName
-                        },
-                        {
-                            key: "Members",
-                            value: membersName
-                        },
-                        {
-                            key: "Created Time",
-                            value: projectInfo.createTime
-                        }
-                    ];
-
-                    this.projectInfoModal = true;
+        Vue.component('tab-content',{
+            template:'#tabContent',
+            props: ["projectList"],
+            components:{
+                'avatar':VueAvatar.Avatar
+            },
+            mounted(){
+                console.log(this.projectList);
+            },
+            data(){
+                return{
+                    selectedProjectInfo: {},
+                    projectInfoModal: false,//modal模态框
+                    columns: [
+                        { title: "Key", key: "key", width: "150px" },
+                        { title: "Value", key: "value" , width: "618px"}
+                    ],
+                    projectInfoShow: [],
+                    //加入项目
+                    applyProjectInfo: {},
+                    applyValidate: {
+                        reason: ""
+                    },
+                    applyRuleValidate: {
+                        reason: [
+                            { required: true, message: "Please enter the reason for application", trigger: "blur" },
+                            { type: "string", min: 5, message: "The reason no less than 10 characters", trigger: "blur" }
+                        ]
+                    },
+                    applyJoinModal: false,
+                    // 记录已经申请的情况
+                    haveApplied: false,
+                    // 申请加入项目的模态框
+                    applyJoinModal: false,
+                    // // 申请加入公共项目的模态框
+                    // publicApplyAssureModal: false,
+                    UserState:false
                 }
             },
+            methods:{
+                projectInfoModalShow(projectInfo) {
+                    if (projectInfo.isMember || projectInfo.isManager) {
+                        // this.$router.push({ path: `project/${projectInfo.projectId}` });
+                        window.location.href="/GeoProblemSolving/Projects/${projectInfo.projectId}";
+                        console.log(projectList);
+                    } else {
+                        console.log(projectList);
+                        this.selectedProjectInfo = Object.assign({}, projectInfo);
+                        var category = "";
+                        if (projectInfo.category != "Human" &&  projectInfo.category != "GISRS"){category = projectInfo.category;}
+                        else if (projectInfo.category == "Human"){category = "Human-Activity";}
+                        else if (projectInfo.category == "GISRS"){category = "GIS & RS";}
 
-            login() {
-                window.location.href="/GeoProblemSolving/Login"
-            },
+                        var membersName = "";
+                        var members = projectInfo.members;
+                        for (var i = 0; i < members.length; i++) {
+                            if (i == 0) {
+                                membersName = members[i].userName;
+                            } else {
+                                membersName = membersName + "," + members[i].userName;
+                            }
+                        }
+                        this.projectInfoShow = [
+                            {
+                                key: "Category",
+                                value: category
+                            },
+                            {
+                                key: "Title",
+                                value: projectInfo.title
+                            },
+                            {
+                                key: "Description",
+                                value: projectInfo.description
+                            },
+                            {
+                                key: "Introduction",
+                                value: projectInfo.introduction
+                            },
+                            {
+                                key: "Tag",
+                                value: projectInfo.tag
+                            },
+                            {
+                                key: "Manager",
+                                value: projectInfo.managerName
+                            },
+                            {
+                                key: "Members",
+                                value: membersName
+                            },
+                            {
+                                key: "Created Time",
+                                value: projectInfo.createTime
+                            }
+                        ];
 
-            enterProject(projectInfo) {
-                window.location.href="/GeoProblemSolving/Projects/${projectInfo.projectId}"
-            },
+                        this.projectInfoModal = true;
+                    }
+                },
 
-        }
-    });
+                login() {
+                    window.location.href="/GeoProblemSolving/Login"
+                },
 
+                enterProject(projectInfo) {
+                    window.location.href="/GeoProblemSolving/Projects/${projectInfo.projectId}"
+                },
 
-
+            }
+        })
 
 </script>
 

@@ -11,14 +11,18 @@ public class NavigationController {
         return "home";
     }
 
-    @RequestMapping("/p")
+    @RequestMapping("/test")
     public String navigation2() {
-        return "personalPage";
+        return "test";
     }
 
     @RequestMapping("/nav")
     public String navigation3() {
         return "navigation";
+    }
+    @RequestMapping("/pro")
+    public String navigation4() {
+        return "projectList";
     }
 
 
