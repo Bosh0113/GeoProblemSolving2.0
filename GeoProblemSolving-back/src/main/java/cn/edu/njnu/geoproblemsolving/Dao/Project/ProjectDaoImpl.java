@@ -394,7 +394,7 @@ public class ProjectDaoImpl implements IProjectDao {
                     String suffix = fileNames.substring(fileNames.lastIndexOf(".") + 1);
                     String regexp = "[^A-Za-z_0-9\\u4E00-\\u9FA5]";
                     String saveName = fileName.replaceAll(regexp, "");
-                    String folderPath = servicePath + "project\\picture";
+                    String folderPath = servicePath + "project/picture";
                     File temp = new File(folderPath);
                     if (!temp.exists()) {
                         temp.mkdirs();
@@ -404,7 +404,7 @@ public class ProjectDaoImpl implements IProjectDao {
                         randomNum = randomNum * 10 + (int) (Math.random() * 10 + 1);
                     }
                     String newFileTitle = saveName + randomNum + "." + suffix;
-                    String localPath = temp + "\\" + newFileTitle;
+                    String localPath = temp + "/" + newFileTitle;
                     System.out.println("图片上传到本地路径：" + localPath);
                     File file = new File(localPath);
                     FileOutputStream fileOutputStream = new FileOutputStream(file);
