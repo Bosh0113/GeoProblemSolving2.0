@@ -1,4 +1,4 @@
-package cn.edu.njnu.geoproblemsolving.incomparison.bean;
+package cn.edu.njnu.geoproblemsolving.comparison.bean;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

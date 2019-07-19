@@ -1,4 +1,4 @@
-package cn.edu.njnu.geoproblemsolving.incomparison.enums;
+package cn.edu.njnu.geoproblemsolving.comparison.enums;
 
 /**
  * 自定义的异常code，请勿覆盖常见的HttpStatus.*.value()

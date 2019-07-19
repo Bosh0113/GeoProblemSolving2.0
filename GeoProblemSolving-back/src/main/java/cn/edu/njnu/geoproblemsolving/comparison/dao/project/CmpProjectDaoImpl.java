@@ -1,6 +1,6 @@
-package cn.edu.njnu.geoproblemsolving.incomparison.dao.project;
+package cn.edu.njnu.geoproblemsolving.comparison.dao.project;
 
-import cn.edu.njnu.geoproblemsolving.incomparison.entity.CmpProject;
+import cn.edu.njnu.geoproblemsolving.comparison.entity.CmpProject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -34,6 +34,11 @@ public class CmpProjectDaoImpl implements ICmpProjectDao {
         project.setCreateTime(dateFormat.format(date));
         String projectId = UUID.randomUUID().toString();
         project.setProjectId(projectId);
+        // 设置modelList
+
+        // 设置outputList
+
+        // 默认 public
         mongoTemplate.save(project);
         return project.getProjectId();
     }

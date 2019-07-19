@@ -18,6 +18,11 @@ import * as socketApi from './api/socket'
 //set globe CSS
 import './assets/css/style.css'
 
+//*********add by songjie******/
+import api from "./request/api"
+Vue.prototype.$api = api; //* 封装的 api，设置为Vue原型可避免每次使用都 import
+//*****************************/
+
 axios.defaults.withCredentials=true;
 Vue.prototype.socketApi = socketApi
 Vue.config.productionTip = false

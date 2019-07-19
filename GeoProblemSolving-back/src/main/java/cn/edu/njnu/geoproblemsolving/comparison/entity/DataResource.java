@@ -1,6 +1,6 @@
-package cn.edu.njnu.geoproblemsolving.incomparison.entity;
+package cn.edu.njnu.geoproblemsolving.comparison.entity;
 
-import cn.edu.njnu.geoproblemsolving.incomparison.enums.DataResourceTypeEnum;
+import cn.edu.njnu.geoproblemsolving.comparison.enums.DataResourceTypeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

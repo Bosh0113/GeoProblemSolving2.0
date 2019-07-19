@@ -1,4 +1,4 @@
-package cn.edu.njnu.geoproblemsolving.incomparison.entity;
+package cn.edu.njnu.geoproblemsolving.comparison.entity;
 
 import com.alibaba.fastjson.JSONArray;
 import lombok.AllArgsConstructor;
@@ -6,8 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import java.util.Date;
 
 /**
  * @Author: SongJie

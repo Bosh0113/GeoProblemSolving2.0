@@ -1,4 +1,4 @@
-package cn.edu.njnu.geoproblemsolving.incomparison.entity;
+package cn.edu.njnu.geoproblemsolving.comparison.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

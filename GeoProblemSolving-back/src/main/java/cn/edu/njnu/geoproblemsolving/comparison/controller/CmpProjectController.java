@@ -1,16 +1,18 @@
-package cn.edu.njnu.geoproblemsolving.incomparison.controller;
+package cn.edu.njnu.geoproblemsolving.comparison.controller;
 
-import cn.edu.njnu.geoproblemsolving.incomparison.bean.JsonResult;
-import cn.edu.njnu.geoproblemsolving.incomparison.dao.project.CmpProjectDaoImpl;
-import cn.edu.njnu.geoproblemsolving.incomparison.dao.subproject.CmpSubprojectDaoImpl;
-import cn.edu.njnu.geoproblemsolving.incomparison.entity.CmpProject;
-import cn.edu.njnu.geoproblemsolving.incomparison.entity.CmpSubproject;
-import cn.edu.njnu.geoproblemsolving.incomparison.enums.ResultEnum;
-import cn.edu.njnu.geoproblemsolving.incomparison.utils.ResultUtils;
+import cn.edu.njnu.geoproblemsolving.comparison.bean.JsonResult;
+import cn.edu.njnu.geoproblemsolving.comparison.dao.project.CmpProjectDaoImpl;
+import cn.edu.njnu.geoproblemsolving.comparison.dao.subproject.CmpSubprojectDaoImpl;
+import cn.edu.njnu.geoproblemsolving.comparison.entity.CmpProject;
+import cn.edu.njnu.geoproblemsolving.comparison.entity.CmpSubproject;
+import cn.edu.njnu.geoproblemsolving.comparison.enums.ResultEnum;
+import cn.edu.njnu.geoproblemsolving.comparison.utils.ResultUtils;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.http.HttpRequest;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -1,6 +1,6 @@
-package cn.edu.njnu.geoproblemsolving.incomparison.dao.project;
+package cn.edu.njnu.geoproblemsolving.comparison.dao.project;
 
-import cn.edu.njnu.geoproblemsolving.incomparison.entity.CmpProject;
+import cn.edu.njnu.geoproblemsolving.comparison.entity.CmpProject;
 
 import java.util.List;
 

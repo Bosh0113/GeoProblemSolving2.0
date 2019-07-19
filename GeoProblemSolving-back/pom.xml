@@ -134,6 +134,13 @@
             <artifactId>ognl</artifactId>
             <version>3.2.10</version>
         </dependency>
+
+        <!--songjie add-->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
     </dependencies>
 
     <build>

@@ -7,7 +7,7 @@ Vue.use(Router)
 
 
 const routes = [{
-  path: '/', name: 'Navigation',component: resolve=>(require(["@/components/navigation"],resolve)), children: [
+  path: '/',component: resolve=>(require(["@/components/navigation"],resolve)), children: [
     { path: '', redirect: 'home'},
     { path: 'home', name: 'Home', component: resolve=>(require(["@/components/navigationContent/home"],resolve)) },
     { path: 'projectlist', name: 'Projects', component: resolve=>(require(["@/components/navigationContent/projectList"],resolve)) },
@@ -27,7 +27,9 @@ const routes = [{
     { path: 'join/:id/:email', name: 'joinProject', component: resolve=>(require(["@/components/Projects/joinNewProject"],resolve)) },
     { path: 'login', name: 'Login', component: resolve=>(require(["@/components/usersState/login"],resolve)) },
     { path: 'register', name: 'Register', component: resolve=>(require(["@/components/usersState/register"],resolve)) },
-    { path: 'resetPassword/:email', name: 'resetPassword', component: resolve=>(require(["@/components/UsersState/resetPwd"],resolve)) } 
+    { path: 'resetPassword/:email', name: 'resetPassword', component: resolve=>(require(["@/components/UsersState/resetPwd"],resolve)) } ,
+    { path: 'cmp-projectlist',name:'cmp-projectlist',component:()=>import("@/views/comparison/CmpProjectList")},
+    { path: 'create-cmp-project', name:'create-cmp-project',component:()=>import("@/views/comparison/CreateProject")}
   ]
 },
 { path: '/chat', name: 'chatUtil', component: resolve=>(require(["@/components/utils/chatroom"],resolve)) },

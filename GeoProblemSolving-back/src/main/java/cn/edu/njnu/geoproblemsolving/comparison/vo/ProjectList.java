@@ -1,6 +1,6 @@
-package cn.edu.njnu.geoproblemsolving.incomparison.vo;
+package cn.edu.njnu.geoproblemsolving.comparison.vo;
 
-import cn.edu.njnu.geoproblemsolving.incomparison.entity.CmpProject;
+import cn.edu.njnu.geoproblemsolving.comparison.entity.CmpProject;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

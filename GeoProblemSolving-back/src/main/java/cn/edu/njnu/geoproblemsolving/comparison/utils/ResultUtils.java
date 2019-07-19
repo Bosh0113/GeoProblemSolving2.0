@@ -1,8 +1,8 @@
-package cn.edu.njnu.geoproblemsolving.incomparison.utils;
+package cn.edu.njnu.geoproblemsolving.comparison.utils;
 
 
-import cn.edu.njnu.geoproblemsolving.incomparison.bean.JsonResult;
-import cn.edu.njnu.geoproblemsolving.incomparison.enums.ResultEnum;
+import cn.edu.njnu.geoproblemsolving.comparison.bean.JsonResult;
+import cn.edu.njnu.geoproblemsolving.comparison.enums.ResultEnum;
 
 /**
  * @ClassName ResultUtils

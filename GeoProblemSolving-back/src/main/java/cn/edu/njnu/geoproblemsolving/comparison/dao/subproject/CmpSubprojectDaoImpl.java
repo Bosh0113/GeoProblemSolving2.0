@@ -1,8 +1,7 @@
-package cn.edu.njnu.geoproblemsolving.incomparison.dao.subproject;
+package cn.edu.njnu.geoproblemsolving.comparison.dao.subproject;
 
-import cn.edu.njnu.geoproblemsolving.incomparison.entity.CmpProject;
-import cn.edu.njnu.geoproblemsolving.incomparison.entity.CmpSubproject;
-import com.alibaba.fastjson.JSONArray;
+import cn.edu.njnu.geoproblemsolving.comparison.entity.CmpProject;
+import cn.edu.njnu.geoproblemsolving.comparison.entity.CmpSubproject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 

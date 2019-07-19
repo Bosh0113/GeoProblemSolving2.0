@@ -1,4 +1,4 @@
-package cn.edu.njnu.geoproblemsolving.incomparison.enums;
+package cn.edu.njnu.geoproblemsolving.comparison.enums;
 
 /**
  * @EnumName DataResourceTypeEnum

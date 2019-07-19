@@ -94,9 +94,13 @@ footer {
           <MenuItem name="home" class="menuItem" style="margin-left:35%">
             <span>Home</span>
           </MenuItem>
-          <MenuItem name="projects" class="menuItem">
-            <span>Projects</span>
-          </MenuItem>
+          <Submenu name="projects" class="menuItem" >
+            <template slot="title">
+              <span>Projects</span>
+            </template>
+              <MenuItem name="projects">GeoProblem Solving</MenuItem>
+              <MenuItem name="geoModel-compare-projects">GeoModel Compare</MenuItem>
+          </Submenu>
           <MenuItem name="resources" class="menuItem">
             <span>Resources</span>
           </MenuItem>
@@ -251,6 +255,8 @@ export default {
         this.$router.replace({ name: "Community" });
       } else if (name == "help") {
         this.$router.replace({ name: "Help" });
+      } else if(name == "geoModel-compare-projects"){
+        this.$router.replace({name:"cmp-projectlist"})
       }
     },
     goHome() {
