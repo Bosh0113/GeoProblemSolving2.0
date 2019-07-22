@@ -18,10 +18,10 @@ public class ExampleController {
     private MongoTemplate mongoTemplate;
 
     @RequestMapping(value = "/build", method = RequestMethod.GET)
-    public void BuildExampleHTML(HttpServletRequest request, HttpServletResponse response){
+    public void BuildExampleHTML(HttpServletResponse response){
         ExampleStatic exampleStatic = new ExampleStatic(mongoTemplate);
         try {
-            exampleStatic.buildStaticHTML(request,response);
+            exampleStatic.buildStaticHTML(response);
         }catch (Exception ignored){}
     }
 }

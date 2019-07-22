@@ -29,4 +29,6 @@ public interface IProjectDao {
     String applyByEmail(EmailEntity emailEntity);
 
     String uploadPicture(HttpServletRequest request);
+
+    Object inquiryByPage(String category, int page, int pageSize);
 }

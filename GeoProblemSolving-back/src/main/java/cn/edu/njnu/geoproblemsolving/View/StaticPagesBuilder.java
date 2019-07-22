@@ -83,14 +83,19 @@ public class StaticPagesBuilder {
         }catch (Exception ignored){}
     }
 
+<<<<<<< HEAD
     public void projectListBuilder() {
         try {
+=======
+    public void projectDetailPageBuilder(String projectId){
+>>>>>>> master
             ClassLoaderTemplateResolver resolver = new ClassLoaderTemplateResolver();
             resolver.setPrefix("templates/");//模板所在目录，相对于当前classloader的classpath。
             resolver.setSuffix(".html");//模板文件后缀
             TemplateEngine templateEngine = new TemplateEngine();
             templateEngine.setTemplateResolver(resolver);
 
+<<<<<<< HEAD
             //构造上下文(Model)
             Context context = new Context();
             List<ProjectEntity> projects = mongoTemplate.findAll(ProjectEntity.class);
@@ -103,10 +108,22 @@ public class StaticPagesBuilder {
             //渲染模板
             String servicePath =System.getProperty("user.dir")+"\\src\\main\\webapp";
             String htmlPath = servicePath+"/Projects";
+=======
+            Context context = new Context();
+            Query queryProjectInfo = new Query(Criteria.where("projectId").is(projectId));
+            ProjectEntity projectEntity = mongoTemplate.findOne(queryProjectInfo,ProjectEntity.class);
+            context.setVariable("projectInfo",projectEntity);
+            context.setVariable("activeName","projects");
+
+            //渲染模板
+            String servicePath = System.getProperty("user.dir")+"\\src\\main\\webapp";
+            String htmlPath = servicePath+"\\project";
+>>>>>>> master
             File temp = new File(htmlPath);
             if (!temp.exists()) {
                 temp.mkdirs();
             }
+<<<<<<< HEAD
 
             String htmlFile = htmlPath+"/result.html";
             System.out.println("Build File: "+htmlFile);
@@ -115,5 +132,12 @@ public class StaticPagesBuilder {
             System.out.println("projectlist page has been build success.");
         }catch (Exception ignored){}
 
+=======
+            String htmlFile = htmlPath+"\\"+projectId+".html";
+            try{
+                FileWriter write = new FileWriter(htmlFile);
+                templateEngine.process("projectDetail", context, write);
+            }catch (Exception ignored){}
+>>>>>>> master
     }
 }
