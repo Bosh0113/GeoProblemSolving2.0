@@ -1,5 +1,8 @@
 package cn.edu.njnu.geoproblemsolving.comparison.dao.project;
 
+import cn.edu.njnu.geoproblemsolving.Entity.UserEntity;
+import cn.edu.njnu.geoproblemsolving.comparison.dao.dataresource.DataResourceDaoImpl;
+import cn.edu.njnu.geoproblemsolving.comparison.dao.modelresource.ModelResourceDaoImpl;
 import cn.edu.njnu.geoproblemsolving.comparison.entity.CmpProject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -29,16 +32,31 @@ public class CmpProjectDaoImpl implements ICmpProjectDao {
 
     @Override
     public String addProject(CmpProject project) {
+        // 1.createdTime
         Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         project.setCreateTime(dateFormat.format(date));
+        // 2.projectId
         String projectId = UUID.randomUUID().toString();
         project.setProjectId(projectId);
-        // 设置modelList
-
-        // 设置outputList
-
-        // 默认 public
+        // 3.设置 memberName:
+        Query query = Query.query(Criteria.where("userId").is(project.getManagerId()));
+        UserEntity userInfo = mongoTemplate.findOne(query, UserEntity.class);
+        project.setManagerName(userInfo.getUserName());
+        // 4.设置默认 public
+        project.setPrivacy("Public");
+        // 5.设置outputList
+        if(project.getOutputDataList()!=null && project.getOutputDataList().size()>0){
+            DataResourceDaoImpl dataResourceDao = new DataResourceDaoImpl(mongoTemplate);
+            List<String> dataIdList = dataResourceDao.createDataResByNameList(project.getOutputDataList(), userInfo);
+            project.setOutputDataList(dataIdList);
+        }
+        // 6.设置modelList
+        if(project.getModelList()!=null&&project.getModelList().size()>0){
+            ModelResourceDaoImpl modelResourceDao = new ModelResourceDaoImpl(mongoTemplate);
+            List<String> modelIdList = modelResourceDao.createModelResByNameList(project.getModelList(), userInfo);
+            project.setModelList(modelIdList);
+        }
         mongoTemplate.save(project);
         return project.getProjectId();
     }

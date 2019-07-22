@@ -1,5 +1,9 @@
 package cn.edu.njnu.geoproblemsolving.comparison.dao.modelresource;
 
+import cn.edu.njnu.geoproblemsolving.Entity.UserEntity;
+
+import java.util.List;
+
 /**
  * @Author: SongJie
  * @Description:
@@ -7,4 +11,5 @@ package cn.edu.njnu.geoproblemsolving.comparison.dao.modelresource;
  * @Modified By:
  **/
 public interface IModelResourceDao {
+    List<String> createModelResByNameList(List<String> nameList, UserEntity user);
 }

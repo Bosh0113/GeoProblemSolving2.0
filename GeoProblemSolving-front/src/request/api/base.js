@@ -5,7 +5,7 @@ const cmpProject = "/cmp_project";
  */
 
  const base ={
-   cmpProjcet: `${appName}/${cmpProject}`,
+   cmpProjcet: `${appName}${cmpProject}`,
  }
 
  export default base;

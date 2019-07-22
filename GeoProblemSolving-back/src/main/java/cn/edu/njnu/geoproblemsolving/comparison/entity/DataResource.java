@@ -22,14 +22,13 @@ import java.util.List;
 @Document
 public class DataResource {
     // 基本信息
-    @Id
-    private String id;
+    private String dataId;
     private String ownerName;
     private String ownerId;
     private String fileName;
     private int fileSize;
     private DataResourceTypeEnum fileType;
-    private Date createdTime;
+    private String createdTime;
     private List<String> imgPaths;
     private boolean isPrivate;
     private String md5;
@@ -52,6 +51,12 @@ public class DataResource {
     private String categoryId;
     private String categoryName;
 
-
+    public DataResource(String fileName,String dataId,String ownerId,String ownerName,String createdTime){
+        this.fileName = fileName;
+        this.dataId = dataId;
+        this.ownerId = ownerId;
+        this.ownerName = ownerName;
+        this.createdTime = createdTime;
+    }
 
 }

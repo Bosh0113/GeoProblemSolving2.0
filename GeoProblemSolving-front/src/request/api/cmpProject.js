@@ -4,6 +4,9 @@ import axios from "../http"
 const cmp_project = {
   create(project){
     return axios.post(`${base.cmpProjcet}/createProject`,project);
+  },
+  getAllProjects(){
+    return axios.get(`${base.cmpProjcet}/getAllProjects`);
   }
 }
 

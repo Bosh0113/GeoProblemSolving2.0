@@ -19,14 +19,21 @@ import java.util.Date;
 @AllArgsConstructor
 @Document
 public class ModelResource {
-    @Id
-    String id;
+    String modelId;
     String ownerId;
     String ownerName;
 
 //    String[] nodeIds;
     String modelName;
     String desc;
-    Date createdTime;
+    String createdTime;
     //todo udxschema
+
+    public ModelResource(String modelId,String modelName,String ownerId,String ownerName,String createdTime){
+        this.modelId=modelId;
+        this.modelName=modelName;
+        this.ownerId=ownerId;
+        this.ownerName=ownerName;
+        this.createdTime=createdTime;
+    }
 }

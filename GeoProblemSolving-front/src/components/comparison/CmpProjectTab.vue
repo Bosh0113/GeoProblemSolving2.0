@@ -1,12 +1,22 @@
 <template>
   <Row>
-    <Col :xs="{ span: 21, offset: 1 }" :md="{ span: 11, offset: 1 }" :lg="{ span: 6 }" v-for="project of projectShowList" :key="project.title">
+    <Col :xs="{ span: 21, offset: 1 }" :md="{ span: 11, offset: 1 }" :lg="{ span: 6 }" v-for="project of projectShowList" :key="project.projectId">
       <Card style="height:auto;margin:10px -15px">
         <a
           href="#"
           class="cmpTitle"
         >{{project.title}}</a>
         <p class="cmpDesc">{{project.description}}</p>
+        <div id="bottom-info">
+          <div class="info">
+            <Icon type="md-body" :size="15" />Manager
+            <span style="margin-left:10px; color:#2b85e4">{{project.managerName}}</span>
+          </div>
+          <div class="info">
+            <Icon type="md-clock" :size="15" />Time
+            <span style="margin-left:10px">{{getCreatedTime(project)}}</span>
+          </div>
+        </div>
       </Card>
     </Col>
   </Row>
@@ -22,6 +32,13 @@ export default {
     projectType:{
       type:String
     }
+  },
+  computed:{
+    getCreatedTime(){
+      return function(project){
+        return project.createTime.split(' ')[0];
+      }
+    }
   }
 };
 </script>
@@ -36,6 +53,18 @@ export default {
 
 .cmpDesc{
   font-size: 14px;
+}
+
+#bottom-info{
+  display: flex;
+  margin-top: 5px;
+  justify-content: space-between;
+}
+
+.info{
+  display: flex;
+  align-items: center;
+  margin-right: 10px;
 }
 
 </style>
