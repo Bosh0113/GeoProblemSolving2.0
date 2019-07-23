@@ -254,5 +254,110 @@
         </Modal>
     </div>
 </div>
+
+
+    <script th:inline="javascript">
+    window.onload=function () {
+        new Vue({
+            el: '#vueBody',
+            data: {
+                loginForm: {
+                    user: "",
+                    password: ""
+                },
+                loginFormRule: {
+                    user: [
+                        {
+                            required: true,
+                            message: "User name can not be empty",
+                            trigger: "blur"
+                        }
+                    ],
+                    password: [
+                        {
+                            required: true,
+                            message: "Password can not be empty",
+                            trigger: "blur"
+                        },
+                        {
+                            type: "string",
+                            min: 6,
+                            message: "The length of password can not be less than 6 characters",
+                            trigger: "blur"
+                        }
+                    ]
+                },
+                loginStyle: {
+                    marginTop: ""
+                },
+                contentStyle: {
+                    height: ""
+                },
+                checked: false,
+                changePwdEmailStyle:
+                    "This email is used for help you reset your password, you can click this URL ",
+                urlAddress: 'http://'+this.$store.state.IP_Port+"/GeoProblemSolving/resetPassword/",
+                resetModalSHow: false
+
+            },
+            methods: {
+                changeTab(type) {
+                    this.currentTab=type;
+                    this.currentPage=1;
+                    this.$nextTick(function(){
+                        this.$refs['pages'].currentPage = 1;
+                    });
+
+                    if(type=="All"){
+                        this.tabPageData=Object.assign([], this.projectShowList);
+                        this.totalCount=List.length;
+                    }
+                    else{
+                        this.changePage(1);
+                    }
+                },
+                changePage(index){
+                    if(this.currentTab=="All" && index==1){
+                        this.tabPageData=Object.assign([], this.projectShowList);
+                        this.totalCount=List.length;
+                    }
+                    else{
+                        axios
+                            .get("/GeoProblemSolving/project/inquiryByPage",{
+                                params:{
+                                    category:this.currentTab,
+                                    page:index,
+                                    pageSize:this.pageSize,
+                                }
+                            })
+                            .then(res => {
+                                console.log(index);
+                                this.getFinish = false;
+                                if (res.data === "None") {
+                                    this.currentProjectList = [];
+                                } else {
+                                    //this.judgeMember(res.data.projectList);
+                                }
+                                this.tabPageData = Object.assign([], res.data.projectList);
+                                this.totalCount=res.data.count;
+                                console.log(res.data)
+                            })
+                            .catch(err => {
+                                console.log(err.data);
+                            });
+                    }
+
+
+                },
+                newProject() {
+                },
+
+
+            }
+        })
+    }
+
+</script>
+
 </body>
 </html>

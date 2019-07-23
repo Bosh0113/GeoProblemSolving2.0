@@ -15,10 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-<<<<<<< HEAD
-import org.springframework.data.mongodb.core.MongoOperations;
-=======
->>>>>>> master
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -473,21 +469,12 @@ public class ProjectDaoImpl implements IProjectDao {
         }
     }
 
-<<<<<<< HEAD
-//先分页后排序
-    public Object inquiryByPage(String category, int page, int pageSize){
-        try {
-            //按时间排序
-            Sort sort = new Sort(Sort.Direction.DESC,"createTime");
-            Pageable pageable = PageRequest.of(page-1,pageSize,sort);
-            //条件
-=======
+
     @Override
     public Object inquiryByPage(String category, int page, int pageSize){
         try {
             Sort sort = new Sort(Sort.Direction.DESC,"createTime");
-            Pageable pageable = PageRequest.of(page,pageSize,sort);
->>>>>>> master
+            Pageable pageable = PageRequest.of(page-1,pageSize,sort);
             Criteria criteriaPublic = Criteria.where("privacy").is("Public");
             Criteria criteriaDiscoverable = Criteria.where("privacy").is("Discoverable");
             Query query;
@@ -496,23 +483,12 @@ public class ProjectDaoImpl implements IProjectDao {
             }else {
                 query = new Query(Criteria.where("category").is(category).orOperator(criteriaDiscoverable,criteriaPublic)).with(pageable);
             }
-<<<<<<< HEAD
-            //计算总数
             long count = mongoTemplate.count(query,ProjectEntity.class);
-            //mongoTemplate.find查询结果集
             int totalPage = (int)Math.ceil((double) count/(double) pageSize);
             List<ProjectEntity> projectEntities=mongoTemplate.find(query,ProjectEntity.class);
-            //返回JSON对象
             JSONObject result = new JSONObject();
             result.fluentPut("totalPage",totalPage);
             result.fluentPut("count",count);
-=======
-            long count = mongoTemplate.count(query,ProjectEntity.class);
-            int totalPage = (int)Math.ceil((double) count/(double) pageSize);
-            List<ProjectEntity> projectEntities=mongoTemplate.find(query,ProjectEntity.class);
-            JSONObject result = new JSONObject();
-            result.fluentPut("totalPage",totalPage);
->>>>>>> master
             result.fluentPut("projectList",projectEntities);
             return result;
 

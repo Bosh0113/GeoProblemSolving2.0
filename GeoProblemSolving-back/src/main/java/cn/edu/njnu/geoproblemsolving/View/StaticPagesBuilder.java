@@ -1,5 +1,4 @@
 package cn.edu.njnu.geoproblemsolving.View;
-
 import cn.edu.njnu.geoproblemsolving.Entity.HistoryEventEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.ProjectEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.ResourceEntity;
@@ -15,12 +14,8 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,10 +25,13 @@ public class StaticPagesBuilder {
     private final MongoTemplate mongoTemplate;
 
     @Autowired
-    public StaticPagesBuilder(MongoTemplate mongoTemplate){this.mongoTemplate=mongoTemplate;}
+    public StaticPagesBuilder(MongoTemplate mongoTemplate) {
+        this.mongoTemplate = mongoTemplate;
+    }
 
-    public void personalPageBuilder(String userId){
+    public void personalPageBuilder(String userId) {
         try {
+
             ClassLoaderTemplateResolver resolver = new ClassLoaderTemplateResolver();
             resolver.setPrefix("templates/");//模板所在目录，相对于当前classloader的classpath。
             resolver.setSuffix(".html");//模板文件后缀
@@ -42,102 +40,136 @@ public class StaticPagesBuilder {
 
             Context context = new Context();
             Query queryUser = new Query(Criteria.where("userId").is(userId));
-            UserEntity userEntity = mongoTemplate.findOne(queryUser,UserEntity.class);
-            context.setVariable("userInfo",userEntity);
+            UserEntity userEntity = mongoTemplate.findOne(queryUser, UserEntity.class);
+            context.setVariable("userInfo", userEntity);
 
             Query queryResource = new Query(Criteria.where("uploaderId").is(userId));
-            List<ResourceEntity> resourceEntities = mongoTemplate.find(queryResource,ResourceEntity.class);
-            context.setVariable("userResourceList",resourceEntities);
+            List<ResourceEntity> resourceEntities = mongoTemplate.find(queryResource, ResourceEntity.class);
+            context.setVariable("userResourceList", resourceEntities);
 
             Query queryManageProjects = new Query(Criteria.where("managerId").is(userId));
-            List<ProjectEntity> manageProjects = mongoTemplate.find(queryManageProjects,ProjectEntity.class);
-            context.setVariable("userManagerProjectList",manageProjects);
+            List<ProjectEntity> manageProjects = mongoTemplate.find(queryManageProjects, ProjectEntity.class);
+            context.setVariable("userManagerProjectList", manageProjects);
 
             ArrayList<ProjectEntity> joinedProjects = new ArrayList<>();
             assert userEntity != null;
             JSONArray joinedList = userEntity.getJoinedProjects();
-            for (int i=0;i<joinedList.size();i++){
+            for (int i = 0; i < joinedList.size(); i++) {
                 JSONObject joinedProjectInfo = joinedList.getJSONObject(i);
                 Query query = new Query(Criteria.where("projectId").is(joinedProjectInfo.getString("projectId")));
-                ProjectEntity projectEntity = mongoTemplate.findOne(query,ProjectEntity.class);
+                ProjectEntity projectEntity = mongoTemplate.findOne(query, ProjectEntity.class);
                 joinedProjects.add(projectEntity);
             }
-            context.setVariable("joinedProjectsList",joinedProjects);
+            context.setVariable("joinedProjectsList", joinedProjects);
 
-            Query queryEvent=new Query(Criteria.where("eventType").is("project").and("userId").is(userId));
-            List<HistoryEventEntity> eventEntities = mongoTemplate.find(queryEvent,HistoryEventEntity.class);
-            context.setVariable("userEventList",eventEntities);
+            Query queryEvent = new Query(Criteria.where("eventType").is("project").and("userId").is(userId));
+            List<HistoryEventEntity> eventEntities = mongoTemplate.find(queryEvent, HistoryEventEntity.class);
+            context.setVariable("userEventList", eventEntities);
 
             //渲染模板
-            String servicePath = System.getProperty("user.dir")+"\\src\\main\\webapp";
-            String htmlPath = servicePath+"\\personal";
+            String servicePath = System.getProperty("user.dir") + "\\src\\main\\webapp";
+            String htmlPath = servicePath + "\\personal";
             File temp = new File(htmlPath);
             if (!temp.exists()) {
                 temp.mkdirs();
             }
-            String htmlFile = htmlPath+"\\"+userId+".html";
-            System.out.println("Build File: "+htmlFile);
+            String htmlFile = htmlPath + "\\" + userId + ".html";
+            System.out.println("Build File: " + htmlFile);
             FileWriter write = new FileWriter(htmlFile);
             templateEngine.process("personalPage", context, write);
             System.out.println("personal page has been build success.");
-        }catch (Exception ignored){}
+        } catch (Exception ignored) {
+        }
     }
 
-<<<<<<< HEAD
-    public void projectListBuilder() {
+    public void projectDetailPageBuilder(String projectId) {
+        ClassLoaderTemplateResolver resolver = new ClassLoaderTemplateResolver();
+        resolver.setPrefix("templates/");//模板所在目录，相对于当前classloader的classpath。
+        resolver.setSuffix(".html");//模板文件后缀
+        TemplateEngine templateEngine = new TemplateEngine();
+        templateEngine.setTemplateResolver(resolver);
+
+        Context context = new Context();
+        Query queryProjectInfo = new Query(Criteria.where("projectId").is(projectId));
+        ProjectEntity projectEntity = mongoTemplate.findOne(queryProjectInfo, ProjectEntity.class);
+        context.setVariable("projectInfo", projectEntity);
+        context.setVariable("activeName", "projects");
+
+        //渲染模板
+        String servicePath = System.getProperty("user.dir") + "\\src\\main\\webapp";
+        String htmlPath = servicePath + "\\projects";
+        File temp = new File(htmlPath);
+        if (!temp.exists()) {
+            temp.mkdirs();
+        }
+        String htmlFile = htmlPath + "\\" + projectId + ".html";
         try {
-=======
-    public void projectDetailPageBuilder(String projectId){
->>>>>>> master
+            FileWriter write = new FileWriter(htmlFile);
+            templateEngine.process("projectDetail", context, write);
+        } catch (Exception ignored) {
+        }
+    }
+
+    public void projectListPageBuilder() {
+        ClassLoaderTemplateResolver resolver = new ClassLoaderTemplateResolver();
+        resolver.setPrefix("templates/");//模板所在目录，相对于当前classloader的classpath。
+        resolver.setSuffix(".html");//模板文件后缀
+        TemplateEngine templateEngine = new TemplateEngine();
+        templateEngine.setTemplateResolver(resolver);
+
+        Context context = new Context();
+
+        Criteria criteriaPublic = Criteria.where("privacy").is("Public");
+        Criteria criteriaDiscoverable = Criteria.where("privacy").is("Discoverable");
+        Query query = new Query(new Criteria().orOperator(criteriaDiscoverable, criteriaPublic));
+        List<ProjectEntity> projects = mongoTemplate.find(query, ProjectEntity.class);
+        List<UserEntity> users = mongoTemplate.findAll(UserEntity.class);
+        context.setVariable("projects", projects);
+        context.setVariable("users", users);
+
+        //渲染模板
+        String servicePath = System.getProperty("user.dir") + "\\src\\main\\webapp";
+        String htmlPath = servicePath + "\\projects";
+        File temp = new File(htmlPath);
+        if (!temp.exists()) {
+            temp.mkdirs();
+        }
+        String htmlFile = htmlPath + "/projectList.html";
+        try {
+            FileWriter write = new FileWriter(htmlFile);
+            templateEngine.process("projectList", context, write);
+        } catch (Exception ignored) {
+        }
+    }
+
+    public void homePageBuilder() {
             ClassLoaderTemplateResolver resolver = new ClassLoaderTemplateResolver();
             resolver.setPrefix("templates/");//模板所在目录，相对于当前classloader的classpath。
             resolver.setSuffix(".html");//模板文件后缀
             TemplateEngine templateEngine = new TemplateEngine();
             templateEngine.setTemplateResolver(resolver);
 
-<<<<<<< HEAD
-            //构造上下文(Model)
             Context context = new Context();
-            List<ProjectEntity> projects = mongoTemplate.findAll(ProjectEntity.class);
+
             List<UserEntity> users = mongoTemplate.findAll(UserEntity.class);
-            context.setVariable("projects", projects);
-//            context.setVariable("users",users);
-
-//            context.setVariable("");
+            context.setVariable("users", users);
 
             //渲染模板
-            String servicePath =System.getProperty("user.dir")+"\\src\\main\\webapp";
-            String htmlPath = servicePath+"/Projects";
-=======
-            Context context = new Context();
-            Query queryProjectInfo = new Query(Criteria.where("projectId").is(projectId));
-            ProjectEntity projectEntity = mongoTemplate.findOne(queryProjectInfo,ProjectEntity.class);
-            context.setVariable("projectInfo",projectEntity);
-            context.setVariable("activeName","projects");
+            String servicePath = System.getProperty("user.dir") + "\\src\\main\\webapp";
 
-            //渲染模板
-            String servicePath = System.getProperty("user.dir")+"\\src\\main\\webapp";
-            String htmlPath = servicePath+"\\project";
->>>>>>> master
-            File temp = new File(htmlPath);
+            File temp = new File(servicePath);
             if (!temp.exists()) {
                 temp.mkdirs();
             }
-<<<<<<< HEAD
-
-            String htmlFile = htmlPath+"/result.html";
-            System.out.println("Build File: "+htmlFile);
-            FileWriter write = new FileWriter(htmlFile);
-            templateEngine.process("projectList", context, write);
-            System.out.println("projectlist page has been build success.");
-        }catch (Exception ignored){}
-
-=======
-            String htmlFile = htmlPath+"\\"+projectId+".html";
-            try{
+            String htmlFile = servicePath + "/home.html";
+            try {
                 FileWriter write = new FileWriter(htmlFile);
-                templateEngine.process("projectDetail", context, write);
-            }catch (Exception ignored){}
->>>>>>> master
+                templateEngine.process("home", context, write);
+            } catch (Exception ignored) {
+            }
     }
 }
+
+
+
+

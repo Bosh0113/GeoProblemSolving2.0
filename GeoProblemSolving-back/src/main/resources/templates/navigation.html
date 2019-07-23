@@ -51,8 +51,9 @@
             background-color: #515a6e;
             height: 60px;
             width: 100%;
-            bottom: 0;
+            bottom: 0 ;
             flex: 0 0 auto;
+            /*position:absolute;*/
         }
 
         .userState {
@@ -129,11 +130,7 @@
                                 <span>Sign up</span>
                             </menu-item>
                         </i-menu>
-<<<<<<< HEAD
 
-=======
-    
->>>>>>> master
                         <i-menu mode="horizontal" theme="dark" @on-select="logged"
                                 :style="`z-index:0;background:`+headerBgColor" v-show="userInfoNav.userState"
                                 class="menuItem">
@@ -146,13 +143,8 @@
                                 <dropdown @on-click="changeSelect" placement="bottom-start">
                                     <div @click="toPersonalPage">
                                         <img v-if="userInfoNav.avatar!=''&&userInfoNav.avatar!=undefined&&userInfoNav.avatar!=null"
-<<<<<<< HEAD
                                              :title="userInfoNav.userName"
                                              style="width:40px;height:40px;vertical-align:middle;">
-=======
-                                                :title="userInfoNav.userName"
-                                                style="width:40px;height:40px;vertical-align:middle;">
->>>>>>> master
                                         <avatar :username="userInfoNav.userName" :size="40" style="margin-top:10px"
                                                 :title="userInfoNav.userName" v-else></avatar>
                                     </div>
@@ -225,7 +217,6 @@
                                 that.getUnreadNoticeCount();
                             } else {
                                 console.log("Not logged in");
-<<<<<<< HEAD
                             }
                         },
                         error: function (err) {
@@ -266,7 +257,7 @@
                         if (name === "home") {
                             window.location.href = "/GeoProblemSolving/home.html"
                         } else if (name == "projects") {
-                            window.location.href = "/GeoProblemSolving/projectList.html"
+                            window.location.href = "/GeoProblemSolving/projects/projectList.html"
                         } else if (name == "resources") {
                             window.location.href = "/GeoProblemSolving/resources.html"
                         } else if (name == "community") {
@@ -313,8 +304,8 @@
                                         unreadCount++;
                                         continue;
                                     }
-                                }
-                                this.$set(this, "unreadNoticeCount", unreadCount);
+                                };
+                                this.unreadNoticeCount=Object.assign([], unreadCount);
                             })
                             .catch(err => {
                                 console.log("失败的原因是" + err.data);
@@ -384,170 +375,10 @@
                                 sessionStorage.removeItem("userInfo");
                                 this.noticeSocket.close();
                                 window.location.href = "/GeoProblemSolving/"+page+".html";
-=======
-                            }
-                        },
-                        error: function (err) {
-                            console.log("Get user info fail.");
-                        }
-                    });
-                },
-                computed: {
-                    headerBgColor() {
-                        return "";
-                    }
-                },
-                data() {
-                    return {
-                        //消息机制
-                        noticeSocket: null,
-                        unreadNoticeCount: 0,
-                        timer: null,
-                        //导航栏宽度
-                        headerWidth: "",
-                        //用户
-                        userInfoNav: {
-                            userName: ""
-                        },
-                        useMenuCSS: true
-                    }
-                },
-                methods: {
-                    identityMenuCSS(){
-                        if(window.innerWidth<1100){
-                            this.useMenuCSS = false;
-                        }
-                        else{
-                            this.useMenuCSS = true;
-                        }
-                    },
-                    turnContent(name) {
-                        if (name === "home") {
-                            window.location.href = "/GeoProblemSolving/home.html"
-                        } else if (name == "projects") {
-                            window.location.href = "/GeoProblemSolving/projectList.html"
-                        } else if (name == "resources") {
-                            window.location.href = "/GeoProblemSolving/resources.html"
-                        } else if (name == "community") {
-                            window.location.href = "/GeoProblemSolving/community.html"
-                        } else if (name == "help") {
-                            window.location.href = "/GeoProblemSolving/help.html"
-                        }
-                    },
-                    goHome() {
-                        window.location.href = "/GeoProblemSolving/home.html"
-                    },
-                    unlogin(name) {
-                        if (name === "login") {
-                            window.location.href = "/GeoProblemSolving/login.html"
-                        } else if (name == "register") {
-                            window.location.href = "/GeoProblemSolving/register.html"
-                        }
-                    },
-                    logged(name) {
-                        if (name === "notification") {
-                            window.location.href = "/GeoProblemSolving/notifications.html"
-                        } else if (name === "personal") {
-                        }
-                    },
-                    toPersonalPage() {
-                        window.location.href = "/GeoProblemSolving//personal/" + this.userInfoNav.userId + ".html"
-                    },
-                    // 获取到通知的数量
-                    getUnreadNoticeCount() {
-                        this.unreadNoticeCount = 0;
-                        //get请求发送的是用户id
-                        axios
-                            .get(
-                                "/GeoProblemSolving/notice/inquiry" +
-                                "?key=recipientId" +
-                                "&value=" +
-                                this.userInfoNav.userId
-                            )
-                            .then(res => {
-                                let noticeList = res.data;
-                                let unreadCount = 0;
-                                for (let i = 0; i < noticeList.length; i++) {
-                                    if (noticeList[i].state === "unread") {
-                                        unreadCount++;
-                                        continue;
-                                    }
-                                }
-                                this.$set(this, "unreadNoticeCount", unreadCount);
->>>>>>> master
                             })
                             .catch(err => {
-                                console.log("失败的原因是" + err.data);
+                                confirm("logout fail!");
                             });
-                    },
-                    initWebSocket() {
-                        if (this.noticeSocket != null) {
-                            this.noticeSocket = null;
-                        }
-                        var noticeSocketURL = "ws://" + window.location.host + "/GeoProblemSolving/NoticeSocket";
-                        this.noticeSocket = new WebSocket(noticeSocketURL);
-                        this.noticeSocket.onopen = this.onOpen;
-                        this.noticeSocket.onmessage = this.onMessage;
-                        this.noticeSocket.onclose = this.onClose;
-                        this.noticeSocket.onerror = this.onError;
-                    },
-                    onOpen() {
-                        // console.log("NoticeSocket连接成功！");
-                    },
-                    onMessage(e) {
-                        if (e.data == "Notice") {
-                            let newCount = this.unreadNoticeCount + 1;
-                            this.$set(this, "unreadNoticeCount", newCount);
-                            this.$Message.info("You have a new notice!");
-                        } else {
-                            console.log(e.data);
-                        }
-                    },
-                    onClose(e) {
-                        this.removeTimer();
-                        // console.log("NoticeSocket连接断开！");
-                    },
-                    onError(e) {
-                        this.removeTimer();
-                        // console.log("NoticeSocket连接错误！");
-                    },
-                    sendMessage(recipientId) {
-                        this.noticeSocket.send(recipientId);
-                    },
-                    setTimer() {
-                        var that = this;
-                        this.timer = setInterval(() => {
-                            if (that.noticeSocket != null && that.noticeSocket != undefined) {
-                                that.noticeSocket.send("ping");
-                            }
-                        }, 20000);
-                    },
-                    removeTimer() {
-                        clearInterval(this.timer);
-                    },
-                    readNotification() {
-                        let newCount = this.unreadNoticeCount;
-                        if (newCount > 0) {
-                            this.unreadNoticeCount = newCount - 1;
-                        }
-                    },
-                    changeSelect(name) {
-                        if (name == "logout") {
-                            this.logout("home");
-                        }
-                    },
-                    logout(page){
-                        axios
-                        .get("/GeoProblemSolving/user/logout")
-                        .then(res => {
-                            this.userInfoNav = {userName: ""};
-                            sessionStorage.removeItem("userInfo");
-                            this.noticeSocket.close();
-                            window.location.href = "/GeoProblemSolving/"+page+".html";
-                        })
-                        .catch(err => {
-                            confirm("logout fail!");
-                        });
                     }
                 }
             },

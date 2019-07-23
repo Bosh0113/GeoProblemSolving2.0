@@ -307,7 +307,7 @@
             <span class="flow-item">
               <span class="flow-item-icon blue">
                 <span class="flow-item-bg"></span>
-                  <Icon type="icon ion-md-build" />
+                  <Icon type="md-build" ></Icon>
               </span>
               <span class="flow-item-text">Register as a participant</span>
             </span>
@@ -315,7 +315,7 @@
 
               <span class="flow-item-icon yellow">
                 <span class="flow-item-bg"></span>
-                  <Icon type="icon ion-md-search" />
+                  <Icon type="md-search" ></Icon>
               </span>
               <span class="flow-item-text">Create or join a project</span>
             </span>
@@ -324,7 +324,7 @@
 
               <span class="flow-item-icon green">
                 <span class="flow-item-bg"></span>
-                <Icon type="icon ion-md-share" />
+                <Icon type="md-share" ></Icon>
               </span>
               <span class="flow-item-text">Communicate ideas in a team</span>
 
@@ -341,7 +341,7 @@
                     <div class="mask">
                         <div class="bg"></div>
                         <div class="case-text">
-                            <Icon type="icon ion-md-planet"/>
+                            <Icon type="md-planet"></Icon>
                         <div>Planet</div>
                     </div>
                     </div>
@@ -351,7 +351,7 @@
                     <div class="mask">
                         <div class="bg"></div>
                         <div class="case-text">
-                            <Icon type="icon ion-md-flame" />
+                            <Icon type="md-flame" ></Icon>
                             <div>Fire</div>
                         </div>
                     </div>
@@ -361,7 +361,7 @@
                     <div class="mask">
                         <div class="bg"></div>
                         <div class="case-text">
-                            <Icon type="icon ion-md-leaf" />
+                            <Icon type="md-leaf" ></Icon>
                             <div>Leaf</div>
                         </div>
                     </div>
@@ -420,12 +420,18 @@
 <script th:inline="javascript">
     new Vue({
         el: '#vueBody',
+        data:{
+            userInfo:[],
+        },
+        mounted() {
+            this.userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
+        },
         methods: {
             start() {
-                if (this.$store.getters.userState) {
-                    this.$router.push({ name: "Projects" });
+                if (this.userInfo.userState) {
+                    window.location.href = "/GeoProblemSolving/projects/projectList.html"
                 } else {
-                    this.$router.push({ name: "Login" });
+                    window.location.href = "/GeoProblemSolving/projects/login.html"
                 }
             }
         }
