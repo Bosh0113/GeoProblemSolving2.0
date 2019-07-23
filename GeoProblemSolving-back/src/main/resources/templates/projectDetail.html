@@ -278,26 +278,28 @@
                                                 </div>
                                                 <div slot="extra">
                                                     <Poptip trigger="hover" content="Invite members" placement="left">
-                                                        <i-button class="changeInviteColor">
+                                                        <i-button class="changeInviteColor" @click="inviteModalShow()">
                                                             <Icon type="md-person-add" :size="20"></Icon>
                                                         </i-button>
                                                     </Poptip>
                                                     <Poptip trigger="hover" content="Remove members" placement="left">
-                                                        <i-button style="margin: 0 0 0 5px;" class="changeRemoveColor">
+                                                        <i-button style="margin: 0 0 0 5px;" class="changeRemoveColor" @click="deleteMemberModelShow">
                                                             <Icon type="md-remove-circle" :size="20"></Icon>
                                                         </i-button>
                                                     </Poptip>
                                                 </div>
                                                 <div :style="{height: membersContentCSS}" style="overflow-y:auto;">
                                                     <vue-scroll :ops="scrollOps">
-                                                        <Card  style="background-color: #dcdee2;border-color: #c5c8ce">
+                                                        <Card  style="background-color: #dcdee2;border-color: #c5c8ce;cursor: pointer;"
+                                                         @click.native=goPersonalPage(projectInfo.managerId)>
                                                             <div title="Manager">
                                                                 <h2 style="color: white" class="overEllipsis">{{projectInfo.managerName}}</h2>
                                                             </div>
                                                         </Card>
-                                                        <Card  v-for="members in projectInfo.members" style="margin-top: 5px">
+                                                        <Card  v-for="member in projectInfo.members" style="margin-top: 5px;cursor: pointer;"
+                                                         @click.native=goPersonalPage(member.userId)>
                                                             <div title="Member">
-                                                                <h2 class="overEllipsis">{{members.userName}}</h2>
+                                                                <h2 class="overEllipsis">{{member.userName}}</h2>
                                                             </div>
                                                         </Card>
                                                     </vue-scroll>
@@ -379,7 +381,7 @@
                     v-model="editProjectModal"
                     title="Edit project"
                     :mask-closable="false"
-                    width="900px"
+                    width="900"
                     >
                     <div>
                         <i-form
@@ -486,6 +488,61 @@
                 >
                   <p>Do you sure to delete this project?</p>
                 </Modal>
+                <Modal
+                v-model="inviteModal"
+                title="Invite others join the Project"
+                :mask-closable="false"
+                width="800">
+                    <i-form ref="emailInfo" :model="emailInfo" :rules="emailInfoRule" :label-width="200" inline>
+                        <Form-item label="Recipient" prop="inputEmail" style="width:100%">
+                            <Auto-complete
+                                v-model="emailInfo.inputEmail"
+                                @on-search="emialAutoFill"
+                                placeholder="input email and press enter button the email will be added below"
+                                style="width:70%"
+                            >
+                                <i-option v-for="item in prompt" :value="item" :key="item">{{ item }}</i-option>
+                            </Auto-complete>
+                        </Form-item>
+                        <Form-item label="Title" prop="emailTitle" style="width:100%">
+                            <i-input
+                                v-model="emailInfo.emailTitle"
+                                placeholder="set the email title to recivers by your self"
+                                style="width:70%"
+                            />
+                        </Form-item>
+                        <Form-item label="Content" prop="emailContent" style="width:100%">
+                        <i-input type="textarea" style="width:70%" :rows="4" v-model="emailInfo.emailContent" />
+                        </Form-item>
+                    </i-form>
+                    <div slot="footer" style="display: inline-block">
+                        <i-button type="primary" @click="invite('emailInfo')" style="float:right;">Assure</i-button>
+                        <i-button @click="closeInviteModel()" style="float:right;margin-right: 15px;">Cancel</i-button>
+                    </div>
+                </Modal>
+                <Modal
+                v-model="deleteMemberModel"
+                title="Remove members from project"
+                :mask-closable="false"
+                width="600">
+                    <Radio-group v-model="removeMemberName">
+                        <div v-for="(member,index) in projectInfo.members" :key="index" @click="getRemoveMemberId(member.userId)">
+                            <Radio :label ="member.userName" ></Radio>
+                        </div>
+                    </Radio-group>
+                    <div slot="footer" style="display: inline-block">
+                        <i-button type="primary" @click="removeMembersAlertShow()" style="float:right;">Assure</i-button>
+                        <i-button @click="closeDeleteMembersModel()" style="float:right;margin-right: 15px;">Cancel</i-button>
+                    </div>
+                </Modal>
+                <Modal
+                v-model="removeMemberAlertModel"
+                title="Remove Member alert"
+                @on-ok="removeMember"
+                ok-text="Submit"
+                cancel-text="Cancel">
+                    <p>Do you sure to remove {{removeMemberName}} from this project?</p>
+                </Modal>
             </div>
         </div>
     </template>
@@ -571,7 +628,53 @@
                     pictureUrl:"",
                     inputTag: "",
                     visible: false,
-                    removeProjectModal:false
+                    removeProjectModal:false,
+                    inviteModal:false,
+                    emailInfo: {
+                        inputEmail: "",
+                        emailTitle: "",
+                        emailContent: ""
+                    },
+                    emailInfoRule: {
+                        inputEmail: [
+                        {
+                            required: true,
+                            message: "Mailbox cannot be empty",
+                            trigger: "blur"
+                        },
+                        {
+                            type: "email",
+                            message: "Incorrect email format",
+                            trigger: "blur"
+                        }
+                        ],
+                        emailTitle: [
+                        {
+                            required: true,
+                            message: "The title cannot be empty",
+                            trigger: "blur"
+                        }
+                        ],
+                        emailContent: [
+                        {
+                            required: true,
+                            message: "The content cannot be empty",
+                            trigger: "blur"
+                        }
+                        ]
+                    },
+                    emailAddStr:
+                        "<br>Please copy the url and access it to join us: <br>" +
+                        "http://" +
+                        window.location.host +
+                        "/GeoProblemSolving/join/" +
+                        projectInfo.projectId +
+                        "/",
+                    prompt: [],
+                    deleteMemberModel:false,
+                    removeMemberName:"",
+                    removeMemberAlertModel:false,
+                    removeMemberId:"",
                 }
             },
             methods: {
@@ -790,6 +893,121 @@
                     }
                     })
                     .catch(err => {});
+                },
+                inviteModalShow() {
+                this.inviteModal = true;
+                this.emailInfo.emailContent =
+                    "hello, it's my pleasure to invite you join in the project called " +
+                    this.projectInfo.title +
+                    ".";
+                },
+                invite(name) {
+                this.$refs[name].validate(valid => {
+                    if (valid) {
+                    var emailFormBody = {};
+                    emailFormBody["recipient"] = this.emailInfo.inputEmail;
+                    emailFormBody["mailTitle"] = this.emailInfo.emailTitle;
+                    emailFormBody["mailContent"] =
+                    this.emailInfo.emailContent + this.emailAddStr;
+                    axios
+                        .post("/GeoProblemSolving/email/invite", emailFormBody)
+                        .then(res => {
+                        if (res.data == "Success") {
+                            this.$Notice.success({
+                            title: "Email send title",
+                            desc:
+                                "The invitation has been sent,the receiver will process this request later."
+                            });
+                            this.inviteModal = false;
+                        } else {
+                            this.$Notice.error({
+                            title: "Email send fail",
+                            desc: "The invitation isn't be sent successfully."
+                            });
+                        }
+                        })
+                        .catch(err => {
+                            console.log(err.data);
+                        });
+                        } else {
+                            this.$Message.info("Form check!");
+                        }
+                    });
+                },
+                closeInviteModel(){
+                    this.inviteModal=false;
+                },
+                emialAutoFill(value) {
+                this.prompt =
+                    !value || value.indexOf("@") >= 0
+                    ? []
+                    : [
+                        value + "@gmail.com",
+                        value + "@sina.com",
+                        value + "@163.com",
+                        value + "@126.com",
+                        value + "@qq.com"
+                        ];
+                },
+                deleteMemberModelShow(){
+                    this.removeMemberId="";
+                    this.removeMemberName="";
+                    this.deleteMemberModel=true;
+                },
+                closeDeleteMembersModel(){
+                    this.deleteMemberModel=false;
+                },
+                removeMembersAlertShow(){
+                    if(this.removeMemberName!=''){
+                        this.removeMemberAlertModel = true;
+                    }else{
+                        this.$Message.warning("There are no member be selected.");
+                    }
+                },
+                getRemoveMemberId(userId){
+                    this.removeMemberId=userId; 
+                },
+                removeMember() {
+                    axios
+                    .get(
+                    "/GeoProblemSolving/project/quit" +
+                        "?projectId=" +
+                        this.projectInfo.projectId +
+                        "&userId=" +
+                        this.removeMemberId
+                    )
+                    .then(res => {
+                    if (res.data == "Offline") {
+                        this.$refs.navigationEl.logout("login");
+                    } else if (res.data == "None") {
+                        this.$Notice.warning({
+                        title: "Operate result",
+                        desc: "The project doesn't exist."
+                        });
+                    } else {
+                        this.$Notice.success({
+                        title: "Operate result",
+                        desc: "The member has been removed from the project successfully."
+                        });
+                        this.deleteMemberModel=false;
+                        var members = this.projectInfo.members;
+                        for (var i = 0; i < members.length; i++) {
+                            if (members[i].userId == this.removeMemberId) {
+                                this.projectInfo.members.splice(i, 1);
+                                break;
+                            }
+                        }
+                    }
+                    })
+                    .catch(err => {});
+                },
+                goPersonalPage(userId){
+                    if(userId==this.userInfo.userId){
+                        window.location.href="/GeoProblemSolving/personalPage";
+                    }
+                    else{
+                        window.location.href="/GeoProblemSolving/memberPage/"+userId;
+                    }
                 },
             }
         }

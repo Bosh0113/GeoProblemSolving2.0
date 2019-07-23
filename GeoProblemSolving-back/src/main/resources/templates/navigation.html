@@ -201,6 +201,13 @@
                     'avatar': VueAvatar.Avatar
                 },
                 mounted() {
+                    var userInfo = {
+                        userState: false,
+                        userName: 'visitor',
+                        userId:'',
+                        avatar:''
+                    }
+                    sessionStorage.setItem('userInfo',JSON.stringify(userInfo));
                     var that = this;
                     $.ajax({
                         url: "/GeoProblemSolving/user/state",
@@ -254,35 +261,35 @@
                     },
                     turnContent(name) {
                         if (name === "home") {
-                            window.location.href = "/GeoProblemSolving/home.html"
+                            window.location.href = "/GeoProblemSolving/home"
                         } else if (name == "projects") {
-                            window.location.href = "/GeoProblemSolving/projectList.html"
+                            window.location.href = "/GeoProblemSolving/projectList"
                         } else if (name == "resources") {
-                            window.location.href = "/GeoProblemSolving/resources.html"
+                            window.location.href = "/GeoProblemSolving/publicResource"
                         } else if (name == "community") {
-                            window.location.href = "/GeoProblemSolving/community.html"
+                            window.location.href = "/GeoProblemSolving/community"
                         } else if (name == "help") {
-                            window.location.href = "/GeoProblemSolving/help.html"
+                            window.location.href = "/GeoProblemSolving/help"
                         }
                     },
                     goHome() {
-                        window.location.href = "/GeoProblemSolving/home.html"
+                        window.location.href = "/GeoProblemSolving/home"
                     },
                     unlogin(name) {
                         if (name === "login") {
-                            window.location.href = "/GeoProblemSolving/login.html"
+                            window.location.href = "/GeoProblemSolving/login"
                         } else if (name == "register") {
-                            window.location.href = "/GeoProblemSolving/register.html"
+                            window.location.href = "/GeoProblemSolving/register"
                         }
                     },
                     logged(name) {
                         if (name === "notification") {
-                            window.location.href = "/GeoProblemSolving/notifications.html"
+                            window.location.href = "/GeoProblemSolving/notifications"
                         } else if (name === "personal") {
                         }
                     },
                     toPersonalPage() {
-                        window.location.href = "/GeoProblemSolving//personal/" + this.userInfoNav.userId + ".html"
+                        window.location.href = "/GeoProblemSolving/personalPage"
                     },
                     // 获取到通知的数量
                     getUnreadNoticeCount() {
@@ -373,7 +380,7 @@
                             this.userInfoNav = {userName: ""};
                             sessionStorage.removeItem("userInfo");
                             this.noticeSocket.close();
-                            window.location.href = "/GeoProblemSolving/"+page+".html";
+                            window.location.href = "/GeoProblemSolving/"+page;
                         })
                         .catch(err => {
                             confirm("logout fail!");

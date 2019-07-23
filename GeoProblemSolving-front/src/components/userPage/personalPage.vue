@@ -216,13 +216,13 @@
                                 >
                                   <Icon type="md-download"/>
                                 </Button>
-                                <Button type="warning" size="small" style="margin-right: 10px">
+                                <!-- <Button type="warning" size="small" style="margin-right: 10px">
                                   <Icon
                                     type="md-share"
                                     @click="processResourceModalShow(index)"
                                     title="share"
                                   />
-                                </Button>
+                                </Button> -->
                                 <Button
                                   type="error"
                                   size="small"
