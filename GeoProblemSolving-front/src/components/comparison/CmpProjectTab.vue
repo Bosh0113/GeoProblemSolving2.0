@@ -5,7 +5,7 @@
         <a
           href="#"
           class="cmpTitle"
-        >{{project.title}}</a>
+        @click.prevent="projectDetail(project)">{{project.title}}</a>
         <p class="cmpDesc">{{project.description}}</p>
         <div id="bottom-info">
           <div class="info">
@@ -38,6 +38,15 @@ export default {
       return function(project){
         return project.createTime.split(' ')[0];
       }
+    }
+  },
+  methods:{
+    projectDetail:function(projectInfo){
+      // todo 做权限拦截
+      this.$store.commit("comparison/xSet",{projectInfo:projectInfo});
+      // console.log(this.$store.state.comparison.projectInfo);
+      this.$router.push({path:`/cmp-project/${projectInfo.projectId}`})
+      // console.log("跳转项目详情");
     }
   }
 };

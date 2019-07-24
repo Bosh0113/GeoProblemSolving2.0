@@ -29,7 +29,8 @@ const routes = [{
     { path: 'register', name: 'Register', component: resolve=>(require(["@/components/usersState/register"],resolve)) },
     { path: 'resetPassword/:email', name: 'resetPassword', component: resolve=>(require(["@/components/UsersState/resetPwd"],resolve)) } ,
     { path: 'cmp-projectlist',name:'cmp-projectlist',component:()=>import("@/views/comparison/CmpProjectList")},
-    { path: 'create-cmp-project', name:'create-cmp-project',component:()=>import("@/views/comparison/CreateProject")}
+    { path: 'create-cmp-project', name:'create-cmp-project',component:()=>import("@/views/comparison/CreateProject")},
+    { path: 'cmp-project/:id',name:'cmp-project-detail',component:()=>import("@/views/comparison/CmpProjectDetail")}
   ]
 },
 { path: '/chat', name: 'chatUtil', component: resolve=>(require(["@/components/utils/chatroom"],resolve)) },

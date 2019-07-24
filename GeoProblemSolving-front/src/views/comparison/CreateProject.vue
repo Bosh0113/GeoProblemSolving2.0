@@ -208,7 +208,7 @@ export default {
             .then(res=>{
                this.$Message.info(res);
             }).catch(error=>{
-              this.$Message.error(error.message);
+              this.$Message.error(error);
             })
         }
       })

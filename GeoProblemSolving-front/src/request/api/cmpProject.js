@@ -7,6 +7,9 @@ const cmp_project = {
   },
   getAllProjects(){
     return axios.get(`${base.cmpProjcet}/getAllProjects`);
+  },
+  getProject(key,value){
+    return axios.get(`${base.cmpProjcet}/getProject?key=${key}&value=${value}`);
   }
 }
 

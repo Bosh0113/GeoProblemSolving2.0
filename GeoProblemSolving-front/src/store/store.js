@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import comparison from "./comparison/comparison"
 Vue.use(Vuex)
 
 export default new Vuex.Store({
@@ -93,4 +94,7 @@ export default new Vuex.Store({
             state.subProject = subProject;
         }
     },
+    modules:{
+      comparison
+    }
 })

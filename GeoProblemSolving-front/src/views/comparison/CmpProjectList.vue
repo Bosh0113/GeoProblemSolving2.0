@@ -51,8 +51,8 @@ export default {
       .then(res=>{
         this.projectShowList = res;
       })
-      .cache(err=>{
-        this.$Message.error(error.message);
+      .catch(err=>{
+        this.$Message.error(err);
       })
   },
   data(){

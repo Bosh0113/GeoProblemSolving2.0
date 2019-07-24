@@ -79,7 +79,7 @@ instance.interceptors.response.use(
           //   if (!window.navigator.onLine) {
           //     store.commit('changeNetwork', false);
           //  } else {
-               return Promise.reject(error);
+               return Promise.reject(error.message);
           //  }
     }
   }
