@@ -47,6 +47,13 @@ public class CmpProjectController {
         return ResultUtils.success(allProject);
     }
 
+    @RequestMapping(value = "/getProject",method = RequestMethod.GET)
+    public JsonResult getProject(@RequestParam("key") String key, @RequestParam("value") String value){
+        CmpProjectDaoImpl cmpProjectDao = new CmpProjectDaoImpl(mongoTemplate);
+        List<CmpProject> projects = cmpProjectDao.getProjects(key, value);
+        return ResultUtils.success(projects);
+    }
+
 
     @RequestMapping(value = "/createSubproject", produces = {"application/json;charset=UTF-8"}, method = RequestMethod.POST)
     public JsonResult createSubproject(@RequestBody CmpSubproject project){
