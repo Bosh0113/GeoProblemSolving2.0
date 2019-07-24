@@ -200,7 +200,7 @@
                 components: {
                     'avatar': VueAvatar.Avatar
                 },
-                mounted() {
+                created() {
                     var userInfo = {
                         userState: false,
                         userName: 'visitor',
@@ -229,6 +229,9 @@
                             console.log("Get user info fail.");
                         }
                     });
+                },
+                updated(){
+                    $("#noticeBadge sup").css("margin", "15px 5px 0 0");
                 },
                 computed: {
                     headerBgColor() {
