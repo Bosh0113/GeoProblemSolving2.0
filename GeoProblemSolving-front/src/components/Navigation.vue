@@ -24,7 +24,6 @@ header {
   position: absolute;
   width: 100%;
   flex: 0 0 auto;
-  position: absolute;
   min-width: 1200px;
 }
 .content {

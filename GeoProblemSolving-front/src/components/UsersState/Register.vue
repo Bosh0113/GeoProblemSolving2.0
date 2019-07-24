@@ -239,7 +239,7 @@
                         </div>
                         <div class="uploadBox">
                           <Icon type="ios-camera" size="20" style="position:absolute;margin:18px;"></Icon>
-                          <input @change="uploadPhoto($event)" type="file" class="uploadAvatar">
+                          <input @change="uploadPhoto($event)" type="file" class="uploadAvatar" id="avatarInput">
                         </div>
                         <Modal title="View Image" v-model="visible">
                           <img :src="avatar" v-if="visible" style="width: 100%">
@@ -516,6 +516,7 @@ export default {
         imgcode = e.target.result;
 
         this.$store.commit("uploadAvatar", imgcode);
+        $('#avatarInput').val("");
       };
     },
     handleView() {
