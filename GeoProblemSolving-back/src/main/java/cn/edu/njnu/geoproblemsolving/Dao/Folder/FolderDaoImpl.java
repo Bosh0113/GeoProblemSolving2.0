@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Component
@@ -142,19 +143,22 @@ public class FolderDaoImpl implements IFolderDao{
     }
 
     @Override
-    public Object shareToFolder(String resourceId, String folderId) {
+    public Object shareToFolder(String addFileList, String folderId) {
         try{
             folderId = decode(folderId);
-            Query queryResource = new Query(Criteria.where("resourceId").is(resourceId));
-            ResourceEntity resourceEntity = mongoTemplate.findOne(queryResource,ResourceEntity.class);
             Query queryFolder = new Query(Criteria.where("folderId").is(folderId));
             FolderEntity folderEntity = mongoTemplate.findOne(queryFolder,FolderEntity.class);
             ArrayList<ResourceEntity> files = folderEntity.getFiles();
-            files.add(resourceEntity);
+            String[] addFileIds = addFileList.split(",");
+            for(String addFileId : addFileIds){
+                Query queryResource = new Query(Criteria.where("resourceId").is(addFileId));
+                ResourceEntity resourceEntity = mongoTemplate.findOne(queryResource,ResourceEntity.class);
+                files.add(resourceEntity);
+            }
             Update updateFolder = new Update();
             updateFolder.set("files",files);
             mongoTemplate.updateFirst(queryFolder,updateFolder,FolderEntity.class);
-            return resourceEntity;
+            return "Success";
         }catch (Exception e){
             return "Fail";
         }

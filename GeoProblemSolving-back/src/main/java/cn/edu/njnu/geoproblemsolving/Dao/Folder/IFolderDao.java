@@ -8,7 +8,7 @@ public interface IFolderDao {
     Object renameFolder(String newName, String folderId, String parentId);
     Object removeFolder(String folderId, String parentId);
     Object uploadToFolder(HttpServletRequest request);
-    Object shareToFolder(String resourceId, String folderId);
+    Object shareToFolder(String addFileList, String folderId);
     Object renameFile(String newName, String fileId, String folderId);
     Object removeFile(String fileId, String folderId);
 }

@@ -89,6 +89,20 @@
   position: relative;
   /* border: 1px solid #eee; */
 }
+.personalFileLabel{
+  width: 150px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.personalFileDes{
+  display: inline-block;
+  margin: 0 5px;
+  width: 250px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
 </style>
 <template>
   <div class="fileSpace">
@@ -108,20 +122,25 @@
           </Button>
         </Tooltip>
         <Tooltip content="Upload files" placement="bottom" class="fileBtn">
-          <Button @click="uploadModalShow" title="upload resource">
+          <Button @click="uploadModalShow">
             <Icon type="md-cloud-upload" size="20"/>
+          </Button>
+        </Tooltip>
+        <Tooltip content="Share personal files" placement="bottom" class="fileBtn">
+          <Button @click="shareModalShow">
+            <Icon type="ios-copy" size="20"/>
           </Button>
         </Tooltip>
       </div>
       <div class="folderContent">
         <Card v-if="folderNameStack.length>0" :padding="5" dis-hover>
           <div style="display:flex;align-items:center">
-            <div style="min-width:60px" v-show="currentFileList.length>0">
+            <div style="min-width:60px" v-show="currentFolder.files.length>0">
               <Checkbox
                 :indeterminate="indeterminate"
                 :value="checkAll"
                 @click.prevent.native="handleCheckAll"
-                v-show="currentFileList.length>0"
+                v-show="currentFolder.files.length>0"
                 style="align-items:center"
                 >
                 All files
@@ -140,18 +159,18 @@
             </Breadcrumb>
             </div>
             <div style="align-items:flex-end">
-              <Button @click="downloadSelectFile" v-show="currentFileList.length>0" title="Download" style="width:60px;height:30px;">
+              <Button @click="downloadSelectFile" v-show="currentFolder.files.length>0" title="Download" style="width:60px;height:30px;">
                 <Icon type="md-cloud-download" size="20"/>
               </Button>
             </div>
           </div>
         </Card>
-        <div v-if="currentFolder.folders.length>0 || currentFileList.length>0">
+        <div v-if="currentFolder.folders.length>0 || currentFolder.files.length>0">
           <Card v-for="(folder,index) in currentFolder.folders" :key="folder.index" :padding="5">
             <div>
               <Icon type="ios-folder-open" class="itemIcon" size="25"/>
               <a
-                @click="enterFolder(folder)"
+                @click="enterFolder(folder.uid)"
                 class="fileItemName"
                 :title="folder.name"
               >{{folder.name}}</a>
@@ -163,17 +182,18 @@
               </span>
             </div>
           </Card>
-
-
           <CheckboxGroup v-model="chooseFilesArray" @on-change="checkAllGroupChange">
-            <Card v-for="(file,index) in currentFileList" :key="file.index" :padding="5">
+            <Card v-for="(file,index) in currentFolder.files" :key="file.index" :padding="5">
               <Checkbox :label="file.pathURL">&nbsp;</Checkbox>
               <Icon type="ios-document-outline" class="itemIcon" size="25"/>
               <span @click="getFileInfo(file)" class="fileItemName" :title="file.name">{{file.name}}</span>
               <span class="fileItemSize">{{file.fileSize}}</span>
-              <span style="width:20%;margin-right:5%">{{file.uploadTime}}</span>
+              <span style="width:20%;margin-right:5%">{{file.uploadTime.substring(0,10)}}</span>
               <span @click="fileDelete(file)" class="fileDeleteBtn">
                 <Icon type="ios-trash" title="Remove" size="25"/>
+              </span>
+              <span @click="fileRenameModalShow(file)" class="filePreviewBtn">
+                <Icon type="md-create" title="Rename" size="25"/>
               </span>
               <a :href="file.pathURL" :download="file.name" class="fileDownloadBtn">
                 <Icon type="ios-cloud-download" title="Download" size="25"/>
@@ -298,7 +318,7 @@
       </div>
       <div slot="footer">
         <Button @click="uploadModal=false">Cancel</Button>
-        <Button type="success" @click="subProjectUpload('uploadValidate')">Upload</Button>
+        <Button type="success" @click="folderUpload('uploadValidate')">Upload</Button>
       </div>
     </Modal>
     <Modal
@@ -322,23 +342,65 @@
         <Button type="primary" @click="fileInfoModal=false">OK</Button>
       </div>
     </Modal>
+    <Modal
+    v-model="shareModal"
+    title="Share file from personal center"
+    width="600"
+    :mask-closable="false">
+      <div style="height:300px;">
+        <vue-scroll :ops="ops">
+        <CheckboxGroup v-model="selectedFilesToShare">
+          <Card dis-hover v-for="file in userResourceList" :key="file.index" style="">
+            <Checkbox :label="file.resourceId" class="personalFileLabel" :title="file.name" v-if="canBeShare(file.resourceId)"><strong>{{file.name}}</strong></Checkbox>
+            <Checkbox :label="file.resourceId" class="personalFileLabel" :title="file.name" disabled v-else><strong>{{file.name}}</strong></Checkbox>
+            <span class="personalFileDes" style="wdith:150px;" :title="file.description">{{file.description}}</span>
+            <span style="display: inline-block;vertical-align;">{{file.fileSize}}</span>
+          </Card>
+        </CheckboxGroup>
+        </vue-scroll>
+      </div>
+      <div slot="footer" style="display: inline-block">
+          <i-button type="primary" @click="shareFile()" style="float:right;">Submit</i-button>
+          <i-button @click="closeshareModel()" style="float:right;margin-right: 15px;">Cancel</i-button>
+      </div>
+    </Modal>
+    <Modal v-model="renameFileModal" title="Rename file" ok-text="Assure" cancel-text="Cancel">
+      <Form
+        ref="renameValidate"
+        :model="renameValidate"
+        :rules="renameRuleValidate"
+        :label-width="80"
+      >
+        <FormItem label="New name" prop="newName">
+          <Input
+            v-model="renameValidate.newName"
+            :rows="4"
+            placeholder="Enter the name for folder..."
+          />
+        </FormItem>
+      </Form>
+      <div slot="footer">
+        <Button @click="renameFileModal=false">Cancel</Button>
+        <Button type="success" @click="renameFile('renameValidate')">Rename</Button>
+      </div>
+    </Modal>
   </div>
 </template>
 <script>
 export default {
-  props: ["subProjectId","role"],
-  created() {
-    this.getSubProjectfileStruct();
+  // props: ["rootFolderId","role"],
+  mounted() {
+    this.enterFolder(this.rootFolderId);
   },
   data() {
     return {
-      subProjectFileStruct: {},
+      rootFolderId:"5723e77c-9d49-42ce-9664-080dd4e1856b",//暂时测试用
+      role:"",//暂时测试用
       currentFolder: {
-        folders: []
+        folders: [],
+        files:[],
       },
-      currentFileList: [],
-      folderUIDStack: [],
-      folderNameStack: [],
+      folderNameStack:[],
       newFolderModal: false,
       setFolderName: "",
       newValidate: {
@@ -353,7 +415,7 @@ export default {
           }
         ]
       },
-      renameFolderInfo: {},
+      renameForeInfo: {},
       renameFolderModal: false,
       renameValidate: {
         newName: ""
@@ -406,7 +468,7 @@ export default {
           title: "key",
           key: "key",
           minWidth: 10,
-          width: 100
+          width: 110
         },
         {
           title: "value",
@@ -421,103 +483,61 @@ export default {
       spinAnimate: false,
       // 关于单选多选的按钮
       indeterminate: true,
-      checkAll: false
+      checkAll: false,
+      shareModal:false,
+      renameFileModal:false,
+      userResourceList:[],
+      selectedFilesToShare:[],
+      ops:{
+        bar:{
+            background:"#808695"
+        }
+      }
     };
   },
   methods: {
-    closePanel() {
-      if (this.panel != null) {
-        this.panel.close();
-      }
-    },
-    getSubProjectfileStruct() {
-      // ！！！！！！！！！！！！！！！！！！！！！！！！！！Beichen 留坑！！！！！！！！！！！！！！！！！！！！！！
-      // this.axios
-      //   .get(
-      //     "/GeoProblemSolving/subProject/getFileStrcut" +
-      //       "?subProjectId=" +
-      //       this.subProjectId
-      //   )
-      //   .then(res => {
-      //     if (res.data == "Offline") {
-      //       this.$store.commit("userLogout");
-      //       this.$router.push({ name: "Login" });
-      //     } else if (res.data != "Fail") {
-      //       var fileStruct = res.data;
-      //       this.subProjectFileStruct = fileStruct;
-      //       this.currentFolder = fileStruct;
-      //       this.enterFolder(this.currentFolder);
-      //     } else {
-      //       this.$Message.warning("Get subproject's info fail.");
-      //     }
-      //   })
-      //   .catch(err => {
-      //     this.$Message.warning("Get subproject's info fail.");
-      //   });
-    },
-    enterFolder(folder) {
+    enterFolder(currentFolderId) {
       this.chooseFilesArray = [];
       this.checkAll = false;
       this.indeterminate = false;
-      this.currentFolder = folder;
-      this.folderUIDStack.push(this.currentFolder.uid);
-      this.folderNameStack.push(this.currentFolder.name);
-      this.getCurrentFilesInfo();
-    },
-    getCurrentFilesInfo() {
-      var files = this.currentFolder.files;
-      var count = files.length;
-      var filesInfoList = [];
-      if (files.length > 0) {
-        this.axios
-          .get(
-            "/GeoProblemSolving/resource/inquiry" +
-              "?key=scope.subProjectId" +
-              "&value=" +
-              this.subProjectId
-          )
-          .then(res => {
-            if (res != "Fail") {
-              var allFiles = res.data;
-              for (var i = 0; i < allFiles.length; i++) {
-                var subProjectFile = allFiles[i];
-                for (var j = 0; j < files.length; j++) {
-                  var folderFile = files[j];
-                  if (subProjectFile.resourceId == folderFile.uid) {
-                    subProjectFile.uploadTime = subProjectFile.uploadTime.substring(
-                      0,
-                      10
-                    );
-                    filesInfoList.push(subProjectFile);
-                  }
-                }
-              }
-              this.$set(this, "currentFileList", filesInfoList);
-            } else {
-              console.log("Get file info fail.");
-            }
-          })
-          .catch(err => {
-            console.log("Get file info fail.");
-          });
-      } else {
-        this.$set(this, "currentFileList", filesInfoList);
-      }
+      this.changeFolder(currentFolderId,"enter");
     },
     backforeFolder() {
       this.chooseFilesArray = [];
       this.checkAll = false;
       this.indeterminate = false;
-      if (this.folderUIDStack.length > 1) {
-        var foreFolderUid = this.folderUIDStack.pop();
-        var foreForlderName = this.folderNameStack.pop();
-        this.refreshCurrentAll(
-          this.subProjectFileStruct,
-          this.folderUIDStack[this.folderUIDStack.length - 1]
-        );
+      if (this.currentFolder.parentId!="") {
+        this.changeFolder(this.currentFolder.parentId,"back");
       } else {
         this.$Message.warning("This is the root folder.");
       }
+    },
+    changeFolder(folderId,type){
+      this.axios
+        .get(
+          "/GeoProblemSolving/folder/inquiry" +
+            "?folderId=" +
+            folderId
+        )
+        .then(res => {
+          if (res.data == "Offline") {
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
+          } else if (res.data != "Fail") {
+            var folderInfo=res.data;
+            this.currentFolder = res.data;
+            if(type=="enter"){
+              this.folderNameStack.push(folderInfo.folderName);
+            }else if(type=="back"){
+              this.folderNameStack.pop();
+            }
+          } else {
+            this.$Message.warning("Get folder info fail.");
+          }
+        })
+        .catch(err => {
+          this.$Message.warning("Get folder info fail.");
+        });
     },
     getFileInfo(file) {
       this.selectedFileData = [
@@ -540,6 +560,10 @@ export default {
         {
           key: "Uploader",
           value: file.uploaderName
+        },
+        {
+          key: "Upload Time",
+          value: file.uploadTime
         }
       ];
       this.fileInfoModal = true;
@@ -551,26 +575,22 @@ export default {
     addFolder(name) {
       this.$refs[name].validate(valid => {
         if (valid) {
-          var currentFolderUid = this.currentFolder.uid;
-          var subProjectId = this.subProjectId;
+          var parentId = this.currentFolder.folderId;
           var newFolderName = this.newValidate.setName;
           this.axios
             .post(
-              "/GeoProblemSolving/subProject/createFolder" +
-                "?subProjectId=" +
-                subProjectId +
+              "/GeoProblemSolving/folder/new" +
+                "?folderName=" +
+                newFolderName +
                 "&parentId=" +
-                currentFolderUid +
-                "&folderName=" +
-                newFolderName
+                parentId
             )
             .then(res => {
               if (res.data == "Offline") {
                 this.$store.commit("userLogout");
                 this.$router.push({ name: "Login" });
               } else if (res.data != "Fail") {
-                this.subProjectFileStruct = res.data;
-                this.refreshCurrentAll(res.data, this.currentFolder.uid);
+                this.currentFolder.folders.push(res.data);
                 this.newFolderModal = false;
               } else {
                 this.$Message.warning("New folder fail.");
@@ -582,44 +602,29 @@ export default {
         }
       });
     },
-    refreshCurrentFolder(folder, uid) {
-      if (folder.uid == uid) {
-        this.currentFolder = Object.assign({}, folder);
-        return;
-      } else {
-        var subFolder = folder.folders;
-        for (let i = 0; i < subFolder.length; i++) {
-          this.refreshCurrentFolder(subFolder[i], uid);
-        }
-      }
-    },
-    refreshCurrentAll(folder, uid) {
-      this.refreshCurrentFolder(folder, uid);
-      this.getCurrentFilesInfo();
-    },
     deleteFolder(folder) {
       if (confirm("Are you sure to delete this folder?")) {
-        var currentFolderUid = this.currentFolder.uid;
-        var subProjectId = this.subProjectId;
-        var deleteFolderUid = folder.uid;
+        var folderId = folder.uid;
+        var parentId = this.currentFolder.folderId;
         this.axios
-          .post(
-            "/GeoProblemSolving/subProject/deleteFolder" +
-              "?subProjectId=" +
-              subProjectId +
+          .get(
+            "/GeoProblemSolving/folder/removeFolder" +
+              "?folderId=" +
+              folderId +
               "&parentId=" +
-              currentFolderUid +
-              "&folderUid=" +
-              deleteFolderUid
+              parentId
           )
           .then(res => {
             if (res.data == "Offline") {
               this.$store.commit("userLogout");
               this.$router.push({ name: "Login" });
             } else if (res.data != "Fail") {
-              this.subProjectFileStruct = res.data;
-              this.refreshCurrentAll(res.data, this.currentFolder.uid);
-              //此处添加从项目内删除
+              for(var i=0;i<this.currentFolder.folders.length;i++){
+                if(this.currentFolder.folders[i].uid==folderId){
+                  this.currentFolder.folders.splice(i,1);
+                  break;
+                }
+              }
             } else {
               this.$Message.warning("Delete folder fail.");
             }
@@ -630,36 +635,41 @@ export default {
       }
     },
     renameFolderModalShow(folder) {
-      this.renameFolderInfo = folder;
+      this.renameForeInfo = folder;
       this.renameValidate.newName = "";
       this.renameFolderModal = true;
     },
     renameFolder(name) {
       this.$refs[name].validate(valid => {
         if (valid) {
-          var currentFolderUid = this.currentFolder.uid;
-          var subProjectId = this.subProjectId;
-          var oldFolderInfo = this.renameFolderInfo;
+          var parentId = this.currentFolder.folderId;
+          var folderId = this.renameForeInfo.uid;
           var newName = this.renameValidate.newName;
           this.axios
-            .post(
-              "/GeoProblemSolving/subProject/renameFolder" +
-                "?subProjectId=" +
-                subProjectId +
-                "&parentId=" +
-                currentFolderUid +
-                "&folderName=" +
+            .get(
+              "/GeoProblemSolving/folder/renameFolder" +
+                "?newName=" +
                 newName +
-                "&folderUid=" +
-                oldFolderInfo.uid
+                "&folderId=" +
+                folderId +
+                "&parentId=" +
+                parentId
             )
             .then(res => {
               if (res.data == "Offline") {
                 this.$store.commit("userLogout");
                 this.$router.push({ name: "Login" });
               } else if (res.data != "Fail") {
-                this.subProjectFileStruct = res.data;
-                this.refreshCurrentAll(res.data, this.currentFolder.uid);
+                var newNameFolder = {
+                  uid:folderId,
+                  name:newName
+                }
+                for(var i=0;i<this.currentFolder.folders.length;i++){
+                  if(this.currentFolder.folders[i].uid==folderId){
+                    this.currentFolder.folders.splice(i,1,newNameFolder);
+                    break;
+                  }
+                }
               } else {
                 this.$Message.warning("Rename fail.");
               }
@@ -706,7 +716,7 @@ export default {
     delFileList(index) {
       this.toUploadFiles.splice(index, 1);
     },
-    subProjectUpload(name) {
+    folderUpload(name) {
       this.$refs[name].validate(valid => {
         if (valid) {
           var uploadFiles = this.toUploadFiles;
@@ -719,22 +729,11 @@ export default {
             formData.append("description", this.uploadValidate.description);
             formData.append("type", this.uploadValidate.type);
             formData.append("uploaderId", this.$store.getters.userInfo.userId);
-            formData.append("belong", sessionStorage.getItem("subProjectName"));
-            let scopeObject = {
-              projectId: "",
-              subProjectId: this.$store.getters.subProject.subProjectId,
-              moduleId: ""
-            };
-            formData.append("scope", JSON.stringify(scopeObject));
             formData.append("privacy", this.uploadValidate.privacy);
-            formData.append(
-              "subProjectId",
-              this.$store.getters.subProject.subProjectId
-            );
-            formData.append("parentId", this.currentFolder.uid);
+            formData.append("folderId", this.currentFolder.folderId);
             this.progressModalShow = true;
             this.axios({
-              url: "/GeoProblemSolving/resource/subProjectUpload",
+              url: "/GeoProblemSolving/folder/uploadToFolder",
               method: "post",
               onUploadProgress: progressEvent => {
                 this.uploadProgress =
@@ -744,8 +743,28 @@ export default {
             })
               .then(res => {
                 if (res.data != "Fail") {
-                  this.subProjectFileStruct = res.data;
-                  this.refreshCurrentAll(res.data, this.currentFolder.uid);
+                  var uploadedList = res.data.uploaded;
+                  var failedList = res.data.failed;
+                  var sizeOverList = res.data.sizeOver;
+                  for(var i=0;i<uploadedList.length;i++){
+                    this.currentFolder.files.push(uploadedList[i]);
+                  }
+                  if(sizeOverList.length>0){
+                    this.$Notice.warning({
+                        title: 'Files too large.',
+                        render: h => {
+                            return h('span',sizeOverList.join(';'))
+                        }
+                    });
+                  }
+                  if(failedList.length>0){
+                    this.$Notice.error({
+                        title: 'Upload fail.',
+                        render: h => {
+                            return h('span',failedList.join(';'))
+                        }
+                    });
+                  }
                 } else {
                   this.$Message.warning("Upload fail.");
                 }
@@ -764,119 +783,31 @@ export default {
       });
     },
     filePreview(fileInfo) {
-      if (
-        /\.(doc|docx|xls|xlsx|csv|ppt|pptx|zip)$/.test(
-          fileInfo.name.toLowerCase()
-        )
-      ) {
-        if (this.panel != null) {
-          this.panel.close();
-        }
-        var url =
-          "http://172.21.212.72:8012/previewFile?url=" +
-          "http://" +
-          this.$store.state.IP_Port +
-          fileInfo.pathURL;
-        var toolURL =
-          "<iframe src=" + url + ' style="width: 100%;height:100%"></iframe>';
-        this.panel = jsPanel.create({
-          headerControls: {
-            smallify: "remove"
-          },
-          theme: "primary",
-          footerToolbar: '<p style="height:10px"></p>',
-          headerTitle: "Preview",
-          contentSize: "800 600",
-          content: toolURL,
-          disableOnMaximized: true,
-          dragit: {
-            containment: 5
-          },
-          closeOnEscape: true
-        });
-        $(".jsPanel-content").css("font-size", "0");
-      } else if (/\.(mp4)$/.test(fileInfo.name.toLowerCase())) {
-        if (this.panel != null) {
-          this.panel.close();
-        }
-        var url = "http://" + this.$store.state.IP_Port + fileInfo.pathURL;
-        var toolURL =
-          "<video src=" +
-          url +
-          ' style="width: 100%;height:100%" controls></video>';
-        this.panel = jsPanel.create({
-          headerControls: {
-            smallify: "remove"
-          },
-          theme: "primary",
-          footerToolbar: '<p style="height:10px"></p>',
-          headerTitle: "Preview",
-          contentSize: "800 600",
-          content: toolURL,
-          disableOnMaximized: true,
-          dragit: {
-            containment: 5
-          },
-          closeOnEscape: true
-        });
-        $(".jsPanel-content").css("font-size", "0");
-      } else if (
-        /\.(pdf|xml|json|md|gif|jpg|png)$/.test(fileInfo.name.toLowerCase())
-      ) {
-        if (this.panel != null) {
-          this.panel.close();
-        }
-        var url = "http://" + this.$store.state.IP_Port + fileInfo.pathURL;
-        var toolURL =
-          "<iframe src=" +
-          url +
-          ' style="width: 100%;height:100%" controls></iframe>';
-        this.panel = jsPanel.create({
-          headerControls: {
-            smallify: "remove"
-          },
-          theme: "primary",
-          footerToolbar: '<p style="height:10px"></p>',
-          headerTitle: "Preview",
-          contentSize: "800 600",
-          content: toolURL,
-          disableOnMaximized: true,
-          dragit: {
-            containment: 5
-          },
-          closeOnEscape: true
-        });
-        $(".jsPanel-content").css("font-size", "0");
-      } else {
-        this.$Notice.error({
-          title: "Open failed",
-          desc: "Not supported file format."
-        });
-        return false;
-      }
+      this.$Message.info('under construction...');
     },
     fileDelete(fileInfo) {
       if (confirm("Are you sure to delete this file?")) {
-        var currentFolderUid = this.currentFolder.uid;
-        var subProjectId = this.subProjectId;
-        var deleteFileUid = fileInfo.resourceId;
+        var folderId = this.currentFolder.folderId;
+        var fileId = fileInfo.resourceId;
         this.axios
-          .post(
-            "/GeoProblemSolving/subProject/deleteFile" +
-              "?subProjectId=" +
-              subProjectId +
-              "&parentId=" +
-              currentFolderUid +
-              "&fileUid=" +
-              deleteFileUid
+          .get(
+            "/GeoProblemSolving/folder/removeFile" +
+              "?folderId=" +
+              folderId +
+              "&fileId=" +
+              fileId
           )
           .then(res => {
             if (res.data == "Offline") {
               this.$store.commit("userLogout");
               this.$router.push({ name: "Login" });
             } else if (res.data != "Fail") {
-              this.subProjectFileStruct = res.data;
-              this.refreshCurrentAll(res.data, this.currentFolder.uid);
+              for(var i=0;i<this.currentFolder.files.length;i++){
+                if(this.currentFolder.files[i].resourceId == fileId){
+                  this.currentFolder.files.splice(i,1);
+                  break;
+                }
+              }
             } else {
               this.$Message.warning("Delete file fail.");
             }
@@ -902,7 +833,7 @@ export default {
       }
       this.indeterminate = false;
       if (this.checkAll) {
-        this.currentFileList.forEach(item => {
+        this.currentFolder.files.forEach(item => {
           this.chooseFilesArray.push(item["pathURL"]);
         });
       } else {
@@ -910,7 +841,7 @@ export default {
       }
     },
     checkAllGroupChange(data) {
-      if (data.length == this.currentFileList.length) {
+      if (data.length == this.currentFolder.files.length) {
         this.indeterminate = false;
         this.checkAll = true;
       } else if (data.length > 0) {
@@ -944,6 +875,124 @@ export default {
       } else {
         alert("you don't choose any file!");
       }
+    },
+    shareModalShow(){
+      this.axios
+        .get(
+          "/GeoProblemSolving/resource/inquiry" +
+            "?key=uploaderId" +
+            "&value=" +
+            this.$store.getters.userId
+        )
+        .then(res => {
+          if (res.data == "Offline") {
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
+          } else if (res.data != "None" && res.data != "Fail") {
+            this.userResourceList = res.data;
+            this.shareModal = true;
+          } else if (res.data == "None") {
+            this.userResourceList = [];
+          }
+        })
+        .catch(err => {
+          console.log(err.data);
+        });
+    },
+    closeshareModel(){
+      this.shareModal = false;
+    },
+    shareFile(){
+      var addFileList = this.selectedFilesToShare;
+      var addFileListStr = addFileList.toString();
+      this.axios
+        .get(
+          "/GeoProblemSolving/folder/shareToFolder" +
+            "?addFileList="+
+             addFileListStr +
+            "&folderId=" +
+            this.currentFolder.folderId
+        )
+        .then(res => {
+          this.shareModal = false;
+          if (res.data == "Offline") {
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
+          } else if (res.data != "Fail") {
+            var addFileInfoList = this.userResourceList.filter(file=>{
+              for(var i=0;i<addFileList.length;i++){
+                if(file.resourceId == addFileList[i]){
+                  return true;
+                }
+              }
+              return false;
+            });
+            var foreFiles = Object.assign([],this.currentFolder.files);
+            this.currentFolder.files = foreFiles.concat(addFileInfoList);
+            this.selectedFilesToShare=[];
+            this.shareModal = false;
+          } else{
+            console.log(res.data);
+          }
+        })
+        .catch(err => {
+          console.log(err.data);
+        });
+    },
+    fileRenameModalShow(fileInfo){
+      this.renameForeInfo = fileInfo;
+      this.renameValidate.newName = "";
+      this.renameFileModal=true;
+    },
+    renameFile(name){
+      this.$refs[name].validate(valid => {
+        if (valid) {
+          var folderId = this.currentFolder.folderId;
+          var fileId = this.renameForeInfo.resourceId;
+          var newName = this.renameValidate.newName;
+          this.axios
+            .get(
+              "/GeoProblemSolving/folder/renameFile" +
+                "?newName=" +
+                newName +
+                "&fileId=" +
+                fileId +
+                "&folderId=" +
+                folderId
+            )
+            .then(res => {
+              this.renameFileModal=false;
+              if (res.data == "Offline") {
+                this.$store.commit("userLogout");
+                this.$router.push({ name: "Login" });
+              } else if (res.data != "Fail") {
+                var newFileInfo = Object.assign({},this.renameForeInfo);
+                newFileInfo.name = newName;
+                for(var i=0;i<this.currentFolder.files.length;i++){
+                  if(this.currentFolder.files[i].resourceId==fileId){
+                    this.currentFolder.files.splice(i,1,newFileInfo);
+                    break;
+                  }
+                }
+              } else {
+                this.$Message.warning("Rename fail.");
+              }
+            })
+            .catch(err => {
+              this.$Message.warning("Rename fail.");
+            });
+          this.renameFolderModal = false;
+        }
+      });
+    },
+    canBeShare(fileId){
+      var result = true;
+      for(var i=0;i<this.currentFolder.files.length;i++){
+        if(this.currentFolder.files[i].resourceId==fileId){
+          result = false;
+        }
+      }
+      return result;
     }
   }
 };

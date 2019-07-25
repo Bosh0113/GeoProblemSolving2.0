@@ -46,9 +46,9 @@ public class FolderController {
     }
 
     @RequestMapping(value = "/shareToFolder", produces = {"application/json;charset=UTF-8"}, method = RequestMethod.GET)
-    public Object shareToFolder(@RequestParam("resourceId") String resourceId, @RequestParam("folderId") String folderId){
+    public Object shareToFolder(@RequestParam("addFileList") String addFileList, @RequestParam("folderId") String folderId){
         FolderDaoImpl folderDao = new FolderDaoImpl(mongoTemplate);
-        return folderDao.shareToFolder(resourceId,folderId);
+        return folderDao.shareToFolder(addFileList,folderId);
     }
 
     @RequestMapping(value = "/renameFile", produces = {"application/json;charset=UTF-8"}, method = RequestMethod.GET)

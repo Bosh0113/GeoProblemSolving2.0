@@ -7,6 +7,8 @@ import router from './router'
 import iView from 'iview'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
+// 滚轮样式
+import vuescroll from 'vuescroll'
 // import $ from 'jquery'
 import 'iview/dist/styles/iview.css'
 import store from './store/store.js'
@@ -25,6 +27,7 @@ Vue.config.productionTip = false
 Vue.use(iView)
 Vue.use(Vuex)
 Vue.use(VueAxios,axios)
+Vue.use(vuescroll)
 // Vue.use(VCharts)
 
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';

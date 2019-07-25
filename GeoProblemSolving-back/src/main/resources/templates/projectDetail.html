@@ -326,7 +326,7 @@
                                 <div :style="{height:subProjectsCSS}">
                                     <vue-scroll :ops="scrollOps">
                                         <div v-for="(subProject,index) in subProjectList" style="width: 25%;display: inline-block;padding: 5px;">
-                                            <Card style="height: 300px;" class="subProjectCard">
+                                            <Card style="height: 300px;" class="subProjectCard" @click.native="goSubProjectPage(subProject)">
                                                 <div slot="title">
                                                     <strong style="width: 160px;display: inline-block;" class="overEllipsis" :title="subProject.title">
                                                         {{subProject.title}}
@@ -1433,7 +1433,21 @@
                             });
                         }
                         });
-                }
+                },
+                goSubProjectPage(subProject){
+                    if(managerIdentity(subProject.managerId)||memberIdentity(subProject.members)){
+                        window.location.href="/GeoProblemSoving/project/"+subProject.subProjectId+"/subproject";
+                    }else{
+                        this.$Message.warning({
+                            render: h => {
+                                return h('div', [
+                                    h('p', 'Sorry, you are not a participant in this sub-project.'),
+                                    h('h3', 'Please apply to join first.'),
+                                ])
+                            }
+                        });
+                    }
+                },
             }
         }
     );

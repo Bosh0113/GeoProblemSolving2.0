@@ -121,7 +121,6 @@ img {
                 <Button
                   type="default"
                   @click="login('loginForm')"
-                  v-model="loginForm.State"
                   class="loginBtn"
                 >Log in</Button>
                 <Button
