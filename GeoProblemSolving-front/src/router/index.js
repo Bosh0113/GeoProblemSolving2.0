@@ -30,7 +30,9 @@ const routes = [{
     { path: 'resetPassword/:email', name: 'resetPassword', component: resolve=>(require(["@/components/UsersState/resetPwd"],resolve)) } ,
     { path: 'cmp-projectlist',name:'cmp-projectlist',component:()=>import("@/views/comparison/CmpProjectList")},
     { path: 'create-cmp-project', name:'create-cmp-project',component:()=>import("@/views/comparison/CreateProject")},
-    { path: 'cmp-project/:id',name:'cmp-project-detail',component:()=>import("@/views/comparison/CmpProjectDetail")}
+    { path: 'cmp-project/:id',name:'cmp-project-detail',component:()=>import("@/views/comparison/CmpProjectDetail")},
+    { path: 'cmp-project/comprehensive/:id',name:'cmp-project-comprehensive',component:()=>import("@/views/comparison/ComprehensiveProject")},
+    { path: 'cmp-project/specific/:id',name:'cmp-project-specific',component:()=>import("@/views/comparison/SpecificProject")},
   ]
 },
 { path: '/chat', name: 'chatUtil', component: resolve=>(require(["@/components/utils/chatroom"],resolve)) },

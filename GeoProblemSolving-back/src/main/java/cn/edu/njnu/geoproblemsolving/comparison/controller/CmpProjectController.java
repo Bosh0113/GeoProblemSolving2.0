@@ -33,8 +33,8 @@ public class CmpProjectController {
     public JsonResult createProject(@RequestBody CmpProject project) {
         CmpProjectDaoImpl cmpProjectDao = new CmpProjectDaoImpl(mongoTemplate);
         try {
-            String projectId = cmpProjectDao.addProject(project);
-            return ResultUtils.success(projectId);
+            CmpProject newProject = cmpProjectDao.addProject(project);
+            return ResultUtils.success(newProject);
         } catch (Exception e) {
             return ResultUtils.error(ResultEnum.FAILED);
         }

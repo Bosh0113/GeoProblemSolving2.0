@@ -11,7 +11,7 @@ import java.util.List;
  * @Modified By:
  **/
 public interface ICmpProjectDao {
-    String addProject(CmpProject project);
+    CmpProject addProject(CmpProject project);
 
     String deleteProject(CmpProject project);
 

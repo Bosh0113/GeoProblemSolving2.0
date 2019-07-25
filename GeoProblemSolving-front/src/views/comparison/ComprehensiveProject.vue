@@ -5,9 +5,6 @@
         <h3 class="cmpTitle">{{projectInfo.title}}</h3>
         <span class="infoName">Description:</span>
         <p>{{projectInfo.description}}</p>
-        <span class="infoName">Evaluation Rules:</span>
-        <p>{{projectInfo.evaluationRules}}</p>
-
         <div class="members">
           <span class="infoName">Members:</span>
           <span class="member">{{projectInfo.managerName}}</span>
@@ -18,65 +15,6 @@
         </div>
         <div class="createTime">
           <span>{{getCreatedTime(projectInfo)}}</span><span>Created Time： </span>
-        </div>
-      </div>
-
-      <div class="constrainsContent">
-        <div class="resourceContent">
-          <span class="infoName">Resource:</span>
-        </div>
-        <div class="constrainsInfo">
-          <Tabs
-            size="default"
-            :animated="false"
-          >
-            <TabPane label="Data Info">
-              <table>
-                <tr>
-                  <td class="constrain_tb_name">Specified Model：</td>
-                  <td class="constrain_tb_value"><span class="member">IBIS</span></td>
-                </tr>
-                <tr>
-                  <td class="constrain_tb_name">Specified Output Data：</td>
-                  <td class="constrain_tb_value">
-                    <span class="member">NPP</span>
-                  </td>
-                </tr>
-                <tr>
-                  <td class="constrain_tb_name">Standard Input Data：</td>
-                  <td class="constrain_tb_value">To upload</td>
-                </tr>
-                <tr>
-                  <td class="constrain_tb_name">Evaluated Data：</td>
-                  <td class="constrain_tb_value">To upload</td>
-                </tr>
-              </table>
-            </TabPane>
-            <TabPane label="Other Info">
-              <table>
-                <tr>
-                  <td class="constrain_tb_name">Start Time：</td>
-                  <td class="constrain_tb_value">2000.01.01</td>
-                </tr>
-                <tr>
-                  <td class="constrain_tb_name">End Time：</td>
-                  <td class="constrain_tb_value">2000.01.01</td>
-                </tr>
-                <tr>
-                  <td class="constrain_tb_name">Location：</td>
-                  <td class="constrain_tb_value">global</td>
-                </tr>
-                <tr>
-                  <td class="constrain_tb_name">Resolution：</td>
-                  <td class="constrain_tb_value">None</td>
-                </tr>
-                <tr>
-                  <td class="constrain_tb_name">Time Interval：</td>
-                  <td class="constrain_tb_value">None</td>
-                </tr>
-              </table>
-            </TabPane>
-          </Tabs>
         </div>
       </div>
 
@@ -117,7 +55,7 @@ export default {
   computed:{
     getCreatedTime(){
       return function(project){
-        return project.createTime.split(' ')[0];
+        return project.createTime?project.createTime.split(' ')[0]:"";
       }
     }
   },
@@ -198,7 +136,6 @@ export default {
   width: 100%;
   flex-wrap: wrap;
   margin-top: 5px;
-  margin-left: 20px;
 }
 
 .member {
@@ -207,6 +144,7 @@ export default {
   border-radius: 8px;
   padding: 3px;
   margin-right: 5px;
+  margin-left: 5px;
   margin-bottom: 5px;
 }
 
@@ -282,6 +220,7 @@ export default {
 
 .comparisonContent{
     margin-bottom: 10px;
+    margin-top: 10px;
 }
 
 .createTime {

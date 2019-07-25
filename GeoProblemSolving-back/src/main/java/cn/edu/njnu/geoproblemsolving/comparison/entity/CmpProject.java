@@ -1,5 +1,6 @@
 package cn.edu.njnu.geoproblemsolving.comparison.entity;
 
+import cn.edu.njnu.geoproblemsolving.comparison.enums.ProjectType;
 import com.alibaba.fastjson.JSONArray;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,6 +25,7 @@ public class CmpProject {
     @Id
     private String id;
     private String projectId;
+    private ProjectType projectType;
     private String title;
     private String description;
     private String category;

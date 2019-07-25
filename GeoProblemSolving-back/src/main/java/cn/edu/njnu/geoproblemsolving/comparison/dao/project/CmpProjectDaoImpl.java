@@ -31,7 +31,7 @@ public class CmpProjectDaoImpl implements ICmpProjectDao {
 
 
     @Override
-    public String addProject(CmpProject project) {
+    public CmpProject addProject(CmpProject project) {
         // 1.createdTime
         Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
@@ -58,7 +58,7 @@ public class CmpProjectDaoImpl implements ICmpProjectDao {
             project.setModelList(modelIdList);
         }
         mongoTemplate.save(project);
-        return project.getProjectId();
+        return project;
     }
 
     @Override

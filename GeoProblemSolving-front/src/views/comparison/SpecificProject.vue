@@ -117,7 +117,7 @@ export default {
   computed:{
     getCreatedTime(){
       return function(project){
-        return project.createTime.split(' ')[0];
+        return project.createTime?project.createTime.split(' ')[0]:"";
       }
     }
   },
@@ -198,7 +198,6 @@ export default {
   width: 100%;
   flex-wrap: wrap;
   margin-top: 5px;
-  margin-left: 20px;
 }
 
 .member {
@@ -207,8 +206,10 @@ export default {
   border-radius: 8px;
   padding: 3px;
   margin-right: 5px;
+  margin-left: 5px;
   margin-bottom: 5px;
 }
+
 
 .constrainsContent {
   display: flex;
@@ -293,5 +294,9 @@ export default {
     color: #586069;
     font-size: 14px;
     line-height: 20px;
+}
+
+table{
+  margin-bottom: 10px;
 }
 </style>
