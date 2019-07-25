@@ -19,29 +19,18 @@
       </div>
 
       <div class="comparisonContent">
-        <div class="box">
-            <div class="blankslate">
-                <svg height="40" class="blankslate-icon" viewBox="0 0 14 16" version="1.1" width="35"
-                    aria-hidden="true">
-                    <path fill-rule="evenodd"
-                        d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z">
-                    </path>
-                </svg>
-                <h3>Welcome to Comparison!</h3>
-                <p>
-                    Comprehensive comparison of simulation capabilities from multiple perspectives improving our
-                    knowledge and understanding of models. To get started, you should
-                    <a href="#" class="">create an comparison item.</a>
-                </p>
-            </div>
-        </div>
+        <blank-box v-bind="blankInfo" v-on:linkClicked="onLinkClick"></blank-box>
       </div>
     </div>
   </div>
 </template>
 <script>
+import BlankBox from "@/components/comparison/BlankBox"
 export default {
-  name: "component_name",
+  name: "comprehensive-project",
+  components:{
+    "blank-box":BlankBox
+  },
   created: function() {
     //* 获取项目信息
     this.getProjectInfo();
@@ -49,7 +38,12 @@ export default {
   data() {
     return {
       animated: false,
-      projectInfo: {}
+      projectInfo: {},
+      blankInfo:{
+        welcomeTitle:"Welcome to Comparison!",
+        welcomeInfo:"Comprehensive comparison of simulation capabilities from multiple perspectives improving our knowledge and understanding of models. To get started, you should",
+        linkInfo:"create an comparison item."
+      }
     };
   },
   computed:{
@@ -75,6 +69,14 @@ export default {
           .catch(err => {
             this.$Message.error(err);
           });
+      }
+    },
+    onLinkClick(){
+      // console.log("11")
+      if (!this.$store.getters.userState) {
+        this.$router.push({ name: "Login" });
+      } else {
+        this.$router.push({ path: `/create-cmp-item/${this.projectInfo.projectId}` });
       }
     }
     //todo 1.基本信息编辑功能

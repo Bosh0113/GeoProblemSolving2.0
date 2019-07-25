@@ -33,6 +33,7 @@ const routes = [{
     { path: 'cmp-project/:id',name:'cmp-project-detail',component:()=>import("@/views/comparison/CmpProjectDetail")},
     { path: 'cmp-project/comprehensive/:id',name:'cmp-project-comprehensive',component:()=>import("@/views/comparison/ComprehensiveProject")},
     { path: 'cmp-project/specific/:id',name:'cmp-project-specific',component:()=>import("@/views/comparison/SpecificProject")},
+    { path: 'create-cmp-item/:id',name:'create-cmp-item',component:()=>import("@/views/comparison/CreateCmpItem")}
   ]
 },
 { path: '/chat', name: 'chatUtil', component: resolve=>(require(["@/components/utils/chatroom"],resolve)) },

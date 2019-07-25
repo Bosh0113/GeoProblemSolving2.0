@@ -3,13 +3,18 @@ package cn.edu.njnu.geoproblemsolving.comparison.dao.project;
 import cn.edu.njnu.geoproblemsolving.Entity.UserEntity;
 import cn.edu.njnu.geoproblemsolving.comparison.dao.dataresource.DataResourceDaoImpl;
 import cn.edu.njnu.geoproblemsolving.comparison.dao.modelresource.ModelResourceDaoImpl;
+import cn.edu.njnu.geoproblemsolving.comparison.entity.BaseCmpInfo;
+import cn.edu.njnu.geoproblemsolving.comparison.entity.CmpItem;
 import cn.edu.njnu.geoproblemsolving.comparison.entity.CmpProject;
+import cn.edu.njnu.geoproblemsolving.comparison.utils.DaoUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -32,33 +37,10 @@ public class CmpProjectDaoImpl implements ICmpProjectDao {
 
     @Override
     public CmpProject addProject(CmpProject project) {
-        // 1.createdTime
-        Date date = new Date();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-        project.setCreateTime(dateFormat.format(date));
-        // 2.projectId
         String projectId = UUID.randomUUID().toString();
-        project.setProjectId(projectId);
-        // 3.设置 memberName:
-        Query query = Query.query(Criteria.where("userId").is(project.getManagerId()));
-        UserEntity userInfo = mongoTemplate.findOne(query, UserEntity.class);
-        project.setManagerName(userInfo.getUserName());
-        // 4.设置默认 public
-        project.setPrivacy("Public");
-        // 5.设置outputList
-        if(project.getOutputDataList()!=null && project.getOutputDataList().size()>0){
-            DataResourceDaoImpl dataResourceDao = new DataResourceDaoImpl(mongoTemplate);
-            List<String> dataIdList = dataResourceDao.createDataResByNameList(project.getOutputDataList(), userInfo);
-            project.setOutputDataList(dataIdList);
-        }
-        // 6.设置modelList
-        if(project.getModelList()!=null&&project.getModelList().size()>0){
-            ModelResourceDaoImpl modelResourceDao = new ModelResourceDaoImpl(mongoTemplate);
-            List<String> modelIdList = modelResourceDao.createModelResByNameList(project.getModelList(), userInfo);
-            project.setModelList(modelIdList);
-        }
-        mongoTemplate.save(project);
-        return project;
+        CmpProject cmpProject = (CmpProject) DaoUtils.createCmpInfo(project,projectId, mongoTemplate);
+        mongoTemplate.save(cmpProject);
+        return cmpProject;
     }
 
     @Override
@@ -72,6 +54,24 @@ public class CmpProjectDaoImpl implements ICmpProjectDao {
     }
 
     @Override
+    public CmpProject updateCmpItems(String projectId, String cmpItemId) {
+        Query query = Query.query(Criteria.where("projectId").is(projectId));
+        CmpProject project = mongoTemplate.findOne(query, CmpProject.class);
+        List<String> cmpItemIds = project.getCmpItemIds();
+        if(cmpItemIds==null){
+            cmpItemIds = new ArrayList<>();
+            cmpItemIds.add(cmpItemId);
+        }else{
+            cmpItemIds.add(cmpItemId);
+        }
+        project.setCmpItemIds(cmpItemIds);
+        Update update = new Update();
+        update.set("cmpItemIds",cmpItemIds);
+        mongoTemplate.updateFirst(query,update,CmpProject.class);
+        return project;
+    }
+
+    @Override
     public List<CmpProject> getAllProject() {
         List<CmpProject> all = mongoTemplate.findAll(CmpProject.class);
         return all;
@@ -80,6 +80,13 @@ public class CmpProjectDaoImpl implements ICmpProjectDao {
     @Override
     public CmpProject findProjectById(String id){
         return mongoTemplate.findById(id, CmpProject.class);
+    }
+
+    @Override
+    public CmpProject findByProjectId(String projectId) {
+        Query query = Query.query(Criteria.where("projectId").is(projectId));
+        CmpProject cmpProject = mongoTemplate.findOne(query, CmpProject.class);
+        return cmpProject;
     }
 
     @Override

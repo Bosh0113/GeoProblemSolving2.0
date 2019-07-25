@@ -53,31 +53,4 @@ public class CmpProjectController {
         List<CmpProject> projects = cmpProjectDao.getProjects(key, value);
         return ResultUtils.success(projects);
     }
-
-
-    @RequestMapping(value = "/createSubproject", produces = {"application/json;charset=UTF-8"}, method = RequestMethod.POST)
-    public JsonResult createSubproject(@RequestBody CmpSubproject project){
-        CmpSubprojectDaoImpl cmpSubprojectDao = new CmpSubprojectDaoImpl(mongoTemplate);
-        try{
-            String subprojectId = cmpSubprojectDao.addProject(project);
-            //更新上级项目
-            CmpProjectDaoImpl cmpProjectDao = new CmpProjectDaoImpl(mongoTemplate);
-            List<CmpProject> projects = cmpProjectDao.getProjects("projectId", project.getProjectId());
-            if(projects!=null){
-                CmpProject parentProject = projects.get(0);
-                List<String> subprojectIds = parentProject.getSubprojectIds();
-                if(subprojectIds==null){
-                    subprojectIds = new ArrayList<>();
-                    subprojectIds.add(subprojectId);
-                }else{
-                    subprojectIds.add(subprojectId);
-                }
-                parentProject.setSubprojectIds(subprojectIds);
-                cmpProjectDao.updateProject(parentProject);
-            }
-            return ResultUtils.success(subprojectId);
-        } catch (Exception e) {
-            return ResultUtils.error(ResultEnum.FAILED);
-        }
-    }
 }

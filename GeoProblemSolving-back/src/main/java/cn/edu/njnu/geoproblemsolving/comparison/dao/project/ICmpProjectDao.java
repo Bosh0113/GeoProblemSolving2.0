@@ -17,9 +17,13 @@ public interface ICmpProjectDao {
 
     String updateProject(CmpProject project);
 
+    CmpProject updateCmpItems(String projectId,String cmpItemId);
+
     List<CmpProject> getAllProject();
 
     CmpProject findProjectById(String id);
+
+    CmpProject findByProjectId(String projectId);
 
     List<CmpProject> getProjects(String key, String value);
 
