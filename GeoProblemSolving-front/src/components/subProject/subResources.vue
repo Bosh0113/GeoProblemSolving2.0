@@ -175,7 +175,7 @@ export default {
       inviteList: [],
       inviteAble: true,
       oldTabPaneState: "home",
-      // 后台获取的module下的task列表
+      // 后台获取的step下的task列表
       taskList: [],
       selectTaskIndex: 0,
       taskDeleteModal: false,
@@ -437,13 +437,13 @@ export default {
         })
         .catch(err => {});
     },
-    closeModuleSocket() {
+    closeStepSocket() {
       if (this.subprojectSocket != null) {
         this.removeTimer();
         this.subprojectSocket.close();
       }
     },
-    openModuleSocket() {
+    openStepSocket() {
       if (this.subprojectSocket != null) {
         this.subprojectSocket = null;
       }
@@ -460,7 +460,7 @@ export default {
       this.setTimer();
     },
     onOpen() {
-      console.log("ModuleSocket连接成功！");
+      console.log("StepSocket连接成功！");
     },
     // 更新人员，更新数据，更新records
     onMessage(e) {
@@ -479,11 +479,11 @@ export default {
     },
     onClose(e) {
       this.removeTimer();
-      console.log("ModuleSocket连接断开！");
+      console.log("StepSocket连接断开！");
     },
     onError(e) {
       this.removeTimer();
-      console.log("ModuleSocket连接错误！");
+      console.log("StepSocket连接错误！");
     },
     setTimer() {
       var that = this;
@@ -1175,10 +1175,10 @@ export default {
     },
     currentTabChanged(name) {
       if (this.oldTabPaneState !== name) {
-        this.closeModuleSocket();
+        this.closeStepSocket();
 
         if (name == "task") {
-          this.openModuleSocket();
+          this.openStepSocket();
           this.$refs.folderTreeEle.closePanel();
         }
       }

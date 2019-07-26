@@ -25,17 +25,17 @@
           <Icon type="ios-git-network" size="30" />
         </MenuItem>
         <MenuItem name="task" style="padding-left: 16px;" title="Task arrangement">
-          <Icon type="ios-calendar-outline" size="30" />
+          <Icon type="ios-calendar-outline" size="30"/>
         </MenuItem>
       </Menu>
       <div
-        style="text-align:center;font-size:1.5rem;height:60px;padding-top:10px;border:1px solid lightgrey"
+        style="font-size:1.5rem;height:60px;padding-top:10px;border:1px solid lightgrey"
       >
-        <strong>{{subProjectInfo.title}}</strong>        
+        <Col offset="4" span="16" style="text-align:center;"><strong>{{subProjectInfo.title}}</strong></Col>   
         <Button
           type="info"
           to="../workspace"
-          icon="ios-git-network"
+          icon="md-globe"
           style="float:right;margin:3px 30px 0 0"
           title="Go to work"
         >Working space</Button>

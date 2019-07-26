@@ -558,7 +558,7 @@
                 width="800px"
                 :mask-closable="false"
               >
-                <p>Once the deletion is confirmed, all module and resource information under the subsystem will be deleted. Please choose carefully.</p>
+                <p>Once the deletion is confirmed, all step and resource information under the subsystem will be deleted. Please choose carefully.</p>
               </Modal>
             </div>
           </Card>
@@ -1943,7 +1943,7 @@ export default {
               let scopeObject = {
                 projectId: this.currentProjectDetail.projectId,
                 subprojectId: "",
-                moduleId: ""
+                stepId: ""
               };
               formData.append("scope", JSON.stringify(scopeObject));
               formData.append("privacy", this.fileUploadForm.privacy);

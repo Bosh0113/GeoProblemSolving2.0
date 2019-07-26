@@ -74,26 +74,61 @@
           <vue-scroll :ops="scrollOps" :style="{height:sidebarHeight+150+'px'}">
             <Card class="Information">
               <div style="width:100%">
-                <strong>Background:</strong>
-                <Icon
-                  v-if="!edit1"
-                  type="ios-create"
-                  :size="18"
-                  style="float:right;cursor:pointer"
-                  title="Edit"
-                  @click="editBackground"
-                />
-                <Icon
-                  v-else
-                  type="md-checkbox-outline"
-                  :size="18"
-                  style="float:right;cursor:pointer"
-                  title="Complete"
-                  @click="editBackground"
-                />
+                <strong>Purposes / Goals:</strong>
+                <template  v-if="subProjectInfo.managerId == $store.getters.userId">
+                  <Icon
+                    v-if="!edit1"
+                    type="ios-create"
+                    :size="18"
+                    style="float:right;cursor:pointer"
+                    title="Edit"
+                    @click="editPurposes"
+                  />
+                  <Icon
+                    v-else
+                    type="md-checkbox-outline"
+                    :size="18"
+                    style="float:right;cursor:pointer"
+                    title="Complete"
+                    @click="editPurposes"
+                  />
+                </template>
               </div>
               <Divider style="margin:10px 0; background:lightblue" />
-              <div v-if="!edit1" class="subProjectDesc" style="overflow-y:auto">{{background}}</div>
+              <div v-if="!edit1" class="subProjectDesc" style="overflow-y:auto">{{purpose}}</div>
+              <template v-else>
+                <Input
+                  v-model="purpose"
+                  type="textarea"
+                  :rows="5"
+                  placeholder="Enter something..."
+                />
+              </template>
+            </Card>
+            <Card class="Information">
+              <div style="width:100%">
+                <strong>Background:</strong>
+                <template  v-if="subProjectInfo.managerId == $store.getters.userId">
+                  <Icon
+                    v-if="!edit2"
+                    type="ios-create"
+                    :size="18"
+                    style="float:right;cursor:pointer"
+                    title="Edit"
+                    @click="editBackground"
+                  />
+                  <Icon
+                    v-else
+                    type="md-checkbox-outline"
+                    :size="18"
+                    style="float:right;cursor:pointer"
+                    title="Complete"
+                    @click="editBackground"
+                  />
+                </template>
+              </div>
+              <Divider style="margin:10px 0; background:lightblue" />
+              <div v-if="!edit2" class="subProjectDesc" style="overflow-y:auto">{{background}}</div>
               <template v-else>
                 <Input
                   v-model="background"
@@ -106,44 +141,14 @@
             <Card class="Information">
               <div style="width:100%">
                 <strong>Limitations / problems:</strong>
-                <Icon
-                  v-if="!edit2"
-                  type="ios-create"
-                  :size="18"
-                  style="float:right;cursor:pointer"
-                  title="Edit"
-                  @click="editLimitation"
-                />
-                <Icon
-                  v-else
-                  type="md-checkbox-outline"
-                  :size="18"
-                  style="float:right;cursor:pointer"
-                  title="Complete"
-                  @click="editLimitation"
-                />
-              </div>
-              <Divider style="margin:10px 0; background:lightblue" />
-              <div v-if="!edit2" class="subProjectDesc" style="overflow-y:auto">{{limitation}}</div>
-              <template v-else>
-                <Input
-                  v-model="limitation"
-                  type="textarea"
-                  :rows="5"
-                  placeholder="Enter something..."
-                />
-              </template>
-            </Card>
-            <Card class="Information">
-              <div style="width:100%">
-                <strong>Main content:</strong>
+                <template v-if="subProjectInfo.managerId == $store.getters.userId">
                 <Icon
                   v-if="!edit3"
                   type="ios-create"
                   :size="18"
                   style="float:right;cursor:pointer"
                   title="Edit"
-                  @click="editContent"
+                  @click="editLimitation"
                 />
                 <Icon
                   v-else
@@ -151,45 +156,15 @@
                   :size="18"
                   style="float:right;cursor:pointer"
                   title="Complete"
-                  @click="editContent"
+                  @click="editLimitation"
                 />
+                </template>
               </div>
               <Divider style="margin:10px 0; background:lightblue" />
-              <div v-if="!edit3" class="subProjectDesc" style="overflow-y:auto">{{content}}</div>
+              <div v-if="!edit3" class="subProjectDesc" style="overflow-y:auto">{{limitation}}</div>
               <template v-else>
                 <Input
-                  v-model="content"
-                  type="textarea"
-                  :rows="5"
-                  placeholder="Enter something..."
-                />
-              </template>
-            </Card>
-            <Card class="Information">
-              <div style="width:100%">
-                <strong>Purposes / Goals:</strong>
-                <Icon
-                  v-if="!edit4"
-                  type="ios-create"
-                  :size="18"
-                  style="float:right;cursor:pointer"
-                  title="Edit"
-                  @click="editPurposes"
-                />
-                <Icon
-                  v-else
-                  type="md-checkbox-outline"
-                  :size="18"
-                  style="float:right;cursor:pointer"
-                  title="Complete"
-                  @click="editPurposes"
-                />
-              </div>
-              <Divider style="margin:10px 0; background:lightblue" />
-              <div v-if="!edit4" class="subProjectDesc" style="overflow-y:auto">{{purpose}}</div>
-              <template v-else>
-                <Input
-                  v-model="purpose"
+                  v-model="limitation"
                   type="textarea"
                   :rows="5"
                   placeholder="Enter something..."
@@ -212,8 +187,22 @@
             <strong>Participants</strong>
           </div>
           <div slot="extra">
-            <Icon v-if="subProjectInfo.managerId == $store.getters.userId" type="md-add" :size="18" style="cursor:pointer" title="Invite other participants" @click="inviteMembersModalShow" />
-            <Icon v-else-if="subProjectInfo.isMember" type="ios-log-out" :size="18" style="cursor:pointer" title="Quit this subproject" @click="quitModal=true"/>
+            <Icon
+              v-if="subProjectInfo.managerId == $store.getters.userId"
+              type="md-add"
+              :size="18"
+              style="cursor:pointer"
+              title="Invite other participants"
+              @click="inviteMembersModalShow"
+            />
+            <Icon
+              v-else-if="subProjectInfo.isMember"
+              type="ios-log-out"
+              :size="18"
+              style="cursor:pointer"
+              title="Quit this subproject"
+              @click="quitModal=true"
+            />
           </div>
           <div :style="{height:sidebarHeight+60+'px'}" style="overflow-y:auto;overflow-x:hidden">
             <vue-scroll :ops="scrollOps" :style="{height:sidebarHeight + 60 + 'px'}">
@@ -311,41 +300,41 @@
             </vue-scroll>
           </div>
           <Modal
-              v-model="quitModal"
-              width="400px"
-              title="Quit Sub-Project"
-              @on-ok="quitSubProject()"
-              ok-text="Ok"
-              cancel-text="Cancel"
-            >
-              <h4 style="color:red">Are you sure to quit this subproject?</h4>
-            </Modal>
-            <Modal
-              v-model="inviteModal"
-              width="400px"
-              title="Invite new participants"
-              @on-ok="inviteMembers"
-              ok-text="Ok"
-              cancel-text="Cancel"
-            >
-              <div>
-                <p>Members:</p>
-                <Tag
-                  v-for="participant in this.participants"
-                  :key="participant.index"
-                >{{participant.userName}}</Tag>
-                <p>Candidates:</p>
-                <CheckboxGroup v-model="inviteList">
-                  <Checkbox
-                    v-for="candidate in candidates"
-                    :key="candidate.index"
-                    :label="candidate.userId"
-                  >
-                    <span>{{candidate.userName}}</span>
-                  </Checkbox>
-                </CheckboxGroup>
-              </div>
-            </Modal>
+            v-model="quitModal"
+            width="400px"
+            title="Quit Sub-Project"
+            @on-ok="quitSubProject()"
+            ok-text="Ok"
+            cancel-text="Cancel"
+          >
+            <h4 style="color:red">Are you sure to quit this subproject?</h4>
+          </Modal>
+          <Modal
+            v-model="inviteModal"
+            width="400px"
+            title="Invite new participants"
+            @on-ok="inviteMembers"
+            ok-text="Ok"
+            cancel-text="Cancel"
+          >
+            <div>
+              <p>Members:</p>
+              <Tag
+                v-for="participant in this.participants"
+                :key="participant.index"
+              >{{participant.userName}}</Tag>
+              <p>Candidates:</p>
+              <CheckboxGroup v-model="inviteList">
+                <Checkbox
+                  v-for="candidate in candidates"
+                  :key="candidate.index"
+                  :label="candidate.userId"
+                >
+                  <span>{{candidate.userName}}</span>
+                </Checkbox>
+              </CheckboxGroup>
+            </div>
+          </Modal>
         </Card>
       </Col>
     </Row>
@@ -388,15 +377,9 @@ export default {
       edit1: false,
       edit2: false,
       edit3: false,
-      edit4: false,
-      background:
-        "TestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTest",
-      limitation:
-        "TestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTest",
-      content:
-        "TestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTest",
-      purpose:
-        "TestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTest",
+      background: "",
+      limitation: "",
+      purpose: "",
       // 用户角色
       userRole: ""
     };
@@ -441,6 +424,8 @@ export default {
           }
         }
         this.$set(this, "subProjectInfo", subProjectInfo);
+        this.getSubprojectDes();
+
         this.inviteAble = false;
         this.showMembers();
         sessionStorage.setItem("subProjectId", subProjectInfo.subProjectId);
@@ -466,10 +451,12 @@ export default {
                 subProjectInfo.subProjectId
               );
               sessionStorage.setItem("subProjectName", subProjectInfo.title);
+              this.getSubprojectDes();
 
-              // this.managerIdentity(subProjectInfo.managerId);
+              this.managerIdentity(subProjectInfo.managerId);
               this.memberIdentity(subProjectInfo.members);
               this.$store.commit("setSubProjectInfo", subProjectInfo);
+
               this.inviteAble = false;
               this.showMembers();
             }
@@ -487,17 +474,43 @@ export default {
         this.userRole = "Visitor";
       }
     },
-    // managerIdentity(managerId) {
-    //   if (managerId === this.$store.getters.userId) {
-    //     this.subProjectInfo.isManager = true;
-    //   }
-    // },
+    managerIdentity(managerId) {
+      if (managerId === this.$store.getters.userId) {
+        this.subProjectInfo.isManager = true;
+      }
+    },
     memberIdentity(members) {
       for (let i = 0; i < members.length; i++) {
         if (members[i].userId === this.$store.getters.userId) {
           this.subProjectInfo.isMember = true;
           break;
         }
+      }
+    },
+    getSubprojectDes() {
+      if (
+        this.subProjectInfo.purpose != undefined &&
+        this.subProjectInfo.purpose != null
+      ) {
+        this.purpose = this.subProjectInfo.purpose;
+      } else if (
+        this.subProjectInfo.description != undefined &&
+        this.subProjectInfo.description != null
+      ) {
+        this.purpose = this.subProjectInfo.description;
+      }
+
+      if (
+        this.subProjectInfo.limitation != undefined &&
+        this.subProjectInfo.limitation != null
+      ) {
+        this.limitation = this.subProjectInfo.limitation;
+      }
+      if (
+        this.subProjectInfo.background != undefined &&
+        this.subProjectInfo.background != null
+      ) {
+        this.background = this.subProjectInfo.background;
       }
     },
     showMembers() {
@@ -840,32 +853,88 @@ export default {
           console.log(err.data);
         });
     },
-    editBackground() {
+    editPurposes() {
       if (this.edit1) {
         this.edit1 = false;
+
+        let obj = new URLSearchParams();
+        obj.append("subProjectId", this.subProjectInfo.subProjectId);
+        obj.append("purpose", this.purpose);
+        this.axios
+          .post("/GeoProblemSolving/subProject/update", obj)
+          .then(res => {
+            if (res.data == "Offline") {
+              this.$store.commit("userLogout");
+              this.$router.push({ name: "Login" });
+            } else if (res.data != "Fail") {
+              this.$Notice.info({
+                desc: "Update successfully!"
+              });
+            } else {
+              this.$Message.error("Update subproject failed.");
+            }
+          })
+          .catch(err => {
+            console.log(err.data);
+          });
       } else {
         this.edit1 = true;
       }
     },
-    editLimitation() {
+    editBackground() {
       if (this.edit2) {
         this.edit2 = false;
+
+        let obj = new URLSearchParams();
+        obj.append("subProjectId", this.subProjectInfo.subProjectId);
+        obj.append("background", this.background);
+        this.axios
+          .post("/GeoProblemSolving/subProject/update", obj)
+          .then(res => {
+            if (res.data == "Offline") {
+              this.$store.commit("userLogout");
+              this.$router.push({ name: "Login" });
+            } else if (res.data != "Fail") {
+              this.$Notice.info({
+                desc: "Update successfully!"
+              });
+            } else {
+              this.$Message.error("Update subproject failed.");
+            }
+          })
+          .catch(err => {
+            console.log(err.data);
+          });
       } else {
         this.edit2 = true;
       }
     },
-    editContent() {
+    editLimitation() {
       if (this.edit3) {
         this.edit3 = false;
+
+        let obj = new URLSearchParams();
+        obj.append("subProjectId", this.subProjectInfo.subProjectId);
+        obj.append("limitation", this.limitation);
+        this.axios
+          .post("/GeoProblemSolving/subProject/update", obj)
+          .then(res => {
+            if (res.data == "Offline") {
+              this.$store.commit("userLogout");
+              this.$router.push({ name: "Login" });
+            } else if (res.data != "Fail") {
+              this.$Notice.info({
+                desc: "Update successfully!"
+              });
+            } else {
+              this.$Message.error("Update subproject failed.");
+            }
+          })
+          .catch(err => {
+            console.log(err.data);
+          });
       } else {
         this.edit3 = true;
-      }
-    },
-    editPurposes() {
-      if (this.edit4) {
-        this.edit4 = false;
-      } else {
-        this.edit4 = true;
       }
     }
   }

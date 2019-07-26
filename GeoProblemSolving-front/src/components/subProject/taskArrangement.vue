@@ -276,7 +276,9 @@
             </Row>
           </template>
           <div v-show="chartSwitch">
-            <gantt-elastic :tasks="ganttTasks" :options="ganttOptions"></gantt-elastic>
+            <vue-scroll :ops="scrollOps" :style="{height:contentHeight+'px'}">
+              <gantt-elastic :tasks="ganttTasks" :options="ganttOptions"></gantt-elastic>
+            </vue-scroll>
           </div>
         </div>
       </Col>
@@ -524,12 +526,12 @@ export default {
         {
           id: 1,
           name: "",
-          user:"",
+          user: "",
           start: new Date(),
           end: new Date(),
           progress: 0,
           type: "task"
-        },
+        }
       ],
       ganttOptions: {
         maxRows: 100,
@@ -633,13 +635,13 @@ export default {
     //     }
     //   }
     // },
-    closeModuleSocket() {
+    closeStepSocket() {
       if (this.subprojectSocket != null) {
         this.removeTimer();
         this.subprojectSocket.close();
       }
     },
-    openModuleSocket() {
+    openStepSocket() {
       if (this.subprojectSocket != null) {
         this.subprojectSocket = null;
       }
@@ -656,7 +658,7 @@ export default {
       this.setTimer();
     },
     onOpen() {
-      console.log("ModuleSocket连接成功！");
+      console.log("StepSocket连接成功！");
     },
     // 更新人员，更新数据，更新records
     onMessage(e) {
@@ -675,11 +677,11 @@ export default {
     },
     onClose(e) {
       this.removeTimer();
-      console.log("ModuleSocket连接断开！");
+      console.log("StepSocket连接断开！");
     },
     onError(e) {
       this.removeTimer();
-      console.log("ModuleSocket连接错误！");
+      console.log("StepSocket连接错误！");
     },
     setTimer() {
       var that = this;
