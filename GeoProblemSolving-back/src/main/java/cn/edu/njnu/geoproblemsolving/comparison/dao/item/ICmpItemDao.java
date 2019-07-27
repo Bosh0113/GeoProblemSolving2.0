@@ -23,5 +23,7 @@ public interface ICmpItemDao {
 
     CmpItem findItemByItemId(String itemId);
 
+    List<CmpItem> findItemByItemIdList(List<String> idList);
+
     List<CmpItem> getItems(String key, String value);
 }

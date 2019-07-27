@@ -21,19 +21,20 @@ import BlankBox from "@/components/comparison/BlankBox";
 import BasicInfo from "@/components/comparison/ProjectBasicInfo";
 import ConstrainsInfo from "@/components/comparison/ConstrainsInfo";
 export default {
-  name: "specific-project",
+  name: "component_name",
   components: {
     "blank-box": BlankBox,
     "basic-info": BasicInfo,
-    "constrains-info":ConstrainsInfo,
+    "constrains-info": ConstrainsInfo
   },
   created: function() {
-    //* 获取项目信息
-    this.getProjectInfo();
+    //*获取 item 信息
+    this.getItemInfo();
   },
   data() {
     return {
-      projectInfo: {},
+      itemInfo: {},
+      projectInfo:{},
       blankInfo: {
         welcomeTitle: "Welcome to Comparison!",
         welcomeInfo:
@@ -46,39 +47,44 @@ export default {
     basicInfo() {
       return {
         projectTitle: this.projectInfo.title || "",
-        description: this.projectInfo.description || "",
-        rules: this.projectInfo.evaluationRules|| "",
-        managerName: this.projectInfo.managerName|| "",
-        members: this.projectInfo.members || [],
-        createTime: this.projectInfo.createTime || ""
+        cmpItemTitle: this.itemInfo.title || "",
+        description: this.itemInfo.description || "",
+        rules: this.itemInfo.evaluationRules || "",
+        managerName: this.itemInfo.managerName || "",
+        members: this.itemInfo.members || [],
+        createTime: this.itemInfo.createTime || ""
       };
     }
   },
   methods: {
-    getProjectInfo() {
-      this.projectInfo = this.$store.state.comparison.projectInfo;
-      if (JSON.stringify(this.projectInfo) === "{}") {
-        //* 请求后台数据
-        let projectId = this.$route.params.id;
-        this.$api.cmp_project
-          .getProject("projectId", projectId)
-          .then(res => {
-            console.log(res);
-            this.projectInfo = res[0];
-            //todo 请求其他数据：模型，输入数据，输出数据，子项目数据
-          })
-          .catch(err => {
-            this.$Message.error(err);
-          });
-      }
+    getItemInfo() {
+      let cmpItemId = this.$route.params.id;
+      this.$api.cmp_item
+        .getCmpItem("itemId", cmpItemId)
+        .then(res => {
+          console.log(res);
+          this.itemInfo = res[0];
+          this.getProjectInfo(this.itemInfo.projectId);
+        })
+        .catch(err => {
+          this.$Message.error(err);
+        });
+    },
+    getProjectInfo(projectId) {
+      //* 请求后台数据
+      this.$api.cmp_project
+        .getProject("projectId", projectId)
+        .then(res => {
+          console.log(res);
+          this.projectInfo = res[0];
+        })
+        .catch(err => {
+          this.$Message.error(err);
+        });
     },
     onLinkClick() {
       console.log("11");
     }
-    //todo 1.基本信息编辑功能
-    //todo 2.模型信息编辑功能
-    //todo 3.数据信息编辑功能
-    //todo 4.资源
   }
 };
 </script>
@@ -103,48 +109,6 @@ export default {
   background-color: #fff;
 }
 
-.basicInfo {
-  border-bottom: 1px solid #d1d5da;
-}
-
-.cmpTitle {
-  color: #0366d6;
-  text-decoration: none;
-  font-weight: 600;
-  margin-top: 10px;
-  margin-bottom: 10px;
-  font-size: 20px;
-}
-
-.infoName {
-  color: #0366d6;
-  font-size: 16px;
-}
-
-.basicInfo p {
-  margin-left: 20px;
-  margin-top: 5px;
-  margin-bottom: 5px;
-  font-size: 16px;
-}
-
-.members {
-  display: flex;
-  width: 100%;
-  flex-wrap: wrap;
-  margin-top: 5px;
-}
-
-.member {
-  font-size: 12px;
-  border: 1px solid #d1d5da;
-  border-radius: 8px;
-  padding: 3px;
-  margin-right: 5px;
-  margin-left: 5px;
-  margin-bottom: 5px;
-}
-
 .constrainsContent {
   display: flex;
   margin-top: 10px;
@@ -165,44 +129,9 @@ export default {
   flex: 1 0 auto;
 }
 
-.box {
-  background-color: #fff;
-  border: 1px solid #d1d5da;
-  border-radius: 3px;
-}
-
-.blankslate {
-  padding: 80px 40px;
-  background-color: #fafbfc;
-  border-radius: 3px;
-  box-shadow: inset 0 0 10px rgba(27, 31, 35, 0.05);
-  text-align: center;
-}
-
-.blankslate-icon {
-  color: #a3aab1;
-  margin-bottom: 8px;
-  margin-left: 4px;
-  margin-right: 4px;
-  vertical-align: text-bottom;
-  display: inline-block;
-  fill: currentColor;
-}
-
-.blankslate h3 {
-  font-size: 20px;
-  margin: 16px 0;
-  font-weight: 600;
-}
-
-.blankslate a {
+.infoName {
   color: #0366d6;
-  text-decoration: none;
-}
-
-.blankslate p {
   font-size: 16px;
-  margin: 0px 50px;
 }
 
 .comparisonContent {
@@ -219,6 +148,4 @@ export default {
   font-size: 14px;
   line-height: 20px;
 }
-
-
 </style>

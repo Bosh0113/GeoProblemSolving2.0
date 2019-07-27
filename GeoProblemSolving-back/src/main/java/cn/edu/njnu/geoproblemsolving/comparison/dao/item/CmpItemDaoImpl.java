@@ -5,6 +5,7 @@ import cn.edu.njnu.geoproblemsolving.comparison.dao.dataresource.DataResourceDao
 import cn.edu.njnu.geoproblemsolving.comparison.dao.modelresource.ModelResourceDaoImpl;
 import cn.edu.njnu.geoproblemsolving.comparison.entity.BaseCmpInfo;
 import cn.edu.njnu.geoproblemsolving.comparison.entity.CmpItem;
+import cn.edu.njnu.geoproblemsolving.comparison.entity.CmpProject;
 import cn.edu.njnu.geoproblemsolving.comparison.utils.DaoUtils;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -68,7 +69,20 @@ public class CmpItemDaoImpl implements ICmpItemDao {
     }
 
     @Override
+    public List<CmpItem> findItemByItemIdList(List<String> idList) {
+        Query query = Query.query(Criteria.where("itemId").in(idList));
+        List<CmpItem> cmpItems = mongoTemplate.find(query, CmpItem.class);
+        return cmpItems;
+    }
+
+    @Override
     public List<CmpItem> getItems(String key, String value) {
-        return null;
+        Query query = Query.query(Criteria.where(key).is(value));
+        if (mongoTemplate.find(query, CmpItem.class).isEmpty()) {
+            return null;
+        } else {
+            List<CmpItem> cmpItems = mongoTemplate.find(query, CmpItem.class);
+            return cmpItems;
+        }
     }
 }

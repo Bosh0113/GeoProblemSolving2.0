@@ -161,7 +161,7 @@ export default {
   border-top: 1px solid #d1d5da;
   padding-left: 20px;
   padding-right: 20px;
-  width: 1400px;
+  width: 1200px;
   margin-left: auto;
   margin-right: auto;
   /* margin-top: 10px; */

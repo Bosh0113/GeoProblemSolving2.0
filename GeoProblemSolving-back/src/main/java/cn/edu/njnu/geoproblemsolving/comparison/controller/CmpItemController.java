@@ -11,6 +11,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * @Author: SongJie
@@ -35,6 +36,29 @@ public class CmpItemController {
             cmpProjectDao.updateCmpItems(item.getProjectId(),item.getItemId());
             return ResultUtils.success(cmpItem);
         } catch (Exception e) {
+            return ResultUtils.error(ResultEnum.FAILED);
+        }
+    }
+
+
+    @RequestMapping(value = "/getCmpItemsByIdList",method = RequestMethod.POST)
+    public JsonResult getCmpItemsByIdList(@RequestBody List<String> idList){
+        CmpItemDaoImpl cmpItemDao = new CmpItemDaoImpl(mongoTemplate);
+        try{
+            List<CmpItem> itemByItemIdList = cmpItemDao.findItemByItemIdList(idList);
+            return ResultUtils.success(itemByItemIdList);
+        }catch (Exception e){
+            return ResultUtils.error(ResultEnum.FAILED);
+        }
+    }
+
+    @RequestMapping(value = "/getCmpItem",method = RequestMethod.GET)
+    public JsonResult getCmpItem(@RequestParam("key") String key, @RequestParam("value") String value){
+        CmpItemDaoImpl cmpItemDao = new CmpItemDaoImpl(mongoTemplate);
+        try{
+            List<CmpItem> items = cmpItemDao.getItems(key, value);
+            return ResultUtils.success(items);
+        }catch (Exception e){
             return ResultUtils.error(ResultEnum.FAILED);
         }
     }

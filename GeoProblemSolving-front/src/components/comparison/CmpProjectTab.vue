@@ -6,7 +6,6 @@
           <div class="cmpTitle">
             <a href="#" @click.prevent="projectDetail(project)">{{project.title}}</a>
           </div>
-
           <p class="cmpDesc">{{project.description}}</p>
           <div id="bottom-info">
             <div class="info">

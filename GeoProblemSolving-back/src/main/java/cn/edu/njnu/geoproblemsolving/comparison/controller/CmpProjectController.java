@@ -43,14 +43,22 @@ public class CmpProjectController {
     @RequestMapping(value="/getAllProjects", method = RequestMethod.GET)
     public JsonResult getProjectList(){
         CmpProjectDaoImpl cmpProjectDao = new CmpProjectDaoImpl(mongoTemplate);
-        List<CmpProject> allProject = cmpProjectDao.getAllProject();
-        return ResultUtils.success(allProject);
+        try{
+            List<CmpProject> allProject = cmpProjectDao.getAllProject();
+            return ResultUtils.success(allProject);
+        }catch (Exception e){
+            return ResultUtils.error(ResultEnum.FAILED);
+        }
     }
 
     @RequestMapping(value = "/getProject",method = RequestMethod.GET)
     public JsonResult getProject(@RequestParam("key") String key, @RequestParam("value") String value){
         CmpProjectDaoImpl cmpProjectDao = new CmpProjectDaoImpl(mongoTemplate);
-        List<CmpProject> projects = cmpProjectDao.getProjects(key, value);
-        return ResultUtils.success(projects);
+        try{
+            List<CmpProject> projects = cmpProjectDao.getProjects(key, value);
+            return ResultUtils.success(projects);
+        }catch (Exception e){
+            return ResultUtils.error(ResultEnum.FAILED);
+        }
     }
 }
