@@ -5,35 +5,6 @@
   padding: 5px;
   margin: 3px;
 }
-.folderDeleteBtn {
-  cursor: pointer;
-  color: red;
-  float: right;
-  margin: 0 1%;
-}
-.folderRenameBtn {
-  cursor: pointer;
-  color: blue;
-  float: right;
-  margin: 0 1%;
-}
-.fileDownloadBtn {
-  color: #9999a5;
-  float: right;
-  margin: 0 1%;
-}
-.filePreviewBtn {
-  cursor: pointer;
-  color: #32d64f;
-  float: right;
-  margin: 0 1%;
-}
-.fileDeleteBtn {
-  cursor: pointer;
-  color: #d65f2f;
-  float: right;
-  margin: 0 1%;
-}
 .resourceTitle {
   font-size: 18px;
   height: 20px;
@@ -103,6 +74,26 @@
   white-space: nowrap;
   text-overflow: ellipsis;
 }
+.fileBtnHoverBlue:hover{
+  background-color: #2db7f5;
+  color: white;
+}
+.fileBtnHoverGreen:hover{
+  background-color: #19be6b;
+  color: white;
+}
+.fileBtnHoverOrange:hover{
+  background-color: #ff9900;
+  color: white;
+}
+.fileBtnHoverRed:hover{
+  background-color: #ed4014;
+  color: white;
+}
+.fileBtnHoverGray:hover{
+  background-color: #808695;
+  color: white;
+}
 </style>
 <template>
   <div class="fileSpace">
@@ -112,23 +103,13 @@
       </div>
       <div slot="extra" class="resourceBtnDiv" v-show="role != 'Visitor'">
         <Tooltip content="Back" placement="bottom" class="fileBtn">
-          <Button @click="backforeFolder">
+          <Button @click="backforeFolder" class="fileBtnHoverGray">
             <Icon type="md-arrow-round-back" size="20"/>
           </Button>
         </Tooltip>
         <Tooltip content="New folder" placement="bottom" class="fileBtn">
-          <Button @click="addFolderModalShow">
+          <Button @click="addFolderModalShow" class="fileBtnHoverGreen">
             <Icon type="ios-folder" size="20"/>
-          </Button>
-        </Tooltip>
-        <Tooltip content="Upload files" placement="bottom" class="fileBtn">
-          <Button @click="uploadModalShow">
-            <Icon type="md-cloud-upload" size="20"/>
-          </Button>
-        </Tooltip>
-        <Tooltip content="Share personal files" placement="bottom" class="fileBtn">
-          <Button @click="shareModalShow">
-            <Icon type="ios-copy" size="20"/>
           </Button>
         </Tooltip>
       </div>
@@ -159,9 +140,15 @@
             </Breadcrumb>
             </div>
             <div style="align-items:flex-end">
-              <Button @click="downloadSelectFile" v-show="currentFolder.files.length>0" title="Download" style="width:60px;height:30px;">
-                <Icon type="md-cloud-download" size="20"/>
-              </Button>
+              <Tooltip content="Download" placement="bottom" class="fileBtn">
+                <Button @click="downloadSelectFile" v-show="currentFolder.files.length>0" shape="circle" icon="md-cloud-download" class="fileBtnHoverGray"></Button>
+              </Tooltip>
+              <Tooltip content="Upload files" placement="bottom" class="fileBtn">
+                <Button @click="uploadModalShow" shape="circle" icon="md-cloud-upload" class="fileBtnHoverGreen"></Button>
+              </Tooltip>
+              <Tooltip content="Share personal files" placement="bottom" class="fileBtn">
+                <Button @click="shareModalShow" shape="circle" icon="ios-copy" class="fileBtnHoverOrange"></Button>
+              </Tooltip>
             </div>
           </div>
         </Card>
@@ -174,12 +161,10 @@
                 class="fileItemName"
                 :title="folder.name"
               >{{folder.name}}</a>
-              <span @click="deleteFolder(folder)" class="folderDeleteBtn">
-                <Icon type="ios-trash-outline" title="Delete" size="25"/>
-              </span>
-              <span @click="renameFolderModalShow(folder)" class="folderRenameBtn">
-                <Icon type="ios-create-outline" title="Rename" size="25"/>
-              </span>
+              <div style="float:right">
+                <Button @click="renameFolderModalShow(folder)" class="fileBtnHoverBlue" shape="circle" icon="ios-create" title="Rename" size="small" type="text"></Button>
+                <Button @click="deleteFolder(folder)" class="fileBtnHoverRed" shape="circle" icon="ios-trash" title="Delete" size="small" style="margin-left:5px" type="text"></Button>
+              </div>
             </div>
           </Card>
           <CheckboxGroup v-model="chooseFilesArray" @on-change="checkAllGroupChange">
@@ -189,18 +174,12 @@
               <span @click="getFileInfo(file)" class="fileItemName" :title="file.name">{{file.name}}</span>
               <span class="fileItemSize">{{file.fileSize}}</span>
               <span style="width:20%;margin-right:5%">{{file.uploadTime.substring(0,10)}}</span>
-              <span @click="fileDelete(file)" class="fileDeleteBtn">
-                <Icon type="ios-trash" title="Remove" size="25"/>
-              </span>
-              <span @click="fileRenameModalShow(file)" class="filePreviewBtn">
-                <Icon type="md-create" title="Rename" size="25"/>
-              </span>
-              <a :href="file.pathURL" :download="file.name" class="fileDownloadBtn">
-                <Icon type="ios-cloud-download" title="Download" size="25"/>
-              </a>
-              <span @click="filePreview(file)" class="filePreviewBtn">
-                <Icon type="md-eye" title="Preview" size="25"/>
-              </span>
+              <div style="float:right">
+                <Button @click="filePreview(file)" shape="circle" icon="md-eye" title="Preview" size="small" class="fileBtnHoverGreen" type="text"></Button>
+                <Button @click="fileDownload(file)" shape="circle" icon="ios-cloud-download" title="Download" size="small" class="fileBtnHoverGray" type="text"></Button>
+                <Button @click="fileRenameModalShow(file)" shape="circle" icon="md-create" title="Rename" size="small" class="fileBtnHoverBlue" type="text"></Button>
+                <Button @click="fileDelete(file)" shape="circle" icon="ios-trash" title="Remove" size="small" class="fileBtnHoverRed" type="text"></Button>
+              </div>
             </Card>
           </CheckboxGroup>
         </div>
@@ -388,14 +367,12 @@
 </template>
 <script>
 export default {
-  // props: ["rootFolderId","role"],
+  props: ["rootFolderId","role"],
   mounted() {
     this.enterFolder(this.rootFolderId);
   },
   data() {
     return {
-      rootFolderId:"5723e77c-9d49-42ce-9664-080dd4e1856b",//暂时测试用
-      role:"",//暂时测试用
       currentFolder: {
         folders: [],
         files:[],
@@ -938,6 +915,9 @@ export default {
         .catch(err => {
           console.log(err.data);
         });
+    },
+    fileDownload(fileInfo){
+      window.open(fileInfo.pathURL);
     },
     fileRenameModalShow(fileInfo){
       this.renameForeInfo = fileInfo;

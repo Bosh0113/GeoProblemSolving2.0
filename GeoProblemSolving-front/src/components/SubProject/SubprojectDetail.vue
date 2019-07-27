@@ -313,7 +313,7 @@
                       </Card>
                       <div class="resourcePanel" style="padding-top: 20px">
                         <folder-tree
-                          :subProjectId="subProjectInfo.subProjectId"
+                          :rootFolderId="subProjectInfo.subProjectId"
                           :role="userRole"
                           ref="folderTreeEle"
                         ></folder-tree>
@@ -727,7 +727,7 @@
 import { VueFlowy, FlowChart } from "vue-flowy";
 import draggable from "vuedraggable";
 import Avatar from "vue-avatar";
-import folderTree from "./FolderTree.vue";
+import folderTree from "../Resource/FolderTree.vue";
 export default {
   updated() {
     $(".userAvatar sup").css("margin", "15px 15px 0 0");
