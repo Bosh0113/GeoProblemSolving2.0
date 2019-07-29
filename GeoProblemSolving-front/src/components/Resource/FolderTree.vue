@@ -146,7 +146,7 @@
               <Tooltip content="Upload files" placement="bottom" class="fileBtn">
                 <Button @click="uploadModalShow" shape="circle" icon="md-cloud-upload" class="fileBtnHoverGreen"></Button>
               </Tooltip>
-              <Tooltip content="Share personal files" placement="bottom" class="fileBtn">
+              <Tooltip content="Share personal files" placement="left" class="fileBtn">
                 <Button @click="shareModalShow" shape="circle" icon="ios-copy" class="fileBtnHoverOrange"></Button>
               </Tooltip>
             </div>

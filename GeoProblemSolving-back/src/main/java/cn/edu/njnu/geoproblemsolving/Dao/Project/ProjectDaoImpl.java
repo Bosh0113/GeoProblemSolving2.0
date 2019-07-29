@@ -8,6 +8,7 @@ import cn.edu.njnu.geoproblemsolving.Entity.Folder.FolderEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.ProjectEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.SubProjectEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.UserEntity;
+import cn.edu.njnu.geoproblemsolving.View.StaticPagesBuilder;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
@@ -71,6 +72,9 @@ public class ProjectDaoImpl implements IProjectDao {
         folderEntity.setParentId("");
         folderEntity.setFolderId(project.getProjectId());
         mongoTemplate.save(folderEntity);
+
+        StaticPagesBuilder staticPagesBuilder = new StaticPagesBuilder(mongoTemplate);
+        staticPagesBuilder.projectDetailPageBuilder(projectId);
         return projectId;
     }
 
@@ -195,6 +199,9 @@ public class ProjectDaoImpl implements IProjectDao {
                     }
                 }
             }catch (Exception ignored){}
+
+            StaticPagesBuilder staticPagesBuilder = new StaticPagesBuilder(mongoTemplate);
+            staticPagesBuilder.projectDetailPageBuilder(projectId);
             return projectEntity;
         } catch (Exception e) {
             return "Fail";
@@ -227,6 +234,9 @@ public class ProjectDaoImpl implements IProjectDao {
                     Update updateUser = new Update();
                     updateUser.set("joinedProjects", joinedProjects);
                     mongoTemplate.updateFirst(queryUser, updateUser, UserEntity.class);
+
+                    StaticPagesBuilder staticPagesBuilder = new StaticPagesBuilder(mongoTemplate);
+                    staticPagesBuilder.projectDetailPageBuilder(projectId);
                     return "Success";
                 }
             } else {
@@ -259,6 +269,9 @@ public class ProjectDaoImpl implements IProjectDao {
                 mongoTemplate.updateFirst(queryUser, updateUser, UserEntity.class);
 
                 quitSubProjectFromProject(projectId, userId);
+
+                StaticPagesBuilder staticPagesBuilder = new StaticPagesBuilder(mongoTemplate);
+                staticPagesBuilder.projectDetailPageBuilder(projectId);
                 return "Success";
             } else {
                 return "None";
@@ -313,6 +326,9 @@ public class ProjectDaoImpl implements IProjectDao {
             update.set("managerName", newManager.getUserName());
             update.set("members", newMembers);
             mongoTemplate.updateFirst(query, update, ProjectEntity.class);
+
+            StaticPagesBuilder staticPagesBuilder = new StaticPagesBuilder(mongoTemplate);
+            staticPagesBuilder.projectDetailPageBuilder(projectId);
             return mongoTemplate.findOne(query, ProjectEntity.class);
         } catch (Exception e) {
             return "Fail";
