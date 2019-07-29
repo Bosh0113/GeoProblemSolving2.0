@@ -61,7 +61,7 @@
   /* border: 1px solid #eee; */
 }
 .personalFileLabel{
-  width: 150px;
+  width: 250px;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -329,11 +329,11 @@
       <div style="height:300px;">
         <vue-scroll :ops="ops">
         <CheckboxGroup v-model="selectedFilesToShare">
-          <Card dis-hover v-for="file in userResourceList" :key="file.index" style="">
+          <Card dis-hover v-for="file in userResourceList" :key="file.index">
             <Checkbox :label="file.resourceId" class="personalFileLabel" :title="file.name" v-if="canBeShare(file.resourceId)"><strong>{{file.name}}</strong></Checkbox>
             <Checkbox :label="file.resourceId" class="personalFileLabel" :title="file.name" disabled v-else><strong>{{file.name}}</strong></Checkbox>
-            <span class="personalFileDes" style="wdith:150px;" :title="file.description">{{file.description}}</span>
-            <span style="display: inline-block;vertical-align;">{{file.fileSize}}</span>
+            <span class="personalFileDes" style="width:150px;" :title="file.description">{{file.description}}</span>
+            <span style="display: inline-block;vertical-align: top;">{{file.fileSize}}</span>
           </Card>
         </CheckboxGroup>
         </vue-scroll>

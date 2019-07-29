@@ -17,6 +17,9 @@
     <script th:replace="navigation::commonHeader-css"></script>
     <script th:replace="navigation::commonHeader-html"></script>
     <script th:replace="navigation::commonHeader-js"></script>
+    <script th:replace="folderTree::common-css"></script>
+    <script th:replace="folderTree::common-html"></script>
+    <script th:replace="folderTree::common-js"></script>
     <style>
         [v-cloak] {
             display: none;
@@ -376,11 +379,14 @@
                     </div>
                 </div>
                 <div v-else-if="showMenuItem=='resources'" style="height: inherit;min-height: fit-content;">
-                    <div style="background:#eee;padding: 10px;height: inherit;">
-                        <Card :bordered="false" style="height: -webkit-fill-available;min-height: 565px;">
+                    <div style="background:#eee;padding: 10px;height: inherit;min-height: fit-content;">
+                        <Card :bordered="false" style="height: -webkit-fill-available;min-height: 565px;min-height: fit-content;">
                             <h1 slot="title" class="projectMenuItemTitle">Resources</h1>
-                            <div>
-                                Content
+                            <div :style="{height:subProjectsCSS}">
+                                <child-folder
+                                :root-folder-id="projectInfo.projectId"
+                                role=""
+                                ref="folderTreeEl"></child-folder>
                             </div>
                         </Card>
                     </div>
@@ -689,6 +695,12 @@
             },
             data() {
                 return {
+                    userInfo:{
+                        userState: false,
+                        userName: 'visitor',
+                        userId: '',
+                        avatar: '',
+                    },
                     projectInfo: projectInfo,
                     showMenuItem: "projectDetail",
                     contentPageCSS: '',
@@ -879,6 +891,7 @@
                         return (() => {
                             this.resizeContent();
                             this.$refs.navigationEl.identityMenuCSS();
+                            this.$refs.folderTreeEl.resizeContent();
                         })()
                     }
                 },
@@ -1005,7 +1018,7 @@
                     this.inputTag = "";
                 },
                 deleteTag(index) {
-                this.projectEditForm.editTags.splice(index, 1);
+                    this.projectEditForm.editTags.splice(index, 1);
                 },
                 editProjectSubmit(form) {
                     this.$refs[form].validate(valid => {
@@ -1435,7 +1448,7 @@
                         });
                 },
                 goSubProjectPage(subProject){
-                    if(managerIdentity(subProject.managerId)||memberIdentity(subProject.members)){
+                    if(this.managerIdentity(subProject.managerId)||this.memberIdentity(subProject.members)){
                         window.location.href="/GeoProblemSoving/project/"+subProject.subProjectId+"/subproject";
                     }else{
                         this.$Message.warning({
