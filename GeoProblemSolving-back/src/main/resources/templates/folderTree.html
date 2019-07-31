@@ -311,7 +311,7 @@
                                         <strong>{{file.name}}</strong>
                                     </Checkbox>
                                     <span class="personalFileDes" style="wdith:150px;" :title="file.description">{{file.description}}</span>
-                                    <span style="display: inline-block;vertical-align;">{{file.fileSize}}</span>
+                                    <span style="display: inline-block;vertical-align:top;">{{file.fileSize}}</span>
                                 </div>
                             </Card>
                         </Checkbox-group>
@@ -455,7 +455,7 @@
             methods: {
                 resizeContent(){
                     if(window.innerHeight>735){
-                        this.listContentCSS= window.innerHeight - 430 + 'px';
+                        this.listContentCSS= window.innerHeight - 265 + 'px';
                     }else{
                         this.listContentCSS= '460px';
                     }
