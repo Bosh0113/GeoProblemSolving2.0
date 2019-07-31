@@ -90,26 +90,11 @@
 </style>
 <template>
   <div>
-    <Row>
-      <!-- <Col span="4" style="height:40px;" class="operatePanel">
-        <Button
-          type="success"
-          @click="gotoWorkingPanel()"
-          icon="ios-git-network"
-          title="Back to project page"
-        >Work</Button>
-        <Button
-          type="default"
-          @click="conveneWork()"
-          icon="md-mail"
-          title="Inform others to work together"
-        >Inform</Button>
-      </Col>-->
-        
-        <Col span="21" style="margin:30px 0 0 100px">          
+    <Row>        
+        <Col span="21" style="margin:10px 0 0 100px">          
           <div class="resourcePanel" style="padding-top: 20px">
             <folder-tree
-              :subProjectId="subProjectInfo.subProjectId"
+              :rootFolderId="subProjectInfo.subProjectId"
               :role="userRole"
               ref="folderTreeEle"
             ></folder-tree>
@@ -121,7 +106,7 @@
 </template>
 <script>
 import Avatar from "vue-avatar";
-import folderTree from "./FolderTree.vue";
+import folderTree from "../resource/FolderTree";
 export default {
   updated() {
     $(".userAvatar sup").css("margin", "15px 15px 0 0");
@@ -297,7 +282,7 @@ export default {
   },
   
   beforeRouteLeave(to, from, next) {
-    this.$refs.folderTreeEle.closePanel();
+    // this.$refs.folderTreeEle.closePanel();
     next();
   },
   beforeDestroy: function() {
