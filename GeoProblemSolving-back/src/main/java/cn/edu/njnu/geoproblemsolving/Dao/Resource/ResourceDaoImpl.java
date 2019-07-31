@@ -92,23 +92,23 @@ public class ResourceDaoImpl implements IResourceDao {
                             String pathURL="/GeoProblemSolving/resource/"+folderName+"/"+newFileTitle;
 
                             // 如果是zip文件
-                            if(suffix.equals("zip")){
-                                try {
-                                    ArrayList<String> fileInZip = new ArrayList<>();
-                                    ZipFile zipFile = new ZipFile(localPath);
-                                    Enumeration enumeration = zipFile.entries();
-                                    while (enumeration.hasMoreElements()){
-                                        ZipEntry zipEntry = (ZipEntry) enumeration.nextElement();
-                                        String fn = zipEntry.getName();
-                                        String[] nameArray = fn.split("\\\\");
-                                        fn = nameArray[nameArray.length - 1];
-                                        fileInZip.add(fn);
-                                    }
-                                }
-                                catch (Exception ex) {
-                                    ex.printStackTrace();
-                                }
-                            }
+//                            if(suffix.equals("zip")){
+//                                try {
+//                                    ArrayList<String> fileInZip = new ArrayList<>();
+//                                    ZipFile zipFile = new ZipFile(localPath);
+//                                    Enumeration enumeration = zipFile.entries();
+//                                    while (enumeration.hasMoreElements()){
+//                                        ZipEntry zipEntry = (ZipEntry) enumeration.nextElement();
+//                                        String fn = zipEntry.getName();
+//                                        String[] nameArray = fn.split("\\\\");
+//                                        fn = nameArray[nameArray.length - 1];
+//                                        fileInZip.add(fn);
+//                                    }
+//                                }
+//                                catch (Exception ex) {
+//                                    ex.printStackTrace();
+//                                }
+//                            }
 
                             String resourceId = UUID.randomUUID().toString();
                             String fileSize;

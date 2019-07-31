@@ -1,6 +1,7 @@
 GeoProblemSolving-back/.idea
 GeoProblemSolving-back/target
 GeoProblemSolving-back/src/main/webapp
+GeoProblemSolving-back/src/main/resources/templates/project
 GeoProblemSolving-front/target.md
 GeoProblemSolving-front/node_modules
 GeoProblemSolving-back/geoproblemsolving.iml

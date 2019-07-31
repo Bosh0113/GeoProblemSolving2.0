@@ -57,14 +57,16 @@
 
         .userState {
             position: absolute;
-            margin-left: 85%;
             width: 15%;
             top: 0px;
             z-index: 1;
+            display: inline-block;
+            min-width: fit-content;
         }
 
         .navPart {
             width: 85%;
+            display: inline-block;
         }
 
         .menuItem a {
@@ -93,27 +95,33 @@
         }
     </style>
     <template th:fragment="commonHeader-html" id="navigation">
-        <div>
-            <header :style="absoluteStyle">
-                <img :src='window.location.origin+"/GeoProblemSolving/Images/OGMS.png"' id="logo" class="pic" @click="goHome" style="cursor:pointer;margin-left:5%">
-                <div class="navPart">
-                    <i-menu mode="horizontal" theme="dark" active-name="home" @on-select="turnContent" :style="`z-index:0;background:headerBgColor`" width="auto">
-                        <menu-item name="home" class="menuItem" style="margin-left:35%">
-                            <span>Home</span>
-                        </menu-item>
-                        <menu-item name="projects" class="menuItem">
-                            <span>Projects</span>
-                        </menu-item>
-                        <menu-item name="resources" class="menuItem">
-                            <span>Resources</span>
-                        </menu-item>
-                        <menu-item name="help" class="menuItem">
-                            <span>Help</span>
-                        </menu-item>
-                    </i-menu>
+        <div style="position: fixed;z-index: 999;">
+            <header style="position:inherit;min-width: -webkit-fill-available;">
+                <img :src='window.location.origin+"/GeoProblemSolving/Images/OGMS.png"' id="logo" class="pic"
+                     @click="goHome" style="cursor:pointer;margin-left:5%">
+                <div v-if="useMenuCSS">
+                    <div class="navPart">
+                        <i-menu mode="horizontal" theme="dark" @on-select="turnContent"
+                                :style="`z-index:0;background:headerBgColor`" width="auto" active-name="projects">
+                            <menu-item name="home" class="menuItem" style="margin-left:35%">
+                                <span>Home</span>
+                            </menu-item>
+                            <menu-item name="projects" class="menuItem">
+                                <span>Projects</span>
+                            </menu-item>
+                            <menu-item name="resources" class="menuItem">
+                                <span>Resources</span>
+                            </menu-item>
+                            <menu-item name="help" class="menuItem">
+                                <span>Help</span>
+                            </menu-item>
+                        </i-menu>
+                    </div>
                     <div class="userState">
-                        <i-menu mode="horizontal" theme="dark" @on-select="unlogin" :style="`z-index:0;background:`+headerBgColor" v-show="!userInfoNav.userState||userInfoNav.userState==undefined"
-                            class="menuItem">
+                        <i-menu mode="horizontal" theme="dark" @on-select="unlogin"
+                                :style="`z-index:0;background:`+headerBgColor"
+                                v-show="!userInfoNav.userState||userInfoNav.userState==undefined"
+                                class="menuItem">
                             <menu-item name="login">
                                 <span>Login</span>
                             </menu-item>
@@ -121,9 +129,10 @@
                                 <span>Sign up</span>
                             </menu-item>
                         </i-menu>
-
-                        <i-menu mode="horizontal" theme="dark" @on-select="logged" :style="`z-index:0;background:`+headerBgColor" v-show="userInfoNav.userState"
-                            class="menuItem">
+    
+                        <i-menu mode="horizontal" theme="dark" @on-select="logged"
+                                :style="`z-index:0;background:`+headerBgColor" v-show="userInfoNav.userState"
+                                class="menuItem">
                             <menu-item name="notification">
                                 <Badge :count="unreadNoticeCount" id="noticeBadge">
                                     <Icon type="ios-notifications-outline" size="25"></Icon>
@@ -132,8 +141,11 @@
                             <menu-item name="personal" style="width:100px">
                                 <dropdown @on-click="changeSelect" placement="bottom-start">
                                     <div @click="toPersonalPage">
-                                        <img v-if="userInfoNav.avatar!=''&&userInfoNav.avatar!=undefined&&userInfoNav.avatar!=null" :title="userInfoNav.userName" style="width:40px;height:40px;vertical-align:middle;">
-                                        <avatar :username="userInfoNav.userName" :size="40" style="margin-top:10px" :title="userInfoNav.userName" v-else></avatar>
+                                        <img v-if="userInfoNav.avatar!=''&&userInfoNav.avatar!=undefined&&userInfoNav.avatar!=null"
+                                                :title="userInfoNav.userName"
+                                                style="width:40px;height:40px;vertical-align:middle;">
+                                        <avatar :username="userInfoNav.userName" :size="40" style="margin-top:10px"
+                                                :title="userInfoNav.userName" v-else></avatar>
                                     </div>
                                     <dropdown-menu slot="list">
                                         <dropdown-item name="logout">Log out</dropdown-item>
@@ -143,210 +155,255 @@
                         </i-menu>
                     </div>
                 </div>
+                <div v-else>
+                    <i-menu mode="horizontal" theme="dark" style="z-index: 0;"></i-menu>
+                    <Dropdown style="position: fixed;top: 10px;right: 20px;">
+                        <i-button icon="md-menu" style="color: white;background-color: #808695"></i-button>
+                        <Dropdown-menu slot="list">
+                            <Dropdown-item>
+                                <a href="/GeoProblemSolving/home.html">Home</a>
+                            </Dropdown-item>
+                            <Dropdown-item>
+                                <a href="/GeoProblemSolving/projectList.html">Projects</a>
+                            </Dropdown-item>
+                            <Dropdown-item>
+                                <a href="/GeoProblemSolving/resources.html">Resources</a>
+                            </Dropdown-item>
+                            <Dropdown-item>
+                                <a href="/GeoProblemSolving/help.html">Help</a>
+                            </Dropdown-item>
+                            <Dropdown-item v-show="!userInfoNav.userState||userInfoNav.userState==undefined">
+                                <a href="/GeoProblemSolving/login.html">Login</a>
+                            </Dropdown-item>
+                            <Dropdown-item v-show="!userInfoNav.userState||userInfoNav.userState==undefined">
+                                <a href="/GeoProblemSolving/register.html">Sign up</a>
+                            </Dropdown-item>
+                            <Dropdown-item v-show="userInfoNav.userState">
+                                <a href="/GeoProblemSolving/notifications.html">Notification</a>
+                            </Dropdown-item>
+                            <Dropdown-item v-show="userInfoNav.userState">
+                                <a @click.native="toPersonalPage">Personal Page</a>
+                            </Dropdown-item>
+                            <Dropdown-item v-show="userInfoNav.userState">
+                                <a @click.native="logout">Log out</a>
+                            </Dropdown-item>
+                        </Dropdown-menu>
+                    </Dropdown>
+                </div>
             </header>
         </div>
     </template>
 
     <script th:fragment="commonHeader-js">
         Vue.component('child-navigation', {
-            template: '#navigation',
-            components: {
-                'avatar': VueAvatar.Avatar
-            },
-            mounted() {
-                $.ajax({
-                    url: "/GeoProblemSolving/user/state",
-                    type: "GET",
-                    async: false,
-                    success: function (data) {
-                        if (data) {
-                            data.userState = true;
-                            this.userInfoNav = data;
-                            sessionStorage.setItem('userInfo', JSON.stringify(data));
-                            this.setTimer();
-                            this.initWebSocket();
-                            this.getUnreadNoticeCount();
-                        }
-                        else {
-                            console.log("Not logged in");
-                        }
-                    },
-                    error: function (err) {
-                        console.log("Get user info fail.");
+                template: '#navigation',
+                components: {
+                    'avatar': VueAvatar.Avatar
+                },
+                created() {
+                    var userInfo = {
+                        userState: false,
+                        userName: 'visitor',
+                        userId:'',
+                        avatar:''
                     }
-                });
-            },
-            computed: {
-                absoluteStyle() {
-                    return "position:inherit";
-                },
-                headerBgColor() {
-                    return "";
-                }
-            },
-            data() {
-                return {
-                    //消息机制
-                    noticeSocket: null,
-                    unreadNoticeCount: 0,
-                    timer: null,
-                    //导航栏宽度
-                    headerWidth: "",
-                    contentHeight: window.innerHeight - 120 + "px",
-                    //用户
-                    userInfoNav: {
-                        userName:""
-                    },
-
-                }
-            },
-            methods: {
-                reSize() {
-                    if (window.innerHeight > 675) {
-                        this.contentHeight = window.innerHeight - 120 + "px";
-                    } else {
-                        this.contentHeight = 675;
-                    }
-                },
-                turnContent(name) {
-                    if (name === "home") {
-                        window.location.href="/GeoProblemSolving/home.html"
-                    } else if (name == "projects") {
-                        window.location.href="/GeoProblemSolving/projectList.html"
-                    } else if (name == "resources") {
-                        window.location.href="/GeoProblemSolving/resources.html"
-                    } else if (name == "community") {
-                        window.location.href="/GeoProblemSolving/community.html"
-                    } else if (name == "help") {
-                        window.location.href="/GeoProblemSolving/help.html"
-                    }
-                },
-                goHome() {
-                        window.location.href="/GeoProblemSolving/home.html"
-                },
-                unlogin(name) {
-                    if (name === "login") {
-                        window.location.href="/GeoProblemSolving/login.html"
-                    } else if (name == "register") {
-                        window.location.href="/GeoProblemSolving/register.html"
-                    }
-                },
-                logged(name) {
-                    if (name === "notification") {
-                        window.location.href="/GeoProblemSolving/notifications.html"
-                    } else if (name === "personal") {
-                    }
-                },
-                toPersonalPage() {
-                        window.location.href="/GeoProblemSolving//personal/"+this.userInfoNav.userId+".html"
-                },
-                // 获取到通知的数量
-                getUnreadNoticeCount() {
-                    this.unreadNoticeCount = 0;
-                    //get请求发送的是用户id
-                    this.axios
-                        .get(
-                            "/GeoProblemSolving/notice/inquiry" +
-                            "?key=recipientId" +
-                            "&value=" +
-                            this.userInfoNav.userId
-                        )
-                        .then(res => {
-                            let noticeList = res.data;
-                            let unreadCount = 0;
-                            for (let i = 0; i < noticeList.length; i++) {
-                                if (noticeList[i].state === "unread") {
-                                    unreadCount++;
-                                    continue;
-                                }
-                            }
-                            this.$set(this, "unreadNoticeCount", unreadCount);
-                        })
-                        .catch(err => {
-                            console.log("失败的原因是" + err.data);
-                        });
-                },
-                initWebSocket() {
-                    if (this.noticeSocket != null) {
-                        this.noticeSocket = null;
-                    }
-                    var noticeSocketURL = "ws://"+window.location.host+"/GeoProblemSolving/NoticeSocket";
-                    this.noticeSocket = new WebSocket(noticeSocketURL);
-                    this.noticeSocket.onopen = this.onOpen;
-                    this.noticeSocket.onmessage = this.onMessage;
-                    this.noticeSocket.onclose = this.onClose;
-                    this.noticeSocket.onerror = this.onError;
-                },
-                onOpen() {
-                    // console.log("NoticeSocket连接成功！");
-                },
-                onMessage(e) {
-                    if (e.data == "Notice") {
-                        let newCount = this.unreadNoticeCount + 1;
-                        this.$set(this, "unreadNoticeCount", newCount);
-                        this.$Message.info("You have a new notice!");
-                    } else {
-                        console.log(e.data);
-                    }
-                },
-                onClose(e) {
-                    this.removeTimer();
-                    // console.log("NoticeSocket连接断开！");
-                },
-                onError(e) {
-                    this.removeTimer();
-                    // console.log("NoticeSocket连接错误！");
-                },
-                sendMessage(recipientId) {
-                    this.noticeSocket.send(recipientId);
-                },
-                setTimer() {
+                    sessionStorage.setItem('userInfo',JSON.stringify(userInfo));
                     var that = this;
-                    this.timer = setInterval(() => {
-                        if (that.noticeSocket != null && that.noticeSocket != undefined) {
-                            that.noticeSocket.send("ping");
+                    $.ajax({
+                        url: "/GeoProblemSolving/user/state",
+                        type: "GET",
+                        async: false,
+                        success: function (data) {
+                            if (data) {
+                                data.userState = true;
+                                that.userInfoNav = data;
+                                sessionStorage.setItem('userInfo', JSON.stringify(data));
+                                that.setTimer();
+                                that.initWebSocket();
+                                that.getUnreadNoticeCount();
+                            } else {
+                                console.log("Not logged in");
+                            }
+                        },
+                        error: function (err) {
+                            console.log("Get user info fail.");
                         }
-                    }, 20000);
+                    });
                 },
-                removeTimer() {
-                    clearInterval(this.timer);
+                updated(){
+                    $("#noticeBadge sup").css("margin", "15px 5px 0 0");
                 },
-                readNotification() {
-                    let newCount = this.unreadNoticeCount;
-                    if (newCount > 0) {
-                        this.unreadNoticeCount = newCount - 1;
+                computed: {
+                    headerBgColor() {
+                        return "";
                     }
                 },
-                changeSelect(name) {
-                    if (name == "logout") {
-                        this.axios
-                            .get("/GeoProblemSolving/user/logout")
+                data() {
+                    return {
+                        //消息机制
+                        noticeSocket: null,
+                        unreadNoticeCount: 0,
+                        timer: null,
+                        //导航栏宽度
+                        headerWidth: "",
+                        //用户
+                        userInfoNav: {
+                            userName: ""
+                        },
+                        useMenuCSS: true
+                    }
+                },
+                methods: {
+                    identityMenuCSS(){
+                        if(window.innerWidth<1100){
+                            this.useMenuCSS = false;
+                        }
+                        else{
+                            this.useMenuCSS = true;
+                        }
+                    },
+                    turnContent(name) {
+                        if (name === "home") {
+                            window.location.href = "/GeoProblemSolving/home"
+                        } else if (name == "projects") {
+                            window.location.href = "/GeoProblemSolving/projectList"
+                        } else if (name == "resources") {
+                            window.location.href = "/GeoProblemSolving/publicResource"
+                        } else if (name == "community") {
+                            window.location.href = "/GeoProblemSolving/community"
+                        } else if (name == "help") {
+                            window.location.href = "/GeoProblemSolving/help"
+                        }
+                    },
+                    goHome() {
+                        window.location.href = "/GeoProblemSolving/home"
+                    },
+                    unlogin(name) {
+                        if (name === "login") {
+                            window.location.href = "/GeoProblemSolving/login"
+                        } else if (name == "register") {
+                            window.location.href = "/GeoProblemSolving/register"
+                        }
+                    },
+                    logged(name) {
+                        if (name === "notification") {
+                            window.location.href = "/GeoProblemSolving/notifications"
+                        } else if (name === "personal") {
+                        }
+                    },
+                    toPersonalPage() {
+                        window.location.href = "/GeoProblemSolving/personalPage"
+                    },
+                    // 获取到通知的数量
+                    getUnreadNoticeCount() {
+                        this.unreadNoticeCount = 0;
+                        //get请求发送的是用户id
+                        axios
+                            .get(
+                                "/GeoProblemSolving/notice/inquiry" +
+                                "?key=recipientId" +
+                                "&value=" +
+                                this.userInfoNav.userId
+                            )
                             .then(res => {
-                                this.userInfoNav = {userName:""};
-                                sessionStorage.removeItem("userInfo");
-                                this.noticeSocket.close();
-                                window.location.href = "/GeoProblemSolving/home.html";
+                                let noticeList = res.data;
+                                let unreadCount = 0;
+                                for (let i = 0; i < noticeList.length; i++) {
+                                    if (noticeList[i].state === "unread") {
+                                        unreadCount++;
+                                        continue;
+                                    }
+                                }
+                                this.$set(this, "unreadNoticeCount", unreadCount);
                             })
                             .catch(err => {
-                                confirm("logout fail!");
+                                console.log("失败的原因是" + err.data);
                             });
+                    },
+                    initWebSocket() {
+                        if (this.noticeSocket != null) {
+                            this.noticeSocket = null;
+                        }
+                        var noticeSocketURL = "ws://" + window.location.host + "/GeoProblemSolving/NoticeSocket";
+                        this.noticeSocket = new WebSocket(noticeSocketURL);
+                        this.noticeSocket.onopen = this.onOpen;
+                        this.noticeSocket.onmessage = this.onMessage;
+                        this.noticeSocket.onclose = this.onClose;
+                        this.noticeSocket.onerror = this.onError;
+                    },
+                    onOpen() {
+                        // console.log("NoticeSocket连接成功！");
+                    },
+                    onMessage(e) {
+                        if (e.data == "Notice") {
+                            let newCount = this.unreadNoticeCount + 1;
+                            this.$set(this, "unreadNoticeCount", newCount);
+                            this.$Message.info("You have a new notice!");
+                        } else {
+                            console.log(e.data);
+                        }
+                    },
+                    onClose(e) {
+                        this.removeTimer();
+                        // console.log("NoticeSocket连接断开！");
+                    },
+                    onError(e) {
+                        this.removeTimer();
+                        // console.log("NoticeSocket连接错误！");
+                    },
+                    sendMessage(recipientId) {
+                        this.noticeSocket.send(recipientId);
+                    },
+                    setTimer() {
+                        var that = this;
+                        this.timer = setInterval(() => {
+                            if (that.noticeSocket != null && that.noticeSocket != undefined) {
+                                that.noticeSocket.send("ping");
+                            }
+                        }, 20000);
+                    },
+                    removeTimer() {
+                        clearInterval(this.timer);
+                    },
+                    readNotification() {
+                        let newCount = this.unreadNoticeCount;
+                        if (newCount > 0) {
+                            this.unreadNoticeCount = newCount - 1;
+                        }
+                    },
+                    changeSelect(name) {
+                        if (name == "logout") {
+                            this.logout("home");
+                        }
+                    },
+                    logout(page){
+                        axios
+                        .get("/GeoProblemSolving/user/logout")
+                        .then(res => {
+                            this.userInfoNav = {userName: ""};
+                            sessionStorage.removeItem("userInfo");
+                            this.noticeSocket.close();
+                            window.location.href = "/GeoProblemSolving/"+page;
+                        })
+                        .catch(err => {
+                            confirm("logout fail!");
+                        });
                     }
                 }
-            }
-        },
+            },
         )
     </script>
 </head>
 
 <body>
-    <div th:fragment="commonFooter">
-        <footer>
-            <h2 class="footerTop">
-                <i>Open Geographic Modeling and Simulation</i>
-            </h2>
-            <p class="footerBottom">Copyright © 2013-2019 OpenGMS. All rights reserved.</p>
-        </footer>
-    </div>
+<div th:fragment="commonFooter">
+    <footer>
+        <h2 class="footerTop">
+            <i>Open Geographic Modeling and Simulation</i>
+        </h2>
+        <p class="footerBottom">Copyright © 2013-2019 OpenGMS. All rights reserved.</p>
+    </footer>
+</div>
 </body>
 
 </html>

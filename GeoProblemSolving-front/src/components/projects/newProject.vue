@@ -170,7 +170,7 @@ h1 {
           </div>
           <div class="uploadBox">
             <Icon type="ios-camera" size="20" style="position:absolute;margin:18px;"></Icon>
-            <input @change="uploadPhoto($event)" type="file" class="uploadAvatar" accept="image/*">
+            <input id="choosePicture" @change="uploadPhoto($event)" type="file" class="uploadAvatar" accept="image/*">
           </div>
           <br>
           <Modal title="View Image" v-model="visible">
@@ -367,8 +367,8 @@ export default {
           .then(res=>{
             if(res.data!="Fail"){
               this.pictureUrl=res.data;
-              var imgcode = e.target.result;
-              this.img = imgcode;
+              this.img = e.target.result;
+              $('#choosePicture').val('');
             }
             else{
               this.$Message.error("upload picture Fail!");

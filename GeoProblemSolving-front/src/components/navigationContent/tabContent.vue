@@ -257,6 +257,8 @@ export default {
     projectInfoModalShow(projectInfo) {
       if (projectInfo.isMember || projectInfo.isManager) {
         this.$router.push({ path: `project/${projectInfo.projectId}` });
+        //以下为请求静态页面的测试代码
+        // window.location.href="http://localhost:8081/GeoProblemSolving/projectDetail/"+projectInfo.projectId;
       } else {
         this.selectedProjectInfo = Object.assign({}, projectInfo);
         var category = "";

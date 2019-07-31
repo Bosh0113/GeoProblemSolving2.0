@@ -355,7 +355,9 @@ export default {
           .get("/GeoProblemSolving/user/logout")
           .then(res => {
             this.$store.commit("userLogout");
-            this.noticeSocket.close();
+            if(this.noticeSocket != null && this.noticeSocket != undefined){
+              this.noticeSocket.close();
+            }
             this.$router.replace({ name: "Home" });
           })
           .catch(err => {

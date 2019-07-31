@@ -8,10 +8,14 @@ import cn.edu.njnu.geoproblemsolving.Entity.Folder.FolderEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.ProjectEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.SubProjectEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.UserEntity;
+import cn.edu.njnu.geoproblemsolving.View.StaticPagesBuilder;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -68,6 +72,9 @@ public class ProjectDaoImpl implements IProjectDao {
         folderEntity.setParentId("");
         folderEntity.setFolderId(project.getProjectId());
         mongoTemplate.save(folderEntity);
+
+        StaticPagesBuilder staticPagesBuilder = new StaticPagesBuilder(mongoTemplate);
+        staticPagesBuilder.projectDetailPageBuilder(projectId);
         return projectId;
     }
 
@@ -192,6 +199,9 @@ public class ProjectDaoImpl implements IProjectDao {
                     }
                 }
             }catch (Exception ignored){}
+
+            StaticPagesBuilder staticPagesBuilder = new StaticPagesBuilder(mongoTemplate);
+            staticPagesBuilder.projectDetailPageBuilder(projectId);
             return projectEntity;
         } catch (Exception e) {
             return "Fail";
@@ -224,6 +234,9 @@ public class ProjectDaoImpl implements IProjectDao {
                     Update updateUser = new Update();
                     updateUser.set("joinedProjects", joinedProjects);
                     mongoTemplate.updateFirst(queryUser, updateUser, UserEntity.class);
+
+                    StaticPagesBuilder staticPagesBuilder = new StaticPagesBuilder(mongoTemplate);
+                    staticPagesBuilder.projectDetailPageBuilder(projectId);
                     return "Success";
                 }
             } else {
@@ -256,6 +269,9 @@ public class ProjectDaoImpl implements IProjectDao {
                 mongoTemplate.updateFirst(queryUser, updateUser, UserEntity.class);
 
                 quitSubProjectFromProject(projectId, userId);
+
+                StaticPagesBuilder staticPagesBuilder = new StaticPagesBuilder(mongoTemplate);
+                staticPagesBuilder.projectDetailPageBuilder(projectId);
                 return "Success";
             } else {
                 return "None";
@@ -310,6 +326,9 @@ public class ProjectDaoImpl implements IProjectDao {
             update.set("managerName", newManager.getUserName());
             update.set("members", newMembers);
             mongoTemplate.updateFirst(query, update, ProjectEntity.class);
+
+            StaticPagesBuilder staticPagesBuilder = new StaticPagesBuilder(mongoTemplate);
+            staticPagesBuilder.projectDetailPageBuilder(projectId);
             return mongoTemplate.findOne(query, ProjectEntity.class);
         } catch (Exception e) {
             return "Fail";
@@ -391,7 +410,7 @@ public class ProjectDaoImpl implements IProjectDao {
                     String suffix = fileNames.substring(fileNames.lastIndexOf(".") + 1);
                     String regexp = "[^A-Za-z_0-9\\u4E00-\\u9FA5]";
                     String saveName = fileName.replaceAll(regexp, "");
-                    String folderPath = servicePath + "project\\picture";
+                    String folderPath = servicePath + "project/picture";
                     File temp = new File(folderPath);
                     if (!temp.exists()) {
                         temp.mkdirs();
@@ -401,7 +420,7 @@ public class ProjectDaoImpl implements IProjectDao {
                         randomNum = randomNum * 10 + (int) (Math.random() * 10 + 1);
                     }
                     String newFileTitle = saveName + randomNum + "." + suffix;
-                    String localPath = temp + "\\" + newFileTitle;
+                    String localPath = temp + "/" + newFileTitle;
                     System.out.println("图片上传到本地路径：" + localPath);
                     File file = new File(localPath);
                     FileOutputStream fileOutputStream = new FileOutputStream(file);
@@ -463,6 +482,32 @@ public class ProjectDaoImpl implements IProjectDao {
                     }
                 }
             }
+        }
+    }
+
+    @Override
+    public Object inquiryByPage(String category, int page, int pageSize){
+        try {
+            Sort sort = new Sort(Sort.Direction.DESC,"createTime");
+            Pageable pageable = PageRequest.of(page,pageSize,sort);
+            Criteria criteriaPublic = Criteria.where("privacy").is("Public");
+            Criteria criteriaDiscoverable = Criteria.where("privacy").is("Discoverable");
+            Query query;
+            if(category.equals("All")){
+                query = new Query(new Criteria().orOperator(criteriaDiscoverable,criteriaPublic)).with(pageable);
+            }else {
+                query = new Query(Criteria.where("category").is(category).orOperator(criteriaDiscoverable,criteriaPublic)).with(pageable);
+            }
+            long count = mongoTemplate.count(query,ProjectEntity.class);
+            int totalPage = (int)Math.ceil((double) count/(double) pageSize);
+            List<ProjectEntity> projectEntities=mongoTemplate.find(query,ProjectEntity.class);
+            JSONObject result = new JSONObject();
+            result.fluentPut("totalPage",totalPage);
+            result.fluentPut("projectList",projectEntities);
+            return result;
+
+        }catch (Exception e){
+            return "Fail";
         }
     }
 }

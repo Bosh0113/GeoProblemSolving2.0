@@ -343,7 +343,7 @@
 </template>
 <script>
 import Avatar from "vue-avatar";
-import folderTree from "./FolderTree.vue";
+import folderTree from "../resource/FolderTree.vue";
 export default {
   updated() {
     $(".userAvatar sup").css("margin", "10px 10px 0 0");
