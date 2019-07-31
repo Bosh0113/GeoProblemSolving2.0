@@ -51,9 +51,8 @@
             background-color: #515a6e;
             height: 60px;
             width: 100%;
-            bottom: 0 ;
+            bottom: 0;
             flex: 0 0 auto;
-            /*position:absolute;*/
         }
 
         .userState {
@@ -130,7 +129,7 @@
                                 <span>Sign up</span>
                             </menu-item>
                         </i-menu>
-
+    
                         <i-menu mode="horizontal" theme="dark" @on-select="logged"
                                 :style="`z-index:0;background:`+headerBgColor" v-show="userInfoNav.userState"
                                 class="menuItem">
@@ -143,8 +142,8 @@
                                 <dropdown @on-click="changeSelect" placement="bottom-start">
                                     <div @click="toPersonalPage">
                                         <img v-if="userInfoNav.avatar!=''&&userInfoNav.avatar!=undefined&&userInfoNav.avatar!=null"
-                                             :title="userInfoNav.userName"
-                                             style="width:40px;height:40px;vertical-align:middle;">
+                                                :title="userInfoNav.userName"
+                                                style="width:40px;height:40px;vertical-align:middle;">
                                         <avatar :username="userInfoNav.userName" :size="40" style="margin-top:10px"
                                                 :title="userInfoNav.userName" v-else></avatar>
                                     </div>
@@ -314,8 +313,8 @@
                                         unreadCount++;
                                         continue;
                                     }
-                                };
-                                this.unreadNoticeCount=Object.assign([], unreadCount);
+                                }
+                                this.$set(this, "unreadNoticeCount", unreadCount);
                             })
                             .catch(err => {
                                 console.log("失败的原因是" + err.data);

@@ -485,12 +485,11 @@ public class ProjectDaoImpl implements IProjectDao {
         }
     }
 
-
     @Override
     public Object inquiryByPage(String category, int page, int pageSize){
         try {
             Sort sort = new Sort(Sort.Direction.DESC,"createTime");
-            Pageable pageable = PageRequest.of(page-1,pageSize,sort);
+            Pageable pageable = PageRequest.of(page,pageSize,sort);
             Criteria criteriaPublic = Criteria.where("privacy").is("Public");
             Criteria criteriaDiscoverable = Criteria.where("privacy").is("Discoverable");
             Query query;
@@ -504,7 +503,6 @@ public class ProjectDaoImpl implements IProjectDao {
             List<ProjectEntity> projectEntities=mongoTemplate.find(query,ProjectEntity.class);
             JSONObject result = new JSONObject();
             result.fluentPut("totalPage",totalPage);
-            result.fluentPut("count",count);
             result.fluentPut("projectList",projectEntities);
             return result;
 

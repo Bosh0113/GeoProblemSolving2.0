@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Example-static</title>
+    <meta http-equiv="Content-Type" content=" charset=UTF-8"/>
+    <script src="https://cdn.bootcss.com/vue/2.6.10/vue.min.js"></script>
+    <link href="https://cdn.bootcss.com/iview/3.4.2/styles/iview.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/iview/3.4.2/iview.min.js"></script>
+    <script th:replace="fragmentExample::navigation-css"></script>
+    <script th:replace="fragmentExample::navigation-html"></script>
+    <script th:replace="fragmentExample::navigation-js"></script>
+    <style>
+        [v-cloak]{
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div id="exampleBody">
+    <child-navigation :user=User></child-navigation>
+    <h1>{{this.User.userName}}</h1>
+    <i-input v-model="User.userName" placeholder="Enter user's name..." style="width: 300px"/>
+</div>
+<script th:inline="javascript"  v-cloak>
+    var userInfo = [[${user}]];
+    new Vue(
+        {
+            el: "#exampleBody",
+            data: {
+                User: userInfo,
+            },
+            created() {
+                console.log(this.User.userName);
+            }
+        }
+    )
+</script>
+</body>
+</html>
