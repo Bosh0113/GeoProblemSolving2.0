@@ -936,7 +936,7 @@ export default {
   },
   beforeRouteLeave(to, from, next) {
     this.removeTimer();
-    this.$refs.folderTreeEle.closePanel();
+    // this.$refs.folderTreeEle.closePanel();
     next();
   },
   beforeDestroy: function() {
@@ -1823,7 +1823,7 @@ export default {
 
         if (name == "task") {
           this.openModuleSocket();
-          this.$refs.folderTreeEle.closePanel();
+          // this.$refs.folderTreeEle.closePanel();
         }
       }
     },
