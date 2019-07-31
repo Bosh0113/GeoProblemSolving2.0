@@ -13,7 +13,18 @@ public class StaticPagesController {
 
     @RequestMapping(value = "/projectDetail",method = RequestMethod.GET)
     public void projectDetail(@RequestParam("projectId") String projectId){
-            StaticPagesBuilder staticPagesBuilder = new StaticPagesBuilder(mongoTemplate);
-            staticPagesBuilder.projectDetailPageBuilder(projectId);
+        StaticPagesBuilder staticPagesBuilder = new StaticPagesBuilder(mongoTemplate);
+        staticPagesBuilder.projectDetailPageBuilder(projectId);
+    }
+
+    @RequestMapping(value = "/project/create",method = RequestMethod.GET)
+    public void projectList(){
+        StaticPagesBuilder staticPagesBuilder = new StaticPagesBuilder(mongoTemplate);
+        staticPagesBuilder.projectListPageBuilder();
+    }
+    @RequestMapping(value = "/home",method = RequestMethod.GET)
+    public void home(){
+        StaticPagesBuilder staticPagesBuilder = new StaticPagesBuilder(mongoTemplate);
+        staticPagesBuilder.homePageBuilder();
     }
 }
