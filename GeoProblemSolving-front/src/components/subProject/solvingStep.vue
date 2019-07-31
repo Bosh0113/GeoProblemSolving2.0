@@ -125,8 +125,6 @@ export default {
       userRole: "",
       // 步骤逻辑图
       stepChart: null,
-      //现在点击的step
-      currentStep: {},
       // 选择的步骤
       selectedStep: [],
       delModal: false
@@ -236,15 +234,15 @@ export default {
     },
     cancel() {},
     //---------------------------------------------------------进入具体的step页面---------------------------------------------------------
-    enterStep (stepId) {},
+    enterStep (moduleId) {},
     //---------------------------------------------------------进入具体的step页面---------------------------------------------------------
-    getStepInfo(stepId) {
+    getStepInfo(moduleId) {
       this.axios
         .get(
           "/GeoProblemSolving/module/inquiry" +
-            "?key=stepId" +
+            "?key=moduleId" +
             "&value=" +
-            stepId
+            moduleId
         )
         .then(res => {
           if (res.data == "Offline") {
@@ -283,7 +281,7 @@ export default {
               
               this.processStructure.push({
                 id: 0,
-                stepID: stepList[0].stepId,
+                stepID: stepList[0].moduleId,
                 name: stepList[0].title,
                 category: nodeCategory,
                 last: [],
@@ -300,7 +298,7 @@ export default {
                 nodeCategory = this.getStepCategroy(stepList[i].type);
                 this.processStructure.push({
                   id: i,
-                  stepID: stepList[i].stepId,
+                  stepID: stepList[i].moduleId,
                   name: stepList[i].title,
                   category: nodeCategory,
                   last: [{ name: stepList[i - 1].title, id: i - 1 }],
@@ -319,7 +317,7 @@ export default {
 
               this.processStructure.push({
                 id: stepList.length - 1,
-                stepID: stepList[stepList.length - 1].stepId,
+                stepID: stepList[stepList.length - 1].moduleId,
                 name: stepList[stepList.length - 1].title,
                 category: nodeCategory,
                 last: [
@@ -472,18 +470,18 @@ export default {
         this.selectedStep = [];
         for (let i = 0; i < this.processStructure.length; i++) {
           //get data
-          if (this.processStructure[i].stepID == this.currentStep.stepId) {
+          if (this.processStructure[i].stepID == this.currentStep.moduleId) {
             option.series[0].data.push({
               name: this.processStructure[i].name,
               index: this.processStructure[i].id,
-              stepId: this.processStructure[i].stepID,
+              moduleId: this.processStructure[i].stepID,
               x: this.processStructure[i].x,
               y: this.processStructure[i].y,
               category: this.processStructure[i].category,
               symbolSize: 45
             });
             this.selectedStep.push({
-              stepId: this.processStructure[i].stepID,
+              moduleId: this.processStructure[i].stepID,
               index: this.processStructure[i].id,
               name: this.processStructure[i].name
             });
@@ -491,7 +489,7 @@ export default {
             option.series[0].data.push({
               name: this.processStructure[i].name,
               index: this.processStructure[i].id,
-              stepId: this.processStructure[i].stepID,
+              moduleId: this.processStructure[i].stepID,
               x: this.processStructure[i].x,
               y: this.processStructure[i].y,
               category: this.processStructure[i].category,
@@ -528,7 +526,7 @@ export default {
 
           // record the selected step nodes
           _this.selectedStep.push({
-            stepId: params.data.stepId,
+            moduleId: params.data.moduleId,
             index: params.data.index,
             name: params.data.name
           });
@@ -537,7 +535,7 @@ export default {
 
           // remove these not selected step nodes
           for (let i = 0; i < _this.selectedStep.length; i++) {
-            if (_this.selectedStep[i].stepId == params.data.stepId) {
+            if (_this.selectedStep[i].moduleId == params.data.moduleId) {
               _this.selectedStep.splice(i, 1);
               break;
             }
@@ -548,24 +546,24 @@ export default {
       // 双击切换当前步骤
       this.stepChart.on("dblclick", function(params) {
         _this.currentStep = _this.processStructure[params.data.index];
-        _this.enterStep(params.data.stepId);
+        _this.enterStep(params.data.moduleId);
 
         _this.selectedStep = [];
         option.series[0].data = [];
         for (let i = 0; i < _this.processStructure.length; i++) {
           //get data
-          if (_this.processStructure[i].stepID == params.data.stepId) {
+          if (_this.processStructure[i].stepID == params.data.moduleId) {
             option.series[0].data.push({
               name: _this.processStructure[i].name,
               index: _this.processStructure[i].id,
-              stepId: _this.processStructure[i].stepID,
+              moduleId: _this.processStructure[i].stepID,
               x: _this.processStructure[i].x,
               y: _this.processStructure[i].y,
               category: _this.processStructure[i].category,
               symbolSize: 45
             });
             _this.selectedStep.push({
-              stepId: _this.processStructure[i].stepID,
+              moduleId: _this.processStructure[i].stepID,
               index: _this.processStructure[i].id,
               name: _this.processStructure[i].name
             });
@@ -573,7 +571,7 @@ export default {
             option.series[0].data.push({
               name: _this.processStructure[i].name,
               index: _this.processStructure[i].id,
-              stepId: _this.processStructure[i].stepID,
+              moduleId: _this.processStructure[i].stepID,
               x: _this.processStructure[i].x,
               y: _this.processStructure[i].y,
               category: _this.processStructure[i].category,

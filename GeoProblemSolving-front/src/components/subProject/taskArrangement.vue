@@ -276,9 +276,9 @@
             </Row>
           </template>
           <div v-show="chartSwitch">
-            <vue-scroll :ops="scrollOps" :style="{height:contentHeight+'px'}">
+            <!-- <vue-scroll :ops="scrollOps" :style="{height:contentHeight+'px'}"> -->
               <gantt-elastic :tasks="ganttTasks" :options="ganttOptions"></gantt-elastic>
-            </vue-scroll>
+            <!-- </vue-scroll> -->
           </div>
         </div>
       </Col>
@@ -535,9 +535,9 @@ export default {
       ],
       ganttOptions: {
         maxRows: 100,
-        maxHeight: 300,
+        maxHeight: this.contentHeight-60,
         row: {
-          height: 26
+          height: 24
         },
         calendar: {
           hour: {
@@ -577,13 +577,13 @@ export default {
               width: 100
             },
             {
-              id: 3,
+              id: 4,
               label: "Start",
               value: task => dayjs(task.start).format("YYYY-MM-DD"),
               width: 90
             },
             {
-              id: 3,
+              id: 5,
               label: "End",
               value: task => dayjs(task.end).format("YYYY-MM-DD"),
               width: 90

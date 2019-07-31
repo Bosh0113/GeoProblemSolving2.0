@@ -1943,7 +1943,7 @@ export default {
               let scopeObject = {
                 projectId: this.currentProjectDetail.projectId,
                 subprojectId: "",
-                stepId: ""
+                moduleId: ""
               };
               formData.append("scope", JSON.stringify(scopeObject));
               formData.append("privacy", this.fileUploadForm.privacy);
