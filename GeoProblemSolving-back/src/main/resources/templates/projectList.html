@@ -117,7 +117,7 @@
     </style>
 </head>
 <body>
-<div id="vueBody" v-cloak>
+<div id="vueBody" v-cloak style="min-width: 1100px;">
    <child-navigation ref="navigationEl"></child-navigation>
     <div class="picscreen" >
         <div class="picbg"></div>
@@ -212,6 +212,11 @@
                 else{
                     this.UserState=false;
                     this.tabPageData=Object.assign([], this.projectShowList);
+                }
+                window.onresize = () => {
+                    return (() => {
+                        this.$refs.navigationEl.identityMenuCSS();
+                    })()
                 }
             },
 
@@ -318,9 +323,9 @@
 
                 newProject() {
                     if (this.UserState == false) {
-                        window.location.href = "/GeoProblemSolving/projects/login.html"
+                        window.location.href = "/GeoProblemSolving/projects/login"
                     } else {
-                        window.location.href = "/GeoProblemSolving/projects/newProject.html"
+                        window.location.href = "/GeoProblemSolving/projects/newProject"
                     }
                 },
 

@@ -285,7 +285,7 @@
 </head>
 
 <body>
-<div id="vueBody" v-cloak>
+<div id="vueBody" v-cloak style="min-width: 1100px">
     <child-navigation ref="navigationEl"></child-navigation>
     <div class="home-screen" >
         <div class="bg" ></div>
@@ -422,13 +422,18 @@
         },
         mounted() {
             this.userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
+            window.onresize = () => {
+                return (() => {
+                    this.$refs.navigationEl.identityMenuCSS();
+                })()
+            }
         },
         methods: {
             start() {
                 if (this.userInfo.userState) {
-                    window.location.href = "/GeoProblemSolving/projects/projectList.html"
+                    window.location.href = "/GeoProblemSolving/projectList"
                 } else {
-                    window.location.href = "/GeoProblemSolving/projects/login.html"
+                    window.location.href = "/GeoProblemSolving/login"
                 }
             }
         }
