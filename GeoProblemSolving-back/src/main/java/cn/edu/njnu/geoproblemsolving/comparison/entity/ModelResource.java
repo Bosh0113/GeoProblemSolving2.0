@@ -1,5 +1,6 @@
 package cn.edu.njnu.geoproblemsolving.comparison.entity;
 
+import cn.edu.njnu.geoproblemsolving.comparison.enums.ExtentsType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -7,6 +8,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @Author: SongJie
@@ -19,21 +21,66 @@ import java.util.Date;
 @AllArgsConstructor
 @Document
 public class ModelResource {
-    String modelId;
+    String oid;
     String ownerId;
     String ownerName;
-
-//    String[] nodeIds;
+    String privacy;
     String modelName;
-    String desc;
-    String createdTime;
-    //todo udxschema
+    String description;
+    String createTime;
 
-    public ModelResource(String modelId,String modelName,String ownerId,String ownerName,String createdTime){
-        this.modelId=modelId;
+    List<String> computableModels;
+    List<String> conceptualModels;
+    List<String> logicalModels;
+
+    // 模型元数据：
+    // mechanism
+    // methods
+    int spatialDimension;
+    String scale;
+    String spatialReference;//wkt
+    ResolutionConstraint  resolutionConstraint;
+    SpatialExtents spatialExtents;
+    GeoVariable timeStep;
+    String startTime;
+    String endTime;
+    List<String> programmingLang;
+
+
+
+
+    public ModelResource(String oid,String modelName,String ownerId,String ownerName,String createTime){
+        this.oid=oid;
         this.modelName=modelName;
         this.ownerId=ownerId;
         this.ownerName=ownerName;
-        this.createdTime=createdTime;
+        this.createTime=createTime;
     }
+
+
+}
+
+class SpatialExtents{
+    ExtentsType type;
+    String value;
+    double[] envelopeValue; // xmin,xmax,ymin,ymax
+    List<GeoPoint> polygon;
+
+}
+
+
+class ResolutionConstraint{
+    GeoVariable x;
+    GeoVariable y;
+    GeoVariable z;
+}
+
+class GeoVariable {
+    String value;
+    String unit;
+}
+
+class GeoPoint{
+    double x;
+    double y;
 }

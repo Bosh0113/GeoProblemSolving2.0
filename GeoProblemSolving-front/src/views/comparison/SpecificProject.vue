@@ -74,6 +74,11 @@ export default {
     },
     onLinkClick() {
       console.log("11");
+      if (!this.$store.getters.userState) {
+        this.$router.push({ name: "Login" });
+      } else {
+        this.$router.push({ name: "create-cmp-solution"  });
+      }
     }
     //todo 1.基本信息编辑功能
     //todo 2.模型信息编辑功能

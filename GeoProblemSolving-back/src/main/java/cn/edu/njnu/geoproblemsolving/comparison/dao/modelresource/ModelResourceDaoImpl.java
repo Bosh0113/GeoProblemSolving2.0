@@ -36,10 +36,10 @@ public class ModelResourceDaoImpl implements IModelResourceDao {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
             for(int i=0;i<len;i++){
                 String name = nameList.get(i);
-                String modelId = UUID.randomUUID().toString();
-                ModelResource modelResource = new ModelResource(modelId, name, user.getUserId(), user.getUserName(),dateFormat.format(date));
+                String oid = UUID.randomUUID().toString();
+                ModelResource modelResource = new ModelResource(oid, name, user.getUserId(), user.getUserName(),dateFormat.format(date));
                 mongoTemplate.save(modelResource);
-                idList.add(modelId);
+                idList.add(oid);
             }
             return idList;
         }else{
