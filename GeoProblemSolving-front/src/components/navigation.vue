@@ -24,6 +24,7 @@ header {
   position: absolute;
   width: 100%;
   flex: 0 0 auto;
+  position: absolute;
   min-width: 1200px;
 }
 .content {
@@ -355,9 +356,7 @@ export default {
           .get("/GeoProblemSolving/user/logout")
           .then(res => {
             this.$store.commit("userLogout");
-            if(this.noticeSocket != null && this.noticeSocket != undefined){
-              this.noticeSocket.close();
-            }
+            this.noticeSocket.close();
             this.$router.replace({ name: "Home" });
           })
           .catch(err => {
