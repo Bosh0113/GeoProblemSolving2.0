@@ -49,6 +49,7 @@ const routes = [{
 { path: '/video', name: 'videoViewer', component: resolve=>(require(["@/components/utils/videoViewer"],resolve)) },
 { path: '/preview', name: 'pdfViewer', component: resolve=>(require(["@/components/utils/filePreview"],resolve)) },
 { path: '/tinymce', name: 'tinymce', component: resolve=>(require(["@/components/utils/singleUtils/tinymce"],resolve)) },
+// { path: '/folderTree', name: 'folderTree', component: resolve=>(require(["@/components/resource/FolderTree"],resolve)) },
 ]
 export default new Router({
   routes,
