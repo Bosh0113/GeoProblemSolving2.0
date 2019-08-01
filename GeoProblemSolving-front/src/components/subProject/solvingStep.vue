@@ -112,7 +112,7 @@ export default {
       processStructure: [],
       currentStep: {},
       typeList: [
-        "Resource collection",
+        "Context definition & resource collection",
         "Data processing",
         "Modeling",
         "Model evaluation",
@@ -374,7 +374,7 @@ export default {
           show: true,
           data: [
             {
-              name: "Resource collection",
+              name: "Context definition & resource collection",
               icon: "circle"
             },
             {
@@ -428,7 +428,7 @@ export default {
             data: [],
             categories: [
               {
-                name: "Resource collection"
+                name: "Context definition & resource collection"
               },
               {
                 name: "Data processing"
@@ -585,7 +585,7 @@ export default {
     getStepType(category) {
       let type;
       if (category == 0) {
-        type = "Resource collection";
+        type = "Context definition & resource collection";
       } else if (category == 1) {
         type = "Data processing";
       } else if (category == 2) {
@@ -607,7 +607,7 @@ export default {
     },
     getStepCategroy(type) {
       let category;
-      if (type == "Resource collection") {
+      if (type == "Context definition & resource collection") {
         category = 0;
       } else if (type == "Data processing") {
         category = 1;

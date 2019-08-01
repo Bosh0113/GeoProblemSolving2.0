@@ -33,10 +33,10 @@ const routes = [{
     { path: 'memberPage/:id', name: 'MemberDetailPage', component: resolve => (require(["@/components/userPage/memberDetailPage"], resolve)) },
     { path: 'resourceList', name: 'resourceList', component: resolve => (require(["@/components/resource/resourceList"], resolve)) },
     { path: 'publicResource', name: 'PublicResource', component: resolve => (require(["@/components/resource/publicResourceList"], resolve)) },
-    { path: 'join/:id/:email', name: 'joinProject', component: resolve => (require(["@/components/Projects/joinNewProject"], resolve)) },
+    { path: 'join/:id/:email', name: 'joinProject', component: resolve => (require(["@/components/projects/joinNewProject"], resolve)) },
     { path: 'login', name: 'Login', component: resolve => (require(["@/components/usersState/login"], resolve)) },
     { path: 'register', name: 'Register', component: resolve => (require(["@/components/usersState/register"], resolve)) },
-    { path: 'resetPassword/:email', name: 'resetPassword', component: resolve => (require(["@/components/UsersState/resetPwd"], resolve)) }
+    { path: 'resetPassword/:email', name: 'resetPassword', component: resolve => (require(["@/components/usersState/resetPwd"], resolve)) }
   ]
 },
 { path: '/chat', name: 'chatUtil', component: resolve=>(require(["@/components/utils/chatroom"],resolve)) },
@@ -49,7 +49,6 @@ const routes = [{
 { path: '/video', name: 'videoViewer', component: resolve=>(require(["@/components/utils/videoViewer"],resolve)) },
 { path: '/preview', name: 'pdfViewer', component: resolve=>(require(["@/components/utils/filePreview"],resolve)) },
 { path: '/tinymce', name: 'tinymce', component: resolve=>(require(["@/components/utils/singleUtils/tinymce"],resolve)) },
-// { path: '/folderTree', name: 'folderTree', component: resolve=>(require(["@/components/resource/FolderTree"],resolve)) },
 ]
 export default new Router({
   routes,
