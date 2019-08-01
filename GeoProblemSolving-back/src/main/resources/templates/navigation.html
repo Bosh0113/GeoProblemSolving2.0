@@ -51,8 +51,9 @@
             background-color: #515a6e;
             height: 60px;
             width: 100%;
-            bottom: 0;
+            bottom: 0 ;
             flex: 0 0 auto;
+            /*position:absolute;*/
         }
 
         .userState {
@@ -129,7 +130,7 @@
                                 <span>Sign up</span>
                             </menu-item>
                         </i-menu>
-    
+
                         <i-menu mode="horizontal" theme="dark" @on-select="logged"
                                 :style="`z-index:0;background:`+headerBgColor" v-show="userInfoNav.userState"
                                 class="menuItem">
@@ -142,8 +143,8 @@
                                 <dropdown @on-click="changeSelect" placement="bottom-start">
                                     <div @click="toPersonalPage">
                                         <img v-if="userInfoNav.avatar!=''&&userInfoNav.avatar!=undefined&&userInfoNav.avatar!=null"
-                                                :title="userInfoNav.userName"
-                                                style="width:40px;height:40px;vertical-align:middle;">
+                                             :title="userInfoNav.userName"
+                                             style="width:40px;height:40px;vertical-align:middle;">
                                         <avatar :username="userInfoNav.userName" :size="40" style="margin-top:10px"
                                                 :title="userInfoNav.userName" v-else></avatar>
                                     </div>
@@ -200,7 +201,14 @@
                 components: {
                     'avatar': VueAvatar.Avatar
                 },
-                mounted() {
+                created() {
+                    var userInfo = {
+                        userState: false,
+                        userName: 'visitor',
+                        userId:'',
+                        avatar:''
+                    }
+                    sessionStorage.setItem('userInfo',JSON.stringify(userInfo));
                     var that = this;
                     $.ajax({
                         url: "/GeoProblemSolving/user/state",
@@ -222,6 +230,9 @@
                             console.log("Get user info fail.");
                         }
                     });
+                },
+                updated(){
+                    $("#noticeBadge sup").css("margin", "15px 5px 0 0");
                 },
                 computed: {
                     headerBgColor() {
@@ -254,35 +265,35 @@
                     },
                     turnContent(name) {
                         if (name === "home") {
-                            window.location.href = "/GeoProblemSolving/home.html"
+                            window.location.href = "/GeoProblemSolving/home"
                         } else if (name == "projects") {
-                            window.location.href = "/GeoProblemSolving/projectList.html"
+                            window.location.href = "/GeoProblemSolving/projectList"
                         } else if (name == "resources") {
-                            window.location.href = "/GeoProblemSolving/resources.html"
+                            window.location.href = "/GeoProblemSolving/publicResource"
                         } else if (name == "community") {
-                            window.location.href = "/GeoProblemSolving/community.html"
+                            window.location.href = "/GeoProblemSolving/community"
                         } else if (name == "help") {
-                            window.location.href = "/GeoProblemSolving/help.html"
+                            window.location.href = "/GeoProblemSolving/help"
                         }
                     },
                     goHome() {
-                        window.location.href = "/GeoProblemSolving/home.html"
+                        window.location.href = "/GeoProblemSolving/home"
                     },
                     unlogin(name) {
                         if (name === "login") {
-                            window.location.href = "/GeoProblemSolving/login.html"
+                            window.location.href = "/GeoProblemSolving/login"
                         } else if (name == "register") {
-                            window.location.href = "/GeoProblemSolving/register.html"
+                            window.location.href = "/GeoProblemSolving/register"
                         }
                     },
                     logged(name) {
                         if (name === "notification") {
-                            window.location.href = "/GeoProblemSolving/notifications.html"
+                            window.location.href = "/GeoProblemSolving/notifications"
                         } else if (name === "personal") {
                         }
                     },
                     toPersonalPage() {
-                        window.location.href = "/GeoProblemSolving//personal/" + this.userInfoNav.userId + ".html"
+                        window.location.href = "/GeoProblemSolving/personalPage"
                     },
                     // 获取到通知的数量
                     getUnreadNoticeCount() {
@@ -303,8 +314,8 @@
                                         unreadCount++;
                                         continue;
                                     }
-                                }
-                                this.$set(this, "unreadNoticeCount", unreadCount);
+                                };
+                                this.unreadNoticeCount=Object.assign([], unreadCount);
                             })
                             .catch(err => {
                                 console.log("失败的原因是" + err.data);
@@ -373,7 +384,7 @@
                             this.userInfoNav = {userName: ""};
                             sessionStorage.removeItem("userInfo");
                             this.noticeSocket.close();
-                            window.location.href = "/GeoProblemSolving/"+page+".html";
+                            window.location.href = "/GeoProblemSolving/"+page;
                         })
                         .catch(err => {
                             confirm("logout fail!");

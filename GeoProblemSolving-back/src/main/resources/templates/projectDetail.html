@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="https://www.thymeleaf.org">
+<html lang="en" xmlns:th="https://www.thymeleaf.org" xmlns:v-bind="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <title th:text="${projectInfo.title}+' | Geo-ProblemSolving'"></title>
@@ -17,6 +17,9 @@
     <script th:replace="navigation::commonHeader-css"></script>
     <script th:replace="navigation::commonHeader-html"></script>
     <script th:replace="navigation::commonHeader-js"></script>
+    <script th:replace="folderTree::common-css"></script>
+    <script th:replace="folderTree::common-html"></script>
+    <script th:replace="folderTree::common-js"></script>
     <style>
         [v-cloak] {
             display: none;
@@ -198,7 +201,7 @@
                                 <h1 class="projectMenuItemTitle">Project: </h1>
                                 <h1 style="display: inline-block;max-width: 75%;vertical-align: top;" class="overEllipsis" id="projectTitle" th:text="${projectInfo.title}">Project title</h1>
                             </div>
-                            <div slot="extra">
+                            <div slot="extra" v-if="managerIdentity(projectInfo.managerId)">
                                 <Poptip trigger="hover" content="Edit project information" placement="left">
                                     <i-button style="margin: 0 5px;" class="changeEditColor" @click="editModelShow()">
                                         <Icon type="ios-create" :size="20"></Icon>
@@ -276,28 +279,30 @@
                                                 <div slot="title">
                                                     <h1>Participants</h1>
                                                 </div>
-                                                <div slot="extra">
+                                                <div slot="extra" v-if="managerIdentity(projectInfo.managerId)">
                                                     <Poptip trigger="hover" content="Invite members" placement="left">
-                                                        <i-button class="changeInviteColor">
+                                                        <i-button class="changeInviteColor" @click="inviteModalShow()">
                                                             <Icon type="md-person-add" :size="20"></Icon>
                                                         </i-button>
                                                     </Poptip>
                                                     <Poptip trigger="hover" content="Remove members" placement="left">
-                                                        <i-button style="margin: 0 0 0 5px;" class="changeRemoveColor">
+                                                        <i-button style="margin: 0 0 0 5px;" class="changeRemoveColor" @click="deleteMemberModelShow">
                                                             <Icon type="md-remove-circle" :size="20"></Icon>
                                                         </i-button>
                                                     </Poptip>
                                                 </div>
                                                 <div :style="{height: membersContentCSS}" style="overflow-y:auto;">
                                                     <vue-scroll :ops="scrollOps">
-                                                        <Card  style="background-color: #dcdee2;border-color: #c5c8ce">
+                                                        <Card  style="background-color: #dcdee2;border-color: #c5c8ce;cursor: pointer;"
+                                                         @click.native=goPersonalPage(projectInfo.managerId)>
                                                             <div title="Manager">
                                                                 <h2 style="color: white" class="overEllipsis">{{projectInfo.managerName}}</h2>
                                                             </div>
                                                         </Card>
-                                                        <Card  v-for="members in projectInfo.members" style="margin-top: 5px">
+                                                        <Card  v-for="member in projectInfo.members" style="margin-top: 5px;cursor: pointer;"
+                                                         @click.native=goPersonalPage(member.userId)>
                                                             <div title="Member">
-                                                                <h2 class="overEllipsis">{{members.userName}}</h2>
+                                                                <h2 class="overEllipsis">{{member.userName}}</h2>
                                                             </div>
                                                         </Card>
                                                     </vue-scroll>
@@ -316,29 +321,37 @@
                                 <h1 slot="title" class="projectMenuItemTitle">Subprojects</h1>
                                 <div slot="extra">
                                     <Poptip trigger="hover" content="Create subproject" placement="left">
-                                        <i-button style="margin: 0 5px;" class="changeInviteColor">
+                                        <i-button style="margin: 0 5px;" class="changeInviteColor" @click="showSubProjectCreateModel">
                                             <Icon type="md-add-circle" :size="20"></Icon>
                                         </i-button>
                                     </Poptip>
                                 </div>
                                 <div :style="{height:subProjectsCSS}">
                                     <vue-scroll :ops="scrollOps">
-                                        <div v-for="subProject in subProjectList" style="width: 25%;display: inline-block;padding: 5px;">
-                                            <Card style="height: 300px;" class="subProjectCard">
+                                        <div v-for="(subProject,index) in subProjectList" style="width: 25%;display: inline-block;padding: 5px;">
+                                            <Card style="height: 300px;" class="subProjectCard" @click.native="goSubProjectPage(subProject)">
                                                 <div slot="title">
                                                     <strong style="width: 160px;display: inline-block;" class="overEllipsis" :title="subProject.title">
                                                         {{subProject.title}}
                                                     </strong>
                                                 </div>
-                                                <div slot="extra" >
+                                                <div slot="extra" v-if="managerIdentity(subProject.managerId)">
                                                     <Poptip trigger="hover" content="Change manager" placement="left">
-                                                        <i-button class="changeInviteColor" icon="ios-people" size="small" shape="circle"></i-button>
+                                                        <i-button class="changeInviteColor" icon="ios-people" size="small" shape="circle" @click="handOverModalShow(index)"></i-button>
                                                     </Poptip>
                                                     <Poptip trigger="hover" content="Edit information" placement="left">
-                                                        <i-button class="changeEditColor" icon="ios-create" size="small" shape="circle"></i-button>
+                                                        <i-button class="changeEditColor" icon="ios-create" size="small" shape="circle" @click="editSubProjectModalShow(index)"></i-button>
                                                     </Poptip>
                                                     <Poptip trigger="hover" content="Remove subproject" placement="left">
-                                                        <i-button class="changeRemoveColor" icon="md-close" size="small" shape="circle"></i-button>
+                                                        <i-button class="changeRemoveColor" icon="md-close" size="small" shape="circle" @click="deleteSubProjectModalShow(index)"></i-button>
+                                                    </Poptip>
+                                                </div>
+                                                <div slot="extra" v-else-if="memberIdentity(subProject.members)">
+                                                    <Icon type="ios-person" :size="20"></Icon>
+                                                </div>
+                                                <div slot="extra" v-else>
+                                                    <Poptip trigger="hover" content="Apply to Join" placement="left">
+                                                        <i-button class="changeInviteColor" icon="md-add" size="small" shape="circle" @click="applyJoinSubProjectModalShow(index)"></i-button>
                                                     </Poptip>
                                                 </div>
                                                 <div class="subProjectDes" :title="subProject.description">
@@ -366,11 +379,14 @@
                     </div>
                 </div>
                 <div v-else-if="showMenuItem=='resources'" style="height: inherit;min-height: fit-content;">
-                    <div style="background:#eee;padding: 10px;height: inherit;">
-                        <Card :bordered="false" style="height: -webkit-fill-available;min-height: 565px;">
+                    <div style="background:#eee;padding: 10px;height: inherit;min-height: fit-content;">
+                        <Card :bordered="false" style="height: -webkit-fill-available;min-height: 565px;min-height: fit-content;">
                             <h1 slot="title" class="projectMenuItemTitle">Resources</h1>
-                            <div>
-                                Content
+                            <div :style="{height:subProjectsCSS}">
+                                <child-folder
+                                :root-folder-id="projectInfo.projectId"
+                                role=""
+                                ref="folderTreeEl"></child-folder>
                             </div>
                         </Card>
                     </div>
@@ -379,7 +395,7 @@
                     v-model="editProjectModal"
                     title="Edit project"
                     :mask-closable="false"
-                    width="900px"
+                    width="900"
                     >
                     <div>
                         <i-form
@@ -463,6 +479,7 @@
                                 type="file"
                                 class="uploadAvatar"
                                 accept="image/*"
+                                id="choosePicture"
                                 />
                             </div>
                             <Modal title="View Image" v-model="visible">
@@ -486,6 +503,176 @@
                 >
                   <p>Do you sure to delete this project?</p>
                 </Modal>
+                <Modal
+                v-model="inviteModal"
+                title="Invite others join the Project"
+                :mask-closable="false"
+                width="800">
+                    <i-form ref="emailInfo" :model="emailInfo" :rules="emailInfoRule" :label-width="200" inline>
+                        <Form-item label="Recipient" prop="inputEmail" style="width:100%">
+                            <Auto-complete
+                                v-model="emailInfo.inputEmail"
+                                @on-search="emialAutoFill"
+                                placeholder="input email and press enter button the email will be added below"
+                                style="width:70%"
+                            >
+                                <i-option v-for="item in prompt" :value="item" :key="item">{{ item }}</i-option>
+                            </Auto-complete>
+                        </Form-item>
+                        <Form-item label="Title" prop="emailTitle" style="width:100%">
+                            <i-input
+                                v-model="emailInfo.emailTitle"
+                                placeholder="set the email title to recivers by your self"
+                                style="width:70%"
+                            />
+                        </Form-item>
+                        <Form-item label="Content" prop="emailContent" style="width:100%">
+                        <i-input type="textarea" style="width:70%" :rows="4" v-model="emailInfo.emailContent" />
+                        </Form-item>
+                    </i-form>
+                    <div slot="footer" style="display: inline-block">
+                        <i-button type="primary" @click="invite('emailInfo')" style="float:right;">Assure</i-button>
+                        <i-button @click="closeInviteModel()" style="float:right;margin-right: 15px;">Cancel</i-button>
+                    </div>
+                </Modal>
+                <Modal
+                v-model="deleteMemberModel"
+                title="Remove members from project"
+                :mask-closable="false"
+                width="600">
+                    <Radio-group v-model="removeMemberName">
+                        <div v-for="(member,index) in projectInfo.members" :key="index" @click="getRemoveMemberId(member.userId)">
+                            <Radio :label ="member.userName" ></Radio>
+                        </div>
+                    </Radio-group>
+                    <div slot="footer" style="display: inline-block">
+                        <i-button type="primary" @click="removeMembersAlertShow()" style="float:right;">Assure</i-button>
+                        <i-button @click="closeDeleteMembersModel()" style="float:right;margin-right: 15px;">Cancel</i-button>
+                    </div>
+                </Modal>
+                <Modal
+                v-model="removeMemberAlertModel"
+                title="Remove Member alert"
+                @on-ok="removeMember"
+                ok-text="Submit"
+                cancel-text="Cancel">
+                    <p>Do you sure to remove {{removeMemberName}} from this project?</p>
+                </Modal>
+                <Modal
+                v-model="createSubProjectModel"
+                title="Create a new subproject"
+                width="800"
+                :mask-closable="false">
+                    <i-form
+                    ref="createSubProjectForm"
+                    :model="createSubProjectForm"
+                    :rules="createSubprojectRuleValidate"
+                    :label-width="120">
+                        <Form-item label="Title" prop="subProjectTitle">
+                            <i-input
+                            type="text"
+                            v-model="createSubProjectForm.subProjectTitle"
+                            placeholder="Enter subproject title (less than 60 characters) ...">
+                            </i-input>
+                        </Form-item>
+                        <Form-item label="Description" prop="subProjectDescription">
+                            <i-input
+                            v-model="createSubProjectForm.subProjectDescription"
+                            placeholder="Enter subproject description..."
+                            :rows="4"
+                            type="textarea">
+                            </i-input>
+                        </Form-item>
+                    </i-form>
+                    <div slot="footer" style="display: inline-block">
+                        <i-button type="primary" @click="createSubProject('createSubProjectForm')" style="float:right;">Submit</i-button>
+                        <i-button @click="closeCreateSubProjectModel()" style="float:right;margin-right: 15px;">Cancel</i-button>
+                    </div>
+                </Modal>
+                <Modal
+                v-model="handOverModal"
+                title="Appoint new manager"
+                with="500"
+                :mask-closable="false">
+                <h3>Please choose the new manager of this sub-project.</h3>
+                <Radio-group v-model="newManagerId">
+                    <Radio v-for="member in subProjectMembers" :label="member.userId">
+                        {{member.userName}}
+                    </Radio>
+                </Radio-group>
+                <div slot="footer" style="display: inline-block">
+                    <i-button type="primary" @click="handOverAuthority()" style="float:right;">Submit</i-button>
+                    <i-button @click="closeHandOverModel()" style="float:right;margin-right: 15px;">Cancel</i-button>
+                </div>
+                </Modal>
+                <Modal
+                v-model="editSubProjectModal"
+                title="Edit the information of this subproject"
+                width="800px"
+                :mask-closable="false"
+                >
+                    <div>
+                    <i-form
+                        ref="editSubProjectForm"
+                        :model="editSubProjectForm"
+                        :rules="editSubProjectFormRuleValidate"
+                        :label-width="120"
+                    >
+                        <Form-item label="Name" prop="subProjectTitleEdit">
+                            <i-input v-model="editSubProjectForm.subProjectTitleEdit"></i-input>
+                        </Form-item>
+                        <Form-item label="Description" prop="subProjectDescriptionEdit">
+                            <i-input
+                                v-model="editSubProjectForm.subProjectDescriptionEdit"
+                                :rows="4"
+                                type="textarea"
+                            ></i-input>
+                        </Form-item>
+                    </i-form>
+                    </div>
+                <div slot="footer" style="display: inline-block">
+                    <i-button type="primary" @click="editSubProject('editSubProjectForm')" style="float:right;">Submit</i-button>
+                    <i-button @click="closeEditSubProjectModel()" style="float:right;margin-right: 15px;">Cancel</i-button>
+                </div>
+              </Modal>
+              <Modal
+                v-model="deleteSubProjectModal"
+                title="Delete sub-project"
+                ok-text="Confirm"
+                cancel-text="Cancel"
+                @on-ok="deleteSubProject()"
+                width="800px"
+                :mask-closable="false"
+              >
+                <p>Once the deletion is confirmed, all module and resource information under the subsystem will be deleted. </p>
+                <div style="text-align: center"><h3 style="color: red">Are you sure to remove this sub-project?</h3></div>
+              </Modal>
+              <Modal
+              v-model="applyJoinSubProjectModal"
+              title="Apply to join sub-project"
+              width="800px"
+              :mask-closable="false">
+                <div>
+                    <i-form
+                    ref="applyJoinForm"
+                    :model="applyJoinForm"
+                    :rules="editSubProjectFormRuleValidate"
+                    :label-width="120"
+                    >
+                        <Form-item label="Reason" prop="reasonDescription">
+                            <i-input
+                                v-model="applyJoinForm.reasonDescription"
+                                :rows="4"
+                                type="textarea"
+                            ></i-input>
+                        </Form-item>
+                    </i-form>
+                </div>
+                <div slot="footer" style="display: inline-block">
+                    <i-button type="primary" @click="applyJoin('applyJoinForm')" style="float:right;">Submit</i-button>
+                    <i-button @click="closeApplyJoinModel()" style="float:right;margin-right: 15px;">Cancel</i-button>
+                </div>
+              </Modal>
             </div>
         </div>
     </template>
@@ -508,6 +695,12 @@
             },
             data() {
                 return {
+                    userInfo:{
+                        userState: false,
+                        userName: 'visitor',
+                        userId: '',
+                        avatar: '',
+                    },
                     projectInfo: projectInfo,
                     showMenuItem: "projectDetail",
                     contentPageCSS: '',
@@ -571,7 +764,116 @@
                     pictureUrl:"",
                     inputTag: "",
                     visible: false,
-                    removeProjectModal:false
+                    removeProjectModal:false,
+                    inviteModal:false,
+                    emailInfo: {
+                        inputEmail: "",
+                        emailTitle: "",
+                        emailContent: ""
+                    },
+                    emailInfoRule: {
+                        inputEmail: [
+                        {
+                            required: true,
+                            message: "Mailbox cannot be empty",
+                            trigger: "blur"
+                        },
+                        {
+                            type: "email",
+                            message: "Incorrect email format",
+                            trigger: "blur"
+                        }
+                        ],
+                        emailTitle: [
+                        {
+                            required: true,
+                            message: "The title cannot be empty",
+                            trigger: "blur"
+                        }
+                        ],
+                        emailContent: [
+                        {
+                            required: true,
+                            message: "The content cannot be empty",
+                            trigger: "blur"
+                        }
+                        ]
+                    },
+                    emailAddStr:
+                        "<br>Please copy the url and access it to join us: <br>" +
+                        "http://" +
+                        window.location.host +
+                        "/GeoProblemSolving/join/" +
+                        projectInfo.projectId +
+                        "/",
+                    prompt: [],
+                    deleteMemberModel:false,
+                    removeMemberName:"",
+                    removeMemberAlertModel:false,
+                    removeMemberId:"",
+                    createSubProjectModel:false,
+                    createSubProjectForm: {
+                        subProjectTitle: "",
+                        subProjectDescription: ""
+                    },
+                    createSubprojectRuleValidate: {
+                        subProjectTitle: [
+                        {
+                            required: true,
+                            message: "The title can't be empty and no more than 60 characters",
+                            trigger: "blur",
+                            type: "string",
+                            max: 60
+                        }
+                        ],
+                        subProjectDescription: [
+                        {
+                            required: true,
+                            message: "The description can't be empty",
+                            trigger: "blur"
+                        }
+                        ]
+                    },
+                    selectSubProjectIndex: 0,
+                    subProjectMembers:[],
+                    handOverModal:false,
+                    newManagerId:"",
+                    editSubProjectModal:false,
+                    editSubProjectForm: {
+                        subProjectTitleEdit: "",
+                        subProjectDescriptionEdit: ""
+                    },
+                    editSubProjectFormRuleValidate: {
+                        subProjectTitleEdit: [
+                        {
+                            required: true,
+                            message: "The title can't be empty and no more than 60 characters",
+                            trigger: "blur",
+                            max: 60
+                        }
+                        ],
+                        subProjectDescriptionEdit: [
+                        {
+                            required: true,
+                            message: "The description can't be empty",
+                            trigger: "blur"
+                        }
+                        ]
+                    },
+                    deleteSubProjectModal:false,
+                    applyJoinSubProjectModal:false,
+                    applyJoinForm:{
+                        reasonDescription:""
+                    },
+                    applyJoinFormRuleValidate:{
+                        reasonDescription:[
+                            {
+                                required: true,
+                                message: "The description can't be empty",
+                                trigger: "blur"
+                            }
+                        ]
+                    }
                 }
             },
             methods: {
@@ -589,6 +891,7 @@
                         return (() => {
                             this.resizeContent();
                             this.$refs.navigationEl.identityMenuCSS();
+                            this.$refs.folderTreeEl.resizeContent();
                         })()
                     }
                 },
@@ -616,16 +919,9 @@
                             console.log(res.data);
                         } else {
                             this.subProjectList = res.data;
-                            this.identitySubProjects();
                         }
                     })
                     .catch(err=>{console.log(err.data)});
-                },
-                identitySubProjects(){
-                    this.subProjectList.forEach(subProject => {
-                        subProject.isManager = this.managerIdentity(subProject.managerId);
-                        subProject.isMember = this.memberIdentity(subProject.members);
-                    });
                 },
                 managerIdentity(managerId){
                     if(managerId==this.userInfo.userId){
@@ -722,7 +1018,7 @@
                     this.inputTag = "";
                 },
                 deleteTag(index) {
-                this.projectEditForm.editTags.splice(index, 1);
+                    this.projectEditForm.editTags.splice(index, 1);
                 },
                 editProjectSubmit(form) {
                     this.$refs[form].validate(valid => {
@@ -791,9 +1087,383 @@
                     })
                     .catch(err => {});
                 },
+                inviteModalShow() {
+                this.inviteModal = true;
+                this.emailInfo.emailContent =
+                    "hello, it's my pleasure to invite you join in the project called " +
+                    this.projectInfo.title +
+                    ".";
+                },
+                invite(name) {
+                this.$refs[name].validate(valid => {
+                    if (valid) {
+                    var emailFormBody = {};
+                    emailFormBody["recipient"] = this.emailInfo.inputEmail;
+                    emailFormBody["mailTitle"] = this.emailInfo.emailTitle;
+                    emailFormBody["mailContent"] =
+                    this.emailInfo.emailContent + this.emailAddStr;
+                    axios
+                        .post("/GeoProblemSolving/email/invite", emailFormBody)
+                        .then(res => {
+                        if (res.data == "Success") {
+                            this.$Notice.success({
+                            title: "Email send title",
+                            desc:
+                                "The invitation has been sent,the receiver will process this request later."
+                            });
+                            this.inviteModal = false;
+                        } else {
+                            this.$Notice.error({
+                            title: "Email send fail",
+                            desc: "The invitation isn't be sent successfully."
+                            });
+                        }
+                        })
+                        .catch(err => {
+                            console.log(err.data);
+                        });
+                        } else {
+                            this.$Message.info("Form check!");
+                        }
+                    });
+                },
+                closeInviteModel(){
+                    this.inviteModal=false;
+                },
+                emialAutoFill(value) {
+                this.prompt =
+                    !value || value.indexOf("@") >= 0
+                    ? []
+                    : [
+                        value + "@gmail.com",
+                        value + "@sina.com",
+                        value + "@163.com",
+                        value + "@126.com",
+                        value + "@qq.com"
+                        ];
+                },
+                deleteMemberModelShow(){
+                    this.removeMemberId="";
+                    this.removeMemberName="";
+                    this.deleteMemberModel=true;
+                },
+                closeDeleteMembersModel(){
+                    this.deleteMemberModel=false;
+                },
+                removeMembersAlertShow(){
+                    if(this.removeMemberName!=''){
+                        this.removeMemberAlertModel = true;
+                    }else{
+                        this.$Message.warning("There are no member be selected.");
+                    }
+                },
+                getRemoveMemberId(userId){
+                    this.removeMemberId=userId; 
+                },
+                removeMember() {
+                    axios
+                    .get(
+                    "/GeoProblemSolving/project/quit" +
+                        "?projectId=" +
+                        this.projectInfo.projectId +
+                        "&userId=" +
+                        this.removeMemberId
+                    )
+                    .then(res => {
+                    if (res.data == "Offline") {
+                        this.$refs.navigationEl.logout("login");
+                    } else if (res.data == "None") {
+                        this.$Notice.warning({
+                        title: "Operate result",
+                        desc: "The project doesn't exist."
+                        });
+                    } else {
+                        this.$Notice.success({
+                        title: "Operate result",
+                        desc: "The member has been removed from the project successfully."
+                        });
+                        this.deleteMemberModel=false;
+                        var members = this.projectInfo.members;
+                        for (var i = 0; i < members.length; i++) {
+                            if (members[i].userId == this.removeMemberId) {
+                                this.projectInfo.members.splice(i, 1);
+                                break;
+                            }
+                        }
+                    }
+                    })
+                    .catch(err => {});
+                },
+                goPersonalPage(userId){
+                    if(userId==this.userInfo.userId){
+                        window.location.href="/GeoProblemSolving/personalPage";
+                    }
+                    else{
+                        window.location.href="/GeoProblemSolving/memberPage/"+userId;
+                    }
+                },
+                showSubProjectCreateModel(){
+                    this.createSubProjectModel = true;
+                },
+                closeCreateSubProjectModel(){
+                    this.createSubProjectModel = false;
+                },
+                createSubProject(form) {
+                this.$refs[form].validate(valid => {
+                    if (valid) {
+                    let SubProject = {};
+                    SubProject[
+                        "description"
+                    ] = this.createSubProjectForm.subProjectDescription;
+                    SubProject["title"] = this.createSubProjectForm.subProjectTitle;
+                    SubProject["projectId"] = this.projectInfo.projectId;
+                    SubProject["managerId"] = this.userInfo.userId;
+                    axios
+                        .post("/GeoProblemSolving/subProject/create", SubProject)
+                        .then(res => {
+                        if (res.data == "Offline") {
+                            this.$refs.navigationEl.logout("login");
+                        } else if (res.data != "Fail") {
+                            this.$Notice.success({
+                            title: "Create result",
+                            desc: "Subproject has been created successfully."
+                            });
+                            this.createSubProjectForm.subProjectTitle = "";
+                            this.createSubProjectForm.subProjectDescription = "";
+                            this.subProjectList.push(res.data);
+                            this.createSubProjectModel = false;
+                        } else {
+                            this.$Message.info("fail");
+                        }
+                        })
+                        .catch(err => {});
+                    } else {
+                    this.$Message.error("Please check your form again!");
+                    }
+                });
+                },
+                handOverModalShow(index){
+                    this.selectSubProjectIndex = index;
+                    this.subProjectMembers = this.subProjectList[index].members;
+                    this.handOverModal = true;
+                },
+                closeHandOverModel(){
+                    this.handOverModal = false;
+                },
+                handOverAuthority(){
+                    axios
+                    .get(
+                    "/GeoProblemSolving/subProject/manager?" +
+                        "subProjectId=" +
+                        this.subProjectList[this.selectSubProjectIndex].subProjectId +
+                        "&userId=" +
+                        this.newManagerId
+                    )
+                    .then(res => {
+                    if (res.data == "Offline") {
+                        this.$refs.navigationEl.logout("login");
+                    } else if (res.data != "Fail") {
+                        this.subProjectList.splice(this.selectSubProjectIndex, 1, res.data);
+                        this.$Message.success("Handover management authority success!");
+                        //此处缺少权限移交后的通知
+                        let replyNotice = {};
+                        replyNotice["recipientId"] = this.newManagerId;
+                        replyNotice["type"] = "notice";
+                        replyNotice["content"] = {
+                        title: "Subproject manager",
+                        description:
+                            "You have already become the manager of subproject: " +
+                            this.subProjectList[this.selectSubProjectIndex].title +
+                            "."
+                        };
+                        axios
+                        .post("/GeoProblemSolving/notice/save", replyNotice)
+                        .then(result => {
+                            if (result.data == "Success") {
+                                this.sendNotice(this.newManagerId);
+                                this.handOverModal = false;
+                            } else {
+                                this.$Message.error("notice fail.");
+                            }
+                        })
+                        .catch(err => {
+                            this.$Message.error("notice fail.");
+                        });
+                    } else {
+                        this.$Message.error("Handover management authority failed.");
+                    }
+                    })
+                    .catch(err => {
+                        console.log(err.data);
+                    });
+                },
+                editSubProjectModalShow(index) {
+                    this.selectSubProjectIndex = index;
+                    this.editSubProjectModal = true;
+                    this.editSubProjectForm.subProjectTitleEdit = this.subProjectList[index].title;
+                    this.editSubProjectForm.subProjectDescriptionEdit = this.subProjectList[index].description;
+                },
+                closeEditSubProjectModel(){
+                    this.editSubProjectModal=false;
+                },
+                editSubProject(form) {
+                    this.$refs[form].validate(valid => {
+                        if (valid) {
+                        this.editSubProjectModal = false;
+                        let obj = new URLSearchParams();
+                        obj.append(
+                            "subProjectId",
+                            this.subProjectList[this.selectSubProjectIndex].subProjectId
+                        );
+                        obj.append("title", this.editSubProjectForm.subProjectTitleEdit);
+                        obj.append(
+                            "description",
+                            this.editSubProjectForm.subProjectDescriptionEdit
+                        );
+                        axios
+                            .post("/GeoProblemSolving/subProject/update", obj)
+                            .then(res => {
+                                if (res.data == "Offline") {
+                                    this.$refs.navigationEl.logout("login");
+                                } else if (res.data != "Fail") {
+                                    this.subProjectList.splice(this.selectSubProjectIndex, 1, res.data);
+                                } else {
+                                    this.$Message.error("Update sub-project failed.");
+                                }
+                            })
+                            .catch(err => {
+                                console.log(err.data);
+                            });
+                        } else {
+                            this.$Message.warning("Please check your form again!");
+                        }
+                    });
+                },
+                deleteSubProjectModalShow(index){
+                    this.selectSubProjectIndex=index;
+                    this.deleteSubProjectModal = true;
+                },
+                deleteSubProject() {
+                var deletedSubProjectId = this.subProjectList[this.selectSubProjectIndex].subProjectId;
+                 axios
+                    .get(
+                    "/GeoProblemSolving/subProject/delete?" +
+                        "subProjectId=" +
+                        deletedSubProjectId
+                    )
+                    .then(res => {
+                    if (res.data == "Offline") {
+                        this.$refs.navigationEl.logout("login");
+                    } else if (res.data == "Success") {
+                        this.subProjectList.splice(this.selectSubProjectIndex, 1);
+                        this.$Message.success("Delete sub-project success!");
+                    } else {
+                        this.$Message.error("Delete sub-project failed.");
+                    }
+                    })
+                    .catch(err => {
+                        console.log(err.data);
+                    });
+                },
+                applyJoinSubProjectModalShow(index){
+                    this.selectSubProjectIndex = index;
+                    this.applyJoinSubProjectModal = true;
+                },
+                closeApplyJoinModel(){
+                    this.applyJoinSubProjectModal = false;
+                },
+                applyJoin(form){
+                    this.$refs[form].validate(valid => {
+                        if (valid) {
+                            this.applyJoinSubProjectModal = false;
+                            var subProject=this.subProjectList[this.selectSubProjectIndex];
+                            let joinSubPForm = {};
+                            joinSubPForm["recipientId"] = subProject.managerId;
+                            joinSubPForm["type"] = "apply";
+                            let userDetail = this.userInfo;
+                            joinSubPForm["content"] = {
+                                userEmail: userDetail.email,
+                                userName: userDetail.userName,
+                                userId: userDetail.userId,
+                                title: "Group application",
+                                description:
+                                    "User " +
+                                    userDetail.userName +
+                                    " apply to join in your subproject: " +
+                                    subProject.title +
+                                    " of project: " +
+                                    this.projectInfo.title +
+                                    " .",
+                                projectId: subProject.subProjectId,
+                                projectTitle: subProject.title,
+                                scope: "subProject",
+                                approve: "unknow"
+                            };
+                            axios
+                            .post("/GeoProblemSolving/notice/save", joinSubPForm)
+                            .then(res => {
+                                this.$Message.info("Apply Successfully");
+                                this.sendNotice(subProject.managerId);
+                            })
+                            .catch(err => {
+                                console.log("申请失败的原因是：" + err.data);
+                            });
+                            let joinSubProjectEmail = {};
+                            joinSubProjectEmail["recipient"] = subProject.managerId;
+                            joinSubProjectEmail["mailTitle"] = "Join sub project application";
+                            joinSubProjectEmail["mailContent"] =
+                            "User " +
+                            userDetail.userName +
+                            " apply to join in your subproject: " +
+                            subProject.title +
+                            " of project: " +
+                            this.projectInfo.title +
+                            " ." +
+                            " And you can access the subproject from this platform. " +
+                            "The url is " +
+                            "http://" +
+                            window.location.host +
+                            "/GeoProblemSolving/home";
+                            
+                            axios
+                            .post("/GeoProblemSolving/project/applyByMail", joinSubProjectEmail)
+                            .then(res => {
+                                if (res.data == "Success") {
+                                this.$Notice.success({
+                                    title: "Email send title",
+                                    desc:
+                                    "The join email has been sent,if he/she doesn't online,the email will remind the mamnager in time."
+                                });
+                                } else {
+                                this.$Notice.error({
+                                    title: "Email send fail",
+                                    desc: "The invitation isn't be sent successfully."
+                                });
+                                }
+                            })
+                            .catch(err => {
+                                console.log(err.data);
+                            });
+                        }
+                        });
+                },
+                goSubProjectPage(subProject){
+                    if(this.managerIdentity(subProject.managerId)||this.memberIdentity(subProject.members)){
+                        window.location.href="/GeoProblemSoving/project/"+subProject.subProjectId+"/subproject";
+                    }else{
+                        this.$Message.warning({
+                            render: h => {
+                                return h('div', [
+                                    h('p', 'Sorry, you are not a participant in this sub-project.'),
+                                    h('h3', 'Please apply to join first.'),
+                                ])
+                            }
+                        });
+                    }
+                },
             }
         }
-    )
+    );
 </script>
 </body>
 </html>

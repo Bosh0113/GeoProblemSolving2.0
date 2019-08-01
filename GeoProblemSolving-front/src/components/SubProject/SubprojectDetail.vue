@@ -24,877 +24,362 @@
   border-bottom: 1px solid lightgray;
 }
 .member-desc {
-  height: 60px;
+  height: 50px;
   margin: 0 20px 0 10px;
   display: flex;
 }
 .member-image {
-  width: 60px;
-  height: 60px;
+  width: 50px;
+  height: 50px;
   padding: 5px;
 }
 .memebr-work {
-  width: 65%;
-  height: 60px;
-}
-.userName {
-  margin-top: 10px;
-  height: 20px;
-  display: flex;
-  align-items: center;
-}
-.organization {
-  height: 30px;
-  display: flex;
-  align-items: center;
+  width: 70%;
+  height: 50px;
 }
 .subProjectDesc {
   text-indent: 2em;
-  padding: 10px;
-  /* word-break: break-all; */
-}
-.taskFormItem {
-  display: flex;
-  align-items: center;
-  margin-bottom: 10px;
-}
-.taskFormItem span {
-  text-align: center;
-}
-#taskContainer {
-  padding: 10px;
-  background-color: white;
-}
-.taskList {
-  min-height: 60px;
-  background: #f7f7f7;
-}
-.taskName {
-  display: inline-block;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  max-width: 120px;
+  padding: 10px 0;
+  min-height: 100px;
+  word-break: break-all;
+  word-wrap: break-word;
 }
 .operatePanel button {
   margin-right: 2.5%;
 }
 .memberOrganization {
-  height: 40px;
   display: inline-block;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   width: 100%;
 }
+.Information {
+  margin-bottom: 10px;
+}
 </style>
 <template>
-  <div style="background-color:#dcdee2">
+  <div>
     <Row>
-      <Col span="22" offset="1">
+      <!-- <Col span="4" style="height:40px;" class="operatePanel">
+        <Button
+          type="default"
+          @click="conveneWork()"
+          icon="md-mail"
+          title="Inform others to work together"
+        >Inform</Button>
+      </Col>-->
+      <Col :xs="14" :sm="15" :md="16" :lg="17" style="margin:30px 0 0 80px">
+        <div>
+          <vue-scroll :ops="scrollOps" :style="{height:sidebarHeight+150+'px'}">
+            <Card class="Information">
+              <div style="width:100%">
+                <strong>Purposes / Goals:</strong>
+                <template  v-if="subProjectInfo.managerId == $store.getters.userId">
+                  <Icon
+                    v-if="!edit1"
+                    type="ios-create"
+                    :size="18"
+                    style="float:right;cursor:pointer"
+                    title="Edit"
+                    @click="editPurposes"
+                  />
+                  <Icon
+                    v-else
+                    type="md-checkbox-outline"
+                    :size="18"
+                    style="float:right;cursor:pointer"
+                    title="Complete"
+                    @click="editPurposes"
+                  />
+                </template>
+              </div>
+              <Divider style="margin:10px 0; background:lightblue" />
+              <div v-if="!edit1" class="subProjectDesc" style="overflow-y:auto">{{purpose}}</div>
+              <template v-else>
+                <Input
+                  v-model="purpose"
+                  type="textarea"
+                  :rows="5"
+                  placeholder="Enter something..."
+                />
+              </template>
+            </Card>
+            <Card class="Information">
+              <div style="width:100%">
+                <strong>Background:</strong>
+                <template  v-if="subProjectInfo.managerId == $store.getters.userId">
+                  <Icon
+                    v-if="!edit2"
+                    type="ios-create"
+                    :size="18"
+                    style="float:right;cursor:pointer"
+                    title="Edit"
+                    @click="editBackground"
+                  />
+                  <Icon
+                    v-else
+                    type="md-checkbox-outline"
+                    :size="18"
+                    style="float:right;cursor:pointer"
+                    title="Complete"
+                    @click="editBackground"
+                  />
+                </template>
+              </div>
+              <Divider style="margin:10px 0; background:lightblue" />
+              <div v-if="!edit2" class="subProjectDesc" style="overflow-y:auto">{{background}}</div>
+              <template v-else>
+                <Input
+                  v-model="background"
+                  type="textarea"
+                  :rows="5"
+                  placeholder="Enter something..."
+                />
+              </template>
+            </Card>
+            <Card class="Information">
+              <div style="width:100%">
+                <strong>Limitations / problems:</strong>
+                <template v-if="subProjectInfo.managerId == $store.getters.userId">
+                <Icon
+                  v-if="!edit3"
+                  type="ios-create"
+                  :size="18"
+                  style="float:right;cursor:pointer"
+                  title="Edit"
+                  @click="editLimitation"
+                />
+                <Icon
+                  v-else
+                  type="md-checkbox-outline"
+                  :size="18"
+                  style="float:right;cursor:pointer"
+                  title="Complete"
+                  @click="editLimitation"
+                />
+                </template>
+              </div>
+              <Divider style="margin:10px 0; background:lightblue" />
+              <div v-if="!edit3" class="subProjectDesc" style="overflow-y:auto">{{limitation}}</div>
+              <template v-else>
+                <Input
+                  v-model="limitation"
+                  type="textarea"
+                  :rows="5"
+                  placeholder="Enter something..."
+                />
+              </template>
+            </Card>
+          </vue-scroll>
+        </div>
+      </Col>
+      <Col
+        :xs="{span:8}"
+        :sm="{span:7}"
+        :md="{span:6}"
+        :lg="{span:5}"
+        v-bind="this.participants"
+        style="margin:30px 0 0 20px;"
+      >
         <Card>
-          <Row>
-            <Col span="5" offset="1" style="height:40px;">
-              <Breadcrumb>
-                <BreadcrumbItem :to="toProjectPage">Project</BreadcrumbItem>
-                <BreadcrumbItem>Subproject</BreadcrumbItem>
-              </Breadcrumb>
-            </Col>
-            <Col span="14" style="text-align:center;font-size:1.5rem;height:40px">
-              <strong>{{subProjectInfo.title}}</strong>
-            </Col>
-            <Col span="4" style="height:40px;" class="operatePanel">
-              <Button
-                type="success"
-                @click="gotoWorkingPanel()"
-                icon="ios-git-network"
-                title="Back to project page"
-              >Work</Button>
-              <Button
-                type="default"
-                @click="conveneWork()"
-                icon="md-mail"
-                title="Inform others to work together"
-              >Inform</Button>
-            </Col>
-          </Row>
-          <Row>
-            <Col span="22" offset="1" style="background-color:white;">
-              <Tabs type="card" v-model="currentTab" @on-click="currentTabChanged">
-                <TabPane label="Subproject home" icon="ios-home" name="home">
-                  <Row type="flex" justify="space-around">
-                    <Col
-                      :xs="{span:9}"
-                      :sm="{span:8}"
-                      :md="{span:7}"
-                      :lg="{span:6}"
-                      v-bind="this.participants"
-                      :style="{height:sidebarHeight+14+'px'}"
-                      style="margin-top:30px;padding-left:20px"
+          <div slot="title" style="font-size:16px">
+            <strong>Participants</strong>
+          </div>
+          <div slot="extra">
+            <Icon
+              v-if="subProjectInfo.managerId == $store.getters.userId"
+              type="md-add"
+              :size="18"
+              style="cursor:pointer"
+              title="Invite other participants"
+              @click="inviteMembersModalShow"
+            />
+            <Icon
+              v-else-if="subProjectInfo.isMember"
+              type="ios-log-out"
+              :size="18"
+              style="cursor:pointer"
+              title="Quit this subproject"
+              @click="quitModal=true"
+            />
+          </div>
+          <div :style="{height:sidebarHeight+60+'px'}" style="overflow-y:auto;overflow-x:hidden">
+            <vue-scroll :ops="scrollOps" :style="{height:sidebarHeight + 60 + 'px'}">
+              <div class="member-desc" v-for="(member,index) in participants" :key="member.index">
+                <template v-if="index==0">
+                  <Badge text="♔" type="warning" class="userAvatar">
+                    <div
+                      class="member-image"
+                      @click="gotoPersonalSpace(member.userId)"
+                      style="cursor:pointer;display:flex;justify-content:center;align-ittems:center"
                     >
-                      <Card>
-                        <div slot="title" style="font-size:18px">
-                          <strong>Participants</strong>
-                        </div>
-                        <div
-                          :style="{height:sidebarHeight-150+'px'}"
-                          style="max-height:600px;overflow-y:auto;overflow-x:hidden"
-                        >
-                          <div
-                            class="member-desc"
-                            v-for="(member,index) in this.participants"
-                            :key="member.index"
-                          >
-                            <template v-if="index==0">
-                              <Badge text="♔" type="warning" class="userAvatar">
-                                <div
-                                  class="member-image"
-                                  @click="gotoPersonalSpace(member.userId)"
-                                  style="cursor:pointer;display:flex;justify-content:center;align-ittems:center"
-                                >
-                                  <img
-                                    v-if="member.avatar != '' && member.avatar!='undefined' && member.avatar!='null'"
-                                    :src="member.avatar"
-                                    style="width:100%;height:100%"
-                                  />
-                                  <avatar
-                                    :username="member.userName"
-                                    :size="50"
-                                    style="width:100%;height:100%"
-                                    :title="member.userName"
-                                    v-else
-                                  ></avatar>
-                                </div>
-                              </Badge>
-                              <div class="memebr-work" style="display:flex;align-items:center">
-                                <div style="height:40px;width:100%">
-                                  <div>
-                                    <span
-                                      style="padding:0 5px;"
-                                      :title="member.userName"
-                                    >{{member.userName}}</span>
-                                  </div>
-                                  <div>
-                                    <span
-                                      style="padding:0 5px;"
-                                      class="memberOrganization"
-                                      :title="member.organization"
-                                    >{{member.organization}}</span>
-                                  </div>
-                                </div>
-                              </div>
-                            </template>
-                            <template v-else style="margin-top:5px">
-                              <div
-                                class="member-image"
-                                @click="gotoPersonalSpace(member.userId)"
-                                style="cursor:pointer;display:flex;justify-content:center;align-items:center"
-                              >
-                                <img
-                                  v-if="member.avatar != '' && member.avatar!='undefined' && member.avatar!='null'"
-                                  :src="member.avatar"
-                                  style="width:100%;height:100%"
-                                />
-                                <avatar
-                                  :username="member.userName"
-                                  :size="50"
-                                  :title="member.userName"
-                                  v-else
-                                ></avatar>
-                              </div>
-                              <div class="memebr-work" style="display:flex;align-items:center">
-                                <div style="height:40px;width:100%">
-                                  <div>
-                                    <span
-                                      style="padding:0 5px;"
-                                      :title="member.userName"
-                                    >{{member.userName}}</span>
-                                  </div>
-                                  <div>
-                                    <span
-                                      style="padding:0 5px;"
-                                      class="memberOrganization"
-                                      :title="member.organization"
-                                    >{{member.organization}}</span>
-                                  </div>
-                                </div>
-                              </div>
-                            </template>
-                            <div style="line-height:60px" type="default">
-                              <span
-                                style="cursor:pointer"
-                                title="quit"
-                                v-show="giveDeleteProperty(index)"
-                                @click="removeMemberAlert=true"
-                              >
-                                <Icon type="md-log-out" :size="20" />
-                              </span>
-                            </div>
-                            <Modal
-                              v-model="removeMemberAlert"
-                              title="Remove member alert"
-                              ok-text="Assure"
-                              cancel-text="Cancel"
-                              @on-ok="removeMember(participants[index].userId,participants[index].userName)"
-                            >
-                              <h5
-                                style="text-align:center;color:red"
-                              >Do you really want to remove this member from this sub-project?</h5>
-                            </Modal>
-                          </div>
-                        </div>
-                        <div
-                          class="member-invite"
-                          style="display:flex;justify-content:center;height:60px;align-items:center"
-                        >
-                          <Button
-                            type="success"
-                            style="text-align:center;width:100px"
-                            @click="inviteMembersModalShow()"
-                            :disabled="inviteAble"
-                            v-if="this.subProjectInfo.managerId == this.$store.getters.userId"
-                          >Invite</Button>
-                          <Button
-                            type="warning"
-                            style="text-align:center;width:100px"
-                            @click="quitModal=true"
-                            v-else-if="this.subProjectInfo.isMember"
-                          >Quit</Button>
-                          <Modal
-                            v-model="quitModal"
-                            width="400px"
-                            title="Quit Sub-Project"
-                            @on-ok="quitSubProject()"
-                            ok-text="Ok"
-                            cancel-text="Cancel"
-                          >
-                            <h4 style="color:red">Are you sure to quit this subproject?</h4>
-                          </Modal>
-                          <Modal
-                            v-model="inviteModal"
-                            width="400px"
-                            title="Invite group members join the sub-project"
-                            @on-ok="inviteMembers"
-                            ok-text="Ok"
-                            cancel-text="Cancel"
-                          >
-                            <div>
-                              <p>Members:</p>
-                              <Tag
-                                v-for="participant in this.participants"
-                                :key="participant.index"
-                              >{{participant.userName}}</Tag>
-                              <p>Candidates:</p>
-                              <CheckboxGroup v-model="inviteList">
-                                <Checkbox
-                                  v-for="candidate in candidates"
-                                  :key="candidate.index"
-                                  :label="candidate.userId"
-                                >
-                                  <span>{{candidate.userName}}</span>
-                                </Checkbox>
-                              </CheckboxGroup>
-                            </div>
-                          </Modal>
-                        </div>
-                      </Card>
-                    </Col>
-                    <Col :xs="15" :sm="16" :md="17" :lg="17" style="margin-top:30px">
-                      <Card style="background-color:white;">
-                        <div slot="title" style="font-size:18px;">
-                          <strong>Description</strong>
-                        </div>
-                        <!-- 判断是不是管理员 -->
-                        <div
-                          :style="{height:descHeight-60 +'px'}"
-                          class="subProjectDesc"
-                          style="overflow-y:auto"
-                        >{{subProjectInfo.description}}</div>
-                      </Card>
-                      <div class="resourcePanel" style="padding-top: 20px">
-                        <folder-tree
-                          :subProjectId="subProjectInfo.subProjectId"
-                          :role="userRole"
-                          ref="folderTreeEle"
-                        ></folder-tree>
-                      </div>
-                    </Col>
-                  </Row>
-                </TabPane>
-                <TabPane label="Task assignment" icon="md-list" name="task">
-                  <Col
-                    id="taskPage"
-                    span="24"
-                    style="margin-top:20px"
-                    :style="{minHeight:taskContainerHeight+14+'px'}"
-                  >
-                    <div id="taskContainer" :style="{minHeight:taskContainerHeight+'px'}">
-                      <Row type="flex" justify="space-around">
-                        <Col span="7">
-                          <Card :padding="0" :border="false">
-                            <h3 slot="title">Todo</h3>
-                            <Button
-                              slot="extra"
-                              type="default"
-                              class="createTaskBtn"
-                              style="margin-top:-10px"
-                              @click="createTaskModalShow()"
-                              v-show="this.subProjectInfo.managerId == this.$store.getters.userId||this.subProjectInfo.isMember"
-                            >Add</Button>
-                            <draggable
-                              class="taskList"
-                              element="ul"
-                              :options="{group:'task'}"
-                              v-model="taskTodo"
-                              @start="setMoveCount()"
-                              @update="updateMoveTask(taskTodo,'todo')"
-                              @add="addMoveTask(taskTodo,'todo')"
-                              @remove="removeMoveTask(taskTodo,'todo')"
-                            >
-                              <Card
-                                v-for="(item,index) in taskTodo"
-                                :key="index"
-                                :padding="3"
-                                style="margin:5px"
-                              >
-                                <div>
-                                  <span style="float:left;padding:0 2.5px">
-                                    <Icon type="ios-list" color="gray" :size="20" />
-                                  </span>
-                                  <span style="padding:5px">
-                                    <strong
-                                      style="color:#57a3f3"
-                                      class="taskName"
-                                      :title="item.taskName"
-                                    >{{item.taskName}}</strong>
-                                  </span>
-                                  <div style="float:right" v-show="userRole != 'Visitor'">
-                                    <Rate
-                                      v-model="item.importance"
-                                      :count="1"
-                                      clearable
-                                      title="Importance"
-                                      @on-change="changeImportance(item)"
-                                    />
-                                    <span title="Edit">
-                                      <Icon
-                                        type="ios-create"
-                                        color="gray"
-                                        :size="20"
-                                        style="cursor:pointer"
-                                        @click="editOneTask(index, taskTodo)"
-                                      />
-                                    </span>
-                                    <span
-                                      style="margin-left:5px;margin-right:3px;cursor: pointer;color:gray;"
-                                      title="Delete"
-                                      @click="taskRemoveAssure(index,taskTodo)"
-                                    >
-                                      <Icon type="ios-trash" :size="20" color="gray" />
-                                    </span>
-                                  </div>
-                                  <p
-                                    style="word-break:break-word;padding:5px;cursor:pointer"
-                                    @click="showTask(index, taskTodo)"
-                                  >{{item.description}}</p>
-                                  <div style="display:flex;justify-content:flex-end">
-                                    <Tag color="default" style="cursor:default">{{item.creatorName}}</Tag>
-                                  </div>
-                                </div>
-                              </Card>
-                            </draggable>
-                          </Card>
-                        </Col>
-                        <Col span="7">
-                          <Card :padding="0" :border="false">
-                            <h3 slot="title">Doing</h3>
-                            <draggable
-                              class="taskList"
-                              element="ul"
-                              :options="{group:'task'}"
-                              v-model="taskDoing"
-                              @start="setMoveCount()"
-                              @update="updateMoveTask(taskDoing,'doing')"
-                              @add="addMoveTask(taskDoing,'doing')"
-                              @remove="removeMoveTask(taskDoing,'doing')"
-                            >
-                              <Card
-                                v-for="(item,index)  in taskDoing"
-                                :key="index"
-                                :padding="3"
-                                style="margin:5px"
-                              >
-                                <div>
-                                  <span style="float:left;padding:0 2.5px">
-                                    <Icon
-                                      type="ios-information-circle-outline"
-                                      color="gray"
-                                      :size="20"
-                                    />
-                                  </span>
-                                  <span style="padding:5px">
-                                    <strong
-                                      style="color:#57a3f3"
-                                      class="taskName"
-                                      :title="item.taskName"
-                                    >{{item.taskName}}</strong>
-                                  </span>
-                                  <div style="float:right" v-show="userRole != 'Visitor'">
-                                    <Rate
-                                      v-model="item.importance"
-                                      :count="1"
-                                      clearable
-                                      title="Importance"
-                                      @on-change="changeImportance(item)"
-                                    />
-                                    <span>
-                                      <Icon
-                                        type="ios-create"
-                                        color="gray"
-                                        :size="20"
-                                        style="cursor:pointer"
-                                        @click="editOneTask(index,taskDoing)"
-                                      />
-                                    </span>
-                                    <span
-                                      style="margin-left:5px;margin-right:3px;cursor: pointer;color:gray;"
-                                      title="Delete"
-                                      @click="taskRemoveAssure(index,taskDoing)"
-                                    >
-                                      <Icon type="ios-trash" :size="20" color="gray" />
-                                    </span>
-                                  </div>
-                                </div>
-                                <p
-                                  style="word-break:break-word;padding:5px;cursor:pointer"
-                                  @click="showTask(index,taskDoing)"
-                                >{{item.description}}</p>
-                                <div style="display:flex;justify-content:flex-end">
-                                  <Tag color="default" style="cursor:default">{{item.managerName}}</Tag>
-                                </div>
-                              </Card>
-                            </draggable>
-                          </Card>
-                        </Col>
-                        <Col span="7">
-                          <Card :padding="0" :border="false">
-                            <h3 slot="title">Done</h3>
-                            <draggable
-                              class="taskList"
-                              element="ul"
-                              :options="{group:'task'}"
-                              v-model="taskDone"
-                              @start="setMoveCount()"
-                              @update="updateMoveTask(taskDone,'done')"
-                              @add="addMoveTask(taskDone,'done')"
-                              @remove="removeMoveTask(taskDone,'done')"
-                            >
-                              <Card
-                                v-for="(item,index) in taskDone"
-                                :key="index"
-                                :padding="3"
-                                style="margin:5px"
-                              >
-                                <div>
-                                  <span style="float:left;padding:0 2.5px">
-                                    <Icon type="md-checkmark-circle-outline" />
-                                  </span>
-                                  <span style="padding:5px">
-                                    <strong
-                                      style="color:#57a3f3"
-                                      class="taskName"
-                                      :title="item.taskName"
-                                    >{{item.taskName}}</strong>
-                                  </span>
-                                  <div style="float:right" v-show="userRole != 'Visitor'">
-                                    <Rate
-                                      v-model="item.importance"
-                                      :count="1"
-                                      clearable
-                                      title="Importance"
-                                      @on-change="changeImportance(item)"
-                                    />
-                                    <span>
-                                      <Icon
-                                        type="ios-create"
-                                        color="gray"
-                                        :size="20"
-                                        style="cursor:pointer"
-                                        @click="editOneTask(index,taskDone)"
-                                      />
-                                    </span>
-                                    <span
-                                      style="margin-left:5px;margin-right:3px;cursor: pointer;color:gray;"
-                                      title="Delete"
-                                      @click="taskRemoveAssure(index,taskDone)"
-                                    >
-                                      <Icon type="ios-trash" :size="20" color="gray" />
-                                    </span>
-                                  </div>
-                                  <p
-                                    style="word-break:break-word;padding:5px;cursor:pointer"
-                                    @click="showTask(index,taskDone)"
-                                  >{{item.description}}</p>
-                                  <div style="display:flex;justify-content:flex-end">
-                                    <Tag color="default" style="cursor:default">{{item.managerName}}</Tag>
-                                  </div>
-                                </div>
-                              </Card>
-                            </draggable>
-                          </Card>
-                        </Col>
-                      </Row>
+                      <img
+                        v-if="member.avatar != '' && member.avatar!='undefined' && member.avatar!='null'"
+                        :src="member.avatar"
+                        style="width:100%;height:100%"
+                      />
+                      <avatar
+                        :username="member.userName"
+                        :size="50"
+                        style="width:100%;height:100%"
+                        :title="member.userName"
+                        v-else
+                      ></avatar>
                     </div>
-                  </Col>
-                </TabPane>
-              </Tabs>
-            </Col>
-          </Row>
+                  </Badge>
+                  <div class="memebr-work" style="display:flex;align-items:center">
+                    <div style="height:100%;width:100%">
+                      <div style="margin:5px 0 0 15px;">
+                        <span :title="member.userName">{{member.userName}}</span>
+                      </div>
+                      <div style="margin:5px 0 0 15px;">
+                        <span
+                          class="memberOrganization"
+                          :title="member.organization"
+                        >{{member.organization}}</span>
+                      </div>
+                    </div>
+                  </div>
+                </template>
+                <template v-else>
+                  <div
+                    class="member-image"
+                    @click="gotoPersonalSpace(member.userId)"
+                    style="cursor:pointer;display:flex;justify-content:center;align-items:center"
+                  >
+                    <img
+                      v-if="member.avatar != '' && member.avatar!='undefined' && member.avatar!='null'"
+                      :src="member.avatar"
+                      style="width:100%;height:100%"
+                    />
+                    <avatar
+                      :username="member.userName"
+                      :size="50"
+                      style="width:100%;height:100%"
+                      :title="member.userName"
+                      v-else
+                    ></avatar>
+                  </div>
+                  <div class="memebr-work" style="display:flex;align-items:center">
+                    <div style="height:100%;width:100%">
+                      <div style="margin:5px 0 0 15px;">
+                        <span :title="member.userName">{{member.userName}}</span>
+                      </div>
+                      <div style="margin:5px 0 0 15px;">
+                        <span
+                          class="memberOrganization"
+                          :title="member.organization"
+                        >{{member.organization}}</span>
+                      </div>
+                    </div>
+                  </div>
+                </template>
+                <div style="line-height:50px" type="default">
+                  <span
+                    style="cursor:pointer"
+                    title="Out"
+                    v-show="giveDeleteProperty(index)"
+                    @click="removeMemberAlert=true"
+                  >
+                    <Icon type="md-log-out" :size="20" />
+                  </span>
+                </div>
+                <Modal
+                  v-model="removeMemberAlert"
+                  title="Remove member alert"
+                  ok-text="Assure"
+                  cancel-text="Cancel"
+                  @on-ok="removeMember(participants[index].userId,participants[index].userName)"
+                >
+                  <h5
+                    style="text-align:center;color:red"
+                  >Do you really want to remove this member from this subproject?</h5>
+                </Modal>
+              </div>
+            </vue-scroll>
+          </div>
+          <Modal
+            v-model="quitModal"
+            width="400px"
+            title="Quit Sub-Project"
+            @on-ok="quitSubProject()"
+            ok-text="Ok"
+            cancel-text="Cancel"
+          >
+            <h4 style="color:red">Are you sure to quit this subproject?</h4>
+          </Modal>
+          <Modal
+            v-model="inviteModal"
+            width="400px"
+            title="Invite new participants"
+            @on-ok="inviteMembers"
+            ok-text="Ok"
+            cancel-text="Cancel"
+          >
+            <div>
+              <p>Members:</p>
+              <Tag
+                v-for="participant in this.participants"
+                :key="participant.index"
+              >{{participant.userName}}</Tag>
+              <p>Candidates:</p>
+              <CheckboxGroup v-model="inviteList">
+                <Checkbox
+                  v-for="candidate in candidates"
+                  :key="candidate.index"
+                  :label="candidate.userId"
+                >
+                  <span>{{candidate.userName}}</span>
+                </Checkbox>
+              </CheckboxGroup>
+            </div>
+          </Modal>
         </Card>
       </Col>
-      <template>
-        <BackTop></BackTop>
-      </template>
     </Row>
-    <Modal
-      v-model="taskDeleteModal"
-      title="Delete Task"
-      @on-ok="taskRemove()"
-      ok-text="Assure"
-      cancel-text="Cancel"
-    >
-      <p>Do yout want to delete this task?</p>
-    </Modal>
-    <Modal v-model="createTaskModal" title="Create Task" width="800px" :closable="false">
-      <Form
-        ref="formValidate"
-        :model="formValidate"
-        :rules="ruleValidate"
-        :label-width="100"
-        style="margin-left: 30px"
-      >
-        <FormItem label="Name" prop="taskName">
-          <Input
-            v-model="formValidate.taskName"
-            placeholder="Fill in the name of task..."
-            style="width: 560px"
-          />
-        </FormItem>
-        <FormItem label="Description" prop="description">
-          <Input
-            v-model="formValidate.description"
-            type="textarea"
-            placeholder="Fill in the description of task..."
-            style="width: 560px"
-            :autosize="{minRows: 6}"
-          />
-        </FormItem>
-        <FormItem label="Start time" prop="startTime">
-          <DatePicker
-            v-model="formValidate.startTime"
-            type="datetime"
-            format="yyyy-MM-dd HH:mm:ss"
-            placeholder="Select start time..."
-            style="width: 560px"
-          ></DatePicker>
-        </FormItem>
-        <FormItem label="End time" prop="endTime">
-          <DatePicker
-            v-model="formValidate.endTime"
-            type="datetime"
-            format="yyyy-MM-dd HH:mm:ss"
-            placeholder="Select end time..."
-            style="width: 560px"
-          ></DatePicker>
-        </FormItem>
-        <FormItem label prop="importance">
-          <Checkbox v-model="formValidate.importanceCheck">Important Task</Checkbox>
-        </FormItem>
-      </Form>
-      <div slot="footer">
-        <Button type="text" @click="createTaskModal=false">Cancel</Button>
-        <Button type="primary" @click="createTask('formValidate')">Create</Button>
-      </div>
-    </Modal>
-    <Modal
-      v-model="editTaskModal"
-      title="Edit Task"
-      @on-ok="updateTask('formValidate')"
-      ok-text="Ok"
-      cancel-text="Cancel"
-      width="800px"
-      :closable="false"
-    >
-      <Form
-        ref="formValidate"
-        :model="formValidate"
-        :rules="ruleValidate"
-        :label-width="100"
-        style="margin-left: 30px"
-      >
-        <FormItem label="Name" prop="taskName">
-          <Input
-            v-model="formValidate.taskName"
-            placeholder="Fill in the name of task..."
-            style="width: 560px"
-          />
-        </FormItem>
-        <FormItem label="Description" prop="description">
-          <Input
-            v-model="formValidate.description"
-            type="textarea"
-            placeholder="Fill in the description of task..."
-            style="width:560px"
-            :autosize="{minRows: 6}"
-          />
-        </FormItem>
-        <FormItem label="Start time" prop="startTime">
-          <DatePicker
-            v-model="formValidate.startTime"
-            type="datetime"
-            format="yyyy-MM-dd HH:mm:ss"
-            placeholder="Select start time..."
-            style="width: 560px"
-          ></DatePicker>
-        </FormItem>
-        <FormItem label="End time" prop="endTime">
-          <DatePicker
-            v-model="formValidate.endTime"
-            type="datetime"
-            format="yyyy-MM-dd HH:mm:ss"
-            placeholder="Select end time..."
-            style="width: 560px"
-          ></DatePicker>
-        </FormItem>
-        <FormItem label prop="importance">
-          <Checkbox v-model="formValidate.importanceCheck">Important Task</Checkbox>
-        </FormItem>
-      </Form>
-      <div slot="footer">
-        <Button type="text" @click="editTaskModal=false">Cancel</Button>
-        <Button type="primary" @click="updateTask('formValidate')">Update</Button>
-      </div>
-    </Modal>
-    <Modal v-model="taskDetailModal" title="Task Detail" width="800px">
-      <div class="taskFormItem">
-        <span style="width:15%">Task name</span>
-        <Input
-          style="width: 600px"
-          :placeholder="this.taskPlaceHolder.name"
-          v-model="taskInfo.taskName"
-          readonly
-        />
-      </div>
-      <div class="taskFormItem">
-        <span style="width:15%">Description</span>
-        <Input
-          style="width: 600px"
-          :placeholder="this.taskPlaceHolder.description"
-          type="textarea"
-          :rows="4"
-          v-model="taskInfo.description"
-          :autosize="{minRows: 6}"
-          readonly
-        />
-      </div>
-      <div class="taskFormItem">
-        <span style="width:15%">Start time</span>
-        <DatePicker
-          type="datetime"
-          format="yyyy-MM-dd HH:mm:ss"
-          :placeholder="this.taskPlaceHolder.startTime"
-          style="width: 600px"
-          v-model="taskInfo.startTime"
-          readonly
-        ></DatePicker>
-      </div>
-      <div class="taskFormItem" style="margin-bottom:10px">
-        <span style="width:15%">End time</span>
-        <DatePicker
-          type="datetime"
-          format="yyyy-MM-dd HH:mm:ss"
-          :placeholder="this.taskPlaceHolder.endTime"
-          style="width: 600px"
-          v-model="taskInfo.endTime"
-          readonly
-        ></DatePicker>
-      </div>
-      <div slot="footer"></div>
-    </Modal>
+    <!-- </Row> -->
   </div>
 </template>
 <script>
-import { VueFlowy, FlowChart } from "vue-flowy";
-import draggable from "vuedraggable";
 import Avatar from "vue-avatar";
-import folderTree from "./FolderTree.vue";
+import folderTree from "../resources/folderTree.vue";
 export default {
   updated() {
-    $(".userAvatar sup").css("margin", "15px 15px 0 0");
-    $(".ivu-steps-title").css("cursor", "pointer");
-    $(".ivu-steps-title").css("overflow", "hidden");
-    $(".ivu-steps-title").css("white-space", "nowrap");
-    $(".ivu-steps-title").css("text-overflow", "ellipsis");
-    $(".ivu-steps-title").css("max-width", "120px");
+    $(".userAvatar sup").css("margin", "10px 10px 0 0");
   },
   components: {
-    VueFlowy,
-    draggable,
     Avatar,
     folderTree
   },
+  props: ["subProjectInfo"],
   data() {
     return {
-      subProjectFileUploadForm: {
-        privacy: "private",
-        type: "data",
-        description: ""
-      },
-      subProjectFileUploadFormRuleValidate: {
-        privacy: [
-          {
-            required: true,
-            message: "file privacy cannot be empty",
-            trigger: "blur"
-          }
-        ],
-        type: [
-          {
-            required: true,
-            message: "file type cannot be empty",
-            trigger: "blur"
-          }
-        ],
-        description: [
-          {
-            required: true,
-            message: "file description cannot be empty",
-            trigger: "blur"
-          }
-        ]
+      scrollOps: {
+        bar: {
+          background: "lightgrey"
+        }
       },
       // information of project
       projectInfo: {},
-      // info of subproject
-      subProjectInfo: [],
       //登陆者身份
       // 关于邀请的模态框
       inviteModal: false,
       quitModal: false,
-      sidebarHeight: 800,
-      descHeight: 250,
-      taskContainerHeight: 800,
+      sidebarHeight: 100,
       participants: [],
       candidates: [],
       inviteList: [],
       inviteAble: true,
-      oldTabPaneState: "home",
-      // 后台获取的module下的task列表
-      taskList: [],
-      selectTaskIndex: 0,
-      taskDeleteModal: false,
-      // 创建任务的模态框
-      createTaskModal: false,
-      // 编辑任务的模态框
-      editTaskModal: false,
-      taskDetailModal: false,
-      // task的placeHolder默认值
-      taskPlaceHolder: {
-        description: "Please input the task description.",
-        name: "Please input the task name",
-        startTime: "Choose the start time of task",
-        endTime: "Choose the end time of task"
-      },
-      //task相关
-      taskInfo: {},
-      taskTodo: [],
-      taskDoing: [],
-      taskDone: [],
-      MoveCount: 0,
-      // 动态记录相关
-      // 消息
-      subprojectSocket: null,
-      timer: null,
-      socketMsg: {
-        type: "",
-        time: "",
-        who: "",
-        whoid: "",
-        content: ""
-      },
-      formValidate: {
-        taskName: "",
-        description: "",
-        startTime: "",
-        endTime: "",
-        importanceCheck: false
-      },
-      ruleValidate: {
-        taskName: [
-          { required: true, message: "Please enter name...", trigger: "blur" }
-        ],
-        description: [
-          { required: true, message: "Please select type...", trigger: "blur" }
-        ],
-        startTime: [{ required: true, type: "date", trigger: "blur" }],
-        endTime: [{ required: true, type: "date", trigger: "blur" }]
-      },
-      contentHeight: "",
-      // tab栏当前选中的tab,初始化默认为home
-      currentTab: "home",
-      toProjectPage: "",
-      toSubProjectPage: "",
-      // 上传文件
-      uploadShow: false,
-      privacy: "",
-      file: [],
-      fileDescription: "",
-      fileType: "",
-      progressModalShow: false,
-      uploadProgress: 0,
-      // 子项目资源列表
-      subProjectResourceList: [],
-      projectTableColName: [
-        {
-          title: "Name",
-          key: "name",
-          tooltip: true,
-          sortable: true
-        },
-        {
-          title: "Type",
-          key: "type",
-          width: 90,
-          sortable: true
-        },
-        {
-          title: "Size",
-          key: "fileSize",
-          width: 100,
-          sortable: true
-        },
-        {
-          title: "Description",
-          key: "description",
-          tooltip: true,
-          sortable: true
-        },
-        {
-          title: "Upload time",
-          key: "uploadTime",
-          width: 150,
-          sortable: true
-        },
-        {
-          title: "Action",
-          slot: "action",
-          width: 120,
-          align: "center"
-        }
-      ],
-      panel: null,
       // 删除成员的提醒
       removeMemberAlert: false,
+      // 编辑子项目信息
+      edit1: false,
+      edit2: false,
+      edit3: false,
+      background: "",
+      limitation: "",
+      purpose: "",
       // 用户角色
       userRole: ""
     };
@@ -903,40 +388,12 @@ export default {
     this.init();
   },
   mounted() {
-    this.contentHeight = window.innerHeight + "px";
     this.toProjectPage = "/project/" + sessionStorage.getItem("projectId");
-    this.inquiryTask();
     this.getProjectInfo();
     window.addEventListener("resize", this.initSize);
   },
-  // add by mzy for navigation guards
-  beforeRouteEnter: (to, from, next) => {
-    next(vm => {
-      if (!vm.$store.getters.userState) {
-        next("/login");
-      } else if (vm.projectInfo.privacy == "Public") {
-        next();
-      } else {
-        var userId = vm.$store.getters.userId;
-        var members = vm.subProjectInfo.members;
-        var isMember = false;
-        for (var i = 0; i < members.length; i++) {
-          if (members[i].userId == userId) {
-            isMember = true;
-            break;
-          }
-        }
-        if (!(vm.subProjectInfo.managerId == userId || isMember)) {
-          vm.$Message.error("You have no property to access it");
-          // next(`/project/${vm.$store.getters.currentProjectId}`);
-          vm.$router.go(-1);
-        }
-      }
-    });
-  },
+
   beforeRouteLeave(to, from, next) {
-    this.removeTimer();
-    this.$refs.folderTreeEle.closePanel();
     next();
   },
   beforeDestroy: function() {
@@ -945,14 +402,7 @@ export default {
   methods: {
     initSize() {
       //侧边栏的高度随着屏幕的高度自适应
-      this.sidebarHeight = window.innerHeight - 250;
-      this.descHeight = (window.innerHeight - 250) / 3;
-      this.taskContainerHeight = this.sidebarHeight + 10;
-      //通知栏的属性设置，top表示距离顶部的距离，duration表示持续的时间
-      // this.$Notice.config({
-      //   top: 50,
-      //   duration: 0
-      // });
+      this.sidebarHeight = window.innerHeight - 380;
     },
     //初始化函数，作用是控制侧边栏的高度，设置右边通知栏弹出时候的距顶高度以及延迟的时间
     init() {
@@ -974,6 +424,8 @@ export default {
           }
         }
         this.$set(this, "subProjectInfo", subProjectInfo);
+        this.getSubprojectDes();
+
         this.inviteAble = false;
         this.showMembers();
         sessionStorage.setItem("subProjectId", subProjectInfo.subProjectId);
@@ -999,10 +451,12 @@ export default {
                 subProjectInfo.subProjectId
               );
               sessionStorage.setItem("subProjectName", subProjectInfo.title);
+              this.getSubprojectDes();
 
-              // this.managerIdentity(subProjectInfo.managerId);
+              this.managerIdentity(subProjectInfo.managerId);
               this.memberIdentity(subProjectInfo.members);
               this.$store.commit("setSubProjectInfo", subProjectInfo);
+
               this.inviteAble = false;
               this.showMembers();
             }
@@ -1020,17 +474,43 @@ export default {
         this.userRole = "Visitor";
       }
     },
-    // managerIdentity(managerId) {
-    //   if (managerId === this.$store.getters.userId) {
-    //     this.subProjectInfo.isManager = true;
-    //   }
-    // },
+    managerIdentity(managerId) {
+      if (managerId === this.$store.getters.userId) {
+        this.subProjectInfo.isManager = true;
+      }
+    },
     memberIdentity(members) {
       for (let i = 0; i < members.length; i++) {
         if (members[i].userId === this.$store.getters.userId) {
           this.subProjectInfo.isMember = true;
           break;
         }
+      }
+    },
+    getSubprojectDes() {
+      if (
+        this.subProjectInfo.purpose != undefined &&
+        this.subProjectInfo.purpose != null
+      ) {
+        this.purpose = this.subProjectInfo.purpose;
+      } else if (
+        this.subProjectInfo.description != undefined &&
+        this.subProjectInfo.description != null
+      ) {
+        this.purpose = this.subProjectInfo.description;
+      }
+
+      if (
+        this.subProjectInfo.limitation != undefined &&
+        this.subProjectInfo.limitation != null
+      ) {
+        this.limitation = this.subProjectInfo.limitation;
+      }
+      if (
+        this.subProjectInfo.background != undefined &&
+        this.subProjectInfo.background != null
+      ) {
+        this.background = this.subProjectInfo.background;
       }
     },
     showMembers() {
@@ -1080,76 +560,6 @@ export default {
           }
         })
         .catch(err => {});
-    },
-    closeModuleSocket() {
-      if (this.subprojectSocket != null) {
-        this.removeTimer();
-        this.subprojectSocket.close();
-      }
-    },
-    openModuleSocket() {
-      if (this.subprojectSocket != null) {
-        this.subprojectSocket = null;
-      }
-
-      let roomId = this.subProjectInfo.subProjectId + "task";
-      var subprojectSocketURL =
-        "ws://localhost:8081/GeoProblemSolving/Module/" + roomId;
-      // var subprojectSocketURL = "ws://"+this.$store.state.IP_Port+"/GeoProblemSolving/Module/" + roomId;
-      this.subprojectSocket = new WebSocket(subprojectSocketURL);
-      this.subprojectSocket.onopen = this.onOpen;
-      this.subprojectSocket.onmessage = this.onMessage;
-      this.subprojectSocket.onclose = this.onClose;
-      this.subprojectSocket.onerror = this.onError;
-      this.setTimer();
-    },
-    onOpen() {
-      console.log("ModuleSocket连接成功！");
-    },
-    // 更新人员，更新数据，更新records
-    onMessage(e) {
-      let messageJson = JSON.parse(e.data);
-      let record = {
-        type: "",
-        time: "",
-        who: "",
-        content: ""
-      };
-
-      // 任务记录
-      if (messageJson.type == "tasks") {
-        this.inquiryTask();
-      }
-    },
-    onClose(e) {
-      this.removeTimer();
-      console.log("ModuleSocket连接断开！");
-    },
-    onError(e) {
-      this.removeTimer();
-      console.log("ModuleSocket连接错误！");
-    },
-    setTimer() {
-      var that = this;
-      this.timer = setInterval(() => {
-        var messageJson = {};
-        messageJson["type"] = "ping";
-        messageJson["message"] = "ping";
-        if (
-          that.subprojectSocket != null &&
-          that.subprojectSocket != undefined
-        ) {
-          that.subprojectSocket.send(JSON.stringify(messageJson));
-        }
-      }, 20000);
-    },
-    removeTimer() {
-      clearInterval(this.timer);
-    },
-    sendMessage(message) {
-      if (this.subprojectSocket != null) {
-        this.subprojectSocket.send(JSON.stringify(message));
-      }
     },
     // 召集参与者
     conveneWork() {
@@ -1371,381 +781,7 @@ export default {
           console.log(err.data);
         });
     },
-    //创建任务
-    createTaskModalShow() {
-      let taskDefult = {
-        taskName: "",
-        description: "",
-        startTime: "",
-        endTime: "",
-        state: "todo"
-      };
-      this.$set(this, "taskInfo", taskDefult);
-      this.$set(this, "formValidate", taskDefult);
-      this.createTaskModal = true;
-    },
-    createTask(name) {
-      this.$refs[name].validate(valid => {
-        if (valid) {
-          let taskForm = {};
-          taskForm["taskName"] = this.formValidate.taskName;
-          taskForm["description"] = this.formValidate.description;
-          taskForm["startTime"] = new Date(this.formValidate.startTime);
-          taskForm["endTime"] = new Date(this.formValidate.endTime);
-          taskForm["creatorId"] = this.$store.getters.userId;
-          taskForm["creatorName"] = this.$store.getters.userName;
-          taskForm["managerName"] = this.$store.getters.userName;
-          taskForm["importance"] = this.formValidate.importanceCheck ? 1 : 0;
-          taskForm["subProjectId"] = this.subProjectInfo.subProjectId;
-          taskForm["state"] = "todo";
-          taskForm["order"] = this.taskTodo.length;
-          this.axios
-            .post("/GeoProblemSolving/task/save", taskForm)
-            .then(res => {
-              if (res.data == "Offline") {
-                this.$store.commit("userLogout");
-                this.$router.push({ name: "Login" });
-              } else if (res.data != "Fail") {
-                // 任务更新socket
-                this.socketMsg.whoid = this.$store.getters.userId;
-                this.socketMsg.who = this.$store.getters.userName;
-                this.socketMsg.type = "tasks";
-                this.socketMsg.content = "created a new task.";
-                this.socketMsg.time = new Date().toLocaleString();
-                this.addNewTask(res.data);
-                this.createTaskModal = false;
-                this.sendMessage(this.socketMsg);
-              }
-            })
-            .catch(err => {});
-        } else {
-          this.$Message.error("Please enter the necessary information!");
-        }
-      });
-    },
-    addNewTask(newTaskObject) {
-      this.taskTodo.push(newTaskObject);
-    },
-    changeImportance(task) {
-      let taskForm = new URLSearchParams();
-      taskForm.append("taskId", task.taskId);
-      taskForm.append("importance", task.importance);
-      this.axios
-        .post("/GeoProblemSolving/task/update", taskForm)
-        .then(res => {
-          if (res.data == "Offline") {
-            this.$store.commit("userLogout");
-            this.$router.push({ name: "Login" });
-          } else if (res.data != "None" && res.data != "Fail") {
-            this.socketMsg.whoid = this.$store.getters.userId;
-            this.socketMsg.who = this.$store.getters.userName;
-            this.socketMsg.type = "tasks";
-            this.socketMsg.content = "Changed the importance of one task.";
-            this.socketMsg.time = new Date().toLocaleString();
-            this.sendMessage(this.socketMsg);
-          } else {
-            this.$Message.error("Fail!");
-          }
-        })
-        .catch(err => {
-          console.log(err.data);
-        });
-    },
-    //打开task编辑器
-    editOneTask(index, taskList) {
-      this.axios
-        .get(
-          "/GeoProblemSolving/task/inquiry?" +
-            "key=taskId" +
-            "&value=" +
-            taskList[index]["taskId"]
-        )
-        .then(res => {
-          if (res.data != "Fail") {
-            let taskInfoRes = res.data[0];
-            taskInfoRes.startTime = new Date(taskInfoRes.startTime);
-            taskInfoRes.endTime = new Date(taskInfoRes.endTime);
-            taskInfoRes.importanceCheck = taskInfoRes.importance ? true : false;
-            this.$set(this, "formValidate", taskInfoRes);
-            this.editTaskModal = true;
-          } else {
-            this.$Message.error("Fail!");
-          }
-        })
-        .catch(err => {
-          this.$Message.error("Fail!");
-        });
-    },
-    showTask(index, taskList) {
-      this.axios
-        .get(
-          "/GeoProblemSolving/task/inquiry?" +
-            "key=taskId" +
-            "&value=" +
-            taskList[index]["taskId"]
-        )
-        .then(res => {
-          if (res.data != "Fail") {
-            let taskInfoRes = res.data[0];
-            taskInfoRes.startTime = new Date(taskInfoRes.startTime);
-            taskInfoRes.endTime = new Date(taskInfoRes.endTime);
-            this.$set(this, "taskInfo", taskInfoRes);
-            this.taskDetailModal = true;
-          } else {
-            this.$Message.error("Fail!");
-          }
-        })
-        .catch(err => {
-          this.$Message.error("Fail!");
-        });
-    },
-    updateTaskList(taskObject) {
-      taskObject.importanceCheck = taskObject.importance ? 1 : 0;
-      switch (taskObject.state) {
-        case "todo": {
-          let taskList = this.taskTodo;
-          for (var i = 0; i < taskList.length; i++) {
-            if (taskList[i].taskId == taskObject.taskId) {
-              this.$set(this.taskTodo, i, taskObject);
-              break;
-            }
-          }
-          break;
-        }
-        case "doing": {
-          let taskList = this.taskDoing;
-          for (var i = 0; i < taskList.length; i++) {
-            if (taskList[i].taskId == taskObject.taskId) {
-              this.$set(this.taskDoing, i, taskObject);
-              break;
-            }
-          }
-          break;
-        }
-        case "done": {
-          let taskList = this.taskDone;
-          for (var i = 0; i < taskList.length; i++) {
-            if (taskList[i].taskId == taskObject.taskId) {
-              this.$set(this.taskDone, i, taskObject);
-              break;
-            }
-          }
-          break;
-        }
-      }
-    },
-    //更新某个task
-    updateTask(name) {
-      this.$refs[name].validate(valid => {
-        if (valid) {
-          let taskForm = new URLSearchParams();
-          taskForm.append("taskId", this.formValidate.taskId);
-          taskForm.append("taskName", this.formValidate.taskName);
-          taskForm.append("description", this.formValidate.description);
-          taskForm.append("startTime", new Date(this.formValidate.startTime));
-          taskForm.append("endTime", new Date(this.formValidate.endTime));
-          let importance = this.formValidate.importanceCheck ? 1 : 0;
-          taskForm.append("importance", importance);
-          this.axios
-            .post("/GeoProblemSolving/task/update", taskForm)
-            .then(res => {
-              if (res.data == "Offline") {
-                this.$store.commit("userLogout");
-                this.$router.push({ name: "Login" });
-              } else if (res.data != "None" && res.data != "Fail") {
-                this.updateTaskList(res.data); // 只更新单个任务
-                this.socketMsg.whoid = this.$store.getters.userId;
-                this.socketMsg.who = this.$store.getters.userName;
-                this.socketMsg.type = "tasks";
-                this.socketMsg.content = "edited a new task.";
-                this.socketMsg.time = new Date().toLocaleString();
-                this.editTaskModal = false;
-                this.sendMessage(this.socketMsg);
-              } else {
-                this.$Message.error("Fail!");
-              }
-            })
-            .catch(err => {
-              console.log(err.data);
-            });
-        } else {
-          this.$Message.error("Please enter the necessary information!");
-        }
-      });
-    },
-    //查询task
-    inquiryTask() {
-      this.inquiryTodoTask();
-      this.inquiryDoingTask();
-      this.inquiryDoneTask();
-    },
-    inquiryTodoTask() {
-      this.axios
-        .get(
-          "/GeoProblemSolving/task/inquiryTodo?" +
-            "subProjectId=" +
-            this.subProjectInfo.subProjectId
-        )
-        .then(res => {
-          if (res.data != "None" && res.data != "Fail") {
-            this.$set(this, "taskTodo", res.data);
-          } else {
-            this.$Message.error("Fail!");
-          }
-        })
-        .catch(err => {
-          console.log(err.data);
-        });
-    },
-    inquiryDoingTask() {
-      this.axios
-        .get(
-          "/GeoProblemSolving/task/inquiryDoing?" +
-            "subProjectId=" +
-            this.subProjectInfo.subProjectId
-        )
-        .then(res => {
-          if (res.data != "None" && res.data != "Fail") {
-            this.$set(this, "taskDoing", res.data);
-          } else {
-            this.$Message.error("Fail!");
-          }
-        })
-        .catch(err => {
-          console.log(err.data);
-        });
-    },
-    inquiryDoneTask() {
-      this.axios
-        .get(
-          "/GeoProblemSolving/task/inquiryDone?" +
-            "subProjectId=" +
-            this.subProjectInfo.subProjectId
-        )
-        .then(res => {
-          if (res.data != "None" && res.data != "Fail") {
-            this.$set(this, "taskDone", res.data);
-          } else {
-            this.$Message.error("Fail!");
-          }
-        })
-        .catch(err => {
-          console.log(err.data);
-        });
-    },
-    setMoveCount() {
-      this.MoveCount = 2;
-    },
-    addMoveTask(taskList, type) {
-      this.MoveCount--;
-      this.taskOrderUpdate(taskList, type);
-    },
-    removeMoveTask(taskList, type) {
-      this.MoveCount--;
-      this.taskOrderUpdate(taskList, type);
-    },
-    updateMoveTask(taskList, type) {
-      this.MoveCount -= 2;
-      this.taskOrderUpdate(taskList, type);
-    },
-    taskOrderUpdate(taskList, type) {
-      if (this.userRole != "Visitor") {
-        let thisUserName = this.$store.getters.userName;
-        let stateChangeIndex = 0;
-        let count = taskList.length;
-        for (let i = 0; i < taskList.length; i++) {
-          let thisTask = taskList[i];
-          if (thisTask.order != i || thisTask.state != type) {
-            if (thisTask.state != type) {
-              stateChangeIndex = i;
-              let taskUpdateObj = new URLSearchParams();
-              taskUpdateObj.append("taskId", taskList[i]["taskId"]);
-              taskUpdateObj.append("order", i);
-              taskUpdateObj.append("state", type);
-              taskUpdateObj.append("managerName", thisUserName);
-              this.axios
-                .post("/GeoProblemSolving/task/update", taskUpdateObj)
-                .then(res => {
-                  count--;
-                  if (res.data == "Offline") {
-                    this.$store.commit("userLogout");
-                    this.$router.push({ name: "Login" });
-                  } else if (res.data != "Fail") {
-                    //更新数组
-                    taskList[stateChangeIndex].managerName = thisUserName;
-                    if (this.MoveCount == 0 && count == 1) {
-                      this.endMove();
-                    }
-                  }
-                })
-                .catch(err => {
-                  console.log(err.data);
-                });
-            } else {
-              let taskUpdateObj = new URLSearchParams();
-              taskUpdateObj.append("taskId", taskList[i]["taskId"]);
-              taskUpdateObj.append("order", i);
-              taskUpdateObj.append("state", type);
-              this.axios
-                .post("/GeoProblemSolving/task/update", taskUpdateObj)
-                .then(res => {
-                  count--;
-                  if (res.data == "Offline") {
-                    this.$store.commit("userLogout");
-                    this.$router.push({ name: "Login" });
-                  } else if (res.data != "Fail") {
-                    if (this.MoveCount == 0 && count == 1) {
-                      this.endMove();
-                    }
-                  }
-                })
-                .catch(err => {
-                  console.log(err.data);
-                });
-            }
-          }
-        }
-      }
-    },
-    endMove() {
-      // 任务更新socket
-      this.socketMsg.whoid = this.$store.getters.userId;
-      this.socketMsg.who = this.$store.getters.userName;
-      this.socketMsg.type = "tasks";
-      this.socketMsg.content = "changed the task schedule.";
-      this.socketMsg.time = new Date().toLocaleString();
-      this.sendMessage(this.socketMsg);
-    },
-    taskRemoveAssure(index, taskList) {
-      this.taskDeleteModal = true;
-      this.selectTaskIndex = index;
-      this.taskList = taskList;
-    },
-    taskRemove() {
-      this.axios
-        .get(
-          "/GeoProblemSolving/task/delete" +
-            "?taskId=" +
-            this.taskList[this.selectTaskIndex]["taskId"]
-        )
-        .then(res => {
-          if (res.data == "Success") {
-            this.taskList.splice(this.selectTaskIndex, 1);
-            // 任务更新socket
-            this.socketMsg.whoid = this.$store.getters.userId;
-            this.socketMsg.who = this.$store.getters.userName;
-            this.socketMsg.type = "tasks";
-            this.socketMsg.content = "removed a task.";
-            this.socketMsg.time = new Date().toLocaleString();
-            this.sendMessage(this.socketMsg);
-          } else {
-            this.$Message.error("Fail!");
-          }
-        })
-        .catch(err => {
-          this.$Message.error("Fail!");
-        });
-    },
+
     gotoPersonalSpace(id) {
       if (id == this.$store.getters.userId) {
         this.$router.push({ name: "PersonalPage" });
@@ -1817,18 +853,89 @@ export default {
           console.log(err.data);
         });
     },
-    currentTabChanged(name) {
-      if (this.oldTabPaneState !== name) {
-        this.closeModuleSocket();
+    editPurposes() {
+      if (this.edit1) {
+        this.edit1 = false;
 
-        if (name == "task") {
-          this.openModuleSocket();
-          this.$refs.folderTreeEle.closePanel();
-        }
+        let obj = new URLSearchParams();
+        obj.append("subProjectId", this.subProjectInfo.subProjectId);
+        obj.append("purpose", this.purpose);
+        this.axios
+          .post("/GeoProblemSolving/subProject/update", obj)
+          .then(res => {
+            if (res.data == "Offline") {
+              this.$store.commit("userLogout");
+              this.$router.push({ name: "Login" });
+            } else if (res.data != "Fail") {
+              this.$Notice.info({
+                desc: "Update successfully!"
+              });
+            } else {
+              this.$Message.error("Update subproject failed.");
+            }
+          })
+          .catch(err => {
+            console.log(err.data);
+          });
+      } else {
+        this.edit1 = true;
       }
     },
-    gotoWorkingPanel() {
-      this.$router.push(`./workspace`);
+    editBackground() {
+      if (this.edit2) {
+        this.edit2 = false;
+
+        let obj = new URLSearchParams();
+        obj.append("subProjectId", this.subProjectInfo.subProjectId);
+        obj.append("background", this.background);
+        this.axios
+          .post("/GeoProblemSolving/subProject/update", obj)
+          .then(res => {
+            if (res.data == "Offline") {
+              this.$store.commit("userLogout");
+              this.$router.push({ name: "Login" });
+            } else if (res.data != "Fail") {
+              this.$Notice.info({
+                desc: "Update successfully!"
+              });
+            } else {
+              this.$Message.error("Update subproject failed.");
+            }
+          })
+          .catch(err => {
+            console.log(err.data);
+          });
+      } else {
+        this.edit2 = true;
+      }
+    },
+    editLimitation() {
+      if (this.edit3) {
+        this.edit3 = false;
+
+        let obj = new URLSearchParams();
+        obj.append("subProjectId", this.subProjectInfo.subProjectId);
+        obj.append("limitation", this.limitation);
+        this.axios
+          .post("/GeoProblemSolving/subProject/update", obj)
+          .then(res => {
+            if (res.data == "Offline") {
+              this.$store.commit("userLogout");
+              this.$router.push({ name: "Login" });
+            } else if (res.data != "Fail") {
+              this.$Notice.info({
+                desc: "Update successfully!"
+              });
+            } else {
+              this.$Message.error("Update subproject failed.");
+            }
+          })
+          .catch(err => {
+            console.log(err.data);
+          });
+      } else {
+        this.edit3 = true;
+      }
     }
   }
 };
