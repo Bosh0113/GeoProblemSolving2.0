@@ -558,7 +558,7 @@
                 width="800px"
                 :mask-closable="false"
               >
-                <p>Once the deletion is confirmed, all module and resource information under the subsystem will be deleted. Please choose carefully.</p>
+                <p>Once the deletion is confirmed, all step and resource information under the subsystem will be deleted. Please choose carefully.</p>
               </Modal>
             </div>
           </Card>

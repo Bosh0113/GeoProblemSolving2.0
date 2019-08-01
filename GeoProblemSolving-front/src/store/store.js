@@ -82,7 +82,7 @@ export default new Vuex.Store({
             sessionStorage.removeItem("userInfo");
         },
         uploadAvatar: (state, avatar) => {
-            state.avatar = avatar;
+            state.userInfo.avatar = avatar;
         },
         setUserInfo: (state, userInfo) => {
             state.userInfo = userInfo;

@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head >
+    <title>Demo</title>
+    <meta http-equiv="Content-Type" content=" charset=UTF-8" />
+    <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/vue/2.6.10/vue.min.js"></script>
+    <link href="https://cdn.bootcss.com/iview/3.4.2/styles/iview.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/iview/3.4.2/iview.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-avatar@2.1.7/dist/vue-avatar.min.js"></script>
+    <script src="https://cdn.bootcss.com/axios/0.19.0-beta.1/axios.min.js"></script>
+
+
+    <script th:replace="navigation :: commonHeader-css"></script>
+    <script th:replace="navigation :: commonHeader-html"></script>
+    <script th:replace="navigation :: commonHeader-js"></script>
+
+    <script th:replace="tabContent :: tab-card"></script>
+    <style th:replace="tabContent :: tab-style"></style>
+    <script th:replace="tabContent :: tab-component"   th:inline="javascript"></script>
+
+    <style >
+        [v-cloak]{
+            display: none;
+        }
+        .picscreen {
+            position: relative;
+            transform: translateY(60px);
+        }
+
+        .picbg {
+            background-image: url("../static/images/projectlistbg.jpg");
+            background-size: cover;
+            position: absolute;
+            height: 140px;
+            width: 100%;
+            background-color: #8b8b8b;
+            top: 0;
+            left: 0;
+        }
+
+        .pictitle{
+            font-size: 2rem;
+            font-family: Georgia, sans-serif, serif;
+            color: #ffffff;
+            position: absolute;
+            top: 18px;
+            left: 100px;
+        }
+        .picdesc{
+            font-size: 0.9rem;
+            color: #f7faf7;
+            position: absolute;
+            top: 72px;
+            left: 100px;
+            display: block;
+        }
+        .project-start-btn{
+            position: absolute;
+            top: 80px;
+            left: 45%;
+            font-size: 0.9rem;
+            border-radius: 6px;
+            background-color: rgba(21, 88, 145, 0.4);
+            color: rgba(255,255,255,1);
+        }
+
+        .search-btn{
+            position: absolute;
+            top: 30px;
+            right: 50px;
+            font-size: 0.5rem;
+            width: 100px;
+            text-align:right;
+        }
+
+        /*Tabs--style*/
+        .tabs{
+            transform: translateY(200px);
+            min-height: 500px;
+        }
+        .tabpane-syle{
+            font-size: 20px;
+            background-color: rgba(133, 115, 92, 0.1);
+            min-height: 500px;
+        }
+        .ivu-tabs-bar {
+            /*border-bottom: 1px solid #dddee1;*/
+            margin-bottom: 0px;
+        }
+        .ivu-tabs-nav-wrap {
+            text-align: center;
+            margin-bottom:0px;
+        }
+        .ivu-tabs-nav-scroll {
+            display: inline-block;
+        }
+        .ivu-tabs-tab{
+            font-size: 16px;
+
+        }
+        .ivu-row{
+            margin-bottom: 45px;
+        }
+
+        .pro-page{
+            bottom:  75px;
+            left:43%;
+            font-size:14px;
+            text-align: center;
+            margin-top: 200px;
+        }
+        /* Loading动画的特效 */
+        .demo-spin-icon-load {
+            animation: ani-demo-spin 1s linear infinite;
+        }
+    </style>
+</head>
+<body>
+<div id="vueBody" v-cloak style="min-width: 1100px;">
+   <child-navigation ref="navigationEl"></child-navigation>
+    <div class="picscreen" >
+        <div class="picbg"></div>
+        <div class="home-content">
+            <div>
+                <span class="pictitle">Projects</span>
+                <span class="picdesc">This is just an description.This is just an <br />description.This is just an description.This is just an description.</span>
+                <i-button class="project-start-btn" @click="newProject"  type="default" >Create a project</i-button>
+                <i-button class="search-btn" icon="icon ion-ios-search" @click=" ">Search...</i-button>
+            </div>
+        </div>
+    </div>
+
+    <div class="tabs">
+        <Row>
+            <i-col>
+                <Spin fix v-show="getFinish">
+                    <Icon type="icon ion-ios-loading" size="100" class="demo-spin-icon-load" color="yellowgreen"></Icon>
+                    <div>Loading</div>
+                </Spin>
+                <div class="pro-tab">
+                    <Tabs  v-model="currentTab" @on-click="changeTab" >
+                        <tab-pane label="All" name="All" icon="md-list"></tab-pane>
+                        <tab-pane label="Terrestrial"  name="Terrestrial" icon="md-globe"></tab-pane>
+                        <tab-pane label="Coastal"  name="Coastal" icon="ios-boat"></tab-pane>
+                        <tab-pane label="Marine"  name="Marine"  icon="ios-water"></tab-pane>
+                        <tab-pane label="Climate"  name="Climate"  icon="ios-partly-sunny"></tab-pane>
+                        <tab-pane label="Ecological"  name="Ecological"  icon="ios-leaf"></tab-pane>
+                        <tab-pane label="Geological"  name="Geological"  icon="ios-analytics"></tab-pane>
+                        <tab-pane label="Human-Activity"  name="Human"  icon="ios-people"></tab-pane>
+                        <tab-pane label="GIS & RS"  name="GISRS"  icon="ios-globe"></tab-pane>
+                        <tab-pane label="General"  name="General"  icon="ios-grid"></tab-pane>
+                    </Tabs>
+                </div>
+                <div class="pro-content">
+                    <tab-content  :project-list =  tabPageData ></tab-content >
+                </div>
+            </i-col>
+
+        </Row>
+        <div class="pro-page" >
+            <Page  ref="pages" :total="totalCount" :page-size="pageSize"  :current="currentPage" size="small"  @on-change="changePage"   show-elevator show-total ></Page>
+        </div>
+        <div th:replace="navigation::commonFooter"></div>
+
+    </div>
+    </div>
+
+    <script th:inline="javascript">
+    window.onload=function () {
+        var List = [[${projects}]];
+        console.log(List);
+        new Vue({
+            el: '#vueBody',
+            data: {
+                getFinish: false,
+                currentProjectList:  List.slice(0,18),
+                projectShowList: List.slice(0,18),
+                projectType:[],
+                currentTab:"All",
+                //初始化信息总条数
+                //projectCount:10,
+                currentPage:1 ,
+                totalCount:List.length,
+                //每页显示多少条
+                pageSize:18,
+                tabPageData:List.slice(0,18),
+                tabPaneType:[{  label:"All",name:"All",icon:"icon ion-md-list"},
+                    { label:"Terrestrial", name:"Terrestrial", icon:"icon ion-md-globe"},
+                    {label:"Coastal", name:"Coastal",icon:"icon ion-ios-boat"},
+                    {label:"Marine", name:"Marine", icon:"icon ion-ios-water"},
+                    {label:"Climate", name:"Climate", icon:"icon ion-ios-partly-sunny"},
+                    {label:"Ecological", name:"Ecological", icon:"icon ion-ios-leaf"},
+                    {label:"Geological", name:"Geological", icon:"icon ion-ios-analytics"},
+                    {label:"Human-Activity", name:"Human" ,icon:"icon ion-ios-people"},
+                    {label:"GIS & RS", name:"GISRS" ,icon:"icon ion-ios-globe"},
+                    {label:"General", name:"General", icon:"icon ion-ios-grid"}
+                ],
+                // user
+                userInfo:[],
+                UserState:false,
+
+            },
+            mounted(){
+                //判断用户状态，如果登录，判断project权限，如果否，不判断
+                this.userInfo=JSON.parse(sessionStorage.getItem("userInfo"));
+                if( this.userInfo != null){
+                    this.UserState= this.userInfo.userState;
+                    this.judgeMember(this.projectShowList);
+                    this.tabPageData=Object.assign([],  this.currentProjectList);
+                }
+                else{
+                    this.UserState=false;
+                    this.tabPageData=Object.assign([], this.projectShowList);
+                }
+                window.onresize = () => {
+                    return (() => {
+                        this.$refs.navigationEl.identityMenuCSS();
+                    })()
+                }
+            },
+
+            methods: {
+                changeTab(type) {
+                    this.currentTab=type;
+                    this.currentPage=1;
+                    this.$nextTick(function(){
+                        this.$refs['pages'].currentPage = 1;
+                    });
+
+                    if(type=="All"){
+                        this.judgeMember(this.projectShowList);
+                        this.tabPageData=Object.assign([],  this.currentProjectList);
+                        this.totalCount=List.length;
+                    }
+                    else{
+                        this.changePage(1);
+                    }
+
+                },
+
+                changePage(index){
+                    if(this.currentTab == "All" && index==1){
+                        this.judgeMember(this.projectShowList);
+                        this.tabPageData=Object.assign([],  this.currentProjectList);
+                        this.totalCount=List.length;
+                    }
+                    else{
+                        axios
+                            .get("/GeoProblemSolving/project/inquiryByPage",{
+                                params:{
+                                    category:this.currentTab,
+                                    page:index,
+                                    pageSize:this.pageSize,
+                                }
+                            })
+                            .then(res => {
+                                console.log(index);
+                                if (res.data === "None") {
+                                    this.currentProjectList = [];
+                                } else {
+                                    this.judgeMember(res.data.projectList);
+                                }
+                                this.tabPageData = Object.assign([], this.currentProjectList);
+                                this.totalCount=res.data.count;
+                                console.log(this.tabPageData);
+                            })
+                            .catch(err => {
+                                console.log(err.data);
+                            });
+                    }
+                },
+
+                judgeMember(list) {
+                    let projectList = list;
+                    console.log(projectList);
+                    //判断登录状态
+                    if(this.UserState == true){
+                        if (projectList.length != 0) {
+                            for (var i = 0; i < projectList.length; i++) {
+                                let managerId = projectList[i].managerId;
+                                let members = projectList[i].members;
+                                if (managerId ==  this.userInfo.userId) {
+                                    projectList[i]["isManager"] = true;
+                                } else {
+                                    projectList[i]["isManager"] = false;
+                                }
+                                if (members.length != 0) {
+                                    for (var j = 0; j < members.length; j++) {
+                                        if (members[j].userId ==  this.userInfo.userId) {
+                                            projectList[i]["isMember"] = true;
+                                            break;
+                                        } else {
+                                            projectList[i]["isMember"] = false;
+                                        }
+                                    }
+                                } else {
+                                    projectList[i]["isMember"] = false;
+                                }
+                                console.log(projectList[i]);
+                            }
+                            this.currentProjectList = Object.assign([],projectList);
+                        }
+                        else{
+                            this.currentProjectList=[];
+                        }
+                    }
+                    else{
+                        if (projectList.length != 0) {
+                            for (var i = 0; i < projectList.length; i++) {
+                                let managerId = projectList[i].managerId;
+                                let members = projectList[i].members;
+                                projectList[i]["isManager"] = false;
+                                projectList[i]["isMember"] = false;
+                            }
+                            this.currentProjectList = Object.assign([],projectList);
+                        }
+                        else{
+                            this.currentProjectList=[];
+                        }
+                    }
+                },
+
+                newProject() {
+                    if (this.UserState == false) {
+                        window.location.href = "/GeoProblemSolving/projects/login"
+                    } else {
+                        window.location.href = "/GeoProblemSolving/projects/newProject"
+                    }
+                },
+
+
+            }
+        })
+    }
+</script>
+
+</body>
+</html>
