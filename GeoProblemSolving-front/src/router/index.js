@@ -29,14 +29,14 @@ const routes = [{
     { path: 'community/:id', name: 'Communityreply', component: resolve => (require(["@/components/community/communityReply"], resolve)) },
     { path: 'help', name: 'Help', component: resolve => (require(["@/components/navigationContent/help"], resolve)) },
     { path: 'personalPage', name: 'PersonalPage', component: resolve => (require(["@/components/userPage/personalPage"], resolve)) },
-    { path: 'notifications', name: 'Notifications', component: resolve => (require(["@/components/usersState/notifications"], resolve)) },
+    { path: 'notifications', name: 'Notifications', component: resolve => (require(["@/components/userState/notifications"], resolve)) },
     { path: 'memberPage/:id', name: 'MemberDetailPage', component: resolve => (require(["@/components/userPage/memberDetailPage"], resolve)) },
-    { path: 'resourceList', name: 'resourceList', component: resolve => (require(["@/components/resource/resourceList"], resolve)) },
-    { path: 'publicResource', name: 'PublicResource', component: resolve => (require(["@/components/resource/publicResourceList"], resolve)) },
-    { path: 'join/:id/:email', name: 'joinProject', component: resolve => (require(["@/components/Projects/joinNewProject"], resolve)) },
-    { path: 'login', name: 'Login', component: resolve => (require(["@/components/usersState/login"], resolve)) },
-    { path: 'register', name: 'Register', component: resolve => (require(["@/components/usersState/register"], resolve)) },
-    { path: 'resetPassword/:email', name: 'resetPassword', component: resolve => (require(["@/components/UsersState/resetPwd"], resolve)) }
+    { path: 'resourceList', name: 'resourceList', component: resolve => (require(["@/components/resources/resourceList"], resolve)) },
+    { path: 'publicResource', name: 'PublicResource', component: resolve => (require(["@/components/resources/publicResourceList"], resolve)) },
+    { path: 'join/:id/:email', name: 'joinProject', component: resolve => (require(["@/components/projects/joinNewProject"], resolve)) },
+    { path: 'login', name: 'Login', component: resolve => (require(["@/components/userState/login"], resolve)) },
+    { path: 'register', name: 'Register', component: resolve => (require(["@/components/userState/register"], resolve)) },
+    { path: 'resetPassword/:email', name: 'resetPassword', component: resolve => (require(["@/components/userState/resetPwd"], resolve)) }
   ]
 },
 { path: '/chat', name: 'chatUtil', component: resolve=>(require(["@/components/utils/chatroom"],resolve)) },
