@@ -452,23 +452,15 @@
           <div class="searchHeader">
             <p>Message Records</p>
           </div>
+          <!-- 日期选择器 -->
           <div style="display:flex">
-            <DatePicker
-              type="date"
-              placeholder="Select date"
-              class="date_pick"
-              v-model="query_date"
-            ></DatePicker>
-            <Button class="date_pick_btn" type="success" @click="find(query_date)">ok</Button>
+            <DatePicker type="date"  placeholder="Select date and time"  class="date_pick"  :date_query="query_date" @on-change="find(date_query)"></DatePicker>
+            <!-- <Button class="date_pick_btn" type="success" @click="find(date_query)">ok</Button> -->
           </div>
           <div class="search_msg">
             <Input search placeholder="Enter something..."/>
           </div>
-          <div
-            class="searchmessageList"
-            :style="{height:messageListPanelHeight}"
-            id="searchmessageList"
-          >
+          <div class="searchmessageList" :style="{height:messageListPanelHeight}" id="searchmessageList" >
             <div class="message_record_board">
               <div style="display:flex" v-for="(list,index) in msgRecords" :key="index">
                 <div class="single_record">
@@ -1031,9 +1023,21 @@ export default {
     },
 
     supportNotify() {
-        //if (window.Notification && (window.Notification.permission === 'default' || window.Notification.permission === 'denied')) {
-        if (window.Notification) {
-            window.Notification.requestPermission();
+      //检查浏览器是否支持
+        if (!("Notification" in window)) {
+          window.alert("This browser does not support desktop notification");
+        }
+        else{
+          var Notification = window.Notification || window.mozNotification || window.webkitNotification;
+
+          if (Notification && Notification.permission === "granted") {// 检查用户是否同意接受通知
+              Notification.requestPermission();
+              console.log("ok");
+          }
+          else{ // 否则我们需要向用户获取权限
+            Notification.requestPermission();
+            console.log("re");
+          }
         }
       },
 
@@ -1041,14 +1045,14 @@ export default {
     sendNotify(msg){
         if (this.windowStatus === 'blur') {
              var notify = new Notification(
-              msg.fromid,
+              "You have got a new message",
               {
-                // tag:"tag",
-                // icon:'http://******.png',//通知的缩略图,//icon 支持ico、png、jpg、jpeg格式
-                body:msg.content //通知的具体内容
+                tag:msg.fromid+msg.time,
+                icon:"/GeoProblemSolving/images/OGMS.png",//通知的缩略图,//icon 支持ico、png、jpg、jpeg格式
+                body:"from   " +msg.from ,//通知的具体内容
+                renotify:true,
               }
             );
-            console.log(notify);
 
             //通知显示
             notify.onshow = function () {
@@ -1063,7 +1067,9 @@ export default {
             };
 
             //报错处理
-            notify.onerror = EventListener;           
+            notify.onerror=function(){
+              console.log("error");
+            };           
 
             //通知关闭
             notify.onclose = function(){
