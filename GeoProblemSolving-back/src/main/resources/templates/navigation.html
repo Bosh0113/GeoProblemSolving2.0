@@ -162,31 +162,31 @@
                         <i-button icon="md-menu" style="color: white;background-color: #808695"></i-button>
                         <Dropdown-menu slot="list">
                             <Dropdown-item>
-                                <a href="/GeoProblemSolving/home.html">Home</a>
+                                <a href="/GeoProblemSolving/home">Home</a>
                             </Dropdown-item>
                             <Dropdown-item>
-                                <a href="/GeoProblemSolving/projectList.html">Projects</a>
+                                <a href="/GeoProblemSolving/projectlist">Projects</a>
                             </Dropdown-item>
                             <Dropdown-item>
-                                <a href="/GeoProblemSolving/resources.html">Resources</a>
+                                <a href="/GeoProblemSolving/publicResource">Resources</a>
                             </Dropdown-item>
                             <Dropdown-item>
-                                <a href="/GeoProblemSolving/help.html">Help</a>
+                                <a href="/GeoProblemSolving/help">Help</a>
                             </Dropdown-item>
                             <Dropdown-item v-show="!userInfoNav.userState||userInfoNav.userState==undefined">
-                                <a href="/GeoProblemSolving/login.html">Login</a>
+                                <a href="/GeoProblemSolving/login">Login</a>
                             </Dropdown-item>
                             <Dropdown-item v-show="!userInfoNav.userState||userInfoNav.userState==undefined">
-                                <a href="/GeoProblemSolving/register.html">Sign up</a>
+                                <a href="/GeoProblemSolving/register">Sign up</a>
                             </Dropdown-item>
                             <Dropdown-item v-show="userInfoNav.userState">
-                                <a href="/GeoProblemSolving/notifications.html">Notification</a>
+                                <a href="/GeoProblemSolving/notifications">Notification</a>
                             </Dropdown-item>
                             <Dropdown-item v-show="userInfoNav.userState">
-                                <a @click.native="toPersonalPage">Personal Page</a>
+                                <a @click="toPersonalPage">Personal Page</a>
                             </Dropdown-item>
                             <Dropdown-item v-show="userInfoNav.userState">
-                                <a @click.native="logout">Log out</a>
+                                <a @click="logout">Log out</a>
                             </Dropdown-item>
                         </Dropdown-menu>
                     </Dropdown>

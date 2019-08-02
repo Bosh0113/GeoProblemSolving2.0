@@ -82,90 +82,127 @@ footer {
         @click="goHome"
         style="cursor:pointer;margin-left:5%"
       >
-      <div class="navPart">
-        <Menu
-          mode="horizontal"
-          theme="dark"
-          active-name="home"
-          @on-select="turnContent"
-          :style="`z-index:0;background:`+headerBgColor"
-          width="auto"
-        >
-          <MenuItem name="home" class="menuItem" style="margin-left:35%">
-            <span>Home</span>
-          </MenuItem>
-          <MenuItem name="projects" class="menuItem">
-            <span>Projects</span>
-          </MenuItem>
-          <MenuItem name="resources" class="menuItem">
-            <span>Resources</span>
-          </MenuItem>
-          <!-- <MenuItem name="community" class="menuItem">
-            <span>Community</span>
-          </MenuItem> -->
-          <MenuItem name="help" class="menuItem">
-            <span>Help</span>
-          </MenuItem>
-        </Menu>
-        <div class="userState">
+      <div v-if="useMenuCSS">
+        <div class="navPart">
           <Menu
             mode="horizontal"
             theme="dark"
-            @on-select="unlogin"
+            active-name="home"
+            @on-select="turnContent"
             :style="`z-index:0;background:`+headerBgColor"
-            v-show="!userState"
-            class="menuItem"
+            width="auto"
           >
-            <MenuItem name="login">
-              <span>Login</span>
+            <MenuItem name="home" class="menuItem" style="margin-left:35%">
+              <span>Home</span>
             </MenuItem>
-            <MenuItem name="register">
-              <span>Sign up</span>
+            <MenuItem name="projects" class="menuItem">
+              <span>Projects</span>
+            </MenuItem>
+            <MenuItem name="resources" class="menuItem">
+              <span>Resources</span>
+            </MenuItem>
+            <!-- <MenuItem name="community" class="menuItem">
+              <span>Community</span>
+            </MenuItem> -->
+            <MenuItem name="help" class="menuItem">
+              <span>Help</span>
             </MenuItem>
           </Menu>
-          <Menu
-            mode="horizontal"
-            theme="dark"
-            @on-select="logged"
-            :style="`z-index:0;background:`+headerBgColor"
-            v-show="userState"
-            class="menuItem"
-          >
-            <MenuItem name="notification">
-              <Badge :count="unreadNoticeCount" id="noticeBadge">
-                <Icon type="ios-notifications-outline" size="25"></Icon>
-              </Badge>
-            </MenuItem>
-            <MenuItem name="personal" style="width:100px">
-              <Dropdown @on-click="changeSelect" placement="bottom-start">
-                <div @click="toPersonalPage">
-                  <img
-                    v-bind:src="avatar"
-                    v-if="avatar!=''&&avatar!=undefined&&avatar!=null"
-                    :title="userName"
-                    style="width:40px;height:40px;vertical-align:middle;"
-                  >
-                  <avatar
-                    :username="userName"
-                    :size="40"
-                    style="margin-top:10px"
-                    :title="userName"
-                    v-else
-                  ></avatar>
-                </div>
-                <DropdownMenu slot="list">
-                  <!-- <DropdownItem name="personalPage">User Space</DropdownItem> -->
-                  <DropdownItem name="logout">Log out</DropdownItem>
-                </DropdownMenu>
-              </Dropdown>
-            </MenuItem>
-          </Menu>
+          <div class="userState">
+            <Menu
+              mode="horizontal"
+              theme="dark"
+              @on-select="unlogin"
+              :style="`z-index:0;background:`+headerBgColor"
+              v-show="!userState"
+              class="menuItem"
+            >
+              <MenuItem name="login">
+                <span>Login</span>
+              </MenuItem>
+              <MenuItem name="register">
+                <span>Sign up</span>
+              </MenuItem>
+            </Menu>
+            <Menu
+              mode="horizontal"
+              theme="dark"
+              @on-select="logged"
+              :style="`z-index:0;background:`+headerBgColor"
+              v-show="userState"
+              class="menuItem"
+            >
+              <MenuItem name="notification">
+                <Badge :count="unreadNoticeCount" id="noticeBadge">
+                  <Icon type="ios-notifications-outline" size="25"></Icon>
+                </Badge>
+              </MenuItem>
+              <MenuItem name="personal" style="width:100px">
+                <Dropdown @on-click="changeSelect" placement="bottom-start">
+                  <div @click="toPersonalPage">
+                    <img
+                      v-bind:src="avatar"
+                      v-if="avatar!=''&&avatar!=undefined&&avatar!=null"
+                      :title="userName"
+                      style="width:40px;height:40px;vertical-align:middle;"
+                    >
+                    <avatar
+                      :username="userName"
+                      :size="40"
+                      style="margin-top:10px"
+                      :title="userName"
+                      v-else
+                    ></avatar>
+                  </div>
+                  <DropdownMenu slot="list">
+                    <!-- <DropdownItem name="personalPage">User Space</DropdownItem> -->
+                    <DropdownItem name="logout">Log out</DropdownItem>
+                  </DropdownMenu>
+                </Dropdown>
+              </MenuItem>
+            </Menu>
+          </div>
         </div>
       </div>
+      <div v-else>
+        <Menu mode="horizontal" theme="dark" style="z-index: 0;"></Menu>
+          <Dropdown style="position: fixed;top: 10px;right: 20px;">
+              <Button icon="md-menu" style="color: white;background-color: #808695"></Button>
+              <DropdownMenu slot="list">
+                  <DropdownItem>
+                      <a href="/GeoProblemSolving/home">Home</a>
+                  </DropdownItem>
+                  <DropdownItem>
+                      <a href="/GeoProblemSolving/projectlist">Projects</a>
+                  </DropdownItem>
+                  <DropdownItem>
+                      <a href="/GeoProblemSolving/publicResource">Resources</a>
+                  </DropdownItem>
+                  <DropdownItem>
+                      <a href="/GeoProblemSolving/help">Help</a>
+                  </DropdownItem>
+                  <DropdownItem v-show="!userState">
+                      <a href="/GeoProblemSolving/login">Login</a>
+                  </DropdownItem>
+                  <DropdownItem v-show="!userState">
+                      <a href="/GeoProblemSolving/register">Sign up</a>
+                  </DropdownItem>
+                  <DropdownItem v-show="userState">
+                      <a href="/GeoProblemSolving/notifications">Notification</a>
+                  </DropdownItem>
+                  <DropdownItem v-show="userState">
+                      <a @click="toPersonalPage">Personal Page</a>
+                  </DropdownItem>
+                  <DropdownItem v-show="userState">
+                      <a @click="logout">Log out</a>
+                  </DropdownItem>
+              </DropdownMenu>
+          </Dropdown>
+      </div>
     </header>
-    <section class="content" :style="{minHeight:contentHeight}">
+    <div class="content" :style="{height:contentHeight}">
       <router-view @sendNotice="sendMessage" @readNotification="readNotification"></router-view>
-    </section>
+    </div>
     <footer>
       <h2 class="footerTop">
         <i>Open Geographic Modeling and Simulation</i>
@@ -184,24 +221,17 @@ export default {
       noticeSocket: null,
       unreadNoticeCount: 0,
       timer: null,
-      //导航栏宽度
-      headerWidth: "",
-      contentHeight: window.innerHeight - 120 + "px"
+      contentHeight: window.innerHeight - 120 + "px",
+      useMenuCSS:false
     };
   },
   mounted() {
-    if(window.innerHeight > 675){
-      this.contentHeight = window.innerHeight - 120 + "px";
-    }
-    else{
-      this.contentHeight = 675 - 120 + "px";
-    }
-    this.headerWidth = window.innerWidth + "px";
     if (this.$store.getters.userState) {
       this.setTimer();
       this.initWebSocket();
       this.getUnreadNoticeCount();
     }
+    this.reSize();
     window.addEventListener("resize", this.reSize);
   },
   beforeDestroy: function() {
@@ -234,10 +264,16 @@ export default {
   },
   methods: {
     reSize() {
-      if (window.innerHeight > 675) {
+      if(window.innerHeight > 675){
         this.contentHeight = window.innerHeight - 120 + "px";
-      } else {
-        this.contentHeight = 675;
+      }
+      else{
+        this.contentHeight = 675 - 120 + "px";
+      }
+      if(window.innerWidth<1200){
+        this.useMenuCSS=false;
+      }else{
+        this.useMenuCSS = true;
       }
     },
     turnContent(name) {
