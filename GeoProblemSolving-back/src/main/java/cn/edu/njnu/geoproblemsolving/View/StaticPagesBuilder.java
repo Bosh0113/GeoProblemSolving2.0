@@ -46,10 +46,12 @@ public class StaticPagesBuilder {
         }
         String htmlFile = htmlPath+"/"+projectId+".html";
         try{
-            FileWriter write = new FileWriter(htmlFile);
-            templateEngine.process("projectDetail", context, write);
-            write.flush();
-            write.close();
+            if(projectEntity!=null){
+                FileWriter write = new FileWriter(htmlFile);
+                templateEngine.process("projectDetail", context, write);
+                write.flush();
+                write.close();
+            }
         }catch (Exception ignored){}
     }
 

@@ -37,7 +37,7 @@ public class ReturnPageController {
         }
         return "/staticPage/home.html";
     }
-    @RequestMapping(value = "/projectlist",method = RequestMethod.GET)
+    @RequestMapping(value = "/projectList",method = RequestMethod.GET)
     public String projectListPage(){
         //此请求根路径在templates文件夹，考虑隐藏后缀，用此方法请求。
         String servicePath = System.getProperty("user.dir")+"/src/main/resources/templates";

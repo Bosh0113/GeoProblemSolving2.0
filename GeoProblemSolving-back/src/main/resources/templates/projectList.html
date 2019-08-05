@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head >
-    <title>Demo</title>
+    <title>Geo-Problem Solving</title>
     <meta http-equiv="Content-Type" content=" charset=UTF-8" />
     <meta name="description" content="Participatory|GeoProblem Solving|GIS">
     <meta name="keywords" content="Participatory|GeoProblem Solving|GIS">
@@ -32,7 +32,7 @@
         }
 
         .picbg {
-            background-image: url("../static/images/projectlistbg.jpg");
+            background-image: url("/static/images/projectlistbg.jpg");
             background-size: cover;
             position: absolute;
             height: 140px;
@@ -156,7 +156,7 @@
                     </Tabs>
                 </div>
                 <div class="pro-content">
-                    <tab-content  :project-list =  tabPageData ></tab-content >
+                    <tab-content  :project-list =  tabPageData @sendNotice="sendMessage"></tab-content >
                 </div>
             </i-col>
 
@@ -172,7 +172,6 @@
     <script th:inline="javascript">
     window.onload=function () {
         var List = [[${projects}]];
-        console.log(List);
         new Vue({
             el: '#vueBody',
             data: {
@@ -258,7 +257,6 @@
                                 }
                             })
                             .then(res => {
-                                console.log(index);
                                 if (res.data === "None") {
                                     this.currentProjectList = [];
                                 } else {
@@ -266,7 +264,6 @@
                                 }
                                 this.tabPageData = Object.assign([], this.currentProjectList);
                                 this.totalCount=res.data.count;
-                                console.log(this.tabPageData);
                             })
                             .catch(err => {
                                 console.log(err.data);
@@ -276,7 +273,6 @@
 
                 judgeMember(list) {
                     let projectList = list;
-                    console.log(projectList);
                     //判断登录状态
                     if(this.UserState == true){
                         if (projectList.length != 0) {
@@ -300,7 +296,6 @@
                                 } else {
                                     projectList[i]["isMember"] = false;
                                 }
-                                console.log(projectList[i]);
                             }
                             this.currentProjectList = Object.assign([],projectList);
                         }
@@ -323,7 +318,6 @@
                         }
                     }
                 },
-
                 newProject() {
                     if (this.UserState == false) {
                         window.location.href = "/GeoProblemSolving/projects/login"
@@ -331,8 +325,9 @@
                         window.location.href = "/GeoProblemSolving/projects/newProject"
                     }
                 },
-
-
+                sendMessage(recipientId){
+                    this.$refs.navigationEl.sendMessage(recipientId);
+                }
             }
         })
     }

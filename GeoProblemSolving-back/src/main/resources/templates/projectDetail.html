@@ -1449,7 +1449,7 @@
                 },
                 goSubProjectPage(subProject){
                     if(this.managerIdentity(subProject.managerId)||this.memberIdentity(subProject.members)){
-                        window.location.href="/GeoProblemSoving/project/"+subProject.subProjectId+"/subproject";
+                        window.location.href="/GeoProblemSoving/project/"+subProject.subProjectId+"/subproject/info";
                     }else{
                         this.$Message.warning({
                             render: h => {

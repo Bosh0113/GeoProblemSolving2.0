@@ -28,7 +28,7 @@ header {
   min-width: 1200px;
 }
 .content {
-  flex: 1 0 auto;
+  /* flex: 1 0 auto; */
   margin-top: 60px;
 }
 footer {
@@ -39,21 +39,21 @@ footer {
   flex: 0 0 auto;
 }
 .userState {
-  position: absolute;
-  margin-left: 85%;
-  width: 15%;
-  top: 0px;
-  z-index: 1;
+    position: absolute;
+    width: 15%;
+    top: 0px;
+    z-index: 1;
+    display: inline-block;
+    min-width: fit-content;
 }
 .navPart {
-  width: 85%;
+    width: 85%;
+    display: inline-block;
 }
-.menuItem span {
-  font-size: 1.2em;
-  font-weight: bold;
-}
-.menuItem:first-child {
-  /* margin-left: 25%; */
+.menuItem a {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: rgba(255, 255, 255, 1);
 }
 .userImg {
   width: 40px;
@@ -74,40 +74,42 @@ footer {
 </style>
 <template>
   <div class="container">
-    <header :style="absoluteStyle">
-      <img
-        src="@/assets/images/OGMS.png"
-        id="logo"
-        class="pic"
-        @click="goHome"
-        style="cursor:pointer;margin-left:5%"
-      >
-      <div v-if="useMenuCSS">
-        <div class="navPart">
-          <Menu
-            mode="horizontal"
-            theme="dark"
-            active-name="home"
-            @on-select="turnContent"
-            :style="`z-index:0;background:`+headerBgColor"
-            width="auto"
-          >
-            <MenuItem name="home" class="menuItem" style="margin-left:35%">
-              <span>Home</span>
-            </MenuItem>
-            <MenuItem name="projects" class="menuItem">
-              <span>Projects</span>
-            </MenuItem>
-            <MenuItem name="resources" class="menuItem">
-              <span>Resources</span>
-            </MenuItem>
-            <!-- <MenuItem name="community" class="menuItem">
-              <span>Community</span>
-            </MenuItem> -->
-            <MenuItem name="help" class="menuItem">
-              <span>Help</span>
-            </MenuItem>
-          </Menu>
+    <div style="position: fixed;z-index: 999;">
+      <header style="position:inherit;min-width: -webkit-fill-available;">
+        <img
+          src="@/assets/images/OGMS.png"
+          id="logo"
+          class="pic"
+          @click="goHome"
+          style="cursor:pointer;margin-left:5%"
+        >
+        <div v-if="useMenuCSS">
+          <div class="navPart">
+            <Menu
+              mode="horizontal"
+              theme="dark"
+              active-name="home"
+              @on-select="turnContent"
+              :style="`z-index:0;background:`+headerBgColor"
+              width="auto"
+            >
+              <MenuItem name="home" class="menuItem" style="margin-left:35%">
+                <span>Home</span>
+              </MenuItem>
+              <MenuItem name="projects" class="menuItem">
+                <span>Projects</span>
+              </MenuItem>
+              <MenuItem name="resources" class="menuItem">
+                <span>Resources</span>
+              </MenuItem>
+              <!-- <MenuItem name="community" class="menuItem">
+                <span>Community</span>
+              </MenuItem> -->
+              <MenuItem name="help" class="menuItem">
+                <span>Help</span>
+              </MenuItem>
+            </Menu>
+          </div>
           <div class="userState">
             <Menu
               mode="horizontal"
@@ -163,44 +165,44 @@ footer {
             </Menu>
           </div>
         </div>
-      </div>
-      <div v-else>
-        <Menu mode="horizontal" theme="dark" style="z-index: 0;"></Menu>
-          <Dropdown style="position: fixed;top: 10px;right: 20px;">
-              <Button icon="md-menu" style="color: white;background-color: #808695"></Button>
-              <DropdownMenu slot="list">
-                  <DropdownItem>
-                      <a href="/GeoProblemSolving/home">Home</a>
-                  </DropdownItem>
-                  <DropdownItem>
-                      <a href="/GeoProblemSolving/projectlist">Projects</a>
-                  </DropdownItem>
-                  <DropdownItem>
-                      <a href="/GeoProblemSolving/publicResource">Resources</a>
-                  </DropdownItem>
-                  <DropdownItem>
-                      <a href="/GeoProblemSolving/help">Help</a>
-                  </DropdownItem>
-                  <DropdownItem v-show="!userState">
-                      <a href="/GeoProblemSolving/login">Login</a>
-                  </DropdownItem>
-                  <DropdownItem v-show="!userState">
-                      <a href="/GeoProblemSolving/register">Sign up</a>
-                  </DropdownItem>
-                  <DropdownItem v-show="userState">
-                      <a href="/GeoProblemSolving/notifications">Notification</a>
-                  </DropdownItem>
-                  <DropdownItem v-show="userState">
-                      <a @click="toPersonalPage">Personal Page</a>
-                  </DropdownItem>
-                  <DropdownItem v-show="userState">
-                      <a @click="logout">Log out</a>
-                  </DropdownItem>
-              </DropdownMenu>
-          </Dropdown>
-      </div>
-    </header>
-    <div class="content" :style="{height:contentHeight}">
+        <div v-else>
+          <Menu mode="horizontal" theme="dark" style="z-index: 0;"></Menu>
+            <Dropdown style="position: fixed;top: 10px;right: 20px;">
+                <Button icon="md-menu" style="color: white;background-color: #808695"></Button>
+                <DropdownMenu slot="list">
+                    <DropdownItem>
+                        <a href="/GeoProblemSolving/home">Home</a>
+                    </DropdownItem>
+                    <DropdownItem>
+                        <a href="/GeoProblemSolving/projectlist">Projects</a>
+                    </DropdownItem>
+                    <DropdownItem>
+                        <a href="/GeoProblemSolving/publicResource">Resources</a>
+                    </DropdownItem>
+                    <DropdownItem>
+                        <a href="/GeoProblemSolving/help">Help</a>
+                    </DropdownItem>
+                    <DropdownItem v-show="!userState">
+                        <a href="/GeoProblemSolving/login">Login</a>
+                    </DropdownItem>
+                    <DropdownItem v-show="!userState">
+                        <a href="/GeoProblemSolving/register">Sign up</a>
+                    </DropdownItem>
+                    <DropdownItem v-show="userState">
+                        <a href="/GeoProblemSolving/notifications">Notification</a>
+                    </DropdownItem>
+                    <DropdownItem v-show="userState">
+                        <a @click="toPersonalPage">Personal Page</a>
+                    </DropdownItem>
+                    <DropdownItem v-show="userState">
+                        <a @click="logout">Log out</a>
+                    </DropdownItem>
+                </DropdownMenu>
+            </Dropdown>
+        </div>
+      </header>
+    </div>
+    <div class="content" :style="{minHeight:contentHeight}">
       <router-view @sendNotice="sendMessage" @readNotification="readNotification"></router-view>
     </div>
     <footer>
@@ -255,11 +257,6 @@ export default {
     },
     headerBgColor() {
       return this.$route.name === "Home" ? "none" : "";
-    },
-    absoluteStyle() {
-      return this.$route.name === "Home"
-        ? "position:absolute"
-        : "position:fixed";
     }
   },
   methods: {
@@ -388,6 +385,10 @@ export default {
     },
     changeSelect(name) {
       if (name == "logout") {
+        this.logout();
+      }
+    },
+    logout(){
         this.axios
           .get("/GeoProblemSolving/user/logout")
           .then(res => {
@@ -398,7 +399,6 @@ export default {
           .catch(err => {
             confirm("logout fail!");
           });
-      }
     }
   }
 };
