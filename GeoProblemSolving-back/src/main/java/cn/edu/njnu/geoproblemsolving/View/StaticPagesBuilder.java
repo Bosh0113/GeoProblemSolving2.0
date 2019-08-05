@@ -1,6 +1,7 @@
 package cn.edu.njnu.geoproblemsolving.View;
 import cn.edu.njnu.geoproblemsolving.Entity.ProjectEntity;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -38,7 +39,7 @@ public class StaticPagesBuilder {
 
         //渲染模板
         //String servicePath = System.getProperty("user.dir")+"/src/main/webapp";
-        String servicePath = System.getProperty("user.dir")+"/src/main/resources/templates";
+        String servicePath = getServicePath();
         String htmlPath = servicePath+"/staticPage/project";
         File temp = new File(htmlPath);
         if (!temp.exists()) {
@@ -71,7 +72,7 @@ public class StaticPagesBuilder {
         context.setVariable("projects", projects);
 
         //渲染模板
-        String servicePath = System.getProperty("user.dir")+"/src/main/resources/templates";
+        String servicePath = getServicePath();
         String htmlPath = servicePath + "/staticPage";
         File temp = new File(htmlPath);
         if (!temp.exists()) {
@@ -89,13 +90,13 @@ public class StaticPagesBuilder {
 
     public void homePageBuilder() {
         ClassLoaderTemplateResolver resolver = new ClassLoaderTemplateResolver();
+        String servicePath = getServicePath();
         resolver.setPrefix("templates/");//模板所在目录，相对于当前classloader的classpath。
         resolver.setSuffix(".html");//模板文件后缀
         TemplateEngine templateEngine = new TemplateEngine();
         templateEngine.setTemplateResolver(resolver);
 
         Context context = new Context();
-        String servicePath = System.getProperty("user.dir")+"/src/main/resources/templates";
         String htmlPath = servicePath + "/staticPage";
         File temp = new File(htmlPath);
         if (!temp.exists()) {
@@ -109,6 +110,12 @@ public class StaticPagesBuilder {
             write.close();
         } catch (Exception ignored) {
         }
+    }
+
+    private String getServicePath(){
+        String servicePath = System.getProperty("user.dir")+"/src/main/resources/templates";
+//        String servicePath = System.getProperty("user.dir")+"/src/main/webapp";
+        return servicePath.replaceAll("\\\\","/");
     }
 }
 
