@@ -386,13 +386,13 @@
         <RadioGroup v-model="selectShareProject">
           <span
             @click="selectPID(item.projectId, item.title)"
-            v-for="(item,index) in joinedProjectsNameList"
+            v-for="(item,index) in joinedProjectIndexList"
             v-bind:key="index"
           >
             <Radio :key="item.index" :label="item.title"></Radio>
           </span>
         </RadioGroup>
-        <!-- <div v-for="(item,index)in joinedProjectsNameList" :key="item.index">{{item.title}}</div> -->
+        <!-- <div v-for="(item,index)in joinedProjectIndexList" :key="item.index">{{item.title}}</div> -->
       </div>
       <div>
         <h3>Management Projects</h3>
@@ -454,7 +454,7 @@ export default {
     // 获取用户管理的项目信息
     this.getManagerProjectList();
     // 获取用户参与的项目信息（根据参与的项目id、array获取项目详情）
-    this.getParticipatoryList(this.joinedProjectsNameList);
+    this.getParticipatoryList(this.joinedProjectIndexList);
     // 获取用户的历史事件记录
     this.readPersonalEvent();
     // 初始化样式的高度
@@ -652,7 +652,7 @@ export default {
       //抽屉开启状态控制
       // drawerClose:false,
       //加入的项目的名字id数组
-      joinedProjectsNameList: [],
+      joinedProjectIndexList: [],
       //加入的项目详情数组列表
       joinedProjectsList: [],
       // 关于样式的变量定义
@@ -693,7 +693,7 @@ export default {
       delete this.userDetail.password;
       delete this.userDetail.joinedProjects;
       delete this.userDetail.manageProjects;
-      this.joinedProjectsNameList = this.$store.getters.userInfo.joinedProjects;
+      this.joinedProjectIndexList = this.$store.getters.userInfo.joinedProjects;
     },
     //获取用户参与的项目列表
     getParticipatoryList(projectIds) {
@@ -1072,7 +1072,7 @@ export default {
     // 处理个人的资源可以选择copy到参与的项目，也可以选择copy到管理的项目
     processResource() {
       let resourceInfo = {};
-      this.joinedProjectsNameList = this.$store.getters.userInfo[
+      this.joinedProjectIndexList = this.$store.getters.userInfo[
         "joinedProjects"
       ];
       resourceInfo = this.userResourceList[this.selectResourceIndex];

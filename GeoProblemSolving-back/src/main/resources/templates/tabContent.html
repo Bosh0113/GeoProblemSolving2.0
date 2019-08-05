@@ -87,7 +87,7 @@
                                     {{item.description}}
                                 </p>
                             </div>
-                            <!--  avatar-->
+                            <!-- avatar-->
                             <div style="height:200px;display:flex;justify-content:center;margin-top:10px">
                                 <img :src="item.picture" v-if="item.picture!=''&&item.picture!='undefined'" />
                                 <avatar :username="item.title" :size="200"  :title="item.title" :rounded="false"  v-else >  </avatar>

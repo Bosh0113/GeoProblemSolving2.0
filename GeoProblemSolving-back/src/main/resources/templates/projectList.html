@@ -64,7 +64,6 @@
             background-color: rgba(21, 88, 145, 0.4);
             color: rgba(255,255,255,1);
         }
-
         .search-btn{
             position: absolute;
             top: 30px;
@@ -240,18 +239,28 @@
                 },
 
                 changePage(index){
-                    if(this.currentTab == "All" && index==1){
+                    if(this.currentTab == "All" && index==1 && !this.userState){
                         this.judgeMember(this.projectShowList);
                         this.tabPageData=Object.assign([],  this.currentProjectList);
                         this.totalCount=List.length;
                     }
-                    else{
+                    else {
+                        let userId = "";
+                        let joinedProjects = [];
+                        if(this.userState){
+                            userId = this.userInfo.userId;
+                            for(let i = 0; i < this.userInfo.joinedProjects.length; i++) {
+                                joinedProjects.add(this.userInfo.joinedProjects[i].userId);
+                            }
+                        }
                         axios
                             .get("/GeoProblemSolving/project/inquiryByPage",{
                                 params:{
                                     category:this.currentTab,
                                     page:index,
                                     pageSize:this.pageSize,
+                                    userId: userId,
+                                    joinedProjects:joinedProjects
                                 }
                             })
                             .then(res => {

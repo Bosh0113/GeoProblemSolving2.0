@@ -350,9 +350,16 @@
                                                     <Icon type="ios-person" :size="20"></Icon>
                                                 </div>
                                                 <div slot="extra" v-else>
-                                                    <Poptip trigger="hover" content="Apply to Join" placement="left">
-                                                        <i-button class="changeInviteColor" icon="md-add" size="small" shape="circle" @click="applyJoinSubProjectModalShow(index)"></i-button>
-                                                    </Poptip>
+                                                    <template v-if="managerIdentity(project.managerId)">
+                                                        <Poptip trigger="hover" content="To be member" placement="left">
+                                                            <i-button class="changeInviteColor" icon="md-add-circle" size="small" shape="circle" @click="joinSubProject(index)"></i-button>
+                                                        </Poptip>
+                                                    </template>
+                                                    <template v-else>
+                                                        <Poptip trigger="hover" content="Apply to Join" placement="left">
+                                                            <i-button class="changeInviteColor" icon="md-add" size="small" shape="circle" @click="applyJoinSubProjectModalShow(index)"></i-button>
+                                                        </Poptip>
+                                                    </template>
                                                 </div>
                                                 <div class="subProjectDes" :title="subProject.description">
                                                     {{subProject.description}}
@@ -689,9 +696,10 @@
                 'avatar': VueAvatar.Avatar
             },
             mounted() {
+                this.userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
+                this.userEnter();
                 this.resizeContent();
                 this.getAllSubProjects();
-                this.userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
             },
             data() {
                 return {
@@ -877,6 +885,21 @@
                 }
             },
             methods: {
+                userEnter(){
+                    if(this.projectInfo.privacy == "Public") {
+
+                    } else if(this.projectInfo.privacy == "Discoverable") {
+                        if(!this.userInfo.userState) {
+                            window.location.href="/GeoProblemSolving/projectList.html";
+                        }
+                    } else if(this.projectInfo.privacy == "Private") {
+                        let isManager = this.managerIdentity(this.projectInfo.managerId);
+                        let isMember = this.memberIdentity(this.projectInfo.members);
+                        if(!this.userInfo.userState || !(isManager || isMember)) {
+                            window.location.href="/GeoProblemSolving/projectList.html";
+                        }
+                    }
+                },
                 resizeContent(){
                     if(window.innerHeight>735){
                         this.membersContentCSS = window.innerHeight - 260+'px';
@@ -1371,6 +1394,22 @@
                 },
                 closeApplyJoinModel(){
                     this.applyJoinSubProjectModal = false;
+                },
+                joinSubProject(index){
+                    let subProject = this.subProjectList[index];
+                    this.axios.get("/GeoProblemSolving/subProject/join?subProjectId="+ subProject.subProjectId + '&userId=' + this.userInfo.userId)
+                    .then(res=> {
+                      if(res.data !== "Fail" && res.data !== "None"){
+                          this.$Notice.success({
+                              title: 'Success notice',
+                              desc: 'Now you are a member of this subproject.',
+                          });
+                          window.location.href="/GeoProblemSoving/project/"+subProject.subProjectId+"/subproject";
+                      }
+                    })
+                    .catch(err=>{
+                      console.log(err.data);
+                    })
                 },
                 applyJoin(form){
                     this.$refs[form].validate(valid => {

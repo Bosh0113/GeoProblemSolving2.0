@@ -40,6 +40,7 @@
                   icon="md-remove"
                   class="removeBtn"
                   title="Remove this step"
+                  v-show="userRole == 'Manager'"
                   style="float:right;margin-left:10px"
                 >Remove</Button>
               </template>
@@ -48,6 +49,7 @@
                 @click="addNewStep()"
                 icon="md-add"
                 class="addBtn"
+                v-show="userRole == 'Manager'"
                 title="Add a new step"
                 style="float:right;margin-left:10px"
               >Add</Button>
@@ -76,7 +78,7 @@
 <script>
 import echarts from "echarts";
 export default {
-  props: ["subProjectInfo"],
+  props: ["subProjectInfo", "userRole"],
   data() {
     return {
       scrollOps: {
@@ -84,7 +86,6 @@ export default {
           background: "lightgrey"
         }
       },
-
       // 消息
       subprojectSocket: null,
       timer: null,
@@ -122,7 +123,6 @@ export default {
         "Qualitative analysis",
         "Decision-making & management"
       ],
-      userRole: "",
       // 步骤逻辑图
       stepChart: null,
       // 选择的步骤
@@ -152,12 +152,6 @@ export default {
     //初始化函数，作用是控制侧边栏的高度，设置右边通知栏弹出时候的距顶高度以及延迟的时间
     init() {
       this.initSize();
-      if (
-        !this.subProjectInfo.isMember &&
-        this.subProjectInfo.managerId != this.$store.getters.userId
-      ) {
-        this.userRole = "Visitor";
-      }
     },
     closeStepSocket() {
       if (this.subprojectSocket != null) {

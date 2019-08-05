@@ -487,25 +487,60 @@ public class ProjectDaoImpl implements IProjectDao {
 
 
     @Override
-    public Object inquiryByPage(String category, int page, int pageSize){
+    public Object inquiryByPage(String category, int page, int pageSize, String userId, String[] joinedProjects) {
         try {
             Sort sort = new Sort(Sort.Direction.DESC,"createTime");
-            Pageable pageable = PageRequest.of(page-1,pageSize,sort);
+            // Public
             Criteria criteriaPublic = Criteria.where("privacy").is("Public");
+            // Discoverable
             Criteria criteriaDiscoverable = Criteria.where("privacy").is("Discoverable");
+            // Manager
+            Criteria criteriaManager = new Criteria();
             Query query;
-            if(category.equals("All")){
-                query = new Query(new Criteria().orOperator(criteriaDiscoverable,criteriaPublic)).with(pageable);
-            }else {
-                query = new Query(Criteria.where("category").is(category).orOperator(criteriaDiscoverable,criteriaPublic)).with(pageable);
+            if(userId != "") {
+                criteriaManager = Criteria.where("managerId").is(userId);
+                if(category.equals("All")) {
+                    query = new Query(new Criteria().orOperator(criteriaDiscoverable,criteriaPublic,criteriaManager));
+                }else {
+                    query = new Query(Criteria.where("category").is(category).orOperator(criteriaDiscoverable,criteriaPublic,criteriaManager));
+                }
+            }
+            else {
+                if(category.equals("All")) {
+                    query = new Query(new Criteria().orOperator(criteriaDiscoverable,criteriaPublic));
+                }else {
+                    query = new Query(Criteria.where("category").is(category).orOperator(criteriaDiscoverable,criteriaPublic));
+                }
             }
             long count = mongoTemplate.count(query,ProjectEntity.class);
-            int totalPage = (int)Math.ceil((double) count/(double) pageSize);
             List<ProjectEntity> projectEntities=mongoTemplate.find(query,ProjectEntity.class);
+
+            // 添加参与的私有项目
+            Criteria criteriaPrivate = Criteria.where("privacy").is("Private");
+            for(int i = joinedProjects.length-1 ; i >= 0; i--) {
+                count++;
+                Criteria criteria = Criteria.where("projectId").is(joinedProjects[i]);
+                query = new Query(new Criteria().andOperator(criteriaPrivate,criteria));
+                List<ProjectEntity> project = mongoTemplate.find(query,ProjectEntity.class);
+                if (!project.isEmpty() && project.size() == 1) {
+                    projectEntities.add(0,project.get(0));
+                }
+                else if(project.size() > 1) {
+                    System.out.println("ERROR：有重复的ProjectID");
+                }
+            }
+
+            // 分页
+            int totalPage = (int)Math.ceil((double) count/(double) pageSize);
+            List<ProjectEntity> pagedProjects = new ArrayList<>();
+            for (int i = 0; i < pageSize; i++){
+                pagedProjects.add(projectEntities.get((page-1) * pageSize + i));
+            }
+
             JSONObject result = new JSONObject();
             result.fluentPut("totalPage",totalPage);
             result.fluentPut("count",count);
-            result.fluentPut("projectList",projectEntities);
+            result.fluentPut("projectList",pagedProjects);
             return result;
 
         }catch (Exception e){

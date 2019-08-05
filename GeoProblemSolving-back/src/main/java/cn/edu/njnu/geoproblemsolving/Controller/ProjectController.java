@@ -118,8 +118,8 @@ public class ProjectController {
     }
 
     @RequestMapping(value = "/inquiryByPage", method = RequestMethod.GET)
-    public Object inquiryByPage(@RequestParam("category") String category, @RequestParam("page") int page, @RequestParam("pageSize") int pageSize){
+    public Object inquiryByPage(@RequestParam("category") String category, @RequestParam("page") int page, @RequestParam("pageSize") int pageSize, @RequestParam("userId") String userId, @RequestParam("joinedProjects") String[] joinedProjects){
         ProjectDaoImpl projectDao = new ProjectDaoImpl(mongoTemplate);
-        return projectDao.inquiryByPage(category,page,pageSize);
+        return projectDao.inquiryByPage(category,page,pageSize,userId,joinedProjects);
     }
 }

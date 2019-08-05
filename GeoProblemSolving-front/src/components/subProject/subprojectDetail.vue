@@ -61,21 +61,13 @@
 <template>
   <div>
     <Row>
-      <!-- <Col span="4" style="height:40px;" class="operatePanel">
-        <Button
-          type="default"
-          @click="conveneWork()"
-          icon="md-mail"
-          title="Inform others to work together"
-        >Inform</Button>
-      </Col>-->
       <Col :xs="14" :sm="15" :md="16" :lg="17" style="margin:30px 0 0 80px">
         <div>
           <vue-scroll :ops="scrollOps" :style="{height:sidebarHeight+150+'px'}">
             <Card class="Information">
               <div style="width:100%">
                 <strong>Purposes / Goals:</strong>
-                <template  v-if="subProjectInfo.managerId == $store.getters.userId">
+                <template  v-if="userRole == 'Manager'">
                   <Icon
                     v-if="!edit1"
                     type="ios-create"
@@ -108,7 +100,7 @@
             <Card class="Information">
               <div style="width:100%">
                 <strong>Background:</strong>
-                <template  v-if="subProjectInfo.managerId == $store.getters.userId">
+                <template  v-if="userRole=='Manager'">
                   <Icon
                     v-if="!edit2"
                     type="ios-create"
@@ -141,7 +133,7 @@
             <Card class="Information">
               <div style="width:100%">
                 <strong>Limitations / problems:</strong>
-                <template v-if="subProjectInfo.managerId == $store.getters.userId">
+                <template v-if="userRole=='Manager'">
                 <Icon
                   v-if="!edit3"
                   type="ios-create"
@@ -188,7 +180,7 @@
           </div>
           <div slot="extra">
             <Icon
-              v-if="subProjectInfo.managerId == $store.getters.userId"
+              v-if="userRole=='Manager'"
               type="md-add"
               :size="18"
               style="cursor:pointer"
@@ -196,7 +188,7 @@
               @click="inviteMembersModalShow"
             />
             <Icon
-              v-else-if="subProjectInfo.isMember"
+              v-else-if="userRole=='Member'"
               type="ios-log-out"
               :size="18"
               style="cursor:pointer"
@@ -338,7 +330,6 @@
         </Card>
       </Col>
     </Row>
-    <!-- </Row> -->
   </div>
 </template>
 <script>
@@ -352,7 +343,7 @@ export default {
     Avatar,
     folderTree
   },
-  props: ["subProjectInfo"],
+  props: ["subProjectInfo","userRole","projectInfo"],
   data() {
     return {
       scrollOps: {
@@ -360,8 +351,6 @@ export default {
           background: "lightgrey"
         }
       },
-      // information of project
-      projectInfo: {},
       //登陆者身份
       // 关于邀请的模态框
       inviteModal: false,
@@ -380,16 +369,12 @@ export default {
       background: "",
       limitation: "",
       purpose: "",
-      // 用户角色
-      userRole: ""
     };
   },
   created() {
     this.init();
   },
   mounted() {
-    this.toProjectPage = "/project/" + sessionStorage.getItem("projectId");
-    this.getProjectInfo();
     window.addEventListener("resize", this.initSize);
   },
 
@@ -407,85 +392,8 @@ export default {
     //初始化函数，作用是控制侧边栏的高度，设置右边通知栏弹出时候的距顶高度以及延迟的时间
     init() {
       this.initSize();
-      var that = this;
-      let subProjectId = this.$route.params.id;
-      let subProjectInfo = this.$store.getters.subProject;
-      if (
-        JSON.stringify(subProjectInfo) != "{}" &&
-        subProjectInfo.subProjectId == subProjectId
-      ) {
-        var userId = this.$store.getters.userId;
-        var members = subProjectInfo.members;
-        subProjectInfo.isMember = false;
-        for (var i = 0; i < members.length; i++) {
-          if (members[i].userId == userId) {
-            subProjectInfo.isMember = true;
-            break;
-          }
-        }
-        this.$set(this, "subProjectInfo", subProjectInfo);
-        this.getSubprojectDes();
-
-        this.inviteAble = false;
-        this.showMembers();
-        sessionStorage.setItem("subProjectId", subProjectInfo.subProjectId);
-        sessionStorage.setItem("subProjectName", subProjectInfo.title);
-      } else {
-        $.ajax({
-          url:
-            "/GeoProblemSolving/subProject/inquiry" +
-            "?key=subProjectId" +
-            "&value=" +
-            subProjectId,
-          type: "GET",
-          async: false,
-          success: data => {
-            if (data == "Offline") {
-              this.$store.commit("userLogout");
-              this.$router.push({ name: "Login" });
-            } else if (data != "None" && data != "Fail") {
-              subProjectInfo = data[0];
-              this.$set(this, "subProjectInfo", subProjectInfo);
-              sessionStorage.setItem(
-                "subProjectId",
-                subProjectInfo.subProjectId
-              );
-              sessionStorage.setItem("subProjectName", subProjectInfo.title);
-              this.getSubprojectDes();
-
-              this.managerIdentity(subProjectInfo.managerId);
-              this.memberIdentity(subProjectInfo.members);
-              this.$store.commit("setSubProjectInfo", subProjectInfo);
-
-              this.inviteAble = false;
-              this.showMembers();
-            }
-          },
-          error: function(err) {
-            console.log("Get manager name fail.");
-          }
-        });
-      }
-      // 判断用户权限
-      if (
-        !this.subProjectInfo.isMember &&
-        this.subProjectInfo.managerId != this.$store.getters.userId
-      ) {
-        this.userRole = "Visitor";
-      }
-    },
-    managerIdentity(managerId) {
-      if (managerId === this.$store.getters.userId) {
-        this.subProjectInfo.isManager = true;
-      }
-    },
-    memberIdentity(members) {
-      for (let i = 0; i < members.length; i++) {
-        if (members[i].userId === this.$store.getters.userId) {
-          this.subProjectInfo.isMember = true;
-          break;
-        }
-      }
+      this.getSubprojectDes();
+      this.showMembers();
     },
     getSubprojectDes() {
       if (
@@ -560,44 +468,7 @@ export default {
           }
         })
         .catch(err => {});
-    },
-    // 召集参与者
-    conveneWork() {
-      for (let i = 0; i < this.participants.length; i++) {
-        if (this.participants[i].userId != this.$store.getters.userId) {
-          let notice = {};
-          notice["recipientId"] = this.participants[i].userId;
-          notice["type"] = "work";
-          notice["content"] = {
-            subProjectId: this.subProjectInfo.subProjectId,
-            title: "Work Notice",
-            description:
-              "The manager of" +
-              " the sub-project " +
-              this.subProjectInfo.title +
-              " of project " +
-              this.projectInfo.title +
-              " informs you to start working!"
-          };
-          this.axios
-            .post("/GeoProblemSolving/notice/save", notice)
-            .then(res => {
-              if (res.data == "Success") {
-                this.$Notice.success({
-                  desc: "Inform Successfully"
-                });
-              } else {
-                this.$Notice.info({
-                  desc: "Inform failed"
-                });
-              }
-            })
-            .catch(err => {
-              console.log(err.data);
-            });
-        }
-      }
-    },
+    },    
     ok() {
       this.$Message.info("Clicked ok");
     },
@@ -625,35 +496,6 @@ export default {
         }
       }
       this.inviteModal = true;
-    },
-    getProjectInfo() {
-      let that = this;
-      let projectInfo = that.$store.getters.project;
-      if (
-        JSON.stringify(projectInfo) != "{}" &&
-        projectInfo.projectId.substring(0, 36) ==
-          this.subProjectInfo.projectId.substring(0, 36)
-      ) {
-        this.projectInfo = projectInfo;
-      } else {
-        $.ajax({
-          url:
-            "/GeoProblemSolving/project/inquiry" +
-            "?key=projectId" +
-            "&value=" +
-            this.subProjectInfo.projectId,
-          type: "GET",
-          async: false,
-          success: data => {
-            if (data != "None" && data != "Fail") {
-              that.projectInfo = data[0];
-              that.$store.commit("setProjectInfo", data[0]);
-            } else {
-              console.log(data);
-            }
-          }
-        });
-      }
     },
     inviteMembers() {
       var that = this;
@@ -795,6 +637,8 @@ export default {
         index != 0
       ) {
         return true;
+      } else if(this.projectInfo.managerId == this.subProjectInfo.members[index].userId) {
+        return false;
       } else {
         return false;
       }
