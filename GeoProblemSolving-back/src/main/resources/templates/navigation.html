@@ -51,7 +51,7 @@
             background-color: #515a6e;
             height: 60px;
             width: 100%;
-            bottom: 0 ;
+            bottom: 0;
             flex: 0 0 auto;
             /*position:absolute;*/
         }
@@ -103,7 +103,7 @@
                 <div v-if="useMenuCSS">
                     <div class="navPart">
                         <i-menu mode="horizontal" theme="dark" @on-select="turnContent"
-                                :style="`z-index:0;background:headerBgColor`" width="auto" active-name="projects">
+                                :style="`z-index:0;background:headerBgColor`" width="auto" :active-name="activeType">
                             <menu-item name="home" class="menuItem" style="margin-left:35%">
                                 <span>Home</span>
                             </menu-item>
@@ -198,6 +198,7 @@
     <script th:fragment="commonHeader-js">
         Vue.component('child-navigation', {
                 template: '#navigation',
+                props: ["activeType"],
                 components: {
                     'avatar': VueAvatar.Avatar
                 },
@@ -205,10 +206,10 @@
                     var userInfo = {
                         userState: false,
                         userName: 'visitor',
-                        userId:'',
-                        avatar:''
-                    }
-                    sessionStorage.setItem('userInfo',JSON.stringify(userInfo));
+                        userId: '',
+                        avatar: ''
+                    };
+                    sessionStorage.setItem('userInfo', JSON.stringify(userInfo));
                     var that = this;
                     $.ajax({
                         url: "/GeoProblemSolving/user/state",
@@ -231,7 +232,7 @@
                         }
                     });
                 },
-                updated(){
+                updated() {
                     $("#noticeBadge sup").css("margin", "15px 5px 0 0");
                 },
                 computed: {
@@ -255,11 +256,10 @@
                     }
                 },
                 methods: {
-                    identityMenuCSS(){
-                        if(window.innerWidth<1100){
+                    identityMenuCSS() {
+                        if (window.innerWidth < 1100) {
                             this.useMenuCSS = false;
-                        }
-                        else{
+                        } else {
                             this.useMenuCSS = true;
                         }
                     },
@@ -314,8 +314,9 @@
                                         unreadCount++;
                                         continue;
                                     }
-                                };
-                                this.unreadNoticeCount=Object.assign([], unreadCount);
+                                }
+                                ;
+                                this.unreadNoticeCount = Object.assign([], unreadCount);
                             })
                             .catch(err => {
                                 console.log("失败的原因是" + err.data);
@@ -377,18 +378,18 @@
                             this.logout("home");
                         }
                     },
-                    logout(page){
+                    logout(page) {
                         axios
-                        .get("/GeoProblemSolving/user/logout")
-                        .then(res => {
-                            this.userInfoNav = {userName: ""};
-                            sessionStorage.removeItem("userInfo");
-                            this.noticeSocket.close();
-                            window.location.href = "/GeoProblemSolving/"+page;
-                        })
-                        .catch(err => {
-                            confirm("logout fail!");
-                        });
+                            .get("/GeoProblemSolving/user/logout")
+                            .then(res => {
+                                this.userInfoNav = {userName: ""};
+                                sessionStorage.removeItem("userInfo");
+                                this.noticeSocket.close();
+                                window.location.href = "/GeoProblemSolving/" + page;
+                            })
+                            .catch(err => {
+                                confirm("logout fail!");
+                            });
                     }
                 }
             },

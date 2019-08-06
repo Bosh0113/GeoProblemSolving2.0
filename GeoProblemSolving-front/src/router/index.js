@@ -8,10 +8,12 @@ Vue.use(Router)
 
 const routes = [{
   path: '/', name: 'Navigation', component: resolve => (require(["@/components/navigation"], resolve)), children: [
-    { path: '', redirect: 'home' },
-    { path: 'home', name: 'Home', component: resolve => (require(["@/components/navigationContent/home"], resolve)) },
-    { path: 'projectlist', name: 'Projects', component: resolve => (require(["@/components/navigationContent/projectList"], resolve)) },
-    { path: 'project/:id', name: 'ProjectDetail', component: resolve => (require(["@/components/projects/projectDetail"], resolve)) },
+    { path: '', redirect: 'staticPage' },
+    { path: 'staticPage', name: 'StaticPage', component: resolve => (require(["@/components/navigationContent/staticPage"], resolve)) },
+    // { path: '', redirect: 'home' },
+    // { path: 'home', name: 'Home', component: resolve => (require(["@/components/navigationContent/home"], resolve)) },
+    // { path: 'projectlist', name: 'Projects', component: resolve => (require(["@/components/navigationContent/projectList"], resolve)) },
+    // { path: 'project/:id', name: 'ProjectDetail', component: resolve => (require(["@/components/projects/projectDetail"], resolve)) },
     { path: 'project/:id/workspace', name: 'workspace', component: resolve => (require(["@/components/workingSpace/moduleList"], resolve)) },
     { path: 'project/:id/stepCreation', name: 'stepCreation', component: resolve => (require(["@/components/workingSpace/stepCreation"], resolve)) },
     {
