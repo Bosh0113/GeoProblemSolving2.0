@@ -229,6 +229,15 @@
                     type="text"
                   ></Button>
                   <Button
+                    @click="showCopyFileModel(file)"
+                    shape="circle"
+                    icon="ios-share-alt"
+                    title="Copy to personal center"
+                    size="small"
+                    class="fileBtnHoverOrange"
+                    type="text"
+                  ></Button>
+                  <Button
                     @click="fileRenameModalShow(file)"
                     shape="circle"
                     icon="md-create"
@@ -451,6 +460,16 @@
         <Button type="success" @click="renameFile('renameValidate')">Rename</Button>
       </div>
     </Modal>
+    <Modal v-model="copyFileModal" title="Copy file to personal center" width="500">
+      <RadioGroup v-model="copyFilePrivacy">
+        <Radio label="public">Public</Radio>
+        <Radio label="private">Private</Radio>
+      </RadioGroup>
+      <div slot="footer">
+        <Button @click="copyFileModal=false">Cancel</Button>
+        <Button type="success" @click="copyFileToCenter">Copy</Button>
+      </div>
+    </Modal>
   </div>
 </template>
 <script>
@@ -555,7 +574,10 @@ export default {
           background: "#808695"
         }
       },
-      contentHeight: 100
+      contentHeight: 100,
+      copyFileModal:false,
+      copyFilePrivacy:"private",
+      selectedFileId:""
     };
   },
   mounted() {
@@ -1066,6 +1088,31 @@ export default {
         }
       }
       return result;
+    },
+    showCopyFileModel(file){
+      this.copyFileModal = true;
+      this.copyFilePrivacy = "private";
+      this.selectedFileId = file.resourceId;
+    },
+    copyFileToCenter(){
+      this.axios
+      .get(
+        "/GeoProblemSolving/resource/copyToCenter"+
+        "?resourceId="+this.selectedFileId+
+        "&userId="+this.$store.getters.userId+
+        "&privacy="+this.copyFilePrivacy
+      )
+      .then(res=>{
+        this.copyFileModal = false;
+        if(res.data=="Success"){
+          this.$Message.success("Copy file success.");
+        }else{
+          this.$Message.warning(res.data);
+        }
+      })
+      .catch(err=>{
+          this.$Message.error("Copy file fail.");
+      });
     }
   }
 };

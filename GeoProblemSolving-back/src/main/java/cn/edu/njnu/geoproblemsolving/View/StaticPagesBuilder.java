@@ -1,7 +1,6 @@
 package cn.edu.njnu.geoproblemsolving.View;
 import cn.edu.njnu.geoproblemsolving.Entity.ProjectEntity;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -105,7 +104,7 @@ public class StaticPagesBuilder {
         String htmlFile = htmlPath + "/home.html";
         try {
             FileWriter write = new FileWriter(htmlFile);
-            templateEngine.process("home", context, write);
+            templateEngine.process("home", context, write);//优化点，写加锁
             write.flush();
             write.close();
         } catch (Exception ignored) {

@@ -50,4 +50,10 @@ public class ResourceController {
         ResourceDaoImpl resourceDao = new ResourceDaoImpl(mongoTemplate);
         resourceDao.packageToZip(request,response);
     }
+
+    @RequestMapping(value = "/copyToCenter",method = RequestMethod.GET)
+    public String copyToCenter(@RequestParam("resourceId") String resourceId, @RequestParam("userId") String userId,  @RequestParam("privacy") String privacy){
+        ResourceDaoImpl resourceDao = new ResourceDaoImpl(mongoTemplate);
+        return resourceDao.copyFileToPersonalCenter(resourceId,userId,privacy);
+    }
 }

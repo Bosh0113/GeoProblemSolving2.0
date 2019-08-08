@@ -315,8 +315,7 @@
                                         continue;
                                     }
                                 }
-                                ;
-                                this.unreadNoticeCount = Object.assign([], unreadCount);
+                                this.unreadNoticeCount = unreadCount;
                             })
                             .catch(err => {
                                 console.log("失败的原因是" + err.data);

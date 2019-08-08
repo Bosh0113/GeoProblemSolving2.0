@@ -4,6 +4,7 @@ import cn.edu.njnu.geoproblemsolving.Entity.Folder.UploadResult;
 import cn.edu.njnu.geoproblemsolving.Entity.ResourceEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.UserEntity;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -220,6 +221,65 @@ public class ResourceDaoImpl implements IResourceDao {
             outputStream.close();
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    public String copyFileToPersonalCenter(String resourceId, String userId,String privacy){
+        try {
+            Query queryFile = new Query(Criteria.where("resourceId").is(resourceId));
+            ResourceEntity resourceFile = mongoTemplate.findOne(queryFile,ResourceEntity.class);
+            String fileUrl = resourceFile.getPathURL();
+            String regex = "GeoProblemSolving(\\S*)";
+            Pattern pattern = Pattern.compile(regex);
+            Matcher matcher = pattern.matcher(fileUrl);
+            String filePath = "";
+            while (matcher.find()){
+                filePath = matcher.group(1);
+            }
+            String localPath = System.getProperty("user.dir")+"/src/main/webapp"+filePath;
+            String fileLocalPath = localPath.replaceAll("\\\\","/");
+            File oldFile = new File(fileLocalPath);
+            if(oldFile.exists()){
+                String fileNames = resourceFile.getName();
+                String fileName = fileNames.substring(0, fileNames.lastIndexOf("."));
+                String suffix = fileNames.substring(fileNames.lastIndexOf(".") + 1);
+                String newFilePath = System.getProperty("user.dir")+"/src/main/webapp/resource/"+userId;
+                String newFileLocalPath = newFilePath.replaceAll("\\\\","/");
+                File folder = new File(newFileLocalPath);
+                if(!folder.exists()){
+                    folder.mkdirs();
+                }
+
+                int randomNum = (int) (Math.random() * 10 + 1);
+                for (int i = 0; i < 5; i++) {
+                    randomNum = randomNum * 10 + (int) (Math.random() * 10 + 1);
+                }
+                String newFileName=fileName + randomNum + "." + suffix;
+                String fileSavePath = newFilePath+"/"+newFileName;
+                File newFile = new File(fileSavePath);
+
+                FileUtils.copyFile(oldFile,newFile);//优化点，异步执行
+
+                String newFileUrl = "/GeoProblemSolving/resource/"+userId+"/"+newFileName;
+                resourceFile.setResourceId(UUID.randomUUID().toString());
+                resourceFile.setUploaderId(userId);
+                resourceFile.setPathURL(newFileUrl);
+                resourceFile.setPrivacy(privacy);
+                Query queryUser = new Query(Criteria.where("userId").is(userId));
+                UserEntity userEntity = mongoTemplate.findOne(queryUser,UserEntity.class);
+                resourceFile.setUploaderName(userEntity.getUserName());
+                Date date = new Date();
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+                String uploadTime = dateFormat.format(date);
+                resourceFile.setUploadTime(uploadTime);
+                mongoTemplate.save(resourceFile);
+                return "Success";
+            }
+            else {
+                return "None";
+            }
+        }catch (Exception e){
+            return "Fail";
         }
     }
 

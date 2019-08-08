@@ -177,8 +177,8 @@
                                     <Icon type="ios-folder-open" class="itemIcon" size="25"></Icon>
                                     <a @click="enterFolder(folder.uid)" class="fileItemName" :title="folder.name">{{folder.name}}</a>
                                     <div style="float:right">
-                                        <i-button @click="renameFolderModalShow(folder)" class="fileBtnHoverBlue" shape="circle" icon="ios-create" title="Rename" size="small"
-                                            type="text"></i-button>
+                                        <i-button @click="renameFolderModalShow(folder)" class="fileBtnHoverBlue" shape="circle" icon="ios-create" title="Rename"
+                                            size="small" type="text"></i-button>
                                         <i-button @click="deleteFolder(folder)" class="fileBtnHoverRed" shape="circle" icon="ios-trash" title="Delete" size="small"
                                             style="margin-left:5px" type="text"></i-button>
                                     </div>
@@ -188,13 +188,16 @@
                                 <Card v-for="(file,index) in currentFolder.files" :key="file.index" :padding="5">
                                     <div>
                                         <Checkbox :label="file.pathURL">&nbsp;</Checkbox>
-                                        <Icon type="ios-document-outline" class="itemIcon" size="25" ></Icon>
+                                        <Icon type="ios-document-outline" class="itemIcon" size="25"></Icon>
                                         <span @click="getFileInfo(file)" class="fileItemName" :title="file.name">{{file.name}}</span>
                                         <span class="fileItemSize">{{file.fileSize}}</span>
                                         <span style="width:20%;margin-right:5%">{{file.uploadTime.substring(0,10)}}</span>
                                         <div style="float:right">
-                                            <i-button @click="filePreview(file)" shape="circle" icon="md-eye" title="Preview" size="small" class="fileBtnHoverGreen" type="text"></i-button>
+                                            <i-button @click="filePreview(file)" shape="circle" icon="md-eye" title="Preview" size="small" class="fileBtnHoverGreen"
+                                                type="text"></i-button>
                                             <i-button @click="fileDownload(file)" shape="circle" icon="ios-cloud-download" title="Download" size="small" class="fileBtnHoverGray"
+                                                type="text"></i-button>
+                                            <i-button @click="showCopyFileModel(file)" shape="circle" icon="ios-share-alt" title="Copy to personal center" size="small" class="fileBtnHoverOrange"
                                                 type="text"></i-button>
                                             <i-button @click="fileRenameModalShow(file)" shape="circle" icon="md-create" title="Rename" size="small" class="fileBtnHoverBlue"
                                                 type="text"></i-button>
@@ -211,10 +214,10 @@
                     <div>
                         <Row>
                             <i-col class="demo-spin-col" span="8" offset="8" v-show="spinAnimate==true">
-                            <Spin fix v-show="spinAnimate==true">
-                                <Icon type="ios-loading" size=40 class="demo-spin-icon-load"></Icon>
-                                <div>Loading</div>
-                            </Spin>
+                                <Spin fix v-show="spinAnimate==true">
+                                    <Icon type="ios-loading" size=40 class="demo-spin-icon-load"></Icon>
+                                    <div>Loading</div>
+                                </Spin>
                             </i-col>
                         </Row>
                     </div>
@@ -333,6 +336,16 @@
                     <i-button type="success" @click="renameFile('renameValidate')">Rename</i-button>
                 </div>
             </Modal>
+            <Modal v-model="copyFileModal" title="Copy file to personal center" width="500">
+              <Radio-group v-model="copyFilePrivacy">
+                <Radio label="public">Public</Radio>
+                <Radio label="private">Private</Radio>
+              </Radio-group>
+              <div slot="footer">
+                <i-button @click="copyFileModal=false">Cancel</i-button>
+                <i-button type="success" @click="copyFileToCenter">Copy</i-button>
+              </div>
+            </Modal>
         </div>
     </template>
     <script th:fragment="common-js">
@@ -342,12 +355,12 @@
             mounted() {
                 this.resizeContent();
                 this.enterFolder(this.rootFolderId);
-                this.userInfo=JSON.parse(sessionStorage.getItem("userInfo"));
+                this.userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
             },
             data() {
                 return {
-                    listContentCSS:'',
-                    userInfo:{
+                    listContentCSS: '',
+                    userInfo: {
                         userState: false,
                         userName: 'visitor',
                         userId: '',
@@ -449,15 +462,18 @@
                         bar: {
                             background: "#808695"
                         }
-                    }
+                    },
+                    copyFileModal:false,
+                    copyFilePrivacy:"private",
+                    selectedFileId:""
                 };
             },
             methods: {
-                resizeContent(){
-                    if(window.innerHeight>735){
-                        this.listContentCSS= window.innerHeight - 265 + 'px';
-                    }else{
-                        this.listContentCSS= '460px';
+                resizeContent() {
+                    if (window.innerHeight > 735) {
+                        this.listContentCSS = window.innerHeight - 265 + 'px';
+                    } else {
+                        this.listContentCSS = '460px';
                     }
                 },
                 enterFolder(currentFolderId) {
@@ -952,6 +968,31 @@
                         }
                     }
                     return result;
+                },
+                showCopyFileModel(file){
+                    this.copyFileModal = true;
+                    this.copyFilePrivacy = "private";
+                    this.selectedFileId = file.resourceId;
+                },
+                copyFileToCenter(){
+                    axios
+                    .get(
+                        "/GeoProblemSolving/resource/copyToCenter"+
+                        "?resourceId="+this.selectedFileId+
+                        "&userId="+this.userInfo.userId+
+                        "&privacy="+this.copyFilePrivacy
+                    )
+                    .then(res=>{
+                        this.copyFileModal = false;
+                        if(res.data=="Success"){
+                            this.$Message.success("Copy file success.");
+                        }else{
+                            this.$Message.warning(res.data);
+                        }
+                    })
+                    .catch(err=>{
+                        this.$Message.error("Copy file fail.");
+                    });
                 }
             }
         });
