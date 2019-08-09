@@ -1809,7 +1809,7 @@ export default {
               title: "Success",
               desc: "Delete project successfully."
             });
-            this.$router.push({ name: "Projects" });
+            window.location.href="/GeoProblemSolving/projectList";
           }
         })
         .catch(err => {});

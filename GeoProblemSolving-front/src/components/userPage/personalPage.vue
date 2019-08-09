@@ -1005,7 +1005,7 @@ export default {
             this.$store.getters.userId
         )
         .then(res => {
-          this.$router.push({ name: "Home" });
+            window.location.href="/GeoProblemSolving/home";
         })
         .catch(err => {
           console.log(err.data);

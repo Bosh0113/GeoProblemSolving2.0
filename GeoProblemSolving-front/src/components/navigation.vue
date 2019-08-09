@@ -275,9 +275,9 @@ export default {
     },
     turnContent(name) {
       if (name === "home") {
-        this.$router.replace({ name: "Home" });
+        window.location.href="/GeoProblemSolving/home";
       } else if (name == "projects") {
-        this.$router.replace({ name: "Projects" });
+        window.location.href="/GeoProblemSolving/projectList";
       } else if (name == "resources") {
         this.$router.replace({ name: "PublicResource" });
       } else if (name == "community") {
@@ -287,7 +287,7 @@ export default {
       }
     },
     goHome() {
-      this.$router.push({ name: "Home" });
+        window.location.href="/GeoProblemSolving/home";
     },
     unlogin(name) {
       if (name === "login") {
@@ -394,7 +394,7 @@ export default {
           .then(res => {
             this.$store.commit("userLogout");
             this.noticeSocket.close();
-            this.$router.replace({ name: "Home" });
+            window.location.href="/GeoProblemSolving/home";
           })
           .catch(err => {
             confirm("logout fail!");

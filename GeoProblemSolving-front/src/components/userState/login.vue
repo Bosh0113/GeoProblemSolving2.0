@@ -281,13 +281,13 @@ export default {
       });
     },
     goBack() {
-      this.$router.push({ name: "Home" });
+      window.location.href="/GeoProblemSolving/home";
     },
     register() {
       this.$router.push({ name: "Register" });
     },
     goHome() {
-      this.$router.push({ name: "Home" });
+      window.location.href="/GeoProblemSolving/home";
     },
     getlocalStorage() {
       this.loginForm.user = localStorage.getItem("user");
