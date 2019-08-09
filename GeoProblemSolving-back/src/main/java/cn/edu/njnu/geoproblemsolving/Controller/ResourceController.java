@@ -33,6 +33,12 @@ public class ResourceController {
         return resourceDao.readPublicResource();
     }
 
+    @RequestMapping(value = "/update",method = RequestMethod.POST)
+    public Object updateResource(HttpServletRequest request){
+        ResourceDaoImpl resourceDao = new ResourceDaoImpl(mongoTemplate);
+        return resourceDao.updateResource(request);
+    }
+
     @RequestMapping(value = "/delete", method = RequestMethod.GET)
     public String deleteResource(@RequestParam("resourceId") String resourceId) {
         ResourceDaoImpl resourceDao = new ResourceDaoImpl(mongoTemplate);

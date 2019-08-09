@@ -1,3 +1,146 @@
+<style scoped>
+.detailSidebar {
+  margin-right: 20px;
+}
+.rightContent {
+  margin-top: 20px;
+  flex: 1;
+}
+/* 用户头像 */
+.user-img {
+  margin-top: 20px;
+  width: 100%;
+  max-height: 100%;
+  text-align: center;
+}
+/* 注册时上传头像的用户的头像样式 */
+.u_img {
+  max-width: 100%;
+  padding: 10px;
+}
+/* 注册时未上传头像的用户头像显示样式 */
+.avatarStyle {
+  margin: 0 auto;
+}
+/* 用户头像结束 */
+body {
+  overflow-x: hidden;
+}
+/* 侧边用户信息的显示样式 */
+.single-info {
+  padding: 5px;
+  height: 30px;
+  font-size: 12px;
+  line-height: 15px;
+}
+/* 表示空格间距的 */
+.whitespace {
+  height: 20px;
+}
+/* 关于提交用户更改头像信息的样式 */
+.demo-upload-list {
+  display: inline-block;
+  width: 60px;
+  height: 60px;
+  text-align: center;
+  line-height: 60px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #fff;
+  position: relative;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+  margin-right: 4px;
+}
+.avatarImage {
+  width: 100%;
+  height: 100%;
+}
+.demo-upload-list-cover {
+  display: none;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.6);
+}
+.demo-upload-list:hover .demo-upload-list-cover {
+  display: block;
+}
+.demo-upload-list-cover i {
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+  margin: 0 2px;
+}
+.uploadAvatar {
+  position: relative;
+  width: 58px;
+  height: 58px;
+  top: 0;
+  left: 0;
+  outline: none;
+  background-color: transparent;
+  opacity: 0;
+}
+.uploadBox {
+  display: inline-block;
+  width: 58px;
+  height: 58px;
+  line-height: 58px;
+  overflow: hidden;
+  border-width: 0.75px;
+  border-style: dashed;
+  border-color: lightslategray;
+}
+/* 2-25 add 实现的效果是旋浮上去出现下划线且变红 */
+.projectsTitle:hover {
+  /* color: red; */
+  cursor: pointer;
+}
+
+/* 新定义的样式 */
+.authorBtn:hover {
+  background-color: #57a3f3;
+  color: white;
+}
+.deleteBtn:hover {
+  background-color: #ed4014;
+  color: white;
+}
+.table table {
+  table-layout: auto;
+  width: 100% !important;
+}
+.participatoryProjectCard:hover {
+  cursor: pointer;
+}
+.manageProjectsCard:hover {
+  cursor: pointer;
+}
+/* 时间轴样式 */
+.timeLineStyle {
+  margin-left: 5%;
+  height: 180px;
+}
+.parent .ivu-tabs-nav-container {
+  font-size: 15px !important;
+  font-weight: bold;
+}
+.fileBtnHoverGreen:hover {
+  background-color: #19be6b;
+  color: white;
+}
+.fileBtnHoverRed:hover {
+  background-color: #ed4014;
+  color: white;
+}
+.fileBtnHoverBlue:hover {
+  background-color: #2db7f5;
+  color: white;
+}
+</style>
 <template>
   <div>
     <Row>
@@ -68,7 +211,7 @@
               >{{userDetail.introduction}}</div>
               <div class="whitespace"></div>
               <div style="display:flex;justify-content:center">
-                <Button type="success" style="height:40px" @click="editModalShow()" title="Edit">
+                <Button class="fileBtnHoverBlue" style="height:40px" @click="editModalShow()" title="Edit">
                   <Icon type="md-create" :size="20"/>
                 </Button>
                 <Drawer
@@ -78,6 +221,7 @@
                   v-model="editProfileModal"
                   width="600px"
                 >
+                <vue-scroll :ops="ops">
                   <Form
                     ref="personalInfoItem"
                     :model="personalInfoItem"
@@ -154,6 +298,7 @@
                       <Button @click="resetForm()" style="margin-left: 50%" type="primary">Reset</Button>
                     </FormItem>
                   </Form>
+                  </vue-scroll>
                 </Drawer>
               </div>
             </div>
@@ -169,169 +314,194 @@
                 <Tabs value="Overview" style="font-size:20px" type="card">
                   <TabPane label="Overview" name="Overview">
                     <Col :lg="{span:22,offset:1}" :md="{span:22,offset:1}" :sm="{span:22,offset:1}">
-                      <Card>
+                      <Card dis-hover>
                         <p slot="title">History line</p>
-                        <Timeline class="timeLineStyle">
-                          <div v-if="userEventList.length==0">
-                            <div style="display:flex;justify-content:center">
-                              <Icon type="md-alert" size="40" color="gray"/>
+                        <div class="timeLineStyle">
+                          <vue-scroll :ops="ops">
+                          <Timeline>
+                            <div v-if="userEventList.length==0">
+                              <div style="display:flex;justify-content:center">
+                                <Icon type="md-alert" size="40" color="gray"/>
+                              </div>
+                              <br>
+                              <div style="display:flex;justify-content:center">
+                                <h3
+                                  style="text-align:center;width:80%"
+                                >Sorry, there are no events now.</h3>
+                              </div>
                             </div>
-                            <br>
-                            <div style="display:flex;justify-content:center">
-                              <h3
-                                style="text-align:center;width:80%"
-                              >Sorry,there are no events here.Once you upload or join in some projects,here will list your events timeline.</h3>
-                            </div>
-                          </div>
-
-                          <TimelineItem
-                            v-for="(item,index) in userEventList"
-                            :key="index"
-                            v-show="userEventList.length>0"
-                          >
-                            <strong>
-                              <p class="time">{{item.createTime}}</p>
-                            </strong>
-                            <p class="content">{{item.description}}</p>
-                          </TimelineItem>
-                        </Timeline>
+                              <TimelineItem
+                                v-for="(item,index) in userEventList"
+                                :key="index"
+                                v-show="userEventList.length>0"
+                              >
+                                <strong>
+                                  <p class="time">{{item.createTime}}</p>
+                                </strong>
+                                <p class="content">{{item.description}}</p>
+                              </TimelineItem>
+                          </Timeline>
+                          </vue-scroll>
+                        </div>
                       </Card>
                       <br>
                       <div style="margin-bottom:40px">
-                        <Card>
+                        <Card dis-hover>
                           <p slot="title">Resource list</p>
-                          <div style="overflow-y:scroll;height:500px">
-                            <Table :data="userResourceList" :columns="resourceColumn" class="table">
-                              <template slot-scope="{ row }" slot="name">
-                                <strong>{{ row.name }}</strong>
-                              </template>
-                              <template slot-scope="{ row, index }" slot="action">
-                                <Button
-                                  type="success"
-                                  size="small"
-                                  style="margin-right: 10px"
-                                  :href="userResourceList[index].pathURL"
-                                  title="download"
-                                  @click="download(index)"
-                                >
-                                  <Icon type="md-download"/>
-                                </Button>
-                                <!-- <Button type="warning" size="small" style="margin-right: 10px">
-                                  <Icon
-                                    type="md-share"
-                                    @click="processResourceModalShow(index)"
-                                    title="share"
-                                  />
-                                </Button> -->
-                                <Button
-                                  type="error"
-                                  size="small"
-                                  @click="deleteResourceModalShow(userResourceList[index].resourceId)"
-                                >
-                                  <!-- @click="deleteResource(userResourceList[index].resourceId)" -->
-                                  <Icon type="md-close"/>
-                                </Button>
-                              </template>
-                            </Table>
+                          <div style="height:500px">
+                            <vue-scroll :ops="ops">
+                              <Table :data="userResourceList" :columns="resourceColumn" class="table">
+                                <template slot-scope="{ row }" slot="name">
+                                  <strong>{{ row.name }}</strong>
+                                </template>
+                                <template slot-scope="{ row, index }" slot="action">
+                                  <Button
+                                    class="fileBtnHoverGreen"
+                                    size="small"
+                                    title="Download"
+                                    @click="download(index)"
+                                    icon="md-download"
+                                    shape="circle"
+                                    type="text"
+                                  >
+                                  </Button>
+                                  <!-- <Button type="warning" size="small" style="margin-right: 10px">
+                                    <Icon
+                                      type="md-share"
+                                      @click="processResourceModalShow(index)"
+                                      title="share"
+                                    />
+                                  </Button> -->
+                                  <Button
+                                    @click="fileEditModalShow(index)"
+                                    shape="circle"
+                                    icon="md-create"
+                                    title="Edit"
+                                    size="small"
+                                    class="fileBtnHoverBlue"
+                                    type="text"
+                                  ></Button>
+                                  <Button
+                                    class="fileBtnHoverRed"
+                                    size="small"
+                                    shape="circle"
+                                    type="text"
+                                    icon="md-close"
+                                    title="Remove"
+                                    @click="deleteResourceModalShow(userResourceList[index].resourceId)"
+                                  >
+                                  </Button>
+                                </template>
+                              </Table>
+                            </vue-scroll>
                           </div>
                         </Card>
                       </div>
                     </Col>
                   </TabPane>
                   <TabPane label="Joined projects" name="Participatory">
-                    <Card :bordered="false" v-if="joinedProjectsList.length == 0">
-                      <div style="display:flex;justify-content:center">
-                        <Icon type="md-alert" size="40" color="gray"/>
-                      </div>
-                      <br>
-                      <div style="display:flex;justify-content:center">
-                        <h3
-                          style="text-align:center;width:80%"
-                        >Sorry, you didn't participate in any projects.</h3>
-                      </div>
-                    </Card>
-                    <div
-                      v-for="(item,index) in joinedProjectsList"
-                      :key="index"
-                      v-show="joinedProjectsList!=[]"
-                    >
-                      <Col :lg="{span:11, offset:1}" :md="{span:22, offset:1}">
+                    <div style="height:900px;padding:5px;border:#dcdee2 solid 1px;">
+                      <vue-scroll :ops="ops">
+                        <Card :bordered="false" v-if="joinedProjectsList.length == 0">
+                          <div style="display:flex;justify-content:center">
+                            <Icon type="md-alert" size="40" color="gray"/>
+                          </div>
+                          <br>
+                          <div style="display:flex;justify-content:center">
+                            <h3
+                              style="text-align:center;width:80%"
+                            >Sorry, you didn't participate in any projects.</h3>
+                          </div>
+                        </Card>
                         <div
-                          class="participatoryProjectCard"
-                          @click="goSingleProject(item.projectId)"
+                          v-for="(item,index) in joinedProjectsList"
+                          :key="index"
+                          v-show="joinedProjectsList!=[]"
                         >
-                          <Card style="height:320px;margin-top:20px;">
-                            <p slot="title" style="height:40x" class="projectsTitle">{{item.title}}</p>
-                            <Button slot="extra" @click.stop="quitModalShow(item)">Quit</Button>
-                            <p
-                              style="height:200px;text-indent:2em;overflow-y:auto;word-break:break-word"
-                            >{{item.introduction}}</p>
-                            <br>
-                            <div style="height:40px">
-                              <span style="float:left">CreateTime:</span>
-                              <span style="float:right">{{item.createTime}}</span>
+                          <Col :lg="{span:10, offset:1}" :md="{span:22, offset:1}">
+                            <div
+                              class="participatoryProjectCard"
+                              @click="goSingleProject(item.projectId)"
+                            >
+                              <Card style="height:320px;margin-top:20px;">
+                                <p slot="title" style="height:40x" class="projectsTitle">{{item.title}}</p>
+                                <Button class="fileBtnHoverRed" slot="extra" @click.stop="quitModalShow(item)">Quit</Button>
+                                <p
+                                  style="height:200px;text-indent:2em;word-break:break-word"
+                                >
+                                <vue-scroll :ops="ops">{{item.introduction}}</vue-scroll></p>
+                                <br>
+                                <div style="height:40px">
+                                  <span style="float:left">CreateTime:</span>
+                                  <span style="float:right">{{item.createTime}}</span>
+                                </div>
+                              </Card>
                             </div>
-                          </Card>
+                          </Col>
                         </div>
-                      </Col>
+                      </vue-scroll>
                     </div>
                   </TabPane>
                   <TabPane label="Managed projects" name="Management">
-                    <Card :bordered="false" v-if="userManagerProjectList.length == 0">
-                      <div style="display:flex;justify-content:center">
-                        <Icon type="md-alert" size="40" color="gray"/>
-                      </div>
-                      <br>
-                      <div style="display:flex;justify-content:center">
-                        <h3
-                          style="text-align:center;width:80%"
-                        >Sorry, you didn't created any projects.</h3>
-                      </div>
-                    </Card>
-                    <div
-                      v-for="(mProject,index) in userManagerProjectList"
-                      v-show="userManagerProjectList!='None'"
-                      :key="index"
-                    >
-                      <Col :lg="{span:11, offset:1}" :md="{span:22, offset:1}">
+                    <div style="height:900px;padding:5px;border:#dcdee2 solid 1px;">
+                      <vue-scroll :ops="ops">
+                        <Card :bordered="false" v-if="userManagerProjectList.length == 0">
+                          <div style="display:flex;justify-content:center">
+                            <Icon type="md-alert" size="40" color="gray"/>
+                          </div>
+                          <br>
+                          <div style="display:flex;justify-content:center">
+                            <h3
+                              style="text-align:center;width:80%"
+                            >Sorry, you didn't created any projects.</h3>
+                          </div>
+                        </Card>
                         <div
-                          class="manageProjectsCard"
-                          @click="goSingleProject(mProject.projectId)"
+                          v-for="(mProject,index) in userManagerProjectList"
+                          v-show="userManagerProjectList!='None'"
+                          :key="index"
                         >
-                          <Card style="height:320px;margin-top:20px">
-                            <p slot="title" class="projectsTitle">{{mProject.title}}</p>
-                            <Button
-                              class="authorBtn"
-                              type="default"
-                              slot="extra"
-                              title="Privilege change"
-                              style="margin:-5px 5px 0 5px"
-                              @click.stop="authorizeModalShow(index)"
-                              icon="md-happy"
-                            ></Button>
-                            <Button
-                              class="deleteBtn"
-                              type="default"
-                              slot="extra"
-                              style="margin:-5px 5px 0 5px"
-                              @click.stop="deleteProjectModalShow(mProject.projectId)"
-                              icon="md-close"
-                              title="remove"
-                            ></Button>
-                            <!--  @click.stop="deleteProjectModalShow(mProject.projectId)" -->
-                            <!-- 表头结束 -->
-                            <p
-                              style="height:200px;text-indent:2em;overflow-y:auto;word-break:break-word"
-                            >{{mProject.introduction}}</p>
-                            <!-- <hr> -->
-                            <br>
-                            <div>
-                              <span style="float:left">CreateTime:</span>
-                              <span style="float:right">{{mProject.createTime}}</span>
+                          <Col :lg="{span:10, offset:1}" :md="{span:22, offset:1}">
+                            <div
+                              class="manageProjectsCard"
+                              @click="goSingleProject(mProject.projectId)"
+                            >
+                              <Card style="height:320px;margin-top:20px">
+                                <p slot="title" class="projectsTitle">{{mProject.title}}</p>
+                                <Button
+                                  class="authorBtn"
+                                  type="default"
+                                  slot="extra"
+                                  title="Privilege change"
+                                  style="margin:-5px 5px 0 5px"
+                                  @click.stop="authorizeModalShow(index)"
+                                  icon="md-happy"
+                                ></Button>
+                                <Button
+                                  class="deleteBtn"
+                                  type="default"
+                                  slot="extra"
+                                  style="margin:-5px 5px 0 5px"
+                                  @click.stop="deleteProjectModalShow(mProject.projectId)"
+                                  icon="md-close"
+                                  title="remove"
+                                ></Button>
+                                <!--  @click.stop="deleteProjectModalShow(mProject.projectId)" -->
+                                <!-- 表头结束 -->
+                                <p
+                                  style="height:200px;text-indent:2em;word-break:break-word"
+                                ><vue-scroll :ops="ops">{{mProject.introduction}}</vue-scroll></p>
+                                <!-- <hr> -->
+                                <br>
+                                <div>
+                                  <span style="float:left">CreateTime:</span>
+                                  <span style="float:right">{{mProject.createTime}}</span>
+                                </div>
+                              </Card>
                             </div>
-                          </Card>
+                          </Col>
                         </div>
-                      </Col>
+                      </vue-scroll>
                     </div>
                   </TabPane>
                 </Tabs>
@@ -431,6 +601,43 @@
       cancel-text="Cancel"
     >
       <h3>Do you really want to delete this project?</h3>
+    </Modal>
+    <Modal v-model="editFileModel" title="Edit file info" width="600">
+      <Form
+        ref="editFileValidate"
+        :model="editFileValidate"
+        :rules="editFileRuleValidate"
+        :label-width="100"
+        label-position="left"
+      >
+        <FormItem label="Privacy" prop="privacy">
+          <RadioGroup v-model="editFileValidate.privacy" style="width:80%">
+            <Radio label="private">Private</Radio>
+            <Radio label="public">Public</Radio>
+          </RadioGroup>
+        </FormItem>
+        <FormItem label="Type" prop="type">
+          <RadioGroup v-model="editFileValidate.type">
+            <Radio label="data"></Radio>
+            <Radio label="paper"></Radio>
+            <Radio label="document"></Radio>
+            <Radio label="model"></Radio>
+            <Radio label="image"></Radio>
+            <Radio label="video"></Radio>
+            <Radio label="others"></Radio>
+          </RadioGroup>
+        </FormItem>
+        <FormItem label="Name" prop="name">
+          <Input type="text" :rows="4" v-model="editFileValidate.name" />
+        </FormItem>
+        <FormItem label="Description" prop="description">
+          <Input type="textarea" :rows="4" v-model="editFileValidate.description" />
+        </FormItem>
+      </Form>
+      <div slot="footer">
+        <Button @click="editFileModel=false">Cancel</Button>
+        <Button type="success" @click="changeFileInfo('editFileValidate')">Submit</Button>
+      </div>
     </Modal>
   </div>
 </template>
@@ -666,7 +873,7 @@ export default {
       // 处理资源的模态框激活
       processResourceModal: false,
       // 选中资源的索引
-      selectResourceIndex: "",
+      selectResourceIndex: 0,
       // 选中的将要分享资源的项目名
       selectShareProject: "",
       selectShareProjectId: "",
@@ -679,7 +886,48 @@ export default {
       deleteProjectModal: false,
       // 要删除的项目的Id
       deleteProjectId: "",
-      img:"",
+      ops: {
+        bar: {
+          background: "#808695"
+        }
+      },
+      editFileModel:false,
+      editFileValidate: {
+        name:"",
+        description:"",
+        type:"",
+        privacy:""
+      },
+      editFileRuleValidate: {
+        privacy: [
+          {
+            required: true,
+            message: "file privacy cannot be empty",
+            trigger: "blur"
+          }
+        ],
+        type: [
+          {
+            required: true,
+            message: "file type cannot be empty",
+            trigger: "blur"
+          }
+        ],
+        name: [
+          {
+            required: true,
+            message: "file description cannot be empty",
+            trigger: "blur"
+          }
+        ],
+        description: [
+          {
+            required: true,
+            message: "file description cannot be empty",
+            trigger: "blur"
+          }
+        ]
+      },
     };
   },
   methods: {
@@ -1138,141 +1386,47 @@ export default {
     selectPID(id, name) {
       this.selectShareProjectId = id;
       this.selectShareProjectName = name;
+    },
+    fileEditModalShow(index){
+      this.selectResourceIndex = index;
+      var oldFileInfo = this.userResourceList[index]; 
+      this.editFileValidate={
+        name:oldFileInfo.name,
+        description:oldFileInfo.description,
+        type:oldFileInfo.type,
+        privacy:oldFileInfo.privacy
+      };
+      this.editFileModel = true;
+    },
+    changeFileInfo(name){
+      this.$refs[name].validate(valid => {
+        if (valid) {
+          var editFormData=new FormData();
+          editFormData.append("resourceId",this.userResourceList[this.selectResourceIndex].resourceId);
+          editFormData.append("name",this.editFileValidate.name);
+          editFormData.append("type",this.editFileValidate.type);
+          editFormData.append("description",this.editFileValidate.description);
+          editFormData.append("privacy",this.editFileValidate.privacy);
+          this.axios({
+            url:"/GeoProblemSolving/resource/update",
+            method: "post",
+            data:editFormData
+          })
+            .then(res=>{
+              this.editFileModel = false;
+              if(res.data!="Fail"&&res.data!="None"){
+                var newResourceInfo = res.data;
+                this.userResourceList.splice(this.selectResourceIndex,1,newResourceInfo);
+              }else{
+                this.$Message.error("Edit fail: "+res.data+".");
+              }
+            })
+            .catch(err=>{
+              this.$Message.error("Edit error.");
+            });
+        }
+      });
     }
   }
 };
 </script>
-<style scoped>
-.detailSidebar {
-  margin-right: 20px;
-}
-.rightContent {
-  margin-top: 20px;
-  flex: 1;
-}
-/* 用户头像 */
-.user-img {
-  margin-top: 20px;
-  width: 100%;
-  max-height: 100%;
-  text-align: center;
-}
-/* 注册时上传头像的用户的头像样式 */
-.u_img {
-  max-width: 100%;
-  padding: 10px;
-}
-/* 注册时未上传头像的用户头像显示样式 */
-.avatarStyle {
-  margin: 0 auto;
-}
-/* 用户头像结束 */
-body {
-  overflow-x: hidden;
-}
-/* 侧边用户信息的显示样式 */
-.single-info {
-  padding: 5px;
-  height: 30px;
-  font-size: 12px;
-  line-height: 15px;
-}
-/* 表示空格间距的 */
-.whitespace {
-  height: 20px;
-}
-/* 关于提交用户更改头像信息的样式 */
-.demo-upload-list {
-  display: inline-block;
-  width: 60px;
-  height: 60px;
-  text-align: center;
-  line-height: 60px;
-  border: 1px solid transparent;
-  border-radius: 4px;
-  overflow: hidden;
-  background: #fff;
-  position: relative;
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
-  margin-right: 4px;
-}
-.avatarImage {
-  width: 100%;
-  height: 100%;
-}
-.demo-upload-list-cover {
-  display: none;
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: rgba(0, 0, 0, 0.6);
-}
-.demo-upload-list:hover .demo-upload-list-cover {
-  display: block;
-}
-.demo-upload-list-cover i {
-  color: #fff;
-  font-size: 20px;
-  cursor: pointer;
-  margin: 0 2px;
-}
-.uploadAvatar {
-  position: relative;
-  width: 58px;
-  height: 58px;
-  top: 0;
-  left: 0;
-  outline: none;
-  background-color: transparent;
-  opacity: 0;
-}
-.uploadBox {
-  display: inline-block;
-  width: 58px;
-  height: 58px;
-  line-height: 58px;
-  overflow: hidden;
-  border-width: 0.75px;
-  border-style: dashed;
-  border-color: lightslategray;
-}
-/* 2-25 add 实现的效果是旋浮上去出现下划线且变红 */
-.projectsTitle:hover {
-  /* color: red; */
-  cursor: pointer;
-}
-
-/* 新定义的样式 */
-.authorBtn:hover {
-  background-color: #57a3f3;
-  color: white;
-}
-.deleteBtn:hover {
-  background-color: #ed4014;
-  color: white;
-}
-.table table {
-  table-layout: auto;
-  width: 100% !important;
-}
-.participatoryProjectCard:hover {
-  cursor: pointer;
-}
-.manageProjectsCard:hover {
-  cursor: pointer;
-}
-/* 时间轴样式 */
-.timeLineStyle {
-  margin-left: 5%;
-  max-height: 300px;
-  overflow-y: auto;
-}
-</style>
-<style>
-.parent .ivu-tabs-nav-container {
-  font-size: 15px !important;
-  font-weight: bold;
-}
-</style>

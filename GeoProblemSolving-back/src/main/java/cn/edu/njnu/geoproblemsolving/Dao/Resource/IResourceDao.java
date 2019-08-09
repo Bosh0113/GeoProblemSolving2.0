@@ -11,8 +11,13 @@ public interface IResourceDao {
 
     Object readPublicResource();
 
+    Object updateResource(HttpServletRequest request);
+
     String deleteResource(String key,String value);
 
     void getZipResource(HttpServletRequest request, HttpServletResponse response, String key, String value);
 
+    void packageToZip(HttpServletRequest request,HttpServletResponse response);
+
+    String copyFileToPersonalCenter(String resourceId, String userId,String privacy);
 }
