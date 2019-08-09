@@ -9,7 +9,7 @@ public interface IFolderDao {
     Object removeFolder(String folderId, String parentId);
     Object uploadToFolder(HttpServletRequest request);
     Object shareToFolder(String addFileList, String folderId);
-    Object renameFile(String newName, String fileId, String folderId);
+    Object editFile(String fileId, String folderId,String type,String name,String description);
     Object removeFile(String fileId, String folderId);
     String copyFileToPersonalCenter(String resourceId, String userId,String privacy,String type,String name,String description);
 }

@@ -199,7 +199,7 @@
                                                 type="text"></i-button>
                                             <i-button @click="showCopyFileModel(file)" shape="circle" icon="ios-share-alt" title="Copy to personal center" size="small" class="fileBtnHoverOrange"
                                                 type="text"></i-button>
-                                            <i-button @click="fileRenameModalShow(file)" shape="circle" icon="md-create" title="Rename" size="small" class="fileBtnHoverBlue"
+                                            <i-button @click="fileEditModelShow(file)" shape="circle" icon="md-create" title="Edit info" size="small" class="fileBtnHoverBlue"
                                                 type="text"></i-button>
                                             <i-button @click="fileDelete(file)" shape="circle" icon="ios-trash" title="Remove" size="small" class="fileBtnHoverRed" type="text"></i-button>
                                         </div>
@@ -325,15 +325,29 @@
                     <i-button @click="closeshareModel()" style="float:right;margin-right: 15px;">Cancel</i-button>
                 </div>
             </Modal>
-            <Modal v-model="renameFileModal" title="Rename file" ok-text="Assure" cancel-text="Cancel">
-                <i-form ref="renameValidate" :model="renameValidate" :rules="renameRuleValidate" :label-width="80">
-                    <Form-item label="New name" prop="newName">
-                        <i-input v-model="renameValidate.newName" :rows="4" placeholder="Enter the name for folder..." />
+            <Modal v-model="editFileModel" title="Edit file info">
+                <i-form ref="editFileValidate" :model="editFileValidate" :rules="renameRuleValidate" :label-width="80">
+                    <Form-item label="Type" prop="type">
+                      <Radio-group v-model="editFileValidate.type">
+                        <Radio label="data"></Radio>
+                        <Radio label="paper"></Radio>
+                        <Radio label="document"></Radio>
+                        <Radio label="model"></Radio>
+                        <Radio label="image"></Radio>
+                        <Radio label="video"></Radio>
+                        <Radio label="others"></Radio>
+                      </Radio-group>
+                    </Form-item>
+                    <Form-item label="Name" prop="name">
+                        <i-input v-model="editFileValidate.name" :rows="4" placeholder="Enter the name for file..." />
+                    </Form-item>
+                    <Form-item label="Description" prop="description">
+                      <i-input type="textarea" :rows="4" v-model="editFileValidate.description" />
                     </Form-item>
                 </i-form>
                 <div slot="footer">
-                    <i-button @click="renameFileModal=false">Cancel</i-button>
-                    <i-button type="success" @click="renameFile('renameValidate')">Rename</i-button>
+                    <i-button @click="editFileModel=false">Cancel</i-button>
+                    <i-button type="success" @click="editFileInfo('editFileValidate')">Submit</i-button>
                 </div>
             </Modal>
             <Modal v-model="copyFileModal" title="Copy file to personal center" width="500">
@@ -399,6 +413,34 @@
                             }
                         ]
                     },
+                    editFileValidate:{
+                        name:"",
+                        type:"",
+                        description:""
+                    },
+                    editFileRuleValidate:{
+                        type: [
+                        {
+                            required: true,
+                            message: "file type cannot be empty",
+                            trigger: "blur"
+                        }
+                        ],
+                        name: [
+                        {
+                            required: true,
+                            message: "file description cannot be empty",
+                            trigger: "blur"
+                        }
+                        ],
+                        description: [
+                        {
+                            required: true,
+                            message: "file description cannot be empty",
+                            trigger: "blur"
+                        }
+                        ]
+                    },
                     uploadModal: false,
                     uploadValidate: {
                         privacy: "private",
@@ -455,7 +497,7 @@
                     indeterminate: true,
                     checkAll: false,
                     shareModal: false,
-                    renameFileModal: false,
+                    editFileModel: false,
                     userResourceList: [],
                     selectedFilesToShare: [],
                     ops: {
@@ -915,48 +957,55 @@
                 fileDownload(fileInfo) {
                     window.open(fileInfo.pathURL);
                 },
-                fileRenameModalShow(fileInfo) {
+                fileEditModelShow(fileInfo) {
                     this.renameForeInfo = fileInfo;
-                    this.renameValidate.newName = "";
-                    this.renameFileModal = true;
+                    this.editFileValidate.name = fileInfo.name;
+                    this.editFileValidate.type = fileInfo.type;
+                    this.editFileValidate.description = fileInfo.description;
+                    this.editFileModel = true;
                 },
-                renameFile(name) {
+                editFileInfo(name) {
                     this.$refs[name].validate(valid => {
                         if (valid) {
-                            var folderId = this.currentFolder.folderId;
-                            var fileId = this.renameForeInfo.resourceId;
-                            var newName = this.renameValidate.newName;
-                            axios
-                                .get(
-                                    "/GeoProblemSolving/folder/renameFile" +
-                                    "?newName=" +
-                                    newName +
-                                    "&fileId=" +
-                                    fileId +
-                                    "&folderId=" +
-                                    folderId
-                                )
-                                .then(res => {
-                                    this.renameFileModal = false;
-                                    if (res.data == "Offline") {
-                                        confirm("You are offline, please login again.");
-                                    } else if (res.data != "Fail") {
-                                        var newFileInfo = Object.assign({}, this.renameForeInfo);
-                                        newFileInfo.name = newName;
-                                        for (var i = 0; i < this.currentFolder.files.length; i++) {
-                                            if (this.currentFolder.files[i].resourceId == fileId) {
-                                                this.currentFolder.files.splice(i, 1, newFileInfo);
-                                                break;
-                                            }
-                                        }
-                                    } else {
-                                        this.$Message.warning("Rename fail.");
+                        var folderId = this.currentFolder.folderId;
+                        var fileId = this.renameForeInfo.resourceId;
+                        axios
+                            .get(
+                            "/GeoProblemSolving/folder/editFile" +
+                                "?fileId=" +
+                                fileId +
+                                "&folderId=" +
+                                folderId +
+                                "&name=" +
+                                this.editFileValidate.name+
+                                "&type=" +
+                                this.editFileValidate.type+
+                                "&description=" +
+                                this.editFileValidate.description
+                            )
+                            .then(res => {
+                                this.editFileModel = false;
+                            if (res.data == "Offline") {
+                                confirm("You are offline, please login again.");
+                            } else if (res.data != "Fail") {
+                                var newFileInfo = Object.assign({}, this.renameForeInfo);
+                                newFileInfo.name = this.editFileValidate.name;
+                                newFileInfo.type = this.editFileValidate.type;
+                                newFileInfo.description = this.editFileValidate.description;
+                                for (var i = 0; i < this.currentFolder.files.length; i++) {
+                                    if (this.currentFolder.files[i].resourceId == fileId) {
+                                        this.currentFolder.files.splice(i, 1, newFileInfo);
+                                        break;
                                     }
-                                })
-                                .catch(err => {
-                                    this.$Message.warning("Rename fail.");
-                                });
-                            this.renameFolderModal = false;
+                                }
+                            } else {
+                                this.$Message.warning("Rename fail.");
+                            }
+                            })
+                            .catch(err => {
+                            this.$Message.warning("Rename fail.");
+                            });
+                        this.renameFolderModal = false;
                         }
                     });
                 },

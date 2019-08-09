@@ -172,7 +172,7 @@ public class FolderDaoImpl implements IFolderDao{
     }
 
     @Override
-    public Object renameFile(String newName, String fileId, String folderId) {
+    public Object editFile(String fileId, String folderId,String type,String name,String description) {
         try{
             folderId = decode(folderId);
             Query queryFolder = new Query(Criteria.where("folderId").is(folderId));
@@ -180,7 +180,9 @@ public class FolderDaoImpl implements IFolderDao{
             ArrayList<ResourceEntity> files = folderEntity.getFiles();
             for (ResourceEntity file:files){
                 if (file.getResourceId().equals(fileId)){
-                    file.setName(newName);
+                    file.setName(name);
+                    file.setDescription(description);
+                    file.setType(type);
                     break;
                 }
             }

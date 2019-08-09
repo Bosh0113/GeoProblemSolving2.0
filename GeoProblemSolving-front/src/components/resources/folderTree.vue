@@ -238,10 +238,10 @@
                     type="text"
                   ></Button>
                   <Button
-                    @click="fileRenameModalShow(file)"
+                    @click="fileEditModelShow(file)"
                     shape="circle"
                     icon="md-create"
-                    title="Rename"
+                    title="Edit info"
                     size="small"
                     class="fileBtnHoverBlue"
                     type="text"
@@ -440,24 +440,38 @@
         <i-button @click="closeshareModel()" style="float:right;margin-right: 15px;">Cancel</i-button>
       </div>
     </Modal>
-    <Modal v-model="renameFileModal" title="Rename file" ok-text="Assure" cancel-text="Cancel">
+    <Modal v-model="editFileModel" title="Edit file info">
       <Form
-        ref="renameValidate"
-        :model="renameValidate"
-        :rules="renameRuleValidate"
+        ref="editFileValidate"
+        :model="editFileValidate"
+        :rules="editFileRuleValidate"
         :label-width="80"
       >
-        <FormItem label="New name" prop="newName">
+        <FormItem label="Type" prop="type">
+          <RadioGroup v-model="editFileValidate.type">
+            <Radio label="data"></Radio>
+            <Radio label="paper"></Radio>
+            <Radio label="document"></Radio>
+            <Radio label="model"></Radio>
+            <Radio label="image"></Radio>
+            <Radio label="video"></Radio>
+            <Radio label="others"></Radio>
+          </RadioGroup>
+        </FormItem>
+        <FormItem label="Name" prop="name">
           <Input
-            v-model="renameValidate.newName"
+            v-model="editFileValidate.name"
             :rows="4"
-            placeholder="Enter the name for folder..."
+            placeholder="Enter the name for file..."
           />
+        </FormItem>
+        <FormItem label="Description" prop="description">
+          <Input type="textarea" :rows="4" v-model="editFileValidate.description" />
         </FormItem>
       </Form>
       <div slot="footer">
-        <Button @click="renameFileModal=false">Cancel</Button>
-        <Button type="success" @click="renameFile('renameValidate')">Rename</Button>
+        <Button @click="editFileModel=false">Cancel</Button>
+        <Button type="success" @click="editFileInfo('editFileValidate')">Submit</Button>
       </div>
     </Modal>
     <Modal v-model="copyFileModal" title="Copy file to personal center" width="500">
@@ -506,6 +520,34 @@ export default {
           {
             required: true,
             message: "The name can't be null.",
+            trigger: "blur"
+          }
+        ]
+      },
+      editFileValidate:{
+        name:"",
+        type:"",
+        description:""
+      },
+      editFileRuleValidate:{
+        type: [
+          {
+            required: true,
+            message: "file type cannot be empty",
+            trigger: "blur"
+          }
+        ],
+        name: [
+          {
+            required: true,
+            message: "file description cannot be empty",
+            trigger: "blur"
+          }
+        ],
+        description: [
+          {
+            required: true,
+            message: "file description cannot be empty",
             trigger: "blur"
           }
         ]
@@ -566,7 +608,7 @@ export default {
       indeterminate: true,
       checkAll: false,
       shareModal: false,
-      renameFileModal: false,
+      editFileModel: false,
       userResourceList: [],
       selectedFilesToShare: [],
       ops: {
@@ -1034,35 +1076,42 @@ export default {
     fileDownload(fileInfo) {
       window.open(fileInfo.pathURL);
     },
-    fileRenameModalShow(fileInfo) {
+    fileEditModelShow(fileInfo) {
       this.renameForeInfo = fileInfo;
-      this.renameValidate.newName = "";
-      this.renameFileModal = true;
+      this.editFileValidate.name = fileInfo.name;
+      this.editFileValidate.type = fileInfo.type;
+      this.editFileValidate.description = fileInfo.description;
+      this.editFileModel = true;
     },
-    renameFile(name) {
+    editFileInfo(name) {
       this.$refs[name].validate(valid => {
         if (valid) {
           var folderId = this.currentFolder.folderId;
           var fileId = this.renameForeInfo.resourceId;
-          var newName = this.renameValidate.newName;
           this.axios
             .get(
-              "/GeoProblemSolving/folder/renameFile" +
-                "?newName=" +
-                newName +
-                "&fileId=" +
+              "/GeoProblemSolving/folder/editFile" +
+                "?fileId=" +
                 fileId +
                 "&folderId=" +
-                folderId
+                folderId +
+                "&name=" +
+                this.editFileValidate.name+
+                "&type=" +
+                this.editFileValidate.type+
+                "&description=" +
+                this.editFileValidate.description
             )
             .then(res => {
-              this.renameFileModal = false;
+              this.editFileModel = false;
               if (res.data == "Offline") {
                 this.$store.commit("userLogout");
                 this.$router.push({ name: "Login" });
               } else if (res.data != "Fail") {
                 var newFileInfo = Object.assign({}, this.renameForeInfo);
-                newFileInfo.name = newName;
+                newFileInfo.name = this.editFileValidate.name;
+                newFileInfo.type = this.editFileValidate.type;
+                newFileInfo.description = this.editFileValidate.description;
                 for (var i = 0; i < this.currentFolder.files.length; i++) {
                   if (this.currentFolder.files[i].resourceId == fileId) {
                     this.currentFolder.files.splice(i, 1, newFileInfo);
