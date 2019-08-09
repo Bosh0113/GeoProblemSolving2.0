@@ -577,7 +577,7 @@ export default {
       contentHeight: 100,
       copyFileModal:false,
       copyFilePrivacy:"private",
-      selectedFileId:""
+      selectedFile:{}
     };
   },
   mounted() {
@@ -1092,15 +1092,18 @@ export default {
     showCopyFileModel(file){
       this.copyFileModal = true;
       this.copyFilePrivacy = "private";
-      this.selectedFileId = file.resourceId;
+      this.selectedFile = file;
     },
     copyFileToCenter(){
       this.axios
       .get(
-        "/GeoProblemSolving/resource/copyToCenter"+
-        "?resourceId="+this.selectedFileId+
+        "/GeoProblemSolving/folder/copyToCenter"+
+        "?resourceId="+this.selectedFile.resourceId+
         "&userId="+this.$store.getters.userId+
-        "&privacy="+this.copyFilePrivacy
+        "&privacy="+this.copyFilePrivacy+
+        "&type="+this.selectedFile.type+
+        "&name="+this.selectedFile.name+
+        "&description="+this.selectedFile.description
       )
       .then(res=>{
         this.copyFileModal = false;

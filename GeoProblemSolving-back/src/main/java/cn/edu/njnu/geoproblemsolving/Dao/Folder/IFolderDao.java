@@ -11,4 +11,5 @@ public interface IFolderDao {
     Object shareToFolder(String addFileList, String folderId);
     Object renameFile(String newName, String fileId, String folderId);
     Object removeFile(String fileId, String folderId);
+    String copyFileToPersonalCenter(String resourceId, String userId,String privacy,String type,String name,String description);
 }

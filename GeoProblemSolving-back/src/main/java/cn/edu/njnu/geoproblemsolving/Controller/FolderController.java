@@ -62,4 +62,14 @@ public class FolderController {
         FolderDaoImpl folderDao = new FolderDaoImpl(mongoTemplate);
         return folderDao.removeFile(fileId,folderId);
     }
+    @RequestMapping(value = "/copyToCenter",method = RequestMethod.GET)
+    public String copyToCenter(@RequestParam("resourceId") String resourceId,
+                               @RequestParam("userId") String userId,
+                               @RequestParam("privacy") String privacy,
+                               @RequestParam("type") String type,
+                               @RequestParam("name") String name,
+                               @RequestParam("description") String description){
+        FolderDaoImpl folderDao = new FolderDaoImpl(mongoTemplate);
+        return folderDao.copyFileToPersonalCenter(resourceId,userId,privacy,type,name,description);
+    }
 }
