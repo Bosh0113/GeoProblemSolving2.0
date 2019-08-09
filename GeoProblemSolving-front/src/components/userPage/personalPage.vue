@@ -1240,7 +1240,7 @@ export default {
     },
     //点击跳转到指定项目的函数
     goSingleProject(id) {
-      this.$router.push({ name: "ProjectDetail", params: { id: id } });
+      window.location.href="/GeoProblemSolving/projectDetail/"+id;
     },
     readPersonalEvent() {
       this.axios

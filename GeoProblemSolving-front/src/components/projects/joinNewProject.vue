@@ -271,15 +271,15 @@ export default {
             this.password
         )
         .then(res => {
+          let gotoProjectId = this.projectId;
           if (res.data === "Success") {
             this.$Message.info("Join successfuly");
-            let gotoProjectId = this.projectId
-            this.$router.push({ name: "ProjectDetail", params: { id: gotoProjectId } });
+            window.location.href="/GeoProblemSolving/projectDetail/"+gotoProjectId;
           } else if (res.data === "Fail") {
             this.$Message.info("Fail to join in this project");
           }else if(res.data === "Exist"){
             this.$Message.info("you have been in this group,no need to apply again");
-            this.$router.push({ name: "ProjectDetail", params: { id: gotoProjectId } });
+            window.location.href="/GeoProblemSolving/projectDetail/"+gotoProjectId;
           }else if(res.data === "None"){
             this.$Message.info("this group doesn't exist");
           }else if(res.data === "Password"){

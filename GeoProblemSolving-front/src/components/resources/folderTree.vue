@@ -93,6 +93,9 @@
   background-color: #808695;
   color: white;
 }
+.demo-spin-icon-load{
+    animation: ani-demo-spin 1s linear infinite;
+}
 </style>
 <template>
   <div class="fileSpace">
@@ -1144,6 +1147,7 @@ export default {
       this.selectedFile = file;
     },
     copyFileToCenter(){
+      this.$Spin.show();
       this.axios
       .get(
         "/GeoProblemSolving/folder/copyToCenter"+
@@ -1155,6 +1159,7 @@ export default {
         "&description="+this.selectedFile.description
       )
       .then(res=>{
+        this.$Spin.hide();
         this.copyFileModal = false;
         if(res.data=="Success"){
           this.$Message.success("Copy file success.");
