@@ -266,16 +266,6 @@
         <div v-else style="text-align:center">
           <div style="color:lightgray;font-size:2em; font-weight:bold">No file or folder</div>
         </div>
-        <div>
-          <Row>
-            <Col class="demo-spin-col" span="8" offset="8" v-show="spinAnimate==true">
-              <Spin fix v-show="spinAnimate==true">
-                <Icon type="ios-loading" size="40" class="demo-spin-icon-load"></Icon>
-                <div>Loading</div>
-              </Spin>
-            </Col>
-          </Row>
-        </div>
       </div>
     </Card>
     <Modal v-model="renameFolderModal" title="Rename folder" ok-text="Assure" cancel-text="Cancel">
@@ -605,8 +595,6 @@ export default {
       panel: null,
       // 单选选中的名称数组
       chooseFilesArray: [],
-      // loading动画
-      spinAnimate: false,
       // 关于单选多选的按钮
       indeterminate: true,
       checkAll: false,
@@ -960,7 +948,7 @@ export default {
       a.download = "package.zip";
       a.href = blobUrl;
       a.click();
-      document.body.removeChild(a);
+      a.remove();
     },
     handleCheckAll() {
       if (this.indeterminate) {
@@ -992,7 +980,7 @@ export default {
     downloadSelectFile() {
       let choosefileUrls = this.chooseFilesArray.toString();
       if (choosefileUrls != "") {
-        this.spinAnimate = true;
+        this.$Spin.show();
         this.axios({
           method: "post",
           url:
@@ -1001,7 +989,7 @@ export default {
         })
           .then(res => {
             if (res.status == 200) {
-              this.spinAnimate = false;
+              this.$Spin.hide();
               const blobUrl = window.URL.createObjectURL(res.data);
               if (blobUrl != "") {
                 this.download(blobUrl);

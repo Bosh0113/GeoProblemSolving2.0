@@ -140,6 +140,13 @@ body {
   background-color: #2db7f5;
   color: white;
 }
+.fileBtnHoverGray:hover {
+  background-color: #808695;
+  color: white;
+}
+.demo-spin-icon-load{
+    animation: ani-demo-spin 1s linear infinite;
+}
 </style>
 <template>
   <div>
@@ -348,9 +355,17 @@ body {
                       <div style="margin-bottom:40px">
                         <Card dis-hover>
                           <p slot="title">Resource list</p>
+                          <div slot="extra">
+                            <Button 
+                            class="fileBtnHoverGray"
+                            title="Download all selected"
+                            @click="downloadFiles">
+                            <Icon size="20" type="md-cloud-download"></Icon>
+                            </Button>
+                          </div>
                           <div style="height:500px">
                             <vue-scroll :ops="ops">
-                              <Table :data="userResourceList" :columns="resourceColumn" class="table">
+                              <Table :data="userResourceList" :columns="resourceColumn" class="table" @on-selection-change="setSelectedFiles">
                                 <template slot-scope="{ row }" slot="name">
                                   <strong>{{ row.name }}</strong>
                                 </template>
@@ -928,6 +943,7 @@ export default {
           }
         ]
       },
+      filesToPackage:[],
     };
   },
   methods: {
@@ -1426,7 +1442,48 @@ export default {
             });
         }
       });
-    }
+    },
+    setSelectedFiles(selectedFileList){
+      var selectedFileUrls = [];
+      for(var i=0;i<selectedFileList.length;i++){
+        selectedFileUrls.push(selectedFileList[i].pathURL);
+      }
+      this.$set(this,"filesToPackage",selectedFileUrls);
+    },
+    downloadFiles(){
+      if(this.filesToPackage.length>0){
+        this.$Spin.show();
+        var filesUrlStr = this.filesToPackage.toString();
+        this.axios({
+          method: "post",
+          url:
+            "/GeoProblemSolving/resource/packageZIP?fileURLs=" + filesUrlStr,
+          responseType: "blob"
+        })
+          .then(res => {
+            this.$Spin.hide();
+            if (res.status == 200) {
+              const blobUrl = window.URL.createObjectURL(res.data);
+              if (blobUrl != "") {
+                this.download(blobUrl);
+              }
+            }
+          })
+          .catch(err => {
+            confirm("errror");
+          });
+      }else{
+        this.$Message.warning("No file be selected.");
+      }
+    },
+    download(blobUrl) {
+      const a = document.createElement("a");
+      a.style.display = "none";
+      a.download = "package.zip";
+      a.href = blobUrl;
+      a.click();
+      a.remove();
+    },
   }
 };
 </script>
