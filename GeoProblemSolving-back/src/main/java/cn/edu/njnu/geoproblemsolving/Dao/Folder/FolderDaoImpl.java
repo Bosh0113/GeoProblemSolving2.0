@@ -1,5 +1,6 @@
 package cn.edu.njnu.geoproblemsolving.Dao.Folder;
 
+import cn.edu.njnu.geoproblemsolving.Dao.Method.FileCopyThread;
 import cn.edu.njnu.geoproblemsolving.Dao.Resource.ResourceDaoImpl;
 import cn.edu.njnu.geoproblemsolving.Entity.Folder.FolderEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.Folder.FolderItem;
@@ -253,7 +254,12 @@ public class FolderDaoImpl implements IFolderDao{
                 String fileSavePath = newFilePath+"/"+newFileName;
                 File newFile = new File(fileSavePath);
 
-                FileUtils.copyFile(oldFile,newFile);//优化点，异步执行
+                //单独开个线程执行文件复制
+                FileCopyThread fileCopyThread = new FileCopyThread();
+                fileCopyThread.setSrcFile(oldFile);
+                fileCopyThread.setDestFile(newFile);
+                Thread thread = new Thread(fileCopyThread);
+                thread.start();
 
                 String newFileUrl = "/GeoProblemSolving/resource/"+userId+"/"+newFileName;
                 resourceFile.setResourceId(UUID.randomUUID().toString());
