@@ -24,7 +24,7 @@ public class MessageRecordsDaoImpl implements IMessageRecordsDao {
     public String saveMessageRecords(MessageRecordsEntity messageEvent){
         try {
             Date date=new Date();
-            SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             messageEvent.setCreateTime(dateFormat.format(date));
             messageEvent.setMessageId(UUID.randomUUID().toString());
             mongoTemplate.save(messageEvent);

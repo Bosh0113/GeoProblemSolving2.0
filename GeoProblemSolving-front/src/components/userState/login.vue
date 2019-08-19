@@ -228,7 +228,7 @@ export default {
   mounted() {
     // this.$Notice.config({
     //   top: 100,
-    //   duration: 0
+    //   duration: 0`
     // });
     this.contentStyle.height = window.innerHeight - 60 + "px";
     this.loginStyle.marginTop = window.innerHeight / 5 + "px";
