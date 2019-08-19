@@ -1,89 +1,105 @@
 <style scoped>
 /* 注意css在哪里生效,需要全局使用就全局定义，仅在某个局部定义就在某个div或者元素下定义，在其子元素生效 */
-.layout {
-  --layout-background: lightgray;
-  --headerHeight: 60px;
-  --footerHeight: 60px;
-  --loginDivWidth:40%;
-  --loginTextAlign:center;
-  overflow: hidden;
-}
-.header {
-  /* 计算属性，可以根据需求动态变化宽高 */
-  height: calc(var(--headerHeight) * 1);
-  background: #515a6e;
-}
+        .layout {
+            background-color: #ffffff;
+            --headerHeight: 60px;
+            /*--footerHeight: 60px;*/
+            overflow: hidden;
+        }
+      
 
-.content {
-  background-color: var(--layout-background);
-  display: flex;
-  justify-content: center;
-}
-.loginDiv {
-  width: var(--loginDivWidth);
-  border: var(--loginBorder);
-  --loginContentColor: white;
-  --loginFontColor: white;
-  --loginTitleColor: #57a3f3;
-  --loginBtnFontSize: 15px;
-}
-.loginTitle {
-  background-color: var(--loginTitleColor);
-  text-align: var(--loginTextAlign);
-  vertical-align: middle;
-  line-height: 60px;
-  color: var(--loginFontColor);
-  font-size: 30px;
-  font-weight: bold;
-  padding: 0;
-}
-.login-content {
-  background-color: var(--loginContentColor);
-  padding: 50px 20px 20px 20px;
-}
-#logo {
-  position: absolute;
-  width: 129px;
-  height: 40px;
-  z-index: 1;
-  margin-top: 5px;
-  margin-left: 2.5%;
-}
-.loginBtn {
-  font-size: var(--loginBtnFontSize);
-}
-.loginBtn:hover {
-  color: white;
-  background-color: var(--loginTitleColor);
-  font-size: var(--loginBtnFontSize);
-}
-img {
-  cursor: pointer;
-}
-.reUseDiv {
-  display: flex;
-  text-align: var(--loginTextAlign);
-  justify-content: center;
-}
-.reciverSpan {
-  width: 100px;
-  text-align: var(--loginTextAlign);
-}
-.resetReuseDiv {
-  display: flex;
-  align-items: center;
-  padding: 10px;
-}
-.resetReuseDiv p,
-.resetReuseDiv input {
-  width: 100%;
-}
+        .content {
+            background-image: url("../../assets/images/c5.jpg");
+            background-size:cover;
+            display: flex;
+            justify-content: center;   
+            /* background-attachment:fixed; */
+            margin: 0 auto;
+        }
+        .loginDiv {
+            width: 450px;
+            border: 1px solid rgba(133, 115, 92, 0.4);
+            position: absolute;
+            left: 60%;
+            top: 5%;
+            background-color: rgba(255,255,255,1);
+        }
+        .loginTitle {
+            text-align:center;
+            vertical-align: middle;
+            line-height: 50px;
+            color: #332d23;
+            font-size: 25px;
+            font-weight: bold;
+            padding-top: 40px;
+            margin-left: 20%;
+            margin-right: 20%;
+            border-bottom: 1px solid rgba(133, 115, 92, 0.4);
+        }
+        .login-content {
+            padding: 50px 10px 20px 20px;
+            height: 350px;
+            margin-left: 10%;
+            margin-right: 10%;
+        }
+        .ivu-form .ivu-form-item-label {
+            text-align: right;
+            vertical-align: middle;
+            float: left;
+            font-size: 14px;
+            color: #495060;
+            line-height: 1.5;
+            padding: 5px 12px 10px 0;
+            -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+        }
+        .ivu-input{
+            width: 90%;
+            font-size: 13px;
+        }
+
+        #logo {
+            position: absolute;
+            width: 129px;
+            height: 40px;
+            z-index: 1;
+            margin-top: 5px;
+            margin-left: 2.5%;
+        }
+        .loginBtn {
+            font-size: 15px;
+        }
+        .loginBtn:hover {
+            color: rgb(54, 72, 109);
+            background-color: white;
+            font-size: 15px;
+
+        }
+        img {
+            cursor: pointer;
+        }
+        .reUseDiv {
+            display: flex;
+            text-align: center;
+            justify-content: center;
+        }
+        .reciverSpan {
+            width: 100px;
+            text-align: center;
+        }
+        .resetReuseDiv {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+        }
+        .resetReuseDiv p,
+        .resetReuseDiv input {
+            width: 100%;
+        }
+
 </style>
 <template>
   <div class="layout">
-    <!-- <div class="header">
-      <img src="@/assets/images/OGMS.png" id="logo" @click="goHome">
-    </div> -->
     <div class="content" ref="homePage" v-if="UserState===false" v-bind:style="contentStyle">
       <div class="loginDiv" v-bind:style="loginStyle">
         <div class="loginTitle">Log in</div>
@@ -154,6 +170,7 @@ img {
     </Modal>
   </div>
 </template>
+
 <script>
 export default {
   components: {},
@@ -211,7 +228,7 @@ export default {
   mounted() {
     // this.$Notice.config({
     //   top: 100,
-    //   duration: 0
+    //   duration: 0`
     // });
     this.contentStyle.height = window.innerHeight - 60 + "px";
     this.loginStyle.marginTop = window.innerHeight / 5 + "px";

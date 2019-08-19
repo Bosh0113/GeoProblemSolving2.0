@@ -13,6 +13,7 @@ const routes = [{
     { path: 'projectlist', name: 'Projects', component: resolve => (require(["@/components/navigationContent/projectList"], resolve)) },
     { path: 'project/:id', name: 'ProjectDetail', component: resolve => (require(["@/components/projects/projectDetail"], resolve)) },
     { path: 'project/:id/workspace', name: 'workspace', component: resolve => (require(["@/components/workingSpace/moduleList"], resolve)) },
+    { path: 'project/workspace/contextdefinition/:id', name: 'contextDefinition', component: resolve => (require(["@/components/workingSpace/contextDefinition"], resolve)) },
     { path: 'project/:id/stepCreation', name: 'stepCreation', component: resolve => (require(["@/components/workingSpace/stepCreation"], resolve)) },
     {
       path: 'project/:id/subproject/', name: 'subproject', component: resolve => (require(["@/components/subProject/subprojectNav"], resolve)), children: [
@@ -20,8 +21,10 @@ const routes = [{
         { path: 'info', name: 'info', component: resolve => (require(["@/components/subProject/subprojectDetail"], resolve)) },
         { path: 'resource', name: 'resource', component: resolve => (require(["@/components/subProject/subResources"], resolve)) },
         { path: 'process', name: 'process', component: resolve => (require(["@/components/subProject/solvingStep"], resolve)) },
-        { path: 'task', name: 'task', component: resolve => (require(["@/components/subProject/taskArrangement"], resolve)) },
-      ]
+        { path: 'task', name: 'task', component: resolve => (require(["@/components/subProject/taskArrangement"], resolve)) },        
+       
+      ],
+      
     },
     { path: 'newproject', name: 'NewProject', component: resolve => (require(["@/components/projects/newProject"], resolve)) },
     { path: 'participants', name: 'Participants', component: resolve => (require(["@/components/navigationContent/participants"], resolve)) },
