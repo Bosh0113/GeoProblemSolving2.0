@@ -118,7 +118,6 @@ export default {
     },
     getProjectInfo() {
       let projectInfo = this.$store.getters.project;
-      let that = this;
       if (
         JSON.stringify(projectInfo) != "{}" &&
         projectInfo.projectId.substring(0, 36) ==

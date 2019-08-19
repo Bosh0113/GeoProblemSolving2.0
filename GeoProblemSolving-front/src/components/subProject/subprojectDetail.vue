@@ -40,7 +40,7 @@
 .subProjectDesc {
   text-indent: 2em;
   padding: 10px 0;
-  min-height: 100px;
+  min-height: 250px;
   word-break: break-all;
   word-wrap: break-word;
 }
@@ -66,7 +66,7 @@
           <vue-scroll :ops="scrollOps" :style="{height:sidebarHeight+150+'px'}">
             <Card class="Information">
               <div style="width:100%">
-                <strong>Purposes / Goals:</strong>
+                <strong>Description:</strong>
                 <template  v-if="userRole == 'Manager'">
                   <Icon
                     v-if="!edit1"
@@ -74,7 +74,7 @@
                     :size="18"
                     style="float:right;cursor:pointer"
                     title="Edit"
-                    @click="editPurposes"
+                    @click="editDescription"
                   />
                   <Icon
                     v-else
@@ -82,17 +82,17 @@
                     :size="18"
                     style="float:right;cursor:pointer"
                     title="Complete"
-                    @click="editPurposes"
+                    @click="editDescription"
                   />
                 </template>
               </div>
               <Divider style="margin:10px 0; background:lightblue" />
-              <div v-if="!edit1" class="subProjectDesc" style="overflow-y:auto">{{purpose}}</div>
+              <div v-if="!edit1" class="subProjectDesc" style="overflow-y:auto">{{description}}</div>
               <template v-else>
                 <Input
-                  v-model="purpose"
+                  v-model="description"
                   type="textarea"
-                  :rows="5"
+                  :rows="12"
                   placeholder="Enter something..."
                 />
               </template>
@@ -125,12 +125,12 @@
                 <Input
                   v-model="background"
                   type="textarea"
-                  :rows="5"
+                  :rows="12"
                   placeholder="Enter something..."
                 />
               </template>
             </Card>
-            <Card class="Information">
+            <!-- <Card class="Information">
               <div style="width:100%">
                 <strong>Limitations / problems:</strong>
                 <template v-if="userRole=='Manager'">
@@ -162,7 +162,7 @@
                   placeholder="Enter something..."
                 />
               </template>
-            </Card>
+            </Card> -->
           </vue-scroll>
         </div>
       </Col>
@@ -367,8 +367,8 @@ export default {
       edit2: false,
       edit3: false,
       background: "",
-      limitation: "",
-      purpose: "",
+      // limitation: "",
+      description: "",
     };
   },
   created() {
@@ -397,23 +397,17 @@ export default {
     },
     getSubprojectDes() {
       if (
-        this.subProjectInfo.purpose != undefined &&
-        this.subProjectInfo.purpose != null
-      ) {
-        this.purpose = this.subProjectInfo.purpose;
-      } else if (
         this.subProjectInfo.description != undefined &&
         this.subProjectInfo.description != null
       ) {
-        this.purpose = this.subProjectInfo.description;
+        this.description = this.subProjectInfo.description;
+      } else if (
+        this.subProjectInfo.purpose != undefined &&
+        this.subProjectInfo.purpose != null
+      ) {
+        this.description = this.subProjectInfo.purpose;
       }
 
-      if (
-        this.subProjectInfo.limitation != undefined &&
-        this.subProjectInfo.limitation != null
-      ) {
-        this.limitation = this.subProjectInfo.limitation;
-      }
       if (
         this.subProjectInfo.background != undefined &&
         this.subProjectInfo.background != null
@@ -697,13 +691,13 @@ export default {
           console.log(err.data);
         });
     },
-    editPurposes() {
+    editDescription() {
       if (this.edit1) {
         this.edit1 = false;
 
         let obj = new URLSearchParams();
         obj.append("subProjectId", this.subProjectInfo.subProjectId);
-        obj.append("purpose", this.purpose);
+        obj.append("description", this.description);
         this.axios
           .post("/GeoProblemSolving/subProject/update", obj)
           .then(res => {
