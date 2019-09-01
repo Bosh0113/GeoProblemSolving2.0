@@ -1,7 +1,7 @@
 <style scoped>
 .picscreen {
   position: relative;
-  padding-top: 0.5%;
+  padding-top: 10px;
   /* transform: translateY(60px); */
 }
 
@@ -30,17 +30,13 @@
 
 /* content */
 .condefContent {
-  clear: both;
-  margin-top: 3%;
-  margin-left: 15%;
-  width: 800px;
+  margin: 0 15%;
+  height: auto;
 }
 .pro-tab {
-  margin-top: 30px;
+  margin-top: 15px;
   /* height:auto; */
   min-height: 200px;
- 
-  
 }
 
 .pro-tab >>> .tabpane-syle {
@@ -66,12 +62,10 @@
 }
 .pro-tab >>> .ivu-tabs-tab {
   font-size: 16px;
-  height:auto
+  height: auto;
 }
-.pro-tab >>> .ivu-tabs-tabpane{
-   height:auto;
-    min-height: auto;
-  
+.pro-tab >>> .ivu-card-body {
+  padding: 12px;
 }
 
 .tool-panel {
@@ -96,9 +90,20 @@
 }
 
 .resourceCard {
-  clear: both; 
+  clear: both;
   width: 100%;
-  margin-top:2.5%;
+}
+
+#subDescription {
+  width: 100%;
+  display: inline-block;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  text-align: center;
+  font-size: 1rem;
+  height: 20px;
+  color: white;
 }
 </style>
 <template>
@@ -122,10 +127,12 @@
             </Col>
           </Row>
           <Row>
-            <Col
-              span="24"
-              style="text-align:center;font-size:1rem;height:20px;color:white"
-            >{{subProjectInfo.description}}</Col>
+            <Col span="16" offset="4">
+              <div
+                id="subDescription"
+                :title="subProjectInfo.description"
+              >{{subProjectInfo.description}}</div>
+            </Col>
           </Row>
         </div>
       </div>
@@ -133,110 +140,169 @@
 
     <!-- tab  on-click事件 -->
     <Row>
-      <div class="pro-tab" >
-        <div >
+      <div class="pro-tab" :style="{height:sidebarHeight+ 80+'px'}">
+        <div>
           <Tabs>
-            <TabPane label="Context Definition" name="Context" icon="md-home">
-              <div class="workspaceContent">
-                <template>
-                  <Row style="margin-top:10px">
-                    <!--contextdefinition -->
-                    <div :style="{height:sidebarHeight+'px'}" style="margin:0 1% 50px 1%">
-                      <div class="tools">
-                        <Card style=" position:relative;height:100%;">
-                          <h4 align="center">ToolBox</h4>
-                          <!-- toolbox -->
-                          <div class="tool-panel">
-                            <!-- map -->
-                            <div class="singl_tool_style">
-                              <Icon type="md-globe" size="40" @click.native="toolPanel('map')" title="Map"
-                                color="#808695" />
-                            </div>
-                            <!-- draw -->
-                            <div class="singl_tool_style">
-                              <Icon type="ios-brush" size="40" @click.native="toolPanel('draw')" title="DrawBoard"
-                                color="#808695" />
-                            </div>
-                            <!-- mindMapping -->
-                            <div class="singl_tool_style">
-                              <Icon type="md-bulb" size="40" @click.native="toolPanel('mindMapping')" title="DrawBoard"
-                                color="#808695" />
-                            </div>
-                            <!-- chat -->
-                            <div class="singl_tool_style">
-                              <Icon type="ios-chatboxes" size="40" @click.native="toolPanel('chat')" title="DrawBoard"
-                                color="#808695" />
-                            </div>
+            <TabPane label="Context definition" name="Context" icon="md-home">
+              <template>
+                <Row style="margin-top:10px">
+                  <!--contextdefinition -->
+                  <div :style="{height:sidebarHeight+10+'px'}" style="margin:0 1%">
+                    <div class="tools">
+                      <Card style=" position:relative;height:100%;">
+                        <h4 align="center">Tool box</h4>
+                        <!-- toolbox -->
+                        <div class="tool-panel">
+                          <!-- map -->
+                          <div class="singl_tool_style">
+                            <Icon
+                              type="md-globe"
+                              size="40"
+                              @click.native="toolPanel('map')"
+                              title="Map"
+                              color="#808695"
+                            />
                           </div>
-                        </Card>
-                      </div>
-                      <div class="condef">
-                        <Card style="height:auto;min-height:100%">
-                          <div class="condefTitle">
-                            <div style="width:3px;height:18px;float:left;background-color:rgb(124, 126, 126)"></div>
-                            <h4 style="float:left;margin-left:5px">Context Definition</h4>
+                          <!-- draw -->
+                          <div class="singl_tool_style">
+                            <Icon
+                              type="ios-brush"
+                              size="40"
+                              @click.native="toolPanel('draw')"
+                              title="DrawBoard"
+                              color="#808695"
+                            />
                           </div>
-                          <div class="condefContent" style="height:auto;">
-                            <Form ref="contextForm" :rules="contextFormValidate" :model="contextForm"
-                              :label-width="180">
-                              <FormItem label="Problem Boundary" prop="boundary">
-                                <Input v-model="contextForm.boundary"
-                                  placeholder="Please enter the boundry of the problem" type="textarea"
-                                  :autosize="{minRows: 1,maxRows: 5}" clearable></Input>
+                          <!-- mindMapping -->
+                          <div class="singl_tool_style">
+                            <Icon
+                              type="md-bulb"
+                              size="40"
+                              @click.native="toolPanel('mindMapping')"
+                              title="DrawBoard"
+                              color="#808695"
+                            />
+                          </div>
+                          <!-- chat -->
+                          <div class="singl_tool_style">
+                            <Icon
+                              type="ios-chatboxes"
+                              size="40"
+                              @click.native="toolPanel('chat')"
+                              title="DrawBoard"
+                              color="#808695"
+                            />
+                          </div>
+                        </div>
+                      </Card>
+                    </div>
+                    <div class="condef">
+                      <Card style="height:auto;min-height:100%">
+                        <div class="condefTitle">
+                          <div
+                            style="width:3px;height:18px;float:left;background-color:rgb(124, 126, 126)"
+                          ></div>
+                          <h4 style="float:left;margin-left:5px">Context</h4>
+                        </div>
+                        <vue-scroll :ops="scrollOps" :style="{height:sidebarHeight-50+'px'}">
+                          <div class="condefContent">
+                            <Form
+                              ref="contextForm"
+                              :rules="contextFormValidate"
+                              :model="contextForm"
+                              :label-width="180"
+                            >
+                              <FormItem label="Problem boundary" prop="boundary">
+                                <Input
+                                  v-model="contextForm.boundary"
+                                  placeholder="Please enter the boundry of the problem"
+                                  type="textarea"
+                                  :autosize="{minRows: 1,maxRows: 5}"
+                                  clearable
+                                ></Input>
                               </FormItem>
-                              <FormItem label="Spatiotemporal Scale" prop="scale">
-                                <Input v-model="contextForm.scale" placeholder="Please enter the spatiotemporal scale"
-                                  type="textarea" :autosize="{minRows: 1,maxRows: 5}" clearable />
+                              <FormItem label="Spatiotemporal scale" prop="scale">
+                                <Input
+                                  v-model="contextForm.scale"
+                                  placeholder="Please enter the spatiotemporal scale"
+                                  type="textarea"
+                                  :autosize="{minRows: 1,maxRows: 5}"
+                                  clearable
+                                />
                               </FormItem>
-                              <FormItem label=" Main Methods" prop="methods">
-                                <Input v-model="contextForm.methods" placeholder="Please enter the main methods"
-                                  type="textarea" :autosize="{minRows: 1,maxRows: 5}" clearable />
+                              <FormItem label=" Main methods" prop="methods">
+                                <Input
+                                  v-model="contextForm.methods"
+                                  placeholder="Please enter the main methods"
+                                  type="textarea"
+                                  :autosize="{minRows: 1,maxRows: 5}"
+                                  clearable
+                                />
                               </FormItem>
-                              <FormItem label="Goals" prop="goals">
-                                <Input v-model="contextForm.goals" placeholder="Please enter your goal" type="textarea"
-                                  :autosize="{minRows: 1,maxRows: 5}" clearable />
+                              <FormItem label="Goals or Purposes" prop="goals">
+                                <Input
+                                  v-model="contextForm.goals"
+                                  placeholder="Please enter your goal"
+                                  type="textarea"
+                                  :autosize="{minRows: 1,maxRows: 5}"
+                                  clearable
+                                />
                               </FormItem>
-                              <FormItem label=" Difficulties" prop="difficulties">
-                                <Input v-model="contextForm.difficulties" placeholder="Please enter the difficulties"
-                                  type="textarea" :autosize="{minRows: 1,maxRows: 5}" clearable />
+                              <FormItem label=" Difficulties or Limitations" prop="difficulties">
+                                <Input
+                                  v-model="contextForm.difficulties"
+                                  placeholder="Please enter the difficulties"
+                                  type="textarea"
+                                  :autosize="{minRows: 1,maxRows: 5}"
+                                  clearable
+                                />
                               </FormItem>
                               <FormItem label="Others" prop="others">
-                                <Input v-model="contextForm.others" placeholder="Supplement" type="textarea"
-                                  :autosize="{minRows: 1,maxRows: 5}" clearable />
+                                <Input
+                                  v-model="contextForm.others"
+                                  placeholder="Supplement"
+                                  type="textarea"
+                                  :autosize="{minRows: 1,maxRows: 5}"
+                                  clearable
+                                />
                               </FormItem>
                               <FormItem>
                                 <Button @click="submit('contextForm')">Submit</Button>
                               </FormItem>
                             </Form>
                           </div>
-                        </Card>
-                      </div>
+                        </vue-scroll>
+                      </Card>
                     </div>
-                  </Row>
-                </template>
-              </div>
+                  </div>
+                </Row>
+              </template>
             </TabPane>
-
-            <TabPane label="Resources" name="Resources" icon="logo-buffer">
+            <TabPane label="Resources collection" name="Resources" icon="logo-buffer">
               <div class="resourceContent">
                 <Row style="margin-top:10px">
-                  <Card :style="{height:sidebarHeight+'px'}" style="margin:0 1% 50px 1%">
+                  <Card :style="{height:sidebarHeight+10+'px'}" style="margin:0 1% 50px 1%">
                     <div class="condefTitle">
-                      <div style="width:3px;height:18px;float:left;background-color:rgb(124, 126, 126)"></div>
+                      <div
+                        style="width:3px;height:18px;float:left;background-color:rgb(124, 126, 126)"
+                      ></div>
                       <h4 style="float:left;margin-left:5px">Resources</h4>
                     </div>
-                    <div class="resourceCard" :style="{height:sidebarHeight+'px'}">
+                    <vue-scroll :ops="scrollOps" :style="{height:sidebarHeight-50+'px'}">
                       <div v-for="(item,index) in resourceType" :key="index">
-                        <Col :xs="{ span: 20, offset: 1 }" :sm="{ span: 10, offset: 1 }" :md="{ span: 10, offset: 1 }"
-                          :lg="{ span: 11 }">
-                        <Card style="height:150px;margin-bottom:10px">
-                          <Icon :type="item.typeIcon" style="float:left;" size="18"></Icon>
-                          <h4> &ensp;{{item.typeName}}</h4>
-                        </Card>
+                        <Col
+                          :xs="{ span: 20, offset: 1 }"
+                          :sm="{ span: 10, offset: 1 }"
+                          :md="{ span: 10, offset: 1 }"
+                          :lg="{ span: 11 }"
+                        >
+                          <Card style="height:150px;margin-bottom:10px">
+                            <Icon :type="item.typeIcon" style="float:left;" size="18"></Icon>
+                            <h4>&ensp;{{item.typeName}}</h4>
+                          </Card>
                         </Col>
                       </div>
-
-                    </div>
+                    </vue-scroll>
                   </Card>
                 </Row>
               </div>
@@ -260,6 +326,11 @@ export default {
   },
   data() {
     return {
+      scrollOps: {
+        bar: {
+          background: "lightgrey"
+        }
+      },
       stepId: this.$route.params.id,
       // info of subproject --by mzy
       subProjectInfo: [],
@@ -268,7 +339,7 @@ export default {
       // web socket for contextDefinition
       subprojectSocket: null,
       // 资源继承
-      selectResource: [],    
+      selectResource: [],
 
       // 问题解决流程结构
       processStructure: [],
@@ -329,7 +400,8 @@ export default {
           }
         ]
       },
-      resourceType: [{
+      resourceType: [
+        {
           typeName: "Data",
           typeIcon: "ios-stats"
         },
@@ -358,7 +430,6 @@ export default {
           typeIcon: "md-cube"
         }
       ]
-
     };
   },
 
@@ -366,19 +437,18 @@ export default {
     this.init();
   },
   mounted() {
-    window.addEventListener("resize", this.reSize);
-   // this.getContextDefiniton();
+    window.addEventListener("resize", this.initSize);
+    // this.getContextDefiniton();
   },
 
   methods: {
     initSize() {
-      this.sidebarHeight = window.innerHeight - 227;
+      this.sidebarHeight = window.innerHeight - 290;
     },
 
     init() {
       this.initSize();
-      this.getContextDefinition();     
-      
+      this.getContextDefinition();
     },
 
     submit(contextform) {
@@ -427,17 +497,18 @@ export default {
 
     getContextDefinition() {
       this.axios
-        .get("/GeoProblemSolving/contextdefinition/inquiry/"+
-        "?key=stepId" +
-        "&value=" 
-         +this.stepId
+        .get(
+          "/GeoProblemSolving/contextdefinition/inquiry/" +
+            "?key=stepId" +
+            "&value=" +
+            this.stepId
         )
-      .then(res => {
-        console.log(res.data);
+        .then(res => {
+          console.log(res.data);
           //new id
           //ContextDefinition["stepId"] = res.data;
-          this.contextForm= res.data[0];
-          console.log(this.currentContextDefinition);         
+          this.contextForm = res.data[0];
+          console.log(this.currentContextDefinition);
         });
     }
   }
