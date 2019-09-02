@@ -37,7 +37,6 @@ public class StaticPagesBuilder {
         context.setVariable("activeName", "projects");
 
         //渲染模板
-        //String servicePath = System.getProperty("user.dir")+"/src/main/webapp";
         String servicePath = getServicePath();
         String htmlPath = servicePath+"/staticPage/project";
         File temp = new File(htmlPath);
@@ -113,7 +112,7 @@ public class StaticPagesBuilder {
 
     private String getServicePath(){
         String servicePath = System.getProperty("user.dir")+"/src/main/resources/templates";
-//        String servicePath = System.getProperty("user.dir")+"/src/main/webapp";
+//        String servicePath = System.getProperty("user.dir")+"/src/main/webapp"; //部署使用
         return servicePath.replaceAll("\\\\","/");
     }
 }
