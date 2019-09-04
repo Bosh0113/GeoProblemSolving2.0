@@ -9,7 +9,7 @@ public enum ResultEnum {
 
     DEFAULT_EXCEPTION(-1, "默认的服务器内部异常，我并不想进行处理！！"),
 
-    NO_OBJECT(-2, "没有对应的对象"),
+    NO_OBJECT(-2, "Not Found"),
     EXIST_OBJECT(-3, "同名对象已存在，请更换名称"),
 
     NO_TOKEN(-4, "Missing Token"),

@@ -82,13 +82,13 @@
                 </div>
               </FormItem>
 
-              <FormItem prop="modelList" label="Specify Model" :label-width="150">
+              <FormItem prop="specificModel" label="Specify Model" :label-width="150">
                 <Input v-model="modelTag" placeholder="Specify comparison model" style="width: 400px"
                   @keyup.enter.native="addModel(modelTag)" @on-blur="addModel(modelTag)"/>
                 <Button icon="ios-add" type="dashed" size="small" @click="addModel(modelTag)"
                   style="margin-left:2.5%">Add Model</Button>
                 <div>
-                  <Tag color="primary" v-for="(item,index) in this.project.modelList" :key="index" closable
+                  <Tag color="primary" v-for="(item,index) in this.project.specificModel" :key="index" closable
                     @on-close="deleteModel(index)">{{item}}</Tag>
                 </div>
               </FormItem>
@@ -176,7 +176,7 @@ export default {
         projectType: "SPECIFIC",
         evaluationRules: "",
         //model
-        modelList: [],
+        specificModel:[],
         //output data
         outputDataList: [],
         standardInputData: "Provide",
@@ -294,7 +294,7 @@ export default {
     },
     addModel(tag) {
       if (tag != "") {
-        this.project.modelList.push(tag);
+        this.project.specificModel.push(tag);
         this.modelTag = "";
       }
     },
@@ -305,7 +305,7 @@ export default {
       }
     },
     deleteModel(index) {
-      this.project.modelList.splice(index, 1);
+      this.project.specificModel.splice(index, 1);
     },
     deleteData(index) {
       this.project.outputDataList.splice(index, 1);

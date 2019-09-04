@@ -10,6 +10,12 @@ const cmp_project = {
   },
   getProject(key,value){
     return axios.get(`${base.cmpProjcet}/getProject?key=${key}&value=${value}`);
+  },
+  getSubprojectList(projectId){
+    return axios.get(`${base.cmpProjcet}/getSubprojectList?projectId=${projectId}`);
+  },
+  getProjectAllInfo(projectId){
+    return axios.get(`${base.cmpProjcet}/getProjectAllInfo?projectId=${projectId}`)
   }
 }
 

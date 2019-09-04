@@ -22,7 +22,7 @@
 
       <FormItem prop="modelList" label="Specify Model" :label-width="150">
         <Input v-model="modelTag" placeholder="Specify comparison model" style="width: 400px"
-          @keyup.enter.native="addModel(modelTag)" @on-blur="addModel(modelTag)"/>
+          @keyup.enter.native="addModel(modelTag)" @on-blur="addModel(modelTag)" />
         <Button icon="ios-add" type="dashed" size="small" @click="addModel(modelTag)" style="margin-left:2.5%">Add
           Model</Button>
         <div>
@@ -33,7 +33,7 @@
 
       <FormItem prop="outputDataList" label="Specify Output Data" :label-width="150">
         <Input v-model="outputDataTag" placeholder="Specify output data" style="width: 400px"
-          @keyup.enter.native="addData(outputDataTag)" @on-blur="addData(outputDataTag)"/>
+          @keyup.enter.native="addData(outputDataTag)" @on-blur="addData(outputDataTag)" />
         <Button icon="ios-add" type="dashed" size="small" @click="addData(outputDataTag)" style="margin-left:2.5%">Add
           Data</Button>
         <div>
@@ -94,9 +94,9 @@ export default {
     });
   },
   name: "create-cmp-item",
-  created:function(){
+  created: function() {
     let projectId = this.$route.params.id;
-    this.item.projectId = projectId;
+    this.item.parentId = projectId;
   },
   data() {
     return {
@@ -109,7 +109,8 @@ export default {
         //output data
         outputDataList: [],
         standardInputData: "Provide",
-        evaluatedData: "Provide"
+        evaluatedData: "Provide",
+        projectType: "SPECIFIC"
       },
       createItemRule: {
         title: [
@@ -150,24 +151,33 @@ export default {
       //用来存储模型标签
       modelTag: "",
       //用来存储输出数据标签
-      outputDataTag: "",
+      outputDataTag: ""
     };
   },
   methods: {
     createItem(name) {
-      this.$refs[name].validate(valid=>{
-        if(valid){
+      this.$refs[name].validate(valid => {
+        if (valid) {
           this.item["managerId"] = this.$store.getters.userId;
-          this.$api.cmp_item.create(this.item)
-            .then(res=>{
-              this.$router.back(-1)
+          this.$api.cmp_project
+            .create(this.item)
+            .then(res => {
+              this.$router.back(-1);
               console.log(res);
             })
-            .catch(err=>{
+            .cache(err => {
               this.$Message.error(err);
-            })
+            });
+          // this.$api.cmp_item.create(this.item)
+          //   .then(res=>{
+          //     this.$router.back(-1)
+          //     console.log(res);
+          //   })
+          //   .catch(err=>{
+          //     this.$Message.error(err);
+          //   })
         }
-      })
+      });
       console.log(this.item);
     },
     addModel(tag) {
@@ -188,10 +198,10 @@ export default {
     deleteData(index) {
       this.item.outputDataList.splice(index, 1);
     },
-    blur(){
+    blur() {
       console.log("blur");
     },
-    focus(){
+    focus() {
       console.log("focus");
     }
   }

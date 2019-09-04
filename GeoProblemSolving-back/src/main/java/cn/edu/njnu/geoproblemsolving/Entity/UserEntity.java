@@ -3,6 +3,9 @@ package cn.edu.njnu.geoproblemsolving.Entity;
 import com.alibaba.fastjson.JSONArray;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Document(collection = "User")
 public class UserEntity {
 
@@ -22,6 +25,26 @@ public class UserEntity {
     private String direction;
     private String homePage;
     private String avatar;
+
+    //comparison module
+    private List<String> cmpProjects = new ArrayList<>();
+    private List<String> cmpSolutions = new ArrayList<>();
+
+    public List<String> getCmpProjects() {
+        return cmpProjects;
+    }
+
+    public void setCmpProjects(List<String> cmpProjects) {
+        this.cmpProjects = cmpProjects;
+    }
+
+    public List<String> getCmpSolutions() {
+        return cmpSolutions;
+    }
+
+    public void setCmpSolutions(List<String> cmpSolutions) {
+        this.cmpSolutions = cmpSolutions;
+    }
 
     public JSONArray getManageProjects() {
         return manageProjects;

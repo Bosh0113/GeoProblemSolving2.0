@@ -24,7 +24,8 @@ public class ComputableModelImpl implements IComputableModelDao {
 
     @Override
     public ComputableModel addComputableModel(ComputableModel computableModel) {
-        return null;
+        mongoTemplate.save(computableModel);
+        return computableModel;
     }
 
     @Override

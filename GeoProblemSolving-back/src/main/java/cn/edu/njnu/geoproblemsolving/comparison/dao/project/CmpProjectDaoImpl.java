@@ -3,6 +3,7 @@ package cn.edu.njnu.geoproblemsolving.comparison.dao.project;
 import cn.edu.njnu.geoproblemsolving.Entity.UserEntity;
 import cn.edu.njnu.geoproblemsolving.comparison.dao.dataresource.DataResourceDaoImpl;
 import cn.edu.njnu.geoproblemsolving.comparison.dao.modelresource.ModelResourceDaoImpl;
+import cn.edu.njnu.geoproblemsolving.comparison.dao.user.CmpUserImpl;
 import cn.edu.njnu.geoproblemsolving.comparison.entity.BaseCmpInfo;
 import cn.edu.njnu.geoproblemsolving.comparison.entity.CmpItem;
 import cn.edu.njnu.geoproblemsolving.comparison.entity.CmpProject;
@@ -38,8 +39,15 @@ public class CmpProjectDaoImpl implements ICmpProjectDao {
     @Override
     public CmpProject addProject(CmpProject project) {
         String projectId = UUID.randomUUID().toString();
-        CmpProject cmpProject = (CmpProject) DaoUtils.createCmpInfo(project,projectId, mongoTemplate);
+        CmpProject cmpProject = DaoUtils.createProject(project,projectId, mongoTemplate);
         mongoTemplate.save(cmpProject);
+        //更新父级项目
+        if(project.getParentId()!=null){
+            updateSubprojects(project.getParentId(),projectId,true);
+        }
+        //更新用户数据
+        CmpUserImpl cmpUserDao = new CmpUserImpl(mongoTemplate);
+        cmpUserDao.updateProjects(project.getManagerId(),projectId,true);
         return cmpProject;
     }
 
@@ -57,24 +65,66 @@ public class CmpProjectDaoImpl implements ICmpProjectDao {
     public CmpProject updateCmpItems(String projectId, String cmpItemId) {
         Query query = Query.query(Criteria.where("projectId").is(projectId));
         CmpProject project = mongoTemplate.findOne(query, CmpProject.class);
-        List<String> cmpItemIds = project.getCmpItemIds();
-        if(cmpItemIds==null){
-            cmpItemIds = new ArrayList<>();
-            cmpItemIds.add(cmpItemId);
+        List<String> subprojectIds = project.getSubprojects();
+        if(subprojectIds==null){
+            subprojectIds = new ArrayList<>();
+            subprojectIds.add(cmpItemId);
         }else{
-            cmpItemIds.add(cmpItemId);
+            subprojectIds.add(cmpItemId);
         }
-        project.setCmpItemIds(cmpItemIds);
+        project.setSubprojects(subprojectIds);
         Update update = new Update();
-        update.set("cmpItemIds",cmpItemIds);
+        update.set("cmpItemIds",subprojectIds);
         mongoTemplate.updateFirst(query,update,CmpProject.class);
         return project;
     }
 
     @Override
+    public CmpProject updateSubprojects(String parentId, String projectId,boolean isAdd) {
+        Query query = Query.query(Criteria.where("projectId").is(parentId));
+        CmpProject parentProject = mongoTemplate.findOne(query, CmpProject.class);
+        Update update = new Update();
+        if(isAdd == true){
+            update.addToSet("subprojects",projectId);
+        }else{
+            update.pull("subprojects",projectId);
+        }
+        mongoTemplate.updateFirst(query,update,CmpProject.class);
+        return parentProject;
+    }
+
+    @Override
+    public CmpProject updateSolutionList(String projectId, String solutionId, boolean isAdd) {
+        Query query = Query.query(Criteria.where("projectId").is(projectId));
+        CmpProject project = mongoTemplate.findOne(query, CmpProject.class);
+        Update update = new Update();
+        if(isAdd){
+            update.addToSet("solutionList",solutionId);
+        }else{
+            update.pull("solutionList",solutionId);
+        }
+        mongoTemplate.updateFirst(query,update,CmpProject.class);
+        return project;
+    }
+
+    @Override
+    public void updateModelList(String projectId, String modelId, boolean isAdd) {
+        Query query = Query.query(Criteria.where("projectId").is(projectId));
+        Update update = new Update();
+        if(isAdd){
+            update.addToSet("modelList",modelId);
+        }else{
+            update.pull("modelList",modelId);
+        }
+        mongoTemplate.updateFirst(query,update,CmpProject.class);
+    }
+
+    @Override
     public List<CmpProject> getAllProject() {
-        List<CmpProject> all = mongoTemplate.findAll(CmpProject.class);
-        return all;
+        Query query = Query.query(Criteria.where("parentId").exists(false));
+        List<CmpProject> cmpProjects = mongoTemplate.find(query, CmpProject.class);
+//        List<CmpProject> all = mongoTemplate.findAll(CmpProject.class);
+        return cmpProjects;
     }
 
     @Override
@@ -83,11 +133,20 @@ public class CmpProjectDaoImpl implements ICmpProjectDao {
     }
 
     @Override
+    public List<CmpProject> findByProjectIdList(List<String> projectIdList) {
+        Query query = Query.query(Criteria.where("projectId").in(projectIdList));
+        List<CmpProject> cmpProjects = mongoTemplate.find(query, CmpProject.class);
+        return cmpProjects;
+    }
+
+    @Override
     public CmpProject findByProjectId(String projectId) {
         Query query = Query.query(Criteria.where("projectId").is(projectId));
         CmpProject cmpProject = mongoTemplate.findOne(query, CmpProject.class);
         return cmpProject;
     }
+
+
 
     @Override
     public List<CmpProject> getProjects(String key, String value) {

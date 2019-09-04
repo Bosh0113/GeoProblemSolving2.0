@@ -43,9 +43,12 @@ const routes = [{
     { path: 'cmp-project/:id',name:'cmp-project-detail',component:()=>import("@/views/comparison/CmpProjectDetail")},
     { path: 'cmp-project/comprehensive/:id',name:'cmp-project-comprehensive',component:()=>import("@/views/comparison/ComprehensiveProject")},
     { path: 'cmp-project/specific/:id',name:'cmp-project-specific',component:()=>import("@/views/comparison/SpecificProject")},
+    { path: 'cmp-subproject/:id',name:'cmp-subproject',component:()=>import("@/views/comparison/SpecificProject")},
     { path: 'create-cmp-item/:id',name:'create-cmp-item',component:()=>import("@/views/comparison/CreateCmpItem")},
     { path: 'cmp-item/:id',name:'cmp-item-detail',component:()=>import("@/views/comparison/CmpItemDetail")},
-    { path: 'create-cmp-solution',name:"create-cmp-solution",component:()=>import("@/views/comparison/CreateSolution")}
+    { path: 'create-cmp-solution/:id',name:"create-cmp-solution",component:()=>import("@/views/comparison/CreateSolution")},
+    { path: 'create-cmp-model/:id',name:"create-cmp-model",component:()=>import("@/views/comparison/CreateModel")},
+    { path: 'cmp-model/:id',name:'cmp-model-detail',component:()=>import("@/views/comparison/CmpModelDetail")}
   ]
 },
 { path: '/chat', name: 'chatUtil', component: resolve=>(require(["@/components/utils/chatroom"],resolve)) },

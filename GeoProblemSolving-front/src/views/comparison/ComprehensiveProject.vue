@@ -15,36 +15,36 @@
         </div>
       </div>
 
-      <div class="cmpItemContent" v-show="cmpItems.length>0">
-        <span class="infoName">Comparison Items:</span>
+      <div class="cmpItemContent" v-show="subprojects.length>0">
+        <span class="infoName">Comparison Subproject:</span>
         <div class="cmpItemBox">
           <Row>
             <Col :xs="{ span: 21, offset: 1 }" :md="{ span: 11, offset: 1 }" :lg="{ span: 6 }">
-              <div @click="createCmpItem">
-                <Card style="height:180px;margin:10px -15px">
-                  <div style="display:flex; justify-content: center;  height: 150px; align-items: center;">
-                    <img style="width:80px" src="@/assets/images/comparison/add.png" alt="add comparison item">
-                  </div>
-                </Card>
-              </div>
+            <div @click="createCmpItem">
+              <Card style="height:180px;margin:10px -15px">
+                <div style="display:flex; justify-content: center;  height: 150px; align-items: center;">
+                  <img style="width:80px" src="@/assets/images/comparison/add.png" alt="add comparison subproject">
+                </div>
+              </Card>
+            </div>
             </Col>
 
-            <Col :xs="{ span: 21, offset: 1 }" :md="{ span: 11, offset: 1 }" :lg="{ span: 6 }" v-for="item of cmpItems"
-              :key="item.itemId">
+            <Col :xs="{ span: 21, offset: 1 }" :md="{ span: 11, offset: 1 }" :lg="{ span: 6 }"
+              v-for="subproject of subprojects" :key="subproject.projectId">
             <Card style="height:180px;margin:10px -15px">
               <div>
                 <div class="cmpItemTitle">
-                  <a href="#" @click.prevent="itemDetail(item)">{{item.title}}</a>
+                  <a href="#" @click.prevent="itemDetail(subproject)">{{subproject.title}}</a>
                 </div>
-                <p class="cmpItemDesc">{{item.description}}</p>
+                <p class="cmpItemDesc">{{subproject.description}}</p>
                 <div id="bottom-info">
                   <div class="info">
                     <Icon type="md-body" :size="15" />Manager
-                    <span style="margin-left:10px; color:#2b85e4">{{item.managerName}}</span>
+                    <span style="margin-left:10px; color:#2b85e4">{{subproject.managerName}}</span>
                   </div>
                   <div class="info">
                     <Icon type="md-clock" :size="15" />Time
-                    <span style="margin-left:10px">{{getCreatedTime(item)}}</span>
+                    <span style="margin-left:10px">{{getCreatedTime(subproject)}}</span>
                   </div>
                 </div>
               </div>
@@ -54,7 +54,7 @@
         </div>
       </div>
 
-      <div class="comparisonContent" v-show="cmpItems.length==0">
+      <div class="comparisonContent" v-show="subprojects.length==0">
         <blank-box v-bind="blankInfo" v-on:linkClicked="onLinkClick"></blank-box>
       </div>
     </div>
@@ -79,9 +79,10 @@ export default {
         welcomeTitle: "Welcome to Comparison!",
         welcomeInfo:
           "Comprehensive comparison of simulation capabilities from multiple perspectives improving our knowledge and understanding of models. To get started, you should",
-        linkInfo: "create an comparison item."
+        linkInfo: "create an comparison subproject."
       },
-      cmpItems: []
+      cmpItems: [],
+      subprojects: []
     };
   },
   computed: {
@@ -103,16 +104,24 @@ export default {
           console.log(res);
           this.projectInfo = res[0];
           //todo 请求子项目数据
-          let cmpItemIds = this.projectInfo.cmpItemIds;
-          if (cmpItemIds && cmpItemIds.length > 0) {
-            this.$api.cmp_item
-              .getItemsByIdList(cmpItemIds)
+          let subprojects = this.projectInfo.subprojects;
+          if (subprojects && subprojects.length > 0) {
+            this.$api.cmp_project
+              .getSubprojectList(projectId)
               .then(res => {
-                this.cmpItems = res;
+                this.subprojects = res;
               })
               .catch(err => {
                 this.$Message.error(err);
               });
+            // this.$api.cmp_item
+            //   .getItemsByIdList(cmpItemIds)
+            //   .then(res => {
+            //     this.cmpItems = res;
+            //   })
+            //   .catch(err => {
+            //     this.$Message.error(err);
+            //   });
           }
         })
         .catch(err => {
@@ -135,7 +144,14 @@ export default {
       this.onLinkClick();
     },
     itemDetail(item) {
-      this.$router.push({ path: `/cmp-item/${item.itemId}` });
+      this.$router.push({
+        path: `/cmp-subproject`,
+        name: "cmp-subproject",
+        params: {
+          id: item.projectId,
+          parentProject: this.projectInfo
+        }
+      });
     }
     //todo 1.基本信息编辑功能
     //todo 2.模型信息编辑功能

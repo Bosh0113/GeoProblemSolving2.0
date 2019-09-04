@@ -1,7 +1,7 @@
 <template>
   <div class="basicInfo">
-    <h3 class="cmpTitle">{{projectTitle}} <span v-show="projectTitle!==''&&cmpItemTitle&&cmpItemTitle!==''">——</span> <span v-show="cmpItemTitle&&cmpItemTitle!==''" style="color:#515a6e">{{cmpItemTitle}}</span></h3>
-    <!-- <h3 class="subTitle">{{cmpItemTitle}}</h3> -->
+    <h3 class="cmpTitle">{{projectTitle}} <span v-show="projectTitle!==''&&subprojectTitle&&subprojectTitle!==''">——</span> <span v-show="subprojectTitle&&subprojectTitle!==''" style="color:#515a6e">{{subprojectTitle}}</span></h3>
+    <!-- <h3 class="subTitle">{{subprojectTitle}}</h3> -->
     <span class="infoName">Description:</span>
     <p>{{description}}</p>
     <span class="infoName">Evaluation Rules:</span>
@@ -28,7 +28,7 @@ export default {
       type: String,
       required: true
     },
-    cmpItemTitle: {
+    subprojectTitle: {
       type: String,
       required: false
     },

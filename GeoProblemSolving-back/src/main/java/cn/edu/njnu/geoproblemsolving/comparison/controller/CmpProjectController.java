@@ -1,13 +1,21 @@
 package cn.edu.njnu.geoproblemsolving.comparison.controller;
 
 import cn.edu.njnu.geoproblemsolving.comparison.bean.JsonResult;
+import cn.edu.njnu.geoproblemsolving.comparison.dao.modelresource.ModelResourceDaoImpl;
 import cn.edu.njnu.geoproblemsolving.comparison.dao.project.CmpProjectDaoImpl;
+import cn.edu.njnu.geoproblemsolving.comparison.dao.solution.SolutionImpl;
 import cn.edu.njnu.geoproblemsolving.comparison.dao.subproject.CmpSubprojectDaoImpl;
 import cn.edu.njnu.geoproblemsolving.comparison.entity.CmpProject;
+import cn.edu.njnu.geoproblemsolving.comparison.entity.CmpSolution;
 import cn.edu.njnu.geoproblemsolving.comparison.entity.CmpSubproject;
+import cn.edu.njnu.geoproblemsolving.comparison.entity.ModelResource;
+import cn.edu.njnu.geoproblemsolving.comparison.enums.ProjectType;
 import cn.edu.njnu.geoproblemsolving.comparison.enums.ResultEnum;
 import cn.edu.njnu.geoproblemsolving.comparison.utils.ResultUtils;
+import com.alibaba.fastjson.JSONObject;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.HttpRequest;
 import org.springframework.web.bind.annotation.*;
 
@@ -51,6 +59,22 @@ public class CmpProjectController {
         }
     }
 
+    @RequestMapping(value = "/getSubprojectList", method = RequestMethod.GET)
+    public JsonResult getSubprojectList(@RequestParam("projectId") String projectId){
+        CmpProjectDaoImpl cmpProjectDao = new CmpProjectDaoImpl(mongoTemplate);
+        try{
+            CmpProject project = cmpProjectDao.findByProjectId(projectId);
+            if(project.getSubprojects()!=null){
+                List<CmpProject> projectList = cmpProjectDao.findByProjectIdList(project.getSubprojects());
+                return ResultUtils.success(projectList);
+            }else{
+                return ResultUtils.error(ResultEnum.NO_OBJECT);
+            }
+        }catch (Exception e){
+            return ResultUtils.error(ResultEnum.FAILED);
+        }
+    }
+
     @RequestMapping(value = "/getProject",method = RequestMethod.GET)
     public JsonResult getProject(@RequestParam("key") String key, @RequestParam("value") String value){
         CmpProjectDaoImpl cmpProjectDao = new CmpProjectDaoImpl(mongoTemplate);
@@ -60,5 +84,30 @@ public class CmpProjectController {
         }catch (Exception e){
             return ResultUtils.error(ResultEnum.FAILED);
         }
+    }
+
+    @RequestMapping(value = "/getProjectAllInfo",method = RequestMethod.GET)
+    public JsonResult getProjectAllInfo(@RequestParam("projectId") String projectId){
+        CmpProjectDaoImpl cmpProjectDao = new CmpProjectDaoImpl(mongoTemplate);
+        CmpProject project = cmpProjectDao.findByProjectId(projectId);
+
+        ProjectType projectType = project.getProjectType();
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("project",project);
+        if(projectType.equals(ProjectType.COMPREHENSIVE)){
+            // 如果是 comprehensive 类型，只查询子项目信息;
+            List<String> subprojects = project.getSubprojects();
+            List<CmpProject> subprojectList = cmpProjectDao.findByProjectIdList(subprojects);
+            jsonObject.put("subproject",subprojectList);
+        }else{
+
+            //modelList
+            List<String> modelIdList = project.getModelList();
+            ModelResourceDaoImpl modelResourceDao = new ModelResourceDaoImpl(mongoTemplate);
+            List<ModelResource> modelList = modelResourceDao.findModelByIdList(modelIdList);
+
+            jsonObject.put("model",modelList);
+        }
+        return ResultUtils.success(jsonObject);
     }
 }

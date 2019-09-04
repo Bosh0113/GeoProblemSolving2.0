@@ -10,9 +10,71 @@
           <constrains-info></constrains-info>
         </div>
       </div>
-      <div class="comparisonContent">
-        <blank-box v-bind="blankInfo" v-on:linkClicked="onLinkClick"></blank-box>
-      </div>
+
+      <Content :style="{minHeight: '280px', background: '#fff'}">
+        <Layout>
+          <Sider hide-trigger :style="{background: '#fff'}">
+            <Menu @on-select="showTab($event)" theme="light" active-name="Models" :open-names="['Models']" width="150px"
+              :style="{'z-index':1}">
+              <MenuItem name="Models">
+              <Icon type="md-planet" />Models</MenuItem>
+              <MenuItem name="Instances">
+              <Icon type="ios-skip-forward" />Instances</MenuItem>
+            </Menu>
+          </Sider>
+          <Content :style="{ minHeight: '280px', background: '#fff'}">
+            <div v-show="currentTab=='Models'">
+              <div class="comparisonContent" v-show="projectInfo!=={}">
+                <div v-if="modelList.length>0">
+
+                  <div class="cmpModelBox">
+                    <Row>
+                      <Col :xs="{ span: 21, offset: 1 }" :md="{ span: 11, offset: 1 }" :lg="{ span: 6 }">
+                      <div @click="createCmpModel">
+                        <Card style="height:150px;margin:10px -15px">
+                          <div style="display:flex; justify-content: center;  height: 120px; align-items: center;">
+                            <img style="width:70px" src="@/assets/images/comparison/add.png"
+                              alt="add comparison subproject">
+                          </div>
+                        </Card>
+                      </div>
+                      </Col>
+
+                      <Col :xs="{ span: 21, offset: 1 }" :md="{ span: 11, offset: 1 }" :lg="{ span: 6 }"
+                        v-for="model of modelList" :key="model.oid">
+                      <Card style="height:150px;margin:10px -15px">
+                        <div>
+                          <div class="cmpItemTitle">
+                            <a href="#" @click.prevent="modelDetail(model)">{{model.modelName}}</a>
+                          </div>
+                          <p class="cmpItemDesc">{{model.description}}</p>
+                          <div id="bottom-info">
+                            <div class="info">
+                              <Icon type="md-body" :size="15" />
+                              <span style="margin-left:10px; color:#2b85e4">{{model.ownerName}}</span>
+                            </div>
+                            <div class="info">
+                              <Icon type="md-clock" :size="15" />
+                              <span style="margin-left:10px">{{getCreatedTime(model)}}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </Card>
+                      </Col>
+                    </Row>
+                  </div>
+                </div>
+                <blank-box v-else v-bind="blankInfo" v-on:linkClicked="onLinkClick"></blank-box>
+              </div>
+            </div>
+            <div v-show="currentTab=='Instances'">
+              ASDasdASD
+            </div>
+          </Content>
+
+        </Layout>
+      </Content>
+
     </div>
   </div>
 </template>
@@ -25,61 +87,110 @@ export default {
   components: {
     "blank-box": BlankBox,
     "basic-info": BasicInfo,
-    "constrains-info":ConstrainsInfo,
+    "constrains-info": ConstrainsInfo
   },
   created: function() {
+    //* 获取路由信息
+    this.parentInfo = this.$route.params.parentProject;
+    // console.log("parent: ",this.parentInfo);
     //* 获取项目信息
     this.getProjectInfo();
   },
   data() {
     return {
+      // parentInfo:{},
       projectInfo: {},
       blankInfo: {
         welcomeTitle: "Welcome to Comparison!",
         welcomeInfo:
           "Comprehensive comparison of simulation capabilities from multiple perspectives improving our knowledge and understanding of models. To get started, you should",
         linkInfo: "create an comparison task."
-      }
+      },
+      modelList: [],
+      currentTab: "Models"
     };
   },
   computed: {
     basicInfo() {
+      let projectTitle = "";
+      let subprojectTitle = "";
+      if (this.parentInfo == null) {
+        projectTitle = this.projectInfo.title || "";
+      } else {
+        projectTitle = this.parentInfo.title;
+        subprojectTitle = this.projectInfo.title;
+      }
       return {
-        projectTitle: this.projectInfo.title || "",
+        projectTitle: projectTitle,
+        subprojectTitle: subprojectTitle,
         description: this.projectInfo.description || "",
-        rules: this.projectInfo.evaluationRules|| "",
-        managerName: this.projectInfo.managerName|| "",
+        rules: this.projectInfo.evaluationRules || "",
+        managerName: this.projectInfo.managerName || "",
         members: this.projectInfo.members || [],
         createTime: this.projectInfo.createTime || ""
+      };
+    },
+    getCreatedTime(){
+      return function(model) {
+        return model.createTime ? model.createTime.split(" ")[0] : "";
       };
     }
   },
   methods: {
     getProjectInfo() {
-      this.projectInfo = this.$store.state.comparison.projectInfo;
-      if (JSON.stringify(this.projectInfo) === "{}") {
-        //* 请求后台数据
-        let projectId = this.$route.params.id;
-        this.$api.cmp_project
-          .getProject("projectId", projectId)
-          .then(res => {
-            console.log(res);
-            this.projectInfo = res[0];
-            //todo 请求其他数据：模型，输入数据，输出数据，子项目数据
-          })
-          .catch(err => {
-            this.$Message.error(err);
-          });
-      }
+      //* 请求后台数据
+      let projectId = this.$route.params.id;
+      this.$api.cmp_project
+        .getProjectAllInfo(projectId)
+        .then(res => {
+          console.log(res);
+          this.projectInfo = res.project;
+          this.modelList = res.model;
+        })
+        .catch(err => {
+          this.$Message.error(err);
+        });
+
+      // this.$api.cmp_project
+      //   .getProject("projectId", projectId)
+      //   .then(res => {
+      //     console.log(res);
+      //     this.projectInfo = res[0];
+      //     //todo 请求其他数据：模型，输入数据，输出数据，子项目数据
+      //   })
+      //   .catch(err => {
+      //     this.$Message.error(err);
+      //   });
     },
     onLinkClick() {
       console.log("11");
       if (!this.$store.getters.userState) {
         this.$router.push({ name: "Login" });
       } else {
-        this.$router.push({ name: "create-cmp-solution"  });
+        //* 上传模型
+
+        this.$router.push({
+          path: `/create-cmp-model/${this.projectInfo.projectId}`
+        });
       }
-    }
+    },
+    showTab($event) {
+      this.currentTab = $event;
+    },
+    createCmpModel(){
+      this.onLinkClick();
+    },
+    modelDetail(model){
+      this.$router.push({
+        path: `/cmp-model`,
+        name: "cmp-model-detail",
+        params: {
+          id: model.oid,
+          project: this.projectInfo
+        }
+      });
+    },
+
     //todo 1.基本信息编辑功能
     //todo 2.模型信息编辑功能
     //todo 3.数据信息编辑功能
@@ -226,4 +337,40 @@ export default {
 }
 
 
+.cmpItemTitle {
+  /* height: 3em; */
+  overflow: hidden;
+  /* text-overflow: ellipsis; */
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+}
+.cmpItemTitle a {
+  color: #2d8cf0;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 1em;
+}
+
+.cmpItemDesc {
+  font-size: 14px;
+  height: 80px;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+}
+
+#bottom-info {
+  display: flex;
+  margin-top: 5px;
+  justify-content: space-between;
+}
+
+.info {
+  display: flex;
+  align-items: center;
+  margin-right: 10px;
+}
 </style>
