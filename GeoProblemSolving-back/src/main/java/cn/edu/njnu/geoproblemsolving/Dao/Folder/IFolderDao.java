@@ -12,4 +12,5 @@ public interface IFolderDao {
     Object editFile(String fileId, String folderId,String type,String name,String description);
     Object removeFile(String fileId, String folderId);
     String copyFileToPersonalCenter(String resourceId, String userId,String privacy,String type,String name,String description);
+    Object findByFileType(String scopeId, String type);
 }

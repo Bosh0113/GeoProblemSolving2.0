@@ -68,6 +68,7 @@ public class ProjectDaoImpl implements IProjectDao {
         mongoTemplate.save(project);
 
         FolderEntity folderEntity = new FolderEntity();
+        folderEntity.setScopeId(projectId);
         folderEntity.setFolders(new ArrayList<>());
         folderEntity.setFiles(new ArrayList<>());
         folderEntity.setFolderName(project.getTitle());

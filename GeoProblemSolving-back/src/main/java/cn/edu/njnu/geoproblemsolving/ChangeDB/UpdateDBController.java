@@ -27,4 +27,10 @@ public class UpdateDBController {
         UpdateDBDao updateDBDao = new UpdateDBDao(mongoTemplate);
         return updateDBDao.fileStrucToFolder();
     }
+
+    @RequestMapping(value = "/folderAddScopeId", method = RequestMethod.GET)
+    public String foldersAddScopeId(){
+        UpdateDBDao updateDBDao = new UpdateDBDao(mongoTemplate);
+        return updateDBDao.foldersAddScopeId();
+    }
 }

@@ -66,6 +66,7 @@ public class FolderController {
         FolderDaoImpl folderDao = new FolderDaoImpl(mongoTemplate);
         return folderDao.removeFile(fileId,folderId);
     }
+
     @RequestMapping(value = "/copyToCenter",method = RequestMethod.GET)
     public String copyToCenter(@RequestParam("resourceId") String resourceId,
                                @RequestParam("userId") String userId,
@@ -75,5 +76,11 @@ public class FolderController {
                                @RequestParam("description") String description){
         FolderDaoImpl folderDao = new FolderDaoImpl(mongoTemplate);
         return folderDao.copyFileToPersonalCenter(resourceId,userId,privacy,type,name,description);
+    }
+
+    @RequestMapping(value = "/findByFileType", produces = {"application/json;charset=UTF-8"}, method = RequestMethod.GET)
+    public Object findByFileType(@RequestParam("scopeId") String scopeId, @RequestParam("type") String type){
+        FolderDaoImpl folderDao = new FolderDaoImpl(mongoTemplate);
+        return folderDao.findByFileType(scopeId,type);
     }
 }

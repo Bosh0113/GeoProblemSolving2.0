@@ -7,11 +7,20 @@ import java.util.ArrayList;
 
 @Document(collection = "Folder")
 public class FolderEntity {
+    private String scopeId;
     private String folderId;
     private String folderName;
     private String parentId;
     private ArrayList<FolderItem> folders;
     private ArrayList<ResourceEntity> files;
+
+    public String getScopeId() {
+        return scopeId;
+    }
+
+    public void setScopeId(String scopeId) {
+        this.scopeId = scopeId;
+    }
 
     public ArrayList<FolderItem> getFolders() {
         return folders;

@@ -7,7 +7,6 @@ import cn.edu.njnu.geoproblemsolving.Entity.Folder.FolderItem;
 import cn.edu.njnu.geoproblemsolving.Entity.Folder.UploadResult;
 import cn.edu.njnu.geoproblemsolving.Entity.ResourceEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.UserEntity;
-import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -282,6 +281,26 @@ public class FolderDaoImpl implements IFolderDao{
             else {
                 return "None";
             }
+        }catch (Exception e){
+            return "Fail";
+        }
+    }
+
+    @Override
+    public Object findByFileType(String scopeId, String type){
+        try {
+            List<ResourceEntity> resultList = new ArrayList<>();
+            Query query = new Query(Criteria.where("scopeId").is(scopeId));
+            List<FolderEntity> folderEntities = mongoTemplate.find(query,FolderEntity.class);
+            for (FolderEntity folderEntity : folderEntities){
+                ArrayList<ResourceEntity> files = folderEntity.getFiles();
+                for (ResourceEntity file : files){
+                    if(file.getType().equals(type)){
+                        resultList.add(file);
+                    }
+                }
+            }
+            return resultList;
         }catch (Exception e){
             return "Fail";
         }

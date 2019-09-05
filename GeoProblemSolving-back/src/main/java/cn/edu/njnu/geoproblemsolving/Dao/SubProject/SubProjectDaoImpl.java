@@ -46,6 +46,7 @@ public class SubProjectDaoImpl implements ISubProjectDao {
             mongoTemplate.save(subProject);
 
             FolderEntity folderEntity = new FolderEntity();
+            folderEntity.setScopeId(subProjectId);
             folderEntity.setFolders(new ArrayList<>());
             folderEntity.setFiles(new ArrayList<>());
             folderEntity.setFolderName(subProject.getTitle());
