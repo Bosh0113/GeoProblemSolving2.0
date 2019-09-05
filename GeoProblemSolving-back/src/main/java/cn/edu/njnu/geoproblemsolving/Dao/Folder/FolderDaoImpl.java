@@ -35,7 +35,7 @@ public class FolderDaoImpl implements IFolderDao{
     }
 
     @Override
-    public Object newFolder(String folderName, String parentId) {
+    public Object newFolder(String folderName, String parentId,String scopeId) {
         try {
             // decode
             parentId = decode(parentId);
@@ -52,6 +52,7 @@ public class FolderDaoImpl implements IFolderDao{
             mongoTemplate.updateFirst(queryParent,updateParent,FolderEntity.class);
 
             FolderEntity newFolder = new FolderEntity();
+            newFolder.setScopeId(scopeId);
             newFolder.setFiles(new ArrayList<>());
             newFolder.setFolders(new ArrayList<>());
             newFolder.setFolderId(newFolderInfo.getUid());

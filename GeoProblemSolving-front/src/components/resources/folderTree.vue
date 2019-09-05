@@ -708,7 +708,9 @@ export default {
                 "?folderName=" +
                 newFolderName +
                 "&parentId=" +
-                parentId
+                parentId +
+                "&scopeId=" +
+                this.rootFolderId
             )
             .then(res => {
               if (res.data == "Offline") {
