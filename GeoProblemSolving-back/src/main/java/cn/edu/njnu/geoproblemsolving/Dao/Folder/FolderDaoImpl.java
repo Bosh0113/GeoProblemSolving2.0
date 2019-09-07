@@ -296,8 +296,13 @@ public class FolderDaoImpl implements IFolderDao{
             for (FolderEntity folderEntity : folderEntities){
                 ArrayList<ResourceEntity> files = folderEntity.getFiles();
                 for (ResourceEntity file : files){
-                    if(file.getType().equals(type)){
+                    if(type.equals("all")){
                         resultList.add(file);
+                    }
+                    else {
+                        if(file.getType().equals(type)){
+                            resultList.add(file);
+                        }
                     }
                 }
             }

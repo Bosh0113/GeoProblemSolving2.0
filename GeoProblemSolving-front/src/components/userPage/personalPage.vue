@@ -374,7 +374,7 @@ body {
                                     class="fileBtnHoverGreen"
                                     size="small"
                                     title="Download"
-                                    @click="download(index)"
+                                    @click="downloadSingleFile(index)"
                                     icon="md-download"
                                     shape="circle"
                                     type="text"
@@ -1298,7 +1298,7 @@ export default {
           console.log(err.data);
         });
     },
-    download(index) {
+    downloadSingleFile(index) {
       window.open(this.userResourceList[index].pathURL);
     },
     deleteResourceModalShow(id) {

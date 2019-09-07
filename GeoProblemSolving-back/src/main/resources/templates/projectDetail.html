@@ -891,7 +891,9 @@
                         return (() => {
                             this.resizeContent();
                             this.$refs.navigationEl.identityMenuCSS();
-                            this.$refs.folderTreeEl.resizeContent();
+                            if(this.$refs.folderTreeEl!=undefined){
+                                this.$refs.folderTreeEl.resizeContent();
+                            }
                         })()
                     }
                 },
