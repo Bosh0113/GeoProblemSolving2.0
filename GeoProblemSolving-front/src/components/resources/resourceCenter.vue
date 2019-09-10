@@ -21,121 +21,160 @@
   background-color: #808695;
   color: white;
 }
+.leftMenuItem {
+    margin: 0 0 10px 0;
+}
 </style>
 <template>
-    <div style="background:#eee;padding:20px;">
-        <Card shadow>
-            <h1 slot="title">Resource Center</h1>
-            <div>
-                <div>
-                    <span>Project:</span>
-                    <Select class="selector" v-model="selectedProjectId" @on-change="changeProject">
-                        <Option v-for="project in projectList" :key="project.projectId" :value="project.projectId">{{project.title}}</Option>
-                    </Select>
-                    <span style="margin-left:15px">->  Sub-project:</span>
-                    <Select class="selector" v-model="selectedSubProejctId" :disabled="subProjectDisable"  @on-change="changeSubProject">
-                        <Option v-for="subProject in subProjectList" :key="subProject.subProjectId" :value="subProject.subProjectId">{{subProject.title}}</Option>
-                    </Select>
-                    <span style="margin-left:15px">->  Step:</span>
-                    <Select class="selector" v-model="selectedStepId" :disabled="stepDisable"  @on-change="changeStep">
-                        <Option v-for="step in stepList" :key="step.moduleId" :value="step.moduleId">{{step.title}}</Option>
-                    </Select>
-                </div>
-                <div style="margin-top:20px">
-                    <Card dis-hover>
-                        <div slot="title">
-                            <div style="display:inline-block">
-                                <span style="font-weight: bold;">view: </span>
-                                <i-switch v-model="folderType" style="margin-right:5px" @on-change="getResourceInfo">
-                                    <Icon type="ios-folder" slot="open" title="Folder"></Icon>
-                                    <Icon type="md-list" slot="close" title="List"></Icon>
-                                </i-switch>
-                            </div>
-                            <div v-if="!folderType" style="display:inline-block;margin-left:20px">
-                                <div style="display:inline-block">
-                                    <span style="font-weight: bold;">category: </span>
-                                    <RadioGroup v-model="fileType" @on-change="changeFileType">
-                                        <Radio label="all">All</Radio>
-                                        <Radio label="data">Data</Radio>
-                                        <Radio label="paper">Paper</Radio>
-                                        <Radio label="document">Document</Radio>
-                                        <Radio label="model">Model</Radio>
-                                        <Radio label="image">Image</Radio>
-                                        <Radio label="video">Video</Radio>
-                                        <Radio label="others">Others</Radio>
-                                    </RadioGroup>
-                                </div>
-                                <div style="display:inline-block;margin-left:50px">
-                                    <Input search placeholder="Enter something..." size="small" />
-                                </div>
-                            </div>
-                        </div>
+    <div>
+        <div span="2"  style="height: inherit;width: 90px;position: absolute;">
+            <Menu active-name="projectResource" @on-select="changeMenuItem" style="height: inherit;width: fit-content;">
+                <MenuItem name="projectResource" class="leftMenuItem">
+                    <Icon type="ios-paper" title="Project Resource" size="35"></Icon>
+                </MenuItem>
+                <MenuItem name="personalResource" class="leftMenuItem">
+                    <Icon type="ios-folder" title="Personal Resource" size="35"></Icon>
+                </MenuItem>
+                <MenuItem name="publicResource" class="leftMenuItem">
+                    <Icon type="logo-dropbox" title="Public Resources" size="35"></Icon>
+                </MenuItem>
+            </Menu>
+        </div>
+        <div style="margin-left: 90px;height: inherit;min-height: fit-content;">
+            <div v-if="showMenuItem=='projectResource'" style="height: inherit;min-height: fit-content;">
+                <Card shadow>
+                    <h1 slot="title">Project's Resource</h1>
+                    <div>
                         <div>
-                            <div v-if="folderType" style="min-height:500px;">
-                                <h1 v-if="scopeId==''">Folder</h1>
-                                <folder-tree v-else 
-                                :root-folder-id="scopeId"
-                                role=""
-                                ref="folderTreeEl"
-                                :key="freshFolder"></folder-tree>
-                            </div>
-                            <div v-else>
-                                <h1 v-if="scopeId==''">List</h1>
-                                <Card v-else>
-                                <div slot="title" class="resourceTitle">
-                                    <strong>Resources</strong>
-                                </div>
-                                <div slot="extra" class="resourceBtnDiv">
-                                    <Tooltip content="Download all selected" placement="bottom">
-                                        <Button 
-                                        class="fileBtnHoverGray"
-                                        @click="downloadFiles">
-                                        <Icon size="20" type="md-cloud-download"></Icon>
-                                        </Button>
-                                    </Tooltip>
-                                </div>
-                                <div style="height:500px">
-                                    <vue-scroll :ops="ops">
-                                    <Table :data="showResourceList" :columns="resourceColumn" class="table" @on-selection-change="setSelectedFiles">
-                                        <template slot-scope="{ row }" slot="name">
-                                        <strong>{{ row.name }}</strong>
-                                        </template>
-                                        <template slot-scope="{ row, index }" slot="action">
-                                        <Button
-                                            class="fileBtnHoverGreen"
-                                            size="small"
-                                            title="Download"
-                                            @click="downloadSingleFile(index)"
-                                            icon="md-download"
-                                            shape="circle"
-                                            type="text"
-                                        >
-                                        </Button>
-                                        </template>
-                                    </Table>
-                                    </vue-scroll>
-                                </div>
-                                </Card>
-                            </div>
+                            <span>Project:</span>
+                            <Select class="selector" v-model="selectedProjectId" @on-change="changeProject">
+                                <Option v-for="project in projectList" :key="project.projectId" :value="project.projectId">{{project.title}}</Option>
+                            </Select>
+                            <span style="margin-left:15px">->  Sub-project:</span>
+                            <Select class="selector" v-model="selectedSubProejctId" :disabled="subProjectDisable"  @on-change="changeSubProject">
+                                <Option v-for="subProject in subProjectList" :key="subProject.subProjectId" :value="subProject.subProjectId">{{subProject.title}}</Option>
+                            </Select>
+                            <span style="margin-left:15px">->  Step:</span>
+                            <Select class="selector" v-model="selectedStepId" :disabled="stepDisable"  @on-change="changeStep">
+                                <Option v-for="step in stepList" :key="step.moduleId" :value="step.moduleId">{{step.title}}</Option>
+                            </Select>
                         </div>
-                    </Card>
-                </div>
+                        <div style="margin-top:20px">
+                            <Card dis-hover>
+                                <div slot="title">
+                                    <div style="display:inline-block">
+                                        <span style="font-weight: bold;">view: </span>
+                                        <i-switch v-model="folderType" style="margin-right:5px" @on-change="getResourceInfo">
+                                            <Icon type="ios-folder" slot="open" title="Folder"></Icon>
+                                            <Icon type="md-list" slot="close" title="List"></Icon>
+                                        </i-switch>
+                                    </div>
+                                    <div v-if="!folderType" style="display:inline-block;margin-left:20px">
+                                        <div style="display:inline-block">
+                                            <span style="font-weight: bold;">category: </span>
+                                            <RadioGroup v-model="fileType" @on-change="changeFileType">
+                                                <Radio label="all">All</Radio>
+                                                <Radio label="data">Data</Radio>
+                                                <Radio label="paper">Paper</Radio>
+                                                <Radio label="document">Document</Radio>
+                                                <Radio label="model">Model</Radio>
+                                                <Radio label="image">Image</Radio>
+                                                <Radio label="video">Video</Radio>
+                                                <Radio label="others">Others</Radio>
+                                            </RadioGroup>
+                                        </div>
+                                        <div style="display:inline-block;margin-left:50px">
+                                            <Input search placeholder="Enter something..." size="small" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div v-if="folderType" style="min-height:500px;">
+                                        <h1 v-if="scopeId==''">Folder</h1>
+                                        <folder-tree v-else 
+                                        :root-folder-id="scopeId"
+                                        role=""
+                                        ref="folderTreeEl"
+                                        :key="freshFolder"></folder-tree>
+                                    </div>
+                                    <div v-else>
+                                        <h1 v-if="scopeId==''">List</h1>
+                                        <Card v-else>
+                                        <div slot="title" class="resourceTitle">
+                                            <strong>Resources</strong>
+                                        </div>
+                                        <div slot="extra" class="resourceBtnDiv">
+                                            <Tooltip content="Download all selected" placement="bottom">
+                                                <Button 
+                                                class="fileBtnHoverGray"
+                                                @click="downloadFiles">
+                                                <Icon size="20" type="md-cloud-download"></Icon>
+                                                </Button>
+                                            </Tooltip>
+                                        </div>
+                                        <div style="height:500px">
+                                            <vue-scroll :ops="ops">
+                                            <Table :data="showResourceList" :columns="resourceColumn" class="table" @on-selection-change="setSelectedFiles">
+                                                <template slot-scope="{ row }" slot="name">
+                                                <strong>{{ row.name }}</strong>
+                                                </template>
+                                                <template slot-scope="{ row, index }" slot="action">
+                                                <Button
+                                                    class="fileBtnHoverGreen"
+                                                    size="small"
+                                                    title="Download"
+                                                    @click="downloadSingleFile(index)"
+                                                    icon="md-download"
+                                                    shape="circle"
+                                                    type="text"
+                                                >
+                                                </Button>
+                                                </template>
+                                            </Table>
+                                            </vue-scroll>
+                                        </div>
+                                        </Card>
+                                    </div>
+                                </div>
+                            </Card>
+                        </div>
+                    </div>
+                </Card>
             </div>
-        </Card>
+            <div v-if="showMenuItem=='personalResource'" style="height: inherit;min-height: fit-content;">
+            <Card shadow>
+                <h1 slot="title">Personal Resource</h1>
+                <personal-resouce></personal-resouce>
+             </Card>
+            </div>
+            <div v-if="showMenuItem=='publicResource'" style="height: inherit;min-height: fit-content;">
+            <Card shadow>
+                <h1 slot="title">Public Resource</h1>
+                <div>
+                    <public-resouce></public-resouce>
+                </div>
+            </Card>
+            </div>
+        </div>
     </div>
 </template>
 <script>
 import folderTree from "./folderTree.vue";
+import personalResouce from "./personalResourceEl.vue";
+import publicResouce from "./publicResourceList.vue";
 export default {
     components: {
-        folderTree
+        folderTree,
+        personalResouce,
+        publicResouce
     },
     mounted(){
         this.getProjectList();
     },
     data(){
         return{
-            userInfo:JSON.parse(sessionStorage.getItem('userInfo')),
+            userInfo:this.$store.getters.userInfo,
+            showMenuItem:'projectResource',
             projectList:[],
             selectedProjectId:'',
             subProjectList:[],
@@ -386,7 +425,10 @@ export default {
         },
         downloadSingleFile(index){
             window.open(this.showResourceList[index].pathURL);
-        }
+        },
+        changeMenuItem(name) {
+            this.showMenuItem = name;
+        },
     }
 }
 </script>
