@@ -135,8 +135,8 @@ export default {
           async: false,
           success: data => {
             if (data != "None" && data != "Fail") {
-              that.projectInfo = data[0];
-              that.$store.commit("setProjectInfo", data[0]);
+              this.projectInfo = data[0];
+              this.$store.commit("setProjectInfo", data[0]);
             } else {
               console.log(data);
             }
