@@ -228,7 +228,7 @@
             methods:{
                 projectInfoModalShow(projectInfo) {
                     if (projectInfo.isMember || projectInfo.isManager) {
-                        window.location.href="/GeoProblemSolving/Projects/${projectInfo.projectId}"
+                        window.location.href="/GeoProblemSolving/projectDetail/"+projectInfo.projectId;
                     } else {
                         this.selectedProjectInfo = Object.assign({}, projectInfo);
                         var category = "";
@@ -292,13 +292,12 @@
                             let projectInfo = this.projectList[i];
                             isManager = projectInfo["isManager"];
                             isMember = projectInfo["isMember"];
-                            // this.$store.commit("setProjectInfo", projectInfo);
                             break;
                         }
                     }
                     if (this.UserState) {
                         if (isManager || isMember) {
-                            window.location.href = "/GeoProblemSolving/"+`project/${id}`;
+                            window.location.href = "/GeoProblemSolving/projectDetail/"+id;
                         } else {
                             this.$Notice.error({
                                 title: "No access",
@@ -307,13 +306,12 @@
                             });
                         }
                     } else {
-                        window.location.href = "/GeoProblemSolving/login.html";
+                        window.location.href = "/GeoProblemSolving/login";
                     }
                 },
 
                 joinApplyModalShow(applyProjectInfo) {
                     if (this.UserState) {
-                        // this.$set(this, "applyProjectInfo", applyProjectInfo);
                         this.applyProjectInfo=Object.assign([], applyProjectInfo);
                         this.applyValidate.reason = "";
                         if (this.applyProjectInfo.privacy == "Public") {
@@ -324,7 +322,7 @@
                             this.applyJoinModal = true;
                         }
                     } else {
-                        window.location.href = "/GeoProblemSolving/login.html";
+                        window.location.href = "/GeoProblemSolving/login";
                     }
                 },
 
@@ -366,7 +364,7 @@
                                         scope: "project",
                                         approve: "unknow"
                                     };
-                                    this.axios
+                                    axios
                                         .post("/GeoProblemSolving/notice/save", joinForm)
                                         .then(res => {
                                             if (res.data == "Success") {
@@ -375,7 +373,7 @@
                                                     desc:
                                                         "The project's manager will process your apply in time,you can get a notification later to tell you the result."
                                                 });
-                                                //this.$emit("sendNotice", data.managerId);
+                                                this.$emit("sendNotice", data.managerId);
                                                 this.haveApplied = true;
                                             } else {
                                                 this.$Notice.open({
@@ -395,10 +393,10 @@
                                             "<br>" +
                                             "You can click this url and enter the site to process this application: " +
                                             "http://" +
-                                            this.$store.state.IP_Port +
+                                            window.location.host +
                                             "/GeoProblemSolving/home"
                                     };
-                                    this.axios
+                                    axios
                                         .post("/GeoProblemSolving/project/applyByMail", emailObject)
                                         .then(res => {
                                             if (res.data == "Success") {

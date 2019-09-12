@@ -37,8 +37,7 @@ public class StaticPagesBuilder {
         context.setVariable("activeName", "projects");
 
         //渲染模板
-        //String servicePath = System.getProperty("user.dir")+"/src/main/webapp";
-        String servicePath = System.getProperty("user.dir")+"/src/main/resources/templates";
+        String servicePath = getServicePath();
         String htmlPath = servicePath+"/staticPage/project";
         File temp = new File(htmlPath);
         if (!temp.exists()) {
@@ -46,10 +45,12 @@ public class StaticPagesBuilder {
         }
         String htmlFile = htmlPath+"/"+projectId+".html";
         try{
-            FileWriter write = new FileWriter(htmlFile);
-            templateEngine.process("projectDetail", context, write);
-            write.flush();
-            write.close();
+            if(projectEntity!=null){
+                FileWriter write = new FileWriter(htmlFile);
+                templateEngine.process("projectDetail", context, write);
+                write.flush();
+                write.close();
+            }
         }catch (Exception ignored){}
     }
 
@@ -69,7 +70,7 @@ public class StaticPagesBuilder {
         context.setVariable("projects", projects);
 
         //渲染模板
-        String servicePath = System.getProperty("user.dir")+"/src/main/resources/templates";
+        String servicePath = getServicePath();
         String htmlPath = servicePath + "/staticPage";
         File temp = new File(htmlPath);
         if (!temp.exists()) {
@@ -87,13 +88,13 @@ public class StaticPagesBuilder {
 
     public void homePageBuilder() {
         ClassLoaderTemplateResolver resolver = new ClassLoaderTemplateResolver();
+        String servicePath = getServicePath();
         resolver.setPrefix("templates/");//模板所在目录，相对于当前classloader的classpath。
         resolver.setSuffix(".html");//模板文件后缀
         TemplateEngine templateEngine = new TemplateEngine();
         templateEngine.setTemplateResolver(resolver);
 
         Context context = new Context();
-        String servicePath = System.getProperty("user.dir")+"/src/main/resources/templates";
         String htmlPath = servicePath + "/staticPage";
         File temp = new File(htmlPath);
         if (!temp.exists()) {
@@ -102,11 +103,17 @@ public class StaticPagesBuilder {
         String htmlFile = htmlPath + "/home.html";
         try {
             FileWriter write = new FileWriter(htmlFile);
-            templateEngine.process("home", context, write);
+            templateEngine.process("home", context, write);//优化点，写加锁
             write.flush();
             write.close();
         } catch (Exception ignored) {
         }
+    }
+
+    private String getServicePath(){
+        String servicePath = System.getProperty("user.dir")+"/src/main/resources/templates";
+//        String servicePath = System.getProperty("user.dir")+"/src/main/webapp"; //部署使用
+        return servicePath.replaceAll("\\\\","/");
     }
 }
 

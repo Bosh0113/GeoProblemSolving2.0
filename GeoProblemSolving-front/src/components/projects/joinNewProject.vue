@@ -271,15 +271,15 @@ export default {
             this.password
         )
         .then(res => {
+          let gotoProjectId = this.projectId;
           if (res.data === "Success") {
             this.$Message.info("Join successfuly");
-            let gotoProjectId = this.projectId
-            this.$router.push({ name: "ProjectDetail", params: { id: gotoProjectId } });
+            window.location.href="/GeoProblemSolving/projectDetail/"+gotoProjectId;
           } else if (res.data === "Fail") {
             this.$Message.info("Fail to join in this project");
           }else if(res.data === "Exist"){
             this.$Message.info("you have been in this group,no need to apply again");
-            this.$router.push({ name: "ProjectDetail", params: { id: gotoProjectId } });
+            window.location.href="/GeoProblemSolving/projectDetail/"+gotoProjectId;
           }else if(res.data === "None"){
             this.$Message.info("this group doesn't exist");
           }else if(res.data === "Password"){
@@ -291,11 +291,11 @@ export default {
         });
     },
     goHome() {
-      this.$router.push({ name: "Home" });
+      window.location.href="/GeoProblemSolving/home";
     },
     turnContent(name) {
       if (name === "home") {
-        this.$router.replace({ name: "Home" });
+        window.location.href="/GeoProblemSolving/home";
       } else if (name == "project") {
         this.$router.replace({ name: "Project" });
       } else if (name == "Public Resource") {
@@ -379,7 +379,7 @@ export default {
           .then(res => {
             this.$store.commit("userLogout");
             this.noticeSocket.close();
-            this.$router.replace({ name: "Home" });
+            window.location.href="/GeoProblemSolving/home";
           })
           .catch(err => {
             confirm("logout fail!");

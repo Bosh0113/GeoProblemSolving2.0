@@ -66,7 +66,7 @@
           </Menu>
         </div>
         <div class="resourcePanel" style="margin-left:-20px">
-          <div class="resourcePanel" style="margin-top: 20px">
+          <div class="resourcePanel" style="margin-top: 20px;height:352px;">
             <Row style="height:100%; overflow-y:auto">
               <template v-if="$store.getters.userState">
                 <Col span="22" offset="1">
@@ -88,7 +88,7 @@
               </template>
               <template v-else>
                 <Col span="22" offset="1">
-                  <Table :columns="resourceColumn" :data="showList" border>
+                  <Table :columns="resourceColumn" :data="showList" border size="small">
                     <template slot-scope="{ row, index }" slot="action" v-show="showList.length>0">
                       <a title="Please download after login">
                         <Icon type="md-download" :size="20" color="gray"/>
@@ -101,16 +101,16 @@
                 </Col>
               </template>
             </Row>
-            <div style="display:flex;justify-content:center">
-              <Page
-                :total="dataCount"
-                :page-size="pageSize"
-                show-total
-                @on-change="changepage"
-                show-elevator
-                style="position: absolute;top:600px"
-              />
-            </div>
+          </div>
+          <div style="display:flex;justify-content:center;margin-top: 80px;">
+            <Page
+              :total="dataCount"
+              :page-size="pageSize"
+              show-total
+              @on-change="changepage"
+              show-elevator
+              style="position: absolute;"
+            />
           </div>
         </div>
       </div>
@@ -208,7 +208,7 @@ export default {
       allSelectedList: [],
       showList: [],
       dataCount: 0,
-      pageSize: 10,
+      pageSize: 8,
       // 上传文件的模态框
       uploadModal: false,
       file: "",

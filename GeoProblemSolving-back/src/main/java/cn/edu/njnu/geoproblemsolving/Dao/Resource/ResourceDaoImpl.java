@@ -1,14 +1,17 @@
 package cn.edu.njnu.geoproblemsolving.Dao.Resource;
 
+import cn.edu.njnu.geoproblemsolving.Dao.Method.CommonMethod;
 import cn.edu.njnu.geoproblemsolving.Entity.Folder.UploadResult;
 import cn.edu.njnu.geoproblemsolving.Entity.ResourceEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.UserEntity;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
@@ -180,6 +183,19 @@ public class ResourceDaoImpl implements IResourceDao {
     }
 
     @Override
+    public Object updateResource(HttpServletRequest request){
+        try {
+            String resourceId = request.getParameter("resourceId");
+            Query query = new Query(Criteria.where("resourceId").is(resourceId));
+            CommonMethod commonMethod = new CommonMethod();
+            Update update = commonMethod.setUpdate(request);
+            mongoTemplate.updateFirst(query,update,ResourceEntity.class);
+            return mongoTemplate.findOne(query,ResourceEntity.class);
+        }catch (Exception e){
+            return "Fail";
+        }
+    }
+    @Override
     public String deleteResource(String key, String value) {
         try {
             //文件系统内删除
@@ -223,6 +239,7 @@ public class ResourceDaoImpl implements IResourceDao {
         }
     }
 
+    @Override
     public void packageToZip(HttpServletRequest request,HttpServletResponse response){
         String fileURLsStr = request.getParameter("fileURLs");
         String[] fileURLs = fileURLsStr.split(",");

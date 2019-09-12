@@ -2,6 +2,7 @@ package cn.edu.njnu.geoproblemsolving.Dao.SubProject;
 
 import cn.edu.njnu.geoproblemsolving.Dao.Method.CommonMethod;
 import cn.edu.njnu.geoproblemsolving.Entity.Folder.FolderEntity;
+import cn.edu.njnu.geoproblemsolving.Entity.ProjectEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.SubProjectEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.UserEntity;
 import com.alibaba.fastjson.JSONArray;
@@ -45,12 +46,18 @@ public class SubProjectDaoImpl implements ISubProjectDao {
             mongoTemplate.save(subProject);
 
             FolderEntity folderEntity = new FolderEntity();
+            folderEntity.setScopeId(subProjectId);
             folderEntity.setFolders(new ArrayList<>());
             folderEntity.setFiles(new ArrayList<>());
             folderEntity.setFolderName(subProject.getTitle());
             folderEntity.setParentId("");
             folderEntity.setFolderId(subProject.getSubProjectId());
             mongoTemplate.save(folderEntity);
+
+            Query query = new Query(Criteria.where("projectId").is(subProject.getProjectId()));
+            ProjectEntity projectEntity = mongoTemplate.findOne(query,ProjectEntity.class);
+            joinSubProject(subProject.getSubProjectId(),projectEntity.getManagerId());
+
             return subProject;
         } catch (Exception e) {
             return "Fail";

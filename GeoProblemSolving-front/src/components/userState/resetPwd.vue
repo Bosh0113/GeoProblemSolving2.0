@@ -253,11 +253,11 @@ export default {
       this.pwdType = this.pwdType === "password" ? "text" : "password";
     },
     goHome() {
-      this.$router.push({ name: "Home" });
+      window.location.href="/GeoProblemSolving/home";
     },
     turnContent(name) {
       if (name === "home") {
-        this.$router.replace({ name: "Home" });
+        window.location.href="/GeoProblemSolving/home";
       } else if (name == "project") {
         this.$router.replace({ name: "Project" });
       } else if (name == "Public Resource") {
@@ -288,7 +288,7 @@ export default {
           .then(res => {
             this.$store.commit("userLogout");
             this.noticeSocket.close();
-            this.$router.replace({ name: "Home" });
+            window.location.href="/GeoProblemSolving/home";
           })
           .catch(err => {
             confirm("logout fail!");

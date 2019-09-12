@@ -177,7 +177,7 @@
 
 <body>
 <div id="projectDetailPage"  v-cloak>
-        <child-navigation ref="navigationEl"></child-navigation>
+        <child-navigation ref="navigationEl" active-type="projects"></child-navigation>
     <template>
         <div :style="{height: contentPageCSS}" style="margin-top: 60px;">
             <div span="2" style="height: inherit;width: 90px;position: absolute;">
@@ -914,7 +914,9 @@
                         return (() => {
                             this.resizeContent();
                             this.$refs.navigationEl.identityMenuCSS();
-                            this.$refs.folderTreeEl.resizeContent();
+                            if(this.$refs.folderTreeEl!=undefined){
+                                this.$refs.folderTreeEl.resizeContent();
+                            }
                         })()
                     }
                 },
@@ -1488,7 +1490,7 @@
                 },
                 goSubProjectPage(subProject){
                     if(this.managerIdentity(subProject.managerId)||this.memberIdentity(subProject.members)){
-                        window.location.href="/GeoProblemSoving/project/"+subProject.subProjectId+"/subproject";
+                        window.location.href="/GeoProblemSoving/project/"+subProject.subProjectId+"/subproject/info";
                     }else{
                         this.$Message.warning({
                             render: h => {

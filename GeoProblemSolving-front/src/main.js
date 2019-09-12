@@ -18,7 +18,7 @@ import * as socketApi from './api/socket'
 // import VCharts from 'v-charts';
 
 //set globe CSS
-import './assets/css/style.css'
+// import './assets/css/style.css'
 
 axios.defaults.withCredentials=true;
 Vue.prototype.socketApi = socketApi

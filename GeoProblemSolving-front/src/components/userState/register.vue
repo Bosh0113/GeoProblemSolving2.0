@@ -527,7 +527,7 @@ export default {
     },
     //点击图标片跳转到主页
     goHome() {
-      this.$router.push({ name: "Home" });
+      window.location.href="/GeoProblemSolving/home";
     },
     //输入密码时
     changeType() {
