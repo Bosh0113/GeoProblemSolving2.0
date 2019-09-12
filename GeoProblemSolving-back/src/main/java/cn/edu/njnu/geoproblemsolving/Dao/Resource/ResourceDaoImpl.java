@@ -46,7 +46,7 @@ public class ResourceDaoImpl implements IResourceDao {
         try {
             InetAddress address = InetAddress.getLocalHost();
             String ip = address.getHostAddress();
-            String servicePath = request.getSession().getServletContext().getRealPath("/");
+            String servicePath = request.getSession().getServletContext().getRealPath("/");//获得绝对路径。
             if (!ServletFileUpload.isMultipartContent(request)) {
                 System.out.println("File is not multimedia.");
                 return "Fail";

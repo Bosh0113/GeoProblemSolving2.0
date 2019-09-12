@@ -118,7 +118,6 @@ export default {
     },
     getProjectInfo() {
       let projectInfo = this.$store.getters.project;
-      let that = this;
       if (
         JSON.stringify(projectInfo) != "{}" &&
         projectInfo.projectId.substring(0, 36) ==
@@ -136,8 +135,8 @@ export default {
           async: false,
           success: data => {
             if (data != "None" && data != "Fail") {
-              that.projectInfo = data[0];
-              that.$store.commit("setProjectInfo", data[0]);
+              this.projectInfo = data[0];
+              this.$store.commit("setProjectInfo", data[0]);
             } else {
               console.log(data);
             }
