@@ -292,6 +292,41 @@
   white-space: nowrap;
   max-width:50%;
 }
+.chat-notice{
+  color: darkgreen;
+  position: absolute;
+  left: 50%;
+}
+.offlineparticipantState{
+  background:rgba(255,255,255,0.4);
+}
+.onlineparticipantState{
+  background:rgba(18, 158, 71, 0.4);
+}
+.onlinecircle{
+        width: 14px;      
+        height: 14px;      
+        background-color:rgb(93, 243, 79);    
+        border:2px solid rgb(221, 245, 221);  
+        border-radius: 50%;      
+        -moz-border-radius: 50%;      
+        -webkit-border-radius: 50%;
+        position:absolute; 
+        bottom:-2px; 
+        right: -2px
+       }
+.offlinecircle{
+        width: 14px;      
+        height: 14px;      
+        background-color:rgb(151, 153, 152);
+        border:2px solid rgb(175, 175, 175);       
+        border-radius: 50%;      
+        -moz-border-radius: 50%;      
+        -webkit-border-radius: 50%;
+        position:absolute; 
+        bottom:-2px; 
+        right: -2px
+       }
 </style>
 <template>
   <Row>
@@ -301,20 +336,21 @@
           <div class="panelHeader">
             <h4>Groups</h4>
           </div>
+          <!-- 选择聊天室 -->
           <Select v-model="selectItem" style="width:195px;margin-left:2.5px;margin-right:2.5px">
             <Option v-for="(item,index) in itemList" :value="item.value" :key="item.index" @click.native="changeChatroom(index)">{{ item.label }}</Option>
           </Select>
+
+          <!-- 参与者 -->
           <div class="participants">
             <h4>Participants</h4>
-            <Card v-for="(participant,index) in participants" :key="index" style="margin:2.5%" :padding="5">
+            <div>
+            <Card v-for="(participant,index) in onlineParticipants" :key="'online' +index" style="margin:2.5%" :padding="5"  >
               <div style="display:flex;align-items:center">
-                <div class="memberImg">
-                  <img
-                  v-if="participant.avatar != '' && participant.avatar!='undefined'"
-                  :src="participant.avatar"
-                  style="width:40px;height:40px"
-                >
-                <avatar v-else :username="participant.userName" :size="40" :rounded="false"></avatar>
+                <div class="memberImg" style="position:relative">
+                    <img v-if="participant.avatar != '' && participant.avatar!='undefined'"  :src="participant.avatar" style="width:40px;height:40px" >                 
+                    <avatar v-else :username="participant.userName" :size="40" :rounded="false"></avatar>
+                    <div class="onlinecircle" ></div>
                 </div>
                 <div class="memberDetail">
                   <div class="memberName">
@@ -326,20 +362,29 @@
                 </div>
               </div>
             </Card>
-
-            <!-- <div v-for="(participant,index) in participants" :key="index" class="f_list">
-              <div>
-                <img
-                  v-if="participant.avatar != '' && participant.avatar!='undefined'"
-                  :src="participant.avatar"
-                  style="width:35px;height:35px"
-                >
-                <avatar v-else :username="participant.userName" :size="35" :rounded="false"></avatar>
+            </div>
+            <div>
+             <Card v-for="(participant,index) in offlineParticipants" :key=" 'offline' + index" style="margin:2.5%" :padding="5"  >
+              <div style="display:flex;align-items:center">
+                <div class="memberImg" style="position:relative">
+                    <img v-if="participant.avatar != '' && participant.avatar!='undefined'"  :src="participant.avatar" style="width:40px;height:40px" >                 
+                    <avatar v-else :username="participant.userName" :size="40" :rounded="false"></avatar>
+                    <div class="offlinecircle" ></div>
+                </div>
+                <div class="memberDetail">
+                  <div class="memberName">
+                    <span>{{participant.userName}}</span>
+                  </div>
+                  <div class="memberOrganization">
+                    <span>{{participant.organization}}</span>
+                  </div>
+                </div>
               </div>
-              <div class="name">{{participant.userName}}</div>
-            </div> -->
+            </Card>
+            </div>
           </div>
         </div>
+
         <div class="contentPanel">
           <div class="contentHeader">
             <div class="chatObject">
@@ -349,9 +394,13 @@
               <Button type="default" class="recordsButton" @click="showRecords">Records</Button>
             </div>
           </div>
-          <div class="contentBody" :style="message_panelObj" id="contentBody">
+
+          <div class="contentBody" :style="message_panelObj" id="contentBody">            
             <div style="display:flex" v-for="(list,index) in msglist" :key="index">
-              <template v-if="list.fromid === thisUserId">
+               <template v-if="list.type === 'notice'">
+                  <div class="chat-notice" :style="message_notice">{{list.message}}上线</div>
+              </template>
+              <template v-else-if="list.fromid === thisUserId ">
                 <div style="width:95%">
                   <div class="chat-bubble-r chat-bubble-right">{{list.content}}</div>
                 </div>
@@ -375,6 +424,7 @@
                   <div class="chat-bubble-l chat-bubble-left">{{list.content}}</div>
                 </div>
               </template>
+             
             </div>
           </div>
           <div class="contentFooter">
@@ -397,27 +447,20 @@
             </div>
           </div>
         </div>
+
         <div class="searchPanel" v-show="searchPanelShow" style="border:1px solid lightgray">
           <div class="searchHeader">
             <p>Message Records</p>
           </div>
+          <!-- 日期选择器 -->
           <div style="display:flex">
-            <DatePicker
-              type="date"
-              placeholder="Select date"
-              class="date_pick"
-              v-model="query_date"
-            ></DatePicker>
-            <Button class="date_pick_btn" type="success" @click="find(query_date)">ok</Button>
+            <DatePicker type="date"  placeholder="Select date and time"  class="date_pick"  :date_query="query_date" @on-change="find(date_query)"></DatePicker>
+            <!-- <Button class="date_pick_btn" type="success" @click="find(date_query)">ok</Button> -->
           </div>
           <div class="search_msg">
             <Input search placeholder="Enter something..."/>
           </div>
-          <div
-            class="searchmessageList"
-            :style="{height:messageListPanelHeight}"
-            id="searchmessageList"
-          >
+          <div class="searchmessageList" :style="{height:messageListPanelHeight}" id="searchmessageList" >
             <div class="message_record_board">
               <div style="display:flex" v-for="(list,index) in msgRecords" :key="index">
                 <div class="single_record">
@@ -433,9 +476,17 @@
     </Col>
   </Row>
 </template>
+
+
 <script>
 import * as socketApi from "./../../api/socket.js";
 import Avatar from "vue-avatar";
+//import notification from '../utils/notification';
+
+
+//notice
+
+
 export default {
   components: {
     Avatar
@@ -450,6 +501,11 @@ export default {
         borderRight: "0px",
         searchPanelShow: false
       },
+      message_notice:{
+        color:"green",
+        right: "0px",
+        borderRight: "0px",
+      },
       // 原有的变量字段
       projectId: "",
       subProjectId: "",
@@ -462,6 +518,7 @@ export default {
       message: "",
       my_msglist: [],
       other_msglist: [],
+      notice_msglist:[],
       msglist: [],
       msgRecords: [],
       send_msg: [],
@@ -487,9 +544,32 @@ export default {
           label:"Project"
         },
       ],
-      selectItem: "Module"
+      selectItem: "Module",
+      onlineParticipants:[],
+      onlineP:[],
+      offlineParticipants:[],
+      parMessage:[],
+      windowStatus :'focus',//监听浏览器失焦事件
     };
   },
+
+  mounted() {    
+    
+    window.addEventListener('blur', this.winBlur);//监听浏览器失焦事件    
+    window.addEventListener('focus', this.winFocus);//监听浏览器失焦事件
+    window.addEventListener("resize", this.initSize);   
+
+    this.init();
+    //init module
+    this.participants = [];
+    this.select_group = this.moduleName;
+    this.select_groupId = this.moduleId;
+    this.startWebSocket(this.moduleId);
+    this.seletRoom = "module";
+    this.supportNotify();
+   
+  },
+
   methods: {
     init() {
       this.initSize();
@@ -521,6 +601,7 @@ export default {
         }
       ];
     },
+
     changeChatroom(index) {
       this.socketApi.close();
       if (index == 0) {
@@ -564,14 +645,17 @@ export default {
         this.msgRecords = [];
         this.getParticipants(this.projectId, "project");
         this.select_group = this.projectName;
-        this.select_groupId = this.projectId;
-        this.startWebSocket(this.projectId);
+        this.select_groupId = this.projectId;        
+        this.startWebSocket(this.projectId, "project");
         this.seletRoom = "project";
-      }
+      };
+         
+      
     },
+
     getParticipants(id, scope) {
       if (scope == "subproject") {
-        let that = this;
+        //let that = this;
         $.ajax({
           url:
             "/GeoProblemSolving/subProject/inquiry" +
@@ -579,14 +663,16 @@ export default {
             "&value=" +
             that.subProjectId,
           type: "GET",
+          async: false,
           success: data => {
             if (data != "None" && data != "Fail" && data != "Offline") {
               let subProjectInfo = data[0];
               let membersList = subProjectInfo["members"];
               let manager = { userId: subProjectInfo["managerId"] };
-              membersList.unshift(manager);
+              membersList.unshift(manager);//在List开头加入manager元素
               let participantsTemp = [];
               for (let i = 0; i < membersList.length; i++) {
+                //查找数据库中userId和subProject里面的成员相同的
                 $.ajax({
                   url:
                     "/GeoProblemSolving/user/inquiry" +
@@ -601,7 +687,8 @@ export default {
                   }
                 });
               }
-              that.$set(that, "participants", participantsTemp);
+              this.$set(this, "participants", participantsTemp);
+              //this.judgeonlineParticipant(this.participants);
             }
           },
           error: function(err) {
@@ -610,17 +697,18 @@ export default {
         });
       } else if (scope == "project") {
         let that = this;
-        let queryObject = { key: "projectId", value: this.projectId };
-        try {
-          $.ajax({
-            url:
-              "/GeoProblemSolving/project/inquiry" +
-              "?key=" +
-              queryObject["key"] +
-              "&value=" +
-              queryObject["value"],
-            type: "GET",
-            success: function(data) {
+        console.log(this.onlineParticipants);
+        let queryObject = { key: "projectId", value: this.projectId };    
+        $.ajax({
+          url:
+           "/GeoProblemSolving/project/inquiry" +
+            "?key=" +
+            queryObject["key"] +
+            "&value=" +
+            queryObject["value"],
+          type: "GET",
+          async: false,
+          success: data => {
               if (data != "None" && data != "Fail") {
                 let projectInfo = data[0];
                 let membersList = projectInfo["members"];
@@ -628,43 +716,54 @@ export default {
 
                 membersList.unshift(manager);
                 let participantsTemp = [];
+                let count = membersList.length;
                 for (let i = 0; i < membersList.length; i++) {
+                  //  this.axios.get(
+                  //     "/GeoProblemSolving/user/inquiry" +
+                  //     "?key=" +
+                  //     "userId" +
+                  //     "&value=" +
+                  //     membersList[i].userId
+                  //     )
+                  //     .then(res=>{
+                  //       participantsTemp.push(res.data);
+                  //       if(--count==0){
+                  //         //this.$set(this, "participants", participantsTemp);//获取项目所有成员
+                  //         this.participants = participantsTemp;
+                  //         console.log(this.onlineParticipants);
+                  //         this.judgeonlineParticipant(this.onlineParticipants);
+                  //       }
+                  //     });
                   $.ajax({
-                    url:
-                      "/GeoProblemSolving/user/inquiry" +
-                      "?key=" +
-                      "userId" +
-                      "&value=" +
-                      membersList[i].userId,
-                    type: "GET",
-                    async: false,
-                    success: function(data) {
-                      participantsTemp.push(data);
-                    },
-                    error: function(err) {
-                      console.log("Get manager name failed.");
-                    }
-                  });
+                  url:
+                    "/GeoProblemSolving/user/inquiry" +
+                    "?key=" +
+                    "userId" +
+                    "&value=" +
+                    membersList[i].userId,
+                  type: "GET",
+                  async: false,
+                  success: function(data) {
+                    participantsTemp.push(data);
+                  }
+                });                 
                 }
-                that.$set(that, "participants", participantsTemp);
+                this.$set(this, "participants", participantsTemp);
+                 console.log(this.participants);
               }
-            },
-            error: function(err) {
-              console.log("Get manager name fail.");
             }
           });
-        } catch (err) {
-          console.log(err);
+         
         }
-      }
-    },
+    },  
+
     olParticipantChange() {
       let userIndex = -1;
-
       // 自己刚上线，olParticipants空
       if (this.participants.length == 0) {
         var that = this;
         for (let i = 0; i < this.olParticipants.length; i++) {
+          //在库中查找到userId=this.olParticipants[i]的user；
           this.axios
             .get(
               "/GeoProblemSolving/user/inquiry" +
@@ -675,7 +774,7 @@ export default {
             )
             .then(res => {
               if (res.data != "None" && res.data != "Fail") {
-                that.participants.push(res.data);
+                that.participants.push(res.data);//向数组的末尾添加res.data元素
               } else if (res.data == "None") {
               }
             });
@@ -694,7 +793,6 @@ export default {
               break;
             }
           }
-
           // 人员渲染
           var that = this;
           this.axios
@@ -707,7 +805,7 @@ export default {
             )
             .then(res => {
               if (res.data != "None" && res.data != "Fail") {
-                that.participants.push(res.data);
+                that.participants.push(res.data);//向participants的末尾添加res.data
                 if (userIndex != -1) {
                 }
               } else if (res.data == "None") {
@@ -725,10 +823,12 @@ export default {
               break;
             }
           }
-          this.participants.splice(userIndex, 1);
+          this.participants.splice(userIndex, 1);  //删除一个元素，返回userIndex数组      
+          //console.log(this.participants);
         }
       }
     },
+
     showRecords() {
       this.searchPanelShow = !this.searchPanelShow;
       this.message_panelObj["right"] = 0;
@@ -754,7 +854,9 @@ export default {
           });
       }
     },
+
     send(msg) {
+       console.log(msg);
       this.message = msg;
       let myDate = new Date();
       let current_time = myDate.toLocaleString(); //获取日期与时间
@@ -772,28 +874,51 @@ export default {
         this.my_msglist.push(this.send_msg);
         this.msglist.push(this.send_msg);
         this.msgRecords.push(this.send_msg);
-        this.socketApi.sendSock(this.send_msg, this.getSocketConnect);
+        this.socketApi.sendSock(this.send_msg, this.getSocketConnect);//连接后台onopen方法
       }
       this.message = "";
-    },
+    },   
+    
+    startWebSocket(id, scope) {
+      // this.getParticipants(id, scope);
+      this.socketApi.initWebSocket("ChatServer/" + id,this.$store.state.IP_Port);
+      this.send_msg = {
+        type: "test",
+        from: "Test",
+        content: "TestChat"
+      };
+      this.socketApi.sendSock(this.send_msg, this.getSocketConnect);
+    }, 
+    
     getSocketConnect(data) {
-      var chatMsg = data;
+      var chatMsg = data;//data传回onopen方法里的值
       if (data.type === "members") {
         let members = data.message
           .replace("[", "")
           .replace("]", "")
           .replace(/\s/g, "")
           .split(",");
-        this.olParticipants = members;
-        if (this.seletRoom == "module") {
-          this.olParticipantChange();
+          //this.$set(this,"onlineParticipants",members);
+          this.onlineParticipants=members;
+          console.log(this.onlineParticipants);
+          this.judgeonlineParticipant(members);
+        if (this.seletRoom == "project") {
+          //this.judgeonlineParticipant(this.onlineParticipants);   
         }
       } else if (data.type === "message") {
         //判断消息的发出者
         if (chatMsg.content != "") {
+          console.log(chatMsg);
           this.other_msglist.push(chatMsg);
           this.msglist.push(chatMsg);
-          this.msgRecords.push(chatMsg);
+          this.msgRecords.push(chatMsg);          
+          this.sendNotify(chatMsg);  
+        }
+      } else if (data.type === "notice") {
+        //上线下线提示
+        if (chatMsg.content != "") {
+          this.msglist.push(chatMsg);
+          this.notice_msglist.push(chatMsg);
         }
       } else if (chatMsg.type == undefined && chatMsg.length > 0) {
         for (let i = 0; i < chatMsg.length; i++) {
@@ -803,22 +928,44 @@ export default {
             this.msgRecords.push(chatMsg[i]);
           }
         }
-      }
+      }     
+     
     },
-    startWebSocket(id) {
-      this.socketApi.initWebSocket("ChatServer/" + id,this.$store.state.IP_Port);
 
-      this.send_msg = {
-        type: "test",
-        from: "Test",
-        content: "TestChat"
-      };
-      this.socketApi.sendSock(this.send_msg, this.getSocketConnect);
+    //传过来的是ID 根据ID获得用户所有的属性值
+    getParMessage(member){
+      this.parMessage=[];
+      let count = member.length;
+      for (let i = 0; i < member.length; i++) {
+        // 异步-->转同步
+       this.axios
+          .get(
+              "/GeoProblemSolving/user/inquiry" +
+                "?key=" +
+                "userId" +
+                "&value=" +
+                member[i]
+            )
+            .then(res => {
+              if (res.data != "None" && res.data != "Fail") {
+                this.parMessage.push(res.data);
+                 if(--count==0){
+                    this.$set(this,"onlineParticipants",this.parMessage);
+                    this.$set(this,"olParticipants",this.parMessage);
+                    console.log(this.onlineParticipants);
+                  }
+              } else if (res.data == "None") {
+            };              
+          }); 
+      };      
     },
+
+
     find(date) {
       let q_date = date.toLocaleDateString();
       console.log(q_date);
     },
+
     initSize() {
       if(window.innerHeight > 675) {
         this.panelHeight = window.innerHeight;
@@ -833,18 +980,107 @@ export default {
         this.panelWidth = 1200;
       }
       this.messageListPanelHeight = this.panelHeight - 144 + "px";
-    }
-  },
-  mounted() {
-    window.addEventListener("resize", this.initSize);
-    this.init();
-    //init module
-    this.participants = [];
-    this.select_group = this.moduleName;
-    this.select_groupId = this.moduleId;
-    this.startWebSocket(this.moduleId);
-    this.seletRoom = "module";
-  },
+    },
+
+    //判断在线的用户列表
+    judgeonlineParticipant(onlineparticipants){ 
+      console.log(this.participants);
+      console.log(this.onlineParticipants); 
+      var that=this;     
+
+     // let onlineparticipants=this.onlineParticipants; //online成员 ID
+      let participants=this.participants; //项目所有成员
+
+      let offline=[];//不在线成员过渡
+      let online=[];//在线成员过渡
+      var index=0;//不在线成员index
+
+      for (var i= 0 ; i<participants.length ; i++) {
+        for (var j = 0; j < onlineparticipants.length; j++) {
+          if (participants[i].userId === onlineparticipants[j]) {
+            online.push(participants[i]);            
+            break;
+          }          
+          if (j == (onlineparticipants.length-1)) {
+            index = i;
+            offline.push(participants[index]);  //删除一个元素，返回userIndex数组      
+            break;
+          }
+        }
+      };
+      this.offlineParticipants=[];
+      this.$set(this,"offlineParticipants",offline);
+      this.$set(this,"onlineParticipants",online);
+      console.log(offline);
+      console.log(online);
+    },
+
+    winBlur(){
+      this.windowStatus = 'blur';
+    },
+    winFocus(){
+      this.windowStatus = 'focus';
+    },
+
+    supportNotify() {
+      //检查浏览器是否支持
+        if (!("Notification" in window)) {
+          window.alert("This browser does not support desktop notification");
+        }
+        else{
+          var Notification = window.Notification || window.mozNotification || window.webkitNotification;
+
+          if (Notification && Notification.permission === "granted") {// 检查用户是否同意接受通知
+              Notification.requestPermission();
+              console.log("ok");
+          }
+          else{ // 否则我们需要向用户获取权限
+            Notification.requestPermission();
+            console.log("re");
+          }
+        }
+      },
+
+    
+    sendNotify(msg){
+        if (this.windowStatus === 'blur') {
+             var notify = new Notification(
+              "You have got a new message",
+              {
+                tag:msg.fromid+msg.time,
+                icon:"/GeoProblemSolving/images/OGMS.png",//通知的缩略图,//icon 支持ico、png、jpg、jpeg格式
+                body:"from   " +msg.from ,//通知的具体内容
+                renotify:true,
+              }
+            );
+
+            //通知显示
+            notify.onshow = function () {
+                //5s自行停止通知
+                setTimeout(notify.close.bind(notify), 5000);
+            };
+
+            //单击通知，跳转到页面
+            notify.onclick=function(){
+              window.focus();
+              notify.close();
+            };
+
+            //报错处理
+            notify.onerror=function(){
+              console.log("error");
+            };           
+
+            //通知关闭
+            notify.onclose = function(){
+              console.log("HTML5桌面消息关闭！！！");
+            };
+      
+        }        
+    }, 
+},
+
+ 
   beforeDestroy() {
     this.socketApi.close();
     window.removeEventListener("resize", this.initSize);
@@ -864,6 +1100,7 @@ export default {
       div.scrollTop = div.scrollHeight - 60;
       div2.scrollTop = div.scrollHeight;
     });
-  }
+  },
+  
 };
 </script>
