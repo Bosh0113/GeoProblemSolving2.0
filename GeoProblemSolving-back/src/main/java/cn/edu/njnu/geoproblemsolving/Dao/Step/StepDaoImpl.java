@@ -1,8 +1,8 @@
-package cn.edu.njnu.geoproblemsolving.Dao.ContextDefinition;
+package cn.edu.njnu.geoproblemsolving.Dao.Step;
 
 import cn.edu.njnu.geoproblemsolving.Dao.Method.CommonMethod;
 import cn.edu.njnu.geoproblemsolving.Entity.Folder.FolderEntity;
-import cn.edu.njnu.geoproblemsolving.Entity.ContextDefinitionEntity;
+import cn.edu.njnu.geoproblemsolving.Entity.StepEntity;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -17,48 +17,48 @@ import java.util.List;
 
 
 @Component
-public class ContextDefinitionDaoImpl implements IContextDefinitionDao{
+public class StepDaoImpl implements IStepDao{
     private final MongoTemplate mongoTemplate;
 
     @Autowired
-    public ContextDefinitionDaoImpl(MongoTemplate mongoTemplate){this.mongoTemplate=mongoTemplate;}
+    public StepDaoImpl(MongoTemplate mongoTemplate){this.mongoTemplate=mongoTemplate;}
 
     @Override
-    public String createStep(ContextDefinitionEntity contextDefinition) {
-        mongoTemplate.save(contextDefinition);
+    public String createStep(StepEntity step) {
+        mongoTemplate.save(step);
         FolderEntity folderEntity = new FolderEntity();
         folderEntity.setFolders(new ArrayList<>());
         folderEntity.setFiles(new ArrayList<>());
-        folderEntity.setFolderName(contextDefinition.getTitle());
+        folderEntity.setFolderName(step.getTitle());
         folderEntity.setParentId("");
-        folderEntity.setFolderId(contextDefinition.getStepId());
-        return contextDefinition.getStepId();
+        folderEntity.setFolderId(step.getStepId());
+        return step.getStepId();
     }
 
     @Override
-    public Object readContextDefinition(String key, String value) {
+    public Object readStep(String key, String value) {
         Query query=Query.query(Criteria.where(key).is(value));
-        if(mongoTemplate.find(query,ContextDefinitionEntity.class).isEmpty()){
+        if(mongoTemplate.find(query,StepEntity.class).isEmpty()){
             return "None";
         }else {
-            List<ContextDefinitionEntity> ContextDefinitionEntities = mongoTemplate.find(query, ContextDefinitionEntity.class);
-            return ContextDefinitionEntities;
+            List<StepEntity> StepEntities = mongoTemplate.find(query, StepEntity.class);
+            return StepEntities;
         }
     }
 
     @Override
-    public void deleteContextDefinition(String key, String value) {
+    public void deleteStep(String key, String value) {
         Query query=Query.query(Criteria.where(key).is(value));
-        mongoTemplate.remove(query,ContextDefinitionEntity.class);
+        mongoTemplate.remove(query,StepEntity.class);
     }
 
     @Override
-    public String updateContextDefinition(HttpServletRequest request) {
+    public String updateStep(HttpServletRequest request) {
         try {
             Query query=new Query(Criteria.where("stepId").is(request.getParameter("stepId")));
             CommonMethod method=new CommonMethod();
             Update update=method.setUpdate(request);
-            mongoTemplate.updateFirst(query,update,ContextDefinitionEntity.class);
+            mongoTemplate.updateFirst(query,update,StepEntity.class);
             return "Success";
         }catch (Exception e){
             return "Fail";
