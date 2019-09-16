@@ -188,7 +188,7 @@ export default {
       },
       contentHeight: "",
       processStructure: [],
-      currentStep: {},
+      activeStep: {},
       typeList: [
         "Context definition & resource collection",
         "Data processing",
@@ -399,20 +399,20 @@ export default {
 
               for (let i = 0; i < this.processStructure.length; i++) {
                 if (this.processStructure[i].activeStatus) {
-                  this.currentStep = this.processStructure[i];
-                  this.currentStep = stepList[i];
+                  this.activeStep = this.processStructure[i];
+                  this.activeStep = stepList[i];
                   break;
                 } else if (
                   i == this.processStructure.length - 1 &&
                   this.processStructure[i].activeStatus == undefined
                 ) {
                   this.processStructure[i].activeStatus = true;
-                  this.currentStep = this.processStructure[i];
-                  this.currentStep = stepList[i];
+                  this.activeStep = this.processStructure[i];
+                  this.activeStep = stepList[i];
                 }
               }
             } else if (res.data == "None" || res.data == "Fail") {
-              this.currentStep = [];
+              this.activeStep = [];
             }
           })
           .catch(err => {});
@@ -421,7 +421,7 @@ export default {
 
         for (let i = 0; i < this.processStructure.length; i++) {
           if (this.processStructure[i].activeStatus) {
-            this.currentStep = this.processStructure[i];
+            this.activeStep = this.processStructure[i];
             // 请求step数据
             this.getStepInfo(this.processStructure[i].stepID);
           }
@@ -533,7 +533,7 @@ export default {
         this.selectedStep = [];
         for (let i = 0; i < this.processStructure.length; i++) {
           //get data
-          if (this.processStructure[i].stepID == this.currentStep.moduleId) {
+          if (this.processStructure[i].stepID == this.activeStep.moduleId) {
             option.series[0].data.push({
               name: this.processStructure[i].name,
               index: this.processStructure[i].id,
@@ -548,7 +548,8 @@ export default {
               index: this.processStructure[i].id,
               name: this.processStructure[i].name
             });
-          } else {
+          } else 
+          {
             option.series[0].data.push({
               name: this.processStructure[i].name,
               index: this.processStructure[i].id,
@@ -608,7 +609,7 @@ export default {
       });
       // 双击切换当前步骤
       this.stepChart.on("dblclick", function(params) {
-        _this.currentStep = _this.processStructure[params.data.index];
+        _this.activeStep = _this.processStructure[params.data.index];
         _this.enterStep(params.data.moduleId);
 
         _this.selectedStep = [];
@@ -691,7 +692,6 @@ export default {
       }
       return category;
     },
-    // ---------------------------------------------------需要改---------------------------------------------------
     addNewStep() {
       // 重复命名检测
       for (let i = 0; i < this.processStructure.length; i++) {
@@ -729,10 +729,10 @@ export default {
       // 继承的子项目资源，项目资源，需要手动拉入子项目
       $.ajax({
         url:
-          "/GeoProblemSolving/folder/inquiry?" +
+          "/GeoProblemSolving/folder/findByFileType?" +
           "scopeId=" +
           this.subProjectInfo.subProjectId +
-          "&value=all",
+          "&type=all",
         type: "GET",
         async: false,
         success: function(data) {
@@ -768,13 +768,13 @@ export default {
             "/GeoProblemSolving/folder/findByFileType?" +
             "scopeId=" +
             selectedStepId +
-            "&value=all";
+            "&type=all";
         } else {
           getResUrl =
             "/GeoProblemSolving/folder/findByFileType?" +
             "scopeId=" +
             selectedStepId +
-            "&value=data";
+            "&type=data";
         }
         $.ajax({
           url: getResUrl,
@@ -801,7 +801,6 @@ export default {
           }
         });
       }
-      this.selectedStep = [];
 
       return mockData;
     },
@@ -845,26 +844,65 @@ export default {
             this.$store.commit("userLogout");
             this.$router.push({ name: "Login" });
           } else if (res.data != "None" && res.data != "Fail") {
-            this.currentStep = res.data[0];
+            this.activeStep = res.data[0];
           } else if (res.data == "None") {
-            this.currentStep = [];
+            this.activeStep = [];
           }
         })
         .catch(err => {});
     },
     createStep() {
-      this.createStepGraph();
       this.createStepContent();
     },
-    createStepGraph() {
+    createStepContent() {
+      // 新步骤的基本信息、资源（数据）、拓展工具
+      this.selectResource = [];
+      this.selectResource = this.getTargetKeys();
+
+      let Step = {};
+      Step["name"] = this.formValidate1.stepTitle;
+      Step["type"] = this.formValidate1.stepType;
+      Step["description"] = this.formValidate1.result;     
+      Step["creator"] = this.$store.getters.userId;
+      Step["subProjectId"] = this.$route.params.id; 
+      this.axios
+        .post("/GeoProblemSolving/step/create", Step)
+        .then(res => {
+          if (res.data == "Offline") {
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
+          } else if (res.data === "Fail") {
+            this1.$Message.info("Fail");
+          } else {
+            this.createStepGraph(res.data);
+
+            // 更新新Step的资源----------------------------------------------------------------------需要改
+            this.copyResource(res.data);
+
+            // collaborative
+            // let socketMsg = {
+            //   type: "step",
+            //   operate: "update",
+            //   content: JSON.stringify(this.processStructure)
+            // };
+            // this.subprojectSocket.send(socketMsg);
+
+            this.createModuleSuccess(Step["name"]);
+          }
+        })
+        .catch(err => {
+          console.log(err.data);
+        });
+    },
+    createStepGraph(id) {
       if (this.processStructure.length == 0) {
         // 新步骤的类别
         let nodeCategory = 0;
         nodeCategory = this.getStepCategroy(this.formValidate1.stepType);
         // create step node
         let newStepNode = {
-          id: 1,
-          stepID: "",
+          id: 0,
+          stepID: id,
           name: this.formValidate1.stepTitle,
           category: nodeCategory,
           last: [],
@@ -873,7 +911,7 @@ export default {
           y: 200,
           level: 0,
           end: true,
-          activeStatus: true
+          activeStatus: false
         };
         this.processStructure.push(newStepNode);
         // 重新渲染
@@ -946,7 +984,7 @@ export default {
           y: nodeY,
           level: nodeLevel,
           end: true,
-          activeStatus: true
+          activeStatus: false
         };
         this.processStructure.push(newStepNode);
         levelNum.push(newStepNode.id);
@@ -980,54 +1018,6 @@ export default {
           desc: "There is no step node being selected!"
         });
       }
-    },
-    createStepContent() {
-      // 新步骤的基本信息、资源（数据）、拓展工具
-      this.selectResource = [];
-      this.selectResource = this.getTargetKeys();
-
-      // 创建项目
-      // let index = this.processStructure.length - 1;
-      // let Module = {};
-      // Module["subProjectId"] = this.$route.params.id;
-      // Module["title"] = this.formValidate1.moduleTitle;
-      // Module["description"] = "There is no description of this module.";
-      // Module["creator"] = this.$store.getters.userId;
-      // Module["type"] = this.formValidate1.moduleType;
-      // this.axios
-      //   .post("/GeoProblemSolving/module/create", Module)
-      //   .then(res => {
-      //     if (res.data == "Offline") {
-      //       this.$store.commit("userLogout");
-      //       this.$router.push({ name: "Login" });
-      //     } else if (res.data === "Fail") {
-      //       this1.$Message.info("Fail");
-      //     } else {
-      //       // new StepID
-      //       this.processStructure[index].stepID = res.data;
-
-      //       // current step and module
-      //       this.currentStep = this.processStructure[index];
-      //       Module["moduleId"] = res.data;
-      //       this.currentStep = Module;
-
-      //       // collaborative
-      //       let socketMsg = {
-      //         type: "step",
-      //         operate: "update",
-      //         content: JSON.stringify(this.processStructure)
-      //       };
-      //       this.subprojectSocket.send(socketMsg);
-
-      //       //更新新module的资源---------------------静态化之后完成
-      //       // this.copyResource(res.data);
-
-      //       this.createModuleSuccess(Module["title"]);
-      //     }
-      //   })
-      //   .catch(err => {
-      //     console.log(err.data);
-      //   });
     },
     removeStep() {
       if (this.selectedStep.length == 1) {
@@ -1070,7 +1060,7 @@ export default {
         let currentIndex = this.selectedStep[0].index;
         if (
           this.processStructure[currentIndex].end &&
-          this.processStructure[currentIndex].name != this.currentStep.name
+          !this.processStructure[currentIndex].activeStatus
         ) {
           // 删除step节点
           if (currentIndex > 0) {
