@@ -302,7 +302,7 @@ export default {
               } else {
                 this.createProjectId = res.data;
                 this.addHistoryEvent(this.createProjectId);
-                this.$router.push({ path: `project/${res.data}` });
+                window.location.href="/GeoProblemSolving/projectDetail/"+this.createProjectId;
               }
             })
             .catch(err => {

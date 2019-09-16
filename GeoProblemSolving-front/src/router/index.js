@@ -8,12 +8,18 @@ Vue.use(Router)
 
 const routes = [{
   path: '/', name: 'Navigation', component: resolve => (require(["@/components/navigation"], resolve)), children: [
-    { path: '', redirect: 'home' },
-    { path: 'home', name: 'Home', component: resolve => (require(["@/components/navigationContent/home"], resolve)) },
-    { path: 'projectlist', name: 'Projects', component: resolve => (require(["@/components/navigationContent/projectList"], resolve)) },
-    { path: 'project/:id', name: 'ProjectDetail', component: resolve => (require(["@/components/projects/projectDetail"], resolve)) },
+    { path: '', redirect: 'staticPage' },
+    { path: 'staticPage', name: 'StaticPage', component: resolve => (require(["@/components/navigationContent/staticPage"], resolve)) },
+    // { path: '', redirect: 'home' },
+    // { path: 'home', name: 'Home', component: resolve => (require(["@/components/navigationContent/home"], resolve)) },
+    // { path: 'projectlist', name: 'Projects', component: resolve => (require(["@/components/navigationContent/projectList"], resolve)) },
+    // { path: 'project/:id', name: 'ProjectDetail', component: resolve => (require(["@/components/projects/projectDetail"], resolve)) },
     { path: 'project/:id/workspace', name: 'workspace', component: resolve => (require(["@/components/workingSpace/moduleList"], resolve)) },
-    { path: 'project/:id/stepCreation', name: 'stepCreation', component: resolve => (require(["@/components/workingSpace/stepCreation"], resolve)) },
+    { path: 'project/workspace/contextdefinition/:id', name: 'contextDefinition', component: resolve => (require(["@/components/workingSpace/contextDefinition"], resolve)) },
+    { path: 'project/workspace/dataprocessing/:id', name: 'dataProcessing', component: resolve => (require(["@/components/workingSpace/dataProcessing"], resolve)) },
+    { path: 'project/workspace/modelprocess/:id', name: 'modelProcess', component: resolve => (require(["@/components/workingSpace/modelProcess"], resolve)) },
+    { path: 'project/workspace/modelevalution/:id', name: 'modelEvalution', component: resolve => (require(["@/components/workingSpace/modelEvalution"], resolve)) },
+    { path: 'subproject/:id/online', name: 'online', component: resolve => (require(["@/components/workingSpace/participantvisitor"], resolve)) },
     {
       path: 'project/:id/subproject/', name: 'subproject', component: resolve => (require(["@/components/subProject/subprojectNav"], resolve)), children: [
         { path: '', redirect: 'info' },
@@ -21,7 +27,7 @@ const routes = [{
         { path: 'resource', name: 'resource', component: resolve => (require(["@/components/subProject/subResources"], resolve)) },
         { path: 'process', name: 'process', component: resolve => (require(["@/components/subProject/solvingStep"], resolve)) },
         { path: 'task', name: 'task', component: resolve => (require(["@/components/subProject/taskArrangement"], resolve)) },
-      ]
+      ],
     },
     { path: 'newproject', name: 'NewProject', component: resolve => (require(["@/components/projects/newProject"], resolve)) },
     { path: 'participants', name: 'Participants', component: resolve => (require(["@/components/navigationContent/participants"], resolve)) },
@@ -38,6 +44,11 @@ const routes = [{
     { path: 'register', name: 'Register', component: resolve => (require(["@/components/userState/register"], resolve)) },
     { path: 'resetPassword/:email', name: 'resetPassword', component: resolve => (require(["@/components/userState/resetPwd"], resolve)) },
 
+    { path: 'resourceCenter', name: 'resourceCenter', component: resolve => (require(["@/components/resources/resourceCenter"], resolve)) },
+
+
+
+
 
     { path: 'cmp-projectlist',name:'cmp-projectlist',component: resolve=>(require(["@/views/comparison/CmpProjectList"],resolve)) },
     { path: 'create-cmp-project', name:'create-cmp-project',component: resolve=>(require(["@/views/comparison/CreateProject"],resolve)) },
@@ -50,10 +61,11 @@ const routes = [{
     { path: 'create-cmp-solution/:id',name:"create-cmp-solution",component: resolve=>(require(["@/views/comparison/CreateSolution"],resolve)) },
     { path: 'create-cmp-model/:id',name:"create-cmp-model",component: resolve=>(require(["@/views/comparison/CreateModel"],resolve)) },
     { path: 'cmp-model/:projectTitle/:id',name:'cmp-model-detail',component: resolve=>(require(["@/views/comparison/CmpModelDetail"],resolve)) },
-    { path: 'cmp-invoke-model/:id',name:'cmp-invoke-model',component: resolve=>(require(["@/views/comparison/InvokeModel"],resolve)) }
+    { path: 'cmp-invoke-model/:id',name:'cmp-invoke-model',component: resolve=>(require(["@/views/comparison/InvokeModel"],resolve)) },
   ]
 },
 { path: '/chat', name: 'chatUtil', component: resolve=>(require(["@/components/utils/chatroom"],resolve)) },
+{ path: '/par', name: 'chatUtil2', component: resolve=>(require(["@/components/workingSpace/participantvisitor"],resolve)) },
 { path: '/draw', name: 'drawUtil', component: resolve=>(require(["@/components/utils/drawBoard"],resolve)) },
 { path: '/map', name: 'mapTool', component: resolve=>(require(["@/components/utils/mapTool"],resolve)) },
 { path: '/charts', name: 'dataCharts', component: resolve=>(require(["@/components/utils/charts"],resolve)) },

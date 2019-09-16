@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head >
-    <title>Demo</title>
+    <title>Geo-Problem Solving</title>
     <meta http-equiv="Content-Type" content=" charset=UTF-8" />
     <meta name="description" content="Participatory|GeoProblem Solving|GIS">
     <meta name="keywords" content="Participatory|GeoProblem Solving|GIS">
@@ -32,7 +32,7 @@
         }
 
         .picbg {
-            background-image: url("../static/images/projectlistbg.jpg");
+            background-image: url("static/images/projectlistbg.jpg");
             background-size: cover;
             position: absolute;
             height: 140px;
@@ -67,7 +67,6 @@
             background-color: rgba(21, 88, 145, 0.4);
             color: rgba(255,255,255,1);
         }
-
         .search-btn{
             position: absolute;
             top: 30px;
@@ -121,7 +120,7 @@
 </head>
 <body>
 <div id="vueBody" v-cloak style="min-width: 1100px;">
-   <child-navigation ref="navigationEl"></child-navigation>
+   <child-navigation ref="navigationEl" active-type="projects"></child-navigation>
     <div class="picscreen" >
         <div class="picbg"></div>
         <div class="home-content">
@@ -156,7 +155,7 @@
                     </Tabs>
                 </div>
                 <div class="pro-content">
-                    <tab-content  :project-list =  tabPageData ></tab-content >
+                    <tab-content  :project-list =  tabPageData @sendNotice="sendMessage"></tab-content >
                 </div>
             </i-col>
 
@@ -172,7 +171,6 @@
     <script th:inline="javascript">
     window.onload=function () {
         var List = [[${projects}]];
-        console.log(List);
         new Vue({
             el: '#vueBody',
             data: {
@@ -243,22 +241,31 @@
                 },
 
                 changePage(index){
-                    if(this.currentTab == "All" && index==1){
+                    if(this.currentTab == "All" && index==1 && !this.userState){
                         this.judgeMember(this.projectShowList);
                         this.tabPageData=Object.assign([],  this.currentProjectList);
                         this.totalCount=List.length;
                     }
-                    else{
+                    else {
+                        let userId = "";
+                        let joinedProjects = [];
+                        if(this.userState){
+                            userId = this.userInfo.userId;
+                            for(let i = 0; i < this.userInfo.joinedProjects.length; i++) {
+                                joinedProjects.add(this.userInfo.joinedProjects[i].userId);
+                            }
+                        }
                         axios
                             .get("/GeoProblemSolving/project/inquiryByPage",{
                                 params:{
                                     category:this.currentTab,
                                     page:index,
                                     pageSize:this.pageSize,
+                                    userId: userId,
+                                    joinedProjects:joinedProjects
                                 }
                             })
                             .then(res => {
-                                console.log(index);
                                 if (res.data === "None") {
                                     this.currentProjectList = [];
                                 } else {
@@ -266,7 +273,6 @@
                                 }
                                 this.tabPageData = Object.assign([], this.currentProjectList);
                                 this.totalCount=res.data.count;
-                                console.log(this.tabPageData);
                             })
                             .catch(err => {
                                 console.log(err.data);
@@ -276,7 +282,6 @@
 
                 judgeMember(list) {
                     let projectList = list;
-                    console.log(projectList);
                     //判断登录状态
                     if(this.UserState == true){
                         if (projectList.length != 0) {
@@ -300,7 +305,6 @@
                                 } else {
                                     projectList[i]["isMember"] = false;
                                 }
-                                console.log(projectList[i]);
                             }
                             this.currentProjectList = Object.assign([],projectList);
                         }
@@ -323,7 +327,6 @@
                         }
                     }
                 },
-
                 newProject() {
                     if (this.UserState == false) {
                         window.location.href = "/GeoProblemSolving/projects/login"
@@ -331,8 +334,9 @@
                         window.location.href = "/GeoProblemSolving/projects/newProject"
                     }
                 },
-
-
+                sendMessage(recipientId){
+                    this.$refs.navigationEl.sendMessage(recipientId);
+                }
             }
         })
     }

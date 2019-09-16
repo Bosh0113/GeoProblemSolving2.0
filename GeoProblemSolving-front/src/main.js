@@ -18,7 +18,7 @@ import * as socketApi from './api/socket'
 // import VCharts from 'v-charts';
 
 //set globe CSS
-import './assets/css/style.css'
+// import './assets/css/style.css'
 
 //*********add by songjie******/
 import api from "./request/api"

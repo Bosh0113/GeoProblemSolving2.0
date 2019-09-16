@@ -64,7 +64,7 @@
                     class="createTaskBtn"
                     style="margin-top:-8px"
                     @click="createTaskModalShow()"
-                    v-show="this.subProjectInfo.managerId == this.$store.getters.userId||this.subProjectInfo.isMember"
+                    v-show="userRole!='Visitor'"
                   >Add</Button>
                   <vue-scroll :ops="scrollOps" :style="{height:contentHeight-80+'px'}">
                     <draggable
@@ -460,7 +460,7 @@ export default {
     dayjs,
     ganttElastic: GanttElastic
   },
-  props: ["subProjectInfo"],
+  props: ["subProjectInfo","userRole"],
   data() {
     return {
       scrollOps: {
@@ -519,7 +519,6 @@ export default {
         endTime: [{ required: true, type: "date", trigger: "blur" }]
       },
       contentHeight: "",
-      userRole: "",
       chartSwitch: false, // 切换至甘特图
       // gantt 图
       ganttTasks: [
@@ -594,7 +593,7 @@ export default {
     };
   },
   created() {
-    this.init();
+    this.initSize();
   },
   mounted() {
     this.inquiryTask();
@@ -612,29 +611,6 @@ export default {
     initSize() {
       this.contentHeight = window.innerHeight - 210;
     },
-    //初始化函数，作用是控制侧边栏的高度，设置右边通知栏弹出时候的距顶高度以及延迟的时间
-    init() {
-      this.initSize();
-      if (
-        !this.subProjectInfo.isMember &&
-        this.subProjectInfo.managerId != this.$store.getters.userId
-      ) {
-        this.userRole = "Visitor";
-      }
-    },
-    // managerIdentity(managerId) {
-    //   if (managerId === this.$store.getters.userId) {
-    //     this.subProjectInfo.isManager = true;
-    //   }
-    // },
-    // memberIdentity(members) {
-    //   for (let i = 0; i < members.length; i++) {
-    //     if (members[i].userId === this.$store.getters.userId) {
-    //       this.subProjectInfo.isMember = true;
-    //       break;
-    //     }
-    //   }
-    // },
     closeStepSocket() {
       if (this.subprojectSocket != null) {
         this.removeTimer();
