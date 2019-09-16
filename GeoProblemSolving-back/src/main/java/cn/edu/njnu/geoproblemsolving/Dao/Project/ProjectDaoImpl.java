@@ -2,6 +2,7 @@ package cn.edu.njnu.geoproblemsolving.Dao.Project;
 
 import cn.edu.njnu.geoproblemsolving.Dao.Email.EmailDaoImpl;
 import cn.edu.njnu.geoproblemsolving.Dao.Method.CommonMethod;
+import cn.edu.njnu.geoproblemsolving.Dao.SubProject.SubProjectDaoImpl;
 import cn.edu.njnu.geoproblemsolving.Dao.User.UserDaoImpl;
 import cn.edu.njnu.geoproblemsolving.Entity.EmailEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.Folder.FolderEntity;
@@ -65,7 +66,9 @@ public class ProjectDaoImpl implements IProjectDao {
         updateUser.set("manageProjects", manageProjects);
         mongoTemplate.updateFirst(query, updateUser, UserEntity.class);
         mongoTemplate.save(project);
+
         FolderEntity folderEntity = new FolderEntity();
+        folderEntity.setScopeId(projectId);
         folderEntity.setFolders(new ArrayList<>());
         folderEntity.setFiles(new ArrayList<>());
         folderEntity.setFolderName(project.getTitle());
@@ -75,6 +78,8 @@ public class ProjectDaoImpl implements IProjectDao {
 
         StaticPagesBuilder staticPagesBuilder = new StaticPagesBuilder(mongoTemplate);
         staticPagesBuilder.projectDetailPageBuilder(projectId);
+        staticPagesBuilder.projectListPageBuilder();
+
         return projectId;
     }
 
@@ -148,6 +153,10 @@ public class ProjectDaoImpl implements IProjectDao {
         updateManager.set("manageProjects", manageProjects);
         mongoTemplate.updateFirst(queryManager, updateManager, UserEntity.class);
         mongoTemplate.remove(query, "Project");
+
+        if(key.equals("projectId")){
+            updateProjectListStaticPage(value);
+        }
     }
 
     @Override
@@ -202,6 +211,7 @@ public class ProjectDaoImpl implements IProjectDao {
 
             StaticPagesBuilder staticPagesBuilder = new StaticPagesBuilder(mongoTemplate);
             staticPagesBuilder.projectDetailPageBuilder(projectId);
+            updateProjectListStaticPage(projectId);
             return projectEntity;
         } catch (Exception e) {
             return "Fail";
@@ -237,6 +247,7 @@ public class ProjectDaoImpl implements IProjectDao {
 
                     StaticPagesBuilder staticPagesBuilder = new StaticPagesBuilder(mongoTemplate);
                     staticPagesBuilder.projectDetailPageBuilder(projectId);
+                    updateProjectListStaticPage(projectId);
                     return "Success";
                 }
             } else {
@@ -272,6 +283,7 @@ public class ProjectDaoImpl implements IProjectDao {
 
                 StaticPagesBuilder staticPagesBuilder = new StaticPagesBuilder(mongoTemplate);
                 staticPagesBuilder.projectDetailPageBuilder(projectId);
+                updateProjectListStaticPage(projectId);
                 return "Success";
             } else {
                 return "None";
@@ -329,6 +341,9 @@ public class ProjectDaoImpl implements IProjectDao {
 
             StaticPagesBuilder staticPagesBuilder = new StaticPagesBuilder(mongoTemplate);
             staticPagesBuilder.projectDetailPageBuilder(projectId);
+            updateProjectListStaticPage(projectId);
+            newProjectManagerBeSubProjectsMember(projectId,userId);
+
             return mongoTemplate.findOne(query, ProjectEntity.class);
         } catch (Exception e) {
             return "Fail";
@@ -451,43 +466,8 @@ public class ProjectDaoImpl implements IProjectDao {
         }
     }
 
-    private void quitSubProjectFromProject(String projectId, String userId) {
-        Query querySubProjects = Query.query(Criteria.where("projectId").is(projectId));
-        List<SubProjectEntity> subProjectList = mongoTemplate.find(querySubProjects, SubProjectEntity.class);
-        for (SubProjectEntity subProject : subProjectList) {
-            Query query = Query.query(Criteria.where("subProjectId").is(subProject.getSubProjectId()));
-            JSONArray members = subProject.getMembers();
-            String managerId = subProject.getManagerId();
-            if (managerId.equals(userId)) {
-                if (members.size() > 0) {
-                    JSONObject firstMember = members.getJSONObject(0);
-                    members.remove(0);
-                    Update update = new Update();
-                    update.set("managerId", firstMember.get("userId"));
-                    update.set("managerName", firstMember.get("userName"));
-                    update.set("members", members);
-                    mongoTemplate.updateFirst(query, update, SubProjectEntity.class);
-                } else {
-                    mongoTemplate.remove(query, SubProjectEntity.class);
-                }
-            } else {
-                for (int i = 0; i < members.size(); i++) {
-                    JSONObject member = members.getJSONObject(i);
-                    if (member.getString("userId").equals(userId)) {
-                        members.remove(i);
-                        Update update = new Update();
-                        update.set("members", member);
-                        mongoTemplate.updateFirst(query, update, SubProjectEntity.class);
-                        break;
-                    }
-                }
-            }
-        }
-    }
-
-
     @Override
-    public Object inquiryByPage(String category, int page, int pageSize, String userId, String[] joinedProjects) {
+    public Object inquiryByPage(String category, int page, int pageSize, String userId, String[] joinedProjects){
         try {
             Sort sort = new Sort(Sort.Direction.DESC,"createTime");
             // Public
@@ -547,4 +527,65 @@ public class ProjectDaoImpl implements IProjectDao {
             return "Fail";
         }
     }
+
+    private void quitSubProjectFromProject(String projectId, String userId) {
+        Query querySubProjects = Query.query(Criteria.where("projectId").is(projectId));
+        List<SubProjectEntity> subProjectList = mongoTemplate.find(querySubProjects, SubProjectEntity.class);
+        for (SubProjectEntity subProject : subProjectList) {
+            Query query = Query.query(Criteria.where("subProjectId").is(subProject.getSubProjectId()));
+            JSONArray members = subProject.getMembers();
+            String managerId = subProject.getManagerId();
+            if (managerId.equals(userId)) {
+                if (members.size() > 0) {
+                    JSONObject firstMember = members.getJSONObject(0);
+                    members.remove(0);
+                    Update update = new Update();
+                    update.set("managerId", firstMember.get("userId"));
+                    update.set("managerName", firstMember.get("userName"));
+                    update.set("members", members);
+                    mongoTemplate.updateFirst(query, update, SubProjectEntity.class);
+                } else {
+                    mongoTemplate.remove(query, SubProjectEntity.class);
+                }
+            } else {
+                for (int i = 0; i < members.size(); i++) {
+                    JSONObject member = members.getJSONObject(i);
+                    if (member.getString("userId").equals(userId)) {
+                        members.remove(i);
+                        Update update = new Update();
+                        update.set("members", member);
+                        mongoTemplate.updateFirst(query, update, SubProjectEntity.class);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    private void newProjectManagerBeSubProjectsMember(String projectId, String newManagerId){
+        Query querySubProjects = new Query(Criteria.where("projectId").is(projectId));
+        List<SubProjectEntity> subProjectEntities = mongoTemplate.find(querySubProjects,SubProjectEntity.class);
+        for(SubProjectEntity subProject:subProjectEntities){
+            String subProjectId = subProject.getSubProjectId();
+            SubProjectDaoImpl subProjectDao = new SubProjectDaoImpl(mongoTemplate);
+            subProjectDao.joinSubProject(subProjectId,newManagerId);
+        }
+    }
+
+    private void updateProjectListStaticPage(String projectId){
+        Sort sort = new Sort(Sort.Direction.DESC,"createTime");
+        Pageable pageable = PageRequest.of(0,18,sort);
+        Criteria criteriaPublic = Criteria.where("privacy").is("Public");
+        Criteria criteriaDiscoverable = Criteria.where("privacy").is("Discoverable");
+        Query query = new Query(new Criteria().orOperator(criteriaDiscoverable,criteriaPublic)).with(pageable);
+        List<ProjectEntity> projects = mongoTemplate.find(query,ProjectEntity.class);
+        for(ProjectEntity project : projects){
+            if(projectId.equals(project.getProjectId())){
+                StaticPagesBuilder staticPagesBuilder = new StaticPagesBuilder(mongoTemplate);
+                staticPagesBuilder.projectListPageBuilder();
+                break;
+            }
+        }
+    }
+
 }

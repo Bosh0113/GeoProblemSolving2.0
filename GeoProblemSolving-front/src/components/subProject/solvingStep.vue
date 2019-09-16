@@ -73,6 +73,82 @@
     >
       <p>Do you really want to delete this step?</p>
     </Modal>
+    <Modal
+      width="800px"
+      v-model="createStepModal"
+      title="Create a new step"
+      @on-ok="createStep"
+      ok-text="Submit"
+      cancel-text="Cancel"
+    >
+      <Carousel
+        v-if="createStepModal"
+        v-model="stepValue"
+        :dots="setting.dots"
+        :trigger="setting.trigger"
+        :arrow="setting.arrow"
+      >
+        <CarouselItem>
+          <div style="height:380px;width:640px;margin-left:50px">
+            <Form
+              ref="formValidate1"
+              :model="formValidate1"
+              :rules="ruleValidate1"
+              :label-width="120"
+            >
+              <FormItem label="Name" prop="stepTitle">
+                <Input v-model="formValidate1.stepTitle" placeholder="Enter step name"></Input>
+              </FormItem>
+              <FormItem label="Step type" prop="stepType" style="margin-top:40px">
+                <Select v-model="formValidate1.stepType" placeholder="Select step type">
+                  <Option v-for="item in typeList" :key="item.index" :value="item">{{ item }}</Option>
+                </Select>
+              </FormItem>
+              <FormItem label="Expected result" prop="result" style="margin-top:50px">
+                <Input
+                  v-model="formValidate1.result"
+                  type="textarea"
+                  :rows="10"
+                  placeholder="Enter something..."
+                ></Input>
+              </FormItem>
+            </Form>
+          </div>
+        </CarouselItem>
+        <CarouselItem>
+          <div style="margin-left:75px">
+            <div style="font-size:14px">Select needed data:</div>
+            <Transfer
+              :data="inheritResource"
+              :target-keys="targetKeys"
+              :list-style="listStyle"
+              :render-format="resourceRender"
+              :titles="['This process', 'The next process']"
+              filter-placeholder="Enter key words..."
+              filterable
+              :filter-method="filterMethod"
+              @on-change="handleChange"
+            ></Transfer>
+          </div>
+        </CarouselItem>
+        <CarouselItem>
+          <div style="font-size:14px;margin-left:65px">Contained modules:</div>
+          <div
+            style="width:640px;height:345px;border:1px solid #dcdee2;border-radius:4px;margin:10px 0 0 65px"
+          >
+            <Card style="width:100px;height:80px;border:1px solid lightblue;margin:1%;float:left">
+              <Avatar
+                shape="square"
+                icon="ios-hammer"
+                size="large"
+                style="margin-left: 12px;margin-top: -5px"
+              />
+              <div style="text-align:center;font-size: 8px">module 1</div>
+            </Card>
+          </div>
+        </CarouselItem>
+      </Carousel>
+    </Modal>
   </Row>
 </template>
 <script>
@@ -99,7 +175,8 @@ export default {
       // 添加/编辑step
       formValidate1: {
         stepTitle: "",
-        stepType: ""
+        stepType: "",
+        result: ""
       },
       ruleValidate1: {
         stepTitle: [
@@ -127,7 +204,20 @@ export default {
       stepChart: null,
       // 选择的步骤
       selectedStep: [],
-      delModal: false
+      delModal: false,
+      // 创建步骤
+      createStepModal: false,
+      stepValue: 0,
+      setting: {
+        dots: "outside",
+        trigger: "click",
+        arrow: "always"
+      },
+      //资源继承
+      inheritResource: [],
+      targetKeys: [],
+      selectResource: [],
+      listStyle: { width: "280px", height: "375px" }
     };
   },
   created() {
@@ -228,28 +318,8 @@ export default {
     },
     cancel() {},
     //---------------------------------------------------------进入具体的step页面---------------------------------------------------------
-    enterStep (moduleId) {},
+    enterStep(moduleId) {},
     //---------------------------------------------------------进入具体的step页面---------------------------------------------------------
-    getStepInfo(moduleId) {
-      this.axios
-        .get(
-          "/GeoProblemSolving/module/inquiry" +
-            "?key=moduleId" +
-            "&value=" +
-            moduleId
-        )
-        .then(res => {
-          if (res.data == "Offline") {
-            this.$store.commit("userLogout");
-            this.$router.push({ name: "Login" });
-          } else if (res.data != "None" && res.data != "Fail") {
-            this.currentStep = res.data[0];
-          } else if (res.data == "None") {
-            this.currentStep = [];
-          }
-        })
-        .catch(err => {});
-    },
     getProcessSteps() {
       this.processStructure = [];
       if (
@@ -272,7 +342,7 @@ export default {
               let stepList = res.data;
 
               let nodeCategory = this.getStepCategroy(stepList[0].type);
-              
+
               this.processStructure.push({
                 id: 0,
                 stepID: stepList[0].moduleId,
@@ -288,7 +358,6 @@ export default {
               });
 
               for (let i = 1; i < stepList.length - 1; i++) {
-
                 nodeCategory = this.getStepCategroy(stepList[i].type);
                 this.processStructure.push({
                   id: i,
@@ -637,116 +706,10 @@ export default {
         this.formValidate1.stepTitle != "" &&
         this.formValidate1.stepType != ""
       ) {
-        if (this.selectedStep.length > 0) {
-          //  计算新增节点的属性信息
-          let lastNode = [];
-          let nodeLevel = 0;
-          let nodeY = 0;
-          let nodeCategory = 0;
-          for (let i = 0; i < this.selectedStep.length; i++) {
-            lastNode.push({
-              name: this.selectedStep[i].name,
-              id: this.selectedStep[i].index
-            });
-
-            if (
-              this.processStructure[this.selectedStep[i].index].level >=
-              nodeLevel
-            ) {
-              nodeLevel =
-                this.processStructure[this.selectedStep[i].index].level + 1;
-            }
-
-            // modify original step node
-            this.processStructure[this.selectedStep[i].index].next.push({
-              name: this.formValidate1.stepTitle,
-              id: this.processStructure.length
-            });
-            this.processStructure[this.selectedStep[i].index].end = false;
-
-            // calculate y
-            if (this.processStructure[i].last == []) {
-              nodeY = 200;
-            } else {
-              let sumY = 0;
-              for (let j = 0; j < this.selectedStep.length; j++) {
-                sumY += this.processStructure[this.selectedStep[j].index].y;
-              }
-              nodeY = sumY / this.selectedStep.length;
-            }
-          }
-
-          let isOverlap = false;
-          // 统计每层的节点数 并 非激活现有的step
-          let levelNum = [];
-          for (let i = 0; i < this.processStructure.length; i++) {
-            if (this.processStructure[i].level == nodeLevel) {
-              levelNum.push(this.processStructure[i].id);
-            }
-            this.processStructure[i].activeStatus = false;
-          }
-          // 节点重复检测
-          for (let i = 0; i < levelNum.length; i++) {
-            if (Math.abs(this.processStructure[levelNum[i]].y - nodeY) < 30) {
-              isOverlap = true;
-              break;
-            }
-          }
-
-          // 新步骤的类别
-          nodeCategory = this.getStepCategroy(this.formValidate1.stepType)
-          
-          // create step node
-          let newStepNode = {
-            id: this.processStructure.length,
-            stepID: "",
-            name: this.formValidate1.stepTitle,
-            category: nodeCategory,
-            last: lastNode,
-            next: [],
-            x: 0,
-            y: nodeY,
-            level: nodeLevel,
-            end: true,
-            activeStatus: true
-          };
-          this.processStructure.push(newStepNode);
-          levelNum.push(newStepNode.id);
-
-          // 如果重叠，修改y坐标
-          if (isOverlap) {
-            for (let i = 0; i < levelNum.length; i++) {
-              this.processStructure[levelNum[i]].y =
-                (400 / (levelNum.length + 1)) * (i + 1);
-            }
-            isOverlap = false;
-          }
-
-          // calculate x
-          let maxLevel = 0;
-          for (let i = 0; i < this.processStructure.length; i++) {
-            if (this.processStructure[i].level > maxLevel) {
-              maxLevel = this.processStructure[i].level;
-            }
-          }
-          for (let i = 0; i < this.processStructure.length; i++) {
-            this.processStructure[i].x =
-              (800 / (maxLevel + 1)) * (this.processStructure[i].level + 1);
-          }
-
-          // 重新渲染
-          this.stepChart.dispose();
-          this.stepChart = null;
-          this.createNewStep();
-          // this.showSteps();
-
-          // //选择资源
-          // this.chooseResource();
-        } else {
-          this.$Notice.info({
-            desc: "There is no step node being selected!"
-          });
-        }
+        // 获取可继承的资源
+        this.getInheritResource();
+        // 创建步骤模态框
+        this.createStepModal = true;
       } else if (this.formValidate1.stepTitle == "") {
         this.$Notice.info({
           desc: "The name of new step should not be empty!"
@@ -757,10 +720,322 @@ export default {
         });
       }
     },
+    getInheritResource() {
+      this.inheritResource = this.getMockData();
+    },
+    getMockData() {
+      let mockData = [];
+      let selectedRes = [];
+      // 继承的子项目资源，项目资源，需要手动拉入子项目
+      $.ajax({
+        url:
+          "/GeoProblemSolving/folder/inquiry?" +
+          "scopeId=" +
+          this.subProjectInfo.subProjectId +
+          "&value=all",
+        type: "GET",
+        async: false,
+        success: function(data) {
+          if (data !== "Fail") {
+            selectedRes = data;
+            for (let i = 0; i < selectedRes.length; i++) {
+              mockData.push({
+                key: i,
+                name: selectedRes.name,
+                type: selectedRes.type,
+                resourceId: selectedRes.resourceId
+              });
+            }
+          } else {
+            selectedRes = [];
+          }
+        },
+        error: function(err) {
+          selectedRes = [];
+          console.log("err!");
+        }
+      });
+      // 前驱步骤的资源
+      for (let i = 0; i < this.selectedStep.length; i++) {
+        let selectedStepId = this.selectedStep[i].moduleId;
+
+        let getResUrl = "";
+        if (
+          this.formValidate1.stepType ==
+          "Context definition & resource collection"
+        ) {
+          getResUrl =
+            "/GeoProblemSolving/folder/findByFileType?" +
+            "scopeId=" +
+            selectedStepId +
+            "&value=all";
+        } else {
+          getResUrl =
+            "/GeoProblemSolving/folder/findByFileType?" +
+            "scopeId=" +
+            selectedStepId +
+            "&value=data";
+        }
+        $.ajax({
+          url: getResUrl,
+          type: "GET",
+          async: false,
+          success: function(data) {
+            if (data !== "Fail") {
+              selectedRes = data;
+              for (let i = 0; i < selectedRes.length; i++) {
+                mockData.push({
+                  key: i,
+                  name: selectedRes.name,
+                  type: selectedRes.type,
+                  resourceId: selectedRes.resourceId
+                });
+              }
+            } else {
+              selectedRes = [];
+            }
+          },
+          error: function(err) {
+            selectedRes = [];
+            console.log("err!");
+          }
+        });
+      }
+      this.selectedStep = [];
+
+      return mockData;
+    },
+    getTargetKeys() {
+      let mockData = [];
+      if (this.inheritResource.length > 0) {
+        for (let i = 0; i < this.targetKeys.length; i++) {
+          mockData.push({
+            key: this.targetKeys[i],
+            name: this.inheritResource[this.targetKeys[i]].name,
+            type: this.inheritResource[this.targetKeys[i]].type,
+            resourceId: this.inheritResource[this.targetKeys[i]].resourceId
+          });
+        }
+      }
+      return mockData;
+    },
+    handleChange(newTargetKeys) {
+      this.targetKeys = newTargetKeys;
+    },
+    filterMethod(data, query) {
+      if (data.length > 0) {
+        return data.type.indexOf(query) > -1;
+      } else {
+        return false;
+      }
+    },
+    resourceRender(item) {
+      return item.type + " - " + item.name;
+    },
+    getStepInfo(moduleId) {
+      this.axios
+        .get(
+          "/GeoProblemSolving/module/inquiry" +
+            "?key=moduleId" +
+            "&value=" +
+            moduleId
+        )
+        .then(res => {
+          if (res.data == "Offline") {
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
+          } else if (res.data != "None" && res.data != "Fail") {
+            this.currentStep = res.data[0];
+          } else if (res.data == "None") {
+            this.currentStep = [];
+          }
+        })
+        .catch(err => {});
+    },
+    createStep() {
+      this.createStepGraph();
+      this.createStepContent();
+    },
+    createStepGraph() {
+      if (this.processStructure.length == 0) {
+        // 新步骤的类别
+        let nodeCategory = 0;
+        nodeCategory = this.getStepCategroy(this.formValidate1.stepType);
+        // create step node
+        let newStepNode = {
+          id: 1,
+          stepID: "",
+          name: this.formValidate1.stepTitle,
+          category: nodeCategory,
+          last: [],
+          next: [],
+          x: 600,
+          y: 200,
+          level: 0,
+          end: true,
+          activeStatus: true
+        };
+        this.processStructure.push(newStepNode);
+        // 重新渲染
+        this.stepChart.dispose();
+        this.stepChart = null;
+        this.showSteps();
+        // 存储Step
+        this.updateSteps();
+      } else if (this.selectedStep.length > 0) {
+        //  计算新增节点的属性信息
+        let lastNode = [];
+        let nodeLevel = 0;
+        let nodeY = 0;
+        let nodeCategory = 0;
+        for (let i = 0; i < this.selectedStep.length; i++) {
+          lastNode.push({
+            name: this.selectedStep[i].name,
+            id: this.selectedStep[i].index
+          });
+          if (
+            this.processStructure[this.selectedStep[i].index].level >= nodeLevel
+          ) {
+            nodeLevel =
+              this.processStructure[this.selectedStep[i].index].level + 1;
+          }
+          // modify original step node
+          this.processStructure[this.selectedStep[i].index].next.push({
+            name: this.formValidate1.stepTitle,
+            id: this.processStructure.length
+          });
+          this.processStructure[this.selectedStep[i].index].end = false;
+          // calculate y
+          if (this.processStructure[i].last == []) {
+            nodeY = 200;
+          } else {
+            let sumY = 0;
+            for (let j = 0; j < this.selectedStep.length; j++) {
+              sumY += this.processStructure[this.selectedStep[j].index].y;
+            }
+            nodeY = sumY / this.selectedStep.length;
+          }
+        }
+        let isOverlap = false;
+        // 统计每层的节点数 并 非激活现有的step
+        let levelNum = [];
+        for (let i = 0; i < this.processStructure.length; i++) {
+          if (this.processStructure[i].level == nodeLevel) {
+            levelNum.push(this.processStructure[i].id);
+          }
+          this.processStructure[i].activeStatus = false;
+        }
+        // 节点重复检测
+        for (let i = 0; i < levelNum.length; i++) {
+          if (Math.abs(this.processStructure[levelNum[i]].y - nodeY) < 30) {
+            isOverlap = true;
+            break;
+          }
+        }
+        // 新步骤的类别
+        nodeCategory = this.getStepCategroy(this.formValidate1.stepType);
+        // create step node
+        let newStepNode = {
+          id: this.processStructure.length,
+          stepID: "",
+          name: this.formValidate1.stepTitle,
+          category: nodeCategory,
+          last: lastNode,
+          next: [],
+          x: 0,
+          y: nodeY,
+          level: nodeLevel,
+          end: true,
+          activeStatus: true
+        };
+        this.processStructure.push(newStepNode);
+        levelNum.push(newStepNode.id);
+        // 如果重叠，修改y坐标
+        if (isOverlap) {
+          for (let i = 0; i < levelNum.length; i++) {
+            this.processStructure[levelNum[i]].y =
+              (400 / (levelNum.length + 1)) * (i + 1);
+          }
+          isOverlap = false;
+        }
+        // calculate x
+        let maxLevel = 0;
+        for (let i = 0; i < this.processStructure.length; i++) {
+          if (this.processStructure[i].level > maxLevel) {
+            maxLevel = this.processStructure[i].level;
+          }
+        }
+        for (let i = 0; i < this.processStructure.length; i++) {
+          this.processStructure[i].x =
+            (800 / (maxLevel + 1)) * (this.processStructure[i].level + 1);
+        }
+        // 重新渲染
+        this.stepChart.dispose();
+        this.stepChart = null;
+        this.showSteps();
+        // 存储Step
+        this.updateSteps();
+      } else {
+        this.$Notice.info({
+          desc: "There is no step node being selected!"
+        });
+      }
+    },
+    createStepContent() {
+      // 新步骤的基本信息、资源（数据）、拓展工具
+      this.selectResource = [];
+      this.selectResource = this.getTargetKeys();
+
+      // 创建项目
+      // let index = this.processStructure.length - 1;
+      // let Module = {};
+      // Module["subProjectId"] = this.$route.params.id;
+      // Module["title"] = this.formValidate1.moduleTitle;
+      // Module["description"] = "There is no description of this module.";
+      // Module["creator"] = this.$store.getters.userId;
+      // Module["type"] = this.formValidate1.moduleType;
+      // this.axios
+      //   .post("/GeoProblemSolving/module/create", Module)
+      //   .then(res => {
+      //     if (res.data == "Offline") {
+      //       this.$store.commit("userLogout");
+      //       this.$router.push({ name: "Login" });
+      //     } else if (res.data === "Fail") {
+      //       this1.$Message.info("Fail");
+      //     } else {
+      //       // new StepID
+      //       this.processStructure[index].stepID = res.data;
+
+      //       // current step and module
+      //       this.currentStep = this.processStructure[index];
+      //       Module["moduleId"] = res.data;
+      //       this.currentStep = Module;
+
+      //       // collaborative
+      //       let socketMsg = {
+      //         type: "step",
+      //         operate: "update",
+      //         content: JSON.stringify(this.processStructure)
+      //       };
+      //       this.subprojectSocket.send(socketMsg);
+
+      //       //更新新module的资源---------------------静态化之后完成
+      //       // this.copyResource(res.data);
+
+      //       this.createModuleSuccess(Module["title"]);
+      //     }
+      //   })
+      //   .catch(err => {
+      //     console.log(err.data);
+      //   });
+    },
     removeStep() {
-      if (this.selectedStep.length > 0) {
-        // this.stepsModal = false;
+      if (this.selectedStep.length == 1) {
         this.delModal = true;
+      } else if (this.selectedStep.length > 1) {
+        this.$Notice.info({
+          desc: "Steps should be deleted one by one! "
+        });
       } else {
         this.$Notice.info({
           desc: "There is no step selected! "
@@ -768,97 +1043,98 @@ export default {
       }
     },
     delStep() {
+      this.delStepContent();
+      this.delStepGraph();
+    },
+    delStepContent() {
+      let currentIndex = this.selectedStep[0].index;
+      // 删除step
+      this.axios
+        .get(
+          "/GeoProblemSolving/module/delete" +
+            "?moduleId=" +
+            this.processStructure[currentIndex].stepID
+        )
+        .then(res => {
+          if (res.data === "Success") {
+          }
+        })
+        .catch(err => {
+          console.log(err.data);
+        });
+    },
+    delStepGraph() {
       if (
         this.$store.getters.userInfo.userId == this.subProjectInfo.managerId
       ) {
-        for (let i = 0; i < this.selectedStep.length; i++) {
-          let currentIndex = this.selectedStep[i].index;
-          if (
-            this.processStructure[currentIndex].end &&
-            this.processStructure[currentIndex].name != this.currentStep.name
-          ) {
-            // 删除module
-            this.axios
-              .get(
-                "/GeoProblemSolving/module/delete" +
-                  "?moduleId=" +
-                  this.processStructure[currentIndex].stepID
-              )
-              .then(res => {
-                if (res.data === "Success") {
-                }
-              })
-              .catch(err => {
-                console.log(err.data);
-              });
-
-            // 删除step节点
-            if (currentIndex > 0) {
-              // 处理被删除节点的前驱节点
-              for (
-                let j = 0;
-                j < this.processStructure[currentIndex].last.length;
-                j++
-              ) {
-                let lastIndex = this.processStructure[currentIndex].last[j].id;
-                if (this.processStructure[lastIndex].next.length === 1) {
-                  this.processStructure[lastIndex].next = [];
-                } else if (this.processStructure[lastIndex].next.length > 1) {
-                  for (
-                    let s = 0;
-                    s < this.processStructure[lastIndex].next.length;
-                    s++
+        let currentIndex = this.selectedStep[0].index;
+        if (
+          this.processStructure[currentIndex].end &&
+          this.processStructure[currentIndex].name != this.currentStep.name
+        ) {
+          // 删除step节点
+          if (currentIndex > 0) {
+            // 处理被删除节点的前驱节点
+            for (
+              let j = 0;
+              j < this.processStructure[currentIndex].last.length;
+              j++
+            ) {
+              let lastIndex = this.processStructure[currentIndex].last[j].id;
+              if (this.processStructure[lastIndex].next.length === 1) {
+                this.processStructure[lastIndex].next = [];
+              } else if (this.processStructure[lastIndex].next.length > 1) {
+                for (
+                  let s = 0;
+                  s < this.processStructure[lastIndex].next.length;
+                  s++
+                ) {
+                  if (
+                    this.processStructure[lastIndex].next[s].name ===
+                    this.selectedStep[0].name
                   ) {
-                    if (
-                      this.processStructure[lastIndex].next[s].name ===
-                      this.selectedStep[i].name
-                    ) {
-                      this.processStructure[lastIndex].next.splice(s, 1);
-                    }
+                    this.processStructure[lastIndex].next.splice(s, 1);
                   }
                 }
-                this.processStructure[lastIndex].end = true;
               }
-
-              // 删除节点
-              this.processStructure.splice(currentIndex, 1);
-
-              // 处理后继节点, 统一步骤id与step在数组里的位置index
-              for (
-                let j = currentIndex;
-                j < this.processStructure.length;
-                j++
-              ) {
-                if (this.processStructure[j].id !== j) {
-                  this.processStructure[j].id = j;
-                }
-              }
-            } else if (currentIndex === 0) {
-              // 删除节点
-              this.processStructure.splice(currentIndex, 1);
+              this.processStructure[lastIndex].end = true;
             }
-            // this.updateSteps();
 
-            // 重新渲染
-            this.stepChart.dispose();
-            this.stepChart = null;
-            this.showSteps();
+            // 删除节点
+            this.processStructure.splice(currentIndex, 1);
 
-            // collaborative
-            let socketMsg = {
-              type: "step",
-              operate: "update",
-              content: JSON.stringify(this.processStructure)
-            };
-            // this.subprojectSocket.send(socketMsg);
-          } else {
-            this.$Notice.info({
-              desc:
-                "The selected step " +
-                this.selectedStep[i].name +
-                "can not be removed. Because it has the next step, or it is a active step."
-            });
+            // 处理后继节点, 统一步骤id与step在数组里的位置index
+            for (let j = currentIndex; j < this.processStructure.length; j++) {
+              if (this.processStructure[j].id !== j) {
+                this.processStructure[j].id = j;
+              }
+            }
+          } else if (currentIndex === 0) {
+            // 删除节点
+            this.processStructure.splice(currentIndex, 1);
           }
+
+          // 重新渲染
+          this.stepChart.dispose();
+          this.stepChart = null;
+          this.showSteps();
+
+          this.updateSteps();
+
+          // collaborative
+          // let socketMsg = {
+          //   type: "step",
+          //   operate: "update",
+          //   content: JSON.stringify(this.processStructure)
+          // };
+          // this.subprojectSocket.send(socketMsg);
+        } else {
+          this.$Notice.info({
+            desc:
+              "The selected step " +
+              this.selectedStep[0].name +
+              "can not be removed. Because it has the next step, or it is a active step."
+          });
         }
       }
     },
@@ -883,9 +1159,6 @@ export default {
         .catch(err => {
           console.log(err.data);
         });
-    },
-    createNewStep() {
-      this.$router.push({ path: "../stepCreation" });
     },
     toWorkingSpace() {}
     // gotoPersonalSpace(id) {

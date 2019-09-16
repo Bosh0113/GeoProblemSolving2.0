@@ -51,7 +51,7 @@
             background-color: #515a6e;
             height: 60px;
             width: 100%;
-            bottom: 0 ;
+            bottom: 0;
             flex: 0 0 auto;
             /*position:absolute;*/
         }
@@ -103,7 +103,7 @@
                 <div v-if="useMenuCSS">
                     <div class="navPart">
                         <i-menu mode="horizontal" theme="dark" @on-select="turnContent"
-                                :style="`z-index:0;background:headerBgColor`" width="auto" active-name="projects">
+                                :style="`z-index:0;background:headerBgColor`" width="auto" :active-name="activeType">
                             <menu-item name="home" class="menuItem" style="margin-left:35%">
                                 <span>Home</span>
                             </menu-item>
@@ -162,31 +162,31 @@
                         <i-button icon="md-menu" style="color: white;background-color: #808695"></i-button>
                         <Dropdown-menu slot="list">
                             <Dropdown-item>
-                                <a href="/GeoProblemSolving/home.html">Home</a>
+                                <a href="/GeoProblemSolving/home">Home</a>
                             </Dropdown-item>
                             <Dropdown-item>
-                                <a href="/GeoProblemSolving/projectList.html">Projects</a>
+                                <a href="/GeoProblemSolving/projectlist">Projects</a>
                             </Dropdown-item>
                             <Dropdown-item>
-                                <a href="/GeoProblemSolving/resources.html">Resources</a>
+                                <a href="/GeoProblemSolving/publicResource">Resources</a>
                             </Dropdown-item>
                             <Dropdown-item>
-                                <a href="/GeoProblemSolving/help.html">Help</a>
+                                <a href="/GeoProblemSolving/help">Help</a>
                             </Dropdown-item>
                             <Dropdown-item v-show="!userInfoNav.userState||userInfoNav.userState==undefined">
-                                <a href="/GeoProblemSolving/login.html">Login</a>
+                                <a href="/GeoProblemSolving/login">Login</a>
                             </Dropdown-item>
                             <Dropdown-item v-show="!userInfoNav.userState||userInfoNav.userState==undefined">
-                                <a href="/GeoProblemSolving/register.html">Sign up</a>
+                                <a href="/GeoProblemSolving/register">Sign up</a>
                             </Dropdown-item>
                             <Dropdown-item v-show="userInfoNav.userState">
-                                <a href="/GeoProblemSolving/notifications.html">Notification</a>
+                                <a href="/GeoProblemSolving/notifications">Notification</a>
                             </Dropdown-item>
                             <Dropdown-item v-show="userInfoNav.userState">
-                                <a @click.native="toPersonalPage">Personal Page</a>
+                                <a @click="toPersonalPage">Personal Page</a>
                             </Dropdown-item>
                             <Dropdown-item v-show="userInfoNav.userState">
-                                <a @click.native="logout">Log out</a>
+                                <a @click="logout">Log out</a>
                             </Dropdown-item>
                         </Dropdown-menu>
                     </Dropdown>
@@ -198,6 +198,7 @@
     <script th:fragment="commonHeader-js">
         Vue.component('child-navigation', {
                 template: '#navigation',
+                props: ["activeType"],
                 components: {
                     'avatar': VueAvatar.Avatar
                 },
@@ -205,10 +206,10 @@
                     var userInfo = {
                         userState: false,
                         userName: 'visitor',
-                        userId:'',
-                        avatar:''
-                    }
-                    sessionStorage.setItem('userInfo',JSON.stringify(userInfo));
+                        userId: '',
+                        avatar: ''
+                    };
+                    sessionStorage.setItem('userInfo', JSON.stringify(userInfo));
                     var that = this;
                     $.ajax({
                         url: "/GeoProblemSolving/user/state",
@@ -231,7 +232,7 @@
                         }
                     });
                 },
-                updated(){
+                updated() {
                     $("#noticeBadge sup").css("margin", "15px 5px 0 0");
                 },
                 computed: {
@@ -255,11 +256,10 @@
                     }
                 },
                 methods: {
-                    identityMenuCSS(){
-                        if(window.innerWidth<1100){
+                    identityMenuCSS() {
+                        if (window.innerWidth < 1100) {
                             this.useMenuCSS = false;
-                        }
-                        else{
+                        } else {
                             this.useMenuCSS = true;
                         }
                     },
@@ -314,8 +314,8 @@
                                         unreadCount++;
                                         continue;
                                     }
-                                };
-                                this.unreadNoticeCount=Object.assign([], unreadCount);
+                                }
+                                this.unreadNoticeCount = unreadCount;
                             })
                             .catch(err => {
                                 console.log("失败的原因是" + err.data);
@@ -377,18 +377,18 @@
                             this.logout("home");
                         }
                     },
-                    logout(page){
+                    logout(page) {
                         axios
-                        .get("/GeoProblemSolving/user/logout")
-                        .then(res => {
-                            this.userInfoNav = {userName: ""};
-                            sessionStorage.removeItem("userInfo");
-                            this.noticeSocket.close();
-                            window.location.href = "/GeoProblemSolving/"+page;
-                        })
-                        .catch(err => {
-                            confirm("logout fail!");
-                        });
+                            .get("/GeoProblemSolving/user/logout")
+                            .then(res => {
+                                this.userInfoNav = {userName: ""};
+                                sessionStorage.removeItem("userInfo");
+                                this.noticeSocket.close();
+                                window.location.href = "/GeoProblemSolving/" + page;
+                            })
+                            .catch(err => {
+                                confirm("logout fail!");
+                            });
                     }
                 }
             },

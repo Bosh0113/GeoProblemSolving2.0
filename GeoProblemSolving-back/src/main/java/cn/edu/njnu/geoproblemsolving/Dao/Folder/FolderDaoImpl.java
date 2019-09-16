@@ -1,10 +1,12 @@
 package cn.edu.njnu.geoproblemsolving.Dao.Folder;
 
+import cn.edu.njnu.geoproblemsolving.Dao.Method.FileCopyThread;
 import cn.edu.njnu.geoproblemsolving.Dao.Resource.ResourceDaoImpl;
 import cn.edu.njnu.geoproblemsolving.Entity.Folder.FolderEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.Folder.FolderItem;
 import cn.edu.njnu.geoproblemsolving.Entity.Folder.UploadResult;
 import cn.edu.njnu.geoproblemsolving.Entity.ResourceEntity;
+import cn.edu.njnu.geoproblemsolving.Entity.UserEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -13,9 +15,14 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Component
 public class FolderDaoImpl implements IFolderDao{
@@ -28,7 +35,7 @@ public class FolderDaoImpl implements IFolderDao{
     }
 
     @Override
-    public Object newFolder(String folderName, String parentId) {
+    public Object newFolder(String folderName, String parentId,String scopeId) {
         try {
             // decode
             parentId = decode(parentId);
@@ -45,6 +52,7 @@ public class FolderDaoImpl implements IFolderDao{
             mongoTemplate.updateFirst(queryParent,updateParent,FolderEntity.class);
 
             FolderEntity newFolder = new FolderEntity();
+            newFolder.setScopeId(scopeId);
             newFolder.setFiles(new ArrayList<>());
             newFolder.setFolders(new ArrayList<>());
             newFolder.setFolderId(newFolderInfo.getUid());
@@ -165,7 +173,7 @@ public class FolderDaoImpl implements IFolderDao{
     }
 
     @Override
-    public Object renameFile(String newName, String fileId, String folderId) {
+    public Object editFile(String fileId, String folderId,String type,String name,String description) {
         try{
             folderId = decode(folderId);
             Query queryFolder = new Query(Criteria.where("folderId").is(folderId));
@@ -173,7 +181,9 @@ public class FolderDaoImpl implements IFolderDao{
             ArrayList<ResourceEntity> files = folderEntity.getFiles();
             for (ResourceEntity file:files){
                 if (file.getResourceId().equals(fileId)){
-                    file.setName(newName);
+                    file.setName(name);
+                    file.setDescription(description);
+                    file.setType(type);
                     break;
                 }
             }
@@ -206,6 +216,99 @@ public class FolderDaoImpl implements IFolderDao{
             return null;
         }catch (Exception e){
             return null;
+        }
+    }
+
+    @Override
+    public String copyFileToPersonalCenter(String resourceId, String userId,String privacy,String type,String name,String description){
+        try {
+            Query queryFile = new Query(Criteria.where("resourceId").is(resourceId));
+            ResourceEntity resourceFile = mongoTemplate.findOne(queryFile,ResourceEntity.class);
+            String fileUrl = resourceFile.getPathURL();
+            String regex = "GeoProblemSolving(\\S*)";
+            Pattern pattern = Pattern.compile(regex);
+            Matcher matcher = pattern.matcher(fileUrl);
+            String filePath = "";
+            while (matcher.find()){
+                filePath = matcher.group(1);
+            }
+            String localPath = System.getProperty("user.dir")+"/src/main/webapp"+filePath;
+            String fileLocalPath = localPath.replaceAll("\\\\","/");
+            File oldFile = new File(fileLocalPath);
+            if(oldFile.exists()){
+                String fileNames = resourceFile.getName();
+                String fileName = fileNames.substring(0, fileNames.lastIndexOf("."));
+                String suffix = fileNames.substring(fileNames.lastIndexOf(".") + 1);
+                String newFilePath = System.getProperty("user.dir")+"/src/main/webapp/resource/"+userId;
+                String newFileLocalPath = newFilePath.replaceAll("\\\\","/");
+                File folder = new File(newFileLocalPath);
+                if(!folder.exists()){
+                    folder.mkdirs();
+                }
+
+                int randomNum = (int) (Math.random() * 10 + 1);
+                for (int i = 0; i < 5; i++) {
+                    randomNum = randomNum * 10 + (int) (Math.random() * 10 + 1);
+                }
+                String newFileName=fileName + randomNum + "." + suffix;
+                String fileSavePath = newFilePath+"/"+newFileName;
+                File newFile = new File(fileSavePath);
+
+                //单独开个线程执行文件复制
+                FileCopyThread fileCopyThread = new FileCopyThread();
+                fileCopyThread.setSrcFile(oldFile);
+                fileCopyThread.setDestFile(newFile);
+                Thread thread = new Thread(fileCopyThread);
+                thread.start();
+
+                String newFileUrl = "/GeoProblemSolving/resource/"+userId+"/"+newFileName;
+                resourceFile.setResourceId(UUID.randomUUID().toString());
+                resourceFile.setUploaderId(userId);
+                resourceFile.setPathURL(newFileUrl);
+                resourceFile.setPrivacy(privacy);
+                resourceFile.setType(type);
+                resourceFile.setName(name);
+                resourceFile.setDescription(description);
+                Query queryUser = new Query(Criteria.where("userId").is(userId));
+                UserEntity userEntity = mongoTemplate.findOne(queryUser, UserEntity.class);
+                resourceFile.setUploaderName(userEntity.getUserName());
+                Date date = new Date();
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+                String uploadTime = dateFormat.format(date);
+                resourceFile.setUploadTime(uploadTime);
+                mongoTemplate.save(resourceFile);
+                return "Success";
+            }
+            else {
+                return "None";
+            }
+        }catch (Exception e){
+            return "Fail";
+        }
+    }
+
+    @Override
+    public Object findByFileType(String scopeId, String type){
+        try {
+            List<ResourceEntity> resultList = new ArrayList<>();
+            Query query = new Query(Criteria.where("scopeId").is(scopeId));
+            List<FolderEntity> folderEntities = mongoTemplate.find(query,FolderEntity.class);
+            for (FolderEntity folderEntity : folderEntities){
+                ArrayList<ResourceEntity> files = folderEntity.getFiles();
+                for (ResourceEntity file : files){
+                    if(type.equals("all")){
+                        resultList.add(file);
+                    }
+                    else {
+                        if(file.getType().equals(type)){
+                            resultList.add(file);
+                        }
+                    }
+                }
+            }
+            return resultList;
+        }catch (Exception e){
+            return "Fail";
         }
     }
 

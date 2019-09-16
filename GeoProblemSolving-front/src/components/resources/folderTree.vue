@@ -93,6 +93,9 @@
   background-color: #808695;
   color: white;
 }
+.demo-spin-icon-load{
+    animation: ani-demo-spin 1s linear infinite;
+}
 </style>
 <template>
   <div class="fileSpace">
@@ -232,10 +235,19 @@
                     type="text"
                   ></Button>
                   <Button
-                    @click="fileRenameModalShow(file)"
+                    @click="showCopyFileModel(file)"
+                    shape="circle"
+                    icon="ios-share-alt"
+                    title="Copy to personal center"
+                    size="small"
+                    class="fileBtnHoverOrange"
+                    type="text"
+                  ></Button>
+                  <Button
+                    @click="fileEditModelShow(file)"
                     shape="circle"
                     icon="md-create"
-                    title="Rename"
+                    title="Edit info"
                     size="small"
                     class="fileBtnHoverBlue"
                     type="text"
@@ -256,16 +268,6 @@
         </div>
         <div v-else style="text-align:center">
           <div style="color:lightgray;font-size:2em; font-weight:bold">No file or folder</div>
-        </div>
-        <div>
-          <Row>
-            <Col class="demo-spin-col" span="8" offset="8" v-show="spinAnimate==true">
-              <Spin fix v-show="spinAnimate==true">
-                <Icon type="ios-loading" size="40" class="demo-spin-icon-load"></Icon>
-                <div>Loading</div>
-              </Spin>
-            </Col>
-          </Row>
         </div>
       </div>
     </Card>
@@ -434,24 +436,48 @@
         <i-button @click="closeshareModel()" style="float:right;margin-right: 15px;">Cancel</i-button>
       </div>
     </Modal>
-    <Modal v-model="renameFileModal" title="Rename file" ok-text="Assure" cancel-text="Cancel">
+    <Modal v-model="editFileModel" title="Edit file info">
       <Form
-        ref="renameValidate"
-        :model="renameValidate"
-        :rules="renameRuleValidate"
+        ref="editFileValidate"
+        :model="editFileValidate"
+        :rules="editFileRuleValidate"
         :label-width="80"
       >
-        <FormItem label="New name" prop="newName">
+        <FormItem label="Type" prop="type">
+          <RadioGroup v-model="editFileValidate.type">
+            <Radio label="data"></Radio>
+            <Radio label="paper"></Radio>
+            <Radio label="document"></Radio>
+            <Radio label="model"></Radio>
+            <Radio label="image"></Radio>
+            <Radio label="video"></Radio>
+            <Radio label="others"></Radio>
+          </RadioGroup>
+        </FormItem>
+        <FormItem label="Name" prop="name">
           <Input
-            v-model="renameValidate.newName"
+            v-model="editFileValidate.name"
             :rows="4"
-            placeholder="Enter the name for folder..."
+            placeholder="Enter the name for file..."
           />
+        </FormItem>
+        <FormItem label="Description" prop="description">
+          <Input type="textarea" :rows="4" v-model="editFileValidate.description" />
         </FormItem>
       </Form>
       <div slot="footer">
-        <Button @click="renameFileModal=false">Cancel</Button>
-        <Button type="success" @click="renameFile('renameValidate')">Rename</Button>
+        <Button @click="editFileModel=false">Cancel</Button>
+        <Button type="success" @click="editFileInfo('editFileValidate')">Submit</Button>
+      </div>
+    </Modal>
+    <Modal v-model="copyFileModal" title="Copy file to personal center" width="500">
+      <RadioGroup v-model="copyFilePrivacy">
+        <Radio label="public">Public</Radio>
+        <Radio label="private">Private</Radio>
+      </RadioGroup>
+      <div slot="footer">
+        <Button @click="copyFileModal=false">Cancel</Button>
+        <Button type="success" @click="copyFileToCenter">Copy</Button>
       </div>
     </Modal>
   </div>
@@ -490,6 +516,34 @@ export default {
           {
             required: true,
             message: "The name can't be null.",
+            trigger: "blur"
+          }
+        ]
+      },
+      editFileValidate:{
+        name:"",
+        type:"",
+        description:""
+      },
+      editFileRuleValidate:{
+        type: [
+          {
+            required: true,
+            message: "file type cannot be empty",
+            trigger: "blur"
+          }
+        ],
+        name: [
+          {
+            required: true,
+            message: "file description cannot be empty",
+            trigger: "blur"
+          }
+        ],
+        description: [
+          {
+            required: true,
+            message: "file description cannot be empty",
             trigger: "blur"
           }
         ]
@@ -544,13 +598,11 @@ export default {
       panel: null,
       // 单选选中的名称数组
       chooseFilesArray: [],
-      // loading动画
-      spinAnimate: false,
       // 关于单选多选的按钮
       indeterminate: true,
       checkAll: false,
       shareModal: false,
-      renameFileModal: false,
+      editFileModel: false,
       userResourceList: [],
       selectedFilesToShare: [],
       ops: {
@@ -558,7 +610,10 @@ export default {
           background: "#808695"
         }
       },
-      contentHeight: 100
+      contentHeight: 100,
+      copyFileModal:false,
+      copyFilePrivacy:"private",
+      selectedFile:{}
     };
   },
   mounted() {
@@ -656,7 +711,9 @@ export default {
                 "?folderName=" +
                 newFolderName +
                 "&parentId=" +
-                parentId
+                parentId +
+                "&scopeId=" +
+                this.rootFolderId
             )
             .then(res => {
               if (res.data == "Offline") {
@@ -896,7 +953,7 @@ export default {
       a.download = "package.zip";
       a.href = blobUrl;
       a.click();
-      document.body.removeChild(a);
+      a.remove();
     },
     handleCheckAll() {
       if (this.indeterminate) {
@@ -928,7 +985,7 @@ export default {
     downloadSelectFile() {
       let choosefileUrls = this.chooseFilesArray.toString();
       if (choosefileUrls != "") {
-        this.spinAnimate = true;
+        this.$Spin.show();
         this.axios({
           method: "post",
           url:
@@ -937,7 +994,7 @@ export default {
         })
           .then(res => {
             if (res.status == 200) {
-              this.spinAnimate = false;
+              this.$Spin.hide();
               const blobUrl = window.URL.createObjectURL(res.data);
               if (blobUrl != "") {
                 this.download(blobUrl);
@@ -1015,35 +1072,42 @@ export default {
     fileDownload(fileInfo) {
       window.open(fileInfo.pathURL);
     },
-    fileRenameModalShow(fileInfo) {
+    fileEditModelShow(fileInfo) {
       this.renameForeInfo = fileInfo;
-      this.renameValidate.newName = "";
-      this.renameFileModal = true;
+      this.editFileValidate.name = fileInfo.name;
+      this.editFileValidate.type = fileInfo.type;
+      this.editFileValidate.description = fileInfo.description;
+      this.editFileModel = true;
     },
-    renameFile(name) {
+    editFileInfo(name) {
       this.$refs[name].validate(valid => {
         if (valid) {
           var folderId = this.currentFolder.folderId;
           var fileId = this.renameForeInfo.resourceId;
-          var newName = this.renameValidate.newName;
           this.axios
             .get(
-              "/GeoProblemSolving/folder/renameFile" +
-                "?newName=" +
-                newName +
-                "&fileId=" +
+              "/GeoProblemSolving/folder/editFile" +
+                "?fileId=" +
                 fileId +
                 "&folderId=" +
-                folderId
+                folderId +
+                "&name=" +
+                this.editFileValidate.name+
+                "&type=" +
+                this.editFileValidate.type+
+                "&description=" +
+                this.editFileValidate.description
             )
             .then(res => {
-              this.renameFileModal = false;
+              this.editFileModel = false;
               if (res.data == "Offline") {
                 this.$store.commit("userLogout");
                 this.$router.push({ name: "Login" });
               } else if (res.data != "Fail") {
                 var newFileInfo = Object.assign({}, this.renameForeInfo);
-                newFileInfo.name = newName;
+                newFileInfo.name = this.editFileValidate.name;
+                newFileInfo.type = this.editFileValidate.type;
+                newFileInfo.description = this.editFileValidate.description;
                 for (var i = 0; i < this.currentFolder.files.length; i++) {
                   if (this.currentFolder.files[i].resourceId == fileId) {
                     this.currentFolder.files.splice(i, 1, newFileInfo);
@@ -1069,6 +1133,36 @@ export default {
         }
       }
       return result;
+    },
+    showCopyFileModel(file){
+      this.copyFileModal = true;
+      this.copyFilePrivacy = "private";
+      this.selectedFile = file;
+    },
+    copyFileToCenter(){
+      this.$Spin.show();
+      this.axios
+      .get(
+        "/GeoProblemSolving/folder/copyToCenter"+
+        "?resourceId="+this.selectedFile.resourceId+
+        "&userId="+this.$store.getters.userId+
+        "&privacy="+this.copyFilePrivacy+
+        "&type="+this.selectedFile.type+
+        "&name="+this.selectedFile.name+
+        "&description="+this.selectedFile.description
+      )
+      .then(res=>{
+        this.$Spin.hide();
+        this.copyFileModal = false;
+        if(res.data=="Success"){
+          this.$Message.success("Copy file success.");
+        }else{
+          this.$Message.warning(res.data);
+        }
+      })
+      .catch(err=>{
+          this.$Message.error("Copy file fail.");
+      });
     }
   }
 };

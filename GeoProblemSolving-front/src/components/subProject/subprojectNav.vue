@@ -12,12 +12,12 @@
   <div>
     <Row>
       <Menu
-        active-name="info"
+        :active-name="menuActive"
         style="width:60px;position:absolute"
         :style="{height:contentHeight}"
         @on-select="changeContent"
       >
-        <MenuItem name="home" style="padding-left: 16px;" title="Project page" :to="toProjectPage">
+        <MenuItem name="home" style="padding-left: 16px;" title="Project page">
           <Icon type="md-arrow-round-back" size="30" />
         </MenuItem>
         <MenuItem name="info" style="padding-left: 16px;" title="Subproject introduction">
@@ -53,12 +53,12 @@
 export default {
   data() {
     return {
+      menuActive:"info",
       // information of project
       projectInfo: {},
       // info of subproject
       subProjectInfo: [],
       contentHeight: "",
-      toProjectPage: "",
       // 用户角色
       userRole: "Visitor"
     };
@@ -67,7 +67,12 @@ export default {
     this.init();
   },
   mounted() {
-    this.toProjectPage = "/project/" + sessionStorage.getItem("projectId");
+    var type = window.location.href.match(/subproject\/(\S*)/)[1];
+    if(type!=""){
+      this.menuActive = type;
+    }else{
+      this.menuActive = 'info';
+    }
     window.addEventListener("resize", this.initSize);
   },
   // add by mzy for navigation guards
@@ -135,8 +140,8 @@ export default {
           async: false,
           success: data => {
             if (data != "None" && data != "Fail") {
-              that.projectInfo = data[0];
-              that.$store.commit("setProjectInfo", data[0]);
+              this.projectInfo = data[0];
+              this.$store.commit("setProjectInfo", data[0]);
             } else {
               console.log(data);
             }
@@ -224,7 +229,10 @@ export default {
     },
     cancel() {},
     changeContent(name) {
-      if (name == "process") {
+      if(name == "home"){
+        window.location.href = "/GeoProblemSolving/projectDetail/"+this.subProjectInfo.projectId;
+      }
+      else if (name == "process") {
         this.$router.replace({ name: "process" });
       } else if (name == "info") {
         this.$router.replace({ name: "info" });

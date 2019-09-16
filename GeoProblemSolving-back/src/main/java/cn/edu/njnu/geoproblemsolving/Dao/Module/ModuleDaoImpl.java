@@ -29,6 +29,7 @@ public class ModuleDaoImpl implements IModuleDao {
         mongoTemplate.save(module);
 
         FolderEntity folderEntity = new FolderEntity();
+        folderEntity.setScopeId(module.getModuleId());
         folderEntity.setFolders(new ArrayList<>());
         folderEntity.setFiles(new ArrayList<>());
         folderEntity.setFolderName(module.getTitle());
