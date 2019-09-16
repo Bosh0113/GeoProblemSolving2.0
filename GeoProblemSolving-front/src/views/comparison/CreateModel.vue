@@ -140,14 +140,6 @@ export default {
             .catch(err=>{
               this.$Message.error(err);
             });
-          // this.$api.cmp_solution
-          //   .create(model)
-          //   .then(res => {
-          //     console.log(res);
-          //   })
-          //   .catch(err => {
-          //     this.$Message.error(err);
-          //   });
         }
       });
     },
@@ -196,6 +188,7 @@ export default {
     removeFile() {
       console.log("delete");
       this.creatable = false;
+      this.modelInfo.computableModels = [];
     },
     uploadSuccess(response) {
       // console.log(response);
@@ -203,11 +196,13 @@ export default {
         this.creatable = true;
         this.modelInfo.computableModels.push(response.data.oid);
       }else{
-        this.$Message.error(response.data.msg);
+        this.$Message.error(response.msg);
       }
     },
     uploadError() {
       this.$Message.error("upload model failed!");
+      this.creatable = false;
+      this.modelInfo.computableModels = [];
     }
   },
   computed: {

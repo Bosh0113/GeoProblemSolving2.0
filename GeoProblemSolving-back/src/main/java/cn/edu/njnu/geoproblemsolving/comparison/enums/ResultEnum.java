@@ -24,7 +24,12 @@ public enum ResultEnum {
     REMOTE_SERVICE_ERROR(-12, "远程服务调用出错"),
     FILE_NOT_FOUND(-13,"file not found"),
     FILE_TRANSLATE_FAILED(-14,"Failed to translate file"),
-    NO_GDAL_LIB(-15,"No gdal lib");
+    NO_GDAL_LIB(-15,"No gdal lib"),
+    DEPLOY_MODEL_ERROR(-16,"Failed to deploy model."),
+    NO_COMPUTABLE_MODEL(-17,"No computable model"),
+    FAILED_TO_GET_INFO(-18,"Failed to get info"),
+    FAILED_TO_UPLOAD_DATA(-19,"Failed to upload data"),
+    FAILED_TO_INVOKE_MODEL(-20,"Failed to invoke model");
 
     private Integer code;
 

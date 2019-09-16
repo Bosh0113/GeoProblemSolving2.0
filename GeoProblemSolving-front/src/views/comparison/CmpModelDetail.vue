@@ -8,7 +8,7 @@
             <h1 class="public">
               <span style="display:flex">
                 <Icon type="md-planet" class="titleIcon" color="#959da5" size="22" />
-                <span id="projectName"><a href="#">{{projectInfo.title}}</a></span>
+                <span id="projectName"><a href="#">{{projectTitle}}</a></span>
                 <span style="margin:0 .25em">/</span>
                 <strong><a href="#">{{modelInfo.modelName}}</a></strong>
               </span>
@@ -40,7 +40,7 @@
     <div class="instanceContent">
       <h2>Instance:</h2>
       <div class="item">
-        
+
       </div>
     </div>
 
@@ -50,18 +50,19 @@
 export default {
   created: function() {
     //* 获取路由信息
-    this.projectInfo = this.$route.params.project;
-    let modelId = this.$route.params.id;
-    // console.log("parent: ",this.parentInfo);
+    this.projectTitle = this.$route.params.projectTitle;
+    this.modelId = this.$route.params.id;
+    // console.log("parent: ",this.projectInfo);
     //* 获取模型信息
-    this.getModelInfo(modelId);
+    this.getModelInfo(this.modelId);
   },
   data() {
     return {
       modelInfo: {
         modelName: ""
       },
-      projectInfo: {}
+      projectTitle: "",
+      modelId: ""
     };
   },
   computed: {
@@ -83,7 +84,16 @@ export default {
           this.$Message.error(err);
         });
     },
-    runModel() {}
+    runModel() {
+      sessionStorage.setItem("modelInfo",JSON.stringify(this.modelInfo));
+      this.$router.push({
+        path: `/cmp-invoke-model`,
+        name: "cmp-invoke-model",
+        params: {
+          id: this.modelId
+        }
+      });
+    }
   }
 };
 </script>
@@ -122,7 +132,7 @@ export default {
   flex: 1 0 500px;
 }
 
-.instanceContent{
+.instanceContent {
   width: 1060px;
   margin: auto;
   margin-top: 20px;

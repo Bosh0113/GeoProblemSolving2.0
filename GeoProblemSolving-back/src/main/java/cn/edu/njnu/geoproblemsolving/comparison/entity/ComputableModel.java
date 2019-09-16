@@ -27,6 +27,8 @@ public class ComputableModel {
     String createTime;
     List<String>  recordList;
     // todo MDL 信息
+    ModelServiceNode serviceNode;
+    List<ModelState> states;
 
     public ComputableModel(String oid,String name,String ownerName,String ownerId,String md5,String createTime){
         this.oid = oid;

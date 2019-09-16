@@ -38,17 +38,19 @@ const routes = [{
     { path: 'register', name: 'Register', component: resolve => (require(["@/components/userState/register"], resolve)) },
     { path: 'resetPassword/:email', name: 'resetPassword', component: resolve => (require(["@/components/userState/resetPwd"], resolve)) },
 
-    { path: 'cmp-projectlist',name:'cmp-projectlist',component:()=>import("@/views/comparison/CmpProjectList")},
-    { path: 'create-cmp-project', name:'create-cmp-project',component:()=>import("@/views/comparison/CreateProject")},
-    { path: 'cmp-project/:id',name:'cmp-project-detail',component:()=>import("@/views/comparison/CmpProjectDetail")},
-    { path: 'cmp-project/comprehensive/:id',name:'cmp-project-comprehensive',component:()=>import("@/views/comparison/ComprehensiveProject")},
-    { path: 'cmp-project/specific/:id',name:'cmp-project-specific',component:()=>import("@/views/comparison/SpecificProject")},
-    { path: 'cmp-subproject/:id',name:'cmp-subproject',component:()=>import("@/views/comparison/SpecificProject")},
-    { path: 'create-cmp-item/:id',name:'create-cmp-item',component:()=>import("@/views/comparison/CreateCmpItem")},
-    { path: 'cmp-item/:id',name:'cmp-item-detail',component:()=>import("@/views/comparison/CmpItemDetail")},
-    { path: 'create-cmp-solution/:id',name:"create-cmp-solution",component:()=>import("@/views/comparison/CreateSolution")},
-    { path: 'create-cmp-model/:id',name:"create-cmp-model",component:()=>import("@/views/comparison/CreateModel")},
-    { path: 'cmp-model/:id',name:'cmp-model-detail',component:()=>import("@/views/comparison/CmpModelDetail")}
+
+    { path: 'cmp-projectlist',name:'cmp-projectlist',component: resolve=>(require(["@/views/comparison/CmpProjectList"],resolve)) },
+    { path: 'create-cmp-project', name:'create-cmp-project',component: resolve=>(require(["@/views/comparison/CreateProject"],resolve)) },
+    { path: 'cmp-project/:id',name:'cmp-project-detail',component: resolve=>(require(["@/views/comparison/CmpProjectDetail"],resolve)) },
+    { path: 'cmp-project/comprehensive/:id',name:'cmp-project-comprehensive',component: resolve=>(require(["@/views/comparison/ComprehensiveProject"],resolve)) },
+    { path: 'cmp-project/specific/:id',name:'cmp-project-specific',component: resolve=>(require(["@/views/comparison/SpecificProject"],resolve)) },
+    { path: 'cmp-subproject/:id',name:'cmp-subproject',component: resolve=>(require(["@/views/comparison/SpecificProject"],resolve)) },
+    { path: 'create-cmp-item/:id',name:'create-cmp-item',component: resolve=>(require(["@/views/comparison/CreateCmpItem"],resolve)) },
+    { path: 'cmp-item/:id',name:'cmp-item-detail',component: resolve=>(require(["@/views/comparison/CmpItemDetail"],resolve)) },
+    { path: 'create-cmp-solution/:id',name:"create-cmp-solution",component: resolve=>(require(["@/views/comparison/CreateSolution"],resolve)) },
+    { path: 'create-cmp-model/:id',name:"create-cmp-model",component: resolve=>(require(["@/views/comparison/CreateModel"],resolve)) },
+    { path: 'cmp-model/:projectTitle/:id',name:'cmp-model-detail',component: resolve=>(require(["@/views/comparison/CmpModelDetail"],resolve)) },
+    { path: 'cmp-invoke-model/:id',name:'cmp-invoke-model',component: resolve=>(require(["@/views/comparison/InvokeModel"],resolve)) }
   ]
 },
 { path: '/chat', name: 'chatUtil', component: resolve=>(require(["@/components/utils/chatroom"],resolve)) },

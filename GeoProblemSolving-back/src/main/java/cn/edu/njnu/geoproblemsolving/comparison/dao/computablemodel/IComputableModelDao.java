@@ -2,6 +2,7 @@ package cn.edu.njnu.geoproblemsolving.comparison.dao.computablemodel;
 
 import cn.edu.njnu.geoproblemsolving.comparison.entity.CmpItem;
 import cn.edu.njnu.geoproblemsolving.comparison.entity.ComputableModel;
+import cn.edu.njnu.geoproblemsolving.comparison.entity.ModelState;
 
 import java.util.List;
 
@@ -25,6 +26,8 @@ public interface IComputableModelDao {
     ComputableModel findItemByOid(String oid);
 
     ComputableModel findItemByMd5(String md5);
+
+    ComputableModel updateStates(String oid, List<ModelState> states);
 
     List<ComputableModel> getItems(String key, String value);
 }

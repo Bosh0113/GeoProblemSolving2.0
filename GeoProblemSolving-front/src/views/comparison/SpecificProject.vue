@@ -168,7 +168,6 @@ export default {
         this.$router.push({ name: "Login" });
       } else {
         //* 上传模型
-
         this.$router.push({
           path: `/create-cmp-model/${this.projectInfo.projectId}`
         });
@@ -185,8 +184,8 @@ export default {
         path: `/cmp-model`,
         name: "cmp-model-detail",
         params: {
-          id: model.oid,
-          project: this.projectInfo
+          projectTitle: this.projectInfo.title,
+          id: model.oid
         }
       });
     },

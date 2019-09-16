@@ -2,9 +2,12 @@ package cn.edu.njnu.geoproblemsolving.comparison.dao.computablemodel;
 
 import cn.edu.njnu.geoproblemsolving.comparison.entity.CmpProject;
 import cn.edu.njnu.geoproblemsolving.comparison.entity.ComputableModel;
+import cn.edu.njnu.geoproblemsolving.comparison.entity.ModelResource;
+import cn.edu.njnu.geoproblemsolving.comparison.entity.ModelState;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 
 import java.util.List;
 
@@ -50,13 +53,26 @@ public class ComputableModelImpl implements IComputableModelDao {
 
     @Override
     public ComputableModel findItemByOid(String oid) {
-        return null;
+        Query query = Query.query(Criteria.where("oid").is(oid));
+        ComputableModel model = mongoTemplate.findOne(query, ComputableModel.class);
+        return model;
     }
 
     @Override
     public ComputableModel findItemByMd5(String md5) {
         Query query = Query.query(Criteria.where("md5").is(md5));
         ComputableModel computableModel = mongoTemplate.findOne(query, ComputableModel.class);
+        return computableModel;
+    }
+
+    @Override
+    public ComputableModel updateStates(String oid, List<ModelState> states) {
+        Query query = Query.query(Criteria.where("oid").is(oid));
+        ComputableModel computableModel = mongoTemplate.findOne(query, ComputableModel.class);
+        Update update = new Update();
+        update.addToSet("states",states);
+        mongoTemplate.updateFirst(query,update,ComputableModel.class);
+        computableModel.setStates(states);
         return computableModel;
     }
 
