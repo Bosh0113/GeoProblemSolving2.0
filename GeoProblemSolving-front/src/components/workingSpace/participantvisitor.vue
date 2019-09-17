@@ -504,7 +504,6 @@
       this.startWebSocket(this.subProjectId);
       this.getParticipants(this.subProjectId);
       
-      console.log(this.subProjectId);
 
     },
 
@@ -549,7 +548,6 @@
                 });
               }
               this.$set(this, "participants", participantsTemp);
-              console.log(this.participants);
             }
           }
         });
@@ -578,13 +576,11 @@
             .split(",");
         
           this.onlineParticipants = members;
-          console.log(this.onlineParticipants);
           this.judgeonlineParticipant(members);
        
         } else if (data.type === "message") {
           //判断消息的发出者
           if (chatMsg.content != "") {
-            console.log(chatMsg);
             this.other_msglist.push(chatMsg);
             this.msglist.push(chatMsg);
             this.msgRecords.push(chatMsg);
@@ -645,8 +641,6 @@
         this.offlineParticipants = [];
         this.$set(this, "offlineParticipants", offline);
         this.$set(this, "onlineParticipants", online);
-        console.log(this.onlineparticipants);
-        console.log(this.offlineparticipants);
       }, 
     },
 

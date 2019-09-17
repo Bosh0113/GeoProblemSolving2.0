@@ -729,10 +729,10 @@ export default {
       // 继承的子项目资源，项目资源，需要手动拉入子项目
       $.ajax({
         url:
-          "/GeoProblemSolving/folder/inquiry?" +
+          "/GeoProblemSolving/folder/findByFileType?" +
           "scopeId=" +
           this.subProjectInfo.subProjectId +
-          "&value=all",
+          "&type=all",
         type: "GET",
         async: false,
         success: function(data) {
@@ -768,13 +768,13 @@ export default {
             "/GeoProblemSolving/folder/findByFileType?" +
             "scopeId=" +
             selectedStepId +
-            "&value=all";
+            "&type=all";
         } else {
           getResUrl =
             "/GeoProblemSolving/folder/findByFileType?" +
             "scopeId=" +
             selectedStepId +
-            "&value=data";
+            "&type=data";
         }
         $.ajax({
           url: getResUrl,

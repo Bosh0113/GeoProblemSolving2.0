@@ -183,9 +183,7 @@
                           <li>{{item.name}}</li>
                         </ul>
                       </TabPane>
-                     
                     </Tabs>
-                    
                   </Card>
                 </div>
                 <div class="condef">
@@ -249,7 +247,6 @@
               </div>
             </Row>
           </template>
-
         </div>
       </div>
     </Row>
@@ -339,7 +336,6 @@
       init() {
         this.initSize();
         this.getModelProcess();
-        console.log(this.stepId);
       },
 
       getResources() {
@@ -412,8 +408,6 @@
       },
 
       getModelProcess() {
-        console.log(this.stepId);
-        console.log(234);
         this.axios
           .get(
             "/GeoProblemSolving/step/inquiry/" +

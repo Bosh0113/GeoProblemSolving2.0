@@ -268,7 +268,6 @@
       init() {
         this.initSize();
         this.getDataProcessing();
-        console.log(this.stepId);
       },
 
       getResources() {
@@ -341,8 +340,6 @@
       },
 
       getDataProcessing() {
-        console.log(this.stepId);
-        console.log(234);
         this.axios
           .get(
             "/GeoProblemSolving/step/inquiry/" +
@@ -354,7 +351,6 @@
             //new id
             //ContextDefinition["stepId"] = res.data;
             this.dataForm = res.data[0].content;
-            console.log(this.dataForm);
           });
       },
 

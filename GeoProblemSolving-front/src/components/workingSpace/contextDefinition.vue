@@ -696,7 +696,6 @@
             //new id
             //ContextDefinition["stepId"] = res.data;
             this.contextForm = res.data[0].content;
-            console.log(this.contextForm);
           });
       },
 
@@ -865,8 +864,7 @@
             filterFile.push(stepResourceList[i]);
           }
         }
-        this.$set(this,"filterFileType",filterFile)
-        console.log(this.filterFileType);
+        this.$set(this,"filterFileType",filterFile);
       }, 
 
 

@@ -308,7 +308,6 @@
       init() {
         this.initSize();
         this.getModelProcess();
-        console.log(this.stepId);
       },
 
       getResources() {
@@ -381,8 +380,6 @@
       },
 
       getModelProcess() {
-        console.log(this.stepId);
-        console.log(234);
         this.axios
           .get(
             "/GeoProblemSolving/step/inquiry/" +
