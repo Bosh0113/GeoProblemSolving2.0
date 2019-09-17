@@ -155,8 +155,13 @@
             </Col>
             <Col span="10" style="text-align:center;font-size:1.5rem;height:20px;color:white;margin-top:1%">
             <strong>Context Definition & Resources Collection</strong>
+            <Button @click="drawerValue = true" type="primary">Test</Button>
             </Col>
+           
           </Row>
+          <Drawer title="Participants" :closable="false" v-model="drawerValue">
+            <online-participant :sub-project-id="subprojectId" :room-id="stepId"></online-participant>
+          </Drawer>
          
         </div>
       </div>
@@ -420,11 +425,13 @@
   import Avatar from "vue-avatar";
   import echarts from "echarts";
   import folderTree from "../resources/folderTree";
+  import onlineParticipant from "./onlineParticipants";
   export default {
     components: {
       VueFlowy,
       Avatar,
-      folderTree
+      folderTree,
+      onlineParticipant
     },
     data() {
       return {
@@ -519,7 +526,7 @@
             typeIcon: "md-cube"
           }
         ],
-        // subprojectId:"",
+         subprojectId:this.$route.params.subid,
 
         //////// resource
         // 点击上传文件按钮时弹出的模态框
@@ -616,6 +623,8 @@
         subprojectSocket: null,
         timer: null,
 
+        // online drawer
+        drawerValue : false,
 
       
       };
@@ -627,7 +636,7 @@
     mounted() {
       window.addEventListener("resize", this.initSize);
       this.getAllResource();
-      // this.getContextDefiniton();
+      this.getContextDefiniton();
     },
 
     methods: {
@@ -639,9 +648,6 @@
         this.initSize();
         this.getContextDefinition();
       },
-
-
-
 
       submit(contextform) {
         // this.subprojectId = this.$route.params.id;
@@ -696,7 +702,8 @@
             //new id
             //ContextDefinition["stepId"] = res.data;
             this.contextForm = res.data[0].content;
-            console.log(this.contextForm);
+            // this.subprojectId = res.data[0].subProjectId;
+            console.log(this.subprojectId);
           });
       },
 
@@ -872,13 +879,15 @@
 
       // 工具栏
       toolPanel(type) {
-      // if (this.userRole != "Visitor") {
+        // if (this.userRole != "Visitor") {
         this.axios
           .get("/GeoProblemSolving/user/state")
           .then(res => {
             if (!res.data) {
               this.$store.commit("userLogout");
-              this.$router.push({ name: "Login" });
+              this.$router.push({
+                name: "Login"
+              });
             } else {
               var toolURL = "";
               let toolName = "";
@@ -1040,7 +1049,7 @@
                 dragit: {
                   containment: 5
                 },
-                callback: function() {
+                callback: function () {
                   // this.content.style.padding = "20px";
                 }
               });
@@ -1063,13 +1072,13 @@
           .catch(err => {
             console.log("Get user info fail.");
           });
-      // }
-      // else {
-      //   this.$Notice.info({
-      //   desc: "Please join this project first!"
-      // });
-      // }
-    },
+        // }
+        // else {
+        //   this.$Notice.info({
+        //   desc: "Please join this project first!"
+        // });
+        // }
+      },
     closePanel() {
       for (let i = 0; i < this.panelList.length; i++) {
         this.panelList[i].close();
