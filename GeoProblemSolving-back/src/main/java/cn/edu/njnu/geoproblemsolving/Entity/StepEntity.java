@@ -12,7 +12,7 @@ public class StepEntity {
     // 基本信息
     private String stepId;
     private String name;
-    private String type;
+    private String type; //
     private String description;
     private String subProjectId;
     private String creator;

@@ -20,6 +20,7 @@ const routes = [{
     { path: 'project/workspace/modelprocess/:id', name: 'modelProcess', component: resolve => (require(["@/components/workingSpace/modelProcess"], resolve)) },
     { path: 'project/workspace/modelevalution/:id', name: 'modelEvalution', component: resolve => (require(["@/components/workingSpace/modelEvalution"], resolve)) },
     { path: 'project/workspace/simulationprediction/:id', name: 'simulationPrediction', component: resolve => (require(["@/components/workingSpace/simulationPrediction"], resolve)) },
+    { path: 'project/workspace/datavisulization/:id', name: 'dataVisulization', component: resolve => (require(["@/components/workingSpace/dataVisulization"], resolve)) },
     { path: 'subproject/:id/online', name: 'online', component: resolve => (require(["@/components/workingSpace/participantvisitor"], resolve)) },
     {
       path: 'project/:id/subproject/', name: 'subproject', component: resolve => (require(["@/components/subProject/subprojectNav"], resolve)), children: [
