@@ -6,9 +6,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.UUID;
 
 @CrossOrigin(origins = "*",allowCredentials = "true")
 @RestController
@@ -17,18 +14,11 @@ public class StepController {
     @Resource
     private MongoTemplate mongoTemplate;
 
-//    创建页面，带subprojectid
+    // 创建页面，带subprojectId
     @RequestMapping(value = "/create", produces = {"application/json;charset=UTF-8"},method = RequestMethod.POST)
     public String createStep(@RequestBody StepEntity step){
         StepDaoImpl stepDao = new StepDaoImpl(mongoTemplate);
         try {
-            Date date=new Date();
-            SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-            String stepId=UUID.randomUUID().toString();
-            step.setStepId(stepId);
-            step.setCreateTime(dateFormat.format(date));
-//            step.setSubProjectId(subProjectId);
-
             return stepDao.createStep(step);
         }catch (Exception e){
             return "Fail";

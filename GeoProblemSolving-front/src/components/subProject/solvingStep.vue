@@ -188,16 +188,15 @@ export default {
       },
       contentHeight: "",
       processStructure: [],
-      currentStep: {},
+      activeStep: {},
       typeList: [
         "Context definition & resource collection",
         "Data processing",
-        "Modeling",
+        "Modeling for geographic process",
         "Model evaluation",
-        "Analysis with models or tools",
+        "Quantitative and qualitative analysis",
         "Simulation/Prediction",
-        "Visualization & Representation",
-        "Qualitative analysis",
+        "Visualization & representation",
         "Decision-making & management"
       ],
       // 步骤逻辑图
@@ -317,9 +316,25 @@ export default {
       this.$Message.info("Clicked ok");
     },
     cancel() {},
-    //---------------------------------------------------------进入具体的step页面---------------------------------------------------------
-    enterStep(moduleId) {},
-    //---------------------------------------------------------进入具体的step页面---------------------------------------------------------
+    // 进入具体的step页面
+    enterStep(type, moduleId) {
+      if (type == 0) {
+        this.$router.push({
+          name: "contextDefinition",
+          params: { id: moduleId }
+        });
+      } else if (type == 1) {
+        this.$router.push({ name: "dataProcessing", params: { id: moduleId } });
+      } else if (type == 2) {
+        this.$router.push({ name: "modelProcess", params: { id: moduleId } });
+      } else if (type == 3) {
+        this.$router.push({ name: "modelEvalution", params: { id: moduleId } });
+      } else if (type == 4) {
+      } else if (type == 5) {
+      } else if (type == 6) {
+      } else if (type == 7) {
+      }
+    },
     getProcessSteps() {
       this.processStructure = [];
       if (
@@ -399,20 +414,20 @@ export default {
 
               for (let i = 0; i < this.processStructure.length; i++) {
                 if (this.processStructure[i].activeStatus) {
-                  this.currentStep = this.processStructure[i];
-                  this.currentStep = stepList[i];
+                  this.activeStep = this.processStructure[i];
+                  this.activeStep = stepList[i];
                   break;
                 } else if (
                   i == this.processStructure.length - 1 &&
                   this.processStructure[i].activeStatus == undefined
                 ) {
                   this.processStructure[i].activeStatus = true;
-                  this.currentStep = this.processStructure[i];
-                  this.currentStep = stepList[i];
+                  this.activeStep = this.processStructure[i];
+                  this.activeStep = stepList[i];
                 }
               }
             } else if (res.data == "None" || res.data == "Fail") {
-              this.currentStep = [];
+              this.activeStep = [];
             }
           })
           .catch(err => {});
@@ -421,7 +436,7 @@ export default {
 
         for (let i = 0; i < this.processStructure.length; i++) {
           if (this.processStructure[i].activeStatus) {
-            this.currentStep = this.processStructure[i];
+            this.activeStep = this.processStructure[i];
             // 请求step数据
             this.getStepInfo(this.processStructure[i].stepID);
           }
@@ -445,7 +460,7 @@ export default {
               icon: "circle"
             },
             {
-              name: "Modeling",
+              name: "Modeling for geographic process",
               icon: "circle"
             },
             {
@@ -453,7 +468,7 @@ export default {
               icon: "circle"
             },
             {
-              name: "Analysis with models or tools",
+              name: "Quantitative and qualitative analysis",
               icon: "circle"
             },
             {
@@ -462,10 +477,6 @@ export default {
             },
             {
               name: "Visualization & Representation",
-              icon: "circle"
-            },
-            {
-              name: "Qualitative analysis",
               icon: "circle"
             },
             {
@@ -497,22 +508,19 @@ export default {
                 name: "Data processing"
               },
               {
-                name: "Modeling"
+                name: "Modeling for geographic process"
               },
               {
                 name: "Model evaluation"
               },
               {
-                name: "Analysis with models or tools"
+                name: "Quantitative and qualitative analysis"
               },
               {
                 name: "Simulation/Prediction"
               },
               {
                 name: "Visualization & Representation"
-              },
-              {
-                name: "Qualitative analysis"
               },
               {
                 name: "Decision-making & management"
@@ -533,7 +541,7 @@ export default {
         this.selectedStep = [];
         for (let i = 0; i < this.processStructure.length; i++) {
           //get data
-          if (this.processStructure[i].stepID == this.currentStep.moduleId) {
+          if (this.processStructure[i].stepID == this.activeStep.moduleId) {
             option.series[0].data.push({
               name: this.processStructure[i].name,
               index: this.processStructure[i].id,
@@ -608,41 +616,41 @@ export default {
       });
       // 双击切换当前步骤
       this.stepChart.on("dblclick", function(params) {
-        _this.currentStep = _this.processStructure[params.data.index];
-        _this.enterStep(params.data.moduleId);
+        _this.activeStep = _this.processStructure[params.data.index];
+        _this.enterStep(params.data.category, params.data.moduleId);
 
-        _this.selectedStep = [];
-        option.series[0].data = [];
-        for (let i = 0; i < _this.processStructure.length; i++) {
-          //get data
-          if (_this.processStructure[i].stepID == params.data.moduleId) {
-            option.series[0].data.push({
-              name: _this.processStructure[i].name,
-              index: _this.processStructure[i].id,
-              moduleId: _this.processStructure[i].stepID,
-              x: _this.processStructure[i].x,
-              y: _this.processStructure[i].y,
-              category: _this.processStructure[i].category,
-              symbolSize: 45
-            });
-            _this.selectedStep.push({
-              moduleId: _this.processStructure[i].stepID,
-              index: _this.processStructure[i].id,
-              name: _this.processStructure[i].name
-            });
-          } else {
-            option.series[0].data.push({
-              name: _this.processStructure[i].name,
-              index: _this.processStructure[i].id,
-              moduleId: _this.processStructure[i].stepID,
-              x: _this.processStructure[i].x,
-              y: _this.processStructure[i].y,
-              category: _this.processStructure[i].category,
-              symbolSize: 30
-            });
-          }
-        }
-        _this.stepChart.setOption(option);
+        // _this.selectedStep = [];
+        // option.series[0].data = [];
+        // for (let i = 0; i < _this.processStructure.length; i++) {
+        //   //get data
+        //   if (_this.processStructure[i].stepID == params.data.moduleId) {
+        //     option.series[0].data.push({
+        //       name: _this.processStructure[i].name,
+        //       index: _this.processStructure[i].id,
+        //       moduleId: _this.processStructure[i].stepID,
+        //       x: _this.processStructure[i].x,
+        //       y: _this.processStructure[i].y,
+        //       category: _this.processStructure[i].category,
+        //       symbolSize: 45
+        //     });
+        //     _this.selectedStep.push({
+        //       moduleId: _this.processStructure[i].stepID,
+        //       index: _this.processStructure[i].id,
+        //       name: _this.processStructure[i].name
+        //     });
+        //   } else {
+        //     option.series[0].data.push({
+        //       name: _this.processStructure[i].name,
+        //       index: _this.processStructure[i].id,
+        //       moduleId: _this.processStructure[i].stepID,
+        //       x: _this.processStructure[i].x,
+        //       y: _this.processStructure[i].y,
+        //       category: _this.processStructure[i].category,
+        //       symbolSize: 30
+        //     });
+        //   }
+        // }
+        // _this.stepChart.setOption(option);
       });
     },
     getStepType(category) {
@@ -652,18 +660,16 @@ export default {
       } else if (category == 1) {
         type = "Data processing";
       } else if (category == 2) {
-        type = "Modeling";
+        type = "Modeling for geographic process";
       } else if (category == 3) {
         type = "Model evaluation";
       } else if (category == 4) {
-        type = "Analysis with models or tools";
+        type = "Quantitative and qualitative analysis";
       } else if (category == 5) {
         type = "Simulation/Prediction";
       } else if (category == 6) {
         type = "Visualization & Representation";
       } else if (category == 7) {
-        type = "Qualitative analysis";
-      } else if (category == 8) {
         type = "Decision-making & management";
       }
       return type;
@@ -674,24 +680,21 @@ export default {
         category = 0;
       } else if (type == "Data processing") {
         category = 1;
-      } else if (type == "Modeling") {
+      } else if (type == "Modeling for geographic process") {
         category = 2;
       } else if (type == "Model evaluation") {
         category = 3;
-      } else if (type == "Analysis with models or tools") {
+      } else if (type == "Quantitative and qualitative analysis") {
         category = 4;
       } else if (type == "Simulation/Prediction") {
         category = 5;
       } else if (type == "Visualization & Representation") {
         category = 6;
-      } else if (type == "Qualitative analysis") {
-        category = 7;
       } else if (type == "Decision-making & management") {
-        category = 8;
+        category = 7;
       }
       return category;
     },
-    // ---------------------------------------------------需要改---------------------------------------------------
     addNewStep() {
       // 重复命名检测
       for (let i = 0; i < this.processStructure.length; i++) {
@@ -729,10 +732,10 @@ export default {
       // 继承的子项目资源，项目资源，需要手动拉入子项目
       $.ajax({
         url:
-          "/GeoProblemSolving/folder/inquiry?" +
+          "/GeoProblemSolving/folder/findByFileType?" +
           "scopeId=" +
           this.subProjectInfo.subProjectId +
-          "&value=all",
+          "&type=all",
         type: "GET",
         async: false,
         success: function(data) {
@@ -768,13 +771,13 @@ export default {
             "/GeoProblemSolving/folder/findByFileType?" +
             "scopeId=" +
             selectedStepId +
-            "&value=all";
+            "&type=all";
         } else {
           getResUrl =
             "/GeoProblemSolving/folder/findByFileType?" +
             "scopeId=" +
             selectedStepId +
-            "&value=data";
+            "&type=data";
         }
         $.ajax({
           url: getResUrl,
@@ -801,7 +804,6 @@ export default {
           }
         });
       }
-      this.selectedStep = [];
 
       return mockData;
     },
@@ -845,26 +847,65 @@ export default {
             this.$store.commit("userLogout");
             this.$router.push({ name: "Login" });
           } else if (res.data != "None" && res.data != "Fail") {
-            this.currentStep = res.data[0];
+            this.activeStep = res.data[0];
           } else if (res.data == "None") {
-            this.currentStep = [];
+            this.activeStep = [];
           }
         })
         .catch(err => {});
     },
     createStep() {
-      this.createStepGraph();
       this.createStepContent();
     },
-    createStepGraph() {
+    createStepContent() {
+      // 新步骤的基本信息、资源（数据）、拓展工具
+      this.selectResource = [];
+      this.selectResource = this.getTargetKeys();
+
+      let Step = {};
+      Step["name"] = this.formValidate1.stepTitle;
+      Step["type"] = this.formValidate1.stepType;
+      Step["description"] = this.formValidate1.result;
+      Step["creator"] = this.$store.getters.userId;
+      Step["subProjectId"] = this.$route.params.id;
+      this.axios
+        .post("/GeoProblemSolving/step/create", Step)
+        .then(res => {
+          if (res.data == "Offline") {
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
+          } else if (res.data === "Fail") {
+            this1.$Message.info("Fail");
+          } else {
+            this.createStepGraph(res.data);
+
+            // 更新新Step的资源----------------------------------------------------------------------需要改，留坑
+            this.copyResource(res.data);
+
+            // collaborative
+            // let socketMsg = {
+            //   type: "step",
+            //   operate: "update",
+            //   content: JSON.stringify(this.processStructure)
+            // };
+            // this.subprojectSocket.send(socketMsg);
+
+            this.createModuleSuccess(Step["name"]);
+          }
+        })
+        .catch(err => {
+          console.log(err.data);
+        });
+    },
+    createStepGraph(id) {
       if (this.processStructure.length == 0) {
         // 新步骤的类别
         let nodeCategory = 0;
         nodeCategory = this.getStepCategroy(this.formValidate1.stepType);
         // create step node
         let newStepNode = {
-          id: 1,
-          stepID: "",
+          id: 0,
+          stepID: id,
           name: this.formValidate1.stepTitle,
           category: nodeCategory,
           last: [],
@@ -873,7 +914,7 @@ export default {
           y: 200,
           level: 0,
           end: true,
-          activeStatus: true
+          activeStatus: false
         };
         this.processStructure.push(newStepNode);
         // 重新渲染
@@ -946,7 +987,7 @@ export default {
           y: nodeY,
           level: nodeLevel,
           end: true,
-          activeStatus: true
+          activeStatus: false
         };
         this.processStructure.push(newStepNode);
         levelNum.push(newStepNode.id);
@@ -981,54 +1022,8 @@ export default {
         });
       }
     },
-    createStepContent() {
-      // 新步骤的基本信息、资源（数据）、拓展工具
-      this.selectResource = [];
-      this.selectResource = this.getTargetKeys();
-
-      // 创建项目
-      // let index = this.processStructure.length - 1;
-      // let Module = {};
-      // Module["subProjectId"] = this.$route.params.id;
-      // Module["title"] = this.formValidate1.moduleTitle;
-      // Module["description"] = "There is no description of this module.";
-      // Module["creator"] = this.$store.getters.userId;
-      // Module["type"] = this.formValidate1.moduleType;
-      // this.axios
-      //   .post("/GeoProblemSolving/module/create", Module)
-      //   .then(res => {
-      //     if (res.data == "Offline") {
-      //       this.$store.commit("userLogout");
-      //       this.$router.push({ name: "Login" });
-      //     } else if (res.data === "Fail") {
-      //       this1.$Message.info("Fail");
-      //     } else {
-      //       // new StepID
-      //       this.processStructure[index].stepID = res.data;
-
-      //       // current step and module
-      //       this.currentStep = this.processStructure[index];
-      //       Module["moduleId"] = res.data;
-      //       this.currentStep = Module;
-
-      //       // collaborative
-      //       let socketMsg = {
-      //         type: "step",
-      //         operate: "update",
-      //         content: JSON.stringify(this.processStructure)
-      //       };
-      //       this.subprojectSocket.send(socketMsg);
-
-      //       //更新新module的资源---------------------静态化之后完成
-      //       // this.copyResource(res.data);
-
-      //       this.createModuleSuccess(Module["title"]);
-      //     }
-      //   })
-      //   .catch(err => {
-      //     console.log(err.data);
-      //   });
-    },
+    // 数据继承-----------------------------------------
+    copyResource() {},
     removeStep() {
       if (this.selectedStep.length == 1) {
         this.delModal = true;
@@ -1043,7 +1038,6 @@ export default {
       }
     },
     delStep() {
-      this.delStepContent();
       this.delStepGraph();
     },
     delStepContent() {
@@ -1070,7 +1064,7 @@ export default {
         let currentIndex = this.selectedStep[0].index;
         if (
           this.processStructure[currentIndex].end &&
-          this.processStructure[currentIndex].name != this.currentStep.name
+          !this.processStructure[currentIndex].activeStatus
         ) {
           // 删除step节点
           if (currentIndex > 0) {
@@ -1118,8 +1112,9 @@ export default {
           this.stepChart.dispose();
           this.stepChart = null;
           this.showSteps();
-
           this.updateSteps();
+          //删除数据库
+          this.delStepContent();
 
           // collaborative
           // let socketMsg = {
