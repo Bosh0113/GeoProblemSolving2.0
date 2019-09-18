@@ -52,7 +52,7 @@
             <Breadcrumb>
               <!-- <BreadcrumbItem :to="toProjectPage">Project</BreadcrumbItem> -->
                 <BreadcrumbItem :to="toSubProjectPage">Subproject</BreadcrumbItem>
-                <BreadcrumbItem>Modeling for Geographic Process</BreadcrumbItem>
+                <BreadcrumbItem>Data visualization and result representation</BreadcrumbItem>
             </Breadcrumb>
             </Col>
             <Col span="12" style="text-align:center;font-size:1.5rem;height:20px;color:white;margin-top:1%">
@@ -78,18 +78,18 @@
                     <Card shadow>
                         <div :style="{height:sidebarHeight+1+'px'}">
                             <Tabs value="chart">
-                                <TabPane label="Chart & Table" name="chart" icon="md-construct">
+                                <TabPane label="Chart & Table" name="chart" icon="md-pie">
                                     <div :style="{height:sidebarHeight- 50 +'px'}">
                                       <!-- <iframe :src="'/GeoProblemSolving/charts'" style="height:100%;width:100%;"></iframe> -->
                                       <iframe :src="'/charts'" style="height:100%;width:100%;"></iframe>
                                     </div>
                                 </TabPane>
-                                <TabPane label="Earth & Map" name="earth" icon="md-sunny">
+                                <TabPane label="Earth & Map" name="earth" icon="md-globe">
                                     <div :style="{height:sidebarHeight- 50 +'px'}">
                                       <iframe :src="'/GeoProblemSolving/Collaborative/3DEarth/index.html'" style="height:100%;width:100%;"></iframe>
                                     </div>
                                 </TabPane>
-                                <TabPane label="3D Model" name="3dModel" icon="md-construct">
+                                <TabPane label="3D Model" name="3dModel" icon="md-cube">
                                     <div :style="{height:sidebarHeight- 50 +'px'}">
                                       <iframe :src="'/GeoProblemSolving/Collaborative/3DmodelViewer/index.html?groupID='+stepId" style="height:100%;width:100%;"></iframe>
                                     </div>

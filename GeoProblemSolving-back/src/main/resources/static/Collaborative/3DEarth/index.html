@@ -18,8 +18,9 @@
     rel="stylesheet" type="text/css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-fileinput/5.0.1/js/fileinput.min.js"></script>
   <style>
-    @import url(https://cesiumjs.org/Cesium/Build/Cesium/Widgets/widgets.css);
+    @import url(./Build/Cesium/Widgets/widgets.css);
     @import url(https://cesiumjs.org/Cesium/Build/Apps/Sandcastle/templates/bucket.css);
+    @import url(./Build/Cesium/Widgets/BaseLayerPicker/BaseLayerPicker.css);
 
     html,
     body {
@@ -32,6 +33,12 @@
       margin: 0;
       padding: 0;
       overflow: hidden;
+    }
+    #baseLayerPickerContainer{
+        position: absolute;
+        right: 80px;
+        top: 5px;
+        z-index: 666;
     }
 
     #toolbar {
@@ -52,7 +59,9 @@
 </head>
 
 <body>
-  <div id="cesiumContainer" class="fullSize"></div>
+  <div id="cesiumContainer" class="fullSize">
+    <div id="baseLayerPickerContainer"></div>
+  </div>
   <div id="toolbar">
     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#uploadModal">
       Add Data
@@ -130,16 +139,82 @@
     </div>
   </div>
   <script>
+    Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIyZDBmM2RmOS1hOWY5LTRhOWQtYjc1ZC0yZDVjMTc5ZTg2YWYiLCJpZCI6OTg1MCwic2NvcGVzIjpbImFzciIsImdjIl0sImlhdCI6MTU1NTA1NjIyOX0.wdI4ZrTxsMrfiHvNQapn_usuNgo7OwHj9o3gUVtit2w';
     var viewer = new Cesium.Viewer('cesiumContainer', {
       timeline:false, //时间轴
       animation:false, //动画控件
       geocoder:false,
+      baseLayerPicker: false,
       navigationHelpButton:false,
       terrainProvider: Cesium.createWorldTerrain()
     });
     // viewer.scene.globe.enableLighting = true;//开启照明，即昼夜效果
     // viewer.scene.globe.depthTestAgainstTerrain = true;
     viewer._cesiumWidget._creditContainer.style.display = "none";
+
+//添加地图选择器
+var vec_tdt = new Cesium.ProviderViewModel({
+      name:"矢量底图",
+      tooltip:"矢量地图_天地图",
+      iconUrl:"http://lbs.tianditu.gov.cn/images/vec_c.png",
+      creationFunction :function(){
+        var vec_tdt_layer = new Cesium.WebMapTileServiceImageryProvider({
+          url: 'http://t0.tianditu.gov.cn/vec_w/wmts?tk=27b3201a048d562a3d8d7b9715bd9ca3',
+          layer:'vec',
+          style:'default',
+          tileMatrixSetID:'w',
+          format:'tiles',
+          maximumLevel: 18
+         });
+         addLabel('http://t0.tianditu.gov.cn/cva_w/wmts?tk=27b3201a048d562a3d8d7b9715bd9ca3');
+         return vec_tdt_layer;
+      }
+    });
+
+    var img_tdt = new Cesium.ProviderViewModel({
+      name:"影像底图",
+      tooltip:"卫星遥感图_天地图",
+      iconUrl:"http://lbs.tianditu.gov.cn/images/img_c.png",
+      creationFunction :function(){
+        var  img_tdt_layer = new Cesium.WebMapTileServiceImageryProvider({
+          url: 'http://t0.tianditu.gov.cn/img_w/wmts?tk=5fafee9aee9c5ca2bea2cc71abf26c1f',
+          layer:'img',
+          style:'default',
+          tileMatrixSetID:'w',
+          format:'tiles',
+          maximumLevel: 18
+        });
+        addLabel('http://t0.tianditu.gov.cn/cia_w/wmts?tk=5fafee9aee9c5ca2bea2cc71abf26c1f');
+        return img_tdt_layer;
+      }
+    });
+    var addLabel = function(labelUrl){
+      // viewer.imageryLayers.remove();
+      viewer.imageryLayers.addImageryProvider(
+          new Cesium.WebMapTileServiceImageryProvider({
+            url: labelUrl,
+            layer:'cva',
+            style:'default',
+            tileMatrixSetID:'w',
+            format:'tiles',
+            maximumLevel: 18,
+          }));
+    }//添加地图标注
+    var baseLayerPicker = new Cesium.BaseLayerPicker('baseLayerPickerContainer', {
+        globe : viewer.scene.globe,
+        imageryProviderViewModels : [vec_tdt,img_tdt]
+    });
+    document.querySelector('.cesium-baseLayerPicker-sectionTitle').innerText = "底图切换";
+
+    viewer.camera.setView({
+      destination:Cesium.Cartesian3.fromDegrees(118.92151,32.11261,8000000.0),
+      orientation: {
+        heading : Cesium.Math.toRadians(0.0), // 方向
+        pitch : Cesium.Math.toRadians(-90.0),// 倾斜角度
+        roll : 0
+      }
+    });
+
     var dataList = [];
     var selectedDataIndex = 0;
     function addData() {

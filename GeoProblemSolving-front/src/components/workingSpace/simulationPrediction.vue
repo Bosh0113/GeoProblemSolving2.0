@@ -52,7 +52,7 @@
             <Breadcrumb>
               <!-- <BreadcrumbItem :to="toProjectPage">Project</BreadcrumbItem> -->
                 <BreadcrumbItem :to="toSubProjectPage">Subproject</BreadcrumbItem>
-                <BreadcrumbItem>Modeling for Geographic Process</BreadcrumbItem>
+                <BreadcrumbItem>Simulation and prediction</BreadcrumbItem>
             </Breadcrumb>
             </Col>
             <Col span="12" style="text-align:center;font-size:1.5rem;height:20px;color:white;margin-top:1%">
