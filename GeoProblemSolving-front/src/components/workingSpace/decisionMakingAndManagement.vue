@@ -73,7 +73,7 @@
                                 <TabPane label="Decision-making" name="decision" icon="md-paper">
                                     <div :style="{height:sidebarHeight- 50 +'px'}">
                                       <vue-scroll :ops="ops">
-                                      <Col span="8" v-for="(tool,index) in quantitativeToolSet" :key="index">
+                                      <Col span="8" v-for="(tool,index) in decisionToolSet" :key="index">
                                           <Card dis-hover style="min-width:200px;">
                                               <h3 slot="title">{{tool.title}}</h3>
                                               <div style="width:60%;display:inline-block;cursor: pointer;" @click="enterTheme(tool.url)">
@@ -93,7 +93,7 @@
                                 <TabPane label="Management" name="management" icon="md-checkmark-circle-outline">
                                     <div :style="{height:sidebarHeight- 50 +'px'}">
                                       <vue-scroll :ops="ops">
-                                      <Col span="8" v-for="(tool,index) in qualitativeToolSet" :key="index">
+                                      <Col span="8" v-for="(tool,index) in managementToolSet" :key="index">
                                           <Card dis-hover style="min-width:200px;">
                                               <h3 slot="title">{{tool.title}}</h3>
                                               <div style="width:60%;display:inline-block;cursor: pointer;" @click="enterTheme(tool.url)">
@@ -133,7 +133,7 @@ export default {
         name: ""
       },
       sidebarHeight: 800,
-      quantitativeToolSet: [
+      decisionToolSet: [
         {
           img: "http://www.saga-gis.org/_images/logo_saga_big.png",
           url: "http://geomodeling.njnu.edu.cn/Online_Saga/saga-tools",
@@ -142,7 +142,7 @@ export default {
             "SAGA stands for System for Automated Geoscientific Analyses. SAGA GIS has been developed by a small group of developers primarily based in Germany. Most past and current SAGA developments come from the team around J. Böhner and O. Conrad, both are now working at the Institute of Geography, Section for Physical Geography, Klimacampus and University of Hamburg, Germany."
         },
       ],
-      qualitativeToolSet: [
+      managementToolSet: [
         {
           img: "https://jupyter.org/assets/main-logo.svg",
           url: "http://134.175.111.77/note",
