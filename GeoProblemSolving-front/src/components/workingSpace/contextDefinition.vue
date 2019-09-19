@@ -136,6 +136,44 @@
     left:300px;
     right:50px
   }
+
+  .stepName{   
+    text-align:center;
+    font-size:1.2rem;
+    height:20px;
+    color:white;
+  }
+  .stepName p{  
+    font-size:1rem;
+    height:20px;
+    color:white;
+  }
+
+   .stepName input{  
+    outline-style: none ;
+    border: 0px;
+    background-color: transparent;
+    color:white;
+    /* float:center; */
+
+  }
+
+  .onlineListBtn{
+    position:absolute;
+    top:70%;
+    right:15%;
+    /* width: 100px */
+  }
+
+   /* .home_content >>> .ivu-modal-footer {
+    border:none;
+    padding-bottom:12px;
+    padding-right:18px ;
+  }
+  .home_content >>> .ivu-modal-body {
+    padding-bottom: 0;
+  } */
+
 </style>
 <template>
   <div style="background-color:#e8eaec;height:auto">
@@ -146,22 +184,46 @@
         <div class="home_content">
           <Row>
             <!-- 需要修改样式 -->
-            <Col span="8" style="height:40px;">
-            <Breadcrumb>
-              <!-- <BreadcrumbItem :to="toProjectPage">Project</BreadcrumbItem> -->
-              <BreadcrumbItem :to="toSubProjectPage">Subproject</BreadcrumbItem>
-              <BreadcrumbItem>Context Definition & Resources Collection</BreadcrumbItem>
-            </Breadcrumb>
-            </Col>
-            <Col span="10" style="text-align:center;font-size:1.5rem;height:20px;color:white;margin-top:1%">
-            <strong>Context Definition & Resources Collection</strong>
-            <Button @click="drawerValue = true" type="primary">Test</Button>
-            </Col>
-           
+            <div class="breadCrumb">
+              <Breadcrumb>
+                <BreadcrumbItem :to="toSubProjectPage">Subproject</BreadcrumbItem>
+                <BreadcrumbItem>Context Definition & Resources Collection</BreadcrumbItem>
+              </Breadcrumb>
+            </div>
+
+            <div class="stepName">
+              <strong>{{stepContent.name}}</strong>
+              <p>{{stepContent.description}}</p>
+            </div>
+
+            <div class="onlineListBtn">
+              <Button  @click="drawerValue = true" type="default" ghost>Participants</Button>
+              <Button  @click="modifyStep = true" style="margin-left:20px" type="info" ghost>Modify Step</Button>
+            </div>          
+
           </Row>
           <Drawer title="Participants" :closable="false" v-model="drawerValue">
             <online-participant :sub-project-id="subprojectId" :room-id="stepId"></online-participant>
           </Drawer>
+
+          <Modal v-model="modifyStep">
+            <p slot="header" style="text-align:center">
+              <Icon type="ios-information-circle"></Icon>
+              <span>Modify Step Name and Step Description</span>
+            </p>
+            <Form :label-width="120" label-position="left" :model="stepForm">
+              <FormItem label="Step Name" prop="name">
+                <Input v-model="stepForm.name" type="textarea" :autosize="{minRows: 1,maxRows: 3}" clearable />
+              </FormItem>
+              <FormItem label="Step Description" prop="description">
+                <Input v-model="stepForm.description" type="textarea" :autosize="{minRows: 1,maxRows: 3}" clearable />
+              </FormItem>
+            </Form>
+            <div slot="footer">
+              <Button @click="cancelModifyStep">Cancel</Button>
+              <Button type="primary" @click="submitModifyStep">Modify</Button>
+            </div>
+          </Modal>
          
         </div>
       </div>
@@ -218,7 +280,7 @@
                               <FormItem label="Problem boundary" prop="boundary">
                                 <Input v-model="contextForm.boundary"
                                   placeholder="Please enter the boundry of the problem" type="textarea"
-                                  :autosize="{minRows: 1,maxRows: 5}" clearable></Input>
+                                  :autosize="{minRows: 1,maxRows: 5}" clearable />
                               </FormItem>
                               <FormItem label="Spatiotemporal scale" prop="scale">
                                 <Input v-model="contextForm.scale" placeholder="Please enter the spatiotemporal scale"
@@ -304,27 +366,7 @@
                             <Icon type="md-cube" />
                             Others
                           </MenuItem>
-                          <!-- <Icon :type="item.typeIcon" style="float:left;" size="18"></Icon>
-                          <h4>&ensp;{{item.typeName}}</h4> -->
-                          <!-- filelist filter -->
-                          <!-- <div style="height:250px;overflow-y:scroll;margin-top:10px" >
-                            <Table size="small" :columns="resourceTableColName"  :data="stepResourceList | filterResourceType"
-                              v-show="stepResourceList!=[]&&stepResourceList!='None'">
-                              <template slot-scope="{ row }" slot="name">
-                                <strong>{{ row.name }}</strong>
-                              </template>
-
-                              <template slot-scope="{ row, index }" slot="action">
-                                <a :href="stepResourceList[index].pathURL"
-                                  :download="stepResourceList[index].name" title="Download">
-                                  <Icon type="md-download" :size="20" />
-                                </a>
-                                <span @click="show(index)" style="margin-left:10px" title="Preview">
-                                  <Icon type="md-eye" :size="20" color="#2d8cf0" style="cursor:pointer" />
-                                </span>
-                              </template>
-                            </Table>
-                          </div> -->
+                        
                         </Menu>  
                       <!-- </div> -->
                     </div>
@@ -337,8 +379,8 @@
                               </template>
 
                               <template slot-scope="{ row, index }" slot="action">
-                                <a :href="stepResourceList[index].pathURL"
-                                  :download="stepResourceList[index].name" title="Download">
+                                <a :href="filterFileType[index].pathURL"
+                                  :download="filterFileType[index].name" title="Download">
                                   <Icon type="md-download" :size="20" />
                                 </a>
                                 <span @click="show(index)" style="margin-left:10px" title="Preview">
@@ -498,31 +540,31 @@
           }]
         },
         resourceType: [{
-            typeName: "Data",
+            typeName: "data",
             typeIcon: "ios-stats"
           },
           {
-            typeName: "Images",
+            typeName: "image",
             typeIcon: "md-image"
           },
           {
-            typeName: "Videos",
+            typeName: "video",
             typeIcon: "md-videocam"
           },
           {
-            typeName: "Papers",
+            typeName: "paper",
             typeIcon: "ios-paper"
           },
           {
-            typeName: "Documents",
+            typeName: "document",
             typeIcon: "md-document"
           },
           {
-            typeName: "Models",
+            typeName: "model",
             typeIcon: "md-construct"
           },
           {
-            typeName: "Others",
+            typeName: "others",
             typeIcon: "md-cube"
           }
         ],
@@ -614,7 +656,7 @@
           }]
         },
         filterFileType: [],
-        typeName: "Data",
+        typeName: "data",
           // 当前选中通知条目的详情
         currentNoticeDetail: [],
         panelList: [],
@@ -625,6 +667,13 @@
 
         // online drawer
         drawerValue : false,
+        stepContent:[],
+        modifyStep:false,
+
+        stepForm: {          
+          name:"",
+          description:""
+        },
 
       
       };
@@ -635,8 +684,6 @@
     },
     mounted() {
       window.addEventListener("resize", this.initSize);
-      this.getAllResource();
-      this.getContextDefiniton();
     },
 
     methods: {
@@ -647,6 +694,7 @@
       init() {
         this.initSize();
         this.getContextDefinition();
+        this.getAllResource();
       },
 
       submit(contextform) {
@@ -657,7 +705,7 @@
           if (valid) {
             let contextDefinition = new URLSearchParams();
             contextDefinition.append("creator", creatorId);
-            contextDefinition.append("type", "context definition");
+            contextDefinition.append("type", "contextDefinition");
 
             contextDefinition.append("content.boundary", this.contextForm.boundary);
             contextDefinition.append("content.scale", this.contextForm.scale);
@@ -699,11 +747,16 @@
             this.stepId
           )
           .then(res => {
-            //new id
-            //ContextDefinition["stepId"] = res.data;
-            this.contextForm = res.data[0].content;
-            // this.subprojectId = res.data[0].subProjectId;
-            console.log(this.subprojectId);
+            if (res.data[0].type === "contextDefinition") {
+              this.contextForm = res.data[0].content;
+              this.stepContent = res.data[0];
+              this.stepForm = res.data[0];
+
+            } else {
+              this.$Notice.info({
+                desc: "Get the description failed!"
+              });
+            }
           });
       },
 
@@ -784,8 +837,93 @@
             }
           } 
         });
-        // this.getAllResource();
+       
         
+      },
+
+      // 预览
+      show(index) {
+        let name = this.filterFileType[index].name;
+        if (/\.(doc|docx|xls|xlsx|csv|ppt|pptx|zip)$/.test(name.toLowerCase())) {
+          if (this.panel != null) {
+            this.panel.close();
+          }
+          var url =
+            "http://172.21.212.72:8012/previewFile?url=" + 'http://' + this.$store.state.IP_Port +
+            this.filterFileType[index].pathURL;
+          var toolURL =
+            '<iframe src=' + url + ' style="width: 100%;height:100%"></iframe>';
+          this.panel = jsPanel.create({
+            headerControls: {
+              smallify: "remove"
+            },
+            theme: "primary",
+            footerToolbar: '<p style="height:5px"></p>',
+            headerTitle: "Preview",
+            contentSize: "800 600",
+            content: toolURL,
+            disableOnMaximized: true,
+            dragit: {
+              containment: 5
+            },
+            closeOnEscape: true,
+          });
+          $(".jsPanel-content").css("font-size", "0");
+        } else if (/\.(mp4)$/.test(name.toLowerCase())) {
+          if (this.panel != null) {
+            this.panel.close();
+          }
+          var url =
+            'http://' + this.$store.state.IP_Port + this.filterFileType[index].pathURL;
+          var toolURL =
+            '<video src=' + url + ' style="width: 100%;height:100%" controls></video>';
+          this.panel = jsPanel.create({
+            headerControls: {
+              smallify: "remove"
+            },
+            theme: "primary",
+            footerToolbar: '<p style="height:10px"></p>',
+            headerTitle: "Preview",
+            contentSize: "800 600",
+            content: toolURL,
+            disableOnMaximized: true,
+            dragit: {
+              containment: 5
+            },
+            closeOnEscape: true
+          });
+          $(".jsPanel-content").css("font-size", "0");
+        } else if (/\.(pdf|xml|json|md|gif|jpg|png)$/.test(name.toLowerCase())) {
+          if (this.panel != null) {
+            this.panel.close();
+          }
+          var url =
+            'http://' + this.$store.state.IP_Port + this.filterFileType[index].pathURL;
+          var toolURL =
+            '<iframe src=' + url + ' style="width: 100%;height:100%" controls></iframe>';
+          this.panel = jsPanel.create({
+            headerControls: {
+              smallify: "remove"
+            },
+            theme: "primary",
+            footerToolbar: '<p style="height:10px"></p>',
+            headerTitle: "Preview",
+            contentSize: "800 600",
+            content: toolURL,
+            disableOnMaximized: true,
+            dragit: {
+              containment: 5
+            },
+            closeOnEscape: true
+          });
+          $(".jsPanel-content").css("font-size", "0");
+        } else {
+          this.$Notice.error({
+            title: "Open failed",
+            desc: "Not supported file format."
+          });
+          return false;
+        }
       },
 
       gatherFile(file) {
@@ -855,11 +993,12 @@
             
         });
         this.$set(this, "stepResourceList",this.stepResourceList[0]);
+
         this.filterResourceType(this.typeName);       
 
       },
 
-       filterResourceType(name){  
+      filterResourceType(name){  
         this.typeName = name;
         let filterFile = [];
         let resourceType = this.resourceType;
@@ -876,6 +1015,39 @@
         console.log(this.filterFileType);
       }, 
 
+      submitModifyStep() {
+          let obj = new URLSearchParams();
+          obj.append("name", this.stepForm.name);
+          obj.append("description", this.stepForm.description);
+          obj.append("stepId", this.stepId);
+
+          this.axios
+            .post("/GeoProblemSolving/step/update", obj)
+            .then(res => {
+              console.log(res.data);
+              if (res.data == "Offline") {
+                this.$store.commit("userLogout");
+                this.$router.push({
+                  name: "Login"
+                });
+              } else if (res.data != "Fail") {
+                this.$Notice.info({
+                  desc: "Update successfully!"
+                });
+              } else {
+                this.$Message.error("Update step failed.");
+              }
+            })
+            .catch(err => {
+              console.log(err.data);
+            });
+            this.modifyStep = false;        
+      },
+
+
+      cancelModifyStep() {
+        this.modifyStep = false;
+      },
 
       // 工具栏
       toolPanel(type) {
@@ -1079,59 +1251,59 @@
         // });
         // }
       },
-    closePanel() {
-      for (let i = 0; i < this.panelList.length; i++) {
-        this.panelList[i].close();
-      }
-    },
-
-    closeModuleSocket() {
-      if (this.subprojectSocket != null) {
-        this.removeTimer();
-        this.subprojectSocket.close();
-      }
-    },
-    openModuleSocket() {
-      if (this.subprojectSocket != null) {
-        this.subprojectSocket = null;
-      }
-      let subProjectId = this.subProjectInfo.subProjectId;
-      var subprojectSocketURL =
-        "ws://localhost:8081/GeoProblemSolving/Module/" + subProjectId;
-      // var subprojectSocketURL = "ws://" + this.$store.state.IP_Port + "/GeoProblemSolving/Module/" + subProjectId;
-      this.subprojectSocket = new WebSocket(subprojectSocketURL);
-      this.subprojectSocket.onopen = this.onOpen;
-      this.subprojectSocket.onmessage = this.onMessage;
-      this.subprojectSocket.onclose = this.onClose;
-      this.subprojectSocket.onerror = this.onError;
-      this.setTimer();
-    },
-
-    onClose(e) {
-      this.removeTimer();
-      console.log("ModuleSocket连接断开！");
-    },
-    onError(e) {
-      this.removeTimer();
-      console.log("ModuleSocket连接错误！");
-    },
-    setTimer() {
-      var that = this;
-      this.timer = setInterval(() => {
-        var messageJson = {};
-        messageJson["type"] = "ping";
-        messageJson["message"] = "ping";
-        if (
-          that.subprojectSocket != null &&
-          that.subprojectSocket != undefined
-        ) {
-          that.subprojectSocket.send(JSON.stringify(messageJson));
+      closePanel() {
+        for (let i = 0; i < this.panelList.length; i++) {
+          this.panelList[i].close();
         }
-      }, 20000);
-    },
-    removeTimer() {
-      clearInterval(this.timer);
-    },
+      },
+
+      closeModuleSocket() {
+        if (this.subprojectSocket != null) {
+          this.removeTimer();
+          this.subprojectSocket.close();
+        }
+      },
+      openModuleSocket() {
+        if (this.subprojectSocket != null) {
+          this.subprojectSocket = null;
+        }
+        let subProjectId = this.subProjectInfo.subProjectId;
+        var subprojectSocketURL =
+          "ws://localhost:8081/GeoProblemSolving/Module/" + subProjectId;
+        // var subprojectSocketURL = "ws://" + this.$store.state.IP_Port + "/GeoProblemSolving/Module/" + subProjectId;
+        this.subprojectSocket = new WebSocket(subprojectSocketURL);
+        this.subprojectSocket.onopen = this.onOpen;
+        this.subprojectSocket.onmessage = this.onMessage;
+        this.subprojectSocket.onclose = this.onClose;
+        this.subprojectSocket.onerror = this.onError;
+        this.setTimer();
+      },
+
+      onClose(e) {
+        this.removeTimer();
+        console.log("ModuleSocket连接断开！");
+      },
+      onError(e) {
+        this.removeTimer();
+        console.log("ModuleSocket连接错误！");
+      },
+      setTimer() {
+        var that = this;
+        this.timer = setInterval(() => {
+          var messageJson = {};
+          messageJson["type"] = "ping";
+          messageJson["message"] = "ping";
+          if (
+            that.subprojectSocket != null &&
+            that.subprojectSocket != undefined
+          ) {
+            that.subprojectSocket.send(JSON.stringify(messageJson));
+          }
+        }, 20000);
+      },
+      removeTimer() {
+        clearInterval(this.timer);
+      },
 
     }
   };

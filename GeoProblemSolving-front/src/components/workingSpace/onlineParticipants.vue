@@ -389,7 +389,6 @@
       <div class="memberPanel">
         <!-- 参与者 -->
         <div class="participants">
-          <!-- <h4>Participants</h4> -->
           <div>
             <Card v-for="(participant,index) in onlineParticipants" :key="'online' +index" style="margin:2.5%"
               :padding="5">
@@ -498,10 +497,9 @@
 
       this.initSize();
       this.participants = [];
-    
-      // this.getSubProjectId(this.stepId);
-      this.startWebSocket(this.roomId);
+     
       this.getParticipants(this.subProjectId);
+      this.startWebSocket(this.roomId);
       
       console.log(this.subProjectId);
 

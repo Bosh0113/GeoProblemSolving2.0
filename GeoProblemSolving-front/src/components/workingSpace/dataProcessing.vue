@@ -16,16 +16,23 @@
     left: 0;
   }
 
-  .tools {
+  .fileList {
     float: left;
     height: 100%;
-    width: 27%;
+    width: 19%;
+  }
+
+  .fileUdx {
+    float: left;
+    height: 100%;
+    width: 35%;
+    margin-left: 10px;
   }
 
   .condef {
     float: left;
     height: 100%;
-    width: 72%;
+    width: 44%;
     margin-left: 10px;
   }
 
@@ -102,8 +109,48 @@
     right:50px
   }
 
+    .stepName{   
+    text-align:center;
+    font-size:1.2rem;
+    height:20px;
+    color:white;
+  }
+  .stepName p{  
+    font-size:1rem;
+    height:20px;
+    color:white;
+  }
+
+   .onlineListBtn{
+    position:absolute;
+    top:70%;
+    right:15%;
+    /* width: 100px */
+  }
+
+   /* .pro-tab>>>.ivu-modal-footer {
+    border-top:none;
+    padding-bottom:12px;
+    padding-right:18px ;
+  }
+  .pro-tab>>>.ivu-modal-body {
+    padding-bottom: 0;
+  } */
+
+   .pro-tab >>> .ivu-btn-icon-only{
+      font-size: 40px
+  }
+  .modelToolBtn{
+      margin-left:2%;
+      margin-top:3%;
+      /* clear: both; */
+  }
+
 
 </style>
+
+
+
 <template>
   <div style="background-color:#e8eaec;height:auto">
     <Row>
@@ -113,18 +160,48 @@
         <div class="home_content">
           <Row>
             <!-- 需要修改样式 -->
-            <Col span="6" style="height:40px;">
-            <Breadcrumb>
-              <!-- <BreadcrumbItem :to="toProjectPage">Project</BreadcrumbItem> -->
+            <div  class="breadCrumb">
+              <Breadcrumb>
+                <!-- <BreadcrumbItem :to="toProjectPage">Project</BreadcrumbItem> -->
                 <BreadcrumbItem :to="toSubProjectPage">Subproject</BreadcrumbItem>
                 <BreadcrumbItem>Data Processing</BreadcrumbItem>
-            </Breadcrumb>
-            </Col>
-            
-            <Col span="12" style="text-align:center;font-size:1.5rem;height:20px;color:white;margin-top:1%">
-            <strong>Data Processing</strong>
-            </Col>
+              </Breadcrumb>
+            </div>
+
+            <div class="stepName">
+              <strong>{{stepContent.name}}</strong>
+              <p>{{stepContent.description}}</p>              
+            </div>
+
+            <div class="onlineListBtn">
+              <Button @click="drawerValue = true" type="default" ghost>Participants</Button>
+              <Button @click="modifyStep = true" style="margin-left:20px" type="info" ghost>Modify Step</Button>
+            </div>
+
           </Row>
+          <Drawer title="Participants" :closable="false" v-model="drawerValue">
+            <online-participant :sub-project-id="subprojectId" :room-id="stepId"></online-participant>
+          </Drawer>
+
+          
+            <Modal v-model="modifyStep">
+              <p slot="header" style="text-align:center">
+                <Icon type="ios-information-circle"></Icon>
+                <span>Modify Step Name and Step Description</span>
+              </p>
+              <Form :label-width="120" label-position="left" :model="stepForm">
+                <FormItem label="Step Name" prop="name">
+                  <Input v-model="stepForm.name" type="textarea" :autosize="{minRows: 1,maxRows: 3}" clearable />
+                </FormItem>
+                <FormItem label="Step Description" prop="description">
+                  <Input v-model="stepForm.description" type="textarea" :autosize="{minRows: 1,maxRows: 3}" clearable />
+                </FormItem>
+              </Form>
+              <div slot="footer">
+                <Button @click="cancelModifyStep">Cancel</Button>
+                <Button type="primary" @click="submitModifyStep">Modify</Button>
+              </div>
+            </Modal>
          
         </div>
       </div>
@@ -137,47 +214,52 @@
           <template>
             <Row style="margin-top:40px">
               <div :style="{height:sidebarHeight+45+'px'}" style="margin:20px 1%">
-                <div class="tools">
+                <div class="fileList">
                   <Card style=" height:100%;">
-                    <Tabs value="Description">
-                      <TabPane name="Description" icon="ios-brush" label="Description">
-                        <Form ref="dataForm" :rules="dataProcessingValidate" :model="dataForm" :label-width="120" label-position="left" style="margin-top:15px" >
-                          <FormItem label="Data description" prop="description">
-                            <Input v-model="dataForm.description" placeholder="Please enter the description of the data"
-                              type="textarea" :autosize="{minRows: 1,maxRows: 5}" clearable ></Input>
-                          </FormItem>
-                          <FormItem label="Income data" prop="income">
-                            <Input v-model="dataForm.income" placeholder="Please enter the income data description"
-                              type="textarea" :autosize="{minRows: 1,maxRows: 5}" clearable /></Input>
-                          </FormItem>
-                          <FormItem label="Outcome data" prop="outcome">
-                            <Input v-model="dataForm.outcome" placeholder="Please enter the outcome data description"
-                              type="textarea" :autosize="{minRows: 1,maxRows: 5}" clearable /></Input>
-                          </FormItem>
-                          <FormItem label="Main methods" prop="methods">
-                            <Input v-model="dataForm.methods" placeholder="Please enter your goal" type="textarea"
-                              :autosize="{minRows: 1,maxRows: 5}" clearable /></Input>
-                          </FormItem>
-                          <FormItem>
-                            <Button @click="submit('dataForm')">Submit</Button>
-                          </FormItem>
-                        </Form>
-                      </TabPane>
-                      <TabPane name="Data" icon="ios-paper" label="Data">
-                        <ul v-for="(item,index) in dataList" :key="index">
-                          <li>{{item.name}}</li>
-                        </ul>
-                      </TabPane>
-                      <TabPane name="Toolbox" icon="ios-construct" label="Toolbox">
+                    <div class="condefTitle">
+                      <div style="width:3px;height:18px;float:left;background-color:rgb(124, 126, 126)"></div>
+                      <h4 style="float:left;margin-left:5px">Data</h4>
+                    </div>
+                    <ul v-for="(item,index) in dataList" :key="index">
+                      <li>{{item.name}}</li>
+                    </ul>
 
-                      </TabPane>
-                    </Tabs>
-                    
+
+                  </Card>
+                </div>
+                <div class="fileUdx">
+                  <Card style="height:auto;min-height:100%">
+                    <div class="condefTitle">
+                      <div style="width:3px;height:18px;float:left;background-color:rgb(124, 126, 126)"></div>
+                      <h4 style="float:left;margin-left:5px">Data Origin</h4>
+                       
+                    </div>
+                    <div  style="clear:both">
+                      <vue-markdown>this is the default slot</vue-markdown>
+                      <Tabs>
+                        <TabPane label="Data Origin" name="origin" icon="md-home"></TabPane>
+                        <TabPane label="UDX Schema" name="udx" icon="md-home">
+                          <vue-markdown>this is the default slot</vue-markdown>
+                          <!-- <pre class="brush: html"><button></button></pre> -->
+                        </TabPane>
+                      </Tabs>
+                    </div>
                   </Card>
                 </div>
                 <div class="condef">
                   <Card style="height:auto;min-height:100%">
-                   
+                    <div class="condefTitle">
+                      <div style="width:3px;height:18px;float:left;background-color:rgb(124, 126, 126)"></div>
+                      <h4 style="float:left;margin-left:5px">Toolbox</h4>                     
+                    </div>
+                    <div  style="clear:both">
+                     <Tooltip placement="bottom-start" class="modelToolBtn">
+                        <Button icon="ios-brush" to="//134.175.111.77/note" target="_blank"></Button>
+                        <div slot="content">
+                          <p>Test Tool</p>
+                        </div>
+                      </Tooltip>
+                    </div>
                   </Card>
                 </div>
               </div>
@@ -199,14 +281,17 @@
   import Avatar from "vue-avatar";
   import echarts from "echarts";
   import folderTree from "../resources/folderTree";
-  import min from  "../../../static/js/jquery.min.js";
-  import slimscroll from  "../../../static/js/jquery.slimscroll.min.js";
-  import klorofil from  "../../../static/js/klorofil-common.js";
+  import onlineParticipant from "./onlineParticipants";
+  import VueMarkdown from 'vue-markdown';
+  import markDown from "./../../mock/markdown.js";
   export default {
     components: {
       VueFlowy,
       Avatar,
-      folderTree
+      folderTree,
+      onlineParticipant,
+      VueMarkdown,
+      markDown
     },
     data() {
       return {
@@ -216,37 +301,15 @@
         dataList:[],
         sidebarHeight: 800,
         stepId: this.$route.params.id,
+        subprojectId:this.$route.params.subid,
 
-        // submit
-        dataForm: {
-            // others:"",
-            methods: "",
-              description: "",
-              income: "",
-              outcome: "",
-            },
-
-        dataProcessingValidate: {
-          description: [{
-            required: true,
-            message: "The description of data cannot be empty",
-            trigger: "blur"
-          }],
-          income: [{
-            required: true,
-            message: "The income data should be described",
-            trigger: "blur"
-          }],
-          outcome: [{
-            required: false,
-            message: "The outcome data should be described",
-            trigger: "blur"
-          }],
-          methods: [{
-            required: false,
-            message: "The method of data processing is need",
-            trigger: "blur"
-          }]          
+        stepContent:[],
+         // online drawer
+        drawerValue : false,
+        modifyStep:false,
+        stepForm: {          
+          name:"",
+          description:""
         },
       };
     },
@@ -256,7 +319,7 @@
     },
     mounted() {
       window.addEventListener("resize", this.initSize);
-      this.getDataProcessing();
+      // this.getDataProcessing();
       // this.init();
     },
 
@@ -299,50 +362,7 @@
         this.$set(this, "dataList", filterdata);
       },
 
-      submit(dataform) {
-        // this.subprojectId = this.$route.params.id;
-        let creatorId = this.$store.getters.userId;
-        this.$refs[dataform].validate(valid => {
-          // 提交表单
-          if (valid) {
-            let dataProcessing = new URLSearchParams();
-            // dataProcessing.append("subProjectId", this.subprojectId);
-            dataProcessing.append("creator", creatorId);
-            dataProcessing.append("type", "data processing");
-
-            dataProcessing.append("content.description", this.dataForm.description);
-            dataProcessing.append("content.income", this.dataForm.income);
-            dataProcessing.append("content.outcome", this.dataForm.outcome);
-            dataProcessing.append("content.methods", this.dataForm.methods);
-            // dataProcessing.append("others", this.dataForm.others);
-            dataProcessing.append("stepId", this.stepId)
-
-            this.axios
-              .post(
-                "/GeoProblemSolving/step/update",
-                dataProcessing
-              )
-              .then(res => {
-                if (res.data == "Offline") {
-                  this.$store.commit("userLogout");
-                  this.$router.push({
-                    name: "Login"
-                  });
-                } else if (res.data != "Fail") {
-                  this.$Notice.info({
-                    desc: "Update successfully!"
-                  });
-                } else {
-                  this.$Message.error("Update subproject failed.");
-                }
-              });
-          }
-        });
-      },
-
       getDataProcessing() {
-        console.log(this.stepId);
-        console.log(234);
         this.axios
           .get(
             "/GeoProblemSolving/step/inquiry/" +
@@ -351,12 +371,52 @@
             this.stepId
           )
           .then(res => {
-            //new id
-            //ContextDefinition["stepId"] = res.data;
-            this.dataForm = res.data[0].content;
-            console.log(this.dataForm);
+            if (res.data[0].type === "dataProcessing") {
+              // this.dataForm = res.data[0].content;
+              this.stepContent = res.data[0];
+              this.stepForm = res.data[0];
+            } else {
+              this.$Notice.info({
+                desc: "Get the description failed!"
+              });
+            }
           });
       },
+
+      submitModifyStep() {
+        let obj = new URLSearchParams();
+        obj.append("name", this.stepForm.name);
+        obj.append("description", this.stepForm.description);
+        obj.append("stepId", this.stepId);
+
+        this.axios
+          .post("/GeoProblemSolving/step/update", obj)
+          .then(res => {
+            console.log(res.data);
+            if (res.data == "Offline") {
+              this.$store.commit("userLogout");
+              this.$router.push({
+                name: "Login"
+              });
+            } else if (res.data != "Fail") {
+              this.$Notice.info({
+                desc: "Update successfully!"
+              });
+            } else {
+              this.$Message.error("Update step failed.");
+            }
+          })
+          .catch(err => {
+            console.log(err.data);
+          });
+        this.modifyStep = false;
+      },
+
+
+      cancelModifyStep() {
+        this.modifyStep = false;
+      },
+    
 
     }
 
