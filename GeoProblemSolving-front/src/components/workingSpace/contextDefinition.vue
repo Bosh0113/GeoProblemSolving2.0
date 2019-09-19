@@ -80,6 +80,10 @@
   padding: 12px;
 }
 
+.subproject-back >>>.ivu-breadcrumb-item-link{
+  color:white;
+}
+
 .tool-panel {
   display: flex;
   height: auto;
@@ -183,7 +187,7 @@
             <!-- 需要修改样式 -->
             <div class="breadCrumb">
               <Breadcrumb>
-                <BreadcrumbItem :to="toSubProjectPage" style="color: white">Subproject</BreadcrumbItem>
+                <BreadcrumbItem :to="toSubProjectPage" class="subproject-back">Subproject</BreadcrumbItem>
                 <BreadcrumbItem style="color: white">Context definition & resources collection</BreadcrumbItem>
               </Breadcrumb>
             </div>
@@ -210,7 +214,7 @@
           <Modal v-model="modifyStep">
             <p slot="header" style="text-align:center">
               <Icon type="ios-information-circle"></Icon>
-              <span>Modify Step Name and Step Description</span>
+              <span>Modify step name and description</span>
             </p>
             <Form :label-width="120" label-position="left" :model="stepForm">
               <FormItem label="Step Name" prop="name">
@@ -1172,6 +1176,8 @@ export default {
             this.$Notice.info({
               desc: "Update successfully!"
             });
+            this.stepContent.name = this.stepForm.name;
+            this.stepContent.description = this.stepForm.description;
           } else {
             this.$Message.error("Update step failed.");
           }

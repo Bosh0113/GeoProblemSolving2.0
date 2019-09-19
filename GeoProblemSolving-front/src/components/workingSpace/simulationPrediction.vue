@@ -39,6 +39,9 @@
   background-color: #19be6b;
   color: white;
 }
+.subproject-back >>>.ivu-breadcrumb-item-link{
+  color:white;
+}
 </style>
 <template>
   <div style="background-color:#e8eaec;height:auto">
@@ -51,7 +54,7 @@
             <Col span="6" style="height:40px;">
               <Breadcrumb>
                 <!-- <BreadcrumbItem :to="toProjectPage">Project</BreadcrumbItem> -->
-                <BreadcrumbItem :to="toSubProjectPage" style="color:white">Subproject</BreadcrumbItem>
+                <BreadcrumbItem :to="toSubProjectPage"  class="subproject-back">Subproject</BreadcrumbItem>
                 <BreadcrumbItem style="color:white">Simulation and prediction</BreadcrumbItem>
               </Breadcrumb>
             </Col>

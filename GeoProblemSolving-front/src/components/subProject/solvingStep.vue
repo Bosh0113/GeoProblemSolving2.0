@@ -501,7 +501,7 @@ export default {
               icon: "circle"
             },
             {
-              name: "Visualization & Representation",
+              name: "Visualization & representation",
               icon: "circle"
             },
             {
@@ -545,7 +545,7 @@ export default {
                 name: "Simulation/Prediction"
               },
               {
-                name: "Visualization & Representation"
+                name: "Visualization & representation"
               },
               {
                 name: "Decision-making & management"
@@ -693,7 +693,7 @@ export default {
       } else if (category == 5) {
         type = "Simulation/Prediction";
       } else if (category == 6) {
-        type = "Visualization & Representation";
+        type = "Visualization & representation";
       } else if (category == 7) {
         type = "Decision-making & management";
       }
@@ -713,7 +713,7 @@ export default {
         category = 4;
       } else if (type == "Simulation/Prediction") {
         category = 5;
-      } else if (type == "Visualization & Representation") {
+      } else if (type == "Visualization & representation") {
         category = 6;
       } else if (type == "Decision-making & management") {
         category = 7;
