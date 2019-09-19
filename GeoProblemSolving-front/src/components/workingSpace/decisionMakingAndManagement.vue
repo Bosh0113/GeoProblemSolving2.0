@@ -49,75 +49,98 @@
           <Row>
             <!-- 需要修改样式 -->
             <Col span="6" style="height:40px;">
-            <Breadcrumb>
-              <!-- <BreadcrumbItem :to="toProjectPage">Project</BreadcrumbItem> -->
-                <BreadcrumbItem :to="toSubProjectPage">Subproject</BreadcrumbItem>
-                <BreadcrumbItem>Decision-making and Management</BreadcrumbItem>
-            </Breadcrumb>
+              <Breadcrumb>
+                <!-- <BreadcrumbItem :to="toProjectPage">Project</BreadcrumbItem> -->
+                <BreadcrumbItem :to="toSubProjectPage" style="color:white">Subproject</BreadcrumbItem>
+                <BreadcrumbItem style="color:white">Decision-making and Management</BreadcrumbItem>
+              </Breadcrumb>
             </Col>
-            <Col span="12" style="text-align:center;font-size:1.5rem;height:20px;color:white;margin-top:1%">
-                <strong>{{stepInfo.name}}</strong>
-                <p style="font-size:0.8rem;margin-top:5px;">{{stepInfo.description}}</p>
+            <Col
+              span="12"
+              style="text-align:center;font-size:1.5rem;height:20px;color:white;margin-top:1%"
+            >
+              <strong>{{stepInfo.name}}</strong>
+              <p style="font-size:0.8rem;margin-top:5px;">{{stepInfo.description}}</p>
             </Col>
           </Row>
         </div>
       </div>
     </Row>
     <div style="margin-top:50px;padding:15px">
-        <Row>
-            <Col span="24">
-                <div style="margin-left:15px">
-                    <Card shadow>
-                        <div :style="{height:sidebarHeight+1+'px'}">
-                            <Tabs value="decision">
-                                <TabPane label="Decision-making" name="decision" icon="md-paper">
-                                    <div :style="{height:sidebarHeight- 50 +'px'}">
-                                      <vue-scroll :ops="ops">
-                                      <Col span="8" v-for="(tool,index) in decisionToolSet" :key="index">
-                                          <Card dis-hover style="min-width:200px;">
-                                              <h3 slot="title">{{tool.title}}</h3>
-                                              <div style="width:60%;display:inline-block;cursor: pointer;" @click="enterTheme(tool.url)">
-                                                  <div class="imgBox">
-                                                      <img :src="tool.img">
-                                                  </div>
-                                              </div>
-                                              <Button class="fileBtnHoverGreen" shape="circle" icon="md-exit" style="margin: -150px 0 0 25px;" size="large" @click="enterTheme(tool.url)"></Button>
-                                              <div style="height:80px;">
-                                                  <span class="itemDesc" :title="tool.description">{{tool.description}}</span>
-                                              </div>
-                                          </Card>
-                                      </Col>
-                                      </vue-scroll>
-                                    </div>
-                                </TabPane>
-                                <TabPane label="Management" name="management" icon="md-checkmark-circle-outline">
-                                    <div :style="{height:sidebarHeight- 50 +'px'}">
-                                      <vue-scroll :ops="ops">
-                                      <Col span="8" v-for="(tool,index) in managementToolSet" :key="index">
-                                          <Card dis-hover style="min-width:200px;">
-                                              <h3 slot="title">{{tool.title}}</h3>
-                                              <div style="width:60%;display:inline-block;cursor: pointer;" @click="enterTheme(tool.url)">
-                                                  <div class="imgBox">
-                                                      <img :src="tool.img">
-                                                  </div>
-                                              </div>
-                                              <Button class="fileBtnHoverGreen" shape="circle" icon="md-exit" style="margin: -150px 0 0 25px;" size="large" @click="enterTheme(tool.url)"></Button>
-                                              <div style="height:80px;">
-                                                  <span class="itemDesc" :title="tool.description">{{tool.description}}</span>
-                                              </div>
-                                          </Card>
-                                      </Col>
-                                      </vue-scroll>
-                                    </div>
-                                </TabPane>
-                            </Tabs>
-                        </div>
-                    </Card>
-                </div>
-            </Col>
-        </Row>
+      <Row>
+        <Col span="24">
+          <div style="margin-left:15px">
+            <Card shadow>
+              <div :style="{height:sidebarHeight+1+'px'}">
+                <Tabs value="decision">
+                  <TabPane label="Decision-making" name="decision" icon="md-paper">
+                    <div :style="{height:sidebarHeight- 50 +'px'}">
+                      <vue-scroll :ops="ops">
+                        <Col span="8" v-for="(tool,index) in decisionToolSet" :key="index">
+                          <Card dis-hover style="min-width:200px;">
+                            <h3 slot="title">{{tool.title}}</h3>
+                            <div
+                              style="width:60%;display:inline-block;cursor: pointer;"
+                              @click="enterTheme(tool.url)"
+                            >
+                              <div class="imgBox">
+                                <img :src="tool.img" />
+                              </div>
+                            </div>
+                            <Button
+                              class="fileBtnHoverGreen"
+                              shape="circle"
+                              icon="md-exit"
+                              style="margin: -150px 0 0 25px;"
+                              size="large"
+                              @click="enterTheme(tool.url)"
+                            ></Button>
+                            <div style="height:80px;">
+                              <span class="itemDesc" :title="tool.description">{{tool.description}}</span>
+                            </div>
+                          </Card>
+                        </Col>
+                      </vue-scroll>
+                    </div>
+                  </TabPane>
+                  <TabPane label="Management" name="management" icon="md-checkmark-circle-outline">
+                    <div :style="{height:sidebarHeight- 50 +'px'}">
+                      <vue-scroll :ops="ops">
+                        <Col span="8" v-for="(tool,index) in managementToolSet" :key="index">
+                          <Card dis-hover style="min-width:200px;">
+                            <h3 slot="title">{{tool.title}}</h3>
+                            <div
+                              style="width:60%;display:inline-block;cursor: pointer;"
+                              @click="enterTheme(tool.url)"
+                            >
+                              <div class="imgBox">
+                                <img :src="tool.img" />
+                              </div>
+                            </div>
+                            <Button
+                              class="fileBtnHoverGreen"
+                              shape="circle"
+                              icon="md-exit"
+                              style="margin: -150px 0 0 25px;"
+                              size="large"
+                              @click="enterTheme(tool.url)"
+                            ></Button>
+                            <div style="height:80px;">
+                              <span class="itemDesc" :title="tool.description">{{tool.description}}</span>
+                            </div>
+                          </Card>
+                        </Col>
+                      </vue-scroll>
+                    </div>
+                  </TabPane>
+                </Tabs>
+              </div>
+            </Card>
+          </div>
+        </Col>
+      </Row>
     </div>
-    </div>
+  </div>
 </template>
 <script>
 export default {
@@ -129,6 +152,7 @@ export default {
   data() {
     return {
       stepId: this.$route.params.id,
+      toSubProjectPage: "/project/" + this.$route.params.subid + "/subproject",
       stepInfo: {
         name: ""
       },
@@ -140,7 +164,7 @@ export default {
           title: "Online-SAGA",
           description:
             "SAGA stands for System for Automated Geoscientific Analyses. SAGA GIS has been developed by a small group of developers primarily based in Germany. Most past and current SAGA developments come from the team around J. Böhner and O. Conrad, both are now working at the Institute of Geography, Section for Physical Geography, Klimacampus and University of Hamburg, Germany."
-        },
+        }
       ],
       managementToolSet: [
         {
@@ -149,7 +173,7 @@ export default {
           title: "Jupyter",
           description:
             "Project Jupyter exists to develop open-source software, open-standards, and services for interactive computing across dozens of programming languages."
-        },
+        }
       ],
       ops: {
         bar: {

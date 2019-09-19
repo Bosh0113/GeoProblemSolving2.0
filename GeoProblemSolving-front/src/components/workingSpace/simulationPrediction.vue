@@ -49,83 +49,109 @@
           <Row>
             <!-- 需要修改样式 -->
             <Col span="6" style="height:40px;">
-            <Breadcrumb>
-              <!-- <BreadcrumbItem :to="toProjectPage">Project</BreadcrumbItem> -->
-                <BreadcrumbItem :to="toSubProjectPage">Subproject</BreadcrumbItem>
-                <BreadcrumbItem>Simulation and prediction</BreadcrumbItem>
-            </Breadcrumb>
+              <Breadcrumb>
+                <!-- <BreadcrumbItem :to="toProjectPage">Project</BreadcrumbItem> -->
+                <BreadcrumbItem :to="toSubProjectPage" style="color:white">Subproject</BreadcrumbItem>
+                <BreadcrumbItem style="color:white">Simulation and prediction</BreadcrumbItem>
+              </Breadcrumb>
             </Col>
-            <Col span="12" style="text-align:center;font-size:1.5rem;height:20px;color:white;margin-top:1%">
-                <strong>{{stepInfo.name}}</strong>
-                <p style="font-size:0.8rem;margin-top:5px;">{{stepInfo.description}}</p>
+            <Col
+              span="12"
+              style="text-align:center;font-size:1.5rem;height:20px;color:white;margin-top:1%"
+            >
+              <strong>{{stepInfo.name}}</strong>
+              <p style="font-size:0.8rem;margin-top:5px;">{{stepInfo.description}}</p>
             </Col>
           </Row>
         </div>
       </div>
     </Row>
     <div style="margin-top:50px;padding:15px">
-        <Row>
-            <Col span="7" :style="{height:sidebarHeight+40+'px'}">
-                <Card shadow>
-                    <p slot="title"><Icon type="ios-paper" />  Data</p>
-                    <div :style="{height:sidebarHeight-50+'px'}">
-                        <h3>Data list</h3>
-                    </div>
-                </Card>
-            </Col>
-            <Col span="17">
-                <div style="margin-left:15px">
-                    <Card shadow>
-                        <div :style="{height:sidebarHeight+1+'px'}">
-                            <Tabs value="thematic">
-                                <TabPane label="Thematic Models" name="thematic" icon="md-sunny">
-                                    <Row :gutter="16">
-                                        <div :style="{height:sidebarHeight-55 +'px'}">
-                                            <vue-scroll :ops="ops">
-                                            <Col span="8" v-for="(model,index) in themeModels" :key="index">
-                                                <Card dis-hover style="min-width:200px;">
-                                                    <h3 slot="title">{{model.title}}</h3>
-                                                    <div style="width:60%;display:inline-block;cursor: pointer;" @click="enterTheme(model.url)">
-                                                        <div class="imgBox">
-                                                            <img :src="model.img">
-                                                        </div>
-                                                    </div>
-                                                    <Button class="fileBtnHoverGreen" shape="circle" icon="md-exit" style="margin: -150px 0 0 25px;" size="large" @click="enterTheme(model.url)"></Button>
-                                                    <div style="height:80px;">
-                                                        <span class="itemDesc" :title="model.description">{{model.description}}</span>
-                                                    </div>
-                                                </Card>
-                                            </Col>
-                                            </vue-scroll>
-                                        </div>
-                                    </Row>
-                                </TabPane>
-                                <TabPane label="Customize Model" name="customize" icon="md-construct">
-                                    <h3 style="display:inline-block">Deploy your model:</h3>
-                                    <a href="http://106.14.78.235:8060/index" style="margin-left:10px" target="_blank">Model Service Container</a>
-                                </TabPane>
-                                <TabPane label="Model Integration" name="integration" icon="md-analytics">
-                                    <Row>
-                                        <Col span="8">
-                                        <Card >
-                                            <h3 slot="title">Integration Tool</h3>
-                                            <div @click="enterTheme('/GeoProblemSolving/Collaborative/LogicalModel/index.html?groupID='+stepId)">
-                                            <div class="imgBox" style="cursor: pointer;">
-                                                <img src="http://94.191.49.160:8080/GeoProblemSolving/resource/subProjectUpload/integration379564.png">
-                                            </div>
-                                            </div>
-                                        </Card>
-                                        </Col>
-                                    </Row>
-                                </TabPane>
-                            </Tabs>
-                        </div>
-                    </Card>
-                </div>
-            </Col>
-        </Row>
+      <Row>
+        <Col span="7" :style="{height:sidebarHeight+40+'px'}">
+          <Card shadow>
+            <p slot="title">
+              <Icon type="ios-paper" />Data
+            </p>
+            <div :style="{height:sidebarHeight-50+'px'}">
+              <h3>Data list</h3>
+            </div>
+          </Card>
+        </Col>
+        <Col span="17">
+          <div style="margin-left:15px">
+            <Card shadow>
+              <div :style="{height:sidebarHeight+1+'px'}">
+                <Tabs value="thematic">
+                  <TabPane label="Thematic Models" name="thematic" icon="md-sunny">
+                    <Row :gutter="16">
+                      <div :style="{height:sidebarHeight-55 +'px'}">
+                        <vue-scroll :ops="ops">
+                          <Col span="8" v-for="(model,index) in themeModels" :key="index">
+                            <Card dis-hover style="min-width:200px;">
+                              <h3 slot="title">{{model.title}}</h3>
+                              <div
+                                style="width:60%;display:inline-block;cursor: pointer;"
+                                @click="enterTheme(model.url)"
+                              >
+                                <div class="imgBox">
+                                  <img :src="model.img" />
+                                </div>
+                              </div>
+                              <Button
+                                class="fileBtnHoverGreen"
+                                shape="circle"
+                                icon="md-exit"
+                                style="margin: -150px 0 0 25px;"
+                                size="large"
+                                @click="enterTheme(model.url)"
+                              ></Button>
+                              <div style="height:80px;">
+                                <span
+                                  class="itemDesc"
+                                  :title="model.description"
+                                >{{model.description}}</span>
+                              </div>
+                            </Card>
+                          </Col>
+                        </vue-scroll>
+                      </div>
+                    </Row>
+                  </TabPane>
+                  <TabPane label="Customize Model" name="customize" icon="md-construct">
+                    <h3 style="display:inline-block">Deploy your model:</h3>
+                    <a
+                      href="http://106.14.78.235:8060/index"
+                      style="margin-left:10px"
+                      target="_blank"
+                    >Model Service Container</a>
+                  </TabPane>
+                  <TabPane label="Model Integration" name="integration" icon="md-analytics">
+                    <Row>
+                      <Col span="8">
+                        <Card>
+                          <h3 slot="title">Integration Tool</h3>
+                          <div
+                            @click="enterTheme('/GeoProblemSolving/Collaborative/LogicalModel/index.html?groupID='+stepId)"
+                          >
+                            <div class="imgBox" style="cursor: pointer;">
+                              <img
+                                src="http://94.191.49.160:8080/GeoProblemSolving/resource/subProjectUpload/integration379564.png"
+                              />
+                            </div>
+                          </div>
+                        </Card>
+                      </Col>
+                    </Row>
+                  </TabPane>
+                </Tabs>
+              </div>
+            </Card>
+          </div>
+        </Col>
+      </Row>
     </div>
-    </div>
+  </div>
 </template>
 <script>
 export default {
@@ -137,6 +163,7 @@ export default {
   data() {
     return {
       stepId: this.$route.params.id,
+      toSubProjectPage: "/project/" + this.$route.params.subid + "/subproject",
       stepInfo: {
         name: ""
       },

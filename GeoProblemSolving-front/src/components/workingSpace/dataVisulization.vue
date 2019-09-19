@@ -49,59 +49,70 @@
           <Row>
             <!-- 需要修改样式 -->
             <Col span="6" style="height:40px;">
-            <Breadcrumb>
-              <!-- <BreadcrumbItem :to="toProjectPage">Project</BreadcrumbItem> -->
-                <BreadcrumbItem :to="toSubProjectPage">Subproject</BreadcrumbItem>
-                <BreadcrumbItem>Data visualization and result representation</BreadcrumbItem>
-            </Breadcrumb>
+              <Breadcrumb>
+                <!-- <BreadcrumbItem :to="toProjectPage">Project</BreadcrumbItem> -->
+                <BreadcrumbItem :to="toSubProjectPage" style="color:white">Subproject</BreadcrumbItem>
+                <BreadcrumbItem style="color:white">Data visualization and result representation</BreadcrumbItem>
+              </Breadcrumb>
             </Col>
-            <Col span="12" style="text-align:center;font-size:1.5rem;height:20px;color:white;margin-top:1%">
-                <strong>{{stepInfo.name}}</strong>
-                <p style="font-size:0.8rem;margin-top:5px;">{{stepInfo.description}}</p>
+            <Col
+              span="12"
+              style="text-align:center;font-size:1.5rem;height:20px;color:white;margin-top:1%"
+            >
+              <strong>{{stepInfo.name}}</strong>
+              <p style="font-size:0.8rem;margin-top:5px;">{{stepInfo.description}}</p>
             </Col>
           </Row>
         </div>
       </div>
     </Row>
     <div style="margin-top:50px;padding:15px">
-        <Row>
-            <Col span="7" :style="{height:sidebarHeight+40+'px'}">
-                <Card shadow>
-                    <p slot="title"><Icon type="ios-paper" />  Data</p>
-                    <div :style="{height:sidebarHeight-50+'px'}">
-                        <h3>Data list</h3>
+      <Row>
+        <Col span="7" :style="{height:sidebarHeight+40+'px'}">
+          <Card shadow>
+            <p slot="title">
+              <Icon type="ios-paper" />Data
+            </p>
+            <div :style="{height:sidebarHeight-50+'px'}">
+              <h3>Data list</h3>
+            </div>
+          </Card>
+        </Col>
+        <Col span="17">
+          <div style="margin-left:15px">
+            <Card shadow>
+              <div :style="{height:sidebarHeight+1+'px'}">
+                <Tabs value="chart">
+                  <TabPane label="Chart & Table" name="chart" icon="md-pie">
+                    <div :style="{height:sidebarHeight- 50 +'px'}">
+                      <!-- <iframe :src="'/GeoProblemSolving/charts'" style="height:100%;width:100%;"></iframe> -->
+                      <iframe :src="'/charts'" style="height:100%;width:100%;"></iframe>
                     </div>
-                </Card>
-            </Col>
-            <Col span="17">
-                <div style="margin-left:15px">
-                    <Card shadow>
-                        <div :style="{height:sidebarHeight+1+'px'}">
-                            <Tabs value="chart">
-                                <TabPane label="Chart & Table" name="chart" icon="md-pie">
-                                    <div :style="{height:sidebarHeight- 50 +'px'}">
-                                      <!-- <iframe :src="'/GeoProblemSolving/charts'" style="height:100%;width:100%;"></iframe> -->
-                                      <iframe :src="'/charts'" style="height:100%;width:100%;"></iframe>
-                                    </div>
-                                </TabPane>
-                                <TabPane label="Earth & Map" name="earth" icon="md-globe">
-                                    <div :style="{height:sidebarHeight- 50 +'px'}">
-                                      <iframe :src="'/GeoProblemSolving/Collaborative/3DEarth/index.html'" style="height:100%;width:100%;"></iframe>
-                                    </div>
-                                </TabPane>
-                                <TabPane label="3D Model" name="3dModel" icon="md-cube">
-                                    <div :style="{height:sidebarHeight- 50 +'px'}">
-                                      <iframe :src="'/GeoProblemSolving/Collaborative/3DmodelViewer/index.html?groupID='+stepId" style="height:100%;width:100%;"></iframe>
-                                    </div>
-                                </TabPane>
-                            </Tabs>
-                        </div>
-                    </Card>
-                </div>
-            </Col>
-        </Row>
+                  </TabPane>
+                  <TabPane label="Earth & Map" name="earth" icon="md-globe">
+                    <div :style="{height:sidebarHeight- 50 +'px'}">
+                      <iframe
+                        :src="'/GeoProblemSolving/Collaborative/3DEarth/index.html'"
+                        style="height:100%;width:100%;"
+                      ></iframe>
+                    </div>
+                  </TabPane>
+                  <TabPane label="3D Model" name="3dModel" icon="md-cube">
+                    <div :style="{height:sidebarHeight- 50 +'px'}">
+                      <iframe
+                        :src="'/GeoProblemSolving/Collaborative/3DmodelViewer/index.html?groupID='+stepId"
+                        style="height:100%;width:100%;"
+                      ></iframe>
+                    </div>
+                  </TabPane>
+                </Tabs>
+              </div>
+            </Card>
+          </div>
+        </Col>
+      </Row>
     </div>
-    </div>
+  </div>
 </template>
 <script>
 export default {
@@ -113,10 +124,11 @@ export default {
   data() {
     return {
       stepId: this.$route.params.id,
+      toSubProjectPage: "/project/" + this.$route.params.subid + "/subproject",
       stepInfo: {
         name: ""
       },
-      sidebarHeight: 800,
+      sidebarHeight: 800
     };
   },
   methods: {
@@ -147,7 +159,7 @@ export default {
           }
         })
         .catch();
-    },
+    }
   }
 };
 </script>

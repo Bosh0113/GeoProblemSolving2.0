@@ -23,7 +23,6 @@ const routes = [{
     { path: 'project/:subid/workspace/simulationprediction/:id', name: 'simulationPrediction', component: resolve => (require(["@/components/workingSpace/simulationPrediction"], resolve)) },
     { path: 'project/:subid/workspace/datavisulization/:id', name: 'dataVisulization', component: resolve => (require(["@/components/workingSpace/dataVisulization"], resolve)) },
     { path: 'project/:subid/workspace/decisionmakingandmanagement/:id', name: 'decisionMakingAndManagement', component: resolve => (require(["@/components/workingSpace/decisionMakingAndManagement"], resolve)) },
-    { path: 'subproject/:id/online', name: 'online', component: resolve => (require(["@/components/workingSpace/participantvisitor"], resolve)) },
     {
       path: 'project/:id/subproject/', name: 'subproject', component: resolve => (require(["@/components/subProject/subprojectNav"], resolve)), children: [
         { path: '', redirect: 'info' },

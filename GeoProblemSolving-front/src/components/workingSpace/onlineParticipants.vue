@@ -670,10 +670,10 @@
     },
     updated: function () {
       this.$nextTick(function () {
-        var div = document.getElementById("contentBody");
-        var div2 = document.getElementById("searchmessageList");
-        div.scrollTop = div.scrollHeight - 60;
-        div2.scrollTop = div.scrollHeight;
+        // var div = document.getElementById("contentBody");
+        // var div2 = document.getElementById("searchmessageList");
+        // div.scrollTop = div.scrollHeight - 60;
+        // div2.scrollTop = div.scrollHeight;
       });
     },
 

@@ -317,22 +317,47 @@ export default {
     },
     cancel() {},
     // 进入具体的step页面
-    enterStep(type, moduleId) {
+    enterStep(type, stepId) {
       if (type == 0) {
         this.$router.push({
           name: "contextDefinition",
-          params: { id: moduleId }
+          params: { subid: this.subProjectInfo.subProjectId, id: stepId }
         });
       } else if (type == 1) {
-        this.$router.push({ name: "dataProcessing", params: { id: moduleId } });
+        this.$router.push({
+          name: "dataProcessing",
+          params: { subid: this.subProjectInfo.subProjectId, id: stepId }
+        });
       } else if (type == 2) {
-        this.$router.push({ name: "modelProcess", params: { id: moduleId } });
+        this.$router.push({
+          name: "modelProcess",
+          params: { subid: this.subProjectInfo.subProjectId, id: stepId }
+        });
       } else if (type == 3) {
-        this.$router.push({ name: "modelEvalution", params: { id: moduleId } });
+        this.$router.push({
+          name: "modelEvalution",
+          params: { subid: this.subProjectInfo.subProjectId, id: stepId }
+        });
       } else if (type == 4) {
+        this.$router.push({
+          name: "quantitativeAndQualitative",
+          params: { subid: this.subProjectInfo.subProjectId, id: stepId }
+        });
       } else if (type == 5) {
+        this.$router.push({
+          name: "simulationPrediction",
+          params: { subid: this.subProjectInfo.subProjectId, id: stepId }
+        });
       } else if (type == 6) {
+        this.$router.push({
+          name: "dataVisulization",
+          params: { subid: this.subProjectInfo.subProjectId, id: stepId }
+        });
       } else if (type == 7) {
+        this.$router.push({
+          name: "decisionMakingAndManagement",
+          params: { subid: this.subProjectInfo.subProjectId, id: stepId }
+        });
       }
     },
     getProcessSteps() {
@@ -341,7 +366,7 @@ export default {
         this.subProjectInfo.solvingProcess == undefined ||
         this.subProjectInfo.solvingProcess.length == 0
       ) {
-        // 为了兼容
+        // 为了兼容Module
         this.axios
           .get(
             "/GeoProblemSolving/module/inquiry" +
@@ -834,13 +859,13 @@ export default {
     resourceRender(item) {
       return item.type + " - " + item.name;
     },
-    getStepInfo(moduleId) {
+    getStepInfo(stepId) {
       this.axios
         .get(
-          "/GeoProblemSolving/module/inquiry" +
-            "?key=moduleId" +
+          "/GeoProblemSolving/step/inquiry" +
+            "?key=stepId" +
             "&value=" +
-            moduleId
+            stepId
         )
         .then(res => {
           if (res.data == "Offline") {
@@ -866,8 +891,9 @@ export default {
       Step["name"] = this.formValidate1.stepTitle;
       Step["type"] = this.formValidate1.stepType;
       Step["description"] = this.formValidate1.result;
+      Step["subProjectId"] = this.subProjectInfo.subProjectId;
       Step["creator"] = this.$store.getters.userId;
-      Step["subProjectId"] = this.$route.params.id;
+      Step["content"] = {};
       this.axios
         .post("/GeoProblemSolving/step/create", Step)
         .then(res => {
@@ -978,7 +1004,7 @@ export default {
         // create step node
         let newStepNode = {
           id: this.processStructure.length,
-          stepID: "",
+          stepID: id,
           name: this.formValidate1.stepTitle,
           category: nodeCategory,
           last: lastNode,
@@ -1023,7 +1049,7 @@ export default {
       }
     },
     // 数据继承-----------------------------------------
-    copyResource() {},
+    copyResource(stepId) {},
     removeStep() {
       if (this.selectedStep.length == 1) {
         this.delModal = true;
@@ -1045,12 +1071,15 @@ export default {
       // 删除step
       this.axios
         .get(
-          "/GeoProblemSolving/module/delete" +
-            "?moduleId=" +
+          "/GeoProblemSolving/step/delete" +
+            "?stepId=" +
             this.processStructure[currentIndex].stepID
         )
         .then(res => {
           if (res.data === "Success") {
+            this.$Notice.info({
+              desc: "Remove successfully! "
+            });
           }
         })
         .catch(err => {
@@ -1155,7 +1184,6 @@ export default {
           console.log(err.data);
         });
     },
-    toWorkingSpace() {}
     // gotoPersonalSpace(id) {
     //   if (id == this.$store.getters.userId) {
     //     this.$router.push({ name: "PersonalPage" });
