@@ -36,10 +36,10 @@ public class StepController {
     }
 
     @RequestMapping(value = "/delete", method = RequestMethod.GET)
-    public String deleteStep(@RequestParam("StepId") String stepId){
+    public String deleteStep(@RequestParam("stepId") String stepId){
         StepDaoImpl stepDao = new StepDaoImpl(mongoTemplate);
         try {
-            stepDao.deleteStep("StepId",stepId);
+            stepDao.deleteStep("stepId",stepId);
             return "Success";
         }catch (Exception e){
             return "Fail";

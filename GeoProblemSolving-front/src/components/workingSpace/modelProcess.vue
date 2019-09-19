@@ -117,6 +117,33 @@
       min-height: 300px
   }
 
+    .stepName{   
+    text-align:center;
+    font-size:1.2rem;
+    height:20px;
+    color:white;
+  }
+  .stepName p{  
+    font-size:1rem;
+    height:20px;
+    color:white;
+  }
+
+  .onlineListBtn{
+    position:absolute;
+    top:70%;
+    right:15%;
+    /* width: 100px */
+  }
+
+   .pro-tab>>>.ivu-modal-footer {
+    border-top:none;
+    padding-bottom:12px;
+    padding-right:18px ;
+  }
+  .pro-tab>>>.ivu-modal-body {
+    padding-bottom: 0;
+  }
 
 </style>
 <template>
@@ -128,18 +155,46 @@
         <div class="home_content">
           <Row>
             <!-- 需要修改样式 -->
-            <Col span="6" style="height:40px;">
-            <Breadcrumb>
-              <!-- <BreadcrumbItem :to="toProjectPage">Project</BreadcrumbItem> -->
+            <div  class="breadCrumb">
+              <Breadcrumb>
+                <!-- <BreadcrumbItem :to="toProjectPage">Project</BreadcrumbItem> -->
                 <BreadcrumbItem :to="toSubProjectPage">Subproject</BreadcrumbItem>
                 <BreadcrumbItem>Modeling for Geographic Process</BreadcrumbItem>
-            </Breadcrumb>
-            </Col>
-            
-            <Col span="12" style="text-align:center;font-size:1.5rem;height:20px;color:white;margin-top:1%">
-            <strong>Modeling for Geographic Process</strong>
-            </Col>
+              </Breadcrumb>
+            </div>
+
+            <div class="stepName">
+              <strong>{{stepContent.name}}</strong>
+              <p>{{stepContent.description}}</p>              
+            </div>
+
+            <div class="onlineListBtn">
+              <Button  @click="drawerValue = true" type="default" ghost>Participants</Button>
+              <Button  @click="modifyStep = true" style="margin-left:20px" type="info" ghost>Modify Step</Button>
+            </div>
           </Row>
+          <Drawer title="Participants" :closable="false" v-model="drawerValue">
+            <online-participant :sub-project-id="subprojectId" :room-id="stepId"></online-participant>
+          </Drawer>
+          
+          <Modal v-model="modifyStep">
+            <p slot="header" style="text-align:center">
+              <Icon type="ios-information-circle"></Icon>
+              <span>Modify Step Name and Step Description</span>
+            </p>
+            <Form :label-width="120" label-position="left" :model="stepForm">
+              <FormItem label="Step Name" prop="name">
+                <Input v-model="stepForm.name" type="textarea" :autosize="{minRows: 1,maxRows: 3}" clearable />
+              </FormItem>
+              <FormItem label="Step Description" prop="description">
+                <Input v-model="stepForm.description" type="textarea" :autosize="{minRows: 1,maxRows: 3}" clearable />
+              </FormItem>
+            </Form>
+            <div slot="footer">
+              <Button @click="cancelModifyStep">Cancel</Button>
+              <Button type="primary" @click="submitModifyStep">Modify</Button>
+            </div>
+          </Modal>
          
         </div>
       </div>
@@ -154,35 +209,12 @@
               <div :style="{height:sidebarHeight+45+'px'}" style="margin:20px 1%">
                 <div class="tools">
                   <Card style=" height:100%;">
-                    <Tabs value="Description">
-                      <TabPane name="Description" icon="ios-brush" label="Description">
-                        <Form ref="modelProcessForm" :rules="dataProcessingValidate" :model="modelProcessForm" :label-width="120" label-position="left" style="margin-top:15px" >
-                          <FormItem label="Model description" prop="description">
-                            <Input v-model="modelProcessForm.description" placeholder="Please enter the description of the model"
-                              type="textarea" :autosize="{minRows: 1,maxRows: 5}" clearable />
-                          </FormItem>
-                          <FormItem label="Main methods" prop="methods">
-                            <Input v-model="modelProcessForm.methods" placeholder="Please enter the main method"
-                              type="textarea" :autosize="{minRows: 1,maxRows: 5}" clearable />
-                          </FormItem>
-                          <FormItem label="Outcome description" prop="outcome">
-                            <Input v-model="modelProcessForm.outcome" placeholder="Please enter the outcome data description"
-                              type="textarea" :autosize="{minRows: 1,maxRows: 5}" clearable />
-                          </FormItem>
-                          <FormItem label="Others" prop="others">
-                            <Input v-model="modelProcessForm.others" placeholder="Please enter something to add" type="textarea"
-                              :autosize="{minRows: 1,maxRows: 5}" clearable />
-                          </FormItem>
-                          <FormItem>
-                            <Button @click="submit('modelProcessForm')">Submit</Button>
-                          </FormItem>
-                        </Form>
-                      </TabPane>
+                    <Tabs value="Data">
                       <TabPane name="Data" icon="ios-paper" label="Data">
                         <ul v-for="(item,index) in dataList" :key="index">
                           <li>{{item.name}}</li>
                         </ul>
-                      </TabPane>
+                      </TabPane>                     
                     </Tabs>
                   </Card>
                 </div>
@@ -315,7 +347,17 @@
         timer: null,
         jupyterLink:{
             path:'http://134.175.111.77/note'
-        }
+        },
+        
+        subprojectId:this.$route.params.subid,
+        stepContent:[],
+        drawerValue:false,
+
+        modifyStep:false,
+        stepForm: {          
+          name:"",
+          description:""
+        },
       };
     },
 
@@ -418,8 +460,10 @@
           .then(res => {
             //new id
             //ContextDefinition["stepId"] = res.data;
-            if(res.data[0].type === "modeling for geographic process"){
+            if(res.data[0].type === "modelProcess"){
                 this.modelProcessForm = res.data[0].content;
+                this.stepContent = res.data[0];
+                this.stepForm = res.data[0];
             }
             else{
                 this.$Notice.info({
@@ -430,6 +474,42 @@
             
           });
       },
+
+
+      submitModifyStep() {
+          let obj = new URLSearchParams();
+          obj.append("name", this.stepForm.name);
+          obj.append("description", this.stepForm.description);
+          obj.append("stepId", this.stepId);
+
+          this.axios
+            .post("/GeoProblemSolving/step/update", obj)
+            .then(res => {
+              console.log(res.data);
+              if (res.data == "Offline") {
+                this.$store.commit("userLogout");
+                this.$router.push({
+                  name: "Login"
+                });
+              } else if (res.data != "Fail") {
+                this.$Notice.info({
+                  desc: "Update successfully!"
+                });
+              } else {
+                this.$Message.error("Update step failed.");
+              }
+            })
+            .catch(err => {
+              console.log(err.data);
+            });
+          this.modifyStep = false;
+        },
+
+
+        cancelModifyStep() {
+          this.modifyStep = false;
+        },
+
 
         toolPanel(type) {
         // if (this.userRole != "Visitor") {

@@ -7,7 +7,7 @@
   /* member部分样式 */
   .memberPanel {
     width: 200px;
-    background-color: #515a6e;
+    /* background-color: rgba(0,0,0,0.1); */
   }
 
   .panelHeader {
@@ -26,7 +26,7 @@
     font-size: 20px;
     line-height: 20px;
     text-align: center;
-    color: white;
+    color:  #515a6e;;
   }
 
   .f_list {
@@ -384,13 +384,11 @@
 
 </style>
 <template>
-  <Row>
-    <Col span="24">
-    <div class="chatPanel" :style="{height:panelHeight+'px',width:panelWidth+'px'}">
+  <div>   
+    <!-- <div class="chatPanel" :style="{height:panelHeight+'px',width:panelWidth+'px'}"> -->
       <div class="memberPanel">
         <!-- 参与者 -->
         <div class="participants">
-          <h4>Participants</h4>
           <div>
             <Card v-for="(participant,index) in onlineParticipants" :key="'online' +index" style="margin:2.5%"
               :padding="5">
@@ -435,9 +433,8 @@
           </div>
         </div>
       </div>
-    </div>
-    </Col>
-  </Row>
+    <!-- </div>    -->
+  </div>
 </template>
 
 
@@ -449,6 +446,7 @@
     components: {
       Avatar
     },
+     props:["subProjectId","roomId"],
 
     data() {
       return {
@@ -467,7 +465,7 @@
         },
         // 原有的变量字段
         projectId: "",
-        subProjectId: this.$route.params.id,
+        // subProjectId: "",
         moduleId: "",
         participants: [],
         groups: [],
@@ -499,10 +497,9 @@
 
       this.initSize();
       this.participants = [];
-    
      
-      this.startWebSocket(this.subProjectId);
       this.getParticipants(this.subProjectId);
+      this.startWebSocket(this.roomId);
       
 
     },
@@ -642,6 +639,20 @@
         this.$set(this, "offlineParticipants", offline);
         this.$set(this, "onlineParticipants", online);
       }, 
+
+      getSubProjectId(id){
+         this.axios
+          .get(
+            "/GeoProblemSolving/step/inquiry/" +
+            "?key=stepId" +
+            "&value=" +
+            id
+          )
+          .then(res => {            
+            this.subProjectId = res.data[0].subProjectId;
+            console.log(this.subProjectId);
+          });
+      }
     },
 
     beforeDestroy() {
