@@ -221,6 +221,7 @@ export default {
   },
   created() {
     this.init();
+    this.subProjectInfo = this.$store.getters.subProject;
   },
   mounted() {
     window.addEventListener("resize", this.initSize);
@@ -1173,6 +1174,7 @@ export default {
             this.$store.commit("userLogout");
             this.$router.push({ name: "Login" });
           } else if (res.data != "Fail") {
+            this.$store.commit("setSubProjectInfo", res.data);
             this.$Notice.info({
               desc: "Update successfully!"
             });
