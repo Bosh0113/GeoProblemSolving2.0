@@ -155,7 +155,7 @@
                     </Tabs>
                 </div>
                 <div class="pro-content">
-                    <tab-content  :project-list = tabPageData @sendNotice="sendMessage"></tab-content >
+                    <tab-content  :project-list = tabPageData @sendNotice="sendMessage" :key="freshEle"></tab-content >
                 </div>
             </i-col>
 
@@ -199,20 +199,22 @@
                 ],
                 // user
                 userInfo:[],
-                UserState:false,
-
+                userState:false,
+                freshEle:0
             },
             mounted(){
                 //判断用户状态，如果登录，判断project权限，如果否，不判断
                 this.userInfo=JSON.parse(sessionStorage.getItem("userInfo"));
-                if( this.userInfo != null&&this.userInfo.UserState){
-                    this.UserState=true;
+                if( this.userInfo != null&&this.userInfo.userState){
+                    this.userState=true;
                     this.judgeMember(this.projectShowList);
                     this.tabPageData=Object.assign([],  this.currentProjectList);
+                    this.freshEle++;
                 }
                 else{
-                    this.UserState=false;
+                    this.userState=false;
                     this.tabPageData=Object.assign([], this.projectShowList);
+                    this.freshEle++;
                 }
                 window.onresize = () => {
                     return (() => {
@@ -232,6 +234,7 @@
                     if(type=="All"){
                         this.judgeMember(this.projectShowList);
                         this.tabPageData=Object.assign([],  this.currentProjectList);
+                        this.freshEle++;
                         this.totalCount=List.length;
                     }
                     else{
@@ -244,6 +247,7 @@
                     if(this.currentTab == "All" && index==1 && !this.userState){
                         this.judgeMember(this.projectShowList);
                         this.tabPageData=Object.assign([],  this.currentProjectList);
+                        this.freshEle++;
                         this.totalCount=List.length;
                     }
                     else {
@@ -252,27 +256,31 @@
                         if(this.userState){
                             userId = this.userInfo.userId;
                             for(let i = 0; i < this.userInfo.joinedProjects.length; i++) {
-                                joinedProjects.add(this.userInfo.joinedProjects[i].userId);
+                                joinedProjects.push(this.userInfo.joinedProjects[i].projectId);
                             }
                         }
                         axios
-                            .get("/GeoProblemSolving/project/inquiryByPage",{
-                                params:{
-                                    category:this.currentTab,
-                                    page:index,
-                                    pageSize:this.pageSize,
-                                    userId: userId,
-                                    joinedProjects:joinedProjects
-                                }
-                            })
+                            .get("/GeoProblemSolving/project/inquiryByPage"+
+                                    "?category="+this.currentTab+
+                                    "&page="+index+
+                                    "&pageSize="+this.pageSize+
+                                    "&userId="+userId+
+                                    "&joinedProjects="+joinedProjects)
                             .then(res => {
-                                if (res.data === "None") {
-                                    this.currentProjectList = [];
-                                } else {
-                                    this.judgeMember(res.data.projectList);
+                                if(res.data !="Fail") {
+                                    if (res.data === "None") {
+                                        this.currentProjectList = [];
+                                    }
+                                    else{
+                                        this.judgeMember(res.data.projectList);
+                                    }
+                                    this.tabPageData = Object.assign([], this.currentProjectList);
+                                    this.freshEle++;
+                                    this.totalCount=res.data.count;
                                 }
-                                this.tabPageData = Object.assign([], this.currentProjectList);
-                                this.totalCount=res.data.count;
+                                else{
+                                    console.log("Fail");
+                                }
                             })
                             .catch(err => {
                                 console.log(err.data);
@@ -283,7 +291,7 @@
                 judgeMember(list) {
                     let projectList = list;
                     //判断登录状态
-                    if(this.UserState == true){
+                    if(this.userState == true){
                         if (projectList.length != 0) {
                             for (var i = 0; i < projectList.length; i++) {
                                 let managerId = projectList[i].managerId;
@@ -328,10 +336,10 @@
                     }
                 },
                 newProject() {
-                    if (this.UserState == false) {
-                        window.location.href = "/GeoProblemSolving/projects/login"
+                    if (this.userState == false) {
+                        window.location.href = "/GeoProblemSolving/login"
                     } else {
-                        window.location.href = "/GeoProblemSolving/projects/newProject"
+                        window.location.href = "/GeoProblemSolving/newProject"
                     }
                 },
                 sendMessage(recipientId){

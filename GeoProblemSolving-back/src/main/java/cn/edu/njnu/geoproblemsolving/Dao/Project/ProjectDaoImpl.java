@@ -477,7 +477,7 @@ public class ProjectDaoImpl implements IProjectDao {
             // Manager
             Criteria criteriaManager = new Criteria();
             Query query;
-            if(userId != "") {
+            if(!userId.equals("")) {
                 criteriaManager = Criteria.where("managerId").is(userId);
                 if(category.equals("All")) {
                     query = new Query(new Criteria().orOperator(criteriaDiscoverable,criteriaPublic,criteriaManager));
@@ -514,7 +514,10 @@ public class ProjectDaoImpl implements IProjectDao {
             int totalPage = (int)Math.ceil((double) count/(double) pageSize);
             List<ProjectEntity> pagedProjects = new ArrayList<>();
             for (int i = 0; i < pageSize; i++){
-                pagedProjects.add(projectEntities.get((page-1) * pageSize + i));
+                int index = (page-1) * pageSize + i;
+                if(projectEntities.size()>index){
+                    pagedProjects.add(projectEntities.get(index));
+                }
             }
 
             JSONObject result = new JSONObject();
