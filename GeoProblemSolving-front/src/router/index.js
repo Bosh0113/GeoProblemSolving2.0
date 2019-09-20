@@ -19,7 +19,10 @@ const routes = [{
     { path: 'project/:subid/workspace/dataprocessing/:id', name: 'dataProcessing', component: resolve => (require(["@/components/workingSpace/dataProcessing"], resolve)) },
     { path: 'project/:subid/workspace/modelprocess/:id', name: 'modelProcess', component: resolve => (require(["@/components/workingSpace/modelProcess"], resolve)) },
     { path: 'project/:subid/workspace/modelevalution/:id', name: 'modelEvalution', component: resolve => (require(["@/components/workingSpace/modelEvalution"], resolve)) },
-    { path: 'subproject/:id/online', name: 'online', component: resolve => (require(["@/components/workingSpace/onlineParticipants"], resolve)) },
+    { path: 'project/:subid/workspace/quantitativeandqualitative/:id', name: 'quantitativeAndQualitative', component: resolve => (require(["@/components/workingSpace/quantitativeAndQualitative"], resolve)) },
+    { path: 'project/:subid/workspace/simulationprediction/:id', name: 'simulationPrediction', component: resolve => (require(["@/components/workingSpace/simulationPrediction"], resolve)) },
+    { path: 'project/:subid/workspace/datavisulization/:id', name: 'dataVisulization', component: resolve => (require(["@/components/workingSpace/dataVisulization"], resolve)) },
+    { path: 'project/:subid/workspace/decisionmakingandmanagement/:id', name: 'decisionMakingAndManagement', component: resolve => (require(["@/components/workingSpace/decisionMakingAndManagement"], resolve)) },
     {
       path: 'project/:id/subproject/', name: 'subproject', component: resolve => (require(["@/components/subProject/subprojectNav"], resolve)), children: [
         { path: '', redirect: 'info' },

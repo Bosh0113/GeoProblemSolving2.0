@@ -501,7 +501,6 @@
       this.getParticipants(this.subProjectId);
       this.startWebSocket(this.roomId);
       
-      console.log(this.subProjectId);
 
     },
 
@@ -546,7 +545,6 @@
                 });
               }
               this.$set(this, "participants", participantsTemp);
-              console.log(this.participants);
             }
           }
         });
@@ -575,13 +573,11 @@
             .split(",");
         
           this.onlineParticipants = members;
-          console.log(this.onlineParticipants);
           this.judgeonlineParticipant(members);
        
         } else if (data.type === "message") {
           //判断消息的发出者
           if (chatMsg.content != "") {
-            console.log(chatMsg);
             this.other_msglist.push(chatMsg);
             this.msglist.push(chatMsg);
             this.msgRecords.push(chatMsg);
@@ -642,8 +638,6 @@
         this.offlineParticipants = [];
         this.$set(this, "offlineParticipants", offline);
         this.$set(this, "onlineParticipants", online);
-        console.log(this.onlineparticipants);
-        console.log(this.offlineparticipants);
       }, 
 
       getSubProjectId(id){
@@ -676,10 +670,10 @@
     },
     updated: function () {
       this.$nextTick(function () {
-        var div = document.getElementById("contentBody");
-        var div2 = document.getElementById("searchmessageList");
-        div.scrollTop = div.scrollHeight - 60;
-        div2.scrollTop = div.scrollHeight;
+        // var div = document.getElementById("contentBody");
+        // var div2 = document.getElementById("searchmessageList");
+        // div.scrollTop = div.scrollHeight - 60;
+        // div2.scrollTop = div.scrollHeight;
       });
     },
 
