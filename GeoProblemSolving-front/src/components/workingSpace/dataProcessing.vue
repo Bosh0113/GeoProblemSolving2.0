@@ -239,8 +239,11 @@
                       <Tabs>
                         <TabPane label="Data Origin" name="origin" icon="md-home"></TabPane>
                         <TabPane label="UDX Schema" name="udx" icon="md-home">
-                          <vue-markdown>this is the default slot</vue-markdown>
+                          <!-- <mark-down> </mark-down> -->
                           <!-- <pre class="brush: html"><button></button></pre> -->
+                          <template>
+                            <mark-down />
+                          </template>
                         </TabPane>
                       </Tabs>
                     </div>
@@ -282,21 +285,23 @@
   import echarts from "echarts";
   import folderTree from "../resources/folderTree";
   import onlineParticipant from "./onlineParticipants";
-  import VueMarkdown from 'vue-markdown';
-  import markDown from "./../../mock/markdown.js";
+  // import VueMarkdown from 'vue-markdown';
+  // import markDown2 from "./../../mock/markdown.js";
+  // import markDown from "./markdown";
+  import MarkDown from 'vue-meditor'
   export default {
     components: {
       VueFlowy,
       Avatar,
       folderTree,
       onlineParticipant,
-      VueMarkdown,
-      markDown
+      // VueMarkdown,
+      MarkDown
     },
     data() {
       return {
         userInfo:"",
-        contextDefinitionId: this.$route.params.id,//上一步的ID 和这一步的id？？
+        contextDefinitionId: this.$route.params.id,
         fileList:[],
         dataList:[],
         sidebarHeight: 800,
@@ -416,10 +421,12 @@
       cancelModifyStep() {
         this.modifyStep = false;
       },
-    
-
     }
 
     
   };
 </script>
+
+  
+
+
