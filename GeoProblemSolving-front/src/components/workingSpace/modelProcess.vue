@@ -303,12 +303,14 @@ import * as socketApi from "./../../api/socket";
 import Avatar from "vue-avatar";
 import echarts from "echarts";
 import folderTree from "../resources/folderTree";
+import onlineParticipant from "./onlineParticipants";
 
 export default {
   components: {
     VueFlowy,
     Avatar,
-    folderTree
+    folderTree,
+    onlineParticipant,
   },
   data() {
     return {
@@ -529,7 +531,7 @@ export default {
     toolPanel(type) {
       // if (this.userRole != "Visitor") {
       this.axios
-        .get("/GeoProblemSolving/user/state")
+        .post("/GeoProblemSolving/user/state")
         .then(res => {
           if (!res.data) {
             this.$store.commit("userLogout");

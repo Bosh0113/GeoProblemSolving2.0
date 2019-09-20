@@ -1196,7 +1196,7 @@ export default {
     toolPanel(type) {
       // if (this.userRole != "Visitor") {
       this.axios
-        .get("/GeoProblemSolving/user/state")
+        .post("/GeoProblemSolving/user/state")
         .then(res => {
           if (!res.data) {
             this.$store.commit("userLogout");

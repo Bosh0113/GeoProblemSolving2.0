@@ -317,7 +317,7 @@
                 </div>
                 <div v-else-if="showMenuItem=='subProjects'" style="height: inherit;min-height: fit-content;">
                     <div style="background:#eee;padding: 10px;height: inherit;min-height: fit-content;">
-                        <Card :bordered="false" style="height: -webkit-fill-available;min-height: fit-content;">
+                        <Card :bordered="false" dis-hover style="height: -webkit-fill-available;min-height: fit-content;">
                                 <h1 slot="title" class="projectMenuItemTitle">Subprojects</h1>
                                 <div slot="extra">
                                     <Poptip trigger="hover" content="Create subproject" placement="left">
@@ -387,7 +387,7 @@
                 </div>
                 <div v-else-if="showMenuItem=='resources'" style="height: inherit;min-height: fit-content;">
                     <div style="background:#eee;padding: 10px;height: inherit;min-height: fit-content;">
-                        <Card :bordered="false" style="height: -webkit-fill-available;min-height: 565px;min-height: fit-content;">
+                        <Card :bordered="false" dis-hover style="height: -webkit-fill-available;min-height: 565px;min-height: fit-content;">
                             <h1 slot="title" class="projectMenuItemTitle">Resources</h1>
                             <div :style="{height:subProjectsCSS}">
                                 <child-folder
@@ -695,8 +695,13 @@
             components: {
                 'avatar': VueAvatar.Avatar
             },
-            mounted() {
+            created(){
                 this.userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
+                if(!this.userInfo.userState){
+                    window.location.href='/GeoProblemSolving/login';
+                }
+            },
+            mounted() {
                 this.userEnter();
                 this.resizeContent();
                 this.getAllSubProjects();

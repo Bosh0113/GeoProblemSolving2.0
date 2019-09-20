@@ -199,7 +199,7 @@ export default {
     next(vm=>{
       $.ajax({
         url: "/GeoProblemSolving/user/state",
-        type: "GET",
+        type: "POST",
         async: false,
         success: function (data) {
             if (!data) {

@@ -205,8 +205,8 @@
             mounted(){
                 //判断用户状态，如果登录，判断project权限，如果否，不判断
                 this.userInfo=JSON.parse(sessionStorage.getItem("userInfo"));
-                if( this.userInfo != null){
-                    this.UserState= this.userInfo.userState;
+                if( this.userInfo != null&&this.userInfo.UserState){
+                    this.UserState=true;
                     this.judgeMember(this.projectShowList);
                     this.tabPageData=Object.assign([],  this.currentProjectList);
                 }

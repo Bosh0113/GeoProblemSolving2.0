@@ -127,7 +127,7 @@
 <body>
     <template th:fragment="common-html" id="folderTreeComponent">
         <div class="fileSpace">
-            <Card :padding="1">
+            <Card :padding="1" dis-hover>
                 <div slot="title" class="resourceTitle">
                     <strong>Resources List</strong>
                 </div>
@@ -504,7 +504,7 @@
             methods: {
                 resizeContent() {
                     if (window.innerHeight > 735) {
-                        this.listContentCSS = window.innerHeight - 265 + 'px';
+                        this.listContentCSS = window.innerHeight - 275 + 'px';
                     } else {
                         this.listContentCSS = '460px';
                     }

@@ -99,7 +99,7 @@ public class UserController {
         session.invalidate();
     }
 
-    @RequestMapping(value = "/state", method = RequestMethod.GET)
+    @RequestMapping(value = "/state", method = RequestMethod.POST)
     public Object userState(HttpServletRequest request){
         try {
             HttpSession session=request.getSession();

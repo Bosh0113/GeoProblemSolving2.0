@@ -20,7 +20,7 @@
 header {
   height: 60px;
   top: 0;
-  z-index: 100;
+  z-index: 99;
   position: absolute;
   width: 100%;
   flex: 0 0 auto;
@@ -74,7 +74,7 @@ footer {
 </style>
 <template>
   <div class="container">
-    <div style="position: fixed;z-index: 999;">
+    <div style="position: fixed;z-index: 99;">
       <header style="position:inherit;min-width: -webkit-fill-available;">
         <img
           src="@/assets/images/OGMS.png"
