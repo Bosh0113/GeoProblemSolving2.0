@@ -112,10 +112,6 @@
             text-align: center;
             margin-top: 200px;
         }
-        /* Loading动画的特效 */
-        .demo-spin-icon-load {
-            animation: ani-demo-spin 1s linear infinite;
-        }
     </style>
 </head>
 <body>
@@ -136,10 +132,6 @@
     <div class="tabs">
         <Row>
             <i-col>
-                <Spin fix v-show="getFinish">
-                    <Icon type="icon ion-ios-loading" size="100" class="demo-spin-icon-load" color="yellowgreen"></Icon>
-                    <div>Loading</div>
-                </Spin>
                 <div class="pro-tab">
                     <Tabs  v-model="currentTab" @on-click="changeTab" >
                         <tab-pane label="All" name="All" icon="md-list"></tab-pane>
@@ -174,9 +166,7 @@
         new Vue({
             el: '#vueBody',
             data: {
-                getFinish: false,
                 currentProjectList:  projectsInfo.projectList,
-                projectShowList: projectsInfo.projectList,
                 projectType:[],
                 currentTab:"All",
                 //初始化信息总条数
@@ -207,14 +197,12 @@
                 this.userInfo=JSON.parse(sessionStorage.getItem("userInfo"));
                 if( this.userInfo != null&&this.userInfo.userState){
                     this.userState=true;
-                    // this.judgeMember(this.projectShowList);
-                    // this.tabPageData=Object.assign([],  this.currentProjectList);
                     this.changePage(1);
-                    this.freshEle++;
                 }
                 else{
                     this.userState=false;
-                    this.tabPageData=Object.assign([], this.projectShowList);
+                    this.judgeMember(projectsInfo.projectList);
+                    this.tabPageData=Object.assign([], projectsInfo.projectList);
                     this.freshEle++;
                 }
                 window.onresize = () => {
@@ -232,8 +220,8 @@
                         this.$refs['pages'].currentPage = 1;
                     });
 
-                    if(type=="All"){
-                        this.judgeMember(this.projectShowList);
+                    if(type=="All"&& !this.userState){
+                        this.judgeMember(projectsInfo.projectList);
                         this.tabPageData=Object.assign([],  this.currentProjectList);
                         this.freshEle++;
                         this.totalCount=projectsInfo.count;
@@ -246,7 +234,7 @@
 
                 changePage(index){
                     if(this.currentTab == "All" && index==1 && !this.userState){
-                        this.judgeMember(this.projectShowList);
+                        this.judgeMember(projectsInfo.projectList);
                         this.tabPageData=Object.assign([],  this.currentProjectList);
                         this.freshEle++;
                         this.totalCount=projectsInfo.count;
@@ -260,6 +248,7 @@
                                 joinedProjects.push(this.userInfo.joinedProjects[i].projectId);
                             }
                         }
+                        this.$Spin.show();
                         axios
                             .get("/GeoProblemSolving/project/inquiryByPage"+
                                     "?category="+this.currentTab+
@@ -268,6 +257,7 @@
                                     "&userId="+userId+
                                     "&joinedProjects="+joinedProjects)
                             .then(res => {
+                                this.$Spin.hide();
                                 if(res.data !="Fail") {
                                     if (res.data === "None") {
                                         this.currentProjectList = [];

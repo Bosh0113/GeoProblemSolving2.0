@@ -131,7 +131,7 @@ public class ProjectDaoImpl implements IProjectDao {
 
     @Override
     public void deleteProject(String projectId) {
-        Boolean updatePage = isUpdateProjectListStaticPage(projectId);
+        Boolean updatePage = isUpdateProjectListStaticPage(projectId,false);
 
         Query query = Query.query(Criteria.where("projectId").is(projectId));
         ProjectEntity projectEntity = mongoTemplate.findOne(query, ProjectEntity.class);
@@ -166,7 +166,14 @@ public class ProjectDaoImpl implements IProjectDao {
     public Object updateProject(HttpServletRequest request) {
         try {
             String projectId = request.getParameter("projectId");
-            Boolean updatePage = isUpdateProjectListStaticPage(projectId);
+            Boolean changeFromPrivate = false;
+            if(request.getParameter("privacy")!=null){
+                String newPrivacy = request.getParameter("privacy");
+                if(!newPrivacy.equals("Private")){
+                    changeFromPrivate  = true;
+                }
+            }
+            Boolean updatePage = isUpdateProjectListStaticPage(projectId,changeFromPrivate);
             Query query = new Query(Criteria.where("projectId").is(projectId));
             CommonMethod method = new CommonMethod();
             Update update = method.setUpdate(request);
@@ -227,7 +234,7 @@ public class ProjectDaoImpl implements IProjectDao {
     @Override
     public Object joinProject(String projectId, String userId) {
         try {
-            Boolean updatePage = isUpdateProjectListStaticPage(projectId);
+            Boolean updatePage = isUpdateProjectListStaticPage(projectId,false);
             Query queryProject = new Query(Criteria.where("projectId").is(projectId));
             if (!mongoTemplate.find(queryProject, ProjectEntity.class).isEmpty()) {
                 ProjectEntity project = mongoTemplate.findOne(queryProject, ProjectEntity.class);
@@ -270,7 +277,7 @@ public class ProjectDaoImpl implements IProjectDao {
     @Override
     public String quitProject(String projectId, String userId) {
         try {
-            Boolean updatePage = isUpdateProjectListStaticPage(projectId);
+            Boolean updatePage = isUpdateProjectListStaticPage(projectId,false);
             Query queryProject = new Query(Criteria.where("projectId").is(projectId));
             if (!mongoTemplate.find(queryProject, ProjectEntity.class).isEmpty()) {
                 ProjectEntity project = mongoTemplate.findOne(queryProject, ProjectEntity.class);
@@ -309,7 +316,7 @@ public class ProjectDaoImpl implements IProjectDao {
     @Override
     public Object changeManager(String projectId, String userId) {
         try {
-            Boolean updatePage = isUpdateProjectListStaticPage(projectId);
+            Boolean updatePage = isUpdateProjectListStaticPage(projectId,false);
             Query query = new Query(Criteria.where("projectId").is(projectId));
             ProjectEntity project = mongoTemplate.findOne(query, ProjectEntity.class);
             quitProject(projectId, userId);
@@ -513,11 +520,11 @@ public class ProjectDaoImpl implements IProjectDao {
             // 添加参与的私有项目
             Criteria criteriaPrivate = Criteria.where("privacy").is("Private");
             for(int i = joinedProjects.length-1 ; i >= 0; i--) {
-                count++;
                 Criteria criteria = Criteria.where("projectId").is(joinedProjects[i]);
                 query = new Query(new Criteria().andOperator(criteriaPrivate,criteria));
                 ProjectEntity project = mongoTemplate.findOne(query,ProjectEntity.class);
                 if(project!=null){
+                    count++;
                     projectEntities.add(0,project);
                 }
             }
@@ -587,12 +594,17 @@ public class ProjectDaoImpl implements IProjectDao {
         }
     }
 
-    private Boolean isUpdateProjectListStaticPage(String projectId){
+    private Boolean isUpdateProjectListStaticPage(String projectId, Boolean noPrivate){
+        int pageSize = 18;
         Sort sort = new Sort(Sort.Direction.DESC,"createTime");
-        Pageable pageable = PageRequest.of(0,18,sort);
+        Pageable pageable = PageRequest.of(0,pageSize,sort);
         Criteria criteriaPublic = Criteria.where("privacy").is("Public");
         Criteria criteriaDiscoverable = Criteria.where("privacy").is("Discoverable");
         Query query = new Query(new Criteria().orOperator(criteriaDiscoverable,criteriaPublic)).with(pageable);
+        long count = mongoTemplate.count(query,ProjectEntity.class);
+        if (count<pageSize && noPrivate){ //如果首页数量少于页面数量规格且有新的可见条目，则更新
+            return true;
+        }
         List<ProjectEntity> projects = mongoTemplate.find(query,ProjectEntity.class);
         for(ProjectEntity project : projects){
             if(projectId.equals(project.getProjectId())){
