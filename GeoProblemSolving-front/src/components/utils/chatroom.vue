@@ -583,7 +583,7 @@
         // 原有的变量字段
         projectId: "",
         subProjectId: "",
-        moduleId: "",
+        stepId: "",
         participants: [],
         groups: [],
         select_group: "",
@@ -603,11 +603,11 @@
         panelHeight: "",
         panelWidth: "",
         messageListPanelHeight: "",
-        seletRoom: "module",
+        seletRoom: "step",
         // 下拉框的测试数据
         itemList: [{
-            value: "Module",
-            label: "Module"
+            value: "Step",
+            label: "Step"
           },
           {
             value: "Subproject",
@@ -618,7 +618,7 @@
             label: "Project"
           },
         ],
-        selectItem: "Module",
+        selectItem: "Step",
         onlineParticipants: [],
         onlineP: [],
         offlineParticipants: [],
@@ -646,12 +646,12 @@
       window.addEventListener("resize", this.initSize);
 
       this.init();
-      //init module
+      //init step
       this.participants = [];
-      this.select_group = this.moduleName;
-      this.select_groupId = this.moduleId;
-      this.startWebSocket(this.moduleId);
-      this.seletRoom = "module";
+      this.select_group = this.stepName;
+      this.select_groupId = this.stepId;
+      this.startWebSocket(this.stepId);
+      this.seletRoom = "step";
       this.supportNotify();
 
 
@@ -660,18 +660,18 @@
     methods: {
       init() {
         this.initSize();
-        this.moduleId = sessionStorage.getItem("moduleId");
+        this.stepId = sessionStorage.getItem("stepId");
         this.subProjectId = sessionStorage.getItem("subProjectId");
         this.projectId = sessionStorage.getItem("projectId");
-        this.moduleName = sessionStorage.getItem("moduleName");
+        this.stepName = sessionStorage.getItem("stepName");
         this.subProjectName = sessionStorage.getItem("subProjectName");
         this.projectName = sessionStorage.getItem("projectName");
         //groups
         this.groups = [{
-            name: this.moduleName,
-            id: this.moduleId,
-            scope: "Module",
-            title: "Chat in the module"
+            name: this.stepName,
+            id: this.stepId,
+            scope: "Step",
+            title: "Chat in the step"
           },
           {
             name: this.subProjectName,
@@ -691,19 +691,19 @@
       changeChatroom(index) {
         this.socketApi.close();
         if (index == 0) {
-          if (this.moduleId == null || this.moduleId == undefined || this.moduleId == "") {
+          if (this.stepId == null || this.stepId == undefined || this.stepId == "") {
             this.$Notice.open({
-              desc: "No information about this module",
+              desc: "No information about this step",
             });
             return;
           }
           this.participants = [];
           this.msglist = [];
           this.msgRecords = [];
-          this.select_group = this.moduleName;
-          this.select_groupId = this.moduleId;
-          this.startWebSocket(this.moduleId);
-          this.seletRoom = "module";
+          this.select_group = this.stepName;
+          this.select_groupId = this.stepId;
+          this.startWebSocket(this.stepId);
+          this.seletRoom = "step";
         } else if (index == 1) {
           if (this.subProjectId == null || this.subProjectId == undefined || this.subProjectId == "") {
             this.$Notice.open({

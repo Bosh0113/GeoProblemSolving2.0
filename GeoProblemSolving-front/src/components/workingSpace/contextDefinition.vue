@@ -16,6 +16,10 @@
   left: 0;
 }
 
+.breadCrumb{
+  margin-left: 1%;
+}
+
 .tools {
   float: left;
   height: 100%;
@@ -32,7 +36,7 @@
 /* content */
 .condefContent {
   margin: 0 15%;
-  height: auto;
+  height: 80%;
 }
 
 .home_content >>> .ivu-breadcrumb {
@@ -46,7 +50,7 @@
 .pro-tab {
   margin-top: 50px;
   /* height:auto; */
-  min-height: 200px;
+  /* min-height: 200px; */
 }
 
 .pro-tab >>> .tabpane-syle {
@@ -147,23 +151,22 @@
   color: white;
 }
 .stepName p {
+  margin: 0 auto;
   font-size: 1rem;
   height: 20px;
   color: white;
+  word-break:break-word;
+  overflow: hidden;
+  white-space: nowrap; 
+  text-overflow: ellipsis; 
+  max-width: 400px;
 }
 
-.stepName input {
-  outline-style: none;
-  border: 0px;
-  background-color: transparent;
-  color: white;
-  /* float:center; */
-}
 
 .onlineListBtn {
   position: absolute;
   top: 70%;
-  right: 15%;
+  right: 10%;
   /* width: 100px */
 }
 
@@ -177,8 +180,7 @@
   } */
 </style>
 <template>
-  <div style="background-color:#e8eaec;height:auto">
-    <Row>
+  <div style="background-color:#e8eaec;height:auto">    
       <div class="picscreen">
         <div class="picbg"></div>
 
@@ -194,7 +196,7 @@
 
             <div class="stepName">
               <strong>{{stepContent.name}}</strong>
-              <p>{{stepContent.description}}</p>
+              <p :title="stepContent.description"> {{stepContent.description}}</p>
             </div>
 
             <div class="onlineListBtn">
@@ -209,8 +211,10 @@
           </Row>
           <Drawer title="Participants" :closable="false" v-model="drawerValue">
             <online-participant :sub-project-id="subprojectId" :room-id="stepId"></online-participant>
+            <div class="toChatroom" style="position:absolute; left:25%;bottom:5%">
+              <Button  @click.native="toolPanel('chat')" type="success">Go to Chatroom</Button>
+            </div>
           </Drawer>
-
           <Modal v-model="modifyStep">
             <p slot="header" style="text-align:center">
               <Icon type="ios-information-circle"></Icon>
@@ -240,11 +244,10 @@
             </div>
           </Modal>
         </div>
-      </div>
-    </Row>
+      </div>   
 
     <!-- tab  on-click事件 -->
-    <Row>
+    
       <div class="pro-tab" :style="{height:sidebarHeight+ 70+'px'}">
         <div>
           <Tabs>
@@ -309,7 +312,7 @@
                           ></div>
                           <h4 style="float:left;margin-left:5px">Context</h4>
                         </div>
-                        <vue-scroll :ops="scrollOps" :style="{height:sidebarHeight-50+'px'}">
+                        <vue-scroll :ops="scrollOps" :style="{height:sidebarHeight-60+'px'}">
                           <div class="condefContent">
                             <Form
                               ref="contextForm"
@@ -572,7 +575,7 @@
           </Tabs>
         </div>
       </div>
-    </Row>
+   
   </div>
 </template>
 
@@ -590,15 +593,18 @@ export default {
     folderTree,
     onlineParticipant
   },
+
   data() {
     return {
       scrollOps: {
         bar: {
-          background: "lightgrey"
+          background: "lightgrey",
+          // detectResize: true
         }
       },
       stepId: this.$route.params.id,
       toSubProjectPage: "/project/" + this.$route.params.subid + "/subproject",
+      toChatroom:"/chat",
       // 关于邀请的模态框
       sidebarHeight: 800,
       // web socket for contextDefinition
