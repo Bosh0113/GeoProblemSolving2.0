@@ -121,9 +121,15 @@
   color: white;
 }
 .stepName p {
+  margin: 0 auto;
   font-size: 1rem;
   height: 20px;
   color: white;
+  word-break:break-word;
+  overflow: hidden;
+  white-space: nowrap; 
+  text-overflow: ellipsis; 
+  max-width: 400px;
 }
 
 .onlineListBtn {
@@ -144,10 +150,15 @@
 .subproject-back >>>.ivu-breadcrumb-item-link{
   color:white;
 }
+
+.breadCrumb{
+  margin-left: 1%;
+}
+
 </style>
 <template>
   <div style="background-color:#e8eaec;height:auto">
-    <Row>
+    
       <div class="picscreen">
         <div class="picbg"></div>
 
@@ -164,7 +175,7 @@
 
             <div class="stepName">
               <strong>{{stepContent.name}}</strong>
-              <p>{{stepContent.description}}</p>
+              <p :title="stepContent.description">{{stepContent.description}}</p>
             </div>
 
             <div class="onlineListBtn">
@@ -179,6 +190,9 @@
           </Row>
           <Drawer title="Participants" :closable="false" v-model="drawerValue">
             <online-participant :sub-project-id="subprojectId" :room-id="stepId"></online-participant>
+             <div class="toChatroom" style="position:absolute; left:25%;bottom:5%">
+              <Button  @click.native="toolPanel('chat')" type="success">Go to Chatroom</Button>
+            </div>
           </Drawer>
 
           <Modal v-model="modifyStep">
@@ -211,10 +225,10 @@
           </Modal>
         </div>
       </div>
-    </Row>
+   
 
     <!-- tab  on-click事件 -->
-    <Row>
+   
       <div class="pro-tab" :style="{height:sidebarHeight+ 80+'px'}">
         <div>
           <template>
@@ -293,7 +307,7 @@
           </template>
         </div>
       </div>
-    </Row>
+    
   </div>
 </template>
 
@@ -560,7 +574,14 @@ export default {
                 this.stepId +
                 '" style="width: 100%;height:100%"></iframe>';
               toolName = "Computational modeling";
-            }
+            }else if (type == "chat") {
+              toolURL =
+                '<iframe src="' +
+                "http://" +
+                this.$store.state.IP_Port +
+                '/GeoProblemSolving/chat" style="width: 100%;height:100%"></iframe>';
+              toolName = "Chatroom";
+            } 
 
             let panel = jsPanel.create({
               theme: "success",

@@ -113,9 +113,15 @@
   color: white;
 }
 .stepName p {
+  margin: 0 auto;
   font-size: 1rem;
   height: 20px;
   color: white;
+  word-break:break-word;
+  overflow: hidden;
+  white-space: nowrap; 
+  text-overflow: ellipsis; 
+  max-width: 400px;
 }
 
 .onlineListBtn {
@@ -145,10 +151,15 @@
 .subproject-back >>>.ivu-breadcrumb-item-link{
   color:white;
 }
+
+.breadCrumb{
+  margin-left: 1%;
+}
+
 </style>
 <template>
   <div style="background-color:#e8eaec;height:auto">
-    <Row>
+    
       <div class="picscreen">
         <div class="picbg"></div>
 
@@ -165,7 +176,7 @@
 
             <div class="stepName">
               <strong>{{stepContent.name}}</strong>
-              <p>{{stepContent.description}}</p>
+              <p :title="stepContent.description">{{stepContent.description}}</p>
             </div>
 
             <div class="onlineListBtn">
@@ -180,6 +191,9 @@
           </Row>
           <Drawer title="Participants" :closable="false" v-model="drawerValue">
             <online-participant :sub-project-id="subprojectId" :room-id="stepId"></online-participant>
+            <div class="toChatroom" style="position:absolute; left:25%;bottom:5%">
+              <Button  @click.native="toolPanel('chat')" type="success">Go to Chatroom</Button>
+            </div>
           </Drawer>
 
           <Modal v-model="modifyStep">
@@ -212,10 +226,10 @@
           </Modal>
         </div>
       </div>
-    </Row>
+    
 
     <!-- tab  on-click事件 -->
-    <Row>
+    
       <div class="pro-tab" :style="{height:sidebarHeight+ 80+'px'}">
         <div>
           <template>
@@ -247,8 +261,11 @@
                       <Tabs>
                         <TabPane label="Data Origin" name="origin" icon="md-home"></TabPane>
                         <TabPane label="UDX Schema" name="udx" icon="md-home">
-                          <vue-markdown>this is the default slot</vue-markdown>
+                          <!-- <mark-down> </mark-down> -->
                           <!-- <pre class="brush: html"><button></button></pre> -->
+                          <template>
+                            <mark-down />
+                          </template>
                         </TabPane>
                       </Tabs>
                     </div>
@@ -277,7 +294,7 @@
           </template>
         </div>
       </div>
-    </Row>
+   
   </div>
 </template>
 
@@ -417,7 +434,69 @@ export default {
 
     cancelModifyStep() {
       this.modifyStep = false;
-    }
+    },
+
+     toolPanel(type) {
+      // if (this.userRole != "Visitor") {
+      this.axios
+        .get("/GeoProblemSolving/user/state")
+        .then(res => {
+          if (!res.data) {
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
+          } else {
+            var toolURL = "";
+            let toolName = "";
+            if (type == "chat") {
+              toolURL =
+                '<iframe src="' +
+                "http://" +
+                this.$store.state.IP_Port +
+                '/GeoProblemSolving/chat" style="width: 100%;height:100%"></iframe>';
+              toolName = "Chatroom";
+            } 
+
+            let panel = jsPanel.create({
+              theme: "success",
+              headerTitle: toolName,
+              footerToolbar: '<p style="height:10px"></p>',
+              contentSize: "1200 600",
+              content: toolURL,
+              disableOnMaximized: true,
+              dragit: {
+                containment: 5
+              },
+              callback: function() {
+                // this.content.style.padding = "20px";
+              }
+            });
+            panel.resizeit("disable");
+            $(".jsPanel-content").css("font-size", "0");
+            this.panelList.push(panel);
+            // 生成records, 同步
+            let record = {
+              who: this.$store.getters.userName,
+              whoid: this.$store.getters.userId,
+              type: "tools",
+              toolType: type,
+              content: "used a tool: " + type,
+              moduleId: this.stepId,
+              time: new Date().toLocaleString()
+            };
+            this.subprojectSocket.send(JSON.stringify(record));
+          }
+        })
+        .catch(err => {
+          console.log("Get user info fail.");
+        });
+  
+    },
+
+
   }
 };
 </script>
+
+  
+
+
