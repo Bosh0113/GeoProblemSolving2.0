@@ -14,7 +14,7 @@ public interface IProjectDao {
 
     Object readByType(String key, String value);
 
-    void deleteProject(String key, String value);
+    void deleteProject(String value);
 
     Object updateProject(HttpServletRequest request);
 

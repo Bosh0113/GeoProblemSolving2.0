@@ -52,7 +52,7 @@ public class ProjectController {
     public String deleteProject(@RequestParam("projectId") String projectId) {
         ProjectDaoImpl projectDao = new ProjectDaoImpl(mongoTemplate);
         try {
-            projectDao.deleteProject("projectId", projectId);
+            projectDao.deleteProject(projectId);
             return "Success";
         } catch (Exception e) {
             return "Fail";

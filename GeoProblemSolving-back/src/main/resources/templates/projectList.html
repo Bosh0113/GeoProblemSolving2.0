@@ -170,22 +170,22 @@
 
     <script th:inline="javascript">
     window.onload=function () {
-        var List = [[${projects}]];
+        var projectsInfo = [[${projectsInfo}]];
         new Vue({
             el: '#vueBody',
             data: {
                 getFinish: false,
-                currentProjectList:  List.slice(0,18),
-                projectShowList: List.slice(0,18),
+                currentProjectList:  projectsInfo.projectList,
+                projectShowList: projectsInfo.projectList,
                 projectType:[],
                 currentTab:"All",
                 //初始化信息总条数
                 //projectCount:10,
                 currentPage:1 ,
-                totalCount:List.length,
+                totalCount:projectsInfo.count,
                 //每页显示多少条
                 pageSize:18,
-                tabPageData:List.slice(0,18),
+                tabPageData:projectsInfo.projectList,
                 tabPaneType:[{  label:"All",name:"All",icon:"icon ion-md-list"},
                     { label:"Terrestrial", name:"Terrestrial", icon:"icon ion-md-globe"},
                     {label:"Coastal", name:"Coastal",icon:"icon ion-ios-boat"},
@@ -207,8 +207,9 @@
                 this.userInfo=JSON.parse(sessionStorage.getItem("userInfo"));
                 if( this.userInfo != null&&this.userInfo.userState){
                     this.userState=true;
-                    this.judgeMember(this.projectShowList);
-                    this.tabPageData=Object.assign([],  this.currentProjectList);
+                    // this.judgeMember(this.projectShowList);
+                    // this.tabPageData=Object.assign([],  this.currentProjectList);
+                    this.changePage(1);
                     this.freshEle++;
                 }
                 else{
@@ -235,7 +236,7 @@
                         this.judgeMember(this.projectShowList);
                         this.tabPageData=Object.assign([],  this.currentProjectList);
                         this.freshEle++;
-                        this.totalCount=List.length;
+                        this.totalCount=projectsInfo.count;
                     }
                     else{
                         this.changePage(1);
@@ -248,7 +249,7 @@
                         this.judgeMember(this.projectShowList);
                         this.tabPageData=Object.assign([],  this.currentProjectList);
                         this.freshEle++;
-                        this.totalCount=List.length;
+                        this.totalCount=projectsInfo.count;
                     }
                     else {
                         let userId = "";

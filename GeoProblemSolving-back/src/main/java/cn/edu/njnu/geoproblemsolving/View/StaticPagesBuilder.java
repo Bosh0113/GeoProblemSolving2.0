@@ -1,6 +1,9 @@
 package cn.edu.njnu.geoproblemsolving.View;
 import cn.edu.njnu.geoproblemsolving.Entity.ProjectEntity;
+import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -61,13 +64,21 @@ public class StaticPagesBuilder {
         TemplateEngine templateEngine = new TemplateEngine();
         templateEngine.setTemplateResolver(resolver);
 
-        Context context = new Context();
-
+        int pageSize = 18;
+        Pageable pageable = PageRequest.of(0,pageSize);
         Criteria criteriaPublic = Criteria.where("privacy").is("Public");
         Criteria criteriaDiscoverable = Criteria.where("privacy").is("Discoverable");
-        Query query = new Query(new Criteria().orOperator(criteriaDiscoverable, criteriaPublic));
+        Query query = new Query(new Criteria().orOperator(criteriaDiscoverable, criteriaPublic)).with(pageable);
         List<ProjectEntity> projects = mongoTemplate.find(query, ProjectEntity.class);
-        context.setVariable("projects", projects);
+        long count = mongoTemplate.count(query,ProjectEntity.class);
+        int totalPage = (int)Math.ceil((double) count/(double) pageSize);
+        JSONObject result = new JSONObject();
+        result.fluentPut("totalPage",totalPage);
+        result.fluentPut("count",count);
+        result.fluentPut("projectList",projects);
+
+        Context context = new Context();
+        context.setVariable("projectsInfo", result);
 
         //渲染模板
         String servicePath = getServicePath();
