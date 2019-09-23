@@ -2,6 +2,7 @@
 <html lang="en" xmlns:th="https://www.thymeleaf.org" xmlns:v-bind="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
+    <link rel="shortcut icon" href="/GeoProblemSolving/static/favicon.ico">
     <title th:text="${projectInfo.title}+' | Geo-ProblemSolving'"></title>
     <meta http-equiv="Content-Type" content=" charset=UTF-8"/>
     <meta name="description" th:attr="content=${projectInfo.description}">
@@ -329,8 +330,8 @@
                                 <div :style="{height:subProjectsCSS}">
                                     <vue-scroll :ops="scrollOps">
                                         <div v-for="(subProject,index) in subProjectList" style="width: 25%;display: inline-block;padding: 5px;">
-                                            <Card style="height: 300px;" class="subProjectCard" @click.native="goSubProjectPage(subProject)">
-                                                <div slot="title">
+                                            <Card style="height: 300px;" class="subProjectCard">
+                                                <div slot="title" style="cursor: pointer;" @click="goSubProjectPage(subProject)">
                                                     <strong style="width: 160px;display: inline-block;" class="overEllipsis" :title="subProject.title">
                                                         {{subProject.title}}
                                                     </strong>
@@ -361,7 +362,7 @@
                                                         </Poptip>
                                                     </template>
                                                 </div>
-                                                <div class="subProjectDes" :title="subProject.description">
+                                                <div class="subProjectDes" :title="subProject.description" style="cursor: pointer;" @click="goSubProjectPage(subProject)">
                                                     {{subProject.description}}
                                                 </div>
                                                 <div style="height: 75px;padding: 5px;">
@@ -1411,7 +1412,7 @@
                               title: 'Success notice',
                               desc: 'Now you are a member of this subproject.',
                           });
-                          window.location.href="/GeoProblemSoving/project/"+subProject.subProjectId+"/subproject";
+                          window.location.href="/GeoProblemSolving/project/"+subProject.subProjectId+"/subproject";
                       }
                     })
                     .catch(err=>{
@@ -1495,7 +1496,7 @@
                 },
                 goSubProjectPage(subProject){
                     if(this.managerIdentity(subProject.managerId)||this.memberIdentity(subProject.members)){
-                        window.location.href="/GeoProblemSoving/project/"+subProject.subProjectId+"/subproject/info";
+                        window.location.href="/GeoProblemSolving/project/"+subProject.subProjectId+"/subproject/info";
                     }else{
                         this.$Message.warning({
                             render: h => {

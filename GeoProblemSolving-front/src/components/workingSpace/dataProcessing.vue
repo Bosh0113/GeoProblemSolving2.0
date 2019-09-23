@@ -326,6 +326,7 @@ export default {
       toSubProjectPage: "/project/" + this.$route.params.subid + "/subproject",
       stepContent: [],
       // online drawer
+      subprojectId: this.$route.params.subid,
       drawerValue: false,
       modifyStep: false,
       stepForm: {
