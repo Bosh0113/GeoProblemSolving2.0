@@ -1426,9 +1426,10 @@ export default {
         this.subprojectSocket = null;
       }
       let subProjectId = this.subProjectId;
-      var subprojectSocketURL =
-        "ws://localhost:8081/GeoProblemSolving/Module/" + subProjectId;
-      // var subprojectSocketURL = "ws://" + this.$store.state.IP_Port + "/GeoProblemSolving/Module/" + subProjectId;
+      var subprojectSocketURL = "ws://" + this.$store.state.IP_Port + "/GeoProblemSolving/Module/" + subProjectId;
+      if(this.$store.state.IP_Port == "localhost:8080"){
+        subprojectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + subProjectId;
+      }
       this.subprojectSocket = new WebSocket(subprojectSocketURL);
       this.subprojectSocket.onopen = this.onOpen;
       this.subprojectSocket.onmessage = this.onMessage;
