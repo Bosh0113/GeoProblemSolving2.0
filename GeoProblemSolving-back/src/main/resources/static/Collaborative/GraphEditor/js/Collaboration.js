@@ -53,9 +53,10 @@ var waitingList = [];
             var url = window.location.href;
             if (url.search(reg) != -1) {
                 let groupID = url.match(reg)[1];
+                mxGraphSocket = new WebSocket("ws://"+window.location.origin+"/GeoProblemSolving/GraphEditorSocket/" + groupID);
                 // mxGraphSocket = new WebSocket("ws://localhost:8081/GeoProblemSolving/GraphEditorSocket/" + groupID);
                 // mxGraphSocket = new WebSocket("ws://172.21.212.72:8082/GeoProblemSolving/GraphEditorSocket/" + groupID);
-                mxGraphSocket = new WebSocket("ws://94.191.49.160:8080/GeoProblemSolving/GraphEditorSocket/" + groupID);
+                // mxGraphSocket = new WebSocket("ws://94.191.49.160:8080/GeoProblemSolving/GraphEditorSocket/" + groupID);
                 // mxGraphSocket = new WebSocket("ws://172.21.213.185:8080/GeoProblemSolving/GraphEditorSocket/" + groupID);
                 mxGraphSocket.onopen = function () {
                     console.log("Websocket connected.");
