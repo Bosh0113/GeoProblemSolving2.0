@@ -620,7 +620,14 @@ export default {
         methods: "",
         others: ""
       },
-
+      defaultContent:{
+        boundary: "",
+        scale: "",
+        difficulties: "",
+        goals: "",
+        methods: "",
+        others: ""
+      },
       contextFormValidate: {
         boundary: [
           {
@@ -887,8 +894,10 @@ export default {
             this.stepForm.name = res.data[0].name;
             this.stepForm.description = res.data[0].description;
 
-            if (res.data[0].content !== {} && res.data[0].content !== null) {
+            if (JSON.stringify(res.data[0].content) != "{}") {
               this.contextForm = res.data[0].content;
+            }else{
+              this.contextForm = this.defaultContent;
             }
           } else {
             this.$Notice.info({
