@@ -89,7 +89,7 @@
                   <TabPane label="Chart & Table" name="chart" icon="md-pie">
                     <div :style="{height:sidebarHeight- 50 +'px'}">
                       <!-- <iframe :src="'/GeoProblemSolving/charts'" style="height:100%;width:100%;"></iframe> -->
-                      <iframe :src="'/charts'" style="height:100%;width:100%;"></iframe>
+                      <iframe :src="'/GeoProblemSolving/charts'" style="height:100%;width:100%;"></iframe>
                     </div>
                   </TabPane>
                   <TabPane label="Earth & Map" name="earth" icon="md-globe">

@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="https://www.thymeleaf.org" xmlns:v-bind="http://www.w3.org/1999/xhtml">
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
     <link rel="shortcut icon" href="/GeoProblemSolving/static/favicon.ico">
     <title th:text="${projectInfo.title}+' | Geo-ProblemSolving'"></title>
-    <meta http-equiv="Content-Type" content=" charset=UTF-8"/>
+    <meta http-equiv="Content-Type" content=" charset=UTF-8" />
     <meta name="description" th:attr="content=${projectInfo.description}">
     <meta name="keywords" th:attr="content=${projectInfo.tag}">
     <meta name="author" content="OpenGMS">
@@ -97,6 +96,7 @@
             text-indent: 2em;
             height: 150px;
             display: -webkit-box;
+            word-break: break-all;
             -webkit-box-orient: vertical;
             -webkit-line-clamp: 7;
             overflow: hidden;
@@ -255,7 +255,7 @@
                                                         <div style="text-align: left;padding: 5px;">
                                                             <p><strong>Privacy:</strong><span id="projectPrivacy" th:text="${projectInfo.privacy}">Project privacy</span> </p>
                                                             <p><strong>Category:</strong><span id="projectCategory" th:text="${projectInfo.category}">Project category</span></p>
-                                                            <p><strong>Tag:</strong><span id="projectTag" th:text="${projectInfo.tag}">Project tag</span></p>
+                                                            <p><strong>Tag:</strong><span id="projectTag" class="overEllipsis" style="display: inline-block;vertical-align: top;width:230px" th:text="${projectInfo.tag}" th:attr="title=${projectInfo.tag}">Project tag</span></p>
                                                             <p><strong>Manager:</strong> {{projectInfo.managerName}}</p>
                                                             <p><strong>Create time:</strong> {{projectInfo.createTime}}</p>
                                                         </div>
@@ -351,7 +351,7 @@
                                                     <Icon type="ios-person" :size="20"></Icon>
                                                 </div>
                                                 <div slot="extra" v-else>
-                                                    <template v-if="managerIdentity(project.managerId)">
+                                                    <template v-if="managerIdentity(subProject.managerId)">
                                                         <Poptip trigger="hover" content="To be member" placement="left">
                                                             <i-button class="changeInviteColor" icon="md-add-circle" size="small" shape="circle" @click="joinSubProject(index)"></i-button>
                                                         </Poptip>
@@ -380,6 +380,9 @@
                                                     </p>
                                                 </div>
                                             </Card>
+                                        </div>
+                                        <div v-if="!subProjectList.length" style="text-align:center">
+                                            <div style="color:lightgray;font-size:4em; font-weight:bold">No sub-projects have been created.</div>
                                         </div>
                                     </vue-scroll>
                                 </div>
@@ -698,7 +701,7 @@
             },
             created(){
                 this.userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
-                if(!this.userInfo.userState){
+                if(this.userInfo==null||!this.userInfo.userState){
                     window.location.href='/GeoProblemSolving/login';
                 }
             },
