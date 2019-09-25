@@ -280,17 +280,19 @@
                                                 <div slot="title">
                                                     <h1>Participants</h1>
                                                 </div>
-                                                <div slot="extra" v-if="managerIdentity(projectInfo.managerId)">
-                                                    <Poptip trigger="hover" content="Invite members" placement="left">
-                                                        <i-button class="changeInviteColor" @click="inviteModalShow()">
-                                                            <Icon type="md-person-add" :size="20"></Icon>
-                                                        </i-button>
-                                                    </Poptip>
-                                                    <Poptip trigger="hover" content="Remove members" placement="left">
-                                                        <i-button style="margin: 0 0 0 5px;" class="changeRemoveColor" @click="deleteMemberModelShow">
-                                                            <Icon type="md-remove-circle" :size="20"></Icon>
-                                                        </i-button>
-                                                    </Poptip>
+                                                <div slot="extra">
+                                                    <div v-if="managerIdentity(projectInfo.managerId)">
+                                                        <Poptip trigger="hover" content="Invite members" placement="left">
+                                                            <i-button class="changeInviteColor" @click="inviteModalShow()">
+                                                                <Icon type="md-person-add" :size="20"></Icon>
+                                                            </i-button>
+                                                        </Poptip>
+                                                        <Poptip trigger="hover" content="Remove members" placement="left">
+                                                            <i-button style="margin: 0 0 0 5px;" class="changeRemoveColor" @click="deleteMemberModelShow">
+                                                                <Icon type="md-remove-circle" :size="20"></Icon>
+                                                            </i-button>
+                                                        </Poptip>
+                                                    </div>
                                                 </div>
                                                 <div :style="{height: membersContentCSS}" style="overflow-y:auto;">
                                                     <vue-scroll :ops="scrollOps">
