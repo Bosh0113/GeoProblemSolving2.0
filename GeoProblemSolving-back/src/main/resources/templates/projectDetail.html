@@ -186,10 +186,10 @@
                     <menu-item name="projectDetail" class="projectMenuItem">
                         <Icon type="ios-information-circle" title="Project detail" size="35"></Icon>
                     </menu-item>
-                    <menu-item name="subProjects" class="projectMenuItem">
+                    <menu-item name="subProjects" class="projectMenuItem" :style="cursorStyle()" :disabled="menuDisable()">
                         <Icon type="md-git-branch" title="Subprojects" size="35"></Icon>
                     </menu-item>
-                    <menu-item name="resources" class="projectMenuItem">
+                    <menu-item name="resources" class="projectMenuItem" :style="cursorStyle()" :disabled="menuDisable()">
                         <Icon type="ios-folder" title="Resources" size="35"></Icon>
                     </menu-item>
                 </i-menu>
@@ -1513,6 +1513,20 @@
                         });
                     }
                 },
+                cursorStyle(){
+                    if(this.managerIdentity(this.projectInfo.managerId)||this.memberIdentity(this.projectInfo.members)){
+                        return "cursor: pointer;";
+                    }else{
+                        return "cursor: no-drop;";
+                    }
+                },
+                menuDisable(){
+                    if(this.managerIdentity(this.projectInfo.managerId)||this.memberIdentity(this.projectInfo.members)){
+                        return false;
+                    }else{
+                        return true;
+                    }
+                }
             }
         }
     );
