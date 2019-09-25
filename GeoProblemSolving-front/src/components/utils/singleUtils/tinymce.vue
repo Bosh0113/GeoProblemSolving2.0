@@ -14,7 +14,7 @@
         enctype="multipart/form-data"
         style="width:0px;height:0;overflow:hidden"
       >
-        <input name="image" type="file" @change="uploadPhoto($event)" accept="image/*">
+        <input name="image" type="file" id="choosePicture" @change="uploadPhoto($event)" accept="image/*">
       </form>
       <Button type="primary" @click="saveModalShow" style="margin-top:20px;margin-left:10px">Save</Button>
     </div>
@@ -134,6 +134,7 @@ export default {
         var reader = new FileReader();
         reader.readAsDataURL(file);
         reader.onload = e => {
+          $('#choosePicture').val('');
           // 读取到的图片base64 数据编码 将此编码字符串传给后台即可
           let formData = new FormData();
           formData.append("picture", file);
