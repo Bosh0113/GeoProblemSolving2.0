@@ -276,9 +276,9 @@
             </Row>
           </template>
           <div v-show="chartSwitch">
-            <!-- <vue-scroll :ops="scrollOps" :style="{height:contentHeight+'px'}"> -->
+            <vue-scroll :ops="scrollOps" :style="{height:contentHeight - 15 +'px'}">
               <gantt-elastic :tasks="ganttTasks" :options="ganttOptions"></gantt-elastic>
-            <!-- </vue-scroll> -->
+            </vue-scroll>
           </div>
         </div>
       </Col>
@@ -465,7 +465,14 @@ export default {
     return {
       scrollOps: {
         bar: {
-          background: "lightgrey"
+          background: "#808080",
+          keepShow:true,
+          size:"8px"
+        },
+        rail:{
+          background: "#d7d7d7",
+          opacity:0.8,
+          size:"10px"
         }
       },
       // 后台获取的subproject下的task列表
