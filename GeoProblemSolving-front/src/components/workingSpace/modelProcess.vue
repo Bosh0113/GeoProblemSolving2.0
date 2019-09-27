@@ -180,12 +180,14 @@
 
             <div class="onlineListBtn">
               <Button @click="drawerValue = true" type="default" ghost>Participants</Button>
-              <Button
-                @click="modifyStep = true"
-                style="margin-left:20px"
-                type="info"
-                ghost
-              >Modify Step</Button>
+               <template  v-if="userRole == 'Manager'">
+                  <Button                
+                    @click="modifyStep = true"
+                    style="margin-left:20px"
+                    type="info"
+                    ghost
+                  >Modify Step</Button>
+               </template>
             </div>
           </Row>
           <Drawer title="Participants" :closable="false" v-model="drawerValue">
@@ -229,39 +231,24 @@
 
     <!-- tab  on-click事件 -->
    
-      <div class="pro-tab" :style="{height:sidebarHeight+ 80+'px'}">
+      <div class="pro-tab" :style="{height:sidebarHeight+ 79+'px'}">
         <div>
           <template>
             <Row style="margin-top:40px">
               <div :style="{height:sidebarHeight+45+'px'}" style="margin:20px 1%">
-                <div class="tools">
-                  <Card style=" height:100%;">
-                    <Tabs value="Data">
-                      <TabPane name="Data" icon="ios-paper" label="Data">
-                        <ul v-for="(item,index) in dataList" :key="index">
-                          <li>{{item.name}}</li>
-                        </ul>
-                      </TabPane>
-                    </Tabs>
-                  </Card>
-                </div>
-                <div class="condef">
-                  <Card style="height:auto;min-height:100%">
-                    <!-- <div class="condefTitle">
-                      <div style="width:3px;height:18px;float:left;background-color:rgb(124, 126, 126)"></div>
-                      <h4 style="float:left;margin-left:5px">Resources</h4>
-                    </div>-->
+                <Col span="6">
+                  <Card :style="{height:sidebarHeight+45+'px'}">
                     <div class="condefTitle">
-                      <!-- <Menu active-name="single"  @on-select="filterResourceType">
-                          <MenuItem name="single">
-                            <Icon type="ios-stats" />
-                            Single Modeling
-                          </MenuItem>
-                          <MenuItem name="integrated">
-                            <Icon type="md-image" />
-                            Integrated Modeling
-                          </MenuItem>                         
-                      </Menu>-->
+                        <div
+                            style="width:3px;height:18px;float:left;background-color:rgb(124, 126, 126)"
+                        ></div>
+                        <h4 style="float:left;margin-left:5px">Data</h4>
+                    </div>
+                  </Card>
+                </Col>
+                <Col span="18">
+                  <Card :style="{height:sidebarHeight+45+'px'}">                   
+                    <div class="condefTitle">                    
                       <Tabs value="single">
                         <TabPane name="single" icon="ios-brush" label="Single Modeling">
                           <Tooltip placement="bottom-start" class="modelToolBtn">
@@ -301,7 +288,7 @@
                       </Tabs>
                     </div>
                   </Card>
-                </div>
+               </Col>
               </div>
             </Row>
           </template>
@@ -383,7 +370,7 @@ export default {
         path: "http://134.175.111.77/note"
       },
 
-      subprojectId: this.$route.params.subid,
+      subprojectId:sessionStorage.getItem("subProjectId"),
       stepContent: [],
       drawerValue: false,
 
@@ -391,7 +378,9 @@ export default {
       stepForm: {
         name: "",
         description: ""
-      }
+      },
+       // 用户角色
+      userRole: "Visitor"
     };
   },
 
@@ -413,6 +402,8 @@ export default {
       this.initSize();
       this.getModelProcess();
     },
+
+    
 
     getResources() {
       this.userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
@@ -484,6 +475,24 @@ export default {
       });
     },
 
+    userRoleIdentity() {
+      this.userRole = "Visitor";
+      // console.log(this.stepContent.creator);
+      // console.log(this.$store.getters.userId);
+      let creatorId = sessionStorage.getItem("subProjectManagerId");
+      console.log(creatorId);
+      if (this.$store.getters.userState) {
+        // 是否是子项目管理员
+        if (creatorId === this.$store.getters.userId) {
+          this.userRole = "Manager";
+          console.log(this.userRole);
+        }
+        else{
+           this.userRole = "Visitor";
+        }
+      }
+    },
+
     getModelProcess() {
       this.axios
         .get(
@@ -498,7 +507,8 @@ export default {
           if (res.data != "Fail") {
             this.modelProcessForm = res.data[0].content;
             this.stepContent = res.data[0];
-            this.stepForm = res.data[0];
+            this.stepForm = res.data[0];            
+            this.userRoleIdentity();
           } else {
             this.$Notice.info({
               desc: "Get the description failed!"

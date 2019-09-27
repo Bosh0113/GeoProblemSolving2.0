@@ -161,6 +161,7 @@ export default {
 
         sessionStorage.setItem("subProjectId", subProjectInfo.subProjectId);
         sessionStorage.setItem("subProjectName", subProjectInfo.title);
+        sessionStorage.setItem("subProjectManagerId", subProjectInfo.managerId);
       } else {
         let that = this;
         $.ajax({
@@ -185,6 +186,8 @@ export default {
                 subProjectInfo.subProjectId
               );
               sessionStorage.setItem("subProjectName", subProjectInfo.title);
+              sessionStorage.setItem("subProjectManagerId", subProjectInfo.managerId);
+              console.log(subProjectInfo);
               that.$store.commit("setSubProjectInfo", subProjectInfo);
             }
           },
