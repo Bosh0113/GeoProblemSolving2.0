@@ -201,12 +201,14 @@
 
             <div class="onlineListBtn">
               <Button @click="drawerValue = true" type="default" ghost>Participants</Button>
-              <Button
-                @click="modifyStep = true"
-                style="margin-left:20px"
-                type="info"
-                ghost
-              >Modify Step</Button>
+               <template  v-if="userRole == 'Manager'">
+                  <Button                
+                    @click="modifyStep = true"
+                    style="margin-left:20px"
+                    type="info"
+                    ghost
+                  >Modify Step</Button>
+               </template>
             </div>
           </Row>
           <Drawer title="Participants" :closable="false" v-model="drawerValue">
@@ -248,141 +250,151 @@
 
     <!-- tab  on-click事件 -->
     
-      <div class="pro-tab" :style="{height:sidebarHeight+ 70+'px'}">
+      <div class="pro-tab" :style="{height:sidebarHeight+ 69+'px'}">
         <div>
           <Tabs>
             <TabPane label="Context definition" name="Context" icon="md-home">
               <template>
                 <Row style="margin-top:10px">
                   <!--contextdefinition -->
-                  <div :style="{height:sidebarHeight+10+'px'}" style="margin:0 1%">
-                    <div class="tools">
-                      <Card style=" height:100%;">
-                        <h4 align="center">Toolbox</h4>
-                        <!-- toolbox -->
-                        <div class="tool-panel">
-                          <!-- map -->
-                          <div class="singl_tool_style">
-                            <Icon
-                              type="md-globe"
-                              size="40"
-                              @click.native="toolPanel('map')"
-                              title="Map"
-                              color="#808695"
-                            />
-                          </div>
-                          <!-- draw -->
-                          <div class="singl_tool_style">
-                            <Icon
-                              type="ios-brush"
-                              size="40"
-                              @click.native="toolPanel('draw')"
-                              title="DrawBoard"
-                              color="#808695"
-                            />
-                          </div>
-                          <!-- mindMapping -->
-                          <div class="singl_tool_style">
-                            <Icon
-                              type="md-bulb"
-                              size="40"
-                              @click.native="toolPanel('mindMapping')"
-                              title="DrawBoard"
-                              color="#808695"
-                            />
-                          </div>
-                          <!-- chat -->
-                          <div class="singl_tool_style">
-                            <Icon
-                              type="ios-chatboxes"
-                              size="40"
-                              @click.native="toolPanel('chat')"
-                              title="DrawBoard"
-                              color="#808695"
-                            />
-                          </div>
-                        </div>
-                      </Card>
-                    </div>
-                    <div class="condef">
-                      <Card style="height:auto;min-height:100%">
-                        <div class="condefTitle">
-                          <div
-                            style="width:3px;height:18px;float:left;background-color:rgb(124, 126, 126)"
-                          ></div>
-                          <h4 style="float:left;margin-left:5px">Context</h4>
-                        </div>
-                        <vue-scroll :ops="scrollOps" :style="{height:sidebarHeight-60+'px'}">
-                          <div class="condefContent">
-                            <Form
-                              ref="contextForm"
-                              :rules="contextFormValidate"
-                              :model="contextForm"
-                              :label-width="180"
-                            >
-                              <FormItem label="Problem boundary" prop="boundary">
-                                <Input
-                                  v-model="contextForm.boundary"
-                                  placeholder="Please enter the boundry of the problem"
-                                  type="textarea"
-                                  :autosize="{minRows: 1,maxRows: 5}"
-                                  clearable
-                                />
-                              </FormItem>
-                              <FormItem label="Spatiotemporal scale" prop="scale">
-                                <Input
-                                  v-model="contextForm.scale"
-                                  placeholder="Please enter the spatiotemporal scale"
-                                  type="textarea"
-                                  :autosize="{minRows: 1,maxRows: 5}"
-                                  clearable
-                                />
-                              </FormItem>
-                              <FormItem label=" Main methods" prop="methods">
-                                <Input
-                                  v-model="contextForm.methods"
-                                  placeholder="Please enter the main methods"
-                                  type="textarea"
-                                  :autosize="{minRows: 1,maxRows: 5}"
-                                  clearable
-                                />
-                              </FormItem>
-                              <FormItem label="Goals or Purposes" prop="goals">
-                                <Input
-                                  v-model="contextForm.goals"
-                                  placeholder="Please enter your goal"
-                                  type="textarea"
-                                  :autosize="{minRows: 1,maxRows: 5}"
-                                  clearable
-                                />
-                              </FormItem>
-                              <FormItem label=" Difficulties or Limitations" prop="difficulties">
-                                <Input
-                                  v-model="contextForm.difficulties"
-                                  placeholder="Please enter the difficulties"
-                                  type="textarea"
-                                  :autosize="{minRows: 1,maxRows: 5}"
-                                  clearable
-                                />
-                              </FormItem>
-                              <FormItem label="Others" prop="others">
-                                <Input
-                                  v-model="contextForm.others"
-                                  placeholder="Supplement"
-                                  type="textarea"
-                                  :autosize="{minRows: 1,maxRows: 5}"
-                                  clearable
-                                />
-                              </FormItem>
-                              <FormItem>
-                                <Button @click="submit('contextForm')">Submit</Button>
-                              </FormItem>
-                            </Form>
-                          </div>
-                        </vue-scroll>
-                      </Card>
-                    </div>
-                  </div>
+                  <!-- <div  style=""> -->
+                    <template >
+                      <Row style="margin:0 1%">
+                        <Col span="2" >
+                          <!-- <div class="tools"> -->
+                            <Card :style="{height:sidebarHeight - 10 + 'px'}">
+                              <h4 align="center">Toolbox</h4>
+                              <!-- toolbox -->
+                              <div class="tool-panel">
+                                <!-- map -->
+                                <div class="singl_tool_style">
+                                  <Icon
+                                    type="md-globe"
+                                    size="40"
+                                    @click.native="toolPanel('map')"
+                                    title="Map"
+                                    color="#808695"
+                                  />
+                                </div>
+                                <!-- draw -->
+                                <div class="singl_tool_style">
+                                  <Icon
+                                    type="ios-brush"
+                                    size="40"
+                                    @click.native="toolPanel('draw')"
+                                    title="Draw Board"
+                                    color="#808695"
+                                  />
+                                </div>
+                                <!-- mindMapping -->
+                                <div class="singl_tool_style">
+                                  <Icon
+                                    type="md-bulb"
+                                    size="40"
+                                    @click.native="toolPanel('mindMapping')"
+                                    title="Mind Mapping"
+                                    color="#808695"
+                                  />
+                                </div>
+                                <!-- chat -->
+                                <div class="singl_tool_style">
+                                  <Icon
+                                    type="ios-chatboxes"
+                                    size="40"
+                                    @click.native="toolPanel('chat')"
+                                    title="Chatroom"
+                                    color="#808695"
+                                  />
+                                </div>
+                              </div>
+                            </Card>
+                          <!-- </div> -->
+                        </Col>
+                        <Col span="22"   >
+                          <!-- <div class="condef"> -->
+                            <Card :style="{height:sidebarHeight - 10 + 'px'}">
+                              <div class="condefTitle">
+                                <div
+                                  style="width:3px;height:18px;float:left;background-color:rgb(124, 126, 126)"
+                                ></div>
+                                <h4 style="float:left;margin-left:5px">Context</h4>
+                              </div>
+                              <vue-scroll :ops="scrollOps" :style="{height:sidebarHeight-60+'px'}">
+                                <div class="condefContent">
+                                  <Form
+                                    ref="contextForm"
+                                    :rules="contextFormValidate"
+                                    :model="contextForm"
+                                    :label-width="180"
+                                  >
+                                    <FormItem label="Problem boundary" prop="boundary">
+                                      <Input
+                                        v-model="contextForm.boundary"
+                                        placeholder="Please enter the boundry of the problem"
+                                        type="textarea"
+                                        :autosize="{minRows: 1,maxRows: 5}"
+                                        clearable
+                                      />
+                                    </FormItem>
+                                    <FormItem label="Spatiotemporal scale" prop="scale">
+                                      <Input
+                                        v-model="contextForm.scale"
+                                        placeholder="Please enter the spatiotemporal scale"
+                                        type="textarea"
+                                        :autosize="{minRows: 1,maxRows: 5}"
+                                        clearable
+                                      />
+                                    </FormItem>
+                                    <FormItem label=" Main methods" prop="methods">
+                                      <Input
+                                        v-model="contextForm.methods"
+                                        placeholder="Please enter the main methods"
+                                        type="textarea"
+                                        :autosize="{minRows: 1,maxRows: 5}"
+                                        clearable
+                                      />
+                                    </FormItem>
+                                    <FormItem label="Goals or Purposes" prop="goals">
+                                      <Input
+                                        v-model="contextForm.goals"
+                                        placeholder="Please enter your goal"
+                                        type="textarea"
+                                        :autosize="{minRows: 1,maxRows: 5}"
+                                        clearable
+                                      />
+                                    </FormItem>
+                                    <FormItem label=" Difficulties or Limitations" prop="difficulties">
+                                      <Input
+                                        v-model="contextForm.difficulties"
+                                        placeholder="Please enter the difficulties"
+                                        type="textarea"
+                                        :autosize="{minRows: 1,maxRows: 5}"
+                                        clearable
+                                      />
+                                    </FormItem>
+                                    <FormItem label="Others" prop="others">
+                                      <Input
+                                        v-model="contextForm.others"
+                                        placeholder="Supplement"
+                                        type="textarea"
+                                        :autosize="{minRows: 1,maxRows: 5}"
+                                        clearable
+                                      />
+                                    </FormItem>
+                                    <FormItem>
+                                      <template  v-if="userRole == 'Manager'">
+                                      <Button @click="submit('contextForm')">Submit</Button>
+                                      </template>
+                                    </FormItem>
+                                  </Form>
+                                </div>
+                              </vue-scroll>
+                            </Card>
+                          <!-- </div> -->
+                        </Col>
+                      </Row>
+                    </template>
+                  <!-- </div> -->
                 </Row>
               </template>
             </TabPane>
@@ -411,16 +423,7 @@
                       >
                         <Icon type="md-cloud-upload" size="20" />
                       </Button>
-                      <!-- 显示所有的resource -->
-                      <Button
-                        class="moreBtn"
-                        type="default"
-                        style="margin-left: 10px"
-                        @click="toResourceList()"
-                        title="more"
-                      >
-                        <Icon type="md-more" />
-                      </Button>
+                   
                     </div>
                     <!-- <vue-scroll :ops="scrollOps" :style="{height:sidebarHeight-50+'px'}"> -->
                     <div class="resourceMenu">
@@ -626,7 +629,14 @@ export default {
         methods: "",
         others: ""
       },
-
+      defaultContent:{
+        boundary: "",
+        scale: "",
+        difficulties: "",
+        goals: "",
+        methods: "",
+        others: ""
+      },
       contextFormValidate: {
         boundary: [
           {
@@ -701,8 +711,8 @@ export default {
           typeIcon: "md-cube"
         }
       ],
-      subprojectId: this.$route.params.subid,
-
+      // subprojectId: this.$route.params.subid,
+      subprojectId:sessionStorage.getItem("subProjectId"),
       //////// resource
       // 点击上传文件按钮时弹出的模态框
       uploadFileModal: false,
@@ -813,7 +823,9 @@ export default {
       stepForm: {
         name: "",
         description: ""
-      }
+      },
+       // 用户角色
+      userRole: "Visitor"
     };
   },
 
@@ -833,6 +845,7 @@ export default {
       this.initSize();
       this.getContextDefinition();
       this.getAllResource();
+     
     },
 
     submit(contextform) {
@@ -842,7 +855,7 @@ export default {
         // 提交表单
         if (valid) {
           let contextDefinition = new URLSearchParams();
-          contextDefinition.append("creator", creatorId);
+          // contextDefinition.append("creator", creatorId);
           contextDefinition.append("type", "contextDefinition");
 
           contextDefinition.append(
@@ -892,9 +905,12 @@ export default {
             this.stepContent = res.data[0];
             this.stepForm.name = res.data[0].name;
             this.stepForm.description = res.data[0].description;
+            this.userRoleIdentity();
 
-            if (res.data[0].content !== {} && res.data[0].content !== null) {
+            if (JSON.stringify(res.data[0].content) != "{}") {
               this.contextForm = res.data[0].content;
+            }else{
+              this.contextForm = this.defaultContent;
             }
           } else {
             this.$Notice.info({
@@ -1198,9 +1214,28 @@ export default {
       this.modifyStep = false;
     },
 
+    // 判断用户权限
+    userRoleIdentity() {
+      this.userRole = "Visitor";
+      // console.log(this.stepContent.creator);
+      // console.log(this.$store.getters.userId);
+      let creatorId = sessionStorage.getItem("subProjectManagerId");
+      console.log(creatorId);
+      if (this.$store.getters.userState) {
+        // 是否是子项目管理员
+        if (creatorId === this.$store.getters.userId) {
+          this.userRole = "Manager";
+          console.log(this.userRole);
+        }
+        else{
+           this.userRole = "Visitor";
+        }
+      }
+    },
+
     // 工具栏
     toolPanel(type) {
-      // if (this.userRole != "Visitor") {
+      if (this.userRole != "Visitor") {
       this.axios
         .post("/GeoProblemSolving/user/state")
         .then(res => {
@@ -1393,12 +1428,12 @@ export default {
         .catch(err => {
           console.log("Get user info fail.");
         });
-      // }
-      // else {
-      //   this.$Notice.info({
-      //   desc: "Please join this project first!"
-      // });
-      // }
+      }
+      else {
+        this.$Notice.info({
+        desc: "Please join this step first!"
+      });
+      }
     },
     closePanel() {
       for (let i = 0; i < this.panelList.length; i++) {
@@ -1417,9 +1452,10 @@ export default {
         this.subprojectSocket = null;
       }
       let subProjectId = this.subProjectId;
-      var subprojectSocketURL =
-        "ws://localhost:8081/GeoProblemSolving/Module/" + subProjectId;
-      // var subprojectSocketURL = "ws://" + this.$store.state.IP_Port + "/GeoProblemSolving/Module/" + subProjectId;
+      var subprojectSocketURL = "ws://" + this.$store.state.IP_Port + "/GeoProblemSolving/Module/" + subProjectId;
+      if(this.$store.state.IP_Port == "localhost:8080"){
+        subprojectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + subProjectId;
+      }
       this.subprojectSocket = new WebSocket(subprojectSocketURL);
       this.subprojectSocket.onopen = this.onOpen;
       this.subprojectSocket.onmessage = this.onMessage;

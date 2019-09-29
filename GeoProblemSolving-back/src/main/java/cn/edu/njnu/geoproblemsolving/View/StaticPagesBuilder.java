@@ -13,7 +13,9 @@ import org.thymeleaf.context.Context;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
+import java.io.OutputStreamWriter;
 import java.util.List;
 
 @Component
@@ -49,8 +51,8 @@ public class StaticPagesBuilder {
         String htmlFile = htmlPath+"/"+projectId+".html";
         try{
             if(projectEntity!=null){
-                FileWriter write = new FileWriter(htmlFile);
-                templateEngine.process("projectDetail", context, write);
+                OutputStreamWriter write = new OutputStreamWriter(new FileOutputStream(htmlFile),"UTF-8");
+                templateEngine.process("projectDetail", context,write);
                 write.flush();
                 write.close();
             }
@@ -89,7 +91,7 @@ public class StaticPagesBuilder {
         }
         String htmlFile = htmlPath + "/projectList.html";
         try {
-            FileWriter write = new FileWriter(htmlFile);
+            OutputStreamWriter write = new OutputStreamWriter(new FileOutputStream(htmlFile),"UTF-8");
             templateEngine.process("projectList", context, write);
             write.flush();
             write.close();

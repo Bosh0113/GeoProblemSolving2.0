@@ -179,12 +179,14 @@
             </div>
             <div class="onlineListBtn">
               <Button @click="drawerValue = true" type="default" ghost>Participants</Button>
-              <Button
-                @click="modifyStep = true"
-                style="margin-left:20px"
-                type="info"
-                ghost
-              >Modify Step</Button>
+               <template  v-if="userRole == 'Manager'">
+                  <Button                
+                    @click="modifyStep = true"
+                    style="margin-left:20px"
+                    type="info"
+                    ghost
+                  >Modify Step</Button>
+               </template>
             </div>
           </Row>
           <Drawer title="Participants" :closable="false" v-model="drawerValue">
@@ -227,24 +229,23 @@
     
     <!-- tab  on-click事件 -->
     
-      <div class="pro-tab" :style="{height:sidebarHeight+ 80+'px'}">
-        <div>
+      <div class="pro-tab" :style="{height:sidebarHeight+ 79+'px'}">
           <template>
             <Row style="margin-top:40px">
               <div :style="{height:sidebarHeight+45+'px'}" style="margin:20px 1%">
-                <div class="tools">
-                  <Card style=" height:100%;">
-                    <Tabs value="Data">
-                      <TabPane name="Data" icon="ios-paper" label="Data">
-                        <ul v-for="(item,index) in dataList" :key="index">
-                          <li>{{item.name}}</li>
-                        </ul>
-                      </TabPane>
-                    </Tabs>
-                  </Card>
-                </div>
-                <div class="condef">
-                  <Card style="height:auto;min-height:100%">
+                <template>
+                  <Col span="6">
+                    <Card :style="{height:sidebarHeight+45+'px'}">
+                      <div class="condefTitle">
+                          <div
+                            style="width:3px;height:18px;float:left;background-color:rgb(124, 126, 126)"
+                          ></div>
+                          <h4 style="float:left;margin-left:5px">Data</h4>
+                        </div>
+                    </Card>
+                </Col>
+                <Col span="18">               
+                  <Card :style="{height:sidebarHeight+45+'px'}">
                     <div class="condefTitle">
                       <Tabs value="general">
                         <TabPane name="general" icon="ios-brush" label="General Tool">
@@ -270,11 +271,11 @@
                       </Tabs>
                     </div>
                   </Card>
-                </div>
+                </Col>
+                </template>
               </div>
             </Row>
           </template>
-        </div>
       </div>
     
   </div>
@@ -348,7 +349,7 @@ export default {
       // web socket for module
       subprojectSocket: null,
       timer: null,
-      subprojectId: this.$route.params.subid,
+      subprojectId:sessionStorage.getItem("subProjectId"),
       stepContent: [],
       drawerValue: false,
 
@@ -356,7 +357,9 @@ export default {
       stepForm: {
         name: "",
         description: ""
-      }
+      },
+       // 用户角色
+      userRole: "Visitor"
     };
   },
 
@@ -377,6 +380,24 @@ export default {
     init() {
       this.initSize();
       this.getModelProcess();
+    },
+
+    userRoleIdentity() {
+      this.userRole = "Visitor";
+      // console.log(this.stepContent.creator);
+      // console.log(this.$store.getters.userId);
+      let creatorId = sessionStorage.getItem("subProjectManagerId");
+      console.log(creatorId);
+      if (this.$store.getters.userState) {
+        // 是否是子项目管理员
+        if (creatorId === this.$store.getters.userId) {
+          this.userRole = "Manager";
+          console.log(this.userRole);
+        }
+        else{
+           this.userRole = "Visitor";
+        }
+      }
     },
 
     getResources() {
@@ -461,6 +482,7 @@ export default {
             this.modelProcessForm = res.data[0].content;
             this.stepContent = res.data[0];
             this.stepForm = res.data[0];
+            this.userRoleIdentity();
           } else {
             this.$Notice.info({
               desc: "Get the description failed!"
@@ -602,9 +624,10 @@ export default {
         this.subprojectSocket = null;
       }
       let subProjectId = this.subProjectInfo.subProjectId;
-      var subprojectSocketURL =
-        "ws://localhost:8081/GeoProblemSolving/Module/" + subProjectId;
-      // var subprojectSocketURL = "ws://" + this.$store.state.IP_Port + "/GeoProblemSolving/Module/" + subProjectId;
+      var subprojectSocketURL = "ws://" + this.$store.state.IP_Port + "/GeoProblemSolving/Module/" + subProjectId;
+      if(this.$store.state.IP_Port == "localhost:8080"){
+        subprojectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + subProjectId;
+      }
       this.subprojectSocket = new WebSocket(subprojectSocketURL);
       this.subprojectSocket.onopen = this.onOpen;
       this.subprojectSocket.onmessage = this.onMessage;

@@ -2,7 +2,6 @@
 .picscreen {
   position: relative;
   padding-top: 10px;
-  /* transform: translateY(60px); */
 }
 
 .picbg {
@@ -181,12 +180,14 @@
 
             <div class="onlineListBtn">
               <Button @click="drawerValue = true" type="default" ghost>Participants</Button>
-              <Button
-                @click="modifyStep = true"
-                style="margin-left:20px"
-                type="info"
-                ghost
-              >Modify Step</Button>
+               <template  v-if="userRole == 'Manager'">
+                  <Button                
+                    @click="modifyStep = true"
+                    style="margin-left:20px"
+                    type="info"
+                    ghost
+                  >Modify Step</Button>
+               </template>
             </div>
           </Row>
           <Drawer title="Participants" :closable="false" v-model="drawerValue">
@@ -230,69 +231,106 @@
 
     <!-- tab  on-click事件 -->
     
-      <div class="pro-tab" :style="{height:sidebarHeight+ 80+'px'}">
-        <div>
-          <template>
-            <Row style="margin-top:40px">
-              <div :style="{height:sidebarHeight+45+'px'}" style="margin:20px 1%">
-                <div class="fileList">
-                  <Card style=" height:100%;">
-                    <div class="condefTitle">
-                      <div
-                        style="width:3px;height:18px;float:left;background-color:rgb(124, 126, 126)"
-                      ></div>
-                      <h4 style="float:left;margin-left:5px">Data</h4>
-                    </div>
-                    <ul v-for="(item,index) in dataList" :key="index">
-                      <li>{{item.name}}</li>
-                    </ul>
-                  </Card>
-                </div>
-                <div class="fileUdx">
-                  <Card style="height:auto;min-height:100%">
-                    <div class="condefTitle">
-                      <div
-                        style="width:3px;height:18px;float:left;background-color:rgb(124, 126, 126)"
-                      ></div>
-                      <h4 style="float:left;margin-left:5px">Data Origin</h4>
-                    </div>
-                    <div style="clear:both">
-                      <!-- <vue-markdown>this is the default slot</vue-markdown> -->
-                      <Tabs>
-                        <TabPane label="Data Origin" name="origin" icon="md-home"></TabPane>
-                        <TabPane label="UDX Schema" name="udx" icon="md-home">
-                          <!-- <mark-down> </mark-down> -->
-                          <!-- <pre class="brush: html"><button></button></pre> -->
-                          <template>
-                            <mark-down />
-                          </template>
-                        </TabPane>
-                      </Tabs>
-                    </div>
-                  </Card>
-                </div>
-                <div class="condef">
-                  <Card style="height:auto;min-height:100%">
-                    <div class="condefTitle">
-                      <div
-                        style="width:3px;height:18px;float:left;background-color:rgb(124, 126, 126)"
-                      ></div>
-                      <h4 style="float:left;margin-left:5px">Toolbox</h4>
-                    </div>
-                    <div style="clear:both">
-                      <Tooltip placement="bottom-start" class="modelToolBtn">
-                        <Button icon="ios-brush" to="//134.175.111.77/note" target="_blank"></Button>
-                        <div slot="content">
-                          <p>Test Tool</p>
-                        </div>
-                      </Tooltip>
-                    </div>
-                  </Card>
-                </div>
-              </div>
-            </Row>
-          </template>
-        </div>
+      <div class="pro-tab" :style="{height:sidebarHeight+ 59+'px'}" style="margin-top:60px">
+       
+                <template style="margin:20px 1%">
+                  <Row>
+                    <Col span="7" >
+                  <!-- <div class="fileList"> -->
+                    <Card :style="{height:sidebarHeight+45+'px'}">
+                      <div class="condefTitle">
+                        <div
+                          style="width:3px;height:18px;float:left;background-color:rgb(124, 126, 126)"
+                        ></div>
+                        <h4 style="float:left;margin-left:5px">Data</h4>
+                      </div>
+                      <ul v-for="(item,index) in dataList" :key="index">
+                        <li>{{item.name}}</li>
+                      </ul>
+                    </Card>
+                  <!-- </div> -->
+                  </Col>
+                  <Col span="9">
+                  <!-- <div class="fileUdx"> -->
+                    <Card :style="{height:sidebarHeight+45+'px'}">
+                      <!-- <div class="condefTitle">
+                        <div
+                          style="width:3px;height:18px;float:left;background-color:rgb(124, 126, 126)"
+                        ></div>
+                        <h4 style="float:left;margin-left:5px">Data Origin</h4>
+                      </div> -->
+                      <div style="clear:both">
+                        <Tabs>
+                          <TabPane label="Data Origin" name="origin" icon="md-home">
+                            <div style="width:100%;position:absolute;right:5%">
+                              <template  v-if="userRole == 'Manager'">
+                                <Icon
+                                  v-if="!edit1"
+                                  type="ios-create"
+                                  :size="25"
+                                  style="float:right;cursor:pointer"
+                                  title="Edit"
+                                  @click="editDataOrginInput"
+                                />
+                                <Icon
+                                  v-else
+                                  type="md-checkbox-outline"
+                                  :size="25"
+                                  style="float:right;cursor:pointer"
+                                  title="Complete"
+                                  @click="editDataOrginInput"
+                                />
+                              </template>                           
+                            </div>
+                            
+              
+                            <div v-if="!edit1" class="subProjectDesc" style="word-break: break-all; word-wrap: break-word;width:85%">{{dataOrginInput}}</div>
+                            <template v-else >
+                              <Input
+                                v-model="dataOrginInput"
+                                type="textarea"
+                                :rows="5"
+                                :autosize="{minRows: 5,maxRows: 18}"
+                                placeholder="Enter something..."
+                                style="width:85%"
+                              
+                              />
+                            </template>
+                          </TabPane>
+                          <TabPane label="UDX Schema" name="udx" icon="md-home">
+                            <!-- <mark-down> </mark-down> -->
+                            <pre class="brush: html"></pre>
+                            <template>
+                              <!-- <mark-down /> -->
+                            </template>
+                          </TabPane>
+                        </Tabs>
+                      </div>
+                    </Card>
+                  <!-- </div> -->
+                  </Col>
+                  <Col span="8">
+                  <!-- <div class="condef"> -->
+                    <Card :style="{height:sidebarHeight+45+'px'}">
+                      <div class="condefTitle">
+                        <div
+                          style="width:3px;height:18px;float:left;background-color:rgb(124, 126, 126)"
+                        ></div>
+                        <h4 style="float:left;margin-left:5px">Toolbox</h4>
+                      </div>
+                      <div style="clear:both">
+                        <Tooltip placement="bottom-start" class="modelToolBtn">
+                          <Button icon="ios-brush" to="//134.175.111.77/note" target="_blank"></Button>
+                          <div slot="content">
+                            <p>Test Tool</p>
+                          </div>
+                        </Tooltip>
+                      </div>
+                    </Card>
+                  <!-- </div> -->
+                  </Col>
+                  </Row>
+                </template>
       </div>
    
   </div>
@@ -305,17 +343,15 @@ import Avatar from "vue-avatar";
 import echarts from "echarts";
 import folderTree from "../resources/folderTree";
 import onlineParticipant from "./onlineParticipants";
-// import VueMarkdown from "vue-markdown";
-// import markDown from "./../../mock/markdown.js";
 export default {
   components: {
     VueFlowy,
     Avatar,
     folderTree,
     onlineParticipant,
-    // VueMarkdown
-    // markDown
+   
   },
+  // props: ["subProjectInfo","userRole","projectInfo"],
   data() {
     return {
       userInfo: "",
@@ -326,12 +362,19 @@ export default {
       toSubProjectPage: "/project/" + this.$route.params.subid + "/subproject",
       stepContent: [],
       // online drawer
+      subprojectId:sessionStorage.getItem("subProjectId"),
       drawerValue: false,
       modifyStep: false,
       stepForm: {
         name: "",
         description: ""
-      }
+      },
+      dataOrginInput:"",
+      // 编辑data描述信息
+      edit1: false,
+      description: "",
+       // 用户角色
+      userRole: "Visitor"
     };
   },
 
@@ -380,6 +423,24 @@ export default {
       this.$set(this, "dataList", filterdata);
     },
 
+    userRoleIdentity() {
+      this.userRole = "Visitor";
+      // console.log(this.stepContent.creator);
+      // console.log(this.$store.getters.userId);
+      let creatorId = sessionStorage.getItem("subProjectManagerId");
+      console.log(creatorId);
+      if (this.$store.getters.userState) {
+        // 是否是子项目管理员
+        if (creatorId === this.$store.getters.userId) {
+          this.userRole = "Manager";
+          console.log(this.userRole);
+        }
+        else{
+           this.userRole = "Visitor";
+        }
+      }
+    },
+
     getDataProcessing() {
       this.axios
         .get(
@@ -393,6 +454,8 @@ export default {
             // this.dataForm = res.data[0].content;
             this.stepContent = res.data[0];
             this.stepForm = res.data[0];
+            this.dataOrginInput = res.data[0].content.dataOrginInput;//绑定input
+            this.userRoleIdentity();
           } else {
             this.$Notice.info({
               desc: "Get the description failed!"
@@ -490,6 +553,35 @@ export default {
           console.log("Get user info fail.");
         });
   
+    },
+
+     editDataOrginInput() {
+      if (this.edit1) {
+        this.edit1 = false;
+
+        let obj = new URLSearchParams();
+        obj.append("stepId", this.stepId);
+        obj.append("content.dataOrginInput", this.dataOrginInput);
+        this.axios
+          .post("/GeoProblemSolving/step/update", obj)
+          .then(res => {
+            if (res.data == "Offline") {
+              this.$store.commit("userLogout");
+              this.$router.push({ name: "Login" });
+            } else if (res.data != "Fail") {
+              this.$Notice.info({
+                desc: "Update successfully!"
+              });
+            } else {
+              this.$Message.error("Update step failed.");
+            }
+          })
+          .catch(err => {
+            console.log(err.data);
+          });
+      } else {
+        this.edit1 = true;
+      }
     },
 
 
