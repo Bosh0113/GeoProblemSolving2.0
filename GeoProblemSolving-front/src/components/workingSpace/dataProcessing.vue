@@ -257,7 +257,7 @@
                       <h4 style="float:left;margin-left:5px">Data Origin</h4>
                     </div>
                     <div style="clear:both">
-                      <vue-markdown>this is the default slot</vue-markdown>
+                      <!-- <vue-markdown>this is the default slot</vue-markdown> -->
                       <Tabs>
                         <TabPane label="Data Origin" name="origin" icon="md-home"></TabPane>
                         <TabPane label="UDX Schema" name="udx" icon="md-home">
@@ -305,7 +305,7 @@ import Avatar from "vue-avatar";
 import echarts from "echarts";
 import folderTree from "../resources/folderTree";
 import onlineParticipant from "./onlineParticipants";
-import VueMarkdown from "vue-markdown";
+// import VueMarkdown from "vue-markdown";
 // import markDown from "./../../mock/markdown.js";
 export default {
   components: {
@@ -313,7 +313,7 @@ export default {
     Avatar,
     folderTree,
     onlineParticipant,
-    VueMarkdown
+    // VueMarkdown
     // markDown
   },
   data() {
