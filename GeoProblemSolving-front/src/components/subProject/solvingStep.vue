@@ -1046,7 +1046,7 @@ export default {
         this.updateSteps();
       } else {
         this.$Notice.info({
-          desc: "There is no step node being selected!"
+          desc: "Select at least one step as source(s), please!"
         });
       }
     },
