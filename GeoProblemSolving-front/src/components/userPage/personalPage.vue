@@ -212,7 +212,7 @@ body {
               </div>
               <br>
               <div
-                style="padding:10px;font-size:12px;border:1px dotted lightgray"
+                style="word-break: break-word;padding:10px;font-size:12px;border:1px dotted lightgray"
                 title="Introduction"
                 v-show="userDetail.introduction!=''"
               >{{userDetail.introduction}}</div>
@@ -293,7 +293,7 @@ body {
                         </div>
                         <div class="uploadBox">
                           <Icon type="ios-camera" size="20" style="position:absolute;margin:18px;"></Icon>
-                          <input @change="uploadPhoto($event)" type="file" class="uploadAvatar">
+                          <input id="choosePicture" @change="uploadPhoto($event)" type="file" class="uploadAvatar">
                         </div>
                         <Modal title="View Image" v-model="visible">
                           <img :src="personalInfoItem.avatar" v-if="visible" style="width: 100%">
@@ -361,6 +361,12 @@ body {
                             title="Download all selected"
                             @click="downloadFiles">
                             <Icon size="20" type="md-cloud-download"></Icon>
+                            </Button>
+                            <Button 
+                            class="fileBtnHoverBlue"
+                            title="Resource center"
+                            @click="goResourceCenter">
+                            <Icon size="20" type="ios-albums"></Icon>
                             </Button>
                           </div>
                           <div style="height:500px">
@@ -1206,8 +1212,7 @@ export default {
           // 读取到的图片base64 数据编码 将此编码字符串传给后台即可
           imgcode = e.target.result;
           this.personalInfoItem.avatar = imgcode;
-          this.userDetail.avatar = "";
-          this.$store.commit("uploadAvatar", imgcode);
+          $('#choosePicture').val('');
         };
       }
     },
@@ -1216,8 +1221,6 @@ export default {
     },
     handleRemove() {
       this.personalInfoItem.avatar = "";
-      this.userDetail.avatar = "";
-      this.$store.commit("uploadAvatar", "");
     },
     submitProfileEdit(name) {
       this.$refs[name].validate(valid => {
@@ -1227,9 +1230,7 @@ export default {
           changedProfile.append("userId", this.$store.getters.userId);
           //筛选出需要修改的信息
           for (var item in data) {
-            if (data[item] != "") {
               changedProfile.append(item, data[item]);
-            }
           }
           this.axios
             .post("/GeoProblemSolving/user/update", changedProfile)
@@ -1244,6 +1245,9 @@ export default {
                 userInfo.userState = true;
                 this.$store.commit("setUserInfo", userInfo);
                 this.$set(this, "userDetail", userInfo);
+                delete this.userDetail.password;
+                delete this.userDetail.joinedProjects;
+                delete this.userDetail.manageProjects;
                 sessionStorage.setItem("userInfo", JSON.stringify(userInfo));
               }
             })
@@ -1484,6 +1488,9 @@ export default {
       a.click();
       a.remove();
     },
+    goResourceCenter(){
+      window.location.href="/GeoProblemSolving/resourceCenter";
+    }
   }
 };
 </script>

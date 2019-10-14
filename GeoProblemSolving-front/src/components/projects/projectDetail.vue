@@ -805,6 +805,7 @@
               <div class="uploadBox">
                 <Icon type="ios-camera" size="20" style="position:absolute;margin:18px;"></Icon>
                 <input
+                  id="choosePicture"
                   @change="uploadPhoto($event)"
                   type="file"
                   class="uploadAvatar"
@@ -2087,6 +2088,7 @@ export default {
                 this.pictureUrl = res.data;
                 var imgcode = e.target.result;
                 this.img = imgcode;
+                $('#choosePicture').val('');
               } else {
                 this.$Message.error("upload picture Fail!");
               }

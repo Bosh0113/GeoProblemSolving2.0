@@ -173,6 +173,13 @@
         .inline_style {
             display: flex;
         }
+        .fileBtn {
+            margin: 0px 3px;
+        }
+        .fileBtnHoverBlue:hover {
+            background-color: #2db7f5;
+            color: white;
+        }
     </style>
 </head>
 
@@ -186,10 +193,10 @@
                     <menu-item name="projectDetail" class="projectMenuItem">
                         <Icon type="ios-information-circle" title="Project detail" size="35"></Icon>
                     </menu-item>
-                    <menu-item name="subProjects" class="projectMenuItem">
+                    <menu-item name="subProjects" class="projectMenuItem" :style="cursorStyle()" :disabled="menuDisable()">
                         <Icon type="md-git-branch" title="Subprojects" size="35"></Icon>
                     </menu-item>
-                    <menu-item name="resources" class="projectMenuItem">
+                    <menu-item name="resources" class="projectMenuItem" :style="cursorStyle()" :disabled="menuDisable()">
                         <Icon type="ios-folder" title="Resources" size="35"></Icon>
                     </menu-item>
                 </i-menu>
@@ -202,17 +209,19 @@
                                 <h1 class="projectMenuItemTitle">Project: </h1>
                                 <h1 style="display: inline-block;max-width: 75%;vertical-align: top;" class="overEllipsis" id="projectTitle" th:text="${projectInfo.title}">Project title</h1>
                             </div>
-                            <div slot="extra" v-if="managerIdentity(projectInfo.managerId)">
-                                <Poptip trigger="hover" content="Edit project information" placement="left">
-                                    <i-button style="margin: 0 5px;" class="changeEditColor" @click="editModelShow()">
-                                        <Icon type="ios-create" :size="20"></Icon>
-                                    </i-button>
-                                </Poptip>
-                                <Poptip trigger="hover" content="Remove project" placement="left">
-                                    <i-button style="margin: 0 5px;" class="changeRemoveColor" @click="deleteProjectShow()">
-                                        <Icon type="md-close" :size="20"></Icon>
-                                    </i-button>
-                                </Poptip>
+                            <div slot="extra">
+                                <div v-if="managerIdentity(projectInfo.managerId)">
+                                    <Poptip trigger="hover" content="Edit project information" placement="left">
+                                        <i-button style="margin: 0 5px;" class="changeEditColor" @click="editModelShow()">
+                                            <Icon type="ios-create" :size="20"></Icon>
+                                        </i-button>
+                                    </Poptip>
+                                    <Poptip trigger="hover" content="Remove project" placement="left">
+                                        <i-button style="margin: 0 5px;" class="changeRemoveColor" @click="deleteProjectShow()">
+                                            <Icon type="md-close" :size="20"></Icon>
+                                        </i-button>
+                                    </Poptip>
+                                </div>
                             </div>
                             <div class="flex1" style="min-height: fit-content;">
                                 <Row gutter="25" style="flex: 1;display: flex;flex-flow: initial">
@@ -395,6 +404,13 @@
                     <div style="background:#eee;padding: 10px;height: inherit;min-height: fit-content;">
                         <Card :bordered="false" dis-hover style="height: -webkit-fill-available;min-height: 565px;min-height: fit-content;">
                             <h1 slot="title" class="projectMenuItemTitle">Resources</h1>
+                            <div slot="extra">
+                                <Tooltip content="Resources center" placement="bottom" class="fileBtn">
+                                    <i-button @click="goResourceCenter" class="fileBtnHoverBlue">
+                                        <Icon type="ios-albums" size="20"></Icon>
+                                    </i-button>
+                                </Tooltip>
+                            </div>
                             <div :style="{height:subProjectsCSS}">
                                 <child-folder
                                 :root-folder-id="projectInfo.projectId"
@@ -1513,6 +1529,23 @@
                         });
                     }
                 },
+                cursorStyle(){
+                    if(this.managerIdentity(this.projectInfo.managerId)||this.memberIdentity(this.projectInfo.members)){
+                        return "cursor: pointer;";
+                    }else{
+                        return "cursor: no-drop;";
+                    }
+                },
+                menuDisable(){
+                    if(this.managerIdentity(this.projectInfo.managerId)||this.memberIdentity(this.projectInfo.members)){
+                        return false;
+                    }else{
+                        return true;
+                    }
+                },
+                goResourceCenter(){
+                    window.location.href="/GeoProblemSolving/resourceCenter";
+                }
             }
         }
     );
