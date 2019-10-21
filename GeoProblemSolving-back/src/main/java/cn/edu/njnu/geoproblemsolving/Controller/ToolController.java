@@ -1,6 +1,7 @@
 package cn.edu.njnu.geoproblemsolving.Controller;
-import cn.edu.njnu.geoproblemsolving.Dao.Step.StepDaoImpl;
-import cn.edu.njnu.geoproblemsolving.Entity.StepEntity;
+
+import cn.edu.njnu.geoproblemsolving.Dao.Tool_related.ToolDaoImpl;
+import cn.edu.njnu.geoproblemsolving.Entity.ToolEntity;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.web.bind.annotation.*;
 
@@ -9,37 +10,36 @@ import javax.servlet.http.HttpServletRequest;
 
 @CrossOrigin(origins = "*",allowCredentials = "true")
 @RestController
-@RequestMapping("/step")
-public class StepController {
+@RequestMapping("/tool")
+public class ToolController {
     @Resource
     private MongoTemplate mongoTemplate;
 
-    // 创建页面，带subprojectId
     @RequestMapping(value = "/create", produces = {"application/json;charset=UTF-8"},method = RequestMethod.POST)
-    public String createStep(@RequestBody StepEntity step){
-        StepDaoImpl stepDao = new StepDaoImpl(mongoTemplate);
+    public String createTool(@RequestBody ToolEntity tool){
+        ToolDaoImpl toolDao = new ToolDaoImpl(mongoTemplate);
         try {
-            return stepDao.createStep(step);
+            return toolDao.createTool(tool);
         }catch (Exception e){
             return "Fail";
         }
     }
 
     @RequestMapping(value = "/inquiry", method = RequestMethod.GET)
-    public Object readStep(@RequestParam("key") String key,@RequestParam("value") String value){
-        StepDaoImpl stepDao = new StepDaoImpl(mongoTemplate);
+    public Object readTool(@RequestParam("key") String key,@RequestParam("value") String value){
+        ToolDaoImpl toolDao = new ToolDaoImpl(mongoTemplate);
         try {
-            return stepDao.readStep(key,value);
+            return toolDao.readTool(key,value);
         }catch (Exception e){
             return "Fail";
         }
     }
 
     @RequestMapping(value = "/delete", method = RequestMethod.GET)
-    public String deleteStep(@RequestParam("stepId") String stepId){
-        StepDaoImpl stepDao = new StepDaoImpl(mongoTemplate);
+    public String deleteTool(@RequestParam("tid") String tid){
+        ToolDaoImpl toolDao = new ToolDaoImpl(mongoTemplate);
         try {
-            stepDao.deleteStep("stepId",stepId);
+            toolDao.deleteTool("tid",tid);
             return "Success";
         }catch (Exception e){
             return "Fail";
@@ -47,8 +47,8 @@ public class StepController {
     }
 
     @RequestMapping(value = "/update", produces = {"application/json;charset=UTF-8"}, method = RequestMethod.POST)
-    public String updateStep(HttpServletRequest request){
-        StepDaoImpl stepDao = new StepDaoImpl(mongoTemplate);
-        return stepDao.updateStep(request);
+    public String updateTool(HttpServletRequest request){
+        ToolDaoImpl toolDao = new ToolDaoImpl(mongoTemplate);
+        return toolDao.updateTool(request);
     }
 }

@@ -30,7 +30,7 @@
         <div span="2"  style="height: inherit;width: 90px;position: absolute;">
             <Menu active-name="projectResource" @on-select="changeMenuItem" style="height: inherit;width: fit-content;">
                 <MenuItem name="projectResource" class="leftMenuItem">
-                    <Icon type="ios-paper" title="Project Resource" size="35"></Icon>
+                    <Icon type="ios-paper" title="Project Resources" size="35"></Icon>
                 </MenuItem>
                 <MenuItem name="personalResource" class="leftMenuItem">
                     <Icon type="ios-folder" title="Personal Resource" size="35"></Icon>

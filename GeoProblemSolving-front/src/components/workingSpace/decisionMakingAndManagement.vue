@@ -149,13 +149,34 @@
 export default {
   mounted() {
     this.initSize();
+    this.userRoleIdentity();
     this.getStepInfo();
     window.addEventListener("resize", this.initSize);
+  },
+  beforeRouteEnter: (to, from, next) => {
+    next(vm => {
+      if (!vm.$store.getters.userState) {
+        next("/login");
+      } else {
+        if (
+          !(
+            vm.userRole == "Manager" ||
+            vm.userRole == "Member" ||
+            vm.userRole == "PManager"
+          )
+        ) {
+          vm.$Message.error("You have no property to access it");
+          vm.$router.go(-1);
+        } else {
+          next();
+        }
+      }
+    });
   },
   data() {
     return {
       stepId: this.$route.params.id,
-      toSubProjectPage: "/project/" + this.$route.params.subid + "/subproject",
+      toSubProjectPage: "",
       stepInfo: {
         name: ""
       },
@@ -208,6 +229,7 @@ export default {
             this.$router.push({ name: "Login" });
           } else if (res.data != "Fail" && res.data != "None") {
             this.stepInfo = res.data[0];
+            this.toSubProjectPage = "/project/" + res.data[0].subProjectId + "/subproject";
           } else {
             this.$Message.warning("Get step info fail.");
           }
@@ -216,7 +238,23 @@ export default {
     },
     enterTheme(url) {
       window.open(url);
-    }
+    },
+    userRoleIdentity() {
+      this.userRole = "Visitor";
+      // console.log(this.stepContent.creator);
+      // console.log(this.$store.getters.userId);
+      let creatorId = sessionStorage.getItem("subProjectManagerId");
+      console.log(creatorId);
+      if (this.$store.getters.userState) {
+        // 是否是子项目管理员
+        if (creatorId === this.$store.getters.userId) {
+          this.userRole = "Manager";
+          console.log(this.userRole);
+        } else {
+          this.userRole = "Visitor";
+        }
+      }
+    },
   }
 };
 </script>

@@ -39,10 +39,10 @@
         </Col>
         <Button
           type="info"
-          to="../workspace"
           icon="md-globe"
           style="float:right;margin:3px 30px 0 0"
           title="Go to work"
+          @click="gotoWorkingspace"
         >Working space</Button>
       </div>
       <router-view :subProjectInfo="subProjectInfo" :userRole="userRole" :projectInfo="projectInfo"></router-view>
@@ -53,7 +53,7 @@
 export default {
   data() {
     return {
-      menuActive:"info",
+      menuActive: "info",
       // information of project
       projectInfo: {},
       // info of subproject
@@ -68,14 +68,13 @@ export default {
   },
   mounted() {
     var type = window.location.href.match(/subproject\/(\S*)/)[1];
-    if(type!=""){
+    if (type != "") {
       this.menuActive = type;
-    }else{
-      this.menuActive = 'info';
+    } else {
+      this.menuActive = "info";
     }
     window.addEventListener("resize", this.initSize);
   },
-  // add by mzy for navigation guards
   beforeRouteEnter: (to, from, next) => {
     next(vm => {
       if (!vm.$store.getters.userState) {
@@ -186,7 +185,10 @@ export default {
                 subProjectInfo.subProjectId
               );
               sessionStorage.setItem("subProjectName", subProjectInfo.title);
-              sessionStorage.setItem("subProjectManagerId", subProjectInfo.managerId);
+              sessionStorage.setItem(
+                "subProjectManagerId",
+                subProjectInfo.managerId
+              );
               console.log(subProjectInfo);
               that.$store.commit("setSubProjectInfo", subProjectInfo);
             }
@@ -232,10 +234,10 @@ export default {
     },
     cancel() {},
     changeContent(name) {
-      if(name == "home"){
-        window.location.href = "/GeoProblemSolving/projectDetail/"+this.subProjectInfo.projectId;
-      }
-      else if (name == "process") {
+      if (name == "home") {
+        window.location.href =
+          "/GeoProblemSolving/projectDetail/" + this.subProjectInfo.projectId;
+      } else if (name == "process") {
         this.$router.replace({ name: "process" });
       } else if (name == "info") {
         this.$router.replace({ name: "info" });
@@ -243,6 +245,70 @@ export default {
         this.$router.replace({ name: "resource" });
       } else if (name == "task") {
         this.$router.replace({ name: "task" });
+      }
+    },
+    gotoWorkingspace() {
+      this.processStructure = JSON.parse(this.subProjectInfo.solvingProcess);
+
+      if (this.processStructure.length > 0) {
+        let activeStep = undefined;
+        for (let i = 0; i < this.processStructure.length; i++) {
+          if (this.processStructure[i].activeStatus) {
+            activeStep = this.processStructure[i];
+          }
+        }
+
+        if (activeStep === undefined) {
+          activeStep = this.processStructure[0];
+        }
+
+        let stepId = activeStep.stepID;
+        if (activeStep.category == 0) {
+          this.$router.push({
+            name: "contextDefinition",
+            params: { id: stepId }
+          });
+        } else if (activeStep.category == 1) {
+          this.$router.push({
+            name: "dataProcessing",
+            params: { id: stepId }
+          });
+        } else if (activeStep.category == 2) {
+          this.$router.push({
+            name: "modelProcess",
+            params: { id: stepId }
+          });
+        } else if (activeStep.category == 3) {
+          this.$router.push({
+            name: "modelEvalution",
+            params: { id: stepId }
+          });
+        } else if (activeStep.category == 4) {
+          this.$router.push({
+            name: "quantitativeAndQualitative",
+            params: { id: stepId }
+          });
+        } else if (activeStep.category == 5) {
+          this.$router.push({
+            name: "simulationPrediction",
+            params: { id: stepId }
+          });
+        } else if (activeStep.category == 6) {
+          this.$router.push({
+            name: "dataVisulization",
+            params: { id: stepId }
+          });
+        } else if (activeStep.category == 7) {
+          this.$router.push({
+            name: "decisionMakingAndManagement",
+            params: { id: stepId }
+          });
+        }
+      }
+      else{
+        this.$Notice.info({
+              desc: "The working space have not be initialized!"
+            });
       }
     }
   }
