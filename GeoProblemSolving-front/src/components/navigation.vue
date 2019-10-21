@@ -88,7 +88,7 @@ footer {
             <Menu
               mode="horizontal"
               theme="dark"
-              active-name="home"
+              :active-name="activeMenu"
               @on-select="turnContent"
               :style="`z-index:0;background:`+headerBgColor"
               width="auto"
@@ -114,6 +114,7 @@ footer {
             <Menu
               mode="horizontal"
               theme="dark"
+              :active-name="activeMenu"
               @on-select="unlogin"
               :style="`z-index:0;background:`+headerBgColor"
               v-show="!userState"
@@ -219,6 +220,7 @@ export default {
   name: "HelloWorld",
   data() {
     return {
+      activeMenu:"",
       //消息机制
       noticeSocket: null,
       unreadNoticeCount: 0,
@@ -226,6 +228,14 @@ export default {
       contentHeight: window.innerHeight - 120 + "px",
       useMenuCSS:false
     };
+  },
+  watch: {
+    '$route.name':function (newVal,oldVal) {
+      this.setMenuTitle(newVal)
+    } 
+  },
+  created(){
+    this.setMenuTitle(this.$route.name)
   },
   mounted() {
     if (this.$store.getters.userState) {
@@ -260,6 +270,28 @@ export default {
     }
   },
   methods: {
+    setMenuTitle(newVal){
+        switch(newVal){
+          case "PublicResource":{
+            this.activeMenu = "resources";
+            break;
+          }
+          case "Help":{
+            this.activeMenu = "help";
+            break;
+          }
+          case "Login":{
+            this.activeMenu = "login";
+            break;
+          }
+          case "Register":{
+            this.activeMenu = "register";
+            break;
+          }
+          default:
+            this.activeMenu = ""
+        }
+    },
     reSize() {
       if(window.innerHeight > 675){
         this.contentHeight = window.innerHeight - 120 + "px";

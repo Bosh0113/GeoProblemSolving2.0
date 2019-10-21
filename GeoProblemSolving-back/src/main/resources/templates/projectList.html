@@ -248,7 +248,7 @@
                                 joinedProjects.push(this.userInfo.joinedProjects[i].projectId);
                             }
                         }
-                        this.$Spin.show();
+                        // this.$Spin.show();
                         axios
                             .get("/GeoProblemSolving/project/inquiryByPage"+
                                     "?category="+this.currentTab+
@@ -257,7 +257,7 @@
                                     "&userId="+userId+
                                     "&joinedProjects="+joinedProjects)
                             .then(res => {
-                                this.$Spin.hide();
+                                // this.$Spin.hide();
                                 if(res.data !="Fail") {
                                     if (res.data === "None") {
                                         this.currentProjectList = [];

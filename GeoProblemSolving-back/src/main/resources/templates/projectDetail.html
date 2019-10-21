@@ -52,7 +52,7 @@
         }
 
         .projectDescriptionContent {
-            height: 160px;
+            height: 75px;
             overflow-y: auto;
             text-indent: 2em;
             padding: 0 5px;
@@ -66,7 +66,7 @@
             word-break: break-word;
         }
         .statistics{
-            width: 40%;
+            /* width: 40%; */
             height: -webkit-fill-available;
             display: inline-block;
         }
@@ -204,7 +204,7 @@
             <div style="margin-left: 90px;height: inherit;min-height: fit-content;">
                 <div v-if="showMenuItem=='projectDetail'" style="height: inherit;min-height: fit-content;">
                     <div style="background:#eee;padding: 10px;height: inherit;min-height: fit-content;">
-                        <Card :bordered="false" dis-hover style="height: -webkit-fill-available;display: flex;flex-flow: column;min-height: fit-content;">
+                        <Card :bordered="false" dis-hover style="height: -webkit-fill-available;flex-flow: column;min-height: fit-content;">
                             <div slot="title">
                                 <h1 class="projectMenuItemTitle">Project: </h1>
                                 <h1 style="display: inline-block;max-width: 75%;vertical-align: top;" class="overEllipsis" id="projectTitle" th:text="${projectInfo.title}">Project title</h1>
@@ -227,7 +227,7 @@
                                 <Row gutter="25" style="flex: 1;display: flex;flex-flow: initial">
                                     <i-col span="16" style="display: flex;flex-flow: column">
                                         <div style="border: solid 1px #eeeeee;flex: 1;padding: 20px;flex-flow: column;display: flex;">
-                                            <Row gutter="15" style="height: 200px;">
+                                            <Row gutter="15" style="height: 200px;display: flex;">
                                                 <i-col span="8">
                                                     <div style="width: 200px;height: 200px;">
                                                         <img :src="projectInfo.picture" style="height: inherit;width: inherit;" v-if="projectInfo.picture!=''&&projectInfo.picture!=undefined"
@@ -235,21 +235,42 @@
                                                         <avatar :username="projectInfo.title" :size="200" :title="projectInfo.title" :rounded="false" v-else></avatar>
                                                     </div>
                                                 </i-col>
-                                                <i-col span="16">
-                                                    <div style="height: -webkit-fill-available;padding: 5px;">
-                                                        <h3>Description:</h3>
-                                                        <div class="projectDescriptionContent">
-                                                            <vue-scroll :ops="scrollOps">
-                                                                <div id="projectDescription" th:text="${projectInfo.description}">
-                                                                    Project description
-                                                                </div>
-                                                            </vue-scroll>
+                                                <i-col span="16" style="align-self: center;">
+                                                    <div style="height: -webkit-fill-available;text-align: center;">
+                                                        <div class="statistics">
+                                                            <div style="text-align: left;padding: 5px;">
+                                                                <p><strong>Privacy:</strong><span id="projectPrivacy" th:text="${projectInfo.privacy}">Project privacy</span> </p>
+                                                                <p><strong>Category:</strong><span id="projectCategory" th:text="${projectInfo.category}">Project category</span></p>
+                                                                <p><strong>Tag:</strong><span id="projectTag" class="overEllipsis" style="display: inline-block;vertical-align: top;width:230px" th:text="${projectInfo.tag}" th:attr="title=${projectInfo.tag}">Project tag</span></p>
+                                                                <p><strong>Manager:</strong> {{projectInfo.managerName}}</p>
+                                                                <p><strong>Create time:</strong> {{projectInfo.createTime}}</p>
+                                                            </div>
+                                                        </div>
+                                                        <div class="statistics">
+                                                            <div>
+                                                                <Icon type="md-git-branch" size="30"></Icon>
+                                                                <span class="showCount">{{SubProjectCount()}}</span>
+                                                            </div>
+                                                            <div>
+                                                                <Icon type="md-contacts" size="30"></Icon>
+                                                                <span class="showCount">{{ParticipantsCount()}}</span>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </i-col>
                                             </Row>
                                             <div class="flex1" style="margin-top: 10px;">
-                                                <div style="flex: 1;min-height: 200px;padding: 5px;">
+                                                <div style="padding: 5px;min-height: 80px;max-height: 100px;border: #e8eaec 0.1px dashed;">
+                                                    <h3>Description:</h3>
+                                                    <div class="projectDescriptionContent">
+                                                        <vue-scroll :ops="scrollOps">
+                                                            <div id="projectDescription" th:text="${projectInfo.description}">
+                                                                Project description
+                                                            </div>
+                                                        </vue-scroll>
+                                                    </div>
+                                                </div>
+                                                <div style="flex: 1;min-height: 200px;padding: 5px;border: #e8eaec 0.1px dashed;margin-top: 10px;">
                                                     <h3>Introduction:</h3>
                                                     <div class="projectIntroductionContent">
                                                         <vue-scroll :ops="scrollOps">
@@ -257,27 +278,6 @@
                                                                 Project introduction
                                                             </div>
                                                         </vue-scroll>
-                                                    </div>
-                                                </div>
-                                                <div style="min-height: 80px;max-height: 100px;text-align: center;">
-                                                    <div class="statistics">
-                                                        <div style="text-align: left;padding: 5px;">
-                                                            <p><strong>Privacy:</strong><span id="projectPrivacy" th:text="${projectInfo.privacy}">Project privacy</span> </p>
-                                                            <p><strong>Category:</strong><span id="projectCategory" th:text="${projectInfo.category}">Project category</span></p>
-                                                            <p><strong>Tag:</strong><span id="projectTag" class="overEllipsis" style="display: inline-block;vertical-align: top;width:230px" th:text="${projectInfo.tag}" th:attr="title=${projectInfo.tag}">Project tag</span></p>
-                                                            <p><strong>Manager:</strong> {{projectInfo.managerName}}</p>
-                                                            <p><strong>Create time:</strong> {{projectInfo.createTime}}</p>
-                                                        </div>
-                                                    </div>
-                                                    <div class="statistics">
-                                                        <div>
-                                                            <Icon type="md-git-branch" size="30"></Icon>
-                                                            <span class="showCount">{{SubProjectCount()}}</span>
-                                                        </div>
-                                                        <div>
-                                                            <Icon type="md-contacts" size="30"></Icon>
-                                                            <span class="showCount">{{ParticipantsCount()}}</span>
-                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -519,7 +519,7 @@
                         </i-form>
                     </div>
                     <div slot="footer" style="display: inline-block">
-                        <i-button type="primary" @click="editProjectSubmit('projectEditForm')" style="float:right;">Submit</i-button>
+                        <i-button type="primary" @click="editProjectSubmit('projectEditForm')" style="float:right;">OK</i-button>
                         <i-button @click="closeEditModel()" style="float:right;margin-right: 15px;">Cancel</i-button>
                     </div>
                 </Modal>
@@ -527,7 +527,7 @@
                   v-model="removeProjectModal"
                   title="Delete warning "
                   @on-ok="deleteProject"
-                  ok-text="Submit"
+                  ok-text="Ok"
                   cancel-text="Cancel"
                 >
                   <p>Do you sure to delete this project?</p>
@@ -583,7 +583,7 @@
                 v-model="removeMemberAlertModel"
                 title="Remove Member alert"
                 @on-ok="removeMember"
-                ok-text="Submit"
+                ok-text="OK"
                 cancel-text="Cancel">
                     <p>Do you sure to remove {{removeMemberName}} from this project?</p>
                 </Modal>
@@ -614,7 +614,7 @@
                         </Form-item>
                     </i-form>
                     <div slot="footer" style="display: inline-block">
-                        <i-button type="primary" @click="createSubProject('createSubProjectForm')" style="float:right;">Submit</i-button>
+                        <i-button type="primary" @click="createSubProject('createSubProjectForm')" style="float:right;">OK</i-button>
                         <i-button @click="closeCreateSubProjectModel()" style="float:right;margin-right: 15px;">Cancel</i-button>
                     </div>
                 </Modal>
@@ -630,7 +630,7 @@
                     </Radio>
                 </Radio-group>
                 <div slot="footer" style="display: inline-block">
-                    <i-button type="primary" @click="handOverAuthority()" style="float:right;">Submit</i-button>
+                    <i-button type="primary" @click="handOverAuthority()" style="float:right;">OK</i-button>
                     <i-button @click="closeHandOverModel()" style="float:right;margin-right: 15px;">Cancel</i-button>
                 </div>
                 </Modal>
@@ -660,7 +660,7 @@
                     </i-form>
                     </div>
                 <div slot="footer" style="display: inline-block">
-                    <i-button type="primary" @click="editSubProject('editSubProjectForm')" style="float:right;">Submit</i-button>
+                    <i-button type="primary" @click="editSubProject('editSubProjectForm')" style="float:right;">OK</i-button>
                     <i-button @click="closeEditSubProjectModel()" style="float:right;margin-right: 15px;">Cancel</i-button>
                 </div>
               </Modal>
@@ -698,7 +698,7 @@
                     </i-form>
                 </div>
                 <div slot="footer" style="display: inline-block">
-                    <i-button type="primary" @click="applyJoin('applyJoinForm')" style="float:right;">Submit</i-button>
+                    <i-button type="primary" @click="applyJoin('applyJoinForm')" style="float:right;">OK</i-button>
                     <i-button @click="closeApplyJoinModel()" style="float:right;margin-right: 15px;">Cancel</i-button>
                 </div>
               </Modal>
