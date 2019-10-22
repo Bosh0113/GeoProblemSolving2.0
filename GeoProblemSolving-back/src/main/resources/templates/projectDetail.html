@@ -14,12 +14,19 @@
     <script src="https://cdn.jsdelivr.net/npm/vue-avatar@2.1.7/dist/vue-avatar.min.js"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="https://unpkg.com/vuescroll"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.8.4/Sortable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Vue.Draggable/2.20.0/vuedraggable.umd.min.js"></script>
+    <script src="https://unpkg.com/gantt-elastic@1.0.10/dist/GanttElastic.umd.js"></script>
+    <script src="https://unpkg.com/dayjs@1.8.16/dayjs.min.js"></script>
     <script th:replace="navigation::commonHeader-css"></script>
     <script th:replace="navigation::commonHeader-html"></script>
     <script th:replace="navigation::commonHeader-js"></script>
     <script th:replace="folderTree::common-css"></script>
     <script th:replace="folderTree::common-html"></script>
     <script th:replace="folderTree::common-js"></script>
+    <script th:replace="taskManager::task-css"></script>
+    <script th:replace="taskManager::task-html"></script>
+    <script th:replace="taskManager::task-js"></script>
     <style>
         [v-cloak] {
             display: none;
@@ -196,14 +203,14 @@
                     <menu-item name="projectDetail" class="projectMenuItem">
                         <Icon type="ios-information-circle" title="Project detail" size="35"></Icon>
                     </menu-item>
+                    <menu-item name="tasks" class="projectMenuItem">
+                        <Icon type="md-calendar" title="Tasks" size="35"></Icon>
+                    </menu-item>
                     <menu-item name="subProjects" class="projectMenuItem" :style="cursorStyle()" :disabled="menuDisable()">
                         <Icon type="md-git-branch" title="Subprojects" size="35"></Icon>
                     </menu-item>
                     <menu-item name="resources" class="projectMenuItem" :style="cursorStyle()" :disabled="menuDisable()">
                         <Icon type="ios-folder" title="Resources" size="35"></Icon>
-                    </menu-item>
-                    <menu-item name="tasks" class="projectMenuItem" :style="cursorStyle()" :disabled="menuDisable()">
-                        <Icon type="md-calendar" title="Tasks" size="35"></Icon>
                     </menu-item>
                 </i-menu>
             </div>
@@ -438,7 +445,10 @@
                         <Card :bordered="false" dis-hover style="height: -webkit-fill-available;min-height: 565px;min-height: fit-content;">
                             <h1 slot="title" class="projectMenuItemTitle">Tasks</h1>
                             <div>
-                                <h3>Content</h3>
+                                <child-task
+                                :project-info="projectInfo"
+                                :user-role="taskRole"
+                                ref="taskTreeEl"></child-task>
                             </div>
                         </Card>
                     </div>
@@ -766,6 +776,7 @@
                 this.userEnter();
                 this.resizeContent();
                 this.getAllSubProjects();
+                this.roleIdentity();
             },
             data() {
                 return {
@@ -961,6 +972,7 @@
                     },
                     applyJoinModal: false,
                     haveApplied: false,
+                    taskRole:"",
                 }
             },
             methods: {
@@ -977,6 +989,17 @@
                         if(!this.userInfo.userState || !(isManager || isMember)) {
                             window.location.href="/GeoProblemSolving/projectList.html";
                         }
+                    }
+                },
+                roleIdentity(){
+                    if(this.managerIdentity(this.projectInfo.managerId)){
+                        this.taskRole = 'PManager';
+                    }
+                    else if(this.memberIdentity(this.projectInfo.members)){
+                        this.taskRole = 'Member';
+                    }
+                    else{
+                        this.taskRole = 'Visitor';
                     }
                 },
                 resizeContent(){

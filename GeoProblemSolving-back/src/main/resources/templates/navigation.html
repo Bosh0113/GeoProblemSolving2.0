@@ -320,6 +320,9 @@
                         this.noticeSocket = null;
                     }
                     var noticeSocketURL = "ws://" + window.location.host + "/GeoProblemSolving/NoticeSocket";
+                    if(window.location.host == "localhost:8080"){
+                        noticeSocketURL = "ws://localhost:8081/GeoProblemSolving/NoticeSocket";
+                    }
                     this.noticeSocket = new WebSocket(noticeSocketURL);
                     this.noticeSocket.onopen = this.onOpen;
                     this.noticeSocket.onmessage = this.onMessage;

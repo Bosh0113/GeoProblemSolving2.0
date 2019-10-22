@@ -68,7 +68,7 @@
                   >Add</Button>
                   <vue-scroll :ops="ops" :style="{height:contentHeight-80+'px'}">
                     <draggable
-                      :disabled = "isManager()"
+                      :disabled = "taskItemDraggable()"
                       class="taskList"
                       element="ul"
                       :options="{group:'task'}"
@@ -98,7 +98,7 @@
                           </span>
                           <div style="float:right">
                             <Rate
-                              :disabled = "isManager()"
+                              :disabled = "!isManager()"
                               v-model="item.importance"
                               :count="1"
                               clearable
@@ -140,6 +140,7 @@
                   <h3 slot="title">Doing</h3>
                   <vue-scroll :ops="ops" :style="{height:contentHeight-80+'px'}">
                     <draggable
+                      :disabled = "taskItemDraggable()"
                       class="taskList"
                       element="ul"
                       :options="{group:'task'}"
@@ -169,13 +170,14 @@
                           </span>
                           <div style="float:right" v-show="userRole != 'Visitor'">
                             <Rate
+                              :disabled = "!isManager()"
                               v-model="item.importance"
                               :count="1"
                               clearable
                               title="Importance"
                               @on-change="changeImportance(item)"
                             />
-                            <span>
+                            <span title="Edit" v-if="isManager()">
                               <Icon
                                 type="ios-create"
                                 color="gray"
@@ -184,7 +186,7 @@
                                 @click="editOneTask(index,taskDoing)"
                               />
                             </span>
-                            <span
+                            <span v-if="isManager()"
                               style="margin-left:5px;margin-right:3px;cursor: pointer;color:gray;"
                               title="Delete"
                               @click="taskRemoveAssure(index,taskDoing)"
@@ -210,6 +212,7 @@
                   <h3 slot="title">Done</h3>
                   <vue-scroll :ops="ops" :style="{height:contentHeight-80+'px'}">
                     <draggable
+                      :disabled = "taskItemDraggable()"
                       class="taskList"
                       element="ul"
                       :options="{group:'task'}"
@@ -239,13 +242,14 @@
                           </span>
                           <div style="float:right" v-show="userRole != 'Visitor'">
                             <Rate
+                              :disabled = "!isManager()"
                               v-model="item.importance"
                               :count="1"
                               clearable
                               title="Importance"
                               @on-change="changeImportance(item)"
                             />
-                            <span>
+                            <span title="Edit" v-if="isManager()">
                               <Icon
                                 type="ios-create"
                                 color="gray"
@@ -254,7 +258,7 @@
                                 @click="editOneTask(index,taskDone)"
                               />
                             </span>
-                            <span
+                            <span v-if="isManager()"
                               style="margin-left:5px;margin-right:3px;cursor: pointer;color:gray;"
                               title="Delete"
                               @click="taskRemoveAssure(index,taskDone)"
@@ -1076,12 +1080,20 @@ export default {
         });
     },
     isManager(){
-      if(this.userRole=='Manager'||this.userRole=='PManager'){
+      // if(this.userRole=='Manager'||this.userRole=='PManager'){
         return true;
-      }
-      else{
+      // }
+      // else{
+      //   return false;
+      // }
+    },
+    taskItemDraggable(){
+      // if(this.userRole=='Manager'||this.userRole=='PManager'||this.userRole=='Member'){
         return false;
-      }
+      // }
+      // else{
+      //   return true;
+      // }
     },
     initGantt() {
       this.ganttTasks = [];
