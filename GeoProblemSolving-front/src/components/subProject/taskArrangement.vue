@@ -64,10 +64,11 @@
                     class="createTaskBtn"
                     style="margin-top:-8px"
                     @click="createTaskModalShow()"
-                    v-show="userRole!='Visitor'"
+                    v-show="isManager()"
                   >Add</Button>
-                  <vue-scroll :ops="scrollOps" :style="{height:contentHeight-80+'px'}">
+                  <vue-scroll :ops="ops" :style="{height:contentHeight-80+'px'}">
                     <draggable
+                      :disabled = "isManager()"
                       class="taskList"
                       element="ul"
                       :options="{group:'task'}"
@@ -95,15 +96,16 @@
                               :title="item.taskName"
                             >{{item.taskName}}</strong>
                           </span>
-                          <div style="float:right" v-show="userRole != 'Visitor'">
+                          <div style="float:right">
                             <Rate
+                              :disabled = "isManager()"
                               v-model="item.importance"
                               :count="1"
                               clearable
                               title="Importance"
                               @on-change="changeImportance(item)"
                             />
-                            <span title="Edit">
+                            <span title="Edit" v-if="isManager()">
                               <Icon
                                 type="ios-create"
                                 color="gray"
@@ -112,7 +114,7 @@
                                 @click="editOneTask(index, taskTodo)"
                               />
                             </span>
-                            <span
+                            <span  v-if="isManager()"
                               style="margin-left:5px;margin-right:3px;cursor: pointer;color:gray;"
                               title="Delete"
                               @click="taskRemoveAssure(index,taskTodo)"
@@ -136,7 +138,7 @@
               <Col span="7">
                 <Card :padding="0" :border="false">
                   <h3 slot="title">Doing</h3>
-                  <vue-scroll :ops="scrollOps" :style="{height:contentHeight-80+'px'}">
+                  <vue-scroll :ops="ops" :style="{height:contentHeight-80+'px'}">
                     <draggable
                       class="taskList"
                       element="ul"
@@ -206,7 +208,7 @@
               <Col span="7">
                 <Card :padding="0" :border="false">
                   <h3 slot="title">Done</h3>
-                  <vue-scroll :ops="scrollOps" :style="{height:contentHeight-80+'px'}">
+                  <vue-scroll :ops="ops" :style="{height:contentHeight-80+'px'}">
                     <draggable
                       class="taskList"
                       element="ul"
@@ -460,9 +462,14 @@ export default {
     dayjs,
     ganttElastic: GanttElastic
   },
-  props: ["subProjectInfo","userRole"],
+  props: ["subProjectInfo","userRole"], //子项目管理者Manager，项目管理者PManager,成员Member
   data() {
     return {
+      ops: {
+        bar: {
+          background: "#808695"
+        }
+      },
       scrollOps: {
         bar: {
           background: "#808080",
@@ -1067,6 +1074,14 @@ export default {
         .catch(err => {
           this.$Message.error("Fail!");
         });
+    },
+    isManager(){
+      if(this.userRole=='Manager'||this.userRole=='PManager'){
+        return true;
+      }
+      else{
+        return false;
+      }
     },
     initGantt() {
       this.ganttTasks = [];
