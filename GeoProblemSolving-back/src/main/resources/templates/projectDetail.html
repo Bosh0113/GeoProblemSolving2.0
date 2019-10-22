@@ -70,6 +70,9 @@
             height: -webkit-fill-available;
             display: inline-block;
         }
+        .statistics p{
+            margin-top: 5px;
+        }
         .showCount{
             font-size: 30px;
             vertical-align: middle;
@@ -222,6 +225,13 @@
                                         </i-button>
                                     </Poptip>
                                 </div>
+                                <div v-if="!managerIdentity(projectInfo.managerId)&&!memberIdentity(projectInfo.members)">
+                                    <i-button
+                                        type="success"
+                                        @click="joinApplyModalShow()"
+                                        title="Apply to join the project"
+                                    >Apply to join</i-button>
+                                </div>
                             </div>
                             <div class="flex1" style="min-height: fit-content;">
                                 <Row gutter="25" style="flex: 1;display: flex;flex-flow: initial">
@@ -235,7 +245,7 @@
                                                         <avatar :username="projectInfo.title" :size="200" :title="projectInfo.title" :rounded="false" v-else></avatar>
                                                     </div>
                                                 </i-col>
-                                                <i-col span="16" style="align-self: center;">
+                                                <i-col span="16" style="align-self: flex-end;">
                                                     <div style="height: -webkit-fill-available;text-align: center;">
                                                         <div class="statistics">
                                                             <div style="text-align: left;padding: 5px;">
@@ -702,6 +712,22 @@
                     <i-button @click="closeApplyJoinModel()" style="float:right;margin-right: 15px;">Cancel</i-button>
                 </div>
               </Modal>
+              <Modal v-model="applyJoinModal" title="Apply to join the project">
+                <i-form ref="applyValidate" :model="applyValidate" :rules="applyRuleValidate" :label-width="80">
+                    <form-item label="Reason" prop="reason">
+                        <i-input
+                                v-model="applyValidate.reason"
+                                type="textarea"
+                                :rows="4"
+                                placeholder="Enter The Reason For Application ..."
+                        ></i-input>
+                    </form-item>
+                </i-form>
+                <div slot="footer">
+                    <i-button @click="applyJoinModal=false">Cancel</i-button>
+                    <i-button type="success" @click="joinApply('applyValidate')">Apply</i-button>
+                </div>
+            </Modal>
             </div>
         </div>
     </template>
@@ -908,7 +934,20 @@
                                 trigger: "blur"
                             }
                         ]
-                    }
+                    },
+                    //加入项目
+                    applyProjectInfo: {},
+                    applyValidate: {
+                        reason: ""
+                    },
+                    applyRuleValidate: {
+                        reason: [
+                            { required: true, message: "Please enter the reason for application", trigger: "blur" },
+                            { type: "string", min: 5, message: "The reason no less than 10 characters", trigger: "blur" }
+                        ]
+                    },
+                    applyJoinModal: false,
+                    haveApplied: false,
                 }
             },
             methods: {
@@ -1545,7 +1584,99 @@
                 },
                 goResourceCenter(){
                     window.location.href="/GeoProblemSolving/resourceCenter";
-                }
+                },
+                joinApplyModalShow() {
+                    this.applyProjectInfo=Object.assign([], this.projectInfo);
+                    this.applyValidate.reason = "";
+                    this.applyJoinModal = true;
+                },
+                joinApply(name) {
+                    this.$refs[name].validate(valid => {
+                        if (valid) {
+                            this.applyJoinModal = false;
+                            var data = this.applyProjectInfo;
+                            if (
+                                this.haveApplied == true &&
+                                data.projectId == sessionStorage.getItem("applyId")
+                            ) {
+                                this.$Notice.warning({
+                                    title: "repeat apply warning",
+                                    desc: "You have apply success, no need to click again!"
+                                });
+                            } else {
+                                let userDetail = this.userInfo;
+                                let joinForm = {};
+                                sessionStorage.setItem("applyId", data.projectId);
+                                joinForm["recipientId"] = data.managerId;
+                                joinForm["type"] = "apply";
+                                joinForm["content"] = {
+                                    userEmail: userDetail.email,
+                                    userName:this.userInfo.userName,
+                                    userId: this.userInfo.userId,
+                                    title: "Group application",
+                                    description:
+                                        "User " +
+                                        this.userInfo.userName +
+                                        " apply to join your project: " +
+                                        data.title +
+                                        " ." +
+                                        " The reason for application is: " +
+                                        this.applyValidate.reason,
+                                    projectId: data.projectId,
+                                    projectTitle: data.title,
+                                    scope: "project",
+                                    approve: "unknow"
+                                };
+                                axios
+                                    .post("/GeoProblemSolving/notice/save", joinForm)
+                                    .then(res => {
+                                        if (res.data == "Success") {
+                                            this.$Notice.open({
+                                                title: "Apply Successfully",
+                                                desc:
+                                                    "The project's manager will process your apply in time,you can get a notification later to tell you the result."
+                                            });
+                                            this.$emit("sendNotice", data.managerId);
+                                            this.haveApplied = true;
+                                        } else {
+                                            this.$Notice.open({
+                                                desc: "Apply failed"
+                                            });
+                                        }
+                                    })
+                                    .catch(err => {
+                                        console.log("申请失败的原因是：" + err.data);
+                                    });
+
+                                let emailObject = {
+                                    recipient: joinForm.recipientId,
+                                    mailTitle: "Group application",
+                                    mailContent:
+                                        joinForm.content.description +
+                                        "<br>" +
+                                        "You can click this url and enter the site to process this application: " +
+                                        "http://" +
+                                        window.location.host +
+                                        "/GeoProblemSolving/home"
+                                };
+                                axios
+                                    .post("/GeoProblemSolving/project/applyByMail", emailObject)
+                                    .then(res => {
+                                        if (res.data == "Success") {
+                                            console.log("Email Success.");
+                                        } else {
+                                            console.log("Email fail.");
+                                        }
+                                    })
+                                    .catch(err => {
+                                        console.log("Email fail.");
+                                    });
+                            }
+                        } else {
+                            this.$Message.error("Fail!");
+                        }
+                    });
+                },
             }
         }
     );
