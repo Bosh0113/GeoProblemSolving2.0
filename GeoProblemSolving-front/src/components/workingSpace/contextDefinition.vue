@@ -211,7 +211,7 @@
           </div>
         </Row>
         <Drawer title="Participants" :closable="false" v-model="drawerValue">
-          <online-participant :sub-project-id="subprojectId" :room-id="stepId"></online-participant>
+          <online-participant :sub-project-id="subProjectInfo.subProjectId" :room-id="stepId"></online-participant>
           <div class="toChatroom" style="position:absolute; left:25%;bottom:5%">
             <Button @click.native="toolPanel('chat')" type="success">Go to Chatroom</Button>
           </div>
@@ -602,8 +602,9 @@ export default {
           // detectResize: true
         }
       },
+      subProjectInfo:{},
+      projectInfo:{},
       stepId: this.$route.params.id,
-      subprojectId: sessionStorage.getItem("subProjectId"),
       toSubProjectPage: "",
       toChatroom: "/chat",
       // 关于邀请的模态框
@@ -859,6 +860,8 @@ export default {
 
     init() {
       this.initSize();
+      this.getSubprojectInfo();
+      this.getProjectInfo();
       this.userRoleIdentity();
       this.getContextDefinition();
       this.getAllResource();
@@ -866,7 +869,6 @@ export default {
     },
 
     submit(contextform) {
-      // this.subprojectId = this.$route.params.id;
       let creatorId = this.$store.getters.userId;
       this.$refs[contextform].validate(valid => {
         // 提交表单
@@ -958,10 +960,9 @@ export default {
               total += that.file[i].fileSize;
             }
             if (total < Math.pow(1024, 2)) {
-              let userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
               formData.append("description", this.fileUploadForm.description);
               formData.append("type", this.fileUploadForm.type);
-              formData.append("uploaderId", userInfo.userId);
+              formData.append("uploaderId", this.$store.getters.userId);
               formData.append("folderId", this.stepId);
               formData.append("privacy", this.fileUploadForm.privacy);
               this.progressModalShow = true;
@@ -1231,18 +1232,95 @@ export default {
       this.modifyStep = false;
     },
 
-    // 判断用户权限
+    getSubprojectInfo(){
+      let subProjectInfo = this.$store.getters.subProject;
+      if (
+        JSON.stringify(subProjectInfo) != "{}"
+      ) {
+        // this.$set(this, "subProjectInfo", subProjectInfo);
+        this.subProjectInfo = subProjectInfo;
+      } else {
+        let that = this;
+        $.ajax({
+          url:
+            "/GeoProblemSolving/subProject/inquiry" +
+            "?key=subProjectId" +
+            "&value=" +
+            subProjectId,
+          type: "GET",
+          async: false,
+          success: data => {
+            if (data == "Offline") {
+              that.$store.commit("userLogout");
+              that.$router.push({ name: "Login" });
+            } else if (data != "None" && data != "Fail") {
+              subProjectInfo = data[0];
+              that.$set(that, "subProjectInfo", subProjectInfo);
+
+              that.$store.commit("setSubProjectInfo", subProjectInfo);
+            }
+          },
+          error: function(err) {
+            console.log("Get manager name fail.");
+          }
+        });
+      }
+    },
+    getProjectInfo(){
+      let projectInfo = this.$store.getters.project;
+      if (
+        JSON.stringify(projectInfo) != "{}" &&
+        projectInfo.projectId.substring(0, 36) ==
+          this.subProjectInfo.projectId.substring(0, 36)
+      ) {
+        this.projectInfo = projectInfo;
+      } else {
+        $.ajax({
+          url:
+            "/GeoProblemSolving/project/inquiry" +
+            "?key=projectId" +
+            "&value=" +
+            this.subProjectInfo.projectId,
+          type: "GET",
+          async: false,
+          success: data => {
+            if (data != "None" && data != "Fail") {
+              this.projectInfo = data[0];
+              this.$store.commit("setProjectInfo", data[0]);
+            } else {
+              console.log(data);
+            }
+          }
+        });
+      }
+    },
     userRoleIdentity() {
       this.userRole = "Visitor";
-      let creatorId = sessionStorage.getItem("subProjectManagerId");
       if (this.$store.getters.userState) {
         // 是否是子项目管理员
-        if (creatorId === this.$store.getters.userId) {
+        if (this.subProjectInfo.managerId === this.$store.getters.userId) {
           this.userRole = "Manager";
-          console.log(this.userRole);
-        } else {
-          this.userRole = "Visitor";
         }
+        // 是否是子项目成员
+        else {
+          for (let i = 0; i < this.subProjectInfo.members.length; i++) {
+            if (
+              this.subProjectInfo.members[i].userId ===
+              this.$store.getters.userId
+            ) {
+              this.userRole = "Member";
+              break;
+            }
+          }
+        }
+        // 是否是项目管理员
+        if (this.userRole != "Manager") {
+          if (this.projectInfo.managerId === this.$store.getters.userId) {
+            this.userRole = "PManager";
+          }
+        }
+      } else {
+        this.userRole = "Visitor";
       }
     },
 

@@ -589,7 +589,7 @@ export default {
                 "User " +
                 this.$store.getters.userName +
                 " quit from your project called " +
-                sessionStorage.getItem("subProjectName"),
+                this.subProjectInfo.title,
               scope: "subProject",
               approve: "unknow"
             };

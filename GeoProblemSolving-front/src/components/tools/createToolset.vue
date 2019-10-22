@@ -24,6 +24,63 @@ h1 {
   margin-left: 20%;
   margin-top: 10%;
 }
+/* 上传图片 */
+.demo-upload-list {
+  display: inline-block;
+  width: 60px;
+  height: 60px;
+  text-align: center;
+  line-height: 60px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  /* overflow-x: hidden; */
+  /* overflow-y: scroll; */
+  background: #fff;
+  position: relative;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+  margin-right: 4px;
+}
+.demo-upload-list img {
+  width: 100%;
+  height: 100%;
+}
+.demo-upload-list-cover {
+  display: none;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.6);
+}
+.demo-upload-list:hover .demo-upload-list-cover {
+  display: block;
+}
+.demo-upload-list-cover i {
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+  margin: 0 2px;
+}
+.uploadAvatar {
+  position: relative;
+  width: 58px;
+  height: 58px;
+  top: 0;
+  left: 0;
+  outline: none;
+  background-color: transparent;
+  opacity: 0;
+}
+.uploadBox {
+  display: inline-block;
+  width: 58px;
+  height: 58px;
+  line-height: 58px;
+  border-width: 0.75px;
+  border-style: dashed;
+  border-color: lightslategray;
+}
 /* 结束 */
 </style>
 <template>
@@ -78,6 +135,33 @@ h1 {
             <Tag style="cursor:default">evaluation</Tag>
           </div>
         </FormItem>
+        <FormItem label="Image:" prop="toolsetImg" :label-width="140">
+          <div class="inline_style">
+            <div class="demo-upload-list" v-if="image!=''">
+              <template>
+                <img :src="image" />
+                <div class="demo-upload-list-cover">
+                  <Icon type="ios-eye-outline" @click.native="handleView()"></Icon>
+                  <Icon type="ios-trash-outline" @click.native="handleRemove()"></Icon>
+                </div>
+              </template>
+            </div>
+            <div class="uploadBox">
+              <Icon type="ios-camera" size="20" style="position:absolute;margin:18px;"></Icon>
+              <input
+                id="choosePicture"
+                @change="uploadPhoto($event)"
+                type="file"
+                class="uploadAvatar"
+                accept="image/*"
+              />
+            </div>
+            <br />
+            <Modal title="View Image" v-model="visible">
+              <img :src="image" v-if="visible" style="width: 100%" />
+            </Modal>
+          </div>
+        </FormItem>
         <FormItem label="Privacy:" prop="privacy" :label-width="140">
           <RadioGroup v-model="toolsetInfo.privacy">
             <Radio label="public">Public</Radio>
@@ -127,6 +211,7 @@ export default {
       toolsetInfo: {
         name: "",
         recomStep: "",
+        toolsetImg:"",
         privacy: "private",
         categoryTag: []
       },
@@ -163,7 +248,10 @@ export default {
         "Simulation/Prediction",
         "Visualization & representation",
         "Decision-making & management"
-      ]
+      ],
+      visible: false,
+      //表示图片
+      image: ""
     };
   },
   methods: {
@@ -178,6 +266,7 @@ export default {
           createToolsetForm["categoryTag"] = this.toolsetInfo.categoryTag;
           createToolsetForm["recomStep"] = this.toolsetInfo.recomStep;
           createToolsetForm["provider"] = this.$store.getters.userId;
+          createToolForm["toolsetImg"] = this.toolsetInfo.toolsetImg;
           createToolsetForm["privacy"] = this.toolsetInfo.privacy;
 
           this.axios
@@ -216,6 +305,43 @@ export default {
     },
     deleteTag(index) {
       this.toolsetInfo.categoryTag.splice(index, 1);
+    },
+    uploadPhoto(e) {
+      // 利用fileReader对象获取file
+      var file = e.target.files[0];
+      var filesize = file.size;
+      // 2,621,440   2M
+      if (filesize > 2101440) {
+        // 图片大于2MB
+        this.$Message.error("size > 2MB");
+      } else {
+        var reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = e => {
+          // 读取到的图片base64 数据编码 将此编码字符串传给后台即可
+          let formData = new FormData();
+          formData.append("toolsetImg", file);
+          this.axios
+            .post("/GeoProblemSolving/toolset/picture", formData)
+            .then(res => {
+              if (res.data != "Fail") {
+                this.toolsetInfo.toolsetImg = res.data;
+                this.image = e.target.result;
+                $("#choosePicture").val("");
+              } else {
+                this.$Message.error("upload picture Fail!");
+              }
+            })
+            .catch();
+        };
+      }
+    },
+    handleView() {
+      this.visible = true;
+    },
+    handleRemove() {
+      this.image = "";
+      this.toolsetInfo.toolsetImg = "";
     }
   },
   created() {

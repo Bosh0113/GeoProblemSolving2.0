@@ -439,11 +439,11 @@ export default {
           //    this.$set(this, "stepResourceList", list);
         }
       });
-      this.filterData(this.fileList);
+      this.filterData();
     },
 
-    filterData(data) {
-      let filterdata = data.filter(item => {
+    filterData() {
+      let filterdata = this.fileList.filter(item => {
         return item.type === "Data";
       });
       this.$set(this, "dataList", filterdata);

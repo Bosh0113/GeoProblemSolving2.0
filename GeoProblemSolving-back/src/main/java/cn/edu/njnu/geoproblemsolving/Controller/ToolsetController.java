@@ -47,6 +47,12 @@ public class ToolsetController {
         }
     }
 
+    @RequestMapping(value = "/picture", method = RequestMethod.POST)
+    public String uploadPicture(HttpServletRequest request) {
+        ToolsetDaoImpl toolsetDao = new ToolsetDaoImpl(mongoTemplate);
+        return toolsetDao.uploadPicture(request);
+    }
+
     @RequestMapping(value = "/update", produces = {"application/json;charset=UTF-8"}, method = RequestMethod.POST)
     public String updateToolset(HttpServletRequest request){
         ToolsetDaoImpl toolsetDao = new ToolsetDaoImpl(mongoTemplate);

@@ -10,4 +10,5 @@ public interface IToolDao {
     Object readTool(String key,String value);
     void deleteTool(String key,String value);
     String updateTool(HttpServletRequest request);
+    String uploadPicture(HttpServletRequest request);
 }

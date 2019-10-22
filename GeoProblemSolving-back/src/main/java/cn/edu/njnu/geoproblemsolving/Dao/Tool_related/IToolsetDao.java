@@ -9,5 +9,6 @@ public interface IToolsetDao {
     Object readToolset(String key,String value);
     void deleteToolset(String key,String value);
     String updateToolset(HttpServletRequest request);
+    String uploadPicture(HttpServletRequest request);
     String updateToolsetbyToolset(ToolsetEntity toolset);
 }

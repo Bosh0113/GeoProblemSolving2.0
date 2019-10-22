@@ -205,7 +205,7 @@ footer {
     <div class="content" :style="{minHeight:contentHeight}">
       <router-view @sendNotice="sendMessage" @readNotification="readNotification"></router-view>
     </div>
-    <footer style="margin-right: calc(100% - 100vw);width:100vw">
+    <footer>
       <h2 class="footerTop">
         <i>Open Geographic Modeling and Simulation</i>
       </h2>

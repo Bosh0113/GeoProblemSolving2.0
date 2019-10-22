@@ -157,7 +157,8 @@ export default {
       ) {
         this.$set(this, "subProjectInfo", subProjectInfo);
         this.userRoleIdentity();
-
+        
+        //emmmmmmmm
         sessionStorage.setItem("subProjectId", subProjectInfo.subProjectId);
         sessionStorage.setItem("subProjectName", subProjectInfo.title);
         sessionStorage.setItem("subProjectManagerId", subProjectInfo.managerId);

@@ -15,6 +15,7 @@ public class ToolsetEntity {
     private String recomStep; // step类型 or general
     private String provider;
     private String privacy;
+    private String toolsetImg;
     private String createTime;
 
     public String getTsid() {
@@ -43,6 +44,10 @@ public class ToolsetEntity {
 
     public String getPrivacy() {
         return privacy;
+    }
+
+    public String getToolsetImg() {
+        return toolsetImg;
     }
 
     public String getCreateTime() {
@@ -75,6 +80,10 @@ public class ToolsetEntity {
 
     public void setPrivacy(String privacy) {
         this.privacy = privacy;
+    }
+
+    public void setToolsetImg(String toolsetImg) {
+        this.toolsetImg = toolsetImg;
     }
 
     public void setCreateTime(String createTime) {

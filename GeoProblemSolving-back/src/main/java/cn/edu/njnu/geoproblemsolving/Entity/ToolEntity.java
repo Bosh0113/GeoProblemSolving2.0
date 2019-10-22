@@ -19,6 +19,7 @@ public class ToolEntity {
     private ArrayList<String> categoryTag;
     private String provider;
     private String privacy;
+    private String toolImg;
     private String createTime;
 
     public String getTid(){
@@ -55,6 +56,10 @@ public class ToolEntity {
 
     public String getPrivacy() {
         return privacy;
+    }
+
+    public String getToolImg() {
+        return toolImg;
     }
 
     public String getCreateTime() {
@@ -95,6 +100,10 @@ public class ToolEntity {
 
     public void setPrivacy(String privacy) {
         this.privacy = privacy;
+    }
+
+    public void setToolImg(String toolImg) {
+        this.toolImg = toolImg;
     }
 
     public void setCreateTime(String createTime) {

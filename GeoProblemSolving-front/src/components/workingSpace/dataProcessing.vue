@@ -15,12 +15,6 @@
   left: 0;
 }
 
-.fileList {
-  float: left;
-  height: 100%;
-  width: 19%;
-}
-
 .fileUdx {
   float: left;
   height: 100%;
@@ -116,10 +110,10 @@
   font-size: 1rem;
   height: 20px;
   color: white;
-  word-break:break-word;
+  word-break: break-word;
   overflow: hidden;
-  white-space: nowrap; 
-  text-overflow: ellipsis; 
+  white-space: nowrap;
+  text-overflow: ellipsis;
   max-width: 400px;
 }
 
@@ -142,329 +136,310 @@
 .pro-tab >>> .ivu-btn-icon-only {
   font-size: 40px;
 }
-.modelToolBtn {
-  margin-left: 2%;
-  margin-top: 3%;
-  /* clear: both; */
-}
-.subproject-back >>>.ivu-breadcrumb-item-link{
-  color:white;
+.subproject-back >>> .ivu-breadcrumb-item-link {
+  color: white;
 }
 
-.breadCrumb{
+.breadCrumb {
   margin-left: 1%;
 }
-
 </style>
 <template>
-  <div style="background-color:#e8eaec;height:auto">
-    
-      <div class="picscreen">
-        <div class="picbg"></div>
+  <div style="background-color:#e8eaec;height:auto;margin-right: calc(100% - 100vw)">
+    <div class="picscreen">
+      <div class="picbg"></div>
 
-        <div class="home_content">
-          <Row>
-            <!-- 需要修改样式 -->
-            <div class="breadCrumb">
-              <Breadcrumb>
-                <!-- <BreadcrumbItem :to="toProjectPage">Project</BreadcrumbItem> -->
-                <BreadcrumbItem :to="toSubProjectPage"  class="subproject-back">Subproject</BreadcrumbItem>
-                <BreadcrumbItem style="color: white">Data processing</BreadcrumbItem>
-              </Breadcrumb>
-            </div>
+      <div class="home_content">
+        <Row>
+          <!-- 需要修改样式 -->
+          <div class="breadCrumb">
+            <Breadcrumb>
+              <!-- <BreadcrumbItem :to="toProjectPage">Project</BreadcrumbItem> -->
+              <BreadcrumbItem :to="toSubProjectPage" class="subproject-back">Subproject</BreadcrumbItem>
+              <BreadcrumbItem style="color: white">Data processing</BreadcrumbItem>
+            </Breadcrumb>
+          </div>
 
-            <div class="stepName">
-              <strong>{{stepContent.name}}</strong>
-              <p :title="stepContent.description">{{stepContent.description}}</p>
-            </div>
+          <div class="stepName">
+            <strong>{{stepContent.name}}</strong>
+            <p :title="stepContent.description">{{stepContent.description}}</p>
+          </div>
 
-            <div class="onlineListBtn">
-              <Button @click="drawerValue = true" type="default" ghost>Participants</Button>
-               <template  v-if="userRole == 'Manager'">
-                  <Button                
-                    @click="modifyStep = true"
-                    style="margin-left:20px"
-                    type="info"
-                    ghost
-                  >Modify Step</Button>
-               </template>
-            </div>
-          </Row>
-          <Drawer title="Participants" :closable="false" v-model="drawerValue">
-            <online-participant :sub-project-id="subprojectId" :room-id="stepId"></online-participant>
-            <div class="toChatroom" style="position:absolute; left:25%;bottom:5%">
-              <Button  @click.native="toolPanel('chat')" type="success">Go to Chatroom</Button>
-            </div>
-          </Drawer>
+          <div class="onlineListBtn">
+            <Button @click="drawerValue = true" type="default" ghost>Participants</Button>
+            <template v-if="userRole == 'Manager'">
+              <Button
+                @click="modifyStep = true"
+                style="margin-left:20px"
+                type="info"
+                ghost
+              >Modify Step</Button>
+            </template>
+          </div>
+        </Row>
+        <Drawer title="Participants" :closable="false" v-model="drawerValue">
+          <online-participant :sub-project-id="subProjectInfo.subProjectId" :room-id="stepId"></online-participant>
+          <div class="toChatroom" style="position:absolute; left:25%;bottom:5%">
+            <Button @click.native="toolPanel('chat')" type="success">Go to chatroom</Button>
+          </div>
+        </Drawer>
 
-          <Modal v-model="modifyStep">
-            <p slot="header" style="text-align:center">
-              <Icon type="ios-information-circle"></Icon>
-              <span>Modify step name and description</span>
-            </p>
-            <Form :label-width="120" label-position="left" :model="stepForm">
-              <FormItem label="Step Name" prop="name">
-                <Input
-                  v-model="stepForm.name"
-                  type="textarea"
-                  :autosize="{minRows: 1,maxRows: 3}"
-                  clearable
-                />
-              </FormItem>
-              <FormItem label="Step Description" prop="description">
-                <Input
-                  v-model="stepForm.description"
-                  type="textarea"
-                  :autosize="{minRows: 1,maxRows: 3}"
-                  clearable
-                />
-              </FormItem>
-            </Form>
-            <div slot="footer">
-              <Button @click="cancelModifyStep">Cancel</Button>
-              <Button type="primary" @click="submitModifyStep">Modify</Button>
-            </div>
-          </Modal>
-        </div>
+        <Modal v-model="modifyStep">
+          <p slot="header" style="text-align:center">
+            <Icon type="ios-information-circle"></Icon>
+            <span>Modify step name and description</span>
+          </p>
+          <Form :label-width="120" label-position="left" :model="stepForm">
+            <FormItem label="Step Name" prop="name">
+              <Input
+                v-model="stepForm.name"
+                type="textarea"
+                :autosize="{minRows: 1,maxRows: 3}"
+                clearable
+              />
+            </FormItem>
+            <FormItem label="Step Description" prop="description">
+              <Input
+                v-model="stepForm.description"
+                type="textarea"
+                :autosize="{minRows: 1,maxRows: 3}"
+                clearable
+              />
+            </FormItem>
+          </Form>
+          <div slot="footer">
+            <Button @click="cancelModifyStep">Cancel</Button>
+            <Button type="primary" @click="submitModifyStep">Modify</Button>
+          </div>
+        </Modal>
       </div>
-    
+    </div>
 
     <!-- tab  on-click事件 -->
-    
-      <div class="pro-tab" :style="{height:sidebarHeight+ 59+'px'}" style="margin-top:60px">
-       
-                <template style="margin:20px 1%">
-                  <Row>
-                    <Col span="7" >
-                  <!-- <div class="fileList"> -->
-                    <Card :style="{height:sidebarHeight+45+'px'}">
-                      <div class="condefTitle">
-                        <div
-                          style="width:3px;height:18px;float:left;background-color:rgb(124, 126, 126)"
-                        ></div>
-                        <h4 style="float:left;margin-left:5px">Data</h4>
-                      </div>
-                      <ul v-for="(item,index) in dataList" :key="index">
-                        <li>{{item.name}}</li>
-                      </ul>
-                    </Card>
-                  <!-- </div> -->
-                  </Col>
-                  <Col span="9">
-                  <!-- <div class="fileUdx"> -->
-                    <Card :style="{height:sidebarHeight+45+'px'}">
-                      <!-- <div class="condefTitle">
-                        <div
-                          style="width:3px;height:18px;float:left;background-color:rgb(124, 126, 126)"
-                        ></div>
-                        <h4 style="float:left;margin-left:5px">Data Origin</h4>
-                      </div> -->
-                      <div style="clear:both">
-                        <Tabs>
-                          <TabPane label="Data Origin" name="origin" icon="md-home">
-                            <div style="width:100%;position:absolute;right:5%">
-                              <template  v-if="userRole == 'Manager'">
-                                <Icon
-                                  v-if="!edit1"
-                                  type="ios-create"
-                                  :size="25"
-                                  style="float:right;cursor:pointer"
-                                  title="Edit"
-                                  @click="editDataOrginInput"
-                                />
-                                <Icon
-                                  v-else
-                                  type="md-checkbox-outline"
-                                  :size="25"
-                                  style="float:right;cursor:pointer"
-                                  title="Complete"
-                                  @click="editDataOrginInput"
-                                />
-                              </template>                           
-                            </div>
-                            
-              
-                            <div v-if="!edit1" class="subProjectDesc" style="word-break: break-all; word-wrap: break-word;width:85%">{{dataOrginInput}}</div>
-                            <template v-else >
-                              <Input
-                                v-model="dataOrginInput"
-                                type="textarea"
-                                :rows="5"
-                                :autosize="{minRows: 5,maxRows: 18}"
-                                placeholder="Enter something..."
-                                style="width:85%"
-                              
-                              />
-                            </template>
-                          </TabPane>
-                          <TabPane label="UDX Schema" name="udx" icon="md-home">
-                            <!-- <mark-down> </mark-down> -->
-                            <pre class="brush: html"></pre>
-                            <template>
-                              <!-- <mark-down /> -->
-                            </template>
-                          </TabPane>
-                        </Tabs>
-                      </div>
-                    </Card>
-                  <!-- </div> -->
-                  </Col>
-                  <Col span="8">
-                  <!-- <div class="condef"> -->
-                    <Card :style="{height:sidebarHeight+45+'px'}">
-                      <div class="condefTitle">
-                        <div
-                          style="width:3px;height:18px;float:left;background-color:rgb(124, 126, 126)"
-                        ></div>
-                        <h4 style="float:left;margin-left:5px">Toolbox</h4>
-                      </div>
-                      <div style="clear:both">
-                        <Tooltip placement="bottom-start" class="modelToolBtn">
-                          <Button icon="ios-brush" to="//134.175.111.77/note" target="_blank"></Button>
-                          <div slot="content">
-                            <p>Test Tool</p>
-                          </div>
-                        </Tooltip>
-                      </div>
-                    </Card>
-                  <!-- </div> -->
-                  </Col>
-                  </Row>
-                </template>
-      </div>
-   
+
+    <div class="pro-tab" :style="{height:contentHeight+14+'px'}" style="margin-top:60px">
+      <template style="margin:20px 1%">
+        <Card
+          :style="{height:contentHeight+'px'}"
+          style="margin:0 5px 0 10px; width:300px; float:left"
+        >
+          <data-list :stepInfo="stepContent" :contentHeight="contentHeight" :userRole="userRole"></data-list>
+        </Card>
+        <Card
+          :style="{height:contentHeight+'px', width:mapWidth+'px'}"
+          style="margin:0 5px;float:left"
+        >
+          <map-canvas></map-canvas>          
+        </Card>
+        <Card
+          :style="{height:contentHeight+'px'}"
+          style="margin:0 10px 0 5px; width:400px;float:left;margin-right: calc(100% - 100vw)"
+        >
+          <tool-container :stepInfo="stepContent" :contentHeight="contentHeight" :userRole="userRole"></tool-container>
+        </Card>
+      </template>
+    </div>
   </div>
 </template>
 
 <script>
-import { VueFlowy, FlowChart } from "vue-flowy";
 import * as socketApi from "./../../api/socket";
-import Avatar from "vue-avatar";
-import echarts from "echarts";
-import folderTree from "../resources/folderTree";
-import onlineParticipant from "./onlineParticipants";
+import onlineParticipant from "./utils/onlineParticipants";
+import mapCanvas from "./utils/mapCanvas";
+import dataList from "./utils/dataList";
+import toolContainer from "./utils/toolContainer";
 
 export default {
   components: {
-    VueFlowy,
-    Avatar,
-    folderTree,
     onlineParticipant,
-   
+    mapCanvas,
+    dataList,
+    toolContainer
   },
-  // props: ["subProjectInfo","userRole","projectInfo"],
   data() {
     return {
-      userInfo: "",
-      fileList: [],
-      dataList: [],
-      sidebarHeight: 800,
+      subProjectInfo: {},
+      projectInfo: {},
+      contentHeight: 800,
+      mapWidth: 0,
       stepId: this.$route.params.id,
-      toSubProjectPage: "/project/" + this.$route.params.subid + "/subproject",
+      toSubProjectPage: "",
       stepContent: [],
       // online drawer
-      subprojectId:sessionStorage.getItem("subProjectId"),
       drawerValue: false,
       modifyStep: false,
       stepForm: {
         name: "",
         description: ""
       },
-      dataOrginInput:"",
-      // 编辑data描述信息
-      edit1: false,
       description: "",
-       // 用户角色
+      // 用户角色
       userRole: "Visitor"
     };
   },
-
   created() {
     this.init();
   },
   mounted() {
     window.addEventListener("resize", this.initSize);
-    // this.getDataProcessing();
-    // this.init();
   },
-
-  methods: {
-    initSize() {
-      this.sidebarHeight = window.innerHeight - 290;
-    },
-
-    init() {
-      this.initSize();
-      this.getDataProcessing();
-    },
-
-    getResources() {
-      this.userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
-      let list = [];
-      $.ajax({
-        url: "/GeoProblemSolving/folder/inquiry" + "?folderId=" + this.stepId,
-        type: "GET",
-        async: false,
-        success: data => {
-          if (data !== "None") {
-            this.$set(this, "fileList", data.files);
-          } else {
-            this.fileList = [];
-          }
-          //    this.$set(this, "stepResourceList", list);
-        }
-      });
-      this.filterData(this.fileList);
-    },
-
-    filterData(data) {
-      let filterdata = data.filter(item => {
-        return item.type === "Data";
-      });
-      this.$set(this, "dataList", filterdata);
-    },
-
-    userRoleIdentity() {
-      this.userRole = "Visitor";
-      // console.log(this.stepContent.creator);
-      // console.log(this.$store.getters.userId);
-      let creatorId = sessionStorage.getItem("subProjectManagerId");
-      console.log(creatorId);
-      if (this.$store.getters.userState) {
-        // 是否是子项目管理员
-        if (creatorId === this.$store.getters.userId) {
-          this.userRole = "Manager";
-          console.log(this.userRole);
-        }
-        else{
-           this.userRole = "Visitor";
+  beforeRouteEnter: (to, from, next) => {
+    next(vm => {
+      if (!vm.$store.getters.userState) {
+        next("/login");
+      } else {
+        if (
+          !(
+            vm.userRole == "Manager" ||
+            vm.userRole == "Member" ||
+            vm.userRole == "PManager"
+          )
+        ) {
+          vm.$Message.error("You have no property to access it");
+          // next(`/project/${vm.$store.getters.currentProjectId}`);
+          vm.$router.go(-1);
+        } else {
+          next();
         }
       }
+    });
+  },
+  methods: {
+    init() {
+      this.initSize();
+      this.getSubprojectInfo();
+      this.getProjectInfo();
+      this.userRoleIdentity();
+      this.getDataProcessing();
     },
+    initSize() {
+      if (window.innerHeight > 675) {
+        this.contentHeight = window.innerHeight - 245;
+      } else {
+        this.contentHeight = 675 - 245;
+      }
 
-    getDataProcessing() {
-      this.axios
-        .get(
-          "/GeoProblemSolving/step/inquiry/" +
-            "?key=stepId" +
+      this.mapWidth = window.innerWidth - 700 - 40;
+    },
+    getSubprojectInfo() {
+      let subProjectInfo = this.$store.getters.subProject;
+      if (
+        JSON.stringify(subProjectInfo) != "{}" &&
+        subProjectInfo.subProjectId == sessionStorage.getItem("subProjectId")
+      ) {
+        this.$set(this, "subProjectInfo", subProjectInfo);
+      } else {
+        $.ajax({
+          url:
+            "/GeoProblemSolving/subProject/inquiry" +
+            "?key=subProjectId" +
             "&value=" +
-            this.stepId
-        )
-        .then(res => {
-          if (res.data != "Fail") {
-            // this.dataForm = res.data[0].content;
-            this.stepContent = res.data[0];
-            this.stepForm = res.data[0];
-            this.dataOrginInput = res.data[0].content.dataOrginInput;//绑定input
-            this.userRoleIdentity();
-          } else {
-            this.$Notice.info({
-              desc: "Get the description failed!"
-            });
+            sessionStorage.getItem("subProjectId"),
+          type: "GET",
+          async: false,
+          success: data => {
+            if (data == "Offline") {
+              this.$store.commit("userLogout");
+              this.$router.push({ name: "Login" });
+            } else if (data != "None" && data != "Fail") {
+              subProjectInfo = data[0];
+              this.$set(this, "subProjectInfo", subProjectInfo);
+
+              this.$store.commit("setSubProjectInfo", subProjectInfo);
+            }
+          },
+          error: function(err) {
+            console.log("Get manager name fail.");
           }
         });
+      }
     },
-
+    getProjectInfo() {
+      let projectInfo = this.$store.getters.project;
+      if (
+        JSON.stringify(projectInfo) != "{}" &&
+        projectInfo.projectId.substring(0, 36) ==
+          this.subProjectInfo.projectId.substring(0, 36)
+      ) {
+        this.projectInfo = projectInfo;
+      } else {
+        $.ajax({
+          url:
+            "/GeoProblemSolving/project/inquiry" +
+            "?key=projectId" +
+            "&value=" +
+            this.subProjectInfo.projectId,
+          type: "GET",
+          async: false,
+          success: data => {
+            if (data != "None" && data != "Fail") {
+              this.projectInfo = data[0];
+              this.$store.commit("setProjectInfo", data[0]);
+            } else {
+              console.log(data);
+            }
+          }
+        });
+      }
+    },
+    userRoleIdentity() {
+      this.userRole = "Visitor";
+      if (this.$store.getters.userState) {
+        // 是否是子项目管理员
+        if (this.subProjectInfo.managerId === this.$store.getters.userId) {
+          this.userRole = "Manager";
+        }
+        // 是否是子项目成员
+        else {
+          for (let i = 0; i < this.subProjectInfo.members.length; i++) {
+            if (
+              this.subProjectInfo.members[i].userId ===
+              this.$store.getters.userId
+            ) {
+              this.userRole = "Member";
+              break;
+            }
+          }
+        }
+        // 是否是项目管理员
+        if (this.userRole != "Manager") {
+          if (this.projectInfo.managerId === this.$store.getters.userId) {
+            this.userRole = "PManager";
+          }
+        }
+      } else {
+        this.userRole = "Visitor";
+      }
+    },
+    getDataProcessing() {
+      if (this.stepId != "") {
+        $.ajax({
+          url:
+            "/GeoProblemSolving/step/inquiry/" +
+            "?key=stepId" +
+            "&value=" +
+            this.stepId,
+          type: "GET",
+          async: false,
+          success: data => {
+            if (data != "Fail") {
+              this.stepContent = data[0];
+              this.stepForm = data[0];
+              this.toSubProjectPage =
+                "/project/" + data[0].subProjectId + "/subproject";
+            } else {
+              this.$Notice.info({
+                desc: "Get the description failed!"
+              });
+            }
+          }
+        });
+      } else {
+        this.$Notice.info({
+          desc: "Get step information failed!"
+        });
+      }
+    },
     submitModifyStep() {
       let obj = new URLSearchParams();
       obj.append("name", this.stepForm.name);
@@ -495,97 +470,9 @@ export default {
         });
       this.modifyStep = false;
     },
-
     cancelModifyStep() {
       this.modifyStep = false;
-    },
-
-     toolPanel(type) {
-      // if (this.userRole != "Visitor") {
-      this.axios
-        .get("/GeoProblemSolving/user/state")
-        .then(res => {
-          if (!res.data) {
-            this.$store.commit("userLogout");
-            this.$router.push({ name: "Login" });
-          } else {
-            var toolURL = "";
-            let toolName = "";
-            if (type == "chat") {
-              toolURL =
-                '<iframe src="' +
-                "http://" +
-                this.$store.state.IP_Port +
-                '/GeoProblemSolving/chat" style="width: 100%;height:100%"></iframe>';
-              toolName = "Chatroom";
-            } 
-
-            let panel = jsPanel.create({
-              theme: "success",
-              headerTitle: toolName,
-              footerToolbar: '<p style="height:10px"></p>',
-              contentSize: "1200 600",
-              content: toolURL,
-              disableOnMaximized: true,
-              dragit: {
-                containment: 5
-              },
-              callback: function() {
-                // this.content.style.padding = "20px";
-              }
-            });
-            panel.resizeit("disable");
-            $(".jsPanel-content").css("font-size", "0");
-            this.panelList.push(panel);
-            // 生成records, 同步
-            let record = {
-              who: this.$store.getters.userName,
-              whoid: this.$store.getters.userId,
-              type: "tools",
-              toolType: type,
-              content: "used a tool: " + type,
-              moduleId: this.stepId,
-              time: new Date().toLocaleString()
-            };
-            this.subprojectSocket.send(JSON.stringify(record));
-          }
-        })
-        .catch(err => {
-          console.log("Get user info fail.");
-        });
-  
-    },
-
-     editDataOrginInput() {
-      if (this.edit1) {
-        this.edit1 = false;
-
-        let obj = new URLSearchParams();
-        obj.append("stepId", this.stepId);
-        obj.append("content.dataOrginInput", this.dataOrginInput);
-        this.axios
-          .post("/GeoProblemSolving/step/update", obj)
-          .then(res => {
-            if (res.data == "Offline") {
-              this.$store.commit("userLogout");
-              this.$router.push({ name: "Login" });
-            } else if (res.data != "Fail") {
-              this.$Notice.info({
-                desc: "Update successfully!"
-              });
-            } else {
-              this.$Message.error("Update step failed.");
-            }
-          })
-          .catch(err => {
-            console.log(err.data);
-          });
-      } else {
-        this.edit1 = true;
-      }
-    },
-
-
+    }    
   }
 };
 </script>

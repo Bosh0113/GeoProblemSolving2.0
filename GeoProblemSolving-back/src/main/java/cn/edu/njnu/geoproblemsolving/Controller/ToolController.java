@@ -51,4 +51,10 @@ public class ToolController {
         ToolDaoImpl toolDao = new ToolDaoImpl(mongoTemplate);
         return toolDao.updateTool(request);
     }
+
+    @RequestMapping(value = "/picture", method = RequestMethod.POST)
+    public String uploadPicture(HttpServletRequest request) {
+        ToolDaoImpl toolDao = new ToolDaoImpl(mongoTemplate);
+        return toolDao.uploadPicture(request);
+    }
 }

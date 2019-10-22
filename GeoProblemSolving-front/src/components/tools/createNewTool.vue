@@ -24,6 +24,63 @@ h1 {
   margin-left: 20%;
   margin-top: 5%;
 }
+/* 上传图片 */
+.demo-upload-list {
+  display: inline-block;
+  width: 60px;
+  height: 60px;
+  text-align: center;
+  line-height: 60px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  /* overflow-x: hidden; */
+  /* overflow-y: scroll; */
+  background: #fff;
+  position: relative;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+  margin-right: 4px;
+}
+.demo-upload-list img {
+  width: 100%;
+  height: 100%;
+}
+.demo-upload-list-cover {
+  display: none;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.6);
+}
+.demo-upload-list:hover .demo-upload-list-cover {
+  display: block;
+}
+.demo-upload-list-cover i {
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+  margin: 0 2px;
+}
+.uploadAvatar {
+  position: relative;
+  width: 58px;
+  height: 58px;
+  top: 0;
+  left: 0;
+  outline: none;
+  background-color: transparent;
+  opacity: 0;
+}
+.uploadBox {
+  display: inline-block;
+  width: 58px;
+  height: 58px;
+  line-height: 58px;
+  border-width: 0.75px;
+  border-style: dashed;
+  border-color: lightslategray;
+}
 /* 结束 */
 </style>
 <template>
@@ -58,7 +115,11 @@ h1 {
             multiple
             placeholder="The tool will be put in default toolset if no special toolset selected."
           >
-            <Option v-for="item in toolsetList" :key="item.tsid" :value="item">{{ item.toolsetName }}</Option>
+            <Option
+              v-for="item in toolsetList"
+              :key="item.tsid"
+              :value="item.tsid"
+            >{{ item.toolsetName }}</Option>
           </Select>
           <div style="cursor:pointer" @click="createToolset()">
             Add a new toolset
@@ -104,6 +165,33 @@ h1 {
             <Tag style="cursor:default">vector</Tag>
             <Tag style="cursor:default">raster</Tag>
             <Tag style="cursor:default">evaluation</Tag>
+          </div>
+        </FormItem>
+        <FormItem label="Image:" prop="toolImg" :label-width="140">
+          <div class="inline_style">
+            <div class="demo-upload-list" v-if="image!=''">
+              <template>
+                <img :src="image" />
+                <div class="demo-upload-list-cover">
+                  <Icon type="ios-eye-outline" @click.native="handleView()"></Icon>
+                  <Icon type="ios-trash-outline" @click.native="handleRemove()"></Icon>
+                </div>
+              </template>
+            </div>
+            <div class="uploadBox">
+              <Icon type="ios-camera" size="20" style="position:absolute;margin:18px;"></Icon>
+              <input
+                id="choosePicture"
+                @change="uploadPhoto($event)"
+                type="file"
+                class="uploadAvatar"
+                accept="image/*"
+              />
+            </div>
+            <br />
+            <Modal title="View Image" v-model="visible">
+              <img :src="image" v-if="visible" style="width: 100%" />
+            </Modal>
           </div>
         </FormItem>
         <FormItem label="Privacy:" prop="privacy" :label-width="140">
@@ -161,6 +249,7 @@ export default {
         tool_url: "",
         recomStep: "",
         categoryTag: [],
+        toolImg: "",
         privacy: "pirvate"
       },
       toolInfoRule: {
@@ -234,8 +323,17 @@ export default {
           tsid: "2",
           toolsetName: "test2"
         }
-      ]
+      ],
+      visible: false,
+      //表示图片
+      image: ""
     };
+  },
+  created() {
+    // 加入判断，如果未登录自动跳转登录页面
+    if (!this.$store.getters.userState) {
+      this.$router.push({ name: "Login" });
+    }
   },
   methods: {
     createTool(tool) {
@@ -255,6 +353,7 @@ export default {
           createToolForm["recomStep"] = this.toolInfo.recomStep;
           createToolForm["categoryTag"] = this.toolInfo.categoryTag;
           createToolForm["provider"] = this.$store.getters.userId;
+          createToolForm["toolImg"] = this.toolInfo.toolImg;
           createToolForm["privacy"] = this.toolInfo.privacy;
 
           this.axios
@@ -295,12 +394,43 @@ export default {
     },
     createToolset() {
       this.$router.push({ path: "createToolset" });
-    }
-  },
-  created() {
-    // 加入判断，如果未登录自动跳转登录页面
-    if (!this.$store.getters.userState) {
-      this.$router.push({ name: "Login" });
+    },
+    uploadPhoto(e) {
+      // 利用fileReader对象获取file
+      var file = e.target.files[0];
+      var filesize = file.size;
+      // 2,621,440   2M
+      if (filesize > 2101440) {
+        // 图片大于2MB
+        this.$Message.error("size > 2MB");
+      } else {
+        var reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = e => {
+          // 读取到的图片base64 数据编码 将此编码字符串传给后台即可
+          let formData = new FormData();
+          formData.append("toolImg", file);
+          this.axios
+            .post("/GeoProblemSolving/tool/picture", formData)
+            .then(res => {
+              if (res.data != "Fail") {
+                this.toolInfo.toolImg = res.data;
+                this.image = e.target.result;
+                $("#choosePicture").val("");
+              } else {
+                this.$Message.error("upload picture Fail!");
+              }
+            })
+            .catch();
+        };
+      }
+    },
+    handleView() {
+      this.visible = true;
+    },
+    handleRemove() {
+      this.image = "";
+      this.toolInfo.toolImg = "";
     }
   }
 };
