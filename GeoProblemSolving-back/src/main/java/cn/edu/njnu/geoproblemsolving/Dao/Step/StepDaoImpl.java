@@ -37,7 +37,8 @@ public class StepDaoImpl implements IStepDao {
         Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         step.setCreateTime(dateFormat.format(date));
-        step.setToolModule(new ArrayList<>());
+        step.setToolList(new ArrayList<>());
+        step.setToolsetList(new ArrayList<>());
         mongoTemplate.save(step);
 
         // 资源

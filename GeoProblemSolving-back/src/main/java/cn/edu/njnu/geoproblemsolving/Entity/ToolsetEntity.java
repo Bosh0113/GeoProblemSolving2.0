@@ -11,6 +11,7 @@ public class ToolsetEntity {
     private String tsid;
     private String toolsetName;
     private JSONArray toolList; // 创建的时候不添加toolList，在toolCollection页面添加，或者创建tool 选择 toolset时，自动添加
+    private ToolsetEntity subToolsets;
     private ArrayList<String> categoryTag;
     private String recomStep; // step类型 or general
     private String provider;
@@ -28,6 +29,10 @@ public class ToolsetEntity {
 
     public JSONArray getToolList() {
         return toolList;
+    }
+
+    public ToolsetEntity getSubToolsets() {
+        return subToolsets;
     }
 
     public ArrayList<String> getCategoryTag() {
@@ -64,6 +69,10 @@ public class ToolsetEntity {
 
     public void setToolList(JSONArray toolList) {
         this.toolList = toolList;
+    }
+
+    public void setSubToolsets(ToolsetEntity subToolsets) {
+        this.subToolsets = subToolsets;
     }
 
     public void setCategoryTag(ArrayList<String> categoryTag) {

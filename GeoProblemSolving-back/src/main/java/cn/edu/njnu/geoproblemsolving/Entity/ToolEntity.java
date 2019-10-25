@@ -14,7 +14,7 @@ public class ToolEntity {
     private String toolName;
     private String toolUrl;
     private JSONObject modelInfo; //stateId, oid,mdlId,模型条目？
-    private JSONArray toolsetInfo; // 可在多个不同的toolset内，或default toolset内
+    private JSONArray toolsetInfo; // 可在多个不同的toolset内，或没有dataset
     private String recomStep; // step类型 or general
     private ArrayList<String> categoryTag;
     private String provider;

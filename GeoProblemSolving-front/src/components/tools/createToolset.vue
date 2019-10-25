@@ -164,15 +164,15 @@ h1 {
         </FormItem>
         <FormItem label="Privacy:" prop="privacy" :label-width="140">
           <RadioGroup v-model="toolsetInfo.privacy">
-            <Radio label="public">Public</Radio>
-            <Radio label="private">Private</Radio>
+            <Radio label="Public">Public</Radio>
+            <Radio label="Private">Private</Radio>
           </RadioGroup>
         </FormItem>
         <FormItem>
           <div class="inline_style">
             <Button
               type="success"
-              @click="createToolset('toolInfo')"
+              @click="createToolset('toolsetInfo')"
               class="create"
               :disabled="clickForbidden"
             >Create</Button>
@@ -212,7 +212,7 @@ export default {
         name: "",
         recomStep: "",
         toolsetImg:"",
-        privacy: "private",
+        privacy: "Private",
         categoryTag: []
       },
       toolsetInfoRule: {
@@ -255,7 +255,7 @@ export default {
     };
   },
   methods: {
-    createTool(toolset) {
+    createToolset(toolset) {
       this.$refs[toolset].validate(valid => {
         if (valid) {
           this.clickForbidden = true;
@@ -266,7 +266,7 @@ export default {
           createToolsetForm["categoryTag"] = this.toolsetInfo.categoryTag;
           createToolsetForm["recomStep"] = this.toolsetInfo.recomStep;
           createToolsetForm["provider"] = this.$store.getters.userId;
-          createToolForm["toolsetImg"] = this.toolsetInfo.toolsetImg;
+          createToolsetForm["toolsetImg"] = this.toolsetInfo.toolsetImg;
           createToolsetForm["privacy"] = this.toolsetInfo.privacy;
 
           this.axios
@@ -276,13 +276,13 @@ export default {
                 this.$store.commit("userLogout");
                 this.$router.push({ name: "Login" });
               } else if (res.data === "Fail") {
-                this.$Message.error("Create toolset fail.");
+                this.$Notice.error({desc: "Create toolset fail."});
               } else if (res.data === "Duplicate naming") {
-                this.$Message.error("The name already exists.");
+                this.$Notice.error({desc: "The name already exists."});
               } else {
                 // this.createToolsetId = res.data;
                 // this.addHistoryEvent(this.createToolsetId);
-                this.$Message.error("Create successfully");
+                this.$Notice.info({desc: "Create successfully"});
                 // this.$router.push({ name: "toolCollection" });
               }
             })
@@ -300,7 +300,7 @@ export default {
     addTag(tag) {
       if (tag != "") {
         this.toolsetInfo.categoryTag.push(tag);
-        this.inputTag = "";
+        this.inputToolsetTag = "";
       }
     },
     deleteTag(index) {

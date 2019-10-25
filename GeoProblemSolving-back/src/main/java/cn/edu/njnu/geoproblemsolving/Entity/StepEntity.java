@@ -18,7 +18,8 @@ public class StepEntity {
     private String creator;
     private String createTime;
     // 功能模块
-    private ArrayList<String> toolModule;
+    private ArrayList<String> toolList;
+    private ArrayList<String> toolsetList;
     // 专有功能
     private JSONObject content;
 
@@ -50,8 +51,12 @@ public class StepEntity {
         return createTime;
     }
 
-    public ArrayList<String> getToolModule() {
-        return toolModule;
+    public ArrayList<String> getToolList() {
+        return toolList;
+    }
+
+    public ArrayList<String> getToolsetList() {
+        return toolsetList;
     }
 
     public JSONObject getContent() {
@@ -86,8 +91,12 @@ public class StepEntity {
         this.createTime = createTime;
     }
 
-    public void setToolModule(ArrayList<String> toolModule) {
-        this.toolModule = toolModule;
+    public void setToolList(ArrayList<String> toolList) {
+        this.toolList = toolList;
+    }
+
+    public void setToolsetList(ArrayList<String> toolsetList) {
+        this.toolsetList = toolsetList;
     }
 
     public void setContent(JSONObject content) {

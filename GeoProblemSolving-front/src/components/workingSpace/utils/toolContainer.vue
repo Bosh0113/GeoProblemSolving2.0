@@ -29,16 +29,14 @@
           placement="bottom"
           style="margin-left:2%; margin-top:3%"
           v-for="(item,index) in toolsetList"
-          :key="index"
+          :key="'tool-'+index"
           content="Test toolset"
           theme="light"
         >
           <template v-if="item.toolsetImg == '' || item.toolsetImg == undefined">
-            <Button
-              class="modelToolsetBtn"
-              to="//134.175.111.77/note"
-              target="_blank"
-            ><Icon type="ios-hammer-outline" size="60"/></Button>
+            <Button class="modelToolsetBtn" to="//134.175.111.77/note" target="_blank">
+              <Icon type="ios-hammer-outline" size="60" />
+            </Button>
           </template>
           <template v-else>
             <img :src="item.toolsetImg" class="modelToolsetBtn" />
@@ -47,20 +45,18 @@
         <Tooltip
           placement="bottom"
           v-for="(item,index) in toolList"
-          :key="index"
+          :key="'toolset-'+index"
           content="Test tool"
           theme="light"
           style="margin-left:2%;margin-top:3%"
         >
           <template v-if="item.toolImg == '' || item.toolsetImg == undefined">
-            <Button
-              class="modelToolBtn"
-              to="//134.175.111.77/note"
-              target="_blank"
-            ><Icon type="ios-hammer" size="60" /></Button>
+            <Button class="modelToolBtn" to="/chat" target="_blank">
+              <Icon type="ios-hammer" size="60" />
+            </Button>
           </template>
           <template v-else>
-            <img :src="item.toolsetImg" class="modelToolBtn" />
+            <img :src="item.toolsetImg" class="modelToolBtn" to="/map" />
           </template>
         </Tooltip>
       </vue-scroll>
@@ -79,32 +75,33 @@ export default {
       },
       toolList: [
         {
+          tid:"",
           name: "111",
-          model_stateId: "",
-          model_oid: "",
-          model_mdlId: "",
-          toolsetRecords: [],
-          tool_url: "",
-          recomStep: "",
-          categoryTag: [],
           toolImg: "",
-          privacy: "pirvate"
+          tool_url: "",
         },
         {}
       ],
       toolsetList: [
         {
+          tsid:"",
           name: "222",
-          recomStep: "",
           toolsetImg: "",
-          privacy: "private",
-          categoryTag: []
         },
         {}
       ]
     };
   },
+  mounted() {
+    this.getAllTools();
+  },
   methods: {
+    getAllTools() {
+      this.toolList = [];
+      this.toolsetList = [];
+      this.$set(this,"toolList",this.stepInfo.toolList);
+      this.$set(this,"toolsetList",this.stepInfo.toolsetList);
+    },
     addTools() {
       let routeUrl = this.$router.resolve({
         path: "/toolCollection",

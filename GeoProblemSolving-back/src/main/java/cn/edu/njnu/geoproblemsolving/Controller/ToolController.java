@@ -35,6 +35,12 @@ public class ToolController {
         }
     }
 
+    @RequestMapping(value = "/inquiryAll", method = RequestMethod.GET)
+    public Object readAllProject(@RequestParam("provider") String provider) {
+        ToolDaoImpl toolDao = new ToolDaoImpl(mongoTemplate);
+        return toolDao.readAccessibleTools(provider);
+    }
+
     @RequestMapping(value = "/delete", method = RequestMethod.GET)
     public String deleteTool(@RequestParam("tid") String tid){
         ToolDaoImpl toolDao = new ToolDaoImpl(mongoTemplate);

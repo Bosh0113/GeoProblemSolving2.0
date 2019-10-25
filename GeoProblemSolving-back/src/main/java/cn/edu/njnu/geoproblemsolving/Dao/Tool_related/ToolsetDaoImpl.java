@@ -67,6 +67,23 @@ public class ToolsetDaoImpl implements IToolsetDao {
     }
 
     @Override
+    public Object readAccessibleToolsets(String userId) {
+        try {
+            Criteria criteriaPublicToolset = Criteria.where("privacy").is("Public");
+            Criteria criteriaOwnedToolset = Criteria.where("provider").is("userId");
+            Query queryTools = Query.query(new Criteria().orOperator(criteriaPublicToolset,criteriaOwnedToolset));
+            List<ToolsetEntity> toolsetEntityList = mongoTemplate.find(queryTools, ToolsetEntity.class);
+            if (!toolsetEntityList.isEmpty()) {
+                return toolsetEntityList;
+            } else {
+                return "None";
+            }
+        } catch (Exception e) {
+            return "Fail";
+        }
+    }
+
+    @Override
     public void deleteToolset(String key, String value) {
         Query query = Query.query(Criteria.where(key).is(value));
         mongoTemplate.remove(query, ToolsetEntity.class);

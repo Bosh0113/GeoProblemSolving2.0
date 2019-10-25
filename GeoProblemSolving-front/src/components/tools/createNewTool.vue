@@ -196,8 +196,8 @@ h1 {
         </FormItem>
         <FormItem label="Privacy:" prop="privacy" :label-width="140">
           <RadioGroup v-model="toolInfo.privacy">
-            <Radio label="public">Public</Radio>
-            <Radio label="pirvate">Private</Radio>
+            <Radio label="Public">Public</Radio>
+            <Radio label="Private">Private</Radio>
           </RadioGroup>
         </FormItem>
         <FormItem>
@@ -250,7 +250,7 @@ export default {
         recomStep: "",
         categoryTag: [],
         toolImg: "",
-        privacy: "pirvate"
+        privacy: "Private"
       },
       toolInfoRule: {
         name: [
@@ -262,21 +262,21 @@ export default {
         ],
         model_stateId: [
           {
-            required: true,
+            required: false,
             message: "The state id cannot be empty",
             trigger: "blur"
           }
         ],
         model_oid: [
           {
-            required: true,
+            required: false,
             message: "The oid cannot be empty",
             trigger: "blur"
           }
         ],
         model_mdlId: [
           {
-            required: true,
+            required: false,
             message: "The mdl id cannot be empty",
             trigger: "blur"
           }
@@ -315,14 +315,6 @@ export default {
         "Decision-making & management"
       ],
       toolsetList: [
-        {
-          tsid: "1",
-          toolsetName: "test1"
-        },
-        {
-          tsid: "2",
-          toolsetName: "test2"
-        }
       ],
       visible: false,
       //表示图片
@@ -335,7 +327,33 @@ export default {
       this.$router.push({ name: "Login" });
     }
   },
+  mounted() {
+    this.getToolsets();
+  },
   methods: {
+    getToolsets() {
+      this.axios
+        .get(
+          "/GeoProblemSolving/toolset/inquiryAll" +
+            "?provider=" +
+            this.$store.getters.userId
+        )
+        .then(res => {
+          if (res.data == "Offline") {
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
+          } else if (res.data === "Fail") {
+            this.$Notice.error({ desc: "Loading tool fail." });
+          } else if (res.data === "None") {
+            this.$Notice.error({ desc: "There is no existing tool" });
+          } else {
+            this.$set(this, "toolsetList", res.data);
+          }
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    },
     createTool(tool) {
       this.$refs[tool].validate(valid => {
         if (valid) {
@@ -363,13 +381,13 @@ export default {
                 this.$store.commit("userLogout");
                 this.$router.push({ name: "Login" });
               } else if (res.data === "Fail") {
-                this.$Message.error("Create tool fail.");
+                this.$Notice.error({ desc: "Create tool fail." });
               } else if (res.data === "Duplicate naming") {
-                this.$Message.error("The name already exists.");
+                this.$Notice.error({ desc: "The name already exists." });
               } else {
                 // this.createToolId = res.data;
                 // this.addHistoryEvent(this.createToolId);
-                this.$Message.error("Create successfully");
+                this.$Notice.info({ desc: "Create successfully" });
               }
             })
             .catch(err => {
@@ -386,7 +404,7 @@ export default {
     addTag(tag) {
       if (tag != "") {
         this.toolInfo.categoryTag.push(tag);
-        this.inputTag = "";
+        this.inputToolTag = "";
       }
     },
     deleteTag(index) {

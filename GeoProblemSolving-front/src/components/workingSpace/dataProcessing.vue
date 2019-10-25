@@ -229,7 +229,7 @@
           :style="{height:contentHeight+'px', width:mapWidth+'px'}"
           style="margin:0 5px;float:left"
         >
-          <map-canvas></map-canvas>          
+          <map-canvas :stepInfo="stepContent" :contentHeight="contentHeight" :mapWidth="mapWidth" :userRole="userRole"></map-canvas>          
         </Card>
         <Card
           :style="{height:contentHeight+'px'}"

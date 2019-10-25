@@ -36,6 +36,12 @@ public class ToolsetController {
         }
     }
 
+    @RequestMapping(value = "/inquiryAll", method = RequestMethod.GET)
+    public Object readAllProject(@RequestParam("provider") String provider) {
+        ToolsetDaoImpl toolsetDao = new ToolsetDaoImpl(mongoTemplate);
+        return toolsetDao.readAccessibleToolsets(provider);
+    }
+
     @RequestMapping(value = "/delete", method = RequestMethod.GET)
     public String deleteToolset(@RequestParam("tsid") String tsid){
         ToolsetDaoImpl toolsetDao = new ToolsetDaoImpl(mongoTemplate);

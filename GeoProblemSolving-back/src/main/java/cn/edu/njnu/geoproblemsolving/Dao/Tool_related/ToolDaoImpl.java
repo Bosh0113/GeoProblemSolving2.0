@@ -89,6 +89,23 @@ public class ToolDaoImpl implements IToolDao {
     }
 
     @Override
+    public Object readAccessibleTools(String userId) {
+        try {
+            Criteria criteriaPublicTool = Criteria.where("privacy").is("Public");
+            Criteria criteriaOwnedTool = Criteria.where("provider").is("userId");
+            Query queryTools = Query.query(new Criteria().orOperator(criteriaPublicTool,criteriaOwnedTool));
+            List<ToolEntity> toolEntityList = mongoTemplate.find(queryTools, ToolEntity.class);
+            if (!toolEntityList.isEmpty()) {
+                return toolEntityList;
+            } else {
+                return "None";
+            }
+        } catch (Exception e) {
+            return "Fail";
+        }
+    }
+
+    @Override
     public void deleteTool(String key, String value) {
         Query query = Query.query(Criteria.where(key).is(value));
         mongoTemplate.remove(query, ToolEntity.class);

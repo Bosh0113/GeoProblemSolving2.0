@@ -33,21 +33,11 @@
     <div style="margin-left: 90px">
       <Card shadow>
         <h1 slot="title" style="padding-top:5px">Tool Collection for Solving Geo-problem</h1>
-        <div
-          slot="extra"
-          style="cursor:pointer"
-          @click="createTool()"
-        >
-          <Icon type="ios-add-circle-outline" />
-          Create your tool
+        <div slot="extra" style="cursor:pointer" @click="createTool()">
+          <Icon type="ios-add-circle-outline" />Create your tool
         </div>
-        <div
-          slot="extra"
-          style="cursor:pointer"
-          @click="createToolset()"
-        >
-          <Icon type="ios-add-circle-outline" />
-          Create your toolset
+        <div slot="extra" style="cursor:pointer" @click="createToolset()">
+          <Icon type="ios-add-circle-outline" />Create your toolset
         </div>
         <!-- <div v-if="showMenuItem=='publicTools'" style="height: inherit;min-height: fit-content;"></div>
         <div v-if="showMenuItem=='personalTools'" style="height: inherit;min-height: fit-content;"></div>-->
@@ -74,13 +64,61 @@ export default {
       projectList: [],
       subProjectList: [],
       subProjectDisable: true,
-      scopeId: ""
+      scopeId: "",
+      toolsetList: [],
+      toolList: []
     };
   },
   methods: {
     getProjectList() {},
     getSubProjectList(projectId) {},
     getStepList(subProjectId) {},
+    getToolsets() {
+      this.axios
+        .get(
+          "/GeoProblemSolving/toolset/inquiryAll" +
+            "?provider=" +
+            this.$store.getters.userId
+        )
+        .then(res => {
+          if (res.data == "Offline") {
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
+          } else if (res.data === "Fail") {
+            this.$Notice.error({ desc: "Loading tool fail." });
+          } else if (res.data === "None") {
+            this.$Notice.error({ desc: "There is no existing toolset" });
+          } else {
+            this.$set(this, "toolsetList", res.data);
+          }
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    },
+    getTools() {
+      this.axios
+        .get(
+          "/GeoProblemSolving/tool/inquiryAll" +
+            "?provider=" +
+            this.$store.getters.userId
+        )
+        .then(res => {
+          if (res.data == "Offline") {
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
+          } else if (res.data === "Fail") {
+            this.$Notice.error({ desc: "Loading tool fail." });
+          } else if (res.data === "None") {
+            this.$Notice.error({ desc: "There is no existing tool" });
+          } else {
+            this.$set(this, "toolList", res.data);
+          }
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    },
     changeProject(projectId) {
       this.scopeId = projectId;
       this.subProjectDisable = true;
@@ -92,8 +130,8 @@ export default {
     changeMenuItem(name) {
       this.showMenuItem = name;
     },
-    createTool(){
-        this.$router.push({ path: "createNewTool" });
+    createTool() {
+      this.$router.push({ path: "createNewTool" });
     },
     createToolset() {
       this.$router.push({ path: "createToolset" });
