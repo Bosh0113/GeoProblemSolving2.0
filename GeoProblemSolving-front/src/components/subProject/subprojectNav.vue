@@ -13,7 +13,7 @@
     <Row>
       <Menu
         :active-name="menuActive"
-        style="width:60px;position:absolute"
+        style="width:60px;position:absolute;z-index:0"
         :style="{height:contentHeight}"
         @on-select="changeContent"
       >

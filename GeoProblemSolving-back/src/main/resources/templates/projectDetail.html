@@ -7,17 +7,15 @@
     <meta name="description" th:attr="content=${projectInfo.description}">
     <meta name="keywords" th:attr="content=${projectInfo.tag}">
     <meta name="author" content="OpenGMS">
-    <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
-    <script src="https://cdn.bootcss.com/vue/2.6.10/vue.min.js"></script>
-    <link href="https://cdn.bootcss.com/iview/3.4.2/styles/iview.css" rel="stylesheet">
-    <script src="https://cdn.bootcss.com/iview/3.4.2/iview.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vue-avatar@2.1.7/dist/vue-avatar.min.js"></script>
+    <script src="https://unpkg.com/jquery@3.4.1/dist/jquery.js"></script>
+    <script src="https://unpkg.com/vue@2.6.10/dist/vue.min.js"></script>
+    <link href="https://unpkg.com/iview@3.4.2/dist/styles/iview.css" rel="stylesheet">
+    <script src="https://unpkg.com/iview@3.4.2/dist/iview.js"></script>
+    <script src="https://unpkg.com/vue-avatar@2.1.7/dist/vue-avatar.min.js"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="https://unpkg.com/vuescroll"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.8.4/Sortable.min.js"></script>
+    <script src="https://unpkg.com/sortablejs@1.8.4/Sortable.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Vue.Draggable/2.20.0/vuedraggable.umd.min.js"></script>
-    <!-- <script src="https://unpkg.com/gantt-elastic/dist/GanttElastic.umd.js"></script>
-    <script src="https://unpkg.com/gantt-elastic-header/dist/Header.umd.js"></script> -->
     <script th:replace="navigation::commonHeader-css"></script>
     <script th:replace="navigation::commonHeader-html"></script>
     <script th:replace="navigation::commonHeader-js"></script>
@@ -981,13 +979,13 @@
 
                     } else if(this.projectInfo.privacy == "Discoverable") {
                         if(!this.userInfo.userState) {
-                            window.location.href="/GeoProblemSolving/projectList.html";
+                            window.location.href="/GeoProblemSolving/projectList";
                         }
                     } else if(this.projectInfo.privacy == "Private") {
                         let isManager = this.managerIdentity(this.projectInfo.managerId);
                         let isMember = this.memberIdentity(this.projectInfo.members);
                         if(!this.userInfo.userState || !(isManager || isMember)) {
-                            window.location.href="/GeoProblemSolving/projectList.html";
+                            window.location.href="/GeoProblemSolving/projectList";
                         }
                     }
                 },

@@ -48,12 +48,12 @@
 <template th:fragment="task-html" id="taskComponent">
     <div>
         <Row>
-            <i-col span="4" offset="20" style="margin-top:10px">
+            <!-- <i-col span="4" offset="20" style="margin-top:10px"> -->
             <!-- <span id="todoPanel" style="cursor:pointer;color:#57a3f3" @click="switch2Manager">Task manager</span>
             <Divider type="vertical" ></Divider>
             <span id="ganttPanel" style="cursor:pointer" @click="switch2Gantt">Gantt chart</span> -->
-            </i-col>
-            <i-col id="taskPage" span="23" offset="1">
+            <!-- </i-col> -->
+            <!-- <i-col id="taskPage" span="23" offset="1"> -->
             <div id="taskContainer" :style="{height:contentHeight+'px'}">
                 <template v-if="!chartSwitch">
                     <Row type="flex" justify="space-around">
@@ -169,7 +169,7 @@
                     </vue-scroll>
                 </div>
             </div>
-            </i-col>
+            <!-- </i-col> -->
         </Row>
         <Modal v-model="taskDeleteModal" title="Delete Task" @on-ok="taskRemove()" ok-text="Assure" cancel-text="Cancel">
             <p>Do yout want to delete this task?</p>
