@@ -1043,26 +1043,32 @@ Sidebar.prototype.addGeoIconPalette = function (expand)
 {
 	var that = this;
 	$.ajax({
-		url:"http://222.192.7.75:8066/GeoModeling/geoIcon",
+		// url:"http://222.192.7.75:8066/GeoModeling/geoIcon",
+		url:"http://geomodeling.njnu.edu.cn/geoIcon/parentList",
 		type:"GET",
 		dataType:"json",
 		success:function(result){
+			result = result.data;
 			for(var i =0;i<result.length;i++){
 				(function (arg) {
                     var title = result[arg].name;
                     var pid = result[arg].id;
                     console.log(title);
                     $.ajax({
-                        url:"http://222.192.7.75:8066/GeoModeling/geoIcon",
-                        type:"POST",
-                        data:{pid:pid},
+                        // url:"http://222.192.7.75:8066/GeoModeling/geoIcon",
+						url:"http://geomodeling.njnu.edu.cn/geoIcon/list",
+                        type:"GET",
+                        data:{uid:pid,page:1,sortType:"name"},
                         dataType:"json",
                         success:function(icons){
+							icons = icons.data.geoIcons;
                             var fns = [];
                             for(var j = 0;j<icons.length;j++){
-                                var name = icons[j].name;
-                                var id = icons[j].id;
-                                fns.push(that.createVertexTemplateEntry('image;html=1;labelBackgroundColor=#ffffff;image=' + "http://222.192.7.75:8066/GeoModeling/showIcon2Servlet?uid=" + id,
+                                // var name = icons[j].name;
+                                var name = "";
+                                var id = icons[j].icon_id;
+                                // fns.push(that.createVertexTemplateEntry('image;html=1;labelBackgroundColor=#ffffff;image=' + "http://222.192.7.75:8066/GeoModeling/showIcon2Servlet?uid=" + id,
+                                fns.push(that.createVertexTemplateEntry('image;html=1;labelBackgroundColor=#ffffff;image=' + "http://geomodeling.njnu.edu.cn/GeoModeling/showIconServlet?uid=" + id,
                                     that.defaultImageWidth, that.defaultImageHeight, '', name, name != null, null, null));
                             }
                             that.addPaletteFunctions2(pid, title, false, fns);
