@@ -1,0 +1,294 @@
+
+                <!DOCTYPE html>
+                <html lang="en"> 
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                    <title>SAGA TOOL</title>
+                    <link rel="stylesheet" href="../css/bootstrap.min.css">
+                    <style>
+                        body {
+                            margin: 10px;
+                            margin-bottom: 20px;
+                            min-width: 700px;
+                        }
+
+                        th {
+                            text-align: center;
+                            font-size: 18px;
+                        }
+
+                        td,
+                        th {
+                            padding: 2px;
+                        }
+                        .progress{
+                            margin-bottom: 0px;
+                            display: none;
+                        }
+                    </style>
+                </head>
+
+                <body>
+
+                    <div id="desc_content">
+                        
+            <h4>Tool</h4>
+            <table border="0" >
+                <tr>
+                    <td valign="top"><b>Name</b></td>
+                    <td valign="top">RiverBasin</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>ID</b></td>
+                    <td valign="top">0</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>Author</b></td>
+                    <td valign="top">Christian Alwardt</td>
+                </tr>
+            </table>
+            <hr>
+            <h4>Description</h4>
+            <hr>
+            <h4>Parameters</h4>
+            <table tool_id="0"
+            oid="5b90e7bbd15d75093cb5885f"
+            stateId="CB6F2EC2-1C5C-4d11-8DDD-31AFBBD9512A"
+            mdlId="D76B2F28-59E3-4792-8A4D-55CBBA84F295" border="1" width="100%" valign="top" cellpadding="6" rules="all">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Identifier</th>
+                        <th>Description</th>
+                        <th>Constraints</th>
+                        <th>Settings</th>
+                    </tr>
+                
+                <thead>
+                    <tr> 
+                    <th colspan="6">Input</th>
+                    </tr>
+                </thead>
+
+                <tbody id="input_body">
+                    
+            
+            <tr>
+            <td>DTM</td>
+            <td>Grid (input)</td>
+            <td>INPUT</td>
+            <td>Digitales Gelaendemodell des Flusseinzugsgebietes</td>
+            <td></td>
+            <td>
+                <input type="file" id="INPUT" accept="application/zip" optional="false" data_type="Grid (input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>HGGrid</td>
+            <td>Grid (input)</td>
+            <td>INPUT2</td>
+            <td>Eingaberaster der Hauptgerinnerasterzellen des Flussnetzwerkes</td>
+            <td></td>
+            <td>
+                <input type="file" id="INPUT2" accept="application/zip" optional="false" data_type="Grid (input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>statisches Entnahmeraster</td>
+            <td>Grid (optional input)</td>
+            <td>INPUT3</td>
+            <td>Eingaberaster mit Angaben zur statischen Flaechenwasserentnahme.</td>
+            <td></td>
+            <td>
+                <input type="file" id="INPUT3" accept="application/zip" optional="true" data_type="Grid (optional input)"></input>
+            </td>
+            </tr>
+        
+        
+                </tbody>
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Options</th>
+                    </tr>
+                </thead>
+                <tbody id="options_body">
+                    
+        
+            <tr>
+                <td>Anteilige Flaechenwasserentnahme</td>
+                <td>Boolean</td>
+                <td>WCons</td>
+                <td>Wenn gesetzt, werden die Werte des statischen Entahmerasters anteilig entnommen und als Raster statWUse ausgegeben</td>
+                <td>Default: 0</td>
+                <td>
+                <input type="text" id="WCons" class="form-control" value="0">
+                </td>
+            </tr>,
+            <tr>
+                <td>Dynamische Flaechenwassernutzung...</td>
+                <td>Choice</td>
+                <td>WCons2</td>
+                <td>Auswahl der Art der anteiligen Flaechenwasserwasserentnahme.</td>
+                <td>Available Choices:
+[0] ...anteilig aus den Flussrasterzellen
+[1] ...anteilig aus Rasterzellen der Teileinzugegebiete
+Default: 0</td>
+                <td>
+                
+        <select class="form-control" id="WCons2">
+            <option value="0">[0] ...anteilig aus den Flussrasterzellen</option>,<option value="1">[1] ...anteilig aus Rasterzellen der Teileinzugegebiete</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Hauptgerinne-Parameter pHG</td>
+                <td>Floating point</td>
+                <td>pCr</td>
+                <td>Parameter pHG zur Berechnung der Lagtime kHG des Hauptgerinneabflusses</td>
+                <td>Minimum: 0.000000
+Default: 0.003500</td>
+                <td>
+                <input type="text" id="pCr" class="form-control" value="0.003500">
+                </td>
+            </tr>,
+            <tr>
+                <td>Hauptgerinne-Speicherkaskade nHG</td>
+                <td>Integer</td>
+                <td>nCr</td>
+                <td>Festlegen, wieviele Speicher die ChannelFlow River-Speicherkaskade enthaelt</td>
+                <td>Minimum: 1
+Default: 1</td>
+                <td>
+                <input type="text" id="nCr" class="form-control" value="1">
+                </td>
+            </tr>,
+            <tr>
+                <td>Maximal Geschwindigkeit des Hauptgerinnes beruecksichtigen</td>
+                <td>Boolean</td>
+                <td>EnfVmax</td>
+                <td>Angegebene Maximalgeschwindigkeit im Hauptgerinne bei der Berechnung der durchschnittlichen Flieszgeschwindigkeit des Hauptgerinnes beruecksichtigen.</td>
+                <td>Default: 1</td>
+                <td>
+                <input type="text" id="EnfVmax" class="form-control" value="1">
+                </td>
+            </tr>,
+            <tr>
+                <td>Maximalgeschwindigkeit im Hauptgerinne in km/h</td>
+                <td>Floating point</td>
+                <td>VTresh</td>
+                <td>Festlegung der maximalen Wasserflussgeschwindigkeit im Hauptgerinne in km/h (oberer Grenzwert)</td>
+                <td>Minimum: 0.000000
+Maximum: 10.000000
+Default: 4.000000</td>
+                <td>
+                <input type="text" id="VTresh" class="form-control" value="4.000000">
+                </td>
+            </tr>
+                </tbody> 
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Output</th>
+                    </tr>
+                </thead>
+
+                <tbody id="output_body">
+                
+            
+            <tr>
+            <td>Grad</td>
+            <td>Grid (output)</td>
+            <td>OUTPUT2</td>
+            <td>Ausgabe der Abflussgradienten jeder Rasterzelle</td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="OUTPUT2" optional="false" data_type="Grid (output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Direc</td>
+            <td>Grid (output)</td>
+            <td>OUTPUT3</td>
+            <td>Ausgabe der Abflussrichtung fuer jede Rasterzelle</td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="OUTPUT3" optional="false" data_type="Grid (output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>HGGrad</td>
+            <td>Grid (output)</td>
+            <td>OUTPUT4</td>
+            <td>Ausgabe der Abflussgradienten jeder Hauptgerinnerasterzelle</td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="OUTPUT4" optional="false" data_type="Grid (output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>RivSpeed</td>
+            <td>Grid (output)</td>
+            <td>OUTPUT5</td>
+            <td>Ausgabe Flussgeschwindigkeiten der Hauptgerinnerasterzellen (siehe Parametereinstellungen)</td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="OUTPUT5" optional="false" data_type="Grid (output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Coordinates</td>
+            <td>Grid (output)</td>
+            <td>OUTPUT6</td>
+            <td>Ausgabe der Koordinatenwerte der Rasterzellen im Format xxxx.yyyy</td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="OUTPUT6" optional="false" data_type="Grid (output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>BasinShare</td>
+            <td>Grid (output)</td>
+            <td>OUTPUT7</td>
+            <td>Ausagbe der Rasterzellen des Flusseinzugsgebiets</td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="OUTPUT7" optional="false" data_type="Grid (output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>statWUse</td>
+            <td>Grid (optional output)</td>
+            <td>OUTPUT8</td>
+            <td>Ausagbe der anteiligen Flaechenwasserentnahme je Rasterzelle</td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="OUTPUT8" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>NumInFlowCells</td>
+            <td>Grid (output)</td>
+            <td>OUTPUT9</td>
+            <td>Ausgaberaster mit Angabe ueber die Anzahl der Rasterzellen, die in eine spezifische Rasterzelle (x,y) abflieszen</td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="OUTPUT9" optional="false" data_type="Grid (output)">Download Data</a></td>
+            </tr>
+        
+         
+                </tbody>
+                
+            </table>(*) <i>optional</i>
+            <div class="progress">
+                <div id="progressbar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="60"
+                    aria-valuemin="0" aria-valuemax="100" style="width: 10%"> 
+                </div>
+            </div>
+            <button type="button" style="float: right;margin-top: 20px; margin-bottom: 20px; margin-right: 30px;width: 100px;tab-size: 28px" class="btn btn-success" onclick="onRunButtonClick()">Run
+            </button>
+            
+                    </div>
+                    <script src="../js/jquery-3.4.1.js"></script>
+                    <script src="../js/bootstrap.min.js"></script>
+                    <script src="../js/runModel.js"></script>
+                </body> 
+                </html>

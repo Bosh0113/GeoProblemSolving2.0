@@ -1,0 +1,350 @@
+
+                <!DOCTYPE html>
+                <html lang="en"> 
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                    <title>SAGA TOOL</title>
+                    <link rel="stylesheet" href="../css/bootstrap.min.css">
+                    <style>
+                        body {
+                            margin: 10px;
+                            margin-bottom: 20px;
+                            min-width: 700px;
+                        }
+
+                        th {
+                            text-align: center;
+                            font-size: 18px;
+                        }
+
+                        td,
+                        th {
+                            padding: 2px;
+                        }
+                        .progress{
+                            margin-bottom: 0px;
+                            display: none;
+                        }
+                    </style>
+                </head>
+
+                <body>
+
+                    <div id="desc_content">
+                        
+            <h4>Tool</h4>
+            <table border="0" >
+                <tr>
+                    <td valign="top"><b>Name</b></td>
+                    <td valign="top">Mosaicking (Grid Collections)</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>ID</b></td>
+                    <td valign="top">38</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>Author</b></td>
+                    <td valign="top">O.Conrad (c) 2017</td>
+                </tr>
+            </table>
+            <hr>
+            <h4>Description</h4>
+            <hr>
+            <h4>Parameters</h4>
+            <table tool_id="38"
+            oid="5b90e7bbd15d75093cb5876f"
+            stateId="9A8D89B3-6AD3-4242-B792-72F4219AA911"
+            mdlId="C3A5FAA2-484D-4a8a-B50B-5572B8F7894A" border="1" width="100%" valign="top" cellpadding="6" rules="all">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Identifier</th>
+                        <th>Description</th>
+                        <th>Constraints</th>
+                        <th>Settings</th>
+                    </tr>
+                
+                <thead>
+                    <tr> 
+                    <th colspan="6">Input</th>
+                    </tr>
+                </thead>
+
+                <tbody id="input_body">
+                    
+            
+            <tr>
+            <td>Grid Collections</td>
+            <td>Grids list (input)</td>
+            <td>GRIDS</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="GRIDS" accept="application/zip" optional="false" data_type="Grids list (input)" multiple="multiple"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Target System</td>
+            <td>Grid (optional input)</td>
+            <td>TARGET_TEMPLATE</td>
+            <td>use this grid's system for output grids</td>
+            <td></td>
+            <td>
+                <input type="file" id="TARGET_TEMPLATE" accept="application/zip" optional="true" data_type="Grid (optional input)"></input>
+            </td>
+            </tr>
+        
+        
+                </tbody>
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Options</th>
+                    </tr>
+                </thead>
+                <tbody id="options_body">
+                    
+        
+            <tr>
+                <td>Name</td>
+                <td>Text</td>
+                <td>NAME</td>
+                <td></td>
+                <td>Default: Mosaic</td>
+                <td>
+                <input type="text" id="NAME" class="form-control" value="Mosaic">
+                </td>
+            </tr>,
+            <tr>
+                <td>Data Storage Type</td>
+                <td>Choice</td>
+                <td>TYPE</td>
+                <td></td>
+                <td>Available Choices:
+[0] 1 bit
+[1] 1 byte unsigned integer
+[2] 1 byte signed integer
+[3] 2 byte unsigned integer
+[4] 2 byte signed integer
+[5] 4 byte unsigned integer
+[6] 4 byte signed integer
+[7] 4 byte floating point
+[8] 8 byte floating point
+[9] same as first grid in list
+Default: 9</td>
+                <td>
+                
+        <select class="form-control" id="TYPE">
+            <option value="0">[0] 1 bit</option>,<option value="1">[1] 1 byte unsigned integer</option>,<option value="2">[2] 1 byte signed integer</option>,<option value="3">[3] 2 byte unsigned integer</option>,<option value="4">[4] 2 byte signed integer</option>,<option value="5">[5] 4 byte unsigned integer</option>,<option value="6">[6] 4 byte signed integer</option>,<option value="7">[7] 4 byte floating point</option>,<option value="8">[8] 8 byte floating point</option>,<option value="9">[9] same as first grid in list</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Resampling</td>
+                <td>Choice</td>
+                <td>RESAMPLING</td>
+                <td></td>
+                <td>Available Choices:
+[0] Nearest Neighbour
+[1] Bilinear Interpolation
+[2] Bicubic Spline Interpolation
+[3] B-Spline Interpolation
+Default: 3</td>
+                <td>
+                
+        <select class="form-control" id="RESAMPLING">
+            <option value="0">[0] Nearest Neighbour</option>,<option value="1">[1] Bilinear Interpolation</option>,<option value="2">[2] Bicubic Spline Interpolation</option>,<option value="3">[3] B-Spline Interpolation</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Overlapping Areas</td>
+                <td>Choice</td>
+                <td>OVERLAP</td>
+                <td></td>
+                <td>Available Choices:
+[0] first
+[1] last
+[2] minimum
+[3] maximum
+[4] mean
+[5] blend boundary
+[6] feathering
+Default: 1</td>
+                <td>
+                
+        <select class="form-control" id="OVERLAP">
+            <option value="0">[0] first</option>,<option value="1">[1] last</option>,<option value="2">[2] minimum</option>,<option value="3">[3] maximum</option>,<option value="4">[4] mean</option>,<option value="5">[5] blend boundary</option>,<option value="6">[6] feathering</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Blending Distance</td>
+                <td>Floating point</td>
+                <td>BLEND_DIST</td>
+                <td>blending distance given in map units</td>
+                <td>Minimum: 0.000000
+Default: 10.000000</td>
+                <td>
+                <input type="text" id="BLEND_DIST" class="form-control" value="10.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Match</td>
+                <td>Choice</td>
+                <td>MATCH</td>
+                <td></td>
+                <td>Available Choices:
+[0] none
+[1] match histogram of first grid in list
+[2] match histogram of overlapping area
+[3] regression
+Default: 0</td>
+                <td>
+                
+        <select class="form-control" id="MATCH">
+            <option value="0">[0] none</option>,<option value="1">[1] match histogram of first grid in list</option>,<option value="2">[2] match histogram of overlapping area</option>,<option value="3">[3] regression</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Target Grid System</td>
+                <td>Choice</td>
+                <td>TARGET_DEFINITION</td>
+                <td></td>
+                <td>Available Choices:
+[0] user defined
+[1] grid or grid system
+Default: 0</td>
+                <td>
+                
+        <select class="form-control" id="TARGET_DEFINITION">
+            <option value="0">[0] user defined</option>,<option value="1">[1] grid or grid system</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Cellsize</td>
+                <td>Floating point</td>
+                <td>TARGET_USER_SIZE</td>
+                <td></td>
+                <td>Minimum: 0.000000
+Default: 1.000000</td>
+                <td>
+                <input type="text" id="TARGET_USER_SIZE" class="form-control" value="1.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Left</td>
+                <td>Floating point</td>
+                <td>TARGET_USER_XMIN</td>
+                <td></td>
+                <td>Default: 0.000000</td>
+                <td>
+                <input type="text" id="TARGET_USER_XMIN" class="form-control" value="0.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Right</td>
+                <td>Floating point</td>
+                <td>TARGET_USER_XMAX</td>
+                <td></td>
+                <td>Default: 100.000000</td>
+                <td>
+                <input type="text" id="TARGET_USER_XMAX" class="form-control" value="100.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Bottom</td>
+                <td>Floating point</td>
+                <td>TARGET_USER_YMIN</td>
+                <td></td>
+                <td>Default: 0.000000</td>
+                <td>
+                <input type="text" id="TARGET_USER_YMIN" class="form-control" value="0.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Top</td>
+                <td>Floating point</td>
+                <td>TARGET_USER_YMAX</td>
+                <td></td>
+                <td>Default: 100.000000</td>
+                <td>
+                <input type="text" id="TARGET_USER_YMAX" class="form-control" value="100.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Fit</td>
+                <td>Choice</td>
+                <td>TARGET_USER_FITS</td>
+                <td></td>
+                <td>Available Choices:
+[0] nodes
+[1] cells
+Default: 0</td>
+                <td>
+                
+        <select class="form-control" id="TARGET_USER_FITS">
+            <option value="0">[0] nodes</option>,<option value="1">[1] cells</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Grid System</td>
+                <td>Grid system</td>
+                <td>TARGET_SYSTEM</td>
+                <td></td>
+                <td></td>
+                <td>
+                <input type="text" id="TARGET_SYSTEM" class="form-control" value="">
+                </td>
+            </tr>
+                </tbody> 
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Output</th>
+                    </tr>
+                </thead>
+
+                <tbody id="output_body">
+                
+            
+            <tr>
+            <td>Mosaic</td>
+            <td>Grids (output)</td>
+            <td>MOSAIC</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="MOSAIC" optional="false" data_type="Grids (output)">Download Data</a></td>
+            </tr>
+        
+         
+                </tbody>
+                
+            </table>(*) <i>optional</i>
+            <div class="progress">
+                <div id="progressbar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="60"
+                    aria-valuemin="0" aria-valuemax="100" style="width: 10%"> 
+                </div>
+            </div>
+            <button type="button" style="float: right;margin-top: 20px; margin-bottom: 20px; margin-right: 30px;width: 100px;tab-size: 28px" class="btn btn-success" onclick="onRunButtonClick()">Run
+            </button>
+            
+                    </div>
+                    <script src="../js/jquery-3.4.1.js"></script>
+                    <script src="../js/bootstrap.min.js"></script>
+                    <script src="../js/runModel.js"></script>
+                </body> 
+                </html>

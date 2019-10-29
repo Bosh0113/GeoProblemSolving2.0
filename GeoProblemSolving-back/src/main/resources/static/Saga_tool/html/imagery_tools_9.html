@@ -1,0 +1,262 @@
+
+                <!DOCTYPE html>
+                <html lang="en"> 
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                    <title>SAGA TOOL</title>
+                    <link rel="stylesheet" href="../css/bootstrap.min.css">
+                    <style>
+                        body {
+                            margin: 10px;
+                            margin-bottom: 20px;
+                            min-width: 700px;
+                        }
+
+                        th {
+                            text-align: center;
+                            font-size: 18px;
+                        }
+
+                        td,
+                        th {
+                            padding: 2px;
+                        }
+                        .progress{
+                            margin-bottom: 0px;
+                            display: none;
+                        }
+                    </style>
+                </head>
+
+                <body>
+
+                    <div id="desc_content">
+                        
+            <h4>Tool</h4>
+            <table border="0" >
+                <tr>
+                    <td valign="top"><b>Name</b></td>
+                    <td valign="top">Automated Cloud Cover Assessment</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>ID</b></td>
+                    <td valign="top">9</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>Author</b></td>
+                    <td valign="top">B.Bechtel, O.Conrad (c) 2013</td>
+                </tr>
+            </table>
+            <hr>
+            <h4>Description</h4>
+            <hr>
+            <h4>Parameters</h4>
+            <table tool_id="9"
+            oid="5b90e7bbd15d75093cb5879c"
+            stateId="6DD26FB4-DCBC-4125-ABDC-6B9C26DC1A87"
+            mdlId="7C7EAC71-C4DA-45fa-80AA-ED677D86B907" border="1" width="100%" valign="top" cellpadding="6" rules="all">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Identifier</th>
+                        <th>Description</th>
+                        <th>Constraints</th>
+                        <th>Settings</th>
+                    </tr>
+                
+                <thead>
+                    <tr> 
+                    <th colspan="6">Input</th>
+                    </tr>
+                </thead>
+
+                <tbody id="input_body">
+                    
+            
+            <tr>
+            <td>Landsat Band 2</td>
+            <td>Grid (input)</td>
+            <td>BAND2</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="BAND2" accept="application/zip" optional="false" data_type="Grid (input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Landsat Band 3</td>
+            <td>Grid (input)</td>
+            <td>BAND3</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="BAND3" accept="application/zip" optional="false" data_type="Grid (input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Landsat Band 4</td>
+            <td>Grid (input)</td>
+            <td>BAND4</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="BAND4" accept="application/zip" optional="false" data_type="Grid (input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Landsat Band 5</td>
+            <td>Grid (input)</td>
+            <td>BAND5</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="BAND5" accept="application/zip" optional="false" data_type="Grid (input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Landsat Band 6</td>
+            <td>Grid (input)</td>
+            <td>BAND6</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="BAND6" accept="application/zip" optional="false" data_type="Grid (input)"></input>
+            </td>
+            </tr>
+        
+        
+                </tbody>
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Options</th>
+                    </tr>
+                </thead>
+                <tbody id="options_body">
+                    
+        
+            <tr>
+                <td>Grid system</td>
+                <td>Grid system</td>
+                <td>PARAMETERS_GRID_SYSTEM</td>
+                <td></td>
+                <td></td>
+                <td>
+                <input type="text" id="PARAMETERS_GRID_SYSTEM" class="form-control" value="">
+                </td>
+            </tr>,
+            <tr>
+                <td>Grid system</td>
+                <td>Grid system</td>
+                <td>BAND6_GRIDSYSTEM</td>
+                <td></td>
+                <td></td>
+                <td>
+                <input type="text" id="BAND6_GRIDSYSTEM" class="form-control" value="">
+                </td>
+            </tr>,
+            <tr>
+                <td>Apply post-processing filter to remove small holes</td>
+                <td>Boolean</td>
+                <td>FILTER</td>
+                <td></td>
+                <td>Default: 1</td>
+                <td>
+                <input type="text" id="FILTER" class="form-control" value="1">
+                </td>
+            </tr>,
+            <tr>
+                <td>B56 Composite (step 6)</td>
+                <td>Floating point</td>
+                <td>B56C</td>
+                <td></td>
+                <td>Default: 225.000000</td>
+                <td>
+                <input type="text" id="B56C" class="form-control" value="225.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>B45 Ratio: Desert detection (step 10)</td>
+                <td>Floating point</td>
+                <td>B45R</td>
+                <td></td>
+                <td>Default: 1.000000</td>
+                <td>
+                <input type="text" id="B45R" class="form-control" value="1.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Always use cloud signature (step 14)</td>
+                <td>Boolean</td>
+                <td>CSIG</td>
+                <td></td>
+                <td>Default: 1</td>
+                <td>
+                <input type="text" id="CSIG" class="form-control" value="1">
+                </td>
+            </tr>,
+            <tr>
+                <td>Bypass second-pass processing, and merge warm (not ambiguous) and cold clouds</td>
+                <td>Boolean</td>
+                <td>PASS2</td>
+                <td></td>
+                <td>Default: 1</td>
+                <td>
+                <input type="text" id="PASS2" class="form-control" value="1">
+                </td>
+            </tr>,
+            <tr>
+                <td>Include a category for cloud shadows</td>
+                <td>Boolean</td>
+                <td>SHADOW</td>
+                <td></td>
+                <td>Default: 1</td>
+                <td>
+                <input type="text" id="SHADOW" class="form-control" value="1">
+                </td>
+            </tr>
+                </tbody> 
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Output</th>
+                    </tr>
+                </thead>
+
+                <tbody id="output_body">
+                
+            
+            <tr>
+            <td>Cloud Cover</td>
+            <td>Grid (output)</td>
+            <td>CLOUD</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="CLOUD" optional="false" data_type="Grid (output)">Download Data</a></td>
+            </tr>
+        
+         
+                </tbody>
+                
+            </table>(*) <i>optional</i>
+            <div class="progress">
+                <div id="progressbar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="60"
+                    aria-valuemin="0" aria-valuemax="100" style="width: 10%"> 
+                </div>
+            </div>
+            <button type="button" style="float: right;margin-top: 20px; margin-bottom: 20px; margin-right: 30px;width: 100px;tab-size: 28px" class="btn btn-success" onclick="onRunButtonClick()">Run
+            </button>
+            
+                    </div>
+                    <script src="../js/jquery-3.4.1.js"></script>
+                    <script src="../js/bootstrap.min.js"></script>
+                    <script src="../js/runModel.js"></script>
+                </body> 
+                </html>

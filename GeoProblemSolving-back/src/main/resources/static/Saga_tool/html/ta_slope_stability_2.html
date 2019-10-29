@@ -1,0 +1,388 @@
+
+                <!DOCTYPE html>
+                <html lang="en"> 
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                    <title>SAGA TOOL</title>
+                    <link rel="stylesheet" href="../css/bootstrap.min.css">
+                    <style>
+                        body {
+                            margin: 10px;
+                            margin-bottom: 20px;
+                            min-width: 700px;
+                        }
+
+                        th {
+                            text-align: center;
+                            font-size: 18px;
+                        }
+
+                        td,
+                        th {
+                            padding: 2px;
+                        }
+                        .progress{
+                            margin-bottom: 0px;
+                            display: none;
+                        }
+                    </style>
+                </head>
+
+                <body>
+
+                    <div id="desc_content">
+                        
+            <h4>Tool</h4>
+            <table border="0" >
+                <tr>
+                    <td valign="top"><b>Name</b></td>
+                    <td valign="top">SHALSTAB</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>ID</b></td>
+                    <td valign="top">2</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>Author</b></td>
+                    <td valign="top">A. G&uuml;nther (c) 2012</td>
+                </tr>
+            </table>
+            <hr>
+            <h4>Description</h4>
+            <hr>
+            <h4>Parameters</h4>
+            <table tool_id="2"
+            oid="5b90e7bbd15d75093cb58902"
+            stateId="43DC0F51-D30C-4107-9B24-AE58474028AF"
+            mdlId="378E7D38-9121-43a5-B139-5BAE93738AF0" border="1" width="100%" valign="top" cellpadding="6" rules="all">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Identifier</th>
+                        <th>Description</th>
+                        <th>Constraints</th>
+                        <th>Settings</th>
+                    </tr>
+                
+                <thead>
+                    <tr> 
+                    <th colspan="6">Input</th>
+                    </tr>
+                </thead>
+
+                <tbody id="input_body">
+                    
+            
+            <tr>
+            <td>Slope grid (rad)</td>
+            <td>Grid (input)</td>
+            <td>A</td>
+            <td>A slope angle grid (in rad�ans)</td>
+            <td></td>
+            <td>
+                <input type="file" id="A" accept="application/zip" optional="false" data_type="Grid (input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Catchment area grid (m2)</td>
+            <td>Grid (input)</td>
+            <td>B</td>
+            <td>A catchment area grid (in square meters)</td>
+            <td></td>
+            <td>
+                <input type="file" id="B" accept="application/zip" optional="false" data_type="Grid (input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Min Density grid (g/cm3)</td>
+            <td>Grid (optional input)</td>
+            <td>Cmin</td>
+            <td>A grid representing minimum material density (in g/cm3)</td>
+            <td></td>
+            <td>
+                <input type="file" id="Cmin" accept="application/zip" optional="true" data_type="Grid (optional input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Max Density grid (g/cm3)</td>
+            <td>Grid (optional input)</td>
+            <td>Cmax</td>
+            <td>A grid representing maximum material density (in g/cm3)</td>
+            <td></td>
+            <td>
+                <input type="file" id="Cmax" accept="application/zip" optional="true" data_type="Grid (optional input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Min Hydraulic conductivity grid (m/hr) </td>
+            <td>Grid (optional input)</td>
+            <td>Dmin</td>
+            <td>A grid representing minimum material hydraulic conductivity (in m/hr)</td>
+            <td></td>
+            <td>
+                <input type="file" id="Dmin" accept="application/zip" optional="true" data_type="Grid (optional input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Max Hydraulic conductivity grid (m/hr) </td>
+            <td>Grid (optional input)</td>
+            <td>Dmax</td>
+            <td>A grid representing maximum material hydraulic conductivity (in m/hr)</td>
+            <td></td>
+            <td>
+                <input type="file" id="Dmax" accept="application/zip" optional="true" data_type="Grid (optional input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Min Thickness grid (m)</td>
+            <td>Grid (optional input)</td>
+            <td>Emin</td>
+            <td>A grid representing minimum material thickness (in m)</td>
+            <td></td>
+            <td>
+                <input type="file" id="Emin" accept="application/zip" optional="true" data_type="Grid (optional input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Max Thickness grid (m)</td>
+            <td>Grid (optional input)</td>
+            <td>Emax</td>
+            <td>A grid representing maximum material thickness (in m)</td>
+            <td></td>
+            <td>
+                <input type="file" id="Emax" accept="application/zip" optional="true" data_type="Grid (optional input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Min Friction angle grid (degree) </td>
+            <td>Grid (optional input)</td>
+            <td>Fmin</td>
+            <td>A grid representing minimum material friction angle (in degrees)</td>
+            <td></td>
+            <td>
+                <input type="file" id="Fmin" accept="application/zip" optional="true" data_type="Grid (optional input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Max Friction angle grid (degree) </td>
+            <td>Grid (optional input)</td>
+            <td>Fmax</td>
+            <td>A grid representing maximum material friction angle (in degrees)</td>
+            <td></td>
+            <td>
+                <input type="file" id="Fmax" accept="application/zip" optional="true" data_type="Grid (optional input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Min Bulk cohesion grid (MPa) </td>
+            <td>Grid (optional input)</td>
+            <td>Jmin</td>
+            <td>A grid representing minimum bulk cohesion</td>
+            <td></td>
+            <td>
+                <input type="file" id="Jmin" accept="application/zip" optional="true" data_type="Grid (optional input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Max Bulk cohesion grid (MPa) </td>
+            <td>Grid (optional input)</td>
+            <td>Jmax</td>
+            <td>A grid representing maximum bulk cohesion</td>
+            <td></td>
+            <td>
+                <input type="file" id="Jmax" accept="application/zip" optional="true" data_type="Grid (optional input)"></input>
+            </td>
+            </tr>
+        
+        
+                </tbody>
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Options</th>
+                    </tr>
+                </thead>
+                <tbody id="options_body">
+                    
+        
+            <tr>
+                <td>Grid system</td>
+                <td>Grid system</td>
+                <td>PARAMETERS_GRID_SYSTEM</td>
+                <td></td>
+                <td></td>
+                <td>
+                <input type="text" id="PARAMETERS_GRID_SYSTEM" class="form-control" value="">
+                </td>
+            </tr>,
+            <tr>
+                <td>Global minimum density (g/cm3)</td>
+                <td>Floating point</td>
+                <td>fCmin</td>
+                <td>Constant value if no raster set</td>
+                <td>Default: 1.600000</td>
+                <td>
+                <input type="text" id="fCmin" class="form-control" value="1.600000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Global maximum density (g/cm3)</td>
+                <td>Floating point</td>
+                <td>fCmax</td>
+                <td>Constant value if no raster set</td>
+                <td>Default: 1.600000</td>
+                <td>
+                <input type="text" id="fCmax" class="form-control" value="1.600000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Global minimum conductivity (m/hr)</td>
+                <td>Floating point</td>
+                <td>fDmin</td>
+                <td>Constant value if no raster set</td>
+                <td>Default: 2.700000</td>
+                <td>
+                <input type="text" id="fDmin" class="form-control" value="2.700000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Global maximum conductivity (m/hr)</td>
+                <td>Floating point</td>
+                <td>fDmax</td>
+                <td>Constant value if no raster set</td>
+                <td>Default: 2.700000</td>
+                <td>
+                <input type="text" id="fDmax" class="form-control" value="2.700000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Global minimum thickness (m)</td>
+                <td>Floating point</td>
+                <td>fEmin</td>
+                <td>Constant value if no raster set</td>
+                <td>Default: 1.000000</td>
+                <td>
+                <input type="text" id="fEmin" class="form-control" value="1.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Global maximum thickness (m)</td>
+                <td>Floating point</td>
+                <td>fEmax</td>
+                <td>Constant value if no raster set</td>
+                <td>Default: 1.000000</td>
+                <td>
+                <input type="text" id="fEmax" class="form-control" value="1.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Global minimum friction angle (degree)</td>
+                <td>Floating point</td>
+                <td>fFmin</td>
+                <td>Constant value if no raster set</td>
+                <td>Default: 33.000000</td>
+                <td>
+                <input type="text" id="fFmin" class="form-control" value="33.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Global maximum friction angle (degree)</td>
+                <td>Floating point</td>
+                <td>fFmax</td>
+                <td>Constant value if no raster set</td>
+                <td>Default: 33.000000</td>
+                <td>
+                <input type="text" id="fFmax" class="form-control" value="33.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Global minimum bulk cohesion (MPa)</td>
+                <td>Floating point</td>
+                <td>fJmin</td>
+                <td>Constant value if no raster set</td>
+                <td>Default: 0.000000</td>
+                <td>
+                <input type="text" id="fJmin" class="form-control" value="0.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Global maximum bulk cohesion (MPa)</td>
+                <td>Floating point</td>
+                <td>fJmax</td>
+                <td>Constant value if no raster set</td>
+                <td>Default: 0.000000</td>
+                <td>
+                <input type="text" id="fJmax" class="form-control" value="0.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Parameter sampling runs</td>
+                <td>Integer</td>
+                <td>fK</td>
+                <td>Number of sampling cycles</td>
+                <td>Default: 1</td>
+                <td>
+                <input type="text" id="fK" class="form-control" value="1">
+                </td>
+            </tr>
+                </tbody> 
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Output</th>
+                    </tr>
+                </thead>
+
+                <tbody id="output_body">
+                
+            
+            <tr>
+            <td>CR values</td>
+            <td>Grid (output)</td>
+            <td>G</td>
+            <td>Resulting critical recharge (m/day) grid</td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="G" optional="false" data_type="Grid (output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>CR classes</td>
+            <td>Grid (optional output)</td>
+            <td>H</td>
+            <td>Classified critical recharge (-) grid</td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="H" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        
+         
+                </tbody>
+                
+            </table>(*) <i>optional</i>
+            <div class="progress">
+                <div id="progressbar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="60"
+                    aria-valuemin="0" aria-valuemax="100" style="width: 10%"> 
+                </div>
+            </div>
+            <button type="button" style="float: right;margin-top: 20px; margin-bottom: 20px; margin-right: 30px;width: 100px;tab-size: 28px" class="btn btn-success" onclick="onRunButtonClick()">Run
+            </button>
+            
+                    </div>
+                    <script src="../js/jquery-3.4.1.js"></script>
+                    <script src="../js/bootstrap.min.js"></script>
+                    <script src="../js/runModel.js"></script>
+                </body> 
+                </html>

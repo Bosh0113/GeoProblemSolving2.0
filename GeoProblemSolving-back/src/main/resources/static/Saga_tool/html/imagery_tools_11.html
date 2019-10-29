@@ -1,0 +1,309 @@
+
+                <!DOCTYPE html>
+                <html lang="en"> 
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                    <title>SAGA TOOL</title>
+                    <link rel="stylesheet" href="../css/bootstrap.min.css">
+                    <style>
+                        body {
+                            margin: 10px;
+                            margin-bottom: 20px;
+                            min-width: 700px;
+                        }
+
+                        th {
+                            text-align: center;
+                            font-size: 18px;
+                        }
+
+                        td,
+                        th {
+                            padding: 2px;
+                        }
+                        .progress{
+                            margin-bottom: 0px;
+                            display: none;
+                        }
+                    </style>
+                </head>
+
+                <body>
+
+                    <div id="desc_content">
+                        
+            <h4>Tool</h4>
+            <table border="0" >
+                <tr>
+                    <td valign="top"><b>Name</b></td>
+                    <td valign="top">Textural Features</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>ID</b></td>
+                    <td valign="top">11</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>Author</b></td>
+                    <td valign="top">O.Conrad (c) 2016</td>
+                </tr>
+            </table>
+            <hr>
+            <h4>Description</h4>
+            <hr>
+            <h4>Parameters</h4>
+            <table tool_id="11"
+            oid="5b90e7bbd15d75093cb58791"
+            stateId="9D132DBD-CA9A-4672-BAEA-452425A8D916"
+            mdlId="6F9E7823-9F13-477c-AD1A-830C9E7DC545" border="1" width="100%" valign="top" cellpadding="6" rules="all">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Identifier</th>
+                        <th>Description</th>
+                        <th>Constraints</th>
+                        <th>Settings</th>
+                    </tr>
+                
+                <thead>
+                    <tr> 
+                    <th colspan="6">Input</th>
+                    </tr>
+                </thead>
+
+                <tbody id="input_body">
+                    
+            
+            <tr>
+            <td>Grid</td>
+            <td>Grid (input)</td>
+            <td>GRID</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="GRID" accept="application/zip" optional="false" data_type="Grid (input)"></input>
+            </td>
+            </tr>
+        
+        
+                </tbody>
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Options</th>
+                    </tr>
+                </thead>
+                <tbody id="options_body">
+                    
+        
+            <tr>
+                <td>Grid system</td>
+                <td>Grid system</td>
+                <td>PARAMETERS_GRID_SYSTEM</td>
+                <td></td>
+                <td></td>
+                <td>
+                <input type="text" id="PARAMETERS_GRID_SYSTEM" class="form-control" value="">
+                </td>
+            </tr>,
+            <tr>
+                <td>Direction</td>
+                <td>Choice</td>
+                <td>DIRECTION</td>
+                <td></td>
+                <td>Available Choices:
+[0] all
+[1] N-S
+[2] NE-SW
+[3] E-W
+[4] SE-NW
+Default: 0</td>
+                <td>
+                
+        <select class="form-control" id="DIRECTION">
+            <option value="0">[0] all</option>,<option value="1">[1] N-S</option>,<option value="2">[2] NE-SW</option>,<option value="3">[3] E-W</option>,<option value="4">[4] SE-NW</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Radius</td>
+                <td>Integer</td>
+                <td>RADIUS</td>
+                <td>kernel radius in cells</td>
+                <td>Minimum: 1
+Default: 1</td>
+                <td>
+                <input type="text" id="RADIUS" class="form-control" value="1">
+                </td>
+            </tr>,
+            <tr>
+                <td>Distance</td>
+                <td>Integer</td>
+                <td>DISTANCE</td>
+                <td>The distance between two samples.</td>
+                <td>Minimum: 1
+Default: 1</td>
+                <td>
+                <input type="text" id="DISTANCE" class="form-control" value="1">
+                </td>
+            </tr>,
+            <tr>
+                <td>Maximum Number of Categories</td>
+                <td>Integer</td>
+                <td>MAX_CATS</td>
+                <td></td>
+                <td>Minimum: 2
+Default: 256</td>
+                <td>
+                <input type="text" id="MAX_CATS" class="form-control" value="256">
+                </td>
+            </tr>
+                </tbody> 
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Output</th>
+                    </tr>
+                </thead>
+
+                <tbody id="output_body">
+                
+            
+            <tr>
+            <td>Angular Second Moment</td>
+            <td>Grid (optional output)</td>
+            <td>ASM</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="ASM" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Contrast</td>
+            <td>Grid (optional output)</td>
+            <td>CONTRAST</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="CONTRAST" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Correlation</td>
+            <td>Grid (optional output)</td>
+            <td>CORRELATION</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="CORRELATION" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Variance</td>
+            <td>Grid (optional output)</td>
+            <td>VARIANCE</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="VARIANCE" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Inverse Diff Moment</td>
+            <td>Grid (optional output)</td>
+            <td>IDM</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="IDM" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Sum Average</td>
+            <td>Grid (optional output)</td>
+            <td>SUM_AVERAGE</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="SUM_AVERAGE" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Sum Entropy</td>
+            <td>Grid (optional output)</td>
+            <td>SUM_ENTROPY</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="SUM_ENTROPY" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Sum Variance</td>
+            <td>Grid (optional output)</td>
+            <td>SUM_VARIANCE</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="SUM_VARIANCE" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Entropy</td>
+            <td>Grid (optional output)</td>
+            <td>ENTROPY</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="ENTROPY" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Difference Variance</td>
+            <td>Grid (optional output)</td>
+            <td>DIF_VARIANCE</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="DIF_VARIANCE" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Difference Entropy</td>
+            <td>Grid (optional output)</td>
+            <td>DIF_ENTROPY</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="DIF_ENTROPY" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Measure of Correlation-1</td>
+            <td>Grid (optional output)</td>
+            <td>MOC_1</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="MOC_1" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Measure of Correlation-2</td>
+            <td>Grid (optional output)</td>
+            <td>MOC_2</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="MOC_2" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        
+         
+                </tbody>
+                
+            </table>(*) <i>optional</i>
+            <div class="progress">
+                <div id="progressbar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="60"
+                    aria-valuemin="0" aria-valuemax="100" style="width: 10%"> 
+                </div>
+            </div>
+            <button type="button" style="float: right;margin-top: 20px; margin-bottom: 20px; margin-right: 30px;width: 100px;tab-size: 28px" class="btn btn-success" onclick="onRunButtonClick()">Run
+            </button>
+            
+                    </div>
+                    <script src="../js/jquery-3.4.1.js"></script>
+                    <script src="../js/bootstrap.min.js"></script>
+                    <script src="../js/runModel.js"></script>
+                </body> 
+                </html>

@@ -1,0 +1,277 @@
+
+                <!DOCTYPE html>
+                <html lang="en"> 
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                    <title>SAGA TOOL</title>
+                    <link rel="stylesheet" href="../css/bootstrap.min.css">
+                    <style>
+                        body {
+                            margin: 10px;
+                            margin-bottom: 20px;
+                            min-width: 700px;
+                        }
+
+                        th {
+                            text-align: center;
+                            font-size: 18px;
+                        }
+
+                        td,
+                        th {
+                            padding: 2px;
+                        }
+                        .progress{
+                            margin-bottom: 0px;
+                            display: none;
+                        }
+                    </style>
+                </head>
+
+                <body>
+
+                    <div id="desc_content">
+                        
+            <h4>Tool</h4>
+            <table border="0" >
+                <tr>
+                    <td valign="top"><b>Name</b></td>
+                    <td valign="top">Multi Level to Surface Interpolation</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>ID</b></td>
+                    <td valign="top">0</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>Author</b></td>
+                    <td valign="top">O.Conrad (c) 2012</td>
+                </tr>
+            </table>
+            <hr>
+            <h4>Description</h4>
+            <hr>
+            <h4>Parameters</h4>
+            <table tool_id="0"
+            oid="5b90e7bbd15d75093cb586bf"
+            stateId="AF3EDED6-95E9-4e58-85DE-C38D65F75FEF"
+            mdlId="F64A69E1-7107-4126-B06A-C010BECF640D" border="1" width="100%" valign="top" cellpadding="6" rules="all">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Identifier</th>
+                        <th>Description</th>
+                        <th>Constraints</th>
+                        <th>Settings</th>
+                    </tr>
+                
+                <thead>
+                    <tr> 
+                    <th colspan="6">Input</th>
+                    </tr>
+                </thead>
+
+                <tbody id="input_body">
+                    
+            
+            <tr>
+            <td>Variable</td>
+            <td>Grid list (input)</td>
+            <td>VARIABLE</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="VARIABLE" accept="application/zip" optional="false" data_type="Grid list (input)" multiple="multiple"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Level Heights</td>
+            <td>Grid list (optional input)</td>
+            <td>X_GRIDS</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="X_GRIDS" accept="application/zip" optional="true" data_type="Grid list (optional input)" multiple="multiple"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Minimum Height</td>
+            <td>Grid (optional input)</td>
+            <td>X_GRIDS_CHECK</td>
+            <td>if set, only values with level heights above DEM will be used</td>
+            <td></td>
+            <td>
+                <input type="file" id="X_GRIDS_CHECK" accept="application/zip" optional="true" data_type="Grid (optional input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Surface</td>
+            <td>Grid (input)</td>
+            <td>SURFACE</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="SURFACE" accept="application/zip" optional="false" data_type="Grid (input)"></input>
+            </td>
+            </tr>
+        
+        
+                </tbody>
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Options</th>
+                    </tr>
+                </thead>
+                <tbody id="options_body">
+                    
+        
+            <tr>
+                <td>Grid system</td>
+                <td>Grid system</td>
+                <td>PARAMETERS_GRID_SYSTEM</td>
+                <td></td>
+                <td></td>
+                <td>
+                <input type="text" id="PARAMETERS_GRID_SYSTEM" class="form-control" value="">
+                </td>
+            </tr>,
+            <tr>
+                <td>Get Heights from ...</td>
+                <td>Choice</td>
+                <td>X_SOURCE</td>
+                <td></td>
+                <td>Available Choices:
+[0] table
+[1] grid list
+Default: 1</td>
+                <td>
+                
+        <select class="form-control" id="X_SOURCE">
+            <option value="0">[0] table</option>,<option value="1">[1] grid list</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Horizontal Interpolation Method</td>
+                <td>Choice</td>
+                <td>H_METHOD</td>
+                <td></td>
+                <td>Available Choices:
+[0] Nearest Neighbour
+[1] Bilinear Interpolation
+[2] Bicubic Spline Interpolation
+[3] B-Spline Interpolation
+Default: 3</td>
+                <td>
+                
+        <select class="form-control" id="H_METHOD">
+            <option value="0">[0] Nearest Neighbour</option>,<option value="1">[1] Bilinear Interpolation</option>,<option value="2">[2] Bicubic Spline Interpolation</option>,<option value="3">[3] B-Spline Interpolation</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Vertical Interpolation Method</td>
+                <td>Choice</td>
+                <td>V_METHOD</td>
+                <td></td>
+                <td>Available Choices:
+[0] linear
+[1] spline
+[2] polynomial trend
+[3] polynomial trend (coefficient interpolation)
+Default: 0</td>
+                <td>
+                
+        <select class="form-control" id="V_METHOD">
+            <option value="0">[0] linear</option>,<option value="1">[1] spline</option>,<option value="2">[2] polynomial trend</option>,<option value="3">[3] polynomial trend (coefficient interpolation)</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Sorted Levels</td>
+                <td>Boolean</td>
+                <td>LINEAR_SORTED</td>
+                <td></td>
+                <td>Default: 0</td>
+                <td>
+                <input type="text" id="LINEAR_SORTED" class="form-control" value="0">
+                </td>
+            </tr>,
+            <tr>
+                <td>Pre-analyze</td>
+                <td>Boolean</td>
+                <td>SPLINE_ALL</td>
+                <td></td>
+                <td>Default: 0</td>
+                <td>
+                <input type="text" id="SPLINE_ALL" class="form-control" value="0">
+                </td>
+            </tr>,
+            <tr>
+                <td>Polynomial Order</td>
+                <td>Integer</td>
+                <td>TREND_ORDER</td>
+                <td></td>
+                <td>Minimum: 1
+Default: 3</td>
+                <td>
+                <input type="text" id="TREND_ORDER" class="form-control" value="3">
+                </td>
+            </tr>,
+            <tr>
+                <td>Grid system</td>
+                <td>Grid system</td>
+                <td>SYSTEM</td>
+                <td></td>
+                <td></td>
+                <td>
+                <input type="text" id="SYSTEM" class="form-control" value="">
+                </td>
+            </tr>
+                </tbody> 
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Output</th>
+                    </tr>
+                </thead>
+
+                <tbody id="output_body">
+                
+            
+            <tr>
+            <td>Interpolation</td>
+            <td>Grid (output)</td>
+            <td>RESULT</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="RESULT" optional="false" data_type="Grid (output)">Download Data</a></td>
+            </tr>
+        
+         
+                </tbody>
+                
+            </table>(*) <i>optional</i>
+            <div class="progress">
+                <div id="progressbar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="60"
+                    aria-valuemin="0" aria-valuemax="100" style="width: 10%"> 
+                </div>
+            </div>
+            <button type="button" style="float: right;margin-top: 20px; margin-bottom: 20px; margin-right: 30px;width: 100px;tab-size: 28px" class="btn btn-success" onclick="onRunButtonClick()">Run
+            </button>
+            
+                    </div>
+                    <script src="../js/jquery-3.4.1.js"></script>
+                    <script src="../js/bootstrap.min.js"></script>
+                    <script src="../js/runModel.js"></script>
+                </body> 
+                </html>

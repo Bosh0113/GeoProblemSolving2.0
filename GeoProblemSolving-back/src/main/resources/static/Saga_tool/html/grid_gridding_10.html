@@ -1,0 +1,297 @@
+
+                <!DOCTYPE html>
+                <html lang="en"> 
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                    <title>SAGA TOOL</title>
+                    <link rel="stylesheet" href="../css/bootstrap.min.css">
+                    <style>
+                        body {
+                            margin: 10px;
+                            margin-bottom: 20px;
+                            min-width: 700px;
+                        }
+
+                        th {
+                            text-align: center;
+                            font-size: 18px;
+                        }
+
+                        td,
+                        th {
+                            padding: 2px;
+                        }
+                        .progress{
+                            margin-bottom: 0px;
+                            display: none;
+                        }
+                    </style>
+                </head>
+
+                <body>
+
+                    <div id="desc_content">
+                        
+            <h4>Tool</h4>
+            <table border="0" >
+                <tr>
+                    <td valign="top"><b>Name</b></td>
+                    <td valign="top">Polygon Categories to Grid</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>ID</b></td>
+                    <td valign="top">10</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>Author</b></td>
+                    <td valign="top">O.Conrad (c) 2018</td>
+                </tr>
+            </table>
+            <hr>
+            <h4>Description</h4>
+            <hr>
+            <h4>Parameters</h4>
+            <table tool_id="10"
+            oid="5b90e7bbd15d75093cb58742"
+            stateId="BE3A5074-1936-4e55-A19D-A2BEE9345539"
+            mdlId="3E857493-0962-471a-9B99-5275F1BE87E7" border="1" width="100%" valign="top" cellpadding="6" rules="all">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Identifier</th>
+                        <th>Description</th>
+                        <th>Constraints</th>
+                        <th>Settings</th>
+                    </tr>
+                
+                <thead>
+                    <tr> 
+                    <th colspan="6">Input</th>
+                    </tr>
+                </thead>
+
+                <tbody id="input_body">
+                    
+            
+            <tr>
+            <td>Polygons</td>
+            <td>Shapes (input)</td>
+            <td>POLYGONS</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="POLYGONS" accept="application/zip" optional="false" data_type="Shapes (input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Target System</td>
+            <td>Grid (optional input)</td>
+            <td>TARGET_TEMPLATE</td>
+            <td>use this grid's system for output grids</td>
+            <td></td>
+            <td>
+                <input type="file" id="TARGET_TEMPLATE" accept="application/zip" optional="true" data_type="Grid (optional input)"></input>
+            </td>
+            </tr>
+        
+        
+                </tbody>
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Options</th>
+                    </tr>
+                </thead>
+                <tbody id="options_body">
+                    
+        
+            <tr>
+                <td>Category</td>
+                <td>Table field</td>
+                <td>FIELD</td>
+                <td>The attribute field that specifies the category a polygon belongs to.</td>
+                <td></td>
+                <td>
+                <input type="text" id="FIELD" class="form-control" value="">
+                </td>
+            </tr>,
+            <tr>
+                <td>Method</td>
+                <td>Choice</td>
+                <td>METHOD</td>
+                <td>Choose cell wise, if you have not many polygons. Polygon wise will show much better performance, if you have many (small) polygons.</td>
+                <td>Available Choices:
+[0] cell wise
+[1] polygon wise
+Default: 1</td>
+                <td>
+                
+        <select class="form-control" id="METHOD">
+            <option value="0">[0] cell wise</option>,<option value="1">[1] polygon wise</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Multiple Polygons</td>
+                <td>Choice</td>
+                <td>MULTIPLE</td>
+                <td>Output value for cells that intersect wiht more than one polygon.</td>
+                <td>Available Choices:
+[0] minimum coverage
+[1] maximum coverage
+Default: 1</td>
+                <td>
+                
+        <select class="form-control" id="MULTIPLE">
+            <option value="0">[0] minimum coverage</option>,<option value="1">[1] maximum coverage</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Target Grid System</td>
+                <td>Choice</td>
+                <td>TARGET_DEFINITION</td>
+                <td></td>
+                <td>Available Choices:
+[0] user defined
+[1] grid or grid system
+Default: 0</td>
+                <td>
+                
+        <select class="form-control" id="TARGET_DEFINITION">
+            <option value="0">[0] user defined</option>,<option value="1">[1] grid or grid system</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Cellsize</td>
+                <td>Floating point</td>
+                <td>TARGET_USER_SIZE</td>
+                <td></td>
+                <td>Minimum: 0.000000
+Default: 1.000000</td>
+                <td>
+                <input type="text" id="TARGET_USER_SIZE" class="form-control" value="1.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Left</td>
+                <td>Floating point</td>
+                <td>TARGET_USER_XMIN</td>
+                <td></td>
+                <td>Default: 0.000000</td>
+                <td>
+                <input type="text" id="TARGET_USER_XMIN" class="form-control" value="0.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Right</td>
+                <td>Floating point</td>
+                <td>TARGET_USER_XMAX</td>
+                <td></td>
+                <td>Default: 100.000000</td>
+                <td>
+                <input type="text" id="TARGET_USER_XMAX" class="form-control" value="100.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Bottom</td>
+                <td>Floating point</td>
+                <td>TARGET_USER_YMIN</td>
+                <td></td>
+                <td>Default: 0.000000</td>
+                <td>
+                <input type="text" id="TARGET_USER_YMIN" class="form-control" value="0.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Top</td>
+                <td>Floating point</td>
+                <td>TARGET_USER_YMAX</td>
+                <td></td>
+                <td>Default: 100.000000</td>
+                <td>
+                <input type="text" id="TARGET_USER_YMAX" class="form-control" value="100.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Fit</td>
+                <td>Choice</td>
+                <td>TARGET_USER_FITS</td>
+                <td></td>
+                <td>Available Choices:
+[0] nodes
+[1] cells
+Default: 0</td>
+                <td>
+                
+        <select class="form-control" id="TARGET_USER_FITS">
+            <option value="0">[0] nodes</option>,<option value="1">[1] cells</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Grid System</td>
+                <td>Grid system</td>
+                <td>TARGET_SYSTEM</td>
+                <td></td>
+                <td></td>
+                <td>
+                <input type="text" id="TARGET_SYSTEM" class="form-control" value="">
+                </td>
+            </tr>
+                </tbody> 
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Output</th>
+                    </tr>
+                </thead>
+
+                <tbody id="output_body">
+                
+            
+            <tr>
+            <td>Category</td>
+            <td>Grid (output)</td>
+            <td>CATEGORY</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="CATEGORY" optional="false" data_type="Grid (output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Coverage</td>
+            <td>Grid (optional output)</td>
+            <td>COVERAGE</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="COVERAGE" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        
+         
+                </tbody>
+                
+            </table>(*) <i>optional</i>
+            <div class="progress">
+                <div id="progressbar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="60"
+                    aria-valuemin="0" aria-valuemax="100" style="width: 10%"> 
+                </div>
+            </div>
+            <button type="button" style="float: right;margin-top: 20px; margin-bottom: 20px; margin-right: 30px;width: 100px;tab-size: 28px" class="btn btn-success" onclick="onRunButtonClick()">Run
+            </button>
+            
+                    </div>
+                    <script src="../js/jquery-3.4.1.js"></script>
+                    <script src="../js/bootstrap.min.js"></script>
+                    <script src="../js/runModel.js"></script>
+                </body> 
+                </html>

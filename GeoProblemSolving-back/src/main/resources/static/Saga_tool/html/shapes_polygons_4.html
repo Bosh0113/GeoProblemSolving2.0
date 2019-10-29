@@ -1,0 +1,248 @@
+
+                <!DOCTYPE html>
+                <html lang="en"> 
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                    <title>SAGA TOOL</title>
+                    <link rel="stylesheet" href="../css/bootstrap.min.css">
+                    <style>
+                        body {
+                            margin: 10px;
+                            margin-bottom: 20px;
+                            min-width: 700px;
+                        }
+
+                        th {
+                            text-align: center;
+                            font-size: 18px;
+                        }
+
+                        td,
+                        th {
+                            padding: 2px;
+                        }
+                        .progress{
+                            margin-bottom: 0px;
+                            display: none;
+                        }
+                    </style>
+                </head>
+
+                <body>
+
+                    <div id="desc_content">
+                        
+            <h4>Tool</h4>
+            <table border="0" >
+                <tr>
+                    <td valign="top"><b>Name</b></td>
+                    <td valign="top">Point Statistics for Polygons</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>ID</b></td>
+                    <td valign="top">4</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>Author</b></td>
+                    <td valign="top">V. Olaya, O. Conrad (c) 2005, 2010</td>
+                </tr>
+            </table>
+            <hr>
+            <h4>Description</h4>
+            <hr>
+            <h4>Parameters</h4>
+            <table tool_id="4"
+            oid="5b90e7bbd15d75093cb58827"
+            stateId="D064534F-F86E-408b-954D-77D9B7A17282"
+            mdlId="1213F4C5-E9F2-4aba-B966-62A2ACAFE410" border="1" width="100%" valign="top" cellpadding="6" rules="all">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Identifier</th>
+                        <th>Description</th>
+                        <th>Constraints</th>
+                        <th>Settings</th>
+                    </tr>
+                
+                <thead>
+                    <tr> 
+                    <th colspan="6">Input</th>
+                    </tr>
+                </thead>
+
+                <tbody id="input_body">
+                    
+            
+            <tr>
+            <td>Points</td>
+            <td>Shapes (input)</td>
+            <td>POINTS</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="POINTS" accept="application/zip" optional="false" data_type="Shapes (input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Polygons</td>
+            <td>Shapes (input)</td>
+            <td>POLYGONS</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="POLYGONS" accept="application/zip" optional="false" data_type="Shapes (input)"></input>
+            </td>
+            </tr>
+        
+        
+                </tbody>
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Options</th>
+                    </tr>
+                </thead>
+                <tbody id="options_body">
+                    
+        
+            <tr>
+                <td>Attributes</td>
+                <td>Table fields</td>
+                <td>FIELDS</td>
+                <td></td>
+                <td></td>
+                <td>
+                <input type="text" id="FIELDS" class="form-control" value="">
+                </td>
+            </tr>,
+            <tr>
+                <td>Sum</td>
+                <td>Boolean</td>
+                <td>SUM</td>
+                <td></td>
+                <td>Default: 0</td>
+                <td>
+                <input type="text" id="SUM" class="form-control" value="0">
+                </td>
+            </tr>,
+            <tr>
+                <td>Mean</td>
+                <td>Boolean</td>
+                <td>AVG</td>
+                <td></td>
+                <td>Default: 1</td>
+                <td>
+                <input type="text" id="AVG" class="form-control" value="1">
+                </td>
+            </tr>,
+            <tr>
+                <td>Variance</td>
+                <td>Boolean</td>
+                <td>VAR</td>
+                <td></td>
+                <td>Default: 0</td>
+                <td>
+                <input type="text" id="VAR" class="form-control" value="0">
+                </td>
+            </tr>,
+            <tr>
+                <td>Deviation</td>
+                <td>Boolean</td>
+                <td>DEV</td>
+                <td></td>
+                <td>Default: 0</td>
+                <td>
+                <input type="text" id="DEV" class="form-control" value="0">
+                </td>
+            </tr>,
+            <tr>
+                <td>Minimum</td>
+                <td>Boolean</td>
+                <td>MIN</td>
+                <td></td>
+                <td>Default: 0</td>
+                <td>
+                <input type="text" id="MIN" class="form-control" value="0">
+                </td>
+            </tr>,
+            <tr>
+                <td>Maximum</td>
+                <td>Boolean</td>
+                <td>MAX</td>
+                <td></td>
+                <td>Default: 0</td>
+                <td>
+                <input type="text" id="MAX" class="form-control" value="0">
+                </td>
+            </tr>,
+            <tr>
+                <td>Count</td>
+                <td>Boolean</td>
+                <td>NUM</td>
+                <td></td>
+                <td>Default: 0</td>
+                <td>
+                <input type="text" id="NUM" class="form-control" value="0">
+                </td>
+            </tr>,
+            <tr>
+                <td>Field Naming</td>
+                <td>Choice</td>
+                <td>FIELD_NAME</td>
+                <td></td>
+                <td>Available Choices:
+[0] variable type + original name
+[1] original name + variable type
+[2] original name
+[3] variable type
+Default: 0</td>
+                <td>
+                
+        <select class="form-control" id="FIELD_NAME">
+            <option value="0">[0] variable type + original name</option>,<option value="1">[1] original name + variable type</option>,<option value="2">[2] original name</option>,<option value="3">[3] variable type</option>
+        </select>
+        
+                </td>
+            </tr>
+                </tbody> 
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Output</th>
+                    </tr>
+                </thead>
+
+                <tbody id="output_body">
+                
+            
+            <tr>
+            <td>Statistics</td>
+            <td>Shapes (optional output)</td>
+            <td>STATISTICS</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="STATISTICS" optional="true" data_type="Shapes (optional output)">Download Data</a></td>
+            </tr>
+        
+         
+                </tbody>
+                
+            </table>(*) <i>optional</i>
+            <div class="progress">
+                <div id="progressbar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="60"
+                    aria-valuemin="0" aria-valuemax="100" style="width: 10%"> 
+                </div>
+            </div>
+            <button type="button" style="float: right;margin-top: 20px; margin-bottom: 20px; margin-right: 30px;width: 100px;tab-size: 28px" class="btn btn-success" onclick="onRunButtonClick()">Run
+            </button>
+            
+                    </div>
+                    <script src="../js/jquery-3.4.1.js"></script>
+                    <script src="../js/bootstrap.min.js"></script>
+                    <script src="../js/runModel.js"></script>
+                </body> 
+                </html>

@@ -1,0 +1,249 @@
+
+                <!DOCTYPE html>
+                <html lang="en"> 
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                    <title>SAGA TOOL</title>
+                    <link rel="stylesheet" href="../css/bootstrap.min.css">
+                    <style>
+                        body {
+                            margin: 10px;
+                            margin-bottom: 20px;
+                            min-width: 700px;
+                        }
+
+                        th {
+                            text-align: center;
+                            font-size: 18px;
+                        }
+
+                        td,
+                        th {
+                            padding: 2px;
+                        }
+                        .progress{
+                            margin-bottom: 0px;
+                            display: none;
+                        }
+                    </style>
+                </head>
+
+                <body>
+
+                    <div id="desc_content">
+                        
+            <h4>Tool</h4>
+            <table border="0" >
+                <tr>
+                    <td valign="top"><b>Name</b></td>
+                    <td valign="top">Universal Image Quality Index</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>ID</b></td>
+                    <td valign="top">13</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>Author</b></td>
+                    <td valign="top">M.Ambrosi (c) 2017</td>
+                </tr>
+            </table>
+            <hr>
+            <h4>Description</h4>
+            <hr>
+            <h4>Parameters</h4>
+            <table tool_id="13"
+            oid="5b90e7bbd15d75093cb58793"
+            stateId="6098C300-E71C-4cf8-9436-9F1A01A9A358"
+            mdlId="BB6B4A9B-8C3A-4ce8-8C3D-BA5D4356A742" border="1" width="100%" valign="top" cellpadding="6" rules="all">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Identifier</th>
+                        <th>Description</th>
+                        <th>Constraints</th>
+                        <th>Settings</th>
+                    </tr>
+                
+                <thead>
+                    <tr> 
+                    <th colspan="6">Input</th>
+                    </tr>
+                </thead>
+
+                <tbody id="input_body">
+                    
+            
+            <tr>
+            <td>First Grid</td>
+            <td>Grid (input)</td>
+            <td>A</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="A" accept="application/zip" optional="false" data_type="Grid (input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Second Grid</td>
+            <td>Grid (input)</td>
+            <td>B</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="B" accept="application/zip" optional="false" data_type="Grid (input)"></input>
+            </td>
+            </tr>
+        
+        
+                </tbody>
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Options</th>
+                    </tr>
+                </thead>
+                <tbody id="options_body">
+                    
+        
+            <tr>
+                <td>Grid system</td>
+                <td>Grid system</td>
+                <td>PARAMETERS_GRID_SYSTEM</td>
+                <td></td>
+                <td></td>
+                <td>
+                <input type="text" id="PARAMETERS_GRID_SYSTEM" class="form-control" value="">
+                </td>
+            </tr>,
+            <tr>
+                <td>k1</td>
+                <td>Floating point</td>
+                <td>K1</td>
+                <td></td>
+                <td>Minimum: 0.000000
+Maximum: 1.000000
+Default: 0.010000</td>
+                <td>
+                <input type="text" id="K1" class="form-control" value="0.010000">
+                </td>
+            </tr>,
+            <tr>
+                <td>k2</td>
+                <td>Floating point</td>
+                <td>K2</td>
+                <td></td>
+                <td>Minimum: 0.000000
+Maximum: 1.000000
+Default: 0.030000</td>
+                <td>
+                <input type="text" id="K2" class="form-control" value="0.030000">
+                </td>
+            </tr>,
+            <tr>
+                <td>L</td>
+                <td>Integer</td>
+                <td>L</td>
+                <td>The dynamic range for the image pixel, i.e. the number of different grey values.</td>
+                <td>Minimum: 1
+Default: 255</td>
+                <td>
+                <input type="text" id="L" class="form-control" value="255">
+                </td>
+            </tr>,
+            <tr>
+                <td>Kernel Type</td>
+                <td>Choice</td>
+                <td>KERNEL_TYPE</td>
+                <td>The shape of the filter kernel.</td>
+                <td>Available Choices:
+[0] Square
+[1] Circle
+Default: 1</td>
+                <td>
+                
+        <select class="form-control" id="KERNEL_TYPE">
+            <option value="0">[0] Square</option>,<option value="1">[1] Circle</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Kernel Radius</td>
+                <td>Integer</td>
+                <td>KERNEL_RADIUS</td>
+                <td>The kernel radius in cells.</td>
+                <td>Minimum: 1
+Default: 2</td>
+                <td>
+                <input type="text" id="KERNEL_RADIUS" class="form-control" value="2">
+                </td>
+            </tr>
+                </tbody> 
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Output</th>
+                    </tr>
+                </thead>
+
+                <tbody id="output_body">
+                
+            
+            <tr>
+            <td>Universal Image Quality Index</td>
+            <td>Grid (output)</td>
+            <td>Q</td>
+            <td>The product of correlation, luminance and contrast similarity.</td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="Q" optional="false" data_type="Grid (output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Correlation</td>
+            <td>Grid (optional output)</td>
+            <td>R</td>
+            <td>The correlation coefficient.</td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="R" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Luminance</td>
+            <td>Grid (optional output)</td>
+            <td>L</td>
+            <td>The similarity of mean luminance.</td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="L" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Contrast</td>
+            <td>Grid (optional output)</td>
+            <td>C</td>
+            <td>The similarity of contrast.</td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="C" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        
+         
+                </tbody>
+                
+            </table>(*) <i>optional</i>
+            <div class="progress">
+                <div id="progressbar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="60"
+                    aria-valuemin="0" aria-valuemax="100" style="width: 10%"> 
+                </div>
+            </div>
+            <button type="button" style="float: right;margin-top: 20px; margin-bottom: 20px; margin-right: 30px;width: 100px;tab-size: 28px" class="btn btn-success" onclick="onRunButtonClick()">Run
+            </button>
+            
+                    </div>
+                    <script src="../js/jquery-3.4.1.js"></script>
+                    <script src="../js/bootstrap.min.js"></script>
+                    <script src="../js/runModel.js"></script>
+                </body> 
+                </html>

@@ -1,0 +1,286 @@
+
+                <!DOCTYPE html>
+                <html lang="en"> 
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                    <title>SAGA TOOL</title>
+                    <link rel="stylesheet" href="../css/bootstrap.min.css">
+                    <style>
+                        body {
+                            margin: 10px;
+                            margin-bottom: 20px;
+                            min-width: 700px;
+                        }
+
+                        th {
+                            text-align: center;
+                            font-size: 18px;
+                        }
+
+                        td,
+                        th {
+                            padding: 2px;
+                        }
+                        .progress{
+                            margin-bottom: 0px;
+                            display: none;
+                        }
+                    </style>
+                </head>
+
+                <body>
+
+                    <div id="desc_content">
+                        
+            <h4>Tool</h4>
+            <table border="0" >
+                <tr>
+                    <td valign="top"><b>Name</b></td>
+                    <td valign="top">LS-Factor, Field Based</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>ID</b></td>
+                    <td valign="top">25</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>Author</b></td>
+                    <td valign="top">O.Conrad (c) 2013</td>
+                </tr>
+            </table>
+            <hr>
+            <h4>Description</h4>
+            <hr>
+            <h4>Parameters</h4>
+            <table tool_id="25"
+            oid="5b90e7bbd15d75093cb588c3"
+            stateId="6617E939-0766-4db6-9443-54AD635B62DA"
+            mdlId="44951FEF-E49D-4e29-8D90-4C566FD25F2E" border="1" width="100%" valign="top" cellpadding="6" rules="all">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Identifier</th>
+                        <th>Description</th>
+                        <th>Constraints</th>
+                        <th>Settings</th>
+                    </tr>
+                
+                <thead>
+                    <tr> 
+                    <th colspan="6">Input</th>
+                    </tr>
+                </thead>
+
+                <tbody id="input_body">
+                    
+            
+            <tr>
+            <td>Elevation</td>
+            <td>Grid (input)</td>
+            <td>DEM</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="DEM" accept="application/zip" optional="false" data_type="Grid (input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Fields</td>
+            <td>Shapes (optional input)</td>
+            <td>FIELDS</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="FIELDS" accept="application/zip" optional="true" data_type="Shapes (optional input)"></input>
+            </td>
+            </tr>
+        
+        
+                </tbody>
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Options</th>
+                    </tr>
+                </thead>
+                <tbody id="options_body">
+                    
+        
+            <tr>
+                <td>LS Calculation</td>
+                <td>Choice</td>
+                <td>METHOD</td>
+                <td></td>
+                <td>Available Choices:
+[0] Moore & Nieber 1989
+[1] Desmet & Govers 1996
+[2] Wischmeier & Smith 1978
+Default: 0</td>
+                <td>
+                
+        <select class="form-control" id="METHOD">
+            <option value="0">[0] Moore & Nieber 1989</option>,<option value="1">[1] Desmet & Govers 1996</option>,<option value="2">[2] Wischmeier & Smith 1978</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Type of Slope</td>
+                <td>Choice</td>
+                <td>METHOD_SLOPE</td>
+                <td></td>
+                <td>Available Choices:
+[0] local slope
+[1] distance weighted average catchment slope
+Default: 0</td>
+                <td>
+                
+        <select class="form-control" id="METHOD_SLOPE">
+            <option value="0">[0] local slope</option>,<option value="1">[1] distance weighted average catchment slope</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Specific Catchment Area</td>
+                <td>Choice</td>
+                <td>METHOD_AREA</td>
+                <td></td>
+                <td>Available Choices:
+[0] specific catchment area (contour length simply as cell size)
+[1] specific catchment area (contour length dependent on aspect)
+[2] catchment length (square root of catchment area)
+[3] effective flow length
+Default: 1</td>
+                <td>
+                
+        <select class="form-control" id="METHOD_AREA">
+            <option value="0">[0] specific catchment area (contour length simply as cell size)</option>,<option value="1">[1] specific catchment area (contour length dependent on aspect)</option>,<option value="2">[2] catchment length (square root of catchment area)</option>,<option value="3">[3] effective flow length</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Stop at Edge</td>
+                <td>Boolean</td>
+                <td>STOP_AT_EDGE</td>
+                <td></td>
+                <td>Default: 1</td>
+                <td>
+                <input type="text" id="STOP_AT_EDGE" class="form-control" value="1">
+                </td>
+            </tr>,
+            <tr>
+                <td>Rill/Interrill Erosivity</td>
+                <td>Floating point</td>
+                <td>EROSIVITY</td>
+                <td></td>
+                <td>Minimum: 0.000000
+Default: 1.000000</td>
+                <td>
+                <input type="text" id="EROSIVITY" class="form-control" value="1.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Stability</td>
+                <td>Choice</td>
+                <td>STABILITY</td>
+                <td></td>
+                <td>Available Choices:
+[0] stable
+[1] instable (thawing)
+Default: 0</td>
+                <td>
+                
+        <select class="form-control" id="STABILITY">
+            <option value="0">[0] stable</option>,<option value="1">[1] instable (thawing)</option>
+        </select>
+        
+                </td>
+            </tr>
+                </tbody> 
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Output</th>
+                    </tr>
+                </thead>
+
+                <tbody id="output_body">
+                
+            
+            <tr>
+            <td>Field Statistics</td>
+            <td>Shapes (optional output)</td>
+            <td>STATISTICS</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="STATISTICS" optional="true" data_type="Shapes (optional output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Upslope Length Factor</td>
+            <td>Grid (optional output)</td>
+            <td>UPSLOPE_AREA</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="UPSLOPE_AREA" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Effective Flow Length</td>
+            <td>Grid (optional output)</td>
+            <td>UPSLOPE_LENGTH</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="UPSLOPE_LENGTH" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Upslope Slope</td>
+            <td>Grid (optional output)</td>
+            <td>UPSLOPE_SLOPE</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="UPSLOPE_SLOPE" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>LS Factor</td>
+            <td>Grid (output)</td>
+            <td>LS_FACTOR</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="LS_FACTOR" optional="false" data_type="Grid (output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Sediment Balance</td>
+            <td>Grid (optional output)</td>
+            <td>BALANCE</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="BALANCE" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        
+         
+                </tbody>
+                
+            </table>(*) <i>optional</i>
+            <div class="progress">
+                <div id="progressbar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="60"
+                    aria-valuemin="0" aria-valuemax="100" style="width: 10%"> 
+                </div>
+            </div>
+            <button type="button" style="float: right;margin-top: 20px; margin-bottom: 20px; margin-right: 30px;width: 100px;tab-size: 28px" class="btn btn-success" onclick="onRunButtonClick()">Run
+            </button>
+            
+                    </div>
+                    <script src="../js/jquery-3.4.1.js"></script>
+                    <script src="../js/bootstrap.min.js"></script>
+                    <script src="../js/runModel.js"></script>
+                </body> 
+                </html>

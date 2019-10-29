@@ -13,7 +13,7 @@
     <Row>
       <Menu
         :active-name="menuActive"
-        style="width:60px;position:absolute"
+        style="width:60px;position:absolute;z-index:1"
         :style="{height:contentHeight}"
         @on-select="changeContent"
       >
@@ -80,15 +80,6 @@ export default {
       if (!vm.$store.getters.userState) {
         next("/login");
       } else {
-        // var userId = vm.$store.getters.userId;
-        // var members = vm.subProjectInfo.members;
-        // var isMember = false;
-        // for (var i = 0; i < members.length; i++) {
-        //   if (members[i].userId == userId) {
-        //     isMember = true;
-        //     break;
-        //   }
-        // }
         if (
           !(
             vm.userRole == "Manager" ||

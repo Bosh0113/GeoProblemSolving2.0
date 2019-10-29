@@ -49,7 +49,6 @@ public class ToolDaoImpl implements IToolDao {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
             tool.setCreateTime(dateFormat.format(date));
 
-            // 有待测试-----------------------------------------------------------------------------
             // 创建tool时，如果选择了toolset，更新toolset离的toolList
             JSONArray toolsetList = tool.getToolsetInfo();
             for(int i=0;i<toolsetList.size();i++){

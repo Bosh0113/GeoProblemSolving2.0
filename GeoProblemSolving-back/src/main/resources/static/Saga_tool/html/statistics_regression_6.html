@@ -1,0 +1,369 @@
+
+                <!DOCTYPE html>
+                <html lang="en"> 
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                    <title>SAGA TOOL</title>
+                    <link rel="stylesheet" href="../css/bootstrap.min.css">
+                    <style>
+                        body {
+                            margin: 10px;
+                            margin-bottom: 20px;
+                            min-width: 700px;
+                        }
+
+                        th {
+                            text-align: center;
+                            font-size: 18px;
+                        }
+
+                        td,
+                        th {
+                            padding: 2px;
+                        }
+                        .progress{
+                            margin-bottom: 0px;
+                            display: none;
+                        }
+                    </style>
+                </head>
+
+                <body>
+
+                    <div id="desc_content">
+                        
+            <h4>Tool</h4>
+            <table border="0" >
+                <tr>
+                    <td valign="top"><b>Name</b></td>
+                    <td valign="top">GWR for Multiple Predictor Grids</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>ID</b></td>
+                    <td valign="top">6</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>Author</b></td>
+                    <td valign="top">O.Conrad (c) 2010</td>
+                </tr>
+            </table>
+            <hr>
+            <h4>Description</h4>
+            <hr>
+            <h4>Parameters</h4>
+            <table tool_id="6"
+            oid="5b90e7bbd15d75093cb58888"
+            stateId="65B32147-7FD4-41a0-A27C-13A5A2525041"
+            mdlId="A34D66B3-438E-4d71-82CA-0466A4DEAD96" border="1" width="100%" valign="top" cellpadding="6" rules="all">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Identifier</th>
+                        <th>Description</th>
+                        <th>Constraints</th>
+                        <th>Settings</th>
+                    </tr>
+                
+                <thead>
+                    <tr> 
+                    <th colspan="6">Input</th>
+                    </tr>
+                </thead>
+
+                <tbody id="input_body">
+                    
+            
+            <tr>
+            <td>Points</td>
+            <td>Shapes (input)</td>
+            <td>POINTS</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="POINTS" accept="application/zip" optional="false" data_type="Shapes (input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Predictors</td>
+            <td>Grid list (input)</td>
+            <td>PREDICTORS</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="PREDICTORS" accept="application/zip" optional="false" data_type="Grid list (input)" multiple="multiple"></input>
+            </td>
+            </tr>
+        
+        
+                </tbody>
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Options</th>
+                    </tr>
+                </thead>
+                <tbody id="options_body">
+                    
+        
+            <tr>
+                <td>Grid system</td>
+                <td>Grid system</td>
+                <td>PARAMETERS_GRID_SYSTEM</td>
+                <td></td>
+                <td></td>
+                <td>
+                <input type="text" id="PARAMETERS_GRID_SYSTEM" class="form-control" value="">
+                </td>
+            </tr>,
+            <tr>
+                <td>Dependent Variable</td>
+                <td>Table field</td>
+                <td>DEPENDENT</td>
+                <td></td>
+                <td></td>
+                <td>
+                <input type="text" id="DEPENDENT" class="form-control" value="">
+                </td>
+            </tr>,
+            <tr>
+                <td>Output of Regression Parameters</td>
+                <td>Boolean</td>
+                <td>MODEL_OUT</td>
+                <td></td>
+                <td>Default: 0</td>
+                <td>
+                <input type="text" id="MODEL_OUT" class="form-control" value="0">
+                </td>
+            </tr>,
+            <tr>
+                <td>Model Resolution</td>
+                <td>Choice</td>
+                <td>RESOLUTION</td>
+                <td></td>
+                <td>Available Choices:
+[0] same as predictors
+[1] user defined
+Default: 1</td>
+                <td>
+                
+        <select class="form-control" id="RESOLUTION">
+            <option value="0">[0] same as predictors</option>,<option value="1">[1] user defined</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Resolution</td>
+                <td>Floating point</td>
+                <td>RESOLUTION_VAL</td>
+                <td>map units</td>
+                <td>Minimum: 0.000000
+Default: 1.000000</td>
+                <td>
+                <input type="text" id="RESOLUTION_VAL" class="form-control" value="1.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Weighting Function</td>
+                <td>Choice</td>
+                <td>DW_WEIGHTING</td>
+                <td></td>
+                <td>Available Choices:
+[0] no distance weighting
+[1] inverse distance to a power
+[2] exponential
+[3] gaussian weighting
+Default: 3</td>
+                <td>
+                
+        <select class="form-control" id="DW_WEIGHTING">
+            <option value="0">[0] no distance weighting</option>,<option value="1">[1] inverse distance to a power</option>,<option value="2">[2] exponential</option>,<option value="3">[3] gaussian weighting</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Inverse Distance Weighting Power</td>
+                <td>Floating point</td>
+                <td>DW_IDW_POWER</td>
+                <td></td>
+                <td>Minimum: 0.000000
+Default: 1.000000</td>
+                <td>
+                <input type="text" id="DW_IDW_POWER" class="form-control" value="1.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Inverse Distance Offset</td>
+                <td>Boolean</td>
+                <td>DW_IDW_OFFSET</td>
+                <td>Calculates weights for distance plus one, avoiding division by zero for zero distances</td>
+                <td>Default: 1</td>
+                <td>
+                <input type="text" id="DW_IDW_OFFSET" class="form-control" value="1">
+                </td>
+            </tr>,
+            <tr>
+                <td>Gaussian and Exponential Weighting Bandwidth</td>
+                <td>Floating point</td>
+                <td>DW_BANDWIDTH</td>
+                <td></td>
+                <td>Minimum: 0.000000
+Default: 1.000000</td>
+                <td>
+                <input type="text" id="DW_BANDWIDTH" class="form-control" value="1.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Search Range</td>
+                <td>Choice</td>
+                <td>SEARCH_RANGE</td>
+                <td></td>
+                <td>Available Choices:
+[0] local
+[1] global
+Default: 1</td>
+                <td>
+                
+        <select class="form-control" id="SEARCH_RANGE">
+            <option value="0">[0] local</option>,<option value="1">[1] global</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Maximum Search Distance</td>
+                <td>Floating point</td>
+                <td>SEARCH_RADIUS</td>
+                <td>local maximum search distance given in map units</td>
+                <td>Minimum: 0.000000
+Default: 1000.000000</td>
+                <td>
+                <input type="text" id="SEARCH_RADIUS" class="form-control" value="1000.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Number of Points</td>
+                <td>Choice</td>
+                <td>SEARCH_POINTS_ALL</td>
+                <td></td>
+                <td>Available Choices:
+[0] maximum number of nearest points
+[1] all points within search distance
+Default: 1</td>
+                <td>
+                
+        <select class="form-control" id="SEARCH_POINTS_ALL">
+            <option value="0">[0] maximum number of nearest points</option>,<option value="1">[1] all points within search distance</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Minimum</td>
+                <td>Integer</td>
+                <td>SEARCH_POINTS_MIN</td>
+                <td>minimum number of points to use</td>
+                <td>Minimum: 1
+Default: 16</td>
+                <td>
+                <input type="text" id="SEARCH_POINTS_MIN" class="form-control" value="16">
+                </td>
+            </tr>,
+            <tr>
+                <td>Maximum</td>
+                <td>Integer</td>
+                <td>SEARCH_POINTS_MAX</td>
+                <td>maximum number of nearest points</td>
+                <td>Minimum: 1
+Default: 20</td>
+                <td>
+                <input type="text" id="SEARCH_POINTS_MAX" class="form-control" value="20">
+                </td>
+            </tr>,
+            <tr>
+                <td>Direction</td>
+                <td>Choice</td>
+                <td>SEARCH_DIRECTION</td>
+                <td></td>
+                <td>Available Choices:
+[0] all directions
+[1] quadrants
+Default: 0</td>
+                <td>
+                
+        <select class="form-control" id="SEARCH_DIRECTION">
+            <option value="0">[0] all directions</option>,<option value="1">[1] quadrants</option>
+        </select>
+        
+                </td>
+            </tr>
+                </tbody> 
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Output</th>
+                    </tr>
+                </thead>
+
+                <tbody id="output_body">
+                
+            
+            <tr>
+            <td>Residuals</td>
+            <td>Shapes (optional output)</td>
+            <td>RESIDUALS</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="RESIDUALS" optional="true" data_type="Shapes (optional output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Regression</td>
+            <td>Grid (output)</td>
+            <td>REGRESSION</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="REGRESSION" optional="false" data_type="Grid (output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Coefficient of Determination</td>
+            <td>Grid (output)</td>
+            <td>QUALITY</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="QUALITY" optional="false" data_type="Grid (output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Regression Parameters</td>
+            <td>Grid list (optional output)</td>
+            <td>MODEL</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="MODEL" optional="true" data_type="Grid list (optional output)">Download Data</a></td>
+            </tr>
+        
+         
+                </tbody>
+                
+            </table>(*) <i>optional</i>
+            <div class="progress">
+                <div id="progressbar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="60"
+                    aria-valuemin="0" aria-valuemax="100" style="width: 10%"> 
+                </div>
+            </div>
+            <button type="button" style="float: right;margin-top: 20px; margin-bottom: 20px; margin-right: 30px;width: 100px;tab-size: 28px" class="btn btn-success" onclick="onRunButtonClick()">Run
+            </button>
+            
+                    </div>
+                    <script src="../js/jquery-3.4.1.js"></script>
+                    <script src="../js/bootstrap.min.js"></script>
+                    <script src="../js/runModel.js"></script>
+                </body> 
+                </html>

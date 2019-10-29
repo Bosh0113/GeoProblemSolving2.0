@@ -1,0 +1,329 @@
+
+                <!DOCTYPE html>
+                <html lang="en"> 
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                    <title>SAGA TOOL</title>
+                    <link rel="stylesheet" href="../css/bootstrap.min.css">
+                    <style>
+                        body {
+                            margin: 10px;
+                            margin-bottom: 20px;
+                            min-width: 700px;
+                        }
+
+                        th {
+                            text-align: center;
+                            font-size: 18px;
+                        }
+
+                        td,
+                        th {
+                            padding: 2px;
+                        }
+                        .progress{
+                            margin-bottom: 0px;
+                            display: none;
+                        }
+                    </style>
+                </head>
+
+                <body>
+
+                    <div id="desc_content">
+                        
+            <h4>Tool</h4>
+            <table border="0" >
+                <tr>
+                    <td valign="top"><b>Name</b></td>
+                    <td valign="top">TOPMODEL</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>ID</b></td>
+                    <td valign="top">2</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>Author</b></td>
+                    <td valign="top">(c) 2003 by O.Conrad</td>
+                </tr>
+            </table>
+            <hr>
+            <h4>Description</h4>
+            <hr>
+            <h4>Parameters</h4>
+            <table tool_id="2"
+            oid="5b90e7bbd15d75093cb5884e"
+            stateId="8B49882C-DAA6-4bd4-9B78-6643C14B25A4"
+            mdlId="57DBA397-E995-4bb9-B821-6715F5A6E42B" border="1" width="100%" valign="top" cellpadding="6" rules="all">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Identifier</th>
+                        <th>Description</th>
+                        <th>Constraints</th>
+                        <th>Settings</th>
+                    </tr>
+                
+                <thead>
+                    <tr> 
+                    <th colspan="6">Input</th>
+                    </tr>
+                </thead>
+
+                <tbody id="input_body">
+                    
+            
+            <tr>
+            <td>Topographic Wetness Index</td>
+            <td>Grid (input)</td>
+            <td>ATANB</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="ATANB" accept="application/zip" optional="false" data_type="Grid (input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Weather Records</td>
+            <td>Table (input)</td>
+            <td>WEATHER</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="WEATHER" accept="application/zip" optional="false" data_type="Table (input)"></input>
+            </td>
+            </tr>
+        
+        
+                </tbody>
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Options</th>
+                    </tr>
+                </thead>
+                <tbody id="options_body">
+                    
+        
+            <tr>
+                <td>Precipitation [m / dt]</td>
+                <td>Table field</td>
+                <td>RECORD_P</td>
+                <td></td>
+                <td></td>
+                <td>
+                <input type="text" id="RECORD_P" class="form-control" value="">
+                </td>
+            </tr>,
+            <tr>
+                <td>Evapotranspiration [m / dt]</td>
+                <td>Table field</td>
+                <td>RECORD_ET</td>
+                <td></td>
+                <td></td>
+                <td>
+                <input type="text" id="RECORD_ET" class="form-control" value="">
+                </td>
+            </tr>,
+            <tr>
+                <td>Date/Time</td>
+                <td>Table field</td>
+                <td>RECORD_DATE</td>
+                <td></td>
+                <td></td>
+                <td>
+                <input type="text" id="RECORD_DATE" class="form-control" value="">
+                </td>
+            </tr>,
+            <tr>
+                <td>Time Step [h]</td>
+                <td>Floating point</td>
+                <td>DTIME</td>
+                <td></td>
+                <td>Default: 1.000000</td>
+                <td>
+                <input type="text" id="DTIME" class="form-control" value="1.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Number of Classes</td>
+                <td>Integer</td>
+                <td>NCLASSES</td>
+                <td></td>
+                <td>Minimum: 1
+Default: 30</td>
+                <td>
+                <input type="text" id="NCLASSES" class="form-control" value="30">
+                </td>
+            </tr>,
+            <tr>
+                <td>Initial subsurface flow per unit area [m/h]</td>
+                <td>Floating point</td>
+                <td>P_QS0</td>
+                <td></td>
+                <td>Default: 0.000033</td>
+                <td>
+                <input type="text" id="P_QS0" class="form-control" value="0.000033">
+                </td>
+            </tr>,
+            <tr>
+                <td>Areal average of ln(T0) = ln(Te) [ln(m^2/h)]</td>
+                <td>Floating point</td>
+                <td>P_LNTE</td>
+                <td></td>
+                <td>Default: 5.000000</td>
+                <td>
+                <input type="text" id="P_LNTE" class="form-control" value="5.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Model parameter [m]</td>
+                <td>Floating point</td>
+                <td>P_MODEL</td>
+                <td></td>
+                <td>Default: 0.032000</td>
+                <td>
+                <input type="text" id="P_MODEL" class="form-control" value="0.032000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Initial root zone storage deficit [m]</td>
+                <td>Floating point</td>
+                <td>P_SR0</td>
+                <td></td>
+                <td>Default: 0.002000</td>
+                <td>
+                <input type="text" id="P_SR0" class="form-control" value="0.002000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Maximum root zone storage deficit [m]</td>
+                <td>Floating point</td>
+                <td>P_SRZMAX</td>
+                <td></td>
+                <td>Default: 0.050000</td>
+                <td>
+                <input type="text" id="P_SRZMAX" class="form-control" value="0.050000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Unsaturated zone time delay per unit storage deficit [h]</td>
+                <td>Floating point</td>
+                <td>P_SUZ_TD</td>
+                <td></td>
+                <td>Default: 50.000000</td>
+                <td>
+                <input type="text" id="P_SUZ_TD" class="form-control" value="50.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Main channel routing velocity [m/h]</td>
+                <td>Floating point</td>
+                <td>P_VCH</td>
+                <td></td>
+                <td>Default: 3600.000000</td>
+                <td>
+                <input type="text" id="P_VCH" class="form-control" value="3600.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Internal subcatchment routing velocity [m/h]</td>
+                <td>Floating point</td>
+                <td>P_VR</td>
+                <td></td>
+                <td>Default: 3600.000000</td>
+                <td>
+                <input type="text" id="P_VR" class="form-control" value="3600.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Surface hydraulic conductivity [m/h]</td>
+                <td>Floating point</td>
+                <td>P_K0</td>
+                <td></td>
+                <td>Default: 1.000000</td>
+                <td>
+                <input type="text" id="P_K0" class="form-control" value="1.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Wetting front suction [m]</td>
+                <td>Floating point</td>
+                <td>P_PSI</td>
+                <td></td>
+                <td>Default: 0.020000</td>
+                <td>
+                <input type="text" id="P_PSI" class="form-control" value="0.020000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Water content change across the wetting front</td>
+                <td>Floating point</td>
+                <td>P_DTHETA</td>
+                <td></td>
+                <td>Default: 0.100000</td>
+                <td>
+                <input type="text" id="P_DTHETA" class="form-control" value="0.100000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Green-Ampt Infiltration</td>
+                <td>Boolean</td>
+                <td>BINF</td>
+                <td></td>
+                <td>Default: 1</td>
+                <td>
+                <input type="text" id="BINF" class="form-control" value="1">
+                </td>
+            </tr>
+                </tbody> 
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Output</th>
+                    </tr>
+                </thead>
+
+                <tbody id="output_body">
+                
+            
+            <tr>
+            <td>Soil Moisture Deficit</td>
+            <td>Grid (optional output)</td>
+            <td>MOIST</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="MOIST" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Simulation Output</td>
+            <td>Table (output)</td>
+            <td>TABLE</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="TABLE" optional="false" data_type="Table (output)">Download Data</a></td>
+            </tr>
+        
+         
+                </tbody>
+                
+            </table>(*) <i>optional</i>
+            <div class="progress">
+                <div id="progressbar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="60"
+                    aria-valuemin="0" aria-valuemax="100" style="width: 10%"> 
+                </div>
+            </div>
+            <button type="button" style="float: right;margin-top: 20px; margin-bottom: 20px; margin-right: 30px;width: 100px;tab-size: 28px" class="btn btn-success" onclick="onRunButtonClick()">Run
+            </button>
+            
+                    </div>
+                    <script src="../js/jquery-3.4.1.js"></script>
+                    <script src="../js/bootstrap.min.js"></script>
+                    <script src="../js/runModel.js"></script>
+                </body> 
+                </html>

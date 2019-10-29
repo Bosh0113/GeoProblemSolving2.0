@@ -1,0 +1,235 @@
+
+                <!DOCTYPE html>
+                <html lang="en"> 
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                    <title>SAGA TOOL</title>
+                    <link rel="stylesheet" href="../css/bootstrap.min.css">
+                    <style>
+                        body {
+                            margin: 10px;
+                            margin-bottom: 20px;
+                            min-width: 700px;
+                        }
+
+                        th {
+                            text-align: center;
+                            font-size: 18px;
+                        }
+
+                        td,
+                        th {
+                            padding: 2px;
+                        }
+                        .progress{
+                            margin-bottom: 0px;
+                            display: none;
+                        }
+                    </style>
+                </head>
+
+                <body>
+
+                    <div id="desc_content">
+                        
+            <h4>Tool</h4>
+            <table border="0" >
+                <tr>
+                    <td valign="top"><b>Name</b></td>
+                    <td valign="top">Points Filter</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>ID</b></td>
+                    <td valign="top">11</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>Author</b></td>
+                    <td valign="top">O.Conrad (c) 2010</td>
+                </tr>
+            </table>
+            <hr>
+            <h4>Description</h4>
+            <hr>
+            <h4>Parameters</h4>
+            <table tool_id="11"
+            oid="5b90e7bbd15d75093cb58806"
+            stateId="3826DD75-F706-47c4-A86D-ADAFA349D83D"
+            mdlId="8BB387CB-773D-4e00-82D5-7AC227411847" border="1" width="100%" valign="top" cellpadding="6" rules="all">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Identifier</th>
+                        <th>Description</th>
+                        <th>Constraints</th>
+                        <th>Settings</th>
+                    </tr>
+                
+                <thead>
+                    <tr> 
+                    <th colspan="6">Input</th>
+                    </tr>
+                </thead>
+
+                <tbody id="input_body">
+                    
+            
+            <tr>
+            <td>Points</td>
+            <td>Shapes (input)</td>
+            <td>POINTS</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="POINTS" accept="application/zip" optional="false" data_type="Shapes (input)"></input>
+            </td>
+            </tr>
+        
+        
+                </tbody>
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Options</th>
+                    </tr>
+                </thead>
+                <tbody id="options_body">
+                    
+        
+            <tr>
+                <td>Attribute</td>
+                <td>Table field</td>
+                <td>FIELD</td>
+                <td></td>
+                <td></td>
+                <td>
+                <input type="text" id="FIELD" class="form-control" value="">
+                </td>
+            </tr>,
+            <tr>
+                <td>Radius</td>
+                <td>Floating point</td>
+                <td>RADIUS</td>
+                <td></td>
+                <td>Minimum: 0.000000
+Default: 1.000000</td>
+                <td>
+                <input type="text" id="RADIUS" class="form-control" value="1.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Minimum Number of Points</td>
+                <td>Integer</td>
+                <td>MINNUM</td>
+                <td>only points with given minimum number of points in search radius will be processed</td>
+                <td>Minimum: 0
+Default: 0</td>
+                <td>
+                <input type="text" id="MINNUM" class="form-control" value="0">
+                </td>
+            </tr>,
+            <tr>
+                <td>Maximum Number of Points</td>
+                <td>Integer</td>
+                <td>MAXNUM</td>
+                <td>Number of nearest points, which will be evaluated for filtering. Set to zero to investigate all points in search radius.</td>
+                <td>Minimum: 0
+Default: 0</td>
+                <td>
+                <input type="text" id="MAXNUM" class="form-control" value="0">
+                </td>
+            </tr>,
+            <tr>
+                <td>Quadrants</td>
+                <td>Boolean</td>
+                <td>QUADRANTS</td>
+                <td></td>
+                <td>Default: 0</td>
+                <td>
+                <input type="text" id="QUADRANTS" class="form-control" value="0">
+                </td>
+            </tr>,
+            <tr>
+                <td>Filter Criterion</td>
+                <td>Choice</td>
+                <td>METHOD</td>
+                <td></td>
+                <td>Available Choices:
+[0] keep maxima (with tolerance)
+[1] keep minima (with tolerance)
+[2] remove maxima (with tolerance)
+[3] remove minima (with tolerance)
+[4] remove below percentile
+[5] remove above percentile
+Default: 0</td>
+                <td>
+                
+        <select class="form-control" id="METHOD">
+            <option value="0">[0] keep maxima (with tolerance)</option>,<option value="1">[1] keep minima (with tolerance)</option>,<option value="2">[2] remove maxima (with tolerance)</option>,<option value="3">[3] remove minima (with tolerance)</option>,<option value="4">[4] remove below percentile</option>,<option value="5">[5] remove above percentile</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Tolerance</td>
+                <td>Floating point</td>
+                <td>TOLERANCE</td>
+                <td></td>
+                <td>Minimum: 0.000000
+Default: 0.000000</td>
+                <td>
+                <input type="text" id="TOLERANCE" class="form-control" value="0.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Percentile</td>
+                <td>Floating point</td>
+                <td>PERCENT</td>
+                <td></td>
+                <td>Minimum: 0.000000
+Maximum: 100.000000
+Default: 50.000000</td>
+                <td>
+                <input type="text" id="PERCENT" class="form-control" value="50.000000">
+                </td>
+            </tr>
+                </tbody> 
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Output</th>
+                    </tr>
+                </thead>
+
+                <tbody id="output_body">
+                
+            
+            <tr>
+            <td>Filtered Points</td>
+            <td>Shapes (optional output)</td>
+            <td>FILTER</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="FILTER" optional="true" data_type="Shapes (optional output)">Download Data</a></td>
+            </tr>
+        
+         
+                </tbody>
+                
+            </table>(*) <i>optional</i>
+            <div class="progress">
+                <div id="progressbar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="60"
+                    aria-valuemin="0" aria-valuemax="100" style="width: 10%"> 
+                </div>
+            </div>
+            <button type="button" style="float: right;margin-top: 20px; margin-bottom: 20px; margin-right: 30px;width: 100px;tab-size: 28px" class="btn btn-success" onclick="onRunButtonClick()">Run
+            </button>
+            
+                    </div>
+                    <script src="../js/jquery-3.4.1.js"></script>
+                    <script src="../js/bootstrap.min.js"></script>
+                    <script src="../js/runModel.js"></script>
+                </body> 
+                </html>

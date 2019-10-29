@@ -1,0 +1,241 @@
+
+                <!DOCTYPE html>
+                <html lang="en"> 
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                    <title>SAGA TOOL</title>
+                    <link rel="stylesheet" href="../css/bootstrap.min.css">
+                    <style>
+                        body {
+                            margin: 10px;
+                            margin-bottom: 20px;
+                            min-width: 700px;
+                        }
+
+                        th {
+                            text-align: center;
+                            font-size: 18px;
+                        }
+
+                        td,
+                        th {
+                            padding: 2px;
+                        }
+                        .progress{
+                            margin-bottom: 0px;
+                            display: none;
+                        }
+                    </style>
+                </head>
+
+                <body>
+
+                    <div id="desc_content">
+                        
+            <h4>Tool</h4>
+            <table border="0" >
+                <tr>
+                    <td valign="top"><b>Name</b></td>
+                    <td valign="top">Accumulation Functions</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>ID</b></td>
+                    <td valign="top">18</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>Author</b></td>
+                    <td valign="top">Copyrights (c) 2009 by Volker Wichmann</td>
+                </tr>
+            </table>
+            <hr>
+            <h4>Description</h4>
+            <hr>
+            <h4>Parameters</h4>
+            <table tool_id="18"
+            oid="5b90e7bbd15d75093cb5870e"
+            stateId="7EC0583B-830E-43ad-AA74-5C4CCB9A4D18"
+            mdlId="C6E6A7D4-1A1A-473d-8663-11D1963BC969" border="1" width="100%" valign="top" cellpadding="6" rules="all">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Identifier</th>
+                        <th>Description</th>
+                        <th>Constraints</th>
+                        <th>Settings</th>
+                    </tr>
+                
+                <thead>
+                    <tr> 
+                    <th colspan="6">Input</th>
+                    </tr>
+                </thead>
+
+                <tbody id="input_body">
+                    
+            
+            <tr>
+            <td>Surface</td>
+            <td>Grid (input)</td>
+            <td>SURFACE</td>
+            <td>Surface used to derive the LDD network, e.g. a DTM.</td>
+            <td></td>
+            <td>
+                <input type="file" id="SURFACE" accept="application/zip" optional="false" data_type="Grid (input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Input</td>
+            <td>Grid (input)</td>
+            <td>INPUT</td>
+            <td>Grid with the input values to accumulate.</td>
+            <td></td>
+            <td>
+                <input type="file" id="INPUT" accept="application/zip" optional="false" data_type="Grid (input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>State t</td>
+            <td>Grid (optional input)</td>
+            <td>STATE_IN</td>
+            <td>Grid describing the state of each cell at timestep t.</td>
+            <td></td>
+            <td>
+                <input type="file" id="STATE_IN" accept="application/zip" optional="true" data_type="Grid (optional input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Operation Control</td>
+            <td>Grid (optional input)</td>
+            <td>CONTROL</td>
+            <td>Depending on mode of operation either transport capacity, transport fraction, threshold value or trigger value.</td>
+            <td></td>
+            <td>
+                <input type="file" id="CONTROL" accept="application/zip" optional="true" data_type="Grid (optional input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Linear Flow Control Grid</td>
+            <td>Grid (optional input)</td>
+            <td>CTRL_LINEAR</td>
+            <td>The values of this grid are checked against the linear flow threshold to decide on the flow-routing algorithm.</td>
+            <td></td>
+            <td>
+                <input type="file" id="CTRL_LINEAR" accept="application/zip" optional="true" data_type="Grid (optional input)"></input>
+            </td>
+            </tr>
+        
+        
+                </tbody>
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Options</th>
+                    </tr>
+                </thead>
+                <tbody id="options_body">
+                    
+        
+            <tr>
+                <td>Grid system</td>
+                <td>Grid system</td>
+                <td>PARAMETERS_GRID_SYSTEM</td>
+                <td></td>
+                <td></td>
+                <td>
+                <input type="text" id="PARAMETERS_GRID_SYSTEM" class="form-control" value="">
+                </td>
+            </tr>,
+            <tr>
+                <td>Operation</td>
+                <td>Choice</td>
+                <td>OPERATION</td>
+                <td>Select a mode of operation</td>
+                <td>Available Choices:
+[0] accuflux
+[1] accucapacityflux / state
+[2] accufractionflux / state
+[3] accuthresholdflux / state
+[4] accutriggerflux / state
+Default: 0</td>
+                <td>
+                
+        <select class="form-control" id="OPERATION">
+            <option value="0">[0] accuflux</option>,<option value="1">[1] accucapacityflux / state</option>,<option value="2">[2] accufractionflux / state</option>,<option value="3">[3] accuthresholdflux / state</option>,<option value="4">[4] accutriggerflux / state</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Switch to Linear Flow</td>
+                <td>Boolean</td>
+                <td>LINEAR</td>
+                <td>Switch from MFD8 to D8 if linear flow threshold is crossed.</td>
+                <td>Default: 1</td>
+                <td>
+                <input type="text" id="LINEAR" class="form-control" value="1">
+                </td>
+            </tr>,
+            <tr>
+                <td>Threshold Linear Flow</td>
+                <td>Floating point</td>
+                <td>THRES_LINEAR</td>
+                <td>Threshold for linear flow, if exceeded D8 is used.</td>
+                <td>Default: 0.000000</td>
+                <td>
+                <input type="text" id="THRES_LINEAR" class="form-control" value="0.000000">
+                </td>
+            </tr>
+                </tbody> 
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Output</th>
+                    </tr>
+                </thead>
+
+                <tbody id="output_body">
+                
+            
+            <tr>
+            <td>Flux</td>
+            <td>Grid (output)</td>
+            <td>FLUX</td>
+            <td>Flux out of each cell, i.e. everything accumulated so far.</td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="FLUX" optional="false" data_type="Grid (output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>State t + 1</td>
+            <td>Grid (optional output)</td>
+            <td>STATE_OUT</td>
+            <td>Grid describing the state of each cell at timestep t + 1.</td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="STATE_OUT" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        
+         
+                </tbody>
+                
+            </table>(*) <i>optional</i>
+            <div class="progress">
+                <div id="progressbar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="60"
+                    aria-valuemin="0" aria-valuemax="100" style="width: 10%"> 
+                </div>
+            </div>
+            <button type="button" style="float: right;margin-top: 20px; margin-bottom: 20px; margin-right: 30px;width: 100px;tab-size: 28px" class="btn btn-success" onclick="onRunButtonClick()">Run
+            </button>
+            
+                    </div>
+                    <script src="../js/jquery-3.4.1.js"></script>
+                    <script src="../js/bootstrap.min.js"></script>
+                    <script src="../js/runModel.js"></script>
+                </body> 
+                </html>

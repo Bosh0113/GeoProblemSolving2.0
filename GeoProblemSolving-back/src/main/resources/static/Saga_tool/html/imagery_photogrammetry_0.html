@@ -1,0 +1,287 @@
+
+                <!DOCTYPE html>
+                <html lang="en"> 
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                    <title>SAGA TOOL</title>
+                    <link rel="stylesheet" href="../css/bootstrap.min.css">
+                    <style>
+                        body {
+                            margin: 10px;
+                            margin-bottom: 20px;
+                            min-width: 700px;
+                        }
+
+                        th {
+                            text-align: center;
+                            font-size: 18px;
+                        }
+
+                        td,
+                        th {
+                            padding: 2px;
+                        }
+                        .progress{
+                            margin-bottom: 0px;
+                            display: none;
+                        }
+                    </style>
+                </head>
+
+                <body>
+
+                    <div id="desc_content">
+                        
+            <h4>Tool</h4>
+            <table border="0" >
+                <tr>
+                    <td valign="top"><b>Name</b></td>
+                    <td valign="top">Resection (Terrestrial)</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>ID</b></td>
+                    <td valign="top">0</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>Author</b></td>
+                    <td valign="top">HfT Stuttgart (c) 2013</td>
+                </tr>
+            </table>
+            <hr>
+            <h4>Description</h4>
+            <hr>
+            <h4>Parameters</h4>
+            <table tool_id="0"
+            oid=""
+            stateId=""
+            mdlId="" border="1" width="100%" valign="top" cellpadding="6" rules="all">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Identifier</th>
+                        <th>Description</th>
+                        <th>Constraints</th>
+                        <th>Settings</th>
+                    </tr>
+                
+                <thead>
+                    <tr> 
+                    <th colspan="6">Input</th>
+                    </tr>
+                </thead>
+
+                <tbody id="input_body">
+                    
+            
+            <tr>
+            <td>Measured Points (PC)</td>
+            <td>Point Cloud (input)</td>
+            <td>POINTS</td>
+            <td>List of Measured Points as PC</td>
+            <td></td>
+            <td>
+                <input type="file" id="POINTS" accept="application/zip" optional="false" data_type="Point Cloud (input)"></input>
+            </td>
+            </tr>
+        
+        
+                </tbody>
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Options</th>
+                    </tr>
+                </thead>
+                <tbody id="options_body">
+                    
+        
+            <tr>
+                <td>Focal Length (mm)</td>
+                <td>Floating point</td>
+                <td>F</td>
+                <td>Focal Length in mm</td>
+                <td>Default: 0.000000</td>
+                <td>
+                <input type="text" id="F" class="form-control" value="0.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Pixel Width (um)</td>
+                <td>Floating point</td>
+                <td>W</td>
+                <td>Pixel Width in micro meters</td>
+                <td>Default: 0.000000</td>
+                <td>
+                <input type="text" id="W" class="form-control" value="0.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Estimate Principal Point Offsets?</td>
+                <td>Boolean</td>
+                <td>EST_OFFSETS</td>
+                <td>Do you wish to estimate Principal Point Offsets?</td>
+                <td>Default: 0</td>
+                <td>
+                <input type="text" id="EST_OFFSETS" class="form-control" value="0">
+                </td>
+            </tr>,
+            <tr>
+                <td>Principal Point Offset in X (pixels)</td>
+                <td>Floating point</td>
+                <td>ppX</td>
+                <td>Principal Point Offset in X</td>
+                <td>Default: 0.000000</td>
+                <td>
+                <input type="text" id="ppX" class="form-control" value="0.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Principal Point Offset in Y (pixels)</td>
+                <td>Floating point</td>
+                <td>ppY</td>
+                <td>Principal Point Offset in Y</td>
+                <td>Default: 0.000000</td>
+                <td>
+                <input type="text" id="ppY" class="form-control" value="0.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Provide Radial Distortion Parameters?</td>
+                <td>Boolean</td>
+                <td>GIVE_DISTORTIONS</td>
+                <td>Do you wish to provide the Radial Distortion Parameters?</td>
+                <td>Default: 0</td>
+                <td>
+                <input type="text" id="GIVE_DISTORTIONS" class="form-control" value="0">
+                </td>
+            </tr>,
+            <tr>
+                <td>K1</td>
+                <td>Floating point</td>
+                <td>K1</td>
+                <td>K1</td>
+                <td>Default: 0.000000</td>
+                <td>
+                <input type="text" id="K1" class="form-control" value="0.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>K2</td>
+                <td>Floating point</td>
+                <td>K2</td>
+                <td>K2</td>
+                <td>Default: 0.000000</td>
+                <td>
+                <input type="text" id="K2" class="form-control" value="0.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>K3</td>
+                <td>Floating point</td>
+                <td>K3</td>
+                <td>K3</td>
+                <td>Default: 0.000000</td>
+                <td>
+                <input type="text" id="K3" class="form-control" value="0.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>X</td>
+                <td>Floating point</td>
+                <td>Xc</td>
+                <td>Approximate Coordinate</td>
+                <td>Default: 0.000000</td>
+                <td>
+                <input type="text" id="Xc" class="form-control" value="0.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Y</td>
+                <td>Floating point</td>
+                <td>Yc</td>
+                <td>Approximate Coordinate</td>
+                <td>Default: 0.000000</td>
+                <td>
+                <input type="text" id="Yc" class="form-control" value="0.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Z</td>
+                <td>Floating point</td>
+                <td>Zc</td>
+                <td>Approximate Coordinate</td>
+                <td>Default: 0.000000</td>
+                <td>
+                <input type="text" id="Zc" class="form-control" value="0.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>X</td>
+                <td>Floating point</td>
+                <td>Xt</td>
+                <td>Approximate Coordinate</td>
+                <td>Default: 0.000000</td>
+                <td>
+                <input type="text" id="Xt" class="form-control" value="0.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Y</td>
+                <td>Floating point</td>
+                <td>Yt</td>
+                <td>Approximate Coordinate</td>
+                <td>Default: 0.000000</td>
+                <td>
+                <input type="text" id="Yt" class="form-control" value="0.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Z</td>
+                <td>Floating point</td>
+                <td>Zt</td>
+                <td>Approximate Coordinate</td>
+                <td>Default: 0.000000</td>
+                <td>
+                <input type="text" id="Zt" class="form-control" value="0.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Output Text File</td>
+                <td>File path</td>
+                <td>OUTPUT FILE</td>
+                <td>The file to write the Calculation Results to.</td>
+                <td></td>
+                <td>
+                <input type="text" id="OUTPUT FILE" class="form-control" value="">
+                </td>
+            </tr>
+                </tbody> 
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Output</th>
+                    </tr>
+                </thead>
+
+                <tbody id="output_body">
+                 
+                </tbody>
+                
+            </table>(*) <i>optional</i>
+            <div class="progress">
+                <div id="progressbar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="60"
+                    aria-valuemin="0" aria-valuemax="100" style="width: 10%"> 
+                </div>
+            </div>
+            <button type="button" style="float: right;margin-top: 20px; margin-bottom: 20px; margin-right: 30px;width: 100px;tab-size: 28px" class="btn btn-success" onclick="onRunButtonClick()">Run
+            </button>
+            
+                    </div>
+                    <script src="../js/jquery-3.4.1.js"></script>
+                    <script src="../js/bootstrap.min.js"></script>
+                    <script src="../js/runModel.js"></script>
+                </body> 
+                </html>

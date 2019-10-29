@@ -1,0 +1,285 @@
+
+                <!DOCTYPE html>
+                <html lang="en"> 
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                    <title>SAGA TOOL</title>
+                    <link rel="stylesheet" href="../css/bootstrap.min.css">
+                    <style>
+                        body {
+                            margin: 10px;
+                            margin-bottom: 20px;
+                            min-width: 700px;
+                        }
+
+                        th {
+                            text-align: center;
+                            font-size: 18px;
+                        }
+
+                        td,
+                        th {
+                            padding: 2px;
+                        }
+                        .progress{
+                            margin-bottom: 0px;
+                            display: none;
+                        }
+                    </style>
+                </head>
+
+                <body>
+
+                    <div id="desc_content">
+                        
+            <h4>Tool</h4>
+            <table border="0" >
+                <tr>
+                    <td valign="top"><b>Name</b></td>
+                    <td valign="top">IHACRES Calibration (2)</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>ID</b></td>
+                    <td valign="top">0</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>Author</b></td>
+                    <td valign="top">copyrights (c) 2008 Stefan Liersch</td>
+                </tr>
+            </table>
+            <hr>
+            <h4>Description</h4>
+            <hr>
+            <h4>Parameters</h4>
+            <table tool_id="0"
+            oid="5b90e7bbd15d75093cb58854"
+            stateId="2BD619CF-43F3-402e-9E3F-78056176D841"
+            mdlId="29A28BB8-B35A-4646-B8E4-469999F26121" border="1" width="100%" valign="top" cellpadding="6" rules="all">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Identifier</th>
+                        <th>Description</th>
+                        <th>Constraints</th>
+                        <th>Settings</th>
+                    </tr>
+                
+                <thead>
+                    <tr> 
+                    <th colspan="6">Input</th>
+                    </tr>
+                </thead>
+
+                <tbody id="input_body">
+                    
+            
+            <tr>
+            <td>Table</td>
+            <td>Table (input)</td>
+            <td>TABLE</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="TABLE" accept="application/zip" optional="false" data_type="Table (input)"></input>
+            </td>
+            </tr>
+        
+        
+                </tbody>
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Options</th>
+                    </tr>
+                </thead>
+                <tbody id="options_body">
+                    
+        
+            <tr>
+                <td>Date Column</td>
+                <td>Table field</td>
+                <td>DATE_Field</td>
+                <td>Select the column containing the Date</td>
+                <td></td>
+                <td>
+                <input type="text" id="DATE_Field" class="form-control" value="">
+                </td>
+            </tr>,
+            <tr>
+                <td>Streamflow Column</td>
+                <td>Table field</td>
+                <td>DISCHARGE_Field</td>
+                <td>Select the Column containing Discharge Values</td>
+                <td></td>
+                <td>
+                <input type="text" id="DISCHARGE_Field" class="form-control" value="">
+                </td>
+            </tr>,
+            <tr>
+                <td>Precipitation Column</td>
+                <td>Table field</td>
+                <td>PCP_Field</td>
+                <td>Select the Column containing precipitation Values</td>
+                <td></td>
+                <td>
+                <input type="text" id="PCP_Field" class="form-control" value="">
+                </td>
+            </tr>,
+            <tr>
+                <td>Temperature Column</td>
+                <td>Table field</td>
+                <td>TMP_Field</td>
+                <td>Select the Column containing Temperature Values</td>
+                <td></td>
+                <td>
+                <input type="text" id="TMP_Field" class="form-control" value="">
+                </td>
+            </tr>,
+            <tr>
+                <td>Subbasin Inflow</td>
+                <td>Table field</td>
+                <td>INFLOW_Field</td>
+                <td>Select the column containing inflow data to the subbasin</td>
+                <td></td>
+                <td>
+                <input type="text" id="INFLOW_Field" class="form-control" value="">
+                </td>
+            </tr>,
+            <tr>
+                <td>Is the subbasin upstream (no external inflow)</td>
+                <td>Boolean</td>
+                <td>bUPSTREAM</td>
+                <td>If checked, it means there is no external inflow to the subbasin</td>
+                <td>Default: 1</td>
+                <td>
+                <input type="text" id="bUPSTREAM" class="form-control" value="1">
+                </td>
+            </tr>,
+            <tr>
+                <td>Using temperature data?</td>
+                <td>Boolean</td>
+                <td>USE_TMP</td>
+                <td>If checked, then temperature data are used.</td>
+                <td>Default: 1</td>
+                <td>
+                <input type="text" id="USE_TMP" class="form-control" value="1">
+                </td>
+            </tr>,
+            <tr>
+                <td>Number of Simulations</td>
+                <td>Integer</td>
+                <td>NSIM</td>
+                <td>Number of Simulations for Calibration</td>
+                <td>Minimum: 1
+Maximum: 10000000
+Default: 1000</td>
+                <td>
+                <input type="text" id="NSIM" class="form-control" value="1000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Area of the Watershed in [km2]</td>
+                <td>Floating point</td>
+                <td>AREA</td>
+                <td>Area of the Watershed in [km2] used for unit conversion</td>
+                <td>Minimum: 0.000010
+Default: 100.000000</td>
+                <td>
+                <input type="text" id="AREA" class="form-control" value="100.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Storage</td>
+                <td>Choice</td>
+                <td>STORAGE</td>
+                <td></td>
+                <td>Available Choices:
+[0] Single Storage
+[1] Two Parallel Storages
+[2] Two Storages in Series
+Default: 0</td>
+                <td>
+                
+        <select class="form-control" id="STORAGE">
+            <option value="0">[0] Single Storage</option>,<option value="1">[1] Two Parallel Storages</option>,<option value="2">[2] Two Storages in Series</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>IHACRES Version</td>
+                <td>Choice</td>
+                <td>IHACVERS</td>
+                <td></td>
+                <td>Available Choices:
+[0] Jakeman & Hornberger (1993)
+[1] Croke et al. (2005)
+Default: 0</td>
+                <td>
+                
+        <select class="form-control" id="IHACVERS">
+            <option value="0">[0] Jakeman & Hornberger (1993)</option>,<option value="1">[1] Croke et al. (2005)</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Snow Tool on/off</td>
+                <td>Boolean</td>
+                <td>SNOW_TOOL</td>
+                <td>If checked the snow module is active</td>
+                <td>Default: 1</td>
+                <td>
+                <input type="text" id="SNOW_TOOL" class="form-control" value="1">
+                </td>
+            </tr>
+                </tbody> 
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Output</th>
+                    </tr>
+                </thead>
+
+                <tbody id="output_body">
+                
+            
+            <tr>
+            <td>Table</td>
+            <td>Data Object Table (optional output)</td>
+            <td>TABLEout</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="TABLEout" optional="true" data_type="Data Object Table (optional output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Table</td>
+            <td>Data Object Table (optional output)</td>
+            <td>TABLEparms</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="TABLEparms" optional="true" data_type="Data Object Table (optional output)">Download Data</a></td>
+            </tr>
+        
+         
+                </tbody>
+                
+            </table>(*) <i>optional</i>
+            <div class="progress">
+                <div id="progressbar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="60"
+                    aria-valuemin="0" aria-valuemax="100" style="width: 10%"> 
+                </div>
+            </div>
+            <button type="button" style="float: right;margin-top: 20px; margin-bottom: 20px; margin-right: 30px;width: 100px;tab-size: 28px" class="btn btn-success" onclick="onRunButtonClick()">Run
+            </button>
+            
+                    </div>
+                    <script src="../js/jquery-3.4.1.js"></script>
+                    <script src="../js/bootstrap.min.js"></script>
+                    <script src="../js/runModel.js"></script>
+                </body> 
+                </html>

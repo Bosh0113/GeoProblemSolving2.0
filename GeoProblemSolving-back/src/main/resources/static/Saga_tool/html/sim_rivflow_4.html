@@ -1,0 +1,228 @@
+
+                <!DOCTYPE html>
+                <html lang="en"> 
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                    <title>SAGA TOOL</title>
+                    <link rel="stylesheet" href="../css/bootstrap.min.css">
+                    <style>
+                        body {
+                            margin: 10px;
+                            margin-bottom: 20px;
+                            min-width: 700px;
+                        }
+
+                        th {
+                            text-align: center;
+                            font-size: 18px;
+                        }
+
+                        td,
+                        th {
+                            padding: 2px;
+                        }
+                        .progress{
+                            margin-bottom: 0px;
+                            display: none;
+                        }
+                    </style>
+                </head>
+
+                <body>
+
+                    <div id="desc_content">
+                        
+            <h4>Tool</h4>
+            <table border="0" >
+                <tr>
+                    <td valign="top"><b>Name</b></td>
+                    <td valign="top">GridCombination</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>ID</b></td>
+                    <td valign="top">4</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>Author</b></td>
+                    <td valign="top">Christian Alwardt</td>
+                </tr>
+            </table>
+            <hr>
+            <h4>Description</h4>
+            <hr>
+            <h4>Parameters</h4>
+            <table tool_id="4"
+            oid=""
+            stateId=""
+            mdlId="" border="1" width="100%" valign="top" cellpadding="6" rules="all">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Identifier</th>
+                        <th>Description</th>
+                        <th>Constraints</th>
+                        <th>Settings</th>
+                    </tr>
+                
+                <thead>
+                    <tr> 
+                    <th colspan="6">Input</th>
+                    </tr>
+                </thead>
+
+                <tbody id="input_body">
+                    
+            
+            <tr>
+            <td>Gelaendemodell (DTM)</td>
+            <td>Grid (input)</td>
+            <td>INPUT</td>
+            <td>Digitales Gelaendemodell des Flusseinzugsgebietes</td>
+            <td></td>
+            <td>
+                <input type="file" id="INPUT" accept="application/zip" optional="false" data_type="Grid (input)"></input>
+            </td>
+            </tr>
+        
+        
+                </tbody>
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Options</th>
+                    </tr>
+                </thead>
+                <tbody id="options_body">
+                    
+        
+            <tr>
+                <td>Pfad WaterGap Raster</td>
+                <td>File path</td>
+                <td>Folder1</td>
+                <td>Ordnerpfad in dem alle zu bearbeitenden WaterGap Raster abgelegt sind</td>
+                <td></td>
+                <td>
+                <input type="text" id="Folder1" class="form-control" value="">
+                </td>
+            </tr>,
+            <tr>
+                <td>Start-Jahr</td>
+                <td>Integer</td>
+                <td>sY</td>
+                <td>Jahr in dem die Gridoperation startet</td>
+                <td>Minimum: 1906
+Maximum: 2000
+Default: 1990</td>
+                <td>
+                <input type="text" id="sY" class="form-control" value="1990">
+                </td>
+            </tr>,
+            <tr>
+                <td>End-Jahr</td>
+                <td>Integer</td>
+                <td>eY</td>
+                <td>Jahr in dem der Verarbeitungsprozess enden soll</td>
+                <td>Minimum: 1906
+Maximum: 2000
+Default: 1990</td>
+                <td>
+                <input type="text" id="eY" class="form-control" value="1990">
+                </td>
+            </tr>,
+            <tr>
+                <td>Domestic Water</td>
+                <td>Boolean</td>
+                <td>DomW</td>
+                <td>Beruecksichtigung der Domestic Water im resultieren Raster.</td>
+                <td>Default: 1</td>
+                <td>
+                <input type="text" id="DomW" class="form-control" value="1">
+                </td>
+            </tr>,
+            <tr>
+                <td>Electricity Water</td>
+                <td>Boolean</td>
+                <td>ElecW</td>
+                <td>Beruecksichtigung der Electricity Water im resultieren Raster.</td>
+                <td>Default: 1</td>
+                <td>
+                <input type="text" id="ElecW" class="form-control" value="1">
+                </td>
+            </tr>,
+            <tr>
+                <td>Livestock Water</td>
+                <td>Boolean</td>
+                <td>LiveW</td>
+                <td>Beruecksichtigung der Livestock Water im resultieren Raster.</td>
+                <td>Default: 1</td>
+                <td>
+                <input type="text" id="LiveW" class="form-control" value="1">
+                </td>
+            </tr>,
+            <tr>
+                <td>Manufacturing Water</td>
+                <td>Boolean</td>
+                <td>ManW</td>
+                <td>Beruecksichtigung des Manufacturing Water im resultieren Raster.</td>
+                <td>Default: 1</td>
+                <td>
+                <input type="text" id="ManW" class="form-control" value="1">
+                </td>
+            </tr>,
+            <tr>
+                <td>Irrigation Water</td>
+                <td>Boolean</td>
+                <td>IrrW</td>
+                <td>Beruecksichtigung des Irrigation Water im resultieren Raster (moeglicher Einheitenfehler im WaterGapDatensatz!!).</td>
+                <td>Default: 1</td>
+                <td>
+                <input type="text" id="IrrW" class="form-control" value="1">
+                </td>
+            </tr>,
+            <tr>
+                <td>Flaechenverbrauch-Auswahl (FvA)</td>
+                <td>Choice</td>
+                <td>FvA</td>
+                <td></td>
+                <td>Available Choices:
+[0] Resultierendes Raster ueber WasserENTNAHME erstellen
+[1] Resultierendes Raster ueber WasserNUTZUNG erstellen
+Default: 0</td>
+                <td>
+                
+        <select class="form-control" id="FvA">
+            <option value="0">[0] Resultierendes Raster ueber WasserENTNAHME erstellen</option>,<option value="1">[1] Resultierendes Raster ueber WasserNUTZUNG erstellen</option>
+        </select>
+        
+                </td>
+            </tr>
+                </tbody> 
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Output</th>
+                    </tr>
+                </thead>
+
+                <tbody id="output_body">
+                 
+                </tbody>
+                
+            </table>(*) <i>optional</i>
+            <div class="progress">
+                <div id="progressbar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="60"
+                    aria-valuemin="0" aria-valuemax="100" style="width: 10%"> 
+                </div>
+            </div>
+            <button type="button" style="float: right;margin-top: 20px; margin-bottom: 20px; margin-right: 30px;width: 100px;tab-size: 28px" class="btn btn-success" onclick="onRunButtonClick()">Run
+            </button>
+            
+                    </div>
+                    <script src="../js/jquery-3.4.1.js"></script>
+                    <script src="../js/bootstrap.min.js"></script>
+                    <script src="../js/runModel.js"></script>
+                </body> 
+                </html>

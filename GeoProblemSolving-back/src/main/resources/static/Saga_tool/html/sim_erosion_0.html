@@ -1,0 +1,635 @@
+
+                <!DOCTYPE html>
+                <html lang="en"> 
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                    <title>SAGA TOOL</title>
+                    <link rel="stylesheet" href="../css/bootstrap.min.css">
+                    <style>
+                        body {
+                            margin: 10px;
+                            margin-bottom: 20px;
+                            min-width: 700px;
+                        }
+
+                        th {
+                            text-align: center;
+                            font-size: 18px;
+                        }
+
+                        td,
+                        th {
+                            padding: 2px;
+                        }
+                        .progress{
+                            margin-bottom: 0px;
+                            display: none;
+                        }
+                    </style>
+                </head>
+
+                <body>
+
+                    <div id="desc_content">
+                        
+            <h4>Tool</h4>
+            <table border="0" >
+                <tr>
+                    <td valign="top"><b>Name</b></td>
+                    <td valign="top">MMF-SAGA Soil Erosion Model</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>ID</b></td>
+                    <td valign="top">0</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>Author</b></td>
+                    <td valign="top">(c) 2009-2012 V. Wichmann, M. Setiawan</td>
+                </tr>
+            </table>
+            <hr>
+            <h4>Description</h4>
+            <hr>
+            <h4>Parameters</h4>
+            <table tool_id="0"
+            oid="5b90e7bbd15d75093cb58848"
+            stateId="A54BF41C-365C-48a9-96B7-199AF4AA0139"
+            mdlId="9A190B2D-1E73-4bee-B5A3-4FE590F0CDB4" border="1" width="100%" valign="top" cellpadding="6" rules="all">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Identifier</th>
+                        <th>Description</th>
+                        <th>Constraints</th>
+                        <th>Settings</th>
+                    </tr>
+                
+                <thead>
+                    <tr> 
+                    <th colspan="6">Input</th>
+                    </tr>
+                </thead>
+
+                <tbody id="input_body">
+                    
+            
+            <tr>
+            <td>Digital Terrain Model</td>
+            <td>Grid (input)</td>
+            <td>DTM</td>
+            <td>DTM, digital terrain model [m]</td>
+            <td></td>
+            <td>
+                <input type="file" id="DTM" accept="application/zip" optional="false" data_type="Grid (input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Slope</td>
+            <td>Grid (input)</td>
+            <td>S</td>
+            <td>S, slope [rad]</td>
+            <td></td>
+            <td>
+                <input type="file" id="S" accept="application/zip" optional="false" data_type="Grid (input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Channel Network</td>
+            <td>Grid (optional input)</td>
+            <td>CHANNEL</td>
+            <td>Channel network, all other cells NoData</td>
+            <td></td>
+            <td>
+                <input type="file" id="CHANNEL" accept="application/zip" optional="true" data_type="Grid (optional input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Permament Interception</td>
+            <td>Grid (input)</td>
+            <td>PI</td>
+            <td>PI, permanent interception expressed as the proportion [between 0-1] of rainfall</td>
+            <td></td>
+            <td>
+                <input type="file" id="PI" accept="application/zip" optional="false" data_type="Grid (input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Canopy Cover</td>
+            <td>Grid (input)</td>
+            <td>CC</td>
+            <td>CC, canopy cover expressed as a portion [between 0-1] of the soil surface protected by vegetation or crop</td>
+            <td></td>
+            <td>
+                <input type="file" id="CC" accept="application/zip" optional="false" data_type="Grid (input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Plant Height</td>
+            <td>Grid (input)</td>
+            <td>PH</td>
+            <td>PH, plant height [m], representing the effective height from which raindrops fall from the crop or vegetation</td>
+            <td></td>
+            <td>
+                <input type="file" id="PH" accept="application/zip" optional="false" data_type="Grid (input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Ratio Evapotranspiration</td>
+            <td>Grid (input)</td>
+            <td>EtEo</td>
+            <td>Et/Eo, ratio of actual to potential evapotranspiration</td>
+            <td></td>
+            <td>
+                <input type="file" id="EtEo" accept="application/zip" optional="false" data_type="Grid (input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Ground cover</td>
+            <td>Grid (input)</td>
+            <td>GC</td>
+            <td>GC, Ground cover expressed as a portion [between 0-1] of the soil surface protected by vegetation or crop cover on the ground</td>
+            <td></td>
+            <td>
+                <input type="file" id="GC" accept="application/zip" optional="false" data_type="Grid (input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Diameter plant elements</td>
+            <td>Grid (input)</td>
+            <td>D</td>
+            <td>D, Average diameter [m] of the individual plants elements (stem, leaves) at the ground surface</td>
+            <td></td>
+            <td>
+                <input type="file" id="D" accept="application/zip" optional="false" data_type="Grid (input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Number plant elements</td>
+            <td>Grid (input)</td>
+            <td>NV</td>
+            <td>NV, Number of plant elements per unit area [number/unit area] at the ground surface</td>
+            <td></td>
+            <td>
+                <input type="file" id="NV" accept="application/zip" optional="false" data_type="Grid (input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Soil moisture (at FC)</td>
+            <td>Grid (input)</td>
+            <td>MS</td>
+            <td>MS, Soil moisture at field capacity [% w/w]</td>
+            <td></td>
+            <td>
+                <input type="file" id="MS" accept="application/zip" optional="false" data_type="Grid (input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Bulk density top layer</td>
+            <td>Grid (input)</td>
+            <td>BD</td>
+            <td>BD, Bulk density of the top layer [Mg/m3]</td>
+            <td></td>
+            <td>
+                <input type="file" id="BD" accept="application/zip" optional="false" data_type="Grid (input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Effective hydrological depth</td>
+            <td>Grid (input)</td>
+            <td>EHD</td>
+            <td>EHD, Effective hydrological depth of the soil [m]</td>
+            <td></td>
+            <td>
+                <input type="file" id="EHD" accept="application/zip" optional="false" data_type="Grid (input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Sat. lateral permeability</td>
+            <td>Grid (input)</td>
+            <td>LP</td>
+            <td>LP, Saturated lateral permeability of the soil [m/day]</td>
+            <td></td>
+            <td>
+                <input type="file" id="LP" accept="application/zip" optional="false" data_type="Grid (input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Percentage clays</td>
+            <td>Grid (input)</td>
+            <td>PER_C</td>
+            <td>c, Percentage clays [%]</td>
+            <td></td>
+            <td>
+                <input type="file" id="PER_C" accept="application/zip" optional="false" data_type="Grid (input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Percentage silt</td>
+            <td>Grid (input)</td>
+            <td>PER_Z</td>
+            <td>z, Percentage silt [%]</td>
+            <td></td>
+            <td>
+                <input type="file" id="PER_Z" accept="application/zip" optional="false" data_type="Grid (input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Percentage sand</td>
+            <td>Grid (input)</td>
+            <td>PER_S</td>
+            <td>s, Percentage sand [%]</td>
+            <td></td>
+            <td>
+                <input type="file" id="PER_S" accept="application/zip" optional="false" data_type="Grid (input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Percentage rock fragments</td>
+            <td>Grid (input)</td>
+            <td>ST</td>
+            <td>ST, Percentage rock fragments on the soil surface [%]</td>
+            <td></td>
+            <td>
+                <input type="file" id="ST" accept="application/zip" optional="false" data_type="Grid (input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Surface roughness</td>
+            <td>Grid (optional input)</td>
+            <td>RFR</td>
+            <td>RFR, Surface roughness [cm/m]. In case the surface roughness is not provided as input, v_flow_t is set to 1.0, i.e. natural soil surface roughness is not accounted for.</td>
+            <td></td>
+            <td>
+                <input type="file" id="RFR" accept="application/zip" optional="true" data_type="Grid (optional input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Meteorological data</td>
+            <td>Table (optional input)</td>
+            <td>TAB_METEO</td>
+            <td>Meteorological data for multiple timestep modelling [model step (day); temperature (Celsius); rainfall (mm), rainfall intensity (mm/h); rainfall duration (day); timespan (days)]</td>
+            <td></td>
+            <td>
+                <input type="file" id="TAB_METEO" accept="application/zip" optional="true" data_type="Table (optional input)"></input>
+            </td>
+            </tr>
+        
+        
+                </tbody>
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Options</th>
+                    </tr>
+                </thead>
+                <tbody id="options_body">
+                    
+        
+            <tr>
+                <td>Grid system</td>
+                <td>Grid system</td>
+                <td>PARAMETERS_GRID_SYSTEM</td>
+                <td></td>
+                <td></td>
+                <td>
+                <input type="text" id="PARAMETERS_GRID_SYSTEM" class="form-control" value="">
+                </td>
+            </tr>,
+            <tr>
+                <td>Output file path</td>
+                <td>File path</td>
+                <td>OUT_PATH</td>
+                <td>Full path to the directory for the output grids of each model step</td>
+                <td></td>
+                <td>
+                <input type="text" id="OUT_PATH" class="form-control" value="">
+                </td>
+            </tr>,
+            <tr>
+                <td>Simulate Interflow</td>
+                <td>Boolean</td>
+                <td>INTERFLOW</td>
+                <td>Simulate interflow</td>
+                <td>Default: 1</td>
+                <td>
+                <input type="text" id="INTERFLOW" class="form-control" value="1">
+                </td>
+            </tr>,
+            <tr>
+                <td>Mean temperature</td>
+                <td>Floating point</td>
+                <td>T</td>
+                <td>T, mean temperature [degree C]</td>
+                <td>Default: 18.000000</td>
+                <td>
+                <input type="text" id="T" class="form-control" value="18.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Timespan (days)</td>
+                <td>Integer</td>
+                <td>TIMESPAN</td>
+                <td>The number of days to model.</td>
+                <td>Minimum: 1
+Maximum: 365
+Default: 30</td>
+                <td>
+                <input type="text" id="TIMESPAN" class="form-control" value="30">
+                </td>
+            </tr>,
+            <tr>
+                <td>Rainfall</td>
+                <td>Floating point</td>
+                <td>R</td>
+                <td>R, height of precipitation in timespan [mm]</td>
+                <td>Default: 200.000000</td>
+                <td>
+                <input type="text" id="R" class="form-control" value="200.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Rainfall intensity</td>
+                <td>Floating point</td>
+                <td>I</td>
+                <td>I, rainfall intensity [mm/h]</td>
+                <td>Default: 20.000000</td>
+                <td>
+                <input type="text" id="I" class="form-control" value="20.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Rainfall Duration</td>
+                <td>Floating point</td>
+                <td>Rn</td>
+                <td>Rn, number of rain days in timespan [-]</td>
+                <td>Default: 20.000000</td>
+                <td>
+                <input type="text" id="Rn" class="form-control" value="20.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Relationship KE - I</td>
+                <td>Choice</td>
+                <td>KE_I_METHOD</td>
+                <td>Relationship between kinetic energy (KE) and rainfall intensity (I)</td>
+                <td>Available Choices:
+[0] North America east of Rocky Mountains (Wischmeier & Smith 1978)
+[1] North-western Europe (Marshall & Palmer)
+[2] Mediterranean-type climates (Zanchi & Torri 1980)
+[3] Western Mediterranean (Coutinho & Tomas 1995)
+[4] Tropical climates (Hudson 1965)
+[5] Eastern Asia (Onaga et al. 1998)
+[6] Southern hemisphere climates (Rosewell 1986)
+[7] Bogor, West-Java, Indonesia (McISaac 1990)
+Default: 0</td>
+                <td>
+                
+        <select class="form-control" id="KE_I_METHOD">
+            <option value="0">[0] North America east of Rocky Mountains (Wischmeier & Smith 1978)</option>,<option value="1">[1] North-western Europe (Marshall & Palmer)</option>,<option value="2">[2] Mediterranean-type climates (Zanchi & Torri 1980)</option>,<option value="3">[3] Western Mediterranean (Coutinho & Tomas 1995)</option>,<option value="4">[4] Tropical climates (Hudson 1965)</option>,<option value="5">[5] Eastern Asia (Onaga et al. 1998)</option>,<option value="6">[6] Southern hemisphere climates (Rosewell 1986)</option>,<option value="7">[7] Bogor, West-Java, Indonesia (McISaac 1990)</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Flow Depth (actual flow velocity)</td>
+                <td>Floating point</td>
+                <td>FLOWD_VA</td>
+                <td>The flow depth used to calculate the actual flow velocity [m] (e.g. 0.005 unchannelled flow, 0.01 shallow rills, 0.25 deeper rills.</td>
+                <td>Minimum: 0.000000
+Default: 0.005000</td>
+                <td>
+                <input type="text" id="FLOWD_VA" class="form-control" value="0.005000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Route Soil along Channel Network</td>
+                <td>Boolean</td>
+                <td>CHANNELTRANSPORT</td>
+                <td>Route soil loss along channel network to outlet</td>
+                <td>Default: 0</td>
+                <td>
+                <input type="text" id="CHANNELTRANSPORT" class="form-control" value="0">
+                </td>
+            </tr>
+                </tbody> 
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Output</th>
+                    </tr>
+                </thead>
+
+                <tbody id="output_body">
+                
+            
+            <tr>
+            <td>Interflow</td>
+            <td>Grid (optional output)</td>
+            <td>IF</td>
+            <td>IF</td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="IF" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Mean runoff</td>
+            <td>Grid (output)</td>
+            <td>Q</td>
+            <td>Q, estimation of mean runoff [mm]</td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="Q" optional="false" data_type="Grid (output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Mean soil loss</td>
+            <td>Grid (output)</td>
+            <td>SL</td>
+            <td>SL, estimation of mean soil loss [kg]</td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="SL" optional="false" data_type="Grid (output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Effective Rainfall</td>
+            <td>Grid (output)</td>
+            <td>Rf</td>
+            <td>Rf</td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="Rf" optional="false" data_type="Grid (output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Total Kinetic Energy</td>
+            <td>Grid (output)</td>
+            <td>KE</td>
+            <td>KE</td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="KE" optional="false" data_type="Grid (output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Soil moisture storage capacity</td>
+            <td>Grid (output)</td>
+            <td>Rc</td>
+            <td>Rc</td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="Rc" optional="false" data_type="Grid (output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Transport Capacity Clay</td>
+            <td>Grid (output)</td>
+            <td>TCc</td>
+            <td>TCc</td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="TCc" optional="false" data_type="Grid (output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Transport Capacity Silt</td>
+            <td>Grid (output)</td>
+            <td>TCz</td>
+            <td>TCz</td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="TCz" optional="false" data_type="Grid (output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Transport Capacity Sand</td>
+            <td>Grid (output)</td>
+            <td>TCs</td>
+            <td>SLs</td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="TCs" optional="false" data_type="Grid (output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Available Clay</td>
+            <td>Grid (output)</td>
+            <td>Gc</td>
+            <td>Gc</td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="Gc" optional="false" data_type="Grid (output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Available Silt</td>
+            <td>Grid (output)</td>
+            <td>Gz</td>
+            <td>Gz</td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="Gz" optional="false" data_type="Grid (output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Available Sand</td>
+            <td>Grid (output)</td>
+            <td>Gs</td>
+            <td>Gs</td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="Gs" optional="false" data_type="Grid (output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Sediment Balance Clay</td>
+            <td>Grid (output)</td>
+            <td>SLc</td>
+            <td>SLc</td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="SLc" optional="false" data_type="Grid (output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Sediment Balance Silt</td>
+            <td>Grid (output)</td>
+            <td>SLz</td>
+            <td>SLz</td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="SLz" optional="false" data_type="Grid (output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Sediment Balance Sand</td>
+            <td>Grid (output)</td>
+            <td>SLs</td>
+            <td>SLs</td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="SLs" optional="false" data_type="Grid (output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Transport Condition Clay</td>
+            <td>Grid (output)</td>
+            <td>TCONDc</td>
+            <td>Sediment Limited [0], Transport Limited (SL = TC) [1], Transport Limited (SL = G) [2]</td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="TCONDc" optional="false" data_type="Grid (output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Transport Condition Silt</td>
+            <td>Grid (output)</td>
+            <td>TCONDz</td>
+            <td>Sediment Limited [0], Transport Limited (SL = TC) [1], Transport Limited (SL = G) [2]</td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="TCONDz" optional="false" data_type="Grid (output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Transport Condition Sand</td>
+            <td>Grid (output)</td>
+            <td>TCONDs</td>
+            <td>Sediment Limited [0], Transport Limited (SL = TC) [1], Transport Limited (SL = G) [2]</td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="TCONDs" optional="false" data_type="Grid (output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Upslope Flow Width</td>
+            <td>Grid (output)</td>
+            <td>W_up</td>
+            <td>W_up</td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="W_up" optional="false" data_type="Grid (output)">Download Data</a></td>
+            </tr>
+        
+         
+                </tbody>
+                
+            </table>(*) <i>optional</i>
+            <div class="progress">
+                <div id="progressbar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="60"
+                    aria-valuemin="0" aria-valuemax="100" style="width: 10%"> 
+                </div>
+            </div>
+            <button type="button" style="float: right;margin-top: 20px; margin-bottom: 20px; margin-right: 30px;width: 100px;tab-size: 28px" class="btn btn-success" onclick="onRunButtonClick()">Run
+            </button>
+            
+                    </div>
+                    <script src="../js/jquery-3.4.1.js"></script>
+                    <script src="../js/bootstrap.min.js"></script>
+                    <script src="../js/runModel.js"></script>
+                </body> 
+                </html>

@@ -1,0 +1,269 @@
+
+                <!DOCTYPE html>
+                <html lang="en"> 
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                    <title>SAGA TOOL</title>
+                    <link rel="stylesheet" href="../css/bootstrap.min.css">
+                    <style>
+                        body {
+                            margin: 10px;
+                            margin-bottom: 20px;
+                            min-width: 700px;
+                        }
+
+                        th {
+                            text-align: center;
+                            font-size: 18px;
+                        }
+
+                        td,
+                        th {
+                            padding: 2px;
+                        }
+                        .progress{
+                            margin-bottom: 0px;
+                            display: none;
+                        }
+                    </style>
+                </head>
+
+                <body>
+
+                    <div id="desc_content">
+                        
+            <h4>Tool</h4>
+            <table border="0" >
+                <tr>
+                    <td valign="top"><b>Name</b></td>
+                    <td valign="top">WEDGEFAIL</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>ID</b></td>
+                    <td valign="top">4</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>Author</b></td>
+                    <td valign="top">A. G&uuml;nther (c) 2012</td>
+                </tr>
+            </table>
+            <hr>
+            <h4>Description</h4>
+            <hr>
+            <h4>Parameters</h4>
+            <table tool_id="4"
+            oid="5b90e7bbd15d75093cb58904"
+            stateId="68AA2734-F127-41e7-98F0-F5613477F4FE"
+            mdlId="F98465AB-57CC-42f8-A61F-F0A61F5423EC" border="1" width="100%" valign="top" cellpadding="6" rules="all">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Identifier</th>
+                        <th>Description</th>
+                        <th>Constraints</th>
+                        <th>Settings</th>
+                    </tr>
+                
+                <thead>
+                    <tr> 
+                    <th colspan="6">Input</th>
+                    </tr>
+                </thead>
+
+                <tbody id="input_body">
+                    
+            
+            <tr>
+            <td>DEM</td>
+            <td>Grid (input)</td>
+            <td>DEM</td>
+            <td>A DEM</td>
+            <td></td>
+            <td>
+                <input type="file" id="DEM" accept="application/zip" optional="false" data_type="Grid (input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Dip/Plunge direction grid (degree) </td>
+            <td>Grid (optional input)</td>
+            <td>C</td>
+            <td>A dip- or plunge direction grid (in degrees)</td>
+            <td></td>
+            <td>
+                <input type="file" id="C" accept="application/zip" optional="true" data_type="Grid (optional input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Dip/Plunge grid (degree) </td>
+            <td>Grid (optional input)</td>
+            <td>D</td>
+            <td>A dip- or plunge grid (in degrees)</td>
+            <td></td>
+            <td>
+                <input type="file" id="D" accept="application/zip" optional="true" data_type="Grid (optional input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Min friction angle grid (degree) </td>
+            <td>Grid (optional input)</td>
+            <td>Emin</td>
+            <td>A minimum discontinuity friction angle grid (in degrees)</td>
+            <td></td>
+            <td>
+                <input type="file" id="Emin" accept="application/zip" optional="true" data_type="Grid (optional input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Max friction angle grid (degree) </td>
+            <td>Grid (optional input)</td>
+            <td>Emax</td>
+            <td>A maximum discontinuity friction angle grid (in degrees)</td>
+            <td></td>
+            <td>
+                <input type="file" id="Emax" accept="application/zip" optional="true" data_type="Grid (optional input)"></input>
+            </td>
+            </tr>
+        
+        
+                </tbody>
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Options</th>
+                    </tr>
+                </thead>
+                <tbody id="options_body">
+                    
+        
+            <tr>
+                <td>Grid system</td>
+                <td>Grid system</td>
+                <td>PARAMETERS_GRID_SYSTEM</td>
+                <td></td>
+                <td></td>
+                <td>
+                <input type="text" id="PARAMETERS_GRID_SYSTEM" class="form-control" value="">
+                </td>
+            </tr>,
+            <tr>
+                <td>Global dip/plunge direction (degree)</td>
+                <td>Floating point</td>
+                <td>fC</td>
+                <td>Constant value if no raster set</td>
+                <td>Default: 0.000000</td>
+                <td>
+                <input type="text" id="fC" class="form-control" value="0.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Global dip/plunge (degree)</td>
+                <td>Floating point</td>
+                <td>fD</td>
+                <td>Constant value if no raster set</td>
+                <td>Default: 35.000000</td>
+                <td>
+                <input type="text" id="fD" class="form-control" value="35.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Min global friction angle (degree)</td>
+                <td>Floating point</td>
+                <td>fEmin</td>
+                <td>Constant value if no raster set</td>
+                <td>Default: 35.000000</td>
+                <td>
+                <input type="text" id="fEmin" class="form-control" value="35.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Max global friction angle (degree)</td>
+                <td>Floating point</td>
+                <td>fEmax</td>
+                <td>Constant value if no raster set</td>
+                <td>Default: 35.000000</td>
+                <td>
+                <input type="text" id="fEmax" class="form-control" value="35.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Cone radius (degree)</td>
+                <td>Integer</td>
+                <td>ff</td>
+                <td>Radius of optional cone variance (in degrees)</td>
+                <td>Default: 0</td>
+                <td>
+                <input type="text" id="ff" class="form-control" value="0">
+                </td>
+            </tr>,
+            <tr>
+                <td>Parameter sampling runs</td>
+                <td>Integer</td>
+                <td>fI</td>
+                <td>Number of sampling cycles</td>
+                <td>Default: 1</td>
+                <td>
+                <input type="text" id="fI" class="form-control" value="1">
+                </td>
+            </tr>,
+            <tr>
+                <td>Mode</td>
+                <td>Choice</td>
+                <td>METHOD</td>
+                <td>Set failure mode</td>
+                <td>Available Choices:
+[0] Slide
+[1] Topple
+Default: 0</td>
+                <td>
+                
+        <select class="form-control" id="METHOD">
+            <option value="0">[0] Slide</option>,<option value="1">[1] Topple</option>
+        </select>
+        
+                </td>
+            </tr>
+                </tbody> 
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Output</th>
+                    </tr>
+                </thead>
+
+                <tbody id="output_body">
+                
+            
+            <tr>
+            <td>Failures</td>
+            <td>Grid (output)</td>
+            <td>F</td>
+            <td>Resulting failure cells (-) grid</td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="F" optional="false" data_type="Grid (output)">Download Data</a></td>
+            </tr>
+        
+         
+                </tbody>
+                
+            </table>(*) <i>optional</i>
+            <div class="progress">
+                <div id="progressbar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="60"
+                    aria-valuemin="0" aria-valuemax="100" style="width: 10%"> 
+                </div>
+            </div>
+            <button type="button" style="float: right;margin-top: 20px; margin-bottom: 20px; margin-right: 30px;width: 100px;tab-size: 28px" class="btn btn-success" onclick="onRunButtonClick()">Run
+            </button>
+            
+                    </div>
+                    <script src="../js/jquery-3.4.1.js"></script>
+                    <script src="../js/bootstrap.min.js"></script>
+                    <script src="../js/runModel.js"></script>
+                </body> 
+                </html>
