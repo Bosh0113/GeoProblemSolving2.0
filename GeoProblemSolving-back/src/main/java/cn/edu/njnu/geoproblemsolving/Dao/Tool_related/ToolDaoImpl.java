@@ -36,39 +36,20 @@ public class ToolDaoImpl implements IToolDao {
     }
 
     @Override
-    public String createTool(ToolEntity tool) {
+    public Object createTool(ToolEntity tool) {
 
         String toolName = tool.getToolName();
         Query query = Query.query(Criteria.where("toolName").is(toolName));
 
         if (mongoTemplate.find(query, ToolEntity.class).isEmpty()) {
 
-            String tid = UUID.randomUUID().toString();
-            tool.setTid(tid);
+            String tId = UUID.randomUUID().toString();
+            tool.setTId(tId);
             Date date = new Date();
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
             tool.setCreateTime(dateFormat.format(date));
-
-            // 创建tool时，如果选择了toolset，更新toolset离的toolList
-            JSONArray toolsetList = tool.getToolsetInfo();
-            for(int i=0;i<toolsetList.size();i++){
-
-                ToolsetDaoImpl toolsetDao = new ToolsetDaoImpl(mongoTemplate);
-
-                //遍历创建tool时选择的toolsetList的Id，找到对应的Toolset实体
-                JSONObject toolObj = toolsetList.getJSONObject(i);
-                List<ToolsetEntity> toolsets = (List<ToolsetEntity>)toolsetDao.readToolset("tsid", toolObj.getString("tsid"));
-                ToolsetEntity updataToolset = toolsets.get(0);
-                // 更新toolset
-                JSONArray newToolList = updataToolset.getToolList();
-                newToolList.add(toolObj);
-                updataToolset.setToolList(newToolList);
-
-                toolsetDao.updateToolsetbyToolset(updataToolset);
-            }
-
             mongoTemplate.save(tool);
-            return tid;
+            return tool;
         }
         else {
             return "Duplicate naming";
@@ -113,7 +94,7 @@ public class ToolDaoImpl implements IToolDao {
     @Override
     public String updateTool(HttpServletRequest request) {
         try {
-            Query query = new Query(Criteria.where("tid").is(request.getParameter("tid")));
+            Query query = new Query(Criteria.where("tId").is(request.getParameter("tId")));
             CommonMethod method = new CommonMethod();
             Update update = method.setUpdate(request);
             mongoTemplate.updateFirst(query, update, ToolEntity.class);

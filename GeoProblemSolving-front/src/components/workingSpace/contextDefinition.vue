@@ -865,7 +865,6 @@ export default {
       this.userRoleIdentity();
       this.getContextDefinition();
       this.getAllResource();
-      console.log(this.toSubProjectPage);
     },
 
     submit(contextform) {

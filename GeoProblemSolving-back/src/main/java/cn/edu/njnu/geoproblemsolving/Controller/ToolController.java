@@ -16,7 +16,7 @@ public class ToolController {
     private MongoTemplate mongoTemplate;
 
     @RequestMapping(value = "/create", produces = {"application/json;charset=UTF-8"},method = RequestMethod.POST)
-    public String createTool(@RequestBody ToolEntity tool){
+    public Object createTool(@RequestBody ToolEntity tool){
         ToolDaoImpl toolDao = new ToolDaoImpl(mongoTemplate);
         try {
             return toolDao.createTool(tool);

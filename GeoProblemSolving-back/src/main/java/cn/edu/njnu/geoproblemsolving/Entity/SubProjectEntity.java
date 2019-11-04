@@ -15,10 +15,6 @@ public class SubProjectEntity {
     private JSONArray members;
     private String createTime;
     private String solvingProcess;
-    private String background;
-    private String limitation;
-    private String content;
-    private String purpose;
 
     public String getManagerName() {
         return managerName;
@@ -50,22 +46,6 @@ public class SubProjectEntity {
 
     public String getSubProjectId() {
         return subProjectId;
-    }
-
-    public String getBackground() {
-        return background;
-    }
-
-    public String getLimitation() {
-        return limitation;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public String getPurpose() {
-        return purpose;
     }
 
     public String getSolvingProcess() {
@@ -106,21 +86,5 @@ public class SubProjectEntity {
 
     public void setSolvingProcess(String solvingProcess) {
         this.solvingProcess = solvingProcess;
-    }
-
-    public void setBackground(String background) {
-        this.background = background;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public void setLimitation(String limitation) {
-        this.limitation = limitation;
-    }
-
-    public void setPurpose(String purpose) {
-        this.purpose = purpose;
     }
 }

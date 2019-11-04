@@ -109,22 +109,8 @@ h1 {
         <FormItem label="Model mdlId:" prop="model_mdlId" :label-width="140">
           <Input v-model="toolInfo.model_mdlId" placeholder="Enter the model mdlId of your tool"></Input>
         </FormItem>
-        <FormItem label="Toolset name:" prop="toolsetRecords" :label-width="140">
-          <Select
-            v-model="toolInfo.toolsetRecords"
-            multiple
-            placeholder="The tool will be put in default toolset if no special toolset selected."
-          >
-            <Option
-              v-for="item in toolsetList"
-              :key="item.tsid"
-              :value="item.tsid"
-            >{{ item.toolsetName }}</Option>
-          </Select>
-          <div style="cursor:pointer" @click="createToolset()">
-            Add a new toolset
-            <Icon type="ios-add-circle-outline" />
-          </div>
+        <FormItem label="Tool description:" prop="toolsetRecords" :label-width="140">
+          <Input v-model="toolInfo.description" show-word-limit type="textarea" placeholder="Enter description of your tool" />
         </FormItem>
         <FormItem label="Tool url:" prop="tool_url" :label-width="140">
           <Input v-model="toolInfo.tool_url" placeholder="Enter the tool url of your tool"></Input>
@@ -132,6 +118,7 @@ h1 {
         <FormItem label="Recommended step:" prop="recomStep" :label-width="140">
           <Select
             v-model="toolInfo.recomStep"
+            multiple
             placeholder="Select the recommended step of yout tool"
           >
             <Option v-for="item in stepList" :key="item.index" :value="item">{{ item }}</Option>
@@ -245,7 +232,7 @@ export default {
         model_stateId: "",
         model_oid: "",
         model_mdlId: "",
-        toolsetRecords: [],
+        description:"",
         tool_url: "",
         recomStep: "",
         categoryTag: [],
@@ -285,13 +272,6 @@ export default {
           {
             required: true,
             message: "The tool url cannot be empty",
-            trigger: "blur"
-          }
-        ],
-        recomStep: [
-          {
-            required: true,
-            message: "Please select the recommended step",
             trigger: "blur"
           }
         ],
@@ -367,7 +347,7 @@ export default {
             oid: this.toolInfo.oid,
             mdlId: this.toolInfo.mdlId
           };
-          createToolForm["toolsetInfo"] = this.toolInfo.toolsetRecords;
+          createToolForm["description"] = this.toolInfo.description;
           createToolForm["recomStep"] = this.toolInfo.recomStep;
           createToolForm["categoryTag"] = this.toolInfo.categoryTag;
           createToolForm["provider"] = this.$store.getters.userId;
@@ -385,8 +365,7 @@ export default {
               } else if (res.data === "Duplicate naming") {
                 this.$Notice.error({ desc: "The name already exists." });
               } else {
-                // this.createToolId = res.data;
-                // this.addHistoryEvent(this.createToolId);
+                console.log(res.data);
                 this.$Notice.info({ desc: "Create successfully" });
               }
             })
@@ -409,9 +388,6 @@ export default {
     },
     deleteTag(index) {
       this.toolInfo.categoryTag.splice(index, 1);
-    },
-    createToolset() {
-      this.$router.push({ path: "createToolset" });
     },
     uploadPhoto(e) {
       // 利用fileReader对象获取file

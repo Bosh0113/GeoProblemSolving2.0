@@ -8,7 +8,7 @@ import java.util.ArrayList;
 @Document(collection = "Toolset")
 @Data
 public class ToolsetEntity {
-    private String tsid;
+    private String tsId;
     private String toolsetName;
     private JSONArray toolList; // 创建的时候不添加toolList，在toolCollection页面添加，或者创建tool 选择 toolset时，自动添加
     private ToolsetEntity subToolsets;
@@ -19,8 +19,8 @@ public class ToolsetEntity {
     private String toolsetImg;
     private String createTime;
 
-    public String getTsid() {
-        return tsid;
+    public String getTsId() {
+        return tsId;
     }
 
     public String getToolsetName() {
@@ -59,8 +59,8 @@ public class ToolsetEntity {
         return createTime;
     }
 
-    public void setTsid(String tsid) {
-        this.tsid = tsid;
+    public void setTsId(String tsId) {
+        this.tsId = tsId;
     }
 
     public void setToolsetName(String toolsetName) {

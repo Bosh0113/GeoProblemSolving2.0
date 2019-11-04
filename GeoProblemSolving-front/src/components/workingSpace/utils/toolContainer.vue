@@ -75,7 +75,7 @@ export default {
       },
       toolList: [
         {
-          tid:"",
+          tId:"",
           name: "111",
           toolImg: "",
           tool_url: "",
@@ -84,7 +84,7 @@ export default {
       ],
       toolsetList: [
         {
-          tsid:"",
+          tsId:"",
           name: "222",
           toolsetImg: "",
         },

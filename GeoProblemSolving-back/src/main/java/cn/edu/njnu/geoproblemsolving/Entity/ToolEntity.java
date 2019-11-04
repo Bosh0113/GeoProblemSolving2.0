@@ -10,20 +10,20 @@ import java.util.ArrayList;
 @Document(collection = "Tool")
 @Data
 public class ToolEntity {
-    private String tid;
+    private String tId;
     private String toolName;
     private String toolUrl;
     private JSONObject modelInfo; //stateId, oid,mdlId,模型条目？
-    private JSONArray toolsetInfo; // 可在多个不同的toolset内，或没有dataset
-    private String recomStep; // step类型 or general
+    private String description; // 可在多个不同的toolset内，或没有dataset
+    private ArrayList<String> recomStep; // step类型 or general
     private ArrayList<String> categoryTag;
     private String provider;
     private String privacy;
     private String toolImg;
     private String createTime;
 
-    public String getTid(){
-        return tid;
+    public String getTId(){
+        return tId;
     }
 
     public String getToolName() {
@@ -38,15 +38,15 @@ public class ToolEntity {
         return modelInfo;
     }
 
-    public JSONArray getToolsetInfo() {
-        return toolsetInfo;
+    public String getDescription() {
+        return description;
     }
 
     public ArrayList<String> getCategoryTag() {
         return categoryTag;
     }
 
-    public String getRecomStep() {
+    public ArrayList<String> getRecomStep() {
         return recomStep;
     }
 
@@ -66,8 +66,8 @@ public class ToolEntity {
         return createTime;
     }
 
-    public void setTid(String tid) {
-        this.tid = tid;
+    public void setTId(String tId) {
+        this.tId = tId;
     }
 
     public void setToolName(String toolName) {
@@ -82,15 +82,15 @@ public class ToolEntity {
         this.modelInfo = modelInfo;
     }
 
-    public void setToolsetInfo(JSONArray toolsetInfo) {
-        this.toolsetInfo = toolsetInfo;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public void setCategoryTag(ArrayList<String> categoryTag) {
         this.categoryTag = categoryTag;
     }
 
-    public void setRecomStep(String recomStep) {
+    public void setRecomStep(ArrayList<String> recomStep) {
         this.recomStep = recomStep;
     }
 

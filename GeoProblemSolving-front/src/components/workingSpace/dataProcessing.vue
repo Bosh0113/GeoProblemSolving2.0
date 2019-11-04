@@ -264,7 +264,7 @@ export default {
       mapWidth: 0,
       stepId: this.$route.params.id,
       toSubProjectPage: "",
-      stepContent: [],
+      stepContent: {},
       // online drawer
       drawerValue: false,
       modifyStep: false,
@@ -307,10 +307,10 @@ export default {
   methods: {
     init() {
       this.initSize();
+      this.getDataProcessing();
       this.getSubprojectInfo();
       this.getProjectInfo();
       this.userRoleIdentity();
-      this.getDataProcessing();
     },
     initSize() {
       if (window.innerHeight > 675) {
@@ -334,7 +334,7 @@ export default {
             "/GeoProblemSolving/subProject/inquiry" +
             "?key=subProjectId" +
             "&value=" +
-            sessionStorage.getItem("subProjectId"),
+            this.stepContent.subProjectId,
           type: "GET",
           async: false,
           success: data => {
@@ -346,6 +346,9 @@ export default {
               this.$set(this, "subProjectInfo", subProjectInfo);
 
               this.$store.commit("setSubProjectInfo", subProjectInfo);
+            }
+            else{
+              console.log(data);
             }
           },
           error: function(err) {
@@ -412,7 +415,7 @@ export default {
       }
     },
     getDataProcessing() {
-      if (this.stepId != "") {
+      if (this.stepContent.stepId == "" || this.stepContent.stepId == undefined) {
         $.ajax({
           url:
             "/GeoProblemSolving/step/inquiry/" +

@@ -41,14 +41,14 @@ public class ToolsetDaoImpl implements IToolsetDao {
 
         if (mongoTemplate.find(query, ToolsetEntity.class).isEmpty()) {
 
-            String tsid = UUID.randomUUID().toString();
-            toolset.setTsid(tsid);
+            String tsId = UUID.randomUUID().toString();
+            toolset.setTsId(tsId);
             Date date = new Date();
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
             toolset.setCreateTime(dateFormat.format(date));
 
             mongoTemplate.save(toolset);
-            return tsid;
+            return tsId;
         }
         else {
             return "Duplicate naming";
@@ -92,7 +92,7 @@ public class ToolsetDaoImpl implements IToolsetDao {
     @Override
     public String updateToolset(HttpServletRequest request) {
         try {
-            Query query = new Query(Criteria.where("tsid").is(request.getParameter("tsid")));
+            Query query = new Query(Criteria.where("tsId").is(request.getParameter("tsId")));
             CommonMethod method = new CommonMethod();
             Update update = method.setUpdate(request);
             mongoTemplate.updateFirst(query, update, ToolsetEntity.class);
@@ -166,7 +166,7 @@ public class ToolsetDaoImpl implements IToolsetDao {
     // 有待测试---------------------------------------------------------
     public String updateToolsetbyToolset(ToolsetEntity toolset) {
         try {
-            Query query = new Query(Criteria.where("tsid").is(toolset.getTsid()));
+            Query query = new Query(Criteria.where("tsId").is(toolset.getTsId()));
             CommonMethod method = new CommonMethod();
             Update update = new Update();
             update.set("toolList",toolset.getToolList());

@@ -213,7 +213,7 @@ export default {
   methods: {
     getDataList() {
       let list = [];
-      if (this.stepInfo.stepId != "" || this.stepInfo.stepId != undefined) {
+      if (this.stepInfo.stepId != "" && this.stepInfo.stepId != undefined) {
         $.ajax({
           url:
             "/GeoProblemSolving/folder/inquiry" +

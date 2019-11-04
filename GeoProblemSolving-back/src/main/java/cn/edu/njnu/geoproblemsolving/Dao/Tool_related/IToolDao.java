@@ -6,7 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 
 public interface IToolDao {
 
-    String createTool(ToolEntity step);
+    Object createTool(ToolEntity step);
     Object readTool(String key,String value);
     Object readAccessibleTools(String userId);
     void deleteTool(String key,String value);
