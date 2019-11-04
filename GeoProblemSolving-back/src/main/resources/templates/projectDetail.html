@@ -7,19 +7,24 @@
     <meta name="description" th:attr="content=${projectInfo.description}">
     <meta name="keywords" th:attr="content=${projectInfo.tag}">
     <meta name="author" content="OpenGMS">
-    <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
-    <script src="https://cdn.bootcss.com/vue/2.6.10/vue.min.js"></script>
-    <link href="https://cdn.bootcss.com/iview/3.4.2/styles/iview.css" rel="stylesheet">
-    <script src="https://cdn.bootcss.com/iview/3.4.2/iview.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vue-avatar@2.1.7/dist/vue-avatar.min.js"></script>
+    <script src="https://unpkg.com/jquery@3.4.1/dist/jquery.js"></script>
+    <script src="https://unpkg.com/vue@2.6.10/dist/vue.min.js"></script>
+    <link href="https://unpkg.com/iview@3.4.2/dist/styles/iview.css" rel="stylesheet">
+    <script src="https://unpkg.com/iview@3.4.2/dist/iview.js"></script>
+    <script src="https://unpkg.com/vue-avatar@2.1.7/dist/vue-avatar.min.js"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="https://unpkg.com/vuescroll"></script>
+    <script src="https://unpkg.com/sortablejs@1.8.4/Sortable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Vue.Draggable/2.20.0/vuedraggable.umd.min.js"></script>
     <script th:replace="navigation::commonHeader-css"></script>
     <script th:replace="navigation::commonHeader-html"></script>
     <script th:replace="navigation::commonHeader-js"></script>
     <script th:replace="folderTree::common-css"></script>
     <script th:replace="folderTree::common-html"></script>
     <script th:replace="folderTree::common-js"></script>
+    <script th:replace="taskManager::task-css"></script>
+    <script th:replace="taskManager::task-html"></script>
+    <script th:replace="taskManager::task-js"></script>
     <style>
         [v-cloak] {
             display: none;
@@ -52,7 +57,7 @@
         }
 
         .projectDescriptionContent {
-            height: 160px;
+            height: 75px;
             overflow-y: auto;
             text-indent: 2em;
             padding: 0 5px;
@@ -66,9 +71,12 @@
             word-break: break-word;
         }
         .statistics{
-            width: 40%;
+            /* width: 40%; */
             height: -webkit-fill-available;
             display: inline-block;
+        }
+        .statistics p{
+            margin-top: 5px;
         }
         .showCount{
             font-size: 30px;
@@ -193,6 +201,9 @@
                     <menu-item name="projectDetail" class="projectMenuItem">
                         <Icon type="ios-information-circle" title="Project detail" size="35"></Icon>
                     </menu-item>
+                    <menu-item name="tasks" class="projectMenuItem">
+                        <Icon type="md-calendar" title="Tasks" size="35"></Icon>
+                    </menu-item>
                     <menu-item name="subProjects" class="projectMenuItem" :style="cursorStyle()" :disabled="menuDisable()">
                         <Icon type="md-git-branch" title="Subprojects" size="35"></Icon>
                     </menu-item>
@@ -204,7 +215,7 @@
             <div style="margin-left: 90px;height: inherit;min-height: fit-content;">
                 <div v-if="showMenuItem=='projectDetail'" style="height: inherit;min-height: fit-content;">
                     <div style="background:#eee;padding: 10px;height: inherit;min-height: fit-content;">
-                        <Card :bordered="false" dis-hover style="height: -webkit-fill-available;display: flex;flex-flow: column;min-height: fit-content;">
+                        <Card :bordered="false" dis-hover style="height: -webkit-fill-available;flex-flow: column;min-height: fit-content;">
                             <div slot="title">
                                 <h1 class="projectMenuItemTitle">Project: </h1>
                                 <h1 style="display: inline-block;max-width: 75%;vertical-align: top;" class="overEllipsis" id="projectTitle" th:text="${projectInfo.title}">Project title</h1>
@@ -222,12 +233,19 @@
                                         </i-button>
                                     </Poptip>
                                 </div>
+                                <div v-if="!managerIdentity(projectInfo.managerId)&&!memberIdentity(projectInfo.members)">
+                                    <i-button
+                                        type="success"
+                                        @click="joinApplyModalShow()"
+                                        title="Apply to join the project"
+                                    >Apply to join</i-button>
+                                </div>
                             </div>
                             <div class="flex1" style="min-height: fit-content;">
                                 <Row gutter="25" style="flex: 1;display: flex;flex-flow: initial">
                                     <i-col span="16" style="display: flex;flex-flow: column">
                                         <div style="border: solid 1px #eeeeee;flex: 1;padding: 20px;flex-flow: column;display: flex;">
-                                            <Row gutter="15" style="height: 200px;">
+                                            <Row gutter="15" style="height: 200px;display: flex;">
                                                 <i-col span="8">
                                                     <div style="width: 200px;height: 200px;">
                                                         <img :src="projectInfo.picture" style="height: inherit;width: inherit;" v-if="projectInfo.picture!=''&&projectInfo.picture!=undefined"
@@ -235,21 +253,42 @@
                                                         <avatar :username="projectInfo.title" :size="200" :title="projectInfo.title" :rounded="false" v-else></avatar>
                                                     </div>
                                                 </i-col>
-                                                <i-col span="16">
-                                                    <div style="height: -webkit-fill-available;padding: 5px;">
-                                                        <h3>Description:</h3>
-                                                        <div class="projectDescriptionContent">
-                                                            <vue-scroll :ops="scrollOps">
-                                                                <div id="projectDescription" th:text="${projectInfo.description}">
-                                                                    Project description
-                                                                </div>
-                                                            </vue-scroll>
+                                                <i-col span="16" style="align-self: flex-end;">
+                                                    <div style="height: -webkit-fill-available;text-align: center;">
+                                                        <div class="statistics">
+                                                            <div style="text-align: left;padding: 5px;">
+                                                                <p><strong>Privacy:</strong><span id="projectPrivacy" th:text="${projectInfo.privacy}">Project privacy</span> </p>
+                                                                <p><strong>Category:</strong><span id="projectCategory" th:text="${projectInfo.category}">Project category</span></p>
+                                                                <p><strong>Tag:</strong><span id="projectTag" class="overEllipsis" style="display: inline-block;vertical-align: top;width:230px" th:text="${projectInfo.tag}" th:attr="title=${projectInfo.tag}">Project tag</span></p>
+                                                                <p><strong>Manager:</strong> {{projectInfo.managerName}}</p>
+                                                                <p><strong>Create time:</strong> {{projectInfo.createTime}}</p>
+                                                            </div>
+                                                        </div>
+                                                        <div class="statistics">
+                                                            <div>
+                                                                <Icon type="md-git-branch" size="30"></Icon>
+                                                                <span class="showCount">{{SubProjectCount()}}</span>
+                                                            </div>
+                                                            <div>
+                                                                <Icon type="md-contacts" size="30"></Icon>
+                                                                <span class="showCount">{{ParticipantsCount()}}</span>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </i-col>
                                             </Row>
                                             <div class="flex1" style="margin-top: 10px;">
-                                                <div style="flex: 1;min-height: 200px;padding: 5px;">
+                                                <div style="padding: 5px;min-height: 80px;max-height: 100px;border: #e8eaec 0.1px dashed;">
+                                                    <h3>Description:</h3>
+                                                    <div class="projectDescriptionContent">
+                                                        <vue-scroll :ops="scrollOps">
+                                                            <div id="projectDescription" th:text="${projectInfo.description}">
+                                                                Project description
+                                                            </div>
+                                                        </vue-scroll>
+                                                    </div>
+                                                </div>
+                                                <div style="flex: 1;min-height: 200px;padding: 5px;border: #e8eaec 0.1px dashed;margin-top: 10px;">
                                                     <h3>Introduction:</h3>
                                                     <div class="projectIntroductionContent">
                                                         <vue-scroll :ops="scrollOps">
@@ -257,27 +296,6 @@
                                                                 Project introduction
                                                             </div>
                                                         </vue-scroll>
-                                                    </div>
-                                                </div>
-                                                <div style="min-height: 80px;max-height: 100px;text-align: center;">
-                                                    <div class="statistics">
-                                                        <div style="text-align: left;padding: 5px;">
-                                                            <p><strong>Privacy:</strong><span id="projectPrivacy" th:text="${projectInfo.privacy}">Project privacy</span> </p>
-                                                            <p><strong>Category:</strong><span id="projectCategory" th:text="${projectInfo.category}">Project category</span></p>
-                                                            <p><strong>Tag:</strong><span id="projectTag" class="overEllipsis" style="display: inline-block;vertical-align: top;width:230px" th:text="${projectInfo.tag}" th:attr="title=${projectInfo.tag}">Project tag</span></p>
-                                                            <p><strong>Manager:</strong> {{projectInfo.managerName}}</p>
-                                                            <p><strong>Create time:</strong> {{projectInfo.createTime}}</p>
-                                                        </div>
-                                                    </div>
-                                                    <div class="statistics">
-                                                        <div>
-                                                            <Icon type="md-git-branch" size="30"></Icon>
-                                                            <span class="showCount">{{SubProjectCount()}}</span>
-                                                        </div>
-                                                        <div>
-                                                            <Icon type="md-contacts" size="30"></Icon>
-                                                            <span class="showCount">{{ParticipantsCount()}}</span>
-                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -420,6 +438,19 @@
                         </Card>
                     </div>
                 </div>
+                <div v-else-if="showMenuItem=='tasks'" style="height: inherit;min-height: fit-content;">
+                    <div style="background:#eee;padding: 10px;height: inherit;min-height: fit-content;">
+                        <Card :bordered="false" dis-hover style="height: -webkit-fill-available;min-height: 565px;min-height: fit-content;">
+                            <h1 slot="title" class="projectMenuItemTitle">Tasks</h1>
+                            <div>
+                                <child-task
+                                :project-info="projectInfo"
+                                :user-role="taskRole"
+                                ref="taskTreeEl"></child-task>
+                            </div>
+                        </Card>
+                    </div>
+                </div>
                 <Modal
                     v-model="editProjectModal"
                     title="Edit project"
@@ -519,7 +550,7 @@
                         </i-form>
                     </div>
                     <div slot="footer" style="display: inline-block">
-                        <i-button type="primary" @click="editProjectSubmit('projectEditForm')" style="float:right;">Submit</i-button>
+                        <i-button type="primary" @click="editProjectSubmit('projectEditForm')" style="float:right;">OK</i-button>
                         <i-button @click="closeEditModel()" style="float:right;margin-right: 15px;">Cancel</i-button>
                     </div>
                 </Modal>
@@ -527,7 +558,7 @@
                   v-model="removeProjectModal"
                   title="Delete warning "
                   @on-ok="deleteProject"
-                  ok-text="Submit"
+                  ok-text="Ok"
                   cancel-text="Cancel"
                 >
                   <p>Do you sure to delete this project?</p>
@@ -583,7 +614,7 @@
                 v-model="removeMemberAlertModel"
                 title="Remove Member alert"
                 @on-ok="removeMember"
-                ok-text="Submit"
+                ok-text="OK"
                 cancel-text="Cancel">
                     <p>Do you sure to remove {{removeMemberName}} from this project?</p>
                 </Modal>
@@ -614,7 +645,7 @@
                         </Form-item>
                     </i-form>
                     <div slot="footer" style="display: inline-block">
-                        <i-button type="primary" @click="createSubProject('createSubProjectForm')" style="float:right;">Submit</i-button>
+                        <i-button type="primary" @click="createSubProject('createSubProjectForm')" style="float:right;">OK</i-button>
                         <i-button @click="closeCreateSubProjectModel()" style="float:right;margin-right: 15px;">Cancel</i-button>
                     </div>
                 </Modal>
@@ -630,7 +661,7 @@
                     </Radio>
                 </Radio-group>
                 <div slot="footer" style="display: inline-block">
-                    <i-button type="primary" @click="handOverAuthority()" style="float:right;">Submit</i-button>
+                    <i-button type="primary" @click="handOverAuthority()" style="float:right;">OK</i-button>
                     <i-button @click="closeHandOverModel()" style="float:right;margin-right: 15px;">Cancel</i-button>
                 </div>
                 </Modal>
@@ -660,7 +691,7 @@
                     </i-form>
                     </div>
                 <div slot="footer" style="display: inline-block">
-                    <i-button type="primary" @click="editSubProject('editSubProjectForm')" style="float:right;">Submit</i-button>
+                    <i-button type="primary" @click="editSubProject('editSubProjectForm')" style="float:right;">OK</i-button>
                     <i-button @click="closeEditSubProjectModel()" style="float:right;margin-right: 15px;">Cancel</i-button>
                 </div>
               </Modal>
@@ -698,10 +729,26 @@
                     </i-form>
                 </div>
                 <div slot="footer" style="display: inline-block">
-                    <i-button type="primary" @click="applyJoin('applyJoinForm')" style="float:right;">Submit</i-button>
+                    <i-button type="primary" @click="applyJoin('applyJoinForm')" style="float:right;">OK</i-button>
                     <i-button @click="closeApplyJoinModel()" style="float:right;margin-right: 15px;">Cancel</i-button>
                 </div>
               </Modal>
+              <Modal v-model="applyJoinModal" title="Apply to join the project">
+                <i-form ref="applyValidate" :model="applyValidate" :rules="applyRuleValidate" :label-width="80">
+                    <form-item label="Reason" prop="reason">
+                        <i-input
+                                v-model="applyValidate.reason"
+                                type="textarea"
+                                :rows="4"
+                                placeholder="Enter The Reason For Application ..."
+                        ></i-input>
+                    </form-item>
+                </i-form>
+                <div slot="footer">
+                    <i-button @click="applyJoinModal=false">Cancel</i-button>
+                    <i-button type="success" @click="joinApply('applyValidate')">Apply</i-button>
+                </div>
+            </Modal>
             </div>
         </div>
     </template>
@@ -727,6 +774,7 @@
                 this.userEnter();
                 this.resizeContent();
                 this.getAllSubProjects();
+                this.roleIdentity();
             },
             data() {
                 return {
@@ -908,7 +956,21 @@
                                 trigger: "blur"
                             }
                         ]
-                    }
+                    },
+                    //加入项目
+                    applyProjectInfo: {},
+                    applyValidate: {
+                        reason: ""
+                    },
+                    applyRuleValidate: {
+                        reason: [
+                            { required: true, message: "Please enter the reason for application", trigger: "blur" },
+                            { type: "string", min: 5, message: "The reason no less than 10 characters", trigger: "blur" }
+                        ]
+                    },
+                    applyJoinModal: false,
+                    haveApplied: false,
+                    taskRole:"",
                 }
             },
             methods: {
@@ -917,14 +979,25 @@
 
                     } else if(this.projectInfo.privacy == "Discoverable") {
                         if(!this.userInfo.userState) {
-                            window.location.href="/GeoProblemSolving/projectList.html";
+                            window.location.href="/GeoProblemSolving/projectList";
                         }
                     } else if(this.projectInfo.privacy == "Private") {
                         let isManager = this.managerIdentity(this.projectInfo.managerId);
                         let isMember = this.memberIdentity(this.projectInfo.members);
                         if(!this.userInfo.userState || !(isManager || isMember)) {
-                            window.location.href="/GeoProblemSolving/projectList.html";
+                            window.location.href="/GeoProblemSolving/projectList";
                         }
+                    }
+                },
+                roleIdentity(){
+                    if(this.managerIdentity(this.projectInfo.managerId)){
+                        this.taskRole = 'PManager';
+                    }
+                    else if(this.memberIdentity(this.projectInfo.members)){
+                        this.taskRole = 'Member';
+                    }
+                    else{
+                        this.taskRole = 'Visitor';
                     }
                 },
                 resizeContent(){
@@ -1545,7 +1618,99 @@
                 },
                 goResourceCenter(){
                     window.location.href="/GeoProblemSolving/resourceCenter";
-                }
+                },
+                joinApplyModalShow() {
+                    this.applyProjectInfo=Object.assign([], this.projectInfo);
+                    this.applyValidate.reason = "";
+                    this.applyJoinModal = true;
+                },
+                joinApply(name) {
+                    this.$refs[name].validate(valid => {
+                        if (valid) {
+                            this.applyJoinModal = false;
+                            var data = this.applyProjectInfo;
+                            if (
+                                this.haveApplied == true &&
+                                data.projectId == sessionStorage.getItem("applyId")
+                            ) {
+                                this.$Notice.warning({
+                                    title: "repeat apply warning",
+                                    desc: "You have apply success, no need to click again!"
+                                });
+                            } else {
+                                let userDetail = this.userInfo;
+                                let joinForm = {};
+                                sessionStorage.setItem("applyId", data.projectId);
+                                joinForm["recipientId"] = data.managerId;
+                                joinForm["type"] = "apply";
+                                joinForm["content"] = {
+                                    userEmail: userDetail.email,
+                                    userName:this.userInfo.userName,
+                                    userId: this.userInfo.userId,
+                                    title: "Group application",
+                                    description:
+                                        "User " +
+                                        this.userInfo.userName +
+                                        " apply to join your project: " +
+                                        data.title +
+                                        " ." +
+                                        " The reason for application is: " +
+                                        this.applyValidate.reason,
+                                    projectId: data.projectId,
+                                    projectTitle: data.title,
+                                    scope: "project",
+                                    approve: "unknow"
+                                };
+                                axios
+                                    .post("/GeoProblemSolving/notice/save", joinForm)
+                                    .then(res => {
+                                        if (res.data == "Success") {
+                                            this.$Notice.open({
+                                                title: "Apply Successfully",
+                                                desc:
+                                                    "The project's manager will process your apply in time,you can get a notification later to tell you the result."
+                                            });
+                                            this.$emit("sendNotice", data.managerId);
+                                            this.haveApplied = true;
+                                        } else {
+                                            this.$Notice.open({
+                                                desc: "Apply failed"
+                                            });
+                                        }
+                                    })
+                                    .catch(err => {
+                                        console.log("申请失败的原因是：" + err.data);
+                                    });
+
+                                let emailObject = {
+                                    recipient: joinForm.recipientId,
+                                    mailTitle: "Group application",
+                                    mailContent:
+                                        joinForm.content.description +
+                                        "<br>" +
+                                        "You can click this url and enter the site to process this application: " +
+                                        "http://" +
+                                        window.location.host +
+                                        "/GeoProblemSolving/home"
+                                };
+                                axios
+                                    .post("/GeoProblemSolving/project/applyByMail", emailObject)
+                                    .then(res => {
+                                        if (res.data == "Success") {
+                                            console.log("Email Success.");
+                                        } else {
+                                            console.log("Email fail.");
+                                        }
+                                    })
+                                    .catch(err => {
+                                        console.log("Email fail.");
+                                    });
+                            }
+                        } else {
+                            this.$Message.error("Fail!");
+                        }
+                    });
+                },
             }
         }
     );

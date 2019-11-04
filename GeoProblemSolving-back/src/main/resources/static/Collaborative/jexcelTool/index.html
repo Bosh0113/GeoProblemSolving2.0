@@ -291,7 +291,7 @@
             },
             openExcelSocket() {
                 var moduleId = sessionStorage.getItem("moduleId");
-                var moduleSocketURL = "ws://"+window.location.origin+"/GeoProblemSolving/ExcelTool/" + moduleId;
+                var moduleSocketURL = "ws://"+window.location.host+"/GeoProblemSolving/ExcelTool/" + moduleId;
                 // var moduleSocketURL = "ws://localhost:8081/GeoProblemSolving/ExcelTool/" + moduleId;
                 // var moduleSocketURL = "ws://172.21.212.72:8082/GeoProblemSolving/ExcelTool/" + moduleId;
                 // var moduleSocketURL = "ws://94.191.49.160:8080/GeoProblemSolving/ExcelTool/" + moduleId;

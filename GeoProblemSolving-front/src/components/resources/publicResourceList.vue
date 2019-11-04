@@ -66,7 +66,7 @@
           </Menu>
         </div>
         <div class="resourcePanel" style="margin-left:-20px">
-          <div class="resourcePanel" style="margin-top: 20px;height:352px;">
+          <div class="resourcePanel" style="margin-top: 20px;">
             <Row style="height:100%; overflow-y:auto">
               <template v-if="$store.getters.userState">
                 <Col span="22" offset="1">
@@ -102,7 +102,7 @@
               </template>
             </Row>
           </div>
-          <div style="display:flex;justify-content:center;margin-top: 80px;">
+          <div style="display:flex;justify-content:center;margin-top: 60px;">
             <Page
               :total="dataCount"
               :page-size="pageSize"

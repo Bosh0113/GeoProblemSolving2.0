@@ -7,14 +7,13 @@
     <meta name="description" content="Participatory|GeoProblem Solving|GIS">
     <meta name="keywords" content="Participatory|GeoProblem Solving|GIS">
     <meta name="author" content="OpenGMS">
-    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/vue@2.6.10/dist/vue.min.js"></script>
+    <script src="https://unpkg.com/jquery@3.4.1/dist/jquery.js"></script>
     <script src="https://unpkg.com/ionicons@4.5.10-1/dist/ionicons.js"></script>
     <link href="https://unpkg.com/ionicons@4.5.10-1/dist/css/ionicons.min.css" rel="stylesheet">
-    <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
-    <script src="https://cdn.bootcss.com/vue/2.6.10/vue.min.js"></script>
-    <link href="https://cdn.bootcss.com/iview/3.4.2/styles/iview.css" rel="stylesheet">
-    <script src="https://cdn.bootcss.com/iview/3.4.2/iview.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vue-avatar@2.1.7/dist/vue-avatar.min.js"></script>
+    <link href="https://unpkg.com/iview@3.4.2/dist/styles/iview.css" rel="stylesheet">
+    <script src="https://unpkg.com/iview@3.4.2/dist/iview.js"></script>
+    <script src="https://unpkg.com/vue-avatar@2.1.7/dist/vue-avatar.min.js"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 
     <style >
@@ -309,24 +308,21 @@
             <div class="flow-content">
                 <span class="flow-title">Solve a Problem Collaboratively</span>
                 <div class="flow-item-container">
-            <span class="flow-item">
+            <span class="flow-item" @click="toRegister">
               <span class="flow-item-icon blue">
                 <span class="flow-item-bg"></span>
                   <Icon type="md-build" ></Icon>
               </span>
               <span class="flow-item-text">Register as a participant</span>
             </span>
-                    <span class="flow-item">
-
+              <span class="flow-item" @click="toCreate">
               <span class="flow-item-icon yellow">
                 <span class="flow-item-bg"></span>
                   <Icon type="md-search" ></Icon>
               </span>
               <span class="flow-item-text">Create or join a project</span>
             </span>
-
-                    <span class="flow-item">
-
+              <span class="flow-item" @click="toTeam">
               <span class="flow-item-icon green">
                 <span class="flow-item-bg"></span>
                 <Icon type="md-share" ></Icon>
@@ -343,7 +339,7 @@
             <Row class="case-content">
                 <i-col class="case-item" span="8">
                     <div class="case-img img1"></div>
-                    <div class="mask">
+                    <div class="mask" @click="toDemo">
                         <div class="bg"></div>
                         <div class="case-text">
                             <Icon type="md-planet"></Icon>
@@ -353,7 +349,7 @@
                 </i-col>
                 <i-col class="case-item"span="8">
                     <div class="case-img img2"></div>
-                    <div class="mask">
+                    <div class="mask" @click="toDemo">
                         <div class="bg"></div>
                         <div class="case-text">
                             <Icon type="md-flame" ></Icon>
@@ -363,7 +359,7 @@
                 </i-col>
                 <i-col class="case-item" span="8" >
                     <div class="case-img img3"></div>
-                    <div class="mask">
+                    <div class="mask" @click="toDemo">
                         <div class="bg"></div>
                         <div class="case-text">
                             <Icon type="md-leaf" ></Icon>
@@ -440,6 +436,18 @@
                 } else {
                     window.location.href = "/GeoProblemSolving/login"
                 }
+            },
+            toRegister(){
+                window.location.href = "/GeoProblemSolving/register"
+            },
+            toCreate(){
+                window.location.href = "/GeoProblemSolving/newProject"
+            },
+            toTeam(){
+                window.location.href = "/GeoProblemSolving/projectList"
+            },
+            toDemo(){
+                window.location.href = "/GeoProblemSolving/projectList"
             }
         }
     })
