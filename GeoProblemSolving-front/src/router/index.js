@@ -48,9 +48,7 @@ const routes = [{
     { path: 'register', name: 'Register', component: resolve => (require(["@/components/userState/register"], resolve)) },
     { path: 'resetPassword/:email', name: 'resetPassword', component: resolve => (require(["@/components/userState/resetPwd"], resolve)) },
     { path: 'resourceCenter', name: 'resourceCenter', component: resolve => (require(["@/components/resources/resourceCenter"], resolve)) },
-    { path: 'toolCollection', name: 'toolCollection', component: resolve => (require(["@/components/tools/toolCollection"], resolve)) },    
-    { path: 'createNewTool', name: 'createNewTool', component: resolve => (require(["@/components/tools/createNewTool"], resolve)) },    
-    { path: 'createToolset', name: 'createToolset', component: resolve => (require(["@/components/tools/createToolset"], resolve)) }
+    { path: 'toolCollection', name: 'toolCollection', component: resolve => (require(["@/components/tools/toolCollection"], resolve)) }, 
   ]
 },
 { path: '/chat', name: 'chatUtil', component: resolve=>(require(["@/components/utils/chatroom"],resolve)) },
