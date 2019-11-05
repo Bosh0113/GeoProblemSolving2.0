@@ -82,13 +82,16 @@
 /* 结束 */
 </style>
 <template>
-  <div :style="{height: contentHeight+'px'}">
+  <div :style="{height: contentHeight+'px'}" style="min-width:1200px;">
     <Card dis-hover>
-      <h1 slot="title">Tool management center</h1>
+      <h1 slot="title">
+        <Button shape="circle" icon="md-arrow-round-back" @click="toStep"></Button>
+        <span style="margin-left:15px">Manage tools of step</span>
+      </h1>
       <div>
         <Row>
           <Col span="16">
-          <div span="2" style="height: inherit;width: 90px;position: absolute;" :style="{height: contentHeight-89+'px'}">
+          <div span="2" style="height: inherit;width: 90px;position: absolute;" :style="{height: contentHeight-93+'px'}">
             <Menu
               active-name="publicTools"
               @on-select="changeMenuItem"
@@ -113,10 +116,10 @@
                 <Button class="changeGreenColor" shape="circle" icon="ios-add-circle-outline" @click="createToolModalShow()">Create tool</Button>
                 <Button class="changeGreenColor" shape="circle" icon="ios-add-circle-outline" @click="createToolsetModalShow()">Create toolset</Button>
               </div>
-              <div v-if="showMenuItem=='publicTools'" style="height: inherit;min-height: fit-content;" :style="{height: contentHeight-178+'px'}">
+              <div v-if="showMenuItem=='publicTools'" style="height: inherit;min-height: fit-content;" :style="{height: contentHeight-187+'px'}">
                   <h3>Public tools</h3>
               </div>
-              <div v-if="showMenuItem=='personalTools'" style="height: inherit;min-height: fit-content;" :style="{height: contentHeight-178+'px'}">
+              <div v-if="showMenuItem=='personalTools'" style="height: inherit;min-height: fit-content;" :style="{height: contentHeight-187+'px'}">
                   <h3>Personal tools</h3>
               </div>
             </Card>
@@ -125,7 +128,7 @@
             <div style="padding: 0 5px;margin-left: 15px;">
               <Card dis-hover>
                 <h1 slot="title" style="padding-top:5px">Tools in step</h1>
-                <div :style="{height: contentHeight-178+'px'}">
+                <div :style="{height: contentHeight-187+'px'}">
 
                 </div>
               </Card>
@@ -157,8 +160,8 @@
         <FormItem label="Model mdlId:" prop="model_mdlId" :label-width="140">
           <Input v-model="toolInfo.model_mdlId" placeholder="Enter the model mdlId of your tool"></Input>
         </FormItem>
-        <FormItem label="Tool description:" prop="toolsetRecords" :label-width="140">
-          <Input v-model="toolInfo.description" show-word-limit type="textarea" placeholder="Enter description of your tool" />
+        <FormItem label="Tool description:" prop="description" :label-width="140">
+          <Input v-model="toolInfo.description" type="textarea" placeholder="Enter description of your tool" />
         </FormItem>
         <FormItem label="Tool url:" prop="tool_url" :label-width="140">
           <Input v-model="toolInfo.tool_url" placeholder="Enter the tool url of your tool"></Input>
@@ -167,7 +170,7 @@
           <Select
             v-model="toolInfo.recomStep"
             multiple
-            placeholder="Select the recommended step of yout tool"
+            placeholder="Select the recommended step of your tool"
           >
             <Option v-for="item in stepList" :key="item.index" :value="item">{{ item }}</Option>
           </Select>
@@ -257,9 +260,13 @@
         <FormItem label="Name" prop="name" :label-width="140">
           <Input v-model="toolsetInfo.name" placeholder="Enter the name of your toolset"></Input>
         </FormItem>
+        <FormItem label="Description" prop="description" :label-width="140">
+          <Input v-model="toolsetInfo.description" type="textarea" placeholder="Enter the description of your toolset"></Input>
+        </FormItem>
         <FormItem label="Recommended step:" prop="recomStep" :label-width="140">
           <Select
             v-model="toolsetInfo.recomStep"
+            multiple
             placeholder="Select the recommended step of yout toolset"
           >
             <Option v-for="item in stepList" :key="item.index" :value="item">{{ item }}</Option>
@@ -346,7 +353,6 @@ export default {
   components: {},
   mounted() {
     this.resizeContent();
-    this.getProjectList();
   },
   data() {
     return {
@@ -409,6 +415,13 @@ export default {
             trigger: "blur"
           }
         ],
+        description: [
+          {
+            required: true,
+            message: "The tool description cannot be empty",
+            trigger: "blur"
+          }
+        ],
         tool_url: [
           {
             required: true,
@@ -442,7 +455,8 @@ export default {
       inputToolsetTag: "",
       toolsetInfo: {
         name: "",
-        recomStep: "",
+        description:"",
+        recomStep: [],
         toolsetImg:"",
         privacy: "Private",
         categoryTag: []
@@ -455,10 +469,10 @@ export default {
             trigger: "blur"
           }
         ],
-        recomStep: [
+        description: [
           {
             required: true,
-            message: "Please select the recommended step",
+            message: "The toolset description cannot be empty",
             trigger: "blur"
           }
         ],
@@ -485,9 +499,9 @@ export default {
         })();
       };
     },
-    getProjectList() {},
-    getSubProjectList(projectId) {},
-    getStepList(subProjectId) {},
+    toStep(){
+      this.$router.go(-1);
+    },
     getToolsets() {
       this.axios
         .get(
@@ -534,18 +548,23 @@ export default {
           console.log(err);
         });
     },
-    changeProject(projectId) {
-      this.scopeId = projectId;
-      this.subProjectDisable = true;
-      this.getSubProjectList(projectId);
-    },
-    changeSubProject(subProjectId) {},
-    changeStep(stepId) {},
-    changeFileType(value) {},
     changeMenuItem(name) {
       this.showMenuItem = name;
     },
     createToolModalShow(){
+      this.inputToolTag = "";
+      this.toolInfo= {
+        name: "",
+        model_stateId: "",
+        model_oid: "",
+        model_mdlId: "",
+        description:"",
+        tool_url: "",
+        recomStep: [],
+        categoryTag: [],
+        toolImg: "",
+        privacy: "Private"
+      };
       this.createToolModal=true;
       this.clickForbidden = false;
     },
@@ -596,10 +615,13 @@ export default {
       if (tag != "") {
         this.toolInfo.categoryTag.push(tag);
         this.inputToolTag = "";
+        this.toolsetInfo.categoryTag.push(tag);
+        this.inputToolsetTag = "";
       }
     },
     deleteTag(index) {
       this.toolInfo.categoryTag.splice(index, 1);
+      this.toolsetInfo.categoryTag.splice(index, 1);
     },
     uploadPhoto(e) {
       // 利用fileReader对象获取file
@@ -639,6 +661,16 @@ export default {
       this.toolInfo.toolImg = "";
     },
     createToolsetModalShow() {
+      this.image = "";
+      this.inputToolsetTag = "";
+      this.toolsetInfo= {
+        name: "",
+        description:"",
+        recomStep: [],
+        toolsetImg:"",
+        privacy: "Private",
+        categoryTag: []
+      };
       this.createToolsetModal = true;
       this.clickForbidden = false;
     },
@@ -649,7 +681,7 @@ export default {
 
           let createToolsetForm = {};
           createToolsetForm["toolsetName"] = this.toolsetInfo.name;
-          createToolsetForm["toolList"] = [];
+          createToolsetForm["description"] = this.toolsetInfo.description;
           createToolsetForm["categoryTag"] = this.toolsetInfo.categoryTag;
           createToolsetForm["recomStep"] = this.toolsetInfo.recomStep;
           createToolsetForm["provider"] = this.$store.getters.userId;

@@ -103,11 +103,8 @@ export default {
       this.$set(this,"toolsetList",this.stepInfo.toolsetList);
     },
     addTools() {
-      let routeUrl = this.$router.resolve({
-        path: "/toolCollection",
-        query: { id: 1 }
-      });
-      window.open(routeUrl.href, "_blank");
+      var stepId = this.stepInfo.stepId;
+      this.$router.push({name:"toolToStep",params:{stepId}});
     },
     toolPanel(type) {
       // if (this.userRole != "Visitor") {
