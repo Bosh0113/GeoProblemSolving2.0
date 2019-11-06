@@ -80,6 +80,10 @@
               <div v-if="isPublic&&showMenuItem=='allToolsets'" style="height: 400px;">
                   <vue-scroll :ops="ops" style="height:400px;">
                   <Row>
+                    <draggable
+                      element="ul"
+                      :options="{group:'toolset'}"
+                      v-model="publicToolsets">
                     <Col span="8" v-for="toolset in publicToolsets" :key="toolset.index">
                     <Card style="background-color: ghostwhite;margin: 0 5px 10px 5px">
                       <div style="text-align:center">
@@ -101,12 +105,17 @@
                       </div>
                     </Card>
                     </Col>
+                    </draggable>
                   </Row>
                   </vue-scroll>
               </div>
               <div v-if="!isPublic&&showMenuItem=='allToolsets'" style="height: 400px;">
                   <vue-scroll :ops="ops" style="height:400px;">
                   <Row>
+                    <draggable
+                      element="ul"
+                      :options="{group:'toolset'}"
+                      v-model="personalToolsets">
                     <Col span="8" v-for="toolset in personalToolsets" :key="toolset.index">
                     <Card style="background-color: #faebd794;margin: 0 5px 10px 5px">
                       <div style="text-align:center">
@@ -128,6 +137,7 @@
                       </div>
                     </Card>
                     </Col>
+                    </draggable>
                   </Row>
                   </vue-scroll>
               </div>
@@ -146,12 +156,17 @@
                 <h2 slot="title" style="padding-top:5px" v-if="showMenuItem=='allTools'">Tools in step</h2>
                 <div style="height: 400px;" v-if="showMenuItem=='allToolsets'">
                   <vue-scroll :ops="ops" style="height:400px;">
+                    <draggable
+                      element="ul"
+                      :group="{name:'toolset',put: ture, pull:false}"
+                      v-model="stepToolsetsShow">
                   <Card v-for="toolset in stepToolsetsShow" :key="toolset.index" class="stepItems" style="margin:0 0 5px 0">
                     <div>
                       <Button class="ellipsis" type="text" style="width: 140px;padding:0" @click="showInfo(toolset,toolset.toolsetName)">{{toolset.toolsetName}}</Button>
                       <Button shape="circle" icon="md-remove" class="changeRedColor" size="small" style="float:right"></Button>
                     </div>
                   </Card>
+                    </draggable>
                   </vue-scroll>
                 </div>
                 <div style="height: 400px;" v-if="showMenuItem=='allTools'">
@@ -209,8 +224,10 @@
 </template>
 <script>
 import Avatar from "vue-avatar";
+import draggable from "vuedraggable";
 export default {
   components: {
+    draggable,
     Avatar
   },
   mounted() {
