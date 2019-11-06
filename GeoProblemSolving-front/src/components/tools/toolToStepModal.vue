@@ -3,14 +3,6 @@
 .selector {
   width: 250px;
 }
-.fileBtnHoverGreen:hover {
-  background-color: #19be6b;
-  color: white;
-}
-.fileBtnHoverGray:hover {
-  background-color: #808695;
-  color: white;
-}
 .leftMenuItem {
   margin: 0 0 10px 0;
 }
@@ -18,12 +10,32 @@
     background-color: #19be6b;
     color: white;
 }
+.changeRedColor:hover {
+  background-color: #ed4014;
+  color: white;
+}
 .ellipsis{
   display: inline-block;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   vertical-align: top;
+}
+.stepItems>>>.ivu-card-body{
+  padding: 5px;
+}
+.api table {
+    font-size: 12px;
+    border-collapse: collapse;
+    border-spacing: 0;
+    empty-cells: show;
+    border: 1px solid #e9e9e9;
+    width: 100%;
+}
+.api table td, .api table th {
+    border: 1px solid #e9e9e9;
+    padding: 8px 16px;
+    text-align: left;
 }
 </style>
 <template>
@@ -51,11 +63,15 @@
             </Menu>
           </div>
             <Card dis-hover style="margin-left: 80px">
-              <h2 slot="title" style="padding-top:5px;color: #2d8cf099" v-if="isPublic&&showMenuItem=='allToolsets'">Public toolsets</h2>
-              <h2 slot="title" style="padding-top:5px;color: #2d8cf099" v-if="isPublic&&showMenuItem=='allTools'">Public tools</h2>
-              <h2 slot="title" style="padding-top:5px;color: #2d8cf099" v-if="!isPublic&&showMenuItem=='allToolsets'">Personal toolsets</h2>
-              <h2 slot="title" style="padding-top:5px;color: #2d8cf099" v-if="!isPublic&&showMenuItem=='allTools'">Personal tools</h2>
-              <div slot="extra">
+              <h2 slot="title" style="padding-top:5px;color: #2d8cf099">{{listTitle()}}</h2>
+              <div slot="extra" style="width:210px;">
+                <Select
+                  v-model="typeSelected"
+                  @on-change="typeChanged"
+                  style="width:160px"
+                >
+                  <Option v-for="item in typeOptions" :key="item.index" :value="item">{{ item }}</Option>
+                </Select>
                 <i-switch v-model="isPublic">
                   <Icon type="logo-dropbox" slot="open" title="Public"></Icon>
                   <Icon type="ios-cube" slot="close" title="Personal"></Icon>
@@ -129,9 +145,14 @@
                 <h2 slot="title" style="padding-top:5px" v-if="showMenuItem=='allToolsets'">Toolsets in step</h2>
                 <h2 slot="title" style="padding-top:5px" v-if="showMenuItem=='allTools'">Tools in step</h2>
                 <div style="height: 400px;" v-if="showMenuItem=='allToolsets'">
-                  <Card v-for="toolset in stepToolsetsShow" :key="toolset.index">
-                    <div class="ellipsis" style="width: 100px;">{{toolset.toolsetName}}</div>
+                  <vue-scroll :ops="ops" style="height:400px;">
+                  <Card v-for="toolset in stepToolsetsShow" :key="toolset.index" class="stepItems" style="margin:0 0 5px 0">
+                    <div>
+                      <Button class="ellipsis" type="text" style="width: 140px;padding:0" @click="showInfo(toolset,toolset.toolsetName)">{{toolset.toolsetName}}</Button>
+                      <Button shape="circle" icon="md-remove" class="changeRedColor" size="small" style="float:right"></Button>
+                    </div>
                   </Card>
+                  </vue-scroll>
                 </div>
                 <div style="height: 400px;" v-if="showMenuItem=='allTools'">
                   <h1>Tools List</h1>
@@ -145,8 +166,44 @@
         <Button
           type="success"
           @click="confirmToolset()"
-        >OK</Button>
+        >Save</Button>
       </div>
+      </Modal>
+      <Modal  v-model="infoModal" title="Info of the toolset or tool" width="400">
+        <div class="api">
+          <table>
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Info</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Name</td>
+                <td>{{itemInfo.name}}</td>
+              </tr>
+              <tr>
+                <td>Description</td>
+                <td>{{itemInfo.description}}</td>
+              </tr>
+              <tr>
+                <td>Tags</td>
+                <td>{{itemInfo.tags.join(',')}}</td>
+              </tr>
+              <tr>
+                <td>Step</td>
+                <td>{{itemInfo.recomStep.join(',')}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div slot="footer">
+          <Button
+            type="info"
+            @click="infoModal=false"
+          >OK</Button>
+        </div>
       </Modal>
   </div>
 </template>
@@ -183,6 +240,27 @@ export default {
           background: "#808695"
         }
       },
+      typeSelected:"All",
+      typeOptions: [
+        "All",
+        "General step",
+        "Context definition & resource collection",
+        "Data processing",
+        "Modeling for geographic process",
+        "Model evaluation",
+        "Quantitative and qualitative analysis",
+        "Simulation/Prediction",
+        "Visualization & representation",
+        "Decision-making & management",
+        "Others"
+      ],
+      infoModal:false,
+      itemInfo:{
+        name:"",
+        description:"",
+        tags:[],
+        recomStep:[]
+      }
     };
   },
   methods: {
@@ -199,7 +277,30 @@ export default {
       };
     },
     stepToolModalShow(){
+      this.typeSelected = "All";
+      this.showMenuItem = "allToolsets";
+      this.isPublic = true;
       this.stepToolModal = true;
+    },
+    showInfo(item,name){
+      this.itemInfo.name = name;
+      this.itemInfo.description = item.description;
+      this.itemInfo.tags = item.categoryTag;
+      this.itemInfo.recomStep = item.recomStep;
+      this.infoModal = true;
+    },
+    listTitle(){
+      if(this.isPublic&&this.showMenuItem=='allToolsets'){
+        return "Public toolsets";
+      }
+      else if(this.isPublic&&this.showMenuItem=='allTools'){
+        return "Public tools";
+      }else if(!this.isPublic&&this.showMenuItem=='allToolsets'){
+        return "Personal toolsets";
+      }
+      else if(!this.isPublic&&this.showMenuItem=='allTools'){
+        return "Personal tools";
+      }
     },
     getStepToolsets(){
       var stepToolsetIds = this.stepToolsets;
@@ -314,6 +415,9 @@ export default {
     },
     changeMenuItem(name) {
       this.showMenuItem = name;
+    },
+    typeChanged(type){
+      console.log("type selected:"+type);
     },
     confirmToolset(){
       console.log('update toolset.');
