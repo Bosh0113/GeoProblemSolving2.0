@@ -83,8 +83,8 @@
                     <draggable
                       element="ul"
                       :options="{group:'toolset'}"
-                      v-model="publicToolsets">
-                    <Col span="8" v-for="toolset in publicToolsets" :key="toolset.index">
+                      v-model="publicToolsetsShow">
+                    <Col span="8" v-for="toolset in publicToolsetsShow" :key="toolset.index">
                     <Card style="background-color: ghostwhite;margin: 0 5px 10px 5px">
                       <div style="text-align:center">
                         <Tooltip placement="bottom" max-width="600">
@@ -115,8 +115,8 @@
                     <draggable
                       element="ul"
                       :options="{group:'toolset'}"
-                      v-model="personalToolsets">
-                    <Col span="8" v-for="toolset in personalToolsets" :key="toolset.index">
+                      v-model="personalToolsetsShow">
+                    <Col span="8" v-for="toolset in personalToolsetsShow" :key="toolset.index">
                     <Card style="background-color: #faebd794;margin: 0 5px 10px 5px">
                       <div style="text-align:center">
                         <Tooltip placement="bottom" max-width="600">
@@ -158,12 +158,14 @@
                   <vue-scroll :ops="ops" style="height:400px;">
                     <draggable
                       element="ul"
-                      :group="{name:'toolset',put: ture, pull:false}"
-                      v-model="stepToolsetsShow">
-                  <Card v-for="toolset in stepToolsetsShow" :key="toolset.index" class="stepItems" style="margin:0 0 5px 0">
+                      :group="{name:'toolset', put:true, pull:false}"
+                      v-model="stepToolsetsShow"
+                      @add="addToolsettoStep"
+                      style="min-height:400px">
+                  <Card v-for="(toolset,index) in stepToolsetsShow" :key="toolset.index" class="stepItems" style="margin:0 0 5px 0">
                     <div>
                       <Button class="ellipsis" type="text" style="width: 140px;padding:0" @click="showInfo(toolset,toolset.toolsetName)">{{toolset.toolsetName}}</Button>
-                      <Button shape="circle" icon="md-remove" class="changeRedColor" size="small" style="float:right"></Button>
+                      <Button shape="circle" icon="md-remove" class="changeRedColor" size="small" style="float:right" @click="removeToolset(index)"></Button>
                     </div>
                   </Card>
                     </draggable>
@@ -239,17 +241,21 @@ export default {
   },
   data() {
     return {
-      stepToolsets:["168ed2bb-895e-4085-9bf0-3f3a6684200d","c1ba9d27-616e-44cf-b887-d278a42f2a49","380d9f07-695a-48c3-9f06-e6bd925ee5a0"],
-      stepTools:[],
-      stepToolsetsShow:[],
+      stepToolsetIds:["168ed2bb-895e-4085-9bf0-3f3a6684200d","c1ba9d27-616e-44cf-b887-d278a42f2a49","380d9f07-695a-48c3-9f06-e6bd925ee5a0"],
+      stepToolIds:[],
       stepToolsShow:[],
+      stepToolsetsShow:[],
       contentHeight: "",
       userInfo: this.$store.getters.userInfo,
       showMenuItem: "allToolsets",
       publicToolsets:[],
+      publicToolsetsShow:[],
       personalToolsets:[],
+      personalToolsetsShow:[],
       publicTools:[],
+      publicToolsShow:[],
       personalTools:[],
+      personalToolsShow:[],
       stepToolModal:false,
       isPublic:true,
       ops: {
@@ -320,8 +326,8 @@ export default {
       }
     },
     getStepToolsets(){
-      var stepToolsetIds = this.stepToolsets;
-      var toolsetsCount = this.stepToolsets.length;
+      var stepToolsetIds = this.stepToolsetIds;
+      var toolsetsCount = this.stepToolsetIds.length;
       var flagCount = toolsetsCount;
       var stepToolsetInfos = [];
       for(var i=0;i<toolsetsCount;i++){
@@ -352,6 +358,8 @@ export default {
                   }
                 }
                 this.$set(this, "stepToolsetsShow", sortToolsets);
+                this.filterDuplicateToolsets();
+                this.filterShowListByType();
               }
             }
           })
@@ -434,7 +442,107 @@ export default {
       this.showMenuItem = name;
     },
     typeChanged(type){
-      console.log("type selected:"+type);
+      this.typeSelected = type;
+      this.filterShowListByType();
+    },
+    filterDuplicateToolsets(){
+      var tempPublicToolsets=[];
+      for(var i=0;i<this.publicToolsets.length;i++){
+        var exist = false;
+        for(var j=0;j<this.stepToolsetsShow.length;j++){
+          if(this.publicToolsets[i].tsId==this.stepToolsetsShow[j].tsId){
+            exist=true;
+            break;
+          }
+        }
+        if(!exist){
+          tempPublicToolsets.push(this.publicToolsets[i]);
+        }
+      }
+      this.publicToolsets = tempPublicToolsets;
+      var tempPersonalToolsets=[];
+      for(var i=0;i<this.personalToolsets.length;i++){
+        var exist = false;
+        for(var j=0;j<this.stepToolsetsShow.length;j++){
+          if(this.personalToolsets[i].tsId==this.stepToolsetsShow[j].tsId){
+            exist=true;
+            continue;
+          }
+        }
+        if(!exist){
+          tempPersonalToolsets.push(this.personalToolsets[i]);
+        }
+      }
+      this.personalToolsets = tempPersonalToolsets;
+    },
+    filterShowListByType(){
+      this.publicToolsetsShow = this.getFilterResult(this.publicToolsets);
+      this.personalToolsetsShow = this.getFilterResult(this.personalToolsets);
+      this.publicToolsShow = this.getFilterResult(this.publicTools);
+      this.personalToolsShow = this.getFilterResult(this.personalTools);
+    },
+    getFilterResult(foreList){
+      var selectedType = this.typeSelected;
+      var resultList=foreList.filter(function(item){
+        switch(selectedType){
+          case "All":{
+            return item;
+            break;
+          }
+          case "General step":
+          case "Context definition & resource collection":
+          case "Data processing":
+          case "Modeling for geographic process":
+          case "Model evaluation":
+          case "Quantitative and qualitative analysis":
+          case "Simulation/Prediction":
+          case "Visualization & representation":
+          case "Decision-making & management":{
+            var stepTypes = item.recomStep;
+            for(var i=0;i<stepTypes.length;i++){
+              if(stepTypes[i]==selectedType){
+                return item;
+                break;
+              }
+            }
+            break;
+          }
+          case "Others":{
+            if(item.recomStep.length<1){
+              return item;
+            }
+            break;
+          }
+        }
+      });
+      return resultList;
+    },
+    addToolsettoStep(evt){
+      var addedToolsetId = this.stepToolsetsShow[evt.newDraggableIndex].tsId;
+      for(var i=0;i<this.publicToolsets.length;i++){
+        if(this.publicToolsets[i].tsId==addedToolsetId){
+          this.publicToolsets.splice(i,1);
+          break;
+        }
+      }
+      for(var i=0;i<this.personalToolsets.length;i++){
+        if(this.personalToolsets[i].tsId==addedToolsetId){
+          this.personalToolsets.splice(i,1);
+          break;
+        }
+      }
+      this.filterShowListByType();
+    },
+    removeToolset(index){
+      var removeToolsetInfo = this.stepToolsetsShow[index];
+      this.stepToolsetsShow.splice(index,1);
+      if(removeToolsetInfo.privacy=="Public"){
+        this.publicToolsets.push(removeToolsetInfo);
+      }
+      if(removeToolsetInfo.provider==this.userInfo.userId){
+        this.personalToolsets.push(removeToolsetInfo);
+      }
+      this.filterShowListByType();
     },
     confirmToolset(){
       console.log('update toolset.');
