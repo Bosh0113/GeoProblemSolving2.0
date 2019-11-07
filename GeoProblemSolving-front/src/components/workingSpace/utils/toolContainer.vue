@@ -104,8 +104,7 @@ export default {
     },
     addTools() {
       let routeUrl = this.$router.resolve({
-        path: "/toolCollection",
-        query: { id: 1 }
+        path: "/toolCollection"
       });
       window.open(routeUrl.href, "_blank");
     },
