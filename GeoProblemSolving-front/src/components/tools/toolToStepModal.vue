@@ -300,6 +300,7 @@
 import Avatar from "vue-avatar";
 import draggable from "vuedraggable";
 export default {
+  props: ["stepInfo"],
   components: {
     draggable,
     Avatar
@@ -314,12 +315,6 @@ export default {
   },
   data() {
     return {
-      stepInfo:{
-        stepId:"7bf7d08f-9b1d-423a-b60c-5c9dc31820d4",
-        toolsetList:["168ed2bb-895e-4085-9bf0-3f3a6684200d","c1ba9d27-616e-44cf-b887-d278a42f2a49","380d9f07-695a-48c3-9f06-e6bd925ee5a0"],
-        toolList:["989bb109-1b2c-4fac-831f-18ed72495e49"],
-      },
-
       stepId: "",
       stepToolsetIds: [],
       stepToolIds: [],
