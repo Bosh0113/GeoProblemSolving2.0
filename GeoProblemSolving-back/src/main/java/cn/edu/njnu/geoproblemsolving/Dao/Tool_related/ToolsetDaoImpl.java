@@ -2,6 +2,7 @@ package cn.edu.njnu.geoproblemsolving.Dao.Tool_related;
 
 import cn.edu.njnu.geoproblemsolving.Dao.Method.CommonMethod;
 import cn.edu.njnu.geoproblemsolving.Entity.ToolsetEntity;
+import com.alibaba.fastjson.JSONArray;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -34,7 +35,7 @@ public class ToolsetDaoImpl implements IToolsetDao {
     }
 
     @Override
-    public String createToolset(ToolsetEntity toolset) {
+    public Object createToolset(ToolsetEntity toolset) {
 
         String toolsetName = toolset.getToolsetName();
         Query query = Query.query(Criteria.where("toolsetName").is(toolsetName));
@@ -46,9 +47,9 @@ public class ToolsetDaoImpl implements IToolsetDao {
             Date date = new Date();
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
             toolset.setCreateTime(dateFormat.format(date));
-
+            toolset.setToolList(new JSONArray());
             mongoTemplate.save(toolset);
-            return tsId;
+            return toolset;
         }
         else {
             return "Duplicate naming";
@@ -69,9 +70,8 @@ public class ToolsetDaoImpl implements IToolsetDao {
     @Override
     public Object readAccessibleToolsets(String userId) {
         try {
-            Criteria criteriaPublicToolset = Criteria.where("privacy").is("Public");
-            Criteria criteriaOwnedToolset = Criteria.where("provider").is("userId");
-            Query queryTools = Query.query(new Criteria().orOperator(criteriaPublicToolset,criteriaOwnedToolset));
+            Criteria criteriaOwnedToolset = Criteria.where("provider").is(userId);
+            Query queryTools = Query.query(criteriaOwnedToolset);
             List<ToolsetEntity> toolsetEntityList = mongoTemplate.find(queryTools, ToolsetEntity.class);
             if (!toolsetEntityList.isEmpty()) {
                 return toolsetEntityList;

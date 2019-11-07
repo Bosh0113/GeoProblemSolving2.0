@@ -1,4 +1,5 @@
 <style scoped>
+/* import { try } from 'q'; */
 .selector {
   width: 250px;
 }
@@ -17,16 +18,18 @@
     background-color: #19be6b;
     color: white;
 }
-
 </style>
 <template>
-  <div :style="{height: contentHeight+'px'}">
+  <div :style="{height: contentHeight+'px'}" style="min-width:1200px;">
     <Card dis-hover>
-      <h1 slot="title">Tool management center</h1>
+      <h1 slot="title">
+        <Button shape="circle" icon="md-arrow-round-back" @click="toStep"></Button>
+        <span style="margin-left:15px">Manage tools of step</span>
+      </h1>
       <div>
         <Row>
           <Col span="16">
-          <div span="2" style="height: inherit;width: 90px;position: absolute;" :style="{height: contentHeight-89+'px'}">
+          <div span="2" style="height: inherit;width: 90px;position: absolute;" :style="{height: contentHeight-93+'px'}">
             <Menu
               active-name="publicTools"
               @on-select="changeMenuItem"
@@ -45,16 +48,12 @@
             </Menu>
           </div>
             <Card dis-hover style="margin-left: 80px">
-              <h1 slot="title" style="padding-top:5px" v-if="showMenuItem=='publicTools'">Public tools</h1>
-              <h1 slot="title" style="padding-top:5px" v-if="showMenuItem=='personalTools'">Personal tools</h1>
-              <div slot="extra">
-                <Button class="changeGreenColor" shape="circle" icon="ios-add-circle-outline" @click="createTool()">Create tool</Button>
-                <Button class="changeGreenColor" shape="circle" icon="ios-add-circle-outline" @click="createToolset()">Create toolset</Button>
-              </div>
-              <div v-if="showMenuItem=='publicTools'" style="height: inherit;min-height: fit-content;" :style="{height: contentHeight-178+'px'}">
+              <h1 slot="title" style="padding-top:5px;color: #2d8cf099" v-if="showMenuItem=='publicTools'">Public tools</h1>
+              <h1 slot="title" style="padding-top:5px;color: #2d8cf099" v-if="showMenuItem=='personalTools'">Personal tools</h1>
+              <div v-if="showMenuItem=='publicTools'" style="height: inherit;min-height: fit-content;" :style="{height: contentHeight-187+'px'}">
                   <h3>Public tools</h3>
               </div>
-              <div v-if="showMenuItem=='personalTools'" style="height: inherit;min-height: fit-content;" :style="{height: contentHeight-178+'px'}">
+              <div v-if="showMenuItem=='personalTools'" style="height: inherit;min-height: fit-content;" :style="{height: contentHeight-187+'px'}">
                   <h3>Personal tools</h3>
               </div>
             </Card>
@@ -63,7 +62,7 @@
             <div style="padding: 0 5px;margin-left: 15px;">
               <Card dis-hover>
                 <h1 slot="title" style="padding-top:5px">Tools in step</h1>
-                <div :style="{height: contentHeight-178+'px'}">
+                <div :style="{height: contentHeight-187+'px'}">
 
                 </div>
               </Card>
@@ -79,25 +78,16 @@ export default {
   components: {},
   mounted() {
     this.resizeContent();
-    this.getProjectList();
+    this.getToolsets();
+    this.getTools();
   },
   data() {
     return {
       contentHeight: "",
       userInfo: this.$store.getters.userInfo,
       showMenuItem: "publicTools",
-      // 待用
-      ops: {
-        bar: {
-          background: "#808695"
-        }
-      },
-      projectList: [],
-      subProjectList: [],
-      subProjectDisable: true,
-      scopeId: "",
-      toolsetList: [],
-      toolList: []
+      toolsetList:[],
+      toolList:[]
     };
   },
   methods: {
@@ -113,15 +103,15 @@ export default {
         })();
       };
     },
-    getProjectList() {},
-    getSubProjectList(projectId) {},
-    getStepList(subProjectId) {},
+    toStep(){
+      this.$router.go(-1);
+    },
     getToolsets() {
       this.axios
         .get(
           "/GeoProblemSolving/toolset/inquiryAll" +
             "?provider=" +
-            this.$store.getters.userId
+            this.userInfo.userId
         )
         .then(res => {
           if (res.data == "Offline") {
@@ -132,6 +122,7 @@ export default {
           } else if (res.data === "None") {
             this.$Notice.error({ desc: "There is no existing toolset" });
           } else {
+            console.log(res.data);
             this.$set(this, "toolsetList", res.data);
           }
         })
@@ -144,7 +135,7 @@ export default {
         .get(
           "/GeoProblemSolving/tool/inquiryAll" +
             "?provider=" +
-            this.$store.getters.userId
+            this.userInfo.userId
         )
         .then(res => {
           if (res.data == "Offline") {
@@ -155,6 +146,7 @@ export default {
           } else if (res.data === "None") {
             this.$Notice.error({ desc: "There is no existing tool" });
           } else {
+            console.log(res.data);
             this.$set(this, "toolList", res.data);
           }
         })
@@ -162,23 +154,9 @@ export default {
           console.log(err);
         });
     },
-    changeProject(projectId) {
-      this.scopeId = projectId;
-      this.subProjectDisable = true;
-      this.getSubProjectList(projectId);
-    },
-    changeSubProject(subProjectId) {},
-    changeStep(stepId) {},
-    changeFileType(value) {},
     changeMenuItem(name) {
       this.showMenuItem = name;
     },
-    createTool() {
-      this.$router.push({ path: "createNewTool" });
-    },
-    createToolset() {
-      this.$router.push({ path: "createToolset" });
-    }
   }
 };
 </script>

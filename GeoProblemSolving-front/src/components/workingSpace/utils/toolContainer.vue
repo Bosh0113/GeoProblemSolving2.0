@@ -19,8 +19,8 @@
     <div>
       <div style="width:3px;height:18px;float:left;background-color:rgb(124, 126, 126)"></div>
       <h4 style="float:left;margin-left:5px">Toolbox</h4>
-      <div style="float:right;cursor:pointer" @click="addTools" title="Add other tools">
-        <Icon type="md-add" />
+      <div style="float:right;" title="Manage tools and toolsets">
+        <manage-tools :step-info="stepInfo"></manage-tools>
       </div>
     </div>
     <div :style="{height:contentHeight-66+'px'}">
@@ -64,8 +64,12 @@
   </div>
 </template>
 <script>
+import manageTools from "./../../tools/toolToStepModal";
 export default {
   props: ["stepInfo", "contentHeight", "userRole"],
+  components: {
+    manageTools
+  },
   data() {
     return {
       ops: {
@@ -101,12 +105,6 @@ export default {
       this.toolsetList = [];
       this.$set(this,"toolList",this.stepInfo.toolList);
       this.$set(this,"toolsetList",this.stepInfo.toolsetList);
-    },
-    addTools() {
-      let routeUrl = this.$router.resolve({
-        path: "/toolCollection"
-      });
-      window.open(routeUrl.href, "_blank");
     },
     toolPanel(type) {
       // if (this.userRole != "Visitor") {

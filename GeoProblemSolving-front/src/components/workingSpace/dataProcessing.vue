@@ -133,9 +133,9 @@
     padding-bottom: 0;
   } */
 
-.pro-tab >>> .ivu-btn-icon-only {
+/* .pro-tab >>> .ivu-btn-icon-only {
   font-size: 40px;
-}
+} */
 .subproject-back >>> .ivu-breadcrumb-item-link {
   color: white;
 }

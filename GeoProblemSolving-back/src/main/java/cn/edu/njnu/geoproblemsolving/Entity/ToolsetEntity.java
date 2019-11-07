@@ -11,9 +11,9 @@ public class ToolsetEntity {
     private String tsId;
     private String toolsetName;
     private JSONArray toolList; // 创建的时候不添加toolList，在toolCollection页面添加，或者创建tool 选择 toolset时，自动添加
-    private ToolsetEntity subToolsets;
     private ArrayList<String> categoryTag;
-    private String recomStep; // step类型 or general
+    private ArrayList<String> recomStep; // step类型 or general
+    private String description;
     private String provider;
     private String privacy;
     private String toolsetImg;
@@ -21,6 +21,14 @@ public class ToolsetEntity {
 
     public String getTsId() {
         return tsId;
+    }
+
+    public String getDescription(){
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String getToolsetName() {
@@ -31,15 +39,11 @@ public class ToolsetEntity {
         return toolList;
     }
 
-    public ToolsetEntity getSubToolsets() {
-        return subToolsets;
-    }
-
     public ArrayList<String> getCategoryTag() {
         return categoryTag;
     }
 
-    public String getRecomStep() {
+    public ArrayList<String> getRecomStep() {
         return recomStep;
     }
 
@@ -71,15 +75,11 @@ public class ToolsetEntity {
         this.toolList = toolList;
     }
 
-    public void setSubToolsets(ToolsetEntity subToolsets) {
-        this.subToolsets = subToolsets;
-    }
-
     public void setCategoryTag(ArrayList<String> categoryTag) {
         this.categoryTag = categoryTag;
     }
 
-    public void setRecomStep(String recomStep) {
+    public void setRecomStep(ArrayList<String> recomStep) {
         this.recomStep = recomStep;
     }
 

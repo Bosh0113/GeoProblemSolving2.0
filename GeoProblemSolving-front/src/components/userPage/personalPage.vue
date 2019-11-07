@@ -212,7 +212,7 @@ body {
               </div>
               <br>
               <div
-                style="word-break: break-word;padding:10px;font-size:12px;border:1px dotted lightgray"
+                style="word-break: break-word;padding:10px;font-size:12px;border:1px dotted lightgray;white-space: pre-line;"
                 title="Introduction"
                 v-show="userDetail.introduction!=''"
               >{{userDetail.introduction}}</div>
@@ -448,7 +448,7 @@ body {
                                 <p slot="title" style="height:40x" class="projectsTitle">{{item.title}}</p>
                                 <Button class="fileBtnHoverRed" slot="extra" @click.stop="quitModalShow(item)">Quit</Button>
                                 <p
-                                  style="height:200px;text-indent:2em;word-break:break-word"
+                                  style="height:200px;text-indent:2em;word-break:break-word;white-space: pre-line;"
                                 >
                                 <vue-scroll :ops="ops">{{item.introduction}}</vue-scroll></p>
                                 <br>
@@ -510,7 +510,7 @@ body {
                                 <!--  @click.stop="deleteProjectModalShow(mProject.projectId)" -->
                                 <!-- 表头结束 -->
                                 <p
-                                  style="height:200px;text-indent:2em;word-break:break-word"
+                                  style="height:200px;text-indent:2em;word-break:break-word;white-space: pre-line;"
                                 ><vue-scroll :ops="ops">{{mProject.introduction}}</vue-scroll></p>
                                 <!-- <hr> -->
                                 <br>
