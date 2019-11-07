@@ -142,10 +142,68 @@
                   </vue-scroll>
               </div>
               <div v-if="isPublic&&showMenuItem=='allTools'" style="height: 400px;">
-                  <h3>All Public tools</h3>
+                  <vue-scroll :ops="ops" style="height:400px;">
+                  <Row>
+                    <draggable
+                      element="ul"
+                      :options="{group:'tool'}"
+                      v-model="publicToolsShow">
+                    <Col span="8" v-for="tool in publicToolsShow" :key="tool.index">
+                    <Card style="background-color: ghostwhite;margin: 0 5px 10px 5px">
+                      <div style="text-align:center">
+                        <Tooltip placement="bottom" max-width="600">
+                          <img :src="tool.toolImg" v-if="tool.toolImg!=''" style="height:100%;max-height:50px;">
+                          <avatar
+                          :username="tool.toolName"
+                          :size="50"
+                          style="margin-bottom:6px"
+                          v-else
+                        ></avatar>
+                        <div slot="content">
+                          <span>{{tool.description}}</span>
+                          <br v-if="tool.categoryTag.length>0"/>
+                          <span><i>{{tool.categoryTag.join(',')}}</i></span>
+                        </div>
+                        </Tooltip>
+                        <h4 :title="tool.toolName" style="display:block;width:90px;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;">{{tool.toolName}}</h4>
+                      </div>
+                    </Card>
+                    </Col>
+                    </draggable>
+                  </Row>
+                  </vue-scroll>
               </div>
               <div v-if="!isPublic&&showMenuItem=='allTools'" style="height: 400px;">
-                  <h3>All Personal tools</h3>
+                  <vue-scroll :ops="ops" style="height:400px;">
+                  <Row>
+                    <draggable
+                      element="ul"
+                      :options="{group:'tool'}"
+                      v-model="personalToolsShow">
+                    <Col span="8" v-for="tool in personalToolsShow" :key="tool.index">
+                    <Card style="background-color: #faebd794;margin: 0 5px 10px 5px">
+                      <div style="text-align:center">
+                        <Tooltip placement="bottom" max-width="600">
+                          <img :src="tool.toolImg" v-if="tool.toolImg!=''" style="height:100%;max-height:50px;">
+                          <avatar
+                          :username="tool.toolName"
+                          :size="50"
+                          style="margin-bottom:6px"
+                          v-else
+                        ></avatar>
+                        <div slot="content">
+                          <span>{{tool.description}}</span>
+                          <br v-if="tool.categoryTag.length>0"/>
+                          <span><i>{{tool.categoryTag.join(',')}}</i></span>
+                        </div>
+                        </Tooltip>
+                        <h4 :title="tool.toolName" style="width:90px;" class="ellipsis">{{tool.toolName}}</h4>
+                      </div>
+                    </Card>
+                    </Col>
+                    </draggable>
+                  </Row>
+                  </vue-scroll>
               </div>
             </Card>
           </Col>
@@ -172,7 +230,21 @@
                   </vue-scroll>
                 </div>
                 <div style="height: 400px;" v-if="showMenuItem=='allTools'">
-                  <h1>Tools List</h1>
+                  <vue-scroll :ops="ops" style="height:400px;">
+                    <draggable
+                      element="ul"
+                      :group="{name:'tool', put:true, pull:false}"
+                      v-model="stepToolsShow"
+                      @add="addTooltoStep"
+                      style="min-height:400px">
+                  <Card v-for="(tool,index) in stepToolsShow" :key="tool.index" class="stepItems" style="margin:0 0 5px 0">
+                    <div>
+                      <Button class="ellipsis" type="text" style="width: 140px;padding:0" @click="showInfo(tool,tool.toolName)">{{tool.toolName}}</Button>
+                      <Button shape="circle" icon="md-remove" class="changeRedColor" size="small" style="float:right" @click="removeTool(index)"></Button>
+                    </div>
+                  </Card>
+                    </draggable>
+                  </vue-scroll>
                 </div>
               </Card>
             </div>
@@ -182,7 +254,7 @@
         <Button @click="stepToolModal=false">Cancel</Button>
         <Button
           type="success"
-          @click="confirmToolset()"
+          @click="confirmSetting()"
         >Save</Button>
       </div>
       </Modal>
@@ -232,17 +304,25 @@ export default {
     draggable,
     Avatar
   },
+  created(){
+    this.stepId=this.stepInfo.stepId;
+    this.stepToolsetIds=this.stepInfo.toolsetList;
+    this.stepToolIds=this.stepInfo.toolList;
+  },
   mounted() {
     this.resizeContent();
-    this.getPublicToolsets();
-    this.getPersonalToolsets();
-    this.getPersonalTools();
-    this.getStepToolsets();
   },
   data() {
     return {
-      stepToolsetIds:["168ed2bb-895e-4085-9bf0-3f3a6684200d","c1ba9d27-616e-44cf-b887-d278a42f2a49","380d9f07-695a-48c3-9f06-e6bd925ee5a0"],
-      stepToolIds:[],
+      stepInfo:{
+        stepId:"7bf7d08f-9b1d-423a-b60c-5c9dc31820d4",
+        toolsetList:["168ed2bb-895e-4085-9bf0-3f3a6684200d","c1ba9d27-616e-44cf-b887-d278a42f2a49","380d9f07-695a-48c3-9f06-e6bd925ee5a0"],
+        toolList:["989bb109-1b2c-4fac-831f-18ed72495e49"],
+      },
+
+      stepId: "",
+      stepToolsetIds: [],
+      stepToolIds: [],
       stepToolsShow:[],
       stepToolsetsShow:[],
       contentHeight: "",
@@ -299,7 +379,16 @@ export default {
         })();
       };
     },
+    getAllListInfo(){
+      this.getPublicToolsets();
+      this.getPersonalToolsets();
+      this.getPublicTools();
+      this.getPersonalTools();
+      this.getStepToolsets();
+      this.getStepTools();
+    },
     stepToolModalShow(){
+      this.getAllListInfo();
       this.typeSelected = "All";
       this.showMenuItem = "allToolsets";
       this.isPublic = true;
@@ -323,49 +412,6 @@ export default {
       }
       else if(!this.isPublic&&this.showMenuItem=='allTools'){
         return "Personal tools";
-      }
-    },
-    getStepToolsets(){
-      var stepToolsetIds = this.stepToolsetIds;
-      var toolsetsCount = this.stepToolsetIds.length;
-      var flagCount = toolsetsCount;
-      var stepToolsetInfos = [];
-      for(var i=0;i<toolsetsCount;i++){
-        this.axios
-          .get(
-            "/GeoProblemSolving/toolset/inquiry" +
-              "?key="+"tsId" +
-              "&value="+stepToolsetIds[i]
-          )
-          .then(res => {
-            if (res.data == "Offline") {
-              this.$store.commit("userLogout");
-              this.$router.push({ name: "Login" });
-            } else if (res.data === "Fail") {
-              this.$Notice.error({ desc: "Loading toolsets fail." });
-            } else if (res.data === "None") {
-              this.$Notice.error({ desc: "There is no existing toolset" });
-            } else {
-              stepToolsetInfos.push(res.data[0]);
-              if(--flagCount<1){
-                var sortToolsets = [];
-                for(var j=0;j<toolsetsCount;j++){
-                  for(var k=0;k<toolsetsCount;k++){
-                    if(stepToolsetIds[j]==stepToolsetInfos[k].tsId){
-                      sortToolsets.push(stepToolsetInfos[k]);
-                      break;
-                    }
-                  }
-                }
-                this.$set(this, "stepToolsetsShow", sortToolsets);
-                this.filterDuplicateToolsets();
-                this.filterShowListByType();
-              }
-            }
-          })
-          .catch(err => {
-            console.log(err);
-          });
       }
     },
     getPublicToolsets() {
@@ -414,6 +460,78 @@ export default {
           console.log(err);
         });
     },
+    getStepToolsets(){
+      var stepToolsetIds = this.stepToolsetIds;
+      var toolsetsCount = this.stepToolsetIds.length;
+      var flagCount = toolsetsCount;
+      var stepToolsetInfos = [];
+      for(var i=0;i<toolsetsCount;i++){
+        this.axios
+          .get(
+            "/GeoProblemSolving/toolset/inquiry" +
+              "?key="+"tsId" +
+              "&value="+stepToolsetIds[i]
+          )
+          .then(res => {
+            if (res.data == "Offline") {
+              this.$store.commit("userLogout");
+              this.$router.push({ name: "Login" });
+            } else if (res.data === "Fail") {
+              this.$Notice.error({ desc: "Loading toolsets fail." });
+            } else if (res.data === "None") {
+              this.$Notice.error({ desc: "There is no existing toolset" });
+            } else {
+              stepToolsetInfos.push(res.data[0]);
+              if(--flagCount<1){
+                var sortToolsets = [];
+                for(var j=0;j<toolsetsCount;j++){
+                  for(var k=0;k<toolsetsCount;k++){
+                    if(stepToolsetIds[j]==stepToolsetInfos[k].tsId){
+                      sortToolsets.push(stepToolsetInfos[k]);
+                      break;
+                    }
+                  }
+                }
+                this.$set(this, "stepToolsetsShow", sortToolsets);
+                var that = this;
+                var timer = window.setInterval(function(){
+                  if(!that.publicToolsets.length<1&&!that.personalToolsets.length<1){
+                    that.filterDuplicateToolsets();
+                    that.filterShowListByType();
+                    window.clearInterval(timer);
+                  }
+                },10);
+              }
+            }
+          })
+          .catch(err => {
+            console.log(err);
+          });
+      }
+    },
+    getPublicTools(){
+      this.axios
+        .get(
+          "/GeoProblemSolving/tool/inquiry" +
+            "?key="+"privacy" +
+            "&value="+"Public"
+        )
+        .then(res => {
+          if (res.data == "Offline") {
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
+          } else if (res.data === "Fail") {
+            this.$Notice.error({ desc: "Loading tools fail." });
+          } else if (res.data === "None") {
+            this.$Notice.error({ desc: "There is no existing tool" });
+          } else {
+            this.$set(this, "publicTools", res.data);
+          }
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    },
     getPersonalTools() {
       this.axios
         .get(
@@ -430,13 +548,61 @@ export default {
           } else if (res.data === "None") {
             this.$Notice.error({ desc: "There is no existing tool" });
           } else {
-            console.log(res.data);
             this.$set(this, "personalTools", res.data);
           }
         })
         .catch(err => {
           console.log(err);
         });
+    },
+    getStepTools(){
+      var stepToolIds = this.stepToolIds;
+      var toolsCount = this.stepToolIds.length;
+      var flagCount = toolsCount;
+      var stepToolInfos = [];
+      for(var i=0;i<toolsCount;i++){
+        this.axios
+          .get(
+            "/GeoProblemSolving/tool/inquiry" +
+              "?key="+"tId" +
+              "&value="+stepToolIds[i]
+          )
+          .then(res => {
+            if (res.data == "Offline") {
+              this.$store.commit("userLogout");
+              this.$router.push({ name: "Login" });
+            } else if (res.data === "Fail") {
+              this.$Notice.error({ desc: "Loading tools fail." });
+            } else if (res.data === "None") {
+              this.$Notice.error({ desc: "There is no existing tool" });
+            } else {
+              stepToolInfos.push(res.data[0]);
+              if(--flagCount<1){
+                var sortTools = [];
+                for(var j=0;j<toolsCount;j++){
+                  for(var k=0;k<toolsCount;k++){
+                    if(stepToolIds[j]==stepToolInfos[k].tId){
+                      sortTools.push(stepToolInfos[k]);
+                      break;
+                    }
+                  }
+                }
+                this.$set(this, "stepToolsShow", sortTools);
+                var that = this;
+                var timer = window.setInterval(function(){
+                  if(!that.publicTools.length<1&&!that.personalTools.length<1){
+                    that.filterDuplicateTools();
+                    that.filterShowListByType();
+                    window.clearInterval(timer);
+                  }
+                },10);
+              }
+            }
+          })
+          .catch(err => {
+            console.log(err);
+          });
+      }
     },
     changeMenuItem(name) {
       this.showMenuItem = name;
@@ -474,6 +640,36 @@ export default {
         }
       }
       this.personalToolsets = tempPersonalToolsets;
+    },
+    filterDuplicateTools(){
+      var tempPublicTools=[];
+      for(var i=0;i<this.publicTools.length;i++){
+        var exist = false;
+        for(var j=0;j<this.stepToolsShow.length;j++){
+          if(this.publicTools[i].tId==this.stepToolsShow[j].tId){
+            exist=true;
+            break;
+          }
+        }
+        if(!exist){
+          tempPublicTools.push(this.publicTools[i]);
+        }
+      }
+      this.publicTools = tempPublicTools;
+      var tempPersonalTools=[];
+      for(var i=0;i<this.personalTools.length;i++){
+        var exist = false;
+        for(var j=0;j<this.stepToolsShow.length;j++){
+          if(this.personalTools[i].tId==this.stepToolsShow[j].tId){
+            exist=true;
+            continue;
+          }
+        }
+        if(!exist){
+          tempPersonalTools.push(this.personalTools[i]);
+        }
+      }
+      this.personalTools = tempPersonalTools;
     },
     filterShowListByType(){
       this.publicToolsetsShow = this.getFilterResult(this.publicToolsets);
@@ -544,9 +740,70 @@ export default {
       }
       this.filterShowListByType();
     },
-    confirmToolset(){
-      console.log('update toolset.');
-      this.stepToolModal = false;
+    addTooltoStep(evt){
+      var addedToolId = this.stepToolsShow[evt.newDraggableIndex].tId;
+      for(var i=0;i<this.publicTools.length;i++){
+        if(this.publicTools[i].tId==addedToolId){
+          this.publicTools.splice(i,1);
+          break;
+        }
+      }
+      for(var i=0;i<this.personalTools.length;i++){
+        if(this.personalTools[i].tId==addedToolId){
+          this.personalTools.splice(i,1);
+          break;
+        }
+      }
+      this.filterShowListByType();
+    },
+    removeTool(index){
+      var removeToolInfo = this.stepToolsShow[index];
+      this.stepToolsShow.splice(index,1);
+      if(removeToolInfo.privacy=="Public"){
+        this.publicTools.push(removeToolInfo);
+      }
+      if(removeToolInfo.provider==this.userInfo.userId){
+        this.personalTools.push(removeToolInfo);
+      }
+      this.filterShowListByType();
+    },
+    confirmSetting(){
+      var newStepToolsets = [];
+      var newStepTools = [];
+      this.stepToolsetsShow.forEach(toolset=>{
+        newStepToolsets.push(toolset.tsId);
+      })
+      this.stepToolsShow.forEach(tool=>{
+        newStepTools.push(tool.tId);
+      })
+      console.log('update step.');
+      console.log(newStepToolsets);
+      console.log(newStepTools);
+      let obj = new URLSearchParams();
+      obj.append("stepId",this.stepInfo.stepId);
+      obj.append("toolsetList",newStepToolsets);
+      obj.append("toolList",newStepTools);
+      this.axios
+        .post(
+          "/GeoProblemSolving/step/update",
+          obj
+        )
+        .then(res => {
+          if (res.data == "Offline") {
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
+          } else if (res.data === "Fail") {
+            this.$Notice.error({ desc: "Loading tool fail." });
+          } else if (res.data === "None") {
+            this.$Notice.error({ desc: "There is no existing tool" });
+          } else {
+            //此处要更新父组件的列表
+            this.stepToolModal = false;
+          }
+        })
+        .catch(err => {
+          console.log(err);
+        });
     }
   }
 };

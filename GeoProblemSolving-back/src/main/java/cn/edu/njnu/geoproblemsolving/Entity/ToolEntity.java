@@ -2,6 +2,7 @@ package cn.edu.njnu.geoproblemsolving.Entity;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -66,6 +67,7 @@ public class ToolEntity {
         return createTime;
     }
 
+    @JsonProperty("tId")
     public void setTId(String tId) {
         this.tId = tId;
     }

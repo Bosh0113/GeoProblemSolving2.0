@@ -42,10 +42,10 @@ public class ToolController {
     }
 
     @RequestMapping(value = "/delete", method = RequestMethod.GET)
-    public String deleteTool(@RequestParam("tid") String tid){
+    public String deleteTool(@RequestParam("tId") String tid){
         ToolDaoImpl toolDao = new ToolDaoImpl(mongoTemplate);
         try {
-            toolDao.deleteTool("tid",tid);
+            toolDao.deleteTool("tId",tid);
             return "Success";
         }catch (Exception e){
             return "Fail";

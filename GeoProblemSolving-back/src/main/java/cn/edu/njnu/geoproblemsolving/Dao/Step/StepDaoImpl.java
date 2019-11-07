@@ -15,11 +15,8 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.UUID;
 
 
 @Component
@@ -79,6 +76,18 @@ public class StepDaoImpl implements IStepDao {
             Query query = new Query(Criteria.where("stepId").is(request.getParameter("stepId")));
             CommonMethod method = new CommonMethod();
             Update update = method.setUpdate(request);
+            if(request.getParameter("toolList")!=null){
+                String newToolList = request.getParameter("toolList");
+                ArrayList<String> toolList =new ArrayList<>();
+                Collections.addAll(toolList, newToolList.split(","));
+                update.set("toolList",toolList);
+            }
+            if(request.getParameter("toolsetList")!=null){
+                String newToolsetList = request.getParameter("toolsetList");
+                ArrayList<String> toolsetList =new ArrayList<>();
+                Collections.addAll(toolsetList, newToolsetList.split(","));
+                update.set("toolsetList",toolsetList);
+            }
             //更新子项目中有向图中的标签
             StepEntity stepEntity = mongoTemplate.findOne(query,StepEntity.class);
             if(request.getParameter("name")!=null&&!stepEntity.getName().equals(request.getParameter("name"))){
