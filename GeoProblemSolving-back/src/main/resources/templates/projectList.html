@@ -130,7 +130,7 @@
     </div>
 
     <div class="tabs">
-        <Row>
+        <Row :style="{minHeight:contentMinHeight+'px'}">
             <i-col>
                 <div class="pro-tab">
                     <Tabs  v-model="currentTab" @on-click="changeTab" >
@@ -171,6 +171,7 @@
                 currentTab:"All",
                 //初始化信息总条数
                 //projectCount:10,
+                contentMinHeight:0,
                 currentPage:1 ,
                 totalCount:projectsInfo.count,
                 //每页显示多少条
@@ -193,6 +194,7 @@
                 freshEle:0
             },
             mounted(){
+                this.resizeContent();
                 //判断用户状态，如果登录，判断project权限，如果否，不判断
                 this.userInfo=JSON.parse(sessionStorage.getItem("userInfo"));
                 if( this.userInfo != null&&this.userInfo.userState){
@@ -208,11 +210,15 @@
                 window.onresize = () => {
                     return (() => {
                         this.$refs.navigationEl.identityMenuCSS();
+                        this.resizeContent();
                     })()
                 }
             },
 
             methods: {
+                resizeContent(){
+                    this.contentMinHeight = window.innerHeight-340.38;
+                },
                 changeTab(type) {
                     this.currentTab=type;
                     this.currentPage=1;

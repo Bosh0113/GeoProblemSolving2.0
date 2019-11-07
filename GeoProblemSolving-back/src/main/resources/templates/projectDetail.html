@@ -108,6 +108,7 @@
             -webkit-box-orient: vertical;
             -webkit-line-clamp: 7;
             overflow: hidden;
+            white-space: pre-line;
         }
         .subProjectExtraP{
             display: flex;
@@ -282,7 +283,7 @@
                                                     <h3>Description:</h3>
                                                     <div class="projectDescriptionContent">
                                                         <vue-scroll :ops="scrollOps">
-                                                            <div id="projectDescription" th:text="${projectInfo.description}">
+                                                            <div id="projectDescription" style="white-space: pre-line;" th:text="${projectInfo.description}">
                                                                 Project description
                                                             </div>
                                                         </vue-scroll>
@@ -292,7 +293,7 @@
                                                     <h3>Introduction:</h3>
                                                     <div class="projectIntroductionContent">
                                                         <vue-scroll :ops="scrollOps">
-                                                            <div id="projectIntroduction" th:text="${projectInfo.introduction}">
+                                                            <div id="projectIntroduction" style="white-space: pre-line;" th:text="${projectInfo.introduction}">
                                                                 Project introduction
                                                             </div>
                                                         </vue-scroll>
@@ -858,10 +859,6 @@
                         inputEmail: [
                         {
                             required: true,
-                            message: "Mailbox cannot be empty",
-                            trigger: "blur"
-                        },
-                        {
                             type: "email",
                             message: "Incorrect email format",
                             trigger: "blur"

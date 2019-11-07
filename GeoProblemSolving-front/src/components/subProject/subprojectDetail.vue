@@ -43,6 +43,7 @@
   min-height: 250px;
   word-break: break-all;
   word-wrap: break-word;
+  white-space: pre-line;
 }
 .operatePanel button {
   margin-right: 2.5%;

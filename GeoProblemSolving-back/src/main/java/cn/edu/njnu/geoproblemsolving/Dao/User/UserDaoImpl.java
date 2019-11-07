@@ -7,6 +7,7 @@ import cn.edu.njnu.geoproblemsolving.Entity.ProjectEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.ResourceEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.SubProjectEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.UserEntity;
+import cn.edu.njnu.geoproblemsolving.View.StaticPagesBuilder;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -149,6 +150,8 @@ public class UserDaoImpl implements IUserDao {
                     Update updateProject = new Update();
                     updateProject.set("members",members);
                     mongoTemplate.updateFirst(queryProject,updateProject,ProjectEntity.class);
+                    StaticPagesBuilder staticPagesBuilder = new StaticPagesBuilder(mongoTemplate);
+                    staticPagesBuilder.projectDetailPageBuilder(projectId);
                     break;
                 }
             }
@@ -163,6 +166,8 @@ public class UserDaoImpl implements IUserDao {
             Update updateProject = new Update();
             updateProject.set("managerName",newUserName);
             mongoTemplate.updateFirst(queryProject,updateProject,ProjectEntity.class);
+            StaticPagesBuilder staticPagesBuilder = new StaticPagesBuilder(mongoTemplate);
+            staticPagesBuilder.projectDetailPageBuilder(projectId);
             updateAllSubProjectForUserName(projectId,userId,newUserName);
         }
 
