@@ -15,6 +15,24 @@ public class SubProjectEntity {
     private JSONArray members;
     private String createTime;
     private String solvingProcess;
+    private String background;
+    private String limitation;
+
+    public String getBackground() {
+        return background;
+    }
+
+    public String getLimitation() {
+        return limitation;
+    }
+
+    public void setBackground(String background) {
+        this.background = background;
+    }
+
+    public void setLimitation(String limitation) {
+        this.limitation = limitation;
+    }
 
     public String getManagerName() {
         return managerName;
