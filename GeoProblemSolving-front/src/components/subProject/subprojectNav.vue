@@ -21,16 +21,16 @@
           <Icon type="md-arrow-round-back" size="30" />
         </MenuItem>
         <MenuItem name="info" style="padding-left: 16px;" title="Subproject introduction">
-          <Icon type="md-globe" size="30" />
+          <Icon type="ios-information-circle" size="30"/>
         </MenuItem>
         <MenuItem name="resource" style="padding-left: 16px;" title="Subproject resources">
-          <Icon type="ios-cloud-outline" size="30" />
+          <Icon type="ios-folder" size="30" />
         </MenuItem>
         <MenuItem name="process" style="padding-left: 16px;" title="Working steps">
-          <Icon type="ios-git-network" size="30" />
+          <Icon type="md-git-branch" size="30" />
         </MenuItem>
         <MenuItem name="task" style="padding-left: 16px;" title="Task arrangement">
-          <Icon type="ios-calendar-outline" size="30" />
+          <Icon type="md-calendar" size="30" />
         </MenuItem>
       </Menu>
       <div style="font-size:1.5rem;height:60px;padding-top:10px;border:1px solid lightgrey">

@@ -741,6 +741,8 @@ export default {
         this.getInheritResource();
         // 创建步骤模态框
         this.createStepModal = true;
+        this.stepValue = 0;
+        
       } else if (this.formValidate1.stepTitle == "") {
         this.$Notice.info({
           desc: "The name of new step should not be empty!"
