@@ -153,7 +153,7 @@ img {
       title="Reset password board"
     >
       <div class="resetReuseDiv">
-        <span class="reciverSpan">reciever:</span>
+        <span class="reciverSpan">Reciever:</span>
         <Input v-model="loginForm.user" />
       </div>
       <div class="resetReuseDiv">

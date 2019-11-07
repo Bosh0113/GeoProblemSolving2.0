@@ -1,0 +1,179 @@
+
+                <!DOCTYPE html>
+                <html lang="en"> 
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                    <title>SAGA TOOL</title>
+                    <link rel="stylesheet" href="../css/bootstrap.min.css">
+                    <style>
+                        body {
+                            margin: 10px;
+                            margin-bottom: 20px;
+                            min-width: 700px;
+                        }
+
+                        th {
+                            text-align: center;
+                            font-size: 18px;
+                        }
+
+                        td,
+                        th {
+                            padding: 2px;
+                        }
+                        .progress{
+                            margin-bottom: 0px;
+                            display: none;
+                        }
+                    </style>
+                </head>
+
+                <body>
+
+                    <div id="desc_content">
+                        
+            <h4>Tool</h4>
+            <table border="0" >
+                <tr>
+                    <td valign="top"><b>Name</b></td>
+                    <td valign="top">Least Cost Paths</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>ID</b></td>
+                    <td valign="top">5</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>Author</b></td>
+                    <td valign="top">O. Conrad, V. Olaya, V. Wichmann (c) 2004-2010</td>
+                </tr>
+            </table>
+            <hr>
+            <h4>Description</h4>
+            <hr>
+            <h4>Parameters</h4>
+            <table tool_id="5"
+            oid="5b90e7bbd15d75093cb58713"
+            stateId="D0765B7F-85BF-4de6-A2EE-43E805532B3E"
+            mdlId="8F37BACF-D3A8-469b-AAA7-1997F61DA065" border="1" width="100%" valign="top" cellpadding="6" rules="all">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Identifier</th>
+                        <th>Description</th>
+                        <th>Constraints</th>
+                        <th>Settings</th>
+                    </tr>
+                
+                <thead>
+                    <tr> 
+                    <th colspan="6">Input</th>
+                    </tr>
+                </thead>
+
+                <tbody id="input_body">
+                    
+            
+            <tr>
+            <td>Source Point(s)</td>
+            <td>Shapes (input)</td>
+            <td>SOURCE</td>
+            <td>Point shapefile with source point(s)</td>
+            <td></td>
+            <td>
+                <input type="file" id="SOURCE" accept="application/zip" optional="false" data_type="Shapes (input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Accumulated Cost Surface</td>
+            <td>Grid (input)</td>
+            <td>DEM</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="DEM" accept="application/zip" optional="false" data_type="Grid (input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Values</td>
+            <td>Grid list (optional input)</td>
+            <td>VALUES</td>
+            <td>Allows writing cell values from additional grids to the output</td>
+            <td></td>
+            <td>
+                <input type="file" id="VALUES" accept="application/zip" optional="true" data_type="Grid list (optional input)" multiple="multiple"></input>
+            </td>
+            </tr>
+        
+        
+                </tbody>
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Options</th>
+                    </tr>
+                </thead>
+                <tbody id="options_body">
+                    
+        
+            <tr>
+                <td>Grid system</td>
+                <td>Grid system</td>
+                <td>PARAMETERS_GRID_SYSTEM</td>
+                <td></td>
+                <td></td>
+                <td>
+                <input type="text" id="PARAMETERS_GRID_SYSTEM" class="form-control" value="">
+                </td>
+            </tr>
+                </tbody> 
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Output</th>
+                    </tr>
+                </thead>
+
+                <tbody id="output_body">
+                
+            
+            <tr>
+            <td>Profile Points</td>
+            <td>Shapes list (output)</td>
+            <td>POINTS</td>
+            <td>Least cost path profile points</td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="POINTS" optional="false" data_type="Shapes list (output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Profile Lines</td>
+            <td>Shapes list (output)</td>
+            <td>LINE</td>
+            <td>Least cost path profile lines</td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="LINE" optional="false" data_type="Shapes list (output)">Download Data</a></td>
+            </tr>
+        
+         
+                </tbody>
+                
+            </table>(*) <i>optional</i>
+            <div class="progress">
+                <div id="progressbar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="60"
+                    aria-valuemin="0" aria-valuemax="100" style="width: 10%"> 
+                </div>
+            </div>
+            <button type="button" style="float: right;margin-top: 20px; margin-bottom: 20px; margin-right: 30px;width: 100px;tab-size: 28px" class="btn btn-success" onclick="onRunButtonClick()">Run
+            </button>
+            
+                    </div>
+                    <script src="../js/jquery-3.4.1.js"></script>
+                    <script src="../js/bootstrap.min.js"></script>
+                    <script src="../js/runModel.js"></script>
+                </body> 
+                </html>

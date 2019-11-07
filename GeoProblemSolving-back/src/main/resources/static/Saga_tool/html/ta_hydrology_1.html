@@ -1,0 +1,325 @@
+
+                <!DOCTYPE html>
+                <html lang="en"> 
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                    <title>SAGA TOOL</title>
+                    <link rel="stylesheet" href="../css/bootstrap.min.css">
+                    <style>
+                        body {
+                            margin: 10px;
+                            margin-bottom: 20px;
+                            min-width: 700px;
+                        }
+
+                        th {
+                            text-align: center;
+                            font-size: 18px;
+                        }
+
+                        td,
+                        th {
+                            padding: 2px;
+                        }
+                        .progress{
+                            margin-bottom: 0px;
+                            display: none;
+                        }
+                    </style>
+                </head>
+
+                <body>
+
+                    <div id="desc_content">
+                        
+            <h4>Tool</h4>
+            <table border="0" >
+                <tr>
+                    <td valign="top"><b>Name</b></td>
+                    <td valign="top">Flow Accumulation (Recursive)</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>ID</b></td>
+                    <td valign="top">1</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>Author</b></td>
+                    <td valign="top">O.Conrad (c) 2001</td>
+                </tr>
+            </table>
+            <hr>
+            <h4>Description</h4>
+            <hr>
+            <h4>Parameters</h4>
+            <table tool_id="1"
+            oid="5b90e7bbd15d75093cb588b3"
+            stateId="2C751511-221B-4960-900B-CF039144EFF0"
+            mdlId="DE6C5B7C-1D99-403b-AE17-7F2689D53952" border="1" width="100%" valign="top" cellpadding="6" rules="all">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Identifier</th>
+                        <th>Description</th>
+                        <th>Constraints</th>
+                        <th>Settings</th>
+                    </tr>
+                
+                <thead>
+                    <tr> 
+                    <th colspan="6">Input</th>
+                    </tr>
+                </thead>
+
+                <tbody id="input_body">
+                    
+            
+            <tr>
+            <td>Elevation</td>
+            <td>Grid (input)</td>
+            <td>ELEVATION</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="ELEVATION" accept="application/zip" optional="false" data_type="Grid (input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Sink Routes</td>
+            <td>Grid (optional input)</td>
+            <td>SINKROUTE</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="SINKROUTE" accept="application/zip" optional="true" data_type="Grid (optional input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Weights</td>
+            <td>Grid (optional input)</td>
+            <td>WEIGHTS</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="WEIGHTS" accept="application/zip" optional="true" data_type="Grid (optional input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Input for Mean over Catchment</td>
+            <td>Grid (optional input)</td>
+            <td>VAL_INPUT</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="VAL_INPUT" accept="application/zip" optional="true" data_type="Grid (optional input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Material for Accumulation</td>
+            <td>Grid (optional input)</td>
+            <td>ACCU_MATERIAL</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="ACCU_MATERIAL" accept="application/zip" optional="true" data_type="Grid (optional input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Accumulation Target</td>
+            <td>Grid (input)</td>
+            <td>ACCU_TARGET</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="ACCU_TARGET" accept="application/zip" optional="false" data_type="Grid (input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Target Areas</td>
+            <td>Grid (optional input)</td>
+            <td>TARGETS</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="TARGETS" accept="application/zip" optional="true" data_type="Grid (optional input)"></input>
+            </td>
+            </tr>
+        
+        
+                </tbody>
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Options</th>
+                    </tr>
+                </thead>
+                <tbody id="options_body">
+                    
+        
+            <tr>
+                <td>Step</td>
+                <td>Integer</td>
+                <td>STEP</td>
+                <td></td>
+                <td>Minimum: 1
+Default: 1</td>
+                <td>
+                <input type="text" id="STEP" class="form-control" value="1">
+                </td>
+            </tr>,
+            <tr>
+                <td>Flow Accumulation Unit</td>
+                <td>Choice</td>
+                <td>FLOW_UNIT</td>
+                <td></td>
+                <td>Available Choices:
+[0] number of cells
+[1] cell area
+Default: 1</td>
+                <td>
+                
+        <select class="form-control" id="FLOW_UNIT">
+            <option value="0">[0] number of cells</option>,<option value="1">[1] cell area</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Method</td>
+                <td>Choice</td>
+                <td>METHOD</td>
+                <td></td>
+                <td>Available Choices:
+[0] Deterministic 8
+[1] Rho 8
+[2] Deterministic Infinity
+[3] Multiple m_Flow Direction
+Default: 3</td>
+                <td>
+                
+        <select class="form-control" id="METHOD">
+            <option value="0">[0] Deterministic 8</option>,<option value="1">[1] Rho 8</option>,<option value="2">[2] Deterministic Infinity</option>,<option value="3">[3] Multiple m_Flow Direction</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Convergence</td>
+                <td>Floating point</td>
+                <td>CONVERGENCE</td>
+                <td>Convergence factor for Multiple m_Flow Direction Algorithm (Freeman 1991)</td>
+                <td>Default: 1.100000</td>
+                <td>
+                <input type="text" id="CONVERGENCE" class="form-control" value="1.100000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Prevent Negative Flow Accumulation</td>
+                <td>Boolean</td>
+                <td>NO_NEGATIVES</td>
+                <td>when using weights: do not transport negative flow, set it to zero instead; useful e.g. when accumulating measures of water balance.</td>
+                <td>Default: 1</td>
+                <td>
+                <input type="text" id="NO_NEGATIVES" class="form-control" value="1">
+                </td>
+            </tr>
+                </tbody> 
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Output</th>
+                    </tr>
+                </thead>
+
+                <tbody id="output_body">
+                
+            
+            <tr>
+            <td>Flow Accumulation</td>
+            <td>Grid (output)</td>
+            <td>FLOW</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="FLOW" optional="false" data_type="Grid (output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Mean over Catchment</td>
+            <td>Grid (output)</td>
+            <td>VAL_MEAN</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="VAL_MEAN" optional="false" data_type="Grid (output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Accumulated Material</td>
+            <td>Grid (optional output)</td>
+            <td>ACCU_TOTAL</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="ACCU_TOTAL" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Accumulated Material (Left Side)</td>
+            <td>Grid (optional output)</td>
+            <td>ACCU_LEFT</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="ACCU_LEFT" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Accumulated Material (Right Side)</td>
+            <td>Grid (optional output)</td>
+            <td>ACCU_RIGHT</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="ACCU_RIGHT" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Flow Path Length</td>
+            <td>Grid (optional output)</td>
+            <td>FLOW_LENGTH</td>
+            <td>average distance that a cell's accumulated flow travelled</td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="FLOW_LENGTH" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Loss through Negative Weights</td>
+            <td>Grid (optional output)</td>
+            <td>WEIGHT_LOSS</td>
+            <td>when using weights without support for negative flow: output of the absolute amount of negative flow that occurred</td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="WEIGHT_LOSS" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        
+         
+                </tbody>
+                
+            </table>(*) <i>optional</i>
+            <div class="progress">
+                <div id="progressbar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="60"
+                    aria-valuemin="0" aria-valuemax="100" style="width: 10%"> 
+                </div>
+            </div>
+            <button type="button" style="float: right;margin-top: 20px; margin-bottom: 20px; margin-right: 30px;width: 100px;tab-size: 28px" class="btn btn-success" onclick="onRunButtonClick()">Run
+            </button>
+            
+                    </div>
+                    <script src="../js/jquery-3.4.1.js"></script>
+                    <script src="../js/bootstrap.min.js"></script>
+                    <script src="../js/runModel.js"></script>
+                </body> 
+                </html>

@@ -1,0 +1,277 @@
+
+                <!DOCTYPE html>
+                <html lang="en"> 
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                    <title>SAGA TOOL</title>
+                    <link rel="stylesheet" href="../css/bootstrap.min.css">
+                    <style>
+                        body {
+                            margin: 10px;
+                            margin-bottom: 20px;
+                            min-width: 700px;
+                        }
+
+                        th {
+                            text-align: center;
+                            font-size: 18px;
+                        }
+
+                        td,
+                        th {
+                            padding: 2px;
+                        }
+                        .progress{
+                            margin-bottom: 0px;
+                            display: none;
+                        }
+                    </style>
+                </head>
+
+                <body>
+
+                    <div id="desc_content">
+                        
+            <h4>Tool</h4>
+            <table border="0" >
+                <tr>
+                    <td valign="top"><b>Name</b></td>
+                    <td valign="top">Constant Grid</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>ID</b></td>
+                    <td valign="top">4</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>Author</b></td>
+                    <td valign="top">Victor Olaya (c) 2004</td>
+                </tr>
+            </table>
+            <hr>
+            <h4>Description</h4>
+            <hr>
+            <h4>Parameters</h4>
+            <table tool_id="4"
+            oid="5b90e7bbd15d75093cb58770"
+            stateId="7194CC0F-E1ED-47af-A8D1-97D3400D983F"
+            mdlId="4FEA2C92-BC6F-4f31-83F7-E185A9C09BD4" border="1" width="100%" valign="top" cellpadding="6" rules="all">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Identifier</th>
+                        <th>Description</th>
+                        <th>Constraints</th>
+                        <th>Settings</th>
+                    </tr>
+                
+                <thead>
+                    <tr> 
+                    <th colspan="6">Input</th>
+                    </tr>
+                </thead>
+
+                <tbody id="input_body">
+                    
+            
+            <tr>
+            <td>Target System</td>
+            <td>Grid (optional input)</td>
+            <td>TEMPLATE</td>
+            <td>use this grid's system for output grids</td>
+            <td></td>
+            <td>
+                <input type="file" id="TEMPLATE" accept="application/zip" optional="true" data_type="Grid (optional input)"></input>
+            </td>
+            </tr>
+        
+        
+                </tbody>
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Options</th>
+                    </tr>
+                </thead>
+                <tbody id="options_body">
+                    
+        
+            <tr>
+                <td>Name</td>
+                <td>Text</td>
+                <td>NAME</td>
+                <td></td>
+                <td>Default: Constant Grid</td>
+                <td>
+                <input type="text" id="NAME" class="form-control" value="Constant Grid">
+                </td>
+            </tr>,
+            <tr>
+                <td>Constant Value</td>
+                <td>Floating point</td>
+                <td>CONST</td>
+                <td></td>
+                <td>Default: 1.000000</td>
+                <td>
+                <input type="text" id="CONST" class="form-control" value="1.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Data Type</td>
+                <td>Choice</td>
+                <td>TYPE</td>
+                <td></td>
+                <td>Available Choices:
+[0] bit
+[1] unsigned 1 byte integer
+[2] signed 1 byte integer
+[3] unsigned 2 byte integer
+[4] signed 2 byte integer
+[5] unsigned 8 byte integer
+[6] signed 8 byte integer
+[7] 4 byte floating point number
+[8] 8 byte floating point number
+Default: 7</td>
+                <td>
+                
+        <select class="form-control" id="TYPE">
+            <option value="0">[0] bit</option>,<option value="1">[1] unsigned 1 byte integer</option>,<option value="2">[2] signed 1 byte integer</option>,<option value="3">[3] unsigned 2 byte integer</option>,<option value="4">[4] signed 2 byte integer</option>,<option value="5">[5] unsigned 8 byte integer</option>,<option value="6">[6] signed 8 byte integer</option>,<option value="7">[7] 4 byte floating point number</option>,<option value="8">[8] 8 byte floating point number</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Target Grid System</td>
+                <td>Choice</td>
+                <td>DEFINITION</td>
+                <td></td>
+                <td>Available Choices:
+[0] user defined
+[1] grid or grid system
+Default: 0</td>
+                <td>
+                
+        <select class="form-control" id="DEFINITION">
+            <option value="0">[0] user defined</option>,<option value="1">[1] grid or grid system</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Cellsize</td>
+                <td>Floating point</td>
+                <td>USER_SIZE</td>
+                <td></td>
+                <td>Minimum: 0.000000
+Default: 1.000000</td>
+                <td>
+                <input type="text" id="USER_SIZE" class="form-control" value="1.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Left</td>
+                <td>Floating point</td>
+                <td>USER_XMIN</td>
+                <td></td>
+                <td>Default: 0.000000</td>
+                <td>
+                <input type="text" id="USER_XMIN" class="form-control" value="0.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Right</td>
+                <td>Floating point</td>
+                <td>USER_XMAX</td>
+                <td></td>
+                <td>Default: 100.000000</td>
+                <td>
+                <input type="text" id="USER_XMAX" class="form-control" value="100.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Bottom</td>
+                <td>Floating point</td>
+                <td>USER_YMIN</td>
+                <td></td>
+                <td>Default: 0.000000</td>
+                <td>
+                <input type="text" id="USER_YMIN" class="form-control" value="0.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Top</td>
+                <td>Floating point</td>
+                <td>USER_YMAX</td>
+                <td></td>
+                <td>Default: 100.000000</td>
+                <td>
+                <input type="text" id="USER_YMAX" class="form-control" value="100.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Fit</td>
+                <td>Choice</td>
+                <td>USER_FITS</td>
+                <td></td>
+                <td>Available Choices:
+[0] nodes
+[1] cells
+Default: 0</td>
+                <td>
+                
+        <select class="form-control" id="USER_FITS">
+            <option value="0">[0] nodes</option>,<option value="1">[1] cells</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Grid System</td>
+                <td>Grid system</td>
+                <td>SYSTEM</td>
+                <td></td>
+                <td></td>
+                <td>
+                <input type="text" id="SYSTEM" class="form-control" value="">
+                </td>
+            </tr>
+                </tbody> 
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Output</th>
+                    </tr>
+                </thead>
+
+                <tbody id="output_body">
+                
+            
+            <tr>
+            <td>Target Grid</td>
+            <td>Grid (output)</td>
+            <td>OUT_GRID</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="OUT_GRID" optional="false" data_type="Grid (output)">Download Data</a></td>
+            </tr>
+        
+         
+                </tbody>
+                
+            </table>(*) <i>optional</i>
+            <div class="progress">
+                <div id="progressbar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="60"
+                    aria-valuemin="0" aria-valuemax="100" style="width: 10%"> 
+                </div>
+            </div>
+            <button type="button" style="float: right;margin-top: 20px; margin-bottom: 20px; margin-right: 30px;width: 100px;tab-size: 28px" class="btn btn-success" onclick="onRunButtonClick()">Run
+            </button>
+            
+                    </div>
+                    <script src="../js/jquery-3.4.1.js"></script>
+                    <script src="../js/bootstrap.min.js"></script>
+                    <script src="../js/runModel.js"></script>
+                </body> 
+                </html>

@@ -1,0 +1,261 @@
+
+                <!DOCTYPE html>
+                <html lang="en"> 
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                    <title>SAGA TOOL</title>
+                    <link rel="stylesheet" href="../css/bootstrap.min.css">
+                    <style>
+                        body {
+                            margin: 10px;
+                            margin-bottom: 20px;
+                            min-width: 700px;
+                        }
+
+                        th {
+                            text-align: center;
+                            font-size: 18px;
+                        }
+
+                        td,
+                        th {
+                            padding: 2px;
+                        }
+                        .progress{
+                            margin-bottom: 0px;
+                            display: none;
+                        }
+                    </style>
+                </head>
+
+                <body>
+
+                    <div id="desc_content">
+                        
+            <h4>Tool</h4>
+            <table border="0" >
+                <tr>
+                    <td valign="top"><b>Name</b></td>
+                    <td valign="top">Isochrones Variable Speed</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>ID</b></td>
+                    <td valign="top">9</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>Author</b></td>
+                    <td valign="top">V.Olaya (c) 2004, V.Wichmann (c) 2015</td>
+                </tr>
+            </table>
+            <hr>
+            <h4>Description</h4>
+            <hr>
+            <h4>Parameters</h4>
+            <table tool_id="9"
+            oid="5b90e7bbd15d75093cb588cd"
+            stateId="4D0DAF35-1FE2-47d9-A1AA-E360CF6ADD91"
+            mdlId="40B3B5E1-4442-42cd-B72A-9B7B5DEFE4DD" border="1" width="100%" valign="top" cellpadding="6" rules="all">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Identifier</th>
+                        <th>Description</th>
+                        <th>Constraints</th>
+                        <th>Settings</th>
+                    </tr>
+                
+                <thead>
+                    <tr> 
+                    <th colspan="6">Input</th>
+                    </tr>
+                </thead>
+
+                <tbody id="input_body">
+                    
+            
+            <tr>
+            <td>Elevation</td>
+            <td>Grid (input)</td>
+            <td>DEM</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="DEM" accept="application/zip" optional="false" data_type="Grid (input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Slope</td>
+            <td>Grid (input)</td>
+            <td>SLOPE</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="SLOPE" accept="application/zip" optional="false" data_type="Grid (input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Catchment Area</td>
+            <td>Grid (input)</td>
+            <td>FLOWACC</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="FLOWACC" accept="application/zip" optional="false" data_type="Grid (input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Curve Number</td>
+            <td>Grid (optional input)</td>
+            <td>CN</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="CN" accept="application/zip" optional="true" data_type="Grid (optional input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Manning's N</td>
+            <td>Grid (optional input)</td>
+            <td>MANNING</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="MANNING" accept="application/zip" optional="true" data_type="Grid (optional input)"></input>
+            </td>
+            </tr>
+        
+        
+                </tbody>
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Options</th>
+                    </tr>
+                </thead>
+                <tbody id="options_body">
+                    
+        
+            <tr>
+                <td>Avg. Manning's N</td>
+                <td>Floating point</td>
+                <td>AVGMANNING</td>
+                <td></td>
+                <td>Default: 0.150000</td>
+                <td>
+                <input type="text" id="AVGMANNING" class="form-control" value="0.150000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Avg. Curve Number</td>
+                <td>Floating point</td>
+                <td>AVGCN</td>
+                <td></td>
+                <td>Default: 75.000000</td>
+                <td>
+                <input type="text" id="AVGCN" class="form-control" value="75.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Mixed Flow Threshold (ha)</td>
+                <td>Floating point</td>
+                <td>THRSMIXED</td>
+                <td></td>
+                <td>Default: 18.000000</td>
+                <td>
+                <input type="text" id="THRSMIXED" class="form-control" value="18.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Channel Definition Threshold (ha)</td>
+                <td>Floating point</td>
+                <td>THRSCHANNEL</td>
+                <td></td>
+                <td>Default: 360.000000</td>
+                <td>
+                <input type="text" id="THRSCHANNEL" class="form-control" value="360.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Avg. Rainfall Intensity (mm/h)</td>
+                <td>Floating point</td>
+                <td>AVGRAINFALL</td>
+                <td></td>
+                <td>Default: 1.000000</td>
+                <td>
+                <input type="text" id="AVGRAINFALL" class="form-control" value="1.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Channel side slope(m/m)</td>
+                <td>Floating point</td>
+                <td>CHANSLOPE</td>
+                <td></td>
+                <td>Default: 0.500000</td>
+                <td>
+                <input type="text" id="CHANSLOPE" class="form-control" value="0.500000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Min. Flow Speed (m/s)</td>
+                <td>Floating point</td>
+                <td>MINSPEED</td>
+                <td></td>
+                <td>Default: 0.050000</td>
+                <td>
+                <input type="text" id="MINSPEED" class="form-control" value="0.050000">
+                </td>
+            </tr>
+                </tbody> 
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Output</th>
+                    </tr>
+                </thead>
+
+                <tbody id="output_body">
+                
+            
+            <tr>
+            <td>Time Out(h)</td>
+            <td>Grid (output)</td>
+            <td>TIME</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="TIME" optional="false" data_type="Grid (output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Speed (m/s)</td>
+            <td>Grid (output)</td>
+            <td>SPEED</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="SPEED" optional="false" data_type="Grid (output)">Download Data</a></td>
+            </tr>
+        
+         
+                </tbody>
+                
+            </table>(*) <i>optional</i>
+            <div class="progress">
+                <div id="progressbar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="60"
+                    aria-valuemin="0" aria-valuemax="100" style="width: 10%"> 
+                </div>
+            </div>
+            <button type="button" style="float: right;margin-top: 20px; margin-bottom: 20px; margin-right: 30px;width: 100px;tab-size: 28px" class="btn btn-success" onclick="onRunButtonClick()">Run
+            </button>
+            
+                    </div>
+                    <script src="../js/jquery-3.4.1.js"></script>
+                    <script src="../js/bootstrap.min.js"></script>
+                    <script src="../js/runModel.js"></script>
+                </body> 
+                </html>

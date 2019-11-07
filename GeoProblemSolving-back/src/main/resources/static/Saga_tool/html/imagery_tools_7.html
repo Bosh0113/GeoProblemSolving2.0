@@ -1,0 +1,232 @@
+
+                <!DOCTYPE html>
+                <html lang="en"> 
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                    <title>SAGA TOOL</title>
+                    <link rel="stylesheet" href="../css/bootstrap.min.css">
+                    <style>
+                        body {
+                            margin: 10px;
+                            margin-bottom: 20px;
+                            min-width: 700px;
+                        }
+
+                        th {
+                            text-align: center;
+                            font-size: 18px;
+                        }
+
+                        td,
+                        th {
+                            padding: 2px;
+                        }
+                        .progress{
+                            margin-bottom: 0px;
+                            display: none;
+                        }
+                    </style>
+                </head>
+
+                <body>
+
+                    <div id="desc_content">
+                        
+            <h4>Tool</h4>
+            <table border="0" >
+                <tr>
+                    <td valign="top"><b>Name</b></td>
+                    <td valign="top">Principle Components Based Image Sharpening</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>ID</b></td>
+                    <td valign="top">7</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>Author</b></td>
+                    <td valign="top">O.Conrad (c) 2011</td>
+                </tr>
+            </table>
+            <hr>
+            <h4>Description</h4>
+            <hr>
+            <h4>Parameters</h4>
+            <table tool_id="7"
+            oid="5b90e7bbd15d75093cb5879a"
+            stateId="B03839B4-7605-4ea2-A759-7D1C88C64AF9"
+            mdlId="492D7AF4-3141-4515-BB37-E40C3DDBB670" border="1" width="100%" valign="top" cellpadding="6" rules="all">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Identifier</th>
+                        <th>Description</th>
+                        <th>Constraints</th>
+                        <th>Settings</th>
+                    </tr>
+                
+                <thead>
+                    <tr> 
+                    <th colspan="6">Input</th>
+                    </tr>
+                </thead>
+
+                <tbody id="input_body">
+                    
+            
+            <tr>
+            <td>Original Channels</td>
+            <td>Grid list (input)</td>
+            <td>GRIDS</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="GRIDS" accept="application/zip" optional="false" data_type="Grid list (input)" multiple="multiple"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Panchromatic Channel</td>
+            <td>Grid (input)</td>
+            <td>PAN</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="PAN" accept="application/zip" optional="false" data_type="Grid (input)"></input>
+            </td>
+            </tr>
+        
+        
+                </tbody>
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Options</th>
+                    </tr>
+                </thead>
+                <tbody id="options_body">
+                    
+        
+            <tr>
+                <td>Grid system</td>
+                <td>Grid system</td>
+                <td>PARAMETERS_GRID_SYSTEM</td>
+                <td></td>
+                <td></td>
+                <td>
+                <input type="text" id="PARAMETERS_GRID_SYSTEM" class="form-control" value="">
+                </td>
+            </tr>,
+            <tr>
+                <td>Low Resolution</td>
+                <td>Grid system</td>
+                <td>LO_RES</td>
+                <td></td>
+                <td></td>
+                <td>
+                <input type="text" id="LO_RES" class="form-control" value="">
+                </td>
+            </tr>,
+            <tr>
+                <td>Method</td>
+                <td>Choice</td>
+                <td>METHOD</td>
+                <td></td>
+                <td>Available Choices:
+[0] correlation matrix
+[1] variance-covariance matrix
+[2] sums-of-squares-and-cross-products matrix
+Default: 1</td>
+                <td>
+                
+        <select class="form-control" id="METHOD">
+            <option value="0">[0] correlation matrix</option>,<option value="1">[1] variance-covariance matrix</option>,<option value="2">[2] sums-of-squares-and-cross-products matrix</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Resampling</td>
+                <td>Choice</td>
+                <td>RESAMPLING</td>
+                <td></td>
+                <td>Available Choices:
+[0] nearest neighbour
+[1] bilinear
+[2] cubic convolution
+Default: 2</td>
+                <td>
+                
+        <select class="form-control" id="RESAMPLING">
+            <option value="0">[0] nearest neighbour</option>,<option value="1">[1] bilinear</option>,<option value="2">[2] cubic convolution</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Panchromatic Channel Matching</td>
+                <td>Choice</td>
+                <td>PAN_MATCH</td>
+                <td></td>
+                <td>Available Choices:
+[0] normalized
+[1] standardized
+Default: 1</td>
+                <td>
+                
+        <select class="form-control" id="PAN_MATCH">
+            <option value="0">[0] normalized</option>,<option value="1">[1] standardized</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Overwrite</td>
+                <td>Boolean</td>
+                <td>OVERWRITE</td>
+                <td>overwrite previous output if adequate</td>
+                <td>Default: 1</td>
+                <td>
+                <input type="text" id="OVERWRITE" class="form-control" value="1">
+                </td>
+            </tr>
+                </tbody> 
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Output</th>
+                    </tr>
+                </thead>
+
+                <tbody id="output_body">
+                
+            
+            <tr>
+            <td>Sharpened Channels</td>
+            <td>Grid list (output)</td>
+            <td>SHARPEN</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="SHARPEN" optional="false" data_type="Grid list (output)">Download Data</a></td>
+            </tr>
+        
+         
+                </tbody>
+                
+            </table>(*) <i>optional</i>
+            <div class="progress">
+                <div id="progressbar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="60"
+                    aria-valuemin="0" aria-valuemax="100" style="width: 10%"> 
+                </div>
+            </div>
+            <button type="button" style="float: right;margin-top: 20px; margin-bottom: 20px; margin-right: 30px;width: 100px;tab-size: 28px" class="btn btn-success" onclick="onRunButtonClick()">Run
+            </button>
+            
+                    </div>
+                    <script src="../js/jquery-3.4.1.js"></script>
+                    <script src="../js/bootstrap.min.js"></script>
+                    <script src="../js/runModel.js"></script>
+                </body> 
+                </html>

@@ -47,7 +47,7 @@ public class StepController {
     }
 
     @RequestMapping(value = "/update", produces = {"application/json;charset=UTF-8"}, method = RequestMethod.POST)
-    public String updateModule(HttpServletRequest request){
+    public String updateStep(HttpServletRequest request){
         StepDaoImpl stepDao = new StepDaoImpl(mongoTemplate);
         return stepDao.updateStep(request);
     }

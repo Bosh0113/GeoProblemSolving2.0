@@ -1,0 +1,237 @@
+
+                <!DOCTYPE html>
+                <html lang="en"> 
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                    <title>SAGA TOOL</title>
+                    <link rel="stylesheet" href="../css/bootstrap.min.css">
+                    <style>
+                        body {
+                            margin: 10px;
+                            margin-bottom: 20px;
+                            min-width: 700px;
+                        }
+
+                        th {
+                            text-align: center;
+                            font-size: 18px;
+                        }
+
+                        td,
+                        th {
+                            padding: 2px;
+                        }
+                        .progress{
+                            margin-bottom: 0px;
+                            display: none;
+                        }
+                    </style>
+                </head>
+
+                <body>
+
+                    <div id="desc_content">
+                        
+            <h4>Tool</h4>
+            <table border="0" >
+                <tr>
+                    <td valign="top"><b>Name</b></td>
+                    <td valign="top">K-Means Clustering for Grids</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>ID</b></td>
+                    <td valign="top">1</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>Author</b></td>
+                    <td valign="top">O.Conrad (c) 2001</td>
+                </tr>
+            </table>
+            <hr>
+            <h4>Description</h4>
+            <hr>
+            <h4>Parameters</h4>
+            <table tool_id="1"
+            oid="5b90e7bbd15d75093cb5877f"
+            stateId="758CFDCD-C96E-4006-A9A1-4EB931B2BFD8"
+            mdlId="DCF77DBE-B7E1-48f0-B51E-447A538D7E2B" border="1" width="100%" valign="top" cellpadding="6" rules="all">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Identifier</th>
+                        <th>Description</th>
+                        <th>Constraints</th>
+                        <th>Settings</th>
+                    </tr>
+                
+                <thead>
+                    <tr> 
+                    <th colspan="6">Input</th>
+                    </tr>
+                </thead>
+
+                <tbody id="input_body">
+                    
+            
+            <tr>
+            <td>Grids</td>
+            <td>Grid list (input)</td>
+            <td>GRIDS</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="GRIDS" accept="application/zip" optional="false" data_type="Grid list (input)" multiple="multiple"></input>
+            </td>
+            </tr>
+        
+        
+                </tbody>
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Options</th>
+                    </tr>
+                </thead>
+                <tbody id="options_body">
+                    
+        
+            <tr>
+                <td>Grid system</td>
+                <td>Grid system</td>
+                <td>PARAMETERS_GRID_SYSTEM</td>
+                <td></td>
+                <td></td>
+                <td>
+                <input type="text" id="PARAMETERS_GRID_SYSTEM" class="form-control" value="">
+                </td>
+            </tr>,
+            <tr>
+                <td>Method</td>
+                <td>Choice</td>
+                <td>METHOD</td>
+                <td></td>
+                <td>Available Choices:
+[0] Iterative Minimum Distance (Forgy 1965)
+[1] Hill-Climbing (Rubin 1967)
+[2] Combined Minimum Distance / Hillclimbing
+Default: 1</td>
+                <td>
+                
+        <select class="form-control" id="METHOD">
+            <option value="0">[0] Iterative Minimum Distance (Forgy 1965)</option>,<option value="1">[1] Hill-Climbing (Rubin 1967)</option>,<option value="2">[2] Combined Minimum Distance / Hillclimbing</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Clusters</td>
+                <td>Integer</td>
+                <td>NCLUSTER</td>
+                <td>Number of clusters</td>
+                <td>Minimum: 2
+Default: 10</td>
+                <td>
+                <input type="text" id="NCLUSTER" class="form-control" value="10">
+                </td>
+            </tr>,
+            <tr>
+                <td>Maximum Iterations</td>
+                <td>Integer</td>
+                <td>MAXITER</td>
+                <td>maximum number of iterations, ignored if set to zero (default)</td>
+                <td>Minimum: 0
+Default: 0</td>
+                <td>
+                <input type="text" id="MAXITER" class="form-control" value="0">
+                </td>
+            </tr>,
+            <tr>
+                <td>Normalise</td>
+                <td>Boolean</td>
+                <td>NORMALISE</td>
+                <td>Automatically normalise grids by standard deviation before clustering.</td>
+                <td>Default: 0</td>
+                <td>
+                <input type="text" id="NORMALISE" class="form-control" value="0">
+                </td>
+            </tr>,
+            <tr>
+                <td>Update Colors from Features</td>
+                <td>Boolean</td>
+                <td>RGB_COLORS</td>
+                <td>Use the first three features in list to obtain blue, green, red components for class colour in look-up table.</td>
+                <td>Default: 1</td>
+                <td>
+                <input type="text" id="RGB_COLORS" class="form-control" value="1">
+                </td>
+            </tr>,
+            <tr>
+                <td>Old Version</td>
+                <td>Boolean</td>
+                <td>OLDVERSION</td>
+                <td>slower but memory saving</td>
+                <td>Default: 0</td>
+                <td>
+                <input type="text" id="OLDVERSION" class="form-control" value="0">
+                </td>
+            </tr>,
+            <tr>
+                <td>Update View</td>
+                <td>Boolean</td>
+                <td>UPDATEVIEW</td>
+                <td></td>
+                <td>Default: 1</td>
+                <td>
+                <input type="text" id="UPDATEVIEW" class="form-control" value="1">
+                </td>
+            </tr>
+                </tbody> 
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Output</th>
+                    </tr>
+                </thead>
+
+                <tbody id="output_body">
+                
+            
+            <tr>
+            <td>Clusters</td>
+            <td>Grid (output)</td>
+            <td>CLUSTER</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="CLUSTER" optional="false" data_type="Grid (output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Statistics</td>
+            <td>Table (output)</td>
+            <td>STATISTICS</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="STATISTICS" optional="false" data_type="Table (output)">Download Data</a></td>
+            </tr>
+        
+         
+                </tbody>
+                
+            </table>(*) <i>optional</i>
+            <div class="progress">
+                <div id="progressbar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="60"
+                    aria-valuemin="0" aria-valuemax="100" style="width: 10%"> 
+                </div>
+            </div>
+            <button type="button" style="float: right;margin-top: 20px; margin-bottom: 20px; margin-right: 30px;width: 100px;tab-size: 28px" class="btn btn-success" onclick="onRunButtonClick()">Run
+            </button>
+            
+                    </div>
+                    <script src="../js/jquery-3.4.1.js"></script>
+                    <script src="../js/bootstrap.min.js"></script>
+                    <script src="../js/runModel.js"></script>
+                </body> 
+                </html>

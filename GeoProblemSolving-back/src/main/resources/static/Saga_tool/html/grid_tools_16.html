@@ -1,0 +1,216 @@
+
+                <!DOCTYPE html>
+                <html lang="en"> 
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                    <title>SAGA TOOL</title>
+                    <link rel="stylesheet" href="../css/bootstrap.min.css">
+                    <style>
+                        body {
+                            margin: 10px;
+                            margin-bottom: 20px;
+                            min-width: 700px;
+                        }
+
+                        th {
+                            text-align: center;
+                            font-size: 18px;
+                        }
+
+                        td,
+                        th {
+                            padding: 2px;
+                        }
+                        .progress{
+                            margin-bottom: 0px;
+                            display: none;
+                        }
+                    </style>
+                </head>
+
+                <body>
+
+                    <div id="desc_content">
+                        
+            <h4>Tool</h4>
+            <table border="0" >
+                <tr>
+                    <td valign="top"><b>Name</b></td>
+                    <td valign="top">Change Grid Values - Flood Fill</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>ID</b></td>
+                    <td valign="top">16</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>Author</b></td>
+                    <td valign="top">A.Ringeler (c) 2005, O.Conrad (c) 2006</td>
+                </tr>
+            </table>
+            <hr>
+            <h4>Description</h4>
+            <hr>
+            <h4>Parameters</h4>
+            <table tool_id="16"
+            oid="5b90e7bbd15d75093cb58759"
+            stateId="F9AD94D1-ED71-4315-9307-1302B86A4D32"
+            mdlId="7095E975-468E-4f5c-91ED-F6C84F0C720F" border="1" width="100%" valign="top" cellpadding="6" rules="all">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Identifier</th>
+                        <th>Description</th>
+                        <th>Constraints</th>
+                        <th>Settings</th>
+                    </tr>
+                
+                <thead>
+                    <tr> 
+                    <th colspan="6">Input</th>
+                    </tr>
+                </thead>
+
+                <tbody id="input_body">
+                    
+            
+            <tr>
+            <td>Grid</td>
+            <td>Grid (input)</td>
+            <td>GRID_IN</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="GRID_IN" accept="application/zip" optional="false" data_type="Grid (input)"></input>
+            </td>
+            </tr>
+        
+        
+                </tbody>
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Options</th>
+                    </tr>
+                </thead>
+                <tbody id="options_body">
+                    
+        
+            <tr>
+                <td>Grid system</td>
+                <td>Grid system</td>
+                <td>PARAMETERS_GRID_SYSTEM</td>
+                <td></td>
+                <td></td>
+                <td>
+                <input type="text" id="PARAMETERS_GRID_SYSTEM" class="form-control" value="">
+                </td>
+            </tr>,
+            <tr>
+                <td>Fill Value</td>
+                <td>Floating point</td>
+                <td>FILL</td>
+                <td></td>
+                <td>Default: 1.000000</td>
+                <td>
+                <input type="text" id="FILL" class="form-control" value="1.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Value to be replaced</td>
+                <td>Choice</td>
+                <td>METHOD</td>
+                <td></td>
+                <td>Available Choices:
+[0] value at mouse position
+[1] fixed value
+[2] tolerance as absolute values
+Default: 0</td>
+                <td>
+                
+        <select class="form-control" id="METHOD">
+            <option value="0">[0] value at mouse position</option>,<option value="1">[1] fixed value</option>,<option value="2">[2] tolerance as absolute values</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Fixed value to be replaced</td>
+                <td>Floating point</td>
+                <td>ZFIXED</td>
+                <td></td>
+                <td>Default: 0.000000</td>
+                <td>
+                <input type="text" id="ZFIXED" class="form-control" value="0.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Upper Tolerance</td>
+                <td>Floating point</td>
+                <td>DZMAX</td>
+                <td></td>
+                <td>Default: 1.000000</td>
+                <td>
+                <input type="text" id="DZMAX" class="form-control" value="1.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Lower Tolerance</td>
+                <td>Floating point</td>
+                <td>DZMIN</td>
+                <td></td>
+                <td>Default: -1.000000</td>
+                <td>
+                <input type="text" id="DZMIN" class="form-control" value="-1.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Fill NoData</td>
+                <td>Boolean</td>
+                <td>NODATA</td>
+                <td></td>
+                <td>Default: 0</td>
+                <td>
+                <input type="text" id="NODATA" class="form-control" value="0">
+                </td>
+            </tr>
+                </tbody> 
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Output</th>
+                    </tr>
+                </thead>
+
+                <tbody id="output_body">
+                
+            
+            <tr>
+            <td>Changed Grid</td>
+            <td>Grid (optional output)</td>
+            <td>GRID_OUT</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="GRID_OUT" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        
+         
+                </tbody>
+                
+            </table>(*) <i>optional</i>
+            <div class="progress">
+                <div id="progressbar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="60"
+                    aria-valuemin="0" aria-valuemax="100" style="width: 10%"> 
+                </div>
+            </div>
+            <button type="button" style="float: right;margin-top: 20px; margin-bottom: 20px; margin-right: 30px;width: 100px;tab-size: 28px" class="btn btn-success" onclick="onRunButtonClick()">Run
+            </button>
+            
+                    </div>
+                    <script src="../js/jquery-3.4.1.js"></script>
+                    <script src="../js/bootstrap.min.js"></script>
+                    <script src="../js/runModel.js"></script>
+                </body> 
+                </html>

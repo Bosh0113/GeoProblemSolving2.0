@@ -1,0 +1,200 @@
+
+                <!DOCTYPE html>
+                <html lang="en"> 
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                    <title>SAGA TOOL</title>
+                    <link rel="stylesheet" href="../css/bootstrap.min.css">
+                    <style>
+                        body {
+                            margin: 10px;
+                            margin-bottom: 20px;
+                            min-width: 700px;
+                        }
+
+                        th {
+                            text-align: center;
+                            font-size: 18px;
+                        }
+
+                        td,
+                        th {
+                            padding: 2px;
+                        }
+                        .progress{
+                            margin-bottom: 0px;
+                            display: none;
+                        }
+                    </style>
+                </head>
+
+                <body>
+
+                    <div id="desc_content">
+                        
+            <h4>Tool</h4>
+            <table border="0" >
+                <tr>
+                    <td valign="top"><b>Name</b></td>
+                    <td valign="top">Variogram (Dialog)</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>ID</b></td>
+                    <td valign="top">4</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>Author</b></td>
+                    <td valign="top">O.Conrad (c) 2009</td>
+                </tr>
+            </table>
+            <hr>
+            <h4>Description</h4>
+            <hr>
+            <h4>Parameters</h4>
+            <table tool_id="4"
+            oid="5b90e7bbd15d75093cb58876"
+            stateId="2CFB950A-3A60-4b5e-BB6C-E34DA3AC7F41"
+            mdlId="21E14030-8F16-41e7-921E-9F7FB404EEF5" border="1" width="100%" valign="top" cellpadding="6" rules="all">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Identifier</th>
+                        <th>Description</th>
+                        <th>Constraints</th>
+                        <th>Settings</th>
+                    </tr>
+                
+                <thead>
+                    <tr> 
+                    <th colspan="6">Input</th>
+                    </tr>
+                </thead>
+
+                <tbody id="input_body">
+                    
+            
+            <tr>
+            <td>Points</td>
+            <td>Shapes (input)</td>
+            <td>POINTS</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="POINTS" accept="application/zip" optional="false" data_type="Shapes (input)"></input>
+            </td>
+            </tr>
+        
+        
+                </tbody>
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Options</th>
+                    </tr>
+                </thead>
+                <tbody id="options_body">
+                    
+        
+            <tr>
+                <td>Attribute</td>
+                <td>Table field</td>
+                <td>ATTRIBUTE</td>
+                <td></td>
+                <td></td>
+                <td>
+                <input type="text" id="ATTRIBUTE" class="form-control" value="">
+                </td>
+            </tr>,
+            <tr>
+                <td>Logarithmic Transformation</td>
+                <td>Boolean</td>
+                <td>LOG</td>
+                <td></td>
+                <td>Default: 0</td>
+                <td>
+                <input type="text" id="LOG" class="form-control" value="0">
+                </td>
+            </tr>,
+            <tr>
+                <td>Maximum Distance</td>
+                <td>Floating point</td>
+                <td>VAR_MAXDIST</td>
+                <td></td>
+                <td>Default: -1.000000</td>
+                <td>
+                <input type="text" id="VAR_MAXDIST" class="form-control" value="-1.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Lag Distance Classes</td>
+                <td>Integer</td>
+                <td>VAR_NCLASSES</td>
+                <td>initial number of lag distance classes</td>
+                <td>Minimum: 1
+Default: 100</td>
+                <td>
+                <input type="text" id="VAR_NCLASSES" class="form-control" value="100">
+                </td>
+            </tr>,
+            <tr>
+                <td>Skip</td>
+                <td>Integer</td>
+                <td>VAR_NSKIP</td>
+                <td></td>
+                <td>Minimum: 1
+Default: 1</td>
+                <td>
+                <input type="text" id="VAR_NSKIP" class="form-control" value="1">
+                </td>
+            </tr>,
+            <tr>
+                <td>Model</td>
+                <td>Text</td>
+                <td>VAR_MODEL</td>
+                <td></td>
+                <td>Default: a + b * x</td>
+                <td>
+                <input type="text" id="VAR_MODEL" class="form-control" value="a + b * x">
+                </td>
+            </tr>
+                </tbody> 
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Output</th>
+                    </tr>
+                </thead>
+
+                <tbody id="output_body">
+                
+            
+            <tr>
+            <td>Variogram</td>
+            <td>Table (output)</td>
+            <td>VARIOGRAM</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="VARIOGRAM" optional="false" data_type="Table (output)">Download Data</a></td>
+            </tr>
+        
+         
+                </tbody>
+                
+            </table>(*) <i>optional</i>
+            <div class="progress">
+                <div id="progressbar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="60"
+                    aria-valuemin="0" aria-valuemax="100" style="width: 10%"> 
+                </div>
+            </div>
+            <button type="button" style="float: right;margin-top: 20px; margin-bottom: 20px; margin-right: 30px;width: 100px;tab-size: 28px" class="btn btn-success" onclick="onRunButtonClick()">Run
+            </button>
+            
+                    </div>
+                    <script src="../js/jquery-3.4.1.js"></script>
+                    <script src="../js/bootstrap.min.js"></script>
+                    <script src="../js/runModel.js"></script>
+                </body> 
+                </html>

@@ -1,0 +1,197 @@
+
+                <!DOCTYPE html>
+                <html lang="en"> 
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                    <title>SAGA TOOL</title>
+                    <link rel="stylesheet" href="../css/bootstrap.min.css">
+                    <style>
+                        body {
+                            margin: 10px;
+                            margin-bottom: 20px;
+                            min-width: 700px;
+                        }
+
+                        th {
+                            text-align: center;
+                            font-size: 18px;
+                        }
+
+                        td,
+                        th {
+                            padding: 2px;
+                        }
+                        .progress{
+                            margin-bottom: 0px;
+                            display: none;
+                        }
+                    </style>
+                </head>
+
+                <body>
+
+                    <div id="desc_content">
+                        
+            <h4>Tool</h4>
+            <table border="0" >
+                <tr>
+                    <td valign="top"><b>Name</b></td>
+                    <td valign="top">Geodesic Morphological Reconstruction</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>ID</b></td>
+                    <td valign="top">12</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>Author</b></td>
+                    <td valign="top">HfT Stuttgart (c) 2013</td>
+                </tr>
+            </table>
+            <hr>
+            <h4>Description</h4>
+            <hr>
+            <h4>Parameters</h4>
+            <table tool_id="12"
+            oid="5b90e7bbd15d75093cb58731"
+            stateId="FB6071A8-F1FE-4f6c-A205-5946487F33DB"
+            mdlId="68B3CC24-1A09-4854-871A-13DC204BCF08" border="1" width="100%" valign="top" cellpadding="6" rules="all">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Identifier</th>
+                        <th>Description</th>
+                        <th>Constraints</th>
+                        <th>Settings</th>
+                    </tr>
+                
+                <thead>
+                    <tr> 
+                    <th colspan="6">Input</th>
+                    </tr>
+                </thead>
+
+                <tbody id="input_body">
+                    
+            
+            <tr>
+            <td>Input Grid</td>
+            <td>Grid (input)</td>
+            <td>INPUT_GRID</td>
+            <td>Input for the morphological reconstruction</td>
+            <td></td>
+            <td>
+                <input type="file" id="INPUT_GRID" accept="application/zip" optional="false" data_type="Grid (input)"></input>
+            </td>
+            </tr>
+        
+        
+                </tbody>
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Options</th>
+                    </tr>
+                </thead>
+                <tbody id="options_body">
+                    
+        
+            <tr>
+                <td>Grid system</td>
+                <td>Grid system</td>
+                <td>PARAMETERS_GRID_SYSTEM</td>
+                <td></td>
+                <td></td>
+                <td>
+                <input type="text" id="PARAMETERS_GRID_SYSTEM" class="form-control" value="">
+                </td>
+            </tr>,
+            <tr>
+                <td>Shift value</td>
+                <td>Floating point</td>
+                <td>SHIFT_VALUE</td>
+                <td>Shift value</td>
+                <td>Default: 5.000000</td>
+                <td>
+                <input type="text" id="SHIFT_VALUE" class="form-control" value="5.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Preserve 1px border Yes/No</td>
+                <td>Boolean</td>
+                <td>BORDER_YES_NO</td>
+                <td>Preserve 1px border Yes/No</td>
+                <td>Default: 1</td>
+                <td>
+                <input type="text" id="BORDER_YES_NO" class="form-control" value="1">
+                </td>
+            </tr>,
+            <tr>
+                <td>Create a binary mask Yes/No</td>
+                <td>Boolean</td>
+                <td>BIN_YES_NO</td>
+                <td>Create a binary mask Yes/No</td>
+                <td>Default: 1</td>
+                <td>
+                <input type="text" id="BIN_YES_NO" class="form-control" value="1">
+                </td>
+            </tr>,
+            <tr>
+                <td>Threshold</td>
+                <td>Floating point</td>
+                <td>THRESHOLD</td>
+                <td>Threshold</td>
+                <td>Default: 1.000000</td>
+                <td>
+                <input type="text" id="THRESHOLD" class="form-control" value="1.000000">
+                </td>
+            </tr>
+                </tbody> 
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Output</th>
+                    </tr>
+                </thead>
+
+                <tbody id="output_body">
+                
+            
+            <tr>
+            <td>Object Grid</td>
+            <td>Grid (output)</td>
+            <td>OBJECT_GRID</td>
+            <td>Binary object mask</td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="OBJECT_GRID" optional="false" data_type="Grid (output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Difference Input - Reconstruction</td>
+            <td>Grid (output)</td>
+            <td>DIFFERENCE_GRID</td>
+            <td>Difference Input - Reconstruction</td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="DIFFERENCE_GRID" optional="false" data_type="Grid (output)">Download Data</a></td>
+            </tr>
+        
+         
+                </tbody>
+                
+            </table>(*) <i>optional</i>
+            <div class="progress">
+                <div id="progressbar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="60"
+                    aria-valuemin="0" aria-valuemax="100" style="width: 10%"> 
+                </div>
+            </div>
+            <button type="button" style="float: right;margin-top: 20px; margin-bottom: 20px; margin-right: 30px;width: 100px;tab-size: 28px" class="btn btn-success" onclick="onRunButtonClick()">Run
+            </button>
+            
+                    </div>
+                    <script src="../js/jquery-3.4.1.js"></script>
+                    <script src="../js/bootstrap.min.js"></script>
+                    <script src="../js/runModel.js"></script>
+                </body> 
+                </html>

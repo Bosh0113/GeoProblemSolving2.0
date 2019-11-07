@@ -1,0 +1,298 @@
+
+                <!DOCTYPE html>
+                <html lang="en"> 
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                    <title>SAGA TOOL</title>
+                    <link rel="stylesheet" href="../css/bootstrap.min.css">
+                    <style>
+                        body {
+                            margin: 10px;
+                            margin-bottom: 20px;
+                            min-width: 700px;
+                        }
+
+                        th {
+                            text-align: center;
+                            font-size: 18px;
+                        }
+
+                        td,
+                        th {
+                            padding: 2px;
+                        }
+                        .progress{
+                            margin-bottom: 0px;
+                            display: none;
+                        }
+                    </style>
+                </head>
+
+                <body>
+
+                    <div id="desc_content">
+                        
+            <h4>Tool</h4>
+            <table border="0" >
+                <tr>
+                    <td valign="top"><b>Name</b></td>
+                    <td valign="top">Analytical Hillshading</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>ID</b></td>
+                    <td valign="top">0</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>Author</b></td>
+                    <td valign="top">O.Conrad, V.Wichmann (c) 2003-2013</td>
+                </tr>
+            </table>
+            <hr>
+            <h4>Description</h4>
+            <hr>
+            <h4>Parameters</h4>
+            <table tool_id="0"
+            oid="5b90e7bbd15d75093cb588ce"
+            stateId="60CCE10F-8866-44ea-B4EE-04927724B42D"
+            mdlId="BE3FEE83-9EAC-494b-BD49-D70034DD9CB6" border="1" width="100%" valign="top" cellpadding="6" rules="all">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Identifier</th>
+                        <th>Description</th>
+                        <th>Constraints</th>
+                        <th>Settings</th>
+                    </tr>
+                
+                <thead>
+                    <tr> 
+                    <th colspan="6">Input</th>
+                    </tr>
+                </thead>
+
+                <tbody id="input_body">
+                    
+            
+            <tr>
+            <td>Elevation</td>
+            <td>Grid (input)</td>
+            <td>ELEVATION</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="ELEVATION" accept="application/zip" optional="false" data_type="Grid (input)"></input>
+            </td>
+            </tr>
+        
+        
+                </tbody>
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Options</th>
+                    </tr>
+                </thead>
+                <tbody id="options_body">
+                    
+        
+            <tr>
+                <td>Grid system</td>
+                <td>Grid system</td>
+                <td>PARAMETERS_GRID_SYSTEM</td>
+                <td></td>
+                <td></td>
+                <td>
+                <input type="text" id="PARAMETERS_GRID_SYSTEM" class="form-control" value="">
+                </td>
+            </tr>,
+            <tr>
+                <td>Shading Method</td>
+                <td>Choice</td>
+                <td>METHOD</td>
+                <td></td>
+                <td>Available Choices:
+[0] Standard
+[1] Limited Maximum
+[2] With Shadows
+[3] Shadows Only
+[4] Ambient Occlusion
+[5] Combined Shading
+Default: 0</td>
+                <td>
+                
+        <select class="form-control" id="METHOD">
+            <option value="0">[0] Standard</option>,<option value="1">[1] Limited Maximum</option>,<option value="2">[2] With Shadows</option>,<option value="3">[3] Shadows Only</option>,<option value="4">[4] Ambient Occlusion</option>,<option value="5">[5] Combined Shading</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Sun's Position</td>
+                <td>Choice</td>
+                <td>POSITION</td>
+                <td></td>
+                <td>Available Choices:
+[0] azimuth and height
+[1] date and time
+Default: 0</td>
+                <td>
+                
+        <select class="form-control" id="POSITION">
+            <option value="0">[0] azimuth and height</option>,<option value="1">[1] date and time</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Azimuth</td>
+                <td>Floating point</td>
+                <td>AZIMUTH</td>
+                <td>Direction of the light source, measured in degree clockwise from the North direction.</td>
+                <td>Minimum: 0.000000
+Maximum: 360.000000
+Default: 315.000000</td>
+                <td>
+                <input type="text" id="AZIMUTH" class="form-control" value="315.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Height</td>
+                <td>Floating point</td>
+                <td>DECLINATION</td>
+                <td>Height of the light source, measured in degree above the horizon.</td>
+                <td>Minimum: 0.000000
+Maximum: 90.000000
+Default: 45.000000</td>
+                <td>
+                <input type="text" id="DECLINATION" class="form-control" value="45.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Day</td>
+                <td>Date</td>
+                <td>DATE</td>
+                <td></td>
+                <td>Default: 2018-06-23</td>
+                <td>
+                <input type="text" id="DATE" class="form-control" value="2018-06-23">
+                </td>
+            </tr>,
+            <tr>
+                <td>Hour</td>
+                <td>Floating point</td>
+                <td>TIME</td>
+                <td></td>
+                <td>Minimum: 0.000000
+Maximum: 24.000000
+Default: 12.000000</td>
+                <td>
+                <input type="text" id="TIME" class="form-control" value="12.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Exaggeration</td>
+                <td>Floating point</td>
+                <td>EXAGGERATION</td>
+                <td>The terrain exaggeration factor allows one to increase the shading contrasts in flat areas.</td>
+                <td>Default: 1.000000</td>
+                <td>
+                <input type="text" id="EXAGGERATION" class="form-control" value="1.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Unit</td>
+                <td>Choice</td>
+                <td>UNIT</td>
+                <td></td>
+                <td>Available Choices:
+[0] radians
+[1] degree
+Default: 0</td>
+                <td>
+                
+        <select class="form-control" id="UNIT">
+            <option value="0">[0] radians</option>,<option value="1">[1] degree</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Shadow</td>
+                <td>Choice</td>
+                <td>SHADOW</td>
+                <td>Choose 'slim' to trace grid node's shadow, 'fat' to trace the whole cell's shadow. The first is slightly faster but might show some artifacts.</td>
+                <td>Available Choices:
+[0] slim
+[1] fat
+Default: 0</td>
+                <td>
+                
+        <select class="form-control" id="SHADOW">
+            <option value="0">[0] slim</option>,<option value="1">[1] fat</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Number of Directions</td>
+                <td>Integer</td>
+                <td>NDIRS</td>
+                <td>Number of sample directions for ambient occlusion. Divides azimuth range (270 to 0 to 90 degree) into sectors. Declination (0 to 90 degree) is divided in (Number of Directions / 4) sectors.</td>
+                <td>Minimum: 2
+Default: 8</td>
+                <td>
+                <input type="text" id="NDIRS" class="form-control" value="8">
+                </td>
+            </tr>,
+            <tr>
+                <td>Search Radius</td>
+                <td>Floating point</td>
+                <td>RADIUS</td>
+                <td>Radius used to trace for shadows (ambient occlusion) [map units].</td>
+                <td>Minimum: 0.001000
+Default: 10.000000</td>
+                <td>
+                <input type="text" id="RADIUS" class="form-control" value="10.000000">
+                </td>
+            </tr>
+                </tbody> 
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Output</th>
+                    </tr>
+                </thead>
+
+                <tbody id="output_body">
+                
+            
+            <tr>
+            <td>Analytical Hillshading</td>
+            <td>Grid (output)</td>
+            <td>SHADE</td>
+            <td>The angle between the surface and the incoming light beams, measured in radians.</td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="SHADE" optional="false" data_type="Grid (output)">Download Data</a></td>
+            </tr>
+        
+         
+                </tbody>
+                
+            </table>(*) <i>optional</i>
+            <div class="progress">
+                <div id="progressbar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="60"
+                    aria-valuemin="0" aria-valuemax="100" style="width: 10%"> 
+                </div>
+            </div>
+            <button type="button" style="float: right;margin-top: 20px; margin-bottom: 20px; margin-right: 30px;width: 100px;tab-size: 28px" class="btn btn-success" onclick="onRunButtonClick()">Run
+            </button>
+            
+                    </div>
+                    <script src="../js/jquery-3.4.1.js"></script>
+                    <script src="../js/bootstrap.min.js"></script>
+                    <script src="../js/runModel.js"></script>
+                </body> 
+                </html>

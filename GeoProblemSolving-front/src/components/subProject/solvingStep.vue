@@ -323,42 +323,42 @@ export default {
       if (type == 0) {
         this.$router.push({
           name: "contextDefinition",
-          params: { subid: this.subProjectInfo.subProjectId, id: stepId }
+          params: {id: stepId }
         });
       } else if (type == 1) {
         this.$router.push({
           name: "dataProcessing",
-          params: { subid: this.subProjectInfo.subProjectId, id: stepId }
+          params: {id: stepId }
         });
       } else if (type == 2) {
         this.$router.push({
           name: "modelProcess",
-          params: { subid: this.subProjectInfo.subProjectId, id: stepId }
+          params: { id: stepId }
         });
       } else if (type == 3) {
         this.$router.push({
           name: "modelEvalution",
-          params: { subid: this.subProjectInfo.subProjectId, id: stepId }
+          params: { id: stepId }
         });
       } else if (type == 4) {
         this.$router.push({
           name: "quantitativeAndQualitative",
-          params: { subid: this.subProjectInfo.subProjectId, id: stepId }
+          params: { id: stepId }
         });
       } else if (type == 5) {
         this.$router.push({
           name: "simulationPrediction",
-          params: { subid: this.subProjectInfo.subProjectId, id: stepId }
+          params: { id: stepId }
         });
       } else if (type == 6) {
         this.$router.push({
           name: "dataVisulization",
-          params: { subid: this.subProjectInfo.subProjectId, id: stepId }
+          params: { id: stepId }
         });
       } else if (type == 7) {
         this.$router.push({
           name: "decisionMakingAndManagement",
-          params: { subid: this.subProjectInfo.subProjectId, id: stepId }
+          params: { id: stepId }
         });
       }
     },
@@ -369,19 +369,20 @@ export default {
         this.subProjectInfo.solvingProcess.length == 0
       ) {
         // 为了兼容Module
-        this.axios
-          .get(
-            "/GeoProblemSolving/module/inquiry" +
+        $.ajax({
+        url:  "/GeoProblemSolving/module/inquiry" +
               "?key=subProjectId" +
               "&value=" +
-              this.subProjectInfo.subProjectId
-          )
-          .then(res => {
-            if (res.data == "Offline") {
+              this.subProjectInfo.subProjectId,
+        type: "GET",
+        async: false,
+        success: function (data) {
+
+            if (data == "Offline") {
               this.$store.commit("userLogout");
               this.$router.push({ name: "Login" });
-            } else if (res.data != "None" && res.data != "Fail") {
-              let stepList = res.data;
+            } else if (data != "None" && data != "Fail") {
+              let stepList = data;
 
               let nodeCategory = this.getStepCategroy(stepList[0].type);
 
@@ -453,11 +454,11 @@ export default {
                   this.activeStep = stepList[i];
                 }
               }
-            } else if (res.data == "None" || res.data == "Fail") {
+            } else if (data == "None" || data == "Fail") {
               this.activeStep = [];
             }
-          })
-          .catch(err => {});
+          }
+        })
       } else if (this.subProjectInfo.solvingProcess.length > 0) {
         this.processStructure = JSON.parse(this.subProjectInfo.solvingProcess);
 
@@ -1046,7 +1047,7 @@ export default {
         this.updateSteps();
       } else {
         this.$Notice.info({
-          desc: "There is no step node being selected!"
+          desc: "Select at least one step as source(s), please!"
         });
       }
     },

@@ -1,0 +1,206 @@
+
+                <!DOCTYPE html>
+                <html lang="en"> 
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                    <title>SAGA TOOL</title>
+                    <link rel="stylesheet" href="../css/bootstrap.min.css">
+                    <style>
+                        body {
+                            margin: 10px;
+                            margin-bottom: 20px;
+                            min-width: 700px;
+                        }
+
+                        th {
+                            text-align: center;
+                            font-size: 18px;
+                        }
+
+                        td,
+                        th {
+                            padding: 2px;
+                        }
+                        .progress{
+                            margin-bottom: 0px;
+                            display: none;
+                        }
+                    </style>
+                </head>
+
+                <body>
+
+                    <div id="desc_content">
+                        
+            <h4>Tool</h4>
+            <table border="0" >
+                <tr>
+                    <td valign="top"><b>Name</b></td>
+                    <td valign="top">Connectivity Analysis</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>ID</b></td>
+                    <td valign="top">14</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>Author</b></td>
+                    <td valign="top">HfT Stuttgart (c) 2013</td>
+                </tr>
+            </table>
+            <hr>
+            <h4>Description</h4>
+            <hr>
+            <h4>Parameters</h4>
+            <table tool_id="14"
+            oid="5b90e7bbd15d75093cb58733"
+            stateId="D4A6FE5F-23BE-4800-AA60-C869EB59A855"
+            mdlId="9E020942-537A-433b-BCFC-CB629D5AC6F9" border="1" width="100%" valign="top" cellpadding="6" rules="all">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Identifier</th>
+                        <th>Description</th>
+                        <th>Constraints</th>
+                        <th>Settings</th>
+                    </tr>
+                
+                <thead>
+                    <tr> 
+                    <th colspan="6">Input</th>
+                    </tr>
+                </thead>
+
+                <tbody id="input_body">
+                    
+            
+            <tr>
+            <td>Input Binary Grid</td>
+            <td>Grid (input)</td>
+            <td>INPUT_GRID</td>
+            <td>Binary input image for the connectivity analysis</td>
+            <td></td>
+            <td>
+                <input type="file" id="INPUT_GRID" accept="application/zip" optional="false" data_type="Grid (input)"></input>
+            </td>
+            </tr>
+        
+        
+                </tbody>
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Options</th>
+                    </tr>
+                </thead>
+                <tbody id="options_body">
+                    
+        
+            <tr>
+                <td>Grid system</td>
+                <td>Grid system</td>
+                <td>PARAMETERS_GRID_SYSTEM</td>
+                <td></td>
+                <td></td>
+                <td>
+                <input type="text" id="PARAMETERS_GRID_SYSTEM" class="form-control" value="">
+                </td>
+            </tr>,
+            <tr>
+                <td>Apply Filter?</td>
+                <td>Boolean</td>
+                <td>FILTER</td>
+                <td>Apply a filter (erosion - binary reconstruction) to the input image </td>
+                <td>Default: 1</td>
+                <td>
+                <input type="text" id="FILTER" class="form-control" value="1">
+                </td>
+            </tr>,
+            <tr>
+                <td>Filter Size (Radius)</td>
+                <td>Integer</td>
+                <td>SIZE</td>
+                <td>Filter size (radius in grid cells)</td>
+                <td>Default: 3</td>
+                <td>
+                <input type="text" id="SIZE" class="form-control" value="3">
+                </td>
+            </tr>,
+            <tr>
+                <td>Pixel Centers?</td>
+                <td>Boolean</td>
+                <td>BORDER_PIXEL_CENTERS</td>
+                <td>Should the output shapes contain the centers of the border pixels instead of the corners?</td>
+                <td>Default: 0</td>
+                <td>
+                <input type="text" id="BORDER_PIXEL_CENTERS" class="form-control" value="0">
+                </td>
+            </tr>,
+            <tr>
+                <td>Remove Border Regions?</td>
+                <td>Boolean</td>
+                <td>REMOVE_MARGINAL_REGIONS</td>
+                <td>Remove regions which have contact with (are adjacent to) the image borders?</td>
+                <td>Default: 0</td>
+                <td>
+                <input type="text" id="REMOVE_MARGINAL_REGIONS" class="form-control" value="0">
+                </td>
+            </tr>
+                </tbody> 
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Output</th>
+                    </tr>
+                </thead>
+
+                <tbody id="output_body">
+                
+            
+            <tr>
+            <td>Filtered Image</td>
+            <td>Grid (optional output)</td>
+            <td>FILTERED_MASK</td>
+            <td>Morphologically filtered binary mask</td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="FILTERED_MASK" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Symbolic Image</td>
+            <td>Grid (output)</td>
+            <td>SYMBOLIC_IMAGE</td>
+            <td>The final symbolic image</td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="SYMBOLIC_IMAGE" optional="false" data_type="Grid (output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Outlines</td>
+            <td>Shapes (output)</td>
+            <td>OUTLINES</td>
+            <td>Polygon outlines of object regions</td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="OUTLINES" optional="false" data_type="Shapes (output)">Download Data</a></td>
+            </tr>
+        
+         
+                </tbody>
+                
+            </table>(*) <i>optional</i>
+            <div class="progress">
+                <div id="progressbar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="60"
+                    aria-valuemin="0" aria-valuemax="100" style="width: 10%"> 
+                </div>
+            </div>
+            <button type="button" style="float: right;margin-top: 20px; margin-bottom: 20px; margin-right: 30px;width: 100px;tab-size: 28px" class="btn btn-success" onclick="onRunButtonClick()">Run
+            </button>
+            
+                    </div>
+                    <script src="../js/jquery-3.4.1.js"></script>
+                    <script src="../js/bootstrap.min.js"></script>
+                    <script src="../js/runModel.js"></script>
+                </body> 
+                </html>

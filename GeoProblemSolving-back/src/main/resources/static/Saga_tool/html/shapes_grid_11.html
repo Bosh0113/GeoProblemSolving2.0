@@ -1,0 +1,177 @@
+
+                <!DOCTYPE html>
+                <html lang="en"> 
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                    <title>SAGA TOOL</title>
+                    <link rel="stylesheet" href="../css/bootstrap.min.css">
+                    <style>
+                        body {
+                            margin: 10px;
+                            margin-bottom: 20px;
+                            min-width: 700px;
+                        }
+
+                        th {
+                            text-align: center;
+                            font-size: 18px;
+                        }
+
+                        td,
+                        th {
+                            padding: 2px;
+                        }
+                        .progress{
+                            margin-bottom: 0px;
+                            display: none;
+                        }
+                    </style>
+                </head>
+
+                <body>
+
+                    <div id="desc_content">
+                        
+            <h4>Tool</h4>
+            <table border="0" >
+                <tr>
+                    <td valign="top"><b>Name</b></td>
+                    <td valign="top">Clip Grid with Rectangle</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>ID</b></td>
+                    <td valign="top">11</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>Author</b></td>
+                    <td valign="top">V. Wichmann (c) 2013</td>
+                </tr>
+            </table>
+            <hr>
+            <h4>Description</h4>
+            <hr>
+            <h4>Parameters</h4>
+            <table tool_id="11"
+            oid="5b90e7bbd15d75093cb587ed"
+            stateId="C1481B33-9F84-4440-9868-CC939600CAC2"
+            mdlId="88BA5676-196B-41b7-A538-343183C96C80" border="1" width="100%" valign="top" cellpadding="6" rules="all">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Identifier</th>
+                        <th>Description</th>
+                        <th>Constraints</th>
+                        <th>Settings</th>
+                    </tr>
+                
+                <thead>
+                    <tr> 
+                    <th colspan="6">Input</th>
+                    </tr>
+                </thead>
+
+                <tbody id="input_body">
+                    
+            
+            <tr>
+            <td>Input</td>
+            <td>Grid (input)</td>
+            <td>INPUT</td>
+            <td>The grid to clip.</td>
+            <td></td>
+            <td>
+                <input type="file" id="INPUT" accept="application/zip" optional="false" data_type="Grid (input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Extent</td>
+            <td>Shapes (input)</td>
+            <td>SHAPES</td>
+            <td>The shapefile to use for clipping.</td>
+            <td></td>
+            <td>
+                <input type="file" id="SHAPES" accept="application/zip" optional="false" data_type="Shapes (input)"></input>
+            </td>
+            </tr>
+        
+        
+                </tbody>
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Options</th>
+                    </tr>
+                </thead>
+                <tbody id="options_body">
+                    
+        
+            <tr>
+                <td>Grid system</td>
+                <td>Grid system</td>
+                <td>INPUT_GRIDSYSTEM</td>
+                <td></td>
+                <td></td>
+                <td>
+                <input type="text" id="INPUT_GRIDSYSTEM" class="form-control" value="">
+                </td>
+            </tr>,
+            <tr>
+                <td>Border</td>
+                <td>Choice</td>
+                <td>BORDER</td>
+                <td>Set grid extent to grid cells (pixel as area), to grid nodes (pixel as point) or align to grid system.</td>
+                <td>Available Choices:
+[0] grid cells
+[1] grid nodes
+[2] align to grid system
+Default: 0</td>
+                <td>
+                
+        <select class="form-control" id="BORDER">
+            <option value="0">[0] grid cells</option>,<option value="1">[1] grid nodes</option>,<option value="2">[2] align to grid system</option>
+        </select>
+        
+                </td>
+            </tr>
+                </tbody> 
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Output</th>
+                    </tr>
+                </thead>
+
+                <tbody id="output_body">
+                
+            
+            <tr>
+            <td>Output</td>
+            <td>Data Object Grid (optional output)</td>
+            <td>OUTPUT</td>
+            <td>The clipped grid.</td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="OUTPUT" optional="true" data_type="Data Object Grid (optional output)">Download Data</a></td>
+            </tr>
+        
+         
+                </tbody>
+                
+            </table>(*) <i>optional</i>
+            <div class="progress">
+                <div id="progressbar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="60"
+                    aria-valuemin="0" aria-valuemax="100" style="width: 10%"> 
+                </div>
+            </div>
+            <button type="button" style="float: right;margin-top: 20px; margin-bottom: 20px; margin-right: 30px;width: 100px;tab-size: 28px" class="btn btn-success" onclick="onRunButtonClick()">Run
+            </button>
+            
+                    </div>
+                    <script src="../js/jquery-3.4.1.js"></script>
+                    <script src="../js/bootstrap.min.js"></script>
+                    <script src="../js/runModel.js"></script>
+                </body> 
+                </html>

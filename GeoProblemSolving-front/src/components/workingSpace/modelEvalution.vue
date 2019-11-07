@@ -125,10 +125,10 @@
   font-size: 1rem;
   height: 20px;
   color: white;
-  word-break:break-word;
+  word-break: break-word;
   overflow: hidden;
-  white-space: nowrap; 
-  text-overflow: ellipsis; 
+  white-space: nowrap;
+  text-overflow: ellipsis;
   max-width: 400px;
 }
 
@@ -147,137 +147,134 @@
 .pro-tab >>> .ivu-modal-body {
   padding-bottom: 0;
 }
-.subproject-back >>>.ivu-breadcrumb-item-link{
-  color:white;
+.subproject-back >>> .ivu-breadcrumb-item-link {
+  color: white;
 }
 
-.breadCrumb{
+.breadCrumb {
   margin-left: 1%;
 }
-
 </style>
 <template>
   <div style="background-color:#e8eaec;height:auto">
-   
-      <div class="picscreen">
-        <div class="picbg"></div>
+    <div class="picscreen">
+      <div class="picbg"></div>
 
-        <div class="home_content">
-          <Row>
-            <!-- 需要修改样式 -->
-            <div class="breadCrumb">
-              <Breadcrumb>
-                <!-- <BreadcrumbItem :to="toProjectPage">Project</BreadcrumbItem> -->
-                <BreadcrumbItem :to="toSubProjectPage"  class="subproject-back">Subproject</BreadcrumbItem>
-                <BreadcrumbItem style="color:white">Model evalution</BreadcrumbItem>
-              </Breadcrumb>
-            </div>
+      <div class="home_content">
+        <Row>
+          <!-- 需要修改样式 -->
+          <div class="breadCrumb">
+            <Breadcrumb>
+              <!-- <BreadcrumbItem :to="toProjectPage">Project</BreadcrumbItem> -->
+              <BreadcrumbItem :to="toSubProjectPage" class="subproject-back">Subproject</BreadcrumbItem>
+              <BreadcrumbItem style="color:white">Model evalution</BreadcrumbItem>
+            </Breadcrumb>
+          </div>
 
-            <div class="stepName">
-              <strong>{{stepContent.name}}</strong>
-              <p :title="stepContent.description">{{stepContent.description}}</p>
-            </div>
-            <div class="onlineListBtn">
-              <Button @click="drawerValue = true" type="default" ghost>Participants</Button>
-               <template  v-if="userRole == 'Manager'">
-                  <Button                
-                    @click="modifyStep = true"
-                    style="margin-left:20px"
-                    type="info"
-                    ghost
-                  >Modify Step</Button>
-               </template>
-            </div>
-          </Row>
-          <Drawer title="Participants" :closable="false" v-model="drawerValue">
-            <online-participant :sub-project-id="subprojectId" :room-id="stepId"></online-participant>
-             <div class="toChatroom" style="position:absolute; left:25%;bottom:5%">
-              <Button  @click.native="toolPanel('chat')" type="success">Go to Chatroom</Button>
-            </div>
-          </Drawer>
+          <div class="stepName">
+            <strong>{{stepContent.name}}</strong>
+            <p :title="stepContent.description">{{stepContent.description}}</p>
+          </div>
+          <div class="onlineListBtn">
+            <Button @click="drawerValue = true" type="default" ghost>Participants</Button>
+            <template v-if="userRole == 'Manager'">
+              <Button
+                @click="modifyStep = true"
+                style="margin-left:20px"
+                type="info"
+                ghost
+              >Modify Step</Button>
+            </template>
+          </div>
+        </Row>
+        <Drawer title="Participants" :closable="false" v-model="drawerValue">
+          <online-participant :sub-project-id="subprojectId" :room-id="stepId"></online-participant>
+          <div class="toChatroom" style="position:absolute; left:25%;bottom:5%">
+            <Button @click.native="toolPanel('chat')" type="success">Go to Chatroom</Button>
+          </div>
+        </Drawer>
 
-          <Modal v-model="modifyStep">
-            <p slot="header" style="text-align:center">
-              <Icon type="ios-information-circle"></Icon>
-              <span>Modify step name and description</span>
-            </p>
-            <Form :label-width="120" label-position="left" :model="stepForm">
-              <FormItem label="Step Name" prop="name">
-                <Input
-                  v-model="stepForm.name"
-                  type="textarea"
-                  :autosize="{minRows: 1,maxRows: 3}"
-                  clearable
-                />
-              </FormItem>
-              <FormItem label="Step Description" prop="description">
-                <Input
-                  v-model="stepForm.description"
-                  type="textarea"
-                  :autosize="{minRows: 1,maxRows: 3}"
-                  clearable
-                />
-              </FormItem>
-            </Form>
-            <div slot="footer">
-              <Button @click="cancelModifyStep">Cancel</Button>
-              <Button type="primary" @click="submitModifyStep">Modify</Button>
-            </div>
-          </Modal>
-        </div>
+        <Modal v-model="modifyStep">
+          <p slot="header" style="text-align:center">
+            <Icon type="ios-information-circle"></Icon>
+            <span>Modify step name and description</span>
+          </p>
+          <Form :label-width="120" label-position="left" :model="stepForm">
+            <FormItem label="Step Name" prop="name">
+              <Input
+                v-model="stepForm.name"
+                type="textarea"
+                :autosize="{minRows: 1,maxRows: 3}"
+                clearable
+              />
+            </FormItem>
+            <FormItem label="Step Description" prop="description">
+              <Input
+                v-model="stepForm.description"
+                type="textarea"
+                :autosize="{minRows: 1,maxRows: 3}"
+                clearable
+              />
+            </FormItem>
+          </Form>
+          <div slot="footer">
+            <Button @click="cancelModifyStep">Cancel</Button>
+            <Button type="primary" @click="submitModifyStep">Modify</Button>
+          </div>
+        </Modal>
       </div>
-    
+    </div>
+
     <!-- tab  on-click事件 -->
-    
-      <div class="pro-tab" :style="{height:sidebarHeight+ 79+'px'}">
-          <template>
-            <Row style="margin-top:40px">
-              <div :style="{height:sidebarHeight+45+'px'}" style="margin:20px 1%">
-                <template>
-                  <Col span="6">
-                    <Card :style="{height:sidebarHeight+45+'px'}">
-                      <div class="condefTitle">
-                          <div
-                            style="width:3px;height:18px;float:left;background-color:rgb(124, 126, 126)"
-                          ></div>
-                          <h4 style="float:left;margin-left:5px">Data</h4>
-                        </div>
-                    </Card>
-                </Col>
-                <Col span="18">               
-                  <Card :style="{height:sidebarHeight+45+'px'}">
-                    <div class="condefTitle">
-                      <Tabs value="general">
-                        <TabPane name="general" icon="ios-brush" label="General Tool">
-                          <Tooltip placement="bottom-start" class="modelToolBtn">
-                            <Button icon="ios-brush" to="//134.175.111.77/note" target="_blank"></Button>
-                            <div slot="content">
-                              <p>Jupyter Tool</p>
-                            </div>
-                          </Tooltip>
-                        </TabPane>
-                        <TabPane name="verification" icon="ios-paper" label="Model Verification"></TabPane>
-                        <TabPane name="comparison" icon="ios-paper" label="Model Comparison"></TabPane>
-                        <TabPane
-                          name="sensitivity"
-                          icon="ios-paper"
-                          label="Model Sensitivity Analysis"
-                        ></TabPane>
-                        <TabPane
-                          name="uncertainty"
-                          icon="ios-paper"
-                          label="Model Uncertainty Analysis"
-                        ></TabPane>
-                      </Tabs>
-                    </div>
-                  </Card>
-                </Col>
-                </template>
-              </div>
-            </Row>
-          </template>
-      </div>
-    
+
+    <div class="pro-tab" :style="{height:sidebarHeight+ 79+'px'}">
+      <template>
+        <Row style="margin-top:40px">
+          <div :style="{height:sidebarHeight+45+'px'}" style="margin:20px 1%">
+            <template>
+              <Col span="6">
+                <Card :style="{height:sidebarHeight+45+'px'}">
+                  <div class="condefTitle">
+                    <div
+                      style="width:3px;height:18px;float:left;background-color:rgb(124, 126, 126)"
+                    ></div>
+                    <h4 style="float:left;margin-left:5px">Data</h4>
+                  </div>
+                </Card>
+              </Col>
+              <Col span="18">
+                <Card :style="{height:sidebarHeight+45+'px'}">
+                  <div class="condefTitle">
+                    <Tabs value="general">
+                      <TabPane name="general" icon="ios-brush" label="General Tool">
+                        <Tooltip placement="bottom-start" class="modelToolBtn">
+                          <Button icon="ios-brush" to="//134.175.111.77/note" target="_blank"></Button>
+                          <div slot="content">
+                            <p>Jupyter Tool</p>
+                          </div>
+                        </Tooltip>
+                      </TabPane>
+                      <TabPane name="verification" icon="ios-paper" label="Model Verification"></TabPane>
+                      <TabPane name="comparison" icon="ios-paper" label="Model Comparison"></TabPane>
+                      <TabPane
+                        name="sensitivity"
+                        icon="ios-paper"
+                        label="Model Sensitivity Analysis"
+                      ></TabPane>
+                      <TabPane
+                        name="uncertainty"
+                        icon="ios-paper"
+                        label="Model Uncertainty Analysis"
+                      ></TabPane>
+                    </Tabs>
+                  </div>
+                </Card>
+              </Col>
+            </template>
+          </div>
+        </Row>
+      </template>
+    </div>
   </div>
 </template>
 
@@ -287,7 +284,7 @@ import * as socketApi from "./../../api/socket";
 import Avatar from "vue-avatar";
 import echarts from "echarts";
 import folderTree from "../resources/folderTree";
-import onlineParticipant from "./onlineParticipants";
+import onlineParticipant from "./utils/onlineParticipants";
 
 export default {
   components: {
@@ -304,7 +301,7 @@ export default {
       dataList: [],
       sidebarHeight: 800,
       stepId: this.$route.params.id,
-      toSubProjectPage: "/project/" + this.$route.params.subid + "/subproject",
+      toSubProjectPage: "",
 
       // submit
       modelProcessForm: {
@@ -349,7 +346,7 @@ export default {
       // web socket for module
       subprojectSocket: null,
       timer: null,
-      subprojectId:sessionStorage.getItem("subProjectId"),
+      subprojectId: sessionStorage.getItem("subProjectId"),
       stepContent: [],
       drawerValue: false,
 
@@ -358,7 +355,7 @@ export default {
         name: "",
         description: ""
       },
-       // 用户角色
+      // 用户角色
       userRole: "Visitor"
     };
   },
@@ -371,7 +368,27 @@ export default {
     //   this.getModelProcess();
     // this.init();
   },
-
+  beforeRouteEnter: (to, from, next) => {
+    next(vm => {
+      if (!vm.$store.getters.userState) {
+        next("/login");
+      } else {
+        if (
+          !(
+            vm.userRole == "Manager" ||
+            vm.userRole == "Member" ||
+            vm.userRole == "PManager"
+          )
+        ) {
+          vm.$Message.error("You have no property to access it");
+          // next(`/project/${vm.$store.getters.currentProjectId}`);
+          vm.$router.go(-1);
+        } else {
+          next();
+        }
+      }
+    });
+  },
   methods: {
     initSize() {
       this.sidebarHeight = window.innerHeight - 290;
@@ -379,23 +396,19 @@ export default {
 
     init() {
       this.initSize();
+      this.userRoleIdentity();
       this.getModelProcess();
     },
 
     userRoleIdentity() {
       this.userRole = "Visitor";
-      // console.log(this.stepContent.creator);
-      // console.log(this.$store.getters.userId);
       let creatorId = sessionStorage.getItem("subProjectManagerId");
-      console.log(creatorId);
       if (this.$store.getters.userState) {
         // 是否是子项目管理员
         if (creatorId === this.$store.getters.userId) {
           this.userRole = "Manager";
-          console.log(this.userRole);
-        }
-        else{
-           this.userRole = "Visitor";
+        } else {
+          this.userRole = "Visitor";
         }
       }
     },
@@ -482,7 +495,7 @@ export default {
             this.modelProcessForm = res.data[0].content;
             this.stepContent = res.data[0];
             this.stepForm = res.data[0];
-            this.userRoleIdentity();
+            this.toSubProjectPage = "/project/" + res.data[0].subProjectId + "/subproject";
           } else {
             this.$Notice.info({
               desc: "Get the description failed!"
@@ -558,14 +571,14 @@ export default {
                 this.stepId +
                 '" style="width: 100%;height:100%"></iframe>';
               toolName = "Computational modeling";
-            }else if (type == "chat") {
+            } else if (type == "chat") {
               toolURL =
                 '<iframe src="' +
                 "http://" +
                 this.$store.state.IP_Port +
                 '/GeoProblemSolving/chat" style="width: 100%;height:100%"></iframe>';
               toolName = "Chatroom";
-            } 
+            }
 
             let panel = jsPanel.create({
               theme: "success",
@@ -624,9 +637,14 @@ export default {
         this.subprojectSocket = null;
       }
       let subProjectId = this.subProjectInfo.subProjectId;
-      var subprojectSocketURL = "ws://" + this.$store.state.IP_Port + "/GeoProblemSolving/Module/" + subProjectId;
-      if(this.$store.state.IP_Port == "localhost:8080"){
-        subprojectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + subProjectId;
+      var subprojectSocketURL =
+        "ws://" +
+        this.$store.state.IP_Port +
+        "/GeoProblemSolving/Module/" +
+        subProjectId;
+      if (this.$store.state.IP_Port == "localhost:8080") {
+        subprojectSocketURL =
+          "ws://localhost:8081/GeoProblemSolving/Module/" + subProjectId;
       }
       this.subprojectSocket = new WebSocket(subprojectSocketURL);
       this.subprojectSocket.onopen = this.onOpen;

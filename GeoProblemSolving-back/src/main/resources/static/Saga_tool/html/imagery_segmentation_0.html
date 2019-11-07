@@ -1,0 +1,249 @@
+
+                <!DOCTYPE html>
+                <html lang="en"> 
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                    <title>SAGA TOOL</title>
+                    <link rel="stylesheet" href="../css/bootstrap.min.css">
+                    <style>
+                        body {
+                            margin: 10px;
+                            margin-bottom: 20px;
+                            min-width: 700px;
+                        }
+
+                        th {
+                            text-align: center;
+                            font-size: 18px;
+                        }
+
+                        td,
+                        th {
+                            padding: 2px;
+                        }
+                        .progress{
+                            margin-bottom: 0px;
+                            display: none;
+                        }
+                    </style>
+                </head>
+
+                <body>
+
+                    <div id="desc_content">
+                        
+            <h4>Tool</h4>
+            <table border="0" >
+                <tr>
+                    <td valign="top"><b>Name</b></td>
+                    <td valign="top">Watershed Segmentation</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>ID</b></td>
+                    <td valign="top">0</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>Author</b></td>
+                    <td valign="top">O.Conrad (c) 2002</td>
+                </tr>
+            </table>
+            <hr>
+            <h4>Description</h4>
+            <hr>
+            <h4>Parameters</h4>
+            <table tool_id="0"
+            oid="5b90e7bbd15d75093cb58789"
+            stateId="858DFDDB-5E3E-4878-BA95-4B42D04A9F97"
+            mdlId="6D963335-018F-41b7-9874-FBB019CBF24B" border="1" width="100%" valign="top" cellpadding="6" rules="all">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Identifier</th>
+                        <th>Description</th>
+                        <th>Constraints</th>
+                        <th>Settings</th>
+                    </tr>
+                
+                <thead>
+                    <tr> 
+                    <th colspan="6">Input</th>
+                    </tr>
+                </thead>
+
+                <tbody id="input_body">
+                    
+            
+            <tr>
+            <td>Grid</td>
+            <td>Grid (input)</td>
+            <td>GRID</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="GRID" accept="application/zip" optional="false" data_type="Grid (input)"></input>
+            </td>
+            </tr>
+        
+        
+                </tbody>
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Options</th>
+                    </tr>
+                </thead>
+                <tbody id="options_body">
+                    
+        
+            <tr>
+                <td>Grid system</td>
+                <td>Grid system</td>
+                <td>PARAMETERS_GRID_SYSTEM</td>
+                <td></td>
+                <td></td>
+                <td>
+                <input type="text" id="PARAMETERS_GRID_SYSTEM" class="form-control" value="">
+                </td>
+            </tr>,
+            <tr>
+                <td>Output</td>
+                <td>Choice</td>
+                <td>OUTPUT</td>
+                <td>The values of the resultant grid can be either the seed value (e.g. the local maximum) or the enumerated segment id.</td>
+                <td>Available Choices:
+[0] Seed Value
+[1] Segment ID
+Default: 1</td>
+                <td>
+                
+        <select class="form-control" id="OUTPUT">
+            <option value="0">[0] Seed Value</option>,<option value="1">[1] Segment ID</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Method</td>
+                <td>Choice</td>
+                <td>DOWN</td>
+                <td>Choose if you want to segmentate either on minima or on maxima.</td>
+                <td>Available Choices:
+[0] Minima
+[1] Maxima
+Default: 1</td>
+                <td>
+                
+        <select class="form-control" id="DOWN">
+            <option value="0">[0] Minima</option>,<option value="1">[1] Maxima</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Join Segments based on Threshold Value</td>
+                <td>Choice</td>
+                <td>JOIN</td>
+                <td>Join segments based on threshold value.</td>
+                <td>Available Choices:
+[0] do not join
+[1] seed to saddle difference
+[2] seeds difference
+Default: 0</td>
+                <td>
+                
+        <select class="form-control" id="JOIN">
+            <option value="0">[0] do not join</option>,<option value="1">[1] seed to saddle difference</option>,<option value="2">[2] seeds difference</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Threshold</td>
+                <td>Floating point</td>
+                <td>THRESHOLD</td>
+                <td>Specify a threshold value as minimum difference between neighboured segments.</td>
+                <td>Minimum: 0.000000
+Default: 0.000000</td>
+                <td>
+                <input type="text" id="THRESHOLD" class="form-control" value="0.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Allow Edge Pixels to be Seeds</td>
+                <td>Boolean</td>
+                <td>EDGE</td>
+                <td></td>
+                <td>Default: 1</td>
+                <td>
+                <input type="text" id="EDGE" class="form-control" value="1">
+                </td>
+            </tr>,
+            <tr>
+                <td>Borders</td>
+                <td>Boolean</td>
+                <td>BBORDERS</td>
+                <td>Create borders between segments as new grid.</td>
+                <td>Default: 0</td>
+                <td>
+                <input type="text" id="BBORDERS" class="form-control" value="0">
+                </td>
+            </tr>
+                </tbody> 
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Output</th>
+                    </tr>
+                </thead>
+
+                <tbody id="output_body">
+                
+            
+            <tr>
+            <td>Segments</td>
+            <td>Grid (output)</td>
+            <td>SEGMENTS</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="SEGMENTS" optional="false" data_type="Grid (output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Seed Points</td>
+            <td>Shapes (output)</td>
+            <td>SEEDS</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="SEEDS" optional="false" data_type="Shapes (output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Borders</td>
+            <td>Data Object Grid (optional output)</td>
+            <td>BORDERS</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="BORDERS" optional="true" data_type="Data Object Grid (optional output)">Download Data</a></td>
+            </tr>
+        
+         
+                </tbody>
+                
+            </table>(*) <i>optional</i>
+            <div class="progress">
+                <div id="progressbar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="60"
+                    aria-valuemin="0" aria-valuemax="100" style="width: 10%"> 
+                </div>
+            </div>
+            <button type="button" style="float: right;margin-top: 20px; margin-bottom: 20px; margin-right: 30px;width: 100px;tab-size: 28px" class="btn btn-success" onclick="onRunButtonClick()">Run
+            </button>
+            
+                    </div>
+                    <script src="../js/jquery-3.4.1.js"></script>
+                    <script src="../js/bootstrap.min.js"></script>
+                    <script src="../js/runModel.js"></script>
+                </body> 
+                </html>

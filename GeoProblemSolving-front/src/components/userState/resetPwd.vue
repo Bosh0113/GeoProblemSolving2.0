@@ -127,7 +127,7 @@
           <FormItem label="Email" prop="email">
             <Input v-model="formValidate.email" :class="{InputStyle: inputstyle}"></Input>
           </FormItem>
-          <FormItem label="new password" prop="newPassword">
+          <FormItem label="New password" prop="newPassword">
             <Input
               v-model="formValidate.newPassword"
               placeholder="Plase enter password"
@@ -140,7 +140,7 @@
               </Button>
             </Input>
           </FormItem>
-          <FormItem label="confirm password" prop="confirmPassword">
+          <FormItem label="Confirm password" prop="confirmPassword">
             <Input
               v-model="formValidate.confirmPassword"
               placeholder="Plase enter password again"

@@ -1,0 +1,226 @@
+
+                <!DOCTYPE html>
+                <html lang="en"> 
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                    <title>SAGA TOOL</title>
+                    <link rel="stylesheet" href="../css/bootstrap.min.css">
+                    <style>
+                        body {
+                            margin: 10px;
+                            margin-bottom: 20px;
+                            min-width: 700px;
+                        }
+
+                        th {
+                            text-align: center;
+                            font-size: 18px;
+                        }
+
+                        td,
+                        th {
+                            padding: 2px;
+                        }
+                        .progress{
+                            margin-bottom: 0px;
+                            display: none;
+                        }
+                    </style>
+                </head>
+
+                <body>
+
+                    <div id="desc_content">
+                        
+            <h4>Tool</h4>
+            <table border="0" >
+                <tr>
+                    <td valign="top"><b>Name</b></td>
+                    <td valign="top">Create Graticule</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>ID</b></td>
+                    <td valign="top">12</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>Author</b></td>
+                    <td valign="top">V.Olaya (c) 2004</td>
+                </tr>
+            </table>
+            <hr>
+            <h4>Description</h4>
+            <hr>
+            <h4>Parameters</h4>
+            <table tool_id="12"
+            oid="5b90e7bbd15d75093cb5882f"
+            stateId="C71EE7F0-C644-4a3a-B126-17280D7AD814"
+            mdlId="3AC5EC79-F3BF-45e1-93C9-1AD4DD0C7461" border="1" width="100%" valign="top" cellpadding="6" rules="all">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Identifier</th>
+                        <th>Description</th>
+                        <th>Constraints</th>
+                        <th>Settings</th>
+                    </tr>
+                
+                <thead>
+                    <tr> 
+                    <th colspan="6">Input</th>
+                    </tr>
+                </thead>
+
+                <tbody id="input_body">
+                    
+            
+            <tr>
+            <td>Extent</td>
+            <td>Shapes (optional input)</td>
+            <td>EXTENT</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="EXTENT" accept="application/zip" optional="true" data_type="Shapes (optional input)"></input>
+            </td>
+            </tr>
+        
+        
+                </tbody>
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Options</th>
+                    </tr>
+                </thead>
+                <tbody id="options_body">
+                    
+        
+            <tr>
+                <td>Type</td>
+                <td>Choice</td>
+                <td>TYPE</td>
+                <td></td>
+                <td>Available Choices:
+[0] Lines
+[1] Rectangles
+Default: 0</td>
+                <td>
+                
+        <select class="form-control" id="TYPE">
+            <option value="0">[0] Lines</option>,<option value="1">[1] Rectangles</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Width</td>
+                <td>Value range</td>
+                <td>EXTENT_X</td>
+                <td></td>
+                <td></td>
+                <td>
+                <input type="text" id="EXTENT_X" class="form-control" value="">
+                </td>
+            </tr>,
+            <tr>
+                <td>Height</td>
+                <td>Value range</td>
+                <td>EXTENT_Y</td>
+                <td></td>
+                <td></td>
+                <td>
+                <input type="text" id="EXTENT_Y" class="form-control" value="">
+                </td>
+            </tr>,
+            <tr>
+                <td>Division Width</td>
+                <td>Floating point</td>
+                <td>DIVISION_X</td>
+                <td></td>
+                <td>Minimum: 0.000000
+Default: 10.000000</td>
+                <td>
+                <input type="text" id="DIVISION_X" class="form-control" value="10.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Division Height</td>
+                <td>Floating point</td>
+                <td>DIVISION_Y</td>
+                <td></td>
+                <td>Minimum: 0.000000
+Default: 10.000000</td>
+                <td>
+                <input type="text" id="DIVISION_Y" class="form-control" value="10.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Alignment</td>
+                <td>Choice</td>
+                <td>ALIGNMENT</td>
+                <td>Determines how the graticule is aligned to the extent, if division sizes do not fit.</td>
+                <td>Available Choices:
+[0] bottom-left
+[1] top-left
+[2] bottom-right
+[3] top-right
+[4] centered
+Default: 0</td>
+                <td>
+                
+        <select class="form-control" id="ALIGNMENT">
+            <option value="0">[0] bottom-left</option>,<option value="1">[1] top-left</option>,<option value="2">[2] bottom-right</option>,<option value="3">[3] top-right</option>,<option value="4">[4] centered</option>
+        </select>
+        
+                </td>
+            </tr>
+                </tbody> 
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Output</th>
+                    </tr>
+                </thead>
+
+                <tbody id="output_body">
+                
+            
+            <tr>
+            <td>Graticule</td>
+            <td>Shapes (output)</td>
+            <td>GRATICULE_LINE</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="GRATICULE_LINE" optional="false" data_type="Shapes (output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Graticule</td>
+            <td>Shapes (output)</td>
+            <td>GRATICULE_RECT</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="GRATICULE_RECT" optional="false" data_type="Shapes (output)">Download Data</a></td>
+            </tr>
+        
+         
+                </tbody>
+                
+            </table>(*) <i>optional</i>
+            <div class="progress">
+                <div id="progressbar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="60"
+                    aria-valuemin="0" aria-valuemax="100" style="width: 10%"> 
+                </div>
+            </div>
+            <button type="button" style="float: right;margin-top: 20px; margin-bottom: 20px; margin-right: 30px;width: 100px;tab-size: 28px" class="btn btn-success" onclick="onRunButtonClick()">Run
+            </button>
+            
+                    </div>
+                    <script src="../js/jquery-3.4.1.js"></script>
+                    <script src="../js/bootstrap.min.js"></script>
+                    <script src="../js/runModel.js"></script>
+                </body> 
+                </html>

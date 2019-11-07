@@ -1,0 +1,299 @@
+
+                <!DOCTYPE html>
+                <html lang="en"> 
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                    <title>SAGA TOOL</title>
+                    <link rel="stylesheet" href="../css/bootstrap.min.css">
+                    <style>
+                        body {
+                            margin: 10px;
+                            margin-bottom: 20px;
+                            min-width: 700px;
+                        }
+
+                        th {
+                            text-align: center;
+                            font-size: 18px;
+                        }
+
+                        td,
+                        th {
+                            padding: 2px;
+                        }
+                        .progress{
+                            margin-bottom: 0px;
+                            display: none;
+                        }
+                    </style>
+                </head>
+
+                <body>
+
+                    <div id="desc_content">
+                        
+            <h4>Tool</h4>
+            <table border="0" >
+                <tr>
+                    <td valign="top"><b>Name</b></td>
+                    <td valign="top">Create Grid System</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>ID</b></td>
+                    <td valign="top">23</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>Author</b></td>
+                    <td valign="top">Volker Wichmann (c) 2007</td>
+                </tr>
+            </table>
+            <hr>
+            <h4>Description</h4>
+            <hr>
+            <h4>Parameters</h4>
+            <table tool_id="23"
+            oid="5b90e7bbd15d75093cb58760"
+            stateId="0147BA6D-39FD-45d7-AA08-F63B49C19368"
+            mdlId="25B42822-7429-4024-8BD3-5D89728FD9C1" border="1" width="100%" valign="top" cellpadding="6" rules="all">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Identifier</th>
+                        <th>Description</th>
+                        <th>Constraints</th>
+                        <th>Settings</th>
+                    </tr>
+                
+                <thead>
+                    <tr> 
+                    <th colspan="6">Input</th>
+                    </tr>
+                </thead>
+
+                <tbody id="input_body">
+                    
+            
+            <tr>
+            <td>Shapes Layers</td>
+            <td>Shapes list (input)</td>
+            <td>SHAPESLIST</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="SHAPESLIST" accept="application/zip" optional="false" data_type="Shapes list (input)" multiple="multiple"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Grids</td>
+            <td>Grid list (input)</td>
+            <td>GRIDLIST</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="GRIDLIST" accept="application/zip" optional="false" data_type="Grid list (input)" multiple="multiple"></input>
+            </td>
+            </tr>
+        
+        
+                </tbody>
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Options</th>
+                    </tr>
+                </thead>
+                <tbody id="options_body">
+                    
+        
+            <tr>
+                <td>Initialization Value</td>
+                <td>Floating point</td>
+                <td>INIT</td>
+                <td>Value which is assigned to the dummy grid.</td>
+                <td>Default: 0.000000</td>
+                <td>
+                <input type="text" id="INIT" class="form-control" value="0.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Cellsize</td>
+                <td>Floating point</td>
+                <td>CELLSIZE</td>
+                <td></td>
+                <td>Minimum: 0.000000
+Default: 10.000000</td>
+                <td>
+                <input type="text" id="CELLSIZE" class="form-control" value="10.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Extent Definition</td>
+                <td>Choice</td>
+                <td>M_EXTENT</td>
+                <td></td>
+                <td>Available Choices:
+[0] lower left coordinate and number of rows and columns
+[1] lower left and upper right coordinates
+[2] one or more shapes layers
+[3] one or more grids
+Default: 0</td>
+                <td>
+                
+        <select class="form-control" id="M_EXTENT">
+            <option value="0">[0] lower left coordinate and number of rows and columns</option>,<option value="1">[1] lower left and upper right coordinates</option>,<option value="2">[2] one or more shapes layers</option>,<option value="3">[3] one or more grids</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Adjust</td>
+                <td>Choice</td>
+                <td>ADJUST</td>
+                <td></td>
+                <td>Available Choices:
+[0] extent to cell size
+[1] cell size to left-right extent
+[2] cell size to bottom-top extent
+Default: 0</td>
+                <td>
+                
+        <select class="form-control" id="ADJUST">
+            <option value="0">[0] extent to cell size</option>,<option value="1">[1] cell size to left-right extent</option>,<option value="2">[2] cell size to bottom-top extent</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Left</td>
+                <td>Floating point</td>
+                <td>XMIN</td>
+                <td></td>
+                <td>Default: 0.000000</td>
+                <td>
+                <input type="text" id="XMIN" class="form-control" value="0.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Right</td>
+                <td>Floating point</td>
+                <td>XMAX</td>
+                <td></td>
+                <td>Default: 100.000000</td>
+                <td>
+                <input type="text" id="XMAX" class="form-control" value="100.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Columns</td>
+                <td>Integer</td>
+                <td>NX</td>
+                <td></td>
+                <td>Minimum: 1
+Default: 10</td>
+                <td>
+                <input type="text" id="NX" class="form-control" value="10">
+                </td>
+            </tr>,
+            <tr>
+                <td>Bottom</td>
+                <td>Floating point</td>
+                <td>YMIN</td>
+                <td></td>
+                <td>Default: 0.000000</td>
+                <td>
+                <input type="text" id="YMIN" class="form-control" value="0.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Top</td>
+                <td>Floating point</td>
+                <td>YMAX</td>
+                <td></td>
+                <td>Default: 100.000000</td>
+                <td>
+                <input type="text" id="YMAX" class="form-control" value="100.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Rows</td>
+                <td>Integer</td>
+                <td>NY</td>
+                <td></td>
+                <td>Minimum: 1
+Default: 10</td>
+                <td>
+                <input type="text" id="NY" class="form-control" value="10">
+                </td>
+            </tr>,
+            <tr>
+                <td>Use Offset</td>
+                <td>Boolean</td>
+                <td>USEOFF</td>
+                <td></td>
+                <td>Default: 0</td>
+                <td>
+                <input type="text" id="USEOFF" class="form-control" value="0">
+                </td>
+            </tr>,
+            <tr>
+                <td>X Offset</td>
+                <td>Floating point</td>
+                <td>XOFFSET</td>
+                <td>Positive values result in a shift in E direction.</td>
+                <td>Default: 0.000000</td>
+                <td>
+                <input type="text" id="XOFFSET" class="form-control" value="0.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Y Offset</td>
+                <td>Floating point</td>
+                <td>YOFFSET</td>
+                <td>Positive values result in a shift in N direction.</td>
+                <td>Default: 0.000000</td>
+                <td>
+                <input type="text" id="YOFFSET" class="form-control" value="0.000000">
+                </td>
+            </tr>
+                </tbody> 
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Output</th>
+                    </tr>
+                </thead>
+
+                <tbody id="output_body">
+                
+            
+            <tr>
+            <td>Dummy Grid</td>
+            <td>Data Object Grid (optional output)</td>
+            <td>GRID</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="GRID" optional="true" data_type="Data Object Grid (optional output)">Download Data</a></td>
+            </tr>
+        
+         
+                </tbody>
+                
+            </table>(*) <i>optional</i>
+            <div class="progress">
+                <div id="progressbar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="60"
+                    aria-valuemin="0" aria-valuemax="100" style="width: 10%"> 
+                </div>
+            </div>
+            <button type="button" style="float: right;margin-top: 20px; margin-bottom: 20px; margin-right: 30px;width: 100px;tab-size: 28px" class="btn btn-success" onclick="onRunButtonClick()">Run
+            </button>
+            
+                    </div>
+                    <script src="../js/jquery-3.4.1.js"></script>
+                    <script src="../js/bootstrap.min.js"></script>
+                    <script src="../js/runModel.js"></script>
+                </body> 
+                </html>

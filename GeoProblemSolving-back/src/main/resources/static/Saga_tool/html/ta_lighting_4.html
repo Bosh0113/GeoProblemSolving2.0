@@ -1,0 +1,255 @@
+
+                <!DOCTYPE html>
+                <html lang="en"> 
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                    <title>SAGA TOOL</title>
+                    <link rel="stylesheet" href="../css/bootstrap.min.css">
+                    <style>
+                        body {
+                            margin: 10px;
+                            margin-bottom: 20px;
+                            min-width: 700px;
+                        }
+
+                        th {
+                            text-align: center;
+                            font-size: 18px;
+                        }
+
+                        td,
+                        th {
+                            padding: 2px;
+                        }
+                        .progress{
+                            margin-bottom: 0px;
+                            display: none;
+                        }
+                    </style>
+                </head>
+
+                <body>
+
+                    <div id="desc_content">
+                        
+            <h4>Tool</h4>
+            <table border="0" >
+                <tr>
+                    <td valign="top"><b>Name</b></td>
+                    <td valign="top">Topographic Correction</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>ID</b></td>
+                    <td valign="top">4</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>Author</b></td>
+                    <td valign="top">Copyrights (c) 2008 by Olaf Conrad</td>
+                </tr>
+            </table>
+            <hr>
+            <h4>Description</h4>
+            <hr>
+            <h4>Parameters</h4>
+            <table tool_id="4"
+            oid="5b90e7bbd15d75093cb588d2"
+            stateId="15A2AB91-62A0-4dd5-BF6A-82F5791E8709"
+            mdlId="278AFFA3-A3D5-4ede-BFBB-6C4AEE4BA8E9" border="1" width="100%" valign="top" cellpadding="6" rules="all">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Identifier</th>
+                        <th>Description</th>
+                        <th>Constraints</th>
+                        <th>Settings</th>
+                    </tr>
+                
+                <thead>
+                    <tr> 
+                    <th colspan="6">Input</th>
+                    </tr>
+                </thead>
+
+                <tbody id="input_body">
+                    
+            
+            <tr>
+            <td>Elevation</td>
+            <td>Grid (input)</td>
+            <td>DEM</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="DEM" accept="application/zip" optional="false" data_type="Grid (input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Original Image</td>
+            <td>Grid (input)</td>
+            <td>ORIGINAL</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="ORIGINAL" accept="application/zip" optional="false" data_type="Grid (input)"></input>
+            </td>
+            </tr>
+        
+        
+                </tbody>
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Options</th>
+                    </tr>
+                </thead>
+                <tbody id="options_body">
+                    
+        
+            <tr>
+                <td>Grid system</td>
+                <td>Grid system</td>
+                <td>PARAMETERS_GRID_SYSTEM</td>
+                <td></td>
+                <td></td>
+                <td>
+                <input type="text" id="PARAMETERS_GRID_SYSTEM" class="form-control" value="">
+                </td>
+            </tr>,
+            <tr>
+                <td>Grid system</td>
+                <td>Grid system</td>
+                <td>DEM_GRIDSYSTEM</td>
+                <td></td>
+                <td></td>
+                <td>
+                <input type="text" id="DEM_GRIDSYSTEM" class="form-control" value="">
+                </td>
+            </tr>,
+            <tr>
+                <td>Azimuth</td>
+                <td>Floating point</td>
+                <td>AZI</td>
+                <td>direction of sun (degree, clockwise from North)</td>
+                <td>Minimum: 0.000000
+Maximum: 360.000000
+Default: 180.000000</td>
+                <td>
+                <input type="text" id="AZI" class="form-control" value="180.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Height</td>
+                <td>Floating point</td>
+                <td>HGT</td>
+                <td>height of sun above horizon (degree)</td>
+                <td>Minimum: 0.000000
+Maximum: 90.000000
+Default: 45.000000</td>
+                <td>
+                <input type="text" id="HGT" class="form-control" value="45.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Method</td>
+                <td>Choice</td>
+                <td>METHOD</td>
+                <td></td>
+                <td>Available Choices:
+[0] Cosine Correction (Teillet et al. 1982)
+[1] Cosine Correction (Civco 1989)
+[2] Minnaert Correction
+[3] Minnaert Correction with Slope (Riano et al. 2003)
+[4] Minnaert Correction with Slope (Law & Nichol 2004)
+[5] C Correction
+[6] Normalization (after Civco, modified by Law & Nichol)
+Default: 4</td>
+                <td>
+                
+        <select class="form-control" id="METHOD">
+            <option value="0">[0] Cosine Correction (Teillet et al. 1982)</option>,<option value="1">[1] Cosine Correction (Civco 1989)</option>,<option value="2">[2] Minnaert Correction</option>,<option value="3">[3] Minnaert Correction with Slope (Riano et al. 2003)</option>,<option value="4">[4] Minnaert Correction with Slope (Law & Nichol 2004)</option>,<option value="5">[5] C Correction</option>,<option value="6">[6] Normalization (after Civco, modified by Law & Nichol)</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Minnaert Correction</td>
+                <td>Floating point</td>
+                <td>MINNAERT</td>
+                <td></td>
+                <td>Minimum: 0.000000
+Maximum: 1.000000
+Default: 0.500000</td>
+                <td>
+                <input type="text" id="MINNAERT" class="form-control" value="0.500000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Maximum Cells (C Correction Analysis)</td>
+                <td>Integer</td>
+                <td>MAXCELLS</td>
+                <td>Maximum number of grid cells used for trend analysis as required by C correction.</td>
+                <td>Minimum: 10
+Default: 1000</td>
+                <td>
+                <input type="text" id="MAXCELLS" class="form-control" value="1000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Value Range</td>
+                <td>Choice</td>
+                <td>MAXVALUE</td>
+                <td></td>
+                <td>Available Choices:
+[0] 1 byte (0-255)
+[1] 2 byte (0-65535)
+Default: 0</td>
+                <td>
+                
+        <select class="form-control" id="MAXVALUE">
+            <option value="0">[0] 1 byte (0-255)</option>,<option value="1">[1] 2 byte (0-65535)</option>
+        </select>
+        
+                </td>
+            </tr>
+                </tbody> 
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Output</th>
+                    </tr>
+                </thead>
+
+                <tbody id="output_body">
+                
+            
+            <tr>
+            <td>Corrected Image</td>
+            <td>Grid (output)</td>
+            <td>CORRECTED</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="CORRECTED" optional="false" data_type="Grid (output)">Download Data</a></td>
+            </tr>
+        
+         
+                </tbody>
+                
+            </table>(*) <i>optional</i>
+            <div class="progress">
+                <div id="progressbar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="60"
+                    aria-valuemin="0" aria-valuemax="100" style="width: 10%"> 
+                </div>
+            </div>
+            <button type="button" style="float: right;margin-top: 20px; margin-bottom: 20px; margin-right: 30px;width: 100px;tab-size: 28px" class="btn btn-success" onclick="onRunButtonClick()">Run
+            </button>
+            
+                    </div>
+                    <script src="../js/jquery-3.4.1.js"></script>
+                    <script src="../js/bootstrap.min.js"></script>
+                    <script src="../js/runModel.js"></script>
+                </body> 
+                </html>

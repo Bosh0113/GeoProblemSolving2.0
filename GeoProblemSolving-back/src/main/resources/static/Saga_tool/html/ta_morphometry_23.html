@@ -1,0 +1,292 @@
+
+                <!DOCTYPE html>
+                <html lang="en"> 
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                    <title>SAGA TOOL</title>
+                    <link rel="stylesheet" href="../css/bootstrap.min.css">
+                    <style>
+                        body {
+                            margin: 10px;
+                            margin-bottom: 20px;
+                            min-width: 700px;
+                        }
+
+                        th {
+                            text-align: center;
+                            font-size: 18px;
+                        }
+
+                        td,
+                        th {
+                            padding: 2px;
+                        }
+                        .progress{
+                            margin-bottom: 0px;
+                            display: none;
+                        }
+                    </style>
+                </head>
+
+                <body>
+
+                    <div id="desc_content">
+                        
+            <h4>Tool</h4>
+            <table border="0" >
+                <tr>
+                    <td valign="top"><b>Name</b></td>
+                    <td valign="top">Morphometric Features</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>ID</b></td>
+                    <td valign="top">23</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>Author</b></td>
+                    <td valign="top">O.Conrad (c) 2013</td>
+                </tr>
+            </table>
+            <hr>
+            <h4>Description</h4>
+            <hr>
+            <h4>Parameters</h4>
+            <table tool_id="23"
+            oid="5b90e7bbd15d75093cb588e6"
+            stateId="70F3F6CF-508D-43b2-B594-87B2397CF912"
+            mdlId="A0D43D97-A0CF-4664-8031-A1C8EBCEE1BE" border="1" width="100%" valign="top" cellpadding="6" rules="all">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Identifier</th>
+                        <th>Description</th>
+                        <th>Constraints</th>
+                        <th>Settings</th>
+                    </tr>
+                
+                <thead>
+                    <tr> 
+                    <th colspan="6">Input</th>
+                    </tr>
+                </thead>
+
+                <tbody id="input_body">
+                    
+            
+            <tr>
+            <td>Elevation</td>
+            <td>Grid (input)</td>
+            <td>DEM</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="DEM" accept="application/zip" optional="false" data_type="Grid (input)"></input>
+            </td>
+            </tr>
+        
+        
+                </tbody>
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Options</th>
+                    </tr>
+                </thead>
+                <tbody id="options_body">
+                    
+        
+            <tr>
+                <td>Grid system</td>
+                <td>Grid system</td>
+                <td>PARAMETERS_GRID_SYSTEM</td>
+                <td></td>
+                <td></td>
+                <td>
+                <input type="text" id="PARAMETERS_GRID_SYSTEM" class="form-control" value="">
+                </td>
+            </tr>,
+            <tr>
+                <td>Scale Radius (Cells)</td>
+                <td>Integer</td>
+                <td>SIZE</td>
+                <td>Size of processing window (= 1 + 2 * radius) given as number of cells</td>
+                <td>Minimum: 1
+Default: 5</td>
+                <td>
+                <input type="text" id="SIZE" class="form-control" value="5">
+                </td>
+            </tr>,
+            <tr>
+                <td>Slope Tolerance</td>
+                <td>Floating point</td>
+                <td>TOL_SLOPE</td>
+                <td>Slope tolerance that defines a 'flat' surface (degrees)</td>
+                <td>Default: 1.000000</td>
+                <td>
+                <input type="text" id="TOL_SLOPE" class="form-control" value="1.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Curvature Tolerance</td>
+                <td>Floating point</td>
+                <td>TOL_CURVE</td>
+                <td>Curvature tolerance that defines 'planar' surface</td>
+                <td>Default: 0.000100</td>
+                <td>
+                <input type="text" id="TOL_CURVE" class="form-control" value="0.000100">
+                </td>
+            </tr>,
+            <tr>
+                <td>Distance Weighting Exponent</td>
+                <td>Floating point</td>
+                <td>EXPONENT</td>
+                <td>Exponent for distance weighting (0.0-4.0)</td>
+                <td>Minimum: 0.000000
+Maximum: 4.000000
+Default: 0.000000</td>
+                <td>
+                <input type="text" id="EXPONENT" class="form-control" value="0.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Vertical Scaling</td>
+                <td>Floating point</td>
+                <td>ZSCALE</td>
+                <td>Vertical scaling factor</td>
+                <td>Default: 1.000000</td>
+                <td>
+                <input type="text" id="ZSCALE" class="form-control" value="1.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Constrain</td>
+                <td>Boolean</td>
+                <td>CONSTRAIN</td>
+                <td>Constrain model through central window cell</td>
+                <td>Default: 0</td>
+                <td>
+                <input type="text" id="CONSTRAIN" class="form-control" value="0">
+                </td>
+            </tr>
+                </tbody> 
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Output</th>
+                    </tr>
+                </thead>
+
+                <tbody id="output_body">
+                
+            
+            <tr>
+            <td>Morphometric Features</td>
+            <td>Grid (output)</td>
+            <td>FEATURES</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="FEATURES" optional="false" data_type="Grid (output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Generalized Surface</td>
+            <td>Grid (optional output)</td>
+            <td>ELEVATION</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="ELEVATION" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Slope</td>
+            <td>Grid (optional output)</td>
+            <td>SLOPE</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="SLOPE" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Aspect</td>
+            <td>Grid (optional output)</td>
+            <td>ASPECT</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="ASPECT" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Profile Curvature</td>
+            <td>Grid (optional output)</td>
+            <td>PROFC</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="PROFC" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Plan Curvature</td>
+            <td>Grid (optional output)</td>
+            <td>PLANC</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="PLANC" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Longitudinal Curvature</td>
+            <td>Grid (optional output)</td>
+            <td>LONGC</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="LONGC" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Cross-Sectional Curvature</td>
+            <td>Grid (optional output)</td>
+            <td>CROSC</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="CROSC" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Maximum Curvature</td>
+            <td>Grid (optional output)</td>
+            <td>MAXIC</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="MAXIC" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Minimum Curvature</td>
+            <td>Grid (optional output)</td>
+            <td>MINIC</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="MINIC" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        
+         
+                </tbody>
+                
+            </table>(*) <i>optional</i>
+            <div class="progress">
+                <div id="progressbar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="60"
+                    aria-valuemin="0" aria-valuemax="100" style="width: 10%"> 
+                </div>
+            </div>
+            <button type="button" style="float: right;margin-top: 20px; margin-bottom: 20px; margin-right: 30px;width: 100px;tab-size: 28px" class="btn btn-success" onclick="onRunButtonClick()">Run
+            </button>
+            
+                    </div>
+                    <script src="../js/jquery-3.4.1.js"></script>
+                    <script src="../js/bootstrap.min.js"></script>
+                    <script src="../js/runModel.js"></script>
+                </body> 
+                </html>

@@ -1,0 +1,329 @@
+
+                <!DOCTYPE html>
+                <html lang="en"> 
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                    <title>SAGA TOOL</title>
+                    <link rel="stylesheet" href="../css/bootstrap.min.css">
+                    <style>
+                        body {
+                            margin: 10px;
+                            margin-bottom: 20px;
+                            min-width: 700px;
+                        }
+
+                        th {
+                            text-align: center;
+                            font-size: 18px;
+                        }
+
+                        td,
+                        th {
+                            padding: 2px;
+                        }
+                        .progress{
+                            margin-bottom: 0px;
+                            display: none;
+                        }
+                    </style>
+                </head>
+
+                <body>
+
+                    <div id="desc_content">
+                        
+            <h4>Tool</h4>
+            <table border="0" >
+                <tr>
+                    <td valign="top"><b>Name</b></td>
+                    <td valign="top">Colorisation (PC)</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>ID</b></td>
+                    <td valign="top">1</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>Author</b></td>
+                    <td valign="top">HfT Stuttgart (c) 2013</td>
+                </tr>
+            </table>
+            <hr>
+            <h4>Description</h4>
+            <hr>
+            <h4>Parameters</h4>
+            <table tool_id="1"
+            oid="5b90e7bbd15d75093cb58788"
+            stateId="4564B41D-8F62-431c-B8FD-DDBEF75F0347"
+            mdlId="8681C1C1-F7C4-4bc5-9226-8C5CE83C46E1" border="1" width="100%" valign="top" cellpadding="6" rules="all">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Identifier</th>
+                        <th>Description</th>
+                        <th>Constraints</th>
+                        <th>Settings</th>
+                    </tr>
+                
+                <thead>
+                    <tr> 
+                    <th colspan="6">Input</th>
+                    </tr>
+                </thead>
+
+                <tbody id="input_body">
+                    
+            
+            <tr>
+            <td>RGB Image</td>
+            <td>Grid (input)</td>
+            <td>rgbImage</td>
+            <td>RGB Image</td>
+            <td></td>
+            <td>
+                <input type="file" id="rgbImage" accept="application/zip" optional="false" data_type="Grid (input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Points to be Colorised</td>
+            <td>Point Cloud (input)</td>
+            <td>PC_IN</td>
+            <td>Points to be Colorised</td>
+            <td></td>
+            <td>
+                <input type="file" id="PC_IN" accept="application/zip" optional="false" data_type="Point Cloud (input)"></input>
+            </td>
+            </tr>
+        
+        
+                </tbody>
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Options</th>
+                    </tr>
+                </thead>
+                <tbody id="options_body">
+                    
+        
+            <tr>
+                <td>Grid system</td>
+                <td>Grid system</td>
+                <td>rgbImage_GRIDSYSTEM</td>
+                <td></td>
+                <td></td>
+                <td>
+                <input type="text" id="rgbImage_GRIDSYSTEM" class="form-control" value="">
+                </td>
+            </tr>,
+            <tr>
+                <td>Provide Time stamp of Image?</td>
+                <td>Boolean</td>
+                <td>GIVE_TIME</td>
+                <td>Do you wish to provide the time stamp of Image?</td>
+                <td>Default: 0</td>
+                <td>
+                <input type="text" id="GIVE_TIME" class="form-control" value="0">
+                </td>
+            </tr>,
+            <tr>
+                <td>Time stamp of Image</td>
+                <td>Floating point</td>
+                <td>IMG_TIME</td>
+                <td>Time stamp of Image</td>
+                <td>Default: 0.000000</td>
+                <td>
+                <input type="text" id="IMG_TIME" class="form-control" value="0.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Time Difference between Image & Points</td>
+                <td>Floating point</td>
+                <td>TIME_DIFF</td>
+                <td>Acceptable Time Difference between Image and Laser Points</td>
+                <td>Default: 0.000000</td>
+                <td>
+                <input type="text" id="TIME_DIFF" class="form-control" value="0.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Focal Length (mm)</td>
+                <td>Floating point</td>
+                <td>F</td>
+                <td>Focal Length in mm</td>
+                <td>Default: 0.000000</td>
+                <td>
+                <input type="text" id="F" class="form-control" value="0.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Pixel Width (um)</td>
+                <td>Floating point</td>
+                <td>W</td>
+                <td>Pixel Width in micro meters</td>
+                <td>Default: 0.000000</td>
+                <td>
+                <input type="text" id="W" class="form-control" value="0.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Principal Point Offset in X (pixles)</td>
+                <td>Floating point</td>
+                <td>ppX</td>
+                <td>Principal Point Offset in X</td>
+                <td>Default: 0.000000</td>
+                <td>
+                <input type="text" id="ppX" class="form-control" value="0.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Principal Point Offset in Y (pixels)</td>
+                <td>Floating point</td>
+                <td>ppY</td>
+                <td>Principal Point Offset in Y</td>
+                <td>Default: 0.000000</td>
+                <td>
+                <input type="text" id="ppY" class="form-control" value="0.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Provide Radial Distortion Parameters?</td>
+                <td>Boolean</td>
+                <td>GIVE_DISTORTIONS</td>
+                <td>Do you wish to provide the Radial Distortion Parameters?</td>
+                <td>Default: 0</td>
+                <td>
+                <input type="text" id="GIVE_DISTORTIONS" class="form-control" value="0">
+                </td>
+            </tr>,
+            <tr>
+                <td>K1</td>
+                <td>Floating point</td>
+                <td>K1</td>
+                <td>K1</td>
+                <td>Default: 0.000000</td>
+                <td>
+                <input type="text" id="K1" class="form-control" value="0.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>K2</td>
+                <td>Floating point</td>
+                <td>K2</td>
+                <td>K2</td>
+                <td>Default: 0.000000</td>
+                <td>
+                <input type="text" id="K2" class="form-control" value="0.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>K3</td>
+                <td>Floating point</td>
+                <td>K3</td>
+                <td>K3</td>
+                <td>Default: 0.000000</td>
+                <td>
+                <input type="text" id="K3" class="form-control" value="0.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Projection Centre - X</td>
+                <td>Floating point</td>
+                <td>Xc</td>
+                <td>Projection Centre</td>
+                <td>Default: 0.000000</td>
+                <td>
+                <input type="text" id="Xc" class="form-control" value="0.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Projection Centre - Y</td>
+                <td>Floating point</td>
+                <td>Yc</td>
+                <td>Projection Centre</td>
+                <td>Default: 0.000000</td>
+                <td>
+                <input type="text" id="Yc" class="form-control" value="0.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Projection Centre - Z</td>
+                <td>Floating point</td>
+                <td>Zc</td>
+                <td>Projection Centre</td>
+                <td>Default: 0.000000</td>
+                <td>
+                <input type="text" id="Zc" class="form-control" value="0.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Omega</td>
+                <td>Floating point</td>
+                <td>omega</td>
+                <td>Rotation Angle</td>
+                <td>Default: 0.000000</td>
+                <td>
+                <input type="text" id="omega" class="form-control" value="0.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Kappa</td>
+                <td>Floating point</td>
+                <td>kappa</td>
+                <td>Rotation Angle</td>
+                <td>Default: 0.000000</td>
+                <td>
+                <input type="text" id="kappa" class="form-control" value="0.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Alpha</td>
+                <td>Floating point</td>
+                <td>alpha</td>
+                <td>Rotation Angle</td>
+                <td>Default: 0.000000</td>
+                <td>
+                <input type="text" id="alpha" class="form-control" value="0.000000">
+                </td>
+            </tr>
+                </tbody> 
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Output</th>
+                    </tr>
+                </thead>
+
+                <tbody id="output_body">
+                
+            
+            <tr>
+            <td>Colorised Point Cloud</td>
+            <td>Point Cloud (output)</td>
+            <td>PC_OUT</td>
+            <td>Colorised Point Cloud</td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="PC_OUT" optional="false" data_type="Point Cloud (output)">Download Data</a></td>
+            </tr>
+        
+         
+                </tbody>
+                
+            </table>(*) <i>optional</i>
+            <div class="progress">
+                <div id="progressbar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="60"
+                    aria-valuemin="0" aria-valuemax="100" style="width: 10%"> 
+                </div>
+            </div>
+            <button type="button" style="float: right;margin-top: 20px; margin-bottom: 20px; margin-right: 30px;width: 100px;tab-size: 28px" class="btn btn-success" onclick="onRunButtonClick()">Run
+            </button>
+            
+                    </div>
+                    <script src="../js/jquery-3.4.1.js"></script>
+                    <script src="../js/bootstrap.min.js"></script>
+                    <script src="../js/runModel.js"></script>
+                </body> 
+                </html>

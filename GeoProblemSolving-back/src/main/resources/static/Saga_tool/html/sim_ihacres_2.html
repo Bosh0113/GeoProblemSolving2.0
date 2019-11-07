@@ -1,0 +1,194 @@
+
+                <!DOCTYPE html>
+                <html lang="en"> 
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                    <title>SAGA TOOL</title>
+                    <link rel="stylesheet" href="../css/bootstrap.min.css">
+                    <style>
+                        body {
+                            margin: 10px;
+                            margin-bottom: 20px;
+                            min-width: 700px;
+                        }
+
+                        th {
+                            text-align: center;
+                            font-size: 18px;
+                        }
+
+                        td,
+                        th {
+                            padding: 2px;
+                        }
+                        .progress{
+                            margin-bottom: 0px;
+                            display: none;
+                        }
+                    </style>
+                </head>
+
+                <body>
+
+                    <div id="desc_content">
+                        
+            <h4>Tool</h4>
+            <table border="0" >
+                <tr>
+                    <td valign="top"><b>Name</b></td>
+                    <td valign="top">IHACRES Basin</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>ID</b></td>
+                    <td valign="top">2</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>Author</b></td>
+                    <td valign="top">copyrights (c) 2008 Stefan Liersch</td>
+                </tr>
+            </table>
+            <hr>
+            <h4>Description</h4>
+            <hr>
+            <h4>Parameters</h4>
+            <table tool_id="2"
+            oid="5b90e7bbd15d75093cb58856"
+            stateId="FCD5AD39-5F0C-4458-AA17-3D04DF91476F"
+            mdlId="B43EEA67-6874-4345-9F21-CA735E313205" border="1" width="100%" valign="top" cellpadding="6" rules="all">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Identifier</th>
+                        <th>Description</th>
+                        <th>Constraints</th>
+                        <th>Settings</th>
+                    </tr>
+                
+                <thead>
+                    <tr> 
+                    <th colspan="6">Input</th>
+                    </tr>
+                </thead>
+
+                <tbody id="input_body">
+                    
+                </tbody>
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Options</th>
+                    </tr>
+                </thead>
+                <tbody id="options_body">
+                    
+        
+            <tr>
+                <td>Number of sub-basins</td>
+                <td>Choice</td>
+                <td>NSUBBASINS</td>
+                <td></td>
+                <td>Available Choices:
+[0] 2
+[1] 3
+[2] 4
+[3] 5
+[4] 6
+[5] 7
+[6] 8
+[7] 9
+[8] 10
+Default: 0</td>
+                <td>
+                
+        <select class="form-control" id="NSUBBASINS">
+            <option value="0">[0] 2</option>,<option value="1">[1] 3</option>,<option value="2">[2] 4</option>,<option value="3">[3] 5</option>,<option value="4">[4] 6</option>,<option value="5">[5] 7</option>,<option value="6">[6] 8</option>,<option value="7">[7] 9</option>,<option value="8">[8] 10</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>IHACRES Version</td>
+                <td>Choice</td>
+                <td>IHACVERS</td>
+                <td></td>
+                <td>Available Choices:
+[0] Jakeman & Hornberger (1993)
+[1] Croke et al. (2005) !!! not yet implemented !!!
+Default: 0</td>
+                <td>
+                
+        <select class="form-control" id="IHACVERS">
+            <option value="0">[0] Jakeman & Hornberger (1993)</option>,<option value="1">[1] Croke et al. (2005) !!! not yet implemented !!!</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Storage</td>
+                <td>Choice</td>
+                <td>STORAGE</td>
+                <td></td>
+                <td>Available Choices:
+[0] Single Storage
+[1] Two Parallel Storages
+[2] Two Storages in Series !!! not yet implemented !!!
+Default: 0</td>
+                <td>
+                
+        <select class="form-control" id="STORAGE">
+            <option value="0">[0] Single Storage</option>,<option value="1">[1] Two Parallel Storages</option>,<option value="2">[2] Two Storages in Series !!! not yet implemented !!!</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Using the snow-melt module?</td>
+                <td>Boolean</td>
+                <td>SNOW_TOOL</td>
+                <td>If checked, snow-melt module is used.</td>
+                <td>Default: 0</td>
+                <td>
+                <input type="text" id="SNOW_TOOL" class="form-control" value="0">
+                </td>
+            </tr>
+                </tbody> 
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Output</th>
+                    </tr>
+                </thead>
+
+                <tbody id="output_body">
+                
+            
+            <tr>
+            <td>Table</td>
+            <td>Data Object Table (optional output)</td>
+            <td>TABLEout</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="TABLEout" optional="true" data_type="Data Object Table (optional output)">Download Data</a></td>
+            </tr>
+        
+         
+                </tbody>
+                
+            </table>(*) <i>optional</i>
+            <div class="progress">
+                <div id="progressbar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="60"
+                    aria-valuemin="0" aria-valuemax="100" style="width: 10%"> 
+                </div>
+            </div>
+            <button type="button" style="float: right;margin-top: 20px; margin-bottom: 20px; margin-right: 30px;width: 100px;tab-size: 28px" class="btn btn-success" onclick="onRunButtonClick()">Run
+            </button>
+            
+                    </div>
+                    <script src="../js/jquery-3.4.1.js"></script>
+                    <script src="../js/bootstrap.min.js"></script>
+                    <script src="../js/runModel.js"></script>
+                </body> 
+                </html>

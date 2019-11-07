@@ -1,0 +1,245 @@
+
+                <!DOCTYPE html>
+                <html lang="en"> 
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                    <title>SAGA TOOL</title>
+                    <link rel="stylesheet" href="../css/bootstrap.min.css">
+                    <style>
+                        body {
+                            margin: 10px;
+                            margin-bottom: 20px;
+                            min-width: 700px;
+                        }
+
+                        th {
+                            text-align: center;
+                            font-size: 18px;
+                        }
+
+                        td,
+                        th {
+                            padding: 2px;
+                        }
+                        .progress{
+                            margin-bottom: 0px;
+                            display: none;
+                        }
+                    </style>
+                </head>
+
+                <body>
+
+                    <div id="desc_content">
+                        
+            <h4>Tool</h4>
+            <table border="0" >
+                <tr>
+                    <td valign="top"><b>Name</b></td>
+                    <td valign="top">Wombling (Edge Detection)</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>ID</b></td>
+                    <td valign="top">16</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>Author</b></td>
+                    <td valign="top">O.Conrad (c) 2015</td>
+                </tr>
+            </table>
+            <hr>
+            <h4>Description</h4>
+            <hr>
+            <h4>Parameters</h4>
+            <table tool_id="16"
+            oid="5b90e7bbd15d75093cb58735"
+            stateId="614154AA-49B6-4baa-9CEB-7BAC3D3B7099"
+            mdlId="3B50E374-DF18-4c31-B0C1-D81AE5AB15EB" border="1" width="100%" valign="top" cellpadding="6" rules="all">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Identifier</th>
+                        <th>Description</th>
+                        <th>Constraints</th>
+                        <th>Settings</th>
+                    </tr>
+                
+                <thead>
+                    <tr> 
+                    <th colspan="6">Input</th>
+                    </tr>
+                </thead>
+
+                <tbody id="input_body">
+                    
+            
+            <tr>
+            <td>Feature</td>
+            <td>Grid (input)</td>
+            <td>FEATURE</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="FEATURE" accept="application/zip" optional="false" data_type="Grid (input)"></input>
+            </td>
+            </tr>
+        
+        
+                </tbody>
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Options</th>
+                    </tr>
+                </thead>
+                <tbody id="options_body">
+                    
+        
+            <tr>
+                <td>Grid system</td>
+                <td>Grid system</td>
+                <td>PARAMETERS_GRID_SYSTEM</td>
+                <td></td>
+                <td></td>
+                <td>
+                <input type="text" id="PARAMETERS_GRID_SYSTEM" class="form-control" value="">
+                </td>
+            </tr>,
+            <tr>
+                <td>Minimum Magnitude</td>
+                <td>Floating point</td>
+                <td>TMAGNITUDE</td>
+                <td>Minimum magnitude as percentile.</td>
+                <td>Minimum: 0.000000
+Maximum: 100.000000
+Default: 90.000000</td>
+                <td>
+                <input type="text" id="TMAGNITUDE" class="form-control" value="90.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Maximum Angle</td>
+                <td>Floating point</td>
+                <td>TDIRECTION</td>
+                <td>Maximum angular difference as degree between adjacent segment points.</td>
+                <td>Minimum: 0.000000
+Maximum: 180.000000
+Default: 30.000000</td>
+                <td>
+                <input type="text" id="TDIRECTION" class="form-control" value="30.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Minimum Neighbours</td>
+                <td>Integer</td>
+                <td>TNEIGHBOUR</td>
+                <td>Minimum number of neighbouring potential edge cells with similar direction.</td>
+                <td>Minimum: 0
+Default: 1</td>
+                <td>
+                <input type="text" id="TNEIGHBOUR" class="form-control" value="1">
+                </td>
+            </tr>,
+            <tr>
+                <td>Alignment</td>
+                <td>Choice</td>
+                <td>ALIGNMENT</td>
+                <td></td>
+                <td>Available Choices:
+[0] between cells
+[1] on cell
+Default: 1</td>
+                <td>
+                
+        <select class="form-control" id="ALIGNMENT">
+            <option value="0">[0] between cells</option>,<option value="1">[1] on cell</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Edge Connectivity</td>
+                <td>Choice</td>
+                <td>NEIGHBOUR</td>
+                <td></td>
+                <td>Available Choices:
+[0] Rooke's case
+[1] Queen's case
+Default: 1</td>
+                <td>
+                
+        <select class="form-control" id="NEIGHBOUR">
+            <option value="0">[0] Rooke's case</option>,<option value="1">[1] Queen's case</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Output of Gradients</td>
+                <td>Boolean</td>
+                <td>GRADIENTS_OUT</td>
+                <td></td>
+                <td>Default: 0</td>
+                <td>
+                <input type="text" id="GRADIENTS_OUT" class="form-control" value="0">
+                </td>
+            </tr>
+                </tbody> 
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Output</th>
+                    </tr>
+                </thead>
+
+                <tbody id="output_body">
+                
+            
+            <tr>
+            <td>Edge Points</td>
+            <td>Shapes (optional output)</td>
+            <td>EDGE_POINTS</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="EDGE_POINTS" optional="true" data_type="Shapes (optional output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Edge Segments</td>
+            <td>Shapes (optional output)</td>
+            <td>EDGE_LINES</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="EDGE_LINES" optional="true" data_type="Shapes (optional output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Gradients</td>
+            <td>Grid list (optional output)</td>
+            <td>GRADIENTS</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="GRADIENTS" optional="true" data_type="Grid list (optional output)">Download Data</a></td>
+            </tr>
+        
+         
+                </tbody>
+                
+            </table>(*) <i>optional</i>
+            <div class="progress">
+                <div id="progressbar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="60"
+                    aria-valuemin="0" aria-valuemax="100" style="width: 10%"> 
+                </div>
+            </div>
+            <button type="button" style="float: right;margin-top: 20px; margin-bottom: 20px; margin-right: 30px;width: 100px;tab-size: 28px" class="btn btn-success" onclick="onRunButtonClick()">Run
+            </button>
+            
+                    </div>
+                    <script src="../js/jquery-3.4.1.js"></script>
+                    <script src="../js/bootstrap.min.js"></script>
+                    <script src="../js/runModel.js"></script>
+                </body> 
+                </html>

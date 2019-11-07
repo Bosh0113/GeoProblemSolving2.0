@@ -1,0 +1,255 @@
+
+                <!DOCTYPE html>
+                <html lang="en"> 
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                    <title>SAGA TOOL</title>
+                    <link rel="stylesheet" href="../css/bootstrap.min.css">
+                    <style>
+                        body {
+                            margin: 10px;
+                            margin-bottom: 20px;
+                            min-width: 700px;
+                        }
+
+                        th {
+                            text-align: center;
+                            font-size: 18px;
+                        }
+
+                        td,
+                        th {
+                            padding: 2px;
+                        }
+                        .progress{
+                            margin-bottom: 0px;
+                            display: none;
+                        }
+                    </style>
+                </head>
+
+                <body>
+
+                    <div id="desc_content">
+                        
+            <h4>Tool</h4>
+            <table border="0" >
+                <tr>
+                    <td valign="top"><b>Name</b></td>
+                    <td valign="top">Confusion Matrix (Polygons / Grid)</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>ID</b></td>
+                    <td valign="top">6</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>Author</b></td>
+                    <td valign="top">O.Conrad (c) 2015</td>
+                </tr>
+            </table>
+            <hr>
+            <h4>Description</h4>
+            <hr>
+            <h4>Parameters</h4>
+            <table tool_id="6"
+            oid="5b90e7bbd15d75093cb58784"
+            stateId="650393CF-CDA4-447d-9CC1-210A9033D298"
+            mdlId="A4D2E30E-F5AD-47df-96E2-02BE29F1190E" border="1" width="100%" valign="top" cellpadding="6" rules="all">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Identifier</th>
+                        <th>Description</th>
+                        <th>Constraints</th>
+                        <th>Settings</th>
+                    </tr>
+                
+                <thead>
+                    <tr> 
+                    <th colspan="6">Input</th>
+                    </tr>
+                </thead>
+
+                <tbody id="input_body">
+                    
+            
+            <tr>
+            <td>Classification</td>
+            <td>Grid (input)</td>
+            <td>GRID</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="GRID" accept="application/zip" optional="false" data_type="Grid (input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Look-up Table</td>
+            <td>Table (optional input)</td>
+            <td>GRID_LUT</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="GRID_LUT" accept="application/zip" optional="true" data_type="Table (optional input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Polygons</td>
+            <td>Shapes (input)</td>
+            <td>POLYGONS</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="POLYGONS" accept="application/zip" optional="false" data_type="Shapes (input)"></input>
+            </td>
+            </tr>
+        
+        
+                </tbody>
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Options</th>
+                    </tr>
+                </thead>
+                <tbody id="options_body">
+                    
+        
+            <tr>
+                <td>Grid system</td>
+                <td>Grid system</td>
+                <td>PARAMETERS_GRID_SYSTEM</td>
+                <td></td>
+                <td></td>
+                <td>
+                <input type="text" id="PARAMETERS_GRID_SYSTEM" class="form-control" value="">
+                </td>
+            </tr>,
+            <tr>
+                <td>Value Interpretation</td>
+                <td>Choice</td>
+                <td>GRID_VALUES</td>
+                <td></td>
+                <td>Available Choices:
+[0] values are class identifiers
+[1] use look-up table
+Default: 1</td>
+                <td>
+                
+        <select class="form-control" id="GRID_VALUES">
+            <option value="0">[0] values are class identifiers</option>,<option value="1">[1] use look-up table</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Value</td>
+                <td>Table field</td>
+                <td>GRID_LUT_MIN</td>
+                <td></td>
+                <td></td>
+                <td>
+                <input type="text" id="GRID_LUT_MIN" class="form-control" value="">
+                </td>
+            </tr>,
+            <tr>
+                <td>Value (Maximum)</td>
+                <td>Table field</td>
+                <td>GRID_LUT_MAX</td>
+                <td></td>
+                <td></td>
+                <td>
+                <input type="text" id="GRID_LUT_MAX" class="form-control" value="">
+                </td>
+            </tr>,
+            <tr>
+                <td>Name</td>
+                <td>Table field</td>
+                <td>GRID_LUT_NAM</td>
+                <td></td>
+                <td></td>
+                <td>
+                <input type="text" id="GRID_LUT_NAM" class="form-control" value="">
+                </td>
+            </tr>,
+            <tr>
+                <td>Classes</td>
+                <td>Table field</td>
+                <td>FIELD</td>
+                <td></td>
+                <td></td>
+                <td>
+                <input type="text" id="FIELD" class="form-control" value="">
+                </td>
+            </tr>,
+            <tr>
+                <td>Unclassified</td>
+                <td>Boolean</td>
+                <td>NO_CLASS</td>
+                <td></td>
+                <td>Default: 1</td>
+                <td>
+                <input type="text" id="NO_CLASS" class="form-control" value="1">
+                </td>
+            </tr>
+                </tbody> 
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Output</th>
+                    </tr>
+                </thead>
+
+                <tbody id="output_body">
+                
+            
+            <tr>
+            <td>Confusion Matrix</td>
+            <td>Table (output)</td>
+            <td>CONFUSION</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="CONFUSION" optional="false" data_type="Table (output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Class Values</td>
+            <td>Table (output)</td>
+            <td>CLASSES</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="CLASSES" optional="false" data_type="Table (output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Summary</td>
+            <td>Table (output)</td>
+            <td>SUMMARY</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="SUMMARY" optional="false" data_type="Table (output)">Download Data</a></td>
+            </tr>
+        
+         
+                </tbody>
+                
+            </table>(*) <i>optional</i>
+            <div class="progress">
+                <div id="progressbar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="60"
+                    aria-valuemin="0" aria-valuemax="100" style="width: 10%"> 
+                </div>
+            </div>
+            <button type="button" style="float: right;margin-top: 20px; margin-bottom: 20px; margin-right: 30px;width: 100px;tab-size: 28px" class="btn btn-success" onclick="onRunButtonClick()">Run
+            </button>
+            
+                    </div>
+                    <script src="../js/jquery-3.4.1.js"></script>
+                    <script src="../js/bootstrap.min.js"></script>
+                    <script src="../js/runModel.js"></script>
+                </body> 
+                </html>

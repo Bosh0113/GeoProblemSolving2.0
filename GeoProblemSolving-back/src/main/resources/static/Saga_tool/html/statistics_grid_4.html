@@ -1,0 +1,271 @@
+
+                <!DOCTYPE html>
+                <html lang="en"> 
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                    <title>SAGA TOOL</title>
+                    <link rel="stylesheet" href="../css/bootstrap.min.css">
+                    <style>
+                        body {
+                            margin: 10px;
+                            margin-bottom: 20px;
+                            min-width: 700px;
+                        }
+
+                        th {
+                            text-align: center;
+                            font-size: 18px;
+                        }
+
+                        td,
+                        th {
+                            padding: 2px;
+                        }
+                        .progress{
+                            margin-bottom: 0px;
+                            display: none;
+                        }
+                    </style>
+                </head>
+
+                <body>
+
+                    <div id="desc_content">
+                        
+            <h4>Tool</h4>
+            <table border="0" >
+                <tr>
+                    <td valign="top"><b>Name</b></td>
+                    <td valign="top">Statistics for Grids</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>ID</b></td>
+                    <td valign="top">4</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>Author</b></td>
+                    <td valign="top">O.Conrad (c) 2005</td>
+                </tr>
+            </table>
+            <hr>
+            <h4>Description</h4>
+            <hr>
+            <h4>Parameters</h4>
+            <table tool_id="4"
+            oid="5b90e7bbd15d75093cb5886c"
+            stateId="E394B001-D2F3-4a68-A31A-FDE933E456E6"
+            mdlId="4536D7EC-FF43-479f-849A-FB5F0FDF9B9F" border="1" width="100%" valign="top" cellpadding="6" rules="all">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Identifier</th>
+                        <th>Description</th>
+                        <th>Constraints</th>
+                        <th>Settings</th>
+                    </tr>
+                
+                <thead>
+                    <tr> 
+                    <th colspan="6">Input</th>
+                    </tr>
+                </thead>
+
+                <tbody id="input_body">
+                    
+            
+            <tr>
+            <td>Values</td>
+            <td>Grid list (input)</td>
+            <td>GRIDS</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="GRIDS" accept="application/zip" optional="false" data_type="Grid list (input)" multiple="multiple"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Weights</td>
+            <td>Grid list (optional input)</td>
+            <td>WEIGHTS</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="WEIGHTS" accept="application/zip" optional="true" data_type="Grid list (optional input)" multiple="multiple"></input>
+            </td>
+            </tr>
+        
+        
+                </tbody>
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Options</th>
+                    </tr>
+                </thead>
+                <tbody id="options_body">
+                    
+        
+            <tr>
+                <td>Grid system</td>
+                <td>Grid system</td>
+                <td>PARAMETERS_GRID_SYSTEM</td>
+                <td></td>
+                <td></td>
+                <td>
+                <input type="text" id="PARAMETERS_GRID_SYSTEM" class="form-control" value="">
+                </td>
+            </tr>,
+            <tr>
+                <td>Resampling</td>
+                <td>Choice</td>
+                <td>RESAMPLING</td>
+                <td></td>
+                <td>Available Choices:
+[0] Nearest Neighbour
+[1] Bilinear Interpolation
+[2] Bicubic Spline Interpolation
+[3] B-Spline Interpolation
+Default: 3</td>
+                <td>
+                
+        <select class="form-control" id="RESAMPLING">
+            <option value="0">[0] Nearest Neighbour</option>,<option value="1">[1] Bilinear Interpolation</option>,<option value="2">[2] Bicubic Spline Interpolation</option>,<option value="3">[3] B-Spline Interpolation</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Percentile</td>
+                <td>Floating point</td>
+                <td>PCTL_VAL</td>
+                <td></td>
+                <td>Minimum: 0.000000
+Maximum: 100.000000
+Default: 50.000000</td>
+                <td>
+                <input type="text" id="PCTL_VAL" class="form-control" value="50.000000">
+                </td>
+            </tr>
+                </tbody> 
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Output</th>
+                    </tr>
+                </thead>
+
+                <tbody id="output_body">
+                
+            
+            <tr>
+            <td>Arithmetic Mean</td>
+            <td>Grid (optional output)</td>
+            <td>MEAN</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="MEAN" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Minimum</td>
+            <td>Grid (optional output)</td>
+            <td>MIN</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="MIN" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Maximum</td>
+            <td>Grid (optional output)</td>
+            <td>MAX</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="MAX" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Range</td>
+            <td>Grid (optional output)</td>
+            <td>RANGE</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="RANGE" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Sum</td>
+            <td>Grid (optional output)</td>
+            <td>SUM</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="SUM" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Variance</td>
+            <td>Grid (optional output)</td>
+            <td>VAR</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="VAR" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Standard Deviation</td>
+            <td>Grid (optional output)</td>
+            <td>STDDEV</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="STDDEV" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Mean less Standard Deviation</td>
+            <td>Grid (optional output)</td>
+            <td>STDDEVLO</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="STDDEVLO" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Mean plus Standard Deviation</td>
+            <td>Grid (optional output)</td>
+            <td>STDDEVHI</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="STDDEVHI" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Percentile</td>
+            <td>Grid (optional output)</td>
+            <td>PCTL</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="PCTL" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        
+         
+                </tbody>
+                
+            </table>(*) <i>optional</i>
+            <div class="progress">
+                <div id="progressbar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="60"
+                    aria-valuemin="0" aria-valuemax="100" style="width: 10%"> 
+                </div>
+            </div>
+            <button type="button" style="float: right;margin-top: 20px; margin-bottom: 20px; margin-right: 30px;width: 100px;tab-size: 28px" class="btn btn-success" onclick="onRunButtonClick()">Run
+            </button>
+            
+                    </div>
+                    <script src="../js/jquery-3.4.1.js"></script>
+                    <script src="../js/bootstrap.min.js"></script>
+                    <script src="../js/runModel.js"></script>
+                </body> 
+                </html>

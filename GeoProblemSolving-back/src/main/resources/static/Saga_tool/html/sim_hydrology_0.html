@@ -1,0 +1,250 @@
+
+                <!DOCTYPE html>
+                <html lang="en"> 
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                    <title>SAGA TOOL</title>
+                    <link rel="stylesheet" href="../css/bootstrap.min.css">
+                    <style>
+                        body {
+                            margin: 10px;
+                            margin-bottom: 20px;
+                            min-width: 700px;
+                        }
+
+                        th {
+                            text-align: center;
+                            font-size: 18px;
+                        }
+
+                        td,
+                        th {
+                            padding: 2px;
+                        }
+                        .progress{
+                            margin-bottom: 0px;
+                            display: none;
+                        }
+                    </style>
+                </head>
+
+                <body>
+
+                    <div id="desc_content">
+                        
+            <h4>Tool</h4>
+            <table border="0" >
+                <tr>
+                    <td valign="top"><b>Name</b></td>
+                    <td valign="top">Soil Moisture Content</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>ID</b></td>
+                    <td valign="top">0</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>Author</b></td>
+                    <td valign="top">(c) 2002 by O.Conrad</td>
+                </tr>
+            </table>
+            <hr>
+            <h4>Description</h4>
+            <hr>
+            <h4>Parameters</h4>
+            <table tool_id="0"
+            oid="5b90e7bbd15d75093cb5884c"
+            stateId="30F63F50-D0DF-402d-A1DE-A33ECD765918"
+            mdlId="F504D423-70BA-4e6f-ACDF-A573914DF4E8" border="1" width="100%" valign="top" cellpadding="6" rules="all">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Identifier</th>
+                        <th>Description</th>
+                        <th>Constraints</th>
+                        <th>Settings</th>
+                    </tr>
+                
+                <thead>
+                    <tr> 
+                    <th colspan="6">Input</th>
+                    </tr>
+                </thead>
+
+                <tbody id="input_body">
+                    
+            
+            <tr>
+            <td>Field Capacity [mm]</td>
+            <td>Grid (optional input)</td>
+            <td>STA_FC</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="STA_FC" accept="application/zip" optional="true" data_type="Grid (optional input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Permanent Wilting Point [mm]</td>
+            <td>Grid (optional input)</td>
+            <td>STA_PWP</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="STA_PWP" accept="application/zip" optional="true" data_type="Grid (optional input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Land Use</td>
+            <td>Grid (optional input)</td>
+            <td>LANDUSE</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="LANDUSE" accept="application/zip" optional="true" data_type="Grid (optional input)"></input>
+            </td>
+            </tr>
+        
+        
+                </tbody>
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Options</th>
+                    </tr>
+                </thead>
+                <tbody id="options_body">
+                    
+        
+            <tr>
+                <td>Default</td>
+                <td>Floating point</td>
+                <td>STA_FC_DEF</td>
+                <td></td>
+                <td>Minimum: 0.000000
+Default: 20.000000</td>
+                <td>
+                <input type="text" id="STA_FC_DEF" class="form-control" value="20.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Default</td>
+                <td>Floating point</td>
+                <td>STA_PWP_DEF</td>
+                <td></td>
+                <td>Minimum: 0.000000
+Default: 2.000000</td>
+                <td>
+                <input type="text" id="STA_PWP_DEF" class="form-control" value="2.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Default</td>
+                <td>Integer</td>
+                <td>LANDUSE_DEF</td>
+                <td></td>
+                <td>Default: -1</td>
+                <td>
+                <input type="text" id="LANDUSE_DEF" class="form-control" value="-1">
+                </td>
+            </tr>,
+            <tr>
+                <td>Climate Data</td>
+                <td>Static table</td>
+                <td>DYN_CLIMATE</td>
+                <td></td>
+                <td>3 Fields:
+- 1. [8 byte floating point number] Precipitation [mm]
+- 2. [8 byte floating point number] Temperature (2pm) [DegreeC]
+- 3. [8 byte floating point number] Air Humidity (2pm) [%%]
+</td>
+                <td>
+                <input type="text" id="DYN_CLIMATE" class="form-control" value=":
+- 1. [8 byte floating point number] Precipitation [mm]
+- 2. [8 byte floating point number] Temperature (2pm) [DegreeC]
+- 3. [8 byte floating point number] Air Humidity (2pm) [%%]
+">
+                </td>
+            </tr>,
+            <tr>
+                <td>Crop Coefficients</td>
+                <td>Static table</td>
+                <td>STA_KC</td>
+                <td></td>
+                <td>14 Fields:
+- 1. [signed 4 byte integer] Land Use ID
+- 2. [string] Name
+- 3. [8 byte floating point number] January
+- 4. [8 byte floating point number] February
+- 5. [8 byte floating point number] March
+- 6. [8 byte floating point number] April
+- 7. [8 byte floating point number] May
+- 8. [8 byte floating point number] June
+- 9. [8 byte floating point number] July
+- 10. [8 byte floating point number] August
+- 11. [8 byte floating point number] September
+- 12. [8 byte floating point number] October
+- 13. [8 byte floating point number] November
+- 14. [8 byte floating point number] December
+</td>
+                <td>
+                <input type="text" id="STA_KC" class="form-control" value="s:
+- 1. [signed 4 byte integer] Land Use ID
+- 2. [string] Name
+- 3. [8 byte floating point number] January
+- 4. [8 byte floating point number] February
+- 5. [8 byte floating point number] March
+- 6. [8 byte floating point number] April
+- 7. [8 byte floating point number] May
+- 8. [8 byte floating point number] June
+- 9. [8 byte floating point number] July
+- 10. [8 byte floating point number] August
+- 11. [8 byte floating point number] September
+- 12. [8 byte floating point number] October
+- 13. [8 byte floating point number] November
+- 14. [8 byte floating point number] December
+">
+                </td>
+            </tr>
+                </tbody> 
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Output</th>
+                    </tr>
+                </thead>
+
+                <tbody id="output_body">
+                
+            
+            <tr>
+            <td>Soil Moisture</td>
+            <td>Grid (output)</td>
+            <td>DYN_W</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="DYN_W" optional="false" data_type="Grid (output)">Download Data</a></td>
+            </tr>
+        
+         
+                </tbody>
+                
+            </table>(*) <i>optional</i>
+            <div class="progress">
+                <div id="progressbar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="60"
+                    aria-valuemin="0" aria-valuemax="100" style="width: 10%"> 
+                </div>
+            </div>
+            <button type="button" style="float: right;margin-top: 20px; margin-bottom: 20px; margin-right: 30px;width: 100px;tab-size: 28px" class="btn btn-success" onclick="onRunButtonClick()">Run
+            </button>
+            
+                    </div>
+                    <script src="../js/jquery-3.4.1.js"></script>
+                    <script src="../js/bootstrap.min.js"></script>
+                    <script src="../js/runModel.js"></script>
+                </body> 
+                </html>

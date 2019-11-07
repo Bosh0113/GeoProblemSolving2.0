@@ -439,7 +439,7 @@
 
 
 <script>
-  import * as socketApi from "./../../api/socket.js";
+  import * as socketApi from "./../../../api/socket.js";
   import Avatar from "vue-avatar";
 
   export default {

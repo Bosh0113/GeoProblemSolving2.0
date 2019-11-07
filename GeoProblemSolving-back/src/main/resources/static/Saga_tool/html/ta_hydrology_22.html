@@ -1,0 +1,213 @@
+
+                <!DOCTYPE html>
+                <html lang="en"> 
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                    <title>SAGA TOOL</title>
+                    <link rel="stylesheet" href="../css/bootstrap.min.css">
+                    <style>
+                        body {
+                            margin: 10px;
+                            margin-bottom: 20px;
+                            min-width: 700px;
+                        }
+
+                        th {
+                            text-align: center;
+                            font-size: 18px;
+                        }
+
+                        td,
+                        th {
+                            padding: 2px;
+                        }
+                        .progress{
+                            margin-bottom: 0px;
+                            display: none;
+                        }
+                    </style>
+                </head>
+
+                <body>
+
+                    <div id="desc_content">
+                        
+            <h4>Tool</h4>
+            <table border="0" >
+                <tr>
+                    <td valign="top"><b>Name</b></td>
+                    <td valign="top">LS Factor</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>ID</b></td>
+                    <td valign="top">22</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>Author</b></td>
+                    <td valign="top">O.Conrad (c) 2003</td>
+                </tr>
+            </table>
+            <hr>
+            <h4>Description</h4>
+            <hr>
+            <h4>Parameters</h4>
+            <table tool_id="22"
+            oid="5b90e7bbd15d75093cb588c0"
+            stateId="A2B88682-1012-4d4a-B4CE-8D86CFAA066A"
+            mdlId="07EFF063-54CC-4112-8D78-0830BB2D17C9" border="1" width="100%" valign="top" cellpadding="6" rules="all">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Identifier</th>
+                        <th>Description</th>
+                        <th>Constraints</th>
+                        <th>Settings</th>
+                    </tr>
+                
+                <thead>
+                    <tr> 
+                    <th colspan="6">Input</th>
+                    </tr>
+                </thead>
+
+                <tbody id="input_body">
+                    
+            
+            <tr>
+            <td>Slope</td>
+            <td>Grid (input)</td>
+            <td>SLOPE</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="SLOPE" accept="application/zip" optional="false" data_type="Grid (input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Catchment Area</td>
+            <td>Grid (input)</td>
+            <td>AREA</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="AREA" accept="application/zip" optional="false" data_type="Grid (input)"></input>
+            </td>
+            </tr>
+        
+        
+                </tbody>
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Options</th>
+                    </tr>
+                </thead>
+                <tbody id="options_body">
+                    
+        
+            <tr>
+                <td>Area to Length Conversion</td>
+                <td>Choice</td>
+                <td>CONV</td>
+                <td>Derivation of slope lengths from catchment areas. These are rough approximations! Applies not to Desmet & Govers' method.</td>
+                <td>Available Choices:
+[0] no conversion (areas already given as specific catchment area)
+[1] 1 / cell size (specific catchment area)
+[2] square root (catchment length)
+Default: 0</td>
+                <td>
+                
+        <select class="form-control" id="CONV">
+            <option value="0">[0] no conversion (areas already given as specific catchment area)</option>,<option value="1">[1] 1 / cell size (specific catchment area)</option>,<option value="2">[2] square root (catchment length)</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Method (LS)</td>
+                <td>Choice</td>
+                <td>METHOD</td>
+                <td></td>
+                <td>Available Choices:
+[0] Moore et al. 1991
+[1] Desmet & Govers 1996
+[2] Boehner & Selige 2006
+Default: 0</td>
+                <td>
+                
+        <select class="form-control" id="METHOD">
+            <option value="0">[0] Moore et al. 1991</option>,<option value="1">[1] Desmet & Govers 1996</option>,<option value="2">[2] Boehner & Selige 2006</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Rill/Interrill Erosivity</td>
+                <td>Floating point</td>
+                <td>EROSIVITY</td>
+                <td></td>
+                <td>Minimum: 0.000000
+Default: 1.000000</td>
+                <td>
+                <input type="text" id="EROSIVITY" class="form-control" value="1.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Stability</td>
+                <td>Choice</td>
+                <td>STABILITY</td>
+                <td></td>
+                <td>Available Choices:
+[0] stable
+[1] instable (thawing)
+Default: 0</td>
+                <td>
+                
+        <select class="form-control" id="STABILITY">
+            <option value="0">[0] stable</option>,<option value="1">[1] instable (thawing)</option>
+        </select>
+        
+                </td>
+            </tr>
+                </tbody> 
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Output</th>
+                    </tr>
+                </thead>
+
+                <tbody id="output_body">
+                
+            
+            <tr>
+            <td>LS Factor</td>
+            <td>Grid (output)</td>
+            <td>LS</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="LS" optional="false" data_type="Grid (output)">Download Data</a></td>
+            </tr>
+        
+         
+                </tbody>
+                
+            </table>(*) <i>optional</i>
+            <div class="progress">
+                <div id="progressbar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="60"
+                    aria-valuemin="0" aria-valuemax="100" style="width: 10%"> 
+                </div>
+            </div>
+            <button type="button" style="float: right;margin-top: 20px; margin-bottom: 20px; margin-right: 30px;width: 100px;tab-size: 28px" class="btn btn-success" onclick="onRunButtonClick()">Run
+            </button>
+            
+                    </div>
+                    <script src="../js/jquery-3.4.1.js"></script>
+                    <script src="../js/bootstrap.min.js"></script>
+                    <script src="../js/runModel.js"></script>
+                </body> 
+                </html>

@@ -1,0 +1,289 @@
+
+                <!DOCTYPE html>
+                <html lang="en"> 
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                    <title>SAGA TOOL</title>
+                    <link rel="stylesheet" href="../css/bootstrap.min.css">
+                    <style>
+                        body {
+                            margin: 10px;
+                            margin-bottom: 20px;
+                            min-width: 700px;
+                        }
+
+                        th {
+                            text-align: center;
+                            font-size: 18px;
+                        }
+
+                        td,
+                        th {
+                            padding: 2px;
+                        }
+                        .progress{
+                            margin-bottom: 0px;
+                            display: none;
+                        }
+                    </style>
+                </head>
+
+                <body>
+
+                    <div id="desc_content">
+                        
+            <h4>Tool</h4>
+            <table border="0" >
+                <tr>
+                    <td valign="top"><b>Name</b></td>
+                    <td valign="top">Diversity of Categories</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>ID</b></td>
+                    <td valign="top">21</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>Author</b></td>
+                    <td valign="top">O.Conrad (c) 2015</td>
+                </tr>
+            </table>
+            <hr>
+            <h4>Description</h4>
+            <hr>
+            <h4>Parameters</h4>
+            <table tool_id="21"
+            oid="5b90e7bbd15d75093cb58711"
+            stateId="3C21660D-E21C-4c75-AF6B-3BA227474638"
+            mdlId="3AE40586-9310-47b5-BBAC-09EA006816D9" border="1" width="100%" valign="top" cellpadding="6" rules="all">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Identifier</th>
+                        <th>Description</th>
+                        <th>Constraints</th>
+                        <th>Settings</th>
+                    </tr>
+                
+                <thead>
+                    <tr> 
+                    <th colspan="6">Input</th>
+                    </tr>
+                </thead>
+
+                <tbody id="input_body">
+                    
+            
+            <tr>
+            <td>Categories</td>
+            <td>Grid (input)</td>
+            <td>CATEGORIES</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="CATEGORIES" accept="application/zip" optional="false" data_type="Grid (input)"></input>
+            </td>
+            </tr>
+        
+        
+                </tbody>
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Options</th>
+                    </tr>
+                </thead>
+                <tbody id="options_body">
+                    
+        
+            <tr>
+                <td>Grid system</td>
+                <td>Grid system</td>
+                <td>PARAMETERS_GRID_SYSTEM</td>
+                <td></td>
+                <td></td>
+                <td>
+                <input type="text" id="PARAMETERS_GRID_SYSTEM" class="form-control" value="">
+                </td>
+            </tr>,
+            <tr>
+                <td>Search Mode</td>
+                <td>Choice</td>
+                <td>SEARCH_MODE</td>
+                <td></td>
+                <td>Available Choices:
+[0] Square
+[1] Circle
+Default: 1</td>
+                <td>
+                
+        <select class="form-control" id="SEARCH_MODE">
+            <option value="0">[0] Square</option>,<option value="1">[1] Circle</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Search Distance</td>
+                <td>Integer</td>
+                <td>SEARCH_RADIUS</td>
+                <td>Search distance given as number cells.</td>
+                <td>Minimum: 1
+Default: 3</td>
+                <td>
+                <input type="text" id="SEARCH_RADIUS" class="form-control" value="3">
+                </td>
+            </tr>,
+            <tr>
+                <td>Connectivity Neighbourhood</td>
+                <td>Choice</td>
+                <td>NB_CASE</td>
+                <td></td>
+                <td>Available Choices:
+[0] Rook's case
+[1] Queen's case
+Default: 1</td>
+                <td>
+                
+        <select class="form-control" id="NB_CASE">
+            <option value="0">[0] Rook's case</option>,<option value="1">[1] Queen's case</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Normalize</td>
+                <td>Choice</td>
+                <td>NORMALIZE</td>
+                <td></td>
+                <td>Available Choices:
+[0] no
+[1] by number of cells
+[2] by area size
+Default: 0</td>
+                <td>
+                
+        <select class="form-control" id="NORMALIZE">
+            <option value="0">[0] no</option>,<option value="1">[1] by number of cells</option>,<option value="2">[2] by area size</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Weighting Function</td>
+                <td>Choice</td>
+                <td>DW_WEIGHTING</td>
+                <td></td>
+                <td>Available Choices:
+[0] no distance weighting
+[1] inverse distance to a power
+[2] exponential
+[3] gaussian weighting
+Default: 3</td>
+                <td>
+                
+        <select class="form-control" id="DW_WEIGHTING">
+            <option value="0">[0] no distance weighting</option>,<option value="1">[1] inverse distance to a power</option>,<option value="2">[2] exponential</option>,<option value="3">[3] gaussian weighting</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Inverse Distance Weighting Power</td>
+                <td>Floating point</td>
+                <td>DW_IDW_POWER</td>
+                <td></td>
+                <td>Minimum: 0.000000
+Default: 1.000000</td>
+                <td>
+                <input type="text" id="DW_IDW_POWER" class="form-control" value="1.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Inverse Distance Offset</td>
+                <td>Boolean</td>
+                <td>DW_IDW_OFFSET</td>
+                <td>Calculates weights for distance plus one, avoiding division by zero for zero distances</td>
+                <td>Default: 1</td>
+                <td>
+                <input type="text" id="DW_IDW_OFFSET" class="form-control" value="1">
+                </td>
+            </tr>,
+            <tr>
+                <td>Gaussian and Exponential Weighting Bandwidth</td>
+                <td>Floating point</td>
+                <td>DW_BANDWIDTH</td>
+                <td></td>
+                <td>Minimum: 0.000000
+Default: 0.700000</td>
+                <td>
+                <input type="text" id="DW_BANDWIDTH" class="form-control" value="0.700000">
+                </td>
+            </tr>
+                </tbody> 
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Output</th>
+                    </tr>
+                </thead>
+
+                <tbody id="output_body">
+                
+            
+            <tr>
+            <td>Number of Categories</td>
+            <td>Grid (output)</td>
+            <td>COUNT</td>
+            <td>number of different categories (unique values) within search area</td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="COUNT" optional="false" data_type="Grid (output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Diversity</td>
+            <td>Grid (output)</td>
+            <td>DIVERSITY</td>
+            <td>distance weighted average of the number of different categories for distance classes</td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="DIVERSITY" optional="false" data_type="Grid (output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Connectivity</td>
+            <td>Grid (output)</td>
+            <td>CONNECTIVITY</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="CONNECTIVITY" optional="false" data_type="Grid (output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Averaged Connectivity</td>
+            <td>Grid (output)</td>
+            <td>CONNECTEDAVG</td>
+            <td>average size of the area covered by each category that occurs within search area</td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="CONNECTEDAVG" optional="false" data_type="Grid (output)">Download Data</a></td>
+            </tr>
+        
+         
+                </tbody>
+                
+            </table>(*) <i>optional</i>
+            <div class="progress">
+                <div id="progressbar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="60"
+                    aria-valuemin="0" aria-valuemax="100" style="width: 10%"> 
+                </div>
+            </div>
+            <button type="button" style="float: right;margin-top: 20px; margin-bottom: 20px; margin-right: 30px;width: 100px;tab-size: 28px" class="btn btn-success" onclick="onRunButtonClick()">Run
+            </button>
+            
+                    </div>
+                    <script src="../js/jquery-3.4.1.js"></script>
+                    <script src="../js/bootstrap.min.js"></script>
+                    <script src="../js/runModel.js"></script>
+                </body> 
+                </html>

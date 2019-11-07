@@ -39,21 +39,21 @@ footer {
   flex: 0 0 auto;
 }
 .userState {
-    position: absolute;
-    width: 15%;
-    top: 0px;
-    z-index: 1;
-    display: inline-block;
-    min-width: fit-content;
+  position: absolute;
+  width: 15%;
+  top: 0px;
+  z-index: 1;
+  display: inline-block;
+  min-width: fit-content;
 }
 .navPart {
-    width: 85%;
-    display: inline-block;
+  width: 85%;
+  display: inline-block;
 }
 .menuItem a {
-    font-size: 1.2em;
-    font-weight: bold;
-    color: rgba(255, 255, 255, 1);
+  font-size: 1.2em;
+  font-weight: bold;
+  color: rgba(255, 255, 255, 1);
 }
 .userImg {
   width: 40px;
@@ -82,13 +82,13 @@ footer {
           class="pic"
           @click="goHome"
           style="cursor:pointer;margin-left:5%"
-        >
+        />
         <div v-if="useMenuCSS">
           <div class="navPart">
             <Menu
               mode="horizontal"
               theme="dark"
-              active-name="home"
+              :active-name="activeMenu"
               @on-select="turnContent"
               :style="`z-index:0;background:`+headerBgColor"
               width="auto"
@@ -104,7 +104,7 @@ footer {
               </MenuItem>
               <!-- <MenuItem name="community" class="menuItem">
                 <span>Community</span>
-              </MenuItem> -->
+              </MenuItem>-->
               <MenuItem name="help" class="menuItem">
                 <span>Help</span>
               </MenuItem>
@@ -114,6 +114,7 @@ footer {
             <Menu
               mode="horizontal"
               theme="dark"
+              :active-name="activeMenu"
               @on-select="unlogin"
               :style="`z-index:0;background:`+headerBgColor"
               v-show="!userState"
@@ -147,7 +148,7 @@ footer {
                       v-if="avatar!=''&&avatar!=undefined&&avatar!=null"
                       :title="userName"
                       style="width:40px;height:40px;vertical-align:middle;"
-                    >
+                    />
                     <avatar
                       :username="userName"
                       :size="40"
@@ -167,38 +168,38 @@ footer {
         </div>
         <div v-else>
           <Menu mode="horizontal" theme="dark" style="z-index: 0;"></Menu>
-            <Dropdown style="position: fixed;top: 10px;right: 20px;">
-                <Button icon="md-menu" style="color: white;background-color: #808695"></Button>
-                <DropdownMenu slot="list">
-                    <DropdownItem>
-                        <a href="/GeoProblemSolving/home">Home</a>
-                    </DropdownItem>
-                    <DropdownItem>
-                        <a href="/GeoProblemSolving/projectlist">Projects</a>
-                    </DropdownItem>
-                    <DropdownItem>
-                        <a href="/GeoProblemSolving/publicResource">Resources</a>
-                    </DropdownItem>
-                    <DropdownItem>
-                        <a href="/GeoProblemSolving/help">Help</a>
-                    </DropdownItem>
-                    <DropdownItem v-show="!userState">
-                        <a href="/GeoProblemSolving/login">Login</a>
-                    </DropdownItem>
-                    <DropdownItem v-show="!userState">
-                        <a href="/GeoProblemSolving/register">Sign up</a>
-                    </DropdownItem>
-                    <DropdownItem v-show="userState">
-                        <a href="/GeoProblemSolving/notifications">Notification</a>
-                    </DropdownItem>
-                    <DropdownItem v-show="userState">
-                        <a @click="toPersonalPage">Personal Page</a>
-                    </DropdownItem>
-                    <DropdownItem v-show="userState">
-                        <a @click="logout">Log out</a>
-                    </DropdownItem>
-                </DropdownMenu>
-            </Dropdown>
+          <Dropdown style="position: fixed;top: 10px;right: 20px;">
+            <Button icon="md-menu" style="color: white;background-color: #808695"></Button>
+            <DropdownMenu slot="list">
+              <DropdownItem>
+                <a href="/GeoProblemSolving/home">Home</a>
+              </DropdownItem>
+              <DropdownItem>
+                <a href="/GeoProblemSolving/projectlist">Projects</a>
+              </DropdownItem>
+              <DropdownItem>
+                <a href="/GeoProblemSolving/publicResource">Resources</a>
+              </DropdownItem>
+              <DropdownItem>
+                <a href="/GeoProblemSolving/help">Help</a>
+              </DropdownItem>
+              <DropdownItem v-show="!userState">
+                <a href="/GeoProblemSolving/login">Login</a>
+              </DropdownItem>
+              <DropdownItem v-show="!userState">
+                <a href="/GeoProblemSolving/register">Sign up</a>
+              </DropdownItem>
+              <DropdownItem v-show="userState">
+                <a href="/GeoProblemSolving/notifications">Notification</a>
+              </DropdownItem>
+              <DropdownItem v-show="userState">
+                <a @click="toPersonalPage">Personal Page</a>
+              </DropdownItem>
+              <DropdownItem v-show="userState">
+                <a @click="logout">Log out</a>
+              </DropdownItem>
+            </DropdownMenu>
+          </Dropdown>
         </div>
       </header>
     </div>
@@ -219,13 +220,22 @@ export default {
   name: "HelloWorld",
   data() {
     return {
+      activeMenu:"",
       //消息机制
       noticeSocket: null,
       unreadNoticeCount: 0,
       timer: null,
       contentHeight: window.innerHeight - 120 + "px",
-      useMenuCSS:false
+      useMenuCSS: false
     };
+  },
+  watch: {
+    '$route.name':function (newVal,oldVal) {
+      this.setMenuTitle(newVal)
+    } 
+  },
+  created(){
+    this.setMenuTitle(this.$route.name)
   },
   mounted() {
     if (this.$store.getters.userState) {
@@ -260,24 +270,45 @@ export default {
     }
   },
   methods: {
+    setMenuTitle(newVal){
+        switch(newVal){
+          case "PublicResource":{
+            this.activeMenu = "resources";
+            break;
+          }
+          case "Help":{
+            this.activeMenu = "help";
+            break;
+          }
+          case "Login":{
+            this.activeMenu = "login";
+            break;
+          }
+          case "Register":{
+            this.activeMenu = "register";
+            break;
+          }
+          default:
+            this.activeMenu = ""
+        }
+    },
     reSize() {
-      if(window.innerHeight > 675){
+      if (window.innerHeight > 675) {
         this.contentHeight = window.innerHeight - 120 + "px";
-      }
-      else{
+      } else {
         this.contentHeight = 675 - 120 + "px";
       }
-      if(window.innerWidth<1200){
-        this.useMenuCSS=false;
-      }else{
+      if (window.innerWidth < 1200) {
+        this.useMenuCSS = false;
+      } else {
         this.useMenuCSS = true;
       }
     },
     turnContent(name) {
       if (name === "home") {
-        window.location.href="/GeoProblemSolving/home";
+        window.location.href = "/GeoProblemSolving/home";
       } else if (name == "projects") {
-        window.location.href="/GeoProblemSolving/projectList";
+        window.location.href = "/GeoProblemSolving/projectList";
       } else if (name == "resources") {
         this.$router.replace({ name: "PublicResource" });
       } else if (name == "community") {
@@ -287,7 +318,7 @@ export default {
       }
     },
     goHome() {
-        window.location.href="/GeoProblemSolving/home";
+      window.location.href = "/GeoProblemSolving/home";
     },
     unlogin(name) {
       if (name === "login") {
@@ -335,8 +366,9 @@ export default {
       if (this.noticeSocket != null) {
         this.noticeSocket = null;
       }
-      var noticeSocketURL = "ws://"+this.$store.state.IP_Port+"/GeoProblemSolving/NoticeSocket";
-      if(this.$store.state.IP_Port=="localhost:8080"){
+      var noticeSocketURL =
+        "ws://" + this.$store.state.IP_Port + "/GeoProblemSolving/NoticeSocket";
+      if (this.$store.state.IP_Port == "localhost:8080") {
         noticeSocketURL = "ws://localhost:8081/GeoProblemSolving/NoticeSocket";
       }
       this.noticeSocket = new WebSocket(noticeSocketURL);
@@ -390,17 +422,17 @@ export default {
         this.logout();
       }
     },
-    logout(){
-        this.axios
-          .get("/GeoProblemSolving/user/logout")
-          .then(res => {
-            this.$store.commit("userLogout");
-            this.noticeSocket.close();
-            window.location.href="/GeoProblemSolving/home";
-          })
-          .catch(err => {
-            confirm("logout fail!");
-          });
+    logout() {
+      this.axios
+        .get("/GeoProblemSolving/user/logout")
+        .then(res => {
+          this.$store.commit("userLogout");
+          this.noticeSocket.close();
+          window.location.href = "/GeoProblemSolving/home";
+        })
+        .catch(err => {
+          confirm("logout fail!");
+        });
     }
   }
 };

@@ -1,0 +1,339 @@
+
+                <!DOCTYPE html>
+                <html lang="en"> 
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                    <title>SAGA TOOL</title>
+                    <link rel="stylesheet" href="../css/bootstrap.min.css">
+                    <style>
+                        body {
+                            margin: 10px;
+                            margin-bottom: 20px;
+                            min-width: 700px;
+                        }
+
+                        th {
+                            text-align: center;
+                            font-size: 18px;
+                        }
+
+                        td,
+                        th {
+                            padding: 2px;
+                        }
+                        .progress{
+                            margin-bottom: 0px;
+                            display: none;
+                        }
+                    </style>
+                </head>
+
+                <body>
+
+                    <div id="desc_content">
+                        
+            <h4>Tool</h4>
+            <table border="0" >
+                <tr>
+                    <td valign="top"><b>Name</b></td>
+                    <td valign="top">Maximum Entropy Classifcation</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>ID</b></td>
+                    <td valign="top">0</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>Author</b></td>
+                    <td valign="top">O.Conrad (c) 2015</td>
+                </tr>
+            </table>
+            <hr>
+            <h4>Description</h4>
+            <hr>
+            <h4>Parameters</h4>
+            <table tool_id="0"
+            oid="5b90e7bbd15d75093cb58786"
+            stateId="1FF01544-90A2-4f99-AAB9-E10745CE59AD"
+            mdlId="31B0789F-1B27-41c7-8078-35896165C1E9" border="1" width="100%" valign="top" cellpadding="6" rules="all">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Identifier</th>
+                        <th>Description</th>
+                        <th>Constraints</th>
+                        <th>Settings</th>
+                    </tr>
+                
+                <thead>
+                    <tr> 
+                    <th colspan="6">Input</th>
+                    </tr>
+                </thead>
+
+                <tbody id="input_body">
+                    
+            
+            <tr>
+            <td>Training Areas</td>
+            <td>Shapes (input)</td>
+            <td>TRAINING</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="TRAINING" accept="application/zip" optional="false" data_type="Shapes (input)"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Numerical Features</td>
+            <td>Grid list (optional input)</td>
+            <td>FEATURES_NUM</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="FEATURES_NUM" accept="application/zip" optional="true" data_type="Grid list (optional input)" multiple="multiple"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Categorical Features</td>
+            <td>Grid list (optional input)</td>
+            <td>FEATURES_CAT</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="FEATURES_CAT" accept="application/zip" optional="true" data_type="Grid list (optional input)" multiple="multiple"></input>
+            </td>
+            </tr>
+        
+        
+                </tbody>
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Options</th>
+                    </tr>
+                </thead>
+                <tbody id="options_body">
+                    
+        
+            <tr>
+                <td>Grid system</td>
+                <td>Grid system</td>
+                <td>PARAMETERS_GRID_SYSTEM</td>
+                <td></td>
+                <td></td>
+                <td>
+                <input type="text" id="PARAMETERS_GRID_SYSTEM" class="form-control" value="">
+                </td>
+            </tr>,
+            <tr>
+                <td>Class Name</td>
+                <td>Table field</td>
+                <td>FIELD</td>
+                <td></td>
+                <td></td>
+                <td>
+                <input type="text" id="FIELD" class="form-control" value="">
+                </td>
+            </tr>,
+            <tr>
+                <td>Create Propabilities</td>
+                <td>Boolean</td>
+                <td>PROBS_CREATE</td>
+                <td></td>
+                <td>Default: 0</td>
+                <td>
+                <input type="text" id="PROBS_CREATE" class="form-control" value="0">
+                </td>
+            </tr>,
+            <tr>
+                <td>Method</td>
+                <td>Choice</td>
+                <td>METHOD</td>
+                <td></td>
+                <td>Available Choices:
+[0] Yoshimasa Tsuruoka
+[1] Dekang Lin
+Default: 0</td>
+                <td>
+                
+        <select class="form-control" id="METHOD">
+            <option value="0">[0] Yoshimasa Tsuruoka</option>,<option value="1">[1] Dekang Lin</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Load from File...</td>
+                <td>File path</td>
+                <td>YT_FILE_LOAD</td>
+                <td></td>
+                <td></td>
+                <td>
+                <input type="text" id="YT_FILE_LOAD" class="form-control" value="">
+                </td>
+            </tr>,
+            <tr>
+                <td>Save to File...</td>
+                <td>File path</td>
+                <td>YT_FILE_SAVE</td>
+                <td></td>
+                <td></td>
+                <td>
+                <input type="text" id="YT_FILE_SAVE" class="form-control" value="">
+                </td>
+            </tr>,
+            <tr>
+                <td>Regularization</td>
+                <td>Choice</td>
+                <td>YT_REGUL</td>
+                <td></td>
+                <td>Available Choices:
+[0] none
+[1] L1
+[2] L2
+Default: 1</td>
+                <td>
+                
+        <select class="form-control" id="YT_REGUL">
+            <option value="0">[0] none</option>,<option value="1">[1] L1</option>,<option value="2">[2] L2</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Regularization Factor</td>
+                <td>Floating point</td>
+                <td>YT_REGUL_VAL</td>
+                <td></td>
+                <td>Minimum: 0.000000
+Default: 1.000000</td>
+                <td>
+                <input type="text" id="YT_REGUL_VAL" class="form-control" value="1.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Real-valued Numerical Features</td>
+                <td>Boolean</td>
+                <td>YT_NUMASREAL</td>
+                <td></td>
+                <td>Default: 1</td>
+                <td>
+                <input type="text" id="YT_NUMASREAL" class="form-control" value="1">
+                </td>
+            </tr>,
+            <tr>
+                <td>Alpha</td>
+                <td>Floating point</td>
+                <td>DL_ALPHA</td>
+                <td></td>
+                <td>Default: 0.100000</td>
+                <td>
+                <input type="text" id="DL_ALPHA" class="form-control" value="0.100000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Threshold</td>
+                <td>Floating point</td>
+                <td>DL_THRESHOLD</td>
+                <td></td>
+                <td>Minimum: 0.000000
+Default: 0.000000</td>
+                <td>
+                <input type="text" id="DL_THRESHOLD" class="form-control" value="0.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Maximum Iterations</td>
+                <td>Integer</td>
+                <td>DL_ITERATIONS</td>
+                <td></td>
+                <td>Minimum: 1
+Default: 100</td>
+                <td>
+                <input type="text" id="DL_ITERATIONS" class="form-control" value="100">
+                </td>
+            </tr>,
+            <tr>
+                <td>Number of Numeric Value Classes</td>
+                <td>Integer</td>
+                <td>NUM_CLASSES</td>
+                <td></td>
+                <td>Minimum: 1
+Default: 32</td>
+                <td>
+                <input type="text" id="NUM_CLASSES" class="form-control" value="32">
+                </td>
+            </tr>,
+            <tr>
+                <td>Minimum Probability</td>
+                <td>Floating point</td>
+                <td>PROB_MIN</td>
+                <td>Minimum probability to accept a classification result for a cell.</td>
+                <td>Minimum: 0.000000
+Maximum: 1.000000
+Default: 0.000000</td>
+                <td>
+                <input type="text" id="PROB_MIN" class="form-control" value="0.000000">
+                </td>
+            </tr>
+                </tbody> 
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Output</th>
+                    </tr>
+                </thead>
+
+                <tbody id="output_body">
+                
+            
+            <tr>
+            <td>Classes</td>
+            <td>Grid (output)</td>
+            <td>CLASSES</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="CLASSES" optional="false" data_type="Grid (output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Probability</td>
+            <td>Grid (output)</td>
+            <td>PROB</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="PROB" optional="false" data_type="Grid (output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Probabilities</td>
+            <td>Grid list (output)</td>
+            <td>PROBS</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="PROBS" optional="false" data_type="Grid list (output)">Download Data</a></td>
+            </tr>
+        
+         
+                </tbody>
+                
+            </table>(*) <i>optional</i>
+            <div class="progress">
+                <div id="progressbar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="60"
+                    aria-valuemin="0" aria-valuemax="100" style="width: 10%"> 
+                </div>
+            </div>
+            <button type="button" style="float: right;margin-top: 20px; margin-bottom: 20px; margin-right: 30px;width: 100px;tab-size: 28px" class="btn btn-success" onclick="onRunButtonClick()">Run
+            </button>
+            
+                    </div>
+                    <script src="../js/jquery-3.4.1.js"></script>
+                    <script src="../js/bootstrap.min.js"></script>
+                    <script src="../js/runModel.js"></script>
+                </body> 
+                </html>

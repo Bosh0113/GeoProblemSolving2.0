@@ -1,0 +1,305 @@
+
+                <!DOCTYPE html>
+                <html lang="en"> 
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                    <title>SAGA TOOL</title>
+                    <link rel="stylesheet" href="../css/bootstrap.min.css">
+                    <style>
+                        body {
+                            margin: 10px;
+                            margin-bottom: 20px;
+                            min-width: 700px;
+                        }
+
+                        th {
+                            text-align: center;
+                            font-size: 18px;
+                        }
+
+                        td,
+                        th {
+                            padding: 2px;
+                        }
+                        .progress{
+                            margin-bottom: 0px;
+                            display: none;
+                        }
+                    </style>
+                </head>
+
+                <body>
+
+                    <div id="desc_content">
+                        
+            <h4>Tool</h4>
+            <table border="0" >
+                <tr>
+                    <td valign="top"><b>Name</b></td>
+                    <td valign="top">Slope, Aspect, Curvature</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>ID</b></td>
+                    <td valign="top">0</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>Author</b></td>
+                    <td valign="top">O.Conrad (c) 2001</td>
+                </tr>
+            </table>
+            <hr>
+            <h4>Description</h4>
+            <hr>
+            <h4>Parameters</h4>
+            <table tool_id="0"
+            oid="5b90e7bbd15d75093cb588d6"
+            stateId="D0CFE68F-7497-4299-BB8B-C6083ABFC18E"
+            mdlId="F92ABC67-00D3-4474-A317-B29DBB884D13" border="1" width="100%" valign="top" cellpadding="6" rules="all">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Identifier</th>
+                        <th>Description</th>
+                        <th>Constraints</th>
+                        <th>Settings</th>
+                    </tr>
+                
+                <thead>
+                    <tr> 
+                    <th colspan="6">Input</th>
+                    </tr>
+                </thead>
+
+                <tbody id="input_body">
+                    
+            
+            <tr>
+            <td>Elevation</td>
+            <td>Grid (input)</td>
+            <td>ELEVATION</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="ELEVATION" accept="application/zip" optional="false" data_type="Grid (input)"></input>
+            </td>
+            </tr>
+        
+        
+                </tbody>
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Options</th>
+                    </tr>
+                </thead>
+                <tbody id="options_body">
+                    
+        
+            <tr>
+                <td>Grid system</td>
+                <td>Grid system</td>
+                <td>PARAMETERS_GRID_SYSTEM</td>
+                <td></td>
+                <td></td>
+                <td>
+                <input type="text" id="PARAMETERS_GRID_SYSTEM" class="form-control" value="">
+                </td>
+            </tr>,
+            <tr>
+                <td>Method</td>
+                <td>Choice</td>
+                <td>METHOD</td>
+                <td></td>
+                <td>Available Choices:
+[0] maximum slope (Travis et al. 1975)
+[1] maximum triangle slope (Tarboton 1997)
+[2] least squares fitted plane (Horn 1981, Costa-Cabral & Burgess 1996)
+[3] 6 parameter 2nd order polynom (Evans 1979)
+[4] 6 parameter 2nd order polynom (Heerdegen & Beran 1982)
+[5] 6 parameter 2nd order polynom (Bauer, Rohdenburg, Bork 1985)
+[6] 9 parameter 2nd order polynom (Zevenbergen & Thorne 1987)
+[7] 10 parameter 3rd order polynom (Haralick 1983)
+Default: 6</td>
+                <td>
+                
+        <select class="form-control" id="METHOD">
+            <option value="0">[0] maximum slope (Travis et al. 1975)</option>,<option value="1">[1] maximum triangle slope (Tarboton 1997)</option>,<option value="2">[2] least squares fitted plane (Horn 1981, Costa-Cabral & Burgess 1996)</option>,<option value="3">[3] 6 parameter 2nd order polynom (Evans 1979)</option>,<option value="4">[4] 6 parameter 2nd order polynom (Heerdegen & Beran 1982)</option>,<option value="5">[5] 6 parameter 2nd order polynom (Bauer, Rohdenburg, Bork 1985)</option>,<option value="6">[6] 9 parameter 2nd order polynom (Zevenbergen & Thorne 1987)</option>,<option value="7">[7] 10 parameter 3rd order polynom (Haralick 1983)</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Slope Units</td>
+                <td>Choice</td>
+                <td>UNIT_SLOPE</td>
+                <td></td>
+                <td>Available Choices:
+[0] radians
+[1] degree
+[2] percent
+Default: 0</td>
+                <td>
+                
+        <select class="form-control" id="UNIT_SLOPE">
+            <option value="0">[0] radians</option>,<option value="1">[1] degree</option>,<option value="2">[2] percent</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Aspect Units</td>
+                <td>Choice</td>
+                <td>UNIT_ASPECT</td>
+                <td></td>
+                <td>Available Choices:
+[0] radians
+[1] degree
+Default: 0</td>
+                <td>
+                
+        <select class="form-control" id="UNIT_ASPECT">
+            <option value="0">[0] radians</option>,<option value="1">[1] degree</option>
+        </select>
+        
+                </td>
+            </tr>
+                </tbody> 
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Output</th>
+                    </tr>
+                </thead>
+
+                <tbody id="output_body">
+                
+            
+            <tr>
+            <td>Slope</td>
+            <td>Grid (output)</td>
+            <td>SLOPE</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="SLOPE" optional="false" data_type="Grid (output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Aspect</td>
+            <td>Grid (output)</td>
+            <td>ASPECT</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="ASPECT" optional="false" data_type="Grid (output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>General Curvature</td>
+            <td>Grid (optional output)</td>
+            <td>C_GENE</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="C_GENE" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Profile Curvature</td>
+            <td>Grid (optional output)</td>
+            <td>C_PROF</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="C_PROF" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Plan Curvature</td>
+            <td>Grid (optional output)</td>
+            <td>C_PLAN</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="C_PLAN" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Tangential Curvature</td>
+            <td>Grid (optional output)</td>
+            <td>C_TANG</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="C_TANG" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Longitudinal Curvature</td>
+            <td>Grid (optional output)</td>
+            <td>C_LONG</td>
+            <td>Zevenbergen & Thorne (1987) refer to this as profile curvature</td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="C_LONG" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Cross-Sectional Curvature</td>
+            <td>Grid (optional output)</td>
+            <td>C_CROS</td>
+            <td>Zevenbergen & Thorne (1987) refer to this as plan curvature</td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="C_CROS" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Minimal Curvature</td>
+            <td>Grid (optional output)</td>
+            <td>C_MINI</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="C_MINI" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Maximal Curvature</td>
+            <td>Grid (optional output)</td>
+            <td>C_MAXI</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="C_MAXI" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Total Curvature</td>
+            <td>Grid (optional output)</td>
+            <td>C_TOTA</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="C_TOTA" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Flow Line Curvature</td>
+            <td>Grid (optional output)</td>
+            <td>C_ROTO</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="C_ROTO" optional="true" data_type="Grid (optional output)">Download Data</a></td>
+            </tr>
+        
+         
+                </tbody>
+                
+            </table>(*) <i>optional</i>
+            <div class="progress">
+                <div id="progressbar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="60"
+                    aria-valuemin="0" aria-valuemax="100" style="width: 10%"> 
+                </div>
+            </div>
+            <button type="button" style="float: right;margin-top: 20px; margin-bottom: 20px; margin-right: 30px;width: 100px;tab-size: 28px" class="btn btn-success" onclick="onRunButtonClick()">Run
+            </button>
+            
+                    </div>
+                    <script src="../js/jquery-3.4.1.js"></script>
+                    <script src="../js/bootstrap.min.js"></script>
+                    <script src="../js/runModel.js"></script>
+                </body> 
+                </html>

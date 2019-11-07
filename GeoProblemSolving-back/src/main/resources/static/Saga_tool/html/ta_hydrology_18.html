@@ -1,0 +1,231 @@
+
+                <!DOCTYPE html>
+                <html lang="en"> 
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                    <title>SAGA TOOL</title>
+                    <link rel="stylesheet" href="../css/bootstrap.min.css">
+                    <style>
+                        body {
+                            margin: 10px;
+                            margin-bottom: 20px;
+                            min-width: 700px;
+                        }
+
+                        th {
+                            text-align: center;
+                            font-size: 18px;
+                        }
+
+                        td,
+                        th {
+                            padding: 2px;
+                        }
+                        .progress{
+                            margin-bottom: 0px;
+                            display: none;
+                        }
+                    </style>
+                </head>
+
+                <body>
+
+                    <div id="desc_content">
+                        
+            <h4>Tool</h4>
+            <table border="0" >
+                <tr>
+                    <td valign="top"><b>Name</b></td>
+                    <td valign="top">Flow Accumulation (Mass-Flux Method)</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>ID</b></td>
+                    <td valign="top">18</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>Author</b></td>
+                    <td valign="top">O. Conrad (c) 2009</td>
+                </tr>
+            </table>
+            <hr>
+            <h4>Description</h4>
+            <hr>
+            <h4>Parameters</h4>
+            <table tool_id="18"
+            oid="5b90e7bbd15d75093cb588bb"
+            stateId="6DDDC144-E710-4ead-8756-1C63CD9D2E61"
+            mdlId="9C0A789C-5F16-40d2-B6A5-E1A19B6FDDE2" border="1" width="100%" valign="top" cellpadding="6" rules="all">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Identifier</th>
+                        <th>Description</th>
+                        <th>Constraints</th>
+                        <th>Settings</th>
+                    </tr>
+                
+                <thead>
+                    <tr> 
+                    <th colspan="6">Input</th>
+                    </tr>
+                </thead>
+
+                <tbody id="input_body">
+                    
+            
+            <tr>
+            <td>Elevation</td>
+            <td>Grid (input)</td>
+            <td>DEM</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="DEM" accept="application/zip" optional="false" data_type="Grid (input)"></input>
+            </td>
+            </tr>
+        
+        
+                </tbody>
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Options</th>
+                    </tr>
+                </thead>
+                <tbody id="options_body">
+                    
+        
+            <tr>
+                <td>Flow Split Method</td>
+                <td>Choice</td>
+                <td>METHOD</td>
+                <td></td>
+                <td>Available Choices:
+[0] flow width (original)
+[1] cell area
+Default: 0</td>
+                <td>
+                
+        <select class="form-control" id="METHOD">
+            <option value="0">[0] flow width (original)</option>,<option value="1">[1] cell area</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Slope</td>
+                <td>Boolean</td>
+                <td>B_SLOPE</td>
+                <td></td>
+                <td>Default: 0</td>
+                <td>
+                <input type="text" id="B_SLOPE" class="form-control" value="0">
+                </td>
+            </tr>,
+            <tr>
+                <td>Aspect</td>
+                <td>Boolean</td>
+                <td>B_ASPECT</td>
+                <td></td>
+                <td>Default: 0</td>
+                <td>
+                <input type="text" id="B_ASPECT" class="form-control" value="0">
+                </td>
+            </tr>,
+            <tr>
+                <td>Flow Accumulation</td>
+                <td>Boolean</td>
+                <td>B_AREA</td>
+                <td></td>
+                <td>Default: 0</td>
+                <td>
+                <input type="text" id="B_AREA" class="form-control" value="0">
+                </td>
+            </tr>,
+            <tr>
+                <td>Flow Lines</td>
+                <td>Boolean</td>
+                <td>B_FLOW</td>
+                <td></td>
+                <td>Default: 0</td>
+                <td>
+                <input type="text" id="B_FLOW" class="form-control" value="0">
+                </td>
+            </tr>
+                </tbody> 
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Output</th>
+                    </tr>
+                </thead>
+
+                <tbody id="output_body">
+                
+            
+            <tr>
+            <td>Flow Accumulation</td>
+            <td>Grid (output)</td>
+            <td>AREA</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="AREA" optional="false" data_type="Grid (output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Slope</td>
+            <td>Data Object (optional output)</td>
+            <td>G_SLOPE</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="G_SLOPE" optional="true" data_type="Data Object (optional output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Aspect</td>
+            <td>Data Object (optional output)</td>
+            <td>G_ASPECT</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="G_ASPECT" optional="true" data_type="Data Object (optional output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Flow Accumulation</td>
+            <td>Data Object (optional output)</td>
+            <td>G_AREA</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="G_AREA" optional="true" data_type="Data Object (optional output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Flow Lines</td>
+            <td>Data Object (optional output)</td>
+            <td>G_FLOW</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="G_FLOW" optional="true" data_type="Data Object (optional output)">Download Data</a></td>
+            </tr>
+        
+         
+                </tbody>
+                
+            </table>(*) <i>optional</i>
+            <div class="progress">
+                <div id="progressbar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="60"
+                    aria-valuemin="0" aria-valuemax="100" style="width: 10%"> 
+                </div>
+            </div>
+            <button type="button" style="float: right;margin-top: 20px; margin-bottom: 20px; margin-right: 30px;width: 100px;tab-size: 28px" class="btn btn-success" onclick="onRunButtonClick()">Run
+            </button>
+            
+                    </div>
+                    <script src="../js/jquery-3.4.1.js"></script>
+                    <script src="../js/bootstrap.min.js"></script>
+                    <script src="../js/runModel.js"></script>
+                </body> 
+                </html>

@@ -1,0 +1,307 @@
+
+                <!DOCTYPE html>
+                <html lang="en"> 
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                    <title>SAGA TOOL</title>
+                    <link rel="stylesheet" href="../css/bootstrap.min.css">
+                    <style>
+                        body {
+                            margin: 10px;
+                            margin-bottom: 20px;
+                            min-width: 700px;
+                        }
+
+                        th {
+                            text-align: center;
+                            font-size: 18px;
+                        }
+
+                        td,
+                        th {
+                            padding: 2px;
+                        }
+                        .progress{
+                            margin-bottom: 0px;
+                            display: none;
+                        }
+                    </style>
+                </head>
+
+                <body>
+
+                    <div id="desc_content">
+                        
+            <h4>Tool</h4>
+            <table border="0" >
+                <tr>
+                    <td valign="top"><b>Name</b></td>
+                    <td valign="top">Grid Statistics for Polygons</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>ID</b></td>
+                    <td valign="top">2</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>Author</b></td>
+                    <td valign="top">O.Conrad (c) 2003, Quantile Calculation (c) 2007 by Johan Van de Wauw</td>
+                </tr>
+            </table>
+            <hr>
+            <h4>Description</h4>
+            <hr>
+            <h4>Parameters</h4>
+            <table tool_id="2"
+            oid="5b90e7bbd15d75093cb587f2"
+            stateId="29566E41-E213-4d6a-9193-AAEEF240D09B"
+            mdlId="B5E97A3C-1D01-4250-B8AC-627FC00E0104" border="1" width="100%" valign="top" cellpadding="6" rules="all">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Identifier</th>
+                        <th>Description</th>
+                        <th>Constraints</th>
+                        <th>Settings</th>
+                    </tr>
+                
+                <thead>
+                    <tr> 
+                    <th colspan="6">Input</th>
+                    </tr>
+                </thead>
+
+                <tbody id="input_body">
+                    
+            
+            <tr>
+            <td>Grids</td>
+            <td>Grid list (input)</td>
+            <td>GRIDS</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="GRIDS" accept="application/zip" optional="false" data_type="Grid list (input)" multiple="multiple"></input>
+            </td>
+            </tr>
+        ,
+            <tr>
+            <td>Polygons</td>
+            <td>Shapes (input)</td>
+            <td>POLYGONS</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="POLYGONS" accept="application/zip" optional="false" data_type="Shapes (input)"></input>
+            </td>
+            </tr>
+        
+        
+                </tbody>
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Options</th>
+                    </tr>
+                </thead>
+                <tbody id="options_body">
+                    
+        
+            <tr>
+                <td>Grid system</td>
+                <td>Grid system</td>
+                <td>PARAMETERS_GRID_SYSTEM</td>
+                <td></td>
+                <td></td>
+                <td>
+                <input type="text" id="PARAMETERS_GRID_SYSTEM" class="form-control" value="">
+                </td>
+            </tr>,
+            <tr>
+                <td>Field Naming</td>
+                <td>Choice</td>
+                <td>NAMING</td>
+                <td></td>
+                <td>Available Choices:
+[0] grid number
+[1] grid name
+Default: 1</td>
+                <td>
+                
+        <select class="form-control" id="NAMING">
+            <option value="0">[0] grid number</option>,<option value="1">[1] grid name</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Method</td>
+                <td>Choice</td>
+                <td>METHOD</td>
+                <td></td>
+                <td>Available Choices:
+[0] simple and fast
+[1] polygon wise (cell centers)
+[2] polygon wise (cell area)
+[3] polygon wise (cell area weighted)
+Default: 0</td>
+                <td>
+                
+        <select class="form-control" id="METHOD">
+            <option value="0">[0] simple and fast</option>,<option value="1">[1] polygon wise (cell centers)</option>,<option value="2">[2] polygon wise (cell area)</option>,<option value="3">[3] polygon wise (cell area weighted)</option>
+        </select>
+        
+                </td>
+            </tr>,
+            <tr>
+                <td>Use Multiple Cores</td>
+                <td>Boolean</td>
+                <td>PARALLELIZED</td>
+                <td></td>
+                <td>Default: 0</td>
+                <td>
+                <input type="text" id="PARALLELIZED" class="form-control" value="0">
+                </td>
+            </tr>,
+            <tr>
+                <td>Number of Cells</td>
+                <td>Boolean</td>
+                <td>COUNT</td>
+                <td></td>
+                <td>Default: 1</td>
+                <td>
+                <input type="text" id="COUNT" class="form-control" value="1">
+                </td>
+            </tr>,
+            <tr>
+                <td>Minimum</td>
+                <td>Boolean</td>
+                <td>MIN</td>
+                <td></td>
+                <td>Default: 1</td>
+                <td>
+                <input type="text" id="MIN" class="form-control" value="1">
+                </td>
+            </tr>,
+            <tr>
+                <td>Maximum</td>
+                <td>Boolean</td>
+                <td>MAX</td>
+                <td></td>
+                <td>Default: 1</td>
+                <td>
+                <input type="text" id="MAX" class="form-control" value="1">
+                </td>
+            </tr>,
+            <tr>
+                <td>Range</td>
+                <td>Boolean</td>
+                <td>RANGE</td>
+                <td></td>
+                <td>Default: 1</td>
+                <td>
+                <input type="text" id="RANGE" class="form-control" value="1">
+                </td>
+            </tr>,
+            <tr>
+                <td>Sum</td>
+                <td>Boolean</td>
+                <td>SUM</td>
+                <td></td>
+                <td>Default: 1</td>
+                <td>
+                <input type="text" id="SUM" class="form-control" value="1">
+                </td>
+            </tr>,
+            <tr>
+                <td>Mean</td>
+                <td>Boolean</td>
+                <td>MEAN</td>
+                <td></td>
+                <td>Default: 1</td>
+                <td>
+                <input type="text" id="MEAN" class="form-control" value="1">
+                </td>
+            </tr>,
+            <tr>
+                <td>Variance</td>
+                <td>Boolean</td>
+                <td>VAR</td>
+                <td></td>
+                <td>Default: 1</td>
+                <td>
+                <input type="text" id="VAR" class="form-control" value="1">
+                </td>
+            </tr>,
+            <tr>
+                <td>Standard Deviation</td>
+                <td>Boolean</td>
+                <td>STDDEV</td>
+                <td></td>
+                <td>Default: 1</td>
+                <td>
+                <input type="text" id="STDDEV" class="form-control" value="1">
+                </td>
+            </tr>,
+            <tr>
+                <td>Quantile</td>
+                <td>Integer</td>
+                <td>QUANTILE</td>
+                <td>Calculate distribution quantiles. Value specifies interval (median=50, quartiles=25, deciles=10, ...). Set to zero to omit quantile calculation.</td>
+                <td>Minimum: 0
+Maximum: 50
+Default: 0</td>
+                <td>
+                <input type="text" id="QUANTILE" class="form-control" value="0">
+                </td>
+            </tr>,
+            <tr>
+                <td>Gini</td>
+                <td>Boolean</td>
+                <td>GINI</td>
+                <td></td>
+                <td>Default: 0</td>
+                <td>
+                <input type="text" id="GINI" class="form-control" value="0">
+                </td>
+            </tr>
+                </tbody> 
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Output</th>
+                    </tr>
+                </thead>
+
+                <tbody id="output_body">
+                
+            
+            <tr>
+            <td>Statistics</td>
+            <td>Shapes (optional output)</td>
+            <td>RESULT</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="RESULT" optional="true" data_type="Shapes (optional output)">Download Data</a></td>
+            </tr>
+        
+         
+                </tbody>
+                
+            </table>(*) <i>optional</i>
+            <div class="progress">
+                <div id="progressbar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="60"
+                    aria-valuemin="0" aria-valuemax="100" style="width: 10%"> 
+                </div>
+            </div>
+            <button type="button" style="float: right;margin-top: 20px; margin-bottom: 20px; margin-right: 30px;width: 100px;tab-size: 28px" class="btn btn-success" onclick="onRunButtonClick()">Run
+            </button>
+            
+                    </div>
+                    <script src="../js/jquery-3.4.1.js"></script>
+                    <script src="../js/bootstrap.min.js"></script>
+                    <script src="../js/runModel.js"></script>
+                </body> 
+                </html>

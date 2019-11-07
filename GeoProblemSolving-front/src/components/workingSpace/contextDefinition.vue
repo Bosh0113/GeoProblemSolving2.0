@@ -16,7 +16,7 @@
   left: 0;
 }
 
-.breadCrumb{
+.breadCrumb {
   margin-left: 1%;
 }
 
@@ -84,8 +84,8 @@
   padding: 12px;
 }
 
-.subproject-back >>>.ivu-breadcrumb-item-link{
-  color:white;
+.subproject-back >>> .ivu-breadcrumb-item-link {
+  color: white;
 }
 
 .tool-panel {
@@ -155,13 +155,12 @@
   font-size: 1rem;
   height: 20px;
   color: white;
-  word-break:break-word;
+  word-break: break-word;
   overflow: hidden;
-  white-space: nowrap; 
-  text-overflow: ellipsis; 
+  white-space: nowrap;
+  text-overflow: ellipsis;
   max-width: 400px;
 }
-
 
 .onlineListBtn {
   position: absolute;
@@ -180,405 +179,403 @@
   } */
 </style>
 <template>
-  <div style="background-color:#e8eaec;height:auto">    
-      <div class="picscreen">
-        <div class="picbg"></div>
+  <div style="background-color:#e8eaec;height:auto">
+    <div class="picscreen">
+      <div class="picbg"></div>
 
-        <div class="home_content">
-          <Row>
-            <!-- 需要修改样式 -->
-            <div class="breadCrumb">
-              <Breadcrumb>
-                <BreadcrumbItem :to="toSubProjectPage" class="subproject-back">Subproject</BreadcrumbItem>
-                <BreadcrumbItem style="color: white">Context definition & resources collection</BreadcrumbItem>
-              </Breadcrumb>
-            </div>
+      <div class="home_content">
+        <Row>
+          <!-- 需要修改样式 -->
+          <div class="breadCrumb">
+            <Breadcrumb>
+              <BreadcrumbItem :to="toSubProjectPage" class="subproject-back">Subproject</BreadcrumbItem>
+              <BreadcrumbItem style="color: white">Context definition & resources collection</BreadcrumbItem>
+            </Breadcrumb>
+          </div>
 
-            <div class="stepName">
-              <strong>{{stepContent.name}}</strong>
-              <p :title="stepContent.description"> {{stepContent.description}}</p>
-            </div>
+          <div class="stepName">
+            <strong>{{stepContent.name}}</strong>
+            <p :title="stepContent.description">{{stepContent.description}}</p>
+          </div>
 
-            <div class="onlineListBtn">
-              <Button @click="drawerValue = true" type="default" ghost>Participants</Button>
-               <template  v-if="userRole == 'Manager'">
-                  <Button                
-                    @click="modifyStep = true"
-                    style="margin-left:20px"
-                    type="info"
-                    ghost
-                  >Modify Step</Button>
-               </template>
-            </div>
-          </Row>
-          <Drawer title="Participants" :closable="false" v-model="drawerValue">
-            <online-participant :sub-project-id="subprojectId" :room-id="stepId"></online-participant>
-            <div class="toChatroom" style="position:absolute; left:25%;bottom:5%">
-              <Button  @click.native="toolPanel('chat')" type="success">Go to Chatroom</Button>
-            </div>
-          </Drawer>
-          <Modal v-model="modifyStep">
-            <p slot="header" style="text-align:center">
-              <Icon type="ios-information-circle"></Icon>
-              <span>Modify step name and description</span>
-            </p>
-            <Form :label-width="120" label-position="left" :model="stepForm">
-              <FormItem label="Step Name" prop="name">
-                <Input
-                  v-model="stepForm.name"
-                  type="textarea"
-                  :autosize="{minRows: 1,maxRows: 3}"
-                  clearable
-                />
-              </FormItem>
-              <FormItem label="Step Description" prop="description">
-                <Input
-                  v-model="stepForm.description"
-                  type="textarea"
-                  :autosize="{minRows: 1,maxRows: 3}"
-                  clearable
-                />
-              </FormItem>
-            </Form>
-            <div slot="footer">
-              <Button @click="cancelModifyStep">Cancel</Button>
-              <Button type="primary" @click="submitModifyStep">Modify</Button>
-            </div>
-          </Modal>
-        </div>
-      </div>   
+          <div class="onlineListBtn">
+            <Button @click="drawerValue = true" type="default" ghost>Participants</Button>
+            <template v-if="userRole == 'Manager'">
+              <Button
+                @click="modifyStep = true"
+                style="margin-left:20px"
+                type="info"
+                ghost
+              >Modify Step</Button>
+            </template>
+          </div>
+        </Row>
+        <Drawer title="Participants" :closable="false" v-model="drawerValue">
+          <online-participant :sub-project-id="subProjectInfo.subProjectId" :room-id="stepId"></online-participant>
+          <div class="toChatroom" style="position:absolute; left:25%;bottom:5%">
+            <Button @click.native="toolPanel('chat')" type="success">Go to Chatroom</Button>
+          </div>
+        </Drawer>
+        <Modal v-model="modifyStep">
+          <p slot="header" style="text-align:center">
+            <Icon type="ios-information-circle"></Icon>
+            <span>Modify step name and description</span>
+          </p>
+          <Form :label-width="120" label-position="left" :model="stepForm">
+            <FormItem label="Step Name" prop="name">
+              <Input
+                v-model="stepForm.name"
+                type="textarea"
+                :autosize="{minRows: 1,maxRows: 3}"
+                clearable
+              />
+            </FormItem>
+            <FormItem label="Step Description" prop="description">
+              <Input
+                v-model="stepForm.description"
+                type="textarea"
+                :autosize="{minRows: 1,maxRows: 3}"
+                clearable
+              />
+            </FormItem>
+          </Form>
+          <div slot="footer">
+            <Button @click="cancelModifyStep">Cancel</Button>
+            <Button type="primary" @click="submitModifyStep">Modify</Button>
+          </div>
+        </Modal>
+      </div>
+    </div>
 
     <!-- tab  on-click事件 -->
-    
-      <div class="pro-tab" :style="{height:sidebarHeight+ 69+'px'}">
-        <div>
-          <Tabs>
-            <TabPane label="Context definition" name="Context" icon="md-home">
-              <template>
-                <Row style="margin-top:10px">
-                  <!--contextdefinition -->
-                  <!-- <div  style=""> -->
-                    <template >
-                      <Row style="margin:0 1%">
-                        <Col span="2" >
-                          <!-- <div class="tools"> -->
-                            <Card :style="{height:sidebarHeight - 10 + 'px'}">
-                              <h4 align="center">Toolbox</h4>
-                              <!-- toolbox -->
-                              <div class="tool-panel">
-                                <!-- map -->
-                                <div class="singl_tool_style">
-                                  <Icon
-                                    type="md-globe"
-                                    size="40"
-                                    @click.native="toolPanel('map')"
-                                    title="Map"
-                                    color="#808695"
-                                  />
-                                </div>
-                                <!-- draw -->
-                                <div class="singl_tool_style">
-                                  <Icon
-                                    type="ios-brush"
-                                    size="40"
-                                    @click.native="toolPanel('draw')"
-                                    title="Draw Board"
-                                    color="#808695"
-                                  />
-                                </div>
-                                <!-- mindMapping -->
-                                <div class="singl_tool_style">
-                                  <Icon
-                                    type="md-bulb"
-                                    size="40"
-                                    @click.native="toolPanel('mindMapping')"
-                                    title="Mind Mapping"
-                                    color="#808695"
-                                  />
-                                </div>
-                                <!-- chat -->
-                                <div class="singl_tool_style">
-                                  <Icon
-                                    type="ios-chatboxes"
-                                    size="40"
-                                    @click.native="toolPanel('chat')"
-                                    title="Chatroom"
-                                    color="#808695"
-                                  />
-                                </div>
-                              </div>
-                            </Card>
-                          <!-- </div> -->
-                        </Col>
-                        <Col span="22"   >
-                          <!-- <div class="condef"> -->
-                            <Card :style="{height:sidebarHeight - 10 + 'px'}">
-                              <div class="condefTitle">
-                                <div
-                                  style="width:3px;height:18px;float:left;background-color:rgb(124, 126, 126)"
-                                ></div>
-                                <h4 style="float:left;margin-left:5px">Context</h4>
-                              </div>
-                              <vue-scroll :ops="scrollOps" :style="{height:sidebarHeight-60+'px'}">
-                                <div class="condefContent">
-                                  <Form
-                                    ref="contextForm"
-                                    :rules="contextFormValidate"
-                                    :model="contextForm"
-                                    :label-width="180"
-                                  >
-                                    <FormItem label="Problem boundary" prop="boundary">
-                                      <Input
-                                        v-model="contextForm.boundary"
-                                        placeholder="Please enter the boundry of the problem"
-                                        type="textarea"
-                                        :autosize="{minRows: 1,maxRows: 5}"
-                                        clearable
-                                      />
-                                    </FormItem>
-                                    <FormItem label="Spatiotemporal scale" prop="scale">
-                                      <Input
-                                        v-model="contextForm.scale"
-                                        placeholder="Please enter the spatiotemporal scale"
-                                        type="textarea"
-                                        :autosize="{minRows: 1,maxRows: 5}"
-                                        clearable
-                                      />
-                                    </FormItem>
-                                    <FormItem label=" Main methods" prop="methods">
-                                      <Input
-                                        v-model="contextForm.methods"
-                                        placeholder="Please enter the main methods"
-                                        type="textarea"
-                                        :autosize="{minRows: 1,maxRows: 5}"
-                                        clearable
-                                      />
-                                    </FormItem>
-                                    <FormItem label="Goals or Purposes" prop="goals">
-                                      <Input
-                                        v-model="contextForm.goals"
-                                        placeholder="Please enter your goal"
-                                        type="textarea"
-                                        :autosize="{minRows: 1,maxRows: 5}"
-                                        clearable
-                                      />
-                                    </FormItem>
-                                    <FormItem label=" Difficulties or Limitations" prop="difficulties">
-                                      <Input
-                                        v-model="contextForm.difficulties"
-                                        placeholder="Please enter the difficulties"
-                                        type="textarea"
-                                        :autosize="{minRows: 1,maxRows: 5}"
-                                        clearable
-                                      />
-                                    </FormItem>
-                                    <FormItem label="Others" prop="others">
-                                      <Input
-                                        v-model="contextForm.others"
-                                        placeholder="Supplement"
-                                        type="textarea"
-                                        :autosize="{minRows: 1,maxRows: 5}"
-                                        clearable
-                                      />
-                                    </FormItem>
-                                    <FormItem>
-                                      <template  v-if="userRole == 'Manager'">
-                                      <Button @click="submit('contextForm')">Submit</Button>
-                                      </template>
-                                    </FormItem>
-                                  </Form>
-                                </div>
-                              </vue-scroll>
-                            </Card>
-                          <!-- </div> -->
-                        </Col>
-                      </Row>
-                    </template>
-                  <!-- </div> -->
-                </Row>
-              </template>
-            </TabPane>
-            <TabPane label="Resources collection" name="Resources" icon="logo-buffer">
-              <div class="resourceContent">
-                <Row style="margin-top:10px">
-                  <Card :style="{height:sidebarHeight+10+'px'}" style="margin:0 1% 50px 1%">
-                    <div class="condefTitle">
-                      <div
-                        style="width:3px;height:18px;float:left;background-color:rgb(124, 126, 126)"
-                      ></div>
-                      <h4 style="float:left;margin-left:5px">Resources</h4>
-                    </div>
-                    <div
-                      slot="extra"
-                      style="display:flex;align-items:center;height:40px"
-                      class="popCenter"
-                    >
-                      <!-- 上传 -->
-                      <Button
-                        id="upload"
-                        type="default"
-                        @click="uploadFileModalShow()"
-                        class="uploadBtn"
-                        title="Upload resource"
-                      >
-                        <Icon type="md-cloud-upload" size="20" />
-                      </Button>
-                   
-                    </div>
-                    <!-- <vue-scroll :ops="scrollOps" :style="{height:sidebarHeight-50+'px'}"> -->
-                    <div class="resourceMenu">
-                      <!-- <div v-for="(item,index) in resourceType" :key="index">                         -->
-                      <Menu active-name="data" @on-select="filterResourceType">
-                        <MenuItem name="data">
-                          <Icon type="ios-stats" />Data
-                        </MenuItem>
-                        <MenuItem name="image">
-                          <Icon type="md-image" />Images
-                        </MenuItem>
-                        <MenuItem name="video">
-                          <Icon type="md-videocam" />Videos
-                        </MenuItem>
-                        <MenuItem name="paper">
-                          <Icon type="ios-paper" />Papers
-                        </MenuItem>
-                        <MenuItem name="document">
-                          <Icon type="md-document" />Documents
-                        </MenuItem>
-                        <MenuItem name="model">
-                          <Icon type="md-construct" />Models
-                        </MenuItem>
-                        <MenuItem name="others">
-                          <Icon type="md-cube" />Others
-                        </MenuItem>
-                      </Menu>
+
+    <div class="pro-tab" :style="{height:sidebarHeight+ 69+'px'}">
+      <div>
+        <Tabs>
+          <TabPane label="Context definition" name="Context" icon="md-home">
+            <template>
+              <Row style="margin-top:10px">
+                <!--contextdefinition -->
+                <!-- <div  style=""> -->
+                <template>
+                  <Row style="margin:0 1%">
+                    <Col span="2">
+                      <!-- <div class="tools"> -->
+                      <Card :style="{height:sidebarHeight - 10 + 'px'}">
+                        <h4 align="center">Toolbox</h4>
+                        <!-- toolbox -->
+                        <div class="tool-panel">
+                          <!-- map -->
+                          <div class="singl_tool_style">
+                            <Icon
+                              type="md-globe"
+                              size="40"
+                              @click.native="toolPanel('map')"
+                              title="Map"
+                              color="#808695"
+                            />
+                          </div>
+                          <!-- draw -->
+                          <div class="singl_tool_style">
+                            <Icon
+                              type="ios-brush"
+                              size="40"
+                              @click.native="toolPanel('draw')"
+                              title="Draw Board"
+                              color="#808695"
+                            />
+                          </div>
+                          <!-- mindMapping -->
+                          <div class="singl_tool_style">
+                            <Icon
+                              type="md-bulb"
+                              size="40"
+                              @click.native="toolPanel('mindMapping')"
+                              title="Mind Mapping"
+                              color="#808695"
+                            />
+                          </div>
+                          <!-- chat -->
+                          <div class="singl_tool_style">
+                            <Icon
+                              type="ios-chatboxes"
+                              size="40"
+                              @click.native="toolPanel('chat')"
+                              title="Chatroom"
+                              color="#808695"
+                            />
+                          </div>
+                        </div>
+                      </Card>
                       <!-- </div> -->
-                    </div>
-                    <div class="resourceTable">
-                      <!-- <div style="height:250px;overflow-y:scroll;margin-top:10px" > -->
-                      <Table
-                        :columns="resourceTableColName"
-                        :data="filterFileType"
-                        v-show="filterFileType!=[]&&filterFileType!='None'"
-                      >
-                        <template slot-scope="{ row }" slot="name">
-                          <strong>{{ row.name }}</strong>
-                        </template>
-
-                        <template slot-scope="{ row, index }" slot="action">
-                          <a
-                            :href="filterFileType[index].pathURL"
-                            :download="filterFileType[index].name"
-                            title="Download"
-                          >
-                            <Icon type="md-download" :size="20" />
-                          </a>
-                          <span @click="show(index)" style="margin-left:10px" title="Preview">
-                            <Icon type="md-eye" :size="20" color="#2d8cf0" style="cursor:pointer" />
-                          </span>
-                        </template>
-                      </Table>
-                      <!-- </div>  -->
-                    </div>
-                    <!-- </vue-scroll> -->
-                  </Card>
-                </Row>
-              </div>
-
-              <!-- 上传文件按钮的模态框 -->
-              <Modal
-                v-model="uploadFileModal"
-                title="Upload file"
-                width="800px"
-                :mask-closable="false"
-                @on-ok="filesUpload('fileUploadForm')"
-                ok-text="Submit"
-                cancel-text="Cancel"
-              >
-                <div>
-                  <Form
-                    ref="fileUploadForm"
-                    :model="fileUploadForm"
-                    :rules="fileUploadFormRuleValidate"
-                    :label-width="100"
-                  >
-                    <FormItem label="Privacy" prop="privacy">
-                      <RadioGroup v-model="fileUploadForm.privacy" style="width:80%">
-                        <Radio label="private">Private</Radio>
-                        <Radio label="public">Public</Radio>
-                      </RadioGroup>
-                    </FormItem>
-                    <FormItem label="Type" prop="type">
-                      <RadioGroup v-model="fileUploadForm.type">
-                        <Radio label="data">Data</Radio>
-                        <Radio label="image">Images</Radio>
-                        <Radio label="video">Videos</Radio>
-                        <Radio label="paper">Papers</Radio>
-                        <Radio label="document">Documents</Radio>
-                        <Radio label="model">Models</Radio>
-                        <Radio label="others">Others</Radio>
-                      </RadioGroup>
-                    </FormItem>
-                    <FormItem label="Description" prop="description">
-                      <Input
-                        type="textarea"
-                        :rows="4"
-                        v-model="fileUploadForm.description"
-                        placeholder="Enter file description"
-                      />
-                    </FormItem>
-                  </Form>
-                </div>
-                <Upload
-                  :max-size="1024*1024"
-                  multiple
-                  type="drag"
-                  :before-upload="gatherFile"
-                  action="-"
-                >
-                  <div style="padding: 20px 0">
-                    <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
-                    <p>
-                      Click or drag files here to upload(The file size must control in
-                      <span
-                        style="color:red"
-                      >1GB</span>)
-                    </p>
+                    </Col>
+                    <Col span="22">
+                      <!-- <div class="condef"> -->
+                      <Card :style="{height:sidebarHeight - 10 + 'px'}">
+                        <div class="condefTitle">
+                          <div
+                            style="width:3px;height:18px;float:left;background-color:rgb(124, 126, 126)"
+                          ></div>
+                          <h4 style="float:left;margin-left:5px">Context</h4>
+                        </div>
+                        <vue-scroll :ops="scrollOps" :style="{height:sidebarHeight-60+'px'}">
+                          <div class="condefContent">
+                            <Form
+                              ref="contextForm"
+                              :rules="contextFormValidate"
+                              :model="contextForm"
+                              :label-width="180"
+                            >
+                              <FormItem label="Problem boundary" prop="boundary">
+                                <Input
+                                  v-model="contextForm.boundary"
+                                  placeholder="Please enter the boundry of the problem"
+                                  type="textarea"
+                                  :autosize="{minRows: 1,maxRows: 5}"
+                                  clearable
+                                />
+                              </FormItem>
+                              <FormItem label="Spatiotemporal scale" prop="scale">
+                                <Input
+                                  v-model="contextForm.scale"
+                                  placeholder="Please enter the spatiotemporal scale"
+                                  type="textarea"
+                                  :autosize="{minRows: 1,maxRows: 5}"
+                                  clearable
+                                />
+                              </FormItem>
+                              <FormItem label=" Main methods" prop="methods">
+                                <Input
+                                  v-model="contextForm.methods"
+                                  placeholder="Please enter the main methods"
+                                  type="textarea"
+                                  :autosize="{minRows: 1,maxRows: 5}"
+                                  clearable
+                                />
+                              </FormItem>
+                              <FormItem label="Goals or Purposes" prop="goals">
+                                <Input
+                                  v-model="contextForm.goals"
+                                  placeholder="Please enter your goal"
+                                  type="textarea"
+                                  :autosize="{minRows: 1,maxRows: 5}"
+                                  clearable
+                                />
+                              </FormItem>
+                              <FormItem label=" Difficulties or Limitations" prop="difficulties">
+                                <Input
+                                  v-model="contextForm.difficulties"
+                                  placeholder="Please enter the difficulties"
+                                  type="textarea"
+                                  :autosize="{minRows: 1,maxRows: 5}"
+                                  clearable
+                                />
+                              </FormItem>
+                              <FormItem label="Others" prop="others">
+                                <Input
+                                  v-model="contextForm.others"
+                                  placeholder="Supplement"
+                                  type="textarea"
+                                  :autosize="{minRows: 1,maxRows: 5}"
+                                  clearable
+                                />
+                              </FormItem>
+                              <FormItem>
+                                <template v-if="userRole == 'Manager'">
+                                  <Button @click="submit('contextForm')">Submit</Button>
+                                </template>
+                              </FormItem>
+                            </Form>
+                          </div>
+                        </vue-scroll>
+                      </Card>
+                      <!-- </div> -->
+                    </Col>
+                  </Row>
+                </template>
+                <!-- </div> -->
+              </Row>
+            </template>
+          </TabPane>
+          <TabPane label="Resources collection" name="Resources" icon="logo-buffer">
+            <div class="resourceContent">
+              <Row style="margin-top:10px">
+                <Card :style="{height:sidebarHeight+10+'px'}" style="margin:0 1% 50px 1%">
+                  <div class="condefTitle">
+                    <div
+                      style="width:3px;height:18px;float:left;background-color:rgb(124, 126, 126)"
+                    ></div>
+                    <h4 style="float:left;margin-left:5px">Resources</h4>
                   </div>
-                </Upload>
+                  <div
+                    slot="extra"
+                    style="display:flex;align-items:center;height:40px"
+                    class="popCenter"
+                  >
+                    <!-- 上传 -->
+                    <Button
+                      id="upload"
+                      type="default"
+                      @click="uploadFileModalShow()"
+                      class="uploadBtn"
+                      title="Upload resource"
+                    >
+                      <Icon type="md-cloud-upload" size="20" />
+                    </Button>
+                  </div>
+                  <!-- <vue-scroll :ops="scrollOps" :style="{height:sidebarHeight-50+'px'}"> -->
+                  <div class="resourceMenu">
+                    <!-- <div v-for="(item,index) in resourceType" :key="index">                         -->
+                    <Menu active-name="data" @on-select="filterResourceType">
+                      <MenuItem name="data">
+                        <Icon type="ios-stats" />Data
+                      </MenuItem>
+                      <MenuItem name="image">
+                        <Icon type="md-image" />Images
+                      </MenuItem>
+                      <MenuItem name="video">
+                        <Icon type="md-videocam" />Videos
+                      </MenuItem>
+                      <MenuItem name="paper">
+                        <Icon type="ios-paper" />Papers
+                      </MenuItem>
+                      <MenuItem name="document">
+                        <Icon type="md-document" />Documents
+                      </MenuItem>
+                      <MenuItem name="model">
+                        <Icon type="md-construct" />Models
+                      </MenuItem>
+                      <MenuItem name="others">
+                        <Icon type="md-cube" />Others
+                      </MenuItem>
+                    </Menu>
+                    <!-- </div> -->
+                  </div>
+                  <div class="resourceTable">
+                    <!-- <div style="height:250px;overflow-y:scroll;margin-top:10px" > -->
+                    <Table
+                      :columns="resourceTableColName"
+                      :data="filterFileType"
+                      v-show="filterFileType!=[]&&filterFileType!='None'"
+                    >
+                      <template slot-scope="{ row }" slot="name">
+                        <strong>{{ row.name }}</strong>
+                      </template>
 
-                <div style="padding:0 10px 0 10px">
-                  <ul v-for="(list,index) in file" :key="index">
-                    <li style="display:flex">
-                      File name:
-                      <span
-                        style="font-size:10px;margin: 0 5px 0 5px"
-                        :title="list.name"
-                      >{{ list.name }}</span>
-                      (Size:
-                      <span
-                        v-if="list.size<(1024*1024)"
-                        style="font-size:10px;margin-right:10px"
-                      >{{(list.size/1024).toFixed(2)}}KB)</span>
-                      <span
-                        v-else
-                        style="font-size:10px;margin-right:10px"
-                      >{{(list.size/1024/1024).toFixed(2)}}MB)</span>
-                      <Icon
-                        type="ios-close"
-                        size="20"
-                        @click="delFileList(index)"
-                        style="display:flex;justify-content:flex-end;cursor:pointer"
-                        title="Cancel"
-                      ></Icon>
-                    </li>
-                  </ul>
+                      <template slot-scope="{ row, index }" slot="action">
+                        <a
+                          :href="filterFileType[index].pathURL"
+                          :download="filterFileType[index].name"
+                          title="Download"
+                        >
+                          <Icon type="md-download" :size="20" />
+                        </a>
+                        <span @click="show(index)" style="margin-left:10px" title="Preview">
+                          <Icon type="md-eye" :size="20" color="#2d8cf0" style="cursor:pointer" />
+                        </span>
+                      </template>
+                    </Table>
+                    <!-- </div>  -->
+                  </div>
+                  <!-- </vue-scroll> -->
+                </Card>
+              </Row>
+            </div>
+
+            <!-- 上传文件按钮的模态框 -->
+            <Modal
+              v-model="uploadFileModal"
+              title="Upload file"
+              width="800px"
+              :mask-closable="false"
+              @on-ok="filesUpload('fileUploadForm')"
+              ok-text="Submit"
+              cancel-text="Cancel"
+            >
+              <div>
+                <Form
+                  ref="fileUploadForm"
+                  :model="fileUploadForm"
+                  :rules="fileUploadFormRuleValidate"
+                  :label-width="100"
+                >
+                  <FormItem label="Privacy" prop="privacy">
+                    <RadioGroup v-model="fileUploadForm.privacy" style="width:80%">
+                      <Radio label="private">Private</Radio>
+                      <Radio label="public">Public</Radio>
+                    </RadioGroup>
+                  </FormItem>
+                  <FormItem label="Type" prop="type">
+                    <RadioGroup v-model="fileUploadForm.type">
+                      <Radio label="data">Data</Radio>
+                      <Radio label="image">Images</Radio>
+                      <Radio label="video">Videos</Radio>
+                      <Radio label="paper">Papers</Radio>
+                      <Radio label="document">Documents</Radio>
+                      <Radio label="model">Models</Radio>
+                      <Radio label="others">Others</Radio>
+                    </RadioGroup>
+                  </FormItem>
+                  <FormItem label="Description" prop="description">
+                    <Input
+                      type="textarea"
+                      :rows="4"
+                      v-model="fileUploadForm.description"
+                      placeholder="Enter file description"
+                    />
+                  </FormItem>
+                </Form>
+              </div>
+              <Upload
+                :max-size="1024*1024"
+                multiple
+                type="drag"
+                :before-upload="gatherFile"
+                action="-"
+              >
+                <div style="padding: 20px 0">
+                  <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
+                  <p>
+                    Click or drag files here to upload(The file size must control in
+                    <span
+                      style="color:red"
+                    >1GB</span>)
+                  </p>
                 </div>
-              </Modal>
-            </TabPane>
-          </Tabs>
-        </div>
+              </Upload>
+
+              <div style="padding:0 10px 0 10px">
+                <ul v-for="(list,index) in file" :key="index">
+                  <li style="display:flex">
+                    File name:
+                    <span
+                      style="font-size:10px;margin: 0 5px 0 5px"
+                      :title="list.name"
+                    >{{ list.name }}</span>
+                    (Size:
+                    <span
+                      v-if="list.size<(1024*1024)"
+                      style="font-size:10px;margin-right:10px"
+                    >{{(list.size/1024).toFixed(2)}}KB)</span>
+                    <span
+                      v-else
+                      style="font-size:10px;margin-right:10px"
+                    >{{(list.size/1024/1024).toFixed(2)}}MB)</span>
+                    <Icon
+                      type="ios-close"
+                      size="20"
+                      @click="delFileList(index)"
+                      style="display:flex;justify-content:flex-end;cursor:pointer"
+                      title="Cancel"
+                    ></Icon>
+                  </li>
+                </ul>
+              </div>
+            </Modal>
+          </TabPane>
+        </Tabs>
       </div>
-   
+    </div>
   </div>
 </template>
 
@@ -588,7 +585,7 @@ import * as socketApi from "./../../api/socket";
 import Avatar from "vue-avatar";
 import echarts from "echarts";
 import folderTree from "../resources/folderTree";
-import onlineParticipant from "./onlineParticipants";
+import onlineParticipant from "./utils/onlineParticipants";
 export default {
   components: {
     VueFlowy,
@@ -601,13 +598,15 @@ export default {
     return {
       scrollOps: {
         bar: {
-          background: "lightgrey",
+          background: "lightgrey"
           // detectResize: true
         }
       },
+      subProjectInfo:{},
+      projectInfo:{},
       stepId: this.$route.params.id,
-      toSubProjectPage: "/project/" + this.$route.params.subid + "/subproject",
-      toChatroom:"/chat",
+      toSubProjectPage: "",
+      toChatroom: "/chat",
       // 关于邀请的模态框
       sidebarHeight: 800,
       // web socket for contextDefinition
@@ -629,7 +628,7 @@ export default {
         methods: "",
         others: ""
       },
-      defaultContent:{
+      defaultContent: {
         boundary: "",
         scale: "",
         difficulties: "",
@@ -711,8 +710,6 @@ export default {
           typeIcon: "md-cube"
         }
       ],
-      // subprojectId: this.$route.params.subid,
-      subprojectId:sessionStorage.getItem("subProjectId"),
       //////// resource
       // 点击上传文件按钮时弹出的模态框
       uploadFileModal: false,
@@ -824,7 +821,7 @@ export default {
         name: "",
         description: ""
       },
-       // 用户角色
+      // 用户角色
       userRole: "Visitor"
     };
   },
@@ -835,7 +832,27 @@ export default {
   mounted() {
     window.addEventListener("resize", this.initSize);
   },
-
+  beforeRouteEnter: (to, from, next) => {
+    next(vm => {
+      if (!vm.$store.getters.userState) {
+        next("/login");
+      } else {
+        if (
+          !(
+            vm.userRole == "Manager" ||
+            vm.userRole == "Member" ||
+            vm.userRole == "PManager"
+          )
+        ) {
+          vm.$Message.error("You have no property to access it");
+          // next(`/project/${vm.$store.getters.currentProjectId}`);
+          vm.$router.go(-1);
+        } else {
+          next();
+        }
+      }
+    });
+  },
   methods: {
     initSize() {
       this.sidebarHeight = window.innerHeight - 290;
@@ -843,13 +860,14 @@ export default {
 
     init() {
       this.initSize();
+      this.getSubprojectInfo();
+      this.getProjectInfo();
+      this.userRoleIdentity();
       this.getContextDefinition();
       this.getAllResource();
-     
     },
 
     submit(contextform) {
-      // this.subprojectId = this.$route.params.id;
       let creatorId = this.$store.getters.userId;
       this.$refs[contextform].validate(valid => {
         // 提交表单
@@ -904,12 +922,12 @@ export default {
           if (res.data != "Fail") {
             this.stepContent = res.data[0];
             this.stepForm.name = res.data[0].name;
+            this.toSubProjectPage = "/project/" + res.data[0].subProjectId + "/subproject";
             this.stepForm.description = res.data[0].description;
-            this.userRoleIdentity();
 
             if (JSON.stringify(res.data[0].content) != "{}") {
               this.contextForm = res.data[0].content;
-            }else{
+            } else {
               this.contextForm = this.defaultContent;
             }
           } else {
@@ -941,10 +959,9 @@ export default {
               total += that.file[i].fileSize;
             }
             if (total < Math.pow(1024, 2)) {
-              let userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
               formData.append("description", this.fileUploadForm.description);
               formData.append("type", this.fileUploadForm.type);
-              formData.append("uploaderId", userInfo.userId);
+              formData.append("uploaderId", this.$store.getters.userId);
               formData.append("folderId", this.stepId);
               formData.append("privacy", this.fileUploadForm.privacy);
               this.progressModalShow = true;
@@ -1214,225 +1231,297 @@ export default {
       this.modifyStep = false;
     },
 
-    // 判断用户权限
+    getSubprojectInfo(){
+      let subProjectInfo = this.$store.getters.subProject;
+      if (
+        JSON.stringify(subProjectInfo) != "{}"
+      ) {
+        // this.$set(this, "subProjectInfo", subProjectInfo);
+        this.subProjectInfo = subProjectInfo;
+      } else {
+        let that = this;
+        $.ajax({
+          url:
+            "/GeoProblemSolving/subProject/inquiry" +
+            "?key=subProjectId" +
+            "&value=" +
+            subProjectId,
+          type: "GET",
+          async: false,
+          success: data => {
+            if (data == "Offline") {
+              that.$store.commit("userLogout");
+              that.$router.push({ name: "Login" });
+            } else if (data != "None" && data != "Fail") {
+              subProjectInfo = data[0];
+              that.$set(that, "subProjectInfo", subProjectInfo);
+
+              that.$store.commit("setSubProjectInfo", subProjectInfo);
+            }
+          },
+          error: function(err) {
+            console.log("Get manager name fail.");
+          }
+        });
+      }
+    },
+    getProjectInfo(){
+      let projectInfo = this.$store.getters.project;
+      if (
+        JSON.stringify(projectInfo) != "{}" &&
+        projectInfo.projectId.substring(0, 36) ==
+          this.subProjectInfo.projectId.substring(0, 36)
+      ) {
+        this.projectInfo = projectInfo;
+      } else {
+        $.ajax({
+          url:
+            "/GeoProblemSolving/project/inquiry" +
+            "?key=projectId" +
+            "&value=" +
+            this.subProjectInfo.projectId,
+          type: "GET",
+          async: false,
+          success: data => {
+            if (data != "None" && data != "Fail") {
+              this.projectInfo = data[0];
+              this.$store.commit("setProjectInfo", data[0]);
+            } else {
+              console.log(data);
+            }
+          }
+        });
+      }
+    },
     userRoleIdentity() {
       this.userRole = "Visitor";
-      // console.log(this.stepContent.creator);
-      // console.log(this.$store.getters.userId);
-      let creatorId = sessionStorage.getItem("subProjectManagerId");
-      console.log(creatorId);
       if (this.$store.getters.userState) {
         // 是否是子项目管理员
-        if (creatorId === this.$store.getters.userId) {
+        if (this.subProjectInfo.managerId === this.$store.getters.userId) {
           this.userRole = "Manager";
-          console.log(this.userRole);
         }
-        else{
-           this.userRole = "Visitor";
+        // 是否是子项目成员
+        else {
+          for (let i = 0; i < this.subProjectInfo.members.length; i++) {
+            if (
+              this.subProjectInfo.members[i].userId ===
+              this.$store.getters.userId
+            ) {
+              this.userRole = "Member";
+              break;
+            }
+          }
         }
+        // 是否是项目管理员
+        if (this.userRole != "Manager") {
+          if (this.projectInfo.managerId === this.$store.getters.userId) {
+            this.userRole = "PManager";
+          }
+        }
+      } else {
+        this.userRole = "Visitor";
       }
     },
 
     // 工具栏
     toolPanel(type) {
       if (this.userRole != "Visitor") {
-      this.axios
-        .post("/GeoProblemSolving/user/state")
-        .then(res => {
-          if (!res.data) {
-            this.$store.commit("userLogout");
-            this.$router.push({
-              name: "Login"
-            });
-          } else {
-            var toolURL = "";
-            let toolName = "";
-            if (type == "map") {
-              toolURL =
-                '<iframe src="' +
-                "http://" +
-                this.$store.state.IP_Port +
-                '/GeoProblemSolving/map" style="width: 100%;height:100%"></iframe>';
-              toolName = "Map";
-            } else if (type == "draw") {
-              toolURL =
-                '<iframe src="' +
-                "http://" +
-                this.$store.state.IP_Port +
-                '/GeoProblemSolving/draw" style="width: 100%;height:100%"></iframe>';
-              toolName = "Drawing";
-            } else if (type == "chart") {
-              toolURL =
-                '<iframe src="' +
-                "http://" +
-                this.$store.state.IP_Port +
-                '/GeoProblemSolving/charts" style="width: 100%;height:100%"></iframe>';
-              toolName = "Chart";
-            } else if (type == "chat") {
-              toolURL =
-                '<iframe src="' +
-                "http://" +
-                this.$store.state.IP_Port +
-                '/GeoProblemSolving/chat" style="width: 100%;height:100%"></iframe>';
-              toolName = "Chatroom";
-            } else if (type == "graphEditor") {
-              toolURL =
-                '<iframe src="/GeoProblemSolving/Collaborative/GraphEditor/index.html' +
-                "?groupID=" +
-                this.stepId +
-                '" style="width: 100%;height:100%"></iframe>';
-              toolName = "Sketchpad";
-            } else if (type == "3DmodelViewer") {
-              toolURL =
-                '<iframe src="/GeoProblemSolving/Collaborative/3DmodelViewer/index.html' +
-                "?groupID=" +
-                this.stepId +
-                '" style="width: 100%;height:100%"></iframe>';
-              toolName = "3D model viewer";
-            } else if (type == "LogicalModel") {
-              toolURL =
-                '<iframe src="/GeoProblemSolving/Collaborative/LogicalModel/index.html' +
-                "?groupID=" +
-                this.stepId +
-                '" style="width: 100%;height:100%"></iframe>';
-              toolName = "Logical modeling";
-            } else if (type == "ConceptualModel") {
-              toolURL =
-                '<iframe src="/GeoProblemSolving/Collaborative/ConceptualModel/index.html' +
-                "?groupID=" +
-                this.stepId +
-                '" style="width: 100%;height:100%"></iframe>';
-              toolName = "Conceptual modeling";
-            } else if (type == "ComputationalModel") {
-              toolURL =
-                '<iframe src="/GeoProblemSolving/Collaborative/ComputationalModel/index.html' +
-                "?groupID=" +
-                this.stepId +
-                '" style="width: 100%;height:100%"></iframe>';
-              toolName = "Computational modeling";
-            } else if (type == "tableEditor") {
-              toolURL =
-                '<iframe src="/GeoProblemSolving/Collaborative/jexcelTool/index.html' +
-                "?groupID=" +
-                this.stepId +
-                '" style="width: 100%;height:100%"></iframe>';
-              toolName = "Table editor";
-            } else if (type == "nc-map") {
-              toolURL =
-                '<iframe src="' +
-                "http://" +
-                this.$store.state.IP_Port +
-                '/GeoProblemSolving/nc/map" style="width: 100%;height:100%"></iframe>';
-              toolName = "Map";
-            } else if (type == "nc-draw") {
-              toolURL =
-                '<iframe src="' +
-                "http://" +
-                this.$store.state.IP_Port +
-                '/GeoProblemSolving/nc/draw" style="width: 100%;height:100%"></iframe>';
-              toolName = "Drawing";
-            } else if (type == "nc-chart") {
-              toolURL =
-                '<iframe src="' +
-                "http://" +
-                this.$store.state.IP_Port +
-                '/GeoProblemSolving/nc/charts" style="width: 100%;height:100%"></iframe>';
-              toolName = "Chart";
-            } else if (type == "cn-tableEditor") {
-              toolURL =
-                '<iframe src="/GeoProblemSolving/Collaborative/jexcelTool/excelToolSingle.html' +
-                '" style="width: 100%;height:100%"></iframe>';
-              toolName = "Table editor";
-            } else if (type == "nc-3DmodelViewer") {
-              toolURL =
-                '<iframe src="/GeoProblemSolving/Collaborative/3DmodelViewer/indexSingle.html' +
-                '" style="width: 100%;height:100%"></iframe>';
-              toolName = "3D model viewer";
-            } else if (type == "nc-video") {
-              toolURL =
-                '<iframe src="' +
-                "http://" +
-                this.$store.state.IP_Port +
-                '/GeoProblemSolving/video" style="width: 100%;height:100%"></iframe>';
-              toolName = "Video player";
-            } else if (type == "nc-pdf") {
-              toolURL =
-                '<iframe src="' +
-                "http://" +
-                this.$store.state.IP_Port +
-                '/GeoProblemSolving/pdfview" style="width: 100%;height:100%"></iframe>';
-              toolName = "Pdf viewer";
-            } else if (type == "Doc Edit") {
-              toolURL =
-                '<iframe src="' +
-                "http://" +
-                this.$store.state.IP_Port +
-                '/GeoProblemSolving/tinymce" style="width: 100%;height:100%"></iframe>';
-              toolName = "Text editor";
-            } else if (type == "Video Tool") {
-              var userId = this.$store.getters.userId;
-              var moduleId = this.stepId;
-              var reg = /(\S)*:80/;
-              var IP_Port = this.$store.state.IP_Port;
-              var videoIP_Port = IP_Port.match(reg)[1];
-              toolURL =
-                '<iframe src="https://' +
-                videoIP_Port +
-                ":8083/GeoProblemSolving/Collaborative/vedioChat/WebRtcTest.html" +
-                "?roomId=" +
-                moduleId +
-                "&userId=" +
-                userId +
-                '" style="width: 100%;height:100%"></iframe>';
-              toolName = "Video Tool";
-            } else if (type == "Web-SWMM") {
-              toolURL =
-                '<iframe src="http://geomodeling.njnu.edu.cn/hydro-model-integration/webswmm" style="width: 100%; height:100%"></iframe>';
-              toolName = "Web-SWMM";
-            } else if (type == "TrafficNoise") {
-              toolURL =
-                '<iframe src="http://geomodeling.njnu.edu.cn/TrafficNoiseTheme/trafficNoise.html" style="width: 100%; height:100%"></iframe>';
-              toolName = "Traffic Noise";
-            }
-
-            let panel = jsPanel.create({
-              theme: "success",
-              headerTitle: toolName,
-              footerToolbar: '<p style="height:10px"></p>',
-              contentSize: "1200 600",
-              content: toolURL,
-              disableOnMaximized: true,
-              dragit: {
-                containment: 5
-              },
-              callback: function() {
-                // this.content.style.padding = "20px";
+        this.axios
+          .post("/GeoProblemSolving/user/state")
+          .then(res => {
+            if (!res.data) {
+              this.$store.commit("userLogout");
+              this.$router.push({
+                name: "Login"
+              });
+            } else {
+              var toolURL = "";
+              let toolName = "";
+              if (type == "map") {
+                toolURL =
+                  '<iframe src="' +
+                  "http://" +
+                  this.$store.state.IP_Port +
+                  '/GeoProblemSolving/map" style="width: 100%;height:100%"></iframe>';
+                toolName = "Map";
+              } else if (type == "draw") {
+                toolURL =
+                  '<iframe src="' +
+                  "http://" +
+                  this.$store.state.IP_Port +
+                  '/GeoProblemSolving/draw" style="width: 100%;height:100%"></iframe>';
+                toolName = "Drawing";
+              } else if (type == "chart") {
+                toolURL =
+                  '<iframe src="' +
+                  "http://" +
+                  this.$store.state.IP_Port +
+                  '/GeoProblemSolving/charts" style="width: 100%;height:100%"></iframe>';
+                toolName = "Chart";
+              } else if (type == "chat") {
+                toolURL =
+                  '<iframe src="' +
+                  "http://" +
+                  this.$store.state.IP_Port +
+                  '/GeoProblemSolving/chat" style="width: 100%;height:100%"></iframe>';
+                toolName = "Chatroom";
+              } else if (type == "graphEditor") {
+                toolURL =
+                  '<iframe src="/GeoProblemSolving/Collaborative/GraphEditor/index.html' +
+                  "?groupID=" +
+                  this.stepId +
+                  '" style="width: 100%;height:100%"></iframe>';
+                toolName = "Sketchpad";
+              } else if (type == "3DmodelViewer") {
+                toolURL =
+                  '<iframe src="/GeoProblemSolving/Collaborative/3DmodelViewer/index.html' +
+                  "?groupID=" +
+                  this.stepId +
+                  '" style="width: 100%;height:100%"></iframe>';
+                toolName = "3D model viewer";
+              } else if (type == "LogicalModel") {
+                toolURL =
+                  '<iframe src="/GeoProblemSolving/Collaborative/LogicalModel/index.html' +
+                  "?groupID=" +
+                  this.stepId +
+                  '" style="width: 100%;height:100%"></iframe>';
+                toolName = "Logical modeling";
+              } else if (type == "ConceptualModel") {
+                toolURL =
+                  '<iframe src="/GeoProblemSolving/Collaborative/ConceptualModel/index.html' +
+                  "?groupID=" +
+                  this.stepId +
+                  '" style="width: 100%;height:100%"></iframe>';
+                toolName = "Conceptual modeling";
+              } else if (type == "ComputationalModel") {
+                toolURL =
+                  '<iframe src="/GeoProblemSolving/Collaborative/ComputationalModel/index.html' +
+                  "?groupID=" +
+                  this.stepId +
+                  '" style="width: 100%;height:100%"></iframe>';
+                toolName = "Computational modeling";
+              } else if (type == "tableEditor") {
+                toolURL =
+                  '<iframe src="/GeoProblemSolving/Collaborative/jexcelTool/index.html' +
+                  "?groupID=" +
+                  this.stepId +
+                  '" style="width: 100%;height:100%"></iframe>';
+                toolName = "Table editor";
+              } else if (type == "nc-map") {
+                toolURL =
+                  '<iframe src="' +
+                  "http://" +
+                  this.$store.state.IP_Port +
+                  '/GeoProblemSolving/nc/map" style="width: 100%;height:100%"></iframe>';
+                toolName = "Map";
+              } else if (type == "nc-draw") {
+                toolURL =
+                  '<iframe src="' +
+                  "http://" +
+                  this.$store.state.IP_Port +
+                  '/GeoProblemSolving/nc/draw" style="width: 100%;height:100%"></iframe>';
+                toolName = "Drawing";
+              } else if (type == "nc-chart") {
+                toolURL =
+                  '<iframe src="' +
+                  "http://" +
+                  this.$store.state.IP_Port +
+                  '/GeoProblemSolving/nc/charts" style="width: 100%;height:100%"></iframe>';
+                toolName = "Chart";
+              } else if (type == "cn-tableEditor") {
+                toolURL =
+                  '<iframe src="/GeoProblemSolving/Collaborative/jexcelTool/excelToolSingle.html' +
+                  '" style="width: 100%;height:100%"></iframe>';
+                toolName = "Table editor";
+              } else if (type == "nc-3DmodelViewer") {
+                toolURL =
+                  '<iframe src="/GeoProblemSolving/Collaborative/3DmodelViewer/indexSingle.html' +
+                  '" style="width: 100%;height:100%"></iframe>';
+                toolName = "3D model viewer";
+              } else if (type == "nc-video") {
+                toolURL =
+                  '<iframe src="' +
+                  "http://" +
+                  this.$store.state.IP_Port +
+                  '/GeoProblemSolving/video" style="width: 100%;height:100%"></iframe>';
+                toolName = "Video player";
+              } else if (type == "nc-pdf") {
+                toolURL =
+                  '<iframe src="' +
+                  "http://" +
+                  this.$store.state.IP_Port +
+                  '/GeoProblemSolving/pdfview" style="width: 100%;height:100%"></iframe>';
+                toolName = "Pdf viewer";
+              } else if (type == "Doc Edit") {
+                toolURL =
+                  '<iframe src="' +
+                  "http://" +
+                  this.$store.state.IP_Port +
+                  '/GeoProblemSolving/tinymce" style="width: 100%;height:100%"></iframe>';
+                toolName = "Text editor";
+              } else if (type == "Video Tool") {
+                var userId = this.$store.getters.userId;
+                var moduleId = this.stepId;
+                var reg = /(\S)*:80/;
+                var IP_Port = this.$store.state.IP_Port;
+                var videoIP_Port = IP_Port.match(reg)[1];
+                toolURL =
+                  '<iframe src="https://' +
+                  videoIP_Port +
+                  ":8083/GeoProblemSolving/Collaborative/vedioChat/WebRtcTest.html" +
+                  "?roomId=" +
+                  moduleId +
+                  "&userId=" +
+                  userId +
+                  '" style="width: 100%;height:100%"></iframe>';
+                toolName = "Video Tool";
+              } else if (type == "Web-SWMM") {
+                toolURL =
+                  '<iframe src="http://geomodeling.njnu.edu.cn/hydro-model-integration/webswmm" style="width: 100%; height:100%"></iframe>';
+                toolName = "Web-SWMM";
+              } else if (type == "TrafficNoise") {
+                toolURL =
+                  '<iframe src="http://geomodeling.njnu.edu.cn/TrafficNoiseTheme/trafficNoise.html" style="width: 100%; height:100%"></iframe>';
+                toolName = "Traffic Noise";
               }
-            });
-            // panel.resizeit("disable");
-            $(".jsPanel-content").css("font-size", "0");
-            this.panelList.push(panel);
-            // 生成records, 同步
-            let record = {
-              who: this.$store.getters.userName,
-              whoid: this.$store.getters.userId,
-              type: "tools",
-              toolType: type,
-              content: "used a tool: " + type,
-              moduleId: this.stepId,
-              time: new Date().toLocaleString()
-            };
-            this.subprojectSocket.send(JSON.stringify(record));
-          }
-        })
-        .catch(err => {
-          console.log("Get user info fail.");
-        });
-      }
-      else {
+
+              let panel = jsPanel.create({
+                theme: "success",
+                headerTitle: toolName,
+                footerToolbar: '<p style="height:10px"></p>',
+                contentSize: "1200 600",
+                content: toolURL,
+                disableOnMaximized: true,
+                dragit: {
+                  containment: 5
+                },
+                callback: function() {
+                  // this.content.style.padding = "20px";
+                }
+              });
+              // panel.resizeit("disable");
+              $(".jsPanel-content").css("font-size", "0");
+              this.panelList.push(panel);
+              // 生成records, 同步
+              let record = {
+                who: this.$store.getters.userName,
+                whoid: this.$store.getters.userId,
+                type: "tools",
+                toolType: type,
+                content: "used a tool: " + type,
+                moduleId: this.stepId,
+                time: new Date().toLocaleString()
+              };
+              this.subprojectSocket.send(JSON.stringify(record));
+            }
+          })
+          .catch(err => {
+            console.log("Get user info fail.");
+          });
+      } else {
         this.$Notice.info({
-        desc: "Please join this step first!"
-      });
+          desc: "Please join this step first!"
+        });
       }
     },
     closePanel() {
@@ -1452,9 +1541,14 @@ export default {
         this.subprojectSocket = null;
       }
       let subProjectId = this.subProjectId;
-      var subprojectSocketURL = "ws://" + this.$store.state.IP_Port + "/GeoProblemSolving/Module/" + subProjectId;
-      if(this.$store.state.IP_Port == "localhost:8080"){
-        subprojectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + subProjectId;
+      var subprojectSocketURL =
+        "ws://" +
+        this.$store.state.IP_Port +
+        "/GeoProblemSolving/Module/" +
+        subProjectId;
+      if (this.$store.state.IP_Port == "localhost:8080") {
+        subprojectSocketURL =
+          "ws://localhost:8081/GeoProblemSolving/Module/" + subProjectId;
       }
       this.subprojectSocket = new WebSocket(subprojectSocketURL);
       this.subprojectSocket.onopen = this.onOpen;

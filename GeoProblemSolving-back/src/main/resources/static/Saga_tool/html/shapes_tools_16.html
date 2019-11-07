@@ -1,0 +1,179 @@
+
+                <!DOCTYPE html>
+                <html lang="en"> 
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                    <title>SAGA TOOL</title>
+                    <link rel="stylesheet" href="../css/bootstrap.min.css">
+                    <style>
+                        body {
+                            margin: 10px;
+                            margin-bottom: 20px;
+                            min-width: 700px;
+                        }
+
+                        th {
+                            text-align: center;
+                            font-size: 18px;
+                        }
+
+                        td,
+                        th {
+                            padding: 2px;
+                        }
+                        .progress{
+                            margin-bottom: 0px;
+                            display: none;
+                        }
+                    </style>
+                </head>
+
+                <body>
+
+                    <div id="desc_content">
+                        
+            <h4>Tool</h4>
+            <table border="0" >
+                <tr>
+                    <td valign="top"><b>Name</b></td>
+                    <td valign="top">Split Shapes Layer Randomly</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>ID</b></td>
+                    <td valign="top">16</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>Author</b></td>
+                    <td valign="top">O.Conrad (c) 2008</td>
+                </tr>
+            </table>
+            <hr>
+            <h4>Description</h4>
+            <hr>
+            <h4>Parameters</h4>
+            <table tool_id="16"
+            oid="5b90e7bbd15d75093cb58833"
+            stateId="285AB369-E76B-4d4e-A6A1-77A685D09711"
+            mdlId="A3A0E736-5F50-41ab-8D7B-231C96E90698" border="1" width="100%" valign="top" cellpadding="6" rules="all">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Identifier</th>
+                        <th>Description</th>
+                        <th>Constraints</th>
+                        <th>Settings</th>
+                    </tr>
+                
+                <thead>
+                    <tr> 
+                    <th colspan="6">Input</th>
+                    </tr>
+                </thead>
+
+                <tbody id="input_body">
+                    
+            
+            <tr>
+            <td>Shapes</td>
+            <td>Shapes (input)</td>
+            <td>SHAPES</td>
+            <td></td>
+            <td></td>
+            <td>
+                <input type="file" id="SHAPES" accept="application/zip" optional="false" data_type="Shapes (input)"></input>
+            </td>
+            </tr>
+        
+        
+                </tbody>
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Options</th>
+                    </tr>
+                </thead>
+                <tbody id="options_body">
+                    
+        
+            <tr>
+                <td>Categories</td>
+                <td>Table field</td>
+                <td>FIELD</td>
+                <td></td>
+                <td></td>
+                <td>
+                <input type="text" id="FIELD" class="form-control" value="">
+                </td>
+            </tr>,
+            <tr>
+                <td>Relation B / A</td>
+                <td>Floating point</td>
+                <td>PERCENT</td>
+                <td></td>
+                <td>Minimum: 0.000000
+Maximum: 100.000000
+Default: 25.000000</td>
+                <td>
+                <input type="text" id="PERCENT" class="form-control" value="25.000000">
+                </td>
+            </tr>,
+            <tr>
+                <td>Exact</td>
+                <td>Boolean</td>
+                <td>EXACT</td>
+                <td></td>
+                <td>Default: 1</td>
+                <td>
+                <input type="text" id="EXACT" class="form-control" value="1">
+                </td>
+            </tr>
+                </tbody> 
+
+                <thead>
+                    <tr>
+                        <th colspan="6">Output</th>
+                    </tr>
+                </thead>
+
+                <tbody id="output_body">
+                
+            
+            <tr>
+            <td>Group A</td>
+            <td>Shapes (output)</td>
+            <td>A</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="A" optional="false" data_type="Shapes (output)">Download Data</a></td>
+            </tr>
+        ,
+            <tr>
+            <td>Group B</td>
+            <td>Shapes (output)</td>
+            <td>B</td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center;"><a class="btn btn-danger disabled" href="javascript:return false;" style="" id="B" optional="false" data_type="Shapes (output)">Download Data</a></td>
+            </tr>
+        
+         
+                </tbody>
+                
+            </table>(*) <i>optional</i>
+            <div class="progress">
+                <div id="progressbar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="60"
+                    aria-valuemin="0" aria-valuemax="100" style="width: 10%"> 
+                </div>
+            </div>
+            <button type="button" style="float: right;margin-top: 20px; margin-bottom: 20px; margin-right: 30px;width: 100px;tab-size: 28px" class="btn btn-success" onclick="onRunButtonClick()">Run
+            </button>
+            
+                    </div>
+                    <script src="../js/jquery-3.4.1.js"></script>
+                    <script src="../js/bootstrap.min.js"></script>
+                    <script src="../js/runModel.js"></script>
+                </body> 
+                </html>

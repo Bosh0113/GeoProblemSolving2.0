@@ -56,7 +56,9 @@ public class SubProjectDaoImpl implements ISubProjectDao {
 
             Query query = new Query(Criteria.where("projectId").is(subProject.getProjectId()));
             ProjectEntity projectEntity = mongoTemplate.findOne(query,ProjectEntity.class);
-            joinSubProject(subProject.getSubProjectId(),projectEntity.getManagerId());
+            if(!projectEntity.getManagerId().equals(subProject.getManagerId())){
+                joinSubProject(subProject.getSubProjectId(),projectEntity.getManagerId());
+            }
 
             return subProject;
         } catch (Exception e) {
