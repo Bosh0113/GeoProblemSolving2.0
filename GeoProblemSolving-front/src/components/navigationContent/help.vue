@@ -40,7 +40,7 @@ export default {
   },
   methods: {
     getHelpImg() {
-      for (var i = 1; i < 8; i++) {
+      for (var i = 1; i < 12; i++) {
         var imgUrl = require("@/assets/images/Help/" + "help" + i + ".png");
         this.imageList.push(imgUrl);
       }

@@ -37,13 +37,13 @@
         <Col offset="4" span="16" style="text-align:center;">
           <strong>{{subProjectInfo.title}}</strong>
         </Col>
-        <Button
+        <!-- <Button
           type="info"
           icon="md-globe"
           style="float:right;margin:3px 30px 0 0"
           title="Go to work"
           @click="gotoWorkingspace"
-        >Working space</Button>
+        >Working space</Button> -->
       </div>
       <router-view :subProjectInfo="subProjectInfo" :userRole="userRole" :projectInfo="projectInfo"></router-view>
     </Row>
