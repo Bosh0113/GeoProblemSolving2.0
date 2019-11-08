@@ -385,13 +385,13 @@ export default {
   beforeRouteLeave(to, from, next) {
     var editStart = false;
     if(this.oldLimitation != this.limitation){
-      editCompleted = true;
+      editStart = true;
     }
     if(this.oldBackground != this.background){
-      editCompleted = true;
+      editStart = true;
     }
     if(this.oldDescription != this.description){
-      editCompleted = true;
+      editStart = true;
     }
 
     if((!editStart)||!(this.edit1||this.edit2||this.edit3)){
