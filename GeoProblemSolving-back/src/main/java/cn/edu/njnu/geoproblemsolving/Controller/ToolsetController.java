@@ -17,7 +17,7 @@ public class ToolsetController {
     private MongoTemplate mongoTemplate;
 
     @RequestMapping(value = "/create", produces = {"application/json;charset=UTF-8"}, method = RequestMethod.POST)
-    public String createToolset(@RequestBody ToolsetEntity toolset){
+    public Object createToolset(@RequestBody ToolsetEntity toolset){
         ToolsetDaoImpl toolsetDao = new ToolsetDaoImpl(mongoTemplate);
         try {
             return toolsetDao.createToolset(toolset);

@@ -43,6 +43,7 @@
   min-height: 250px;
   word-break: break-all;
   word-wrap: break-word;
+  white-space: pre-line;
 }
 .operatePanel button {
   margin-right: 2.5%;
@@ -67,7 +68,7 @@
             <Card class="Information">
               <div style="width:100%">
                 <strong>Description:</strong>
-                <template  v-if="userRole == 'Manager'">
+                <template v-if="userRole == 'Manager'">
                   <Icon
                     v-if="!edit1"
                     type="ios-create"
@@ -100,7 +101,7 @@
             <Card class="Information">
               <div style="width:100%">
                 <strong>Background:</strong>
-                <template  v-if="userRole=='Manager'">
+                <template v-if="userRole=='Manager'">
                   <Icon
                     v-if="!edit2"
                     type="ios-create"
@@ -130,7 +131,7 @@
                 />
               </template>
             </Card>
-            <!-- <Card class="Information">
+            <Card class="Information">
               <div style="width:100%">
                 <strong>Limitations / problems:</strong>
                 <template v-if="userRole=='Manager'">
@@ -162,7 +163,7 @@
                   placeholder="Enter something..."
                 />
               </template>
-            </Card> -->
+            </Card>
           </vue-scroll>
         </div>
       </Col>
@@ -343,7 +344,7 @@ export default {
     Avatar,
     folderTree
   },
-  props: ["subProjectInfo","userRole","projectInfo"],
+  props: ["subProjectInfo", "userRole", "projectInfo"],
   data() {
     return {
       scrollOps: {
@@ -367,8 +368,11 @@ export default {
       edit2: false,
       edit3: false,
       background: "",
-      // limitation: "",
+      limitation: "",
       description: "",
+      oldBackground: "",
+      oldLimitation: "",
+      oldDescription: ""
     };
   },
   created() {
@@ -379,7 +383,24 @@ export default {
   },
 
   beforeRouteLeave(to, from, next) {
-    next();
+    var editCompleted = true;
+    if(this.oldLimitation != this.limitation){
+      editCompleted = false;
+    }
+    if(this.oldBackground != this.background){
+      editCompleted = false;
+    }
+    if(this.oldDescription != this.description){
+      editCompleted = false;
+    }
+
+    if ((!this.edit1&&!this.edit2&&!this.edit3)&&(!editCompleted)) {
+      this.$Notice.info({
+        desc: "The content that you edited has not been submitted!"
+      });
+    } else {
+      next();
+    }
   },
   beforeDestroy: function() {
     window.removeEventListener("resize", this.initSize);
@@ -401,11 +422,13 @@ export default {
         this.subProjectInfo.description != null
       ) {
         this.description = this.subProjectInfo.description;
+        this.oldDescription = this.subProjectInfo.description;
       } else if (
         this.subProjectInfo.purpose != undefined &&
         this.subProjectInfo.purpose != null
       ) {
         this.description = this.subProjectInfo.purpose;
+        this.oldDescription = this.subProjectInfo.purpose;
       }
 
       if (
@@ -413,6 +436,16 @@ export default {
         this.subProjectInfo.background != null
       ) {
         this.background = this.subProjectInfo.background;
+        this.oldBackground = this.subProjectInfo.background;
+      }
+
+      
+      if (
+        this.subProjectInfo.limitation != undefined &&
+        this.subProjectInfo.limitation != null
+      ) {
+        this.limitation = this.subProjectInfo.limitation;
+        this.oldLimitation = this.subProjectInfo.limitation;
       }
     },
     showMembers() {
@@ -462,7 +495,7 @@ export default {
           }
         })
         .catch(err => {});
-    },    
+    },
     ok() {
       this.$Message.info("Clicked ok");
     },
@@ -631,7 +664,9 @@ export default {
         index != 0
       ) {
         return true;
-      } else if(this.projectInfo.managerId == this.subProjectInfo.members[index].userId) {
+      } else if (
+        this.projectInfo.managerId == this.subProjectInfo.members[index].userId
+      ) {
         return false;
       } else {
         return false;
@@ -709,6 +744,7 @@ export default {
                 desc: "Update successfully!"
               });
             } else {
+              this.oldDescription = this.description;
               this.$Message.error("Update subproject failed.");
             }
           })
@@ -737,6 +773,7 @@ export default {
                 desc: "Update successfully!"
               });
             } else {
+              this.oldBackground = this.background;
               this.$Message.error("Update subproject failed.");
             }
           })
@@ -765,6 +802,7 @@ export default {
                 desc: "Update successfully!"
               });
             } else {
+              this.oldLimitation=this.limitation;
               this.$Message.error("Update subproject failed.");
             }
           })

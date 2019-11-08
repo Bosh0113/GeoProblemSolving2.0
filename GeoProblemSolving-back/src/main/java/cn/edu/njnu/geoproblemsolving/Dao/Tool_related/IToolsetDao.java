@@ -5,7 +5,7 @@ import cn.edu.njnu.geoproblemsolving.Entity.ToolsetEntity;
 import javax.servlet.http.HttpServletRequest;
 
 public interface IToolsetDao {
-    String createToolset(ToolsetEntity step);
+    Object createToolset(ToolsetEntity step);
     Object readToolset(String key,String value);
     Object readAccessibleToolsets(String userId);
     void deleteToolset(String key,String value);

@@ -62,7 +62,7 @@
         .project-start-btn{
             position: absolute;
             top: 80px;
-            left: 45%;
+            left: 70%;
             font-size: 0.9rem;
             border-radius: 6px;
             background-color: rgba(21, 88, 145, 0.4);
@@ -122,7 +122,8 @@
         <div class="home-content">
             <div>
                 <span class="pictitle">Projects</span>
-                <span class="picdesc">This is just an description.This is just an <br />description.This is just an description.This is just an description.</span>
+                <span class="picdesc">The project is created for solving geographic problems, <br />
+                    where resources, perspectives, and methods can be shared in a participatory manner.</span>
                 <i-button class="project-start-btn" @click="newProject"  type="default" >Create a project</i-button>
 <!--                <i-button class="search-btn" icon="icon ion-ios-search" @click=" ">Search...</i-button>-->
             </div>
@@ -130,7 +131,7 @@
     </div>
 
     <div class="tabs">
-        <Row>
+        <Row :style="{minHeight:contentMinHeight+'px'}">
             <i-col>
                 <div class="pro-tab">
                     <Tabs  v-model="currentTab" @on-click="changeTab" >
@@ -171,6 +172,7 @@
                 currentTab:"All",
                 //初始化信息总条数
                 //projectCount:10,
+                contentMinHeight:0,
                 currentPage:1 ,
                 totalCount:projectsInfo.count,
                 //每页显示多少条
@@ -193,6 +195,7 @@
                 freshEle:0
             },
             mounted(){
+                this.resizeContent();
                 //判断用户状态，如果登录，判断project权限，如果否，不判断
                 this.userInfo=JSON.parse(sessionStorage.getItem("userInfo"));
                 if( this.userInfo != null&&this.userInfo.userState){
@@ -208,11 +211,15 @@
                 window.onresize = () => {
                     return (() => {
                         this.$refs.navigationEl.identityMenuCSS();
+                        this.resizeContent();
                     })()
                 }
             },
 
             methods: {
+                resizeContent(){
+                    this.contentMinHeight = window.innerHeight-340.38;
+                },
                 changeTab(type) {
                     this.currentTab=type;
                     this.currentPage=1;
