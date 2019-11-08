@@ -13,6 +13,13 @@
   padding: 0;
   color: #19be6b;
 }
+.ellipsis{
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: top;
+}
 </style>
 <template>
   <div>
@@ -20,55 +27,67 @@
       <div style="width:3px;height:18px;float:left;background-color:rgb(124, 126, 126)"></div>
       <h4 style="float:left;margin-left:5px">Toolbox</h4>
       <div style="float:right;" title="Manage tools and toolsets">
-        <manage-tools :step-info="stepInfo"></manage-tools>
+        <manage-tools :step-info="stepInfo" @updateStepTools="stepToolListChanged" :key="toolModal"></manage-tools>
       </div>
     </div>
     <div :style="{height:contentHeight-66+'px'}">
       <vue-scroll :ops="ops">
-        <Tooltip
-          placement="bottom"
-          style="margin-left:2%; margin-top:3%"
-          v-for="(item,index) in toolsetList"
-          :key="'tool-'+index"
-          content="Test toolset"
-          theme="light"
-        >
-          <template v-if="item.toolsetImg == '' || item.toolsetImg == undefined">
-            <Button class="modelToolsetBtn" to="//134.175.111.77/note" target="_blank">
-              <Icon type="ios-hammer-outline" size="60" />
-            </Button>
-          </template>
-          <template v-else>
-            <img :src="item.toolsetImg" class="modelToolsetBtn" />
-          </template>
-        </Tooltip>
-        <Tooltip
-          placement="bottom"
-          v-for="(item,index) in toolList"
-          :key="'toolset-'+index"
-          content="Test tool"
-          theme="light"
-          style="margin-left:2%;margin-top:3%"
-        >
-          <template v-if="item.toolImg == '' || item.toolsetImg == undefined">
-            <Button class="modelToolBtn" to="/chat" target="_blank">
-              <Icon type="ios-hammer" size="60" />
-            </Button>
-          </template>
-          <template v-else>
-            <img :src="item.toolsetImg" class="modelToolBtn" to="/map" />
-          </template>
-        </Tooltip>
+        <Row>
+          <Col span="8" v-for="toolset in toolsetList" :key="toolset.index" style="margin-top:15px">
+            <Card style="background-color: #3f51b530;margin: 0 5px 10px 5px">
+              <div style="text-align:center">
+                <Tooltip placement="bottom" max-width="600">
+                  <img :src="toolset.toolsetImg" v-if="toolset.toolsetImg!=''" style="height:100%;max-height:50px;">
+                  <avatar
+                  :username="toolset.toolsetName"
+                  :size="50"
+                  style="margin-bottom:6px"
+                  v-else
+                ></avatar>
+                <div slot="content">
+                  <span>{{toolset.description}}</span>
+                  <br v-if="toolset.categoryTag.length>0"/>
+                  <p><i>{{toolset.categoryTag.join(',')}}</i></p>
+                </div>
+                </Tooltip>
+                <h4 :title="toolset.toolsetName" style="width:75px;" class="ellipsis">{{toolset.toolsetName}}</h4>
+              </div>
+            </Card>
+          </Col>
+          <Col span="8" v-for="tool in toolList" :key="tool.index"  style="margin-top:15px">
+            <Card style="background-color: ghostwhite;margin: 0 5px 10px 5px">
+              <div style="text-align:center">
+                <Tooltip placement="bottom" max-width="600">
+                  <img :src="tool.toolImg" v-if="tool.toolImg!=''" style="height:100%;max-height:50px;">
+                  <avatar
+                  :username="tool.toolName"
+                  :size="50"
+                  style="margin-bottom:6px"
+                  v-else
+                ></avatar>
+                <div slot="content">
+                  <span>{{tool.description}}</span>
+                  <br v-if="tool.categoryTag.length>0"/>
+                  <span><i>{{tool.categoryTag.join(',')}}</i></span>
+                </div>
+                </Tooltip>
+                <h4 :title="tool.toolName" style="display:block;width:90px;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;">{{tool.toolName}}</h4>
+              </div>
+            </Card>
+          </Col>
+        </Row>
       </vue-scroll>
     </div>
   </div>
 </template>
 <script>
 import manageTools from "./../../tools/toolToStepModal";
+import Avatar from "vue-avatar";
 export default {
   props: ["stepInfo", "contentHeight", "userRole"],
   components: {
-    manageTools
+    manageTools,
+    Avatar
   },
   data() {
     return {
@@ -77,87 +96,104 @@ export default {
           background: "#808695"
         }
       },
-      toolList: [
-        {
-          tId:"",
-          name: "111",
-          toolImg: "",
-          tool_url: "",
-        },
-        {}
-      ],
-      toolsetList: [
-        {
-          tsId:"",
-          name: "222",
-          toolsetImg: "",
-        },
-        {}
-      ]
+      toolList: [],
+      toolsetList: [],
+      toolModal:0
     };
   },
   mounted() {
-    this.getAllTools();
+    this.getAllTools(this.stepInfo.toolList,this.stepInfo.toolsetList);
   },
   methods: {
-    getAllTools() {
-      this.toolList = [];
-      this.toolsetList = [];
-      this.$set(this,"toolList",this.stepInfo.toolList);
-      this.$set(this,"toolsetList",this.stepInfo.toolsetList);
+    getAllTools(toolIds,toolsetIds) {
+      this.getToolInfos(toolIds);
+      this.getToolsetInfos(toolsetIds);
     },
-    toolPanel(type) {
-      // if (this.userRole != "Visitor") {
-      // this.axios
-      //   .get("/GeoProblemSolving/user/state")
-      //   .then(res => {
-      //     if (!res.data) {
-      //       this.$store.commit("userLogout");
-      //       this.$router.push({ name: "Login" });
-      //     } else {
-      //       var toolURL = "";
-      //       let toolName = "";
-      //       if (type == "chat") {
-      //         toolURL =
-      //           '<iframe src="' +
-      //           "http://" +
-      //           this.$store.state.IP_Port +
-      //           '/GeoProblemSolving/chat" style="width: 100%;height:100%"></iframe>';
-      //         toolName = "Chatroom";
-      //       }
-      //       let panel = jsPanel.create({
-      //         theme: "success",
-      //         headerTitle: toolName,
-      //         footerToolbar: '<p style="height:10px"></p>',
-      //         contentSize: "1200 600",
-      //         content: toolURL,
-      //         disableOnMaximized: true,
-      //         dragit: {
-      //           containment: 5
-      //         },
-      //         callback: function() {
-      //           // this.content.style.padding = "20px";
-      //         }
-      //       });
-      //       panel.resizeit("disable");
-      //       $(".jsPanel-content").css("font-size", "0");
-      //       this.panelList.push(panel);
-      //       // 生成records, 同步
-      //       let record = {
-      //         who: this.$store.getters.userName,
-      //         whoid: this.$store.getters.userId,
-      //         type: "tools",
-      //         toolType: type,
-      //         content: "used a tool: " + type,
-      //         moduleId: this.stepId,
-      //         time: new Date().toLocaleString()
-      //       };
-      //       this.subprojectSocket.send(JSON.stringify(record));
-      //     }
-      //   })
-      //   .catch(err => {
-      //     console.log("Get user info fail.");
-      //   });
+    getToolInfos(toolIds){
+      var toolsCount = toolIds.length;
+      var flagCount = toolsCount;
+      var ToolInfos = [];
+      for(var i=0;i<toolsCount;i++){
+        this.axios
+          .get(
+            "/GeoProblemSolving/tool/inquiry" +
+              "?key="+"tId" +
+              "&value="+toolIds[i]
+          )
+          .then(res => {
+            if (res.data == "Offline") {
+              this.$store.commit("userLogout");
+              this.$router.push({ name: "Login" });
+            } else if (res.data === "Fail") {
+              this.$Notice.error({ desc: "Loading tools fail." });
+            } else if (res.data === "None") {
+              this.$Notice.error({ desc: "There is no existing tool" });
+            } else {
+              ToolInfos.push(res.data[0]);
+              if(--flagCount<1){
+                var sortTools = [];
+                for(var j=0;j<toolsCount;j++){
+                  for(var k=0;k<toolsCount;k++){
+                    if(toolIds[j]==ToolInfos[k].tId){
+                      sortTools.push(ToolInfos[k]);
+                      break;
+                    }
+                  }
+                }
+                this.$set(this, "toolList", sortTools);
+              }
+            }
+          })
+          .catch(err => {
+            console.log(err);
+          });
+      }
+    },
+    getToolsetInfos(toolsetIds){
+      var toolsetsCount = toolsetIds.length;
+      var flagCount = toolsetsCount;
+      var toolsetInfos = [];
+      for(var i=0;i<toolsetsCount;i++){
+        this.axios
+          .get(
+            "/GeoProblemSolving/toolset/inquiry" +
+              "?key="+"tsId" +
+              "&value="+toolsetIds[i]
+          )
+          .then(res => {
+            if (res.data == "Offline") {
+              this.$store.commit("userLogout");
+              this.$router.push({ name: "Login" });
+            } else if (res.data === "Fail") {
+              this.$Notice.error({ desc: "Loading toolsets fail." });
+            } else if (res.data === "None") {
+              this.$Notice.error({ desc: "There is no existing toolset" });
+            } else {
+              toolsetInfos.push(res.data[0]);
+              if(--flagCount<1){
+                var sortToolsets = [];
+                for(var j=0;j<toolsetsCount;j++){
+                  for(var k=0;k<toolsetsCount;k++){
+                    if(toolsetIds[j]==toolsetInfos[k].tsId){
+                      sortToolsets.push(toolsetInfos[k]);
+                      break;
+                    }
+                  }
+                }
+                this.$set(this, "toolsetList", sortToolsets);
+              }
+            }
+          })
+          .catch(err => {
+            console.log(err);
+          });
+      }
+    },
+    stepToolListChanged(tools,toolsets){
+      this.stepInfo.toolList = tools;
+      this.stepInfo.toolsetList = toolsets;
+      this.toolModal++;
+      this.getAllTools(tools,toolsets);
     }
   }
 };

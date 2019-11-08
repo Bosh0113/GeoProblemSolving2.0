@@ -46,7 +46,7 @@
           <Col span="16">
           <div span="2" style="height: inherit;width: 90px;position: absolute;">
             <Menu
-              active-name="allToolsets"
+              :active-name="showMenuItem"
               @on-select="changeMenuItem"
               style="height: inherit;width: fit-content;z-index:1"
             >
@@ -771,9 +771,6 @@ export default {
       this.stepToolsShow.forEach(tool=>{
         newStepTools.push(tool.tId);
       })
-      console.log('update step.');
-      console.log(newStepToolsets);
-      console.log(newStepTools);
       let obj = new URLSearchParams();
       obj.append("stepId",this.stepInfo.stepId);
       obj.append("toolsetList",newStepToolsets);
@@ -793,6 +790,7 @@ export default {
             this.$Notice.error({ desc: "There is no existing tool" });
           } else {
             //此处要更新父组件的列表
+            this.$emit("updateStepTools", newStepTools,newStepToolsets);
             this.stepToolModal = false;
           }
         })
