@@ -64,7 +64,7 @@
             word-break: break-word;
         }
         .projectIntroductionContent{
-            height: 180px;
+            height: 110px;
             overflow-y: auto;
             text-indent: 2em;
             padding: 0 5px;
@@ -289,7 +289,7 @@
                                                         </vue-scroll>
                                                     </div>
                                                 </div>
-                                                <div style="flex: 1;min-height: 200px;padding: 5px;border: #e8eaec 0.1px dashed;margin-top: 10px;">
+                                                <div style="flex: 1;min-height: 130px;padding: 5px;border: #e8eaec 0.1px dashed;margin-top: 10px;">
                                                     <h3>Introduction:</h3>
                                                     <div class="projectIntroductionContent">
                                                         <vue-scroll :ops="scrollOps">
@@ -999,13 +999,13 @@
                 },
                 resizeContent(){
                     if(window.innerHeight>735){
-                        this.membersContentCSS = window.innerHeight - 260+'px';
-                        this.contentPageCSS = window.innerHeight - 60 + 'px';
-                        this.subProjectsCSS= window.innerHeight - 170 + 'px';
+                        this.membersContentCSS = window.innerHeight - 330+'px';
+                        this.contentPageCSS = window.innerHeight - 130 + 'px';
+                        this.subProjectsCSS= window.innerHeight - 240 + 'px';
                     }else{
-                        this.membersContentCSS = '477px';
+                        this.membersContentCSS = '407px';
                         this.contentPageCSS = 'fit-content';
-                        this.subProjectsCSS= '565px';
+                        this.subProjectsCSS= '495px';
                     }
                     window.onresize = () => {
                         return (() => {
