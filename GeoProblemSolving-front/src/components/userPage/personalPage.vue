@@ -1016,10 +1016,19 @@ export default {
                 participatoryProjectListTemp.push(res.data[0]);
               }
               if (--count == 0) {
+                var participatoryProjectList = [];
+                for(var j=0;j<projectIds.length;j++){
+                  for(var k=0;k<participatoryProjectListTemp.length;k++){
+                    if(projectIds[j].projectId==participatoryProjectListTemp[k].projectId){
+                      participatoryProjectList.push(participatoryProjectListTemp[k]);
+                      break;
+                    }
+                  }
+                }
                 this.$set(
                   this,
                   "joinedProjectsList",
-                  participatoryProjectListTemp
+                  participatoryProjectList
                 );
               }
             })

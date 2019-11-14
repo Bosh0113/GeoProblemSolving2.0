@@ -85,8 +85,7 @@
   <div :style="{height: contentHeight+'px'}" style="min-width:1200px;">
     <Card dis-hover>
       <h1 slot="title">
-        <Button shape="circle" icon="md-arrow-round-back" @click="toStep"></Button>
-        <span style="margin-left:15px">Manage tools of step</span>
+        <span style="margin-left:15px">Tools Center</span>
       </h1>
       <div>
         <Row>
@@ -112,24 +111,39 @@
             <Card dis-hover style="margin-left: 80px">
               <h1 slot="title" style="padding-top:5px;color: #2d8cf099" v-if="showMenuItem=='publicTools'">Public tools</h1>
               <h1 slot="title" style="padding-top:5px;color: #2d8cf099" v-if="showMenuItem=='personalTools'">Personal tools</h1>
-              <div slot="extra">
-                <Button class="changeGreenColor" shape="circle" icon="ios-add-circle-outline" @click="createToolModalShow()">Create tool</Button>
-                <Button class="changeGreenColor" shape="circle" icon="ios-add-circle-outline" @click="createToolsetModalShow()">Create toolset</Button>
-              </div>
+            <div slot="extra">
+              <Select
+                v-model="typeSelected"
+                @on-change="filterShowListByType"
+                style="width:160px"
+              >
+                <Option v-for="item in typeOptions" :key="item.index" :value="item">{{ item }}</Option>
+              </Select>
+              <Button class="changeGreenColor" shape="circle" icon="ios-add-circle-outline" @click="createToolModalShow()">Create tool</Button>
+            </div>
               <div v-if="showMenuItem=='publicTools'" style="height: inherit;min-height: fit-content;" :style="{height: contentHeight-187+'px'}">
-                  <h3>Public tools</h3>
+                <div v-for="tool in publicToolShow" :key="tool.index">
+                  <p>{{tool.toolName}}</p>
+                </div>
               </div>
               <div v-if="showMenuItem=='personalTools'" style="height: inherit;min-height: fit-content;" :style="{height: contentHeight-187+'px'}">
-                  <h3>Personal tools</h3>
+                <div v-for="tool in personalToolShow" :key="tool.index">
+                  <p>{{tool.toolName}}</p>
+                </div>
               </div>
             </Card>
           </Col>
           <Col span="8">
             <div style="padding: 0 5px;margin-left: 15px;">
               <Card dis-hover>
-                <h1 slot="title" style="padding-top:5px">Tools in step</h1>
+                <h1 slot="title" style="padding-top:5px">Toolsets</h1>
+                <div slot="extra">
+                  <Button class="changeGreenColor" shape="circle" icon="ios-add-circle-outline" @click="createToolsetModalShow()">Create toolset</Button>
+                </div>
                 <div :style="{height: contentHeight-187+'px'}">
-
+                    <div v-for="toolset in toolsetList" :key="toolset.index">
+                      <p>{{toolset.toolsetName}}</p>
+                    </div>
                 </div>
               </Card>
             </div>
@@ -353,6 +367,9 @@ export default {
   components: {},
   mounted() {
     this.resizeContent();
+    this.getToolsets();
+    this.getPublicTools();
+    this.getPersonalTools();
   },
   data() {
     return {
@@ -365,14 +382,13 @@ export default {
           background: "#808695"
         }
       },
-      projectList: [],
-      subProjectList: [],
-      subProjectDisable: true,
-      scopeId: "",
       clickForbidden: false,
       inputToolTag: "",
       toolsetList: [],
-      toolList: [],
+      publicTools: [],
+      publicToolShow:[],
+      personalTools: [],
+      personalToolShow:[],
       createToolModal:false,
       toolInfo: {
         name: "",
@@ -386,6 +402,20 @@ export default {
         toolImg: "",
         privacy: "Private"
       },
+      typeSelected:"All",
+      typeOptions: [
+        "All",
+        "General step",
+        "Context definition & resource collection",
+        "Data processing",
+        "Modeling for geographic process",
+        "Model evaluation",
+        "Quantitative and qualitative analysis",
+        "Simulation/Prediction",
+        "Visualization & representation",
+        "Decision-making & management",
+        "Others"
+      ],
       toolInfoRule: {
         name: [
           {
@@ -499,15 +529,12 @@ export default {
         })();
       };
     },
-    toStep(){
-      this.$router.go(-1);
-    },
     getToolsets() {
       this.axios
         .get(
           "/GeoProblemSolving/toolset/inquiryAll" +
             "?provider=" +
-            this.$store.getters.userId
+            this.userInfo.userId
         )
         .then(res => {
           if (res.data == "Offline") {
@@ -525,12 +552,42 @@ export default {
           console.log(err);
         });
     },
-    getTools() {
+    getPublicTools(){
+      this.axios
+        .get(
+          "/GeoProblemSolving/tool/inquiry" +
+            "?key="+"privacy" +
+            "&value="+"Public"
+        )
+        .then(res => {
+          if (res.data == "Offline") {
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
+          } else if (res.data === "Fail") {
+            this.$Notice.error({ desc: "Loading tools fail." });
+          } else if (res.data === "None") {
+            this.$Notice.error({ desc: "There is no existing tool" });
+          } else {
+            this.$set(this, "publicTools", res.data);
+            var that = this;
+            var timer = window.setInterval(function(){
+              if(!that.publicTools.length<1&&!that.personalTools.length<1){
+                that.filterShowListByType();
+                window.clearInterval(timer);
+              }
+            },10);
+          }
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    },
+    getPersonalTools() {
       this.axios
         .get(
           "/GeoProblemSolving/tool/inquiryAll" +
             "?provider=" +
-            this.$store.getters.userId
+            this.userInfo.userId
         )
         .then(res => {
           if (res.data == "Offline") {
@@ -541,7 +598,7 @@ export default {
           } else if (res.data === "None") {
             this.$Notice.error({ desc: "There is no existing tool" });
           } else {
-            this.$set(this, "toolList", res.data);
+            this.$set(this, "personalTools", res.data);
           }
         })
         .catch(err => {
@@ -740,6 +797,46 @@ export default {
             .catch();
         };
       }
+    },
+    filterShowListByType(){
+      this.publicToolShow = this.getFilterResult(this.publicTools);
+      this.personalToolShow = this.getFilterResult(this.personalTools);
+    },
+    getFilterResult(foreList){
+      var selectedType = this.typeSelected;
+      var resultList=foreList.filter(function(item){
+        switch(selectedType){
+          case "All":{
+            return item;
+            break;
+          }
+          case "General step":
+          case "Context definition & resource collection":
+          case "Data processing":
+          case "Modeling for geographic process":
+          case "Model evaluation":
+          case "Quantitative and qualitative analysis":
+          case "Simulation/Prediction":
+          case "Visualization & representation":
+          case "Decision-making & management":{
+            var stepTypes = item.recomStep;
+            for(var i=0;i<stepTypes.length;i++){
+              if(stepTypes[i]==selectedType){
+                return item;
+                break;
+              }
+            }
+            break;
+          }
+          case "Others":{
+            if(item.recomStep.length<1){
+              return item;
+            }
+            break;
+          }
+        }
+      });
+      return resultList;
     },
   }
 };
