@@ -98,7 +98,7 @@
                         <div slot="content">
                           <span>{{toolset.description}}</span>
                           <br v-if="toolset.categoryTag.length>0"/>
-                          <p><i>{{toolset.categoryTag.join(',')}}</i></p>
+                          <p><i>{{toolset.categoryTag.join('|')}}</i></p>
                         </div>
                         </Tooltip>
                         <h4 :title="toolset.toolsetName" style="display:block;width:90px;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;">{{toolset.toolsetName}}</h4>
@@ -130,7 +130,7 @@
                         <div slot="content">
                           <span>{{toolset.description}}</span>
                           <br v-if="toolset.categoryTag.length>0"/>
-                          <p><i>{{toolset.categoryTag.join(',')}}</i></p>
+                          <p><i>{{toolset.categoryTag.join('|')}}</i></p>
                         </div>
                         </Tooltip>
                         <h4 :title="toolset.toolsetName" style="width:90px;" class="ellipsis">{{toolset.toolsetName}}</h4>
@@ -162,7 +162,7 @@
                         <div slot="content">
                           <span>{{tool.description}}</span>
                           <br v-if="tool.categoryTag.length>0"/>
-                          <span><i>{{tool.categoryTag.join(',')}}</i></span>
+                          <span><i>{{tool.categoryTag.join('|')}}</i></span>
                         </div>
                         </Tooltip>
                         <h4 :title="tool.toolName" style="display:block;width:90px;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;">{{tool.toolName}}</h4>
@@ -194,7 +194,7 @@
                         <div slot="content">
                           <span>{{tool.description}}</span>
                           <br v-if="tool.categoryTag.length>0"/>
-                          <span><i>{{tool.categoryTag.join(',')}}</i></span>
+                          <span><i>{{tool.categoryTag.join('|')}}</i></span>
                         </div>
                         </Tooltip>
                         <h4 :title="tool.toolName" style="width:90px;" class="ellipsis">{{tool.toolName}}</h4>
