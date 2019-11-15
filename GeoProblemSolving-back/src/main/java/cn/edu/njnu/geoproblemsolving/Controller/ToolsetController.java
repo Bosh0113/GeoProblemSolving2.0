@@ -43,10 +43,10 @@ public class ToolsetController {
     }
 
     @RequestMapping(value = "/delete", method = RequestMethod.GET)
-    public String deleteToolset(@RequestParam("tsid") String tsid){
+    public String deleteToolset(@RequestParam("tsId") String tsId){
         ToolsetDaoImpl toolsetDao = new ToolsetDaoImpl(mongoTemplate);
         try {
-            toolsetDao.deleteToolset("tsid",tsid);
+            toolsetDao.deleteToolset("tsId",tsId);
             return "Success";
         }catch (Exception e){
             return "Fail";

@@ -167,7 +167,7 @@
                 <Col span="8" v-for="tool in publicToolShow" :key="tool.index">
                   <div style="margin:0 5px 15px 5px">
                     <Card style="background-color: ghostwhite;">
-                      <p slot="title" class="ellipsis" style="width:165px;display:inline-block;" :title="tool.toolName">{{tool.toolName}}</p>
+                      <p slot="title" class="ellipsis" style="width:75%;display:inline-block;" :title="tool.toolName">{{tool.toolName}}</p>
                       <div slot="extra">
                         <Button icon="md-eye" shape="circle" class="btnHoverGray" title="Preview" size="small" @click="showTool(tool)"></Button>
                         <Button icon="md-share-alt" shape="circle" type="success" title="Add to toolset" size="small" @click="addToToolsetShow(tool)"></Button>
@@ -182,12 +182,12 @@
                             v-else
                           ></avatar>
                         </div>
-                        <div style="display: inline-block;vertical-align: top;width: 160px;" class="ellipsis">
+                        <div style="display: inline-block;vertical-align: top;width: 70%;" class="ellipsis">
                           <strong :title="tool.toolName">{{tool.toolName}}</strong>
                           <br/>
                           <span :title="tool.categoryTag.join('|')"><i>{{tool.categoryTag.join('|')}}</i></span>
                         </div>
-                        <div style="width:219px;height: 65px;border: 0.5px dashed #8080804d;padding: 1px 3px;">
+                        <div style="width:100%;height: 65px;border: 0.5px dashed #8080804d;padding: 1px 3px;">
                           <p class="toolDescription" :title="tool.description">{{tool.description}}</p>
                         </div>
                       </div>
@@ -203,7 +203,7 @@
                 <Col span="8" v-for="tool in personalToolShow" :key="tool.index">
                   <div style="margin:0 5px 15px 5px">
                     <Card style="background-color: #faebd75c">
-                      <p slot="title" class="ellipsis" style="width:115px;display:inline-block;" :title="tool.toolName">{{tool.toolName}}</p>
+                      <p slot="title" class="ellipsis" style="width:50%;display:inline-block;" :title="tool.toolName">{{tool.toolName}}</p>
                       <div slot="extra">
                         <Button icon="md-eye" shape="circle" class="btnHoverGray" title="Preview" size="small" @click="showTool(tool)"></Button>
                         <Button icon="ios-create" shape="circle" class="btnHoverBlue" title="Edit" size="small" @click="editToolShow(tool)"></Button>
@@ -220,12 +220,12 @@
                             v-else
                           ></avatar>
                         </div>
-                        <div style="display: inline-block;vertical-align: top;width: 160px;" class="ellipsis">
+                        <div style="display: inline-block;vertical-align: top;width: 70%;" class="ellipsis">
                           <strong :title="tool.toolName">{{tool.toolName}}</strong>
                           <br/>
                           <span :title="tool.categoryTag.join('|')"><i>{{tool.categoryTag.join('|')}}</i></span>
                         </div>
-                        <div style="width:219px;height: 65px;border: 0.5px dashed #8080804d;padding: 1px 3px;">
+                        <div style="width:100%;height: 65px;border: 0.5px dashed #8080804d;padding: 1px 3px;">
                           <p class="toolDescription" :title="tool.description">{{tool.description}}</p>
                         </div>
                       </div>
@@ -245,9 +245,24 @@
                   <Button class="btnHoverGreen" shape="circle" icon="ios-add-circle-outline" @click="createToolsetModalShow()">Create toolset</Button>
                 </div>
                 <div :style="{height: contentHeight-187+'px'}">
-                    <div v-for="toolset in toolsetList" :key="toolset.index">
-                      <p>{{toolset.toolsetName}}</p>
-                    </div>
+                <vue-scroll :ops="ops">
+                  <List>
+                    <ListItem v-for="toolset in toolsetList" :key="toolset.index">
+                    <ListItemMeta 
+                      :avatar="toolset.toolsetImg" 
+                      :title="toolset.toolsetName" 
+                      :description="toolset.description" />
+                    <template slot="action">
+                        <li>
+                            <a href="">Edit</a>
+                        </li>
+                        <li>
+                            <Button icon="md-close" shape="circle" class="btnHoverRed" title="Delete" size="small" @click="removeToolsetShow(toolset)"></Button>
+                        </li>
+                    </template>
+                    </ListItem>
+                  </List>
+                </vue-scroll>
                 </div>
               </Card>
             </div>
@@ -571,7 +586,7 @@
         >Edit</Button>
       </div>
     </Modal>
-    <Modal v-model="removeToolModal" title="Edit Tool" width="400">
+    <Modal v-model="removeToolModal" title="Remove Tool" width="400">
       <div style="text-align: center;">
         <h3>Are you sure to remove the tool: {{selectedTool.toolName}} ?</h3>
         <p style="color:red">This operation is irreversible!</p>
@@ -581,6 +596,20 @@
         <Button
           type="error"
           @click="removeTool()"
+          class="create"
+        >Remove</Button>
+      </div>
+    </Modal>
+    <Modal v-model="removeToolsetModal" title="Remove Toolset" width="400">
+      <div style="text-align: center;">
+        <h3>Are you sure to remove the toolset: {{selectedToolset.toolsetName}} ?</h3>
+        <p style="color:red">This operation is irreversible!</p>
+      </div>
+      <div slot="footer">
+        <Button @click="removeToolsetModal=false">Cancel</Button>
+        <Button
+          type="error"
+          @click="removeToolset()"
           class="create"
         >Remove</Button>
       </div>
@@ -770,6 +799,8 @@ export default {
       },
       editToolModal:false,
       removeToolModal:false,
+      selectedToolset:false,
+      removeToolsetModal:false
     };
   },
   methods: {
@@ -1232,8 +1263,41 @@ export default {
             console.log(err.data);
           })
     },
+    removeToolsetShow(toolset){
+      this.selectedToolset = toolset;
+      this.removeToolsetModal=true;
+    },
+    removeToolset(){
+      this.axios
+          .get(
+            "/GeoProblemSolving/toolset/delete"+
+            "?tsId="+
+            this.selectedToolset.tsId
+          )
+          .then(res => {
+              if (res.data == "Offline") {
+                this.$store.commit("userLogout");
+                this.$router.push({ name: "Login" });
+              } else if (res.data === "Fail") {
+                this.$Notice.error({ desc: "Remove toolset fail." });
+              } else {
+                this.removeToolsetModal = false;
+                var removedToolset = this.selectedToolset;
+                for(var i=0;i<this.toolsetList.length;i++){
+                  if(this.toolsetList[i].tsId==removedToolset.tsId){
+                    this.toolsetList.splice(i,1);
+                    break;
+                  }
+                }
+              this.$Notice.info({ desc: "The toolset("+ removedToolset.toolsetName+") has been removed."});
+              }
+          })
+          .catch(err=>{
+            console.log(err.data);
+          })
+    },
     addToToolsetShow(){
-
+      
     }
   }
 };
