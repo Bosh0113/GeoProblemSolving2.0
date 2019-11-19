@@ -1,6 +1,7 @@
 package cn.edu.njnu.geoproblemsolving.Dao.Tool_related;
 
 import cn.edu.njnu.geoproblemsolving.Dao.Method.CommonMethod;
+import cn.edu.njnu.geoproblemsolving.Entity.ToolEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.ToolsetEntity;
 import com.alibaba.fastjson.JSONArray;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
@@ -18,10 +19,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.InetAddress;
 import java.text.SimpleDateFormat;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -47,7 +45,7 @@ public class ToolsetDaoImpl implements IToolsetDao {
             Date date = new Date();
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
             toolset.setCreateTime(dateFormat.format(date));
-            toolset.setToolList(new JSONArray());
+            toolset.setToolList(new ArrayList<>());
             mongoTemplate.save(toolset);
             return toolset;
         }
@@ -173,6 +171,23 @@ public class ToolsetDaoImpl implements IToolsetDao {
             mongoTemplate.updateFirst(query, update, ToolsetEntity.class);
             return "Success";
         } catch (Exception e) {
+            return "Fail";
+        }
+    }
+
+    public String addToolToToolset(ToolEntity newTool,String[] tsIds){
+        try {
+            for(String tsId:tsIds){
+                Query query = new Query(Criteria.where("tsId").is(tsId));
+                ToolsetEntity toolset = mongoTemplate.findOne(query,ToolsetEntity.class);
+                ArrayList<ToolEntity> tools = toolset.getToolList();
+                tools.add(newTool);
+                Update update = new Update();
+                update.set("toolList",tools);
+                mongoTemplate.updateFirst(query,update,ToolsetEntity.class);
+            }
+            return "Success";
+        }catch (Exception e){
             return "Fail";
         }
     }

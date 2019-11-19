@@ -1,6 +1,8 @@
 package cn.edu.njnu.geoproblemsolving.Controller;
 
 import cn.edu.njnu.geoproblemsolving.Dao.Tool_related.ToolsetDaoImpl;
+import cn.edu.njnu.geoproblemsolving.Entity.ToolEntity;
+import cn.edu.njnu.geoproblemsolving.Entity.ToolReq.AddToolReq;
 import cn.edu.njnu.geoproblemsolving.Entity.ToolsetEntity;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.web.bind.annotation.*;
@@ -63,5 +65,12 @@ public class ToolsetController {
     public String updateToolset(HttpServletRequest request){
         ToolsetDaoImpl toolsetDao = new ToolsetDaoImpl(mongoTemplate);
         return toolsetDao.updateToolset(request);
+    }
+
+
+    @RequestMapping(value = "/addTool", produces = {"application/json;charset=UTF-8"}, method = RequestMethod.POST)
+    public String addTool(@RequestBody AddToolReq addToolReq){
+        ToolsetDaoImpl toolsetDao = new ToolsetDaoImpl(mongoTemplate);
+        return toolsetDao.addToolToToolset(addToolReq.getNewTool(),addToolReq.getTsIds());
     }
 }

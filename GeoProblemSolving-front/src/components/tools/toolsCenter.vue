@@ -254,7 +254,7 @@
                       :description="toolset.description" />
                     <template slot="action">
                         <li>
-                            <a href="">Edit</a>
+                            <a @click="editToolsetShow(toolset)">Edit</a>
                         </li>
                         <li>
                             <Button icon="md-close" shape="circle" class="btnHoverRed" title="Delete" size="small" @click="removeToolsetShow(toolset)"></Button>
@@ -614,6 +614,66 @@
         >Remove</Button>
       </div>
     </Modal>
+    <Modal v-model="addToToolsetModal" title="Add tool to toolsets" width="600">
+      <div>
+        <div style="display: inline-block;">
+          <h3>Category of the toolsets: </h3>
+        </div>
+        <Select
+          v-model="ToolsetTypeSelected"
+          @on-change="filterShowToolsetByType"
+          style="width:160px;margin-left:20px"
+        >
+          <Option v-for="item in typeOptions" :key="item.index" :value="item">{{ item }}</Option>>
+        </Select>
+      </div>
+      <div style="height:350px;padding:5px">
+        <vue-scroll :ops="ops">
+          <CheckboxGroup v-model="addToToolsets">
+            <List>
+              <ListItem v-for="toolset in modalShowToolsets" :key="toolset.index">
+              <ListItemMeta 
+                :avatar="toolset.toolsetImg" 
+                :title="toolset.toolsetName" 
+                :description="toolset.description" />
+              <template slot="action">
+                  <li>
+                      <Checkbox :label="toolset.toolsetName" :disabled="checkBoxDisabled(toolset)">Add</Checkbox>
+                  </li>
+              </template>
+              </ListItem>
+            </List>
+          </CheckboxGroup>
+        </vue-scroll>
+      </div>
+      <div style="border:0.5px dashed gray">
+        <Tag v-for="item in addToToolsets" :key="item" :name="item" closable @on-close="uncheckToolset" color="primary">{{item}}</Tag>
+      </div>
+      <div slot="footer">
+        <Button @click="addToToolsetModal=false">Cancel</Button>
+        <Button
+          type="success"
+          @click="addToolToToolsets()"
+          class="create"
+        >OK</Button>
+      </div>
+    </Modal>
+    <Modal v-model="editToolsetModal" title="Edit toolset" width="600">
+      <div style="text-align: center;height:300px;position: relative;">
+        <div style="position: absolute;top: 0;bottom: 0;left: 0;right: 0;margin: auto;height: fit-content;">
+          <h1>编辑工具集信息</h1>
+          <h1>管理所含工具</h1>
+        </div>
+      </div>
+      <div slot="footer">
+        <Button @click="editToolsetModal=false">Cancel</Button>
+        <Button
+          type="primary"
+          @click="editToolset()"
+          class="create"
+        >OK</Button>
+      </div>
+    </Modal>
   </div>
 </template>
 <script>
@@ -800,7 +860,12 @@ export default {
       editToolModal:false,
       removeToolModal:false,
       selectedToolset:false,
-      removeToolsetModal:false
+      removeToolsetModal:false,
+      addToToolsetModal:false,
+      ToolsetTypeSelected:"All",
+      modalShowToolsets:[],
+      addToToolsets:[],
+      editToolsetModal:false,
     };
   },
   methods: {
@@ -832,7 +897,7 @@ export default {
           } else if (res.data === "None") {
             this.$Notice.error({ desc: "There is no existing toolset" });
           } else {
-            this.$set(this, "toolsetList", res.data);
+            this.$set(this, "toolsetList", res.data.reverse());
           }
         })
         .catch(err => {
@@ -1047,7 +1112,7 @@ export default {
               } else if (res.data === "Duplicate naming") {
                 this.$Notice.error({desc: "The name already exists."});
               } else {
-                console.log(res.data);
+                this.toolsetList.unshift(res.data);
                 this.createToolsetModal = false;
                 this.$Notice.info({desc: "Create successfully"});
               }
@@ -1090,11 +1155,11 @@ export default {
       }
     },
     filterShowListByType(){
-      this.publicToolShow = this.getFilterResult(this.publicTools);
-      this.personalToolShow = this.getFilterResult(this.personalTools);
+      this.publicToolShow = this.getFilterResult(this.publicTools,this.typeSelected);
+      this.personalToolShow = this.getFilterResult(this.personalTools,this.typeSelected);
     },
-    getFilterResult(foreList){
-      var selectedType = this.typeSelected;
+    getFilterResult(foreList,type){
+      var selectedType = type;
       var resultList=foreList.filter(function(item){
         switch(selectedType){
           case "All":{
@@ -1259,7 +1324,7 @@ export default {
               this.filterShowListByType();
               this.$Notice.info({ desc: "The tool("+ removedTool.toolName+") has been removed."});
           })
-          .cathc(err=>{
+          .catch(err=>{
             console.log(err.data);
           })
     },
@@ -1296,8 +1361,77 @@ export default {
             console.log(err.data);
           })
     },
-    addToToolsetShow(){
-      
+    addToToolsetShow(tool){
+      this.selectedTool = tool;
+      this.ToolsetTypeSelected = "All";
+      this.addToToolsets=[];
+      this.filterShowToolsetByType();
+      this.addToToolsetModal = true;
+    },
+    filterShowToolsetByType(){
+      this.modalShowToolsets = this.getFilterResult(this.toolsetList,this.ToolsetTypeSelected);
+    },
+    checkBoxDisabled(toolset){
+      var toolList = toolset.toolList;
+      for(var i=0;i<toolList.length;i++){
+        if(toolList[i].tId==this.selectedTool.tId){
+          return true;
+        }
+      }
+      return false;
+    },
+    uncheckToolset(event,name){
+      const index = this.addToToolsets.indexOf(name);
+      this.addToToolsets.splice(index,1);
+    },
+    addToolToToolsets(){
+      this.addToToolsetModal = false;
+      var allToolsetInfo = this.toolsetList;
+      var addToToolsetIds = [];
+      for(var i=0;i<this.addToToolsets.length;i++){
+        var name = this.addToToolsets[i];
+        for(var j=0;j<allToolsetInfo.length;j++){
+          if(allToolsetInfo[j].toolsetName==name){
+            addToToolsetIds.push(allToolsetInfo[j].tsId);
+            break;
+          }
+        }
+      }
+      var postInfo = {};
+      postInfo["newTool"]=this.selectedTool;
+      postInfo["tsIds"]=addToToolsetIds;
+      this.axios
+      .post("/GeoProblemSolving/toolset/addTool",postInfo)
+      .then(res=>{
+        if (res.data == "Offline") {
+          this.$store.commit("userLogout");
+          this.$router.push({ name: "Login" });
+        } else if (res.data === "Fail") {
+          this.$Notice.error({ desc: "add tool fail." });
+        } else {
+          for(var i=0;i<this.toolsetList.length;i++){
+            for(var j=0;j<addToToolsetIds.length;j++){
+              if(this.toolsetList[i].tsId==addToToolsetIds[j]){
+                this.toolsetList[i].toolList.push(this.selectedTool);
+                break;
+              }
+            }
+          }
+          this.$Notice.info({ desc: "Tool has been added to toolsets."});
+          this.addToToolsetModal = false;
+        }
+      })
+      .catch(err=>{
+        console.log(err.data);
+      })
+    },
+    editToolsetShow(toolset){
+      this.selectedToolset = toolset;
+      this.editToolsetModal = true;
+    },
+    editToolset(){
+      this.editToolsetModal = false;
+      console.log("update toolset");
     }
   }
 };
