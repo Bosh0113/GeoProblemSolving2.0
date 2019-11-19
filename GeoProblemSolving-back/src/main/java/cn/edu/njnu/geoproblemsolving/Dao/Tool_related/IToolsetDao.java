@@ -1,5 +1,7 @@
 package cn.edu.njnu.geoproblemsolving.Dao.Tool_related;
 
+import cn.edu.njnu.geoproblemsolving.Entity.ToolEntity;
+import cn.edu.njnu.geoproblemsolving.Entity.ToolReq.UpdateToolListReq;
 import cn.edu.njnu.geoproblemsolving.Entity.ToolsetEntity;
 
 import javax.servlet.http.HttpServletRequest;
@@ -10,6 +12,8 @@ public interface IToolsetDao {
     Object readAccessibleToolsets(String userId);
     void deleteToolset(String key,String value);
     String updateToolset(HttpServletRequest request);
+    String updateToolList(UpdateToolListReq updateToolListReq);
     String uploadPicture(HttpServletRequest request);
     String updateToolsetbyToolset(ToolsetEntity toolset);
+    String addToolToToolset(ToolEntity newTool, String[] tsIds);
 }

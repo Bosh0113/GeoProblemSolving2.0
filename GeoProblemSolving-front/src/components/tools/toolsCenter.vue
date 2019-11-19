@@ -251,7 +251,9 @@
                     <ListItemMeta 
                       :avatar="toolset.toolsetImg" 
                       :title="toolset.toolsetName" 
-                      :description="toolset.description" />
+                      :description="toolset.description"
+                      @click.native="toolsetInfoShow(toolset)"
+                      style="cursor: pointer;" />
                     <template slot="action">
                         <li>
                             <a @click="editToolsetShow(toolset)">Edit</a>
@@ -313,13 +315,13 @@
             v-model="inputToolTag"
             placeholder="Enter some tag to classify your tools"
             style="width: 400px"
-            @keyup.enter.native="addTag(inputToolTag)"
+            @keyup.enter.native="addCreateToolTag(inputToolTag)"
           />
           <Button
             icon="ios-add"
             type="dashed"
             size="small"
-            @click="addTag(inputToolTag)"
+            @click="addCreateToolTag(inputToolTag)"
             style="margin-left:2.5%"
           >Add tag</Button>
           <div>
@@ -328,7 +330,7 @@
               v-for="(item,index) in this.toolInfo.categoryTag"
               :key="index"
               closable
-              @on-close="deleteTag(index)"
+              @on-close="deleteCreateToolTag(index)"
             >{{item}}</Tag>
           </div>
           <div>
@@ -410,13 +412,13 @@
             v-model="inputToolsetTag"
             placeholder="Enter some tag to classify your toolset"
             style="width: 400px"
-            @keyup.enter.native="addTag(inputToolsetTag)"
+            @keyup.enter.native="addCreateToolsetTag(inputToolsetTag)"
           />
           <Button
             icon="ios-add"
             type="dashed"
             size="small"
-            @click="addTag(inputToolsetTag)"
+            @click="addCreateToolsetTag(inputToolsetTag)"
             style="margin-left:2.5%"
           >Add tag</Button>
           <div>
@@ -425,7 +427,7 @@
               v-for="(item,index) in toolsetInfo.categoryTag"
               :key="index"
               closable
-              @on-close="deleteTag(index)"
+              @on-close="deleteCreateToolsetTag(index)"
             >{{item}}</Tag>
           </div>
           <div>
@@ -522,13 +524,13 @@
             v-model="inputToolTag"
             placeholder="Enter some tag to classify your tools"
             style="width: 400px"
-            @keyup.enter.native="addTag(inputToolTag)"
+            @keyup.enter.native="addEditToolTag(inputToolTag)"
           />
           <Button
             icon="ios-add"
             type="dashed"
             size="small"
-            @click="addTag(inputToolTag)"
+            @click="addEditToolTag(inputToolTag)"
             style="margin-left:2.5%"
           >Add tag</Button>
           <div>
@@ -537,7 +539,7 @@
               v-for="(item,index) in this.selectedTool.categoryTag"
               :key="index"
               closable
-              @on-close="deleteTag(index)"
+              @on-close="deleteEditToolTag(index)"
             >{{item}}</Tag>
           </div>
           <div>
@@ -635,7 +637,9 @@
               <ListItemMeta 
                 :avatar="toolset.toolsetImg" 
                 :title="toolset.toolsetName" 
-                :description="toolset.description" />
+                :description="toolset.description"
+                @click.native="toolsetInfoShow(toolset)"
+                style="cursor: pointer;" />
               <template slot="action">
                   <li>
                       <Checkbox :label="toolset.toolsetName" :disabled="checkBoxDisabled(toolset)">Add</Checkbox>
@@ -658,20 +662,190 @@
         >OK</Button>
       </div>
     </Modal>
-    <Modal v-model="editToolsetModal" title="Edit toolset" width="600">
-      <div style="text-align: center;height:300px;position: relative;">
-        <div style="position: absolute;top: 0;bottom: 0;left: 0;right: 0;margin: auto;height: fit-content;">
-          <h1>编辑工具集信息</h1>
-          <h1>管理所含工具</h1>
-        </div>
+    <Modal v-model="toolsetInfoModal" title="Toolset's detail" width="600">
+      <Row>
+        <Col span="10">
+          <div style="margin:5px;height:300px">
+            <Card dis-hover>
+              <h2 slot="title">{{selectedToolset.toolsetName}}</h2>
+              <div style="height: 250px;">
+                <vue-scroll :ops="ops">
+                  <List size="small">
+                    <ListItem><strong>Description:</strong></ListItem>
+                    <ListItem>{{selectedToolset.description}}</ListItem>
+                    <ListItem><strong>Category Tags:</strong></ListItem>
+                    <ListItem>{{selectedToolset.categoryTag.join('|')}}</ListItem>
+                    <ListItem><strong>Recomment steps:</strong></ListItem>
+                    <ListItem>{{selectedToolset.recomStep.join('|')}}</ListItem>
+                  </List>
+                </vue-scroll>
+              </div>
+            </Card>
+          </div>
+        </Col>
+        <Col span="14">
+          <h3>Tools:</h3>
+          <div style="padding:5px;height:300px;border:1px solid #e8eaec">
+            <vue-scroll :ops="ops">
+              <div v-for="tool in selectedToolset.toolList" :key="tool.index" style="padding:5px">
+                <Card style="background-color: ghostwhite;">
+                  <p slot="title" class="ellipsis" style="width:75%;display:inline-block;" :title="tool.toolName">{{tool.toolName}}</p>
+                      <div slot="extra">
+                        <Button icon="md-eye" shape="circle" class="btnHoverGray" title="Preview" size="small" @click="showTool(tool)"></Button>
+                      </div>
+                  <div>
+                    <div style="display: inline-block;algin:left;">
+                        <img :src="tool.toolImg" v-if="tool.toolImg!=''" style="height:100%;max-height:50px;">
+                        <avatar
+                        :username="tool.toolName"
+                        :size="50"
+                        style="margin-bottom:6px"
+                        v-else
+                      ></avatar>
+                    </div>
+                    <div style="display: inline-block;vertical-align: top;width: 70%;" class="ellipsis">
+                      <strong :title="tool.toolName">{{tool.toolName}}</strong>
+                      <br/>
+                      <span :title="tool.categoryTag.join('|')"><i>{{tool.categoryTag.join('|')}}</i></span>
+                    </div>
+                    <div style="width:100%;height: 65px;border: 0.5px dashed #8080804d;padding: 1px 3px;">
+                      <p class="toolDescription" :title="tool.description">{{tool.description}}</p>
+                    </div>
+                  </div>
+                </Card>
+              </div>
+            </vue-scroll>
+          </div>
+        </Col>
+      </Row>
+      <div slot="footer">
+        <Button
+          type="primary"
+          @click="toolsetInfoModal=false"
+          class="create"
+        >OK</Button>
       </div>
+    </Modal>
+    <Modal v-model="editToolsetModal" title="Edit toolset" width="800">
+      <Row>
+        <Col span="16">
+          <Form
+            ref="selectedToolset"
+            :model="selectedToolset"
+            :rules="toolsetEditRule"
+            :label-width="80"
+            class="toolsetForm"
+          >
+            <FormItem label="Name" prop="name" :label-width="140">
+              <Input v-model="selectedToolset.toolsetName" placeholder="Enter the name of your toolset"></Input>
+            </FormItem>
+            <FormItem label="Description" prop="description" :label-width="140">
+              <Input v-model="selectedToolset.description" type="textarea" placeholder="Enter the description of your toolset"></Input>
+            </FormItem>
+            <FormItem label="Recommended step:" prop="recomStep" :label-width="140">
+              <Select
+                v-model="selectedToolset.recomStep"
+                multiple
+                placeholder="Select the recommended step of yout toolset"
+              >
+                <Option v-for="item in stepList" :key="item.index" :value="item">{{ item }}</Option>
+              </Select>
+            </FormItem>
+            <FormItem label="Categroy tag:" prop="categoryTag" :label-width="140">
+              <Input
+                v-model="inputToolsetTag"
+                placeholder="Enter some tag to classify your toolset"
+                @keyup.enter.native="addEditToolsetTag(inputToolsetTag)"
+              />
+              <Button
+                icon="ios-add"
+                type="dashed"
+                size="small"
+                @click="addEditToolsetTag(inputToolsetTag)"
+                style="margin-left:2.5%"
+              >Add tag</Button>
+              <div>
+                <Tag
+                  color="primary"
+                  v-for="(item,index) in selectedToolset.categoryTag"
+                  :key="index"
+                  closable
+                  @on-close="deleteEditToolsetTag(index)"
+                >{{item}}</Tag>
+              </div>
+              <div>
+                <span>Example:</span>
+                <Tag style="cursor:default">vector</Tag>
+                <Tag style="cursor:default">raster</Tag>
+                <Tag style="cursor:default">evaluation</Tag>
+              </div>
+            </FormItem>
+            <FormItem label="Image:" prop="toolsetImg" :label-width="140">
+              <div class="inline_style">
+                <div class="demo-upload-list" v-if="image!=''">
+                  <template>
+                    <img :src="image" />
+                    <div class="demo-upload-list-cover">
+                      <Icon type="ios-eye-outline" @click.native="handleView()"></Icon>
+                      <Icon type="ios-trash-outline" @click.native="handleRemove()"></Icon>
+                    </div>
+                  </template>
+                </div>
+                <div class="uploadBox">
+                  <Icon type="ios-camera" size="20" style="position:absolute;margin:18px;"></Icon>
+                  <input
+                    id="choosePicture"
+                    @change="uploadtoolsetPhoto($event)"
+                    type="file"
+                    class="uploadAvatar"
+                    accept="image/*"
+                  />
+                </div>
+                <br />
+                <Modal title="View Image" v-model="visible">
+                  <img :src="image" v-if="visible" style="width: 100%" />
+                </Modal>
+              </div>
+            </FormItem>
+            <FormItem label="Privacy:" prop="privacy" :label-width="140">
+              <RadioGroup v-model="selectedToolset.privacy">
+                <Radio label="Public">Public</Radio>
+                <Radio label="Private">Private</Radio>
+              </RadioGroup>
+            </FormItem>
+          </Form>
+        </Col>
+        <Col span="8">       
+        <h3 style="margin-left:10px">Tools:</h3>  
+        <div style="margin-left:10px;border:1px solid #e8eaec;padding:0 0 0 5px;height:500px"> 
+            <vue-scroll :ops="ops">
+            <List>
+              <ListItem v-for="tool in selectedToolset.toolList" :key="tool.index">
+                <ListItemMeta 
+                  :avatar="tool.toolImg" 
+                  :title="tool.toolName" 
+                  :description="tool.description"/>
+                <template slot="action">
+                    <li>
+                        <Button icon="md-eye" shape="circle" class="btnHoverGray" title="Preview" size="small" @click="showTool(tool)"></Button>
+                    </li>
+                    <li>
+                        <Button icon="md-close" shape="circle" class="btnHoverRed" title="Delete" size="small" @click="removeToolFromToolset(tool)"></Button>
+                    </li>
+                </template>
+              </ListItem>
+            </List>
+            </vue-scroll>
+          </div>
+        </Col>
+      </Row>
       <div slot="footer">
         <Button @click="editToolsetModal=false">Cancel</Button>
         <Button
-          type="primary"
-          @click="editToolset()"
+          type="success"
+          @click="editToolset('selectedToolset')"
           class="create"
-        >OK</Button>
+        >Save</Button>
       </div>
     </Modal>
   </div>
@@ -859,12 +1033,42 @@ export default {
       },
       editToolModal:false,
       removeToolModal:false,
-      selectedToolset:false,
+      selectedToolset:{
+        toolsetName:"",
+        description:"",
+        toolList:[],
+        recomStep:[],
+        categoryTag:[]
+      },
+      toolsetEditRule: {
+        toolsetName: [
+          {
+            required: true,
+            message: "The name cannot be empty",
+            trigger: "blur"
+          }
+        ],
+        description: [
+          {
+            required: true,
+            message: "The toolset description cannot be empty",
+            trigger: "blur"
+          }
+        ],
+        privacy: [
+          {
+            required: true,
+            message: "Is this toolset can be used by public or not?",
+            trigger: "change"
+          }
+        ]
+      },
       removeToolsetModal:false,
       addToToolsetModal:false,
       ToolsetTypeSelected:"All",
       modalShowToolsets:[],
       addToToolsets:[],
+      toolsetInfoModal:false,
       editToolsetModal:false,
     };
   },
@@ -1024,17 +1228,41 @@ export default {
         }
       });
     },
-    addTag(tag) {
+    addCreateToolTag(tag) {
       if (tag != "") {
         this.toolInfo.categoryTag.push(tag);
         this.inputToolTag = "";
+      }
+    },
+    addEditToolTag(tag) {
+      if (tag != "") {
+        this.selectedTool.categoryTag.push(tag);
+        this.inputToolTag = "";
+      }
+    },
+    addCreateToolsetTag(tag) {
+      if (tag != "") {
         this.toolsetInfo.categoryTag.push(tag);
         this.inputToolsetTag = "";
       }
     },
-    deleteTag(index) {
+    addEditToolsetTag(tag) {
+      if (tag != "") {
+        this.selectedToolset.categoryTag.push(tag);
+        this.inputToolsetTag = "";
+      }
+    },
+    deleteCreateToolTag(index) {
       this.toolInfo.categoryTag.splice(index, 1);
+    },
+    deleteEditToolTag(index) {
+      this.selectedTool.categoryTag.splice(index, 1);
+    },
+    deleteCreateToolsetTag(index) {
       this.toolsetInfo.categoryTag.splice(index, 1);
+    },
+    deleteEditToolsetTag(index) {
+      this.selectedToolset.categoryTag.splice(index, 1);
     },
     uploadPhoto(e) {
       // 利用fileReader对象获取file
@@ -1056,6 +1284,7 @@ export default {
             .then(res => {
               if (res.data != "Fail") {
                 this.toolInfo.toolImg = res.data;
+                this.selectedTool.toolImg = res.data;
                 this.image = e.target.result;
                 $("#choosePicture").val("");
               } else {
@@ -1144,6 +1373,7 @@ export default {
             .then(res => {
               if (res.data != "Fail") {
                 this.toolsetInfo.toolsetImg = res.data;
+                this.selectedToolset.toolsetImg = res.data;
                 this.image = e.target.result;
                 $("#choosePicture").val("");
               } else {
@@ -1234,7 +1464,8 @@ export default {
           });
     },
     editToolShow(tool){
-      this.selectedTool = tool;
+      this.inputToolTag = "";
+      this.selectedTool = JSON.parse(JSON.stringify(tool));
       this.editToolModal = true;
     },
     editTool(tool) {
@@ -1425,13 +1656,78 @@ export default {
         console.log(err.data);
       })
     },
-    editToolsetShow(toolset){
+    toolsetInfoShow(toolset){
       this.selectedToolset = toolset;
+      this.toolsetInfoModal = true;
+    },
+    editToolsetShow(toolset){
+      this.inputToolsetTag = "";
+      this.selectedToolset = JSON.parse(JSON.stringify(toolset));
       this.editToolsetModal = true;
     },
-    editToolset(){
-      this.editToolsetModal = false;
-      console.log("update toolset");
+    editToolset(toolset){
+      this.$refs[toolset].validate(valid => {
+        if (valid) {
+
+          let editToolsetForm = new URLSearchParams();
+          editToolsetForm.append("tsId",this.selectedToolset.tsId);
+          editToolsetForm.append("toolsetName",this.selectedToolset.toolsetName);
+          editToolsetForm.append("description",this.selectedToolset.description);
+          editToolsetForm.append("recomStep",this.selectedToolset.recomStep);
+          editToolsetForm.append("categoryTag",this.selectedToolset.categoryTag);
+          editToolsetForm.append("toolsetImg",this.selectedToolset.toolsetImg);
+          editToolsetForm.append("privacy",this.selectedToolset.privacy);
+
+          this.axios
+            .post("/GeoProblemSolving/toolset/update", editToolsetForm)
+            .then(res => {
+              if (res.data == "Offline") {
+                this.$store.commit("userLogout");
+                this.$router.push({ name: "Login" });
+              } else if (res.data === "Fail") {
+                this.$Notice.error({ desc: "Edit tool fail." });
+              } else {
+                this.editToolsetModal = false;
+                var newToolsetInfo = this.selectedToolset;
+                for(var i=0;i<this.toolsetList.length;i++){
+                  if(this.toolsetList[i].tsId==newToolsetInfo.tsId){
+                    this.toolsetList.splice(i,1,newToolsetInfo);
+                    break;
+                  }
+                }
+                this.$Notice.info({ desc: "Edit successfully" });
+              }
+            })
+            .catch(err => {
+              console.log(err);
+            });
+
+            var updateReq = {}
+            updateReq["newToolList"]=this.selectedToolset.toolList;
+            updateReq["tsId"]=this.selectedToolset.tsId;
+
+            this.axios
+            .post("/GeoProblemSolving/toolset/updateTools",updateReq)
+            .then(res=>{
+              if (res.data == "Offline") {
+                this.$store.commit("userLogout");
+                this.$router.push({ name: "Login" });
+              } else if (res.data === "Fail") {
+                this.$Notice.error({ desc: "remove tool fail." });
+              } else {
+                this.$Notice.info({ desc: "Tool's list has been update."});
+              }
+            })
+            .catch(err=>{
+              console.log(err.data);
+            });
+        } else {
+        }
+      });
+    },
+    removeToolFromToolset(tool){
+      const index = this.selectedToolset.toolList.indexOf(tool);
+      this.selectedToolset.toolList.splice(index,1);
     }
   }
 };

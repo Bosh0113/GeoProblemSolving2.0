@@ -2,6 +2,7 @@ package cn.edu.njnu.geoproblemsolving.Dao.Tool_related;
 
 import cn.edu.njnu.geoproblemsolving.Dao.Method.CommonMethod;
 import cn.edu.njnu.geoproblemsolving.Entity.ToolEntity;
+import cn.edu.njnu.geoproblemsolving.Entity.ToolReq.UpdateToolListReq;
 import cn.edu.njnu.geoproblemsolving.Entity.ToolsetEntity;
 import com.alibaba.fastjson.JSONArray;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
@@ -101,6 +102,20 @@ public class ToolsetDaoImpl implements IToolsetDao {
     }
 
     @Override
+    public String updateToolList(UpdateToolListReq updateToolListReq){
+        try {
+            Query query = new Query(Criteria.where("tsId").is(updateToolListReq.getTsId()));
+            ArrayList<ToolEntity> toolList = updateToolListReq.getNewToolList();
+            Update update = new Update();
+            update.set("toolList",toolList);
+            mongoTemplate.updateFirst(query,update,ToolsetEntity.class);
+            return "Success";
+        }catch (Exception e){
+            return "Fail";
+        }
+    }
+
+    @Override
     public String uploadPicture(HttpServletRequest request) {
         try {
             InetAddress address = InetAddress.getLocalHost();
@@ -175,6 +190,7 @@ public class ToolsetDaoImpl implements IToolsetDao {
         }
     }
 
+    @Override
     public String addToolToToolset(ToolEntity newTool,String[] tsIds){
         try {
             for(String tsId:tsIds){
