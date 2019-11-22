@@ -141,7 +141,7 @@
                 <Icon type="logo-dropbox" size="35"></Icon>
                 </Tooltip>
               </MenuItem>
-              <MenuItem name="personalTools" class="leftMenuItem">
+              <MenuItem name="personalTools" class="leftMenuItem" v-show="userInfo.userState">
                 <Tooltip content="Personal tools" placement="right">
                 <Icon type="ios-cube" size="35"></Icon>
                 </Tooltip>
@@ -159,7 +159,7 @@
               >
                 <Option v-for="item in typeOptions" :key="item.index" :value="item">{{ item }}</Option>
               </Select>
-              <Button class="btnHoverGreen" shape="circle" icon="ios-add-circle-outline" @click="createToolModalShow()">Create tool</Button>
+              <Button class="btnHoverGreen" shape="circle" icon="ios-add-circle-outline" @click="createToolModalShow()" v-show="userInfo.userState">Create tool</Button>
             </div>
               <div v-if="showMenuItem=='publicTools'" style="height: inherit;min-height: fit-content;" :style="{height: contentHeight-187+'px'}" class="toolList">
                 <vue-scroll :ops="ops">
@@ -170,7 +170,7 @@
                       <p slot="title" class="ellipsis" style="width:75%;display:inline-block;" :title="tool.toolName">{{tool.toolName}}</p>
                       <div slot="extra">
                         <Button icon="md-eye" shape="circle" class="btnHoverGray" title="Preview" size="small" @click="showTool(tool)"></Button>
-                        <Button icon="md-share-alt" shape="circle" type="success" title="Add to toolset" size="small" @click="addToToolsetShow(tool)"></Button>
+                        <Button icon="md-share-alt" shape="circle" type="success" title="Add to toolset" size="small" @click="addToToolsetShow(tool)" v-if="userInfo.userState"></Button>
                       </div>
                       <div>
                         <div style="display: inline-block;algin:left;">
@@ -240,9 +240,10 @@
           <Col span="8">
             <div style="padding: 0 5px;margin-left: 15px;">
               <Card dis-hover>
-                <h1 slot="title" style="padding-top:5px">Toolsets</h1>
+                <h1 slot="title" style="padding-top:5px" v-if="!userInfo.userState">Public toolsets</h1>
+                <h1 slot="title" style="padding-top:5px" v-else>Toolsets</h1>
                 <div slot="extra">
-                  <Button class="btnHoverGreen" shape="circle" icon="ios-add-circle-outline" @click="createToolsetModalShow()">Create toolset</Button>
+                  <Button class="btnHoverGreen" shape="circle" icon="ios-add-circle-outline" @click="createToolsetModalShow()" v-show="userInfo.userState">Create toolset</Button>
                 </div>
                 <div :style="{height: contentHeight-187+'px'}">
                 <vue-scroll :ops="ops">
@@ -254,7 +255,7 @@
                       :description="toolset.description"
                       @click.native="toolsetInfoShow(toolset)"
                       style="cursor: pointer;" />
-                    <template slot="action">
+                    <template slot="action" v-if="userInfo.userState">
                         <li>
                             <a @click="editToolsetShow(toolset)">Edit</a>
                         </li>
@@ -861,9 +862,14 @@ export default {
   },
   mounted() {
     this.resizeContent();
-    this.getToolsets();
     this.getPublicTools();
-    this.getPersonalTools();
+    if(this.userInfo.userState){
+      this.getPersonalToolsets();
+      this.getPersonalTools();
+    }
+    else{
+      this.getPublicToolsets();
+    }
   },
   data() {
     return {
@@ -1085,7 +1091,7 @@ export default {
         })();
       };
     },
-    getToolsets() {
+    getPersonalToolsets() {
       this.axios
         .get(
           "/GeoProblemSolving/toolset/inquiryAll" +
@@ -1097,7 +1103,30 @@ export default {
             this.$store.commit("userLogout");
             this.$router.push({ name: "Login" });
           } else if (res.data === "Fail") {
-            this.$Notice.error({ desc: "Loading tool fail." });
+            this.$Notice.error({ desc: "Loading personal toolsets fail." });
+          } else if (res.data === "None") {
+            this.$Notice.error({ desc: "There is no existing toolset" });
+          } else {
+            this.$set(this, "toolsetList", res.data.reverse());
+          }
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    },
+    getPublicToolsets(){
+      this.axios
+        .get(
+          "/GeoProblemSolving/toolset/inquiry" +
+            "?key=" +"privacy"+
+            "&value="+"Public"
+        )
+        .then(res => {
+          if (res.data == "Offline") {
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
+          } else if (res.data === "Fail") {
+            this.$Notice.error({ desc: "Loading personal toolsets fail." });
           } else if (res.data === "None") {
             this.$Notice.error({ desc: "There is no existing toolset" });
           } else {
@@ -1127,7 +1156,7 @@ export default {
             this.$set(this, "publicTools", res.data);
             var that = this;
             var timer = window.setInterval(function(){
-              if(!that.publicTools.length<1&&!that.personalTools.length<1){
+              if(!that.publicTools.length<1&&(!that.personalTools.length<1||!that.userInfo.userState)){
                 that.filterShowListByType();
                 window.clearInterval(timer);
               }
@@ -1150,7 +1179,7 @@ export default {
             this.$store.commit("userLogout");
             this.$router.push({ name: "Login" });
           } else if (res.data === "Fail") {
-            this.$Notice.error({ desc: "Loading tool fail." });
+            this.$Notice.error({ desc: "Loading personal tools fail." });
           } else if (res.data === "None") {
             this.$Notice.error({ desc: "There is no existing tool" });
           } else {

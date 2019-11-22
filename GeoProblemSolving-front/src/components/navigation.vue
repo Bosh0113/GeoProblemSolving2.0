@@ -11,6 +11,7 @@
 }
 .header span {
   font-size: 15px;
+  font-weight: bold;
 }
 .container {
   display: flex;
@@ -86,6 +87,7 @@ footer {
         <div v-if="useMenuCSS">
           <div class="navPart">
             <Menu
+              class="header"
               mode="horizontal"
               theme="dark"
               :active-name="activeMenu"
@@ -101,6 +103,9 @@ footer {
               </MenuItem>
               <MenuItem name="resources" class="menuItem">
                 <span>Resources</span>
+              </MenuItem>
+              <MenuItem name="toolsCenter" class="menuItem">
+                <span>Tools center</span>
               </MenuItem>
               <!-- <MenuItem name="community" class="menuItem">
                 <span>Community</span>
@@ -179,6 +184,9 @@ footer {
               </DropdownItem>
               <DropdownItem>
                 <a href="/GeoProblemSolving/publicResource">Resources</a>
+              </DropdownItem>
+              <DropdownItem>
+                <a href="/GeoProblemSolving/toolsCenter">Tools center</a>
               </DropdownItem>
               <DropdownItem>
                 <a href="/GeoProblemSolving/help">Help</a>
@@ -276,6 +284,10 @@ export default {
             this.activeMenu = "resources";
             break;
           }
+          case "toolsCenter":{
+            this.activeMenu = "toolsCenter";
+            break;
+          }
           case "Help":{
             this.activeMenu = "help";
             break;
@@ -311,7 +323,9 @@ export default {
         window.location.href = "/GeoProblemSolving/projectList";
       } else if (name == "resources") {
         this.$router.replace({ name: "PublicResource" });
-      } else if (name == "community") {
+      } else if (name == "toolsCenter") {
+        this.$router.replace({ name: "toolsCenter" });
+      }else if (name == "community") {
         this.$router.replace({ name: "Community" });
       } else if (name == "help") {
         this.$router.replace({ name: "Help" });
