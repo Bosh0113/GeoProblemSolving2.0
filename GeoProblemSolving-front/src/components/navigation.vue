@@ -105,7 +105,7 @@ footer {
                 <span>Resources</span>
               </MenuItem>
               <MenuItem name="toolsCenter" class="menuItem">
-                <span>Tools center</span>
+                <span>Tools</span>
               </MenuItem>
               <!-- <MenuItem name="community" class="menuItem">
                 <span>Community</span>
@@ -186,7 +186,7 @@ footer {
                 <a href="/GeoProblemSolving/publicResource">Resources</a>
               </DropdownItem>
               <DropdownItem>
-                <a href="/GeoProblemSolving/toolsCenter">Tools center</a>
+                <a href="/GeoProblemSolving/toolsCenter">Tools</a>
               </DropdownItem>
               <DropdownItem>
                 <a href="/GeoProblemSolving/help">Help</a>
