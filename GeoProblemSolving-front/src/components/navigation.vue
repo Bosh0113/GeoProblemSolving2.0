@@ -243,14 +243,17 @@ export default {
     } 
   },
   created(){
-    this.setMenuTitle(this.$route.name)
+    this.setMenuTitle(this.$route.name);
+    var that = this;
+    var timer = window.setInterval(function(){
+      if(that.$store.getters.userState){
+        that.linkSocket();
+        window.clearInterval(timer);
+      }
+    },10);
   },
   mounted() {
-    if (this.$store.getters.userState) {
-      this.setTimer();
-      this.initWebSocket();
-      this.getUnreadNoticeCount();
-    }
+    // this.linkSocket();
     this.reSize();
     window.addEventListener("resize", this.reSize);
   },
@@ -278,6 +281,13 @@ export default {
     }
   },
   methods: {
+    linkSocket(){
+      if (this.$store.getters.userState) {
+        this.setTimer();
+        this.initWebSocket();
+        this.getUnreadNoticeCount();
+      }
+    },
     setMenuTitle(newVal){
         switch(newVal){
           case "PublicResource":{
