@@ -1,6 +1,9 @@
 package cn.edu.njnu.geoproblemsolving.Controller;
 
 import cn.edu.njnu.geoproblemsolving.Dao.Tool_related.ToolsetDaoImpl;
+import cn.edu.njnu.geoproblemsolving.Entity.ToolEntity;
+import cn.edu.njnu.geoproblemsolving.Entity.ToolReq.AddToolReq;
+import cn.edu.njnu.geoproblemsolving.Entity.ToolReq.UpdateToolListReq;
 import cn.edu.njnu.geoproblemsolving.Entity.ToolsetEntity;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.web.bind.annotation.*;
@@ -43,10 +46,10 @@ public class ToolsetController {
     }
 
     @RequestMapping(value = "/delete", method = RequestMethod.GET)
-    public String deleteToolset(@RequestParam("tsid") String tsid){
+    public String deleteToolset(@RequestParam("tsId") String tsId){
         ToolsetDaoImpl toolsetDao = new ToolsetDaoImpl(mongoTemplate);
         try {
-            toolsetDao.deleteToolset("tsid",tsid);
+            toolsetDao.deleteToolset("tsId",tsId);
             return "Success";
         }catch (Exception e){
             return "Fail";
@@ -63,5 +66,17 @@ public class ToolsetController {
     public String updateToolset(HttpServletRequest request){
         ToolsetDaoImpl toolsetDao = new ToolsetDaoImpl(mongoTemplate);
         return toolsetDao.updateToolset(request);
+    }
+
+    @RequestMapping(value = "/updateTools", produces = {"application/json;charset=UTF-8"}, method = RequestMethod.POST)
+    public String updateTools(@RequestBody UpdateToolListReq updateToolListReq){
+        ToolsetDaoImpl toolsetDao = new ToolsetDaoImpl(mongoTemplate);
+        return toolsetDao.updateToolList(updateToolListReq);
+    }
+
+    @RequestMapping(value = "/addTool", produces = {"application/json;charset=UTF-8"}, method = RequestMethod.POST)
+    public String addTool(@RequestBody AddToolReq addToolReq){
+        ToolsetDaoImpl toolsetDao = new ToolsetDaoImpl(mongoTemplate);
+        return toolsetDao.addToolToToolset(addToolReq.getNewTool(),addToolReq.getTsIds());
     }
 }

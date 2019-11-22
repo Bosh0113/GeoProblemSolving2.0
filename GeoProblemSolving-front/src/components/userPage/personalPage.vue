@@ -94,12 +94,13 @@ body {
   border-style: dashed;
   border-color: lightslategray;
 }
-/* 2-25 add 实现的效果是旋浮上去出现下划线且变红 */
-.projectsTitle:hover {
-  /* color: red; */
+
+.projectsTitle{
+  width: 80%;
+}
+.projectItem{
   cursor: pointer;
 }
-
 /* 新定义的样式 */
 .authorBtn:hover {
   background-color: #57a3f3;
@@ -113,20 +114,17 @@ body {
   table-layout: auto;
   width: 100% !important;
 }
-.participatoryProjectCard:hover {
-  cursor: pointer;
-}
-.manageProjectsCard:hover {
-  cursor: pointer;
-}
 /* 时间轴样式 */
 .timeLineStyle {
   margin-left: 5%;
-  height: 180px;
+  height: 120px;
 }
-.parent .ivu-tabs-nav-container {
+.parent>>>.ivu-tabs-nav-container {
   font-size: 15px !important;
   font-weight: bold;
+}
+.parent>>>.ivu-tabs-bar {
+  margin-bottom: 5px;
 }
 .fileBtnHoverGreen:hover {
   background-color: #19be6b;
@@ -147,14 +145,42 @@ body {
 .demo-spin-icon-load{
     animation: ani-demo-spin 1s linear infinite;
 }
+.editInfoForm>>>.ivu-form-item{
+  margin-bottom:18px;
+}
+.historyLine>>>.ivu-card-head{
+  border-bottom-color: white;
+  padding: 4px 6px;
+}
+.historyLine>>>.ivu-card-body{
+  padding: 5px;
+}
+.personlResouce>>>.ivu-card-head{
+  padding: 8px 6px;
+}
+.personlResouce>>>.ivu-card-extra{
+  top:2px;
+}
+.personlResouce>>>.ivu-card-body{
+  padding: 5px;
+}
+.projectItem>>>.ivu-card-head{
+  padding: 8px 6px;
+}
+.projectItem>>>.ivu-card-head{
+  padding: 8px 6px;
+}
+.projectItem>>>.ivu-card-extra{
+  top:2px;
+}
 </style>
 <template>
   <div>
     <Row>
       <Col span="22" offset="1">
         <Row>
-          <Col :lg="5" :md="8" :sm="10" :xs="12">
-            <div class="detailSidebar" :style="{height:detailSidebarHeight}">
+          <Col span="5">
+            <div class="detailSidebar">
               <div class="user-img">
                 <img
                   v-bind:src="userDetail.avatar"
@@ -210,12 +236,13 @@ body {
                 <Icon type="md-link" :size="20"/>
                 <span> {{userDetail.homePage}}</span>
               </div>
-              <br>
               <div
-                style="word-break: break-word;padding:10px;font-size:12px;border:1px dotted lightgray;white-space: pre-line;"
+                style="word-break: break-word;padding:10px;font-size:12px;border:1px dotted lightgray;white-space: pre-line;height: 120px;"
                 title="Introduction"
                 v-show="userDetail.introduction!=''"
-              >{{userDetail.introduction}}</div>
+              >
+                <vue-scroll :ops="ops">{{userDetail.introduction}}</vue-scroll>
+                </div>
               <div class="whitespace"></div>
               <div style="display:flex;justify-content:center">
                 <Button class="fileBtnHoverBlue" style="height:40px" @click="editModalShow()" title="Edit">
@@ -234,6 +261,7 @@ body {
                     :model="personalInfoItem"
                     :rules="ruleValidate"
                     :label-width="80"
+                    class="editInfoForm"
                   >
                     <FormItem label="Name" prop="userName">
                       <Input v-model="personalInfoItem.userName" :class="{InputStyle: inputstyle}"></Input>
@@ -310,18 +338,14 @@ body {
               </div>
             </div>
           </Col>
-          <Col
-            :lg="{span:18,offset:1}"
-            :md="{span:15,offset:1}"
-            :sm="{span:13,offset:1}"
-            :xs="{span:11,offset:1}"
+          <Col span="18" offset="1"
           >
             <div class="rightContent">
               <div class="parent">
                 <Tabs value="Overview" style="font-size:20px" type="card">
                   <TabPane label="Overview" name="Overview">
-                    <Col :lg="{span:22,offset:1}" :md="{span:22,offset:1}" :sm="{span:22,offset:1}">
-                      <Card dis-hover>
+                    <div :style="{height:tabContentHeight+'px'}"  style="padding:5px;border:#dcdee2 solid 1px;">
+                      <Card dis-hover class="historyLine">
                         <p slot="title">History line</p>
                         <div class="timeLineStyle">
                           <vue-scroll :ops="ops">
@@ -351,8 +375,7 @@ body {
                           </vue-scroll>
                         </div>
                       </Card>
-                      <br>
-                      <div style="margin-bottom:40px">
+                      <div style="margin-top:10px" class="personlResouce">
                         <Card dis-hover>
                           <p slot="title">Resource list</p>
                           <div slot="extra">
@@ -369,9 +392,9 @@ body {
                             <Icon size="20" type="ios-albums"></Icon>
                             </Button>
                           </div>
-                          <div style="height:500px">
+                          <div :style="{height:tabContentHeight-235+'px'}">
                             <vue-scroll :ops="ops">
-                              <Table :data="userResourceList" :columns="resourceColumn" class="table" @on-selection-change="setSelectedFiles">
+                              <Table size="small" :data="userResourceList" :columns="resourceColumn" class="table" @on-selection-change="setSelectedFiles">
                                 <template slot-scope="{ row }" slot="name">
                                   <strong>{{ row.name }}</strong>
                                 </template>
@@ -418,10 +441,10 @@ body {
                           </div>
                         </Card>
                       </div>
-                    </Col>
+                    </div>
                   </TabPane>
                   <TabPane label="Joined projects" name="Participatory">
-                    <div style="height:900px;padding:5px;border:#dcdee2 solid 1px;">
+                    <div :style="{height:tabContentHeight+'px'}" style="padding:5px;border:#dcdee2 solid 1px;">
                       <vue-scroll :ops="ops">
                         <Card :bordered="false" v-if="joinedProjectsList.length == 0">
                           <div style="display:flex;justify-content:center">
@@ -439,10 +462,10 @@ body {
                           :key="index"
                           v-show="joinedProjectsList!=[]"
                         >
-                          <Col :lg="{span:10, offset:1}" :md="{span:22, offset:1}">
+                          <Col span="10" offset="1">
                             <div
-                              class="participatoryProjectCard"
                               @click="goSingleProject(item.projectId)"
+                              class="projectItem"
                             >
                               <Card style="height:320px;margin-top:20px;">
                                 <p slot="title" style="height:40x" class="projectsTitle">{{item.title}}</p>
@@ -464,7 +487,7 @@ body {
                     </div>
                   </TabPane>
                   <TabPane label="Managed projects" name="Management">
-                    <div style="height:900px;padding:5px;border:#dcdee2 solid 1px;">
+                    <div :style="{height:tabContentHeight+'px'}" style="padding:5px;border:#dcdee2 solid 1px;">
                       <vue-scroll :ops="ops">
                         <Card :bordered="false" v-if="userManagerProjectList.length == 0">
                           <div style="display:flex;justify-content:center">
@@ -482,9 +505,9 @@ body {
                           v-show="userManagerProjectList!='None'"
                           :key="index"
                         >
-                          <Col :lg="{span:10, offset:1}" :md="{span:22, offset:1}">
+                          <Col span="10" offset="1">
                             <div
-                              class="manageProjectsCard"
+                              class="projectItem"
                               @click="goSingleProject(mProject.projectId)"
                             >
                               <Card style="height:320px;margin-top:20px">
@@ -494,7 +517,6 @@ body {
                                   type="default"
                                   slot="extra"
                                   title="Privilege change"
-                                  style="margin:-5px 5px 0 5px"
                                   @click.stop="authorizeModalShow(index)"
                                   icon="md-happy"
                                 ></Button>
@@ -502,7 +524,7 @@ body {
                                   class="deleteBtn"
                                   type="default"
                                   slot="extra"
-                                  style="margin:-5px 5px 0 5px"
+                                  style="margin:0 0 0 5px"
                                   @click.stop="deleteProjectModalShow(mProject.projectId)"
                                   icon="md-close"
                                   title="remove"
@@ -687,6 +709,13 @@ export default {
     this.readPersonalEvent();
     // 初始化样式的高度
     this.initStyle();
+    
+    $(".__view").css("width", "inherit");
+    window.onresize = () => {
+        return (() => {
+          this.initStyle();
+        })()
+    }
   },
   components: {
     Avatar
@@ -702,6 +731,7 @@ export default {
       }
     };
     return {
+      tabContentHeight:600,
       userDetail: {},
       resourceColumn: [
         {
@@ -883,8 +913,6 @@ export default {
       joinedProjectIndexList: [],
       //加入的项目详情数组列表
       joinedProjectsList: [],
-      // 关于样式的变量定义
-      detailSidebarHeight: "",
       // 用户event列表
       userEventList: [],
       userResourceList: [],
@@ -955,7 +983,12 @@ export default {
   methods: {
     // 初始化侧边栏样式
     initStyle() {
-      this.detailSidebarHeight = window.innerHeight - 60 + "px";
+      if(window.innerHeight>735){
+        this.tabContentHeight = window.innerHeight - 200;
+      }
+      else{
+        this.tabContentHeight = 600;
+      }
     },
     //获取用户的详细信息
     getUserProfile() {
@@ -983,10 +1016,19 @@ export default {
                 participatoryProjectListTemp.push(res.data[0]);
               }
               if (--count == 0) {
+                var participatoryProjectList = [];
+                for(var j=0;j<projectIds.length;j++){
+                  for(var k=0;k<participatoryProjectListTemp.length;k++){
+                    if(projectIds[j].projectId==participatoryProjectListTemp[k].projectId){
+                      participatoryProjectList.push(participatoryProjectListTemp[k]);
+                      break;
+                    }
+                  }
+                }
                 this.$set(
                   this,
                   "joinedProjectsList",
-                  participatoryProjectListTemp
+                  participatoryProjectList
                 );
               }
             })
@@ -1276,7 +1318,7 @@ export default {
             this.$store.commit("userLogout");
             this.$router.push({ name: "Login" });
           } else if (res.data != "None" && res.data != "Fail") {
-            this.userEventList = res.data;
+            this.userEventList = res.data.reverse();
           }
         })
         .catch(err => {

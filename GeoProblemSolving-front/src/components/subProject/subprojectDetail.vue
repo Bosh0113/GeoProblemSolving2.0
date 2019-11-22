@@ -383,23 +383,24 @@ export default {
   },
 
   beforeRouteLeave(to, from, next) {
-    var editCompleted = true;
+    var editStart = false;
     if(this.oldLimitation != this.limitation){
-      editCompleted = false;
+      editStart = true;
     }
     if(this.oldBackground != this.background){
-      editCompleted = false;
+      editStart = true;
     }
     if(this.oldDescription != this.description){
-      editCompleted = false;
+      editStart = true;
     }
 
-    if ((!this.edit1&&!this.edit2&&!this.edit3)&&(!editCompleted)) {
+    if((!editStart)||!(this.edit1||this.edit2||this.edit3)){
+      next();
+    }
+    else{
       this.$Notice.info({
         desc: "The content that you edited has not been submitted!"
       });
-    } else {
-      next();
     }
   },
   beforeDestroy: function() {

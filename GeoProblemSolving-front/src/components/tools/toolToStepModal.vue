@@ -46,7 +46,7 @@
           <Col span="16">
           <div span="2" style="height: inherit;width: 90px;position: absolute;">
             <Menu
-              active-name="allToolsets"
+              :active-name="showMenuItem"
               @on-select="changeMenuItem"
               style="height: inherit;width: fit-content;z-index:1"
             >
@@ -98,7 +98,7 @@
                         <div slot="content">
                           <span>{{toolset.description}}</span>
                           <br v-if="toolset.categoryTag.length>0"/>
-                          <p><i>{{toolset.categoryTag.join(',')}}</i></p>
+                          <p><i>{{toolset.categoryTag.join('|')}}</i></p>
                         </div>
                         </Tooltip>
                         <h4 :title="toolset.toolsetName" style="display:block;width:90px;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;">{{toolset.toolsetName}}</h4>
@@ -130,7 +130,7 @@
                         <div slot="content">
                           <span>{{toolset.description}}</span>
                           <br v-if="toolset.categoryTag.length>0"/>
-                          <p><i>{{toolset.categoryTag.join(',')}}</i></p>
+                          <p><i>{{toolset.categoryTag.join('|')}}</i></p>
                         </div>
                         </Tooltip>
                         <h4 :title="toolset.toolsetName" style="width:90px;" class="ellipsis">{{toolset.toolsetName}}</h4>
@@ -149,8 +149,8 @@
                       :options="{group:'tool'}"
                       v-model="publicToolsShow">
                     <Col span="8" v-for="tool in publicToolsShow" :key="tool.index">
-                    <Card style="background-color: ghostwhite;margin: 0 5px 10px 5px">
-                      <div style="text-align:center">
+                    <Card style="background-color: ghostwhite;margin: 0 5px 10px 5px;cursor: pointer;">
+                      <div style="text-align:center" @click="showTool(tool)">
                         <Tooltip placement="bottom" max-width="600">
                           <img :src="tool.toolImg" v-if="tool.toolImg!=''" style="height:100%;max-height:50px;">
                           <avatar
@@ -162,7 +162,7 @@
                         <div slot="content">
                           <span>{{tool.description}}</span>
                           <br v-if="tool.categoryTag.length>0"/>
-                          <span><i>{{tool.categoryTag.join(',')}}</i></span>
+                          <span><i>{{tool.categoryTag.join('|')}}</i></span>
                         </div>
                         </Tooltip>
                         <h4 :title="tool.toolName" style="display:block;width:90px;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;">{{tool.toolName}}</h4>
@@ -181,8 +181,8 @@
                       :options="{group:'tool'}"
                       v-model="personalToolsShow">
                     <Col span="8" v-for="tool in personalToolsShow" :key="tool.index">
-                    <Card style="background-color: #faebd794;margin: 0 5px 10px 5px">
-                      <div style="text-align:center">
+                    <Card style="background-color: #faebd794;margin: 0 5px 10px 5px;cursor: pointer;">
+                      <div style="text-align:center" @click="showTool(tool)">
                         <Tooltip placement="bottom" max-width="600">
                           <img :src="tool.toolImg" v-if="tool.toolImg!=''" style="height:100%;max-height:50px;">
                           <avatar
@@ -194,7 +194,7 @@
                         <div slot="content">
                           <span>{{tool.description}}</span>
                           <br v-if="tool.categoryTag.length>0"/>
-                          <span><i>{{tool.categoryTag.join(',')}}</i></span>
+                          <span><i>{{tool.categoryTag.join('|')}}</i></span>
                         </div>
                         </Tooltip>
                         <h4 :title="tool.toolName" style="width:90px;" class="ellipsis">{{tool.toolName}}</h4>
@@ -313,6 +313,10 @@ export default {
   mounted() {
     this.resizeContent();
   },
+  beforeRouteLeave(to, from, next) {
+    this.closePanel();
+    next();
+  },
   data() {
     return {
       stepId: "",
@@ -358,7 +362,8 @@ export default {
         description:"",
         tags:[],
         recomStep:[]
-      }
+      },
+      panelList: [],
     };
   },
   methods: {
@@ -771,9 +776,6 @@ export default {
       this.stepToolsShow.forEach(tool=>{
         newStepTools.push(tool.tId);
       })
-      console.log('update step.');
-      console.log(newStepToolsets);
-      console.log(newStepTools);
       let obj = new URLSearchParams();
       obj.append("stepId",this.stepInfo.stepId);
       obj.append("toolsetList",newStepToolsets);
@@ -793,12 +795,57 @@ export default {
             this.$Notice.error({ desc: "There is no existing tool" });
           } else {
             //此处要更新父组件的列表
+            this.$emit("updateStepTools", newStepTools,newStepToolsets);
             this.stepToolModal = false;
           }
         })
         .catch(err => {
           console.log(err);
         });
+    },
+    closePanel() {
+      for (let i = 0; i < this.panelList.length; i++) {
+        this.panelList[i].close();
+      }
+    },
+    showTool(toolInfo){
+        this.axios
+          .post("/GeoProblemSolving/user/state")
+          .then(res => {
+            if (!res.data) {
+              this.$store.commit("userLogout");
+              this.$router.push({ name: "Login" });
+            } else {
+              let toolURL = '<iframe src="' + toolInfo.toolUrl +"?groupID="+ this.stepId + '" style="width: 100%;height:100%;"></iframe>';
+              var demoPanelTimer= null;
+              let panel = jsPanel.create({
+                theme: "success",
+                headerTitle: toolInfo.toolName,
+                footerToolbar: '<p style="height:10px"></p>',
+                contentSize: "1200 600",
+                content: toolURL,
+                disableOnMaximized: true,
+                dragit: {
+                  containment: 5
+                },
+                id:"demoPanel",
+                onclosed:function(panel, status, closedByUser){
+                  window.clearTimeout(demoPanelTimer);
+                },
+                callback: function() {
+                  var that = this;
+                  demoPanelTimer = window.setInterval(function(){
+                    that.style.zIndex = "9999";
+                  },1);
+                }
+              });
+              // panel.resizeit("disable");
+              $(".jsPanel-content").css("font-size", "0");
+            }
+          })
+          .catch(err => {
+            console.log("Get user info fail.");
+          });
     }
   }
 };

@@ -27,7 +27,7 @@
 </style>
 <template>
     <div>
-        <div span="2"  style="height: inherit;width: 90px;position: absolute;">
+        <div span="2"  style="height: inherit;width: 90px;position: absolute;z-index: 1;">
             <Menu active-name="projectResource" @on-select="changeMenuItem" style="height: inherit;width: fit-content;">
                 <MenuItem name="projectResource" class="leftMenuItem">
                     <Icon type="ios-paper" title="Project Resources" size="35"></Icon>
@@ -56,7 +56,7 @@
                             </Select>
                             <span style="margin-left:15px">->  Step:</span>
                             <Select class="selector" v-model="selectedStepId" :disabled="stepDisable"  @on-change="changeStep">
-                                <Option v-for="step in stepList" :key="step.moduleId" :value="step.moduleId">{{step.title}}</Option>
+                                <Option v-for="step in stepList" :key="step.stepID" :value="step.stepID">{{step.name}}</Option>
                             </Select>
                         </div>
                         <div style="margin-top:20px">
@@ -255,12 +255,12 @@ export default {
             this.getResourceInfo();
         },
         getSubProjectList(projectId){
-            var defaultOption = [{title:"—show sub-project's resource—",moduleId:"all"}];
-            this.selectedStepId = defaultOption[0].moduleId;
+            var defaultOption = [{name:"—show sub-project's resource—",stepID:"all"}];
+            this.selectedStepId = defaultOption[0].stepID;
             this.stepDisable = true;
             this.axios
             .get(
-                "/GeoProblemSolving//subProject/inquiry"+
+                "/GeoProblemSolving/subProject/inquiry"+
                 "?key="+"projectId"+
                 "&value="+projectId
             )
@@ -287,34 +287,24 @@ export default {
             .catch(err=>{console.log(err.data);})
         },
         getStepList(subProjectId){
-            this.axios
-            .get(
-                "/GeoProblemSolving//module/inquiry"+
-                "?key="+"subProjectId"+
-                "&value="+subProjectId
-            )
-            .then(res=>{
-                if (res.data == "Offline") {
-                    this.$store.commit("userLogout");
-                    this.$router.push({ name: "Login" });
-                } else if (res.data != "Fail") {
-                    var defaultOption = [{title:"—show sub-project's resource—",moduleId:"all"}];
-                    var stepOptions = [];
-                    if(res.data!='None'){
-                        var stepInfos = res.data;
-                        stepOptions = defaultOption.concat(stepInfos);
-                    }else{
-                        stepOptions = defaultOption;
-                    }
-                    this.$set(this,'stepList',stepOptions);
-                    this.selectedStepId = stepOptions[0].moduleId;
-                    this.stepDisable = false;
-                } else {
-                    this.$Message.warning("Get sub-projects info fail.");
+            var thisSubProject = {};
+            for(var i=0;i<this.subProjectList.length;i++){
+                if(this.subProjectList[i].subProjectId == subProjectId){
+                    thisSubProject = this.subProjectList[i];
+                    break;
                 }
-            })
-            .catch(err=>{console.log(err.data);})
-
+            }
+            var defaultOption = [{name:"—show sub-project's resource—",stepID:"all"}];
+            var stepOptions = [];
+            if(thisSubProject.solvingProcess!=undefined){
+                var stepInfos = JSON.parse(thisSubProject.solvingProcess);
+                stepOptions = defaultOption.concat(stepInfos);
+            }else{
+                stepOptions = defaultOption;
+            }
+            this.$set(this,'stepList',stepOptions);
+            this.selectedStepId = stepOptions[0].stepID;
+            this.stepDisable = false;
         },
         changeProject(projectId){
             this.scopeId = projectId;
@@ -325,8 +315,8 @@ export default {
         changeSubProject(subProjectId){
             if(subProjectId=="all"){
                 this.scopeId = this.selectedProjectId;
-                var defaultOption = [{title:"—show sub-project's resource—",moduleId:"all"}];
-                this.selectedStepId = defaultOption[0].moduleId;
+                var defaultOption = [{title:"—show sub-project's resource—",stepID:"all"}];
+                this.selectedStepId = defaultOption[0].stepID;
                 this.stepDisable = true;
             }
             else{

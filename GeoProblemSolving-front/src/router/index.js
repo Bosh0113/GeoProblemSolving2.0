@@ -48,7 +48,6 @@ const routes = [{
     { path: 'register', name: 'Register', component: resolve => (require(["@/components/userState/register"], resolve)) },
     { path: 'resetPassword/:email', name: 'resetPassword', component: resolve => (require(["@/components/userState/resetPwd"], resolve)) },
     { path: 'resourceCenter', name: 'resourceCenter', component: resolve => (require(["@/components/resources/resourceCenter"], resolve)) },
-    { path: 'toolToStep/:stepId', name: 'toolToStep', component: resolve => (require(["@/components/tools/toolToStepModal"], resolve)) }, 
     { path: 'toolsCenter', name: 'toolsCenter', component: resolve => (require(["@/components/tools/toolsCenter"], resolve)) }, 
   ]
 },

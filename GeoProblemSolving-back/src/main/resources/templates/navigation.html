@@ -17,6 +17,7 @@
 
         .header span {
             font-size: 15px;
+            font-weight: bold;
         }
 
         .container {
@@ -95,7 +96,7 @@
                 <img :src='window.location.origin+"/GeoProblemSolving/Images/OGMS.png"' id="logo" class="pic" @click="goHome" style="cursor:pointer;margin-left:5%">
                 <div v-if="useMenuCSS">
                     <div class="navPart">
-                        <i-menu mode="horizontal" theme="dark" @on-select="turnContent" :style="`z-index:0;background:headerBgColor`" width="auto"
+                        <i-menu class="header" mode="horizontal" theme="dark" @on-select="turnContent" :style="`z-index:0;background:headerBgColor`" width="auto"
                             :active-name="activeType">
                             <menu-item name="home" class="menuItem" style="margin-left:35%">
                                 <span>Home</span>
@@ -105,6 +106,9 @@
                             </menu-item>
                             <menu-item name="resources" class="menuItem">
                                 <span>Resources</span>
+                            </menu-item>
+                            <menu-item name="toolsCenter" class="menuItem">
+                                <span>Tools center</span>
                             </menu-item>
                             <menu-item name="help" class="menuItem">
                                 <span>Help</span>
@@ -157,6 +161,9 @@
                             </Dropdown-item>
                             <Dropdown-item>
                                 <a href="/GeoProblemSolving/publicResource">Resources</a>
+                            </Dropdown-item>
+                            <Dropdown-item>
+                                <a href="/GeoProblemSolving/toolsCenter">Tools center</a>
                             </Dropdown-item>
                             <Dropdown-item>
                                 <a href="/GeoProblemSolving/help">Help</a>
@@ -258,6 +265,8 @@
                         window.location.href = "/GeoProblemSolving/projectList"
                     } else if (name == "resources") {
                         window.location.href = "/GeoProblemSolving/publicResource"
+                    } else if (name == "toolsCenter") {
+                        window.location.href = "/GeoProblemSolving/toolsCenter"
                     } else if (name == "community") {
                         window.location.href = "/GeoProblemSolving/community"
                     } else if (name == "help") {

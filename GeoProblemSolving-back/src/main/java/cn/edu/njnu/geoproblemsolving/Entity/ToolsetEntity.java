@@ -10,7 +10,7 @@ import java.util.ArrayList;
 public class ToolsetEntity {
     private String tsId;
     private String toolsetName;
-    private JSONArray toolList; // 创建的时候不添加toolList，在toolCollection页面添加，或者创建tool 选择 toolset时，自动添加
+    private ArrayList<ToolEntity> toolList; // 创建的时候不添加toolList，在toolCollection页面添加，或者创建tool 选择 toolset时，自动添加
     private ArrayList<String> categoryTag;
     private ArrayList<String> recomStep; // step类型 or general
     private String description;
@@ -35,8 +35,8 @@ public class ToolsetEntity {
         return toolsetName;
     }
 
-    public JSONArray getToolList() {
-        return toolList;
+    public void setToolList(ArrayList<ToolEntity> toolList) {
+        this.toolList = toolList;
     }
 
     public ArrayList<String> getCategoryTag() {
@@ -71,8 +71,8 @@ public class ToolsetEntity {
         this.toolsetName = toolsetName;
     }
 
-    public void setToolList(JSONArray toolList) {
-        this.toolList = toolList;
+    public ArrayList<ToolEntity> getToolList() {
+        return toolList;
     }
 
     public void setCategoryTag(ArrayList<String> categoryTag) {

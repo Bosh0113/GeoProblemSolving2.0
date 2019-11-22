@@ -1205,7 +1205,6 @@ export default {
       this.axios
         .post("/GeoProblemSolving/step/update", obj)
         .then(res => {
-          console.log(res.data);
           if (res.data == "Offline") {
             this.$store.commit("userLogout");
             this.$router.push({
