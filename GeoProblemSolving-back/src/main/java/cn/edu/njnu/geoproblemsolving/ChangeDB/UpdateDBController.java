@@ -33,4 +33,10 @@ public class UpdateDBController {
         UpdateDBDao updateDBDao = new UpdateDBDao(mongoTemplate);
         return updateDBDao.foldersAddScopeId();
     }
+
+    @RequestMapping(value = "/moduleToStepTree", method = RequestMethod.GET)
+    public String moduleToStepTree(){
+        UpdateDBDao updateDBDao = new UpdateDBDao(mongoTemplate);
+        return updateDBDao.moduleToStepTree();
+    }
 }
