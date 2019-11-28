@@ -105,7 +105,7 @@ footer {
                 <span>Resources</span>
               </MenuItem>
               <MenuItem name="toolsCenter" class="menuItem">
-                <span>Tools center</span>
+                <span>Tools</span>
               </MenuItem>
               <!-- <MenuItem name="community" class="menuItem">
                 <span>Community</span>
@@ -186,7 +186,7 @@ footer {
                 <a href="/GeoProblemSolving/publicResource">Resources</a>
               </DropdownItem>
               <DropdownItem>
-                <a href="/GeoProblemSolving/toolsCenter">Tools center</a>
+                <a href="/GeoProblemSolving/toolsCenter">Tools</a>
               </DropdownItem>
               <DropdownItem>
                 <a href="/GeoProblemSolving/help">Help</a>
@@ -243,14 +243,17 @@ export default {
     } 
   },
   created(){
-    this.setMenuTitle(this.$route.name)
+    this.setMenuTitle(this.$route.name);
+    var that = this;
+    var timer = window.setInterval(function(){
+      if(that.$store.getters.userState){
+        that.linkSocket();
+        window.clearInterval(timer);
+      }
+    },10);
   },
   mounted() {
-    if (this.$store.getters.userState) {
-      this.setTimer();
-      this.initWebSocket();
-      this.getUnreadNoticeCount();
-    }
+    // this.linkSocket();
     this.reSize();
     window.addEventListener("resize", this.reSize);
   },
@@ -278,6 +281,13 @@ export default {
     }
   },
   methods: {
+    linkSocket(){
+      if (this.$store.getters.userState) {
+        this.setTimer();
+        this.initWebSocket();
+        this.getUnreadNoticeCount();
+      }
+    },
     setMenuTitle(newVal){
         switch(newVal){
           case "PublicResource":{
