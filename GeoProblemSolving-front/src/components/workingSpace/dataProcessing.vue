@@ -361,8 +361,7 @@ export default {
       let projectInfo = this.$store.getters.project;
       if (
         JSON.stringify(projectInfo) != "{}" &&
-        projectInfo.projectId.substring(0, 36) ==
-          this.subProjectInfo.projectId.substring(0, 36)
+        projectInfo.projectId == this.subProjectInfo.projectId
       ) {
         this.projectInfo = projectInfo;
       } else {

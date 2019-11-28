@@ -337,7 +337,7 @@ export default {
         });
       } else if (type == 3) {
         this.$router.push({
-          name: "modelEvalution",
+          name: "modelEvaluation",
           params: { id: stepId }
         });
       } else if (type == 4) {
@@ -352,7 +352,7 @@ export default {
         });
       } else if (type == 6) {
         this.$router.push({
-          name: "dataVisulization",
+          name: "dataVisualization",
           params: { id: stepId }
         });
       } else if (type == 7) {
@@ -364,102 +364,7 @@ export default {
     },
     getProcessSteps() {
       this.processStructure = [];
-      if (
-        this.subProjectInfo.solvingProcess == undefined ||
-        this.subProjectInfo.solvingProcess.length == 0
-      ) {
-        // 为了兼容Module
-        $.ajax({
-        url:  "/GeoProblemSolving/module/inquiry" +
-              "?key=subProjectId" +
-              "&value=" +
-              this.subProjectInfo.subProjectId,
-        type: "GET",
-        async: false,
-        success: function (data) {
-
-            if (data == "Offline") {
-              this.$store.commit("userLogout");
-              this.$router.push({ name: "Login" });
-            } else if (data != "None" && data != "Fail") {
-              let stepList = data;
-
-              let nodeCategory = this.getStepCategroy(stepList[0].type);
-
-              this.processStructure.push({
-                id: 0,
-                stepID: stepList[0].moduleId,
-                name: stepList[0].title,
-                category: nodeCategory,
-                last: [],
-                next: [{ name: stepList[1].title, id: 1 }],
-                x: 0,
-                y: 200,
-                level: 0,
-                end: false,
-                activeStatus: stepList[0].activeStatus
-              });
-
-              for (let i = 1; i < stepList.length - 1; i++) {
-                nodeCategory = this.getStepCategroy(stepList[i].type);
-                this.processStructure.push({
-                  id: i,
-                  stepID: stepList[i].moduleId,
-                  name: stepList[i].title,
-                  category: nodeCategory,
-                  last: [{ name: stepList[i - 1].title, id: i - 1 }],
-                  next: [{ name: stepList[i + 1].title, id: i + 1 }],
-                  x: i * (800 / stepList.length),
-                  y: 200,
-                  level: i,
-                  end: false,
-                  activeStatus: stepList[i].activeStatus
-                });
-              }
-
-              nodeCategory = this.getStepCategroy(
-                stepList[stepList.length - 1].type
-              );
-
-              this.processStructure.push({
-                id: stepList.length - 1,
-                stepID: stepList[stepList.length - 1].moduleId,
-                name: stepList[stepList.length - 1].title,
-                category: nodeCategory,
-                last: [
-                  {
-                    name: stepList[stepList.length - 1].title,
-                    id: stepList.length - 1
-                  }
-                ],
-                next: [],
-                x: (stepList.length - 1) * (800 / stepList.length),
-                y: 200,
-                level: stepList.length - 1,
-                end: true,
-                activeStatus: stepList[stepList.length - 1].activeStatus
-              });
-
-              for (let i = 0; i < this.processStructure.length; i++) {
-                if (this.processStructure[i].activeStatus) {
-                  this.activeStep = this.processStructure[i];
-                  this.activeStep = stepList[i];
-                  break;
-                } else if (
-                  i == this.processStructure.length - 1 &&
-                  this.processStructure[i].activeStatus == undefined
-                ) {
-                  this.processStructure[i].activeStatus = true;
-                  this.activeStep = this.processStructure[i];
-                  this.activeStep = stepList[i];
-                }
-              }
-            } else if (data == "None" || data == "Fail") {
-              this.activeStep = [];
-            }
-          }
-        })
-      } else if (this.subProjectInfo.solvingProcess.length > 0) {
+      if (this.subProjectInfo.solvingProcess != undefined && this.subProjectInfo.solvingProcess.length > 0) {
         this.processStructure = JSON.parse(this.subProjectInfo.solvingProcess);
 
         for (let i = 0; i < this.processStructure.length; i++) {
@@ -569,18 +474,18 @@ export default {
         this.selectedStep = [];
         for (let i = 0; i < this.processStructure.length; i++) {
           //get data
-          if (this.processStructure[i].stepID == this.activeStep.moduleId) {
+          if (this.processStructure[i].stepID == this.activeStep.stepId) {
             option.series[0].data.push({
               name: this.processStructure[i].name,
               index: this.processStructure[i].id,
-              moduleId: this.processStructure[i].stepID,
+              stepId: this.processStructure[i].stepID,
               x: this.processStructure[i].x,
               y: this.processStructure[i].y,
               category: this.processStructure[i].category,
               symbolSize: 45
             });
             this.selectedStep.push({
-              moduleId: this.processStructure[i].stepID,
+              stepId: this.processStructure[i].stepID,
               index: this.processStructure[i].id,
               name: this.processStructure[i].name
             });
@@ -588,7 +493,7 @@ export default {
             option.series[0].data.push({
               name: this.processStructure[i].name,
               index: this.processStructure[i].id,
-              moduleId: this.processStructure[i].stepID,
+              stepId: this.processStructure[i].stepID,
               x: this.processStructure[i].x,
               y: this.processStructure[i].y,
               category: this.processStructure[i].category,
@@ -625,7 +530,7 @@ export default {
 
           // record the selected step nodes
           _this.selectedStep.push({
-            moduleId: params.data.moduleId,
+            stepId: params.data.stepId,
             index: params.data.index,
             name: params.data.name
           });
@@ -634,7 +539,7 @@ export default {
 
           // remove these not selected step nodes
           for (let i = 0; i < _this.selectedStep.length; i++) {
-            if (_this.selectedStep[i].moduleId == params.data.moduleId) {
+            if (_this.selectedStep[i].stepId == params.data.stepId) {
               _this.selectedStep.splice(i, 1);
               break;
             }
@@ -645,24 +550,24 @@ export default {
       // 双击切换当前步骤
       this.stepChart.on("dblclick", function(params) {
         _this.activeStep = _this.processStructure[params.data.index];
-        _this.enterStep(params.data.category, params.data.moduleId);
+        _this.enterStep(params.data.category, params.data.stepId);
 
         // _this.selectedStep = [];
         // option.series[0].data = [];
         // for (let i = 0; i < _this.processStructure.length; i++) {
         //   //get data
-        //   if (_this.processStructure[i].stepID == params.data.moduleId) {
+        //   if (_this.processStructure[i].stepID == params.data.stepId) {
         //     option.series[0].data.push({
         //       name: _this.processStructure[i].name,
         //       index: _this.processStructure[i].id,
-        //       moduleId: _this.processStructure[i].stepID,
+        //       stepId: _this.processStructure[i].stepID,
         //       x: _this.processStructure[i].x,
         //       y: _this.processStructure[i].y,
         //       category: _this.processStructure[i].category,
         //       symbolSize: 45
         //     });
         //     _this.selectedStep.push({
-        //       moduleId: _this.processStructure[i].stepID,
+        //       stepId: _this.processStructure[i].stepID,
         //       index: _this.processStructure[i].id,
         //       name: _this.processStructure[i].name
         //     });
@@ -670,7 +575,7 @@ export default {
         //     option.series[0].data.push({
         //       name: _this.processStructure[i].name,
         //       index: _this.processStructure[i].id,
-        //       moduleId: _this.processStructure[i].stepID,
+        //       stepId: _this.processStructure[i].stepID,
         //       x: _this.processStructure[i].x,
         //       y: _this.processStructure[i].y,
         //       category: _this.processStructure[i].category,
@@ -790,7 +695,7 @@ export default {
       });
       // 前驱步骤的资源
       for (let i = 0; i < this.selectedStep.length; i++) {
-        let selectedStepId = this.selectedStep[i].moduleId;
+        let selectedStepId = this.selectedStep[i].stepId;
 
         let getResUrl = "";
         if (

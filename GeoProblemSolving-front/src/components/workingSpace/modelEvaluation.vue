@@ -598,16 +598,16 @@ export default {
             $(".jsPanel-content").css("font-size", "0");
             this.panelList.push(panel);
             // 生成records, 同步
-            let record = {
-              who: this.$store.getters.userName,
-              whoid: this.$store.getters.userId,
-              type: "tools",
-              toolType: type,
-              content: "used a tool: " + type,
-              moduleId: this.stepId,
-              time: new Date().toLocaleString()
-            };
-            this.subprojectSocket.send(JSON.stringify(record));
+            // let record = {
+            //   who: this.$store.getters.userName,
+            //   whoid: this.$store.getters.userId,
+            //   type: "tools",
+            //   toolType: type,
+            //   content: "used a tool: " + type,
+            //   stepId: this.stepId,
+            //   time: new Date().toLocaleString()
+            // };
+            // this.subprojectSocket.send(JSON.stringify(record));
           }
         })
         .catch(err => {

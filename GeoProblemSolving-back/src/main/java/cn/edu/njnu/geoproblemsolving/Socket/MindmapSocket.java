@@ -45,6 +45,13 @@ public class MindmapSocket {
             requireLists.put(groupID, list);
         }
 
+        if(Controller.size() == 0){
+            JSONObject userJson = new JSONObject();
+            userJson.put("userId", "7014115d-2054-4c5e-99ed-ed786574cd32");
+            userJson.put("userName", "nobody");
+            Controller.put(groupID, userJson);//设置权限者为空
+        }
+
     }
 
     @OnMessage
@@ -154,15 +161,21 @@ public class MindmapSocket {
 
     //发送在线用户清单
     private void publicMembers(@PathParam("groupID") String groupID, String messageType, Map requireLists) {
-        ArrayList<String> memberName = new ArrayList<>();
+
+        JSONArray memberList = new JSONArray();
         JSONObject messageMember = new JSONObject();
+
         for (MindmapSocket server : groups.get(groupID)) {
-            memberName.add(members.getJSONObject(server.session.getId()).getString("userName"));
+            JSONObject user = new JSONObject();
+            user.put("id", members.getJSONObject(server.session.getId()).getString("userId"));
+            user.put("name", members.getJSONObject(server.session.getId()).getString("userName"));
+            memberList.add(user);
         }
         messageMember.put("messageType", messageType);
         messageMember.put("controller", Controller.getJSONObject(groupID).toString());
         messageMember.put("requireList", requireLists.get(groupID).toString());
-        messageMember.put("userList", Arrays.toString(memberName.toArray()));
+        messageMember.put("userList", memberList.toJSONString());
+
         try {
             //向客户端发送消息
             for (MindmapSocket server : groups.get(groupID)) {

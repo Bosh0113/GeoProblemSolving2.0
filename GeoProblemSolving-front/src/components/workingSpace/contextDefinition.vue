@@ -1268,8 +1268,7 @@ export default {
       let projectInfo = this.$store.getters.project;
       if (
         JSON.stringify(projectInfo) != "{}" &&
-        projectInfo.projectId.substring(0, 36) ==
-          this.subProjectInfo.projectId.substring(0, 36)
+        projectInfo.projectId == this.subProjectInfo.projectId
       ) {
         this.projectInfo = projectInfo;
       } else {
@@ -1460,7 +1459,7 @@ export default {
                 toolName = "Text editor";
               } else if (type == "Video Tool") {
                 var userId = this.$store.getters.userId;
-                var moduleId = this.stepId;
+                var stepId = this.stepId;
                 var reg = /(\S)*:80/;
                 var IP_Port = this.$store.state.IP_Port;
                 var videoIP_Port = IP_Port.match(reg)[1];
@@ -1469,7 +1468,7 @@ export default {
                   videoIP_Port +
                   ":8083/GeoProblemSolving/Collaborative/vedioChat/WebRtcTest.html" +
                   "?roomId=" +
-                  moduleId +
+                  stepId +
                   "&userId=" +
                   userId +
                   '" style="width: 100%;height:100%"></iframe>';
@@ -1502,16 +1501,16 @@ export default {
               $(".jsPanel-content").css("font-size", "0");
               this.panelList.push(panel);
               // 生成records, 同步
-              let record = {
-                who: this.$store.getters.userName,
-                whoid: this.$store.getters.userId,
-                type: "tools",
-                toolType: type,
-                content: "used a tool: " + type,
-                moduleId: this.stepId,
-                time: new Date().toLocaleString()
-              };
-              this.subprojectSocket.send(JSON.stringify(record));
+              // let record = {
+              //   who: this.$store.getters.userName,
+              //   whoid: this.$store.getters.userId,
+              //   type: "tools",
+              //   toolType: type,
+              //   content: "used a tool: " + type,
+              //   stepId: this.stepId,
+              //   time: new Date().toLocaleString()
+              // };
+              // this.subprojectSocket.send(JSON.stringify(record));
             }
           })
           .catch(err => {
