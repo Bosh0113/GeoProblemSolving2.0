@@ -9,15 +9,15 @@
 .ivu-menu-item {
   padding: 5px 5px 5px 5px;
 }
-.sidebar{
-  width:60px;
-  background-color:#515a6e;
-  justify-content:center;
-  position: absolute
+.sidebar {
+  width: 60px;
+  background-color: #515a6e;
+  justify-content: center;
+  position: absolute;
 }
-.toolContent{
-  flex:1;
-  height:100%
+.toolContent {
+  flex: 1;
+  height: 100%;
 }
 .noDetail h1 {
   color: darkgray;
@@ -26,48 +26,61 @@
 </style>
 <template>
   <div>
-    <div class="sidebar" style="width:60px;float:left" :style="{height:windowHeight+'px'}">      
+    <div class="sidebar" style="width:60px;float:left" :style="{height:windowHeight+'px'}">
       <div style="display:flex;justify-content:center;margin-top:20px" title="Resources">
-        <span @click="resourceDrawer=true" style="cursor:pointer"><Icon type="md-folder" :size="40" color="white"/></span>
+        <span @click="resourceDrawer=true" style="cursor:pointer">
+          <Icon type="md-folder" :size="40" color="white" />
         </span>
         <Drawer title="Resources" :closable="false" v-model="resourceDrawer" placement="left">
-        <div style="height:45%;overflow-y:auto">
-        <div style="font-size:1rem;margin-bottom:10px">Papers:</div>
-        <ul>
-          <li v-for="(resource,index) in paperList" :key="index" @click="selectResource(resource.pathURL)" style="cursor:pointer;margin-bottom:10px" :title="resource.description">{{resource.name}}</li>
-        </ul>
-        </div>
-         <div style="height:45%;overflow-y:auto">
-        <div style="font-size:1rem;margin-bottom:10px">Documents:</div>
-        <ul>
-          <li v-for="(resource,index) in documentList" :key="index" @click="selectResource(resource.pathURL)" style="cursor:pointer;margin-bottom:10px" :title="resource.description">{{resource.name}}</li>
-        </ul>
-        </div>
+          <div style="height:45%;overflow-y:auto">
+            <div style="font-size:1rem;margin-bottom:10px">Papers:</div>
+            <ul>
+              <li
+                v-for="(resource,index) in paperList"
+                :key="index"
+                @click="selectResource(resource.pathURL)"
+                style="cursor:pointer;margin-bottom:10px"
+                :title="resource.description"
+              >{{resource.name}}</li>
+            </ul>
+          </div>
+          <div style="height:45%;overflow-y:auto">
+            <div style="font-size:1rem;margin-bottom:10px">Documents:</div>
+            <ul>
+              <li
+                v-for="(resource,index) in documentList"
+                :key="index"
+                @click="selectResource(resource.pathURL)"
+                style="cursor:pointer;margin-bottom:10px"
+                :title="resource.description"
+              >{{resource.name}}</li>
+            </ul>
+          </div>
         </Drawer>
       </div>
     </div>
     <div :style="{height:windowHeight+'px'}" style="margin-left:60px">
       <template v-if="fileURL != ''" class="pfdPanel">
-      <iframe :width="fileWidth" :height="fileHeight-5" :src="fileURL">
-        This browser does not support Files. Please download the file to view it:
-        <a
-          :href="fileURL"
-        >Download file</a>
-      </iframe>
-    </template>
-    <template v-else  class="pfdPanel">
-      <div :style="{height:fileHeight+'px', width:fileWidth+'px'}" >
-        <Card class="noDetail">
-                <h1>No file selected</h1>
-              </Card>
-      </div>
-    </template>
-    </div>    
+        <iframe :width="fileWidth" :height="fileHeight-5" :src="fileURL">
+          This browser does not support Files. Please download the file to view it:
+          <a
+            :href="fileURL"
+          >Download file</a>
+        </iframe>
+      </template>
+      <template v-else class="pfdPanel">
+        <div :style="{height:fileHeight+'px', width:fileWidth+'px'}">
+          <Card class="noDetail">
+            <h1>No file selected</h1>
+          </Card>
+        </div>
+      </template>
+    </div>
   </div>
 </template>
 <script>
 export default {
-  components: { },
+  components: {},
   data() {
     return {
       windowHeight: window.innerHeight,
@@ -78,7 +91,9 @@ export default {
       fileURL: "",
       isPaper: false,
       activeItem: "",
-      resourceDrawer:false,
+      resourceDrawer: false,
+      pageParams: { pageId: "", userId: "", userName: "" },
+      userInfo: {}
     };
   },
   beforeRouteEnter: (to, from, next) => {
@@ -93,6 +108,8 @@ export default {
   mounted() {
     window.addEventListener("resize", this.initSize);
     this.initSize();
+    this.getStepInfo();
+    this.getUserInfo();
     this.getResource();
   },
   beforeDestroy: function() {
@@ -100,61 +117,99 @@ export default {
   },
   methods: {
     initSize() {
-      if(window.innerHeight > 675) {
+      if (window.innerHeight > 675) {
         this.windowHeight = window.innerHeight;
         this.fileHeight = window.innerHeight;
-      }
-      else{
+      } else {
         this.windowHeight = 675;
         this.fileHeight = 675;
       }
-      if(window.innerWidth >1200){
+      if (window.innerWidth > 1200) {
         this.fileWidth = window.innerWidth - 60;
-      }
-      else{
+      } else {
         this.fileWidth = 1200;
       }
     },
-    getResource() {
-      this.paperList = [];
-      this.documentList = [];
-      let resources = JSON.parse(sessionStorage.getItem("resources"));
-      if (resources != null && resources != undefined && resources.length > 0) {
-        for (let i = 0; i < resources.length; i++) {
-          if (resources[i].type == "paper") {
-            this.paperList.push(resources[i]);
-          } else if (resources[i].type == "document") {
-            this.documentList.push(resources[i]);
+    getStepInfo() {
+      if (
+        this.$route.params.groupID == undefined ||
+        this.$route.params.groupID == ""
+      ) {
+        var href = window.location.href;
+        var url = href.split("&");
+
+        for (var i = 0; i < url.length; i++) {
+          if (/groupID/.test(url[i])) {
+            this.pageParams.pageId = url[i].match(/groupID=(\S*)/)[1];
+            continue;
+          }
+
+          if (/userID/.test(url[i])) {
+            this.pageParams.userId = url[i].match(/userID=(\S*)/)[1];
+            continue;
+          }
+
+          if (/userName/.test(url[i])) {
+            this.pageParams.userName = url[i].match(/userName=(\S*)/)[1];
+            continue;
           }
         }
       } else {
-        var that = this;
+        this.pageParams.pageId = this.$route.params.groupID;
+        this.pageParams.userId = this.$route.params.userID;
+        this.pageParams.userName = this.$route.params.userName;
+      }
+    },
+    getUserInfo() {
+      this.userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
+      if (this.userInfo == {}) {
         this.axios
           .get(
-            "/GeoProblemSolving/resource/inquiry" +
-              "?key=scope.moduleId" +
+            "/GeoProblemSolving/user/inquiry" +
+              "?key=" +
+              "userId" +
               "&value=" +
-              sessionStorage.getItem("moduleId")
+              this.pageParams.userId
           )
           .then(res => {
-            // 写渲染函数，取到所有资源
-            if (res.data !== "None") {              
-              for (let i = 0; i < res.data.length; i++) {
-                if (res.data[i].type == "paper") {
-                  that.paperList.push(res.data[i]);
-                } else if (res.data[i].type == "document") {
-                  that.documentList.push(res.data[i]);
-                }
-              }
-            } else {
-              that.paperList = [];
-              that.documentList = [];
+            if (res.data != "Fail" && res.data != "None") {
+              this.$set(this, "userInfo", res.data);
             }
           })
-          .catch(err => {
-            console.log(err.data);
-          });
+          .catch(err => {});
       }
+    },
+    getResource() {
+      if (this.pageParams.pageId == undefined || this.pageParams.pageId == "") {
+        this.$Message.error("Lose the information of current step.");
+        return false;
+      }
+
+      this.paperList = [];
+      this.documentList = [];
+
+      this.axios
+        .get(
+          "/GeoProblemSolving/folder/inquiry?folderId=" + this.pageParams.pageId
+        )
+        .then(res => {
+          // 写渲染函数，取到所有资源
+          if (res.data !== "None") {
+            for (let i = 0; i < res.data.length; i++) {
+              if (res.data[i].type == "paper") {
+                this.paperList.push(res.data[i]);
+              } else if (res.data[i].type == "document") {
+                this.documentList.push(res.data[i]);
+              }
+            }
+          } else {
+            this.paperList = [];
+            this.documentList = [];
+          }
+        })
+        .catch(err => {
+          console.log(err.data);
+        });
     },
     selectFile(url, name) {
       if (!/\.(pdf)$/.test(name.toLowerCase())) {
@@ -164,62 +219,62 @@ export default {
       this.fileURL = url;
     },
     handleUpload(file) {
+      if (this.pageParams.pageId == undefined || this.pageParams.pageId == "") {
+        this.$Message.error("Lose the information of current step.");
+        return false;
+      }
+
       if (!/\.(pdf)$/.test(file.name.toLowerCase())) {
         this.$Message.error("Worry format");
         return false;
       }
+
       let fileType = "";
       if (this.isPaper) {
         fileType = "paper";
       } else {
         fileType = "document";
       }
-
       //上传数据
       let formData = new FormData();
-      let userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
       formData.append("file", file);
       formData.append("description", "file preview tool");
       formData.append("type", fileType);
-      formData.append("uploaderId", userInfo.userId);
-      formData.append("belong", userInfo.userName);
-      let scopeObject = {
-        projectId: "",
-        subProjectId: "",
-        moduleId: sessionStorage.getItem("moduleId")
-      };
-      formData.append("scope", JSON.stringify(scopeObject));
+      formData.append("uploaderId", this.userInfo.userId);
       formData.append("privacy", "private");
-      let that = this;
+      formData.append("folderId", this.pageParams.pageId);
       this.axios
-        .post("/GeoProblemSolving/resource/upload", formData)
+        .post("/GeoProblemSolving/folder/uploadToFolder", formData)
         .then(res => {
-          if(res.data == "Size over"||res.data == "Fail"||res.data == "Offline"){
+          if (
+            res.data == "Size over" ||
+            res.data == "Fail" ||
+            res.data == "Offline"
+          ) {
             console.log(res.data);
-          }
-          else if (res.data.length > 0) {
+          } else if (res.data.length > 0) {
             let fileName = res.data[0].fileName;
-            that.fileURL = "/GeoProblemSolving/resource/upload/" + fileName;
+            this.fileURL = "/GeoProblemSolving/resource/upload/" + fileName;
 
             let fileItem = {
               name: file.name,
               description: "file preview tool",
               pathURL: "/GeoProblemSolving/resource/upload/" + fileName
             };
-            if (that.isPaper) {
-              that.paperList.push(fileItem);
-              that.activeItem = "1-" + (that.paperList.length - 1);
+            if (this.isPaper) {
+              this.paperList.push(fileItem);
+              this.activeItem = "1-" + (this.paperList.length - 1);
             } else {
-              that.documentList.push(fileItem);
-              that.activeItem = "2-" + (that.documentList.length - 1);
+              this.documentList.push(fileItem);
+              this.activeItem = "2-" + (this.documentList.length - 1);
             }
           }
         })
         .catch(err => {});
       return false;
     },
-    selectResource(url){
-      this.fileURL = 'http://'+this.$store.state.IP_Port+url;
+    selectResource(url) {
+      this.fileURL = "http://" + this.$store.state.IP_Port + url;
     }
   }
 };

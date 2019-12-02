@@ -165,17 +165,6 @@ export default {
               subProjectInfo = data[0];
               that.$set(that, "subProjectInfo", subProjectInfo);
               that.userRoleIdentity();
-
-              sessionStorage.setItem(
-                "subProjectId",
-                subProjectInfo.subProjectId
-              );
-              sessionStorage.setItem("subProjectName", subProjectInfo.title);
-              sessionStorage.setItem(
-                "subProjectManagerId",
-                subProjectInfo.managerId
-              );
-              console.log(subProjectInfo);
               that.$store.commit("setSubProjectInfo", subProjectInfo);
             }
           },

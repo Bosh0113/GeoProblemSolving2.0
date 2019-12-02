@@ -151,7 +151,9 @@
             headers: [],
             xValue: [],
             yValue: "",
-            activeTab: "tablePanel"
+            activeTab: "tablePanel",
+            pageParams: { pageId: "", userId: "", userName: "" },
+            userInfo: {},
         },
         computed: {
             transferHeaders() {
@@ -178,6 +180,55 @@
                     tableOverflow: false,
                     minDimensions: [20, 20]
                 });
+            },
+            getStepInfo() {
+                if (
+                    this.$route.params.groupID == undefined ||
+                    this.$route.params.groupID == ""
+                ) {
+                    var href = window.location.href;
+                    var url = href.split("&");
+
+                    for (var i = 0; i < url.length; i++) {
+                        if (/groupID/.test(url[i])) {
+                            this.pageParams.pageId = url[i].match(/groupID=(\S*)/)[1];
+                            continue;
+                        }
+
+                        if (/userID/.test(url[i])) {
+                            this.pageParams.userId = url[i].match(/userID=(\S*)/)[1];
+                            continue;
+                        }
+
+                        if (/userName/.test(url[i])) {
+                            this.pageParams.userName = url[i].match(/userName=(\S*)/)[1];
+                            continue;
+                        }
+                    }
+                } else {
+                    this.pageParams.pageId = this.$route.params.groupID;
+                    this.pageParams.userId = this.$route.params.userID;
+                    this.pageParams.userName = this.$route.params.userName;
+                }
+            },
+            getUserInfo() {
+                this.userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
+                if (this.userInfo == {}) {
+                    this.axios
+                        .get(
+                            "/GeoProblemSolving/user/inquiry" +
+                            "?key=" +
+                            "userId" +
+                            "&value=" +
+                            this.pageParams.userId
+                        )
+                        .then(res => {
+                            if (res.data != "Fail" && res.data != "None") {
+                                this.$set(this, "userInfo", res.data);
+                            }
+                        })
+                        .catch(err => {});
+                }
             },
             // 下载文件
             download() {
@@ -212,6 +263,11 @@
                 this.activeTab = "tablePanel";
             },
             beforeUpload(file){
+                if (this.pageParams.pageId == undefined || this.pageParams.pageId == "") {
+                    this.$Message.error("Lose the information of current step.");
+                    return false;
+                }
+
                 if (!/\.(xls|xlsx|csv)$/.test(file.name.toLowerCase())) {
                     this.$Message.error("上传格式不正确，请上传xls或者xlsx格式");
                     return false;
@@ -223,18 +279,14 @@
                 formData.append("file", file);
                 formData.append("description", "Data chart tool");
                 formData.append("type", "data");
-                formData.append("uploaderId", userInfo.userId);
-                formData.append("belong", userInfo.userName);
-                var scopeObject = {
-                    projectId: sessionStorage.getItem("projectId"),
-                    subProjectId: sessionStorage.getItem("subProjectId"),
-                    moduleId: sessionStorage.getItem("moduleId")
-                };
-                formData.append("scope", JSON.stringify(scopeObject));
+                formData.append("uploaderId", this.userInfo.userId);
+                formData.append("privacy", "private");
+                formData.append("folderId", this.pageParams.pageId);
+
                 var inThis = this;
                 $.ajax({
                     type: "POST",
-                    url: "/GeoProblemSolving/resource/upload",
+                    url: "/GeoProblemSolving/folder/uploadToFolder",
                     data: formData,
                     cache: false,        //不设置缓存
                     processData: false,  // 不处理数据
@@ -342,6 +394,8 @@
             });
         },
         mounted() {
+            this.getStepInfo();
+            this.getUserInfo();
         }
     });
 </script>
