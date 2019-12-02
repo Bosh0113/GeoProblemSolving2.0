@@ -863,6 +863,13 @@ export default {
   mounted() {
     this.resizeContent();
     this.getPublicTools();
+    var that = this;
+    var timer = window.setInterval(function(){
+      if(!that.publicTools.length<1&&(!that.personalTools.length<1||!that.userInfo.userState)){
+        that.filterShowListByType();
+        window.clearInterval(timer);
+      }
+    },10);
     if(this.userInfo.userState){
       this.getPersonalToolsets();
       this.getPersonalTools();
@@ -1154,13 +1161,6 @@ export default {
             this.$Notice.error({ desc: "There is no existing tool" });
           } else {
             this.$set(this, "publicTools", res.data);
-            var that = this;
-            var timer = window.setInterval(function(){
-              if(!that.publicTools.length<1&&(!that.personalTools.length<1||!that.userInfo.userState)){
-                that.filterShowListByType();
-                window.clearInterval(timer);
-              }
-            },10);
           }
         })
         .catch(err => {

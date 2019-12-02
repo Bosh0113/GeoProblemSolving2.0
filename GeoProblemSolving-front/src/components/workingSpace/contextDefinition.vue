@@ -254,64 +254,20 @@
         <Tabs>
           <TabPane label="Context definition" name="Context" icon="md-home">
             <template>
-              <Row style="margin-top:10px">
+              <Row style="margin-top:10px;display: flex;">
                 <!--contextdefinition -->
                 <!-- <div  style=""> -->
                 <template>
-                  <Row style="margin:0 1%">
-                    <Col span="2">
-                      <!-- <div class="tools"> -->
-                      <Card :style="{height:sidebarHeight - 10 + 'px'}">
-                        <h4 align="center">Toolbox</h4>
-                        <!-- toolbox -->
-                        <div class="tool-panel">
-                          <!-- map -->
-                          <div class="singl_tool_style">
-                            <Icon
-                              type="md-globe"
-                              size="40"
-                              @click.native="toolPanel('map')"
-                              title="Map"
-                              color="#808695"
-                            />
-                          </div>
-                          <!-- draw -->
-                          <div class="singl_tool_style">
-                            <Icon
-                              type="ios-brush"
-                              size="40"
-                              @click.native="toolPanel('draw')"
-                              title="Draw Board"
-                              color="#808695"
-                            />
-                          </div>
-                          <!-- mindMapping -->
-                          <div class="singl_tool_style">
-                            <Icon
-                              type="md-bulb"
-                              size="40"
-                              @click.native="toolPanel('mindMapping')"
-                              title="Mind Mapping"
-                              color="#808695"
-                            />
-                          </div>
-                          <!-- chat -->
-                          <div class="singl_tool_style">
-                            <Icon
-                              type="ios-chatboxes"
-                              size="40"
-                              @click.native="toolPanel('chat')"
-                              title="Chatroom"
-                              color="#808695"
-                            />
-                          </div>
-                        </div>
+                      <Card
+                        :style="{height:contentHeight+'px'}"
+                        style="margin:0 15px 0 5px;width:400px;float:left"
+                      >
+                      <tool-container :stepInfo="stepContent" :contentHeight="contentHeight" :userRole="userRole"></tool-container>
                       </Card>
-                      <!-- </div> -->
-                    </Col>
-                    <Col span="22">
+                  <!-- <Row style="margin:0 1%">
+                    <Col span="24"> -->
                       <!-- <div class="condef"> -->
-                      <Card :style="{height:sidebarHeight - 10 + 'px'}">
+                      <Card :style="{height:sidebarHeight - 10 + 'px'}" style="float:left;flex: 1;margin-right:5px">
                         <div class="condefTitle">
                           <div
                             style="width:3px;height:18px;float:left;background-color:rgb(124, 126, 126)"
@@ -390,8 +346,8 @@
                         </vue-scroll>
                       </Card>
                       <!-- </div> -->
-                    </Col>
-                  </Row>
+                    <!-- </Col>
+                  </Row> -->
                 </template>
                 <!-- </div> -->
               </Row>
@@ -586,12 +542,14 @@ import Avatar from "vue-avatar";
 import echarts from "echarts";
 import folderTree from "../resources/folderTree";
 import onlineParticipant from "./utils/onlineParticipants";
+import toolContainer from "./utils/toolContainer";
 export default {
   components: {
     VueFlowy,
     Avatar,
     folderTree,
-    onlineParticipant
+    onlineParticipant,
+    toolContainer
   },
 
   data() {
@@ -822,7 +780,8 @@ export default {
         description: ""
       },
       // 用户角色
-      userRole: "Visitor"
+      userRole: "Visitor",      
+      contentHeight: 800,
     };
   },
 
@@ -855,15 +814,21 @@ export default {
   },
   methods: {
     initSize() {
-      this.sidebarHeight = window.innerHeight - 290;
+      if (window.innerHeight > 675) {
+        this.sidebarHeight = window.innerHeight - 290;
+        this.contentHeight = window.innerHeight - 298;
+      } else {
+        this.sidebarHeight = 675 - 290;
+        this.contentHeight = 675 - 298;
+      }
     },
 
     init() {
       this.initSize();
+      this.getContextDefinition();
       this.getSubprojectInfo();
       this.getProjectInfo();
       this.userRoleIdentity();
-      this.getContextDefinition();
       this.getAllResource();
     },
 
@@ -912,28 +877,31 @@ export default {
 
     getContextDefinition() {
       this.axios
-        .get(
+        $.ajax({
+          url:
           "/GeoProblemSolving/step/inquiry/" +
             "?key=stepId" +
             "&value=" +
-            this.stepId
-        )
-        .then(res => {
-          if (res.data != "Fail") {
-            this.stepContent = res.data[0];
-            this.stepForm.name = res.data[0].name;
-            this.toSubProjectPage = "/project/" + res.data[0].subProjectId + "/subproject";
-            this.stepForm.description = res.data[0].description;
+            this.stepId,
+            type: "GET",
+            async: false,
+          success: data => {
+            if (data != "Fail") {
+              this.stepContent = data[0];
+              this.stepForm.name = data[0].name;
+              this.toSubProjectPage = "/project/" + data[0].subProjectId + "/subproject";
+              this.stepForm.description = data[0].description;
 
-            if (JSON.stringify(res.data[0].content) != "{}") {
-              this.contextForm = res.data[0].content;
+              if (JSON.stringify(data[0].content) != "{}") {
+                this.contextForm = data[0].content;
+              } else {
+                this.contextForm = this.defaultContent;
+              }
             } else {
-              this.contextForm = this.defaultContent;
+              this.$Notice.info({
+                desc: "Get the description failed!"
+              });
             }
-          } else {
-            this.$Notice.info({
-              desc: "Get the description failed!"
-            });
           }
         });
     },
@@ -1244,7 +1212,7 @@ export default {
             "/GeoProblemSolving/subProject/inquiry" +
             "?key=subProjectId" +
             "&value=" +
-            subProjectId,
+            this.stepContent.subProjectId,
           type: "GET",
           async: false,
           success: data => {

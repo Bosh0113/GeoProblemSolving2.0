@@ -386,6 +386,14 @@ export default {
       this.getPersonalTools();
       this.getStepToolsets();
       this.getStepTools();
+      var that = this;
+      var timer = window.setInterval(function(){
+        if(!that.publicTools.length<1&&!that.personalTools.length<1){
+          that.filterDuplicateTools();
+          that.filterShowListByType();
+          window.clearInterval(timer);
+        }
+      },10);
     },
     stepToolModalShow(){
       this.getAllListInfo();
@@ -588,14 +596,6 @@ export default {
                   }
                 }
                 this.$set(this, "stepToolsShow", sortTools);
-                var that = this;
-                var timer = window.setInterval(function(){
-                  if(!that.publicTools.length<1&&!that.personalTools.length<1){
-                    that.filterDuplicateTools();
-                    that.filterShowListByType();
-                    window.clearInterval(timer);
-                  }
-                },10);
               }
             }
           })

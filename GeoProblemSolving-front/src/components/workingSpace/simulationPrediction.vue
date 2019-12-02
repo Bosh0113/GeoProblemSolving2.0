@@ -269,7 +269,6 @@ export default {
     userRoleIdentity() {
       this.userRole = "Visitor";
       let creatorId = sessionStorage.getItem("subProjectManagerId");
-      console.log(creatorId);
       if (this.$store.getters.userState) {
         // 是否是子项目管理员
         if (creatorId === this.$store.getters.userId) {

@@ -34,25 +34,25 @@
       <vue-scroll :ops="ops">
         <Row>
           <Col span="8" v-for="toolset in toolsetList" :key="toolset.index" style="margin-top:15px">
-            <Card style="background-color: #3f51b530;margin: 0 5px 10px 5px">
-              <div style="text-align:center">
-                <Tooltip placement="bottom" max-width="600">
-                  <img :src="toolset.toolsetImg" v-if="toolset.toolsetImg!=''" style="height:100%;max-height:50px;">
-                  <avatar
-                  :username="toolset.toolsetName"
-                  :size="50"
-                  style="margin-bottom:6px"
-                  v-else
-                ></avatar>
-                <div slot="content">
-                  <span>{{toolset.description}}</span>
-                  <br v-if="toolset.categoryTag.length>0"/>
-                  <p><i>{{toolset.categoryTag.join(',')}}</i></p>
+              <Card style="background-color: #3f51b530;cursor: pointer;margin: 0 5px 10px 5px">
+                <div style="text-align:center" @click="showTools(toolset)">
+                  <Tooltip placement="bottom" max-width="600">
+                    <img :src="toolset.toolsetImg" v-if="toolset.toolsetImg!=''" style="height:100%;max-height:50px;">
+                    <avatar
+                    :username="toolset.toolsetName"
+                    :size="50"
+                    style="margin-bottom:6px"
+                    v-else
+                  ></avatar>
+                  <div slot="content">
+                    <span>{{toolset.description}}</span>
+                    <br v-if="toolset.categoryTag.length>0"/>
+                    <p><i>{{toolset.categoryTag.join(',')}}</i></p>
+                  </div>
+                  </Tooltip>
+                  <h4 :title="toolset.toolsetName" style="width:75px;" class="ellipsis">{{toolset.toolsetName}}</h4>
                 </div>
-                </Tooltip>
-                <h4 :title="toolset.toolsetName" style="width:75px;" class="ellipsis">{{toolset.toolsetName}}</h4>
-              </div>
-            </Card>
+              </Card>
           </Col>
           <Col span="8" v-for="tool in toolList" :key="tool.index"  style="margin-top:15px">
             <Card style="background-color: ghostwhite;margin: 0 5px 10px 5px">
@@ -78,6 +78,47 @@
         </Row>
       </vue-scroll>
     </div>
+    <Modal 
+    v-model="showToolsetToolsModal" 
+    width="432"
+    title="Tools in the toolset"
+    :closable="false">
+      <div style="height:350px" v-if="toolsetToolList.length>0">
+        <vue-scroll :ops="ops">
+        <Row>
+          <Col span="8" v-for="tool in toolsetToolList" :key="tool.index"  style="margin-top:15px">
+              <Card style="background-color: ghostwhite;margin: 0 5px 10px 5px">
+                <div style="text-align:center;cursor: pointer;" @click="useTool(tool)">
+                  <Tooltip placement="bottom" max-width="600">
+                    <img :src="tool.toolImg" v-if="tool.toolImg!=''" style="height:100%;max-height:50px;">
+                    <avatar
+                    :username="tool.toolName"
+                    :size="50"
+                    style="margin-bottom:6px"
+                    v-else
+                  ></avatar>
+                  <div slot="content">
+                    <span>{{tool.description}}</span>
+                    <br v-if="tool.categoryTag.length>0"/>
+                    <span><i>{{tool.categoryTag.join(',')}}</i></span>
+                  </div>
+                  </Tooltip>
+                  <h4 :title="tool.toolName" style="display:block;width:90px;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;">{{tool.toolName}}</h4>
+                </div>
+              </Card>
+            </Col>
+        </Row>
+        </vue-scroll>
+      </div>
+      <div style="height:200px" v-else>
+          <div style="text-align: center;height:200px;position: relative;">
+          <div style="position: absolute;top: 0;bottom: 0;left: 0;right: 0;margin: auto;height: fit-content;">
+            <h1>No tools in this toolset.</h1>
+          </div>
+        </div>
+      </div>
+      <div slot="footer"></div>
+    </Modal>
   </div>
 </template>
 <script>
@@ -99,7 +140,9 @@ export default {
       userInfo: this.$store.getters.userInfo,
       toolList: [],
       toolsetList: [],
-      toolModal:0
+      toolModal:0,
+      toolsetToolList:[],
+      showToolsetToolsModal:false
     };
   },
   mounted() {
@@ -195,6 +238,10 @@ export default {
       this.stepInfo.toolsetList = toolsets;
       this.toolModal++;
       this.getAllTools(tools,toolsets);
+    },
+    showTools(toolsetInfo){
+      this.toolsetToolList = toolsetInfo.toolList;
+      this.showToolsetToolsModal = true;
     },
     useTool(toolInfo){
       let toolURL = '<iframe src="' + toolInfo.toolUrl +"?userName="+ this.userInfo.userName+"&userID="+this.userInfo.userId+"&groupID="+this.stepInfo.stepId + '" style="width: 100%;height:100%;"></iframe>';
