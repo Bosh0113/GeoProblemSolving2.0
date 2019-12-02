@@ -120,7 +120,7 @@
 .onlineListBtn {
   position: absolute;
   top: 70%;
-  right: 15%;
+  right: 10%;
   /* width: 100px */
 }
 
@@ -159,22 +159,16 @@
               <BreadcrumbItem style="color: white">Data processing</BreadcrumbItem>
             </Breadcrumb>
           </div>
-
           <div class="stepName">
             <strong>{{stepContent.name}}</strong>
             <p :title="stepContent.description">{{stepContent.description}}</p>
           </div>
-
           <div class="onlineListBtn">
             <Button @click="drawerValue = true" type="default" ghost>Participants</Button>
             <template v-if="userRole == 'Manager'">
-              <Button
-                @click="modifyStep = true"
-                style="margin-left:20px"
-                type="info"
-                ghost
-              >Modify Step</Button>
+              <Button @click="modifyStep = true" style="margin-left:20px" ghost>Modify Step</Button>
             </template>
+            <step-change></step-change>
           </div>
         </Row>
         <Drawer title="Participants" :closable="false" v-model="drawerValue">
@@ -229,13 +223,22 @@
           :style="{height:contentHeight+'px', width:mapWidth+'px'}"
           style="margin:0 5px;float:left"
         >
-          <map-canvas :stepInfo="stepContent" :contentHeight="contentHeight" :mapWidth="mapWidth" :userRole="userRole"></map-canvas>          
+          <map-canvas
+            :stepInfo="stepContent"
+            :contentHeight="contentHeight"
+            :mapWidth="mapWidth"
+            :userRole="userRole"
+          ></map-canvas>
         </Card>
         <Card
           :style="{height:contentHeight+'px'}"
           style="margin:0 10px 0 5px; width:400px;float:left;margin-right: calc(100% - 100vw)"
         >
-          <tool-container :stepInfo="stepContent" :contentHeight="contentHeight" :userRole="userRole"></tool-container>
+          <tool-container
+            :stepInfo="stepContent"
+            :contentHeight="contentHeight"
+            :userRole="userRole"
+          ></tool-container>
         </Card>
       </template>
     </div>
@@ -248,13 +251,15 @@ import onlineParticipant from "./utils/onlineParticipants";
 import mapCanvas from "./utils/mapCanvas";
 import dataList from "./utils/dataList";
 import toolContainer from "./utils/toolContainer";
+import stepChange from "./utils/stepChange"
 
 export default {
   components: {
     onlineParticipant,
     mapCanvas,
     dataList,
-    toolContainer
+    toolContainer,
+    stepChange
   },
   data() {
     return {
@@ -346,8 +351,7 @@ export default {
               this.$set(this, "subProjectInfo", subProjectInfo);
 
               this.$store.commit("setSubProjectInfo", subProjectInfo);
-            }
-            else{
+            } else {
               console.log(data);
             }
           },
@@ -414,7 +418,10 @@ export default {
       }
     },
     getDataProcessing() {
-      if (this.stepContent.stepId == "" || this.stepContent.stepId == undefined) {
+      if (
+        this.stepContent.stepId == "" ||
+        this.stepContent.stepId == undefined
+      ) {
         $.ajax({
           url:
             "/GeoProblemSolving/step/inquiry/" +
@@ -474,7 +481,7 @@ export default {
     },
     cancelModifyStep() {
       this.modifyStep = false;
-    }    
+    }
   }
 };
 </script>

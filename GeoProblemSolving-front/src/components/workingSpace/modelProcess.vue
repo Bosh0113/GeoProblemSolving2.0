@@ -135,7 +135,7 @@
 .onlineListBtn {
   position: absolute;
   top: 70%;
-  right: 15%;
+  right: 10%;
   /* width: 100px */
 }
 
@@ -182,10 +182,10 @@
               <Button
                 @click="modifyStep = true"
                 style="margin-left:20px"
-                type="info"
                 ghost
               >Modify Step</Button>
             </template>
+            <step-change></step-change>
           </div>
         </Row>
         <Drawer title="Participants" :closable="false" v-model="drawerValue">
