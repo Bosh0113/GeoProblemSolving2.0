@@ -409,13 +409,6 @@ body {
                                     type="text"
                                   >
                                   </Button>
-                                  <!-- <Button type="warning" size="small" style="margin-right: 10px">
-                                    <Icon
-                                      type="md-share"
-                                      @click="processResourceModalShow(index)"
-                                      title="share"
-                                    />
-                                  </Button> -->
                                   <Button
                                     @click="fileEditModalShow(index)"
                                     shape="circle"
@@ -584,48 +577,6 @@ body {
     >
       <p>Once you exit the project, you will not be able to participate in the collaborative process, confirm the exit?</p>
     </Modal>
-    <Modal
-      v-model="processResourceModal"
-      title="share resource in other projects"
-      @on-ok="processResource()"
-      @on-cancel
-      ok-text="Confirm"
-      cancel-text="Cancel"
-    >
-      <!-- todo:这里需要过滤参与的项目以及管理的项目重新渲染 -->
-      <div>
-        <h3>Participatory Projects</h3>
-        <!-- 多选框 -->
-        <RadioGroup v-model="selectShareProject">
-          <span
-            @click="selectPID(item.projectId, item.title)"
-            v-for="(item,index) in joinedProjectIndexList"
-            v-bind:key="index"
-          >
-            <Radio :key="item.index" :label="item.title"></Radio>
-          </span>
-        </RadioGroup>
-        <!-- <div v-for="(item,index)in joinedProjectIndexList" :key="item.index">{{item.title}}</div> -->
-      </div>
-      <div>
-        <h3>Management Projects</h3>
-        <RadioGroup v-model="selectShareProject">
-          <span
-            @click="selectPID(item.projectId, item.title)"
-            v-for="(item,index) in userManagerProjectList"
-            v-bind:key="index"
-          >
-            <Radio :key="item.index" :label="item.title"></Radio>
-          </span>
-        </RadioGroup>
-      </div>
-      <div style="margin-top:5px">
-        <Icon type="ios-information-circle-outline" color="lightblue"/>
-        <span>the resource will be shared in the project you choosed.</span>
-      </div>
-    </Modal>
-    <!-- 删除资源的模态框 -->
-    <!-- deleteResourceModal -->
     <Modal
       v-model="deleteResourceModal"
       @on-ok="deleteResource"
@@ -920,7 +871,6 @@ export default {
       // 退出项目的modal
       quitModal: false,
       // 处理资源的模态框激活
-      processResourceModal: false,
       // 选中资源的索引
       selectResourceIndex: 0,
       // 选中的将要分享资源的项目名
@@ -1379,46 +1329,6 @@ export default {
           });
       }
     },
-    // 处理个人的资源可以选择copy到参与的项目，也可以选择copy到管理的项目
-    processResource() {
-      let resourceInfo = {};
-      this.joinedProjectIndexList = this.$store.getters.userInfo[
-        "joinedProjects"
-      ];
-      resourceInfo = this.userResourceList[this.selectResourceIndex];
-      let shareForm = new FormData();
-      shareForm.append("name", resourceInfo.name);
-      shareForm.append("description", resourceInfo.description);
-      shareForm.append("belong", this.selectShareProject);
-      shareForm.append("type", resourceInfo.type);
-      shareForm.append("fileSize", resourceInfo.fileSize);
-      shareForm.append("pathURL", resourceInfo.pathURL);
-      shareForm.append("uploaderId", resourceInfo.uploaderId);
-      // 还有一个获取到选中的项目的id
-      let scopeObject = {
-        projectId: this.selectShareProjectId,
-        subProjectId: "",
-        moduleId: ""
-      };
-      shareForm.append("scope", JSON.stringify(scopeObject));
-      if (scopeObject.projectId != "") {
-        this.axios
-          .post("/GeoProblemSolving/resource/share", shareForm)
-          .then(res => {
-            if (res.data != "Fail") {
-              this.$Notice.open({
-                title: "Upload notification title",
-                desc:
-                  "File shared to " + this.selectShareProject + " successfully."
-              });
-              // 保存记录
-              this.addUploadEvent(this.selectShareProjectId);
-            }
-          })
-          .catch(err => {});
-      }
-      // uploaderId
-    },
     addUploadEvent(scopeId) {
       let form = {};
       let description =
@@ -1440,10 +1350,6 @@ export default {
         .catch(err => {
           console.log(err.data);
         });
-    },
-    processResourceModalShow(index) {
-      this.processResourceModal = true;
-      this.selectResourceIndex = index;
     },
     selectPID(id, name) {
       this.selectShareProjectId = id;

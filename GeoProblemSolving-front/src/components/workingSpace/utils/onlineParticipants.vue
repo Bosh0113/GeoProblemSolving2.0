@@ -465,8 +465,6 @@
         },
         // 原有的变量字段
         projectId: "",
-        // subProjectId: "",
-        moduleId: "",
         participants: [],
         groups: [],
         message: "",
@@ -474,17 +472,13 @@
         other_msglist: [],
         notice_msglist: [],
         msglist: [],
-
-
-
         send_msg: [],
         query_date: "",
         thisUserName: this.$store.getters.userName,
         thisUserId: this.$store.getters.userId,
         panelHeight: "",
         panelWidth: "",
-        messageListPanelHeight: "",
-       
+        messageListPanelHeight: "",       
         onlineParticipants: [],
         onlineP: [],
         offlineParticipants: [],

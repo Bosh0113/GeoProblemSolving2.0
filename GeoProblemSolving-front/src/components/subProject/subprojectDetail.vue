@@ -638,7 +638,7 @@ export default {
               .catch(err => {
                 console.log(err.data);
               });
-            let projectId = sessionStorage.getItem("projectId");
+            let projectId = this.projectInfo.projectId;
             this.$router.push({
               name: "ProjectDetail",
               params: { id: projectId }
@@ -696,7 +696,7 @@ export default {
             this.$store.commit("setSubProjectInfo", this.subProjectInfo);
             this.$Message.info("Remove member successfully");
             //notice
-            let projectName = sessionStorage.getItem("projectName");
+            let projectName = this.projectInfo.title;
             let removeNotice = {};
             removeNotice["recipientId"] = uid;
             removeNotice["type"] = "notice";

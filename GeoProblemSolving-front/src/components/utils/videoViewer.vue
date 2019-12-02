@@ -53,6 +53,8 @@ export default {
       videoUrl: "",
       activeItem:0,
       resourceDrawer:false,
+      pageParams: { pageId: "", userId: "", userName: "" },
+      userInfo: {},
     };
   },
   beforeRouteEnter: (to, from, next) => {
@@ -67,6 +69,8 @@ export default {
   mounted() {
     window.addEventListener("resize", this.initSize);
     this.initSize();
+      this.getStepInfo();
+      this.getUserInfo();
     this.getVideoResource();
   },
   beforeDestroy: function() {
@@ -83,45 +87,92 @@ export default {
       this.videoWidth = window.innerWidth - 80 - 60;
       this.videoHeight = window.innerHeight - 80;
     },
-    getVideoResource() {
-      this.videoList = [];
-      let resources = JSON.parse(sessionStorage.getItem("resources"));
-      if (resources != null && resources != undefined && resources.length > 0) {
-        for (let i = 0; i < resources.length; i++) {
-          if (resources[i].type == "video") {
-            this.videoList.push(resources[i]);
+    getStepInfo() {
+      if (
+        this.$route.params.groupID == undefined ||
+        this.$route.params.groupID == ""
+      ) {
+        var href = window.location.href;
+        var url = href.split("&");
+
+        for (var i = 0; i < url.length; i++) {
+          if (/groupID/.test(url[i])) {
+            this.pageParams.pageId = url[i].match(/groupID=(\S*)/)[1];
+            continue;
+          }
+
+          if (/userID/.test(url[i])) {
+            this.pageParams.userId = url[i].match(/userID=(\S*)/)[1];
+            continue;
+          }
+
+          if (/userName/.test(url[i])) {
+            this.pageParams.userName = url[i].match(/userName=(\S*)/)[1];
+            continue;
           }
         }
       } else {
-        var that = this;
+        this.pageParams.pageId = this.$route.params.groupID;
+        this.pageParams.userId = this.$route.params.userID;
+        this.pageParams.userName = this.$route.params.userName;
+      }
+    },
+    getUserInfo() {
+      this.userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
+      if (this.userInfo == {}) {
         this.axios
           .get(
-            "/GeoProblemSolving/resource/inquiry" +
-              "?key=scope.moduleId" +
+            "/GeoProblemSolving/user/inquiry" +
+              "?key=" +
+              "userId" +
               "&value=" +
-              sessionStorage.getItem("moduleId")
+              this.pageParams.userId
+          )
+          .then(res => {
+            if (res.data != "Fail" && res.data != "None") {
+              this.$set(this, "userInfo", res.data);
+            }
+          })
+          .catch(err => {});
+      }
+    },
+    getVideoResource() {
+      if (this.pageParams.pageId == undefined || this.pageParams.pageId == "") {
+        this.$Message.error("Lose the information of current step.");
+        return false;
+      }
+
+      this.videoList = [];      
+        this.axios
+          .get(
+           "/GeoProblemSolving/folder/inquiry?folderId=" +
+            this.pageParams.pageId
           )
           .then(res => {
             // 写渲染函数，取到所有资源
             if (res.data !== "None") {              
               for (let i = 0; i < res.data.length; i++) {
                 if (res.data[i].type == "video") {
-                  that.videoList.push(res.data[i]);
+                  this.videoList.push(res.data[i]);
                 }
               }
             } else {
-              that.videoList = [];
+              this.videoList = [];
             }
           })
           .catch(err => {
             console.log(err.data);
-          });
-      }      
+          }); 
     },
     selectVideo(url) {
       this.videoUrl = url;
     },
     handleUpload(file) {
+      if (this.pageParams.pageId == undefined || this.pageParams.pageId == "") {
+        this.$Message.error("Lose the information of current step.");
+        return false;
+      }
+
       if (!/\.(mp4)$/.test(file.name.toLowerCase())) {
         this.$Message.error("上传格式不正确，请上传xls或者xlsx格式");
         return false;
@@ -129,37 +180,29 @@ export default {
 
       //上传数据
       let formData = new FormData();
-      let userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
       formData.append("file", file);
       formData.append("description", "video viewer tool");
       formData.append("type", "video");
-      formData.append("uploaderId", userInfo.userId);
-      formData.append("belong", userInfo.userName);
-      let scopeObject = {
-        projectId: "",
-        subProjectId: "",
-        moduleId: sessionStorage.getItem("moduleId")
-      };
-      formData.append("scope", JSON.stringify(scopeObject));
+      formData.append("uploaderId", this.userInfo.userId);
       formData.append("privacy", "private");
-      let that = this;
+      formData.append("folderId", this.pageParams.pageId);
       this.axios
-        .post("/GeoProblemSolving/resource/upload", formData)
+        .post("/GeoProblemSolving/folder/uploadToFolder", formData)
         .then(res => {
           if(res.data == "Size over"||res.data == "Fail"||res.data == "Offline"){
             console.log(res.data);
           }
           else if (res.data.length > 0) {
             let videoName = res.data[0].fileName;
-            that.videoUrl = "/GeoProblemSolving/resource/upload/" + videoName;
+            this.videoUrl = "/GeoProblemSolving/resource/upload/" + videoName;
 
             let videoItem = {
               name: file.name,
               description: "video viewer tool",
               pathURL: "/GeoProblemSolving/resource/upload/" + videoName
             };
-            that.videoList.push(videoItem);
-            that.activeItem = that.videoList.length - 1;
+            this.videoList.push(videoItem);
+            this.activeItem = this.videoList.length - 1;
           }
         })
         .catch(err => {});

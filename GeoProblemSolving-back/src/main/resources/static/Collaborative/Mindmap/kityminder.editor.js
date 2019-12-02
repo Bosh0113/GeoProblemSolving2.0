@@ -1,6 +1,6 @@
 /*!
  * ====================================================
- * kityminder-editor - v1.0.67 - 2019-11-22
+ * kityminder-editor - v1.0.67 - 2019-11-26
  * https://github.com/fex-team/kityminder-editor
  * GitHub: https://github.com/fex-team/kityminder-editor 
  * Copyright (c) 2019 ; Licensed 
@@ -2090,7 +2090,7 @@ angular.module('kityminderEditor').run(['$templateCache', function($templateCach
 
 
   $templateCache.put('ui/directive/collabPanel/collabPanel.html',
-    "<div style=\"float: right; max-width: 800px\"><span class=\"glyphicon glyphicon-link\" aria-hidden=\"true\" title=\"Click it and start collaboration\" ng-show=\"!collaboration\" style=\"margin-left: 10px;cursor:pointer;margin-right: 30px\" ng-click=\"startCollab()\"></span> <span class=\"glyphicon glyphicon-globe\" aria-hidden=\"true\" title=\"Click it and stop collaboration\" ng-show=\"collaboration\" style=\"margin-left: 10px;cursor:pointer;margin-right: 30px\" ng-click=\"stopCollab()\"></span> <span class=\"glyphicon glyphicon-pencil\" aria-hidden=\"true\" title=\"Apply to draw the mind map\" ng-show=\"!draw\" style=\"cursor:pointer;margin-right: 20px\" ng-click=\"applyCtrl()\"></span> <span class=\"glyphicon glyphicon-refresh\" id=\"giveup-ctrl\" aria-hidden=\"true\" title=\"Give up to draw the mind map\" ng-show=\"draw\" style=\"cursor:pointer;margin-right: 20px\" ng-click=\"giveupCtrl()\"></span> <span class=\"glyphicon glyphicon-user\" aria-hidden=\"true\" title=\"{{drawer}} is drawing the mind map\" style=\"margin-right: 10px\" ng-show=\"draw\"></span> <span ng-show=\"draw\" style=\"margin-right: 20px;margin-left: 10px\">{{leftApply}} people waiting for drawing.</span> <span class=\"glyphicon glyphicon-user\" aria-hidden=\"true\" ng-repeat=\"user in participants\" title=\"{{user}}\" style=\"margin-right: 15px\"></span></div>"
+    "<div style=\"float: right\"><span class=\"glyphicon glyphicon-link\" aria-hidden=\"true\" title=\"Click it and start collaboration\" ng-show=\"!collaboration\" style=\"margin-left: 10px;cursor:pointer;margin-right: 30px\" ng-click=\"startCollab()\"></span> <span class=\"glyphicon glyphicon-globe\" aria-hidden=\"true\" title=\"Click it and stop collaboration\" ng-show=\"collaboration\" style=\"margin-left: 10px;cursor:pointer;margin-right: 30px\" ng-click=\"stopCollab()\"></span> <span class=\"glyphicon glyphicon-pencil\" aria-hidden=\"true\" title=\"Apply to draw the mind map\" ng-show=\"!draw\" style=\"cursor:pointer;margin-right: 20px\" ng-click=\"applyCtrl()\"></span> <span class=\"glyphicon glyphicon-refresh\" id=\"giveup-ctrl\" aria-hidden=\"true\" title=\"Give up to draw the mind map\" ng-show=\"draw\" style=\"cursor:pointer;margin-right: 20px\" ng-click=\"giveupCtrl()\"></span> <span class=\"glyphicon glyphicon-user\" aria-hidden=\"true\" title=\"{{drawer}} is drawing the mind map\" style=\"margin-right: 10px\" ng-show=\"draw\"></span> <span ng-show=\"draw\" style=\"margin-right: 10px;margin-left: 10px\">{{leftApply}} people waiting for drawing.</span> <span data-toggle=\"modal\" data-target=\"#onlineUsers\" style=\"max-width: 500px; overflow: hidden; cursor: pointer\"><span class=\"glyphicon glyphicon-user\" aria-hidden=\"true\" ng-repeat=\"user in participants\" title=\"{{user.name}}\" style=\"margin-left: 15px;margin-right: 5px\"></span>...</span><div class=\"modal fade\" id=\"onlineUsers\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"myModalLabel\" aria-hidden=\"true\" style=\"color: black\"><div class=\"modal-dialog\"><div class=\"modal-content\"><div class=\"modal-header\"><button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button><h4 class=\"modal-title\" id=\"myModalLabel\">Online participants</h4></div><div class=\"modal-body\"><div style=\"min-height: 100px\"><div style=\"float:left; cursor: pointer\" id=\"collaPanel\" ng-repeat=\"user in participants\" ng-click=\"gotoUserspace(user.id)\"><span class=\"glyphicon glyphicon-user\" style=\"margin-right: 5px\"></span><span>{{user.name}}</span></div></div></div><div class=\"modal-footer\"><button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Close</button></div></div></div></div></div>"
   );
 
 
@@ -2110,7 +2110,7 @@ angular.module('kityminderEditor').run(['$templateCache', function($templateCach
 
 
   $templateCache.put('ui/directive/fileSave/fileSave.html',
-    "<div class=\"btn-group-vertical\" dropdown is-open=\"isopen\"><button type=\"button\" class=\"btn btn-default save\" title=\"{{ 'save' | lang:'ui' }}\" ng-class=\"{'active': isopen}\" data-toggle=\"modal\" data-target=\"#saveModal\"></button> <button type=\"button\" class=\"btn btn-default save-caption dropdown-toggle\" title=\"{{ 'save' | lang:'ui' }}\" data-toggle=\"modal\" data-target=\"#saveModal\"><span class=\"caption\">{{ 'save' | lang:'ui' }}</span> <span class=\"sr-only\">{{ 'save' | lang:'ui' }}</span></button><div class=\"modal fade\" id=\"saveModal\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"myModalLabel\" aria-hidden=\"true\"><div class=\"modal-dialog\"><div class=\"modal-content\"><div class=\"modal-header\"><button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button><h4 class=\"modal-title\" id=\"myModalLabel\">Save mind map</h4></div><div class=\"modal-body\"><div><span style=\"font-size: 16px; margin-right: 20px\">Save the current mind map as format:</span><select class=\"form-control\" style=\"width:100px; display: initial\" id=\"datatypeSelect\"><option>json</option><option>md</option><option>km</option><option>png</option></select></div><div class=\"input-group\" style=\"margin-top: 20px\"><span class=\"input-group-addon\">File name:</span> <input type=\"text\" class=\"form-control\" id=\"mindmapName\" placeholder=\"Please fill in the name\"></div><div style=\"margin-top: 20px\"><button type=\"button\" class=\"btn btn-info\" id=\"saveBtn\" ng-click=\"saveMapFun()\">Save to resource center</button> <button style=\"float: right\" type=\"button\" id=\"downloadBtn\" ng-click=\"downloadMapFun()\" class=\"btn btn-info\">Download</button></div></div><div class=\"modal-footer\"><button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Close</button></div></div></div></div></div>"
+    "<div class=\"btn-group-vertical\" dropdown is-open=\"isopen\"><button type=\"button\" class=\"btn btn-default save\" title=\"{{ 'save' | lang:'ui' }}\" ng-class=\"{'active': isopen}\"></button> <button type=\"button\" class=\"btn btn-default save-caption dropdown-toggle\" title=\"{{ 'save' | lang:'ui' }}\" dropdown-toggle><span class=\"caption\">{{ 'save' | lang:'ui' }}</span> <span class=\"caret\"></span> <span class=\"sr-only\">{{ 'save' | lang:'ui' }}</span></button><ul class=\"dropdown-menu\" role=\"menu\"><li data-toggle=\"modal\" data-target=\"#saveModal\"><a href>Save</a></li><li data-toggle=\"modal\" data-target=\"#saveasModal\"><a href>Save as</a></li></ul><div class=\"modal fade\" id=\"saveModal\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"myModalLabel\" aria-hidden=\"true\"><div class=\"modal-dialog\"><div class=\"modal-content\"><div class=\"modal-header\"><button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button><h4 class=\"modal-title\" id=\"myModalLabel\">Save mind map</h4></div><div class=\"modal-body\"><div style=\"margin: 10px 0\"><button type=\"button\" class=\"btn btn-info\" id=\"saveBtn\" ng-click=\"saveMapFun()\">Save to resource center</button> <button style=\"margin-left: 20px\" type=\"button\" id=\"downloadBtn\" ng-click=\"downloadMapFun()\" class=\"btn btn-info\">Download</button></div></div><div class=\"modal-footer\"><button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Close</button></div></div></div></div><div class=\"modal fade\" id=\"saveasModal\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"myModalLabel\" aria-hidden=\"true\"><div class=\"modal-dialog\"><div class=\"modal-content\"><div class=\"modal-header\"><button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button><h4 class=\"modal-title\" id=\"myModalLabel\">Save mind map</h4></div><div class=\"modal-body\"><div><span style=\"font-size: 16px; margin-right: 20px\">Save the current mind map as format:</span><select class=\"form-control\" style=\"width:100px; display: initial\" id=\"datatypeSelect\"><option>json</option><option>md</option><option>km</option><option>png</option></select></div><div class=\"input-group\" style=\"margin-top: 20px\"><span class=\"input-group-addon\">File name:</span> <input type=\"text\" class=\"form-control\" id=\"mindmapName\" placeholder=\"Please fill in the name\"></div><div style=\"margin-top: 20px\"><button type=\"button\" class=\"btn btn-info\" id=\"saveBtn\" ng-click=\"saveasMapFun()\">Save to resource center</button> <button style=\"float: right\" type=\"button\" id=\"downloadBtn\" ng-click=\"downloadMapFun()\" class=\"btn btn-info\">Download</button></div></div><div class=\"modal-footer\"><button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Close</button></div></div></div></div></div>"
   );
 
 
@@ -3374,6 +3374,7 @@ angular.module('kityminderEditor')
                 scope.giveupCtrl = giveupCtrl;
                 scope.startCollab = startCollab;
                 scope.stopCollab = stopCollab;
+                scope.gotoUserspace = gotoUserspace;
 
                 function applyCtrl() {
                     if (Messages.isConnection() && scope.collaboration) {
@@ -3403,7 +3404,7 @@ angular.module('kityminderEditor')
                                             document.getElementById("giveup-ctrl").style.cursor = "not-allowed";
                                         }
 
-                                        scope.participants = data.userList.replace("[", "").replace("]", "").replace(/\s/g, '').split(",");
+                                        scope.participants = JSON.parse(data.userList);
 
                                         try {
                                             var requireList = JSON.parse(data.requireList);
@@ -3428,7 +3429,7 @@ angular.module('kityminderEditor')
                                             document.getElementById("giveup-ctrl").style.cursor = "not-allowed";
                                         }
 
-                                        scope.participants = data.userList.replace("[", "").replace("]", "").replace(/\s/g, '').split(",");
+                                        scope.participants = JSON.parse(data.userList);
 
                                         try {
                                             var requireList = JSON.parse(data.requireList);
@@ -3471,12 +3472,12 @@ angular.module('kityminderEditor')
 
                                         scope.drawer = JSON.parse(data.controller).userName;
                                         drawerId = JSON.parse(data.controller).userId;
-                                        scope.participants = data.userList.replace("[", "").replace("]", "").replace(/\s/g, '').split(",");
+                                        scope.participants = JSON.parse(data.userList);
 
                                     } else if (data.messageType == "Left") {
                                         scope.drawer = JSON.parse(data.controller).userName;
                                         drawerId = JSON.parse(data.controller).userId;
-                                        scope.participants = data.userList.replace("[", "").replace("]", "").replace(/\s/g, '').split(",");
+                                        scope.participants = JSON.parse(data.userList);
 
                                         try {
                                             var requireList = JSON.parse(data.requireList);
@@ -3517,7 +3518,7 @@ angular.module('kityminderEditor')
                                 if (data.messageType == "Join") {
                                     scope.drawer = JSON.parse(data.controller).userName;
                                     drawerId = JSON.parse(data.controller).userId;
-                                    scope.participants = data.userList.replace("[", "").replace("]", "").replace(/\s/g, '').split(",");
+                                    scope.participants = JSON.parse(data.userList);
 
                                     scope.collaboration = true;
                                     document.getElementById("edit-mask").style.display = ""; //屏蔽操作
@@ -3525,7 +3526,7 @@ angular.module('kityminderEditor')
                                 else if (data.messageType == "Left") {
                                     scope.drawer = JSON.parse(data.controller).userName;
                                     drawerId = JSON.parse(data.controller).userId;
-                                    scope.participants = data.userList.replace("[", "").replace("]", "").replace(/\s/g, '').split(",");
+                                    scope.participants = JSON.parse(data.userList);
 
                                     try {
                                         var requireList = JSON.parse(data.requireList);
@@ -3554,6 +3555,18 @@ angular.module('kityminderEditor')
                     scope.participants = [];
                     scope.drawer = "Nobody";
                     document.getElementById("edit-mask").style.display = "none"; //解除屏蔽操作
+                }
+
+                function gotoUserspace(userId) {
+                    var info = RouteInfo.getInfo();
+                    var url = "";
+                    if(userId == info.userId){
+                        url = "http://"+RouteInfo.getIPPort()+"/personalPage";
+                    }
+                    else {
+                        url = "http://"+RouteInfo.getIPPort()+"/GeoProblemSolving/memberPage/"+userId;
+                    }
+                    window.location.href = url;
                 }
             }
         }
@@ -3630,7 +3643,7 @@ angular.module('kityminderEditor')
                         var folderId = info.pageId;
                         try {
                             $.ajax({
-                                url: 'http://localhost:8081/GeoProblemSolving/folder/inquiry?folderId=' + folderId,
+                                url: 'http://'+RouteInfo.getIPPort()+'/GeoProblemSolving/folder/inquiry?folderId=' + folderId,
                                 type: "GET",
                                 async: false,
                                 success: function (data) {
@@ -3690,6 +3703,8 @@ angular.module('kityminderEditor')
                             editor.minder.importData(fileType, content).then(function (data) {
                                 $(fileInput).val('');
                             });
+                            // 导图信息初始化
+                            mindmapInfo = {};
                         }
                         reader.readAsText(file);
                     }
@@ -3713,7 +3728,7 @@ angular.module('kityminderEditor')
 
                     try {
 
-                        var url = "http://localhost:8081" + map.pathURL;
+                        var url = "http://" + RouteInfo.getIPPort() + map.pathURL;
                         var xhr = new XMLHttpRequest();
                         xhr.open("GET", url, true);
                         xhr.onload = function (e) {
@@ -3723,11 +3738,17 @@ angular.module('kityminderEditor')
                                 editor.minder.importData(fileType, file).then(function (data) {
                                     $(fileInput).val('');
                                 });
+
+                                mindmapInfo = {
+                                    name: map.name,
+                                    resourceId: map.resourceId
+                                }
                             }
                         };
                         xhr.send();
                     }
                     catch (ex) {
+                        mindmapInfo = {};
                         console.log("import mindmap error");
                     }
                 }
@@ -3745,9 +3766,80 @@ angular.module('kityminderEditor')
             replace: true,
             link: function (scope) {
                 scope.saveMapFun = saveMapFun;
+                scope.saveasMapFun = saveasMapFun;
                 scope.downloadMapFun = downloadMapFun;
 
                 function saveMapFun() {
+                    if (mindmapInfo != {} && mindmapInfo.name != undefined && mindmapInfo.resourceId != undefined
+                        && mindmapInfo.name != "" && mindmapInfo.resourceId != "") {
+
+                        var datatype = mindmapInfo.name.substring(mindmapInfo.name.lastIndexOf('.') + 1);
+
+                        switch (datatype) {
+                            case 'km':
+                                exportType = 'json';
+                                break;
+                            case 'md':
+                                exportType = 'markdown';
+                                break;
+                            default:
+                                exportType = datatype;
+                                break;
+                        }
+
+                        editor.minder.exportData(exportType).then(function (content) {
+
+                            var info = RouteInfo.getInfo();
+                            if (info.pageId != "" && info.userId != "") {
+
+                                // 文件上传
+                                var blob = new Blob([content]);
+                                var filename = mindmapInfo.name;
+                                var fileBlob = new File([blob], filename);
+
+                                var formData = new FormData();
+                                formData.append("resourceId", mindmapInfo.resourceId);
+                                formData.append("file", fileBlob);
+                                formData.append("uploaderId", info.userId);
+                                formData.append("folderId", info.pageId);
+
+                                try {
+                                    $.ajax({
+                                        url: 'http://' + RouteInfo.getIPPort() + '/GeoProblemSolving/folder/uploadToFolder',
+                                        type: "POST",
+                                        data: formData,
+                                        processData: false,
+                                        contentType: false,
+                                        success: function (data) {
+                                            if (data == "Size over" || data == "Fail" || data == "Offline") {
+                                                console.log(data);
+                                            }
+                                            else if (data.uploaded.length > 0) {
+                                                alert("Save this mind map successfully");
+                                            }
+                                        },
+                                        error: function (err) {
+                                            console.log("fail.");
+                                        }
+                                    });
+                                }
+                                catch (ex) {
+                                    console.log("fail")
+                                }
+                            }
+                            else {
+                                alert("Wrong url!");
+                            }
+
+                        });
+
+                    }
+                    else {
+                        alert("Please click \"Save as\".");
+                    }
+                }
+
+                function saveasMapFun() {
                     if ($('#mindmapName').val() != "" && $('#mindmapName').val() != undefined) {
                         var datatype = $('#datatypeSelect').val();
 
@@ -3783,7 +3875,7 @@ angular.module('kityminderEditor')
 
                                 try {
                                     $.ajax({
-                                        url: 'http://localhost:8081/GeoProblemSolving/folder/uploadToFolder',
+                                        url: 'http://' + RouteInfo.getIPPort() + '/GeoProblemSolving/folder/uploadToFolder',
                                         type: "POST",
                                         data: formData,
                                         processData: false,
@@ -3794,21 +3886,27 @@ angular.module('kityminderEditor')
                                             }
                                             else if (data.uploaded.length > 0) {
                                                 alert("Save this mind map successfully");
-                                                // update $scope.mindmapRes
-                                                scope
+
+                                                mindmapInfo = {
+                                                    name: filename,
+                                                    resourceId: data.uploaded[0].resourceId
+                                                };
                                             }
                                         },
                                         error: function (err) {
                                             console.log("fail.");
+                                            mindmapInfo = {};
                                         }
                                     });
                                 }
                                 catch (ex) {
                                     console.log("fail")
+                                    mindmapInfo = {};
                                 }
                             }
                             else {
                                 alert("Wrong url!");
+                                mindmapInfo = {};
                             }
 
                         });
@@ -3819,8 +3917,51 @@ angular.module('kityminderEditor')
                 }
 
                 function downloadMapFun() {
-                    if ($('#mindmapName').val() != "" && $('#mindmapName').val() != undefined) {
-                        var datatype = $('#datatypeSelect').val();
+
+                    if (mindmapInfo != {} && mindmapInfo.name != undefined && mindmapInfo.name != "") {
+
+                        var datatype = mindmapInfo.name.substring(mindmapInfo.name.lastIndexOf('.') + 1);
+
+                        switch (datatype) {
+                            case 'km':
+                                exportType = 'json';
+                                break;
+                            case 'md':
+                                exportType = 'markdown';
+                                break;
+                            default:
+                                exportType = datatype;
+                                break;
+                        }
+
+                        editor.minder.exportData(exportType).then(function (content) {
+
+                            // 文件下载
+                            if (datatype == "png") {
+                                var arr = content.split(','), mime = arr[0].match(/:(.*?);/)[1],
+                                    bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+                                while (n--) {
+                                    u8arr[n] = bstr.charCodeAt(n);
+                                }
+
+                                var blob = new Blob([u8arr], { type: mime }),
+                                    url = URL.createObjectURL(blob);
+                            }
+                            else {
+                                var blob = new Blob([content]),
+                                    url = URL.createObjectURL(blob);
+                            }
+
+                            var a = document.createElement("a");
+                            a.download = mindmapInfo.name;
+                            a.href = url;
+                            $("body").append(a);
+                            a.click();
+                            $(a).remove();
+                        });
+
+                    } else if ($('#mindmapName').val() != "" && $('#mindmapName').val() != undefined) {
+                        datatype = $('#datatypeSelect').val();
 
                         switch (datatype) {
                             case 'km':

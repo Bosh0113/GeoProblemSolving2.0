@@ -21,7 +21,7 @@
           <Icon type="md-arrow-round-back" size="30" />
         </MenuItem>
         <MenuItem name="info" style="padding-left: 16px;" title="Subproject introduction">
-          <Icon type="ios-information-circle" size="30"/>
+          <Icon type="ios-information-circle" size="30" />
         </MenuItem>
         <MenuItem name="resource" style="padding-left: 16px;" title="Subproject resources">
           <Icon type="ios-folder" size="30" />
@@ -43,7 +43,7 @@
           style="float:right;margin:3px 30px 0 0"
           title="Go to work"
           @click="gotoWorkingspace"
-        >Working space</Button> -->
+        >Working space</Button>-->
       </div>
       <router-view :subProjectInfo="subProjectInfo" :userRole="userRole" :projectInfo="projectInfo"></router-view>
     </Row>
@@ -115,8 +115,7 @@ export default {
       let projectInfo = this.$store.getters.project;
       if (
         JSON.stringify(projectInfo) != "{}" &&
-        projectInfo.projectId.substring(0, 36) ==
-          this.subProjectInfo.projectId.substring(0, 36)
+        projectInfo.projectId == this.subProjectInfo.projectId
       ) {
         this.projectInfo = projectInfo;
       } else {
@@ -148,11 +147,6 @@ export default {
       ) {
         this.$set(this, "subProjectInfo", subProjectInfo);
         this.userRoleIdentity();
-        
-        //emmmmmmmm
-        sessionStorage.setItem("subProjectId", subProjectInfo.subProjectId);
-        sessionStorage.setItem("subProjectName", subProjectInfo.title);
-        sessionStorage.setItem("subProjectManagerId", subProjectInfo.managerId);
       } else {
         let that = this;
         $.ajax({
@@ -171,17 +165,6 @@ export default {
               subProjectInfo = data[0];
               that.$set(that, "subProjectInfo", subProjectInfo);
               that.userRoleIdentity();
-
-              sessionStorage.setItem(
-                "subProjectId",
-                subProjectInfo.subProjectId
-              );
-              sessionStorage.setItem("subProjectName", subProjectInfo.title);
-              sessionStorage.setItem(
-                "subProjectManagerId",
-                subProjectInfo.managerId
-              );
-              console.log(subProjectInfo);
               that.$store.commit("setSubProjectInfo", subProjectInfo);
             }
           },
@@ -272,7 +255,7 @@ export default {
           });
         } else if (activeStep.category == 3) {
           this.$router.push({
-            name: "modelEvalution",
+            name: "modelEvaluation",
             params: { id: stepId }
           });
         } else if (activeStep.category == 4) {
@@ -287,7 +270,7 @@ export default {
           });
         } else if (activeStep.category == 6) {
           this.$router.push({
-            name: "dataVisulization",
+            name: "dataVisualization",
             params: { id: stepId }
           });
         } else if (activeStep.category == 7) {
@@ -296,11 +279,10 @@ export default {
             params: { id: stepId }
           });
         }
-      }
-      else{
+      } else {
         this.$Notice.info({
-              desc: "The working space have not be initialized!"
-            });
+          desc: "The working space have not be initialized!"
+        });
       }
     }
   }

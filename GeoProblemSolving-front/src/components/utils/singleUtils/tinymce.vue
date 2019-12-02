@@ -1,3 +1,5 @@
+<style scoped>
+</style>
 <template>
   <div style="display:flex">
     <div>
@@ -57,12 +59,16 @@ export default {
         convert_urls:false
       },
       Editor: null,
-      pictureUrl: ""
+      pictureUrl: "",
+      pageParams: { pageId: "", userId: "", userName: "" },
+      userInfo: {},
     };
   },
   mounted() {
     this.init();
     this.initSize();
+      this.getStepInfo();
+      this.getUserInfo();
     window.addEventListener("resize", this.initSize);
   },
   beforeDestroy() {
@@ -80,10 +86,64 @@ export default {
     init() {
       const self = this;
     },
+    getStepInfo() {
+      if (
+        this.$route.params.groupID == undefined ||
+        this.$route.params.groupID == ""
+      ) {
+        var href = window.location.href;
+        var url = href.split("&");
+
+        for (var i = 0; i < url.length; i++) {
+          if (/groupID/.test(url[i])) {
+            this.pageParams.pageId = url[i].match(/groupID=(\S*)/)[1];
+            continue;
+          }
+
+          if (/userID/.test(url[i])) {
+            this.pageParams.userId = url[i].match(/userID=(\S*)/)[1];
+            continue;
+          }
+
+          if (/userName/.test(url[i])) {
+            this.pageParams.userName = url[i].match(/userName=(\S*)/)[1];
+            continue;
+          }
+        }
+      } else {
+        this.pageParams.pageId = this.$route.params.groupID;
+        this.pageParams.userId = this.$route.params.userID;
+        this.pageParams.userName = this.$route.params.userName;
+      }
+    },
+    getUserInfo() {
+      this.userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
+      if (this.userInfo == {}) {
+        this.axios
+          .get(
+            "/GeoProblemSolving/user/inquiry" +
+              "?key=" +
+              "userId" +
+              "&value=" +
+              this.pageParams.userId
+          )
+          .then(res => {
+            if (res.data != "Fail" && res.data != "None") {
+              this.$set(this, "userInfo", res.data);
+            }
+          })
+          .catch(err => {});
+      }
+    },
     saveModalShow() {
       this.saveModal = true;
     },
     uploadFile() {
+      if (this.pageParams.pageId == undefined || this.pageParams.pageId == "") {
+        this.$Message.error("Lose the information of current step.");
+        return false;
+      }
+      
       var blob = new Blob(['<meta charset="UTF-8">' + this.data], {
         type: " text/plain;charset=UTF-8"
       });
@@ -94,20 +154,14 @@ export default {
       formData.append("description", this.mdFile.description);
       formData.append("file", fileOfBlob);
       formData.append("type", "document");
-      formData.append("uploaderId", this.$store.getters.userInfo.userId);
-      formData.append("belong", this.$store.getters.userInfo.userName);
-      let scopeObject = {
-        projectId: "",
-        subProjectId: "",
-        moduleId: sessionStorage.getItem("moduleId")
-      };
-      formData.append("scope", JSON.stringify(scopeObject));
+      formData.append("uploaderId", this.userInfo.userId);
       formData.append("privacy", "private");
+      formData.append("folderId", this.pageParams.pageId);
       this.axios.defaults.headers = {
         "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
       };
       this.axios
-        .post("/GeoProblemSolving/resource/upload", formData)
+        .post("/GeoProblemSolving/folder/uploadToFolder", formData)
         .then(res => {
           if(res.data == "Size over"||res.data == "Fail"||res.data == "Offline"){
             console.log(res.data);
@@ -155,5 +209,3 @@ export default {
   }
 };
 </script>
-<style>
-</style>
