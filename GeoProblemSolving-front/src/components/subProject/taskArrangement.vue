@@ -509,16 +509,6 @@ export default {
       taskDone: [],
       MoveCount: 0,
       // 动态记录相关
-      // 消息
-      subprojectSocket: null,
-      timer: null,
-      socketMsg: {
-        type: "",
-        time: "",
-        who: "",
-        whoid: "",
-        content: ""
-      },
       formValidate: {
         taskName: "",
         description: "",
@@ -619,7 +609,6 @@ export default {
     window.addEventListener("resize", this.initSize);
   },
   beforeRouteLeave(to, from, next) {
-    this.removeTimer();
     next();
   },
   beforeDestroy: function() {
@@ -628,80 +617,6 @@ export default {
   methods: {
     initSize() {
       this.contentHeight = window.innerHeight - 210;
-    },
-    closeStepSocket() {
-      if (this.subprojectSocket != null) {
-        this.removeTimer();
-        this.subprojectSocket.close();
-      }
-    },
-    openStepSocket() {
-      if (this.subprojectSocket != null) {
-        this.subprojectSocket = null;
-      }
-
-      let roomId = this.subProjectInfo.subProjectId + "task";
-      var subprojectSocketURL = "ws://"+this.$store.state.IP_Port+"/GeoProblemSolving/Module/" + roomId;
-      if(this.$store.state.IP_Port=="localhost:8080"){
-        subprojectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + roomId;
-      }
-      this.subprojectSocket = new WebSocket(subprojectSocketURL);
-      this.subprojectSocket.onopen = this.onOpen;
-      this.subprojectSocket.onmessage = this.onMessage;
-      this.subprojectSocket.onclose = this.onClose;
-      this.subprojectSocket.onerror = this.onError;
-      this.setTimer();
-    },
-    onOpen() {
-      console.log("StepSocket连接成功！");
-    },
-    // 更新人员，更新数据，更新records
-    onMessage(e) {
-      let messageJson = JSON.parse(e.data);
-      let record = {
-        type: "",
-        time: "",
-        who: "",
-        content: ""
-      };
-
-      // 任务记录
-      if (messageJson.type == "tasks") {
-        this.inquiryTask();
-      }
-    },
-    onClose(e) {
-      this.removeTimer();
-      console.log("StepSocket连接断开！");
-    },
-    onError(e) {
-      this.removeTimer();
-      console.log("StepSocket连接错误！");
-    },
-    setTimer() {
-      var that = this;
-      this.timer = setInterval(() => {
-        var messageJson = {};
-        messageJson["type"] = "ping";
-        messageJson["message"] = "ping";
-        if (
-          that.subprojectSocket != null &&
-          that.subprojectSocket != undefined
-        ) {
-          that.subprojectSocket.send(JSON.stringify(messageJson));
-        }
-      }, 20000);
-    },
-    removeTimer() {
-      clearInterval(this.timer);
-    },
-    sendMessage(message) {
-      if (this.subprojectSocket != null) {
-        this.subprojectSocket.send(JSON.stringify(message));
-      }
-    },
-    ok() {
-      this.$Message.info("Clicked ok");
     },
     cancel() {},
     //创建任务
@@ -739,15 +654,8 @@ export default {
                 this.$store.commit("userLogout");
                 this.$router.push({ name: "Login" });
               } else if (res.data != "Fail") {
-                // 任务更新socket
-                this.socketMsg.whoid = this.$store.getters.userId;
-                this.socketMsg.who = this.$store.getters.userName;
-                this.socketMsg.type = "tasks";
-                this.socketMsg.content = "created a new task.";
-                this.socketMsg.time = new Date().toLocaleString();
                 this.addNewTask(res.data);
                 this.createTaskModal = false;
-                this.sendMessage(this.socketMsg);
               }
             })
             .catch(err => {});
@@ -770,12 +678,7 @@ export default {
             this.$store.commit("userLogout");
             this.$router.push({ name: "Login" });
           } else if (res.data != "None" && res.data != "Fail") {
-            this.socketMsg.whoid = this.$store.getters.userId;
-            this.socketMsg.who = this.$store.getters.userName;
-            this.socketMsg.type = "tasks";
-            this.socketMsg.content = "Changed the importance of one task.";
-            this.socketMsg.time = new Date().toLocaleString();
-            this.sendMessage(this.socketMsg);
+            this.$Message.info("Fail!");
           } else {
             this.$Message.error("Fail!");
           }
@@ -887,13 +790,7 @@ export default {
                 this.$router.push({ name: "Login" });
               } else if (res.data != "None" && res.data != "Fail") {
                 this.updateTaskList(res.data); // 只更新单个任务
-                this.socketMsg.whoid = this.$store.getters.userId;
-                this.socketMsg.who = this.$store.getters.userName;
-                this.socketMsg.type = "tasks";
-                this.socketMsg.content = "edited a new task.";
-                this.socketMsg.time = new Date().toLocaleString();
                 this.editTaskModal = false;
-                this.sendMessage(this.socketMsg);
               } else {
                 this.$Message.error("Fail!");
               }
@@ -1006,9 +903,6 @@ export default {
                   } else if (res.data != "Fail") {
                     //更新数组
                     taskList[stateChangeIndex].managerName = thisUserName;
-                    if (this.MoveCount == 0 && count == 1) {
-                      this.endMove();
-                    }
                   }
                 })
                 .catch(err => {
@@ -1027,9 +921,6 @@ export default {
                     this.$store.commit("userLogout");
                     this.$router.push({ name: "Login" });
                   } else if (res.data != "Fail") {
-                    if (this.MoveCount == 0 && count == 1) {
-                      this.endMove();
-                    }
                   }
                 })
                 .catch(err => {
@@ -1039,15 +930,6 @@ export default {
           }
         }
       }
-    },
-    endMove() {
-      // 任务更新socket
-      this.socketMsg.whoid = this.$store.getters.userId;
-      this.socketMsg.who = this.$store.getters.userName;
-      this.socketMsg.type = "tasks";
-      this.socketMsg.content = "changed the task schedule.";
-      this.socketMsg.time = new Date().toLocaleString();
-      this.sendMessage(this.socketMsg);
     },
     taskRemoveAssure(index, taskList) {
       this.taskDeleteModal = true;
@@ -1064,13 +946,6 @@ export default {
         .then(res => {
           if (res.data == "Success") {
             this.taskList.splice(this.selectTaskIndex, 1);
-            // 任务更新socket
-            this.socketMsg.whoid = this.$store.getters.userId;
-            this.socketMsg.who = this.$store.getters.userName;
-            this.socketMsg.type = "tasks";
-            this.socketMsg.content = "removed a task.";
-            this.socketMsg.time = new Date().toLocaleString();
-            this.sendMessage(this.socketMsg);
           } else {
             this.$Message.error("Fail!");
           }

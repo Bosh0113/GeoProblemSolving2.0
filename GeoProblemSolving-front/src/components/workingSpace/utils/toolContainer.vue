@@ -13,7 +13,7 @@
   padding: 0;
   color: #19be6b;
 }
-.ellipsis{
+.ellipsis {
   display: inline-block;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -37,41 +37,55 @@
             <Card style="background-color: #3f51b530;margin: 0 5px 10px 5px">
               <div style="text-align:center">
                 <Tooltip placement="bottom" max-width="600">
-                  <img :src="toolset.toolsetImg" v-if="toolset.toolsetImg!=''" style="height:100%;max-height:50px;">
+                  <img
+                    :src="toolset.toolsetImg"
+                    v-if="toolset.toolsetImg!=''"
+                    style="height:100%;max-height:50px;"
+                  />
                   <avatar
-                  :username="toolset.toolsetName"
-                  :size="50"
-                  style="margin-bottom:6px"
-                  v-else
-                ></avatar>
-                <div slot="content">
-                  <span>{{toolset.description}}</span>
-                  <br v-if="toolset.categoryTag.length>0"/>
-                  <p><i>{{toolset.categoryTag.join(',')}}</i></p>
-                </div>
+                    :username="toolset.toolsetName"
+                    :size="50"
+                    style="margin-bottom:6px"
+                    v-else
+                  ></avatar>
+                  <div slot="content">
+                    <span>{{toolset.description}}</span>
+                    <br v-if="toolset.categoryTag.length>0" />
+                    <p>
+                      <i>{{toolset.categoryTag.join(',')}}</i>
+                    </p>
+                  </div>
                 </Tooltip>
-                <h4 :title="toolset.toolsetName" style="width:75px;" class="ellipsis">{{toolset.toolsetName}}</h4>
+                <h4
+                  :title="toolset.toolsetName"
+                  style="width:75px;"
+                  class="ellipsis"
+                >{{toolset.toolsetName}}</h4>
               </div>
             </Card>
           </Col>
-          <Col span="8" v-for="tool in toolList" :key="tool.index"  style="margin-top:15px">
+          <Col span="8" v-for="tool in toolList" :key="tool.index" style="margin-top:15px">
             <Card style="background-color: ghostwhite;margin: 0 5px 10px 5px">
               <div style="text-align:center;cursor: pointer;" @click="useTool(tool)">
                 <Tooltip placement="bottom" max-width="600">
-                  <img :src="tool.toolImg" v-if="tool.toolImg!=''" style="height:100%;max-height:50px;">
-                  <avatar
-                  :username="tool.toolName"
-                  :size="50"
-                  style="margin-bottom:6px"
-                  v-else
-                ></avatar>
-                <div slot="content">
-                  <span>{{tool.description}}</span>
-                  <br v-if="tool.categoryTag.length>0"/>
-                  <span><i>{{tool.categoryTag.join(',')}}</i></span>
-                </div>
+                  <img
+                    :src="tool.toolImg"
+                    v-if="tool.toolImg!=''"
+                    style="height:100%;max-height:50px;"
+                  />
+                  <avatar :username="tool.toolName" :size="50" style="margin-bottom:6px" v-else></avatar>
+                  <div slot="content">
+                    <span>{{tool.description}}</span>
+                    <br v-if="tool.categoryTag.length>0" />
+                    <span>
+                      <i>{{tool.categoryTag.join(',')}}</i>
+                    </span>
+                  </div>
                 </Tooltip>
-                <h4 :title="tool.toolName" style="display:block;width:90px;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;">{{tool.toolName}}</h4>
+                <h4
+                  :title="tool.toolName"
+                  style="display:block;width:90px;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;"
+                >{{tool.toolName}}</h4>
               </div>
             </Card>
           </Col>
@@ -99,27 +113,39 @@ export default {
       userInfo: this.$store.getters.userInfo,
       toolList: [],
       toolsetList: [],
-      toolModal:0
+      toolModal: 0
     };
   },
   mounted() {
-    this.getAllTools(this.stepInfo.toolList,this.stepInfo.toolsetList);
+    this.getAllTools();
   },
   methods: {
-    getAllTools(toolIds,toolsetIds) {
-      this.getToolInfos(toolIds);
-      this.getToolsetInfos(toolsetIds);
+    getAllTools() {
+      if (
+        this.stepInfo.toolList != null &&
+        this.stepInfo.toolList != undefined
+      ) {
+        this.getToolInfos(this.stepInfo.toolList);
+      }
+      if (
+        this.stepInfo.toolsetList != null &&
+        this.stepInfo.toolsetList != undefined
+      ) {
+        this.getToolsetInfos(this.stepInfo.toolsetList);
+      }
     },
-    getToolInfos(toolIds){
+    getToolInfos(toolIds) {
       var toolsCount = toolIds.length;
       var flagCount = toolsCount;
       var ToolInfos = [];
-      for(var i=0;i<toolsCount;i++){
+      for (var i = 0; i < toolsCount; i++) {
         this.axios
           .get(
             "/GeoProblemSolving/tool/inquiry" +
-              "?key="+"tId" +
-              "&value="+toolIds[i]
+              "?key=" +
+              "tId" +
+              "&value=" +
+              toolIds[i]
           )
           .then(res => {
             if (res.data == "Offline") {
@@ -131,11 +157,11 @@ export default {
               this.$Notice.error({ desc: "There is no existing tool" });
             } else {
               ToolInfos.push(res.data[0]);
-              if(--flagCount<1){
+              if (--flagCount < 1) {
                 var sortTools = [];
-                for(var j=0;j<toolsCount;j++){
-                  for(var k=0;k<toolsCount;k++){
-                    if(toolIds[j]==ToolInfos[k].tId){
+                for (var j = 0; j < toolsCount; j++) {
+                  for (var k = 0; k < toolsCount; k++) {
+                    if (toolIds[j] == ToolInfos[k].tId) {
                       sortTools.push(ToolInfos[k]);
                       break;
                     }
@@ -150,16 +176,18 @@ export default {
           });
       }
     },
-    getToolsetInfos(toolsetIds){
+    getToolsetInfos(toolsetIds) {
       var toolsetsCount = toolsetIds.length;
       var flagCount = toolsetsCount;
       var toolsetInfos = [];
-      for(var i=0;i<toolsetsCount;i++){
+      for (var i = 0; i < toolsetsCount; i++) {
         this.axios
           .get(
             "/GeoProblemSolving/toolset/inquiry" +
-              "?key="+"tsId" +
-              "&value="+toolsetIds[i]
+              "?key=" +
+              "tsId" +
+              "&value=" +
+              toolsetIds[i]
           )
           .then(res => {
             if (res.data == "Offline") {
@@ -171,11 +199,11 @@ export default {
               this.$Notice.error({ desc: "There is no existing toolset" });
             } else {
               toolsetInfos.push(res.data[0]);
-              if(--flagCount<1){
+              if (--flagCount < 1) {
                 var sortToolsets = [];
-                for(var j=0;j<toolsetsCount;j++){
-                  for(var k=0;k<toolsetsCount;k++){
-                    if(toolsetIds[j]==toolsetInfos[k].tsId){
+                for (var j = 0; j < toolsetsCount; j++) {
+                  for (var k = 0; k < toolsetsCount; k++) {
+                    if (toolsetIds[j] == toolsetInfos[k].tsId) {
                       sortToolsets.push(toolsetInfos[k]);
                       break;
                     }
@@ -190,15 +218,24 @@ export default {
           });
       }
     },
-    stepToolListChanged(tools,toolsets){
+    stepToolListChanged(tools, toolsets) {
       this.stepInfo.toolList = tools;
       this.stepInfo.toolsetList = toolsets;
       this.toolModal++;
-      this.getAllTools(tools,toolsets);
+      this.getAllTools(tools, toolsets);
     },
-    useTool(toolInfo){
-      let toolURL = '<iframe src="' + toolInfo.toolUrl +"?userName="+ this.userInfo.userName+"&userID="+this.userInfo.userId+"&groupID="+this.stepInfo.stepId + '" style="width: 100%;height:100%;"></iframe>';
-      var demoPanelTimer= null;
+    useTool(toolInfo) {
+      let toolURL =
+        '<iframe src="' +
+        toolInfo.toolUrl +
+        "?userName=" +
+        this.userInfo.userName +
+        "&userID=" +
+        this.userInfo.userId +
+        "&groupID=" +
+        this.stepInfo.stepId +
+        '" style="width: 100%;height:100%;"></iframe>';
+      var demoPanelTimer = null;
       let panel = jsPanel.create({
         theme: "success",
         headerTitle: toolInfo.toolName,
@@ -209,15 +246,15 @@ export default {
         dragit: {
           containment: 5
         },
-        id:"demoPanel",
-        onclosed:function(panel, status, closedByUser){
+        id: "demoPanel",
+        onclosed: function(panel, status, closedByUser) {
           window.clearTimeout(demoPanelTimer);
         },
         callback: function() {
           var that = this;
-          demoPanelTimer = window.setInterval(function(){
+          demoPanelTimer = window.setInterval(function() {
             that.style.zIndex = "9999";
-          },1);
+          }, 1);
         }
       });
       // panel.resizeit("disable");
