@@ -816,10 +816,10 @@ export default {
     initSize() {
       if (window.innerHeight > 675) {
         this.sidebarHeight = window.innerHeight - 290;
-        this.contentHeight = window.innerHeight - 298;
+        this.contentHeight = window.innerHeight - 299;
       } else {
         this.sidebarHeight = 675 - 290;
-        this.contentHeight = 675 - 298;
+        this.contentHeight = 675 - 299;
       }
     },
 

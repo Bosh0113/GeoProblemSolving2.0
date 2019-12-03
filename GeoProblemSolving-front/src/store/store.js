@@ -91,6 +91,7 @@ export default new Vuex.Store({
             state.project = project;
         },
         setSubProjectInfo: (state, subProject) => {
+            sessionStorage.setItem("subProjectInfo",JSON.stringify(subProject));
             state.subProject = subProject;
         }
     },

@@ -184,7 +184,6 @@
                 ghost
               >Modify Step</Button>
             </template>
-            <step-change></step-change>
           </div>
         </Row>
         <Drawer title="Participants" :closable="false" v-model="drawerValue">
@@ -238,12 +237,12 @@
                     <div
                       style="width:3px;height:18px;float:left;background-color:rgb(124, 126, 126)"
                     ></div>
-                    <h4 style="float:left;margin-left:5px">Data</h4>
+                      <data-list :stepInfo="stepContent" :contentHeight="contentHeight" :userRole="userRole" :key="dataListIndex"></data-list>
                   </div>
                 </Card>
               </Col>
               <Col span="18">
-                <Card :style="{height:sidebarHeight+45+'px'}">
+                <Card :style="{height:sidebarHeight+45+'px'}" style="margin-left:15px">
                   <div class="condefTitle">
                     <Tabs value="general">
                       <TabPane name="general" icon="ios-brush" label="General Tool">
@@ -285,11 +284,13 @@ import Avatar from "vue-avatar";
 import echarts from "echarts";
 import folderTree from "../resources/folderTree";
 import onlineParticipant from "./utils/onlineParticipants";
+import dataList from "./utils/dataList";
 
 export default {
   components: {
     VueFlowy,
     Avatar,
+    dataList,
     folderTree,
     onlineParticipant
   },
@@ -299,7 +300,9 @@ export default {
       contextDefinitionId: this.$route.params.id, //上一步的ID 和这一步的id？？
       fileList: [],
       dataList: [],
+      contentHeight: 800,
       sidebarHeight: 800,
+      dataListIndex:0,
       stepId: this.$route.params.id,
       toSubProjectPage: "",
 
@@ -391,7 +394,13 @@ export default {
   },
   methods: {
     initSize() {
-      this.sidebarHeight = window.innerHeight - 290;
+      if (window.innerHeight > 675) {
+        this.sidebarHeight = window.innerHeight - 290;
+        this.contentHeight = window.innerHeight - 298;
+      } else {
+        this.sidebarHeight = 675 - 290;
+        this.contentHeight = 675 - 298;
+      }
     },
 
     init() {
@@ -402,7 +411,7 @@ export default {
 
     userRoleIdentity() {
       this.userRole = "Visitor";
-      let creatorId = sessionStorage.getItem("subProjectManagerId");
+      let creatorId = JSON.parse(sessionStorage.getItem("subProjectInfo")).managerId;
       if (this.$store.getters.userState) {
         // 是否是子项目管理员
         if (creatorId === this.$store.getters.userId) {
@@ -494,6 +503,7 @@ export default {
           if (res.data != "Fail") {
             this.modelProcessForm = res.data[0].content;
             this.stepContent = res.data[0];
+            this.dataListIndex++;
             this.stepForm = res.data[0];
             this.toSubProjectPage = "/project/" + res.data[0].subProjectId + "/subproject";
           } else {
