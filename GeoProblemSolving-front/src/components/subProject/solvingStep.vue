@@ -162,16 +162,6 @@ export default {
           background: "lightgrey"
         }
       },
-      // 消息
-      subprojectSocket: null,
-      timer: null,
-      socketMsg: {
-        type: "",
-        time: "",
-        who: "",
-        whoid: "",
-        content: ""
-      },
       // 添加/编辑step
       formValidate1: {
         stepTitle: "",
@@ -229,7 +219,6 @@ export default {
     this.showSteps();
   },
   beforeRouteLeave(to, from, next) {
-    this.removeTimer();
     next();
   },
   beforeDestroy: function() {
@@ -242,81 +231,7 @@ export default {
     //初始化函数，作用是控制侧边栏的高度，设置右边通知栏弹出时候的距顶高度以及延迟的时间
     init() {
       this.initSize();
-    },
-    closeStepSocket() {
-      if (this.subprojectSocket != null) {
-        this.removeTimer();
-        this.subprojectSocket.close();
-      }
-    },
-    openStepSocket() {
-      if (this.subprojectSocket != null) {
-        this.subprojectSocket = null;
-      }
-
-      let roomId = this.subProjectInfo.subProjectId + "task";
-      var subprojectSocketURL = "ws://"+this.$store.state.IP_Port+"/GeoProblemSolving/Module/" + roomId;
-      if(this.$store.state.IP_Port=="localhost:8080"){
-        subprojectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + roomId;
-      }
-      this.subprojectSocket = new WebSocket(subprojectSocketURL);
-      this.subprojectSocket.onopen = this.onOpen;
-      this.subprojectSocket.onmessage = this.onMessage;
-      this.subprojectSocket.onclose = this.onClose;
-      this.subprojectSocket.onerror = this.onError;
-      this.setTimer();
-    },
-    onOpen() {
-      console.log("StepSocket连接成功！");
-    },
-    // 更新人员，更新数据，更新records
-    onMessage(e) {
-      let messageJson = JSON.parse(e.data);
-      let record = {
-        type: "",
-        time: "",
-        who: "",
-        content: ""
-      };
-
-      // 任务记录
-      if (messageJson.type == "tasks") {
-        this.inquiryTask();
-      }
-    },
-    onClose(e) {
-      this.removeTimer();
-      console.log("StepSocket连接断开！");
-    },
-    onError(e) {
-      this.removeTimer();
-      console.log("StepSocket连接错误！");
-    },
-    setTimer() {
-      var that = this;
-      this.timer = setInterval(() => {
-        var messageJson = {};
-        messageJson["type"] = "ping";
-        messageJson["message"] = "ping";
-        if (
-          that.subprojectSocket != null &&
-          that.subprojectSocket != undefined
-        ) {
-          that.subprojectSocket.send(JSON.stringify(messageJson));
-        }
-      }, 20000);
-    },
-    removeTimer() {
-      clearInterval(this.timer);
-    },
-    sendMessage(message) {
-      if (this.subprojectSocket != null) {
-        this.subprojectSocket.send(JSON.stringify(message));
-      }
-    },
-    ok() {
-      this.$Message.info("Clicked ok");
-    },
+    },    
     cancel() {},
     // 进入具体的step页面
     enterStep(type, stepId) {
@@ -818,14 +733,6 @@ export default {
             // 更新新Step的资源----------------------------------------------------------------------需要改，留坑
             this.copyResource(res.data);
 
-            // collaborative
-            // let socketMsg = {
-            //   type: "step",
-            //   operate: "update",
-            //   content: JSON.stringify(this.processStructure)
-            // };
-            // this.subprojectSocket.send(socketMsg);
-
             this.createModuleSuccess(Step["name"]);
           }
         })
@@ -1054,14 +961,6 @@ export default {
           this.updateSteps();
           //删除数据库
           this.delStepContent();
-
-          // collaborative
-          // let socketMsg = {
-          //   type: "step",
-          //   operate: "update",
-          //   content: JSON.stringify(this.processStructure)
-          // };
-          // this.subprojectSocket.send(socketMsg);
         } else {
           this.$Notice.info({
             desc:
