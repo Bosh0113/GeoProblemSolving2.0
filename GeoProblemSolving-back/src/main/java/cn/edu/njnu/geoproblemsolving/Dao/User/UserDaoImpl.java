@@ -34,11 +34,8 @@ public class UserDaoImpl implements IUserDao {
     @Override
     public String saveUser(UserEntity user) {
         Query queryEmail = Query.query(Criteria.where("email").is(user.getEmail()));
-//        Query queryPhone = Query.query(Criteria.where("mobilePhone").is(user.getMobilePhone()));
         if (!mongoTemplate.find(queryEmail, UserEntity.class).isEmpty()) {
             return "Email";
-//        } else if (!mongoTemplate.find(queryPhone, UserEntity.class).isEmpty()) {
-//            return "MobilePhone";
         } else {
             mongoTemplate.save(user);
             return user.getUserId();
