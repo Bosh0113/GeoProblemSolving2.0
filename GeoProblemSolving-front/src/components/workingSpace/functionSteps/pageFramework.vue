@@ -21,7 +21,7 @@
 </style>
 <template>
     <div>
-        <div style="position:relative;padding:10px 10px 0 10px;">
+        <div style="position:relative;padding:10px 10px 0 10px; margin-top:10px">
             <Breadcrumb style="display: inline-block" separator=">">
                 <BreadcrumbItem :to="toSubProjectPage">Subproject</BreadcrumbItem>
                 <BreadcrumbItem>Work space</BreadcrumbItem>
@@ -36,7 +36,7 @@
                     <Button style="float:right;" class="btnHoverBlue" icon="ios-create" size="small" @click="modifyStepShow">Edit</Button>
                     <p style="font-size: medium;"> {{stepInfo.name}}</p>
                     <Divider style="margin:10px 0"/>
-                    <h2>Description:</h2><span style="font-size: larger;white-space: pre-line;"> {{stepInfo.description}}</span>
+                    <h2>Description:</h2><span style="font-size: larger;white-space: pre-line;word-break: break-all;"> {{stepInfo.description}}</span>
                     <Divider style="margin:10px 0"/>
                     <h2>Members:</h2>
                     <online-participant :sub-project-id="stepInfo.subProjectId" :room-id="stepInfo.stepId"></online-participant>

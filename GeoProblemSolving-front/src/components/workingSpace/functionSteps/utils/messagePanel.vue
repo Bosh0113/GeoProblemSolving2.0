@@ -6,8 +6,8 @@
 #msgPanelBtn {
   z-index: 100;
   position: fixed;
-  right: 40px;
-  bottom: 60px;
+  right: 30px;
+  bottom: 80px;
   cursor: pointer;
 }
 #msgPanel {
