@@ -33,6 +33,11 @@ const routes = [{
         { path: 'task', name: 'task', component: resolve => (require(["@/components/subProject/taskArrangement"], resolve)) },
       ],
     },
+    {
+      path: 'workspace/:stepId/', name: 'stepFramework', component: resolve => (require(["@/components/workingSpace/functionSteps/pageFramework"], resolve)), children: [
+        { path: 'dataProcessing', name: 'dataProcessingPage', component: resolve => (require(["@/components/workingSpace/functionSteps/dataProcessingContent"], resolve)) },
+      ],
+    },
     { path: 'newproject', name: 'NewProject', component: resolve => (require(["@/components/projects/newProject"], resolve)) },
     { path: 'participants', name: 'Participants', component: resolve => (require(["@/components/navigationContent/participants"], resolve)) },
     { path: 'community', name: 'Community', component: resolve => (require(["@/components/community/community"], resolve)) },
