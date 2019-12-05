@@ -1,33 +1,540 @@
 <style scoped>
+.content {
+  margin-left: 10px;
+  word-break: break-word;
+}
+#msgPanelBtn {
+  z-index: 100;
+  position: fixed;
+  right: 40px;
+  bottom: 60px;
+  cursor: pointer;
+}
 #msgPanel {
+  z-index: 99;
+  width: 340px;
+  height: 450px;
+  position: fixed;
+  right: 60px;
+  bottom: 80px;
+  background: #ebf3ff;
+  padding: 10px;
+}
+#msgPanel > .ivu-tabs-card > .ivu-tabs-content > .ivu-tabs-tabpane {
+  background: #fff;
+  padding: 10px;
+}
+#msgPanel > .ivu-tabs.ivu-tabs-card > .ivu-tabs-bar .ivu-tabs-tab {
+  border-color: transparent;
+}
+#msgPanel > .ivu-tabs-card > .ivu-tabs-bar .ivu-tabs-tab-active {
+  border-color: #fff;
+}
+
+.contentPanel {
+  display: flex;
+  flex-direction: column;
+  flex: auto;
+}
+.contentBody {
+  flex: 1;
+  padding: 5px;
+  overflow-y: auto;
+}
+.chat-notice {
+  color: lightgrey;
+  /* position: absolute; */
+  margin: auto;
+}
+
+.user_detail {
+  height: 60px;
+}
+
+.u_name {
+  height: 20px;
+  margin-top: 5px;
+  /* margin-left: 10px; */
+  text-align: center;
+  font-size: 10px;
+  line-height: 10px;
+}
+.chat-bubble-r {
+  position: relative;
+  margin: 12px;
+  padding: 5px 8px;
+  word-break: break-all;
+  background: #fff;
+  border: 1px solid lightgray;
+  border-radius: 5px;
+  min-width: 20%;
+  float: right;
+}
+
+.chat-bubble-l {
+  position: relative;
+  margin: 12px;
+  padding: 5px 8px;
+  word-break: break-all;
+  background: #fff;
+  border: 1px solid lightgray;
+  border-radius: 5px;
+  min-width: 20%;
+  float: left;
+}
+.chat-bubble-left:before {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 0;
+  left: -20px;
+  top: 5px;
+  border: 10px solid;
+  border-color: transparent #989898 transparent transparent;
+}
+
+.chat-bubble-left:after {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 0;
+  left: -16px;
+  top: 7px;
+  border: 8px solid;
+  border-color: transparent #989898 transparent transparent;
+}
+.chat-bubble-right:before {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 0;
+  right: -20px;
+  top: 5px;
+  border: 10px solid;
+  border-color: transparent transparent transparent lightgray;
+}
+
+.chat-bubble-right:after {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 0;
+  right: -16px;
+  top: 7px;
+  border: 8px solid;
+  border-color: transparent transparent transparent lightgray;
+}
+
+.contentFooter {
+  display: flex;
+  height: 30px;
+}
+
+.user_img {
+  background-color: lightblue;
+  margin-top: 2px;
+  margin-left: 5px;
+}
+
+.input_panel {
+  width: 85%;
+}
+
+.message_input {
+  height: 40px;
+}
+
+.send_panel {
+  display: flex;
+}
+
+.send_message_btn {
+  height: 32px;
 }
 </style>
 <template>
   <div>
-    <div id="msgPanelBtn" @click="openPanel=!openPanel">
-      <Icon type="ios-paper" size="48" />
+    <div id="msgPanelBtn" @click="openPanel=!openPanel" title="Message panel">
+      <Icon type="ios-paper" size="48" color="#2d8cf0" />
     </div>
-    <template v-if="openPanel">
-      <Tabs value="records" id="msgPanel">
-        <TabPane label="Records" name="records">
-          <div></div>
+    <div id="msgPanel" v-show="openPanel">
+      <Tabs v-model="msgType" type="card">
+        <TabPane :label="label1" name="records" style="margin-top: -16px;">
+          <div>
+            <Timeline>
+              <vue-scroll :ops="scrollOps" style="height: 378px">
+                <TimelineItem v-for="(item,index) in allRecords" :key="index">
+                  <template v-if="item.type == 'resource'">
+                    <span class="time" style="color:#0664a2">{{item.time}}</span>
+                    <span class="time" style="color:#0664a2;margin-left:10px">{{item.who}}</span>
+                    <span class="content" style="color:#0664a2;">{{item.content}}</span>
+                    <a
+                      style="color:green;margin-left:5px"
+                      :href="'http://'+$store.state.IP_Port+'/GeoProblemSolving/resource/upload/'+item.file"
+                      target="_blank"
+                    >Download</a>
+                  </template>
+                  <template v-if="item.type == 'tools'">
+                    <span class="time" style="color:#0664a2">{{item.time}}</span>
+                    <span class="time" style="color:#0664a2; margin-left:10px">{{item.who}}</span>
+                    <span class="content" style="color:#0664a2;">{{item.content}}</span>
+                    <span
+                      style="cursor:pointer;color:green;margin-left:5px"
+                      @click="toolPanel(item.toolType)"
+                    >Check</span>
+                  </template>
+                </TimelineItem>
+              </vue-scroll>
+            </Timeline>
+          </div>
         </TabPane>
-        <TabPane label="Chats" name="chats">
-          <div></div>
+
+        <TabPane :label="label2" name="chats" style="margin-top: -16px;">
+          <div>
+            <div class="contentPanel">
+              <div class="contentBody" id="contentBody">
+                <vue-scroll :ops="scrollOps" style="height: 338px">
+                  <div style="display:flex" v-for="(item,index) in allChatMsgs" :key="index">
+                    <template v-if="item.type == 'notice'">
+                      <div
+                        class="chat-notice"
+                        v-if="item.behavior == 'online'"
+                      >{{item.who.name}} is online</div>
+                      <div
+                        class="chat-notice"
+                        v-else-if="item.behavior == 'offline'"
+                      >{{item.who.name}} is offline</div>
+                    </template>
+                    <template
+                      v-else-if="item.type == 'chatMsg'&& item.from.id === $store.getters.userId "
+                    >
+                      <div style="width:95%">
+                        <div class="chat-bubble-r chat-bubble-right">{{item.content}}</div>
+                      </div>
+                      <div class="user_detail">
+                        <div class="u_img">
+                          <avatar class="user_img" :username="item.from.name" :size="25"></avatar>
+                        </div>
+                        <div class="u_name">{{item.from.name}}</div>
+                      </div>
+                    </template>
+                    <template v-else>
+                      <div class="user_detail" style="margin-left:2.5%;margin-top:5px;">
+                        <div class="u_img">
+                          <avatar class="user_img" :username="item.from.name" :size="25"></avatar>
+                        </div>
+                        <div class="u_name">
+                          <span style="font-size:3px;">{{item.from.name}}</span>
+                        </div>
+                      </div>
+                      <div style="width:95%">
+                        <div class="chat-bubble-l chat-bubble-left">{{item.content}}</div>
+                      </div>
+                    </template>
+                  </div>
+                </vue-scroll>
+              </div>
+              <div class="contentFooter">
+                <div class="input_panel">
+                  <Input
+                    placeholder="Enter message..."
+                    class="message_input"
+                    v-model="typingMsg"
+                    @keyup.enter.native="send(typingMsg)"
+                  />
+                </div>
+                <div class="send_panel">
+                  <Button class="send_message_btn" @click="send(typingMsg)">Send</Button>
+                </div>
+              </div>
+            </div>
+          </div>
         </TabPane>
+        <Button
+          @click="openChatroom()"
+          size="small"
+          slot="extra"
+          title="Use the chatroom tool"
+          v-show="msgType=='chats'"
+        >
+          <Icon type="md-chatboxes" />
+        </Button>
       </Tabs>
-    </template>
+    </div>
   </div>
 </template>
 <script>
+import Avatar from "vue-avatar";
 export default {
+  components: {
+    Avatar
+  },
   data() {
     return {
-      openPanel: false
+      //basic
+      scrollOps: {
+        bar: {
+          background: "lightgrey"
+        }
+      },
+      msgType: "records",
+      label1: h => {
+        return h("div", [
+          h("span", "Records"),
+          h("Badge", {
+            props: {
+              count: this.receivedRecords.length
+            }
+          })
+        ]);
+      },
+      unreadRecords: 0,
+      label2: h => {
+        return h("div", [
+          h("span", "Chats"),
+          h("Badge", {
+            props: {
+              count: this.receivedChatMsgs.length
+            }
+          })
+        ]);
+      },
+      unreadChats: 0,
+      openPanel: false,
+      // records
+      receivedRecords: [
+        {
+          type: "resource",
+          time: "hh:mm:ss",
+          who: "XXX",
+          content: "abcd",
+          file: "efg.hi"
+        }
+      ],
+      allRecords: [
+        {
+          type: "tools",
+          time: "hh:mm:ss",
+          who: "XXX",
+          content: "abcdefg",
+          toolType: "007"
+        },
+        {
+          type: "resource",
+          time: "hh:mm:ss",
+          who: "XXX",
+          content: "abcd",
+          file: "efg.hi"
+        },
+        {
+          type: "tools",
+          time: "hh:mm:ss",
+          who: "XXX",
+          content: "abcdefg",
+          toolType: "007"
+        }
+      ],
+      // chats
+      typingMsg: "",
+      receivedChatMsgs: [
+        {
+          type: "notice",
+          behavior: "offline",
+          who: {
+            id: "123456",
+            name: "AA"
+          }
+        }
+      ],
+      allChatMsgs: [
+        {
+          type: "notice",
+          behavior: "online",
+          who: {
+            id: "123456",
+            name: "AA"
+          }
+        },
+        {
+          type: "chatMsg",
+          content: "123 123 123 asd zxc qwe",
+          from: {
+            id: "654321",
+            name: "ABB"
+          }
+        }
+      ],
+      // socket
+      recordSocket: null,
+      chatSocket: null
     };
   },
   props: [],
   mounted() {},
-  methods: {}
+  updated: function() {
+    // this.$refs["vs"].scrollTo(
+    //   {
+    //     y: "100%"
+    //   },
+    //   0,
+    //   "easeInQuad"
+    // );
+    if (this.msgType == "records") {
+      for (let i = 0; i < this.receivedRecords.length; i++) {
+        this.allRecords.push(this.receivedRecords.shift());
+      }
+    } else if (this.msgType == "chats") {
+      for (let i = 0; i < this.receivedChatMsgs.length; i++) {
+        this.allChatMsgs.push(this.receivedChatMsgs.shift());
+      }
+    }
+  },
+  methods: {
+    openChatroom() {
+      this.openPanel = false;
+      // go to chatroom
+    },
+    toolPanel(toolType) {},
+    // closeMsgSocket() {
+    //   if (this.recordSocket != null) {
+    //     this.removeTimer();
+    //     this.recordSocket.close();
+    //   }
+    // },
+    // openMsgSocket() {
+    //   if (this.recordSocket != null) {
+    //     this.recordSocket = null;
+    //   }
+    //   let subProjectId = this.subProjectInfo.subProjectId;
+    //   var recordSocketURL =
+    //     "ws://" +
+    //     this.$store.state.IP_Port +
+    //     "/GeoProblemSolving/Module/" +
+    //     subProjectId;
+    //   if (this.$store.state.IP_Port == "localhost:8080") {
+    //     recordSocketURL =
+    //       "ws://localhost:8081/GeoProblemSolving/Module/" + subProjectId;
+    //   }
+    //   this.recordSocket = new WebSocket(recordSocketURL);
+    //   this.recordSocket.onopen = this.onOpen;
+    //   this.recordSocket.onmessage = this.onMessage;
+    //   this.recordSocket.onclose = this.onClose;
+    //   this.recordSocket.onerror = this.onError;
+    //   this.setTimer();
+    // },
+    // onOpen() {
+    //   console.log("MsgSocket连接成功！");
+    // },
+    // // 更新人员，更新数据，更新records
+    // onMessage(e) {
+    //   let messageJson = JSON.parse(e.data);
+    //   let record = {
+    //     type: "",
+    //     time: "",
+    //     who: "",
+    //     content: ""
+    //   };
+    //   // 资源记录
+    //   if (messageJson.type == "resource") {
+    //     let record = {};
+    //     record["who"] = messageJson.who;
+    //     record["content"] = messageJson.content;
+    //     record["time"] = messageJson.time;
+    //     this.allRecords.push(messageJson);
+    //     this.getAllResource();
+    //   }
+    //   // 工具记录
+    //   else if (messageJson.type == "tools") {
+    //     let record = {};
+    //     record["who"] = messageJson.who;
+    //     record["content"] = messageJson.content;
+    //     record["time"] = messageJson.time;
+    //     this.allRecords.push(messageJson);
+    //   }
+    //   // module 更新
+    //   else if (messageJson.type == "step") {
+    //     this.processStructure = messageJson.content;
+    //   } else if (messageJson.type == "members") {
+    //     // 比较 判断人员动态 更新records
+    //     let members = messageJson.message
+    //       .replace("[", "")
+    //       .replace("]", "")
+    //       .replace(/\s/g, "")
+    //       .split(",");
+    //     this.olParticipantChange(members);
+    //   }
+    // },
+    // onClose(e) {
+    //   this.removeTimer();
+    //   console.log("MsgSocket连接断开！");
+    // },
+    // onError(e) {
+    //   this.removeTimer();
+    //   console.log("MsgSocket连接错误！");
+    // },
+    // setTimer() {
+    //   var that = this;
+    //   this.timer = setInterval(() => {
+    //     var messageJson = {};
+    //     messageJson["type"] = "ping";
+    //     messageJson["message"] = "ping";
+    //     if (
+    //       that.recordSocket != null &&
+    //       that.recordSocket != undefined
+    //     ) {
+    //       that.recordSocket.send(JSON.stringify(messageJson));
+    //     }
+    //   }, 20000);
+    // },
+    // removeTimer() {
+    //   clearInterval(this.timer);
+    // },
+    send(msg) {
+      // //修改时间格式使其统一
+      // Date.prototype.Format = function(fmt) {
+      //   var o = {
+      //     "M+": this.getMonth() + 1, //月份
+      //     "d+": this.getDate(), //日
+      //     "H+": this.getHours(), //小时
+      //     "m+": this.getMinutes(), //分
+      //     "s+": this.getSeconds(), //秒
+      //     "q+": Math.floor((this.getMonth() + 3) / 3), //季度
+      //     "S+": this.getMilliseconds() //毫毛
+      //   };
+      //   if (/(y+)/.test(fmt))
+      //     fmt = fmt.replace(
+      //       RegExp.$1,
+      //       (this.getFullYear() + "").substr(4 - RegExp.$1.length)
+      //     );
+      //   for (var k in o)
+      //     if (new RegExp("(" + k + ")").test(fmt))
+      //       fmt = fmt.replace(
+      //         RegExp.$1,
+      //         RegExp.$1.length == 1
+      //           ? o[k]
+      //           : ("00" + o[k]).substr(("" + o[k]).length)
+      //       );
+      //   return fmt;
+      // };
+      // this.message = msg;
+      // let myDate = new Date().Format("yyyy-MM-dd HH:mm:ss");
+      // let current_time = myDate.toLocaleString(); //获取日期与时间
+      // // 消息不为空
+      // if (this.message !== "") {
+      //   this.send_msg = {
+      //     type: "message",
+      //     from: this.$store.getters.userName,
+      //     fromid: this.$store.getters.userId,
+      //     content: this.message,
+      //     time: current_time
+      //   };
+      //   this.my_msglist.push(this.send_msg);
+      //   this.msglist.push(this.send_msg);
+      //   this.msgRecords.push(this.send_msg);
+      //   this.socketApi.sendSock(this.send_msg, this.getSocketConnect); //连接后台onopen方法
+      // }
+      // this.message = "";
+    }
+  }
 };
 </script>

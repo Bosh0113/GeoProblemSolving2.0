@@ -242,6 +242,7 @@
         </Card>
       </template>
     </div>
+    <message-panel></message-panel>
   </div>
 </template>
 
@@ -251,7 +252,8 @@ import onlineParticipant from "./utils/onlineParticipants";
 import mapCanvas from "./utils/mapCanvas";
 import dataList from "./utils/dataList";
 import toolContainer from "./utils/toolContainer";
-import stepChange from "./utils/stepChange"
+import stepChange from "./utils/stepChange";
+import messagePanel from "./utils/messagePanel";
 
 export default {
   components: {
@@ -259,7 +261,8 @@ export default {
     mapCanvas,
     dataList,
     toolContainer,
-    stepChange
+    stepChange,
+    messagePanel
   },
   data() {
     return {
