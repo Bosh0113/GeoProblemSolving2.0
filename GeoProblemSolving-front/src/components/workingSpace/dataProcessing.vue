@@ -251,7 +251,7 @@ import onlineParticipant from "./utils/onlineParticipants";
 import mapCanvas from "./utils/mapCanvas";
 import dataList from "./utils/dataList";
 import toolContainer from "./utils/toolContainer";
-import stepChange from "./utils/stepChange"
+import stepChange from "./utils/stepChange";
 
 export default {
   components: {
