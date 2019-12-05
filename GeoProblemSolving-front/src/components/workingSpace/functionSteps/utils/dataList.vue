@@ -6,7 +6,7 @@
 </style>
 <template>
 <div>
-  <Card>
+  <Card dis-hover>
     <div slot="title">
       <h4>Data</h4>
     </div>
