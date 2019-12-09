@@ -28,7 +28,7 @@
             </Breadcrumb>
             <h1 id="stepType">{{stepInfo.type}}</h1>
         </div>
-        <Divider style="margin:10px 0"/>
+        <Divider style="margin:10px 0 3px 0"/>
         <div style="display:flex;background-color: #f8f8f9;padding:5px;">
             <div style="width:300px;margin:0 5px;" class="pageBackground" :style="{minHeight:contentHeight - 10 +'px'}">
                 <div style="padding:15px;">

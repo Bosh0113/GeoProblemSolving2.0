@@ -380,6 +380,12 @@ body {
                           <p slot="title">Resource list</p>
                           <div slot="extra">
                             <Button 
+                            class="fileBtnHoverGreen"
+                            title="Upload resource"
+                            @click="uploadModalShow">
+                            <Icon size="20" type="md-cloud-upload"></Icon>
+                            </Button>
+                            <Button 
                             class="fileBtnHoverGray"
                             title="Download all selected"
                             @click="downloadFiles">
@@ -632,6 +638,76 @@ body {
         <Button @click="editFileModel=false">Cancel</Button>
         <Button type="success" @click="changeFileInfo('editFileValidate')">Submit</Button>
       </div>
+    </Modal>
+    <Modal v-model="uploadModal" title="Upload file" width="600">
+      <Form
+        ref="uploadValidate"
+        :model="uploadValidate"
+        :rules="uploadRuleValidate"
+        :label-width="100"
+        label-position="left"
+      >
+        <FormItem label="Privacy" prop="privacy">
+          <RadioGroup v-model="uploadValidate.privacy" style="width:80%">
+            <Radio label="private">Private</Radio>
+            <Radio label="public">Public</Radio>
+          </RadioGroup>
+        </FormItem>
+        <FormItem label="Type" prop="type">
+          <RadioGroup v-model="uploadValidate.type">
+            <Radio label="data"></Radio>
+            <Radio label="paper"></Radio>
+            <Radio label="document"></Radio>
+            <Radio label="model"></Radio>
+            <Radio label="image"></Radio>
+            <Radio label="video"></Radio>
+            <Radio label="others"></Radio>
+          </RadioGroup>
+        </FormItem>
+        <FormItem label="Description" prop="description">
+          <Input type="textarea" :rows="4" v-model="uploadValidate.description" />
+        </FormItem>
+      </Form>
+      <Upload :max-size="1024*1024" multiple type="drag" :before-upload="gatherFile" action="-">
+        <div style="padding: 20px 0">
+          <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
+          <p>
+            Click or drag files here to upload (The file size must control in
+            <span
+              style="color:red"
+            >1GB</span>)
+          </p>
+        </div>
+      </Upload>
+      <div style="padding:0 10px 0 10px;max-height:200px;overflow-y:auto">
+        <ul v-for="(list,index) in toUploadFiles" :key="index">
+          <li style="display:flex">
+            File name:
+            <span
+              style="font-size:10px;margin: 0 5px 0 5px"
+            >{{ list.name }} ( {{list.fileSize}} )</span>
+            <Icon
+              type="ios-close"
+              size="20"
+              @click="delFileList(index)"
+              style="display:flex;justify-content:flex-end;cursor:pointer"
+            ></Icon>
+          </li>
+        </ul>
+      </div>
+      <div slot="footer">
+        <Button @click="uploadModal=false">Cancel</Button>
+        <Button type="success" @click="resourceUpload('uploadValidate')">Upload</Button>
+      </div>
+    </Modal>
+    <Modal
+      v-model="progressModalShow"
+      title="Upload Progress"
+      :mask-closable="false"
+      :closable="false"
+    >
+      <Progress :percent="uploadProgress"></Progress>
+      <div slot="footer"></div>
     </Modal>
   </div>
 </template>
@@ -928,6 +1004,38 @@ export default {
         ]
       },
       filesToPackage:[],
+      uploadModal:false,
+      uploadValidate: {
+        privacy: "private",
+        type: "data",
+        description: ""
+      },
+      uploadRuleValidate: {
+        privacy: [
+          {
+            required: true,
+            message: "file privacy cannot be empty",
+            trigger: "blur"
+          }
+        ],
+        type: [
+          {
+            required: true,
+            message: "file type cannot be empty",
+            trigger: "blur"
+          }
+        ],
+        description: [
+          {
+            required: true,
+            message: "file description cannot be empty",
+            trigger: "blur"
+          }
+        ]
+      },
+      toUploadFiles:[],
+      uploadProgress: 0,
+      progressModalShow:false
     };
   },
   methods: {
@@ -1438,6 +1546,106 @@ export default {
     },
     goResourceCenter(){
       window.location.href="/GeoProblemSolving/resourceCenter";
+    },
+    uploadModalShow() {
+      this.uploadValidate = {
+        privacy: "private",
+        type: "data",
+        description: ""
+      };
+      this.toUploadFiles = [];
+      this.uploadModal = true;
+    },
+    gatherFile(file) {
+      let that = this;
+      if (that.toUploadFiles.length >= 5) {
+        if (this.fileCountTimer != null) {
+          clearTimeout(this.fileCountTimer);
+        }
+        this.fileCountTimer = setTimeout(() => {
+          this.$Message.info("最多只能上传5个文件");
+        }, 500);
+      } else {
+        var fileSize = file.size;
+        if (fileSize < 1024) {
+          file.fileSize = fileSize + "b";
+        } else if (fileSize < 1024 * 1024) {
+          file.fileSize = Math.round((fileSize / 1024) * 100) / 100 + "Kb";
+        } else {
+          file.fileSize =
+            Math.round((fileSize / (1024 * 1024)) * 100) / 100 + "Mb";
+        }
+        that.toUploadFiles.push(file);
+      }
+      return false;
+    },
+    delFileList(index) {
+      this.toUploadFiles.splice(index, 1);
+    },
+    resourceUpload(name){
+      this.$refs[name].validate(valid => {
+        if (valid) {
+          var uploadFiles = this.toUploadFiles;
+          if (uploadFiles.length > 0) {
+            this.uploadModal = false;
+            var formData = new FormData();
+            for (var i = 0; i < uploadFiles.length; i++) {
+              formData.append("file", uploadFiles[i]);
+            }
+            formData.append("description", this.uploadValidate.description);
+            formData.append("type", this.uploadValidate.type);
+            formData.append("uploaderId", this.$store.getters.userInfo.userId);
+            formData.append("privacy", this.uploadValidate.privacy);
+            this.progressModalShow = true;
+            this.axios({
+              url: "/GeoProblemSolving/resource/upload",
+              method: "post",
+              onUploadProgress: progressEvent => {
+                this.uploadProgress =
+                  ((progressEvent.loaded / progressEvent.total) * 100) | 0;
+              },
+              data: formData
+            })
+              .then(res => {
+                if (res.data != "Fail") {
+                  var uploadedList = res.data.uploaded;
+                  var failedList = res.data.failed;
+                  var sizeOverList = res.data.sizeOver;
+                  for (var i = 0; i < uploadedList.length; i++) {
+                    this.userResourceList.push(uploadedList[i]);
+                  }
+                  if (sizeOverList.length > 0) {
+                    this.$Notice.warning({
+                      title: "Files too large.",
+                      render: h => {
+                        return h("span", sizeOverList.join(";"));
+                      }
+                    });
+                  }
+                  if (failedList.length > 0) {
+                    this.$Notice.error({
+                      title: "Upload fail.",
+                      render: h => {
+                        return h("span", failedList.join(";"));
+                      }
+                    });
+                  }
+                } else {
+                  this.$Message.warning("Upload fail.");
+                }
+                this.progressModalShow = false;
+                this.uploadProgress = 0;
+              })
+              .catch(err => {
+                this.progressModalShow = false;
+                this.$Message.warning("Upload fail.");
+                this.uploadProgress = 0;
+              });
+          } else {
+            this.$Message.warning("Upload file is null.");
+          }
+        }
+      });
     }
   }
 };
