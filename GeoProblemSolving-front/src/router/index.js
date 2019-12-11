@@ -17,7 +17,7 @@ const routes = [{
     // { path: 'project/:id/workspace', name: 'workspace', component: resolve => (require(["@/components/workingSpace/moduleList"], resolve)) },
     // { path: 'markdown', name: 'markDown', component: resolve => (require(["@/components/workingSpace/utils/markDown"], resolve)) },
     { path: 'project/workspace/contextdefinition/:id', name: 'contextDefinition', component: resolve => (require(["@/components/workingSpace/contextDefinition"], resolve)) },
-    { path: 'project/workspace/dataprocessing/:id', name: 'dataProcessing', component: resolve => (require(["@/components/workingSpace/dataProcessing"], resolve)) },
+    // { path: 'project/workspace/dataprocessing/:id', name: 'dataProcessing', component: resolve => (require(["@/components/workingSpace/dataProcessing"], resolve)) },
     { path: 'project/workspace/modelprocess/:id', name: 'modelProcess', component: resolve => (require(["@/components/workingSpace/modelProcess"], resolve)) },
     { path: 'project/workspace/modelevaluation/:id', name: 'modelEvaluation', component: resolve => (require(["@/components/workingSpace/modelEvaluation"], resolve)) },
     { path: 'project/workspace/quantitativeandqualitative/:id', name: 'quantitativeAndQualitative', component: resolve => (require(["@/components/workingSpace/quantitativeAndQualitative"], resolve)) },
@@ -35,7 +35,7 @@ const routes = [{
     },
     {
       path: 'workspace/:stepId/', name: 'stepFramework', component: resolve => (require(["@/components/workingSpace/functionSteps/pageFramework"], resolve)), children: [
-        { path: 'dataProcessing', name: 'dataProcessingPage', component: resolve => (require(["@/components/workingSpace/functionSteps/dataProcessingContent"], resolve)) },
+        { path: 'dataProcessing', name: 'dataProcessing', component: resolve => (require(["@/components/workingSpace/functionSteps/dataProcessingContent"], resolve)) },
       ],
     },
     { path: 'newproject', name: 'NewProject', component: resolve => (require(["@/components/projects/newProject"], resolve)) },

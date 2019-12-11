@@ -23,9 +23,9 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
-@ServerEndpoint(value = "/Module/{moduleId}", configurator = MyEndPointConfigure.class)
+@ServerEndpoint(value = "/Step/{stepId}", configurator = MyEndPointConfigure.class)
 
-public class ModuleSocket {
+public class StepSocket {
     private Session session = null;
     private static final Map<String, Map<String, Session>> modules = new ConcurrentHashMap<>();
 
@@ -33,33 +33,33 @@ public class ModuleSocket {
     MongoTemplate mongoTemplate;
 
     @OnOpen
-    public void onOpen(@PathParam("moduleId") String moduleId, Session session, EndpointConfig config) {
+    public void onOpen(@PathParam("stepId") String stepId, Session session, EndpointConfig config) {
 //        this.session = session;
         HttpSession httpSession = (HttpSession) config.getUserProperties().get(HttpSession.class.getName());
-        if (!modules.containsKey(moduleId)) {
-            Map<String, Session> module = new ConcurrentHashMap<>();
-            module.put(httpSession.getAttribute("userId").toString(), session);
-            modules.put(moduleId, module);
+        if (!modules.containsKey(stepId)) {
+            Map<String, Session> step = new ConcurrentHashMap<>();
+            step.put(httpSession.getAttribute("userId").toString(), session);
+            modules.put(stepId, step);
         } else {
-            modules.get(moduleId).put(httpSession.getAttribute("userId").toString(), session);
+            modules.get(stepId).put(httpSession.getAttribute("userId").toString(), session);
         }
-        broadcastOnlineToModule(moduleId,httpSession.getAttribute("userId").toString());
-        broadcastMembersToModule(moduleId);
+        broadcastOnlineToModule(stepId,httpSession.getAttribute("userId").toString());
+        broadcastMembersToModule(stepId);
     }
 
     @OnMessage
-    public void onMessage(@PathParam("moduleId") String moduleId, String message, Session session) {
+    public void onMessage(@PathParam("stepId") String stepId, String message, Session session) {
         JSONObject messageObject = JSONObject.parseObject(message);
         String messageType = messageObject.getString("type");
         if (!(messageType.equals("ping"))) {
-            broadcastMessageToModule(moduleId, message, session);
+            broadcastMessageToModule(stepId, message, session);
             // 将资源记录和工具记录存储
             try {
                 if(messageType.equals("resource") || messageType.equals("tools")) {
 
                     HistoryEventDaoImpl historyEventDao = new HistoryEventDaoImpl(mongoTemplate);
                     HistoryEventEntity historyEventEntity = new HistoryEventEntity();
-                    historyEventEntity.setScopeId(moduleId);
+                    historyEventEntity.setScopeId(stepId);
                     historyEventEntity.setEventType("record");
                     historyEventEntity.setDescription(message);
                     historyEventDao.saveHistoryEvent(historyEventEntity);
@@ -72,39 +72,39 @@ public class ModuleSocket {
     }
 
     @OnClose
-    public void onClose(@PathParam("moduleId") String moduleId, Session session) {
-        for (Map.Entry<String, Session> server : modules.get(moduleId).entrySet()) {
+    public void onClose(@PathParam("stepId") String stepId, Session session) {
+        for (Map.Entry<String, Session> server : modules.get(stepId).entrySet()) {
             if (server.getValue().equals(session)) {
-                broadcastOfflineToModule(moduleId,server.getKey());
-                modules.get(moduleId).remove(server.getKey());
+                broadcastOfflineToModule(stepId,server.getKey());
+                modules.get(stepId).remove(server.getKey());
                 break;
             }
         }
-        broadcastMembersToModule(moduleId);
+        broadcastMembersToModule(stepId);
     }
 
     @OnError
-    public void onError(@PathParam("moduleId") String moduleId, Session session, Throwable error) {
-        for (Map.Entry<String, Session> server : modules.get(moduleId).entrySet()) {
+    public void onError(@PathParam("stepId") String stepId, Session session, Throwable error) {
+        for (Map.Entry<String, Session> server : modules.get(stepId).entrySet()) {
             if (server.getValue().equals(session)) {
-                broadcastOfflineToModule(moduleId,server.getKey());
-                modules.get(moduleId).remove(server.getKey());
+                broadcastOfflineToModule(stepId,server.getKey());
+                modules.get(stepId).remove(server.getKey());
                 break;
             }
         }
-        broadcastMembersToModule(moduleId);
+        broadcastMembersToModule(stepId);
     }
 
-    private void broadcastMembersToModule(String moduleId) {
+    private void broadcastMembersToModule(String stepId) {
         ArrayList<String> members = new ArrayList<>();
-        for (Map.Entry<String, Session> server : modules.get(moduleId).entrySet()) {
+        for (Map.Entry<String, Session> server : modules.get(stepId).entrySet()) {
             members.add(server.getKey());
         }
         JSONObject messageObject = new JSONObject();
         messageObject.put("type", "members");
         messageObject.put("message", members.toString());
         String message = messageObject.toString();
-        for (Map.Entry<String, Session> server : modules.get(moduleId).entrySet()) {
+        for (Map.Entry<String, Session> server : modules.get(stepId).entrySet()) {
             try {
                 server.getValue().getBasicRemote().sendText(message);
             } catch (Exception e) {
@@ -113,8 +113,8 @@ public class ModuleSocket {
         }
     }
 
-    private void broadcastMessageToModule(String moduleId, String message, Session session) {
-        for (Map.Entry<String, Session> server : modules.get(moduleId).entrySet()) {
+    private void broadcastMessageToModule(String stepId, String message, Session session) {
+        for (Map.Entry<String, Session> server : modules.get(stepId).entrySet()) {
             if (!session.equals(server.getValue())) {
                 try {
                     server.getValue().getBasicRemote().sendText(message);
@@ -125,7 +125,7 @@ public class ModuleSocket {
         }
     }
 
-    private void broadcastOnlineToModule(String moduleId, String userId){
+    private void broadcastOnlineToModule(String stepId, String userId){
         Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         JSONObject messageObject = new JSONObject();
@@ -133,7 +133,7 @@ public class ModuleSocket {
         messageObject.put("userId",userId);
         messageObject.put("createTime",dateFormat.format(date));
         String message = messageObject.toString();
-        for (Map.Entry<String, Session> server : modules.get(moduleId).entrySet()) {
+        for (Map.Entry<String, Session> server : modules.get(stepId).entrySet()) {
             try {
                 server.getValue().getBasicRemote().sendText(message);
             } catch (Exception e) {
@@ -141,7 +141,7 @@ public class ModuleSocket {
             }
         }
     }
-    private void broadcastOfflineToModule(String moduleId, String userId){
+    private void broadcastOfflineToModule(String stepId, String userId){
         Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         JSONObject messageObject = new JSONObject();
@@ -149,7 +149,7 @@ public class ModuleSocket {
         messageObject.put("userId",userId);
         messageObject.put("createTime",dateFormat.format(date));
         String message = messageObject.toString();
-        for (Map.Entry<String, Session> server : modules.get(moduleId).entrySet()) {
+        for (Map.Entry<String, Session> server : modules.get(stepId).entrySet()) {
             try {
                 if(!server.getKey().equals(userId)){
                     server.getValue().getBasicRemote().sendText(message);

@@ -27,6 +27,7 @@
                 <BreadcrumbItem>Work space</BreadcrumbItem>
             </Breadcrumb>
             <h1 id="stepType">{{stepInfo.type}}</h1>
+            <step-change style="float:right" :step-info="stepInfo" :subproject-info="subProjectInfo"></step-change>
         </div>
         <Divider style="margin:10px 0"/>
         <div style="display:flex;background-color: #f8f8f9;padding:5px;">
@@ -39,7 +40,7 @@
                     <h2>Description:</h2><span style="font-size: larger;white-space: pre-line;word-break: break-all;"> {{stepInfo.description}}</span>
                     <Divider style="margin:10px 0"/>
                     <h2>Members:</h2>
-                    <online-participant :sub-project-id="stepInfo.subProjectId" :room-id="stepInfo.stepId"></online-participant>
+                    <online-participant :sub-project-id="stepInfo.subProjectId"></online-participant>
                     <Divider style="margin:10px 0"/>
 
                 </div>
@@ -79,9 +80,11 @@
 
 <script>
 import onlineParticipant from "./utils/onlineParticipants";
+import stepChange from "./utils/stepChange";
 export default {
     components: {
         onlineParticipant,
+        stepChange
     },
     created(){
         this.init();

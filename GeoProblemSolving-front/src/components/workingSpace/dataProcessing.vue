@@ -168,7 +168,6 @@
             <template v-if="userRole == 'Manager'">
               <Button @click="modifyStep = true" style="margin-left:20px" ghost>Modify Step</Button>
             </template>
-            <step-change :step-info="stepContent" :subproject-info="subProjectInfo"></step-change>
           </div>
         </Row>
         <Drawer title="Participants" :closable="false" v-model="drawerValue">
@@ -250,8 +249,7 @@ import * as socketApi from "./../../api/socket";
 import onlineParticipant from "./utils/onlineParticipants";
 import mapCanvas from "./utils/mapCanvas";
 import dataList from "./utils/dataList";
-import toolContainer from "./utils/toolContainer";
-import stepChange from "./utils/stepChange";
+import toolContainer from "./utils/toolContainer";           
 
 export default {
   components: {
@@ -259,7 +257,6 @@ export default {
     mapCanvas,
     dataList,
     toolContainer,
-    stepChange,
     messagePanel
   },
   data() {

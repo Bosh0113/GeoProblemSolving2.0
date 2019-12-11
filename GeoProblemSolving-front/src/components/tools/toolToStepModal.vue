@@ -469,6 +469,10 @@ export default {
         });
     },
     getStepToolsets(){
+      if(this.stepToolsetIds == null || this.stepToolsetIds == undefined){
+        this.stepToolsetIds = [];
+      }
+
       var stepToolsetIds = this.stepToolsetIds;
       var toolsetsCount = this.stepToolsetIds.length;
       var flagCount = toolsetsCount;
@@ -564,6 +568,10 @@ export default {
         });
     },
     getStepTools(){
+      if(this.stepToolIds == null || this.stepToolIds == undefined){
+        this.stepToolIds = [];
+      }
+
       var stepToolIds = this.stepToolIds;
       var toolsCount = this.stepToolIds.length;
       var flagCount = toolsCount;

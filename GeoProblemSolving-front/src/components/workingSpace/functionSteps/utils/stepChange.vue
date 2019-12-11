@@ -2,7 +2,7 @@
 </style>
 <template>
   <span class="stepChange">
-    <Button @click="getProcessSteps()" style="margin-left:20px" ghost>Switch step</Button>
+    <Button @click="getProcessSteps()" style="margin-left:20px;" size="small">Switch step</Button>
     <Modal
       width="800"
       v-model="stepChanged"
