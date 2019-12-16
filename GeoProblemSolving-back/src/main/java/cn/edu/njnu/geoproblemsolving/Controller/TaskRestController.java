@@ -1,7 +1,6 @@
 package cn.edu.njnu.geoproblemsolving.Controller;
 
-import cn.edu.njnu.geoproblemsolving.Dao.ComputerModel.ComputableModelDaoImpl;
-import cn.edu.njnu.geoproblemsolving.Entity.Model.JsonResult;
+import cn.edu.njnu.geoproblemsolving.Entity.Model.support.JsonResult;
 import cn.edu.njnu.geoproblemsolving.Service.TaskService;
 import cn.edu.njnu.geoproblemsolving.Utils.ResultUtils;
 import com.alibaba.fastjson.JSONObject;

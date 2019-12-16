@@ -1,7 +1,7 @@
 package cn.edu.njnu.geoproblemsolving.Service;
 
-import cn.edu.njnu.geoproblemsolving.Dao.ComputerModel.*;
-import cn.edu.njnu.geoproblemsolving.Entity.Model.JsonResult;
+import cn.edu.njnu.geoproblemsolving.Dao.CModel.*;
+import cn.edu.njnu.geoproblemsolving.Entity.Model.support.JsonResult;
 import cn.edu.njnu.geoproblemsolving.Entity.ModelItem.ModelItemEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.ModelItem.Support.State;
 import cn.edu.njnu.geoproblemsolving.Enums.ResultEnum;
@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -20,7 +22,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +51,6 @@ public class TaskService {
     public JsonResult getComputeModel(String oid) {//根据oid获得
         ModelItemDaoImpl modelItemDao = new ModelItemDaoImpl(mongoTemplate);
         Object computableModel = modelItemDao.readComputableModel(oid);
-
 //        Object data=computableModel.getJSON;
         return ResultUtils.success(((ArrayList) computableModel).get(0));
     }
@@ -83,7 +83,6 @@ public class TaskService {
         }
         result = jsonObjectResponseEntity.getBody().getJSONObject("data");
         //保存url到相应的event 和 value
-
         return result;
     }
 
@@ -135,8 +134,7 @@ public class TaskService {
     public JSONObject slefInvoke(JSONObject obj) {
         //传入task在初始化页面时已经创建了Task 不需要再创建且获得了上传数据的URL
         JSONObject invokeBody = new JSONObject();
-        JSONObject modelInstance = new JSONObject();
-        modelInstance = obj.getJSONObject("modelItem");
+        JSONObject modelInstance =  obj.getJSONObject("modelItem");
 
         modelItemDao.updateComputableModel(modelInstance);//更新数据库
 
@@ -152,7 +150,7 @@ public class TaskService {
         refreshBody.put("ip",obj.getString("ip"));
         refreshBody.put("port", obj.getString("port"));
 
-        refresh(refreshBody);
+
         return refresh(refreshBody);
     }
 

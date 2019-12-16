@@ -1,4 +1,4 @@
-package cn.edu.njnu.geoproblemsolving.Entity.Model;
+package cn.edu.njnu.geoproblemsolving.Entity.Model.support;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

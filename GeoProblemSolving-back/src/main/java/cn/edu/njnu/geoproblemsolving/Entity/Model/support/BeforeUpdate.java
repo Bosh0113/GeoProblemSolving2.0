@@ -1,4 +1,4 @@
-package cn.edu.njnu.geoproblemsolving.Entity.Model;
+package cn.edu.njnu.geoproblemsolving.Entity.Model.support;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * @AnnotationName BeforeInsert
+ * @AnnotationName BeforeUpdate
  * @Description todo
  * @Author sun_liber
  * @Date 2019/7/10
@@ -14,5 +14,5 @@ import java.lang.annotation.Target;
  */
 @Target (ElementType.METHOD)
 @Retention (RetentionPolicy.RUNTIME)
-public @interface BeforeInsert {
+public @interface BeforeUpdate {
 }

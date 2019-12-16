@@ -1,4 +1,4 @@
-package cn.edu.njnu.geoproblemsolving.Dao.ComputerModel;
+package cn.edu.njnu.geoproblemsolving.Dao.CModel;
 
 import cn.edu.njnu.geoproblemsolving.Entity.Model.ComputableModelEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.ModelItem.ModelItemEntity;

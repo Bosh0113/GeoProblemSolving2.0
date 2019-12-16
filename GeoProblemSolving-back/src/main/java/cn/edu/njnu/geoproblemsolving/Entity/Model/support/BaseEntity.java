@@ -1,4 +1,4 @@
-package cn.edu.njnu.geoproblemsolving.Entity.Model;
+package cn.edu.njnu.geoproblemsolving.Entity.Model.support;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
