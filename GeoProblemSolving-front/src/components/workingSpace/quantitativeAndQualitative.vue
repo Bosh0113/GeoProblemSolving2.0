@@ -46,39 +46,18 @@
 <template>
   <div style="background-color:#e8eaec;height:auto">
     <Row>
-      <div class="picscreen">
-        <div class="picbg"></div>
-        <div class="homeContent">
-          <Row>
-            <!-- 需要修改样式 -->
-            <Col span="6" style="height:40px;">
-              <Breadcrumb>
-                <!-- <BreadcrumbItem :to="toProjectPage">Project</BreadcrumbItem> -->
-                <BreadcrumbItem :to="toSubProjectPage" class="subproject-back">Subproject</BreadcrumbItem>
-                <BreadcrumbItem style="color:white">Quantitative and qualitative analysis</BreadcrumbItem>
-              </Breadcrumb>
-            </Col>
-            <Col
-              span="12"
-              style="text-align:center;font-size:1.5rem;height:20px;color:white;margin-top:1%"
-            >
-              <strong>{{stepInfo.name}}</strong>
-              <p style="font-size:0.8rem;margin-top:5px;">{{stepInfo.description}}</p>
-            </Col>
-          </Row>
-        </div>
-      </div>
+      <step-header :stepInfo="stepInfo" :subProjectInfo="subProjectInfo" :userRole="userRole" :key="infoRefresh"></step-header>
     </Row>
-    <div style="margin-top:50px;padding:15px">
+    <div style="margin-top:50px;padding:10px">
       <Row>
         <Col span="7" :style="{height:sidebarHeight+40+'px'}">
           <Card shadow>
-            <p slot="title">
-              <Icon type="ios-paper" />Data
-            </p>
-            <div :style="{height:sidebarHeight-50+'px'}">
-              <h3>Data list</h3>
-            </div>
+              <div class="condefTitle">
+                <div
+                  style="width:3px;height:18px;float:left;background-color:rgb(124, 126, 126)"
+                ></div>
+                  <data-list :stepInfo="stepInfo" :contentHeight="contentHeight" :userRole="userRole" :key="infoRefresh"></data-list>
+              </div>
           </Card>
         </Col>
         <Col span="17">
@@ -156,11 +135,22 @@
   </div>
 </template>
 <script>
+import dataList from "./utils/dataList"
+import stepHeader from "./utils/stepHeader"
 export default {
+  components: {
+    dataList,
+    stepHeader
+  },
+  created(){
+    this.getStepInfo();
+    this.getSubprojectInfo();
+    this.getProjectInfo();
+    this.userRoleIdentity();
+  },
   mounted() {
     this.initSize();
-    this.userRoleIdentity();
-    this.getStepInfo();
+    this.infoRefresh++;
     window.addEventListener("resize", this.initSize);
   },  
   beforeRouteEnter: (to, from, next) => {
@@ -187,11 +177,15 @@ export default {
   data() {
     return {
       stepId: this.$route.params.id,
-      toSubProjectPage: "",
       stepInfo: {
         name: ""
       },
+      userRole:"Visitor",
       sidebarHeight: 800,
+      contentHeight: 800,
+      subProjectInfo:{},
+      projectInfo:{},
+      infoRefresh:0,
       quantitativeToolSet: [
         {
           img: "http://www.saga-gis.org/_images/logo_saga_big.png",
@@ -221,47 +215,129 @@ export default {
     initSize() {
       if (window.innerHeight > 675) {
         this.sidebarHeight = window.innerHeight - 290;
+        this.contentHeight = window.innerHeight - 254;
       } else {
-        this.sidebarHeight = 385;
+        this.sidebarHeight = 675 - 290;
+        this.contentHeight = 675 - 254;
       }
     },
     getStepInfo() {
-      this.axios
-        .get(
+      $.ajax({
+          url:
           "/GeoProblemSolving/step/inquiry" +
             "?key=" +
             "stepId" +
             "&value=" +
-            this.stepId
-        )
-        .then(res => {
-          if (res.data == "Offline") {
-            this.$store.commit("userLogout");
-            this.$router.push({ name: "Login" });
-          } else if (res.data != "Fail" && res.data != "None") {
-            this.stepInfo = res.data[0];
-            this.toSubProjectPage = "/project/" + res.data[0].subProjectId + "/subproject";
-          } else {
-            this.$Message.warning("Get step info fail.");
+            this.stepId,
+          type: "GET",
+          async: false,
+          success: data => {
+            if (data == "Offline") {
+              this.$store.commit("userLogout");
+              this.$router.push({ name: "Login" });
+            } else if (data != "Fail" && data != "None") {
+              this.stepInfo = data[0];
+            } else {
+              this.$Message.warning("Get step info fail.");
+            }
+          },
+          error: function(err) {
+            console.log("Get step info fail.");
           }
-        })
-        .catch();
+        });
     },
     enterTheme(url) {
       window.open(url);
     },
+    getSubprojectInfo() {
+      let subProjectInfo = this.$store.getters.subProject;
+      if (
+        JSON.stringify(subProjectInfo) != "{}" &&
+        subProjectInfo.subProjectId == sessionStorage.getItem("subProjectId")
+      ) {
+        this.$set(this, "subProjectInfo", subProjectInfo);
+      } else {
+        $.ajax({
+          url:
+            "/GeoProblemSolving/subProject/inquiry" +
+            "?key=subProjectId" +
+            "&value=" +
+            this.stepInfo.subProjectId,
+          type: "GET",
+          async: false,
+          success: data => {
+            if (data == "Offline") {
+              this.$store.commit("userLogout");
+              this.$router.push({ name: "Login" });
+            } else if (data != "None" && data != "Fail") {
+              subProjectInfo = data[0];
+              this.$set(this, "subProjectInfo", subProjectInfo);
+
+              this.$store.commit("setSubProjectInfo", subProjectInfo);
+            } else {
+              console.log(data);
+            }
+          },
+          error: function(err) {
+            console.log("Get manager name fail.");
+          }
+        });
+      }
+    },
+    getProjectInfo() {
+      let projectInfo = this.$store.getters.project;
+      if (
+        JSON.stringify(projectInfo) != "{}" &&
+        projectInfo.projectId == this.subProjectInfo.projectId
+      ) {
+        this.projectInfo = projectInfo;
+      } else {
+        $.ajax({
+          url:
+            "/GeoProblemSolving/project/inquiry" +
+            "?key=projectId" +
+            "&value=" +
+            this.subProjectInfo.projectId,
+          type: "GET",
+          async: false,
+          success: data => {
+            if (data != "None" && data != "Fail") {
+              this.projectInfo = data[0];
+              this.$store.commit("setProjectInfo", data[0]);
+            } else {
+              console.log(data);
+            }
+          }
+        });
+      }
+    },
     userRoleIdentity() {
       this.userRole = "Visitor";
-      let creatorId = sessionStorage.getItem("subProjectManagerId");
-      console.log(creatorId);
       if (this.$store.getters.userState) {
         // 是否是子项目管理员
-        if (creatorId === this.$store.getters.userId) {
+        if (this.subProjectInfo.managerId === this.$store.getters.userId) {
           this.userRole = "Manager";
-          console.log(this.userRole);
-        } else {
-          this.userRole = "Visitor";
         }
+        // 是否是子项目成员
+        else {
+          for (let i = 0; i < this.subProjectInfo.members.length; i++) {
+            if (
+              this.subProjectInfo.members[i].userId ===
+              this.$store.getters.userId
+            ) {
+              this.userRole = "Member";
+              break;
+            }
+          }
+        }
+        // 是否是项目管理员
+        if (this.userRole != "Manager") {
+          if (this.projectInfo.managerId === this.$store.getters.userId) {
+            this.userRole = "PManager";
+          }
+        }
+      } else {
+        this.userRole = "Visitor";
       }
     },
   }

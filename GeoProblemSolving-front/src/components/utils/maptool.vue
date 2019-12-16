@@ -1,65 +1,3 @@
-<template>
-  <div>
-    <toolStyle  :style="{height:windowHeight+'px'}"
-      :participants="participants"
-      :resources="resources"
-      v-on:resourceUrl="selecetResource"
-    ></toolStyle>
-    <div id="map" class="map" :style="{height:windowHeight+'px', width:windowWidth+'px'}">
-      <Modal
-        v-model="modalExport"
-        title="Export GeoJSON to resource center"
-        @on-ok="save2Resource('formValidate')"
-      >
-        <Form
-          ref="formValidate"
-          :model="formValidate"
-          :rules="ruleValidate"
-          :label-width="80"
-          style="margin-left:20px"
-        >
-          <FormItem label="Name" prop="fileName">
-            <Input v-model="formValidate.fileName" placeholder="*.json" style="width: 350px"/>
-          </FormItem>
-          <FormItem label="Description" prop="fileDescription">
-            <Input
-              v-model="formValidate.fileDescription"
-              type="textarea"
-              placeholder="Enter something..."
-              style="width: 350px"
-            />
-          </FormItem>
-        </Form>
-        <p style="margin-left:30px">
-          Download this data directly.
-          <Button style="margin-left:50px" @click="downloadGeoJson('formValidate')">Download</Button>
-        </p>
-      </Modal>
-      <Modal
-        v-model="modalImport"
-        title="Import GeoJSON data to resource center and show the data"
-        @on-ok="viewData"
-        ok-text="OK"
-        cancel-text="Cancel"
-      >
-        <Upload type="drag" :before-upload="handleUpload" action="-" accept=".json, .zip">
-          <div style="padding: 20px 0">
-            <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
-             <p>Click or drag files here to upload(The file size must control in <span style="color:red">1GB</span>)</p>
-
-          </div>
-        </Upload>
-        <div v-show="showFile">
-          <span id="show-file">
-            <i class="ivu-icon ivu-icon-md-document"></i>
-            {{uploadDataName}}
-          </span>
-        </div>
-        <br>
-      </Modal>
-    </div>
-  </div>
-</template>
 <style>
 @import "../../../static/css/Control.MiniMap.css";
 @import "../../../static/css/leaflet.pm.css";
@@ -93,6 +31,73 @@
   cursor: pointer;
 }
 </style>
+<template>
+  <div>
+    <toolStyle
+      :style="{height:windowHeight+'px'}"
+      :participants="participants"
+      :resources="resources"
+      v-on:resourceUrl="selecetResource"
+    ></toolStyle>
+    <div id="map" class="map" :style="{height:windowHeight+'px', width:windowWidth+'px'}">
+      <Modal
+        v-model="modalExport"
+        title="Export GeoJSON to resource center"
+        @on-ok="save2Resource('formValidate')"
+      >
+        <Form
+          ref="formValidate"
+          :model="formValidate"
+          :rules="ruleValidate"
+          :label-width="80"
+          style="margin-left:20px"
+        >
+          <FormItem label="Name" prop="fileName">
+            <Input v-model="formValidate.fileName" placeholder="*.json" style="width: 350px" />
+          </FormItem>
+          <FormItem label="Description" prop="fileDescription">
+            <Input
+              v-model="formValidate.fileDescription"
+              type="textarea"
+              placeholder="Enter something..."
+              style="width: 350px"
+            />
+          </FormItem>
+        </Form>
+        <p style="margin-left:30px">
+          Download this data directly.
+          <Button style="margin-left:50px" @click="downloadGeoJson('formValidate')">Download</Button>
+        </p>
+      </Modal>
+      <Modal
+        v-model="modalImport"
+        title="Import GeoJSON data to resource center and show the data"
+        @on-ok="viewData"
+        ok-text="OK"
+        cancel-text="Cancel"
+      >
+        <Upload type="drag" :before-upload="handleUpload" action="-" accept=".json, .zip">
+          <div style="padding: 20px 0">
+            <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
+            <p>
+              Click or drag files here to upload(The file size must control in
+              <span
+                style="color:red"
+              >1GB</span>)
+            </p>
+          </div>
+        </Upload>
+        <div v-show="showFile">
+          <span id="show-file">
+            <i class="ivu-icon ivu-icon-md-document"></i>
+            {{uploadDataName}}
+          </span>
+        </div>
+        <br />
+      </Modal>
+    </div>
+  </div>
+</template>
 <script>
 import minimap from "../../../static/js/Control.MiniMap.min.js";
 import pm from "../../../static/js/leaflet.pm.min.js";
@@ -134,6 +139,8 @@ export default {
       olParticipants: [],
       resources: [],
       dataUrl: "",
+      pageParams: { pageId: "", userId: "", userName: "" },
+      userInfo: {},
       formValidate: {
         fileName: "",
         fileDescription: ""
@@ -148,19 +155,90 @@ export default {
       }
     };
   },
+  mounted() {
+    window.addEventListener("resize", this.initSize);
+    this.initSize();
+    this.getResources();
+    this.startWebSocket();
+    this.initMap();
+    this.initLayer();
+    this.initControl();
+    this.startWebSocket();
+    this.listenDraw();
+    this.getResources();
+  },
+  beforeDestroy() {
+    window.removeEventListener("resize", this.initSize);
+    this.socketApi.close();
+  },
+  beforeRouteEnter: (to, from, next) => {
+    next(vm => {
+      if (!vm.$store.getters.userState || vm.$store.getters.userId == "") {
+        vm.$router.push({ name: "Login" });
+      } else {
+      }
+    });
+  },
   methods: {
     initSize() {
-      if(window.innerHeight > 675){
+      if (window.innerHeight > 675) {
         this.windowHeight = window.innerHeight;
+      } else {
+        this.windowHeight = 675;
       }
-      else {
-         this.windowHeight = 675;
-      }
-      if(window.innerWidth > 1200){
+      if (window.innerWidth > 1200) {
         this.windowWidth = window.innerWidth - 60;
-      }
-      else{
+      } else {
         this.windowWidth = 1140;
+      }
+    },
+    getStepInfo() {
+      if (
+        this.$route.params.groupID == undefined ||
+        this.$route.params.groupID == ""
+      ) {
+        var href = window.location.href;
+        var url = href.split("&");
+
+        for (var i = 0; i < url.length; i++) {
+          if (/groupID/.test(url[i])) {
+            this.pageParams.pageId = url[i].match(/groupID=(\S*)/)[1];
+            continue;
+          }
+
+          if (/userID/.test(url[i])) {
+            this.pageParams.userId = url[i].match(/userID=(\S*)/)[1];
+            continue;
+          }
+
+          if (/userName/.test(url[i])) {
+            this.pageParams.userName = url[i].match(/userName=(\S*)/)[1];
+            continue;
+          }
+        }
+      } else {
+        this.pageParams.pageId = this.$route.params.groupID;
+        this.pageParams.userId = this.$route.params.userID;
+        this.pageParams.userName = this.$route.params.userName;
+      }
+    },
+    getUserInfo() {
+      this.userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
+      if (this.userInfo == {}) {
+        this.axios
+          .get(
+            "/GeoProblemSolving/user/inquiry" +
+              "?key=" +
+              "userId" +
+              "&value=" +
+              this.pageParams.userId
+          )
+          .then(res => {
+            if (res.data != "Fail" && res.data != "None") {
+              this.$set(this, "userInfo", res.data);
+            }
+          })
+          .catch(err => {});
       }
     },
     initMap() {
@@ -351,6 +429,11 @@ export default {
       });
     },
     save2Resource(name) {
+      if (this.pageParams.pageId == undefined || this.pageParams.pageId == "") {
+        this.$Message.error("Lose the information of current step.");
+        return false;
+      }
+
       this.$refs[name].validate(valid => {
         if (valid) {
           if (this.geojsonBlob != null) {
@@ -372,33 +455,28 @@ export default {
 
             //上传数据
             let formData = new FormData();
-            let userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
             formData.append("file", fileOfBlob);
             formData.append("description", description);
             formData.append("type", "data");
-            formData.append("uploaderId", userInfo.userId);
-            formData.append("belong", userInfo.userName);
-            let scopeObject = {
-              projectId: "",
-              subProjectId: "",
-              moduleId: sessionStorage.getItem("moduleId")
-            };
-            formData.append("scope", JSON.stringify(scopeObject));
+            formData.append("uploaderId", this.userInfo.userId);
             formData.append("privacy", "private");
-            let that = this;
+            formData.append("folderId", this.pageParams.pageId);
             this.axios
-              .post("/GeoProblemSolving/resource/upload", formData)
+              .post("/GeoProblemSolving/folder/uploadToFolder", formData)
               .then(res => {
-                if(res.data == "Size over"||res.data == "Fail"||res.data == "Offline"){
+                if (
+                  res.data == "Size over" ||
+                  res.data == "Fail" ||
+                  res.data == "Offline"
+                ) {
                   console.log(res.data);
-                }
-                else if (res.data.length > 0) {
-                  that.showFile = true;
-                  that.uploadDataName = filename;
+                } else if (res.data.length > 0) {
+                  this.showFile = true;
+                  this.uploadDataName = filename;
 
-                  that.$Notice.open({
+                  this.$Notice.open({
                     title: "Save to resource center",
-                    desc: "Data saved successfully",
+                    desc: "Data saved successfully"
                     // duration: 0
                   });
 
@@ -409,19 +487,22 @@ export default {
                     description: "map tool data",
                     pathURL: "/GeoProblemSolving/resource/upload/" + dataName
                   };
-                  that.resources.push(dataItem);
+                  this.resources.push(dataItem);
 
                   //文件列表协同
-                  that.send_content = {
+                  this.send_content = {
                     type: "resourcesSave",
                     name: filename,
                     description: "map tool data",
                     pathURL: "/GeoProblemSolving/resource/upload/" + dataName
                   };
-                  that.socketApi.sendSock(that.send_content, that.getSocketConnect);
+                  this.socketApi.sendSock(
+                    this.send_content,
+                    this.getSocketConnect
+                  );
 
                   // 初始化formValidation
-                  that.formValidate = {
+                  this.formValidate = {
                     fileName: "",
                     fileDescription: ""
                   };
@@ -435,6 +516,11 @@ export default {
       });
     },
     handleUpload(file) {
+      if (this.pageParams.pageId == undefined || this.pageParams.pageId == "") {
+        this.$Message.error("Lose the information of current step.");
+        return false;
+      }
+
       if (!/\.(json|zip)$/.test(file.name.toLowerCase())) {
         this.$Message.error("Worry format");
         return false;
@@ -442,55 +528,50 @@ export default {
 
       //上传数据
       let formData = new FormData();
-      let userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
       formData.append("file", file);
       formData.append("description", "Map tool data");
       formData.append("type", "data");
-      formData.append("uploaderId", userInfo.userId);
-      formData.append("belong", userInfo.userName);
-      let scopeObject = {
-        moduleId: sessionStorage.getItem("moduleId"),
-        subProjectId:"",
-        projectId:""
-      };
-      formData.append("scope", JSON.stringify(scopeObject));
+      formData.append("uploaderId", this.userInfo.userId);
       formData.append("privacy", "private");
-      let that = this;
+      formData.append("folderId", this.pageParams.pageId);
       this.axios
-        .post("/GeoProblemSolving/resource/upload", formData)
+        .post("/GeoProblemSolving/folder/uploadToFolder", formData)
         .then(res => {
-          if(res.data == "Size over"||res.data == "Fail"||res.data == "Offline"){
+          if (
+            res.data == "Size over" ||
+            res.data == "Fail" ||
+            res.data == "Offline"
+          ) {
             console.log(res.data);
-          }
-          else if (res.data.length > 0) {
-            that.showFile = true;
-            that.uploadDataName = file.name;
+          } else if (res.data.length > 0) {
+            this.showFile = true;
+            this.uploadDataName = file.name;
 
             let dataName = res.data[0].fileName;
-            that.dataUrl = "/GeoProblemSolving/resource/upload/" + dataName;
+            this.dataUrl = "/GeoProblemSolving/resource/upload/" + dataName;
 
             let dataItem = {
               name: dataName,
               description: "map tool data",
               pathURL: "/GeoProblemSolving/resource/upload/" + dataName
             };
-            that.resources.push(dataItem);
+            this.resources.push(dataItem);
 
             //文件列表协同
-            that.send_content = {
+            this.send_content = {
               type: "resourcesUpdate",
               name: dataName,
               description: "map tool data",
               pathURL: "/GeoProblemSolving/resource/upload/" + dataName
             };
-            that.socketApi.sendSock(that.send_content, that.getSocketConnect);
+            this.socketApi.sendSock(this.send_content, this.getSocketConnect);
           }
         })
         .catch(err => {});
       return false;
     },
     viewData() {
-      if(/\.(json)$/.test(this.dataUrl.toLowerCase())) {
+      if (/\.(json)$/.test(this.dataUrl.toLowerCase())) {
         //从url获取GeoJSON数据
         var that = this;
         var xhr = new XMLHttpRequest();
@@ -512,27 +593,24 @@ export default {
           }
         };
         xhr.send();
-      }
-      else if(/\.(zip)$/.test(this.dataUrl.toLowerCase())){
-        try{
+      } else if (/\.(zip)$/.test(this.dataUrl.toLowerCase())) {
+        try {
           var that = this;
-          shp(this.dataUrl).then(function(file){
+          shp(this.dataUrl).then(function(file) {
             let geoJsonLayer = L.geoJSON(file, {
-                style: function(feature) {
-                  return { color: "orange" };
-                }
-              }).bindPopup(function(layer) {
-                return layer.feature.properties.description;
-              });
-              that.drawingLayerGroup.addLayer(geoJsonLayer);
-              that.map.fitBounds(geoJsonLayer.getBounds());
+              style: function(feature) {
+                return { color: "orange" };
+              }
+            }).bindPopup(function(layer) {
+              return layer.feature.properties.description;
+            });
+            that.drawingLayerGroup.addLayer(geoJsonLayer);
+            that.map.fitBounds(geoJsonLayer.getBounds());
           });
-        }
-        catch(res) {
+        } catch (res) {
           this.$Message.error("Worry data format!");
         }
-      }
-      else{
+      } else {
         this.$Message.error("Worry data format!");
       }
 
@@ -757,7 +835,7 @@ export default {
             let dataItem = {
               name: socketMsg.name,
               description: socketMsg.description,
-              pathURL:socketMsg.pathURL
+              pathURL: socketMsg.pathURL
             };
             this.resources.push(dataItem);
 
@@ -781,18 +859,18 @@ export default {
             xhr.send();
             break;
           }
-          case "selectdata":{
+          case "selectdata": {
             this.dataUrl = socketMsg.pathURL;
             this.viewData();
             break;
           }
-          case "resourcesSave":{
-             let dataItem = {
-                  name: socketMsg.name,
-                  description: socketMsg.description,
-                  pathURL: socketMsg.pathURL
-                };
-                this.resources.push(dataItem);
+          case "resourcesSave": {
+            let dataItem = {
+              name: socketMsg.name,
+              description: socketMsg.description,
+              pathURL: socketMsg.pathURL
+            };
+            this.resources.push(dataItem);
             break;
           }
         }
@@ -870,8 +948,16 @@ export default {
       }
     },
     startWebSocket() {
-      let roomId = sessionStorage.getItem("moduleId");
-      this.socketApi.initWebSocket("MapServer/" + roomId,this.$store.state.IP_Port);
+      if (this.pageParams.pageId == undefined || this.pageParams.pageId == "") {
+        this.$Message.error("Lose the information of current step.");
+        return false;
+      }
+      
+      let roomId = this.pageParams.pageId;
+      this.socketApi.initWebSocket(
+        "MapServer/" + roomId,
+        this.$store.state.IP_Port
+      );
 
       this.send_content = {
         type: "test",
@@ -881,40 +967,34 @@ export default {
       this.socketApi.sendSock(this.send_content, this.getSocketConnect);
     },
     getResources() {
-      this.resources = [];
-      let resources = JSON.parse(sessionStorage.getItem("resources"));
-      if(resources != null && resources != undefined && resources.length > 0){
-        for (let i = 0; i < resources.length; i++) {
-              if (resources[i].type == "data"  && /\.(json|zip)$/.test(resources[i].name.toLowerCase())) {
-                this.resources.push(resources[i]);
-              }
-            }
+      if (this.pageParams.pageId == undefined || this.pageParams.pageId == "") {
+        this.$Message.error("Lose the information of current step.");
+        return false;
       }
-      else {
-      var that = this;
+
+      this.resources = [];
       this.axios
         .get(
-          "/GeoProblemSolving/resource/inquiry" +
-            "?key=scope.moduleId" +
-            "&value=" +
-            sessionStorage.getItem("moduleId")
+          "/GeoProblemSolving/folder/inquiry?folderId=" + this.pageParams.pageId
         )
         .then(res => {
           // 写渲染函数，取到所有资源
           if (res.data !== "None") {
             for (let i = 0; i < res.data.length; i++) {
-              if (res.data[i].type == "data" && /\.(json|zip)$/.test(res.data[i].name.toLowerCase())) {
-                that.resources.push(res.data[i]);
+              if (
+                res.data[i].type == "data" &&
+                /\.(json|zip)$/.test(res.data[i].name.toLowerCase())
+              ) {
+                this.resources.push(res.data[i]);
               }
             }
           } else {
-            that.resources = [];
+            this.resources = [];
           }
         })
         .catch(err => {
           console.log(err.data);
         });
-      }
     },
     selecetResource(url) {
       this.dataUrl = url;
@@ -928,28 +1008,6 @@ export default {
 
       this.viewData();
     }
-  },
-  mounted() {
-    window.addEventListener("resize", this.initSize);
-    this.initSize();
-    this.initMap();
-    this.initLayer();
-    this.initControl();
-    this.startWebSocket();
-    this.listenDraw();
-    this.getResources();
-  },
-  beforeDestroy() {
-    window.removeEventListener("resize", this.initSize);
-    this.socketApi.close();
-  },
-  beforeRouteEnter: (to, from, next) => {
-    next(vm => {
-      if (!vm.$store.getters.userState || vm.$store.getters.userId == "") {
-        vm.$router.push({ name: "Login" });
-      } else {
-      }
-    });
   }
 };
 </script>

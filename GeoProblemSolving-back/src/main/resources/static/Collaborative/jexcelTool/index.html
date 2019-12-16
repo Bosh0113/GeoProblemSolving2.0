@@ -154,7 +154,9 @@
             activeTab: "tablePanel",
             // 表格的socket工具
             excelSocket: null,
-            boolCollaborate: false
+            boolCollaborate: false,
+            pageParams: { pageId: "", userId: "", userName: "" },
+            userInfo: {},
         },
         computed: {
             transferHeaders() {
@@ -172,6 +174,15 @@
                 });
                 return data;
             }
+        },
+        created() {
+            this.$nextTick(function () {
+                this.init();
+            });
+        },
+        mounted() {
+            this.getStepInfo();
+            this.getUserInfo();
         },
         methods: {
             init() {
@@ -192,6 +203,55 @@
                     this.openExcelSocket();
                 } else {
                     alert("不支持");
+                }
+            },
+            getStepInfo() {
+                if (
+                    this.$route.params.groupID == undefined ||
+                    this.$route.params.groupID == ""
+                ) {
+                    var href = window.location.href;
+                    var url = href.split("&");
+
+                    for (var i = 0; i < url.length; i++) {
+                        if (/groupID/.test(url[i])) {
+                            this.pageParams.pageId = url[i].match(/groupID=(\S*)/)[1];
+                            continue;
+                        }
+
+                        if (/userID/.test(url[i])) {
+                            this.pageParams.userId = url[i].match(/userID=(\S*)/)[1];
+                            continue;
+                        }
+
+                        if (/userName/.test(url[i])) {
+                            this.pageParams.userName = url[i].match(/userName=(\S*)/)[1];
+                            continue;
+                        }
+                    }
+                } else {
+                    this.pageParams.pageId = this.$route.params.groupID;
+                    this.pageParams.userId = this.$route.params.userID;
+                    this.pageParams.userName = this.$route.params.userName;
+                }
+            },
+            getUserInfo() {
+                this.userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
+                if (this.userInfo == {}) {
+                    this.axios
+                        .get(
+                            "/GeoProblemSolving/user/inquiry" +
+                            "?key=" +
+                            "userId" +
+                            "&value=" +
+                            this.pageParams.userId
+                        )
+                        .then(res => {
+                            if (res.data != "Fail" && res.data != "None") {
+                                this.$set(this, "userInfo", res.data);
+                            }
+                        })
+                        .catch(err => {});
                 }
             },
             // 下载文件
@@ -235,6 +295,11 @@
                 this.boolCollaborate = false;
             },
             beforeUpload(file){
+                if (this.pageParams.pageId == undefined || this.pageParams.pageId == "") {
+                    this.$Message.error("Lose the information of current step.");
+                    return false;
+                }
+
                 if (!/\.(xls|xlsx|csv)$/.test(file.name.toLowerCase())) {
                     this.$Message.error("上传格式不正确，请上传xls或者xlsx格式");
                     return false;
@@ -242,23 +307,17 @@
 
                 //上传数据
                 var formData = new FormData();
-                var userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
                 formData.append("file", file);
                 formData.append("description", "Data chart tool");
                 formData.append("type", "data");
-                formData.append("uploaderId", userInfo.userId);
-                formData.append("belong", userInfo.userName);
-                var scopeObject = {
-                    projectId: sessionStorage.getItem("projectId"),
-                    subProjectId: sessionStorage.getItem("subProjectId"),
-                    moduleId: sessionStorage.getItem("moduleId")
-                };
-                formData.append("scope", JSON.stringify(scopeObject));
+                formData.append("uploaderId", this.userInfo.userId);
+                formData.append("privacy", "private");
+                formData.append("folderId", this.pageParams.pageId);
 
                 var _this = this;
                 $.ajax({
                     type: "POST",
-                    url: "/GeoProblemSolving/resource/upload",
+                    url: "/GeoProblemSolving/folder/uploadToFolder",
                     data: formData,
                     cache: false,        //不设置缓存
                     processData: false,  // 不处理数据
@@ -290,12 +349,17 @@
                 }
             },
             openExcelSocket() {
-                var moduleId = sessionStorage.getItem("moduleId");
-                var moduleSocketURL = "ws://"+window.location.host+"/GeoProblemSolving/ExcelTool/" + moduleId;
-                // var moduleSocketURL = "ws://localhost:8081/GeoProblemSolving/ExcelTool/" + moduleId;
-                // var moduleSocketURL = "ws://172.21.212.72:8082/GeoProblemSolving/ExcelTool/" + moduleId;
-                // var moduleSocketURL = "ws://94.191.49.160:8080/GeoProblemSolving/ExcelTool/" + moduleId;
-                // var moduleSocketURL = "ws://172.21.213.185:8080/GeoProblemSolving/ExcelTool/" + moduleId;
+                if (this.pageParams.pageId == undefined || this.pageParams.pageId == "") {
+                    this.$Message.error("Lose the information of current step.");
+                    return false;
+                }
+
+                var roomId = this.pageParams.pageId;
+                var moduleSocketURL = "ws://"+window.location.host+"/GeoProblemSolving/ExcelTool/" + roomId;
+                // var moduleSocketURL = "ws://localhost:8081/GeoProblemSolving/ExcelTool/" + roomId;
+                // var moduleSocketURL = "ws://172.21.212.72:8082/GeoProblemSolving/ExcelTool/" + roomId;
+                // var moduleSocketURL = "ws://94.191.49.160:8080/GeoProblemSolving/ExcelTool/" + roomId;
+                // var moduleSocketURL = "ws://172.21.213.185:8080/GeoProblemSolving/ExcelTool/" + roomId;
                 this.excelSocket = new WebSocket(moduleSocketURL);
                 this.excelSocket.onopen = this.onOpen;
                 this.excelSocket.onmessage = this.onMessage;
@@ -547,13 +611,6 @@
                 this.boolCollaborate = false;
             }
 
-        },
-        created() {
-            this.$nextTick(function () {
-                this.init();
-            });
-        },
-        mounted() {
         }
     });
 </script>

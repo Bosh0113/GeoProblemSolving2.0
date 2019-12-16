@@ -43,6 +43,7 @@ public class StepDaoImpl implements IStepDao {
 
         // 资源
         FolderEntity folderEntity = new FolderEntity();
+        folderEntity.setScopeId(stepId);
         folderEntity.setFolders(new ArrayList<>());
         folderEntity.setFiles(new ArrayList<>());
         folderEntity.setFolderName(step.getName());

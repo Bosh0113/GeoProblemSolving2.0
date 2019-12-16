@@ -50,7 +50,7 @@
                   <Icon type="md-link" :size="20"/>
                   <span> {{userDetail.homePage}}</span>
                 <br>
-                <div style="padding:20px 20px 0 20px;font-size:12px;text-indent:2em;border:1px dotted lightgray" v-show="userDetail.introduction!=''">
+                <div style="padding:20px 20px 0 20px;font-size:12px;text-indent:2em;border:1px dotted lightgray;white-space: pre-line;" v-show="userDetail.introduction!=''">
                   {{this.userDetail.introduction}}
                 </div>
               </div>
@@ -68,32 +68,37 @@
                   <Col :lg="{span:22,offset:1}" :md="{span:22,offset:1}" :sm="{span:22,offset:1}">
                     <Card>
                       <p slot="title">History Line</p>
-
-                      <Timeline
-                        style="margin-top:20px;margin-left:5%;max-height:300px;overflow-y:auto"
-                      >
-                      <div v-if="memberEventList.length==0">
-                            <div style="display:flex;justify-content:center">
-                              <Icon type="md-alert" size="40" color="gray"/>
-                            </div>
-                            <br>
-                            <div style="display:flex;justify-content:center">
-                              <h3
-                                style="text-align:center;width:80%"
-                              >Sorry, there is no event here. After some projects are created or joined, the events of creation or joining will be listed here.</h3>
-                            </div>
-                          </div>
-                        <TimelineItem v-for="(item,index) in memberEventList" :key="index" v-show="memberEventList.length>0">
-                          <strong>
-                            <p class="time">{{item.createTime}}</p>
-                          </strong>
-                          <p class="content">{{item.description}}</p>
-                        </TimelineItem>
-                      </Timeline>
+                        <div class="timeLineStyle">
+                          <vue-scroll :ops="ops">
+                            <Timeline
+                              style="margin-top:20px;margin-left:5%;max-height:300px;overflow-y:auto"
+                            >
+                            <div v-if="memberEventList.length==0">
+                                  <div style="display:flex;justify-content:center">
+                                    <Icon type="md-alert" size="40" color="gray"/>
+                                  </div>
+                                  <br>
+                                  <div style="display:flex;justify-content:center">
+                                    <h3
+                                      style="text-align:center;width:80%"
+                                    >Sorry, there is no event here. After some projects are created or joined, the events of creation or joining will be listed here.</h3>
+                                  </div>
+                                </div>
+                              <TimelineItem v-for="(item,index) in memberEventList" :key="index" v-show="memberEventList.length>0">
+                                <strong>
+                                  <p class="time">{{item.createTime}}</p>
+                                </strong>
+                                <p class="content">{{item.description}}</p>
+                              </TimelineItem>
+                            </Timeline>
+                          </vue-scroll>
+                        </div>
                     </Card>
                   </Col>
                 </TabPane>
-                <TabPane label="Joined Project" name="Participatory">
+                <TabPane label="Joined projects" name="Participatory">
+                    <div style="height:900px;padding:5px;border:#dcdee2 solid 1px;">
+                      <vue-scroll :ops="ops">
                   <Card :bordered="false" v-if="joinedProjectsList.length == 0">
                       <div style="display:flex;justify-content:center">
                         <Icon type="md-alert" size="40" color="gray"/>
@@ -117,8 +122,8 @@
                           class="projectsTitle"
                         >{{item.title}}</p>
                         <p
-                          style="height:200px;text-indent:2em;overflow-y:auto;word-break:break-word"
-                        >{{item.introduction}}</p>
+                          style="height:200px;text-indent:2em;overflow-y:auto;word-break:break-word;white-space: pre-line;"
+                        ><vue-scroll :ops="ops">{{item.introduction}}</vue-scroll></p>
                         <br>
                         <div style="height:40px">
                           <span style="float:left">CreateTime:</span>
@@ -128,8 +133,12 @@
                       </div>
                     </Col>
                   </div>
+                  </vue-scroll>
+                  </div>
                 </TabPane>
                 <TabPane label="Managed Project" name="Management">
+                    <div style="height:900px;padding:5px;border:#dcdee2 solid 1px;">
+                      <vue-scroll :ops="ops">
                   <Card :bordered="false" v-if="userManagerProjectList.length == 0">
                       <div style="display:flex;justify-content:center">
                         <Icon type="md-alert" size="40" color="gray"/>
@@ -152,8 +161,8 @@
                           class="projectsTitle"
                         >{{mProject.title}}</p>
                         <p
-                          style="height:200px;text-indent:2em;overflow-y:auto;word-break:break-word"
-                        >{{mProject.introduction}}</p>
+                          style="height:200px;text-indent:2em;overflow-y:auto;word-break:break-word;white-space: pre-line;"
+                        ><vue-scroll :ops="ops">{{mProject.introduction}}</vue-scroll></p>
                         <!-- <hr> -->
                         <br>
                         <div>
@@ -163,6 +172,8 @@
                       </Card>
                     </div>
                     </Col>
+                  </div>
+                  </vue-scroll>
                   </div>
                 </TabPane>
               </Tabs>
@@ -180,7 +191,7 @@
   margin-right: 20px;
 }
 .rightContent {
-  margin-top:20px;
+  margin-top: 20px;
   flex: 1;
 }
 img {
@@ -351,8 +362,8 @@ body {
   table-layout: auto;
   width: 100% !important;
 }
-.participatoryProjectCard:hover,{
-  cursor:pointer;
+.participatoryProjectCard:hover {
+  cursor: pointer;
 }
 </style>
 <script>
@@ -386,6 +397,11 @@ export default {
       //加入的项目详情数组列表
       joinedProjectsList: [],
       userManagerProjectList: [],
+      ops: {
+        bar: {
+          background: "#808695"
+        }
+      },
     };
   },
   methods: {
@@ -408,14 +424,13 @@ export default {
             this.$route.params.id
         )
         .then(res => {
-          if(res.data != "None" && res.data != "Fail") {
+          if (res.data != "None" && res.data != "Fail") {
             this.userDetail = res.data;
             this.joinedProjectsNameArray = this.userDetail.joinedProjects;
-            if(this.joinedProjectsNameArray.length > 0) {
+            if (this.joinedProjectsNameArray.length > 0) {
               this.getParticipatoryList(this.joinedProjectsNameArray);
             }
           }
-
         })
         .catch(err => {
           console.log(err.data);
@@ -431,11 +446,10 @@ export default {
             this.$route.params.id
         )
         .then(res => {
-          if(res.data == "Offline"){
+          if (res.data == "Offline") {
             this.$store.commit("userLogout");
             this.$router.push({ name: "Login" });
-          }
-          else if(res.data !="None"&&res.data !="Fail"){
+          } else if (res.data != "None" && res.data != "Fail") {
             this.memberEventList = res.data;
           }
         })
@@ -452,12 +466,11 @@ export default {
             this.$route.params.id
         )
         .then(res => {
-          if(res.data!="None" && res.data!=""){
+          if (res.data != "None" && res.data != "") {
             //判断是否为空
             this.userManagerProjectList = res.data;
           }
           // 打印用户所管理的项目
-
         })
         .catch(err => {});
     },
@@ -486,14 +499,14 @@ export default {
             console.log(err.data);
           });
       }
-    },
+    }
   },
   mounted() {
     this.getUserProfile();
     this.getManagerProjectList();
     this.readPersonalEvent();
     this.detailSidebarHeight = window.innerHeight - 60 + "px";
-  },
+  }
 };
 </script>
 

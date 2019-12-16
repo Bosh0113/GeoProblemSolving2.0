@@ -16,7 +16,6 @@ h1 {
   width: 20%;
   margin-right: 40%;
   margin-left: 40%;
-  margin-top: 10%;
 }
 #editor {
   /* position:fixed; */
@@ -302,7 +301,6 @@ export default {
               } else {
                 this.createProjectId = res.data;
                 this.addHistoryEvent(this.createProjectId);
-                window.location.href="/GeoProblemSolving/projectDetail/"+this.createProjectId;
               }
             })
             .catch(err => {
@@ -330,7 +328,9 @@ export default {
         .post("/GeoProblemSolving/history/save", form)
         .then(res => {
           if (res.data === "Success") {
-            // this.$router.push({ name: "Project" });
+                window.location.href="/GeoProblemSolving/projectDetail/"+this.createProjectId;
+          }else{
+            confirm("Created project fail.");
           }
         })
         .catch(err => {

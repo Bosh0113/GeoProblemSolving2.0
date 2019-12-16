@@ -1,11 +1,9 @@
 package cn.edu.njnu.geoproblemsolving.ChangeDB;
 
+import cn.edu.njnu.geoproblemsolving.Dao.Step.StepDaoImpl;
+import cn.edu.njnu.geoproblemsolving.Entity.*;
 import cn.edu.njnu.geoproblemsolving.Entity.Folder.FolderEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.Folder.FolderItem;
-import cn.edu.njnu.geoproblemsolving.Entity.ModuleEntity;
-import cn.edu.njnu.geoproblemsolving.Entity.ProjectEntity;
-import cn.edu.njnu.geoproblemsolving.Entity.ResourceEntity;
-import cn.edu.njnu.geoproblemsolving.Entity.SubProjectEntity;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -140,6 +138,115 @@ public class UpdateDBDao {
             Query query1 = new Query(Criteria.where("folderId").is(folderItem.getUid()));
             FolderEntity folderEntity1 = mongoTemplate.findOne(query1,FolderEntity.class);
             folderAddScopeId(folderEntity1,scopeId);
+        }
+    }
+
+    public String moduleToStepTree(){
+        try{
+            List<SubProjectEntity> subProjectEntities = mongoTemplate.findAll(SubProjectEntity.class);
+            for(SubProjectEntity subProject : subProjectEntities){
+                Query query = new Query(Criteria.where("subProjectId").is(subProject.getSubProjectId()));
+                List<ModuleEntity> moduleEntities = mongoTemplate.find(query,ModuleEntity.class);
+                if(moduleEntities.size()>0){
+                    ArrayList<StepNodeEntity> stepNodes = new ArrayList<>();
+                    for(int i=0;i<moduleEntities.size();i++){
+                        ModuleEntity moduleInfo = moduleEntities.get(i);
+                        StepEntity stepEntity = new StepEntity();
+                        stepEntity.setType(transStepType(moduleInfo.getType()));
+                        stepEntity.setName(moduleInfo.getTitle());
+                        stepEntity.setDescription(moduleInfo.getDescription());
+                        stepEntity.setSubProjectId(moduleInfo.getSubProjectId());
+                        stepEntity.setCreator(moduleInfo.getCreator());
+                        stepEntity.setContent(new JSONObject());
+
+                        StepNodeEntity stepNode = new StepNodeEntity();
+                        stepNode.setId(i);
+                        StepDaoImpl  stepDao = new StepDaoImpl(mongoTemplate);
+                        stepNode.setStepID(stepDao.createStep(stepEntity));
+                        stepNode.setName(stepEntity.getName());
+                        stepNode.setCategory(transStepCategory(stepEntity.getType()));
+                        ArrayList<StepListNodeEntity> last = new ArrayList<>();
+                        if (i!=0){
+                            StepListNodeEntity stepListNodeEntity = new StepListNodeEntity();
+                            stepListNodeEntity.setId(i-1);
+                            stepListNodeEntity.setName(moduleEntities.get(i-1).getTitle());
+                            last.add(stepListNodeEntity);
+                        }
+                        stepNode.setLast(last);
+                        ArrayList<StepListNodeEntity> next = new ArrayList<>();
+                        if(i!=moduleEntities.size()-1){
+                            StepListNodeEntity stepListNodeEntity = new StepListNodeEntity();
+                            stepListNodeEntity.setId(i+1);
+                            stepListNodeEntity.setName(moduleEntities.get(i+1).getTitle());
+                            next.add(stepListNodeEntity);
+                        }
+                        stepNode.setNext(next);
+                        if(i==0){
+                            stepNode.setX(0);
+                        }
+                        else {
+                            stepNode.setX(i*((float)800/(float)moduleEntities.size()));
+                        }
+                        stepNode.setY(200);
+                        stepNode.setLevel(i);
+                        if(i!=moduleEntities.size()-1){
+                            stepNode.setEnd(false);
+                            stepNode.setActiveStatus(false);
+                        }
+                        else {
+                            stepNode.setEnd(true);
+                            stepNode.setActiveStatus(true);
+                        }
+                        stepNodes.add(stepNode);
+                    }
+                    Update update = new Update();
+                    update.set("solvingProcess",JSONObject.toJSONString(stepNodes));
+                    mongoTemplate.updateFirst(query,update,SubProjectEntity.class);
+                }
+            }
+            return "Success";
+        }catch (Exception e){
+            return "Fail";
+        }
+    }
+
+    private String transStepType(String oldType){
+        switch (oldType){
+            case "Preparation":
+                return "Context definition & resource collection";
+            case "Analysis":
+                return "Data processing";
+            case "Modeling":
+                return "Modeling for geographic process";
+            case "Simulation":
+                return "Simulation/Prediction";
+            case "Validation":
+                return "Visualization & representation";
+            case "Comparison":
+                return "Model evaluation";
+            default:
+                return "Decision-making & management";
+        }
+    }
+
+    private int transStepCategory(String type){
+        switch (type){
+            case "Context definition & resource collection":
+                return 0;
+            case "Data processing":
+                return 1;
+            case "Modeling for geographic process":
+                return 2;
+            case "Model evaluation":
+                return 3;
+            case "Quantitative and qualitative analysis":
+                return 4;
+            case "Simulation/Prediction":
+                return 5;
+            case "Visualization & representation":
+                return 6;
+            default:
+                return 7;
         }
     }
 }

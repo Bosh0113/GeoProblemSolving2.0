@@ -270,11 +270,23 @@
                                         this.currentProjectList = [];
                                     }
                                     else{
-                                        this.judgeMember(res.data.projectList);
+                                        var category = this.currentTab;
+                                        var thisCategory = [];
+                                        if(category!="All"){
+                                            thisCategory = res.data.projectList.filter(function(e) {
+                                                if (e.category == category) {
+                                                    return e;
+                                                }
+                                            });
+                                        }
+                                        else {
+                                            thisCategory = res.data.projectList;
+                                        }
+                                        this.judgeMember(thisCategory);
                                     }
                                     this.tabPageData = Object.assign([], this.currentProjectList);
+                                    this.totalCount=this.currentProjectList.length;
                                     this.freshEle++;
-                                    this.totalCount=res.data.count;
                                 }
                                 else{
                                     console.log("Fail");

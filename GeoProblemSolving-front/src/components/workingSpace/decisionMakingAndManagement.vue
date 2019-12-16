@@ -241,15 +241,11 @@ export default {
     },
     userRoleIdentity() {
       this.userRole = "Visitor";
-      // console.log(this.stepContent.creator);
-      // console.log(this.$store.getters.userId);
-      let creatorId = sessionStorage.getItem("subProjectManagerId");
-      console.log(creatorId);
+      let creatorId = JSON.parse(sessionStorage.getItem("subProjectInfo")).managerId;
       if (this.$store.getters.userState) {
         // 是否是子项目管理员
         if (creatorId === this.$store.getters.userId) {
           this.userRole = "Manager";
-          console.log(this.userRole);
         } else {
           this.userRole = "Visitor";
         }

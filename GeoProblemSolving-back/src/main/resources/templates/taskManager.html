@@ -422,7 +422,11 @@
         },
         methods: {
             initSize() {
-                this.contentHeight = window.innerHeight - 210;
+                if(window.innerHeight>735){
+                    this.contentHeight = window.innerHeight - 236;
+                }else {
+                    this.contentHeight = "499";
+                }
             },
             closeStepSocket() {
                 if (this.projectSocket != null) {

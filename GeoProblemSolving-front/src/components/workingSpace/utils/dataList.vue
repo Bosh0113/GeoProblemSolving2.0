@@ -1,4 +1,8 @@
 <style scoped>
+.table table {
+  table-layout: auto;
+  width: 100% !important;
+}
 </style>
 <template>
   <div>
@@ -18,6 +22,7 @@
           style="overflow:auto"
           :columns="tableColName"
           :data="this.stepDataList"
+          class="table"
           v-show="this.stepDataList!=[] && this.stepDataList!='None'"
         >
           <template slot-scope="{ row }" slot="name">
@@ -209,6 +214,7 @@ export default {
   created() {},
   mounted() {
     this.getDataList();
+    $(".__view").css("width", "inherit");
   },
   methods: {
     getDataList() {
@@ -230,10 +236,6 @@ export default {
             // this.$set(this, "stepResourceList", list);
             this.filterData();
           }
-        });
-      } else {
-        this.$Notice.info({
-          desc: "Get data failed!"
         });
       }
     },

@@ -73,12 +73,12 @@
       <Row>
         <Col span="7" :style="{height:sidebarHeight+40+'px'}">
           <Card shadow>
-            <p slot="title">
-              <Icon type="ios-paper" />Data
-            </p>
-            <div :style="{height:sidebarHeight-50+'px'}">
-              <h3>Data list</h3>
-            </div>
+              <div class="condefTitle">
+                <div
+                  style="width:3px;height:18px;float:left;background-color:rgb(124, 126, 126)"
+                ></div>
+                  <data-list :stepInfo="stepInfo" :contentHeight="contentHeight" :userRole="userRole" :key="dataListIndex"></data-list>
+              </div>
           </Card>
         </Col>
         <Col span="17">
@@ -157,7 +157,11 @@
   </div>
 </template>
 <script>
+import dataList from "./utils/dataList";
 export default {
+  components: {
+    dataList,
+  },
   mounted() {
     this.initSize();
     this.userRoleIdentity();
@@ -192,7 +196,10 @@ export default {
       stepInfo: {
         name: ""
       },
+      userRole:"Visitor",
       sidebarHeight: 800,
+      contentHeight: 800,
+      dataListIndex:0,
       themeModels: [
         {
           img: "http://www.saga-gis.org/_images/logo_saga_big.png",
@@ -237,8 +244,10 @@ export default {
     initSize() {
       if (window.innerHeight > 675) {
         this.sidebarHeight = window.innerHeight - 290;
+        this.contentHeight = window.innerHeight - 254;
       } else {
-        this.sidebarHeight = 385;
+        this.sidebarHeight = 675 - 290;
+        this.contentHeight = 675 - 254;
       }
     },
     getStepInfo() {
@@ -256,6 +265,7 @@ export default {
             this.$router.push({ name: "Login" });
           } else if (res.data != "Fail" && res.data != "None") {
             this.stepInfo = res.data[0];
+            this.dataListIndex++;
             this.toSubProjectPage = "/project/" + res.data[0].subProjectId + "/subproject";
           } else {
             this.$Message.warning("Get step info fail.");
@@ -268,13 +278,11 @@ export default {
     },
     userRoleIdentity() {
       this.userRole = "Visitor";
-      let creatorId = sessionStorage.getItem("subProjectManagerId");
-      console.log(creatorId);
+      let creatorId = JSON.parse(sessionStorage.getItem("subProjectInfo")).managerId;
       if (this.$store.getters.userState) {
         // 是否是子项目管理员
         if (creatorId === this.$store.getters.userId) {
           this.userRole = "Manager";
-          console.log(this.userRole);
         } else {
           this.userRole = "Visitor";
         }

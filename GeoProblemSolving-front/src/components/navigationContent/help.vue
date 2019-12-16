@@ -30,11 +30,15 @@ export default {
       titleList: [
         "Home page",
         "Projects page",
+        "Project information",
+        "Personal page",
+        "Personal projects",
+        "Notifications center",
         "Project detail page",
-        "Subproject list",
-        "Subproject home page",
-        "Subproject resources",
-        "Subproject task page"
+        "Project's resources",
+        "Project's sub-projects",
+        "Sub-project's detail page",
+        "Sub-project's tasks"
       ]
     };
   },

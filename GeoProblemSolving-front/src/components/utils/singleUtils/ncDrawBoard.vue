@@ -1,130 +1,244 @@
+<style scoped>
+/* @import "//fonts.useso.com/css?family=Roboto:300,400,500,700,400italic"; */
+@import "http://cdn.bootcss.com/material-design-icons/3.0.1/iconfont/material-icons.css";
+* {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+canvas {
+  position: absolute;
+  z-index: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+}
+.layout {
+  background-color: rgb(236, 236, 236);
+  height: 100%;
+  margin-left: 60px;
+}
+.header {
+  background-color: #2196f3;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.logo {
+  display: flex;
+  align-items: center;
+  font-size: 24px;
+  color: white;
+  padding: 10px 20px;
+}
+.nav {
+  display: flex;
+  width: 80%;
+  /* justify-content: center; */
+}
+.edit_panel {
+  /* background-color: aqua; */
+  width: 20%;
+  /* justify-content属性保证里面的元素垂直居中使用center，居左使用flex-front属性，居右则使用flex-right属性 ,space-between则是两端对齐,space-around则是手拉手对齐方式*/
+  /* 不用再加入width:50%；margin-left:25%;margin-right:25%了 */
+  justify-content: center;
+  display: flex;
+  align-content: center;
+}
+
+.content {
+  overflow: hidden;
+  width: 100%;
+  height: calc(100vh - 56px);
+  display: flex;
+}
+.content-left {
+  width: 280px;
+  background-color: white;
+}
+.content-right {
+  width: calc(100% - 280px);
+  height: 100%;
+  padding: 10px 20px;
+  background-color: rgba(0, 0, 0, 0);
+}
+.body {
+  position: relative;
+  background-color: white;
+  border-radius: 5px;
+  height: 100%;
+  margin: 0 auto;
+}
+.setterSize {
+  padding: 5%;
+  font-size: 0.5rem;
+}
+.selected {
+  background: rgba(0, 0, 0, 0.35) !important;
+}
+.tab {
+  margin-right: 5px;
+}
+.icon_style {
+  width: 20%;
+  margin-left: 10%;
+  margin-top: 5px;
+}
+.font_style {
+  line-height: 30px;
+  font-size: 15px;
+  margin-top: 5px;
+  margin-left: 10%;
+}
+.setting_style {
+  margin-top: 10px;
+  height: 40px;
+  display: flex;
+}
+.edit-btn {
+  margin-right: 5px;
+}
+</style>
 <template>
-<div>
-    <toolStyle :style="{height:windowHeight+'px'}"
+  <div>
+    <toolStyle
+      :style="{height:windowHeight+'px'}"
       :resources="resources"
       v-on:resourceUrl="selecetResource"
     ></toolStyle>
-  <div class="layout">    
-    <div class="header">
-      <div class="logo">
-        <span>Drawing</span>
-      </div>
-      <div class="nav">
-        <Button label="Clear" class="tab demo-flat-button" icon="md-close" @click="tabfun('clear')">
-          <span>Clear</span>
-        </Button>
-        <Button type="default" class="edit-btn" @click="Drawcancel()">
-          <Icon type="md-arrow-round-back"/>
-        </Button>
-        <Button type="default" class="edit-btn" @click="Drawrestore()">
-          <Icon type="md-arrow-round-forward"/>
-        </Button>
-        <Button type="default" class="edit-btn" @click="canvas_copy()" style="margin-left:10px">Copy</Button>
-        <Button type="default" class="edit-btn" @click="canvas_paste()">Paste</Button>
-        <Button
-          :label="chooseColorBtn"
-          class="tab demo-flat-button"
-          icon="ios-color-palette"
-          @click="setColor()"
-          :color="color.hex"
-          style="margin-left:10px"
-        >
-          <span>{{this.chooseColorBtn}}</span>
-        </Button>
-        <Button
-          label="Download"
-          class="tab demo-flat-button"
-          icon="md-cloud-download"
-          @click="tabfun('save')"
-          style="margin-left:10px"
-        >
-          <span>Download</span>
-        </Button>
-        <a href="javascript:void(0);" ref="download" download="picture.png" v-show="false"></a>
-        <Button
-          label="Download"
-          class="tab demo-flat-button"
-          icon="ios-download"
-          @click="tabfun('resource')"
-        >
-          <span>Save to resources</span>
-        </Button>
-      </div>
-      <PhotoshopPicker
-        v-model="color"
-        v-if="ischoosecolor"
-        style="position:absolute;z-index:10;top:56px;"
-        @ok="setColor()"
-        @cancel="falseColor()"
-      />
-    </div>
-    <div class="content" :style="{height:windowHeight-56+'px'}">
-      <div class="content-left">
-        <div class="setterSize">
-          <span>Thickness of line:{{penSize}}</span>
-          <Slider v-model="penSize" :step="1" :max="30"></Slider>
-          <span>Dotted length:{{lineType[0]}}</span>
-          <Slider v-model="lineType[0]" :step="1" :max="100"></Slider>
-          <span>Dotted interval:{{lineType[1]}}</span>
-          <Slider v-model="lineType[1]" :step="1" :max="100"></Slider>
+    <div class="layout">
+      <div class="header">
+        <div class="logo">
+          <span>Drawing</span>
         </div>
-        <div v-for="tool in tools" :key="tool.index">
-          <div class="setting_style" @click="drawType(tool)" :class="{'selected':tool.ischoose}">
-            <span class="font_style">{{tool.name}}</span>
+        <div class="nav">
+          <Button
+            label="Clear"
+            class="tab demo-flat-button"
+            icon="md-close"
+            @click="tabfun('clear')"
+          >
+            <span>Clear</span>
+          </Button>
+          <Button type="default" class="edit-btn" @click="Drawcancel()">
+            <Icon type="md-arrow-round-back" />
+          </Button>
+          <Button type="default" class="edit-btn" @click="Drawrestore()">
+            <Icon type="md-arrow-round-forward" />
+          </Button>
+          <Button
+            type="default"
+            class="edit-btn"
+            @click="canvas_copy()"
+            style="margin-left:10px"
+          >Copy</Button>
+          <Button type="default" class="edit-btn" @click="canvas_paste()">Paste</Button>
+          <Button
+            :label="chooseColorBtn"
+            class="tab demo-flat-button"
+            icon="ios-color-palette"
+            @click="setColor()"
+            :color="color.hex"
+            style="margin-left:10px"
+          >
+            <span>{{this.chooseColorBtn}}</span>
+          </Button>
+          <Button
+            label="Download"
+            class="tab demo-flat-button"
+            icon="md-cloud-download"
+            @click="tabfun('save')"
+            style="margin-left:10px"
+          >
+            <span>Download</span>
+          </Button>
+          <a href="javascript:void(0);" ref="download" download="picture.png" v-show="false"></a>
+          <Button
+            label="Download"
+            class="tab demo-flat-button"
+            icon="ios-download"
+            @click="tabfun('resource')"
+          >
+            <span>Save to resources</span>
+          </Button>
+        </div>
+        <PhotoshopPicker
+          v-model="color"
+          v-if="ischoosecolor"
+          style="position:absolute;z-index:10;top:56px;"
+          @ok="setColor()"
+          @cancel="falseColor()"
+        />
+      </div>
+      <div class="content" :style="{height:windowHeight-56+'px'}">
+        <div class="content-left">
+          <div class="setterSize">
+            <span>Thickness of line:{{penSize}}</span>
+            <Slider v-model="penSize" :step="1" :max="30"></Slider>
+            <span>Dotted length:{{lineType[0]}}</span>
+            <Slider v-model="lineType[0]" :step="1" :max="100"></Slider>
+            <span>Dotted interval:{{lineType[1]}}</span>
+            <Slider v-model="lineType[1]" :step="1" :max="100"></Slider>
+          </div>
+          <div v-for="tool in tools" :key="tool.index">
+            <div class="setting_style" @click="drawType(tool)" :class="{'selected':tool.ischoose}">
+              <span class="font_style">{{tool.name}}</span>
+            </div>
+          </div>
+        </div>
+        <div class="content-right">
+          <div
+            class="body"
+            :style="{width:canvasSize.width + 'px', height: canvasSize.height + 'px' }"
+          >
+            <canvas id="canvas" ref="canvas" :style="{cursor:curcursor}"></canvas>
+            <canvas id="canvas_bak" ref="canvas_bak" :style="{cursor:curcursor}"></canvas>
           </div>
         </div>
       </div>
-      <div class="content-right">
-        <div
-          class="body"
-          :style="{width:canvasSize.width + 'px', height: canvasSize.height + 'px' }"
-        >
-          <canvas id="canvas" ref="canvas" :style="{cursor:curcursor}"></canvas>
-          <canvas id="canvas_bak" ref="canvas_bak" :style="{cursor:curcursor}"></canvas>
-        </div>
-      </div>
-    </div>
-    <Modal
-      v-model="uploadFileModal"
-      title="Save to resource"
-      @on-ok="save2Resource('formValidate')"
-      ok-text="Submit"
-      cancel-text="Cancel"
-      width="600px"
-    >
-      <Form
-        ref="formValidate"
-        :model="formValidate"
-        :rules="ruleValidate"
-        :label-width="80"
-        style="margin-left:20px"
+      <Modal
+        v-model="uploadFileModal"
+        title="Save to resource"
+        @on-ok="save2Resource('formValidate')"
+        ok-text="Submit"
+        cancel-text="Cancel"
+        width="600px"
       >
-        <FormItem label="Name" prop="fileName">
-          <Input v-model="formValidate.fileName" placeholder="*.png" style="width: 400px"/>
-        </FormItem>
-        <FormItem label="Description" prop="fileDescription">
-          <Input
-            v-model="formValidate.fileDescription"
-            type="textarea"
-            placeholder="Enter something..."
-            style="width: 400px"
-          />
-        </FormItem>
-      </Form>
-    </Modal>
-  </div>
+        <Form
+          ref="formValidate"
+          :model="formValidate"
+          :rules="ruleValidate"
+          :label-width="80"
+          style="margin-left:20px"
+        >
+          <FormItem label="Name" prop="fileName">
+            <Input v-model="formValidate.fileName" placeholder="*.png" style="width: 400px" />
+          </FormItem>
+          <FormItem label="Description" prop="fileDescription">
+            <Input
+              v-model="formValidate.fileDescription"
+              type="textarea"
+              placeholder="Enter something..."
+              style="width: 400px"
+            />
+          </FormItem>
+        </Form>
+      </Modal>
+    </div>
   </div>
 </template>
 <script>
 import { Photoshop } from "vue-color";
 import toolStyle from "./toolStyle";
 export default {
-  components: { 
+  components: {
     PhotoshopPicker: Photoshop,
     toolStyle
   },
   data() {
-    return {      
+    return {
       windowHeight: window.innerHeight,
       //关于复制
       copyimgdata: "",
@@ -242,21 +356,96 @@ export default {
       // toolStyle 组件
       resources: [],
       dataUrl: "",
+      pageParams: { pageId: "", userId: "", userName: "" },
+      userInfo: {}
     };
   },
-  methods: {    
-    initSize(){
-      if(window.innerHeight  > 675){  
-        this.windowHeight = window.innerHeight;
+  beforeRouteEnter: (to, from, next) => {
+    next(vm => {
+      if (!vm.$store.getters.userState || vm.$store.getters.userId == "") {
+        vm.$router.push({ name: "Login" });
+      } else {
       }
-      else{
+    });
+  },
+  created() {},
+  beforeDestroy() {
+    window.removeEventListener("resize", this.initSize);
+    this.canvas_bak.removeEventListener("click", this.falseColor);
+  },
+  mounted() {
+    this.initSize();
+    this.getStepInfo();
+    this.getUserInfo();
+    this.initCanvas();
+    this.initDrag();
+    this.addkeyBoardlistener();
+    this.drawType(this.tools[0]);
+    this.getResources();
+    this.canvas_bak.addEventListener("click", this.falseColor);
+    window.addEventListener("resize", this.initSize);
+  },
+  methods: {
+    initSize() {
+      if (window.innerHeight > 675) {
+        this.windowHeight = window.innerHeight;
+      } else {
         this.windowHeight = 675;
       }
-      
+
       this.canvasSize = {
         width: window.screen.availWidth - 380,
         height: window.screen.availHeight - 180
       };
+    },
+    getStepInfo() {
+      if (
+        this.$route.params.groupID == undefined ||
+        this.$route.params.groupID == ""
+      ) {
+        var href = window.location.href;
+        var url = href.split("&");
+
+        for (var i = 0; i < url.length; i++) {
+          if (/groupID/.test(url[i])) {
+            this.pageParams.pageId = url[i].match(/groupID=(\S*)/)[1];
+            continue;
+          }
+
+          if (/userID/.test(url[i])) {
+            this.pageParams.userId = url[i].match(/userID=(\S*)/)[1];
+            continue;
+          }
+
+          if (/userName/.test(url[i])) {
+            this.pageParams.userName = url[i].match(/userName=(\S*)/)[1];
+            continue;
+          }
+        }
+      } else {
+        this.pageParams.pageId = this.$route.params.groupID;
+        this.pageParams.userId = this.$route.params.userID;
+        this.pageParams.userName = this.$route.params.userName;
+      }
+    },
+    getUserInfo() {
+      this.userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
+      if (this.userInfo == {}) {
+        this.axios
+          .get(
+            "/GeoProblemSolving/user/inquiry" +
+              "?key=" +
+              "userId" +
+              "&value=" +
+              this.pageParams.userId
+          )
+          .then(res => {
+            if (res.data != "Fail" && res.data != "None") {
+              this.$set(this, "userInfo", res.data);
+            }
+          })
+          .catch(err => {});
+      }
     },
     initCanvas() {
       this.canvas = document.getElementById("canvas");
@@ -328,6 +517,11 @@ export default {
       return new Blob([u8arr], { type: mime });
     },
     save2Resource(name) {
+      if (this.pageParams.pageId == undefined || this.pageParams.pageId == "") {
+        this.$Message.error("Lose the information of current step.");
+        return false;
+      }
+
       this.$refs[name].validate(valid => {
         if (valid) {
           let imageUrl = this.canvas.toDataURL();
@@ -347,30 +541,19 @@ export default {
 
           // base64 转blob
           let imageForm = new FormData();
-          let userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
           let imageBlob = this.getBlobBydataURI(imageUrl);
           var fileOfBlob = new File([imageBlob], filename);
-
           imageForm.append("file", fileOfBlob);
           imageForm.append("description", description);
           imageForm.append("type", "Image");
-          imageForm.append("uploaderId", userInfo.userId);
-          imageForm.append("belong", userInfo.userName);
-          let scopeObject = {
-            projectId: "",
-            subProjectId: "",
-            moduleId: sessionStorage.getItem("moduleId")
-          };
-          imageForm.append("scope", JSON.stringify(scopeObject));
+          imageForm.append("uploaderId", this.userInfo.userId);
           imageForm.append("privacy", "private");
-
-          let that = this;
+          imageForm.append("folderId", this.pageParams.pageId);
           this.axios
-            .post("/GeoProblemSolving/resource/upload", imageForm)
+            .post("/GeoProblemSolving/folder/uploadToFolder", imageForm)
             .then(res => {
               if (res.data != "Size over" && res.data.length > 0) {
-
-                that.$Notice.open({
+                this.$Notice.open({
                   title: "Upload notification title",
                   desc: "File uploaded successfully",
                   duration: 0
@@ -383,14 +566,14 @@ export default {
                   description: "drawing tool data",
                   pathURL: "/GeoProblemSolving/resource/upload/" + dataName
                 };
-                that.resources.push(dataItem);
+                this.resources.push(dataItem);
 
                 // 初始化formValidation
-                that.formValidate = {
+                this.formValidate = {
                   fileName: "",
                   fileDescription: ""
                 };
-              } 
+              }
             })
             .catch(err => {});
         } else {
@@ -406,8 +589,14 @@ export default {
       //鼠标按下获取 开始xy开始画图
       let mousedown = e => {
         e = e || window.event;
-        startX = e.clientX - this.canvasLeft + (document.body.scrollLeft+document.documentElement.scrollLeft);
-        startY = e.clientY - this.canvasTop + (document.body.scrollTop+document.documentElement.scrollTop);
+        startX =
+          e.clientX -
+          this.canvasLeft +
+          (document.body.scrollLeft + document.documentElement.scrollLeft);
+        startY =
+          e.clientY -
+          this.canvasTop +
+          (document.body.scrollTop + document.documentElement.scrollTop);
 
         //记录轨迹 --by mzy
         this.points = [];
@@ -432,8 +621,14 @@ export default {
         e = e || window.event;
 
         if (this.isMouseDown) {
-          let x = e.clientX - this.canvasLeft + (document.body.scrollLeft+document.documentElement.scrollLeft);
-          let y = e.clientY - this.canvasTop + (document.body.scrollTop+document.documentElement.scrollTop);
+          let x =
+            e.clientX -
+            this.canvasLeft +
+            (document.body.scrollLeft + document.documentElement.scrollLeft);
+          let y =
+            e.clientY -
+            this.canvasTop +
+            (document.body.scrollTop + document.documentElement.scrollTop);
 
           this.drawOnMouseup(x, y, graphType);
         }
@@ -453,8 +648,14 @@ export default {
       let mousemove = e => {
         if (this.isMouseDown) {
           e = e || window.event; //为了使多种浏览器兼容
-          let x = e.clientX - this.canvasLeft + (document.body.scrollLeft+document.documentElement.scrollLeft);
-          let y = e.clientY - this.canvasTop + (document.body.scrollTop+document.documentElement.scrollTop);
+          let x =
+            e.clientX -
+            this.canvasLeft +
+            (document.body.scrollLeft + document.documentElement.scrollLeft);
+          let y =
+            e.clientY -
+            this.canvasTop +
+            (document.body.scrollTop + document.documentElement.scrollTop);
 
           //记录轨迹 --by mzy
           let point = {
@@ -709,7 +910,6 @@ export default {
     },
     //保存历史 用于撤销
     saveImageToAry() {
-      
       let dataUrl = this.canvas.toDataURL();
       this.canvasList.push(dataUrl);
       this.storeCanvasList = [];
@@ -793,7 +993,6 @@ export default {
     Drawrestore() {
       if (this.storeLines.length > 0) {
         this.next();
-        
         this.lines.push(this.storeLines.pop());
       }
     },
@@ -808,7 +1007,6 @@ export default {
       context.putImageData(this.copyimgdata, 300, 0);
       this.canvas_bak.onmouseup();
     },
-    
     collaDrawLine(line) {
       let pointsLength = line.Points.length;
       let collaGraphType = line.Graphtype;
@@ -838,197 +1036,64 @@ export default {
       let eX = line.Points[pointsLength - 1].X;
       let eY = line.Points[pointsLength - 1].Y;
       this.drawOnMouseup(eX, eY, collaGraphType);
-    },    
+    },
     getResources() {
-      this.resources = [];
-      let resources = JSON.parse(sessionStorage.getItem("resources"));
-      if(resources != null && resources != undefined && resources.length > 0){
-        for (let i = 0; i < resources.length; i++) {
-              if (resources[i].type == "Image"  && /\.(jpg|jpeg|png|bmp|gif)$/.test(resources[i].name.toLowerCase())) {
-                this.resources.push(resources[i]);
-              }
-            }
+      if (this.pageParams.pageId == undefined || this.pageParams.pageId == "") {
+        this.$Message.error("Lose the information of current step.");
+        return false;
       }
-      else {
-      var that = this;
+
+      this.resources = [];
       this.axios
         .get(
-          "/GeoProblemSolving/resource/inquiry" +
-            "?key=scope.moduleId" +
-            "&value=" +
-            sessionStorage.getItem("moduleId")
+          "/GeoProblemSolving/folder/inquiry?folderId=" + this.pageParams.pageId
         )
         .then(res => {
           // 写渲染函数，取到所有资源
           if (res.data !== "None") {
             for (let i = 0; i < res.data.length; i++) {
-              if (res.data[i].type == "Image" && /\.(jpg|jpeg|png|bmp|gif)$/.test(res.data[i].name.toLowerCase())) {
-                that.resources.push(res.data[i]);
+              if (
+                res.data[i].type == "Image" &&
+                /\.(jpg|jpeg|png|bmp|gif)$/.test(res.data[i].name.toLowerCase())
+              ) {
+                this.resources.push(res.data[i]);
               }
             }
           } else {
-            that.resources = [];
+            this.resources = [];
           }
         })
         .catch(err => {
           console.log(err.data);
         });
-      }
     },
     selecetResource(url) {
       this.dataUrl = url;
       this.viewData();
     },
     viewData() {
-      if(/\.(jpg|jpeg|png|bmp|gif)$/.test(this.dataUrl.toLowerCase())) {
+      if (/\.(jpg|jpeg|png|bmp|gif)$/.test(this.dataUrl.toLowerCase())) {
         let image = new Image();
-              image.src = this.dataUrl;
-              image.onload = () => {
-                this.context.drawImage(
-                  image,
-                  0,
-                  0,
-                  image.width,
-                  image.height,
-                  0,
-                  0,
-                  this.canvasSize.width,
-                  this.canvasSize.height
-                );
-              };
-      }
-      else{
+        image.src = this.dataUrl;
+        image.onload = () => {
+          this.context.drawImage(
+            image,
+            0,
+            0,
+            image.width,
+            image.height,
+            0,
+            0,
+            this.canvasSize.width,
+            this.canvasSize.height
+          );
+        };
+      } else {
         this.$Message.error("Worry data format!");
       }
-
       this.showFile = false;
     }
-  },
-  beforeRouteEnter: (to, from, next) => {
-    next(vm => {
-      if (!vm.$store.getters.userState || vm.$store.getters.userId == "") {
-        vm.$router.push({ name: "Login" });
-      } else {
-      }
-    });
-  },
-  created() {},
-  beforeDestroy() {
-    window.removeEventListener("resize", this.initSize);
-    this.canvas_bak.removeEventListener("click", this.falseColor);
-  },
-  mounted() {
-    this.initSize();
-    this.initCanvas();
-    this.initDrag();
-    this.addkeyBoardlistener();
-    this.drawType(this.tools[0]);
-    this.getResources();
-    this.canvas_bak.addEventListener("click", this.falseColor);
-    window.addEventListener("resize", this.initSize);
   }
 };
 </script>
-<style scoped>
-/* @import "//fonts.useso.com/css?family=Roboto:300,400,500,700,400italic"; */
-@import "http://cdn.bootcss.com/material-design-icons/3.0.1/iconfont/material-icons.css";
-* {
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-}
-canvas {
-  position: absolute;
-  z-index: 0;
-  left: 0;
-  right: 0;
-  width: 100%;
-  height: 100%;
-}
-.layout {
-  background-color: rgb(236, 236, 236);
-  height: 100%;
-  margin-left:60px;
-}
-.header {
-  background-color: #2196f3;
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-.logo {
-  display: flex;
-  align-items: center;
-  font-size: 24px;
-  color: white;
-  padding: 10px 20px;
-}
-.nav {
-  display: flex;
-  width: 80%;
-  /* justify-content: center; */
-}
-.edit_panel {
-  /* background-color: aqua; */
-  width: 20%;
-  /* justify-content属性保证里面的元素垂直居中使用center，居左使用flex-front属性，居右则使用flex-right属性 ,space-between则是两端对齐,space-around则是手拉手对齐方式*/
-  /* 不用再加入width:50%；margin-left:25%;margin-right:25%了 */
-  justify-content: center;
-  display: flex;
-  align-content: center;
-}
 
-.content {
-  overflow: hidden;
-  width: 100%;
-  height: calc(100vh - 56px);
-  display: flex;
-}
-.content-left {
-  width: 280px;
-  background-color: white;
-}
-.content-right {
-  width: calc(100% - 280px);
-  height: 100%;
-  padding: 10px 20px;
-  background-color: rgba(0, 0, 0, 0);
-}
-.body {
-  position: relative;
-  background-color: white;
-  border-radius: 5px;
-  height: 100%;
-  margin: 0 auto;
-}
-.setterSize {
-  padding: 5%;
-  font-size: 0.5rem;
-}
-.selected {
-  background: rgba(0, 0, 0, 0.35) !important;
-}
-.tab {
-  margin-right: 5px;
-}
-.icon_style {
-  width: 20%;
-  margin-left: 10%;
-  margin-top: 5px;
-}
-.font_style {
-  line-height: 30px;
-  font-size: 15px;
-  margin-top: 5px;
-  margin-left: 10%;
-}
-.setting_style {
-  margin-top: 10px;
-  height: 40px;
-  display: flex;
-}
-.edit-btn {
-  margin-right: 5px;
-}
-</style>
