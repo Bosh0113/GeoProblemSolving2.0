@@ -384,7 +384,6 @@
 </style>
 <template>
   <div>
-    <!-- <div class="chatPanel" :style="{height:panelHeight+'px',width:panelWidth+'px'}"> -->
     <div class="memberPanel">
       <!-- 参与者 -->
       <div class="participants">
@@ -446,44 +445,26 @@
         </div>
       </div>
     </div>
-    <!-- </div>    -->
   </div>
 </template>
 
 
 <script>
-import * as socketApi from "./../../../../api/socket.js";
 import Avatar from "vue-avatar";
 
 export default {
   components: {
     Avatar
   },
-  props: ["subProjectId"],
+  props: ["onlineParticipants", "offlineParticipants"],
 
   data() {
     return {
-      // 原有的变量字段
-      participants: [],
-      panelHeight: "",
-      panelWidth: "",
-      onlineParticipants: [],
-      onlineUserIdList: [],
-      offlineParticipants: []
     };
   },
   mounted() {
-    window.addEventListener("resize", this.initSize);
-
-    this.initSize();
-    this.participants = [];
-
-    this.getParticipants();
-    this.startWebSocket();
   },
   beforeDestroy() {
-    this.socketApi.close();
-    window.removeEventListener("resize", this.initSize);
   },
   beforeRouteEnter: (to, from, next) => {
     next(vm => {
@@ -497,130 +478,6 @@ export default {
   },
   updated: function() {},
   methods: {
-    getParticipants() {
-      let queryObject = {
-        key: "subProjectId",
-        value: this.subProjectId
-      };
-      $.ajax({
-        url:
-          "/GeoProblemSolving/subProject/inquiry" +
-          "?key=" +
-          queryObject["key"] +
-          "&value=" +
-          queryObject["value"],
-        type: "GET",
-        async: false,
-        success: data => {
-          if (data != "None" && data != "Fail") {
-            let projectInfo = data[0];
-            let membersList = projectInfo["members"];
-            let manager = {
-              userId: projectInfo["managerId"],
-              userName: projectInfo["managerName"]
-            };
-
-            membersList.unshift(manager);
-            let participantsTemp = [];
-            let count = membersList.length;
-            for (let i = 0; i < membersList.length; i++) {
-              $.ajax({
-                url:
-                  "/GeoProblemSolving/user/inquiry" +
-                  "?key=" +
-                  "userId" +
-                  "&value=" +
-                  membersList[i].userId,
-                type: "GET",
-                async: false,
-                success: function(data) {
-                  participantsTemp.push(data);
-                }
-              });
-            }
-            this.$set(this, "participants", participantsTemp);
-          }
-        }
-      });
-    },
-
-    startWebSocket() {
-      this.socketApi.initWebSocket(
-        "ChatServer/" + this.subProjectId,
-        this.$store.state.IP_Port
-      );
-      let send_msg = {
-        type: "test",
-        from: "Test",
-        content: "TestChat"
-      };
-      this.socketApi.sendSock(send_msg, this.getSocketConnect);
-    },
-
-    getSocketConnect(data) {
-      var chatMsg = data; //data传回onopen方法里的值
-      if (data.type === "members") {
-        let members = data.content
-          .replace("[", "")
-          .replace("]", "")
-          .replace(/\s/g, "")
-          .split(",");
-        this.onlineUserIdList = members;
-        this.judgeonlineParticipant();
-      } else if (data.type === "message") {
-      } else if (data.type === "notice") {
-        // 在线成员变化
-        this.judgeonlineParticipant(chatMsg);
-      } else if (chatMsg.type == undefined && chatMsg.length > 0) {
-      }
-    },
-
-    initSize() {
-      if (window.innerHeight > 675) {
-        this.panelHeight = window.innerHeight;
-      } else {
-        this.panelHeight = 675;
-      }
-      if (window.innerWidth > 1200) {
-        this.panelWidth = window.innerWidth;
-      } else {
-        this.panelWidth = 1200;
-      }
-    },
-
-    //判断在线的用户列表
-    judgeonlineParticipant(msg) {
-      if (msg == undefined) {
-        // initial
-        this.onlineParticipants = [];
-        this.offlineParticipants = [];
-        for (let i = 0; i < this.participants.length; i++) {
-          if (this.onlineUserIdList.includes(this.participants[i].userId)) {
-            this.onlineParticipants.push(this.participants[i]);
-          } else {
-            this.offlineParticipants.push(this.participants[i]);
-          }
-        }
-      } else {
-        if (msg.behavior == "off") {
-          // offline
-          for (let i = 0; i < this.onlineParticipants.length; i++) {
-            if (msg.userId == this.onlineParticipants[i].userId) {
-              let offperson = this.onlineParticipants.splice(i, 1);
-              this.offlineParticipants.push(offperson);
-            }
-          }
-        } else if (msg.behavior == "on") {
-          // online
-          for (let i = 0; i < this.offlineParticipants.length; i++) {
-            if (msg.userId == this.offlineParticipants[i].userId) {
-              let onperson = this.offlineParticipants.splice(i, 1);
-              this.onlineParticipants.push(onperson);
-            }
-          }
-        }
-      }
-    },
   }
 };
 </script>

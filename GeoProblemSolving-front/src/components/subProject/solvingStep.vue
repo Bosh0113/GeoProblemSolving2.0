@@ -24,15 +24,17 @@
                 v-model="formValidate1.stepTitle"
                 placeholder="Enter something..."
                 style="width: 250px;margin-left:10px"
+                readonly
               />
               <label style="margin-left:50px">Step type:</label>
-              <Select
+              <Input
                 v-model="formValidate1.stepType"
                 style="width:250px;margin-left:10px"
                 placeholder="please select step type..."
+                readonly
               >
-                <Option v-for="item in typeList" :key="item.index" :value="item">{{ item }}</Option>
-              </Select>
+                <!-- <Option v-for="item in typeList" :key="item.index" :value="item">{{ item }}</Option> -->
+              </Input>
               <template v-if="this.processStructure.length > 0">
                 <Button
                   type="default"
@@ -60,7 +62,7 @@
             :style="{height:contentHeight-120+'px'}"
             id="steps"
           ></div>
-          <h3 style="margin-top:10px">Steps for solving geo-problem can be ctrated and deleted here.</h3>
+          <h3 style="margin-top:10px">Steps for solving geo-problem can be created and deleted here.</h3>
         </Row>
       </div>
     </Col>
@@ -131,22 +133,6 @@
             ></Transfer>
           </div>
         </CarouselItem>
-        <CarouselItem>
-          <div style="font-size:14px;margin-left:65px">Contained modules:</div>
-          <div
-            style="width:640px;height:345px;border:1px solid #dcdee2;border-radius:4px;margin:10px 0 0 65px"
-          >
-            <Card style="width:100px;height:80px;border:1px solid lightblue;margin:1%;float:left">
-              <Avatar
-                shape="square"
-                icon="ios-hammer"
-                size="large"
-                style="margin-left: 12px;margin-top: -5px"
-              />
-              <div style="text-align:center;font-size: 8px">module 1</div>
-            </Card>
-          </div>
-        </CarouselItem>
       </Carousel>
     </Modal>
   </Row>
@@ -206,7 +192,14 @@ export default {
       inheritResource: [],
       targetKeys: [],
       selectResource: [],
-      listStyle: { width: "280px", height: "375px" }
+      listStyle: { width: "280px", height: "375px" },
+      // 工具
+      personalTools: [],
+      publicTools: [],
+      personalToolsets: [],
+      publicToolsets: [],
+      selectStepTools: [],
+      selectStepToolsets: []
     };
   },
   created() {
@@ -217,6 +210,9 @@ export default {
     window.addEventListener("resize", this.initSize);
     this.getProcessSteps();
     this.showSteps();
+    this.getAllTools();
+    this.getAllToolsets();
+    this.$emit("menuState", "process");
   },
   beforeRouteLeave(to, from, next) {
     next();
@@ -231,19 +227,19 @@ export default {
     //初始化函数，作用是控制侧边栏的高度，设置右边通知栏弹出时候的距顶高度以及延迟的时间
     init() {
       this.initSize();
-    },    
+    },
     cancel() {},
     // 进入具体的step页面
     enterStep(type, stepId) {
       if (type == 0) {
         this.$router.push({
           name: "contextDefinition",
-          params: {id: stepId }
+          params: { id: stepId }
         });
       } else if (type == 1) {
         this.$router.push({
           name: "dataProcessing",
-          params: {id: stepId }
+          params: { id: stepId }
         });
       } else if (type == 2) {
         this.$router.push({
@@ -279,7 +275,10 @@ export default {
     },
     getProcessSteps() {
       this.processStructure = [];
-      if (this.subProjectInfo.solvingProcess != undefined && this.subProjectInfo.solvingProcess.length > 0) {
+      if (
+        this.subProjectInfo.solvingProcess != undefined &&
+        this.subProjectInfo.solvingProcess.length > 0
+      ) {
         this.processStructure = JSON.parse(this.subProjectInfo.solvingProcess);
 
         for (let i = 0; i < this.processStructure.length; i++) {
@@ -466,39 +465,6 @@ export default {
       this.stepChart.on("dblclick", function(params) {
         _this.activeStep = _this.processStructure[params.data.index];
         _this.enterStep(params.data.category, params.data.stepId);
-
-        // _this.selectedStep = [];
-        // option.series[0].data = [];
-        // for (let i = 0; i < _this.processStructure.length; i++) {
-        //   //get data
-        //   if (_this.processStructure[i].stepID == params.data.stepId) {
-        //     option.series[0].data.push({
-        //       name: _this.processStructure[i].name,
-        //       index: _this.processStructure[i].id,
-        //       stepId: _this.processStructure[i].stepID,
-        //       x: _this.processStructure[i].x,
-        //       y: _this.processStructure[i].y,
-        //       category: _this.processStructure[i].category,
-        //       symbolSize: 45
-        //     });
-        //     _this.selectedStep.push({
-        //       stepId: _this.processStructure[i].stepID,
-        //       index: _this.processStructure[i].id,
-        //       name: _this.processStructure[i].name
-        //     });
-        //   } else {
-        //     option.series[0].data.push({
-        //       name: _this.processStructure[i].name,
-        //       index: _this.processStructure[i].id,
-        //       stepId: _this.processStructure[i].stepID,
-        //       x: _this.processStructure[i].x,
-        //       y: _this.processStructure[i].y,
-        //       category: _this.processStructure[i].category,
-        //       symbolSize: 30
-        //     });
-        //   }
-        // }
-        // _this.stepChart.setOption(option);
       });
     },
     getStepType(category) {
@@ -544,34 +510,22 @@ export default {
       return category;
     },
     addNewStep() {
-      // 重复命名检测
-      for (let i = 0; i < this.processStructure.length; i++) {
-        if (this.formValidate1.stepTitle == this.processStructure[i].name) {
-          this.$Notice.info({
-            desc: "The name of new step should not be different!"
-          });
-          return;
-        }
-      }
+      // 选择父节点检测
       if (
-        this.formValidate1.stepTitle != "" &&
-        this.formValidate1.stepType != ""
+        this.processStructure.length != 0 &&
+        (this.selectedStep.length == undefined || this.selectedStep.length == 0)
       ) {
-        // 获取可继承的资源
-        this.getInheritResource();
-        // 创建步骤模态框
-        this.createStepModal = true;
-        this.stepValue = 0;
-        
-      } else if (this.formValidate1.stepTitle == "") {
         this.$Notice.info({
-          desc: "The name of new step should not be empty!"
+          desc: "Please select at least one node in advance!"
         });
-      } else if (this.formValidate1.stepType == "") {
-        this.$Notice.info({
-          desc: "The type of new step should not be empty!"
-        });
+        return;
       }
+
+      // 获取可继承的资源
+      this.getInheritResource();
+      // 创建步骤模态框
+      this.createStepModal = true;
+      this.stepValue = 0;
     },
     getInheritResource() {
       this.inheritResource = this.getMockData();
@@ -687,10 +641,7 @@ export default {
     getStepInfo(stepId) {
       this.axios
         .get(
-          "/GeoProblemSolving/step/inquiry" +
-            "?key=stepId" +
-            "&value=" +
-            stepId
+          "/GeoProblemSolving/step/inquiry" + "?key=stepId" + "&value=" + stepId
         )
         .then(res => {
           if (res.data == "Offline") {
@@ -705,6 +656,15 @@ export default {
         .catch(err => {});
     },
     createStep() {
+      // 重复命名检测
+      for (let i = 0; i < this.processStructure.length; i++) {
+        if (this.formValidate1.stepTitle == this.processStructure[i].name) {
+          this.$Notice.info({
+            desc: "The name of new step should not be different!"
+          });
+          return;
+        }
+      }
       this.createStepContent();
     },
     createStepContent() {
@@ -712,13 +672,20 @@ export default {
       this.selectResource = [];
       this.selectResource = this.getTargetKeys();
 
+      this.filterShowListByType(this.formValidate1.stepType);
+
       let Step = {};
       Step["name"] = this.formValidate1.stepTitle;
       Step["type"] = this.formValidate1.stepType;
       Step["description"] = this.formValidate1.result;
       Step["subProjectId"] = this.subProjectInfo.subProjectId;
       Step["creator"] = this.$store.getters.userId;
+      Step["toolList"] = this.selectStepTools;
+      Step["toolsetList"] = this.selectStepToolsets;
       Step["content"] = {};
+
+      // 添加专用工具
+
       this.axios
         .post("/GeoProblemSolving/step/create", Step)
         .then(res => {
@@ -732,8 +699,6 @@ export default {
 
             // 更新新Step的资源----------------------------------------------------------------------需要改，留坑
             this.copyResource(res.data);
-
-            this.createModuleSuccess(Step["name"]);
           }
         })
         .catch(err => {
@@ -865,6 +830,145 @@ export default {
         });
       }
     },
+    getPublicTools() {
+      this.axios
+        .get(
+          "/GeoProblemSolving/tool/inquiry" +
+            "?key=" +
+            "privacy" +
+            "&value=" +
+            "Public"
+        )
+        .then(res => {
+          if (res.data == "Offline") {
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
+          } else if (res.data === "Fail") {
+            this.$Notice.error({ desc: "Loading tools fail." });
+          } else if (res.data === "None") {
+            this.$Notice.error({ desc: "There is no existing tool" });
+          } else {
+            this.$set(this, "publicTools", res.data);
+          }
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    },
+    getPersonalTools() {
+      this.axios
+        .get(
+          "/GeoProblemSolving/tool/inquiryAll" +
+            "?provider=" +
+            this.$store.getters.userInfo.userId
+        )
+        .then(res => {
+          if (res.data == "Offline") {
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
+          } else if (res.data === "Fail") {
+            this.$Notice.error({ desc: "Loading tool fail." });
+          } else if (res.data === "None") {
+            this.$Notice.error({ desc: "There is no existing tool" });
+          } else {
+            this.$set(this, "personalTools", res.data);
+          }
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    },
+    getAllTools() {
+      this.getPublicTools();
+      this.getPersonalTools();
+    },
+    getPublicToolsets() {
+      this.axios
+        .get(
+          "/GeoProblemSolving/toolset/inquiry" +
+            "?key=" +
+            "privacy" +
+            "&value=" +
+            "Public"
+        )
+        .then(res => {
+          if (res.data == "Offline") {
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
+          } else if (res.data === "Fail") {
+            this.$Notice.error({ desc: "Loading toolsets fail." });
+          } else if (res.data === "None") {
+            this.$Notice.error({ desc: "There is no existing toolset" });
+          } else {
+            this.$set(this, "publicToolsets", res.data);
+          }
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    },
+    getPersonalToolsets() {
+      this.axios
+        .get(
+          "/GeoProblemSolving/toolset/inquiryAll" +
+            "?provider=" +
+            this.$store.getters.userInfo.userId
+        )
+        .then(res => {
+          if (res.data == "Offline") {
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
+          } else if (res.data === "Fail") {
+            this.$Notice.error({ desc: "Loading toolsets fail." });
+          } else if (res.data === "None") {
+            this.$Notice.error({ desc: "There is no existing toolset" });
+          } else {
+            this.$set(this, "personalToolsets", res.data);
+          }
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    },
+    getAllToolsets() {
+      this.getPublicToolsets();
+      this.getPersonalToolsets();
+    },
+    filterShowListByType(stepType) {
+      var toolList = this.publicTools.concat(this.personalTools);
+      this.selectStepTools = this.getFilterResult(toolList, stepType);
+
+      var toolsetList = this.publicToolsets.concat(this.personalToolsets);
+      this.selectStepToolsets = this.getFilterResult(toolsetList, stepType);
+    },
+    getFilterResult(foreList, stepType) {
+      var resultList = foreList.filter(function(item) {
+        switch (stepType) {
+          case "General step": {
+            return item;
+            break;
+          }
+          case "Context definition & resource collection":
+          case "Data processing":
+          case "Modeling for geographic process":
+          case "Model evaluation":
+          case "Quantitative and qualitative analysis":
+          case "Simulation/Prediction":
+          case "Visualization & representation":
+          case "Decision-making & management": {
+            var stepTypes = item.recomStep;
+            for (var i = 0; i < stepTypes.length; i++) {
+              if (stepTypes[i] == stepType) {
+                return item;
+                break;
+              }
+            }
+            break;
+          }
+        }
+      });
+      return resultList;
+    },
     // 数据继承-----------------------------------------
     copyResource(stepId) {},
     removeStep() {
@@ -993,7 +1097,7 @@ export default {
         .catch(err => {
           console.log(err.data);
         });
-    },
+    }
     // gotoPersonalSpace(id) {
     //   if (id == this.$store.getters.userId) {
     //     this.$router.push({ name: "PersonalPage" });

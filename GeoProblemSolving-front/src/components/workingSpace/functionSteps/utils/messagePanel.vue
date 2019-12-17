@@ -286,7 +286,7 @@ export default {
           h("span", "Chats"),
           h("Badge", {
             props: {
-              count: this.receivedChatMsgs.length
+              count: this.receivedChats.length
             }
           })
         ]);
@@ -328,17 +328,19 @@ export default {
       ],
       // chats
       typingMsg: "",
-      receivedChatMsgs: [],
       allChatMsgs: [],
-      // socket
-      recordSocket: null,
-      chatSocket: null
+      receivedChats: []
     };
   },
-  props: ["stepInfo"],
-  mounted() {
-    this.starChatWebSocket();
+  props: ["stepInfo", "receivedChatMsgs"],
+  watch: {
+    receivedChatMsgs(val) {
+      for (let i = 0; i < this.receivedChatMsgs.length; i++) {
+        this.receivedChats.push(this.receivedChatMsgs[i]);
+      }
+    }
   },
+  mounted() {},
   updated: function() {
     // this.$refs["vs"].scrollTo(
     //   {
@@ -352,8 +354,8 @@ export default {
         this.allRecords.push(this.receivedRecords.shift());
       }
     } else if (this.msgType == "chats") {
-      for (let i = 0; i < this.receivedChatMsgs.length; i++) {
-        this.allChatMsgs.push(this.receivedChatMsgs.shift());
+      for (let i = 0; i < this.receivedChats.length; i++) {
+        this.allChatMsgs.push(this.receivedChats.shift());
       }
     }
   },
@@ -417,40 +419,6 @@ export default {
         }
       }
       this.typingMsg = "";
-    },
-    starChatWebSocket() {
-      this.socketApi.initWebSocket(
-        "ChatServer/" + this.stepInfo.stepId,
-        this.$store.state.IP_Port
-      );
-      let send_msg = {
-        type: "test",
-        from: "Test",
-        content: "TestChat"
-      };
-      this.socketApi.sendSock(send_msg, this.getSocketConnect);
-    },
-
-    getSocketConnect(data) {
-      let chatMsg = data; //data传回onopen方法里的值
-      if (data.type === "members") {
-      } else if (data.type === "message") {
-        //判断消息的发出者
-        if (chatMsg.content != "") {
-          this.receivedChatMsgs.push(chatMsg);
-        }
-      } else if (data.type === "notice") {
-        //上线下线提示
-        if (chatMsg.behavior != "" && chatMsg.userId != "") {
-          this.allChatMsgs.push(chatMsg);
-        }
-      } else if (chatMsg.type == undefined && chatMsg.length > 0) {
-        for (let i = 0; i < chatMsg.length; i++) {
-          if (chatMsg[i].content != "") {
-            this.receivedChatMsgs.push(chatMsg[i]);
-          }
-        }
-      }
     }
   }
 };
