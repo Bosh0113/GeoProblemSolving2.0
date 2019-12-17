@@ -28,6 +28,7 @@ export default {
   created() {
   },
   mounted() {
+    this.$emit("menuState", "resource");
   },
   methods: {
   }

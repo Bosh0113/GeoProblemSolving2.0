@@ -1496,25 +1496,24 @@ export default {
       }
     },
 
-    closeModuleSocket() {
+    closeStepSocket() {
       if (this.subprojectSocket != null) {
         this.removeTimer();
         this.subprojectSocket.close();
       }
     },
-    openModuleSocket() {
+    openStepSocket() {
       if (this.subprojectSocket != null) {
         this.subprojectSocket = null;
       }
-      let subProjectId = this.subProjectId;
       var subprojectSocketURL =
         "ws://" +
         this.$store.state.IP_Port +
-        "/GeoProblemSolving/Module/" +
-        subProjectId;
+        "/GeoProblemSolving/Step/" +
+        this.stepId;
       if (this.$store.state.IP_Port == "localhost:8080") {
         subprojectSocketURL =
-          "ws://localhost:8081/GeoProblemSolving/Module/" + subProjectId;
+          "ws://localhost:8081/GeoProblemSolving/Step/" + this.stepId;
       }
       this.subprojectSocket = new WebSocket(subprojectSocketURL);
       this.subprojectSocket.onopen = this.onOpen;
@@ -1526,11 +1525,11 @@ export default {
 
     onClose(e) {
       this.removeTimer();
-      console.log("ModuleSocket连接断开！");
+      console.log("StepSocket连接断开！");
     },
     onError(e) {
       this.removeTimer();
-      console.log("ModuleSocket连接错误！");
+      console.log("StepSocket连接错误！");
     },
     setTimer() {
       var that = this;

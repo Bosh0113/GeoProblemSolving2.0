@@ -78,7 +78,7 @@
             <template v-if="userRole == 'Manager'">
               <Button @click="modifyStepShow" style="margin-left:20px" ghost>Modify Step</Button>
             </template>
-            <step-change></step-change>
+            <!-- <step-change></step-change> -->
           </div>
         </Row>
       </div>
@@ -114,11 +114,11 @@
 
 <script>
 import onlineParticipant from "./onlineParticipants";
-import stepChange from "./stepChange"
+// import stepChange from "./stepChange"
 export default {
   components: {
     onlineParticipant,
-    stepChange
+    // stepChange
   },
   props: ["stepInfo", "subProjectInfo", "userRole"],
   data() {

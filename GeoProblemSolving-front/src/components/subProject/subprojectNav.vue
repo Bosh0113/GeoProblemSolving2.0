@@ -17,8 +17,11 @@
         :style="{height:contentHeight}"
         @on-select="changeContent"
       >
-        <MenuItem name="home" style="padding-left: 16px;" title="Project page">
+        <MenuItem name="back" style="padding-left: 16px;" title="Project page">
           <Icon type="md-arrow-round-back" size="30" />
+        </MenuItem>
+        <MenuItem name="overview" style="padding-left: 16px;" title="Subproject Home">
+          <Icon type="md-home" size="30" />
         </MenuItem>
         <MenuItem name="info" style="padding-left: 16px;" title="Subproject introduction">
           <Icon type="ios-information-circle" size="30" />
@@ -33,7 +36,7 @@
           <Icon type="md-calendar" size="30" />
         </MenuItem>
       </Menu>
-      <div style="font-size:1.5rem;height:60px;padding-top:10px;border:1px solid lightgrey">
+      <div style="font-size:1.5rem;height:60px;padding-top:10px;border:1px solid lightgrey;margin-left:60px">
         <Col offset="4" span="16" style="text-align:center;">
           <strong>{{subProjectInfo.title}}</strong>
         </Col>
@@ -45,7 +48,7 @@
           @click="gotoWorkingspace"
         >Working space</Button>-->
       </div>
-      <router-view :subProjectInfo="subProjectInfo" :userRole="userRole" :projectInfo="projectInfo"></router-view>
+      <router-view :subProjectInfo="subProjectInfo" :userRole="userRole" :projectInfo="projectInfo" @menuState="getActiveMenu"></router-view>
     </Row>
   </div>
 </template>
@@ -53,7 +56,7 @@
 export default {
   data() {
     return {
-      menuActive: "info",
+      menuActive: "overview",
       // information of project
       projectInfo: {},
       // info of subproject
@@ -71,7 +74,7 @@ export default {
     if (type != "") {
       this.menuActive = type;
     } else {
-      this.menuActive = "info";
+      this.menuActive = "overview";
     }
     window.addEventListener("resize", this.initSize);
   },
@@ -204,15 +207,16 @@ export default {
         this.userRole = "Visitor";
       }
     },
-    ok() {
-      this.$Message.info("Clicked ok");
+    getActiveMenu(data){
+      this.menuActive = data;
     },
-    cancel() {},
     changeContent(name) {
-      if (name == "home") {
+      if (name == "back") {
         window.location.href =
           "/GeoProblemSolving/projectDetail/" + this.subProjectInfo.projectId;
-      } else if (name == "process") {
+      } else if (name == "overview") {
+        this.$router.replace({ name: "overview" });
+      }  else if (name == "process") {
         this.$router.replace({ name: "process" });
       } else if (name == "info") {
         this.$router.replace({ name: "info" });

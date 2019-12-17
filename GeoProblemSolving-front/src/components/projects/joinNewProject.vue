@@ -190,12 +190,6 @@ export default {
   mounted(){
     // navigation页面的
     this.getProjectName();
-    if (this.$store.getters.userState) {
-      this.setTimer();
-      // this.initWebSocket();
-      // this.getUnreadNoticeCount();
-    }
-    //
     this.headerWidth = window.innerWidth + "px";
     this.contentHeight = window.innerHeight - 120 + 'px';
     this.projectId = this.$route.params.id;
@@ -318,62 +312,7 @@ export default {
         this.$router.push({ name: "Notifications" });
       } else if (name === "personal") {
       }
-    },
-    // navigation的函数
-    initWebSocket() {
-      if (this.noticeSocket != null) {
-        this.noticeSocket = null;
-      }
-      var noticeSocketURL = "ws://"+this.$store.state.IP_Port+"/GeoProblemSolving/NoticeSocket";
-      if(this.$store.state.IP_Port=="localhost:8080"){
-        noticeSocketURL = "ws://localhost:8081/GeoProblemSolving/NoticeSocket";
-      }
-      this.noticeSocket = new WebSocket(noticeSocketURL);
-      this.noticeSocket.onopen = this.onOpen;
-      this.noticeSocket.onmessage = this.onMessage;
-      this.noticeSocket.onclose = this.onClose;
-      this.noticeSocket.onerror = this.onError;
-    },
-    onOpen() {
-      console.log("NoticeSocket连接成功！");
-    },
-    onMessage(e) {
-      if (e.data == "Notice") {
-        let newCount = this.unreadNoticeCount + 1;
-        this.$set(this, "unreadNoticeCount", newCount);
-        this.$Message.info("You have a new notice!");
-      } else {
-        console.log(e.data);
-      }
-    },
-    onClose(e) {
-      this.removeTimer();
-      console.log("NoticeSocket连接断开！");
-    },
-    onError(e) {
-      this.removeTimer();
-      console.log("NoticeSocket连接错误！");
-    },
-    sendMessage(recipientId) {
-      this.noticeSocket.send(recipientId);
-    },
-    setTimer() {
-      var that = this;
-      this.timer = setInterval(() => {
-        if (that.noticeSocket != null && that.noticeSocket != undefined) {
-          that.noticeSocket.send("ping");
-        }
-      }, 20000);
-    },
-    removeTimer() {
-      clearInterval(this.timer);
-    },
-    readNotification() {
-      let newCount = this.unreadNoticeCount;
-      if (newCount > 0) {
-        this.unreadNoticeCount = newCount - 1;
-      }
-    },
+    },    
     changeSelect(name) {
       if (name == "logout") {
         this.axios

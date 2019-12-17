@@ -475,7 +475,7 @@
           <div class="contentBody" :style="message_panelObj" id="contentBody">
             <div style="display:flex" v-for="(list,index) in msglist" :key="index">
               <template v-if="list.type === 'notice'">
-                <div class="chat-notice" :style="message_notice">{{list.message}}上线</div>
+                <div class="chat-notice" :style="message_notice">{{list.content}}</div>
               </template>
               <template v-else-if="list.fromid === this.$store.getters.userId ">
                 <div style="width:95%">
@@ -620,16 +620,12 @@ export default {
       subProjectInfo: {},
       stepInfo: {},
       participants: [],
-      groups: [],
       selectGroup: {
         selectId: "",
         selectName: "",
         selectType: ""
       },
       message: "",
-      my_msglist: [],
-      other_msglist: [],
-      notice_msglist: [],
       msglist: [],
       send_msg: [],
       query_date: "",
@@ -653,9 +649,8 @@ export default {
       ],
       selectItem: "Step",
       onlineParticipants: [],
-      onlineP: [],
+      onlineUserIdList: [],
       offlineParticipants: [],
-      parMessage: [],
       windowStatus: "focus", //监听浏览器失焦事件
       // 聊天记录
       msgRecords: [],
@@ -678,7 +673,6 @@ export default {
     window.addEventListener("resize", this.initSize);
 
     this.init();
-    // this.startWebSocket(this.stepInfo.stepId);
     this.supportNotify();
   },
 
@@ -686,28 +680,6 @@ export default {
     init() {
       this.initSize();
       this.getStepInfo();
-    },
-    initGroup() {
-      this.groups = [
-        {
-          name: this.stepInfo.name,
-          id: this.stepInfo.stepId,
-          scope: "Step",
-          title: "Chat in the step"
-        },
-        {
-          name: this.subProjectInfo.title,
-          id: this.subProjectInfo.subProjectId,
-          scope: "Subproject",
-          title: "Chat in the subproject"
-        },
-        {
-          name: this.projectInfo.title,
-          id: this.projectInfo.projectId,
-          scope: "Project",
-          title: "Chat in the project"
-        }
-      ];
     },
     getStepInfo() {
       let stepId = this.$route.params.id;
@@ -853,7 +825,7 @@ export default {
         this.getParticipants(this.projectInfo.projectId, "project");
         this.selectGroup.selectName = this.projectInfo.title;
         this.selectGroup.selectId = this.projectInfo.projectId;
-        this.startWebSocket(this.projectInfo.projectId, "project");
+        this.startWebSocket(this.projectInfo.projectId);
         this.selectGroup.selectType = "project";
       }
     },
@@ -988,17 +960,22 @@ export default {
           content: this.message,
           time: current_time
         };
-
-        this.my_msglist.push(this.send_msg);
-        this.msglist.push(this.send_msg);
-        this.msgRecords.push(this.send_msg);
-        this.socketApi.sendSock(this.send_msg, this.getSocketConnect); //连接后台onopen方法
+        if (this.socketApi.getSocketInfo().linked) {
+          this.msglist.push(this.send_msg);
+          this.msgRecords.push(this.send_msg);
+          this.socketApi.sendSock(this.send_msg, this.getSocketConnect); //连接后台onopen方法
+        } else {
+          let chatMsg = {
+            type: "notice",
+            content: "You are disconnected with others."
+          };
+          this.msglist.push(chatMsg);
+        }
       }
       this.message = "";
     },
 
-    startWebSocket(id, scope) {
-      // this.getParticipants(id, scope);
+    startWebSocket(id) {
       this.socketApi.initWebSocket(
         "ChatServer/" + id,
         this.$store.state.IP_Port
@@ -1014,35 +991,30 @@ export default {
     getSocketConnect(data) {
       var chatMsg = data; //data传回onopen方法里的值
       if (data.type === "members") {
-        let members = data.message
+        let members = data.content
           .replace("[", "")
           .replace("]", "")
           .replace(/\s/g, "")
           .split(",");
-        this.onlineParticipants = members;
-        this.judgeonlineParticipant(members);
-        if (this.selectGroup.selectType == "project") {
-          //this.judgeonlineParticipant(this.onlineParticipants);
-        }
+        this.onlineUserIdList = members;
+        this.judgeonlineParticipant();
       } else if (data.type === "message") {
         //判断消息的发出者
         if (chatMsg.content != "") {
-          console.log(chatMsg);
-          this.other_msglist.push(chatMsg);
           this.msglist.push(chatMsg);
           this.msgRecords.push(chatMsg);
           this.sendNotify(chatMsg);
         }
       } else if (data.type === "notice") {
         //上线下线提示
-        if (chatMsg.content != "") {
+        if (chatMsg.behavior != "" && chatMsg.userId != "") {
           this.msglist.push(chatMsg);
-          this.notice_msglist.push(chatMsg);
         }
+        // 在线成员变化
+        this.judgeonlineParticipant(chatMsg);
       } else if (chatMsg.type == undefined && chatMsg.length > 0) {
         for (let i = 0; i < chatMsg.length; i++) {
           if (chatMsg[i].content != "") {
-            this.other_msglist.push(chatMsg[i]);
             this.msglist.push(chatMsg[i]);
             this.msgRecords.push(chatMsg[i]);
           }
@@ -1065,29 +1037,37 @@ export default {
     },
 
     //判断在线的用户列表
-    judgeonlineParticipant(onlineparticipants) {
-      let participants = this.participants; //项目所有成员
-
-      let offline = []; //不在线成员过渡
-      let online = []; //在线成员过渡
-      var index = 0; //不在线成员index
-
-      for (var i = 0; i < participants.length; i++) {
-        for (var j = 0; j < onlineparticipants.length; j++) {
-          if (participants[i].userId === onlineparticipants[j]) {
-            online.push(participants[i]);
-            break;
+    judgeonlineParticipant(msg) {
+      if (msg == undefined) {
+        // initial
+        this.onlineParticipants = [];
+        this.offlineParticipants = [];
+        for (let i = 0; i < this.participants.length; i++) {
+          if (this.onlineUserIdList.includes(this.participants[i].userId)) {
+            this.onlineParticipants.push(this.participants[i]);
+          } else {
+            this.offlineParticipants.push(this.participants[i]);
           }
-          if (j == onlineparticipants.length - 1) {
-            index = i;
-            offline.push(participants[index]); //删除一个元素，返回userIndex数组
-            break;
+        }
+      } else {
+        if (msg.behavior == "off") {
+          // offline
+          for (let i = 0; i < this.onlineParticipants.length; i++) {
+            if (msg.userId == this.onlineParticipants[i].userId) {
+              let offperson = this.onlineParticipants.splice(i, 1);
+              this.offlineParticipants.push(offperson);
+            }
+          }
+        } else if (msg.behavior == "on") {
+          // online
+          for (let i = 0; i < this.offlineParticipants.length; i++) {
+            if (msg.userId == this.offlineParticipants[i].userId) {
+              let onperson = this.offlineParticipants.splice(i, 1);
+              this.onlineParticipants.push(onperson);
+            }
           }
         }
       }
-      this.offlineParticipants = [];
-      this.$set(this, "offlineParticipants", offline);
-      this.$set(this, "onlineParticipants", online);
     },
 
     //notice
