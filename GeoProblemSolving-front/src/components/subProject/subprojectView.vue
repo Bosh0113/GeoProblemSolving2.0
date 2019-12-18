@@ -107,7 +107,6 @@ export default {
     return {};
   },
   mounted(){
-      this.$emit('menuState',"overview");
   },
   methods: {
     gotoIntroduction() {

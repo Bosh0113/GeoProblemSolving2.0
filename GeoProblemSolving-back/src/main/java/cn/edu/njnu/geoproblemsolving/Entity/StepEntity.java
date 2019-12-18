@@ -14,6 +14,7 @@ public class StepEntity {
     private String name;
     private String type;
     private String description;
+    private String projectId;
     private String subProjectId;
     private String creator;
     private String createTime;
@@ -22,6 +23,14 @@ public class StepEntity {
     private ArrayList<String> toolsetList;
     // 专有功能
     private JSONObject content;
+
+    public String getProjectId() {
+        return projectId;
+    }
+
+    public void setProjectId(String projectId) {
+        this.projectId = projectId;
+    }
 
     public String getStepId() {
         return stepId;

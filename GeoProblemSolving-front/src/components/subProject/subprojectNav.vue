@@ -48,7 +48,7 @@
           @click="gotoWorkingspace"
         >Working space</Button>-->
       </div>
-      <router-view :subProjectInfo="subProjectInfo" :userRole="userRole" :projectInfo="projectInfo" @menuState="getActiveMenu"></router-view>
+      <router-view :subProjectInfo="subProjectInfo" :userRole="userRole" :projectInfo="projectInfo"></router-view>
     </Row>
   </div>
 </template>
@@ -70,7 +70,7 @@ export default {
     this.init();
   },
   mounted() {
-    var type = window.location.href.match(/subproject\/(\S*)/)[1];
+    var type = this.$route.name;
     if (type != "") {
       this.menuActive = type;
     } else {
@@ -206,9 +206,6 @@ export default {
       } else {
         this.userRole = "Visitor";
       }
-    },
-    getActiveMenu(data){
-      this.menuActive = data;
     },
     changeContent(name) {
       if (name == "back") {

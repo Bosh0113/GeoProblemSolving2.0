@@ -212,7 +212,6 @@ export default {
     this.showSteps();
     this.getAllTools();
     this.getAllToolsets();
-    this.$emit("menuState", "process");
   },
   beforeRouteLeave(to, from, next) {
     next();
@@ -678,6 +677,7 @@ export default {
       Step["name"] = this.formValidate1.stepTitle;
       Step["type"] = this.formValidate1.stepType;
       Step["description"] = this.formValidate1.result;
+      Step["projectId"] = ""
       Step["subProjectId"] = this.subProjectInfo.subProjectId;
       Step["creator"] = this.$store.getters.userId;
       Step["toolList"] = this.selectStepTools;

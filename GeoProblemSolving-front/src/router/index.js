@@ -30,7 +30,7 @@ const routes = [{
         { path: 'overview', name: 'overview', component: resolve => (require(["@/components/subProject/subprojectView"], resolve)) },
         { path: 'info', name: 'info', component: resolve => (require(["@/components/subProject/subprojectDetail"], resolve)) },
         { path: 'resource', name: 'resource', component: resolve => (require(["@/components/subProject/subResources"], resolve)) },
-        { path: 'process', name: 'process', component: resolve => (require(["@/components/subProject/solvingStep"], resolve)) },
+        { path: 'process', name: 'process', component: resolve => (require(["@/components/subProject/toWork"], resolve)) },
         { path: 'task', name: 'task', component: resolve => (require(["@/components/subProject/taskArrangement"], resolve)) },
       ],
     },
