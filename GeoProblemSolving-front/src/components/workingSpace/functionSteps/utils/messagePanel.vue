@@ -169,6 +169,7 @@
                     <span class="time" style="color:#0664a2">{{item.time}}</span>
                     <span class="time" style="color:#0664a2;margin-left:10px">{{item.who}}</span>
                     <span class="content" style="color:#0664a2;">{{item.content}}</span>
+                    <span class="content" style="color:grey;">{{item.file}}</span>
                     <a
                       style="color:green;margin-left:5px"
                       :href="'http://'+$store.state.IP_Port+'/GeoProblemSolving/resource/upload/'+item.file"
@@ -294,50 +295,23 @@ export default {
       unreadChats: 0,
       openPanel: false,
       // records
-      receivedRecords: [
-        {
-          type: "resource",
-          time: "hh:mm:ss",
-          who: "XXX",
-          content: "abcd",
-          file: "efg.hi"
-        }
-      ],
-      allRecords: [
-        {
-          type: "tools",
-          time: "hh:mm:ss",
-          who: "XXX",
-          content: "abcdefg",
-          toolType: "007"
-        },
-        {
-          type: "resource",
-          time: "hh:mm:ss",
-          who: "XXX",
-          content: "abcd",
-          file: "efg.hi"
-        },
-        {
-          type: "tools",
-          time: "hh:mm:ss",
-          who: "XXX",
-          content: "abcdefg",
-          toolType: "007"
-        }
-      ],
+      receivedRecords: [],
+      allRecords: [],
       // chats
       typingMsg: "",
       allChatMsgs: [],
       receivedChats: []
     };
   },
-  props: ["stepInfo", "receivedChatMsgs"],
+  props: ["stepInfo", "receivedChatMsgs", "operationRecords"],
   watch: {
     receivedChatMsgs(val) {
       for (let i = 0; i < this.receivedChatMsgs.length; i++) {
         this.receivedChats.push(this.receivedChatMsgs[i]);
       }
+    },
+    operationRecords(val) {
+      this.receivedRecords.push(JSON.parse(this.operationRecords));
     }
   },
   mounted() {},

@@ -29,7 +29,7 @@
       <h1 id="stepType">{{stepInfo.type}}</h1>
       <step-change style="float:right" :step-info="stepInfo" :subproject-info="subProjectInfo"></step-change>
     </div>
-    <Divider style="margin:10px 0 3px 0"/>
+    <Divider style="margin:10px 0 3px 0" />
     <div style="display:flex;background-color: #f8f8f9;padding:5px;">
       <div
         style="width:300px;margin:0 5px;"
@@ -221,10 +221,7 @@ export default {
     },
     getSubprojectInfo() {
       let subProjectInfo = this.$store.getters.subProject;
-      if (
-        JSON.stringify(subProjectInfo) != "{}" &&
-        subProjectInfo.subProjectId == sessionStorage.getItem("subProjectInfo")
-      ) {
+      if (JSON.stringify(subProjectInfo) != "{}") {
         this.$set(this, "subProjectInfo", subProjectInfo);
       } else {
         $.ajax({
@@ -284,12 +281,14 @@ export default {
       }
     },
     getParticipants() {
-      let membersList = this.subProjectInfo["members"];
-      let manager = {
-        userId: this.subProjectInfo["managerId"],
-        userName: this.subProjectInfo["managerName"]
-      };
-      membersList.unshift(manager);
+      let members = this.subProjectInfo.members;
+      let manager = [
+        {
+          userId: this.subProjectInfo["managerId"],
+          userName: this.subProjectInfo["managerName"]
+        }
+      ];
+      let membersList = manager.concat(members);
 
       let participantsTemp = [];
       let count = membersList.length;

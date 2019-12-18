@@ -63,6 +63,9 @@
             id="steps"
           ></div>
           <h3 style="margin-top:10px">Steps for solving geo-problem can be created and deleted here.</h3>
+          <h3
+            style="margin-top:10px"
+          >Double click the node, and you can enter the corresponding workspace.</h3>
         </Row>
       </div>
     </Col>
@@ -208,6 +211,7 @@ export default {
   },
   mounted() {
     window.addEventListener("resize", this.initSize);
+    window.addEventListener("resize", this.updateStepchart);
     this.getProcessSteps();
     this.showSteps();
     this.getAllTools();
@@ -228,48 +232,54 @@ export default {
     init() {
       this.initSize();
     },
+    updateStepchart() {
+      // 重新渲染
+      this.stepChart.dispose();
+      this.stepChart = null;
+      this.showSteps();
+    },
     cancel() {},
     // 进入具体的step页面
     enterStep(type, stepId) {
       if (type == 0) {
         this.$router.push({
           name: "contextDefinition",
-          params: { id: stepId }
+          params: { stepId: stepId }
         });
       } else if (type == 1) {
         this.$router.push({
           name: "dataProcessing",
-          params: { id: stepId }
+          params: { stepId: stepId }
         });
       } else if (type == 2) {
         this.$router.push({
           name: "modelProcess",
-          params: { id: stepId }
+          params: { stepId: stepId }
         });
       } else if (type == 3) {
         this.$router.push({
           name: "modelEvaluation",
-          params: { id: stepId }
+          params: { stepId: stepId }
         });
       } else if (type == 4) {
         this.$router.push({
-          name: "quantitativeAndQualitative",
-          params: { id: stepId }
+          name: "analysis",
+          params: { stepId: stepId }
         });
       } else if (type == 5) {
         this.$router.push({
-          name: "simulationPrediction",
-          params: { id: stepId }
+          name: "simulation",
+          params: { stepId: stepId }
         });
       } else if (type == 6) {
         this.$router.push({
-          name: "dataVisualization",
-          params: { id: stepId }
+          name: "visualization",
+          params: { stepId: stepId }
         });
       } else if (type == 7) {
         this.$router.push({
-          name: "decisionMakingAndManagement",
-          params: { id: stepId }
+          name: "decisionMaking",
+          params: { stepId: stepId }
         });
       }
     },
@@ -844,9 +854,9 @@ export default {
             this.$store.commit("userLogout");
             this.$router.push({ name: "Login" });
           } else if (res.data === "Fail") {
-            this.$Notice.error({ desc: "Loading tools fail." });
+            // this.$Notice.error({ desc: "Loading tools fail." });
           } else if (res.data === "None") {
-            this.$Notice.error({ desc: "There is no existing tool" });
+            // this.$Notice.error({ desc: "There is no existing tool" });
           } else {
             this.$set(this, "publicTools", res.data);
           }
@@ -867,9 +877,9 @@ export default {
             this.$store.commit("userLogout");
             this.$router.push({ name: "Login" });
           } else if (res.data === "Fail") {
-            this.$Notice.error({ desc: "Loading tool fail." });
+            // this.$Notice.error({ desc: "Loading tool fail." });
           } else if (res.data === "None") {
-            this.$Notice.error({ desc: "There is no existing tool" });
+            // this.$Notice.error({ desc: "There is no existing tool" });
           } else {
             this.$set(this, "personalTools", res.data);
           }
@@ -896,9 +906,9 @@ export default {
             this.$store.commit("userLogout");
             this.$router.push({ name: "Login" });
           } else if (res.data === "Fail") {
-            this.$Notice.error({ desc: "Loading toolsets fail." });
+            // this.$Notice.error({ desc: "Loading toolsets fail." });
           } else if (res.data === "None") {
-            this.$Notice.error({ desc: "There is no existing toolset" });
+            // this.$Notice.error({ desc: "There is no existing toolset" });
           } else {
             this.$set(this, "publicToolsets", res.data);
           }
@@ -919,9 +929,9 @@ export default {
             this.$store.commit("userLogout");
             this.$router.push({ name: "Login" });
           } else if (res.data === "Fail") {
-            this.$Notice.error({ desc: "Loading toolsets fail." });
+            // this.$Notice.error({ desc: "Loading toolsets fail." });
           } else if (res.data === "None") {
-            this.$Notice.error({ desc: "There is no existing toolset" });
+            // this.$Notice.error({ desc: "There is no existing toolset" });
           } else {
             this.$set(this, "personalToolsets", res.data);
           }
