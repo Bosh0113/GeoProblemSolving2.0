@@ -1,6 +1,6 @@
 <template>
   <div id="app" style="min-width:1200px">
-    <router-view :key="$route.fullPath" />
+    <router-view />
   </div>
 </template>
 <style scoped>

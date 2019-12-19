@@ -104,7 +104,6 @@ export default {
   },
   mounted() {
     window.addEventListener("resize", this.initSize);
-    this.startWebSocket();
   },
   beforeRouteEnter: (to, from, next) => {
     next(vm => {
@@ -172,6 +171,11 @@ export default {
       receivedChatMsgs: []
     };
   },
+  watch: {
+    $route() {
+      this.init();
+    }
+  },
   methods: {
     init() {
       this.initSize();
@@ -180,6 +184,7 @@ export default {
       this.getProjectInfo();
       this.getParticipants();
       this.userRoleIdentity();
+      this.startWebSocket();
     },
     initSize() {
       if (window.innerHeight > 675) {
@@ -189,7 +194,11 @@ export default {
       }
     },
     getStepInfo() {
-      if (this.stepInfo.stepId == "" || this.stepInfo.stepId == undefined) {
+      if (
+        this.stepInfo.stepId != this.$route.params.stepId ||
+        this.stepInfo.stepId == undefined ||
+        this.stepInfo.stepId == ""
+      ) {
         $.ajax({
           url:
             "/GeoProblemSolving/step/inquiry/" +

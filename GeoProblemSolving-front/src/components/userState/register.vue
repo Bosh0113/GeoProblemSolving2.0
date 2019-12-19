@@ -94,7 +94,7 @@
     <Layout>
       <!-- <Header class="header">
         <img src="@/assets/images/OGMS.png" id="logo" @click="goHome" style="cursor:pointer">
-      </Header> -->
+      </Header>-->
       <Content>
         <Row class="Content" id="register">
           <Col :xs="{ span: 12, offset: 6 }" :lg="{ span: 12, offset: 6 }">
@@ -128,8 +128,8 @@
                         :type="pwdType"
                       >
                         <Button slot="append" @click="changeType()">
-                          <Icon type="ios-eye" size="20" v-show="pwdType=='text'"/>
-                          <Icon type="ios-eye-off" size="20" v-show="pwdType=='password'"/>
+                          <Icon type="ios-eye" size="20" v-show="pwdType=='text'" />
+                          <Icon type="ios-eye-off" size="20" v-show="pwdType=='password'" />
                         </Button>
                       </Input>
                     </FormItem>
@@ -230,7 +230,7 @@
                       <div :class="{InputStyle: inputstyle}">
                         <div class="demo-upload-list" v-if="avatar!=''">
                           <template>
-                            <img v-bind:src="avatar">
+                            <img v-bind:src="avatar" />
                             <div class="demo-upload-list-cover">
                               <Icon type="ios-eye-outline" @click.native="handleView()"></Icon>
                               <Icon type="ios-trash-outline" @click.native="handleRemove()"></Icon>
@@ -239,10 +239,15 @@
                         </div>
                         <div class="uploadBox">
                           <Icon type="ios-camera" size="20" style="position:absolute;margin:18px;"></Icon>
-                          <input @change="uploadPhoto($event)" type="file" class="uploadAvatar" id="avatarInput">
+                          <input
+                            @change="uploadPhoto($event)"
+                            type="file"
+                            class="uploadAvatar"
+                            id="avatarInput"
+                          />
                         </div>
                         <Modal title="View Image" v-model="visible">
-                          <img :src="avatar" v-if="visible" style="width: 100%">
+                          <img :src="avatar" v-if="visible" style="width: 100%" />
                         </Modal>
                       </div>
                     </FormItem>
@@ -259,8 +264,12 @@
                     </FormItem>
                   </div>
                   <div class="formStyle">
-                      <Button type="primary" @click="handleSubmit('registerForm')" style="float:left">Submit</Button>
-                      <Button @click="handleReset('registerForm')" style="margin-left: 8px">Reset</Button>
+                    <Button
+                      type="primary"
+                      @click="handleSubmit('registerForm')"
+                      style="float:left"
+                    >Submit</Button>
+                    <Button @click="handleReset('registerForm')" style="margin-left: 8px">Reset</Button>
                   </div>
                 </Form>
                 <!-- 注册样式结束 -->
@@ -441,23 +450,21 @@ export default {
           userJson["direction"] = this.registerForm.field;
           userJson["homePage"] = this.registerForm.homePage;
           userJson["avatar"] = this.registerForm.avatar;
-          var that = this;
+
           var passwordFro = this.registerForm.password;
           var passwordAES = this.encrypto(passwordFro);
           var email = this.registerForm.email;
           this.axios
-            .post(
-              "/GeoProblemSolving/user/register",
-              // params
-              userJson
-            )
+            .post("/GeoProblemSolving/user/register", userJson)
             .then(res => {
               if (res.data == "Email") {
                 this.$Message.success("Email has been used!");
-              } else if (res.data == "MobilePhone") {
-                this.$Message.success("Phone number has been used!");
+                // } else if (res.data == "MobilePhone") {
+                //   this.$Message.success("Phone number has been used!");
               } else {
-                that.axios
+                this.$Message.success("Register successfully!");
+
+                this.axios
                   .get(
                     "/GeoProblemSolving/user/login" +
                       "?email=" +
@@ -467,29 +474,37 @@ export default {
                   )
                   .then(res => {
                     if (res.data === "Fail") {
-                      that.$Message.error("Invalid account or password.");
+                      this.$Message.error("Invalid account or password.");
                     } else {
-                      that.$Message.success("Success!");
+                      this.$store.commit("userLogin", res.data);
+                      this.$router.push({ path: "/" });
+
                       let registerEmailBody = {};
                       registerEmailBody["recipient"] = this.registerForm.email;
                       registerEmailBody["mailTitle"] = "Register result";
-                      registerEmailBody["mailContent"] = "Welcome to join in GeoProblem-Solving platform, you can solve complex problems in this platform with others collaboratively."
-                      that.axios.post("/GeoProblemSolving/email/send", registerEmailBody)
-                        .then(res=>{
-                          console.log(res.data);
+                      registerEmailBody["mailContent"] =
+                        "Welcome to join in GeoProblem-Solving platform, you can solve complex problems in this platform with others collaboratively.";
+                      this.axios
+                        .post(
+                          "/GeoProblemSolving/email/send",
+                          registerEmailBody
+                        )
+                        .then(res => {
+                          // console.log(res.data);
                         })
-                        .catch(err=>{
-                          console.log(err.data);
-                        })
-                      that.$store.commit("userLogin", res.data);
-                      that.$router.push({ path: "/" });
+                        .catch(err => {
+                          // console.log(err.data);
+                        });
                     }
+                  })
+                  .catch(err => {
+                    this.$Message.error("Login fail!");
                   });
               }
-            }),
-            function(res) {
-              this.$Message.error("Fail!");
-            };
+            })
+            .catch(err => {
+              this.$Message.error("Register fail!");
+            });
         } else {
           this.$Message.error("Form fill error!");
         }
@@ -516,7 +531,7 @@ export default {
         imgcode = e.target.result;
 
         this.$store.commit("uploadAvatar", imgcode);
-        $('#avatarInput').val("");
+        $("#avatarInput").val("");
       };
     },
     handleView() {
@@ -527,7 +542,7 @@ export default {
     },
     //点击图标片跳转到主页
     goHome() {
-      window.location.href="/GeoProblemSolving/home";
+      window.location.href = "/GeoProblemSolving/home";
     },
     //输入密码时
     changeType() {

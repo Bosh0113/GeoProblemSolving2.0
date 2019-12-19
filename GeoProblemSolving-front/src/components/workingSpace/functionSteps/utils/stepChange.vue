@@ -38,8 +38,6 @@ export default {
         for (let i = 0; i < processStructure.length; i++) {
           //get data
           if (processStructure[i].stepID == this.stepInfo.stepId) {
-            // temp
-            let tempStep={};
             // last
             let lastSteps = processStructure[i].last;
             for(let j=0; j<lastSteps.length;j++){    
