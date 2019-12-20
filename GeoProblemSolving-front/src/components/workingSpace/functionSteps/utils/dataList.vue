@@ -26,7 +26,7 @@
           style="margin-top:-10px"
         ></Button>
       </div>
-      <div>
+      <div style="width:300px">
         <Table
           :columns="tableColName"
           :data="stepDataList"
@@ -219,46 +219,10 @@ export default {
       checkDataModal: false,
       tableColName: [
         {
-          type: "index",
-          maxWidth: 50,
-          align: "center"
-        },
-        {
           title: "Name",
           key: "name",
           minWidth: 10,
           tooltip: true,
-          sortable: true
-        },
-        {
-          title: "Type",
-          key: "type",
-          width: 100,
-          sortable: true
-        },
-        {
-          title: "Size",
-          key: "fileSize",
-          width: 100,
-          sortable: true
-        },
-        {
-          title: "Description",
-          key: "description",
-          minWidth: 30,
-          tooltip: true
-        },
-        {
-          title: "Provider",
-          key: "uploaderName",
-          width: 150,
-          tooltip: true,
-          align: "center"
-        },
-        {
-          title: "Upload time",
-          key: "uploadTime",
-          width: 150,
           sortable: true
         },
         {

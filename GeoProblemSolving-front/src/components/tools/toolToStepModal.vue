@@ -596,6 +596,8 @@ export default {
                   }
                 }
                 this.$set(this, "stepToolsShow", sortTools);
+                this.filterDuplicateTools();
+                this.filterShowListByType();
               }
             }
           })

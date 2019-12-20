@@ -3,13 +3,13 @@
 <template>
   <div style="padding:15px">
     <Collapse simple v-model="unfold">
-      <Panel name="data">
-        Data list
-        <data-list slot="content" :stepInfo="stepInfo" :userRole="userRole" @dataBehavior="listenDatalist"></data-list>
-      </Panel>
       <Panel name="tool">
         Toolbox
         <tool-container slot="content" :stepInfo="stepInfo" :userRole="userRole" @toolBehavior="listenToolbox"></tool-container>
+      </Panel>
+      <Panel name="data">
+        Data list
+        <data-list slot="content" :stepInfo="stepInfo" :userRole="userRole" @dataBehavior="listenDatalist"></data-list>
       </Panel>
     </Collapse>
     <p style="margin: 10px 0">Map</p>
