@@ -297,6 +297,7 @@
   </div>
 </template>
 <script>
+// import JPanel from 'JSPanel'
 import Avatar from "vue-avatar";
 import draggable from "vuedraggable";
 export default {

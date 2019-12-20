@@ -522,7 +522,7 @@
                 </div>
                 <div v-else-if="showMenuItem=='subProjects'" style="height: inherit;min-height: fit-content;">
                     <div style="background:#eee;padding: 10px;height: inherit;min-height: fit-content;">
-                        <Card :bordered="false" dis-hover
+                        <Card v-if="projectInfo.type=='type0'" :bordered="false" dis-hover
                               style="height: -webkit-fill-available;min-height: fit-content;">
                             <h1 slot="title" class="projectMenuItemTitle">Subprojects</h1>
                             <div slot="extra">
@@ -609,6 +609,9 @@
                                 </vue-scroll>
                             </div>
                         </Card>
+                        <div v-else style="width: -webkit-fill-available;height: -webkit-fill-available;">
+                            <iframe style="width: -webkit-fill-available;height: -webkit-fill-available;border-width:0" src="http://localhost:8080/projectTypeContent/0d69b8a4-5099-40af-91ce-cbd82fdff22a"></iframe>
+                        </div>
                     </div>
                 </div>
                 <div v-else-if="showMenuItem=='resources'" style="height: inherit;min-height: fit-content;">

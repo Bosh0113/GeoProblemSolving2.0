@@ -57,6 +57,7 @@ const routes = [{
     { path: 'toolsCenter', name: 'toolsCenter', component: resolve => (require(["@/components/tools/toolsCenter"], resolve)) }, 
   ]
 },
+{ path: '/projectTypeContent/:projectId', name: 'projectTypeContent', component: resolve=>(require(["@/components/projects/toWork"],resolve)) },
 { path: '/chat', name: 'chatUtil', component: resolve=>(require(["@/components/utils/chatroom"],resolve)) },
 { path: '/draw', name: 'drawUtil', component: resolve=>(require(["@/components/utils/drawBoard"],resolve)) },
 { path: '/map', name: 'mapTool', component: resolve=>(require(["@/components/utils/mapTool"],resolve)) },
