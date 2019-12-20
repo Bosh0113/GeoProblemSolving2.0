@@ -38,8 +38,6 @@ export default {
         for (let i = 0; i < processStructure.length; i++) {
           //get data
           if (processStructure[i].stepID == this.stepInfo.stepId) {
-            // temp
-            let tempStep={};
             // last
             let lastSteps = processStructure[i].last;
             for(let j=0; j<lastSteps.length;j++){    
@@ -216,42 +214,42 @@ export default {
       if (type == 0) {
         this.$router.push({
           name: "contextDefinition",
-          params: {id: stepId }
+          params: { stepId: stepId }
         });
       } else if (type == 1) {
         this.$router.push({
           name: "dataProcessing",
-          params: {id: stepId }
+          params: { stepId: stepId }
         });
       } else if (type == 2) {
         this.$router.push({
           name: "modelProcess",
-          params: { id: stepId }
+          params: { stepId: stepId }
         });
       } else if (type == 3) {
         this.$router.push({
           name: "modelEvaluation",
-          params: { id: stepId }
+          params: { stepId: stepId }
         });
       } else if (type == 4) {
         this.$router.push({
-          name: "quantitativeAndQualitative",
-          params: { id: stepId }
+          name: "analysis",
+          params: { stepId: stepId }
         });
       } else if (type == 5) {
         this.$router.push({
-          name: "simulationPrediction",
-          params: { id: stepId }
+          name: "simulation",
+          params: { stepId: stepId }
         });
       } else if (type == 6) {
         this.$router.push({
-          name: "dataVisualization",
-          params: { id: stepId }
+          name: "visualization",
+          params: { stepId: stepId }
         });
       } else if (type == 7) {
         this.$router.push({
-          name: "decisionMakingAndManagement",
-          params: { id: stepId }
+          name: "decisionMaking",
+          params: { stepId: stepId }
         });
       }
     },

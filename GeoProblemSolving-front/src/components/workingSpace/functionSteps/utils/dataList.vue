@@ -3,37 +3,59 @@
   table-layout: auto;
   width: 100% !important;
 }
+.fileBtnHoverGreen:hover {
+  background-color: #19be6b;
+  color: white;
+}
+.fileBtnHoverRed:hover {
+  background-color: #ed4014;
+  color: white;
+}
 </style>
 <template>
-<div>
-  <Card dis-hover>
-    <div slot="title">
-      <h4>Data</h4>
-    </div>
-    <div slot="extra">
-      <Button shape="circle" icon="md-cloud-upload" @click="dataUploadModalShow" style="margin-top:-10px"></Button>
-    </div>
-    <div>
+  <div>
+    <Card dis-hover>
+      <div slot="title">
+        <h4>Data</h4>
+      </div>
+      <div slot="extra">
+        <Button
+          shape="circle"
+          icon="md-cloud-upload"
+          @click="dataUploadModalShow"
+          style="margin-top:-10px"
+        ></Button>
+      </div>
+      <div style="width:300px">
         <Table
           :columns="tableColName"
-          :data="this.stepDataList"
+          :data="stepDataList"
           class="table"
           height="400"
-          v-show="this.stepDataList!=[] && this.stepDataList!='None'"
+          v-show="stepDataList!=[] && stepDataList!='None'"
         >
           <template slot-scope="{ row }" slot="name">
             <strong>{{ row.name }}</strong>
           </template>
           <template slot-scope="{ row, index }" slot="action">
             <Button
-              type="primary"
+              class="fileBtnHoverGreen"
               size="small"
-              style="margin-right: 5px"
               title="Check"
               @click="checkData(index)"
-            >
-              <Icon type="md-eye" />
-            </Button>
+              icon="md-eye"
+              shape="circle"
+              type="text"
+            ></Button>
+            <Button
+              class="fileBtnHoverRed"
+              size="small"
+              shape="circle"
+              type="text"
+              icon="md-close"
+              title="Remove"
+              @click="deleteResourceModalShow(stepDataList[index].resourceId)"
+            ></Button>
           </template>
         </Table>
       </div>
@@ -81,9 +103,10 @@
           <template>...</template>
         </TabPane>
       </Tabs>
-      <br/>
-      <Button style="margin-right:20px" @click="dataPreview">Preview</Button><Button style="margin-right:20px" @click="dataVisualize">Visualization</Button>
-      <br/>
+      <br />
+      <Button style="margin-right:20px" @click="dataPreview">Preview</Button>
+      <Button style="margin-right:20px" @click="dataVisualize">Visualization</Button>
+      <br />
     </Modal>
     <Modal v-model="dataUploadModal" title="Upload data" width="600">
       <Form
@@ -145,7 +168,15 @@
       <Progress :percent="uploadProgress"></Progress>
       <div slot="footer"></div>
     </Modal>
-</div>
+    <Modal
+      v-model="deleteResourceModal"
+      @on-ok="deleteResource()"
+      ok-text="Assure"
+      cancel-text="Cancel"
+    >
+      <h3>Do you really want to delete this resource?</h3>
+    </Modal>
+  </div>
 </template>
 <script>
 export default {
@@ -187,47 +218,11 @@ export default {
       stepDataList: [],
       checkDataModal: false,
       tableColName: [
-         {
-          type: "index",
-          maxWidth: 50,
-          align: "center"
-        },
         {
           title: "Name",
           key: "name",
           minWidth: 10,
           tooltip: true,
-          sortable: true
-        },
-        {
-          title: "Type",
-          key: "type",
-          width: 100,
-          sortable: true
-        },
-        {
-          title: "Size",
-          key: "fileSize",
-          width: 100,
-          sortable: true
-        },
-        {
-          title: "Description",
-          key: "description",
-          minWidth: 30,
-          tooltip: true
-        },
-        {
-          title:"Provider",
-          key:"uploaderName",
-          width: 150,
-          tooltip: true,
-          align: "center"
-        },
-        {
-          title: "Upload time",
-          key: "uploadTime",
-          width: 150,
           sortable: true
         },
         {
@@ -240,14 +235,43 @@ export default {
       // 编辑data描述信息
       metaDataEdit: false,
       // 元数据信息，待完善
-      metaDataInfo:""
+      metaDataInfo: "",
+      // 删除资源
+      deleteResourceModal: false,
+      deleteResourceId: ""
     };
   },
-  props: ["stepInfo",  "userRole"],
+  props: ["stepInfo", "userRole"],
   created() {},
   mounted() {
     this.getDataList();
     $(".__view").css("width", "inherit");
+
+    Date.prototype.Format = function(fmt) {
+      var o = {
+        "M+": this.getMonth() + 1, //月份
+        "d+": this.getDate(), //日
+        "H+": this.getHours(), //小时
+        "m+": this.getMinutes(), //分
+        "s+": this.getSeconds(), //秒
+        "q+": Math.floor((this.getMonth() + 3) / 3), //季度
+        "S+": this.getMilliseconds() //毫毛
+      };
+      if (/(y+)/.test(fmt))
+        fmt = fmt.replace(
+          RegExp.$1,
+          (this.getFullYear() + "").substr(4 - RegExp.$1.length)
+        );
+      for (var k in o)
+        if (new RegExp("(" + k + ")").test(fmt))
+          fmt = fmt.replace(
+            RegExp.$1,
+            RegExp.$1.length == 1
+              ? o[k]
+              : ("00" + o[k]).substr(("" + o[k]).length)
+          );
+      return fmt;
+    };
   },
   methods: {
     getDataList() {
@@ -303,8 +327,8 @@ export default {
     delFileList(index) {
       this.toUploadFiles.splice(index, 1);
     },
-    dataUploadModalShow(){
-      this.uploadData= {
+    dataUploadModalShow() {
+      this.uploadData = {
         privacy: "private",
         type: "data",
         description: ""
@@ -366,8 +390,25 @@ export default {
                         }
                       });
                     }
+
                     // 初始化上传数据列表
                     this.toUploadFiles = [];
+
+                    // 记录信息
+                    let filelist = "";
+                    for (let i = 0; i < uploadedList.length - 1; i++) {
+                      filelist += uploadedList[i].name + ", ";
+                    }
+                    filelist +=
+                      uploadedList[uploadedList.length - 1].name + ". ";
+                    let dataRecords = {
+                      type: "resource",
+                      time: new Date().Format("yyyy-MM-dd HH:mm:ss"),
+                      who: this.userInfo.userName,
+                      content: "upload data",
+                      file: filelist
+                    };
+                    this.$emit("dataBehavior", dataRecords);
                   } else {
                     this.$Message.warning("Upload fail.");
                   }
@@ -390,38 +431,88 @@ export default {
         }
       });
     },
+    deleteResourceModalShow(id) {
+      this.deleteResourceModal = true;
+      this.deleteResourceId = id;
+    },
+    deleteResource() {
+      if (this.deleteResourceId != "") {
+        this.axios
+          .get(
+            "/GeoProblemSolving/folder/removeFile?" +
+              "fileId=" +
+              this.deleteResourceId +
+              "&folderId=" +
+              this.stepInfo.stepId
+          )
+          .then(res => {
+            if (res.data == "Fail") {
+              this.$Notice.error({
+                title: "Process result",
+                desc: "Delete fail"
+              });
+              // this.$Message.info("Failure");
+            } else {
+              this.$Notice.success({
+                title: "Process result",
+                desc: "Delete successfully"
+              });
+
+              //从列表中删除
+              for (let i = 0; i < this.stepDataList.length; i++) {
+                if (this.stepDataList[i].resourceId == this.deleteResourceId) {
+                  this.stepDataList.splice(i, 1); 
+                  
+                  // 记录信息
+                  let dataRecords = {
+                    type: "resource",
+                    time: new Date().Format("yyyy-MM-dd HH:mm:ss"),
+                    who: this.userInfo.userName,
+                    content: "delete data",
+                    file: this.stepDataList[i].name
+                  };
+                  this.$emit("dataBehavior", dataRecords);
+                }
+              }
+            }
+          })
+          .catch(err => {
+            console.log(err.data);
+          });
+      }
+    },
     checkData() {
       this.checkDataModal = true;
     },
     editMetadata() {
-        if (this.metaDataEdit) {
-          this.metaDataEdit = false;
-      //     let obj = new URLSearchParams();
-      //     obj.append("stepId", this.stepId);
-      //     obj.append("content.metaDataInfo", this.metaDataInfo);
-      //     this.axios
-      //       .post("/GeoProblemSolving/step/update", obj)
-      //       .then(res => {
-      //         if (res.data == "Offline") {
-      //           this.$store.commit("userLogout");
-      //           this.$router.push({ name: "Login" });
-      //         } else if (res.data != "Fail") {
-      //           this.$Notice.info({
-      //             desc: "Update successfully!"
-      //           });
-      //         } else {
-      //           this.$Message.error("Update step failed.");
-      //         }
-      //       })
-      //       .catch(err => {
-      //         console.log(err.data);
-      //       });
-        } else {
-          this.metaDataEdit = true;
-        }
+      if (this.metaDataEdit) {
+        this.metaDataEdit = false;
+        //     let obj = new URLSearchParams();
+        //     obj.append("stepId", this.stepId);
+        //     obj.append("content.metaDataInfo", this.metaDataInfo);
+        //     this.axios
+        //       .post("/GeoProblemSolving/step/update", obj)
+        //       .then(res => {
+        //         if (res.data == "Offline") {
+        //           this.$store.commit("userLogout");
+        //           this.$router.push({ name: "Login" });
+        //         } else if (res.data != "Fail") {
+        //           this.$Notice.info({
+        //             desc: "Update successfully!"
+        //           });
+        //         } else {
+        //           this.$Message.error("Update step failed.");
+        //         }
+        //       })
+        //       .catch(err => {
+        //         console.log(err.data);
+        //       });
+      } else {
+        this.metaDataEdit = true;
+      }
     },
-    dataPreview(){},
-    dataVisualize(){}
+    dataPreview() {},
+    dataVisualize() {}
   }
 };
 </script>

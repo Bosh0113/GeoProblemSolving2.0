@@ -187,7 +187,7 @@ export default {
             } else if (res.data === "Fail") {
               this.$Notice.error({ desc: "Loading tools fail." });
             } else if (res.data === "None") {
-              this.$Notice.error({ desc: "There is no existing tool" });
+              // this.$Notice.error({ desc: "There is no existing tool" });
             } else {
               ToolInfos.push(res.data[0]);
               if (--flagCount < 1) {
@@ -229,7 +229,7 @@ export default {
             } else if (res.data === "Fail") {
               this.$Notice.error({ desc: "Loading toolsets fail." });
             } else if (res.data === "None") {
-              this.$Notice.error({ desc: "There is no existing toolset" });
+              // this.$Notice.error({ desc: "There is no existing toolset" });
             } else {
               toolsetInfos.push(res.data[0]);
               if (--flagCount < 1) {

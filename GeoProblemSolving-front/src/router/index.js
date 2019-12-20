@@ -16,14 +16,15 @@ const routes = [{
     // { path: 'project/:id', name: 'ProjectDetail', component: resolve => (require(["@/components/projects/projectDetail"], resolve)) },
     // { path: 'project/:id/workspace', name: 'workspace', component: resolve => (require(["@/components/workingSpace/moduleList"], resolve)) },
     // { path: 'markdown', name: 'markDown', component: resolve => (require(["@/components/workingSpace/utils/markDown"], resolve)) },
-    { path: 'project/workspace/contextdefinition/:id', name: 'contextDefinition', component: resolve => (require(["@/components/workingSpace/contextDefinition"], resolve)) },
+    
+    // { path: 'project/workspace/contextdefinition/:id', name: 'contextDefinition', component: resolve => (require(["@/components/workingSpace/contextDefinition"], resolve)) },
     // { path: 'project/workspace/dataprocessing/:id', name: 'dataProcessing', component: resolve => (require(["@/components/workingSpace/dataProcessing"], resolve)) },
-    { path: 'project/workspace/modelprocess/:id', name: 'modelProcess', component: resolve => (require(["@/components/workingSpace/modelProcess"], resolve)) },
-    { path: 'project/workspace/modelevaluation/:id', name: 'modelEvaluation', component: resolve => (require(["@/components/workingSpace/modelEvaluation"], resolve)) },
-    { path: 'project/workspace/quantitativeandqualitative/:id', name: 'quantitativeAndQualitative', component: resolve => (require(["@/components/workingSpace/quantitativeAndQualitative"], resolve)) },
-    { path: 'project/workspace/simulationprediction/:id', name: 'simulationPrediction', component: resolve => (require(["@/components/workingSpace/simulationPrediction"], resolve)) },
-    { path: 'project/workspace/datavisualization/:id', name: 'dataVisualization', component: resolve => (require(["@/components/workingSpace/dataVisualization"], resolve)) },
-    { path: 'project/workspace/decisionmakingandmanagement/:id', name: 'decisionMakingAndManagement', component: resolve => (require(["@/components/workingSpace/decisionMakingAndManagement"], resolve)) },
+    // { path: 'project/workspace/modelprocess/:id', name: 'modelProcess', component: resolve => (require(["@/components/workingSpace/modelProcess"], resolve)) },
+    // { path: 'project/workspace/modelevaluation/:id', name: 'modelEvaluation', component: resolve => (require(["@/components/workingSpace/modelEvaluation"], resolve)) },
+    // { path: 'project/workspace/quantitativeandqualitative/:id', name: 'quantitativeAndQualitative', component: resolve => (require(["@/components/workingSpace/quantitativeAndQualitative"], resolve)) },
+    // { path: 'project/workspace/simulationprediction/:id', name: 'simulationPrediction', component: resolve => (require(["@/components/workingSpace/simulationPrediction"], resolve)) },
+    // { path: 'project/workspace/datavisualization/:id', name: 'dataVisualization', component: resolve => (require(["@/components/workingSpace/dataVisualization"], resolve)) },
+    // { path: 'project/workspace/decisionmakingandmanagement/:id', name: 'decisionMakingAndManagement', component: resolve => (require(["@/components/workingSpace/decisionMakingAndManagement"], resolve)) },
     {
       path: 'project/:id/subproject/', name: 'subproject', component: resolve => (require(["@/components/subProject/subprojectNav"], resolve)), children: [
         { path: '', redirect: 'overview' },
@@ -36,7 +37,14 @@ const routes = [{
     },
     {
       path: 'workspace/:stepId/', name: 'stepFramework', component: resolve => (require(["@/components/workingSpace/functionSteps/pageFramework"], resolve)), children: [
+        { path: 'contextDefinition', name: 'contextDefinition', component: resolve => (require(["@/components/workingSpace/functionSteps/contextDefinitionContent"], resolve)) },
         { path: 'dataProcessing', name: 'dataProcessing', component: resolve => (require(["@/components/workingSpace/functionSteps/dataProcessingContent"], resolve)) },
+        { path: 'modelProcess', name: 'modelProcess', component: resolve => (require(["@/components/workingSpace/functionSteps/modelProcessContent"], resolve)) },
+        { path: 'modelEvaluation', name: 'modelEvaluation', component: resolve => (require(["@/components/workingSpace/functionSteps/modelEvaluationContent"], resolve)) },
+        { path: 'analysis', name: 'analysis', component: resolve => (require(["@/components/workingSpace/functionSteps/analysisContent"], resolve)) },
+        { path: 'simulation', name: 'simulation', component: resolve => (require(["@/components/workingSpace/functionSteps/simulationContent"], resolve)) },
+        { path: 'visualization', name: 'visualization', component: resolve => (require(["@/components/workingSpace/functionSteps/visualizationContent"], resolve)) },
+        { path: 'decisionMaking', name: 'decisionMaking', component: resolve => (require(["@/components/workingSpace/functionSteps/decisionMakingContent"], resolve)) },
       ],
     },
     { path: 'newproject', name: 'NewProject', component: resolve => (require(["@/components/projects/newProject"], resolve)) },

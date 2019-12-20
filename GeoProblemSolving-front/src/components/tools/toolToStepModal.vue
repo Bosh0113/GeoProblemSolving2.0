@@ -387,14 +387,6 @@ export default {
       this.getPersonalTools();
       this.getStepToolsets();
       this.getStepTools();
-      var that = this;
-      var timer = window.setInterval(function(){
-        if(!that.publicTools.length<1&&!that.personalTools.length<1){
-          that.filterDuplicateTools();
-          that.filterShowListByType();
-          window.clearInterval(timer);
-        }
-      },10);
     },
     stepToolModalShow(){
       this.getAllListInfo();
@@ -437,7 +429,7 @@ export default {
           } else if (res.data === "Fail") {
             this.$Notice.error({ desc: "Loading toolsets fail." });
           } else if (res.data === "None") {
-            this.$Notice.error({ desc: "There is no existing toolset" });
+            // this.$Notice.error({ desc: "There is no existing toolset" });
           } else {
             this.$set(this, "publicToolsets", res.data);
           }
@@ -460,9 +452,11 @@ export default {
           } else if (res.data === "Fail") {
             this.$Notice.error({ desc: "Loading toolsets fail." });
           } else if (res.data === "None") {
-            this.$Notice.error({ desc: "There is no existing toolset" });
+            // this.$Notice.error({ desc: "There is no existing toolset" });
           } else {
             this.$set(this, "personalToolsets", res.data);
+            this.filterDuplicateToolsets();
+            this.filterShowListByType();
           }
         })
         .catch(err => {
@@ -492,7 +486,7 @@ export default {
             } else if (res.data === "Fail") {
               this.$Notice.error({ desc: "Loading toolsets fail." });
             } else if (res.data === "None") {
-              this.$Notice.error({ desc: "There is no existing toolset" });
+              // this.$Notice.error({ desc: "There is no existing toolset" });
             } else {
               stepToolsetInfos.push(res.data[0]);
               if(--flagCount<1){
@@ -506,14 +500,8 @@ export default {
                   }
                 }
                 this.$set(this, "stepToolsetsShow", sortToolsets);
-                var that = this;
-                var timer = window.setInterval(function(){
-                  if(!that.publicToolsets.length<1&&!that.personalToolsets.length<1){
-                    that.filterDuplicateToolsets();
-                    that.filterShowListByType();
-                    window.clearInterval(timer);
-                  }
-                },10);
+                this.filterDuplicateToolsets();
+                this.filterShowListByType();
               }
             }
           })
@@ -536,9 +524,11 @@ export default {
           } else if (res.data === "Fail") {
             this.$Notice.error({ desc: "Loading tools fail." });
           } else if (res.data === "None") {
-            this.$Notice.error({ desc: "There is no existing tool" });
+            // this.$Notice.error({ desc: "There is no existing tool" });
           } else {
             this.$set(this, "publicTools", res.data);
+            this.filterDuplicateTools();
+            this.filterShowListByType();
           }
         })
         .catch(err => {
@@ -559,9 +549,11 @@ export default {
           } else if (res.data === "Fail") {
             this.$Notice.error({ desc: "Loading tool fail." });
           } else if (res.data === "None") {
-            this.$Notice.error({ desc: "There is no existing tool" });
+            // this.$Notice.error({ desc: "There is no existing tool" });
           } else {
             this.$set(this, "personalTools", res.data);
+            this.filterDuplicateTools();
+            this.filterShowListByType();
           }
         })
         .catch(err => {
@@ -591,7 +583,7 @@ export default {
             } else if (res.data === "Fail") {
               this.$Notice.error({ desc: "Loading tools fail." });
             } else if (res.data === "None") {
-              this.$Notice.error({ desc: "There is no existing tool" });
+              // this.$Notice.error({ desc: "There is no existing tool" });
             } else {
               stepToolInfos.push(res.data[0]);
               if(--flagCount<1){
@@ -605,6 +597,8 @@ export default {
                   }
                 }
                 this.$set(this, "stepToolsShow", sortTools);
+                this.filterDuplicateTools();
+                this.filterShowListByType();
               }
             }
           })
@@ -801,7 +795,7 @@ export default {
           } else if (res.data === "Fail") {
             this.$Notice.error({ desc: "Loading tool fail." });
           } else if (res.data === "None") {
-            this.$Notice.error({ desc: "There is no existing tool" });
+            // this.$Notice.error({ desc: "There is no existing tool" });
           } else {
             //此处要更新父组件的列表
             this.$emit("updateStepTools", newStepTools,newStepToolsets);

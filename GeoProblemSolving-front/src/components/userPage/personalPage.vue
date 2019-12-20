@@ -585,7 +585,7 @@ body {
     </Modal>
     <Modal
       v-model="deleteResourceModal"
-      @on-ok="deleteResource"
+      @on-ok="deleteResource()"
       @on-cancel
       ok-text="Assure"
       cancel-text="Cancel"
