@@ -252,6 +252,7 @@
                             <div slot="title">
                                 <h1 class="projectMenuItemTitle">Overview </h1>
                             </div>
+                            <div slot="extra"></div>
                             <Row style="margin-left:60px">
                                 <div style="text-align:center;">
                                     <h2 class="projectMenuItemTitle">Project title: </h2>
@@ -320,7 +321,7 @@
                                         <div style="text-align:center">
                                             <h3>
                                                 Click it to check
-                                                <a @click="gotoWorking()">Working steps</a>
+                                                <a @click="gotoWorking()">Workspace</a>
                                             </h3>
                                         </div>
                                     </Card>
@@ -521,7 +522,7 @@
                 </div>
                 <div v-else-if="showMenuItem=='subProjects'" style="height: inherit;min-height: fit-content;">
                     <div style="background:#eee;padding: 10px;height: inherit;min-height: fit-content;">
-                        <Card :bordered="false" dis-hover
+                        <Card v-if="projectInfo.type=='type0'" :bordered="false" dis-hover
                               style="height: -webkit-fill-available;min-height: fit-content;">
                             <h1 slot="title" class="projectMenuItemTitle">Subprojects</h1>
                             <div slot="extra">
@@ -545,17 +546,17 @@
                                                 </strong>
                                             </div>
                                             <div slot="extra" v-if="managerIdentity(subProject.managerId)">
-                                                <Poptip trigger="hover" content="Change manager" placement="left">
+                                                <Poptip trigger="hover" content="Change manager" placement="bottom">
                                                     <i-button class="changeInviteColor" icon="ios-people" size="small"
                                                               shape="circle"
                                                               @click="handOverModalShow(index)"></i-button>
                                                 </Poptip>
-                                                <Poptip trigger="hover" content="Edit information" placement="left">
+                                                <Poptip trigger="hover" content="Edit information" placement="bottom">
                                                     <i-button class="changeEditColor" icon="ios-create" size="small"
                                                               shape="circle"
                                                               @click="editSubProjectModalShow(index)"></i-button>
                                                 </Poptip>
-                                                <Poptip trigger="hover" content="Remove subproject" placement="left">
+                                                <Poptip trigger="hover" content="Remove subproject" placement="bottom">
                                                     <i-button class="changeRemoveColor" icon="md-close" size="small"
                                                               shape="circle"
                                                               @click="deleteSubProjectModalShow(index)"></i-button>
@@ -608,6 +609,9 @@
                                 </vue-scroll>
                             </div>
                         </Card>
+                        <div v-else style="width: -webkit-fill-available;height: -webkit-fill-available;">
+                            <iframe style="width: -webkit-fill-available;height: -webkit-fill-available;border-width:0" src="http://localhost:8080/projectTypeContent/0d69b8a4-5099-40af-91ce-cbd82fdff22a"></iframe>
+                        </div>
                     </div>
                 </div>
                 <div v-else-if="showMenuItem=='resources'" style="height: inherit;min-height: fit-content;">
@@ -1569,6 +1573,8 @@
                             SubProject["title"] = this.createSubProjectForm.subProjectTitle;
                             SubProject["projectId"] = this.projectInfo.projectId;
                             SubProject["managerId"] = this.userInfo.userId;
+                            SubProject["type"] = "";
+                            SubProject["stepId"] = "";
                             axios
                                 .post("/GeoProblemSolving/subProject/create", SubProject)
                                 .then(res => {

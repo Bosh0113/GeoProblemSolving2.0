@@ -380,7 +380,6 @@ export default {
   },
   mounted() {
     window.addEventListener("resize", this.initSize);
-    this.$emit("menuState", "info");
   },
 
   beforeRouteLeave(to, from, next) {

@@ -20,6 +20,24 @@ public class ProjectEntity {
     private String picture;
     private String createTime;
     private String endTime;
+    private String type; //type0|type1|type2
+    private String stepId;
+
+    public void setStepId(String stepId) {
+        this.stepId = stepId;
+    }
+
+    public String getStepId() {
+        return stepId;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
 
     public String getManagerName() {
         return managerName;

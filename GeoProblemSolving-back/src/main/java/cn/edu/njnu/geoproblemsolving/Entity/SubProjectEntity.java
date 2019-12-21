@@ -17,6 +17,24 @@ public class SubProjectEntity {
     private String solvingProcess;
     private String background;
     private String limitation;
+    private String type; //type0|type1
+    private String stepId;
+
+    public String getStepId() {
+        return stepId;
+    }
+
+    public void setStepId(String stepId) {
+        this.stepId = stepId;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
 
     public String getBackground() {
         return background;

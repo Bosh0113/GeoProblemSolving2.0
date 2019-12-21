@@ -31,7 +31,7 @@ const routes = [{
         { path: 'overview', name: 'overview', component: resolve => (require(["@/components/subProject/subprojectView"], resolve)) },
         { path: 'info', name: 'info', component: resolve => (require(["@/components/subProject/subprojectDetail"], resolve)) },
         { path: 'resource', name: 'resource', component: resolve => (require(["@/components/subProject/subResources"], resolve)) },
-        { path: 'process', name: 'process', component: resolve => (require(["@/components/subProject/solvingStep"], resolve)) },
+        { path: 'process', name: 'process', component: resolve => (require(["@/components/subProject/toWork"], resolve)) },
         { path: 'task', name: 'task', component: resolve => (require(["@/components/subProject/taskArrangement"], resolve)) },
       ],
     },
@@ -65,6 +65,7 @@ const routes = [{
     { path: 'toolsCenter', name: 'toolsCenter', component: resolve => (require(["@/components/tools/toolsCenter"], resolve)) }, 
   ]
 },
+{ path: '/projectTypeContent/:projectId', name: 'projectTypeContent', component: resolve=>(require(["@/components/projects/toWork"],resolve)) },
 { path: '/chat', name: 'chatUtil', component: resolve=>(require(["@/components/utils/chatroom"],resolve)) },
 { path: '/draw', name: 'drawUtil', component: resolve=>(require(["@/components/utils/drawBoard"],resolve)) },
 { path: '/map', name: 'mapTool', component: resolve=>(require(["@/components/utils/mapTool"],resolve)) },

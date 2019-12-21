@@ -606,7 +606,6 @@ export default {
   mounted() {
     this.inquiryTask();
     window.addEventListener("resize", this.initSize);
-    this.$emit("menuState", "task");
   },
   beforeRouteLeave(to, from, next) {
     next();

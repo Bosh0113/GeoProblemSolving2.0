@@ -288,6 +288,8 @@ export default {
           createProjectForm["introduction"] = this.formInline.introduction;
           createProjectForm["description"] = this.formInline.description;
           createProjectForm["managerId"] = this.$store.getters.userId;
+          createProjectForm["type"] = "";
+          createProjectForm["stepId"] = "";
 
           this.axios
             .post("/GeoProblemSolving/project/create", createProjectForm)
