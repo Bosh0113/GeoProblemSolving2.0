@@ -11,6 +11,53 @@
   background-color: #ed4014;
   color: white;
 }
+.dataInfo {
+  margin: 5px 0;
+}
+.dataLabel {
+  width: 90px;
+  display: inline-block;
+  font-size: 13px;
+  font-weight: bold;
+  vertical-align: top;
+  color: dodgerblue;
+}
+.dataContent {
+  width: 180px;
+  display: inline-block;
+  padding-left: 10px;
+}
+.dataText {
+  padding-left: 10px;
+  display: inline-block;
+  word-break: break-word;
+  width: 470px;
+}
+.toolDataLabel {
+  font-weight: bold;
+  vertical-align: top;
+  color: dodgerblue;
+}
+.toolDataText {
+  width: 100px;
+  word-break: break-word;
+  /* display: inline-block; */
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+#toolData {
+  width: 68%;
+  height: 400px;
+  border: 1px solid #dcdee2;
+}
+#toolDataHeader {
+  font-size: 12px;
+  font-weight: bold;
+  padding: 10px 15px;
+  border-bottom: 1px solid #e8eaec;
+  background-color: #f8f8f9;
+}
 </style>
 <template>
   <div>
@@ -26,76 +73,111 @@
           style="margin-top:-10px"
         ></Button>
       </div>
-      <div style="width:300px">
-        <Table
-          :columns="tableColName"
-          :data="stepDataList"
-          class="table"
-          height="400"
-          v-show="stepDataList!=[] && stepDataList!='None'"
-        >
-          <template slot-scope="{ row }" slot="name">
-            <strong>{{ row.name }}</strong>
-          </template>
-          <template slot-scope="{ row, index }" slot="action">
-            <Button
-              class="fileBtnHoverGreen"
-              size="small"
-              title="Check"
-              @click="checkData(index)"
-              icon="md-eye"
-              shape="circle"
-              type="text"
-            ></Button>
-            <Button
-              class="fileBtnHoverRed"
-              size="small"
-              shape="circle"
-              type="text"
-              icon="md-close"
-              title="Remove"
-              @click="deleteResourceModalShow(stepDataList[index].resourceId)"
-            ></Button>
-          </template>
-        </Table>
+      <div style="display: flex; justify-content: space-between;">
+        <div style="width:30%; height:400px">
+          <vue-scroll :ops="ops">
+            <Table
+              :columns="tableColName"
+              :data="stepDataList"
+              class="table"
+              v-show="stepDataList!=[] && stepDataList!='None'"
+            >
+              <template slot-scope="{ row }" slot="name">
+                <strong>{{ row.name }}</strong>
+              </template>
+              <template slot-scope="{ row, index }" slot="action">
+                <Button
+                  class="fileBtnHoverGreen"
+                  size="small"
+                  title="Check"
+                  @click="checkData(row)"
+                  icon="md-eye"
+                  shape="circle"
+                  type="text"
+                ></Button>
+                <Button
+                  class="fileBtnHoverRed"
+                  size="small"
+                  shape="circle"
+                  type="text"
+                  icon="md-close"
+                  title="Remove"
+                  @click="deleteResourceModalShow(row.resourceId)"
+                ></Button>
+              </template>
+            </Table>
+          </vue-scroll>
+        </div>
+        <div id="toolData">
+          <div id="toolDataHeader">Data from Tools</div>
+          <vue-scroll :ops="ops" style="height:360px">
+            <div v-for="(item,index) in toolDataList" :key="index">
+              <Card style="width:48%; height:150px; float:left; margin:5px">
+                <div style="float:left">
+                  <img
+                    v-if="item.thumbnail != undefined"
+                    :src="item.thumbnail"
+                    height="118px"
+                    width="118px"
+                  />
+                  <avatar v-else :username="item.name" :size="118" :rounded="false"></avatar>
+                </div>
+                <div style="float:left;margin: 0 10px">
+                  <div>
+                    <Label class="toolDataLabel">Name:</Label>
+                    <div class="toolDataText" :title="item.name">{{item.name}}</div>
+                  </div>
+                  <div>
+                    <Label class="toolDataLabel">Description:</Label>
+                    <div class="toolDataText" :title="item.description">{{item.description}}</div>
+                  </div>
+                  <div>
+                    <Button
+                      size="small"
+                      title="Check"
+                      icon="md-eye"
+                      style="margin: 10px 30px 0 0;"
+                      @click="checkData(item)"
+                    ></Button>
+                    <Button
+                      size="small"
+                      title="Delete"
+                      icon="md-close"
+                      style="margin-top: 10px;"
+                      @click="deleteResourceModalShow(item.resourceId)"
+                    ></Button>
+                  </div>
+                </div>
+              </Card>
+            </div>
+          </vue-scroll>
+        </div>
       </div>
     </Card>
     <Modal v-model="checkDataModal" title="Data Information" width="600">
       <Tabs>
-        <TabPane label="Metadata" name="metadata" icon="md-home">
-          <div style="width:100%;position:absolute;right:5%">
-            <template v-if="userRole == 'Manager'">
-              <Icon
-                v-if="!metaDataEdit"
-                type="ios-create"
-                :size="25"
-                style="float:right;cursor:pointer"
-                title="Edit"
-                @click="editMetadata"
-              />
-              <Icon
-                v-else
-                type="md-checkbox-outline"
-                :size="25"
-                style="float:right;cursor:pointer"
-                title="Complete"
-                @click="editMetadata"
-              />
-            </template>
-          </div>
-          <div
-            v-if="!metaDataEdit"
-            style="word-break: break-all; word-wrap: break-word;width:85%"
-          >{{metaDataInfo}}</div>
-          <div v-else>
-            <Input
-              v-model="metaDataInfo"
-              type="textarea"
-              :rows="5"
-              :autosize="{minRows: 5,maxRows: 18}"
-              placeholder="Enter something..."
-              style="width:85%"
-            />
+        <TabPane label="Information" name="metadata" icon="md-home">
+          <div style>
+            <div class="dataInfo">
+              <Label class="dataLabel">Name:</Label>
+              <span class="dataText">{{selectData.name}}</span>
+            </div>
+            <div class="dataInfo">
+              <Label class="dataLabel">Type:</Label>
+              <span class="dataContent">{{selectData.type}}</span>
+              <Label class="dataLabel">Provider:</Label>
+              <span class="dataContent">{{selectData.uploaderName}}</span>
+            </div>
+            <div class="dataInfo">
+              <Label class="dataLabel">File size:</Label>
+              <span class="dataContent">{{selectData.fileSize}}</span>
+              <Label class="dataLabel">Creation time:</Label>
+              <span class="dataContent">{{selectData.uploadTime}}</span>
+            </div>
+            <div class="dataInfo">
+              <Label class="dataLabel">Description:</Label>
+              <span class="dataText">{{selectData.description}}</span>
+            </div>
           </div>
         </TabPane>
         <TabPane label="UDX Schema" name="udx" icon="md-browsers">
@@ -179,7 +261,11 @@
   </div>
 </template>
 <script>
+import Avatar from "vue-avatar";
 export default {
+  components: {
+    Avatar
+  },
   data() {
     return {
       ops: {
@@ -214,8 +300,17 @@ export default {
       fileCountTimer: null,
       progressModalShow: false,
       uploadProgress: 0,
-      fileList: [],
-      stepDataList: [],
+      fileList: [], //resources in the step
+      stepDataList: [], //data in the step
+      toolDataList: [
+        {
+          thumbnail:
+            "http://94.191.49.160:8080/GeoProblemSolving/project/picture/commen1065951.jpeg",
+          name: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          description: "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        },
+        {name:"ABC"}
+      ], //data from tools in the step
       checkDataModal: false,
       tableColName: [
         {
@@ -232,6 +327,7 @@ export default {
           align: "center"
         }
       ],
+      selectData: {},
       // 编辑data描述信息
       metaDataEdit: false,
       // 元数据信息，待完善
@@ -461,8 +557,8 @@ export default {
               //从列表中删除
               for (let i = 0; i < this.stepDataList.length; i++) {
                 if (this.stepDataList[i].resourceId == this.deleteResourceId) {
-                  this.stepDataList.splice(i, 1); 
-                  
+                  this.stepDataList.splice(i, 1);
+
                   // 记录信息
                   let dataRecords = {
                     type: "resource",
@@ -481,7 +577,8 @@ export default {
           });
       }
     },
-    checkData() {
+    checkData(item) {
+      this.selectData = item;
       this.checkDataModal = true;
     },
     editMetadata() {

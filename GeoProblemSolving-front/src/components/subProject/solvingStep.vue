@@ -22,7 +22,7 @@
               <label style="margin-left:20px">Step name:</label>
               <Input
                 v-model="formValidate0.stepTitle"
-                placeholder="Enter something..."
+                placeholder="Show the name of selected step..."
                 style="width: 250px;margin-left:10px"
                 readonly
               />
@@ -30,7 +30,7 @@
               <Input
                 v-model="formValidate0.stepType"
                 style="width:250px;margin-left:10px"
-                placeholder="please select step type..."
+                placeholder="Show the type of selected step..."
                 readonly
               >
                 <!-- <Option v-for="item in typeList" :key="item.index" :value="item">{{ item }}</Option> -->
@@ -203,7 +203,10 @@ export default {
       personalToolsets: [],
       publicToolsets: [],
       selectStepTools: [],
-      selectStepToolsets: []
+      selectStepToolsets: [],
+      // step 结构信息
+      scopeType: "",
+      scopeId:"",
     };
   },
   created() {
