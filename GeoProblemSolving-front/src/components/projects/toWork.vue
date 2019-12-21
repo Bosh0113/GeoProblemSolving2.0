@@ -1,6 +1,6 @@
 <template>
     <div>
-        <type-choose :projectInfo="projectInfo" :userRole="userRole" v-if="projectInfo.type==''"></type-choose>
+        <type-choose :projectInfo="projectInfo" :userRole="userRole" v-if="projectInfo.type==''" @changeProjectInfo = "changeProjectInfo"></type-choose>
         <h1 v-else-if="projectInfo.type=='type1'">工作流页面</h1>
         <h1 v-else-if="projectInfo.type=='type2'">工作空间</h1>
     </div>
@@ -19,7 +19,7 @@ export default {
         return{
             projectId: this.$route.params.projectId,
             userInfo: JSON.parse(sessionStorage.getItem("userInfo")),
-            projectInfo: {},
+            projectInfo: JSON.parse(sessionStorage.getItem("projectInfo")),
             userRole: 'visitor',
         }
     },
@@ -44,24 +44,26 @@ export default {
             }
         },
         getProjectInfo(){
-            $.ajax({
-            url:
-                "/GeoProblemSolving/project/inquiry" +
-                "?key=projectId" +
-                "&value=" +
-                this.projectId,
-            type: "GET",
-            async: false,
-            success: data => {
-                if (data != "None" && data != "Fail") {
-                this.projectInfo = data[0];
-                this.identifyUserRole();
-                this.$store.commit("setProjectInfo", data[0]);
-                } else {
-                console.log(data);
+            if(this.projectInfo=={}||this.projectInfo==undefined){
+                $.ajax({
+                url:
+                    "/GeoProblemSolving/project/inquiry" +
+                    "?key=projectId" +
+                    "&value=" +
+                    this.projectId,
+                type: "GET",
+                async: false,
+                success: data => {
+                    if (data != "None" && data != "Fail") {
+                    this.projectInfo = data[0];
+                    this.identifyUserRole();
+                    this.$store.commit("setProjectInfo", data[0]);
+                    } else {
+                    console.log(data);
+                    }
                 }
+                });
             }
-            });
         },
         identifyUserRole(){
             //Manager|Member|Visitor
@@ -79,6 +81,13 @@ export default {
                         this.userRole = "Member";
                     }
                 }
+            }
+        },
+        changeProjectInfo(newProjectInfo){
+            if(newProjectInfo.type!="type0"){
+                this.projectInfo = newProjectInfo;
+            }else{
+                parent.projectInfo.type = "type0";
             }
         }
     }
