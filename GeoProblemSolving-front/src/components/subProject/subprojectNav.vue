@@ -36,7 +36,9 @@
           <Icon type="md-calendar" size="30" />
         </MenuItem>
       </Menu>
-      <div style="font-size:1.5rem;height:60px;padding-top:10px;border:1px solid lightgrey;margin-left:60px">
+      <div
+        style="font-size:1.5rem;height:60px;padding-top:10px;border:1px solid lightgrey;margin-left:60px"
+      >
         <Col offset="4" span="16" style="text-align:center;">
           <strong>{{subProjectInfo.title}}</strong>
         </Col>
@@ -48,7 +50,12 @@
           @click="gotoWorkingspace"
         >Working space</Button>-->
       </div>
-      <router-view :subProjectInfo="subProjectInfo" :userRole="userRole" :projectInfo="projectInfo"></router-view>
+      <router-view
+        :subProjectInfo="subProjectInfo"
+        :userRole="userRole"
+        :projectInfo="projectInfo"
+        :scopeInfo="scopeInfo"
+      ></router-view>
     </Row>
   </div>
 </template>
@@ -60,7 +67,8 @@ export default {
       // information of project
       projectInfo: {},
       // info of subproject
-      subProjectInfo: [],
+      subProjectInfo: {},
+      scopeInfo: {},
       contentHeight: "",
       // 用户角色
       userRole: "Visitor"
@@ -149,6 +157,7 @@ export default {
         subProjectInfo.subProjectId == subProjectId
       ) {
         this.$set(this, "subProjectInfo", subProjectInfo);
+        this.$set(this, "scopeInfo", subProjectInfo);
         this.userRoleIdentity();
       } else {
         let that = this;
@@ -167,6 +176,7 @@ export default {
             } else if (data != "None" && data != "Fail") {
               subProjectInfo = data[0];
               that.$set(that, "subProjectInfo", subProjectInfo);
+              that.$set(that, "scopeInfo", subProjectInfo);
               that.userRoleIdentity();
               that.$store.commit("setSubProjectInfo", subProjectInfo);
             }
@@ -213,7 +223,7 @@ export default {
           "/GeoProblemSolving/projectDetail/" + this.subProjectInfo.projectId;
       } else if (name == "overview") {
         this.$router.replace({ name: "overview" });
-      }  else if (name == "process") {
+      } else if (name == "process") {
         this.$router.replace({ name: "process" });
       } else if (name == "info") {
         this.$router.replace({ name: "info" });

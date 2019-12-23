@@ -854,7 +854,6 @@
 <script>
 import Avatar from "vue-avatar";
 import draggable from "vuedraggable";
-import contextDefinitionVue from '../workingSpace/contextDefinition.vue';
 export default {
   components: {
     draggable,

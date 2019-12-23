@@ -3,6 +3,10 @@
 <template>
   <div style="padding:15px">
     <Collapse simple v-model="unfold">
+      <Panel name="context">
+        Problem context
+        <context-info slot="content" :stepInfo="stepInfo" :userRole="userRole"></context-info>
+      </Panel>
       <Panel name="tool">
         Toolbox
         <tool-container slot="content" :stepInfo="stepInfo" :userRole="userRole" @toolBehavior="listenToolbox"></tool-container>
@@ -24,17 +28,19 @@ import mapCanvas from "./utils/mapCanvas";
 import dataList from "./utils/dataList";
 import toolContainer from "./utils/toolContainer";
 import messagePanel from "./utils/messagePanel";
+import contextInfo from "./utils/contextInfo";
 export default {
   components: {
     mapCanvas,
     dataList,
     toolContainer,
-    messagePanel
+    messagePanel,
+    contextInfo
   },
   props: ["stepInfo", "userRole", "receivedChatMsgs"],
   data() {
     return {
-      unfold: ["tool", "data"],
+      unfold: ["context","tool", "data"],
       stepSocket: null,
       operationRecords: []
     };

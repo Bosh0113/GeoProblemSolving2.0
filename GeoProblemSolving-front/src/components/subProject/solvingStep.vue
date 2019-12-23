@@ -17,12 +17,12 @@
     <Col span="23" offset="1" style="margin-top:20px">
       <div :style="{height:contentHeight+'px'}">
         <Row type="flex" justify="space-around">
-          <template v-if="$store.getters.userInfo.userId == subProjectInfo.managerId">
+          <template v-if="$store.getters.userInfo.userId == scopeInfo.managerId">
             <div style="width: 80%; height: 25px">
               <label style="margin-left:20px">Step name:</label>
               <Input
                 v-model="formValidate0.stepTitle"
-                placeholder="Enter something..."
+                placeholder="Show the name of selected step..."
                 style="width: 250px;margin-left:10px"
                 readonly
               />
@@ -30,7 +30,7 @@
               <Input
                 v-model="formValidate0.stepType"
                 style="width:250px;margin-left:10px"
-                placeholder="please select step type..."
+                placeholder="Show the type of selected step..."
                 readonly
               >
                 <!-- <Option v-for="item in typeList" :key="item.index" :value="item">{{ item }}</Option> -->
@@ -140,7 +140,7 @@
 <script>
 import echarts from "echarts";
 export default {
-  props: ["subProjectInfo", "userRole"],
+  props: ["userRole", "scopeInfo"],
   data() {
     return {
       scrollOps: {
@@ -203,20 +203,20 @@ export default {
       personalToolsets: [],
       publicToolsets: [],
       selectStepTools: [],
-      selectStepToolsets: []
+      selectStepToolsets: [],
+      // step 结构信息
+      scopeType: "",
+      scopeId: ""
     };
   },
-  created() {
+  created() {    
     this.init();
+    this.getProcessSteps();
   },
   mounted() {
-    window.addEventListener("resize", this.initSize);
-    window.addEventListener("resize", this.updateStepchart);
-    this.getProcessSteps();
     this.showSteps();
     this.getAllTools();
     this.getAllToolsets();
-    this.$emit("menuState", "process");
 
     Array.prototype.contains = function(obj) {
       var i = this.length;
@@ -244,6 +244,15 @@ export default {
     //初始化函数，作用是控制侧边栏的高度，设置右边通知栏弹出时候的距顶高度以及延迟的时间
     init() {
       this.initSize();
+      if (this.scopeInfo.subProjectId == undefined) {
+        this.scopeType = "project";
+        this.scopeId = this.scopeInfo.projectId;
+      } else {
+        this.scopeType = "subproject";
+        this.scopeId = this.scopeInfo.subProjectId;
+      }
+      window.addEventListener("resize", this.initSize);
+      window.addEventListener("resize", this.updateStepchart);
     },
     updateStepchart() {
       // 重新渲染
@@ -299,12 +308,12 @@ export default {
     getProcessSteps() {
       this.processStructure = [];
       if (
-        this.subProjectInfo.solvingProcess != undefined &&
-        this.subProjectInfo.solvingProcess.length > 0
+        this.scopeInfo.solvingProcess != undefined &&
+        this.scopeInfo.solvingProcess.length > 0
       ) {
-        this.processStructure = JSON.parse(this.subProjectInfo.solvingProcess);
+        this.processStructure = JSON.parse(this.scopeInfo.solvingProcess);
 
-        for (let i = 0; i < this.processStructure.length; i++) {
+        for (var i = 0; i < this.processStructure.length; i++) {
           if (this.processStructure[i].activeStatus) {
             this.activeStep = this.processStructure[i];
             // 请求step数据
@@ -409,7 +418,7 @@ export default {
       };
       if (this.processStructure.length > 0) {
         this.selectedStep = [];
-        for (let i = 0; i < this.processStructure.length; i++) {
+        for (var i = 0; i < this.processStructure.length; i++) {
           //get data
           if (this.processStructure[i].stepID == this.activeStep.stepId) {
             option.series[0].data.push({
@@ -439,7 +448,7 @@ export default {
           }
 
           //get links
-          for (let j = 0; j < this.processStructure[i].next.length; j++) {
+          for (var j = 0; j < this.processStructure[i].next.length; j++) {
             option.series[0].links.push({
               source: this.processStructure[i].name,
               target: this.processStructure[i].next[j].name
@@ -456,6 +465,7 @@ export default {
       }
       this.stepChart.setOption(option);
       let _this = this;
+
       // 单击选择步骤
       this.stepChart.on("click", function(params) {
         if (option.series[0].data[params.data.index].symbolSize == 30) {
@@ -475,7 +485,7 @@ export default {
           option.series[0].data[params.data.index].symbolSize = 30;
 
           // remove these not selected step nodes
-          for (let i = 0; i < _this.selectedStep.length; i++) {
+          for (var i = 0; i < _this.selectedStep.length; i++) {
             if (_this.selectedStep[i].stepId == params.data.stepId) {
               _this.selectedStep.splice(i, 1);
               break;
@@ -561,14 +571,14 @@ export default {
         url:
           "/GeoProblemSolving/folder/findByFileType?" +
           "scopeId=" +
-          this.subProjectInfo.subProjectId +
+          this.scopeId +
           "&type=all",
         type: "GET",
         async: false,
         success: function(data) {
           if (data !== "Fail") {
             selectedRes = data;
-            for (let i = 0; i < selectedRes.length; i++) {
+            for (var i = 0; i < selectedRes.length; i++) {
               mockData.push({
                 key: i,
                 name: selectedRes.name,
@@ -586,7 +596,7 @@ export default {
         }
       });
       // 前驱步骤的资源
-      for (let i = 0; i < this.selectedStep.length; i++) {
+      for (var i = 0; i < this.selectedStep.length; i++) {
         let selectedStepId = this.selectedStep[i].stepId;
 
         let getResUrl = "";
@@ -613,7 +623,7 @@ export default {
           success: function(data) {
             if (data !== "Fail") {
               selectedRes = data;
-              for (let i = 0; i < selectedRes.length; i++) {
+              for (var i = 0; i < selectedRes.length; i++) {
                 mockData.push({
                   key: i,
                   name: selectedRes.name,
@@ -637,7 +647,7 @@ export default {
     getTargetKeys() {
       let mockData = [];
       if (this.inheritResource.length > 0) {
-        for (let i = 0; i < this.targetKeys.length; i++) {
+        for (var i = 0; i < this.targetKeys.length; i++) {
           mockData.push({
             key: this.targetKeys[i],
             name: this.inheritResource[this.targetKeys[i]].name,
@@ -683,7 +693,7 @@ export default {
         if (valid) {
           this.createStepModal = false;
           // 重复命名检测
-          for (let i = 0; i < this.processStructure.length; i++) {
+          for (var i = 0; i < this.processStructure.length; i++) {
             if (this.formValidate1.stepTitle == this.processStructure[i].name) {
               this.$Notice.info({
                 desc: "The name of new step should not be different!"
@@ -707,8 +717,8 @@ export default {
       Step["name"] = this.formValidate1.stepTitle;
       Step["type"] = this.formValidate1.stepType;
       Step["description"] = this.formValidate1.result;
-      Step["projectId"] = ""
-      Step["subProjectId"] = this.subProjectInfo.subProjectId;
+      Step["projectId"] = "";
+      Step["subProjectId"] = this.scopeId;
       Step["creator"] = this.$store.getters.userId;
       Step["toolList"] = this.selectStepTools;
       Step["toolsetList"] = this.selectStepToolsets;
@@ -754,9 +764,7 @@ export default {
         };
         this.processStructure.push(newStepNode);
         // 重新渲染
-        this.stepChart.dispose();
-        this.stepChart = null;
-        this.showSteps();
+        this.updateStepchart();
         // 存储Step
         this.updateSteps();
       } else if (this.selectedStep.length > 0) {
@@ -765,7 +773,7 @@ export default {
         let nodeLevel = 0;
         let nodeY = 0;
         let nodeCategory = 0;
-        for (let i = 0; i < this.selectedStep.length; i++) {
+        for (var i = 0; i < this.selectedStep.length; i++) {
           lastNode.push({
             name: this.selectedStep[i].name,
             id: this.selectedStep[i].index
@@ -787,7 +795,7 @@ export default {
             nodeY = 200;
           } else {
             let sumY = 0;
-            for (let j = 0; j < this.selectedStep.length; j++) {
+            for (var j = 0; j < this.selectedStep.length; j++) {
               sumY += this.processStructure[this.selectedStep[j].index].y;
             }
             nodeY = sumY / this.selectedStep.length;
@@ -796,14 +804,14 @@ export default {
         let isOverlap = false;
         // 统计每层的节点数 并 非激活现有的step
         let levelNum = [];
-        for (let i = 0; i < this.processStructure.length; i++) {
+        for (var i = 0; i < this.processStructure.length; i++) {
           if (this.processStructure[i].level == nodeLevel) {
             levelNum.push(this.processStructure[i].id);
           }
           this.processStructure[i].activeStatus = false;
         }
         // 节点重复检测
-        for (let i = 0; i < levelNum.length; i++) {
+        for (var i = 0; i < levelNum.length; i++) {
           if (Math.abs(this.processStructure[levelNum[i]].y - nodeY) < 30) {
             isOverlap = true;
             break;
@@ -829,7 +837,7 @@ export default {
         levelNum.push(newStepNode.id);
         // 如果重叠，修改y坐标
         if (isOverlap) {
-          for (let i = 0; i < levelNum.length; i++) {
+          for (var i = 0; i < levelNum.length; i++) {
             this.processStructure[levelNum[i]].y =
               (400 / (levelNum.length + 1)) * (i + 1);
           }
@@ -837,19 +845,17 @@ export default {
         }
         // calculate x
         let maxLevel = 0;
-        for (let i = 0; i < this.processStructure.length; i++) {
+        for (var i = 0; i < this.processStructure.length; i++) {
           if (this.processStructure[i].level > maxLevel) {
             maxLevel = this.processStructure[i].level;
           }
         }
-        for (let i = 0; i < this.processStructure.length; i++) {
+        for (var i = 0; i < this.processStructure.length; i++) {
           this.processStructure[i].x =
             (800 / (maxLevel + 1)) * (this.processStructure[i].level + 1);
         }
         // 重新渲染
-        this.stepChart.dispose();
-        this.stepChart = null;
-        this.showSteps();
+        this.updateStepchart();
         // 存储Step
         this.updateSteps();
       } else {
@@ -974,7 +980,7 @@ export default {
     },
     filterDuplicateTools() {
       let tools = this.publicTools;
-      for (let i = 0; i < this.personalTools.length; i++) {
+      for (var i = 0; i < this.personalTools.length; i++) {
         if (this.publicTools.contains(this.personalTools[i])) {
           continue;
         } else {
@@ -985,7 +991,7 @@ export default {
     },
     filterDuplicateToolsets() {
       let toolsets = this.publicToolsets;
-      for (let i = 0; i < this.personalToolsets.length; i++) {
+      for (var i = 0; i < this.personalToolsets.length; i++) {
         if (this.publicToolsets.contains(this.personalToolsets[i])) {
           continue;
         } else {
@@ -996,9 +1002,9 @@ export default {
     },
     getFilterToolResult(foreList, stepType) {
       let resultList = [];
-      for (let i = 0; i < foreList.length; i++) {
+      for (var i = 0; i < foreList.length; i++) {
         var stepTypes = foreList[i].recomStep;
-        for (let j = 0; j < stepTypes.length; j++) {
+        for (var j = 0; j < stepTypes.length; j++) {
           if (stepTypes[j] == stepType || stepTypes[j] == "General step") {
             resultList.push(foreList[i].tId);
             break;
@@ -1009,7 +1015,7 @@ export default {
     },
     getFilterToolsetResult(foreList, stepType) {
       let resultList = [];
-      for (let i = 0; i < foreList.length; i++) {
+      for (var i = 0; i < foreList.length; i++) {
         var stepTypes = foreList[i].recomStep;
         for (var j = 0; j < stepTypes.length; j++) {
           if (stepTypes[j] == stepType || stepTypes[j] == "General step") {
@@ -1051,9 +1057,7 @@ export default {
         });
     },
     delStepGraph() {
-      if (
-        this.$store.getters.userInfo.userId == this.subProjectInfo.managerId
-      ) {
+      if (this.$store.getters.userInfo.userId == this.scopeInfo.managerId) {
         let currentIndex = this.selectedStep[0].index;
 
         if (
@@ -1127,9 +1131,7 @@ export default {
           }
 
           // 重新渲染
-          this.stepChart.dispose();
-          this.stepChart = null;
-          this.showSteps();
+          this.updateStepchart();
           this.updateSteps();
           //删除数据库
           this.delStepContent(selectedStepId);
@@ -1145,19 +1147,33 @@ export default {
     },
     updateSteps() {
       let obj = new URLSearchParams();
-      obj.append("subProjectId", this.subProjectInfo.subProjectId);
       obj.append("solvingProcess", JSON.stringify(this.processStructure));
+      var updateurl = "";
+      if (this.scopeType == "project") {
+        obj.append("projectId", this.scopeId);
+        updateurl = "/GeoProblemSolving/project/update";
+      } else if (this.scopeType == "subproject") {
+        obj.append("subProjectId", this.scopeId);
+        updateurl = "/GeoProblemSolving/subProject/update";
+      }
       this.axios
-        .post("/GeoProblemSolving/subProject/update", obj)
+        .post(updateurl, obj)
         .then(res => {
           if (res.data == "Offline") {
             this.$store.commit("userLogout");
             this.$router.push({ name: "Login" });
           } else if (res.data != "Fail") {
-            this.$store.commit("setSubProjectInfo", res.data);
-            this.$Notice.info({
-              desc: "SubProject update successfully!"
-            });
+            if (this.scopeType == "project") {
+              this.$store.commit("setProjectInfo", res.data);
+              this.$Notice.info({
+                desc: "Project update successfully!"
+              });
+            } else if (this.scopeType == "subproject") {
+              this.$store.commit("setSubProjectInfo", res.data);
+              this.$Notice.info({
+                desc: "SubProject update successfully!"
+              });
+            }
           } else {
             this.$Message.error("Update sub-project failed.");
           }
@@ -1166,13 +1182,6 @@ export default {
           console.log(err.data);
         });
     }
-    // gotoPersonalSpace(id) {
-    //   if (id == this.$store.getters.userId) {
-    //     this.$router.push({ name: "PersonalPage" });
-    //   } else {
-    //     this.$router.push({ name: "MemberDetailPage", params: { id: id } });
-    //   }
-    // }
   }
 };
 </script>
