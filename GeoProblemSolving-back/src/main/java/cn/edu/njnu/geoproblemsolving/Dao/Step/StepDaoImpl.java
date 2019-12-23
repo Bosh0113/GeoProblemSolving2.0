@@ -77,6 +77,8 @@ public class StepDaoImpl implements IStepDao {
             Query query = new Query(Criteria.where("stepId").is(request.getParameter("stepId")));
             CommonMethod method = new CommonMethod();
             Update update = method.setUpdate(request);
+            StepEntity stepEntity = mongoTemplate.findOne(query,StepEntity.class);
+
             if(request.getParameter("toolList")!=null){
                 String newToolList = request.getParameter("toolList");
                 ArrayList<String> toolList =new ArrayList<>();
@@ -90,7 +92,6 @@ public class StepDaoImpl implements IStepDao {
                 update.set("toolsetList",toolsetList);
             }
             //更新子项目中有向图中的标签
-            StepEntity stepEntity = mongoTemplate.findOne(query,StepEntity.class);
             if(request.getParameter("name")!=null&&!stepEntity.getName().equals(request.getParameter("name"))){
                 String newName = request.getParameter("name");
                 String subProjectId = stepEntity.getSubProjectId();
@@ -135,6 +136,7 @@ public class StepDaoImpl implements IStepDao {
                 updateSubProject.set("solvingProcess",solvingProcess);
                 mongoTemplate.updateFirst(querySubProject,updateSubProject,SubProjectEntity.class);
             }
+
             mongoTemplate.updateFirst(query, update, StepEntity.class);
             return "Success";
         } catch (Exception e) {

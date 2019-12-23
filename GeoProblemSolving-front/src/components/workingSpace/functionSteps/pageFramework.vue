@@ -217,7 +217,7 @@ export default {
                 "/project/" + data[0].subProjectId + "/subproject";
             } else {
               this.$Notice.info({
-                desc: "Get the description failed!"
+                desc: "Get step description failed!"
               });
             }
           }
@@ -301,7 +301,7 @@ export default {
 
       let participantsTemp = [];
       let count = membersList.length;
-      for (let i = 0; i < membersList.length; i++) {
+      for (var i = 0; i < membersList.length; i++) {
         $.ajax({
           url:
             "/GeoProblemSolving/user/inquiry" +

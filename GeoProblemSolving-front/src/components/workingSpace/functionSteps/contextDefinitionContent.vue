@@ -7,19 +7,15 @@
         Problem context
         <context-info slot="content" :stepInfo="stepInfo" :userRole="userRole"></context-info>
       </Panel>
-      <Panel name="tool">
-        Toolbox
-        <tool-container slot="content" :stepInfo="stepInfo" :userRole="userRole" @toolBehavior="listenToolbox"></tool-container>
-      </Panel>
       <Panel name="data">
         Data list
         <data-list slot="content" :stepInfo="stepInfo" :userRole="userRole" @dataBehavior="listenDatalist"></data-list>
       </Panel>
+      <Panel name="tool">
+        Toolbox
+        <tool-container slot="content" :stepInfo="stepInfo" :userRole="userRole" @toolBehavior="listenToolbox"></tool-container>
+      </Panel>
     </Collapse>
-    <p style="margin: 10px 0">Map</p>
-    <Divider style="margin:10px 0" />
-    <map-canvas :stepInfo="stepInfo" :userRole="userRole"></map-canvas>
-    <message-panel :stepInfo="stepInfo" :received-chat-msgs="receivedChatMsgs" :operation-records="operationRecords"></message-panel>
     <BackTop></BackTop>
   </div>
 </template>

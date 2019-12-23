@@ -78,9 +78,9 @@
           <vue-scroll :ops="ops">
             <Table
               :columns="tableColName"
-              :data="stepDataList"
+              :data="fileList"
               class="table"
-              v-show="stepDataList!=[] && stepDataList!='None'"
+              v-show="fileList!=[] && fileList!='None'"
             >
               <template slot-scope="{ row }" slot="name">
                 <strong>{{ row.name }}</strong>
@@ -302,15 +302,9 @@ export default {
       uploadProgress: 0,
       fileList: [], //resources in the step
       stepDataList: [], //data in the step
-      toolDataList: [
-        {
-          thumbnail:
-            "http://94.191.49.160:8080/GeoProblemSolving/project/picture/commen1065951.jpeg",
-          name: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-          description: "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
-        },
-        {name:"ABC"}
-      ], //data from tools in the step
+      stepResourceList: [], //related resource in the step
+      toolDataList: [], //data from tools in the step
+
       checkDataModal: false,
       tableColName: [
         {
@@ -388,15 +382,34 @@ export default {
             }
             // this.$set(this, "stepResourceList", list);
             this.filterData();
+            this.filterToolData();
+            this.filterRelatedRes();
           }
         });
       }
     },
     filterData() {
-      let filterdata = this.fileList.filter(item => {
+      var filterdata = this.fileList.filter(item => {
         return item.type === "data";
       });
       this.$set(this, "stepDataList", filterdata);
+    },
+    filterToolData() {
+      var filterdata = this.fileList.filter(item => {
+        try {
+          let description = item.description.split(" ");
+          if (description[description.length - 1] == "tool") {
+            return item;
+          }
+        } catch (err) {}
+      });
+      this.$set(this, "toolDataList", filterdata);
+    },
+    filterRelatedRes() {
+      var filterdata = this.fileList.filter(item => {
+        return item.type !== "data";
+      });
+      this.$set(this, "stepResourceList", filterdata);
     },
     gatherFile(file) {
       if (this.toUploadFiles.length >= 5) {
@@ -468,7 +481,7 @@ export default {
                     var failedList = res.data.failed;
                     var sizeOverList = res.data.sizeOver;
                     for (var i = 0; i < uploadedList.length; i++) {
-                      this.stepDataList.push(uploadedList[i]);
+                      this.fileList.push(uploadedList[i]);
                     }
                     if (sizeOverList.length > 0) {
                       this.$Notice.warning({
@@ -555,9 +568,9 @@ export default {
               });
 
               //从列表中删除
-              for (let i = 0; i < this.stepDataList.length; i++) {
-                if (this.stepDataList[i].resourceId == this.deleteResourceId) {
-                  this.stepDataList.splice(i, 1);
+              for (let i = 0; i < this.fileList.length; i++) {
+                if (this.fileList[i].resourceId == this.deleteResourceId) {
+                  this.fileList.splice(i, 1);
 
                   // 记录信息
                   let dataRecords = {
@@ -565,7 +578,7 @@ export default {
                     time: new Date().Format("yyyy-MM-dd HH:mm:ss"),
                     who: this.userInfo.userName,
                     content: "delete data",
-                    file: this.stepDataList[i].name
+                    file: this.fileList[i].name
                   };
                   this.$emit("dataBehavior", dataRecords);
                 }
