@@ -39,8 +39,7 @@ export default {
             .get("/GeoProblemSolving/step/inquiry?key=stepId&value=" + this.projectInfo.stepId)
             .then(res => {
                 if (res.data == "Offline") {
-                this.$store.commit("userLogout");
-                this.$router.push({ name: "Login" });
+                    parent.location.href="/GeoProblemSolving/login"
                 } else if (res.data != "None" && res.data != "Fail") {
                     this.$set(this, "stepInfo", res.data[0]);
                 }

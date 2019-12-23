@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="https://www.thymeleaf.org">
 <head>
+    <meta http-equiv="pragma" content="no-cache">
+    <meta http-equiv="cache-control" content="no-cache">
+    <meta http-equiv="expires" content="0">
     <link rel="shortcut icon" href="/GeoProblemSolving/static/favicon.ico">
     <title th:text="${projectInfo.title}+' | Geo-ProblemSolving'"></title>
     <meta http-equiv="Content-Type" content=" charset=UTF-8"/>
@@ -610,7 +613,8 @@
                             </div>
                         </Card>
                         <div v-else style="width: -webkit-fill-available;height: -webkit-fill-available;">
-                            <iframe style="width: -webkit-fill-available;height: -webkit-fill-available;border-width:0" src="http://localhost:8080/projectTypeContent/0d69b8a4-5099-40af-91ce-cbd82fdff22a"></iframe>
+                            <iframe style="width: -webkit-fill-available;height: -webkit-fill-available;border-width:0" 
+                            :src="ipPort+'/projectTypeContent/' + projectInfo.projectId"></iframe>
                         </div>
                     </div>
                 </div>
@@ -982,6 +986,9 @@
                 if (this.userInfo == null || !this.userInfo.userState) {
                     window.location.href = '/GeoProblemSolving/login';
                 }
+                if(window.location.host=="localhost:8080"){
+                    this.ipPort = 'http://localhost:8080';
+                }
             },
             mounted() {
                 this.userEnter();
@@ -991,6 +998,7 @@
             },
             data() {
                 return {
+                    ipPort: "/GeoProblemSolving",
                     userInfo: {
                         userState: false,
                         userName: 'visitor',
@@ -1259,22 +1267,24 @@
                     this.activeMenu = "tasks";
                 },
                 getAllSubProjects() {
-                    axios
-                        .get(
-                            "/GeoProblemSolving/subProject/inquiry" + "?key=projectId" + "&value=" + this.projectInfo.projectId
-                        )
-                        .then(res => {
-                            if (res.data == "Offline") {
-                                this.$refs.navigationEl.logout("login");
-                            } else if (res.data == "None" || res.data == "Fail") {
-                                console.log(res.data);
-                            } else {
-                                this.subProjectList = res.data;
-                            }
-                        })
-                        .catch(err => {
-                            console.log(err.data)
-                        });
+                    if(this.projectInfo.type=="type0"){
+                        axios
+                            .get(
+                                "/GeoProblemSolving/subProject/inquiry" + "?key=projectId" + "&value=" + this.projectInfo.projectId
+                            )
+                            .then(res => {
+                                if (res.data == "Offline") {
+                                    this.$refs.navigationEl.logout("login");
+                                } else if (res.data == "None" || res.data == "Fail") {
+                                    console.log(res.data);
+                                } else {
+                                    this.subProjectList = res.data;
+                                }
+                            })
+                            .catch(err => {
+                                console.log(err.data)
+                            });
+                    }
                 },
                 managerIdentity(managerId) {
                     if (managerId == this.userInfo.userId) {

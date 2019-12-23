@@ -226,6 +226,7 @@
             methods:{
                 projectInfoModalShow(projectInfo) {
                     if (projectInfo.isMember || projectInfo.isManager) {
+                        window.sessionStorage.setItem("projectInfo",JSON.stringify(projectInfo));
                         window.location.href="/GeoProblemSolving/projectDetail/"+projectInfo.projectId;
                     } else {
                         this.selectedProjectInfo = Object.assign({}, projectInfo);
@@ -281,33 +282,6 @@
                         this.projectInfoModal = true;
                     }
                 },
-
-                goSingleProject() {
-                    var id = this.selectedProjectInfo.projectId;
-                    let isManager, isMember;
-                    for (let i = 0; i < this.projectList.length; i++) {
-                        if (this.projectList[i]["projectId"] === id) {
-                            let projectInfo = this.projectList[i];
-                            isManager = projectInfo["isManager"];
-                            isMember = projectInfo["isMember"];
-                            break;
-                        }
-                    }
-                    if (this.UserState) {
-                        if (isManager || isMember) {
-                            window.location.href = "/GeoProblemSolving/projectDetail/"+id;
-                        } else {
-                            this.$Notice.error({
-                                title: "No access",
-                                desc:
-                                    "You need to click + button at the north right corner to apply join the project"
-                            });
-                        }
-                    } else {
-                        window.location.href = "/GeoProblemSolving/login";
-                    }
-                },
-
                 joinApplyModalShow(applyProjectInfo) {
                     if (this.UserState) {
                         this.applyProjectInfo=Object.assign([], applyProjectInfo);
@@ -422,6 +396,7 @@
                 },
 
                 enterProject(projectInfo) {
+                    window.sessionStorage.setItem("projectInfo",JSON.stringify(projectInfo));
                     window.location.href="/GeoProblemSolving/projectDetail/"+projectInfo.projectId;
                 },
 
