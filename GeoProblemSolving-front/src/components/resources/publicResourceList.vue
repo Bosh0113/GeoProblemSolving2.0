@@ -106,6 +106,7 @@
             <Page
               :total="dataCount"
               :page-size="pageSize"
+              :current="currentPage"
               show-total
               @on-change="changepage"
               show-elevator
@@ -209,6 +210,7 @@ export default {
       showList: [],
       dataCount: 0,
       pageSize: 8,
+      currentPage: 1,
       // 上传文件的模态框
       uploadModal: false,
       file: "",
@@ -276,18 +278,19 @@ export default {
       this.$set(this, "allSelectedList", newList);
     },
     changepage(index) {
+      this.currentPage = 1;
       var _start = (index - 1) * this.pageSize;
       var _end = index * this.pageSize;
       this.showList = this.allSelectedList.slice(_start, _end);
     },
     show(index) {
       let name = this.showList[index].name;
-      if (/\.(doc|docx|xls|xlsx|csv|ppt|pptx|zip)$/.test(name.toLowerCase())) {
+      if (/\.(doc|docx|xls|xlsx|csv|ppt|pptx)$/.test(name.toLowerCase())) {
         if (this.panel != null) {
           this.panel.close();
         }
         var url =
-          "http://172.21.212.72:8012/previewFile?url=" +'http://'+this.$store.state.IP_Port+
+          "http://view.officeapps.live.com/op/view.aspx?src=" +'http://'+this.$store.state.IP_Port+
           this.showList[index].pathURL;
         var toolURL =
           '<iframe src=' + url + ' style="width: 100%;height:100%"></iframe>';
