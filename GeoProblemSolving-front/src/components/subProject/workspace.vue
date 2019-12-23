@@ -33,6 +33,9 @@ export default {
             unfold: ["tool", "data"],
         }
     },
+    created(){
+        this.getStepInfo();
+    },
     methods:{
         getStepInfo(){
             this.axios

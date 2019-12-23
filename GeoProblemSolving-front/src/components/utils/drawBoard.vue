@@ -547,7 +547,7 @@ export default {
           }
           let description = "";
           if (this.formValidate.fileDescription == "") {
-            description = "Drawing tool resource";
+            description = "from Drawing tool";
           } else {
             description = this.formValidate.fileDescription;
           }
@@ -559,7 +559,7 @@ export default {
           imageForm.append("file", fileOfBlob);
           imageForm.append("description", description);
           imageForm.append("type", "Image");
-          imageForm.append("uploaderId", userInfo.userId);
+          imageForm.append("uploaderId", this.userInfo.userId);
           imageForm.append("privacy", "private");
           imageForm.append("folderId", this.pageParams.pageId);
 

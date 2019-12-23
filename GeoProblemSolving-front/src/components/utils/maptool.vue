@@ -446,7 +446,7 @@ export default {
             }
             let description = "";
             if (this.formValidate.fileDescription == "") {
-              description = "Map tool data";
+              description = "from Map tool";
             } else {
               description = this.formValidate.fileDescription;
             }

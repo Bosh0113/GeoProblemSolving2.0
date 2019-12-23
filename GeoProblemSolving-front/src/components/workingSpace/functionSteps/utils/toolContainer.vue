@@ -146,6 +146,11 @@ export default {
     manageTools,
     Avatar
   },
+  watch:{
+    stepInfo(val){
+      this.getAllTools();
+    }
+  },
   data() {
     return {
       ops: {
