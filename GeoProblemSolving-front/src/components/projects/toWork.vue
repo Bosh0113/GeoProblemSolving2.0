@@ -2,14 +2,16 @@
     <div>
         <type-choose :projectInfo="projectInfo" :userRole="userRole" v-if="projectInfo.type==''" @changeProjectInfo = "changeProjectInfo"></type-choose>
         <h1 v-else-if="projectInfo.type=='type1'">工作流页面</h1>
-        <h1 v-else-if="projectInfo.type=='type2'">工作空间</h1>
+        <workspace :projectInfo="projectInfo" :userRole="userRole" v-else-if="projectInfo.type=='type2'"></workspace>
     </div>
 </template>
 <script>
 import typeChoose from "./typeChoose.vue"
+import workspace from "./workspace.vue"
 export default {
     components:{
         typeChoose,
+        workspace
     },
     created(){
         this.getUserInfo();
