@@ -158,6 +158,7 @@ export default {
   mounted() {
     window.addEventListener("resize", this.initSize);
     this.initSize();
+    this.getStepInfo();
     this.getResources();
     this.startWebSocket();
     this.initMap();
