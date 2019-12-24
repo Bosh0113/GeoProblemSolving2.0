@@ -1155,6 +1155,7 @@ export default {
             // this.$Notice.error({ desc: "There is no existing tool" });
           } else {
             this.$set(this, "publicTools", res.data);
+            this.filterShowListByType();
           }
         })
         .catch(err => {
@@ -1178,6 +1179,7 @@ export default {
             // this.$Notice.error({ desc: "There is no existing tool" });
           } else {
             this.$set(this, "personalTools", res.data);
+            this.filterShowListByType();
           }
         })
         .catch(err => {
