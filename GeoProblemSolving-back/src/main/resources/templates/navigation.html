@@ -193,39 +193,17 @@
     <script th:fragment="commonHeader-js">
         Vue.component('child-navigation', {
             template: '#navigation',
-            props: ["activeType"],
+            props: ["activeType", "userInfo"],
             components: {
                 'avatar': VueAvatar.Avatar
             },
+            watch:{
+                userInfo(val){
+                    this.identifyUser();
+                }
+            },
             created() {
-                var userInfo = {
-                    userState: false,
-                    userName: 'visitor',
-                    userId: '',
-                    avatar: ''
-                };
-                sessionStorage.setItem('userInfo', JSON.stringify(userInfo));
-                var that = this;
-                $.ajax({
-                    url: "/GeoProblemSolving/user/state",
-                    type: "POST",
-                    async: false,
-                    success: function (data) {
-                        if (data) {
-                            data.userState = true;
-                            that.userInfoNav = data;
-                            sessionStorage.setItem('userInfo', JSON.stringify(data));
-                            that.setTimer();
-                            that.initWebSocket();
-                            that.getUnreadNoticeCount();
-                        } else {
-                            console.log("Not logged in");
-                        }
-                    },
-                    error: function (err) {
-                        console.log("Get user info fail.");
-                    }
-                });
+                this.identifyUser();
             },
             updated() {
                 $("#noticeBadge sup").css("margin", "15px 5px 0 0");
@@ -251,6 +229,14 @@
                 }
             },
             methods: {
+                identifyUser(){
+                    if(this.userInfo.userState){
+                        this.userInfoNav = this.userInfo;
+                        this.setTimer();
+                        this.initWebSocket();
+                        this.getUnreadNoticeCount();
+                    }
+                },
                 identityMenuCSS() {
                     if (window.innerWidth < 1100) {
                         this.useMenuCSS = false;

@@ -293,7 +293,7 @@
 
 <body>
 <div id="vueBody" v-cloak style="min-width: 1100px">
-    <child-navigation ref="navigationEl" active-type="home"></child-navigation>
+    <child-navigation ref="navigationEl" active-type="home" :user-info="userInfo"></child-navigation>
     <div class="home-screen" >
         <div class="bg" ></div>
         <div class="mask"></div>
@@ -423,6 +423,31 @@
         el: '#vueBody',
         data:{
             userInfo:[],
+        },
+        created(){
+            var userInfo = {
+                userState: false,
+                userName: 'visitor',
+                userId: '',
+                avatar: ''
+            };
+            sessionStorage.setItem('userInfo', JSON.stringify(userInfo));
+            $.ajax({
+                url: "/GeoProblemSolving/user/state",
+                type: "POST",
+                async: false,
+                success: data=> {
+                    if (data) {
+                        data.userState = true;
+                        sessionStorage.setItem('userInfo', JSON.stringify(data));
+                    } else {
+                        console.log("Not logged in");
+                    }
+                },
+                error: function (err) {
+                    console.log("Get user info fail.");
+                }
+            });
         },
         mounted() {
             this.userInfo = JSON.parse(sessionStorage.getItem("userInfo"));

@@ -119,7 +119,7 @@
 </head>
 <body>
 <div id="vueBody" v-cloak style="min-width: 1100px;">
-   <child-navigation ref="navigationEl" active-type="projects"></child-navigation>
+   <child-navigation ref="navigationEl" active-type="projects" :user-info="userInfo"></child-navigation>
     <div class="picscreen" >
         <div class="picbg"></div>
         <div class="home-content">
@@ -197,6 +197,31 @@
                 userState:false,
                 freshEle:0
             },
+            created(){
+                var userInfo = {
+                    userState: false,
+                    userName: 'visitor',
+                    userId: '',
+                    avatar: ''
+                };
+                sessionStorage.setItem('userInfo', JSON.stringify(userInfo));
+                $.ajax({
+                    url: "/GeoProblemSolving/user/state",
+                    type: "POST",
+                    async: false,
+                    success: data=> {
+                        if (data) {
+                            data.userState = true;
+                            sessionStorage.setItem('userInfo', JSON.stringify(data));
+                        } else {
+                            console.log("Not logged in");
+                        }
+                    },
+                    error: function (err) {
+                        console.log("Get user info fail.");
+                    }
+                });
+            },
             mounted(){
                 this.resizeContent();
                 //判断用户状态，如果登录，判断project权限，如果否，不判断
@@ -273,22 +298,10 @@
                                         this.currentProjectList = [];
                                     }
                                     else{
-                                        var category = this.currentTab;
-                                        var thisCategory = [];
-                                        if(category!="All"){
-                                            thisCategory = res.data.projectList.filter(function(e) {
-                                                if (e.category == category) {
-                                                    return e;
-                                                }
-                                            });
-                                        }
-                                        else {
-                                            thisCategory = res.data.projectList;
-                                        }
-                                        this.judgeMember(thisCategory);
+                                        this.judgeMember(res.data.projectList);
                                     }
                                     this.tabPageData = Object.assign([], this.currentProjectList);
-                                    this.totalCount=this.currentProjectList.length;
+                                    this.totalCount=res.data.count;
                                     this.freshEle++;
                                 }
                                 else{
