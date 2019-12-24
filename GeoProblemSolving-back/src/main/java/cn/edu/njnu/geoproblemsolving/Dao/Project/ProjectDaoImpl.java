@@ -505,7 +505,6 @@ public class ProjectDaoImpl implements IProjectDao {
                     query = new Query(new Criteria().orOperator(criteriaDiscoverable,criteriaPublic,criteriaManager));
                 }else {
                     query = new Query(new Criteria().andOperator(Criteria.where("category").is(category),new Criteria().orOperator(criteriaDiscoverable,criteriaPublic,criteriaManager)));
-//                    query = new Query(Criteria.where("category").is(category).andOperator(criteriaDiscoverable.orOperator(criteriaPublic).orOperator(criteriaManager)));
                 }
             }
             else {
