@@ -47,7 +47,7 @@
   overflow: hidden;
 }
 #toolData {
-  width: 68%;
+  width: 66%;
   height: 400px;
   border: 1px solid #dcdee2;
 }
@@ -63,29 +63,41 @@
   <div>
     <Card dis-hover>
       <div slot="title">
-        <h4>Data</h4>
+        <h4>Resources</h4>
       </div>
       <div slot="extra">
+        <Select
+          v-model="resouceModel"
+          size="small"
+          @on-change="changeResModel"
+          style="width:150px;margin-right:20px;margin-top:-10px"
+        >
+          <Option value="resources">All resources</Option>
+          <Option value="data">Data</Option>
+          <Option value="materials">Related materials</Option>
+        </Select>
         <Button
           shape="circle"
           icon="md-cloud-upload"
           @click="dataUploadModalShow"
           style="margin-top:-10px"
+          title="Upload resources"
         ></Button>
       </div>
       <div style="display: flex; justify-content: space-between;">
-        <div style="width:30%; height:400px">
+        <div style="width:33%; height:400px">
           <vue-scroll :ops="ops">
             <Table
               :columns="tableColName"
               :data="fileList"
               class="table"
               v-show="fileList!=[] && fileList!='None'"
+              height="400"
             >
               <template slot-scope="{ row }" slot="name">
                 <strong>{{ row.name }}</strong>
               </template>
-              <template slot-scope="{ row, index }" slot="action">
+              <template slot-scope="{ row }" slot="action">
                 <Button
                   class="fileBtnHoverGreen"
                   size="small"
@@ -186,27 +198,36 @@
         </TabPane>
       </Tabs>
       <br />
-      <Button style="margin-right:20px" @click="dataPreview">Preview</Button>
+      <Button style="margin-right:20px" @click="dataPreview(selectData)">Preview</Button>
       <Button style="margin-right:20px" @click="dataVisualize">Visualization</Button>
-      <br />
     </Modal>
     <Modal v-model="dataUploadModal" title="Upload data" width="600">
       <Form
-        ref="uploadData"
-        :model="uploadData"
+        ref="uploadDataInfo"
+        :model="uploadDataInfo"
         :rules="uploadDataRule"
         :label-width="100"
         label-position="left"
       >
         <FormItem label="Privacy" prop="privacy">
-          <RadioGroup v-model="uploadData.privacy" style="width:80%">
+          <RadioGroup v-model="uploadDataInfo.privacy" style="width:80%">
             <Radio label="private">Private</Radio>
             <Radio label="public">Public</Radio>
           </RadioGroup>
         </FormItem>
-
+        <FormItem label="Type" prop="type">
+          <RadioGroup v-model="uploadDataInfo.type">
+            <Radio label="data"></Radio>
+            <Radio label="paper"></Radio>
+            <Radio label="document"></Radio>
+            <Radio label="model"></Radio>
+            <Radio label="image"></Radio>
+            <Radio label="video"></Radio>
+            <Radio label="others"></Radio>
+          </RadioGroup>
+        </FormItem>
         <FormItem label="Description" prop="description">
-          <Input type="textarea" :rows="4" v-model="uploadData.description" />
+          <Input type="textarea" :rows="4" v-model="uploadDataInfo.description" />
         </FormItem>
       </Form>
       <Upload :max-size="1024*1024" multiple type="drag" :before-upload="gatherFile" action="-">
@@ -238,7 +259,7 @@
       </div>
       <div slot="footer">
         <Button @click="dataUploadModal=false">Cancel</Button>
-        <Button type="success" @click="folderUpload('uploadData')">Upload</Button>
+        <Button type="success" @click="folderUpload('uploadDataInfo')">Upload</Button>
       </div>
     </Modal>
     <Modal
@@ -274,8 +295,9 @@ export default {
         }
       },
       userInfo: this.$store.getters.userInfo,
+      resouceModel: "resources",
       dataUploadModal: false,
-      uploadData: {
+      uploadDataInfo: {
         privacy: "private",
         type: "data",
         description: ""
@@ -285,6 +307,13 @@ export default {
           {
             required: true,
             message: "file privacy cannot be empty",
+            trigger: "blur"
+          }
+        ],
+        type: [
+          {
+            required: true,
+            message: "file type cannot be empty",
             trigger: "blur"
           }
         ],
@@ -300,24 +329,32 @@ export default {
       fileCountTimer: null,
       progressModalShow: false,
       uploadProgress: 0,
-      fileList: [], //resources in the step
+      fileList: [], //showed resources
+      stepResList: [], //resources in the step
       stepDataList: [], //data in the step
-      stepResourceList: [], //related resource in the step
+      relatedResList: [], //related materials in the step
       toolDataList: [], //data from tools in the step
-
+      showType: "resources",
       checkDataModal: false,
       tableColName: [
         {
           title: "Name",
           key: "name",
-          minWidth: 10,
+          minWidth: 30,
+          tooltip: true,
+          sortable: true
+        },
+        {
+          title: "Type",
+          key: "type",
+          width: 90,
           tooltip: true,
           sortable: true
         },
         {
           title: "Action",
           slot: "action",
-          width: 125,
+          width: 90,
           align: "center"
         }
       ],
@@ -334,7 +371,8 @@ export default {
   props: ["stepInfo", "userRole"],
   created() {},
   mounted() {
-    this.getDataList();
+    this.getResList();
+
     $(".__view").css("width", "inherit");
 
     Date.prototype.Format = function(fmt) {
@@ -364,8 +402,8 @@ export default {
     };
   },
   methods: {
-    getDataList() {
-      let list = [];
+    getResList() {
+      var list = [];
       if (this.stepInfo.stepId != "" && this.stepInfo.stepId != undefined) {
         $.ajax({
           url:
@@ -376,11 +414,13 @@ export default {
           async: false,
           success: data => {
             if (data !== "None") {
-              this.$set(this, "fileList", data.files);
+              list = data.files;
             } else {
-              this.fileList = [];
+              list = [];
             }
-            // this.$set(this, "stepResourceList", list);
+            this.$set(this, "stepResList", list);
+            this.$set(this, "fileList", list);
+            //filte
             this.filterData();
             this.filterToolData();
             this.filterRelatedRes();
@@ -396,12 +436,9 @@ export default {
     },
     filterToolData() {
       var filterdata = this.fileList.filter(item => {
-        try {
-          let description = item.description.split(" ");
-          if (description[description.length - 1] == "tool") {
-            return item;
-          }
-        } catch (err) {}
+        if (item.type == "toolData") {
+          return item;
+        }
       });
       this.$set(this, "toolDataList", filterdata);
     },
@@ -409,7 +446,19 @@ export default {
       var filterdata = this.fileList.filter(item => {
         return item.type !== "data";
       });
-      this.$set(this, "stepResourceList", filterdata);
+      this.$set(this, "relatedResList", filterdata);
+    },
+    changeResModel(value) {
+      if (value == "resources") {
+        this.fileList = this.stepResList;
+        this.showType = value;
+      } else if (value == "data") {
+        this.fileList = this.stepDataList;
+        this.showType = value;
+      } else if (value == "materials") {
+        this.fileList = this.relatedResList;
+        this.showType = value;
+      }
     },
     gatherFile(file) {
       if (this.toUploadFiles.length >= 5) {
@@ -437,7 +486,7 @@ export default {
       this.toUploadFiles.splice(index, 1);
     },
     dataUploadModalShow() {
-      this.uploadData = {
+      this.uploadDataInfo = {
         privacy: "private",
         type: "data",
         description: ""
@@ -454,10 +503,10 @@ export default {
             for (var i = 0; i < uploadFiles.length; i++) {
               formData.append("file", uploadFiles[i]);
             }
-            formData.append("description", this.uploadData.description);
-            formData.append("type", this.uploadData.type);
+            formData.append("description", this.uploadDataInfo.description);
+            formData.append("type", this.uploadDataInfo.type);
             formData.append("uploaderId", this.userInfo.userId);
-            formData.append("privacy", this.uploadData.privacy);
+            formData.append("privacy", this.uploadDataInfo.privacy);
             formData.append("folderId", this.stepInfo.stepId);
 
             this.progressModalShow = true;
@@ -482,6 +531,17 @@ export default {
                     var sizeOverList = res.data.sizeOver;
                     for (var i = 0; i < uploadedList.length; i++) {
                       this.fileList.push(uploadedList[i]);
+
+                      if (
+                        this.showType == "data" ||
+                        this.showType == "materials"
+                      ) {
+                        this.stepResList.push(uploadedList[i]);
+                      } else if (this.uploadDataInfo.type == "data") {
+                        this.stepDataList.push(uploadedList[i]);
+                      } else {
+                        this.relatedResList.push(uploadedList[i]);
+                      }
                     }
                     if (sizeOverList.length > 0) {
                       this.$Notice.warning({
@@ -568,19 +628,49 @@ export default {
               });
 
               //从列表中删除
+              var deleteResType = "";
               for (let i = 0; i < this.fileList.length; i++) {
                 if (this.fileList[i].resourceId == this.deleteResourceId) {
-                  this.fileList.splice(i, 1);
-
                   // 记录信息
-                  let dataRecords = {
-                    type: "resource",
-                    time: new Date().Format("yyyy-MM-dd HH:mm:ss"),
-                    who: this.userInfo.userName,
-                    content: "delete data",
-                    file: this.fileList[i].name
-                  };
-                  this.$emit("dataBehavior", dataRecords);
+                  try {
+                    let dataRecords = {
+                      type: "resource",
+                      time: new Date().Format("yyyy-MM-dd HH:mm:ss"),
+                      who: this.userInfo.userName,
+                      content: "delete data",
+                      file: this.fileList[i].name
+                    };
+                    this.$emit("dataBehavior", dataRecords);
+
+                    deleteResType = this.fileList[i].type;
+                    this.fileList.splice(i, 1);
+                  } catch (err) {
+                    console.log(err);
+                  }
+                }
+              }
+              // 同步删除其他数组内的资源
+              if (this.showType == "data" || this.showType == "materials") {
+                for (let i = 0; i < this.stepResList.length; i++) {
+                  if (this.stepResList[i].resourceId == this.deleteResourceId) {
+                    this.stepResList.splice(i, 1);
+                  }
+                }
+              } else if (deleteResType == "data") {
+                for (let i = 0; i < this.stepDataList.length; i++) {
+                  if (
+                    this.stepDataList[i].resourceId == this.deleteResourceId
+                  ) {
+                    this.stepDataList.splice(i, 1);
+                  }
+                }
+              } else {
+                for (let i = 0; i < this.relatedResList.length; i++) {
+                  if (
+                    this.relatedResList[i].resourceId == this.deleteResourceId
+                  ) {
+                    this.relatedResList.splice(i, 1);
+                  }
                 }
               }
             }
@@ -597,31 +687,13 @@ export default {
     editMetadata() {
       if (this.metaDataEdit) {
         this.metaDataEdit = false;
-        //     let obj = new URLSearchParams();
-        //     obj.append("stepId", this.stepId);
-        //     obj.append("content.metaDataInfo", this.metaDataInfo);
-        //     this.axios
-        //       .post("/GeoProblemSolving/step/update", obj)
-        //       .then(res => {
-        //         if (res.data == "Offline") {
-        //           this.$store.commit("userLogout");
-        //           this.$router.push({ name: "Login" });
-        //         } else if (res.data != "Fail") {
-        //           this.$Notice.info({
-        //             desc: "Update successfully!"
-        //           });
-        //         } else {
-        //           this.$Message.error("Update step failed.");
-        //         }
-        //       })
-        //       .catch(err => {
-        //         console.log(err.data);
-        //       });
       } else {
         this.metaDataEdit = true;
       }
     },
-    dataPreview() {},
+    dataPreview(res) {
+
+    },
     dataVisualize() {}
   }
 };
