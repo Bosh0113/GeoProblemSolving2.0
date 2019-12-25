@@ -306,10 +306,13 @@ export default {
     draggable,
     Avatar
   },
+  watch:{
+    stepInfo(val){
+      this.init();
+    }
+  },
   created(){
-    this.stepId=this.stepInfo.stepId;
-    this.stepToolsetIds=this.stepInfo.toolsetList;
-    this.stepToolIds=this.stepInfo.toolList;
+    this.init();
   },
   mounted() {
     this.resizeContent();
@@ -379,6 +382,11 @@ export default {
           this.resizeContent();
         })();
       };
+    },
+    init(){
+      this.stepId=this.stepInfo.stepId;
+      this.stepToolsetIds=this.stepInfo.toolsetList;
+      this.stepToolIds=this.stepInfo.toolList;
     },
     getAllListInfo(){
       this.getPublicToolsets();

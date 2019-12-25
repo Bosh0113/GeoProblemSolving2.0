@@ -56,7 +56,7 @@
                         <div style="text-align:center;margin-top:2%">
                             <h3>
                             To: 
-                            <a @click="selectTypeModalShow('type0')">Design workflow graph</a>
+                            <a @click="selectTypeModalShow('type1')">Design workflow graph</a>
                             </h3>
                         </div>
                     </Card>
@@ -80,7 +80,7 @@
                         <div style="text-align:center;margin-top:2%">
                             <h3>
                             To: 
-                            <a @click="selectTypeModalShow('type1')">Do it right now</a>
+                            <a @click="selectTypeModalShow('type2')">Do it right now</a>
                             </h3>
                         </div>
                     </Card>
@@ -131,8 +131,7 @@ export default {
             .post("/GeoProblemSolving/step/create", Step)
             .then(res => {
             if (res.data == "Offline") {
-                this.$store.commit("userLogout");
-                this.$router.push({ name: "Login" });
+                parent.location.href="/GeoProblemSolving/login"
             } else if (res.data === "Fail") {
                 this1.$Message.info("Fail");
             } else {
@@ -146,8 +145,7 @@ export default {
                     .then(res => {
                         this.selectTypeModal = false;
                         if (res.data == "Offline") {
-                            this.$store.commit("userLogout");
-                            this.$router.push({ name: "Login" });
+                            parent.location.href="/GeoProblemSolving/login"
                         } else if (res.data != "Fail") {
                             this.$store.commit("setProjectInfo", res.data);
                             this.$emit("changeProjectInfo", res.data);

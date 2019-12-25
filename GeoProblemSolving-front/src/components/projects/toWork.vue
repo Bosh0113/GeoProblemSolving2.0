@@ -1,25 +1,34 @@
 <template>
     <div>
         <type-choose :projectInfo="projectInfo" :userRole="userRole" v-if="projectInfo.type==''" @changeProjectInfo = "changeProjectInfo"></type-choose>
-        <h1 v-else-if="projectInfo.type=='type1'">工作流页面</h1>
-        <h1 v-else-if="projectInfo.type=='type2'">工作空间</h1>
+        <solving-step :scopeInfo="projectInfo" :userRole="userRole" v-else-if="projectInfo.type=='type1'"></solving-step>
+        <workspace :projectInfo="projectInfo" :userRole="userRole" v-else-if="projectInfo.type=='type2'"></workspace>
     </div>
 </template>
 <script>
 import typeChoose from "./typeChoose.vue"
+import workspace from "./workspace.vue"
+import solvingStep from "./../subProject/solvingStep"
 export default {
     components:{
         typeChoose,
+        workspace,
+        solvingStep
     },
     created(){
         this.getUserInfo();
         this.getProjectInfo();
     },
+    mounted(){
+        $("#app").css("min-width","0");
+    },
     data(){
         return{
             projectId: this.$route.params.projectId,
-            userInfo: JSON.parse(sessionStorage.getItem("userInfo")),
-            projectInfo: JSON.parse(sessionStorage.getItem("projectInfo")),
+            // userInfo: JSON.parse(sessionStorage.getItem("userInfo")),
+            // projectInfo: JSON.parse(sessionStorage.getItem("projectInfo")),
+            userInfo: parent.userInfo,
+            projectInfo: parent.projectInfo,
             userRole: 'visitor',
         }
     },
@@ -54,15 +63,20 @@ export default {
                 type: "GET",
                 async: false,
                 success: data => {
+                    if (data == "Offline") {
+                        parent.location.href="/GeoProblemSolving/login"
+                    }
                     if (data != "None" && data != "Fail") {
-                    this.projectInfo = data[0];
-                    this.identifyUserRole();
-                    this.$store.commit("setProjectInfo", data[0]);
+                        this.projectInfo = data[0];
+                        this.identifyUserRole();
+                        this.$store.commit("setProjectInfo", data[0]);
                     } else {
                     console.log(data);
                     }
                 }
                 });
+            }else{
+                this.identifyUserRole();
             }
         },
         identifyUserRole(){

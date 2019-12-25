@@ -22,7 +22,7 @@
 import dataList from "./../workingSpace/functionSteps/utils/dataList";
 import toolContainer from "./../workingSpace/functionSteps/utils/toolContainer";
 export default {
-    props: ["subProjectInfo", "userRole"],
+    props: ["projectInfo", "userRole"],
     components: {
         dataList,
         toolContainer,
@@ -33,17 +33,13 @@ export default {
             unfold: ["tool", "data"],
         }
     },
-    created(){
-        this.getStepInfo();
-    },
     methods:{
         getStepInfo(){
             this.axios
-            .get("/GeoProblemSolving/step/inquiry?key=stepId&value=" + this.subProjectInfo.stepId)
+            .get("/GeoProblemSolving/step/inquiry?key=stepId&value=" + this.projectInfo.stepId)
             .then(res => {
                 if (res.data == "Offline") {
-                this.$store.commit("userLogout");
-                this.$router.push({ name: "Login" });
+                    parent.location.href="/GeoProblemSolving/login"
                 } else if (res.data != "None" && res.data != "Fail") {
                     this.$set(this, "stepInfo", res.data[0]);
                 }

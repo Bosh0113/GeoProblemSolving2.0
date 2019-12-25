@@ -678,8 +678,13 @@ export default {
         )
         .then(res => {
           if (res.data == "Offline") {
-            this.$store.commit("userLogout");
-            this.$router.push({ name: "Login" });
+            if(this.scopeType == "subproject"){
+              this.$store.commit("userLogout");
+              this.$router.push({ name: "Login" });
+            }
+            else{
+              parent.location.href="/GeoProblemSolving/login"
+            }
           } else if (res.data != "None" && res.data != "Fail") {
             this.activeStep = res.data[0];
           } else if (res.data == "None") {
@@ -728,8 +733,13 @@ export default {
         .post("/GeoProblemSolving/step/create", Step)
         .then(res => {
           if (res.data == "Offline") {
-            this.$store.commit("userLogout");
-            this.$router.push({ name: "Login" });
+            if(this.scopeType == "subproject"){
+              this.$store.commit("userLogout");
+              this.$router.push({ name: "Login" });
+            }
+            else{
+              parent.location.href="/GeoProblemSolving/login"
+            }
           } else if (res.data === "Fail") {
             this1.$Message.info("Fail");
           } else {
@@ -875,8 +885,13 @@ export default {
         )
         .then(res => {
           if (res.data == "Offline") {
-            this.$store.commit("userLogout");
-            this.$router.push({ name: "Login" });
+            if(this.scopeType == "subproject"){
+              this.$store.commit("userLogout");
+              this.$router.push({ name: "Login" });
+            }
+            else{
+              parent.location.href="/GeoProblemSolving/login"
+            }
           } else if (res.data === "Fail") {
             // this.$Notice.error({ desc: "Loading tools fail." });
           } else if (res.data === "None") {
@@ -898,8 +913,13 @@ export default {
         )
         .then(res => {
           if (res.data == "Offline") {
-            this.$store.commit("userLogout");
-            this.$router.push({ name: "Login" });
+            if(this.scopeType == "subproject"){
+              this.$store.commit("userLogout");
+              this.$router.push({ name: "Login" });
+            }
+            else{
+              parent.location.href="/GeoProblemSolving/login"
+            }
           } else if (res.data === "Fail") {
             // this.$Notice.error({ desc: "Loading tool fail." });
           } else if (res.data === "None") {
@@ -927,8 +947,13 @@ export default {
         )
         .then(res => {
           if (res.data == "Offline") {
-            this.$store.commit("userLogout");
-            this.$router.push({ name: "Login" });
+            if(this.scopeType == "subproject"){
+              this.$store.commit("userLogout");
+              this.$router.push({ name: "Login" });
+            }
+            else{
+              parent.location.href="/GeoProblemSolving/login"
+            }
           } else if (res.data === "Fail") {
             // this.$Notice.error({ desc: "Loading toolsets fail." });
           } else if (res.data === "None") {
@@ -950,8 +975,13 @@ export default {
         )
         .then(res => {
           if (res.data == "Offline") {
-            this.$store.commit("userLogout");
-            this.$router.push({ name: "Login" });
+            if(this.scopeType == "subproject"){
+              this.$store.commit("userLogout");
+              this.$router.push({ name: "Login" });
+            }
+            else{
+              parent.location.href="/GeoProblemSolving/login"
+            }
           } else if (res.data === "Fail") {
             // this.$Notice.error({ desc: "Loading toolsets fail." });
           } else if (res.data === "None") {
@@ -1160,8 +1190,13 @@ export default {
         .post(updateurl, obj)
         .then(res => {
           if (res.data == "Offline") {
-            this.$store.commit("userLogout");
-            this.$router.push({ name: "Login" });
+            if(this.scopeType == "subproject"){
+              this.$store.commit("userLogout");
+              this.$router.push({ name: "Login" });
+            }
+            else{
+              parent.location.href="/GeoProblemSolving/login"
+            }
           } else if (res.data != "Fail") {
             if (this.scopeType == "project") {
               this.$store.commit("setProjectInfo", res.data);
