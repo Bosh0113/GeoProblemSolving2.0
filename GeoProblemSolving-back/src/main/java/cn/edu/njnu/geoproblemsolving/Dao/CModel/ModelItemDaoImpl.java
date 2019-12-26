@@ -1,6 +1,6 @@
 package cn.edu.njnu.geoproblemsolving.Dao.CModel;
 
-import cn.edu.njnu.geoproblemsolving.Entity.ModelItem.ModelItemEntity;
+import cn.edu.njnu.geoproblemsolving.Entity.ModelTools.ModelItem.ModelItemEntity;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;

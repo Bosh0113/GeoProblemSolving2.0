@@ -10,7 +10,7 @@ const routes = [{
   path: '/', name: 'Navigation', component: resolve => (require(["@/components/navigation"], resolve)), children: [
     { path: '', redirect: 'staticPage' },
     { path: 'staticPage', name: 'StaticPage', component: resolve => (require(["@/components/navigationContent/staticPage"], resolve)) },
-    // { path: '', redirect: 'home' },
+  
     // { path: 'home', name: 'Home', component: resolve => (require(["@/components/navigationContent/home"], resolve)) },
     // { path: 'projectlist', name: 'Projects', component: resolve => (require(["@/components/navigationContent/projectList"], resolve)) },
     // { path: 'project/:id', name: 'ProjectDetail', component: resolve => (require(["@/components/projects/projectDetail"], resolve)) },
@@ -54,6 +54,7 @@ const routes = [{
     { path: 'resetPassword/:email', name: 'resetPassword', component: resolve => (require(["@/components/userState/resetPwd"], resolve)) },
     { path: 'resourceCenter', name: 'resourceCenter', component: resolve => (require(["@/components/resources/resourceCenter"], resolve)) },
     { path: 'toolsCenter', name: 'toolsCenter', component: resolve => (require(["@/components/tools/toolsCenter"], resolve)) }, 
+    
   ]
 },
 { path: '/chat', name: 'chatUtil', component: resolve=>(require(["@/components/utils/chatroom"],resolve)) },
@@ -65,7 +66,10 @@ const routes = [{
 { path: '/nc/charts', name: 'dataChartsNC', component: resolve=>(require(["@/components/utils/singleUtils/ncCharts"],resolve)) },
 { path: '/video', name: 'videoViewer', component: resolve=>(require(["@/components/utils/videoViewer"],resolve)) },
 { path: '/preview', name: 'pdfViewer', component: resolve=>(require(["@/components/utils/filePreview"],resolve)) },
-{ path: '/tinymce', name: 'tinymce', component: resolve=>(require(["@/components/utils/singleUtils/tinymce"],resolve)) }
+{ path: '/tinymce', name: 'tinymce', component: resolve=>(require(["@/components/utils/singleUtils/tinymce"],resolve)) },
+{ path: '/modelInstance', name: 'Model', component: resolve => (require(["@/components/model/Model"], resolve)) },
+{ path: '/modelRecords', name: 'ModelRecords', component: resolve => (require(["@/components/model/ModelRecords"], resolve)) },
+{ path: '/modelPost', name: 'ModelRecords', component: resolve => (require(["@/components/model/ModalPost"], resolve)) },
 ]
 export default new Router({
   routes,

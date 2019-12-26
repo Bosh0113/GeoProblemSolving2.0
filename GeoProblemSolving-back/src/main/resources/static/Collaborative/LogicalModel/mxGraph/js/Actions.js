@@ -1265,13 +1265,13 @@ Actions.prototype.init = function()
 
             var option = document.createElement("option");
             option.innerHTML = "Model Dependency View";
-            option.value = "Model";
+            option.value = "CModel";
 			option.setAttribute("currentUID",cell.uid);
             var select = document.getElementById("viewPanel");
             select.appendChild(option);
 
             select.onclick = function () {
-				if(select.value == "Model"){
+				if(select.value == "CModel"){
                     var encoder = new mxCodec();
                     var node = encoder.encode(graph.getModel());
 					ModelDependency = mxUtils.getXml(node);
@@ -1286,7 +1286,7 @@ Actions.prototype.init = function()
 				}
             };
 
-			$("#viewPanel").val("Model");
+			$("#viewPanel").val("CModel");
 			var exist=0;
 			for(let i=0;i<graph.mxgraphList.length;i++){
 				if(graph.mxgraphList[i].uid==cell.uid){

@@ -10,11 +10,13 @@
     "build": "node build/build.js"
   },
   "dependencies": {
+    "@tinymce/tinymce-vue": "^3.0.1",
     "axios": "^0.18.1",
     "babel-runtime": "^6.26.0",
     "crypto-js": "^3.1.9-1",
     "dayjs": "^1.8.16",
     "echarts": "^4.3.0",
+    "element-ui": "^2.13.0",
     "gantt-elastic": "^1.0.10",
     "gantt-elastic-header": "^0.1.11",
     "highlight": "^0.2.4",
@@ -28,6 +30,7 @@
     "marked": "^0.7.0",
     "mavon-editor": "^2.7.6",
     "shpjs": "^3.4.3",
+    "tinymce": "^5.1.5",
     "v-charts": "^1.19.0",
     "vue": "^2.5.2",
     "vue-avatar": "^2.1.8",

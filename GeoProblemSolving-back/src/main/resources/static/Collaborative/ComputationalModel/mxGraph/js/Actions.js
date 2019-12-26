@@ -1269,11 +1269,11 @@ Actions.prototype.init = function()
 				if(graph.mxgraphList[i].uid==cell.uid){
 					var option = document.createElement("option");
 					option.innerHTML = "Model Dependency View";
-					option.value = "Model";
+					option.value = "CModel";
 					option.setAttribute("currentUID",cell.uid);
 					var select = document.getElementById("viewPanel");
 					select.appendChild(option);
-					$("#viewPanel").val("Model");
+					$("#viewPanel").val("CModel");
 					var doc = mxUtils.parseXml(graph.mxgraphList[i].graphXML);
                 	var dec = new mxCodec(doc);
 					dec.decode(doc.documentElement, graph.getModel());

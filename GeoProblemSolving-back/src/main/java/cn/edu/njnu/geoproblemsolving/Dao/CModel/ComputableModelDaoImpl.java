@@ -1,8 +1,8 @@
 package cn.edu.njnu.geoproblemsolving.Dao.CModel;
 
-import cn.edu.njnu.geoproblemsolving.Entity.Model.ComputableModelEntity;
-import cn.edu.njnu.geoproblemsolving.Entity.ModelItem.ModelItemEntity;
-import cn.edu.njnu.geoproblemsolving.Entity.ModelItem.Support.*;
+import cn.edu.njnu.geoproblemsolving.Entity.ModelTools.CModel.ComputableModelEntity;
+import cn.edu.njnu.geoproblemsolving.Entity.ModelTools.ModelItem.ModelItemEntity;
+import cn.edu.njnu.geoproblemsolving.Entity.ModelTools.ModelItem.Support.*;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;

@@ -20,6 +20,10 @@ import * as socketApi from './api/socket'
 //set globe CSS
 // import './assets/css/style.css'
 
+
+import ElementUI from "element-ui";
+import "element-ui/lib/theme-chalk/index.css";
+
 axios.defaults.withCredentials=true;
 Vue.prototype.socketApi = socketApi
 Vue.config.productionTip = false
@@ -28,6 +32,7 @@ Vue.use(iView)
 Vue.use(Vuex)
 Vue.use(VueAxios,axios)
 Vue.use(vuescroll)
+Vue.use(ElementUI)
 // Vue.use(VCharts)
 
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';

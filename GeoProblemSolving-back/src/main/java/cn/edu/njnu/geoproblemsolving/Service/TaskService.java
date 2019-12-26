@@ -1,9 +1,7 @@
 package cn.edu.njnu.geoproblemsolving.Service;
 
 import cn.edu.njnu.geoproblemsolving.Dao.CModel.*;
-import cn.edu.njnu.geoproblemsolving.Entity.Model.support.JsonResult;
-import cn.edu.njnu.geoproblemsolving.Entity.ModelItem.ModelItemEntity;
-import cn.edu.njnu.geoproblemsolving.Entity.ModelItem.Support.State;
+import cn.edu.njnu.geoproblemsolving.Entity.ModelTools.CModel.support.JsonResult;
 import cn.edu.njnu.geoproblemsolving.Enums.ResultEnum;
 import cn.edu.njnu.geoproblemsolving.Exception.MyException;
 import cn.edu.njnu.geoproblemsolving.Utils.ResultUtils;
@@ -13,8 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -24,7 +20,6 @@ import org.springframework.web.client.RestTemplate;
 import javax.annotation.Resource;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
 
 
 @Service
@@ -149,8 +144,6 @@ public class TaskService {
         refreshBody.put("tid", tid);
         refreshBody.put("ip",obj.getString("ip"));
         refreshBody.put("port", obj.getString("port"));
-
-
         return refresh(refreshBody);
     }
 
@@ -173,7 +166,6 @@ public class TaskService {
                 } else {
                     continue;
                 }
-
             }
         }
         return inputList;

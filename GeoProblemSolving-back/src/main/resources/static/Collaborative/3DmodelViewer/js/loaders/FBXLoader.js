@@ -795,7 +795,7 @@
 
 		var modelNodes = relationships.parents.map( function ( parent ) {
 
-			return FBXTree.Objects.Model[ parent.ID ];
+			return cn.edu.njnu.geoproblemsolving.Entity.CModel[ parent.ID ];
 
 		} );
 
@@ -1621,7 +1621,7 @@
 
 		var modelMap = parseModels( FBXTree, skeletons, geometryMap, materialMap, connections );
 
-		var modelNodes = FBXTree.Objects.Model;
+		var modelNodes = cn.edu.njnu.geoproblemsolving.Entity.CModel;
 
 		modelMap.forEach( function ( model ) {
 
@@ -1660,7 +1660,7 @@
 	function parseModels( FBXTree, skeletons, geometryMap, materialMap, connections ) {
 
 		var modelMap = new Map();
-		var modelNodes = FBXTree.Objects.Model;
+		var modelNodes = cn.edu.njnu.geoproblemsolving.Entity.CModel;
 
 		for ( var nodeID in modelNodes ) {
 
@@ -2083,7 +2083,7 @@
 
 				if ( child.relationship === 'LookAtProperty' ) {
 
-					var lookAtTarget = FBXTree.Objects.Model[ child.ID ];
+					var lookAtTarget = cn.edu.njnu.geoproblemsolving.Entity.CModel[ child.ID ];
 
 					if ( 'Lcl_Translation' in lookAtTarget ) {
 
@@ -2386,7 +2386,7 @@
 
 								} );
 
-								var rawModel = FBXTree.Objects.Model[ modelID.toString() ];
+								var rawModel = cn.edu.njnu.geoproblemsolving.Entity.CModel[ modelID.toString() ];
 
 								var node = {
 
