@@ -45,7 +45,7 @@ public class MindmapSocket {
             requireLists.put(groupID, list);
         }
 
-        if(Controller.size() == 0){
+        if (Controller.size() == 0) {
             JSONObject userJson = new JSONObject();
             userJson.put("userId", "7014115d-2054-4c5e-99ed-ed786574cd32");
             userJson.put("userName", "nobody");
@@ -89,9 +89,9 @@ public class MindmapSocket {
                 JSONObject userJson = new JSONObject();
                 userJson.put("userId", userId);
                 userJson.put("userName", userName);
-
                 members.put(this.session.getId(), userJson);
-                System.out.println("Socket connect,  UserId: " + userId +", UserName: " + messageObject.getString("userName"));
+
+                System.out.println("Socket connect,  UserId: " + userId + ", UserName: " + messageObject.getString("userName"));
                 publicMembers(groupID, "Join", requireLists);//公布新的在线数组和演示者
 
                 break;
@@ -139,10 +139,8 @@ public class MindmapSocket {
 
             members.remove(this.session.getId());
             publicMembers(groupID, "Left", requireLists);//发布在线用户群组及演示者
-        }
-        else {
+        } else {
             groups.remove(groupID);
-            members.clear();
             requireLists.clear();
 
             JSONObject userJson = new JSONObject();
@@ -216,11 +214,11 @@ public class MindmapSocket {
         }
     }
 
-    private void ResetRequireLists(String groupID, String userId){
+    private void ResetRequireLists(String groupID, String userId) {
 
         JSONArray list = requireLists.get(groupID);
-        for(int i=0; i<list.size();i++){
-            if(list.getJSONObject(i).getString("userId").equals(userId)){
+        for (int i = 0; i < list.size(); i++) {
+            if (list.getJSONObject(i).getString("userId").equals(userId)) {
                 list.remove(i);
                 break;
             }

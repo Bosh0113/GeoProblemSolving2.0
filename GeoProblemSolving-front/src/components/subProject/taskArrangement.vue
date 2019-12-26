@@ -605,7 +605,6 @@ export default {
   },
   mounted() {
     this.inquiryTask();
-    // this.getProjectInfo();
     window.addEventListener("resize", this.initSize);
   },
   beforeRouteLeave(to, from, next) {

@@ -1,43 +1,49 @@
 var websock = null;
 var global_callback = null;
-var serverPort = '5000';	//webSocket连接端口
 var timer = null;
+var websockLinked = false;
 
 
-function getWebIP() {
-    var curIP = window.location.hostname;
-    return curIP;
-}
+function initWebSocket(para, IP_Port) { //初始化websocket
 
-function initWebSocket(para,IP_Port) { //初始化websocket
-    var wsurl = "ws://"+IP_Port+"/GeoProblemSolving/" + para;
-    if(IP_Port=="localhost:8080"){
+    var wsurl = "ws://" + IP_Port + "/GeoProblemSolving/" + para;
+    if (IP_Port == "localhost:8080") {
         wsurl = "ws://localhost:8081/GeoProblemSolving/" + para;
     }
     //switch 使用时提供一个参数type
     websock = new WebSocket(wsurl);
     websock.onmessage = function (e) {
         websocketonmessage(e);
+        websockLinked = true;
     }
     websock.onclose = function (e) {
         websocketclose(e);
         removeTimer();
+        websockLinked = false;
     }
     websock.onopen = function () {
         websocketOpen();
         setTimer();
+        websockLinked = true;
     }
 
     //连接发生错误的回调方法
     websock.onerror = function () {
         console.log("WebSocket连接发生错误");
         removeTimer();
+        websockLinked = false;
     }
 
 }
 
-function close(){
+function close() {
     websock.close();
+}
+
+function getSocketInfo() {
+    return {
+        linked: websockLinked
+    }
 }
 
 // 实际调用的方法
@@ -62,7 +68,7 @@ function sendSock(agentData, callback) {
 //数据接收
 function websocketonmessage(e) {
     var data = JSON.parse(e.data);
-    if(data.type != "ping"){
+    if (data.type != "ping") {
         if (global_callback != null && global_callback != "" && global_callback != undefined) {
             global_callback(data);
         }
@@ -85,18 +91,18 @@ function websocketOpen(e) {
 
 function setTimer() {
     timer = setInterval(() => {
-      var messageJson = {};
-      messageJson["type"] = "ping";
-      messageJson["message"] = "ping";
-      websocketsend(messageJson);
+        var messageJson = {};
+        messageJson["type"] = "ping";
+        messageJson["message"] = "ping";
+        websocketsend(messageJson);
     }, 20000);
-  }
+}
 
 function removeTimer() {
-  clearInterval(timer);
+    clearInterval(timer);
 }
 
 
 // initWebSocket();
 
-export { sendSock, initWebSocket, close }
+export { initWebSocket, sendSock, close, getSocketInfo }

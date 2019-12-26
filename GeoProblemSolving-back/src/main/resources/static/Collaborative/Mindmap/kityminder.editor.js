@@ -1,6 +1,6 @@
 /*!
  * ====================================================
- * kityminder-editor - v1.0.67 - 2019-11-26
+ * kityminder-editor - v1.0.67 - 2019-12-18
  * https://github.com/fex-team/kityminder-editor
  * GitHub: https://github.com/fex-team/kityminder-editor 
  * Copyright (c) 2019 ; Licensed 
@@ -2105,7 +2105,7 @@ angular.module('kityminderEditor').run(['$templateCache', function($templateCach
 
 
   $templateCache.put('ui/directive/fileImport/fileImport.html',
-    "<div class=\"btn-group-vertical\" dropdown is-open=\"isopen\"><button type=\"button\" class=\"btn btn-default import\" title=\"{{ 'import' | lang:'ui' }}\" ng-class=\"{'active': isopen}\" data-toggle=\"modal\" data-target=\"#importModal\" ng-click=\"updateMaplist()\"></button> <button type=\"button\" class=\"btn btn-default import-caption dropdown-toggle\" data-toggle=\"modal\" data-target=\"#importModal\" title=\"{{ 'import' | lang:'ui' }}\" ng-click=\"updateMaplist()\"><span class=\"caption\">{{ 'import' | lang:'ui' }}</span> <span class=\"sr-only\">{{ 'import' | lang:'ui' }}</span></button><div class=\"modal fade\" id=\"importModal\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"myModalLabel\" aria-hidden=\"true\"><div class=\"modal-dialog\" style=\"width: 800px\"><div class=\"modal-content\"><div class=\"modal-header\"><button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button><h4 class=\"modal-title\" id=\"myModalLabel\">Import mind map</h4></div><div class=\"modal-body\" style=\"font-size: 12px\"><div style=\"width: 95%; margin: auto; border: 1px solid gray\"><table class=\"table\" style=\"width: 90%; margin: auto\"><caption style=\"font-size: 14px;font-weight: 600;color:#333\">Open mindmap from resource center:</caption><thead><tr><th style=\"width: 30%\">Name</th><th style=\"width: 50%\">Description</th><th style=\"width: 20%\">Operation</th></tr></thead></table><div style=\"min-height:100px;max-height: 400px; overflow-y: auto\"><table class=\"table\" style=\"width: 90%;margin: auto\"><tbody><tr ng-repeat=\"item in mindmapRes\"><td style=\"width: 30%\">{{item.name}}</td><td style=\"width: 50%\">{{item.description}}</td><td style=\"width: 20%\"><span style=\"cursor:pointer\" class=\"glyphicon glyphicon-ok-circle\" title=\"Load this mindmap\" ng-click=\"mapLoad(item)\"></span></td></tr></tbody></table></div></div><div style=\"width: 90%; margin: auto;margin-top: 30px\"><span style=\"font-size: 14px;font-weight: 600\">Open mindmap from resource center:</span> <input type=\"file\" id=\"fileInput\" style=\"margin-top: 15px\"><button type=\"button\" class=\"btn btn-info\" style=\"margin-top: 15px\" ng-click=\"mapImport()\">Upload</button></div></div><div class=\"modal-footer\"><button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Close</button></div></div></div></div></div>"
+    "<div class=\"btn-group-vertical\" dropdown is-open=\"isopen\"><button type=\"button\" class=\"btn btn-default import\" title=\"{{ 'import' | lang:'ui' }}\" ng-class=\"{'active': isopen}\" data-toggle=\"modal\" data-target=\"#importModal\" ng-click=\"updateMaplist()\"></button> <button type=\"button\" class=\"btn btn-default import-caption dropdown-toggle\" data-toggle=\"modal\" data-target=\"#importModal\" title=\"{{ 'import' | lang:'ui' }}\" ng-click=\"updateMaplist()\"><span class=\"caption\">{{ 'import' | lang:'ui' }}</span> <span class=\"sr-only\">{{ 'import' | lang:'ui' }}</span></button><div class=\"modal fade\" id=\"importModal\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"myModalLabel\" aria-hidden=\"true\"><div class=\"modal-dialog\" style=\"width: 800px\"><div class=\"modal-content\"><div class=\"modal-header\"><button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button><h4 class=\"modal-title\" id=\"myModalLabel\">Import mind map</h4></div><div class=\"modal-body\" style=\"font-size: 12px\"><div style=\"width: 95%; margin: auto; border: 1px solid gray\"><table class=\"table\" style=\"width: 90%; margin: auto\"><caption style=\"font-size: 14px;font-weight: 600;color:#333\">Open mindmap from resource center:</caption><thead><tr><th style=\"width: 30%\">Name</th><th style=\"width: 50%\">Description</th><th style=\"width: 20%\">Operation</th></tr></thead></table><div style=\"min-height:100px;max-height: 400px; overflow-y: auto\"><table class=\"table\" style=\"width: 90%;margin: auto\"><tbody><tr ng-repeat=\"item in mindmapRes\"><td style=\"width: 30%\">{{item.name}}</td><td style=\"width: 50%\">{{item.description}}</td><td style=\"width: 20%\"><span style=\"cursor:pointer\" class=\"glyphicon glyphicon-ok-circle\" title=\"Load this mindmap\" ng-click=\"mapLoad(item)\"></span> <span style=\"cursor:pointer; margin-left: 20px\" class=\"glyphicon glyphicon-remove-circle\" title=\"Delete this mindmap\" ng-click=\"deleteMap(item)\"></span></td></tr></tbody></table></div></div><div style=\"width: 90%; margin: auto;margin-top: 30px\"><span style=\"font-size: 14px;font-weight: 600\">Open mindmap from resource center:</span> <input type=\"file\" id=\"fileInput\" style=\"margin-top: 15px\"><button type=\"button\" class=\"btn btn-info\" style=\"margin-top: 15px\" ng-click=\"mapImport()\">Upload</button></div></div><div class=\"modal-footer\"><button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Close</button></div></div></div></div></div>"
   );
 
 
@@ -3633,6 +3633,7 @@ angular.module('kityminderEditor')
                 scope.updateMaplist = updateMaplist;
                 scope.mapImport = mapImport;
                 scope.mapLoad = mapLoad;
+                scope.deleteMap = deleteMap;
 
                 function updateMaplist() {
                     var maps = [];
@@ -3643,7 +3644,7 @@ angular.module('kityminderEditor')
                         var folderId = info.pageId;
                         try {
                             $.ajax({
-                                url: 'http://'+RouteInfo.getIPPort()+'/GeoProblemSolving/folder/inquiry?folderId=' + folderId,
+                                url: 'http://' + RouteInfo.getIPPort() + '/GeoProblemSolving/folder/inquiry?folderId=' + folderId,
                                 type: "GET",
                                 async: false,
                                 success: function (data) {
@@ -3654,7 +3655,7 @@ angular.module('kityminderEditor')
 
                                         console.log("success!");
                                         for (var i = 0; i < data.files.length; i++) {
-                                            if (data.files[i].type == "others") {
+                                            if (data.files[i].type == "data") {
                                                 maps.push(data.files[i]);
                                             }
                                         }
@@ -3750,6 +3751,35 @@ angular.module('kityminderEditor')
                     catch (ex) {
                         mindmapInfo = {};
                         console.log("import mindmap error");
+                    }
+                }
+
+                function deleteMap(map) {
+                    try {
+                        var info = RouteInfo.getInfo();
+                        if (info.pageId != "") {
+
+                            var folderId = info.pageId;
+                            $.ajax({
+                                url: 'http://' + RouteInfo.getIPPort() + '/GeoProblemSolving/folder/removeFile?resourceId=' + map.resourceId + '&folderId=' + folderId,
+                                type: "GET",
+                                async: false,
+                                success: function (data) {
+                                    if (data == "Fail") {
+                                    }
+                                    else {
+                                        alert("Delete the mindmap successfully");
+                                        updateMaplist();
+                                    }
+                                },
+                                error: function (err) {
+                                    alert("Fail to delete the mindmap");
+                                }
+                            });
+                        }
+                    }
+                    catch (ex) {
+                        console.log("fail")
                     }
                 }
             }
@@ -3868,7 +3898,7 @@ angular.module('kityminderEditor')
                                 var formData = new FormData();
                                 formData.append("file", fileBlob);
                                 formData.append("description", "Collaborative mindmap tool");
-                                formData.append("type", "others");
+                                formData.append("type", "data");
                                 formData.append("uploaderId", info.userId);
                                 formData.append("privacy", "private");
                                 formData.append("folderId", info.pageId);

@@ -534,7 +534,7 @@ export default {
           }
           let description = "";
           if (this.formValidate.fileDescription == "") {
-            description = "Drawing tool resource";
+            description = "from Drawing tool";
           } else {
             description = this.formValidate.fileDescription;
           }

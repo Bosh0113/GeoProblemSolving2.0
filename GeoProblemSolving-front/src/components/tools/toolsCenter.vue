@@ -1019,7 +1019,6 @@
 <script>
 import Avatar from "vue-avatar";
 import draggable from "vuedraggable";
-import contextDefinitionVue from "../workingSpace/contextDefinition.vue";
 export default {
   components: {
     draggable,
@@ -1280,7 +1279,7 @@ export default {
           } else if (res.data === "Fail") {
             this.$Notice.error({ desc: "Loading personal toolsets fail." });
           } else if (res.data === "None") {
-            this.$Notice.error({ desc: "There is no existing toolset" });
+            // this.$Notice.error({ desc: "There is no existing toolset" });
           } else {
             this.$set(this, "toolsetList", res.data.reverse());
           }
@@ -1305,7 +1304,7 @@ export default {
           } else if (res.data === "Fail") {
             this.$Notice.error({ desc: "Loading personal toolsets fail." });
           } else if (res.data === "None") {
-            this.$Notice.error({ desc: "There is no existing toolset" });
+            // this.$Notice.error({ desc: "There is no existing toolset" });
           } else {
             this.$set(this, "toolsetList", res.data.reverse());
           }
@@ -1330,7 +1329,7 @@ export default {
           } else if (res.data === "Fail") {
             this.$Notice.error({ desc: "Loading tools fail." });
           } else if (res.data === "None") {
-            this.$Notice.error({ desc: "There is no existing tool" });
+            // this.$Notice.error({ desc: "There is no existing tool" });
           } else {
             this.$set(this, "publicTools", res.data);
           }
@@ -1353,7 +1352,7 @@ export default {
           } else if (res.data === "Fail") {
             this.$Notice.error({ desc: "Loading personal tools fail." });
           } else if (res.data === "None") {
-            this.$Notice.error({ desc: "There is no existing tool" });
+            // this.$Notice.error({ desc: "There is no existing tool" });
           } else {
             this.$set(this, "personalTools", res.data);
           }

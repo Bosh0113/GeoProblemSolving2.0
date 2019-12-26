@@ -9,15 +9,16 @@
   right: 30px;
   bottom: 80px;
   cursor: pointer;
+  background-color: #fff;
 }
 #msgPanel {
   z-index: 99;
   width: 340px;
   height: 450px;
   position: fixed;
-  right: 60px;
-  bottom: 80px;
-  background: #ebf3ff;
+  right: 50px;
+  bottom: 100px;
+  background: #5093f8;
   padding: 10px;
 }
 #msgPanel > .ivu-tabs-card > .ivu-tabs-content > .ivu-tabs-tabpane {
@@ -168,6 +169,7 @@
                     <span class="time" style="color:#0664a2">{{item.time}}</span>
                     <span class="time" style="color:#0664a2;margin-left:10px">{{item.who}}</span>
                     <span class="content" style="color:#0664a2;">{{item.content}}</span>
+                    <span class="content" style="color:grey;">{{item.file}}</span>
                     <a
                       style="color:green;margin-left:5px"
                       :href="'http://'+$store.state.IP_Port+'/GeoProblemSolving/resource/upload/'+item.file"
@@ -196,35 +198,26 @@
                 <vue-scroll :ops="scrollOps" style="height: 338px">
                   <div style="display:flex" v-for="(item,index) in allChatMsgs" :key="index">
                     <template v-if="item.type == 'notice'">
-                      <div
-                        class="chat-notice"
-                        v-if="item.behavior == 'online'"
-                      >{{item.who.name}} is online</div>
-                      <div
-                        class="chat-notice"
-                        v-else-if="item.behavior == 'offline'"
-                      >{{item.who.name}} is offline</div>
+                      <div class="chat-notice">{{item.content}}</div>
                     </template>
-                    <template
-                      v-else-if="item.type == 'chatMsg'&& item.from.id === $store.getters.userId "
-                    >
+                    <template v-else-if="item.fromid === $store.getters.userId ">
                       <div style="width:95%">
                         <div class="chat-bubble-r chat-bubble-right">{{item.content}}</div>
                       </div>
                       <div class="user_detail">
                         <div class="u_img">
-                          <avatar class="user_img" :username="item.from.name" :size="25"></avatar>
+                          <avatar class="user_img" :username="item.from" :size="25"></avatar>
                         </div>
-                        <div class="u_name">{{item.from.name}}</div>
+                        <div class="u_name">{{item.from}}</div>
                       </div>
                     </template>
                     <template v-else>
                       <div class="user_detail" style="margin-left:2.5%;margin-top:5px;">
                         <div class="u_img">
-                          <avatar class="user_img" :username="item.from.name" :size="25"></avatar>
+                          <avatar class="user_img" :username="item.from" :size="25"></avatar>
                         </div>
                         <div class="u_name">
-                          <span style="font-size:3px;">{{item.from.name}}</span>
+                          <span style="font-size:3px;">{{item.from}}</span>
                         </div>
                       </div>
                       <div style="width:95%">
@@ -294,7 +287,7 @@ export default {
           h("span", "Chats"),
           h("Badge", {
             props: {
-              count: this.receivedChatMsgs.length
+              count: this.receivedChats.length
             }
           })
         ]);
@@ -302,74 +295,25 @@ export default {
       unreadChats: 0,
       openPanel: false,
       // records
-      receivedRecords: [
-        {
-          type: "resource",
-          time: "hh:mm:ss",
-          who: "XXX",
-          content: "abcd",
-          file: "efg.hi"
-        }
-      ],
-      allRecords: [
-        {
-          type: "tools",
-          time: "hh:mm:ss",
-          who: "XXX",
-          content: "abcdefg",
-          toolType: "007"
-        },
-        {
-          type: "resource",
-          time: "hh:mm:ss",
-          who: "XXX",
-          content: "abcd",
-          file: "efg.hi"
-        },
-        {
-          type: "tools",
-          time: "hh:mm:ss",
-          who: "XXX",
-          content: "abcdefg",
-          toolType: "007"
-        }
-      ],
+      receivedRecords: [],
+      allRecords: [],
       // chats
       typingMsg: "",
-      receivedChatMsgs: [
-        {
-          type: "notice",
-          behavior: "offline",
-          who: {
-            id: "123456",
-            name: "AA"
-          }
-        }
-      ],
-      allChatMsgs: [
-        {
-          type: "notice",
-          behavior: "online",
-          who: {
-            id: "123456",
-            name: "AA"
-          }
-        },
-        {
-          type: "chatMsg",
-          content: "123 123 123 asd zxc qwe",
-          from: {
-            id: "654321",
-            name: "ABB"
-          }
-        }
-      ],
-      // socket
-      recordSocket: null,
-      chatSocket: null
+      allChatMsgs: [],
+      receivedChats: []
     };
   },
-  props: [],
+  props: ["stepInfo", "receivedChatMsgs", "operationRecords"],
+  watch: {
+    receivedChatMsgs(val) {
+      for (let i = 0; i < this.receivedChatMsgs.length; i++) {
+        this.receivedChats.push(this.receivedChatMsgs[i]);
+      }
+    },
+    operationRecords(val) {
+      this.receivedRecords.push(JSON.parse(this.operationRecords));
+    }
+  },
   mounted() {},
   updated: function() {
     // this.$refs["vs"].scrollTo(
@@ -384,8 +328,8 @@ export default {
         this.allRecords.push(this.receivedRecords.shift());
       }
     } else if (this.msgType == "chats") {
-      for (let i = 0; i < this.receivedChatMsgs.length; i++) {
-        this.allChatMsgs.push(this.receivedChatMsgs.shift());
+      for (let i = 0; i < this.receivedChats.length; i++) {
+        this.allChatMsgs.push(this.receivedChats.shift());
       }
     }
   },
@@ -395,145 +339,60 @@ export default {
       // go to chatroom
     },
     toolPanel(toolType) {},
-    // closeMsgSocket() {
-    //   if (this.recordSocket != null) {
-    //     this.removeTimer();
-    //     this.recordSocket.close();
-    //   }
-    // },
-    // openMsgSocket() {
-    //   if (this.recordSocket != null) {
-    //     this.recordSocket = null;
-    //   }
-    //   let subProjectId = this.subProjectInfo.subProjectId;
-    //   var recordSocketURL =
-    //     "ws://" +
-    //     this.$store.state.IP_Port +
-    //     "/GeoProblemSolving/Module/" +
-    //     subProjectId;
-    //   if (this.$store.state.IP_Port == "localhost:8080") {
-    //     recordSocketURL =
-    //       "ws://localhost:8081/GeoProblemSolving/Module/" + subProjectId;
-    //   }
-    //   this.recordSocket = new WebSocket(recordSocketURL);
-    //   this.recordSocket.onopen = this.onOpen;
-    //   this.recordSocket.onmessage = this.onMessage;
-    //   this.recordSocket.onclose = this.onClose;
-    //   this.recordSocket.onerror = this.onError;
-    //   this.setTimer();
-    // },
-    // onOpen() {
-    //   console.log("MsgSocket连接成功！");
-    // },
-    // // 更新人员，更新数据，更新records
-    // onMessage(e) {
-    //   let messageJson = JSON.parse(e.data);
-    //   let record = {
-    //     type: "",
-    //     time: "",
-    //     who: "",
-    //     content: ""
-    //   };
-    //   // 资源记录
-    //   if (messageJson.type == "resource") {
-    //     let record = {};
-    //     record["who"] = messageJson.who;
-    //     record["content"] = messageJson.content;
-    //     record["time"] = messageJson.time;
-    //     this.allRecords.push(messageJson);
-    //     this.getAllResource();
-    //   }
-    //   // 工具记录
-    //   else if (messageJson.type == "tools") {
-    //     let record = {};
-    //     record["who"] = messageJson.who;
-    //     record["content"] = messageJson.content;
-    //     record["time"] = messageJson.time;
-    //     this.allRecords.push(messageJson);
-    //   }
-    //   // module 更新
-    //   else if (messageJson.type == "step") {
-    //     this.processStructure = messageJson.content;
-    //   } else if (messageJson.type == "members") {
-    //     // 比较 判断人员动态 更新records
-    //     let members = messageJson.message
-    //       .replace("[", "")
-    //       .replace("]", "")
-    //       .replace(/\s/g, "")
-    //       .split(",");
-    //     this.olParticipantChange(members);
-    //   }
-    // },
-    // onClose(e) {
-    //   this.removeTimer();
-    //   console.log("MsgSocket连接断开！");
-    // },
-    // onError(e) {
-    //   this.removeTimer();
-    //   console.log("MsgSocket连接错误！");
-    // },
-    // setTimer() {
-    //   var that = this;
-    //   this.timer = setInterval(() => {
-    //     var messageJson = {};
-    //     messageJson["type"] = "ping";
-    //     messageJson["message"] = "ping";
-    //     if (
-    //       that.recordSocket != null &&
-    //       that.recordSocket != undefined
-    //     ) {
-    //       that.recordSocket.send(JSON.stringify(messageJson));
-    //     }
-    //   }, 20000);
-    // },
-    // removeTimer() {
-    //   clearInterval(this.timer);
-    // },
+
+    //chat
     send(msg) {
-      // //修改时间格式使其统一
-      // Date.prototype.Format = function(fmt) {
-      //   var o = {
-      //     "M+": this.getMonth() + 1, //月份
-      //     "d+": this.getDate(), //日
-      //     "H+": this.getHours(), //小时
-      //     "m+": this.getMinutes(), //分
-      //     "s+": this.getSeconds(), //秒
-      //     "q+": Math.floor((this.getMonth() + 3) / 3), //季度
-      //     "S+": this.getMilliseconds() //毫毛
-      //   };
-      //   if (/(y+)/.test(fmt))
-      //     fmt = fmt.replace(
-      //       RegExp.$1,
-      //       (this.getFullYear() + "").substr(4 - RegExp.$1.length)
-      //     );
-      //   for (var k in o)
-      //     if (new RegExp("(" + k + ")").test(fmt))
-      //       fmt = fmt.replace(
-      //         RegExp.$1,
-      //         RegExp.$1.length == 1
-      //           ? o[k]
-      //           : ("00" + o[k]).substr(("" + o[k]).length)
-      //       );
-      //   return fmt;
-      // };
-      // this.message = msg;
-      // let myDate = new Date().Format("yyyy-MM-dd HH:mm:ss");
-      // let current_time = myDate.toLocaleString(); //获取日期与时间
-      // // 消息不为空
-      // if (this.message !== "") {
-      //   this.send_msg = {
-      //     type: "message",
-      //     from: this.$store.getters.userName,
-      //     fromid: this.$store.getters.userId,
-      //     content: this.message,
-      //     time: current_time
-      //   };
-      //   this.my_msglist.push(this.send_msg);
-      //   this.msglist.push(this.send_msg);
-      //   this.msgRecords.push(this.send_msg);
-      //   this.socketApi.sendSock(this.send_msg, this.getSocketConnect); //连接后台onopen方法
-      // }
-      // this.message = "";
+      //修改时间格式使其统一
+      Date.prototype.Format = function(fmt) {
+        var o = {
+          "M+": this.getMonth() + 1, //月份
+          "d+": this.getDate(), //日
+          "H+": this.getHours(), //小时
+          "m+": this.getMinutes(), //分
+          "s+": this.getSeconds(), //秒
+          "q+": Math.floor((this.getMonth() + 3) / 3), //季度
+          "S+": this.getMilliseconds() //毫毛
+        };
+        if (/(y+)/.test(fmt))
+          fmt = fmt.replace(
+            RegExp.$1,
+            (this.getFullYear() + "").substr(4 - RegExp.$1.length)
+          );
+        for (var k in o)
+          if (new RegExp("(" + k + ")").test(fmt))
+            fmt = fmt.replace(
+              RegExp.$1,
+              RegExp.$1.length == 1
+                ? o[k]
+                : ("00" + o[k]).substr(("" + o[k]).length)
+            );
+        return fmt;
+      };
+
+      this.typingMsg = msg;
+      let myDate = new Date().Format("yyyy-MM-dd HH:mm:ss");
+      let current_time = myDate.toLocaleString(); //获取日期与时间
+      // 消息不为空
+      if (this.typingMsg !== "") {
+        if (this.socketApi.getSocketInfo().linked) {
+          let send_msg = {
+            type: "message",
+            from: this.$store.getters.userName,
+            fromid: this.$store.getters.userId,
+            content: this.typingMsg,
+            time: current_time
+          };
+          this.allChatMsgs.push(send_msg);
+          this.socketApi.sendSock(send_msg, this.getSocketConnect);
+        } else {
+          let chatMsg = {
+            type: "notice",
+            content: "You are disconnected with others."
+          };
+          this.allChatMsgs.push(chatMsg);
+        }
+      }
+      this.typingMsg = "";
     }
   }
 };
