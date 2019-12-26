@@ -15,11 +15,11 @@ public class ResourceEntity {
     private String uploaderName;
     private String uploadTime;
     private String privacy;     //public/private
+    private String thumbnail; //缩略图地址
 
     public void setPrivacy(String privacy) {
         this.privacy = privacy;
     }
-
 
     public void setUploaderName(String uploaderName) {
         this.uploaderName = uploaderName;
@@ -53,9 +53,12 @@ public class ResourceEntity {
         this.resourceId = resourceId;
     }
 
-
     public void setUploaderId(String uploaderId) {
         this.uploaderId = uploaderId;
+    }
+
+    public void setThumbnail(String thumbnail) {
+        this.thumbnail = thumbnail;
     }
 
     public String getUploadTime() {
@@ -96,5 +99,9 @@ public class ResourceEntity {
 
     public String getPrivacy() {
         return privacy;
+    }
+
+    public String getThumbnail() {
+        return thumbnail;
     }
 }

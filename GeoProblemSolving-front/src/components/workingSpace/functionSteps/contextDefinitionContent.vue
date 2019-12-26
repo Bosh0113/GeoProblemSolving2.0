@@ -8,7 +8,7 @@
         <context-info slot="content" :stepInfo="stepInfo" :userRole="userRole"></context-info>
       </Panel>
       <Panel name="data">
-        Data list
+        Resource list
         <data-list slot="content" :stepInfo="stepInfo" :userRole="userRole" @dataBehavior="listenDatalist"></data-list>
       </Panel>
       <Panel name="tool">
@@ -16,6 +16,7 @@
         <tool-container slot="content" :stepInfo="stepInfo" :userRole="userRole" @toolBehavior="listenToolbox"></tool-container>
       </Panel>
     </Collapse>
+    <message-panel :stepInfo="stepInfo" :received-chat-msgs="receivedChatMsgs" :operation-records="operationRecords"></message-panel>
     <BackTop></BackTop>
   </div>
 </template>
