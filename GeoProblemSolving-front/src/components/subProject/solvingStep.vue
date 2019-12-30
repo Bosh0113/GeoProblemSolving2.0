@@ -1243,6 +1243,7 @@ export default {
           } else if (res.data != "Fail") {
             if (this.scopeType == "project") {
               this.$store.commit("setProjectInfo", res.data);
+              parent.projectIngo = res.data;
               this.$Notice.info({
                 desc: "Project update successfully!"
               });
