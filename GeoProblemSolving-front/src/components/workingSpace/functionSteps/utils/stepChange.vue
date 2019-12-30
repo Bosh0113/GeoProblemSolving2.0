@@ -24,17 +24,17 @@ export default {
       partProcesses: []
     };
   },
-  props: ["stepInfo", "subprojectInfo"],
+  props: ["stepInfo", "solvingProcess", "scope"],
   created() {},
   mounted() {},
   methods: {
     getProcessSteps() {
       this.partProcesses = [];
       if (
-        this.subprojectInfo.solvingProcess != undefined &&
-        this.subprojectInfo.solvingProcess.length > 0
+        this.solvingProcess != undefined &&
+        this.solvingProcess.length > 0
       ) {
-        let processStructure = JSON.parse(this.subprojectInfo.solvingProcess);
+        let processStructure = JSON.parse(this.solvingProcess);
         for (let i = 0; i < processStructure.length; i++) {
           //get data
           if (processStructure[i].stepID == this.stepInfo.stepId) {
@@ -211,46 +211,108 @@ export default {
       });
     },
     enterStep(type, stepId) {
-      if (type == 0) {
-        this.$router.push({
-          name: "contextDefinition",
-          params: { stepId: stepId }
-        });
-      } else if (type == 1) {
-        this.$router.push({
-          name: "dataProcessing",
-          params: { stepId: stepId }
-        });
-      } else if (type == 2) {
-        this.$router.push({
-          name: "modelProcess",
-          params: { stepId: stepId }
-        });
-      } else if (type == 3) {
-        this.$router.push({
-          name: "modelEvaluation",
-          params: { stepId: stepId }
-        });
-      } else if (type == 4) {
-        this.$router.push({
-          name: "analysis",
-          params: { stepId: stepId }
-        });
-      } else if (type == 5) {
-        this.$router.push({
-          name: "simulation",
-          params: { stepId: stepId }
-        });
-      } else if (type == 6) {
-        this.$router.push({
-          name: "visualization",
-          params: { stepId: stepId }
-        });
-      } else if (type == 7) {
-        this.$router.push({
-          name: "decisionMaking",
-          params: { stepId: stepId }
-        });
+      if(this.scope=="project"){
+        switch(type){
+          case 0:{
+            this.$router.push({
+              name: "contextDefinitionP",
+              params: { stepId: stepId }
+            });
+            break;
+          }
+          case 1:{
+            this.$router.push({
+              name: "dataProcessingP",
+              params: { stepId: stepId }
+            });
+            break;
+          }
+          case 2:{
+            this.$router.push({
+              name: "modelProcessP",
+              params: { stepId: stepId }
+            });
+            break;
+          }
+          case 3:{
+            this.$router.push({
+              name: "modelEvaluationP",
+              params: { stepId: stepId }
+            });
+            break;
+          }
+          case 4:{
+            this.$router.push({
+              name: "analysisP",
+              params: { stepId: stepId }
+            });
+            break;
+          }
+          case 5:{
+            this.$router.push({
+              name: "simulationP",
+              params: { stepId: stepId }
+            });
+            break;
+          }
+          case 6:{
+            this.$router.push({
+              name: "visualizationP",
+              params: { stepId: stepId }
+            });
+            break;
+          }
+          case 7:{
+            this.$router.push({
+              name: "decisionMakingP",
+              params: { stepId: stepId }
+            });
+            break;
+          }
+        }
+      }
+      else{
+        if (type == 0) {
+          this.$router.push({
+            name: "contextDefinition",
+            params: { stepId: stepId }
+          });
+        } else if (type == 1) {
+          this.$router.push({
+            name: "dataProcessing",
+            params: { stepId: stepId }
+          });
+        } else if (type == 2) {
+          this.$router.push({
+            name: "modelProcess",
+            params: { stepId: stepId }
+          });
+        } else if (type == 3) {
+          this.$router.push({
+            name: "modelEvaluation",
+            params: { stepId: stepId }
+          });
+        } else if (type == 4) {
+          this.$router.push({
+            name: "analysis",
+            params: { stepId: stepId }
+          });
+        } else if (type == 5) {
+          this.$router.push({
+            name: "simulation",
+            params: { stepId: stepId }
+          });
+        } else if (type == 6) {
+          this.$router.push({
+            name: "visualization",
+            params: { stepId: stepId }
+          });
+        } else if (type == 7) {
+          this.$router.push({
+            name: "decisionMaking",
+            params: { stepId: stepId }
+          });
+        }
       }
     },
   }

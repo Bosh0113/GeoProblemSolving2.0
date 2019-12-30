@@ -47,6 +47,18 @@ const routes = [{
         { path: 'decisionMaking', name: 'decisionMaking', component: resolve => (require(["@/components/workingSpace/functionSteps/decisionMakingContent"], resolve)) },
       ],
     },
+    {
+      path: '/workspaceP/:stepId/', name: 'stepFrameworkP', component: resolve => (require(["@/components/projects/pageFramework"], resolve)), children: [
+        { path: 'contextDefinition', name: 'contextDefinitionP', component: resolve => (require(["@/components/workingSpace/functionSteps/contextDefinitionContent"], resolve)) },
+        { path: 'dataProcessing', name: 'dataProcessingP', component: resolve => (require(["@/components/workingSpace/functionSteps/dataProcessingContent"], resolve)) },
+        { path: 'modelProcess', name: 'modelProcessP', component: resolve => (require(["@/components/workingSpace/functionSteps/modelProcessContent"], resolve)) },
+        { path: 'modelEvaluation', name: 'modelEvaluationP', component: resolve => (require(["@/components/workingSpace/functionSteps/modelEvaluationContent"], resolve)) },
+        { path: 'analysis', name: 'analysisP', component: resolve => (require(["@/components/workingSpace/functionSteps/analysisContent"], resolve)) },
+        { path: 'simulation', name: 'simulationP', component: resolve => (require(["@/components/workingSpace/functionSteps/simulationContent"], resolve)) },
+        { path: 'visualization', name: 'visualizationP', component: resolve => (require(["@/components/workingSpace/functionSteps/visualizationContent"], resolve)) },
+        { path: 'decisionMaking', name: 'decisionMakingP', component: resolve => (require(["@/components/workingSpace/functionSteps/decisionMakingContent"], resolve)) },
+      ],
+    },
     { path: 'newproject', name: 'NewProject', component: resolve => (require(["@/components/projects/newProject"], resolve)) },
     { path: 'participants', name: 'Participants', component: resolve => (require(["@/components/navigationContent/participants"], resolve)) },
     { path: 'community', name: 'Community', component: resolve => (require(["@/components/community/community"], resolve)) },

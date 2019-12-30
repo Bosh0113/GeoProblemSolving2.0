@@ -74,12 +74,12 @@
                                                 <strong style="color:#57a3f3" class="taskName" :title="item.taskName">{{item.taskName}}</strong>
                                             </span>
                                             <div style="float:right">
-                                                <Rate :disabled="!isManager()" v-model="item.importance" :count="1" clearable title="Importance" @on-change="changeImportance(item)"
+                                                <Rate :disabled="!(isManager()||isOwner(item))" v-model="item.importance" :count="1" clearable title="Importance" @on-change="changeImportance(item)"
                                                 ></Rate>
-                                                <span title="Edit" v-if="isManager()">
+                                                <span title="Edit" v-if="isManager()||isOwner(item)">
                                                     <Icon type="ios-create" color="gray" :size="20" style="cursor:pointer" @click="editOneTask(index, taskTodo)" ></Icon>
                                                 </span>
-                                                <span v-if="isManager()" style="margin-left:5px;margin-right:3px;cursor: pointer;color:gray;" title="Delete" @click="taskRemoveAssure(index,taskTodo)">
+                                                <span v-if="isManager()||isOwner(item)" style="margin-left:5px;margin-right:3px;cursor: pointer;color:gray;" title="Delete" @click="taskRemoveAssure(index,taskTodo)">
                                                     <Icon type="ios-trash" :size="20" color="gray" ></Icon>
                                                 </span>
                                             </div>
@@ -109,11 +109,11 @@
                                                 <strong style="color:#57a3f3" class="taskName" :title="item.taskName">{{item.taskName}}</strong>
                                             </span>
                                             <div style="float:right">
-                                                <Rate :disabled="!isManager()" v-model="item.importance" :count="1" clearable title="Importance" @on-change="changeImportance(item)" ></Rate>
-                                                <span title="Edit" v-if="isManager()">
+                                                <Rate :disabled="!(isManager()||isOwner(item))" v-model="item.importance" :count="1" clearable title="Importance" @on-change="changeImportance(item)" ></Rate>
+                                                <span title="Edit" v-if="isManager()||isOwner(item)">
                                                     <Icon type="ios-create" color="gray" :size="20" style="cursor:pointer" @click="editOneTask(index,taskDoing)" ></Icon>
                                                 </span>
-                                                <span v-if="isManager()" style="margin-left:5px;margin-right:3px;cursor: pointer;color:gray;" title="Delete" @click="taskRemoveAssure(index,taskDoing)">
+                                                <span v-if="isManager()||isOwner(item)" style="margin-left:5px;margin-right:3px;cursor: pointer;color:gray;" title="Delete" @click="taskRemoveAssure(index,taskDoing)">
                                                     <Icon type="ios-trash" :size="20" color="gray" ></Icon>
                                                 </span>
                                             </div>
@@ -143,11 +143,11 @@
                                                 <strong style="color:#57a3f3" class="taskName" :title="item.taskName">{{item.taskName}}</strong>
                                             </span>
                                             <div style="float:right">
-                                                <Rate :disabled="!isManager()" v-model="item.importance" :count="1" clearable title="Importance" @on-change="changeImportance(item)" ></Rate>
-                                                <span title="Edit" v-if="isManager()">
+                                                <Rate :disabled="!(isManager()||isOwner(item))" v-model="item.importance" :count="1" clearable title="Importance" @on-change="changeImportance(item)" ></Rate>
+                                                <span title="Edit" v-if="isManager()||isOwner(item)">
                                                     <Icon type="ios-create" color="gray" :size="20" style="cursor:pointer" @click="editOneTask(index,taskDone)"></Icon>
                                                 </span>
-                                                <span v-if="isManager()" style="margin-left:5px;margin-right:3px;cursor: pointer;color:gray;" title="Delete" @click="taskRemoveAssure(index,taskDone)">
+                                                <span v-if="isManager()||isOwner(item)" style="margin-left:5px;margin-right:3px;cursor: pointer;color:gray;" title="Delete" @click="taskRemoveAssure(index,taskDone)">
                                                     <Icon type="ios-trash" :size="20" color="gray"></Icon>
                                                 </span>
                                             </div>
@@ -878,6 +878,14 @@
                     return true;
                 }
                 else {
+                    return false;
+                }
+            },
+            isOwner(task){
+                if(task.creatorId==this.$store.getters.userId){
+                    return true;
+                }
+                else{
                     return false;
                 }
             },
