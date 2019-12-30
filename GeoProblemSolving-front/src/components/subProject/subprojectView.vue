@@ -13,7 +13,7 @@
           <div style="text-align:center; width:40%; float:left">
             <img src="../../../src/assets/images/info.png" />
           </div>
-          <div style="width:60%; float:left">
+          <div style="width:60%; float:left; min-height: 85px">
             <ul>
               <li>The description of this subproject</li>
               <li>The background of this subproject</li>
@@ -36,7 +36,7 @@
           <div style="text-align:center; width:40%; float:left">
             <img src="../../../src/assets/images/data.png" />
           </div>
-          <div style="width:60%; float:left">
+          <div style="width:60%; float:left; min-height: 85px">
             <ul>
               <li>Collect different types of resources</li>
               <li>Support context understanding</li>
@@ -59,7 +59,7 @@
           <div style="text-align:center; width:40%; float:left">
             <img src="../../../src/assets/images/steps.jpg" />
           </div>
-          <div style="width:60%; float:left">
+          <div style="width:60%; float:left; min-height: 85px">
             <ul>
               <li>Node-presented steps</li>
               <li>Create, select and delete steps</li>
@@ -81,7 +81,7 @@
           <div style="text-align:center; width:40%; float:left">
             <img src="../../../src/assets/images/tasks.png" />
           </div>
-          <div style="width:60%; float:left">
+          <div style="width:60%; float:left; min-height: 85px">
             <ul>
               <li>Task schedule</li>
               <li>"To do" list: tasks that need to be done</li>
