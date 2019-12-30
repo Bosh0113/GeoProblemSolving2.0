@@ -64,7 +64,6 @@
                     class="createTaskBtn"
                     style="margin-top:-8px"
                     @click="createTaskModalShow()"
-                    v-show="isManager()"
                   >Add</Button>
                   <vue-scroll :ops="ops" :style="{height:contentHeight-80+'px'}">
                     <draggable
@@ -98,14 +97,14 @@
                           </span>
                           <div style="float:right">
                             <Rate
-                              :disabled = "!isManager()"
+                              :disabled = "!(isManager()||isOwner(item))"
                               v-model="item.importance"
                               :count="1"
                               clearable
                               title="Importance"
                               @on-change="changeImportance(item)"
                             />
-                            <span title="Edit" v-if="isManager()">
+                            <span title="Edit" v-if="isManager()||isOwner(item)">
                               <Icon
                                 type="ios-create"
                                 color="gray"
@@ -114,7 +113,7 @@
                                 @click="editOneTask(index, taskTodo)"
                               />
                             </span>
-                            <span  v-if="isManager()"
+                            <span  v-if="isManager()||isOwner(item)"
                               style="margin-left:5px;margin-right:3px;cursor: pointer;color:gray;"
                               title="Delete"
                               @click="taskRemoveAssure(index,taskTodo)"
@@ -127,7 +126,7 @@
                             @click="showTask(index, taskTodo)"
                           >{{item.description}}</p>
                           <div style="display:flex;justify-content:flex-end">
-                            <Tag color="default" style="cursor:default">{{item.creatorName}}</Tag>
+                            <Tag color="default" style="cursor:default" title="Creator">{{item.creatorName}}</Tag>
                           </div>
                         </div>
                       </Card>
@@ -170,14 +169,14 @@
                           </span>
                           <div style="float:right" v-show="userRole != 'Visitor'">
                             <Rate
-                              :disabled = "!isManager()"
+                              :disabled = "!(isManager()||isOwner(item))"
                               v-model="item.importance"
                               :count="1"
                               clearable
                               title="Importance"
                               @on-change="changeImportance(item)"
                             />
-                            <span title="Edit" v-if="isManager()">
+                            <span title="Edit" v-if="isManager()||isOwner(item)">
                               <Icon
                                 type="ios-create"
                                 color="gray"
@@ -186,7 +185,7 @@
                                 @click="editOneTask(index,taskDoing)"
                               />
                             </span>
-                            <span v-if="isManager()"
+                            <span v-if="isManager()||isOwner(item)"
                               style="margin-left:5px;margin-right:3px;cursor: pointer;color:gray;"
                               title="Delete"
                               @click="taskRemoveAssure(index,taskDoing)"
@@ -200,7 +199,7 @@
                           @click="showTask(index,taskDoing)"
                         >{{item.description}}</p>
                         <div style="display:flex;justify-content:flex-end">
-                          <Tag color="default" style="cursor:default">{{item.managerName}}</Tag>
+                          <Tag color="default" style="cursor:default" title="Executor">{{item.managerName}}</Tag>
                         </div>
                       </Card>
                     </draggable>
@@ -242,14 +241,14 @@
                           </span>
                           <div style="float:right" v-show="userRole != 'Visitor'">
                             <Rate
-                              :disabled = "!isManager()"
+                              :disabled = "!(isManager()||isOwner(item))"
                               v-model="item.importance"
                               :count="1"
                               clearable
                               title="Importance"
                               @on-change="changeImportance(item)"
                             />
-                            <span title="Edit" v-if="isManager()">
+                            <span title="Edit" v-if="isManager()||isOwner(item)">
                               <Icon
                                 type="ios-create"
                                 color="gray"
@@ -258,7 +257,7 @@
                                 @click="editOneTask(index,taskDone)"
                               />
                             </span>
-                            <span v-if="isManager()"
+                            <span v-if="isManager()||isOwner(item)"
                               style="margin-left:5px;margin-right:3px;cursor: pointer;color:gray;"
                               title="Delete"
                               @click="taskRemoveAssure(index,taskDone)"
@@ -271,7 +270,7 @@
                             @click="showTask(index,taskDone)"
                           >{{item.description}}</p>
                           <div style="display:flex;justify-content:flex-end">
-                            <Tag color="default" style="cursor:default">{{item.managerName}}</Tag>
+                            <Tag color="default" style="cursor:default" title="Executor">{{item.managerName}}</Tag>
                           </div>
                         </div>
                       </Card>
@@ -677,7 +676,7 @@ export default {
             this.$store.commit("userLogout");
             this.$router.push({ name: "Login" });
           } else if (res.data != "None" && res.data != "Fail") {
-            this.$Message.info("Fail!");
+            this.$Message.info("Changed the importance of one task.");
           } else {
             this.$Message.error("Fail!");
           }
@@ -954,12 +953,20 @@ export default {
         });
     },
     isManager(){
-      // if(this.userRole=='Manager'||this.userRole=='PManager'){
+      if(this.userRole=='Manager'||this.userRole=='PManager'){
         return true;
-      // }
-      // else{
-      //   return false;
-      // }
+      }
+      else{
+        return false;
+      }
+    },
+    isOwner(task){
+      if(task.creatorId==this.$store.getters.userId){
+        return true;
+      }
+      else{
+        return false;
+      }
     },
     taskItemDraggable(){
       // if(this.userRole=='Manager'||this.userRole=='PManager'||this.userRole=='Member'){
@@ -1035,13 +1042,6 @@ export default {
 
       this.initGantt();
     }
-    // gotoPersonalSpace(id) {
-    //   if (id == this.$store.getters.userId) {
-    //     this.$router.push({ name: "PersonalPage" });
-    //   } else {
-    //     this.$router.push({ name: "MemberDetailPage", params: { id: id } });
-    //   }
-    // }
   }
 };
 </script>

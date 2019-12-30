@@ -10,15 +10,16 @@
     <meta name="description" th:attr="content=${projectInfo.description}">
     <meta name="keywords" th:attr="content=${projectInfo.tag}">
     <meta name="author" content="OpenGMS">
-    <script src="https://unpkg.com/jquery@3.4.1/dist/jquery.js"></script>
-    <script src="https://unpkg.com/vue@2.6.10/dist/vue.min.js"></script>
-    <link href="https://unpkg.com/iview@3.4.2/dist/styles/iview.css" rel="stylesheet">
-    <script src="https://unpkg.com/iview@3.4.2/dist/iview.js"></script>
-    <script src="https://unpkg.com/vue-avatar@2.1.7/dist/vue-avatar.min.js"></script>
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-    <script src="https://unpkg.com/vuescroll"></script>
-    <script src="https://unpkg.com/sortablejs@1.8.4/Sortable.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Vue.Draggable/2.20.0/vuedraggable.umd.min.js"></script>
+    <script src="/GeoProblemSolving/js/jquery.js"></script>
+    <script src="/GeoProblemSolving/js/vue.min.js"></script>
+    <link href="/GeoProblemSolving/css/iview.css" rel="stylesheet">
+    <script src="/GeoProblemSolving/js/iview.js"></script>
+    <script src="/GeoProblemSolving/js/vue-avatar.min.js"></script>
+    <script src="/GeoProblemSolving/js/axios.min.js"></script>
+    <link href="/GeoProblemSolving/css/vuescroll.css" rel="stylesheet">
+    <script src="/GeoProblemSolving/js/vuescroll.js"></script>
+    <script src="/GeoProblemSolving/js/Sortable.min.js"></script>
+    <script src="/GeoProblemSolving/js/vuedraggable.umd.min.js"></script>
     <script th:replace="navigation::commonHeader-css"></script>
     <script th:replace="navigation::commonHeader-html"></script>
     <script th:replace="navigation::commonHeader-js"></script>
@@ -222,7 +223,7 @@
 
 <body>
 <div id="projectDetailPage" v-cloak>
-    <child-navigation ref="navigationEl" active-type="projects"></child-navigation>
+    <child-navigation ref="navigationEl" active-type="projects" :user-info="userInfo"></child-navigation>
     <template>
         <div :style="{height: contentPageCSS}" style="margin-top: 60px;">
             <div span="2" style="height: inherit;width: 90px;position: absolute;">
@@ -266,9 +267,9 @@
                                     <div style="margin:20px">
                                         <Card style="width:100%;height:10%">
                                             <div style="text-align:center; width:40%; float:left">
-                                                <img src="/GeoProblemSolving/static/Images/info.png"/>
+                                                <img src="/GeoProblemSolving/Images/info.png"/>
                                             </div>
-                                            <div style="width:60%; float:left">
+                                            <div style="width:60%; float:left; min-height: 85px">
                                                 <ul>
                                                     <li>The description of this project</li>
                                                     <li>The introduction of this project</li>
@@ -289,9 +290,9 @@
                                     <div style="margin:20px">
                                         <Card style="width:100%">
                                             <div style="text-align:center; width:40%; float:left">
-                                                <img src="/GeoProblemSolving/static/Images/tasks.png"/>
+                                                <img src="/GeoProblemSolving/Images/tasks.png"/>
                                             </div>
-                                            <div style="width:60%; float:left">
+                                            <div style="width:60%; float:left; min-height: 85px">
                                                 <ul>
                                                     <li>"To do" list: tasks that need to be done</li>
                                                     <li>"Doing" list: tasks that are being done</li>
@@ -312,9 +313,9 @@
                                 <div style="margin:20px">
                                     <Card style="width:100%">
                                         <div style="text-align:center; width:40%; float:left">
-                                            <img src="/GeoProblemSolving/static/Images/steps.jpg"/>
+                                            <img src="/GeoProblemSolving/Images/steps.jpg"/>
                                         </div>
-                                        <div style="width:60%; float:left">
+                                        <div style="width:60%; float:left; min-height: 85px">
                                             <ul>
                                                 <li>Create a subproject with iterative step</li>
                                                 <li>Create a step directly</li>
@@ -334,9 +335,9 @@
                                     <div style="margin:20px">
                                         <Card style="width:100%">
                                             <div style="text-align:center; width:40%; float:left">
-                                                <img src="/GeoProblemSolving/static/Images/data.png"/>
+                                                <img src="/GeoProblemSolving/Images/data.png"/>
                                             </div>
-                                            <div style="width:60%; float:left">
+                                            <div style="width:60%; float:left; min-height: 85px">
                                                 <ul>
                                                     <li>Collect different types of resources</li>
                                                     <li>Support context understanding</li>
@@ -353,9 +354,11 @@
                                         </Card>
                                     </div>
                                 </i-col>
-                                <i-col span="14" offset="6">
-                                    <span style="margin:25px 0; font-size:24px">Project</span>
-                                    <span style="margin: 0px 10px; font-size: 14px;"> is created for dealing with geo-problems in a participatory manner. </span>
+                                <i-col span="24">
+                                    <div style="text-align: center">
+                                        <span style="margin:25px 0; font-size:24px">Project</span>
+                                        <span style="margin: 0px 10px; font-size: 14px;"> is created for dealing with geo-problems in a participatory manner. </span>
+                                    </div>
                                 </i-col>
                             </Row>
                         </Card>
@@ -982,6 +985,29 @@
                 'avatar': VueAvatar.Avatar
             },
             created() {
+                var userInfo = {
+                    userState: false,
+                    userName: 'visitor',
+                    userId: '',
+                    avatar: ''
+                };
+                sessionStorage.setItem('userInfo', JSON.stringify(userInfo));
+                $.ajax({
+                    url: "/GeoProblemSolving/user/state",
+                    type: "POST",
+                    async: false,
+                    success: data=> {
+                        if (data) {
+                            data.userState = true;
+                            sessionStorage.setItem('userInfo', JSON.stringify(data));
+                        } else {
+                            console.log("Not logged in");
+                        }
+                    },
+                    error: function (err) {
+                        console.log("Get user info fail.");
+                    }
+                });
                 this.userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
                 if (this.userInfo == null || !this.userInfo.userState) {
                     window.location.href = '/GeoProblemSolving/login';

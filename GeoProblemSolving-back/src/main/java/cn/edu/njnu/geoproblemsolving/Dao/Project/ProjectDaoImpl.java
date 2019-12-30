@@ -504,21 +504,27 @@ public class ProjectDaoImpl implements IProjectDao {
                 if(category.equals("All")) {
                     query = new Query(new Criteria().orOperator(criteriaDiscoverable,criteriaPublic,criteriaManager));
                 }else {
-                    query = new Query(Criteria.where("category").is(category).orOperator(criteriaDiscoverable,criteriaPublic,criteriaManager));
+                    query = new Query(new Criteria().andOperator(Criteria.where("category").is(category),new Criteria().orOperator(criteriaDiscoverable,criteriaPublic,criteriaManager)));
                 }
             }
             else {
                 if(category.equals("All")) {
                     query = new Query(new Criteria().orOperator(criteriaDiscoverable,criteriaPublic));
                 }else {
-                    query = new Query(Criteria.where("category").is(category).orOperator(criteriaDiscoverable,criteriaPublic));
+                    query = new Query(new Criteria().andOperator(Criteria.where("category").is(category), new Criteria().orOperator(criteriaDiscoverable,criteriaPublic)));
                 }
             }
             long count = mongoTemplate.count(query,ProjectEntity.class);
             List<ProjectEntity> projectEntities=mongoTemplate.find(query,ProjectEntity.class);
 
             // 添加参与的私有项目
-            Criteria criteriaPrivate = Criteria.where("privacy").is("Private");
+            Criteria criteriaPrivate = new Criteria();
+            if(category.equals("All")){
+                criteriaPrivate = Criteria.where("privacy").is("Private");
+            }
+            else {
+                criteriaPrivate = new Criteria().andOperator(Criteria.where("privacy").is("Private"), Criteria.where("category").is(category));
+            }
             for(int i = joinedProjects.length-1 ; i >= 0; i--) {
                 Criteria criteria = Criteria.where("projectId").is(joinedProjects[i]);
                 query = new Query(new Criteria().andOperator(criteriaPrivate,criteria));

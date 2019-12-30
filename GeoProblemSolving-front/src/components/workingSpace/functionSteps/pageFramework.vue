@@ -27,7 +27,7 @@
         <BreadcrumbItem>Work space</BreadcrumbItem>
       </Breadcrumb>
       <h1 id="stepType">{{stepInfo.type}}</h1>
-      <step-change style="float:right" :step-info="stepInfo" :subproject-info="subProjectInfo"></step-change>
+      <step-change style="float:right" :step-info="stepInfo" :solving-process="subProjectInfo.solvingProcess" scope="subProject"></step-change>
     </div>
     <Divider style="margin:10px 0 3px 0" />
     <div style="display:flex;background-color: #f8f8f9;padding:5px;">

@@ -1027,17 +1027,7 @@ export default {
   mounted() {
     this.resizeContent();
     this.getPublicTools();
-    var that = this;
-    var timer = window.setInterval(function() {
-      if (
-        !that.publicTools.length < 1 &&
-        (!that.personalTools.length < 1 || !that.userInfo.userState)
-      ) {
-        that.filterShowListByType();
-        window.clearInterval(timer);
-      }
-    }, 10);
-    if (this.userInfo.userState) {
+    if(this.userInfo.userState){
       this.getPersonalToolsets();
       this.getPersonalTools();
     } else {
@@ -1282,6 +1272,7 @@ export default {
             // this.$Notice.error({ desc: "There is no existing toolset" });
           } else {
             this.$set(this, "toolsetList", res.data.reverse());
+            this.filterShowListByType();
           }
         })
         .catch(err => {
@@ -1307,6 +1298,7 @@ export default {
             // this.$Notice.error({ desc: "There is no existing toolset" });
           } else {
             this.$set(this, "toolsetList", res.data.reverse());
+            this.filterShowListByType();
           }
         })
         .catch(err => {
@@ -1332,6 +1324,7 @@ export default {
             // this.$Notice.error({ desc: "There is no existing tool" });
           } else {
             this.$set(this, "publicTools", res.data);
+            this.filterShowListByType();
           }
         })
         .catch(err => {
@@ -1355,6 +1348,7 @@ export default {
             // this.$Notice.error({ desc: "There is no existing tool" });
           } else {
             this.$set(this, "personalTools", res.data);
+            this.filterShowListByType();
           }
         })
         .catch(err => {

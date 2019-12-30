@@ -78,7 +78,7 @@
     >
       <p>Do you really want to delete this step?</p>
     </Modal>
-    <Modal width="800px" v-model="createStepModal" title="Create a new step">
+    <Modal width="800px" v-model="createStepModal" title="Create a new step" :styles="{top: '20px'}">
       <Carousel
         v-if="createStepModal"
         v-model="stepValue"
@@ -263,46 +263,84 @@ export default {
     cancel() {},
     // 进入具体的step页面
     enterStep(type, stepId) {
-      if (type == 0) {
-        this.$router.push({
-          name: "contextDefinition",
-          params: { stepId: stepId }
-        });
-      } else if (type == 1) {
-        this.$router.push({
-          name: "dataProcessing",
-          params: { stepId: stepId }
-        });
-      } else if (type == 2) {
-        this.$router.push({
-          name: "modelProcess",
-          params: { stepId: stepId }
-        });
-      } else if (type == 3) {
-        this.$router.push({
-          name: "modelEvaluation",
-          params: { stepId: stepId }
-        });
-      } else if (type == 4) {
-        this.$router.push({
-          name: "analysis",
-          params: { stepId: stepId }
-        });
-      } else if (type == 5) {
-        this.$router.push({
-          name: "simulation",
-          params: { stepId: stepId }
-        });
-      } else if (type == 6) {
-        this.$router.push({
-          name: "visualization",
-          params: { stepId: stepId }
-        });
-      } else if (type == 7) {
-        this.$router.push({
-          name: "decisionMaking",
-          params: { stepId: stepId }
-        });
+      if (this.scopeInfo.subProjectId != undefined) {
+        if (type == 0) {
+          this.$router.push({
+            name: "contextDefinition",
+            params: { stepId: stepId }
+          });
+        } else if (type == 1) {
+          this.$router.push({
+            name: "dataProcessing",
+            params: { stepId: stepId }
+          });
+        } else if (type == 2) {
+          this.$router.push({
+            name: "modelProcess",
+            params: { stepId: stepId }
+          });
+        } else if (type == 3) {
+          this.$router.push({
+            name: "modelEvaluation",
+            params: { stepId: stepId }
+          });
+        } else if (type == 4) {
+          this.$router.push({
+            name: "analysis",
+            params: { stepId: stepId }
+          });
+        } else if (type == 5) {
+          this.$router.push({
+            name: "simulation",
+            params: { stepId: stepId }
+          });
+        } else if (type == 6) {
+          this.$router.push({
+            name: "visualization",
+            params: { stepId: stepId }
+          });
+        } else if (type == 7) {
+          this.$router.push({
+            name: "decisionMaking",
+            params: { stepId: stepId }
+          });
+        }
+      }
+      else{
+        switch(type){
+          case 0:{
+            parent.location.href = "/GeoProblemSolving/workspaceP/"+stepId+"/contextDefinition";
+            break;
+          }
+          case 1:{
+            parent.location.href = "/GeoProblemSolving/workspaceP/"+stepId+"/dataProcessing";
+            break;
+          }
+          case 2:{
+            parent.location.href = "/GeoProblemSolving/workspaceP/"+stepId+"/modelProcess";
+            break;
+          }
+          case 3:{
+            parent.location.href = "/GeoProblemSolving/workspaceP/"+stepId+"/modelEvaluation";
+            break;
+          }
+          case 4:{
+            parent.location.href = "/GeoProblemSolving/workspaceP/"+stepId+"/analysis";
+            break;
+          }
+          case 5:{
+            parent.location.href = "/GeoProblemSolving/workspaceP/"+stepId+"/simulation";
+            break;
+          }
+          case 6:{
+            parent.location.href = "/GeoProblemSolving/workspaceP/"+stepId+"/visualization";
+            break;
+          }
+          case 7:{
+            parent.location.href = "/GeoProblemSolving/workspaceP/"+stepId+"/decisionMaking";
+            break;
+          }
+        }
       }
     },
     getProcessSteps() {
@@ -722,8 +760,13 @@ export default {
       Step["name"] = this.formValidate1.stepTitle;
       Step["type"] = this.formValidate1.stepType;
       Step["description"] = this.formValidate1.result;
-      Step["projectId"] = "";
-      Step["subProjectId"] = this.scopeId;
+      if (this.scopeType == "project") {
+        Step["projectId"] = this.scopeId;
+        Step["subProjectId"] = "";
+      } else {
+        Step["projectId"] = "";
+        Step["subProjectId"] = this.scopeId;
+      }
       Step["creator"] = this.$store.getters.userId;
       Step["toolList"] = this.selectStepTools;
       Step["toolsetList"] = this.selectStepToolsets;
@@ -1200,6 +1243,7 @@ export default {
           } else if (res.data != "Fail") {
             if (this.scopeType == "project") {
               this.$store.commit("setProjectInfo", res.data);
+              parent.projectIngo = res.data;
               this.$Notice.info({
                 desc: "Project update successfully!"
               });
