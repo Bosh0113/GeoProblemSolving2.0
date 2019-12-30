@@ -105,4 +105,16 @@ public class ModelItemService {
         JSONObject result = jsonObjectResponseEntity.getBody().getJSONObject("data");
         return result;
     }
+
+    public JSONArray getModelItems() {
+        RestTemplate restTemplate = new RestTemplate();
+        String urlStr = "http://" + sunlingzhiIp  + ":8082" + "/modelitem/all" ;
+
+        ResponseEntity<JSONObject> jsonObjectResponseEntity = restTemplate.getForEntity(urlStr, JSONObject.class);
+        if (!jsonObjectResponseEntity.getStatusCode().is2xxSuccessful()) {
+            throw new MyException(ResultEnum.ERROR);
+        }
+        JSONArray result = jsonObjectResponseEntity.getBody().getJSONArray("data");
+        return result;
+    }
 }

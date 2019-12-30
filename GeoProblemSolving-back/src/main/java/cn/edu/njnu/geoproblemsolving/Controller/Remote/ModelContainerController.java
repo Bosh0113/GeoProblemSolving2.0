@@ -25,6 +25,11 @@ public class ModelContainerController {
         return ResultUtils.success(modelItemService.getModelItem(id));
     }
 
+    @RequestMapping(value = "/getModelItems",method = RequestMethod.GET)
+    public JsonResult getModelItems() {
+        return ResultUtils.success(modelItemService.getModelItems());
+    }
+
     @RequestMapping(value = "/getModelInstance/{id}",method = RequestMethod.GET)
     public JsonResult getModelInstance(@PathVariable("id") String id) {
         return ResultUtils.success(modelItemService.getModelInstance(id));

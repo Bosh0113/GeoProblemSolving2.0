@@ -384,14 +384,14 @@
 </style>
 <template>
   <Row>
-    <Col span="24">
+    <!-- <Col span="24"> -->
       <div class="chatPanel" :style="{height:panelHeight+'px',width:panelWidth+'px'}">
         <div class="memberPanel">
           <div class="panelHeader">
             <h4>Groups</h4>
           </div>
           <!-- 选择聊天室 -->
-          <Select v-model="selectItem" style="width:195px;margin-left:2.5px;margin-right:2.5px">
+          <Select v-model="selectItem">
             <Option
               v-for="(item,index) in itemList"
               :value="item.value"
@@ -589,7 +589,7 @@
           </div>
         </div>
       </div>
-    </Col>
+    <!-- </Col> -->
   </Row>
 </template>
 <script>
@@ -676,31 +676,31 @@ export default {
     this.supportNotify();
 
     //修改时间格式使其统一
-      Date.prototype.Format = function(fmt) {
-        var o = {
-          "M+": this.getMonth() + 1, //月份
-          "d+": this.getDate(), //日
-          "H+": this.getHours(), //小时
-          "m+": this.getMinutes(), //分
-          "s+": this.getSeconds(), //秒
-          "q+": Math.floor((this.getMonth() + 3) / 3), //季度
-          "S+": this.getMilliseconds() //毫毛
-        };
-        if (/(y+)/.test(fmt))
+    Date.prototype.Format = function(fmt) {
+      var o = {
+        "M+": this.getMonth() + 1, //月份
+        "d+": this.getDate(), //日
+        "H+": this.getHours(), //小时
+        "m+": this.getMinutes(), //分
+        "s+": this.getSeconds(), //秒
+        "q+": Math.floor((this.getMonth() + 3) / 3), //季度
+        "S+": this.getMilliseconds() //毫毛
+      };
+      if (/(y+)/.test(fmt))
+        fmt = fmt.replace(
+          RegExp.$1,
+          (this.getFullYear() + "").substr(4 - RegExp.$1.length)
+        );
+      for (var k in o)
+        if (new RegExp("(" + k + ")").test(fmt))
           fmt = fmt.replace(
             RegExp.$1,
-            (this.getFullYear() + "").substr(4 - RegExp.$1.length)
+            RegExp.$1.length == 1
+              ? o[k]
+              : ("00" + o[k]).substr(("" + o[k]).length)
           );
-        for (var k in o)
-          if (new RegExp("(" + k + ")").test(fmt))
-            fmt = fmt.replace(
-              RegExp.$1,
-              RegExp.$1.length == 1
-                ? o[k]
-                : ("00" + o[k]).substr(("" + o[k]).length)
-            );
-        return fmt;
-      };
+      return fmt;
+    };
   },
 
   methods: {
@@ -947,7 +947,7 @@ export default {
       }
     },
 
-    send(msg) {      
+    send(msg) {
       this.message = msg;
       let myDate = new Date().Format("yyyy-MM-dd HH:mm:ss");
       let current_time = myDate.toLocaleString(); //获取日期与时间
@@ -1026,12 +1026,12 @@ export default {
       if (window.innerHeight > 675) {
         this.panelHeight = window.innerHeight;
       } else {
-        this.panelHeight = 675;
+        this.panelHeight = window.innerHeight;
       }
       if (window.innerWidth > 1200) {
         this.panelWidth = window.innerWidth;
       } else {
-        this.panelWidth = 1200;
+        this.panelWidth = window.innerWidth;
       }
       this.messageListPanelHeight = this.panelHeight - 144 - 40 + "px";
     },

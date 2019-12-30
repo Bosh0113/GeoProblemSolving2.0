@@ -77,9 +77,12 @@ const routes = [{
 { path: '/video', name: 'videoViewer', component: resolve=>(require(["@/components/utils/videoViewer"],resolve)) },
 { path: '/preview', name: 'pdfViewer', component: resolve=>(require(["@/components/utils/filePreview"],resolve)) },
 { path: '/tinymce', name: 'tinymce', component: resolve=>(require(["@/components/utils/singleUtils/tinymce"],resolve)) },
-{ path: '/modelInstance', name: 'Model', component: resolve => (require(["@/components/model/Model"], resolve)) },
+{ path: '/modelItem', name: 'Model', component: resolve => (require(["@/components/model/Model"], resolve)) },
 { path: '/modelRecords', name: 'ModelRecords', component: resolve => (require(["@/components/model/ModelRecords"], resolve)) },
 { path: '/modelPost', name: 'ModelRecords', component: resolve => (require(["@/components/model/ModalPost"], resolve)) },
+{ path: '/toolmodel', name: 'toolTemplate', component: resolve => (require(["@/components/model/toolTemplate/ToolFromModel"], resolve)) },
+{ path: '/toolTemplate', name: 'toolTemplate', component: resolve => (require(["@/components/model/toolTemplate/ToolTemplate"], resolve)) },
+{ path: '/toolTemplate/modelList', name: 'toolTemplate', component: resolve => (require(["@/components/model/ModelList"], resolve)) },
 ]
 export default new Router({
   routes,

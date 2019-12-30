@@ -1,0 +1,168 @@
+<style scoped>
+.inline_style {
+  display: flex;
+}
+/* 上传图片 */
+.demo-upload-list {
+  display: inline-block;
+  width: 60px;
+  height: 60px;
+  text-align: center;
+  line-height: 60px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  /* overflow-x: hidden; */
+  /* overflow-y: scroll; */
+  background: #fff;
+  position: relative;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+  margin-right: 4px;
+}
+.demo-upload-list img {
+  width: 100%;
+  height: 100%;
+}
+.demo-upload-list-cover {
+  display: none;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.6);
+}
+.demo-upload-list:hover .demo-upload-list-cover {
+  display: block;
+}
+.demo-upload-list-cover i {
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+  margin: 0 2px;
+}
+.uploadAvatar {
+  position: relative;
+  width: 58px;
+  height: 58px;
+  top: 0;
+  left: 0;
+  outline: none;
+  background-color: transparent;
+  opacity: 0;
+}
+.uploadBox {
+  display: inline-block;
+  width: 58px;
+  height: 58px;
+  line-height: 58px;
+  border-width: 0.75px;
+  border-style: dashed;
+  border-color: lightslategray;
+}
+</style>
+<template>
+  <div>
+    <Form ref="toolInfo" :model="toolInfo" :label-width="80" class="toolForm">   
+      <FormItem label="Image:" prop="toolImg" :label-width="140">
+        <div class="inline_style">
+          <div class="demo-upload-list" v-if="image!=''">
+            <template>
+              <img :src="image" />
+              <div class="demo-upload-list-cover">
+                <Icon type="ios-eye-outline" @click.native="handleView()"></Icon>
+                <Icon type="ios-trash-outline" @click.native="handleRemove()"></Icon>
+              </div>
+            </template>
+          </div>
+          <div class="uploadBox">
+            <Icon type="ios-camera" size="20" style="position:absolute;margin:18px;"></Icon>
+            <input
+              id="choosePicture"
+              @change="uploadPhoto($event)"
+              type="file"
+              class="uploadAvatar"
+              accept="image/*"
+            />
+          </div>
+          <br />
+          <Modal title="View Image" v-model="visible">
+            <img :src="image" v-if="visible" style="width: 100%" />
+          </Modal>
+        </div>
+      </FormItem>
+
+      <Button type="success" @click="createTool('toolInfo')" class="create">Create</Button>
+    </Form>
+  </div>
+</template>
+<script>
+export default {
+  data() {
+    return {
+      selectModelRoute: this.modelRoute,
+      selectModel: this.modelItem,
+      selectModelName: "",
+      selectModelDes: "",
+      selectModelUrl: "",
+      toolInfo: {
+        name: "",
+        description: "",
+        tool_url: "",
+        recomStep: [],
+        categoryTag: [],
+        toolImg: "",
+        privacy: "Private"
+      },
+      userId: "testUserId",
+      inputToolTag: "",
+      visible: false,
+      //表示图片
+      image: ""
+    };
+  },
+
+  methods: {
+    createTool(tool) {
+      let createToolForm = {};
+      createToolForm["toolName"] = this.modelItem.name;
+      createToolForm["toolUrl"] = this.selectModelRoute;
+      createToolForm["description"] = this.modelItem.des;
+      createToolForm["provider"] = this.userId;
+      createToolForm["privacy"] = "Private";
+    //   this.axios
+    //     .post("/GeoProblemSolving/tool/create", createToolForm)
+    //     .then(res => {
+    //       if (res.data == "Offline") {
+    //         this.$store.commit("userLogout");
+    //         this.$router.push({ name: "Login" });
+    //       } else if (res.data === "Fail") {
+    //         this.$Notice.error({ desc: "Create tool fail." });
+    //       } else if (res.data === "Duplicate naming") {
+    //         this.$Notice.error({ desc: "The name already exists." });
+    //       } else {
+    //         this.createToolModal = false;
+    //         this.$Notice.info({ desc: "Create successfully" });
+    //         this.personalTools.push(res.data);
+    //         if (this.toolInfo.privacy == "Public") {
+    //           this.publicTools.push(res.data);
+    //         }
+    //         this.filterShowListByType();
+    //       }
+    //     });
+    },
+   
+    handleView() {
+      this.visible = true;
+    },
+    handleRemove() {
+      this.image = "";
+      this.toolInfo.toolImg = "";
+    }
+  },
+  props: {
+    toolInfoDetail: {
+      type: Object
+    }
+  },
+};
+</script>
