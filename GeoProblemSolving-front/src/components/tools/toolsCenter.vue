@@ -35,26 +35,26 @@
   background-color: #808695;
   color: white;
 }
-.ellipsis{
+.ellipsis {
   display: inline-block;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   vertical-align: top;
 }
-.toolList>>>.ivu-card-head{
+.toolList >>> .ivu-card-head {
   padding: 8px 6px;
 }
-.toolList>>>.ivu-card-extra{
-  top:6px;
-  right:5px;
+.toolList >>> .ivu-card-extra {
+  top: 6px;
+  right: 5px;
 }
-.toolList>>>.ivu-card-body{
+.toolList >>> .ivu-card-body {
   padding: 5px;
 }
 .toolDescription {
   overflow: hidden;
-  text-overflow:ellipsis;
+  text-overflow: ellipsis;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
@@ -130,109 +130,218 @@
       <div>
         <Row>
           <Col span="16">
-          <div span="2" style="height: inherit;width: 90px;position: absolute;" :style="{height: contentHeight-93+'px'}">
-            <Menu
-              active-name="publicTools"
-              @on-select="changeMenuItem"
-              style="height: inherit;width: fit-content;z-index:1"
+            <div
+              span="2"
+              style="height: inherit;width: 90px;position: absolute;"
+              :style="{height: contentHeight-93+'px'}"
             >
-              <MenuItem name="publicTools" class="leftMenuItem">
-                <Tooltip content="Public tools" placement="right">
-                <Icon type="logo-dropbox" size="35"></Icon>
-                </Tooltip>
-              </MenuItem>
-              <MenuItem name="personalTools" class="leftMenuItem" v-show="userInfo.userState">
-                <Tooltip content="Personal tools" placement="right">
-                <Icon type="ios-cube" size="35"></Icon>
-                </Tooltip>
-              </MenuItem>
-            </Menu>
-          </div>
-            <Card dis-hover style="margin-left: 80px">
-              <h1 slot="title" style="padding-top:5px;color: #2d8cf099" v-if="showMenuItem=='publicTools'">Public tools</h1>
-              <h1 slot="title" style="padding-top:5px;color: #2d8cf099" v-if="showMenuItem=='personalTools'">Personal tools</h1>
-            <div slot="extra">
-              <Select
-                v-model="typeSelected"
-                @on-change="filterShowListByType"
-                style="width:160px"
+              <Menu
+                active-name="publicTools"
+                @on-select="changeMenuItem"
+                style="height: inherit;width: fit-content;z-index:1"
               >
-                <Option v-for="item in typeOptions" :key="item.index" :value="item">{{ item }}</Option>
-              </Select>
-              <Button class="btnHoverGreen" shape="circle" icon="ios-add-circle-outline" @click="createToolModalShow()" v-show="userInfo.userState">Create tool</Button>
+                <MenuItem name="publicTools" class="leftMenuItem">
+                  <Tooltip content="Public tools" placement="right">
+                    <Icon type="logo-dropbox" size="35"></Icon>
+                  </Tooltip>
+                </MenuItem>
+                <MenuItem name="personalTools" class="leftMenuItem" v-show="userInfo.userState">
+                  <Tooltip content="Personal tools" placement="right">
+                    <Icon type="ios-cube" size="35"></Icon>
+                  </Tooltip>
+                </MenuItem>
+              </Menu>
             </div>
-              <div v-if="showMenuItem=='publicTools'" style="height: inherit;min-height: fit-content;" :style="{height: contentHeight-187+'px'}" class="toolList">
+            <Card dis-hover style="margin-left: 80px">
+              <h1
+                slot="title"
+                style="padding-top:5px;color: #2d8cf099"
+                v-if="showMenuItem=='publicTools'"
+              >Public tools</h1>
+              <h1
+                slot="title"
+                style="padding-top:5px;color: #2d8cf099"
+                v-if="showMenuItem=='personalTools'"
+              >Personal tools</h1>
+              <div slot="extra">
+                <Select
+                  v-model="typeSelected"
+                  @on-change="filterShowListByType"
+                  style="width:160px"
+                >
+                  <Option v-for="item in typeOptions" :key="item.index" :value="item">{{ item }}</Option>
+                </Select>
+                <Button
+                  class="btnHoverGreen"
+                  shape="circle"
+                  icon="ios-add-circle-outline"
+                  @click="createToolModalShow()"
+                  v-show="userInfo.userState"
+                >Create tool</Button>
+              </div>
+              <div
+                v-if="showMenuItem=='publicTools'"
+                style="height: inherit;min-height: fit-content;"
+                :style="{height: contentHeight-187+'px'}"
+                class="toolList"
+              >
                 <vue-scroll :ops="ops">
-                <Row>
-                <Col span="8" v-for="tool in publicToolShow" :key="tool.index">
-                  <div style="margin:0 5px 15px 5px">
-                    <Card style="background-color: ghostwhite;">
-                      <p slot="title" class="ellipsis" style="width:75%;display:inline-block;" :title="tool.toolName">{{tool.toolName}}</p>
-                      <div slot="extra">
-                        <Button icon="md-eye" shape="circle" class="btnHoverGray" title="Preview" size="small" @click="showTool(tool)"></Button>
-                        <Button icon="md-share-alt" shape="circle" type="success" title="Add to toolset" size="small" @click="addToToolsetShow(tool)" v-if="userInfo.userState"></Button>
+                  <Row>
+                    <Col span="8" v-for="tool in publicToolShow" :key="tool.index">
+                      <div style="margin:0 5px 15px 5px">
+                        <Card style="background-color: ghostwhite;">
+                          <p
+                            slot="title"
+                            class="ellipsis"
+                            style="width:75%;display:inline-block;"
+                            :title="tool.toolName"
+                          >{{tool.toolName}}</p>
+                          <div slot="extra">
+                            <Button
+                              icon="md-eye"
+                              shape="circle"
+                              class="btnHoverGray"
+                              title="Preview"
+                              size="small"
+                              @click="showTool(tool)"
+                            ></Button>
+                            <Button
+                              icon="md-share-alt"
+                              shape="circle"
+                              type="success"
+                              title="Add to toolset"
+                              size="small"
+                              @click="addToToolsetShow(tool)"
+                              v-if="userInfo.userState"
+                            ></Button>
+                          </div>
+                          <div>
+                            <div style="display: inline-block;algin:left;">
+                              <img
+                                :src="tool.toolImg"
+                                v-if="tool.toolImg!=''"
+                                style="height:100%;max-height:50px;"
+                              />
+                              <avatar
+                                :username="tool.toolName"
+                                :size="50"
+                                style="margin-bottom:6px"
+                                v-else
+                              ></avatar>
+                            </div>
+                            <div
+                              style="display: inline-block;vertical-align: top;width: 70%;"
+                              class="ellipsis"
+                            >
+                              <strong :title="tool.toolName">{{tool.toolName}}</strong>
+                              <br />
+                              <span :title="tool.categoryTag.join('|')">
+                                <i>{{tool.categoryTag.join('|')}}</i>
+                              </span>
+                            </div>
+                            <div
+                              style="width:100%;height: 65px;border: 0.5px dashed #8080804d;padding: 1px 3px;"
+                            >
+                              <p
+                                class="toolDescription"
+                                :title="tool.description"
+                              >{{tool.description}}</p>
+                            </div>
+                          </div>
+                        </Card>
                       </div>
-                      <div>
-                        <div style="display: inline-block;algin:left;">
-                            <img :src="tool.toolImg" v-if="tool.toolImg!=''" style="height:100%;max-height:50px;">
-                            <avatar
-                            :username="tool.toolName"
-                            :size="50"
-                            style="margin-bottom:6px"
-                            v-else
-                          ></avatar>
-                        </div>
-                        <div style="display: inline-block;vertical-align: top;width: 70%;" class="ellipsis">
-                          <strong :title="tool.toolName">{{tool.toolName}}</strong>
-                          <br/>
-                          <span :title="tool.categoryTag.join('|')"><i>{{tool.categoryTag.join('|')}}</i></span>
-                        </div>
-                        <div style="width:100%;height: 65px;border: 0.5px dashed #8080804d;padding: 1px 3px;">
-                          <p class="toolDescription" :title="tool.description">{{tool.description}}</p>
-                        </div>
-                      </div>
-                    </Card>
-                  </div>
-                </Col>
-                </Row>
+                    </Col>
+                  </Row>
                 </vue-scroll>
               </div>
-              <div v-if="showMenuItem=='personalTools'" style="height: inherit;min-height: fit-content;" :style="{height: contentHeight-187+'px'}" class="toolList">
+              <div
+                v-if="showMenuItem=='personalTools'"
+                style="height: inherit;min-height: fit-content;"
+                :style="{height: contentHeight-187+'px'}"
+                class="toolList"
+              >
                 <vue-scroll :ops="ops">
-                <Row>
-                <Col span="8" v-for="tool in personalToolShow" :key="tool.index">
-                  <div style="margin:0 5px 15px 5px">
-                    <Card style="background-color: #faebd75c">
-                      <p slot="title" class="ellipsis" style="width:50%;display:inline-block;" :title="tool.toolName">{{tool.toolName}}</p>
-                      <div slot="extra">
-                        <Button icon="md-eye" shape="circle" class="btnHoverGray" title="Preview" size="small" @click="showTool(tool)"></Button>
-                        <Button icon="ios-create" shape="circle" class="btnHoverBlue" title="Edit" size="small" @click="editToolShow(tool)"></Button>
-                        <Button icon="md-close" shape="circle" class="btnHoverRed" title="Delete" size="small" @click="removeToolShow(tool)"></Button>
-                        <Button icon="md-share-alt" shape="circle" type="success" title="Add to toolset" size="small" @click="addToToolsetShow(tool)"></Button>
+                  <Row>
+                    <Col span="8" v-for="tool in personalToolShow" :key="tool.index">
+                      <div style="margin:0 5px 15px 5px">
+                        <Card style="background-color: #faebd75c">
+                          <p
+                            slot="title"
+                            class="ellipsis"
+                            style="width:50%;display:inline-block;"
+                            :title="tool.toolName"
+                          >{{tool.toolName}}</p>
+                          <div slot="extra">
+                            <Button
+                              icon="md-eye"
+                              shape="circle"
+                              class="btnHoverGray"
+                              title="Preview"
+                              size="small"
+                              @click="showTool(tool)"
+                            ></Button>
+                            <Button
+                              icon="ios-create"
+                              shape="circle"
+                              class="btnHoverBlue"
+                              title="Edit"
+                              size="small"
+                              @click="editToolShow(tool)"
+                            ></Button>
+                            <Button
+                              icon="md-close"
+                              shape="circle"
+                              class="btnHoverRed"
+                              title="Delete"
+                              size="small"
+                              @click="removeToolShow(tool)"
+                            ></Button>
+                            <Button
+                              icon="md-share-alt"
+                              shape="circle"
+                              type="success"
+                              title="Add to toolset"
+                              size="small"
+                              @click="addToToolsetShow(tool)"
+                            ></Button>
+                          </div>
+                          <div>
+                            <div style="display: inline-block;algin:left;">
+                              <img
+                                :src="tool.toolImg"
+                                v-if="tool.toolImg!=''"
+                                style="height:100%;max-height:50px;"
+                              />
+                              <avatar
+                                :username="tool.toolName"
+                                :size="50"
+                                style="margin-bottom:6px"
+                                v-else
+                              ></avatar>
+                            </div>
+                            <div
+                              style="display: inline-block;vertical-align: top;width: 70%;"
+                              class="ellipsis"
+                            >
+                              <strong :title="tool.toolName">{{tool.toolName}}</strong>
+                              <br />
+                              <span :title="tool.categoryTag.join('|')">
+                                <i>{{tool.categoryTag.join('|')}}</i>
+                              </span>
+                            </div>
+                            <div
+                              style="width:100%;height: 65px;border: 0.5px dashed #8080804d;padding: 1px 3px;"
+                            >
+                              <p
+                                class="toolDescription"
+                                :title="tool.description"
+                              >{{tool.description}}</p>
+                            </div>
+                          </div>
+                        </Card>
                       </div>
-                      <div>
-                        <div style="display: inline-block;algin:left;">
-                            <img :src="tool.toolImg" v-if="tool.toolImg!=''" style="height:100%;max-height:50px;">
-                            <avatar
-                            :username="tool.toolName"
-                            :size="50"
-                            style="margin-bottom:6px"
-                            v-else
-                          ></avatar>
-                        </div>
-                        <div style="display: inline-block;vertical-align: top;width: 70%;" class="ellipsis">
-                          <strong :title="tool.toolName">{{tool.toolName}}</strong>
-                          <br/>
-                          <span :title="tool.categoryTag.join('|')"><i>{{tool.categoryTag.join('|')}}</i></span>
-                        </div>
-                        <div style="width:100%;height: 65px;border: 0.5px dashed #8080804d;padding: 1px 3px;">
-                          <p class="toolDescription" :title="tool.description">{{tool.description}}</p>
-                        </div>
-                      </div>
-                    </Card>
-                  </div>
-                </Col>
-                </Row>
+                    </Col>
+                  </Row>
                 </vue-scroll>
               </div>
             </Card>
@@ -243,29 +352,43 @@
                 <h1 slot="title" style="padding-top:5px" v-if="!userInfo.userState">Public toolsets</h1>
                 <h1 slot="title" style="padding-top:5px" v-else>Toolsets</h1>
                 <div slot="extra">
-                  <Button class="btnHoverGreen" shape="circle" icon="ios-add-circle-outline" @click="createToolsetModalShow()" v-show="userInfo.userState">Create toolset</Button>
+                  <Button
+                    class="btnHoverGreen"
+                    shape="circle"
+                    icon="ios-add-circle-outline"
+                    @click="createToolsetModalShow()"
+                    v-show="userInfo.userState"
+                  >Create toolset</Button>
                 </div>
                 <div :style="{height: contentHeight-187+'px'}">
-                <vue-scroll :ops="ops">
-                  <List>
-                    <ListItem v-for="toolset in toolsetList" :key="toolset.index">
-                    <ListItemMeta 
-                      :avatar="toolset.toolsetImg" 
-                      :title="toolset.toolsetName" 
-                      :description="toolset.description"
-                      @click.native="toolsetInfoShow(toolset)"
-                      style="cursor: pointer;" />
-                    <template slot="action" v-if="userInfo.userState">
-                        <li>
+                  <vue-scroll :ops="ops">
+                    <List>
+                      <ListItem v-for="toolset in toolsetList" :key="toolset.index">
+                        <ListItemMeta
+                          :avatar="toolset.toolsetImg"
+                          :title="toolset.toolsetName"
+                          :description="toolset.description"
+                          @click.native="toolsetInfoShow(toolset)"
+                          style="cursor: pointer;"
+                        />
+                        <template slot="action" v-if="userInfo.userState">
+                          <li>
                             <a @click="editToolsetShow(toolset)">Edit</a>
-                        </li>
-                        <li>
-                            <Button icon="md-close" shape="circle" class="btnHoverRed" title="Delete" size="small" @click="removeToolsetShow(toolset)"></Button>
-                        </li>
-                    </template>
-                    </ListItem>
-                  </List>
-                </vue-scroll>
+                          </li>
+                          <li>
+                            <Button
+                              icon="md-close"
+                              shape="circle"
+                              class="btnHoverRed"
+                              title="Delete"
+                              size="small"
+                              @click="removeToolsetShow(toolset)"
+                            ></Button>
+                          </li>
+                        </template>
+                      </ListItem>
+                    </List>
+                  </vue-scroll>
                 </div>
               </Card>
             </div>
@@ -297,7 +420,11 @@
           <Input v-model="toolInfo.model_mdlId" placeholder="Enter the model mdlId of your tool"></Input>
         </FormItem>
         <FormItem label="Tool description:" prop="description" :label-width="140">
-          <Input v-model="toolInfo.description" type="textarea" placeholder="Enter description of your tool" />
+          <Input
+            v-model="toolInfo.description"
+            type="textarea"
+            placeholder="Enter description of your tool"
+          />
         </FormItem>
         <FormItem label="Tool url:" prop="tool_url" :label-width="140">
           <Input v-model="toolInfo.tool_url" placeholder="Enter the tool url of your tool"></Input>
@@ -397,7 +524,11 @@
           <Input v-model="toolsetInfo.name" placeholder="Enter the name of your toolset"></Input>
         </FormItem>
         <FormItem label="Description" prop="description" :label-width="140">
-          <Input v-model="toolsetInfo.description" type="textarea" placeholder="Enter the description of your toolset"></Input>
+          <Input
+            v-model="toolsetInfo.description"
+            type="textarea"
+            placeholder="Enter the description of your toolset"
+          ></Input>
         </FormItem>
         <FormItem label="Recommended step:" prop="recomStep" :label-width="140">
           <Select
@@ -500,13 +631,23 @@
           ></Input>
         </FormItem>
         <FormItem label="Model oid:" prop="model_oid" :label-width="140">
-          <Input v-model="selectedTool.modelInfo.oid" placeholder="Enter the model oid of your tool"></Input>
+          <Input
+            v-model="selectedTool.modelInfo.oid"
+            placeholder="Enter the model oid of your tool"
+          ></Input>
         </FormItem>
         <FormItem label="Model mdlId:" prop="model_mdlId" :label-width="140">
-          <Input v-model="selectedTool.modelInfo.mdlId" placeholder="Enter the model mdlId of your tool"></Input>
+          <Input
+            v-model="selectedTool.modelInfo.mdlId"
+            placeholder="Enter the model mdlId of your tool"
+          ></Input>
         </FormItem>
         <FormItem label="Tool description:" prop="description" :label-width="140">
-          <Input v-model="selectedTool.description" type="textarea" placeholder="Enter description of your tool" />
+          <Input
+            v-model="selectedTool.description"
+            type="textarea"
+            placeholder="Enter description of your tool"
+          />
         </FormItem>
         <FormItem label="Tool url:" prop="toolUrl" :label-width="140">
           <Input v-model="selectedTool.toolUrl" placeholder="Enter the tool url of your tool"></Input>
@@ -582,11 +723,7 @@
       </Form>
       <div slot="footer">
         <Button @click="editToolModal=false">Cancel</Button>
-        <Button
-          type="primary"
-          @click="editTool('selectedTool')"
-          class="create"
-        >Edit</Button>
+        <Button type="primary" @click="editTool('selectedTool')" class="create">Edit</Button>
       </div>
     </Modal>
     <Modal v-model="removeToolModal" title="Remove Tool" width="400">
@@ -596,11 +733,7 @@
       </div>
       <div slot="footer">
         <Button @click="removeToolModal=false">Cancel</Button>
-        <Button
-          type="error"
-          @click="removeTool()"
-          class="create"
-        >Remove</Button>
+        <Button type="error" @click="removeTool()" class="create">Remove</Button>
       </div>
     </Modal>
     <Modal v-model="removeToolsetModal" title="Remove Toolset" width="400">
@@ -610,17 +743,13 @@
       </div>
       <div slot="footer">
         <Button @click="removeToolsetModal=false">Cancel</Button>
-        <Button
-          type="error"
-          @click="removeToolset()"
-          class="create"
-        >Remove</Button>
+        <Button type="error" @click="removeToolset()" class="create">Remove</Button>
       </div>
     </Modal>
     <Modal v-model="addToToolsetModal" title="Add tool to toolsets" width="600">
       <div>
         <div style="display: inline-block;">
-          <h3>Category of the toolsets: </h3>
+          <h3>Category of the toolsets:</h3>
         </div>
         <Select
           v-model="ToolsetTypeSelected"
@@ -635,32 +764,36 @@
           <CheckboxGroup v-model="addToToolsets">
             <List>
               <ListItem v-for="toolset in modalShowToolsets" :key="toolset.index">
-              <ListItemMeta 
-                :avatar="toolset.toolsetImg" 
-                :title="toolset.toolsetName" 
-                :description="toolset.description"
-                @click.native="toolsetInfoShow(toolset)"
-                style="cursor: pointer;" />
-              <template slot="action">
+                <ListItemMeta
+                  :avatar="toolset.toolsetImg"
+                  :title="toolset.toolsetName"
+                  :description="toolset.description"
+                  @click.native="toolsetInfoShow(toolset)"
+                  style="cursor: pointer;"
+                />
+                <template slot="action">
                   <li>
-                      <Checkbox :label="toolset.toolsetName" :disabled="checkBoxDisabled(toolset)">Add</Checkbox>
+                    <Checkbox :label="toolset.toolsetName" :disabled="checkBoxDisabled(toolset)">Add</Checkbox>
                   </li>
-              </template>
+                </template>
               </ListItem>
             </List>
           </CheckboxGroup>
         </vue-scroll>
       </div>
       <div style="border:0.5px dashed gray">
-        <Tag v-for="item in addToToolsets" :key="item" :name="item" closable @on-close="uncheckToolset" color="primary">{{item}}</Tag>
+        <Tag
+          v-for="item in addToToolsets"
+          :key="item"
+          :name="item"
+          closable
+          @on-close="uncheckToolset"
+          color="primary"
+        >{{item}}</Tag>
       </div>
       <div slot="footer">
         <Button @click="addToToolsetModal=false">Cancel</Button>
-        <Button
-          type="success"
-          @click="addToolToToolsets()"
-          class="create"
-        >OK</Button>
+        <Button type="success" @click="addToolToToolsets()" class="create">OK</Button>
       </div>
     </Modal>
     <Modal v-model="toolsetInfoModal" title="Toolset's detail" width="600">
@@ -672,11 +805,17 @@
               <div style="height: 250px;">
                 <vue-scroll :ops="ops">
                   <List size="small">
-                    <ListItem><strong>Description:</strong></ListItem>
+                    <ListItem>
+                      <strong>Description:</strong>
+                    </ListItem>
                     <ListItem>{{selectedToolset.description}}</ListItem>
-                    <ListItem><strong>Category Tags:</strong></ListItem>
+                    <ListItem>
+                      <strong>Category Tags:</strong>
+                    </ListItem>
                     <ListItem>{{selectedToolset.categoryTag.join('|')}}</ListItem>
-                    <ListItem><strong>Recomment steps:</strong></ListItem>
+                    <ListItem>
+                      <strong>Recomment steps:</strong>
+                    </ListItem>
                     <ListItem>{{selectedToolset.recomStep.join('|')}}</ListItem>
                   </List>
                 </vue-scroll>
@@ -690,26 +829,44 @@
             <vue-scroll :ops="ops">
               <div v-for="tool in selectedToolset.toolList" :key="tool.index" style="padding:5px">
                 <Card style="background-color: ghostwhite;">
-                  <p slot="title" class="ellipsis" style="width:75%;display:inline-block;" :title="tool.toolName">{{tool.toolName}}</p>
-                      <div slot="extra">
-                        <Button icon="md-eye" shape="circle" class="btnHoverGray" title="Preview" size="small" @click="showTool(tool)"></Button>
-                      </div>
+                  <p
+                    slot="title"
+                    class="ellipsis"
+                    style="width:75%;display:inline-block;"
+                    :title="tool.toolName"
+                  >{{tool.toolName}}</p>
+                  <div slot="extra">
+                    <Button
+                      icon="md-eye"
+                      shape="circle"
+                      class="btnHoverGray"
+                      title="Preview"
+                      size="small"
+                      @click="showTool(tool)"
+                    ></Button>
+                  </div>
                   <div>
                     <div style="display: inline-block;algin:left;">
-                        <img :src="tool.toolImg" v-if="tool.toolImg!=''" style="height:100%;max-height:50px;">
-                        <avatar
-                        :username="tool.toolName"
-                        :size="50"
-                        style="margin-bottom:6px"
-                        v-else
-                      ></avatar>
+                      <img
+                        :src="tool.toolImg"
+                        v-if="tool.toolImg!=''"
+                        style="height:100%;max-height:50px;"
+                      />
+                      <avatar :username="tool.toolName" :size="50" style="margin-bottom:6px" v-else></avatar>
                     </div>
-                    <div style="display: inline-block;vertical-align: top;width: 70%;" class="ellipsis">
+                    <div
+                      style="display: inline-block;vertical-align: top;width: 70%;"
+                      class="ellipsis"
+                    >
                       <strong :title="tool.toolName">{{tool.toolName}}</strong>
-                      <br/>
-                      <span :title="tool.categoryTag.join('|')"><i>{{tool.categoryTag.join('|')}}</i></span>
+                      <br />
+                      <span :title="tool.categoryTag.join('|')">
+                        <i>{{tool.categoryTag.join('|')}}</i>
+                      </span>
                     </div>
-                    <div style="width:100%;height: 65px;border: 0.5px dashed #8080804d;padding: 1px 3px;">
+                    <div
+                      style="width:100%;height: 65px;border: 0.5px dashed #8080804d;padding: 1px 3px;"
+                    >
                       <p class="toolDescription" :title="tool.description">{{tool.description}}</p>
                     </div>
                   </div>
@@ -720,11 +877,7 @@
         </Col>
       </Row>
       <div slot="footer">
-        <Button
-          type="primary"
-          @click="toolsetInfoModal=false"
-          class="create"
-        >OK</Button>
+        <Button type="primary" @click="toolsetInfoModal=false" class="create">OK</Button>
       </div>
     </Modal>
     <Modal v-model="editToolsetModal" title="Edit toolset" width="800">
@@ -738,10 +891,17 @@
             class="toolsetForm"
           >
             <FormItem label="Name" prop="name" :label-width="140">
-              <Input v-model="selectedToolset.toolsetName" placeholder="Enter the name of your toolset"></Input>
+              <Input
+                v-model="selectedToolset.toolsetName"
+                placeholder="Enter the name of your toolset"
+              ></Input>
             </FormItem>
             <FormItem label="Description" prop="description" :label-width="140">
-              <Input v-model="selectedToolset.description" type="textarea" placeholder="Enter the description of your toolset"></Input>
+              <Input
+                v-model="selectedToolset.description"
+                type="textarea"
+                placeholder="Enter the description of your toolset"
+              ></Input>
             </FormItem>
             <FormItem label="Recommended step:" prop="recomStep" :label-width="140">
               <Select
@@ -816,37 +976,48 @@
             </FormItem>
           </Form>
         </Col>
-        <Col span="8">       
-        <h3 style="margin-left:10px">Tools:</h3>  
-        <div style="margin-left:10px;border:1px solid #e8eaec;padding:0 0 0 5px;height:500px"> 
+        <Col span="8">
+          <h3 style="margin-left:10px">Tools:</h3>
+          <div style="margin-left:10px;border:1px solid #e8eaec;padding:0 0 0 5px;height:500px">
             <vue-scroll :ops="ops">
-            <List>
-              <ListItem v-for="tool in selectedToolset.toolList" :key="tool.index">
-                <ListItemMeta 
-                  :avatar="tool.toolImg" 
-                  :title="tool.toolName" 
-                  :description="tool.description"/>
-                <template slot="action">
+              <List>
+                <ListItem v-for="tool in selectedToolset.toolList" :key="tool.index">
+                  <ListItemMeta
+                    :avatar="tool.toolImg"
+                    :title="tool.toolName"
+                    :description="tool.description"
+                  />
+                  <template slot="action">
                     <li>
-                        <Button icon="md-eye" shape="circle" class="btnHoverGray" title="Preview" size="small" @click="showTool(tool)"></Button>
+                      <Button
+                        icon="md-eye"
+                        shape="circle"
+                        class="btnHoverGray"
+                        title="Preview"
+                        size="small"
+                        @click="showTool(tool)"
+                      ></Button>
                     </li>
                     <li>
-                        <Button icon="md-close" shape="circle" class="btnHoverRed" title="Delete" size="small" @click="removeToolFromToolset(tool)"></Button>
+                      <Button
+                        icon="md-close"
+                        shape="circle"
+                        class="btnHoverRed"
+                        title="Delete"
+                        size="small"
+                        @click="removeToolFromToolset(tool)"
+                      ></Button>
                     </li>
-                </template>
-              </ListItem>
-            </List>
+                  </template>
+                </ListItem>
+              </List>
             </vue-scroll>
           </div>
         </Col>
       </Row>
       <div slot="footer">
         <Button @click="editToolsetModal=false">Cancel</Button>
-        <Button
-          type="success"
-          @click="editToolset('selectedToolset')"
-          class="create"
-        >Save</Button>
+        <Button type="success" @click="editToolset('selectedToolset')" class="create">Save</Button>
       </div>
     </Modal>
   </div>
@@ -858,24 +1029,6 @@ export default {
   components: {
     draggable,
     Avatar
-  },
-  mounted() {
-    this.resizeContent();
-    this.getPublicTools();
-    var that = this;
-    var timer = window.setInterval(function(){
-      if(!that.publicTools.length<1&&(!that.personalTools.length<1||!that.userInfo.userState)){
-        that.filterShowListByType();
-        window.clearInterval(timer);
-      }
-    },10);
-    if(this.userInfo.userState){
-      this.getPersonalToolsets();
-      this.getPersonalTools();
-    }
-    else{
-      this.getPublicToolsets();
-    }
   },
   data() {
     return {
@@ -892,23 +1045,23 @@ export default {
       inputToolTag: "",
       toolsetList: [],
       publicTools: [],
-      publicToolShow:[],
+      publicToolShow: [],
       personalTools: [],
-      personalToolShow:[],
-      createToolModal:false,
+      personalToolShow: [],
+      createToolModal: false,
       toolInfo: {
         name: "",
         model_stateId: "",
         model_oid: "",
         model_mdlId: "",
-        description:"",
+        description: "",
         tool_url: "",
         recomStep: [],
         categoryTag: [],
         toolImg: "",
         privacy: "Private"
       },
-      typeSelected:"All",
+      typeSelected: "All",
       typeOptions: [
         "All",
         "General step",
@@ -966,13 +1119,13 @@ export default {
       visible: false,
       //表示图片
       image: "",
-      createToolsetModal:false,
+      createToolsetModal: false,
       inputToolsetTag: "",
       toolsetInfo: {
         name: "",
-        description:"",
+        description: "",
         recomStep: [],
-        toolsetImg:"",
+        toolsetImg: "",
         privacy: "Private",
         categoryTag: []
       },
@@ -999,14 +1152,14 @@ export default {
           }
         ]
       },
-      selectedTool:{
+      selectedTool: {
         toolName: "",
-        modelInfo:{
+        modelInfo: {
           stateId: "",
           oid: "",
-          mdlId: "",
+          mdlId: ""
         },
-        description:"",
+        description: "",
         toolUrl: "",
         recomStep: [],
         categoryTag: [],
@@ -1043,14 +1196,14 @@ export default {
           }
         ]
       },
-      editToolModal:false,
-      removeToolModal:false,
-      selectedToolset:{
-        toolsetName:"",
-        description:"",
-        toolList:[],
-        recomStep:[],
-        categoryTag:[]
+      editToolModal: false,
+      removeToolModal: false,
+      selectedToolset: {
+        toolsetName: "",
+        description: "",
+        toolList: [],
+        recomStep: [],
+        categoryTag: []
       },
       toolsetEditRule: {
         toolsetName: [
@@ -1075,14 +1228,40 @@ export default {
           }
         ]
       },
-      removeToolsetModal:false,
-      addToToolsetModal:false,
-      ToolsetTypeSelected:"All",
-      modalShowToolsets:[],
-      addToToolsets:[],
-      toolsetInfoModal:false,
-      editToolsetModal:false,
+      removeToolsetModal: false,
+      addToToolsetModal: false,
+      ToolsetTypeSelected: "All",
+      modalShowToolsets: [],
+      addToToolsets: [],
+      toolsetInfoModal: false,
+      editToolsetModal: false,
+      // 工具窗口
+      panel: null,
     };
+  },
+   beforeDestory() {
+    this.panel.close();
+    next();
+  },
+  mounted() {
+    this.resizeContent();
+    this.getPublicTools();
+    var that = this;
+    var timer = window.setInterval(function() {
+      if (
+        !that.publicTools.length < 1 &&
+        (!that.personalTools.length < 1 || !that.userInfo.userState)
+      ) {
+        that.filterShowListByType();
+        window.clearInterval(timer);
+      }
+    }, 10);
+    if (this.userInfo.userState) {
+      this.getPersonalToolsets();
+      this.getPersonalTools();
+    } else {
+      this.getPublicToolsets();
+    }
   },
   methods: {
     resizeContent() {
@@ -1120,12 +1299,14 @@ export default {
           console.log(err);
         });
     },
-    getPublicToolsets(){
+    getPublicToolsets() {
       this.axios
         .get(
           "/GeoProblemSolving/toolset/inquiry" +
-            "?key=" +"privacy"+
-            "&value="+"Public"
+            "?key=" +
+            "privacy" +
+            "&value=" +
+            "Public"
         )
         .then(res => {
           if (res.data == "Offline") {
@@ -1143,12 +1324,14 @@ export default {
           console.log(err);
         });
     },
-    getPublicTools(){
+    getPublicTools() {
       this.axios
         .get(
           "/GeoProblemSolving/tool/inquiry" +
-            "?key="+"privacy" +
-            "&value="+"Public"
+            "?key=" +
+            "privacy" +
+            "&value=" +
+            "Public"
         )
         .then(res => {
           if (res.data == "Offline") {
@@ -1192,21 +1375,21 @@ export default {
     changeMenuItem(name) {
       this.showMenuItem = name;
     },
-    createToolModalShow(){
+    createToolModalShow() {
       this.inputToolTag = "";
-      this.toolInfo= {
+      this.toolInfo = {
         name: "",
         model_stateId: "",
         model_oid: "",
         model_mdlId: "",
-        description:"",
+        description: "",
         tool_url: "",
         recomStep: [],
         categoryTag: [],
         toolImg: "",
         privacy: "Private"
       };
-      this.createToolModal=true;
+      this.createToolModal = true;
       this.clickForbidden = false;
     },
     createTool(tool) {
@@ -1240,10 +1423,10 @@ export default {
               } else if (res.data === "Duplicate naming") {
                 this.$Notice.error({ desc: "The name already exists." });
               } else {
-                this.createToolModal=false;
+                this.createToolModal = false;
                 this.$Notice.info({ desc: "Create successfully" });
                 this.personalTools.push(res.data);
-                if(this.toolInfo.privacy=="Public"){
+                if (this.toolInfo.privacy == "Public") {
                   this.publicTools.push(res.data);
                 }
                 this.filterShowListByType();
@@ -1333,11 +1516,11 @@ export default {
     createToolsetModalShow() {
       this.image = "";
       this.inputToolsetTag = "";
-      this.toolsetInfo= {
+      this.toolsetInfo = {
         name: "",
-        description:"",
+        description: "",
         recomStep: [],
-        toolsetImg:"",
+        toolsetImg: "",
         privacy: "Private",
         categoryTag: []
       };
@@ -1365,13 +1548,13 @@ export default {
                 this.$store.commit("userLogout");
                 this.$router.push({ name: "Login" });
               } else if (res.data === "Fail") {
-                this.$Notice.error({desc: "Create toolset fail."});
+                this.$Notice.error({ desc: "Create toolset fail." });
               } else if (res.data === "Duplicate naming") {
-                this.$Notice.error({desc: "The name already exists."});
+                this.$Notice.error({ desc: "The name already exists." });
               } else {
                 this.toolsetList.unshift(res.data);
                 this.createToolsetModal = false;
-                this.$Notice.info({desc: "Create successfully"});
+                this.$Notice.info({ desc: "Create successfully" });
               }
             })
             .catch(err => {
@@ -1412,15 +1595,21 @@ export default {
         };
       }
     },
-    filterShowListByType(){
-      this.publicToolShow = this.getFilterResult(this.publicTools,this.typeSelected);
-      this.personalToolShow = this.getFilterResult(this.personalTools,this.typeSelected);
+    filterShowListByType() {
+      this.publicToolShow = this.getFilterResult(
+        this.publicTools,
+        this.typeSelected
+      );
+      this.personalToolShow = this.getFilterResult(
+        this.personalTools,
+        this.typeSelected
+      );
     },
-    getFilterResult(foreList,type){
+    getFilterResult(foreList, type) {
       var selectedType = type;
-      var resultList=foreList.filter(function(item){
-        switch(selectedType){
-          case "All":{
+      var resultList = foreList.filter(function(item) {
+        switch (selectedType) {
+          case "All": {
             return item;
             break;
           }
@@ -1432,18 +1621,18 @@ export default {
           case "Quantitative and qualitative analysis":
           case "Simulation/Prediction":
           case "Visualization & representation":
-          case "Decision-making & management":{
+          case "Decision-making & management": {
             var stepTypes = item.recomStep;
-            for(var i=0;i<stepTypes.length;i++){
-              if(stepTypes[i]==selectedType){
+            for (var i = 0; i < stepTypes.length; i++) {
+              if (stepTypes[i] == selectedType) {
                 return item;
                 break;
               }
             }
             break;
           }
-          case "Others":{
-            if(item.recomStep.length<1){
+          case "Others": {
+            if (item.recomStep.length < 1) {
               return item;
             }
             break;
@@ -1452,46 +1641,9 @@ export default {
       });
       return resultList;
     },
-    showTool(toolInfo){
-        this.axios
-          .post("/GeoProblemSolving/user/state")
-          .then(res => {
-            if (!res.data) {
-              this.$store.commit("userLogout");
-              this.$router.push({ name: "Login" });
-            } else {
-              let toolURL = '<iframe src="' + toolInfo.toolUrl +"?groupID="+ this.stepId + '" style="width: 100%;height:100%;"></iframe>';
-              var demoPanelTimer= null;
-              let panel = jsPanel.create({
-                theme: "success",
-                headerTitle: toolInfo.toolName,
-                footerToolbar: '<p style="height:10px"></p>',
-                contentSize: "1200 600",
-                content: toolURL,
-                disableOnMaximized: true,
-                dragit: {
-                  containment: 5
-                },
-                id:"demoPanel",
-                onclosed:function(panel, status, closedByUser){
-                  window.clearTimeout(demoPanelTimer);
-                },
-                callback: function() {
-                  var that = this;
-                  demoPanelTimer = window.setInterval(function(){
-                    that.style.zIndex = "9999";
-                  },1);
-                }
-              });
-              // panel.resizeit("disable");
-              $(".jsPanel-content").css("font-size", "0");
-            }
-          })
-          .catch(err => {
-            console.log("Get user info fail.");
-          });
+    showTool(toolInfo) {
     },
-    editToolShow(tool){
+    editToolShow(tool) {
       this.inputToolTag = "";
       this.selectedTool = JSON.parse(JSON.stringify(tool));
       this.editToolModal = true;
@@ -1499,19 +1651,24 @@ export default {
     editTool(tool) {
       this.$refs[tool].validate(valid => {
         if (valid) {
-
           let editToolForm = new URLSearchParams();
-          editToolForm.append("tId",this.selectedTool.tId);
-          editToolForm.append("toolName",this.selectedTool.toolName);
-          editToolForm.append("toolUrl",this.selectedTool.toolUrl);
-          editToolForm.append("modelInfo.stateId",this.selectedTool.modelInfo.stateId);
-          editToolForm.append("modelInfo.oid",this.selectedTool.modelInfo.oid);
-          editToolForm.append("modelInfo.mdlId",this.selectedTool.modelInfo.mdlId);
-          editToolForm.append("description",this.selectedTool.description);
-          editToolForm.append("recomStep",this.selectedTool.recomStep);
-          editToolForm.append("categoryTag",this.selectedTool.categoryTag);
-          editToolForm.append("toolImg",this.selectedTool.toolImg);
-          editToolForm.append("privacy",this.selectedTool.privacy);
+          editToolForm.append("tId", this.selectedTool.tId);
+          editToolForm.append("toolName", this.selectedTool.toolName);
+          editToolForm.append("toolUrl", this.selectedTool.toolUrl);
+          editToolForm.append(
+            "modelInfo.stateId",
+            this.selectedTool.modelInfo.stateId
+          );
+          editToolForm.append("modelInfo.oid", this.selectedTool.modelInfo.oid);
+          editToolForm.append(
+            "modelInfo.mdlId",
+            this.selectedTool.modelInfo.mdlId
+          );
+          editToolForm.append("description", this.selectedTool.description);
+          editToolForm.append("recomStep", this.selectedTool.recomStep);
+          editToolForm.append("categoryTag", this.selectedTool.categoryTag);
+          editToolForm.append("toolImg", this.selectedTool.toolImg);
+          editToolForm.append("privacy", this.selectedTool.privacy);
 
           this.axios
             .post("/GeoProblemSolving/tool/update", editToolForm)
@@ -1522,17 +1679,17 @@ export default {
               } else if (res.data === "Fail") {
                 this.$Notice.error({ desc: "Edit tool fail." });
               } else {
-                this.editToolModal=false;
+                this.editToolModal = false;
                 var newToolInfo = this.selectedTool;
-                for(var i=0;i<this.publicTools.length;i++){
-                  if(this.publicTools[i].tId==newToolInfo.tId){
-                    this.publicTools.splice(i,1,newToolInfo);
+                for (var i = 0; i < this.publicTools.length; i++) {
+                  if (this.publicTools[i].tId == newToolInfo.tId) {
+                    this.publicTools.splice(i, 1, newToolInfo);
                     break;
                   }
                 }
-                for(var i=0;i<this.personalTools.length;i++){
-                  if(this.personalTools[i].tId==newToolInfo.tId){
-                    this.personalTools.splice(i,1,newToolInfo);
+                for (var i = 0; i < this.personalTools.length; i++) {
+                  if (this.personalTools[i].tId == newToolInfo.tId) {
+                    this.personalTools.splice(i, 1, newToolInfo);
                     break;
                   }
                 }
@@ -1547,164 +1704,178 @@ export default {
         }
       });
     },
-    removeToolShow(tool){
+    removeToolShow(tool) {
       this.selectedTool = tool;
       this.removeToolModal = true;
     },
-    removeTool(){
+    removeTool() {
       this.axios
-          .get(
-            "/GeoProblemSolving/tool/delete"+
-            "?tId="+
-            this.selectedTool.tId
-          )
-          .then(res => {
-              if (res.data == "Offline") {
-                this.$store.commit("userLogout");
-                this.$router.push({ name: "Login" });
-              } else if (res.data === "Fail") {
-                this.$Notice.error({ desc: "Remove tool fail." });
-              } else {
-                this.removeToolModal = false;
-                var removedTool = this.selectedTool;
-                for(var i=0;i<this.publicTools.length;i++){
-                  if(this.publicTools[i].tId==removedTool.tId){
-                    this.publicTools.splice(i,1);
-                    break;
-                  }
-                }
-                for(var i=0;i<this.personalTools.length;i++){
-                  if(this.personalTools[i].tId==removedTool.tId){
-                    this.personalTools.splice(i,1);
-                    break;
-                  }
-                }
+        .get("/GeoProblemSolving/tool/delete" + "?tId=" + this.selectedTool.tId)
+        .then(res => {
+          if (res.data == "Offline") {
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
+          } else if (res.data === "Fail") {
+            this.$Notice.error({ desc: "Remove tool fail." });
+          } else {
+            this.removeToolModal = false;
+            var removedTool = this.selectedTool;
+            for (var i = 0; i < this.publicTools.length; i++) {
+              if (this.publicTools[i].tId == removedTool.tId) {
+                this.publicTools.splice(i, 1);
+                break;
               }
-              this.filterShowListByType();
-              this.$Notice.info({ desc: "The tool("+ removedTool.toolName+") has been removed."});
-          })
-          .catch(err=>{
-            console.log(err.data);
-          })
+            }
+            for (var i = 0; i < this.personalTools.length; i++) {
+              if (this.personalTools[i].tId == removedTool.tId) {
+                this.personalTools.splice(i, 1);
+                break;
+              }
+            }
+          }
+          this.filterShowListByType();
+          this.$Notice.info({
+            desc: "The tool(" + removedTool.toolName + ") has been removed."
+          });
+        })
+        .catch(err => {
+          console.log(err.data);
+        });
     },
-    removeToolsetShow(toolset){
+    removeToolsetShow(toolset) {
       this.selectedToolset = toolset;
-      this.removeToolsetModal=true;
+      this.removeToolsetModal = true;
     },
-    removeToolset(){
+    removeToolset() {
       this.axios
-          .get(
-            "/GeoProblemSolving/toolset/delete"+
-            "?tsId="+
+        .get(
+          "/GeoProblemSolving/toolset/delete" +
+            "?tsId=" +
             this.selectedToolset.tsId
-          )
-          .then(res => {
-              if (res.data == "Offline") {
-                this.$store.commit("userLogout");
-                this.$router.push({ name: "Login" });
-              } else if (res.data === "Fail") {
-                this.$Notice.error({ desc: "Remove toolset fail." });
-              } else {
-                this.removeToolsetModal = false;
-                var removedToolset = this.selectedToolset;
-                for(var i=0;i<this.toolsetList.length;i++){
-                  if(this.toolsetList[i].tsId==removedToolset.tsId){
-                    this.toolsetList.splice(i,1);
-                    break;
-                  }
-                }
-              this.$Notice.info({ desc: "The toolset("+ removedToolset.toolsetName+") has been removed."});
+        )
+        .then(res => {
+          if (res.data == "Offline") {
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
+          } else if (res.data === "Fail") {
+            this.$Notice.error({ desc: "Remove toolset fail." });
+          } else {
+            this.removeToolsetModal = false;
+            var removedToolset = this.selectedToolset;
+            for (var i = 0; i < this.toolsetList.length; i++) {
+              if (this.toolsetList[i].tsId == removedToolset.tsId) {
+                this.toolsetList.splice(i, 1);
+                break;
               }
-          })
-          .catch(err=>{
-            console.log(err.data);
-          })
+            }
+            this.$Notice.info({
+              desc:
+                "The toolset(" +
+                removedToolset.toolsetName +
+                ") has been removed."
+            });
+          }
+        })
+        .catch(err => {
+          console.log(err.data);
+        });
     },
-    addToToolsetShow(tool){
+    addToToolsetShow(tool) {
       this.selectedTool = tool;
       this.ToolsetTypeSelected = "All";
-      this.addToToolsets=[];
+      this.addToToolsets = [];
       this.filterShowToolsetByType();
       this.addToToolsetModal = true;
     },
-    filterShowToolsetByType(){
-      this.modalShowToolsets = this.getFilterResult(this.toolsetList,this.ToolsetTypeSelected);
+    filterShowToolsetByType() {
+      this.modalShowToolsets = this.getFilterResult(
+        this.toolsetList,
+        this.ToolsetTypeSelected
+      );
     },
-    checkBoxDisabled(toolset){
+    checkBoxDisabled(toolset) {
       var toolList = toolset.toolList;
-      for(var i=0;i<toolList.length;i++){
-        if(toolList[i].tId==this.selectedTool.tId){
+      for (var i = 0; i < toolList.length; i++) {
+        if (toolList[i].tId == this.selectedTool.tId) {
           return true;
         }
       }
       return false;
     },
-    uncheckToolset(event,name){
+    uncheckToolset(event, name) {
       const index = this.addToToolsets.indexOf(name);
-      this.addToToolsets.splice(index,1);
+      this.addToToolsets.splice(index, 1);
     },
-    addToolToToolsets(){
+    addToolToToolsets() {
       this.addToToolsetModal = false;
       var allToolsetInfo = this.toolsetList;
       var addToToolsetIds = [];
-      for(var i=0;i<this.addToToolsets.length;i++){
+      for (var i = 0; i < this.addToToolsets.length; i++) {
         var name = this.addToToolsets[i];
-        for(var j=0;j<allToolsetInfo.length;j++){
-          if(allToolsetInfo[j].toolsetName==name){
+        for (var j = 0; j < allToolsetInfo.length; j++) {
+          if (allToolsetInfo[j].toolsetName == name) {
             addToToolsetIds.push(allToolsetInfo[j].tsId);
             break;
           }
         }
       }
       var postInfo = {};
-      postInfo["newTool"]=this.selectedTool;
-      postInfo["tsIds"]=addToToolsetIds;
+      postInfo["newTool"] = this.selectedTool;
+      postInfo["tsIds"] = addToToolsetIds;
       this.axios
-      .post("/GeoProblemSolving/toolset/addTool",postInfo)
-      .then(res=>{
-        if (res.data == "Offline") {
-          this.$store.commit("userLogout");
-          this.$router.push({ name: "Login" });
-        } else if (res.data === "Fail") {
-          this.$Notice.error({ desc: "add tool fail." });
-        } else {
-          for(var i=0;i<this.toolsetList.length;i++){
-            for(var j=0;j<addToToolsetIds.length;j++){
-              if(this.toolsetList[i].tsId==addToToolsetIds[j]){
-                this.toolsetList[i].toolList.push(this.selectedTool);
-                break;
+        .post("/GeoProblemSolving/toolset/addTool", postInfo)
+        .then(res => {
+          if (res.data == "Offline") {
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
+          } else if (res.data === "Fail") {
+            this.$Notice.error({ desc: "add tool fail." });
+          } else {
+            for (var i = 0; i < this.toolsetList.length; i++) {
+              for (var j = 0; j < addToToolsetIds.length; j++) {
+                if (this.toolsetList[i].tsId == addToToolsetIds[j]) {
+                  this.toolsetList[i].toolList.push(this.selectedTool);
+                  break;
+                }
               }
             }
+            this.$Notice.info({ desc: "Tool has been added to toolsets." });
+            this.addToToolsetModal = false;
           }
-          this.$Notice.info({ desc: "Tool has been added to toolsets."});
-          this.addToToolsetModal = false;
-        }
-      })
-      .catch(err=>{
-        console.log(err.data);
-      })
+        })
+        .catch(err => {
+          console.log(err.data);
+        });
     },
-    toolsetInfoShow(toolset){
+    toolsetInfoShow(toolset) {
       this.selectedToolset = toolset;
       this.toolsetInfoModal = true;
     },
-    editToolsetShow(toolset){
+    editToolsetShow(toolset) {
       this.inputToolsetTag = "";
       this.selectedToolset = JSON.parse(JSON.stringify(toolset));
       this.editToolsetModal = true;
     },
-    editToolset(toolset){
+    editToolset(toolset) {
       this.$refs[toolset].validate(valid => {
         if (valid) {
-
           let editToolsetForm = new URLSearchParams();
-          editToolsetForm.append("tsId",this.selectedToolset.tsId);
-          editToolsetForm.append("toolsetName",this.selectedToolset.toolsetName);
-          editToolsetForm.append("description",this.selectedToolset.description);
-          editToolsetForm.append("recomStep",this.selectedToolset.recomStep);
-          editToolsetForm.append("categoryTag",this.selectedToolset.categoryTag);
-          editToolsetForm.append("toolsetImg",this.selectedToolset.toolsetImg);
-          editToolsetForm.append("privacy",this.selectedToolset.privacy);
+          editToolsetForm.append("tsId", this.selectedToolset.tsId);
+          editToolsetForm.append(
+            "toolsetName",
+            this.selectedToolset.toolsetName
+          );
+          editToolsetForm.append(
+            "description",
+            this.selectedToolset.description
+          );
+          editToolsetForm.append("recomStep", this.selectedToolset.recomStep);
+          editToolsetForm.append(
+            "categoryTag",
+            this.selectedToolset.categoryTag
+          );
+          editToolsetForm.append("toolsetImg", this.selectedToolset.toolsetImg);
+          editToolsetForm.append("privacy", this.selectedToolset.privacy);
 
           this.axios
             .post("/GeoProblemSolving/toolset/update", editToolsetForm)
@@ -1717,9 +1888,9 @@ export default {
               } else {
                 this.editToolsetModal = false;
                 var newToolsetInfo = this.selectedToolset;
-                for(var i=0;i<this.toolsetList.length;i++){
-                  if(this.toolsetList[i].tsId==newToolsetInfo.tsId){
-                    this.toolsetList.splice(i,1,newToolsetInfo);
+                for (var i = 0; i < this.toolsetList.length; i++) {
+                  if (this.toolsetList[i].tsId == newToolsetInfo.tsId) {
+                    this.toolsetList.splice(i, 1, newToolsetInfo);
                     break;
                   }
                 }
@@ -1730,32 +1901,32 @@ export default {
               console.log(err);
             });
 
-            var updateReq = {}
-            updateReq["newToolList"]=this.selectedToolset.toolList;
-            updateReq["tsId"]=this.selectedToolset.tsId;
+          var updateReq = {};
+          updateReq["newToolList"] = this.selectedToolset.toolList;
+          updateReq["tsId"] = this.selectedToolset.tsId;
 
-            this.axios
-            .post("/GeoProblemSolving/toolset/updateTools",updateReq)
-            .then(res=>{
+          this.axios
+            .post("/GeoProblemSolving/toolset/updateTools", updateReq)
+            .then(res => {
               if (res.data == "Offline") {
                 this.$store.commit("userLogout");
                 this.$router.push({ name: "Login" });
               } else if (res.data === "Fail") {
                 this.$Notice.error({ desc: "remove tool fail." });
               } else {
-                this.$Notice.info({ desc: "Tool's list has been update."});
+                this.$Notice.info({ desc: "Tool's list has been update." });
               }
             })
-            .catch(err=>{
+            .catch(err => {
               console.log(err.data);
             });
         } else {
         }
       });
     },
-    removeToolFromToolset(tool){
+    removeToolFromToolset(tool) {
       const index = this.selectedToolset.toolList.indexOf(tool);
-      this.selectedToolset.toolList.splice(index,1);
+      this.selectedToolset.toolList.splice(index, 1);
     }
   }
 };

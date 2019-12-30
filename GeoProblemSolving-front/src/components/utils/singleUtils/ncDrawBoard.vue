@@ -524,14 +524,15 @@ export default {
 
       this.$refs[name].validate(valid => {
         if (valid) {
-          let imageUrl = this.canvas.toDataURL();
-
+          //name
           let filename = "";
           if (!/\.(png)$/.test(this.formValidate.fileName.toLowerCase())) {
             filename = this.formValidate.fileName + ".png";
           } else {
             filename = this.formValidate.fileName;
           }
+
+          // description
           let description = "";
           if (this.formValidate.fileDescription == "") {
             description = "from Drawing tool";
@@ -539,16 +540,28 @@ export default {
             description = this.formValidate.fileDescription;
           }
 
-          // base64 转blob
-          let imageForm = new FormData();
+          //thumbnail
+          let thumbnail = this.canvas;
+          thumbnail.width = 120; // canvas对图片进行缩放
+          thumbnail.height = 120;
+          let thumbnailUrl = thumbnail.toDataURL();
+          let thumbnailBlob = this.getBlobBydataURI(thumbnailUrl);
+          var thumbnailBlobFile = new File([thumbnailBlob], "thumbnail_"+filename);
+
+          //file
+          let imageUrl = this.canvas.toDataURL();
           let imageBlob = this.getBlobBydataURI(imageUrl);
           var fileOfBlob = new File([imageBlob], filename);
+
+          let imageForm = new FormData();
           imageForm.append("file", fileOfBlob);
           imageForm.append("description", description);
           imageForm.append("type", "Image");
           imageForm.append("uploaderId", this.userInfo.userId);
           imageForm.append("privacy", "private");
           imageForm.append("folderId", this.pageParams.pageId);
+          imageForm.append("thumbnail", thumbnailBlobFile);
+          
           this.axios
             .post("/GeoProblemSolving/folder/uploadToFolder", imageForm)
             .then(res => {

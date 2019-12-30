@@ -4,6 +4,12 @@
     <Col span="9" offset="2">
       <div style="margin:20px">
         <Card style="width:100%;height:10%">
+          <div style="text-align:center">
+            <h3>
+              Click it to check
+              <a @click="gotoIntroduction()">Introduction</a>
+            </h3>
+          </div>
           <div style="text-align:center; width:40%; float:left">
             <img src="../../../src/assets/images/info.png" />
           </div>

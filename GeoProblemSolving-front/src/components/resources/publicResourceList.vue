@@ -23,7 +23,8 @@
   display: flex;
   float: right;
 }
-.ivu-table td, .ivu-table th{
+.ivu-table td,
+.ivu-table th {
   height: 40px !important;
 }
 </style>
@@ -39,28 +40,28 @@
           <Menu theme="light" active-name="all" width="auto" @on-select="onMenuSelect">
             <MenuGroup title="File type">
               <MenuItem name="all">
-                <Icon type="ios-list-box-outline"/>All
+                <Icon type="ios-list-box-outline" />All
               </MenuItem>
               <MenuItem name="image">
-                <Icon type="md-image"/>Images
+                <Icon type="md-image" />Images
               </MenuItem>
               <MenuItem name="video">
-                <Icon type="md-videocam"/>Videos
+                <Icon type="md-videocam" />Videos
               </MenuItem>
               <MenuItem name="data">
-                <Icon type="md-analytics"/>Data
+                <Icon type="md-analytics" />Data
               </MenuItem>
               <MenuItem name="paper">
-                <Icon type="md-paper"/>Papers
+                <Icon type="md-paper" />Papers
               </MenuItem>
               <MenuItem name="document">
-                <Icon type="md-document"/>Documents
+                <Icon type="md-document" />Documents
               </MenuItem>
               <MenuItem name="model">
-                <Icon type="logo-dropbox"/>Models
+                <Icon type="logo-dropbox" />Models
               </MenuItem>
               <MenuItem name="others">
-                <Icon type="logo-xbox"/>Others
+                <Icon type="logo-xbox" />Others
               </MenuItem>
             </MenuGroup>
           </Menu>
@@ -77,10 +78,10 @@
                         :download="showList[index].name"
                         title="Download"
                       >
-                        <Icon type="md-download" :size="20" color="yellowgreen"/>
+                        <Icon type="md-download" :size="20" color="yellowgreen" />
                       </a>
                       <a @click="show(index)" style="margin-left: 10px" title="Preview">
-                        <Icon type="md-eye" :size="20" color="orange"/>
+                        <Icon type="md-eye" :size="20" color="orange" />
                       </a>
                     </template>
                   </Table>
@@ -91,10 +92,10 @@
                   <Table :columns="resourceColumn" :data="showList" border size="small">
                     <template slot-scope="{ row, index }" slot="action" v-show="showList.length>0">
                       <a title="Please download after login">
-                        <Icon type="md-download" :size="20" color="gray"/>
+                        <Icon type="md-download" :size="20" color="gray" />
                       </a>
                       <a style="margin-left: 10px" title="Please preview after login">
-                        <Icon type="md-eye" :size="20" color="gray"/>
+                        <Icon type="md-eye" :size="20" color="gray" />
                       </a>
                     </template>
                   </Table>
@@ -139,13 +140,13 @@
         </RadioGroup>
         <!-- 结束 -->
       </div>
-      <br>
+      <br />
       <div style="display:flex;text-align:center;align-items:center;justify-content:center">
         <span style="width:20%">Description</span>
-        <Input type="textarea" :rows="2" v-model="fileDescription"/>
+        <Input type="textarea" :rows="2" v-model="fileDescription" />
       </div>
-      <br>
-      <input type="file" @change="getFile($event)" style="margin-left:20%" multiple="multiple">
+      <br />
+      <input type="file" @change="getFile($event)" style="margin-left:20%" multiple="multiple" />
     </Modal>
   </Row>
 </template>
@@ -186,8 +187,8 @@ export default {
           tooltip: true
         },
         {
-          title:"Provider",
-          key:"uploaderName",
+          title: "Provider",
+          key: "uploaderName",
           width: 150,
           tooltip: true,
           align: "center"
@@ -285,40 +286,61 @@ export default {
     },
     show(index) {
       let name = this.showList[index].name;
-      if (/\.(doc|docx|xls|xlsx|csv|ppt|pptx)$/.test(name.toLowerCase())) {
-        if (this.panel != null) {
-          this.panel.close();
-        }
-        var url =
-          "http://view.officeapps.live.com/op/view.aspx?src=" +'http://'+this.$store.state.IP_Port+
-          this.showList[index].pathURL;
-        var toolURL =
-          '<iframe src=' + url + ' style="width: 100%;height:100%"></iframe>';
-        this.panel = jsPanel.create({
-          headerControls: {
-            smallify: "remove"
+      if (/\.(doc|docx|xls|xlsx|ppt|pptx)$/.test(name.toLowerCase())) {
+        this.$Modal.confirm({
+          title: "Note",
+          content:
+            "<p>You selected file will be previewed through</p><p style='font-size:16px;font-weight:bold'>Microsoft office online service</p>",
+          onOk: () => {
+            if (this.panel != null) {
+              this.panel.close();
+            }
+            var url =
+              "http://view.officeapps.live.com/op/view.aspx?src=" +
+              "http://" +
+              this.$store.state.IP_Port +
+              res.pathURL;
+            var toolURL =
+              "<iframe src=" +
+              url +
+              ' style="width: 100%;height:100%"></iframe>';
+            this.panel = jsPanel.create({
+              headerControls: {
+                smallify: "remove"
+              },
+              theme: "primary",
+              footerToolbar: '<p style="height:5px"></p>',
+              headerTitle: "Preview",
+              contentSize: "800 600",
+              content: toolURL,
+              disableOnMaximized: true,
+              dragit: {
+                containment: 5
+              },
+              closeOnEscape: true,
+              callback: function() {
+                var that = this;
+                demoPanelTimer = window.setInterval(function() {
+                  that.style.zIndex = "9999";
+                }, 1);
+              }
+            });
+            $(".jsPanel-content").css("font-size", "0");
           },
-          theme: "primary",
-          footerToolbar: '<p style="height:5px"></p>',
-          headerTitle: "Preview",
-          contentSize: "800 600",
-          content: toolURL,
-          disableOnMaximized: true,
-          dragit: {
-            containment: 5
-          },
-          closeOnEscape: true,
+          onCancel: () => {
+            return;
+          }
         });
-        $(".jsPanel-content").css("font-size", "0");
-      }
-      else if(/\.(mp4)$/.test(name.toLowerCase())) {
+      } else if (/\.(mp4)$/.test(name.toLowerCase())) {
         if (this.panel != null) {
           this.panel.close();
         }
         var url =
-          'http://'+this.$store.state.IP_Port+ this.showList[index].pathURL;
+          "http://" + this.$store.state.IP_Port + this.showList[index].pathURL;
         var toolURL =
-          '<video src=' + url + ' style="width: 100%;height:100%" controls></video>';
+          "<video src=" +
+          url +
+          ' style="width: 100%;height:100%" controls></video>';
         this.panel = jsPanel.create({
           headerControls: {
             smallify: "remove"
@@ -335,15 +357,16 @@ export default {
           closeOnEscape: true
         });
         $(".jsPanel-content").css("font-size", "0");
-      }
-      else if(/\.(pdf|xml|json|md|gif|jpg|png)$/.test(name.toLowerCase())){
+      } else if (/\.(pdf|xml|json|md|gif|jpg|png)$/.test(name.toLowerCase())) {
         if (this.panel != null) {
           this.panel.close();
         }
         var url =
-          'http://'+this.$store.state.IP_Port+ this.showList[index].pathURL;
+          "http://" + this.$store.state.IP_Port + this.showList[index].pathURL;
         var toolURL =
-          '<iframe src=' + url + ' style="width: 100%;height:100%" controls></iframe>';
+          "<iframe src=" +
+          url +
+          ' style="width: 100%;height:100%" controls></iframe>';
         this.panel = jsPanel.create({
           headerControls: {
             smallify: "remove"
@@ -360,8 +383,7 @@ export default {
           closeOnEscape: true
         });
         $(".jsPanel-content").css("font-size", "0");
-      }
-      else {
+      } else {
         this.$Notice.error({
           title: "Open failed",
           desc: "Not supported file format."

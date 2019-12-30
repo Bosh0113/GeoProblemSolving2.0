@@ -27,72 +27,93 @@
       <div slot="title">
         <h4>Toolsets and tools</h4>
       </div>
-    <div slot="extra">
-      <manage-tools :step-info="stepInfo" @updateStepTools="stepToolListChanged" :key="toolModal" style="margin-top:-10px"></manage-tools>
-    </div>
-    <div>
-      <div v-if="toolsetList.length<1" style="text-align: center;">
-        <h2 style="color:#808695">No toolsets</h2>
-        <small style="color:#dcdee2">*Click the button on the top right to add toolsets.</small>
+      <div slot="extra">
+        <manage-tools
+          :step-info="stepInfo"
+          @updateStepTools="stepToolListChanged"
+          :key="toolModal"
+          style="margin-top:-10px"
+        ></manage-tools>
       </div>
-        <div v-for="toolset in toolsetList" :key="toolset.index" style="margin-top:15px;width:130px;display: inline-block;" v-else>
-            <Card style="background-color: #3f51b530;cursor: pointer;margin: 0 5px 10px 5px">
-              <div style="text-align:center" @click="showTools(toolset)">
-                <Tooltip placement="bottom" max-width="600">
-                  <img :src="toolset.toolsetImg" v-if="toolset.toolsetImg!=''" style="height:100%;max-height:50px;">
-                  <avatar
-                  :username="toolset.toolsetName"
-                  :size="50"
-                  style="margin-bottom:6px"
-                  v-else
-                ></avatar>
+      <div>
+        <div v-if="toolsetList.length<1" style="text-align: center;">
+          <h2 style="color:#808695">No toolsets</h2>
+          <small style="color:#dcdee2">*Click the button on the top right to add toolsets.</small>
+        </div>
+        <div
+          v-for="toolset in toolsetList"
+          :key="toolset.index"
+          style="margin-top:15px;width:130px;display: inline-block;"
+          v-else
+        >
+          <Card style="background-color: #3f51b530;cursor: pointer;margin: 0 5px 10px 5px">
+            <div style="text-align:center" @click="showTools(toolset)">
+              <Tooltip placement="bottom" max-width="600">
+                <img
+                  :src="toolset.toolsetImg"
+                  v-if="toolset.toolsetImg!=''"
+                  style="height:100%;max-height:50px;"
+                />
+                <avatar :username="toolset.toolsetName" :size="50" style="margin-bottom:6px" v-else></avatar>
                 <div slot="content">
                   <span>{{toolset.description}}</span>
-                  <br v-if="toolset.categoryTag.length>0"/>
-                  <p><i>{{toolset.categoryTag.join(',')}}</i></p>
+                  <br v-if="toolset.categoryTag.length>0" />
+                  <p>
+                    <i>{{toolset.categoryTag.join(',')}}</i>
+                  </p>
                 </div>
-                </Tooltip>
-                <h4 :title="toolset.toolsetName" style="width:75px;" class="ellipsis">{{toolset.toolsetName}}</h4>
-              </div>
-            </Card>
+              </Tooltip>
+              <h4
+                :title="toolset.toolsetName"
+                style="width:75px;"
+                class="ellipsis"
+              >{{toolset.toolsetName}}</h4>
+            </div>
+          </Card>
         </div>
-        <Divider style="margin:10px 0"/>
+        <Divider style="margin:10px 0" />
         <div v-if="toolList.length<1" style="text-align: center;">
           <h2 style="color:#808695">No tools</h2>
           <small style="color:#dcdee2">*Click the button on the top right to add tools.</small>
         </div>
-          <div v-for="tool in toolList" :key="tool.index" style="margin-top:15px;width:130px;display: inline-block;" v-else>
-            <Card style="background-color: ghostwhite;margin: 0 5px 10px 5px">
-              <div style="text-align:center;cursor: pointer;" @click="useTool(tool)">
-                <Tooltip placement="bottom" max-width="600">
-                  <img
-                    :src="tool.toolImg"
-                    v-if="tool.toolImg!=''"
-                    style="height:100%;max-height:50px;"
-                  />
-                  <avatar :username="tool.toolName" :size="50" style="margin-bottom:6px" v-else></avatar>
-                  <div slot="content">
-                    <span>{{tool.description}}</span>
-                    <br v-if="tool.categoryTag.length>0" />
-                    <span>
-                      <i>{{tool.categoryTag.join(',')}}</i>
-                    </span>
-                  </div>
-                </Tooltip>
-                <h4
-                  :title="tool.toolName"
-                  style="display:block;width:90px;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;"
-                >{{tool.toolName}}</h4>
-              </div>
-            </Card>
-          </div>
-    </div>
-  </Card>
-    <Modal 
-    v-model="showToolsetToolsModal" 
-    width="432"
-    title="Tools in the toolset"
-    :closable="false">
+        <div
+          v-for="tool in toolList"
+          :key="tool.index"
+          style="margin-top:15px;width:130px;display: inline-block;"
+          v-else
+        >
+          <Card style="background-color: ghostwhite;margin: 0 5px 10px 5px">
+            <div style="text-align:center;cursor: pointer;" @click="useTool(tool)">
+              <Tooltip placement="bottom" max-width="600">
+                <img
+                  :src="tool.toolImg"
+                  v-if="tool.toolImg!=''"
+                  style="height:100%;max-height:50px;"
+                />
+                <avatar :username="tool.toolName" :size="50" style="margin-bottom:6px" v-else></avatar>
+                <div slot="content">
+                  <span>{{tool.description}}</span>
+                  <br v-if="tool.categoryTag.length>0" />
+                  <span>
+                    <i>{{tool.categoryTag.join(',')}}</i>
+                  </span>
+                </div>
+              </Tooltip>
+              <h4
+                :title="tool.toolName"
+                style="display:block;width:90px;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;"
+              >{{tool.toolName}}</h4>
+            </div>
+          </Card>
+        </div>
+      </div>
+    </Card>
+    <Modal
+      v-model="showToolsetToolsModal"
+      width="432"
+      title="Tools in the toolset"
+      :closable="false"
+    >
       <div style="height:350px" v-if="toolsetToolList.length>0">
         <vue-scroll :ops="ops">
           <Row>
@@ -146,8 +167,8 @@ export default {
     manageTools,
     Avatar
   },
-  watch:{
-    stepInfo(val){
+  watch: {
+    stepInfo(val) {
       this.getAllTools();
     }
   },
@@ -163,7 +184,8 @@ export default {
       toolsetList: [],
       toolModal: 0,
       toolsetToolList: [],
-      showToolsetToolsModal: false
+      showToolsetToolsModal: false,
+      panelList: []
     };
   },
   mounted() {
@@ -316,7 +338,7 @@ export default {
         this.stepInfo.stepId +
         '" style="width: 100%;height:100%;"></iframe>';
       var demoPanelTimer = null;
-      let panel = jsPanel.create({
+      var panel = jsPanel.create({
         theme: "success",
         headerTitle: toolInfo.toolName,
         footerToolbar: '<p style="height:10px"></p>',
@@ -326,7 +348,6 @@ export default {
         dragit: {
           containment: 5
         },
-        id: "demoPanel",
         onclosed: function(panel, status, closedByUser) {
           window.clearTimeout(demoPanelTimer);
         },
@@ -339,9 +360,10 @@ export default {
       });
       // panel.resizeit("disable");
       $(".jsPanel-content").css("font-size", "0");
+      this.panelList.push(panel);
+      this.$emit("toolPanel",panel);
 
       // 记录信息
-
       let toolRecords = {
         type: "tools",
         time: new Date().Format("yyyy-MM-dd HH:mm:ss"),

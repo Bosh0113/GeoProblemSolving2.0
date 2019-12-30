@@ -365,10 +365,18 @@ export default {
       metaDataInfo: "",
       // 删除资源
       deleteResourceModal: false,
-      deleteResourceId: ""
+      deleteResourceId: "",
+      panel: null
     };
   },
   props: ["stepInfo", "userRole"],
+  watch: {
+    checkDataModal(value) {
+      if (!value) {
+        this.panel.close();
+      }
+    }
+  },
   created() {},
   mounted() {
     this.getResList();
@@ -651,13 +659,13 @@ export default {
               }
               // 同步删除其他数组内的资源
               if (this.showType == "data" || this.showType == "materials") {
-                for (let i = 0; i < this.stepResList.length; i++) {
+                for (var i = 0; i < this.stepResList.length; i++) {
                   if (this.stepResList[i].resourceId == this.deleteResourceId) {
                     this.stepResList.splice(i, 1);
                   }
                 }
               } else if (deleteResType == "data") {
-                for (let i = 0; i < this.stepDataList.length; i++) {
+                for (var i = 0; i < this.stepDataList.length; i++) {
                   if (
                     this.stepDataList[i].resourceId == this.deleteResourceId
                   ) {
@@ -665,12 +673,18 @@ export default {
                   }
                 }
               } else {
-                for (let i = 0; i < this.relatedResList.length; i++) {
+                for (var i = 0; i < this.relatedResList.length; i++) {
                   if (
                     this.relatedResList[i].resourceId == this.deleteResourceId
                   ) {
                     this.relatedResList.splice(i, 1);
                   }
+                }
+              }
+              // 如果删除的是ToolData, 同步删除
+              for (var i = 0; i < this.toolDataList.length; i++) {
+                if (this.toolDataList[i].resourceId == this.deleteResourceId) {
+                  this.toolDataList.splice(i, 1);
                 }
               }
             }
@@ -692,7 +706,124 @@ export default {
       }
     },
     dataPreview(res) {
-
+      let name = res.name;
+      if (/\.(doc|docx|xls|xlsx|ppt|pptx)$/.test(name.toLowerCase())) {
+        this.$Modal.confirm({
+          title: "Note",
+          content:
+            "<p>You selected file will be previewed through</p><p style='font-size:16px;font-weight:bold'>Microsoft office online service</p>",
+          onOk: () => {
+            if (this.panel != null) {
+              this.panel.close();
+            }
+            var url =
+              "http://view.officeapps.live.com/op/view.aspx?src=" +
+              "http://" +
+              this.$store.state.IP_Port +
+              res.pathURL;
+            var toolURL =
+              "<iframe src=" +
+              url +
+              ' style="width: 100%;height:100%"></iframe>';
+            var demoPanelTimer = null;
+            this.panel = jsPanel.create({
+              headerControls: {
+                smallify: "remove"
+              },
+              theme: "primary",
+              footerToolbar: '<p style="height:5px"></p>',
+              headerTitle: "Preview",
+              contentSize: "800 600",
+              content: toolURL,
+              disableOnMaximized: true,
+              dragit: {
+                containment: 5
+              },
+              closeOnEscape: true,
+              callback: function() {
+                var that = this;
+                demoPanelTimer = window.setInterval(function() {
+                  that.style.zIndex = "9999";
+                }, 1);
+              }
+            });
+            $(".jsPanel-content").css("font-size", "0");
+          },
+          onCancel: () => {
+            return;
+          }
+        });
+      } else if (/\.(mp4)$/.test(name.toLowerCase())) {
+        if (this.panel != null) {
+          this.panel.close();
+        }
+        var url = "http://" + this.$store.state.IP_Port + res.pathURL;
+        var toolURL =
+          "<video src=" +
+          url +
+          ' style="width: 100%;height:100%" controls></video>';
+        var demoPanelTimer = null;
+        this.panel = jsPanel.create({
+          headerControls: {
+            smallify: "remove"
+          },
+          theme: "primary",
+          footerToolbar: '<p style="height:10px"></p>',
+          headerTitle: "Preview",
+          contentSize: "800 600",
+          content: toolURL,
+          disableOnMaximized: true,
+          dragit: {
+            containment: 5
+          },
+          closeOnEscape: true,
+          callback: function() {
+            var that = this;
+            demoPanelTimer = window.setInterval(function() {
+              that.style.zIndex = "9999";
+            }, 1);
+          }
+        });
+        $(".jsPanel-content").css("font-size", "0");
+      } else if (/\.(pdf|json|md|gif|jpg|png)$/.test(name.toLowerCase())) {
+        if (this.panel != null) {
+          this.panel.close();
+        }
+        var url = "http://" + this.$store.state.IP_Port + res.pathURL;
+        var toolURL =
+          "<iframe src=" +
+          url +
+          ' style="width: 100%;height:100%" controls></iframe>';
+        var demoPanelTimer = null;
+        this.panel = jsPanel.create({
+          headerControls: {
+            smallify: "remove"
+          },
+          theme: "primary",
+          footerToolbar: '<p style="height:10px"></p>',
+          headerTitle: "Preview",
+          contentSize: "800 600",
+          content: toolURL,
+          disableOnMaximized: true,
+          dragit: {
+            containment: 5
+          },
+          closeOnEscape: true,
+          callback: function() {
+            var that = this;
+            demoPanelTimer = window.setInterval(function() {
+              that.style.zIndex = "9999";
+            }, 1);
+          }
+        });
+        $(".jsPanel-content").css("font-size", "0");
+      } else {
+        this.$Notice.error({
+          title: "Open failed",
+          desc: "Sorry. Unsupported file format."
+        });
+        return false;
+      }
     },
     dataVisualize() {}
   }

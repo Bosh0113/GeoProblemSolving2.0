@@ -535,16 +535,17 @@ export default {
         return false;
       }
 
-      this.$refs[name].validate(valid => {
+      this.$refs[name].validate(async valid => {
         if (valid) {
-          let imageUrl = this.canvas.toDataURL();
-
+          //name
           let filename = "";
           if (!/\.(png)$/.test(this.formValidate.fileName.toLowerCase())) {
             filename = this.formValidate.fileName + ".png";
           } else {
             filename = this.formValidate.fileName;
           }
+
+          // description
           let description = "";
           if (this.formValidate.fileDescription == "") {
             description = "from Drawing tool";
@@ -552,16 +553,41 @@ export default {
             description = this.formValidate.fileDescription;
           }
 
-          // base64 转blob
-          let imageForm = new FormData();
+          //thumbnail
+          let thumbnail = this.canvas.cloneNode(true);
+          thumbnail.width = 120; // canvas对图片进行缩放
+          thumbnail.height = 120;
+          var thumbnailContext = thumbnail.getContext("2d");
+          thumbnailContext.clearRect(0, 0, 120, 120);
+          var image = new Image();
+          image.src = this.canvas.toDataURL();
+          var promise = new Promise(reslove => {
+            image.onload = async function() {
+              thumbnailContext.drawImage(image, 0, 0, 120, 120);
+              reslove();
+            };
+          });
+          await promise;
+          let thumbnailUrl = thumbnail.toDataURL();
+          let thumbnailBlob = this.getBlobBydataURI(thumbnailUrl);
+          var thumbnailBlobFile = new File(
+            [thumbnailBlob],
+            "thumbnail_" + filename
+          );
+
+          //file
+          let imageUrl = this.canvas.toDataURL();
           let imageBlob = this.getBlobBydataURI(imageUrl);
           var fileOfBlob = new File([imageBlob], filename);
+
+          let imageForm = new FormData();
           imageForm.append("file", fileOfBlob);
           imageForm.append("description", description);
-          imageForm.append("type", "Image");
+          imageForm.append("type", "toolData");
           imageForm.append("uploaderId", this.userInfo.userId);
           imageForm.append("privacy", "private");
           imageForm.append("folderId", this.pageParams.pageId);
+          imageForm.append("thumbnail", thumbnailBlobFile);
 
           this.axios
             .post("/GeoProblemSolving/folder/uploadToFolder", imageForm)
@@ -1169,7 +1195,7 @@ export default {
         this.$Message.error("Lose the information of current step.");
         return false;
       }
-      
+
       let roomId = this.pageParams.pageId;
       this.socketApi.initWebSocket(
         "DrawServer/" + roomId,
@@ -1262,32 +1288,29 @@ export default {
       }
 
       this.resources = [];
-      
-        this.axios
-          .get(
-             "/GeoProblemSolving/folder/inquiry?folderId=" +
-            this.pageParams.pageId
-          )
-          .then(res => {
-            // 写渲染函数，取到所有资源
-            if (res.data !== "None") {
-              for (let i = 0; i < res.data.length; i++) {
-                if (
-                  res.data[i].type == "Image" &&
-                  /\.(jpg|jpeg|png|bmp|gif)$/.test(
-                    res.data[i].name.toLowerCase()
-                  )
-                ) {
-                  this.resources.push(res.data[i]);
-                }
+
+      this.axios
+        .get(
+          "/GeoProblemSolving/folder/inquiry?folderId=" + this.pageParams.pageId
+        )
+        .then(res => {
+          // 写渲染函数，取到所有资源
+          if (res.data !== "None") {
+            for (let i = 0; i < res.data.length; i++) {
+              if (
+                res.data[i].type == "Image" &&
+                /\.(jpg|jpeg|png|bmp|gif)$/.test(res.data[i].name.toLowerCase())
+              ) {
+                this.resources.push(res.data[i]);
               }
-            } else {
-              this.resources = [];
             }
-          })
-          .catch(err => {
-            console.log(err.data);
-          });
+          } else {
+            this.resources = [];
+          }
+        })
+        .catch(err => {
+          console.log(err.data);
+        });
     },
     selecetResource(url) {
       this.dataUrl = url;
