@@ -23,11 +23,11 @@
   <div>
     <div style="position:relative;padding:10px 10px 0 10px; margin-top:10px">
       <Breadcrumb style="display: inline-block" separator=">">
-        <BreadcrumbItem :to="toSubProjectPage">Subproject</BreadcrumbItem>
+        <BreadcrumbItem><a @click="toProjectDetailPage">Project</a></BreadcrumbItem>
         <BreadcrumbItem>Work space</BreadcrumbItem>
       </Breadcrumb>
       <h1 id="stepType">{{stepInfo.type}}</h1>
-      <step-change style="float:right" :step-info="stepInfo" :solving-process="subProjectInfo.solvingProcess" scope="subProject"></step-change>
+      <step-change style="float:right" :step-info="stepInfo" :solving-process="projectInfo.solvingProcess" scope="project"></step-change>
     </div>
     <Divider style="margin:10px 0 3px 0" />
     <div style="display:flex;background-color: #f8f8f9;padding:5px;">
@@ -92,8 +92,8 @@
 </template>
 
 <script>
-import onlineParticipant from "./utils/onlineParticipants";
-import stepChange from "./utils/stepChange";
+import onlineParticipant from "./../workingSpace/functionSteps/utils/onlineParticipants";
+import stepChange from "./../workingSpace/functionSteps/utils/stepChange";
 export default {
   components: {
     onlineParticipant,
@@ -128,11 +128,11 @@ export default {
   },
   data() {
     return {
+      userInfo:JSON.parse(sessionStorage.getItem("userInfo")),
       contentHeight: 560,
       split: "400px",
-      toSubProjectPage: "",
+      toProjectPage: "",
       stepInfo: {},
-      subProjectInfo: {},
       projectInfo: {},
       participants: [],
       userRole: "Visitor",
@@ -180,7 +180,6 @@ export default {
     init() {
       this.initSize();
       this.getStepInfo();
-      this.getSubprojectInfo();
       this.getProjectInfo();
       this.getParticipants();
       this.userRoleIdentity();
@@ -193,30 +192,34 @@ export default {
         this.contentHeight = 490;
       }
     },
+    toProjectDetailPage(){
+      window.location.href=this.toProjectPage;
+    },
     getStepInfo() {
       if (
         this.stepInfo.stepId != this.$route.params.stepId ||
         this.stepInfo.stepId == undefined ||
         this.stepInfo.stepId == ""
       ) {
+        var that = this;
         $.ajax({
           url:
             "/GeoProblemSolving/step/inquiry/" +
             "?key=stepId" +
             "&value=" +
-            this.$route.params.stepId,
+            that.$route.params.stepId,
           type: "GET",
           async: false,
           success: data => {
             if (data == "Offline") {
-              this.$store.commit("userLogout");
-              this.$router.push({ name: "Login" });
+              that.$store.commit("userLogout");
+              that.$router.push({ name: "Login" });
             } else if (data != "None" && data != "Fail") {
-              this.stepInfo = data[0];
-              this.toSubProjectPage =
-                "/project/" + data[0].subProjectId + "/subproject";
+              that.stepInfo = data[0];
+              that.toProjectPage =
+                "/GeoProblemSolving/projectDetail/" + data[0].projectId;
             } else {
-              this.$Notice.info({
+              that.$Notice.info({
                 desc: "Get step description failed!"
               });
             }
@@ -228,60 +231,30 @@ export default {
         });
       }
     },
-    getSubprojectInfo() {
-      let subProjectInfo = this.$store.getters.subProject;
-      if (JSON.stringify(subProjectInfo) != "{}") {
-        this.$set(this, "subProjectInfo", subProjectInfo);
-      } else {
-        $.ajax({
-          url:
-            "/GeoProblemSolving/subProject/inquiry" +
-            "?key=subProjectId" +
-            "&value=" +
-            this.stepInfo.subProjectId,
-          type: "GET",
-          async: false,
-          success: data => {
-            if (data == "Offline") {
-              this.$store.commit("userLogout");
-              this.$router.push({ name: "Login" });
-            } else if (data != "None" && data != "Fail") {
-              subProjectInfo = data[0];
-              this.$set(this, "subProjectInfo", subProjectInfo);
-              this.$store.commit("setSubProjectInfo", subProjectInfo);
-            } else {
-              console.log(data);
-            }
-          },
-          error: function(err) {
-            console.log("Get manager name fail.");
-          }
-        });
-      }
-    },
     getProjectInfo() {
       let projectInfo = this.$store.getters.project;
       if (
         JSON.stringify(projectInfo) != "{}" &&
-        projectInfo.projectId == this.subProjectInfo.projectId
+        projectInfo.projectId == this.stepInfo.projectId
       ) {
         this.projectInfo = projectInfo;
       } else {
+        var that = this;
         $.ajax({
           url:
             "/GeoProblemSolving/project/inquiry" +
             "?key=projectId" +
             "&value=" +
-            this.subProjectInfo.projectId,
+            that.stepInfo.projectId,
           type: "GET",
           async: false,
           success: data => {
             if (data == "Offline") {
-              this.$store.commit("userLogout");
-              this.$router.push({ name: "Login" });
+              that.$store.commit("userLogout");
+              that.$router.push({ name: "Login" });
             } else if (data != "None" && data != "Fail") {
-              this.projectInfo = data[0];
-              this.$store.commit("setProjectInfo", data[0]);
+              that.projectInfo = data[0];
+              that.$store.commit("setProjectInfo", data[0]);
             } else {
               console.log(data);
             }
@@ -290,11 +263,11 @@ export default {
       }
     },
     getParticipants() {
-      let members = this.subProjectInfo.members;
+      let members = this.projectInfo.members;
       let manager = [
         {
-          userId: this.subProjectInfo["managerId"],
-          userName: this.subProjectInfo["managerName"]
+          userId: this.projectInfo["managerId"],
+          userName: this.projectInfo["managerName"]
         }
       ];
       let membersList = manager.concat(members);
@@ -320,27 +293,19 @@ export default {
     },
     userRoleIdentity() {
       this.userRole = "Visitor";
-      if (this.$store.getters.userState) {
-        // 是否是子项目管理员
-        if (this.subProjectInfo.managerId === this.$store.getters.userId) {
-          this.userRole = "Manager";
+      if (this.userInfo.userState) {
+        if (this.projectInfo.managerId === this.userInfo.userId) {
+          this.userRole = "PManager";
         }
-        // 是否是子项目成员
         else {
-          for (let i = 0; i < this.subProjectInfo.members.length; i++) {
+          for (let i = 0; i < this.projectInfo.members.length; i++) {
             if (
-              this.subProjectInfo.members[i].userId ===
-              this.$store.getters.userId
+              this.projectInfo.members[i].userId ===
+              this.userInfo.userId
             ) {
               this.userRole = "Member";
               break;
             }
-          }
-        }
-        // 是否是项目管理员
-        if (this.userRole != "Manager") {
-          if (this.projectInfo.managerId === this.$store.getters.userId) {
-            this.userRole = "PManager";
           }
         }
       } else {

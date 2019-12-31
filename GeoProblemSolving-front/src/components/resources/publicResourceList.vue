@@ -237,10 +237,10 @@ export default {
     },
     readResource() {
       this.allResourceList = [];
-      this.showList = [];
       this.axios.get("/GeoProblemSolving/resource/allPublic").then(res => {
         if (res.data != "None") {
           var tempResourceList = res.data;
+          tempResourceList.reverse();
           tempResourceList.forEach(function(list) {
             var time = list.uploadTime;
             list.uploadTime = time;

@@ -219,6 +219,10 @@
         .ivu-card-body {
             display: inherit;
         }
+        .btnHoverGray:hover {
+        background-color: #808695;
+        color: white;
+        }
     </style>
 </head>
 
@@ -533,7 +537,10 @@
                     <div style="background:#eee;padding: 10px;height: inherit;min-height: fit-content;">
                         <Card v-if="projectInfo.type=='type0'" :bordered="false" dis-hover
                               style="height: -webkit-fill-available;min-height: fit-content;">
-                            <h1 slot="title" class="projectMenuItemTitle">Subprojects</h1>
+                              <div slot="title">
+                                <h1 class="projectMenuItemTitle">Subprojects</h1>
+                                <i-button class="btnHoverGray" @click="resetProjectTypeModalShow()">Reset project's type</i-button>
+                              </div>
                             <div slot="extra">
                                 <Poptip trigger="hover" content="Create subproject" placement="left">
                                     <i-button style="margin: 0 5px;" class="changeInviteColor"
@@ -959,6 +966,24 @@
                         <i-button type="success" @click="joinApply('applyValidate')">Apply</i-button>
                     </div>
                 </Modal>
+                <Modal
+                  v-model="resetProjectTypeNotice"
+                  title="Reset project's type"
+                >
+                  <h2>Please confirm that all subprojects have been deleted.</h2>
+                  <div slot="footer">
+                    <i-button type="primary" @click="resetProjectTypeNotice=false">OK</i-button>
+                  </div>
+                </Modal>
+                <Modal
+                  v-model="resetProjectTypeModel"
+                  title="Reset project's type"
+                >
+                  <h2>Are you sure you want to reset the project type?</h2>
+                  <div slot="footer">
+                    <i-button type="primary" @click="resetProjectType()">Submit</i-button>
+                  </div>
+                </Modal>
             </div>
         </div>
     </template>
@@ -968,7 +993,7 @@
     var projectInfo = [[${projectInfo}]];
 </script>
 <script>
-    new Vue(
+    var vm = new Vue(
         {
             el: "#projectDetailPage",
             components: {
@@ -992,6 +1017,7 @@
                             sessionStorage.setItem('userInfo', JSON.stringify(data));
                         } else {
                             console.log("Not logged in");
+                            window.location.href = '/GeoProblemSolving/login';
                         }
                     },
                     error: function (err) {
@@ -1204,6 +1230,9 @@
                     applyJoinModal: false,
                     haveApplied: false,
                     taskRole: "",
+                    resetProjectTypeNotice:false,
+                    resetProjectTypeModel:false
+
                 }
             },
             methods: {
@@ -1582,6 +1611,35 @@
                     else {
                         window.location.href = "/GeoProblemSolving/memberPage/" + userId;
                     }
+                },
+                resetProjectTypeModalShow(){
+                    if(this.subProjectList.length > 0){
+                        this.resetProjectTypeNotice = true;
+                    }else{
+                        this.resetProjectTypeModel = true;
+                    }
+                },
+                resetProjectType(){
+                let obj = new URLSearchParams();
+                obj.append("projectId", this.projectInfo.projectId);
+                obj.append("type", "");
+                obj.append("stepId", "");
+                axios
+                    .post("/GeoProblemSolving/project/update", obj)
+                    .then(res => {
+                        this.resetProjectTypeModel = false;
+                        if (res.data == "Offline") {
+                            window.location.href="/GeoProblemSolving/login"
+                        } else if (res.data != "Fail") {
+                            sessionStorage.setItem("projectInfo",JSON.stringify(res.data));
+                            this.projectInfo = res.data;
+                        } else {
+                            this.$Message.error("Set type failed.");
+                        }
+                        })
+                    .catch(err => {
+                        console.log(err.data);
+                    });
                 },
                 showSubProjectCreateModel() {
                     this.createSubProjectModel = true;

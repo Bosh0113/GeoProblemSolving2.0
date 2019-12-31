@@ -11,6 +11,10 @@
   color: white;
   background: #f16643;
 }
+.btnHoverGray:hover {
+  background-color: #808695;
+  color: white;
+}
 </style>
 <template>
   <Row>
@@ -66,6 +70,12 @@
           <h3
             style="margin-top:10px"
           >Double click the node, and you can enter the corresponding workspace.</h3>
+          <div style="width:100%;text-align:center;" v-if="scopeType == 'subproject'">
+            <Button class="btnHoverGray" @click="resetSubProjectTypeModalShow()">Reset sub-project's type</Button>
+          </div>
+          <div style="width:100%;text-align:center;margin-top:100px" v-if="scopeType == 'project'">
+            <Button class="btnHoverGray" @click="resetProjectTypeModalShow()">Reset project's type</Button>
+          </div>
         </Row>
       </div>
     </Col>
@@ -78,7 +88,43 @@
     >
       <p>Do you really want to delete this step?</p>
     </Modal>
-    <Modal width="800px" v-model="createStepModal" title="Create a new step">
+    <Modal
+      v-model="resetSubProjectTypeNotice"
+      title="Reset sub-project's type"
+    >
+      <h2>Please confirm that all nodes have been deleted.</h2>
+      <div slot="footer">
+        <Button type="primary" @click="resetSubProjectTypeNotice=false">OK</Button>
+      </div>
+    </Modal>
+    <Modal
+      v-model="resetSubProjectTypeModel"
+      title="Reset sub-project's type"
+    >
+      <h2>Are you sure you want to reset the sub-project type?</h2>
+      <div slot="footer">
+        <Button type="primary" @click="resetSubProjectType()">Submit</Button>
+      </div>
+    </Modal>
+    <Modal
+      v-model="resetProjectTypeNotice"
+      title="Reset project's type"
+    >
+      <h2>Please confirm that all nodes have been deleted.</h2>
+      <div slot="footer">
+        <Button type="primary" @click="resetProjectTypeNotice=false">OK</Button>
+      </div>
+    </Modal>
+    <Modal
+      v-model="resetProjectTypeModel"
+      title="Reset project's type"
+    >
+      <h2>Are you sure you want to reset the project type?</h2>
+      <div slot="footer">
+        <Button type="primary" @click="resetProjectType()">Submit</Button>
+      </div>
+    </Modal>
+    <Modal width="800px" v-model="createStepModal" title="Create a new step" :styles="{top: '20px'}">
       <Carousel
         v-if="createStepModal"
         v-model="stepValue"
@@ -206,7 +252,11 @@ export default {
       selectStepToolsets: [],
       // step 结构信息
       scopeType: "",
-      scopeId: ""
+      scopeId: "",
+      resetSubProjectTypeNotice:false,
+      resetSubProjectTypeModel:false,
+      resetProjectTypeNotice:false,
+      resetProjectTypeModel:false
     };
   },
   created() {    
@@ -263,46 +313,84 @@ export default {
     cancel() {},
     // 进入具体的step页面
     enterStep(type, stepId) {
-      if (type == 0) {
-        this.$router.push({
-          name: "contextDefinition",
-          params: { stepId: stepId }
-        });
-      } else if (type == 1) {
-        this.$router.push({
-          name: "dataProcessing",
-          params: { stepId: stepId }
-        });
-      } else if (type == 2) {
-        this.$router.push({
-          name: "modelProcess",
-          params: { stepId: stepId }
-        });
-      } else if (type == 3) {
-        this.$router.push({
-          name: "modelEvaluation",
-          params: { stepId: stepId }
-        });
-      } else if (type == 4) {
-        this.$router.push({
-          name: "analysis",
-          params: { stepId: stepId }
-        });
-      } else if (type == 5) {
-        this.$router.push({
-          name: "simulation",
-          params: { stepId: stepId }
-        });
-      } else if (type == 6) {
-        this.$router.push({
-          name: "visualization",
-          params: { stepId: stepId }
-        });
-      } else if (type == 7) {
-        this.$router.push({
-          name: "decisionMaking",
-          params: { stepId: stepId }
-        });
+      if (this.scopeInfo.subProjectId != undefined) {
+        if (type == 0) {
+          this.$router.push({
+            name: "contextDefinition",
+            params: { stepId: stepId }
+          });
+        } else if (type == 1) {
+          this.$router.push({
+            name: "dataProcessing",
+            params: { stepId: stepId }
+          });
+        } else if (type == 2) {
+          this.$router.push({
+            name: "modelProcess",
+            params: { stepId: stepId }
+          });
+        } else if (type == 3) {
+          this.$router.push({
+            name: "modelEvaluation",
+            params: { stepId: stepId }
+          });
+        } else if (type == 4) {
+          this.$router.push({
+            name: "analysis",
+            params: { stepId: stepId }
+          });
+        } else if (type == 5) {
+          this.$router.push({
+            name: "simulation",
+            params: { stepId: stepId }
+          });
+        } else if (type == 6) {
+          this.$router.push({
+            name: "visualization",
+            params: { stepId: stepId }
+          });
+        } else if (type == 7) {
+          this.$router.push({
+            name: "decisionMaking",
+            params: { stepId: stepId }
+          });
+        }
+      }
+      else{
+        switch(type){
+          case 0:{
+            parent.location.href = "/GeoProblemSolving/workspaceP/"+stepId+"/contextDefinition";
+            break;
+          }
+          case 1:{
+            parent.location.href = "/GeoProblemSolving/workspaceP/"+stepId+"/dataProcessing";
+            break;
+          }
+          case 2:{
+            parent.location.href = "/GeoProblemSolving/workspaceP/"+stepId+"/modelProcess";
+            break;
+          }
+          case 3:{
+            parent.location.href = "/GeoProblemSolving/workspaceP/"+stepId+"/modelEvaluation";
+            break;
+          }
+          case 4:{
+            parent.location.href = "/GeoProblemSolving/workspaceP/"+stepId+"/analysis";
+            break;
+          }
+          case 5:{
+            parent.location.href = "/GeoProblemSolving/workspaceP/"+stepId+"/simulation";
+            break;
+          }
+          case 6:{
+            parent.location.href = "/GeoProblemSolving/workspaceP/"+stepId+"/visualization";
+            break;
+          }
+          case 7:{
+            parent.location.href = "/GeoProblemSolving/workspaceP/"+stepId+"/decisionMaking";
+            break;
+          }
+        }
       }
     },
     getProcessSteps() {
@@ -722,8 +810,13 @@ export default {
       Step["name"] = this.formValidate1.stepTitle;
       Step["type"] = this.formValidate1.stepType;
       Step["description"] = this.formValidate1.result;
-      Step["projectId"] = "";
-      Step["subProjectId"] = this.scopeId;
+      if (this.scopeType == "project") {
+        Step["projectId"] = this.scopeId;
+        Step["subProjectId"] = "";
+      } else {
+        Step["projectId"] = "";
+        Step["subProjectId"] = this.scopeId;
+      }
       Step["creator"] = this.$store.getters.userId;
       Step["toolList"] = this.selectStepTools;
       Step["toolsetList"] = this.selectStepToolsets;
@@ -1200,6 +1293,7 @@ export default {
           } else if (res.data != "Fail") {
             if (this.scopeType == "project") {
               this.$store.commit("setProjectInfo", res.data);
+              parent.vm.projectInfo = res.data;
               this.$Notice.info({
                 desc: "Project update successfully!"
               });
@@ -1216,6 +1310,64 @@ export default {
         .catch(err => {
           console.log(err.data);
         });
+    },
+    resetSubProjectTypeModalShow(){
+      if(this.processStructure.length > 0){
+        this.resetSubProjectTypeNotice = true;
+      }else{
+        this.resetSubProjectTypeModel = true;
+      }
+    },
+    resetProjectTypeModalShow(){
+      if(this.processStructure.length > 0){
+        this.resetProjectTypeNotice = true;
+      }else{
+        this.resetProjectTypeModel = true;
+      }
+    },
+    resetSubProjectType(){
+      let obj = new URLSearchParams();
+      obj.append("subProjectId", this.scopeId);
+      obj.append("type", "");
+      obj.append("stepId", "");
+      this.axios
+          .post("/GeoProblemSolving/subProject/update", obj)
+          .then(res => {
+              this.resetProjectTypeModel = false;
+              if (res.data == "Offline") {
+                  parent.location.href="/GeoProblemSolving/login"
+              } else if (res.data != "Fail") {
+                  this.$store.commit("setSubProjectInfo", res.data);
+                  this.$emit("changeSubProjectInfo", res.data);
+              } else {
+                  this.$Message.error("Set type failed.");
+              }
+              })
+          .catch(err => {
+            console.log(err.data);
+          });
+    },
+    resetProjectType(){
+      let obj = new URLSearchParams();
+      obj.append("projectId", this.scopeId);
+      obj.append("type", "");
+      obj.append("stepId", "");
+      this.axios
+          .post("/GeoProblemSolving/project/update", obj)
+          .then(res => {
+              this.resetProjectTypeModel = false;
+              if (res.data == "Offline") {
+                  parent.location.href="/GeoProblemSolving/login"
+              } else if (res.data != "Fail") {
+                  this.$store.commit("setProjectInfo", res.data);
+                  this.$emit("changeProjectInfo", res.data);
+              } else {
+                  this.$Message.error("Set type failed.");
+              }
+              })
+          .catch(err => {
+            console.log(err.data);
+          });
     }
   }
 };

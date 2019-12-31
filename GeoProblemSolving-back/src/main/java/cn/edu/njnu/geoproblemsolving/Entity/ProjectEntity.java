@@ -22,6 +22,15 @@ public class ProjectEntity {
     private String endTime;
     private String type; //type0|type1|type2
     private String stepId;
+    private String solvingProcess;
+
+    public String getSolvingProcess() {
+        return solvingProcess;
+    }
+
+    public void setSolvingProcess(String solvingProcess) {
+        this.solvingProcess = solvingProcess;
+    }
 
     public void setStepId(String stepId) {
         this.stepId = stepId;
