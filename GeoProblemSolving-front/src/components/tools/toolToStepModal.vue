@@ -66,7 +66,7 @@
                   <Icon type="ios-hammer" size="25"></Icon>
                 </Tooltip>
               </MenuItem>
-              <MenuItem name="diyTools" class="leftMenuItem" to="/toolsCenter">
+              <MenuItem name="diyTools" class="leftMenuItem">
                 <Tooltip content="Share your tools" placement="right">
                   <Icon type="md-add" size="25"></Icon>
                 </Tooltip>
@@ -699,6 +699,9 @@ export default {
     },
     changeMenuItem(name) {
       this.showMenuItem = name;
+      if(name=="diyTool"){
+        top.location.href="/GeoProblemSolving/toolsCenter";
+      }
     },
     typeChanged(type) {
       this.typeSelected = type;
