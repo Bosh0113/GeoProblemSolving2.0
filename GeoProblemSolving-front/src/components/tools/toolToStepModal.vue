@@ -699,7 +699,7 @@ export default {
     },
     changeMenuItem(name) {
       this.showMenuItem = name;
-      if(name=="diyTool"){
+      if(name=="diyTools"){
         top.location.href="/GeoProblemSolving/toolsCenter";
       }
     },
