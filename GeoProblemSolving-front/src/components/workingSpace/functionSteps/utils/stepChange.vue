@@ -145,7 +145,7 @@ export default {
               normal: {
                 opacity: 1,
                 width: 3,
-                curveness: 0
+                curveness: 0.1
               }
             }
           }
@@ -163,7 +163,7 @@ export default {
               x: this.partProcesses[i].x,
               y: this.partProcesses[i].y,
               category: this.partProcesses[i].category,
-              symbolSize: 45
+              symbolSize: 60
             });
             this.selectedStep.push({
               stepId: this.partProcesses[i].stepID,
@@ -178,7 +178,7 @@ export default {
               x: this.partProcesses[i].x,
               y: this.partProcesses[i].y,
               category: this.partProcesses[i].category,
-              symbolSize: 30
+              symbolSize: 45
             });
           }
 

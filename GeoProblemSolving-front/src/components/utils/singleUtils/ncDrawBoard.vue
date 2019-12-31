@@ -387,12 +387,9 @@ export default {
   },
   methods: {
     initSize() {
-      if (window.innerHeight > 675) {
-        this.windowHeight = window.innerHeight;
-      } else {
-        this.windowHeight = 675;
-      }
-
+      $("#app").css("min-width", "0");
+      $("#app").css("min-height", "0");
+      this.windowHeight = window.innerHeight;
       this.canvasSize = {
         width: window.screen.availWidth - 380,
         height: window.screen.availHeight - 180
@@ -546,7 +543,10 @@ export default {
           thumbnail.height = 120;
           let thumbnailUrl = thumbnail.toDataURL();
           let thumbnailBlob = this.getBlobBydataURI(thumbnailUrl);
-          var thumbnailBlobFile = new File([thumbnailBlob], "thumbnail_"+filename);
+          var thumbnailBlobFile = new File(
+            [thumbnailBlob],
+            "thumbnail_" + filename
+          );
 
           //file
           let imageUrl = this.canvas.toDataURL();
@@ -561,7 +561,7 @@ export default {
           imageForm.append("privacy", "private");
           imageForm.append("folderId", this.pageParams.pageId);
           imageForm.append("thumbnail", thumbnailBlobFile);
-          
+
           this.axios
             .post("/GeoProblemSolving/folder/uploadToFolder", imageForm)
             .then(res => {

@@ -3,10 +3,10 @@
 <template>
   <div style="display:flex">
     <div>
-      <toolStyle  :style="{height:windowHeight+'px'}"></toolStyle>
+      <toolStyle :style="{height:windowHeight+'px'}"></toolStyle>
     </div>
     <div id="main" style="flex:4;margin-left:60px;overflow:hidden">
-      <tinymce id="d1" v-model="data":other_options="options" ></tinymce>
+      <tinymce id="d1" v-model="data" :other_options="options"></tinymce>
       <iframe id="form_target" name="form_target" style="display:none"></iframe>
       <form
         id="my_form"
@@ -16,7 +16,13 @@
         enctype="multipart/form-data"
         style="width:0px;height:0;overflow:hidden"
       >
-        <input name="image" type="file" id="choosePicture" @change="uploadPhoto($event)" accept="image/*">
+        <input
+          name="image"
+          type="file"
+          id="choosePicture"
+          @change="uploadPhoto($event)"
+          accept="image/*"
+        />
       </form>
       <Button type="primary" @click="saveModalShow" style="margin-top:20px;margin-left:10px">Save</Button>
     </div>
@@ -51,24 +57,23 @@ export default {
         width: "100%",
         height: "600",
         autoresize_min_height: 350,
-        file_browser_callback: (field_name, url, type, win)=> {
+        file_browser_callback: (field_name, url, type, win) => {
           this.inster_field_name = field_name;
-          if (type == "image")
-          $("#my_form input").click();
+          if (type == "image") $("#my_form input").click();
         },
-        convert_urls:false
+        convert_urls: false
       },
       Editor: null,
       pictureUrl: "",
       pageParams: { pageId: "", userId: "", userName: "" },
-      userInfo: {},
+      userInfo: {}
     };
   },
   mounted() {
     this.init();
     this.initSize();
-      this.getStepInfo();
-      this.getUserInfo();
+    this.getStepInfo();
+    this.getUserInfo();
     window.addEventListener("resize", this.initSize);
   },
   beforeDestroy() {
@@ -76,12 +81,9 @@ export default {
   },
   methods: {
     initSize() {
-      if(window.innerHeight > 675){
-        this.windowHeight = window.innerHeight;
-      }
-      else {
-         this.windowHeight = 775;
-      }
+      $("#app").css("min-width", "0");
+      $("#app").css("min-height", "0");
+      this.windowHeight = window.innerHeight;
     },
     init() {
       const self = this;
@@ -143,7 +145,7 @@ export default {
         this.$Message.error("Lose the information of current step.");
         return false;
       }
-      
+
       var blob = new Blob(['<meta charset="UTF-8">' + this.data], {
         type: " text/plain;charset=UTF-8"
       });
@@ -163,13 +165,16 @@ export default {
       this.axios
         .post("/GeoProblemSolving/folder/uploadToFolder", formData)
         .then(res => {
-          if(res.data == "Size over"||res.data == "Fail"||res.data == "Offline"){
+          if (
+            res.data == "Size over" ||
+            res.data == "Fail" ||
+            res.data == "Offline"
+          ) {
             console.log(res.data);
-          }
-          else if (res.data.length > 0) {
+          } else if (res.data.length > 0) {
             this.$Notice.open({
               title: "Upload notification title",
-              desc: "File uploaded successfully",
+              desc: "File uploaded successfully"
               // duration: 0
             });
           }
@@ -188,7 +193,7 @@ export default {
         var reader = new FileReader();
         reader.readAsDataURL(file);
         reader.onload = e => {
-          $('#choosePicture').val('');
+          $("#choosePicture").val("");
           // 读取到的图片base64 数据编码 将此编码字符串传给后台即可
           let formData = new FormData();
           formData.append("picture", file);
@@ -196,8 +201,11 @@ export default {
             .post("/GeoProblemSolving/project/picture", formData)
             .then(res => {
               if (res.data != "Fail") {
-                this.pictureUrl = 'http://'+this.$store.state.IP_Port+ res.data;
-                document.getElementById(this.inster_field_name).value = this.pictureUrl;
+                this.pictureUrl =
+                  "http://" + this.$store.state.IP_Port + res.data;
+                document.getElementById(
+                  this.inster_field_name
+                ).value = this.pictureUrl;
               } else {
                 this.$Message.error("upload picture Fail!");
               }

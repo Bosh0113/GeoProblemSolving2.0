@@ -394,11 +394,9 @@ export default {
   },
   methods: {
     initSize() {
-      if (window.innerHeight > 675) {
-        this.windowHeight = window.innerHeight;
-      } else {
-        this.windowHeight = 675;
-      }
+      $("#app").css("min-width", "0");
+      $("#app").css("min-height", "0");
+      this.windowHeight = window.innerHeight;
 
       this.canvasSize = {
         width: window.screen.availWidth - 380,

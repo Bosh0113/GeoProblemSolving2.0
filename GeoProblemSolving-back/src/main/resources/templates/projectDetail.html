@@ -215,6 +215,7 @@
             background-color: #2db7f5;
             color: white;
         }
+
         .ivu-card-body {
             display: inherit;
         }
@@ -258,18 +259,16 @@
                             </div>
                             <div slot="extra"></div>
                             <Row style="margin-left:60px">
-                                <div style="text-align:center;">
-                                    <h2 class="projectMenuItemTitle">Project title: </h2>
-                                    <h2 style="display: inline-block; max-width: 75%; vertical-align: top;"
-                                        class="overEllipsis" th:text="${projectInfo.title}"></h2>
-                                </div>
                                 <i-col span="10" offset="1">
                                     <div style="margin:20px">
                                         <Card style="width:100%;height:10%">
+                                            <div style="text-align:center;margin-bottom:15px;font-weight:bold;font-size:26px"
+                                            >Introduction
+                                            </div>
                                             <div style="text-align:center; width:40%; float:left">
                                                 <img src="/GeoProblemSolving/Images/info.png"/>
                                             </div>
-                                            <div style="width:60%; float:left; min-height: 85px">
+                                            <div style="width:60%; float:left; min-height: 90px">
                                                 <ul>
                                                     <li>The description of this project</li>
                                                     <li>The introduction of this project</li>
@@ -279,8 +278,7 @@
                                             </div>
                                             <div style="text-align:center">
                                                 <h3>
-                                                    Click it to check
-                                                    <a @click="gotoIntroduction()">Introduction</a>
+                                                    <a @click="gotoIntroduction()">Click to check it</a>
                                                 </h3>
                                             </div>
                                         </Card>
@@ -289,10 +287,13 @@
                                 <i-col span="10" offset="1">
                                     <div style="margin:20px">
                                         <Card style="width:100%">
+                                            <div style="text-align:center;margin-bottom:15px;font-weight:bold;font-size:26px"
+                                            >Task assignment
+                                            </div>
                                             <div style="text-align:center; width:40%; float:left">
                                                 <img src="/GeoProblemSolving/Images/tasks.png"/>
                                             </div>
-                                            <div style="width:60%; float:left; min-height: 85px">
+                                            <div style="width:60%; float:left; min-height: 90px">
                                                 <ul>
                                                     <li>"To do" list: tasks that need to be done</li>
                                                     <li>"Doing" list: tasks that are being done</li>
@@ -302,42 +303,46 @@
                                             </div>
                                             <div style="text-align:center">
                                                 <h3>
-                                                    Click it to check
-                                                    <a @click="gotoTaskassignment()">Task assignment</a>
+                                                    <a @click="gotoTaskassignment()">Click to check it</a>
                                                 </h3>
                                             </div>
                                         </Card>
                                     </div>
                                 </i-col>
                                 <i-col span="10" offset="1">
-                                <div style="margin:20px">
-                                    <Card style="width:100%">
-                                        <div style="text-align:center; width:40%; float:left">
-                                            <img src="/GeoProblemSolving/Images/steps.jpg"/>
-                                        </div>
-                                        <div style="width:60%; float:left; min-height: 85px">
-                                            <ul>
-                                                <li>Create a subproject with iterative step</li>
-                                                <li>Create a step directly</li>
-                                                <li>Start to work with other participants directly</li>
-                                            </ul>
-                                        </div>
-                                        <div style="text-align:center">
-                                            <h3>
-                                                Click it to check
-                                                <a @click="gotoWorking()">Workspace</a>
-                                            </h3>
-                                        </div>
-                                    </Card>
-                                </div>
+                                    <div style="margin:20px">
+                                        <Card style="width:100%">
+                                            <div style="text-align:center;margin-bottom:15px;font-weight:bold;font-size:26px"
+                                            >Workspace
+                                            </div>
+                                            <div style="text-align:center; width:40%; float:left">
+                                                <img src="/GeoProblemSolving/Images/steps.jpg"/>
+                                            </div>
+                                            <div style="width:60%; float:left; min-height: 90px">
+                                                <ul>
+                                                    <li>Create a subproject with iterative step</li>
+                                                    <li>Create a step directly</li>
+                                                    <li>Start to work with other participants directly</li>
+                                                </ul>
+                                            </div>
+                                            <div style="text-align:center">
+                                                <h3>
+                                                    <a @click="gotoWorking()">Click to check it</a>
+                                                </h3>
+                                            </div>
+                                        </Card>
+                                    </div>
                                 </i-col>
                                 <i-col span="10" offset="1">
                                     <div style="margin:20px">
                                         <Card style="width:100%">
+                                            <div style="text-align:center;margin-bottom:15px;font-weight:bold;font-size:26px"
+                                            >Resources
+                                            </div>
                                             <div style="text-align:center; width:40%; float:left">
                                                 <img src="/GeoProblemSolving/Images/data.png"/>
                                             </div>
-                                            <div style="width:60%; float:left; min-height: 85px">
+                                            <div style="width:60%; float:left; min-height: 90px">
                                                 <ul>
                                                     <li>Collect different types of resources</li>
                                                     <li>Support context understanding</li>
@@ -347,8 +352,7 @@
                                             </div>
                                             <div style="text-align:center">
                                                 <h3>
-                                                    Click it to check
-                                                    <a @click="gotoResource()">Resources</a>
+                                                    <a @click="gotoResource()">Click to check it</a>
                                                 </h3>
                                             </div>
                                         </Card>
@@ -369,10 +373,7 @@
                         <Card :bordered="false" dis-hover
                               style="height: -webkit-fill-available;flex-flow: column;min-height: fit-content;">
                             <div slot="title">
-                                <h1 class="projectMenuItemTitle">Project: </h1>
-                                <h1 style="display: inline-block; max-width: 75%; vertical-align: top;"
-                                    class="overEllipsis" id="projectTitle" th:text="${projectInfo.title}">Project
-                                    title</h1>
+                                <h1 slot="title" class="projectMenuItemTitle">Introduction</h1>
                             </div>
                             <div slot="extra">
                                 <div v-if="managerIdentity(projectInfo.managerId)">
@@ -418,21 +419,23 @@
                                                     <div style="height: -webkit-fill-available;text-align: center;">
                                                         <div class="statistics">
                                                             <div style="text-align: left;padding: 5px;">
-                                                                <p><strong>Privacy:</strong><span id="projectPrivacy"
+                                                                <p><strong>Title: </strong><span id="projectTitle" th:text="${projectInfo.title}">Project title</span>
+                                                                </p>
+                                                                <p><strong>Privacy: </strong><span id="projectPrivacy"
                                                                                                   th:text="${projectInfo.privacy}">Project privacy</span>
                                                                 </p>
-                                                                <p><strong>Category:</strong><span id="projectCategory"
+                                                                <p><strong>Category: </strong><span id="projectCategory"
                                                                                                    th:text="${projectInfo.category}">Project category</span>
                                                                 </p>
-                                                                <p><strong>Tag:</strong><span id="projectTag"
+                                                                <p><strong>Tag: </strong><span id="projectTag"
                                                                                               class="overEllipsis"
                                                                                               style="display: inline-block;vertical-align: top;width:230px"
                                                                                               th:text="${projectInfo.tag}"
                                                                                               th:attr="title=${projectInfo.tag}">Project tag</span>
                                                                 </p>
-                                                                <p><strong>Manager:</strong> {{projectInfo.managerName}}
+                                                                <p><strong>Manager: </strong> {{projectInfo.managerName}}
                                                                 </p>
-                                                                <p><strong>Create time:</strong>
+                                                                <p><strong>Create time: </strong>
                                                                     {{projectInfo.createTime}}</p>
                                                             </div>
                                                         </div>
@@ -616,8 +619,8 @@
                             </div>
                         </Card>
                         <div v-else style="width: -webkit-fill-available;height: -webkit-fill-available;">
-                            <iframe style="width: -webkit-fill-available;height: -webkit-fill-available;border-width:0" 
-                            :src="ipPort+'/projectTypeContent/' + projectInfo.projectId"></iframe>
+                            <iframe style="width: -webkit-fill-available;height: -webkit-fill-available;border-width:0"
+                                    :src="ipPort+'/projectTypeContent/' + projectInfo.projectId"></iframe>
                         </div>
                     </div>
                 </div>
@@ -646,7 +649,7 @@
                     <div style="background:#eee;padding: 10px;height: inherit;min-height: fit-content;">
                         <Card :bordered="false" dis-hover
                               style="height: -webkit-fill-available;min-height: 565px;min-height: fit-content;">
-                            <h1 slot="title" class="projectMenuItemTitle">Tasks</h1>
+                            <h1 slot="title" class="projectMenuItemTitle">Task assignment</h1>
                             <div>
                                 <child-task
                                         :project-info="projectInfo"
@@ -669,19 +672,6 @@
                                 :rules="editProjectFormRuleValidate"
                                 :label-width="100"
                         >
-                            <Form-item label="Category" prop="category">
-                                <Radio-group v-model="projectEditForm.category">
-                                    <Radio label="Terrestrial">Terrestrial System</Radio>
-                                    <Radio label="Coastal">Coastal System</Radio>
-                                    <Radio label="Marine">Marine System</Radio>
-                                    <Radio label="Climate">Climate System</Radio>
-                                    <Radio label="Ecological">Ecological System</Radio>
-                                    <Radio label="Geological">Geological System</Radio>
-                                    <Radio label="Human">Human-Activity</Radio>
-                                    <Radio label="GISRS">GIS & RS</Radio>
-                                    <Radio label="General">General</Radio>
-                                </Radio-group>
-                            </Form-item>
                             <Form-item label="Title" prop="title">
                                 <i-input v-model="projectEditForm.title" placeholder="Enter something..."></i-input>
                             </Form-item>
@@ -996,7 +986,7 @@
                     url: "/GeoProblemSolving/user/state",
                     type: "POST",
                     async: false,
-                    success: data=> {
+                    success: data => {
                         if (data) {
                             data.userState = true;
                             sessionStorage.setItem('userInfo', JSON.stringify(data));
@@ -1012,7 +1002,7 @@
                 if (this.userInfo == null || !this.userInfo.userState) {
                     window.location.href = '/GeoProblemSolving/login';
                 }
-                if(window.location.host=="localhost:8080"){
+                if (window.location.host == "localhost:8080") {
                     this.ipPort = 'http://localhost:8080';
                 }
             },
@@ -1049,7 +1039,6 @@
                         introduction: "",
                         title: "",
                         privacy: "",
-                        category: "",
                         editTags: ""
                     },
                     editProjectFormRuleValidate: {
@@ -1275,6 +1264,7 @@
                 },
                 changeMenuItem(name) {
                     this.showMenuItem = name;
+                    this.activeMenu = name;
                 },
                 gotoIntroduction() {
                     this.showMenuItem = "projectDetail";
@@ -1293,7 +1283,7 @@
                     this.activeMenu = "tasks";
                 },
                 getAllSubProjects() {
-                    if(this.projectInfo.type=="type0"){
+                    if (this.projectInfo.type == "type0") {
                         axios
                             .get(
                                 "/GeoProblemSolving/subProject/inquiry" + "?key=projectId" + "&value=" + this.projectInfo.projectId

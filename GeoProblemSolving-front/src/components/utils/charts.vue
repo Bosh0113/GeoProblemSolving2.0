@@ -100,6 +100,8 @@ export default {
   },
   methods: {
     init() {
+      $("#app").css("min-width", "0");
+      $("#app").css("min-height", "0");
       this.sidebarHeight = window.innerHeight + "px";
       $("#mytable").jexcel({
         data: this.testData,
@@ -515,7 +517,7 @@ export default {
         this.$Message.error("Lose the information of current step.");
         return false;
       }
-      
+
       let roomId = this.pageParams.pageId;
       this.socketApi.initWebSocket(
         "ChartsServer/" + roomId,
@@ -535,12 +537,11 @@ export default {
         this.$Message.error("Lose the information of current step.");
         return false;
       }
-      
+
       this.resources = [];
       this.axios
         .get(
-          "/GeoProblemSolving/folder/inquiry?folderId=" +
-            this.pageParams.pageId
+          "/GeoProblemSolving/folder/inquiry?folderId=" + this.pageParams.pageId
         )
         .then(res => {
           // 写渲染函数，取到所有资源

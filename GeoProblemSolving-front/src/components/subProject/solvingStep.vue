@@ -409,8 +409,8 @@ export default {
             lineStyle: {
               normal: {
                 opacity: 1,
-                width: 3,
-                curveness: 0
+                width: 5,
+                curveness: 0.1
               }
             }
           }
@@ -428,7 +428,7 @@ export default {
               x: this.processStructure[i].x,
               y: this.processStructure[i].y,
               category: this.processStructure[i].category,
-              symbolSize: 45
+              symbolSize: 60
             });
             this.selectedStep.push({
               stepId: this.processStructure[i].stepID,
@@ -443,7 +443,7 @@ export default {
               x: this.processStructure[i].x,
               y: this.processStructure[i].y,
               category: this.processStructure[i].category,
-              symbolSize: 30
+              symbolSize: 45
             });
           }
 
@@ -468,8 +468,8 @@ export default {
 
       // 单击选择步骤
       this.stepChart.on("click", function(params) {
-        if (option.series[0].data[params.data.index].symbolSize == 30) {
-          option.series[0].data[params.data.index].symbolSize = 45;
+        if (option.series[0].data[params.data.index].symbolSize == 45) {
+          option.series[0].data[params.data.index].symbolSize = 60;
           _this.formValidate0.stepTitle = params.data.name;
           _this.formValidate0.stepType = _this.getStepType(
             params.data.category
@@ -481,8 +481,8 @@ export default {
             index: params.data.index,
             name: params.data.name
           });
-        } else if (option.series[0].data[params.data.index].symbolSize == 45) {
-          option.series[0].data[params.data.index].symbolSize = 30;
+        } else if (option.series[0].data[params.data.index].symbolSize == 60) {
+          option.series[0].data[params.data.index].symbolSize = 45;
 
           // remove these not selected step nodes
           for (var i = 0; i < _this.selectedStep.length; i++) {

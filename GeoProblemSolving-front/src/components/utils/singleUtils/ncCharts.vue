@@ -91,6 +91,8 @@ export default {
   },
   methods: {
     init() {
+      $("#app").css("min-width", "0");
+      $("#app").css("min-height", "0");
       this.sidebarHeight = window.innerHeight + "px";
       $("#mytable").jexcel({
         data: this.testData,

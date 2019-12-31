@@ -8,37 +8,37 @@
 .ivu-menu-item {
   padding: 5px 5px 5px 5px;
 }
-.sidebar{
-  width:60px;
-  background-color:#515a6e;
-  justify-content:center;
-  position: absolute
+.sidebar {
+  width: 60px;
+  background-color: #515a6e;
+  justify-content: center;
+  position: absolute;
 }
 </style>
 <template>
   <div>
-    <div class="sidebar" style="width:60px;float:left" :style="{height:windowHeight+'px'}">      
+    <div class="sidebar" style="width:60px;float:left" :style="{height:windowHeight+'px'}">
       <div style="display:flex;justify-content:center;margin-top:20px" title="Resources">
-        <span @click="resourceDrawer=true" style="cursor:pointer"><Icon type="md-folder" :size="40" color="white"/></span>
+        <span @click="resourceDrawer=true" style="cursor:pointer">
+          <Icon type="md-folder" :size="40" color="white" />
         </span>
         <Drawer title="Resources" :closable="false" v-model="resourceDrawer" placement="left">
-        <div style="height:45%;overflow-y:auto">
-          <ul>
-            <li v-for="(resource,index) in videoList" :key="index" @click="selectVideo(resource.pathURL)" style="cursor:pointer;margin-bottom:10px" :title="resource.description">{{resource.name}}</li>
-          </ul>
-        </div>
+          <div style="height:45%;overflow-y:auto">
+            <ul>
+              <li
+                v-for="(resource,index) in videoList"
+                :key="index"
+                @click="selectVideo(resource.pathURL)"
+                style="cursor:pointer;margin-bottom:10px"
+                :title="resource.description"
+              >{{resource.name}}</li>
+            </ul>
+          </div>
         </Drawer>
       </div>
     </div>
     <div :style="{height:windowHeight+'px'}" style="float:left;padding-left:100px;padding-top:40px">
-      <video
-        :width="videoWidth"
-        :height="videoHeight"
-        :src="videoUrl"
-        controls
-        class="videoPanel"
-      >
-      </video>
+      <video :width="videoWidth" :height="videoHeight" :src="videoUrl" controls class="videoPanel"></video>
     </div>
   </div>
 </template>
@@ -51,10 +51,10 @@ export default {
       videoHeight: 100,
       videoList: [],
       videoUrl: "",
-      activeItem:0,
-      resourceDrawer:false,
+      activeItem: 0,
+      resourceDrawer: false,
       pageParams: { pageId: "", userId: "", userName: "" },
-      userInfo: {},
+      userInfo: {}
     };
   },
   beforeRouteEnter: (to, from, next) => {
@@ -69,8 +69,8 @@ export default {
   mounted() {
     window.addEventListener("resize", this.initSize);
     this.initSize();
-      this.getStepInfo();
-      this.getUserInfo();
+    this.getStepInfo();
+    this.getUserInfo();
     this.getVideoResource();
   },
   beforeDestroy: function() {
@@ -78,12 +78,9 @@ export default {
   },
   methods: {
     initSize() {
-      if(window.innerHeight > 675){
-        this.windowHeight = window.innerHeight;
-      }
-      else{
-        this.windowHeight = 675;
-      }
+      $("#app").css("min-width", "0");
+      $("#app").css("min-height", "0");
+      this.windowHeight = window.innerHeight;
       this.videoWidth = window.innerWidth - 80 - 60;
       this.videoHeight = window.innerHeight - 80;
     },
@@ -142,27 +139,26 @@ export default {
         return false;
       }
 
-      this.videoList = [];      
-        this.axios
-          .get(
-           "/GeoProblemSolving/folder/inquiry?folderId=" +
-            this.pageParams.pageId
-          )
-          .then(res => {
-            // 写渲染函数，取到所有资源
-            if (res.data !== "None") {              
-              for (let i = 0; i < res.data.length; i++) {
-                if (res.data[i].type == "video") {
-                  this.videoList.push(res.data[i]);
-                }
+      this.videoList = [];
+      this.axios
+        .get(
+          "/GeoProblemSolving/folder/inquiry?folderId=" + this.pageParams.pageId
+        )
+        .then(res => {
+          // 写渲染函数，取到所有资源
+          if (res.data !== "None") {
+            for (let i = 0; i < res.data.length; i++) {
+              if (res.data[i].type == "video") {
+                this.videoList.push(res.data[i]);
               }
-            } else {
-              this.videoList = [];
             }
-          })
-          .catch(err => {
-            console.log(err.data);
-          }); 
+          } else {
+            this.videoList = [];
+          }
+        })
+        .catch(err => {
+          console.log(err.data);
+        });
     },
     selectVideo(url) {
       this.videoUrl = url;
@@ -189,10 +185,13 @@ export default {
       this.axios
         .post("/GeoProblemSolving/folder/uploadToFolder", formData)
         .then(res => {
-          if(res.data == "Size over"||res.data == "Fail"||res.data == "Offline"){
+          if (
+            res.data == "Size over" ||
+            res.data == "Fail" ||
+            res.data == "Offline"
+          ) {
             console.log(res.data);
-          }
-          else if (res.data.length > 0) {
+          } else if (res.data.length > 0) {
             let videoName = res.data[0].fileName;
             this.videoUrl = "/GeoProblemSolving/resource/upload/" + videoName;
 

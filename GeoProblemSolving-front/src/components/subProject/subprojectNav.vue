@@ -39,8 +39,8 @@
       <div
         style="font-size:1.5rem;height:60px;padding-top:10px;border:1px solid lightgrey;margin-left:60px"
       >
-        <Col offset="4" span="16" style="text-align:center;">
-          <strong>{{subProjectInfo.title}}</strong>
+        <Col span="16" style="margin-left:20px;color: #2d8cf099;">
+          <strong>{{panelTitle}}</strong>
         </Col>
         <!-- <Button
           type="info"
@@ -64,6 +64,7 @@ export default {
   data() {
     return {
       menuActive: "overview",
+      panelTitle: "Overview",
       // information of project
       projectInfo: {},
       // info of subproject
@@ -74,16 +75,16 @@ export default {
       userRole: "Visitor"
     };
   },
+  watch: {
+    $route() {
+      this.initPenal();
+    }
+  },
   created() {
     this.init();
   },
   mounted() {
-    var type = this.$route.name;
-    if (type != "") {
-      this.menuActive = type;
-    } else {
-      this.menuActive = "overview";
-    }
+    this.initPenal();
     window.addEventListener("resize", this.initSize);
   },
   beforeRouteEnter: (to, from, next) => {
@@ -121,6 +122,28 @@ export default {
     init() {
       this.initSize();
       this.getSubprojectInfo();
+    },
+    initSize() {
+      this.contentHeight = window.innerHeight - 120 + "px";
+    },
+    initPenal() {
+      var type = this.$route.name;
+      if (type == "" || type == "overview") {
+        this.menuActive = "overview";
+        this.panelTitle = "Overview";
+      } else if (type == "process") {
+        this.menuActive = type;
+        this.panelTitle = "Workspace";
+      } else if (type == "info") {
+        this.menuActive = type;
+        this.panelTitle = "Introduction";
+      } else if (type == "resource") {
+        this.menuActive = type;
+        this.panelTitle = "Resources";
+      } else if (type == "task") {
+        this.menuActive = type;
+        this.panelTitle = "Task assignment";
+      }
     },
     getProjectInfo() {
       let projectInfo = this.$store.getters.project;

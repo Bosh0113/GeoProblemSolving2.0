@@ -32,11 +32,10 @@
         }
         .picscreen {
             position: relative;
-            transform: translateY(60px);
         }
 
         .picbg {
-            background-image: url("Images/projectlistbg.jpg");
+            background-image: url("Images/projectlist.png");
             background-size: cover;
             position: absolute;
             height: 140px;
@@ -47,20 +46,19 @@
         }
 
         .pictitle{
-            font-size: 2rem;
+            font-size: 1.6rem;
             font-family: Georgia, sans-serif, serif;
-            color: #ffffff;
             position: absolute;
             top: 18px;
             left: 100px;
         }
         .picdesc{
             font-size: 0.9rem;
-            color: #f7faf7;
             position: absolute;
             top: 72px;
             left: 100px;
             display: block;
+            width: 700px;
         }
         .project-start-btn{
             position: absolute;
@@ -68,21 +66,22 @@
             left: 70%;
             font-size: 0.9rem;
             border-radius: 6px;
-            background-color: rgba(21, 88, 145, 0.4);
+            background-color: rgba(21, 88, 145, 0.8);
             color: rgba(255,255,255,1);
+            width: 150px;
         }
         .search-btn{
             position: absolute;
             top: 30px;
             right: 50px;
             font-size: 0.5rem;
-            width: 100px;
-            text-align:right;
+            width: 150px;
+            text-align:left;
         }
 
         /*Tabs--style*/
         .tabs{
-            transform: translateY(200px);
+            transform: translateY(60px);
             min-height: 500px;
         }
         .tabpane-syle{
@@ -115,43 +114,40 @@
             text-align: center;
             /*margin-top: 200px;*/
         }
+
+        .tab-content {
+            transform: translateY(140px);
+        }
     </style>
 </head>
 <body>
 <div id="vueBody" v-cloak style="min-width: 1100px;">
    <child-navigation ref="navigationEl" active-type="projects" :user-info="userInfo"></child-navigation>
-    <div class="picscreen" >
-        <div class="picbg"></div>
-        <div class="home-content">
-            <div>
-                <span class="pictitle">Projects</span>
-                <span class="picdesc">The project is created for solving geographic problems, <br />
-                    where resources, perspectives, and methods can be shared in a participatory manner.</span>
-                <i-button class="project-start-btn" @click="newProject"  type="default" >Create a project</i-button>
-                <i-button class="search-btn" icon="icon ion-ios-search" @click=" ">Search...</i-button>
-            </div>
-        </div>
-    </div>
-
     <div class="tabs">
         <Row :style="{minHeight:contentMinHeight+'px'}">
             <i-col>
                 <div class="pro-tab">
                     <Tabs  v-model="currentTab" @on-click="changeTab" >
                         <tab-pane label="All" name="All" icon="md-list"></tab-pane>
-                        <tab-pane label="Terrestrial"  name="Terrestrial" icon="md-globe"></tab-pane>
-                        <tab-pane label="Coastal"  name="Coastal" icon="ios-boat"></tab-pane>
-                        <tab-pane label="Marine"  name="Marine"  icon="ios-water"></tab-pane>
-                        <tab-pane label="Climate"  name="Climate"  icon="ios-partly-sunny"></tab-pane>
-                        <tab-pane label="Ecological"  name="Ecological"  icon="ios-leaf"></tab-pane>
-                        <tab-pane label="Geological"  name="Geological"  icon="ios-analytics"></tab-pane>
-                        <tab-pane label="Human-Activity"  name="Human"  icon="ios-people"></tab-pane>
-                        <tab-pane label="GIS & RS"  name="GISRS"  icon="ios-globe"></tab-pane>
-                        <tab-pane label="General"  name="General"  icon="ios-grid"></tab-pane>
+                        <tab-pane label="Investigational" name="Investigational" icon="md-globe"></tab-pane>
+                        <tab-pane label="Intercomparable" name="Intercomparable" icon="md-git-compare"></tab-pane>
+                        <tab-pane label="Reproducible" name="Reproducible" icon="ios-copy"></tab-pane>
+                        <tab-pane label="Educational" name="Educational" icon="ios-paper"></tab-pane>
                     </Tabs>
                 </div>
                 <div class="pro-content">
-                    <tab-content  :project-list = tabPageData @sendNotice="sendMessage" :key="freshEle"></tab-content >
+                    <div class="picscreen" >
+                        <div class="picbg"></div>
+                        <div class="home-content">
+                            <div>
+                                <span class="pictitle">{{selectCatalog.name}}</span>
+                                <span class="picdesc">{{selectCatalog.introduction}}</span>
+                                <i-button class="project-start-btn" @click="newProject"  type="default" >Create a project</i-button>
+                                <i-button class="search-btn" icon="icon ion-ios-search" @click=" ">Search...</i-button>
+                            </div>
+                        </div>
+                    </div>
+                    <tab-content class="tab-content" :project-list = tabPageData @sendNotice="sendMessage" :key="freshEle"></tab-content >
                 </div>
             </i-col>
 
@@ -182,16 +178,19 @@
                 pageSize:18,
                 tabPageData:projectsInfo.projectList,
                 tabPaneType:[{  label:"All",name:"All",icon:"icon ion-md-list"},
-                    { label:"Terrestrial", name:"Terrestrial", icon:"icon ion-md-globe"},
-                    {label:"Coastal", name:"Coastal",icon:"icon ion-ios-boat"},
-                    {label:"Marine", name:"Marine", icon:"icon ion-ios-water"},
-                    {label:"Climate", name:"Climate", icon:"icon ion-ios-partly-sunny"},
-                    {label:"Ecological", name:"Ecological", icon:"icon ion-ios-leaf"},
-                    {label:"Geological", name:"Geological", icon:"icon ion-ios-analytics"},
-                    {label:"Human-Activity", name:"Human" ,icon:"icon ion-ios-people"},
-                    {label:"GIS & RS", name:"GISRS" ,icon:"icon ion-ios-globe"},
-                    {label:"General", name:"General", icon:"icon ion-ios-grid"}
+                    {label: "Investigational", name: "Investigational", icon: "icon ion-md-globe"},
+                    {label: "Intercomparable", name: "Intercomparable", icon: "icon ion-md-git-compare"},
+                    {label: "Reproducible", name: "Reproducible", icon: "icon ion-ios-copy"},
+                    {label: "Educational", name: "Educational", icon: "icon ion-ios-paper"}
                 ],
+                projectCatalog:[
+                    {name:"All projects", introduction:"All different types of are listed here, including investigational projects, intercomparable projects, reproducible projects, and educational projects. Select the project that you need."},
+                    {name:"Investigational projects", introduction:"Understanding geographic scales and boundaries, clarifying geographic factors, analyzing geographic phenomena, and simulating geographic processes"},
+                    {name:"Intercomparable projects", introduction:"Intercomparable projects"},
+                    {name:"Reproducible projects", introduction:"Reproducible projects"},
+                    {name:"Educational projects", introduction:"Educational projects"},
+                ],
+                selectCatalog:{name:"All projects", introduction:"All different types of are listed here, including investigational projects, intercomparable projects, reproducible projects, and educational projects. Select the project that you need."},
                 // user
                 userInfo:[],
                 userState:false,
@@ -246,7 +245,7 @@
 
             methods: {
                 resizeContent(){
-                    this.contentMinHeight = window.innerHeight-340.38;
+                    this.contentMinHeight = window.innerHeight-100.38;
                 },
                 changeTab(type) {
                     this.currentTab=type;
@@ -260,8 +259,21 @@
                         this.tabPageData=Object.assign([],  this.currentProjectList);
                         this.freshEle++;
                         this.totalCount=projectsInfo.count;
+                        this.selectCatalog = this.projectCatalog[0];
                     }
                     else{
+                        if(type == "Investigational"){
+                            this.selectCatalog = this.projectCatalog[1];
+                        }
+                        else if(type == "Intercomparable"){
+                            this.selectCatalog = this.projectCatalog[2];
+                        }
+                        else if(type == "Reproducible"){
+                            this.selectCatalog = this.projectCatalog[3];
+                        }
+                        else if(type == "Educational"){
+                            this.selectCatalog = this.projectCatalog[4];
+                        }
                         this.changePage(1);
                     }
 
