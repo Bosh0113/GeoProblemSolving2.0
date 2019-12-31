@@ -55,6 +55,7 @@
         :userRole="userRole"
         :projectInfo="projectInfo"
         :scopeInfo="scopeInfo"
+        @changeSubProjectInfo="changeSubProjectInfo"
       ></router-view>
     </Row>
   </div>
@@ -295,6 +296,9 @@ export default {
           desc: "The working space have not be initialized!"
         });
       }
+    },
+    changeSubProjectInfo(newInfo){
+      this.subProjectInfo = newInfo;
     }
   }
 };

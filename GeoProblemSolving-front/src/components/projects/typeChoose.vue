@@ -147,8 +147,8 @@ export default {
                         if (res.data == "Offline") {
                             parent.location.href="/GeoProblemSolving/login"
                         } else if (res.data != "Fail") {
-                            this.$store.commit("setProjectInfo", res.data);
                             this.$emit("changeProjectInfo", res.data);
+                            this.$store.commit("setProjectInfo", res.data);
                         } else {
                             this.$Message.error("Set type failed.");
                         }
