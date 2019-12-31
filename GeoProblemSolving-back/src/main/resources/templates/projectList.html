@@ -116,7 +116,8 @@
         }
 
         .tab-content {
-            transform: translateY(140px);
+            /* transform: translateY(140px); */
+            margin-top: 140px;
         }
     </style>
 </head>
@@ -135,18 +136,18 @@
                         <tab-pane label="Educational" name="Educational" icon="ios-paper"></tab-pane>
                     </Tabs>
                 </div>
-                <div class="pro-content">
-                    <div class="picscreen" >
-                        <div class="picbg"></div>
-                        <div class="home-content">
-                            <div>
-                                <span class="pictitle">{{selectCatalog.name}}</span>
-                                <span class="picdesc">{{selectCatalog.introduction}}</span>
-                                <i-button class="project-start-btn" @click="newProject"  type="default" >Create a project</i-button>
-                                <i-button class="search-btn" icon="icon ion-ios-search" @click=" ">Search...</i-button>
-                            </div>
+                <div class="picscreen" >
+                    <div class="picbg"></div>
+                    <div class="home-content">
+                        <div>
+                            <span class="pictitle">{{selectCatalog.name}}</span>
+                            <span class="picdesc">{{selectCatalog.introduction}}</span>
+                            <i-button class="project-start-btn" @click="newProject"  type="default" >Create a project</i-button>
+                            <i-button class="search-btn" icon="icon ion-ios-search" @click=" ">Search...</i-button>
                         </div>
                     </div>
+                </div>
+                <div class="pro-content">
                     <tab-content class="tab-content" :project-list = tabPageData @sendNotice="sendMessage" :key="freshEle"></tab-content >
                 </div>
             </i-col>
