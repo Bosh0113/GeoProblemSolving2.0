@@ -39,4 +39,10 @@ public class UpdateDBController {
         UpdateDBDao updateDBDao = new UpdateDBDao(mongoTemplate);
         return updateDBDao.moduleToStepTree();
     }
+
+    @RequestMapping(value = "/updatePasswordMD5", method = RequestMethod.GET)
+    public String updatePasswordMD5(){
+        UpdateDBDao updateDBDao = new UpdateDBDao(mongoTemplate);
+        return updateDBDao.md5Password();
+    }
 }
