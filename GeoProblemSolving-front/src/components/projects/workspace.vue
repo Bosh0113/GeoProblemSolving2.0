@@ -1,6 +1,6 @@
 <style scoped>
-.btnHoverGray:hover {
-  background-color: #808695;
+.btnHoverRed:hover {
+  background-color: #ed4014;
   color: white;
 }
 </style>
@@ -10,7 +10,6 @@
         <Card dis-hover>
             <h1 slot="title">Workspace</h1>
             <div slot="extra">
-                <Button class="btnHoverGray" @click="resetProjectTypeModalShow()">Reset project's type</Button>
             </div>
             <Row>
                 <Col span="5">
@@ -39,6 +38,9 @@
                 </Row>
                 </Col>
             </Row>
+            <div style="margin:5px 0 5px 80px;text-align:center">
+                <Button class="btnHoverRed" @click="resetProjectTypeModalShow()">Reset project's type</Button>
+            </div>
         </Card>
         <Modal
         v-model="resetProjectTypeModel"

@@ -5,6 +5,8 @@ import cn.edu.njnu.geoproblemsolving.Entity.Folder.FolderEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.StepEntity;
 
 import cn.edu.njnu.geoproblemsolving.Entity.SubProjectEntity;
+import cn.edu.njnu.geoproblemsolving.Entity.ToolEntity;
+import cn.edu.njnu.geoproblemsolving.Entity.ToolsetEntity;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +41,42 @@ public class StepDaoImpl implements IStepDao {
         step.setCreateTime(dateFormat.format(date));
 //        step.setToolList(new ArrayList<>());
 //        step.setToolsetList(new ArrayList<>());
+        mongoTemplate.save(step);
+
+        // 资源
+        FolderEntity folderEntity = new FolderEntity();
+        folderEntity.setScopeId(stepId);
+        folderEntity.setFolders(new ArrayList<>());
+        folderEntity.setFiles(new ArrayList<>());
+        folderEntity.setFolderName(step.getName());
+        folderEntity.setParentId("");
+        folderEntity.setFolderId(step.getStepId());
+        mongoTemplate.save(folderEntity);
+
+        return stepId;
+    }
+
+    public String createStepOfType(StepEntity step) {
+
+        // 基本信息+工具模块+特有内容
+        String stepId = UUID.randomUUID().toString();
+        step.setStepId(stepId);
+        Date date = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        step.setCreateTime(dateFormat.format(date));
+        Query queryPublic = new Query(Criteria.where("privacy").is("Public"));
+        List<ToolEntity> toolEntities = mongoTemplate.find(queryPublic, ToolEntity.class);
+        ArrayList<String> toolStrs = new ArrayList<>();
+        for (ToolEntity toolEntity:toolEntities){
+            toolStrs.add(toolEntity.getTId());
+        }
+        step.setToolList(toolStrs);
+        List<ToolsetEntity> toolsetEntities = mongoTemplate.find(queryPublic,ToolsetEntity.class);
+        ArrayList<String> toolsetStrs = new ArrayList<>();
+        for (ToolsetEntity toolsetEntity: toolsetEntities){
+            toolsetStrs.add(toolsetEntity.getTsId());
+        }
+        step.setToolsetList(toolsetStrs);
         mongoTemplate.save(step);
 
         // 资源
