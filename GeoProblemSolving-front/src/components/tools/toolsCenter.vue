@@ -201,7 +201,7 @@
                               icon="md-eye"
                               shape="circle"
                               class="btnHoverGray"
-                              title="Preview"
+                              title="Details"
                               size="small"
                               @click="showTool(tool)"
                             ></Button>

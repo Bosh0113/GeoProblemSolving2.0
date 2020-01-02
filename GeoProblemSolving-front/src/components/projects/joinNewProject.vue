@@ -157,6 +157,7 @@
 
 </template>
 <script>
+import md5 from "js-md5";
 import Avatar from "vue-avatar";
 export default {
   data() {
@@ -184,9 +185,6 @@ export default {
       projectName:"",
     };
   },
-  // created(){
-
-  // },
   mounted(){
     // navigation页面的
     this.getProjectName();
@@ -201,6 +199,7 @@ export default {
     $(".userState sup").css("margin-top", "20px");
   },
   components: {
+    md5,
     Avatar
   },
   computed: {
@@ -262,7 +261,7 @@ export default {
             "&email=" +
             this.email+
             "&password="+
-            this.password
+            md5(this.password)
         )
         .then(res => {
           let gotoProjectId = this.projectId;
