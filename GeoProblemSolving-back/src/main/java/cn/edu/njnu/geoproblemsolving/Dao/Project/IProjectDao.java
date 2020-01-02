@@ -30,5 +30,5 @@ public interface IProjectDao {
 
     String uploadPicture(HttpServletRequest request);
 
-    Object inquiryByPage(String category, int page, int pageSize, String userId, String[] joinedProjects);
+    Object inquiryByPage(String category, String tag, int page, int pageSize, String userId, String[] joinedProjects);
 }
