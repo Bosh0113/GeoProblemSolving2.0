@@ -394,7 +394,7 @@
             style="margin:2.5%"
             :padding="5"
           >
-            <div style="display:flex;align-items:center">
+            <div style="display:flex;align-items:center;cursor:pointer" @click="gotoPersonalSpace(participant.userId)">
               <div class="memberImg" style="position:relative">
                 <img
                   v-if="participant.avatar != '' && participant.avatar!='undefined'"
@@ -422,7 +422,7 @@
             style="margin:2.5%"
             :padding="5"
           >
-            <div style="display:flex;align-items:center">
+            <div style="display:flex;align-items:center;cursor:pointer" @click="gotoPersonalSpace(participant.userId)">
               <div class="memberImg" style="position:relative">
                 <img
                   v-if="participant.avatar != '' && participant.avatar!='undefined'"
@@ -477,7 +477,14 @@ export default {
     });
   },
   updated: function() {},
-  methods: {
+  methods: {    
+    gotoPersonalSpace(id) {
+      if (id == this.$store.getters.userId) {
+        this.$router.push({ name: "PersonalPage" });
+      } else {
+        this.$router.push({ name: "MemberDetailPage", params: { id: id } });
+      }
+    },
   }
 };
 </script>
