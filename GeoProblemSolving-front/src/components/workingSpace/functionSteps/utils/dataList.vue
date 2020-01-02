@@ -445,7 +445,7 @@ export default {
     },
     filterToolData() {
       var filterdata = this.fileList.filter(item => {
-        if (item.type == "toolData") {
+        if (item.type.indexOf("toolData") != -1) {
           return item;
         }
       });

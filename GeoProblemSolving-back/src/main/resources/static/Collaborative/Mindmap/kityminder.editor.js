@@ -1,9 +1,9 @@
 /*!
  * ====================================================
- * kityminder-editor - v1.0.67 - 2019-12-27
+ * kityminder-editor - v1.0.67 - 2020-01-02
  * https://github.com/fex-team/kityminder-editor
  * GitHub: https://github.com/fex-team/kityminder-editor 
- * Copyright (c) 2019 ; Licensed 
+ * Copyright (c) 2020 ; Licensed 
  * ====================================================
  */
 
@@ -3692,7 +3692,7 @@ angular.module('kityminderEditor')
                                 break;
                             default:
                                 console.log("File not supported!");
-                                alert('only support data format(*.km, *.md, *.json)');
+                                alert('Only support data format(*.km, *.md, *.json)');
                                 return;
                         }
 
@@ -3759,7 +3759,7 @@ angular.module('kityminderEditor')
 
                             var folderId = info.pageId;
                             $.ajax({
-                                url: 'http://' + RouteInfo.getIPPort() + '/GeoProblemSolving/folder/removeFile?resourceId=' + map.resourceId + '&folderId=' + folderId,
+                                url: 'http://' + RouteInfo.getIPPort() + '/GeoProblemSolving/folder/removeFile?fileId=' + map.resourceId + '&folderId=' + folderId,
                                 type: "GET",
                                 async: false,
                                 success: function (data) {
@@ -3945,7 +3945,7 @@ angular.module('kityminderEditor')
                                         var formData = new FormData();
                                         formData.append("file", fileBlob);
                                         formData.append("description", "Collaborative mindmap tool");
-                                        formData.append("type", "toolData");
+                                        formData.append("type", "toolData:Mindmap");
                                         formData.append("uploaderId", info.userId);
                                         formData.append("privacy", "private");
                                         formData.append("folderId", info.pageId);
