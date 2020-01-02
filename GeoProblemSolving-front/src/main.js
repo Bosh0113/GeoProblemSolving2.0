@@ -26,7 +26,8 @@ import "element-ui/lib/theme-chalk/index.css";
 
 axios.defaults.withCredentials=true;
 Vue.prototype.socketApi = socketApi
-Vue.config.productionTip = false
+Vue.config.productionTip = false;
+Vue.config.devtools = true;
 
 Vue.use(iView)
 Vue.use(Vuex)

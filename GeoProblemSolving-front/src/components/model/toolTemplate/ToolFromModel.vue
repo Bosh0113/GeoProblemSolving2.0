@@ -137,7 +137,7 @@ export default {
     getSelectModel(model) {
       this.selectModelItem = model;
       this.$emit("getSelectModel", this.selectModelItem);
-      $(this).css("background","#f00");
+      // $(this).css("background","#f00");
     }
   },
 
