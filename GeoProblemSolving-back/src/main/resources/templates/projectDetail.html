@@ -261,7 +261,16 @@
                             <div slot="title">
                                 <h1 class="projectMenuItemTitle">Overview </h1>
                             </div>
-                            <div slot="extra"></div>
+                            <div slot="extra">
+                                <div v-if="!managerIdentity(projectInfo.managerId)&&!memberIdentity(projectInfo.members)">
+                                    <i-button
+                                            type="success"
+                                            @click="joinApplyModalShow()"
+                                            title="Apply to join the project"
+                                    >Apply to join
+                                    </i-button>
+                                </div>
+                            </div>
                             <Row style="margin-left:60px">
                                 <i-col span="10" offset="1">
                                     <div style="margin:20px">
@@ -984,6 +993,15 @@
                     <i-button type="primary" @click="resetProjectType()">Submit</i-button>
                   </div>
                 </Modal>
+                <Modal
+                  v-model="joinProjectNotice"
+                  title="Permission restrictions"
+                >
+                  <h2 style="color: #2db7f5">Please confirm that all subprojects have been deleted.</h2>
+                  <div slot="footer">
+                    <i-button type="primary" @click="joinProjectNotice=false">OK</i-button>
+                  </div>
+                </Modal>
             </div>
         </div>
     </template>
@@ -1033,6 +1051,7 @@
                 }
             },
             mounted() {
+                this.getProjectInfo();
                 this.userEnter();
                 this.resizeContent();
                 this.getAllSubProjects();
@@ -1099,13 +1118,6 @@
                                 trigger: "blur"
                             }
                         ],
-                        introduction: [
-                            {
-                                required: true,
-                                message: "The project introduction cannot be empty",
-                                trigger: "blur"
-                            }
-                        ]
                     },
                     pictureUrl: "",
                     inputTag: "",
@@ -1231,11 +1243,34 @@
                     haveApplied: false,
                     taskRole: "",
                     resetProjectTypeNotice:false,
-                    resetProjectTypeModel:false
-
+                    resetProjectTypeModel:false,
+                    joinProjectNotice:false
                 }
             },
             methods: {
+                getProjectInfo(){
+                    if(this.projectInfo=={}||this.projectInfo==undefined){
+                        $.ajax({
+                        url:
+                            "/GeoProblemSolving/project/inquiry" +
+                            "?key=projectId" +
+                            "&value=" +
+                            this.projectId,
+                        type: "GET",
+                        async: false,
+                        success: data => {
+                            if (data == "Offline") {
+                                parent.location.href="/GeoProblemSolving/login"
+                            }
+                            if (data != "None" && data != "Fail") {
+                                this.projectInfo = data[0];
+                            } else {
+                            console.log(data);
+                            }
+                        }
+                        });
+                    }
+                },
                 userEnter() {
                     if (this.projectInfo.privacy == "Public") {
 
@@ -1300,12 +1335,22 @@
                     this.activeMenu = "projectDetail";
                 },
                 gotoResource() {
-                    this.showMenuItem = "resources";
-                    this.activeMenu = "resources";
+                    if(this.taskRole=="Visitor"){
+                        this.joinProjectNotice = true;
+                    }
+                    else{
+                        this.showMenuItem = "resources";
+                        this.activeMenu = "resources";
+                    }
                 },
                 gotoWorking() {
-                    this.showMenuItem = "subProjects";
-                    this.activeMenu = "subProjects";
+                    if(this.taskRole=="Visitor"){
+                        this.joinProjectNotice = true;
+                    }
+                    else{
+                        this.showMenuItem = "subProjects";
+                        this.activeMenu = "subProjects";
+                    }
                 },
                 gotoTaskassignment() {
                     this.showMenuItem = "tasks";

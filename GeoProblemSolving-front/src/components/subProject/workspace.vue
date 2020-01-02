@@ -1,15 +1,12 @@
 <style scoped>
-    .btnHoverGray:hover {
-    background-color: #808695;
-    color: white;
-    }
+.btnHoverRed:hover {
+  background-color: #ed4014;
+  color: white;
+}
 </style>
 
 <template>
     <div>
-        <div style="margin:5px 0 5px 80px">
-            <Button class="btnHoverGray" @click="resetSubProjectTypeModalShow()">Reset sub-project's type</Button>
-        </div>
         <Row>
             <Col span="23" offset="1">
             <Row>
@@ -28,6 +25,9 @@
             </Row>
             </Col>
         </Row>
+        <div style="margin:5px 0 5px 80px;text-align:center">
+            <Button class="btnHoverRed" @click="resetSubProjectTypeModalShow()">Reset sub-project's type</Button>
+        </div>
         <Modal
         v-model="resetSubProjectTypeModel"
         title="Reset sub-project's type"

@@ -96,8 +96,8 @@ export default {
             }
         },
         changeProjectInfo(newProjectInfo){
+            this.projectInfo = newProjectInfo;
             parent.vm.projectInfo = newProjectInfo;
-            this.projectInfo.type = newProjectInfo.type;
         }
     }
 }

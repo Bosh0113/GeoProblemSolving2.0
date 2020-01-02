@@ -25,6 +25,16 @@ public class StepController {
         }
     }
 
+    @RequestMapping(value = "/createForType", produces = {"application/json;charset=UTF-8"},method = RequestMethod.POST)
+    public String createForType(@RequestBody StepEntity step){
+        StepDaoImpl stepDao = new StepDaoImpl(mongoTemplate);
+        try {
+            return stepDao.createStepOfType(step);
+        }catch (Exception e){
+            return "Fail";
+        }
+    }
+
     @RequestMapping(value = "/inquiry", method = RequestMethod.GET)
     public Object readStep(@RequestParam("key") String key,@RequestParam("value") String value){
         StepDaoImpl stepDao = new StepDaoImpl(mongoTemplate);
