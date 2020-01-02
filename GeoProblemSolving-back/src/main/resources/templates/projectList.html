@@ -311,7 +311,9 @@
                     else {
                         this.changePage(1);
                     }
-
+                    if(this.selectTag != ""){
+                        document.getElementById(this.selectTag).style.backgroundColor="lightblue";
+                    }
                     if (type == "All") {
                         this.selectCatalog = this.projectCatalog[0];
                     }
