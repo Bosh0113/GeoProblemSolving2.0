@@ -556,7 +556,7 @@ export default {
           let imageForm = new FormData();
           imageForm.append("file", fileOfBlob);
           imageForm.append("description", description);
-          imageForm.append("type", "Image");
+          imageForm.append("type", "toolData:Sketchpad");
           imageForm.append("uploaderId", this.userInfo.userId);
           imageForm.append("privacy", "private");
           imageForm.append("folderId", this.pageParams.pageId);

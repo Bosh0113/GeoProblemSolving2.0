@@ -86,7 +86,6 @@
       </div>
       <div style="display: flex; justify-content: space-between;">
         <div style="width:33%; height:400px">
-          <vue-scroll :ops="ops">
             <Table
               :columns="tableColName"
               :data="fileList"
@@ -118,7 +117,6 @@
                 ></Button>
               </template>
             </Table>
-          </vue-scroll>
         </div>
         <div id="toolData">
           <div id="toolDataHeader">Data from Tools</div>
@@ -444,7 +442,7 @@ export default {
     },
     filterToolData() {
       var filterdata = this.fileList.filter(item => {
-        if (item.type == "toolData") {
+        if (item.type.indexOf("toolData") != -1) {
           return item;
         }
       });
