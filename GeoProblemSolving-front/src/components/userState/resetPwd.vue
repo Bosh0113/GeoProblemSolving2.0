@@ -163,9 +163,11 @@
 
 </template>
 <script>
+import md5 from "js-md5";
 import Avatar from "vue-avatar";
 export default {
   components: {
+    md5,
     Avatar
   },
   computed: {
@@ -237,7 +239,7 @@ export default {
   methods: {
     resetPwd() {
       this.axios
-        .get("/GeoProblemSolving/user/newPassword?email="+this.formValidate.email+"&password="+this.formValidate.newPassword)
+        .get("/GeoProblemSolving/user/newPassword?email="+this.formValidate.email+"&password="+md5(this.formValidate.newPassword))
         .then(res => {
           if (res.data !== "Fail") {
             this.$Notice.success({

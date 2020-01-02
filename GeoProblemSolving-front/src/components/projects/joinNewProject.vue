@@ -66,9 +66,6 @@ export default {
       projectName:"",
     };
   },
-  // created(){
-
-  // },
   mounted(){
     // navigation页面的
     this.getProjectName();
@@ -77,7 +74,6 @@ export default {
     this.projectId = this.$route.params.id;
     this.email = this.$route.params.email;
     this.judgeMailRegiste();
-
   },
   computed: {
     userState() {
