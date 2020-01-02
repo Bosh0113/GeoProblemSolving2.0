@@ -1,7 +1,7 @@
 package cn.edu.njnu.geoproblemsolving.Dao.User;
 
 
-import cn.edu.njnu.geoproblemsolving.Dao.Method.AESUtils;
+//import cn.edu.njnu.geoproblemsolving.Dao.Method.AESUtils;
 import cn.edu.njnu.geoproblemsolving.Dao.Method.CommonMethod;
 import cn.edu.njnu.geoproblemsolving.Entity.ProjectEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.ResourceEntity;
@@ -102,8 +102,8 @@ public class UserDaoImpl implements IUserDao {
     @Override
     public Object login(String email, String password) {
         if (isRegistered(email)) {
-            AESUtils aesUtils = new AESUtils();
-            password = aesUtils.decrypt(password);
+//            AESUtils aesUtils = new AESUtils();
+//            password = aesUtils.decrypt(password);
             if (verifyPassword(email, password)) {
                 Query query = new Query(Criteria.where("email").is(email));
                 UserEntity user = mongoTemplate.findOne(query, UserEntity.class);

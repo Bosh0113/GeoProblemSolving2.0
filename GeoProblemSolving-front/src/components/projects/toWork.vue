@@ -1,8 +1,8 @@
 <template>
     <div>
         <type-choose :projectInfo="projectInfo" :userRole="userRole" v-if="projectInfo.type==''" @changeProjectInfo = "changeProjectInfo"></type-choose>
-        <solving-step :scopeInfo="projectInfo" :userRole="userRole" v-else-if="projectInfo.type=='type1'"></solving-step>
-        <workspace :projectInfo="projectInfo" :userRole="userRole" v-else-if="projectInfo.type=='type2'"></workspace>
+        <solving-step :scopeInfo="projectInfo" :userRole="userRole" v-else-if="projectInfo.type=='type1'" @changeProjectInfo = "changeProjectInfo"></solving-step>
+        <workspace :projectInfo="projectInfo" :userRole="userRole" v-else-if="projectInfo.type=='type2'" @changeProjectInfo = "changeProjectInfo"></workspace>
     </div>
 </template>
 <script>
@@ -25,10 +25,8 @@ export default {
     data(){
         return{
             projectId: this.$route.params.projectId,
-            // userInfo: JSON.parse(sessionStorage.getItem("userInfo")),
-            // projectInfo: JSON.parse(sessionStorage.getItem("projectInfo")),
-            userInfo: parent.userInfo,
-            projectInfo: parent.projectInfo,
+            userInfo: JSON.parse(sessionStorage.getItem("userInfo")),
+            projectInfo: JSON.parse(sessionStorage.getItem("projectInfo")),
             userRole: 'visitor',
         }
     },
@@ -98,11 +96,8 @@ export default {
             }
         },
         changeProjectInfo(newProjectInfo){
-            if(newProjectInfo.type!="type0"){
-                this.projectInfo = newProjectInfo;
-            }else{
-                parent.projectInfo.type = "type0";
-            }
+            this.projectInfo = newProjectInfo;
+            parent.vm.projectInfo = newProjectInfo;
         }
     }
 }

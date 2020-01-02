@@ -117,18 +117,11 @@ export default {
   },
   methods: {
     initSize() {
-      if (window.innerHeight > 675) {
-        this.windowHeight = window.innerHeight;
-        this.fileHeight = window.innerHeight;
-      } else {
-        this.windowHeight = 675;
-        this.fileHeight = 675;
-      }
-      if (window.innerWidth > 1200) {
-        this.fileWidth = window.innerWidth - 60;
-      } else {
-        this.fileWidth = 1200;
-      }
+      $("#app").css("min-width", "0");
+      $("#app").css("min-height", "0");
+      this.windowHeight = window.innerHeight;
+      this.fileHeight = window.innerHeight;
+      this.fileWidth = window.innerWidth - 60;
     },
     getStepInfo() {
       if (

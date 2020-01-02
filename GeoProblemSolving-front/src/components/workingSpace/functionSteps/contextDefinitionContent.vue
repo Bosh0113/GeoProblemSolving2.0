@@ -13,7 +13,7 @@
       </Panel>
       <Panel name="tool">
         Toolbox
-        <tool-container slot="content" :stepInfo="stepInfo" :userRole="userRole" @toolBehavior="listenToolbox"></tool-container>
+        <tool-container slot="content" :stepInfo="stepInfo" :userRole="userRole" @toolBehavior="listenToolbox" @toolPanel="listenToolPanel"></tool-container>
       </Panel>
     </Collapse>
     <message-panel :stepInfo="stepInfo" :received-chat-msgs="receivedChatMsgs" :operation-records="operationRecords"></message-panel>
@@ -39,7 +39,8 @@ export default {
     return {
       unfold: ["context","tool", "data"],
       stepSocket: null,
-      operationRecords: []
+      operationRecords: [],
+      panelList:[],
     };
   },
   mounted() {
@@ -47,6 +48,12 @@ export default {
   },
   beforeDestroy(){
     this.closeStepSocket();
+    this.closePanel();
+  },
+  watch:{
+    stepInfo(data){
+      this.closePanel();
+    }
   },
   methods: {
     listenDatalist(data) {
@@ -54,6 +61,14 @@ export default {
     },
     listenToolbox(data) {
       this.operationRecords = JSON.stringify(data);
+    },
+    listenToolPanel(data){
+      this.panelList.push(data);
+    },
+    closePanel() {
+      for (let i = 0; i < this.panelList.length; i++) {
+        this.panelList[i].close();
+      }
     },
     closeStepSocket() {
       if (this.stepSocket != null) {

@@ -93,8 +93,8 @@
   background-color: #808695;
   color: white;
 }
-.demo-spin-icon-load{
-    animation: ani-demo-spin 1s linear infinite;
+.demo-spin-icon-load {
+  animation: ani-demo-spin 1s linear infinite;
 }
 </style>
 <template>
@@ -115,7 +115,6 @@
           </Button>
         </Tooltip>
       </div>
-
 
       <!-- 内容 -->
       <div class="folderContent">
@@ -173,7 +172,7 @@
         </Card>
         <div v-if="currentFolder.folders.length>0 || currentFolder.files.length>0">
           <vue-scroll :ops="ops" :style="{height:contentHeight+'px'}">
-            <Card v-for="(folder, index) in currentFolder.folders" :key="folder.index" :padding="5">
+            <Card v-for="(folder) in currentFolder.folders" :key="folder.index" :padding="5">
               <div>
                 <Icon type="ios-folder-open" class="itemIcon" size="25" />
                 <a
@@ -205,7 +204,7 @@
               </div>
             </Card>
             <CheckboxGroup v-model="chooseFilesArray" @on-change="checkAllGroupChange">
-              <Card v-for="(file,index) in currentFolder.files" :key="file.index" :padding="5">
+              <Card v-for="(file) in currentFolder.files" :key="file.index" :padding="5">
                 <Checkbox :label="file.pathURL">&nbsp;</Checkbox>
                 <Icon type="ios-document-outline" class="itemIcon" size="25" />
                 <span
@@ -520,12 +519,12 @@ export default {
           }
         ]
       },
-      editFileValidate:{
-        name:"",
-        type:"",
-        description:""
+      editFileValidate: {
+        name: "",
+        type: "",
+        description: ""
       },
-      editFileRuleValidate:{
+      editFileRuleValidate: {
         type: [
           {
             required: true,
@@ -611,9 +610,9 @@ export default {
         }
       },
       contentHeight: 100,
-      copyFileModal:false,
-      copyFilePrivacy:"private",
-      selectedFile:{}
+      copyFileModal: false,
+      copyFilePrivacy: "private",
+      selectedFile: {}
     };
   },
   mounted() {
@@ -913,7 +912,108 @@ export default {
       });
     },
     filePreview(fileInfo) {
-      this.$Message.info("under construction...");
+      let name = fileInfo.name;
+      if (/\.(doc|docx|xls|xlsx|ppt|pptx)$/.test(name.toLowerCase())) {
+        this.$Modal.confirm({
+          title: "Note",
+          content:
+            "<p>You selected file will be previewed through</p><p style='font-size:16px;font-weight:bold'>Microsoft office online service</p>",
+          onOk: () => {
+            if (this.panel != null) {
+              this.panel.close();
+            }
+            var url =
+              "http://view.officeapps.live.com/op/view.aspx?src=" +
+              "http://" +
+              this.$store.state.IP_Port +
+              fileInfo.pathURL;
+            var toolURL =
+              "<iframe src=" +
+              url +
+              ' style="width: 100%;height:100%"></iframe>';
+            this.panel = jsPanel.create({
+              headerControls: {
+                smallify: "remove"
+              },
+              theme: "primary",
+              footerToolbar: '<p style="height:5px"></p>',
+              headerTitle: "Preview",
+              contentSize: "800 600",
+              content: toolURL,
+              disableOnMaximized: true,
+              dragit: {
+                containment: 5
+              },
+              closeOnEscape: true
+            });
+            $(".jsPanel-content").css("font-size", "0");
+            this.$emit("toolPanel", this.panel);
+          },
+          onCancel: () => {
+            return;
+          }
+        });
+      } else if (/\.(mp4)$/.test(name.toLowerCase())) {
+        if (this.panel != null) {
+          this.panel.close();
+        }
+        var url = "http://" + this.$store.state.IP_Port + fileInfo.pathURL;
+        var toolURL =
+          "<video src=" +
+          url +
+          ' style="width: 100%;height:100%" controls></video>';
+        this.panel = jsPanel.create({
+          headerControls: {
+            smallify: "remove"
+          },
+          theme: "primary",
+          footerToolbar: '<p style="height:10px"></p>',
+          headerTitle: "Preview",
+          contentSize: "800 600",
+          content: toolURL,
+          disableOnMaximized: true,
+          dragit: {
+            containment: 5
+          },
+          closeOnEscape: true
+        });
+        $(".jsPanel-content").css("font-size", "0");
+        this.$emit("toolPanel", this.panel);
+
+      } else if (/\.(pdf|json|md|gif|jpg|png)$/.test(name.toLowerCase())) {
+        if (this.panel != null) {
+          this.panel.close();
+        }
+        var url = "http://" + this.$store.state.IP_Port + fileInfo.pathURL;
+        var toolURL =
+          "<iframe src=" +
+          url +
+          ' style="width: 100%;height:100%" controls></iframe>';
+        this.panel = jsPanel.create({
+          headerControls: {
+            smallify: "remove"
+          },
+          theme: "primary",
+          footerToolbar: '<p style="height:10px"></p>',
+          headerTitle: "Preview",
+          contentSize: "800 600",
+          content: toolURL,
+          disableOnMaximized: true,
+          dragit: {
+            containment: 5
+          },
+          closeOnEscape: true
+        });
+        $(".jsPanel-content").css("font-size", "0");
+        this.$emit("toolPanel", this.panel);
+
+      } else {
+        this.$Notice.error({
+          title: "Open failed",
+          desc: "Sorry. Unsupported file format."
+        });
+        return false;
+      }
     },
     fileDelete(fileInfo) {
       if (confirm("Are you sure to delete this file?")) {
@@ -1092,9 +1192,9 @@ export default {
                 "&folderId=" +
                 folderId +
                 "&name=" +
-                this.editFileValidate.name+
+                this.editFileValidate.name +
                 "&type=" +
-                this.editFileValidate.type+
+                this.editFileValidate.type +
                 "&description=" +
                 this.editFileValidate.description
             )
@@ -1134,35 +1234,41 @@ export default {
       }
       return result;
     },
-    showCopyFileModel(file){
+    showCopyFileModel(file) {
       this.copyFileModal = true;
       this.copyFilePrivacy = "private";
       this.selectedFile = file;
     },
-    copyFileToCenter(){
+    copyFileToCenter() {
       this.$Spin.show();
       this.axios
-      .get(
-        "/GeoProblemSolving/folder/copyToCenter"+
-        "?resourceId="+this.selectedFile.resourceId+
-        "&userId="+this.$store.getters.userId+
-        "&privacy="+this.copyFilePrivacy+
-        "&type="+this.selectedFile.type+
-        "&name="+this.selectedFile.name+
-        "&description="+this.selectedFile.description
-      )
-      .then(res=>{
-        this.$Spin.hide();
-        this.copyFileModal = false;
-        if(res.data=="Success"){
-          this.$Message.success("Copy file success.");
-        }else{
-          this.$Message.warning(res.data);
-        }
-      })
-      .catch(err=>{
+        .get(
+          "/GeoProblemSolving/folder/copyToCenter" +
+            "?resourceId=" +
+            this.selectedFile.resourceId +
+            "&userId=" +
+            this.$store.getters.userId +
+            "&privacy=" +
+            this.copyFilePrivacy +
+            "&type=" +
+            this.selectedFile.type +
+            "&name=" +
+            this.selectedFile.name +
+            "&description=" +
+            this.selectedFile.description
+        )
+        .then(res => {
+          this.$Spin.hide();
+          this.copyFileModal = false;
+          if (res.data == "Success") {
+            this.$Message.success("Copy file success.");
+          } else {
+            this.$Message.warning(res.data);
+          }
+        })
+        .catch(err => {
           this.$Message.error("Copy file fail.");
-      });
+        });
     }
   }
 };

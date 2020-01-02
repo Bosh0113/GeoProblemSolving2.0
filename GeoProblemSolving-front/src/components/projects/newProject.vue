@@ -92,15 +92,10 @@ h1 {
       <!-- 选择类别 -->
       <FormItem prop="category" label="Category" :label-width="100">
           <RadioGroup v-model="formInline.category" style="width:80%">
-            <Radio label="Terrestrial">Terrestrial System</Radio>
-            <Radio label="Coastal">Coastal System</Radio>
-            <Radio label="Marine">Marine System</Radio>
-            <Radio label="Climate">Climate System</Radio>
-            <Radio label="Ecological">Ecological System</Radio>
-            <Radio label="Geological">Geological System</Radio>
-            <Radio label="Human">Human-Activity</Radio>
-            <Radio label="GISRS">GIS & RS</Radio>
-            <Radio label="General">General</Radio>
+            <Radio label="Investigational">Investigational project</Radio>
+            <Radio label="Intercomparable">Intercomparable project</Radio>
+            <Radio label="Reproducible">Reproducible project</Radio>
+            <Radio label="Educational">Educational project</Radio>
           </RadioGroup>
       </FormItem>
       <FormItem prop="title" label="Title" :label-width="100">
@@ -150,10 +145,16 @@ h1 {
             >{{item}}</Tag>
           </div>
           <div>
-            <span>Example:</span>
-            <Tag style="cursor:default">water</Tag>
-            <Tag style="cursor:default">pollution problem</Tag>
-            <Tag style="cursor:default">smoggy day</Tag>
+            <span>Or select:</span>
+            <Tag style="cursor:pointer" @click.native="addTag('Terrestrial')">Terrestrial</Tag>
+            <Tag style="cursor:pointer" @click.native="addTag('Coastal')">Coastal</Tag>
+            <Tag style="cursor:pointer" @click.native="addTag('Marine')">Marine</Tag>
+            <Tag style="cursor:pointer" @click.native="addTag('Climate')">Climate</Tag>
+            <Tag style="cursor:pointer" @click.native="addTag('Ecological')">Ecological</Tag>
+            <Tag style="cursor:pointer" @click.native="addTag('Geological')">Geological</Tag>
+            <Tag style="cursor:pointer" @click.native="addTag('Human')">Human</Tag>
+            <Tag style="cursor:pointer" @click.native="addTag('GIS & RS')">GIS & RS</Tag>
+            <Tag style="cursor:pointer" @click.native="addTag('General')">General</Tag>
           </div>
       </FormItem>
       <FormItem prop="image" label="Image" :label-width="100">
@@ -273,7 +274,22 @@ export default {
       createProjectId: ""
     };
   },
+  created() {
+    // 加入判断，如果未登录自动跳转登录页面
+    if (!this.$store.getters.userState) {
+      this.$router.push({ name: "Login" });
+    };
 
+    Array.prototype.contains = function(obj) {
+      var i = this.length;
+      while (i--) {
+        if (this[i] != undefined && this[i] === obj) {
+          return true;
+        }
+      }
+      return false;
+    };
+  },
   methods: {
     createProject(name) {
       this.$refs[name].validate(valid => {
@@ -340,7 +356,7 @@ export default {
         });
     },
     addTag(tag) {
-      if(tag!=""){
+      if(tag!="" && !this.formInline.tagList.contains(tag)){
         this.formInline.tagList.push(tag);
         this.inputTag = "";
       }
@@ -387,12 +403,6 @@ export default {
       this.img = "";
       this.pictureUrl="";
     }
-  },
-  created() {
-    // 加入判断，如果未登录自动跳转登录页面
-    if (!this.$store.getters.userState) {
-      this.$router.push({ name: "Login" });
-    };
   }
 };
 </script>

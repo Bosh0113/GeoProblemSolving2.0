@@ -1,123 +1,8 @@
 <style scoped>
-.header{
-  height:60px;
-  background:#515a6e;
-  width:100%;
-  color:white;
-  top:0;
-  position:fixed;
-}
-.footer{
-  background:#515a6e;
-  height:60px;
-  width:100%;
-  bottom:0;
-  position:fixed;
-}
-.content{
-  height:auto;
-}
-.menuItem span{
-  font-size: 1.2em;
-  font-weight: bold;
-}
-#logo {
-  position: absolute;
-  width: 129px;
-  height: 40px;
-  z-index: 1;
-  margin-top: 5px;
-  margin-left: 2.5%;
-  /* margin-left: 5%; */
-}
-.userState {
-  position: absolute;
-  margin-left: 80%;
-  width: 20%;
-  top: 0px;
-  z-index: 1;
-}
-.navPart {
-  width: 85%;
-}
-.footer{
-  background-color:#515a6e;
-  height:60px;
-  width:100%;
-  bottom:0;
-}
-
 </style>
 
 <template>
 <div>
-  <div class="header">
-    <img src="@/assets/images/OGMS.png" id="logo" class="pic" @click="goHome" style="cursor:pointer">
-    <div class="navPart">
-        <Menu
-          mode="horizontal"
-          theme="dark"
-          active-name="home"
-          @on-select="turnContent"
-          style="z-index:0"
-          width="auto"
-        >
-          <MenuItem name="home" class="menuItem" style="margin-left:30%">
-            <span>Home</span>
-          </MenuItem>
-          <MenuItem name="project" class="menuItem">
-            <span>Project</span>
-          </MenuItem>
-          <MenuItem name="Public Resource" class="menuItem">
-            <span>Public Resource</span>
-          </MenuItem>
-          <MenuItem name="community" class="menuItem">
-            <span>Community</span>
-          </MenuItem>
-          <MenuItem name="help" class="menuItem" >
-            <span>Help</span>
-          </MenuItem>
-        </Menu>
-        <div class="userState">
-            <Menu mode="horizontal" theme="dark" @on-select="unlogin" style="z-index:0" v-show="!userState" class="menuItem">
-              <MenuItem name="login">
-                <span>Login</span>
-              </MenuItem>
-              <MenuItem name="register">
-                 <span>Sign up</span>
-              </MenuItem>
-            </Menu>
-            <Menu mode="horizontal" theme="dark" @on-select="logged" style="z-index:0"  v-show="userState" class="menuItem">
-              <MenuItem name="notification">
-                <Badge :count="unreadNoticeCount" id="noticeBadge">
-                  <Icon type="ios-notifications-outline" size="25"></Icon>
-                </Badge>
-              </MenuItem>
-              <MenuItem name="personal" style="width:100px">
-                <Dropdown @on-click="changeSelect" placement="bottom-start">
-                  <img
-                    v-bind:src="avatar"
-                    v-if="avatar!=''&&avatar!=undefined&&avatar!=null"
-                    :title="userName"
-                    style="width:40px;height:40px;vertical-align:middle;"
-                  >
-                  <avatar
-                    :username="userName"
-                    :size="40"
-                    style="margin-top:10px"
-                    :title="userName"
-                    v-else
-                  ></avatar>
-                  <DropdownMenu slot="list" >
-                      <DropdownItem name="personalPage">User Space</DropdownItem>
-                      <DropdownItem name="logout">Log out</DropdownItem>
-                  </DropdownMenu>
-                </Dropdown>
-              </MenuItem>
-            </Menu>
-        </div>
-      </div>
-  </div>
   <Row>
     <Col span="18" offset="3" :style="{height:contentHeight}">
     <div style="display:flex;justify-content:center;margin-top:100px;height:100%;padding:100px">
@@ -149,16 +34,13 @@
     </div>
     </Col>
   </Row>
-  <div class="footer">
-      <h2 style="text-align:center;color:white;font-weight:bold;margin-top:15px"><i>Open Geographic Modeling and Simulation</i></h2>
-      <h4 style="text-align:center;color:white">Copyright © 2013-2019 OpenGMS. All rights reserved.</h4>
-    </div>
 </div>
 
 </template>
 <script>
-import Avatar from "vue-avatar";
+import md5 from "js-md5";
 export default {
+  components: { md5 },
   data() {
     return {
       headerWidth: "",
@@ -184,9 +66,6 @@ export default {
       projectName:"",
     };
   },
-  // created(){
-
-  // },
   mounted(){
     // navigation页面的
     this.getProjectName();
@@ -195,23 +74,10 @@ export default {
     this.projectId = this.$route.params.id;
     this.email = this.$route.params.email;
     this.judgeMailRegiste();
-
-  },
-  updated() {
-    $(".userState sup").css("margin-top", "20px");
-  },
-  components: {
-    Avatar
   },
   computed: {
     userState() {
       return this.$store.getters.userState;
-    },
-    userName() {
-      return this.$store.getters.userName;
-    },
-    avatar() {
-      return this.$store.getters.avatar;
     }
   },
   methods:{
@@ -254,6 +120,7 @@ export default {
         });
     },
     joinByMail(){
+      var passwordMD5 = md5(this.password);
       this.axios
         .get(
           "/GeoProblemSolving/project/joinByMail" +
@@ -262,18 +129,18 @@ export default {
             "&email=" +
             this.email+
             "&password="+
-            this.password
+            passwordMD5
         )
         .then(res => {
           let gotoProjectId = this.projectId;
           if (res.data === "Success") {
             this.$Message.info("Join successfuly");
-            window.location.href="/GeoProblemSolving/projectDetail/"+gotoProjectId;
+            this.autoLogin(this.email,passwordMD5,gotoProjectId);
           } else if (res.data === "Fail") {
             this.$Message.info("Fail to join in this project");
           }else if(res.data === "Exist"){
             this.$Message.info("you have been in this group,no need to apply again");
-            window.location.href="/GeoProblemSolving/projectDetail/"+gotoProjectId;
+            this.autoLogin(this.email,passwordMD5,gotoProjectId);
           }else if(res.data === "None"){
             this.$Message.info("this group doesn't exist");
           }else if(res.data === "Password"){
@@ -284,51 +151,26 @@ export default {
           this.$Message.error("Join fail");
         });
     },
-    goHome() {
-      window.location.href="/GeoProblemSolving/home";
-    },
-    turnContent(name) {
-      if (name === "home") {
-        window.location.href="/GeoProblemSolving/home";
-      } else if (name == "project") {
-        this.$router.replace({ name: "Project" });
-      } else if (name == "Public Resource") {
-        this.$router.replace({ name: "resourceList" });
-      } else if (name == "community") {
-        this.$router.replace({ name: "Community" });
-      } else if (name == "help") {
-        this.$router.replace({ name: "Help" });
-      }
-    },
-    unlogin(name) {
-      if (name === "login") {
-        this.$router.push({ name: "Login" });
-      } else if (name == "register") {
-        this.$router.push({ name: "Register" });
-      }
-    },
-    logged(name) {
-      if (name === "notification") {
-        this.$router.push({ name: "Notifications" });
-      } else if (name === "personal") {
-      }
-    },    
-    changeSelect(name) {
-      if (name == "logout") {
-        this.axios
-          .get("/GeoProblemSolving/user/logout")
-          .then(res => {
-            this.$store.commit("userLogout");
-            this.noticeSocket.close();
-            window.location.href="/GeoProblemSolving/home";
-          })
-          .catch(err => {
-            confirm("logout fail!");
-          });
-      } else if (name == "personalPage") {
-        this.$router.push({ name: "PersonalPage" });
-      }
-    },
+    autoLogin(email,passsword,projectId){
+      this.axios
+        .get(
+          "/GeoProblemSolving/user/login" +
+            "?email=" +
+            email +
+            "&password=" +
+            passsword
+        )
+        .then(res => {
+          if (res.data === "Email") {
+            this.$Message.error("Email does not exist.");
+          } else if (res.data === "Password" || res.data === "Fail") {
+            this.$Message.error("Invalid account or password.");
+          } else {
+            this.$store.commit("userLogin", res.data);
+            window.location.href="/GeoProblemSolving/projectDetail/"+projectId;
+          }
+        });
+    }
   }
 };
 </script>

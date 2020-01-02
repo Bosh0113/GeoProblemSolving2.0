@@ -47,8 +47,6 @@ public class ResourceDaoImpl implements IResourceDao {
         uploadInfos.sizeOver = new ArrayList<>();
         uploadInfos.failed = new ArrayList<>();
         try {
-//            InetAddress address = InetAddress.getLocalHost();
-//            String ip = address.getHostAddress();
             if (!ServletFileUpload.isMultipartContent(request)) {
                 System.out.println("File is not multimedia.");
                 return "Fail";
@@ -59,40 +57,38 @@ public class ResourceDaoImpl implements IResourceDao {
 
             String servicePath = request.getSession().getServletContext().getRealPath("/");//获得绝对路径。
             Collection<Part> parts = request.getParts();
+
+            // 保存缩略图，获取路径
+            String thumbnailPath = "";
+            for (Part part : parts) {
+                if(part.getName().equals("thumbnail")){
+                    if (part.getSize() < 1024 * 1024) {
+                        String fileNames = part.getSubmittedFileName();
+
+                        thumbnailPath = saveFiles(part, fileNames, servicePath, folderName);
+                        if(thumbnailPath.equals("ERROR")){
+                            uploadInfos.failed.add(part.getSubmittedFileName());
+                            continue;
+                        }
+
+                    } else {
+                        uploadInfos.sizeOver.add(part.getSubmittedFileName());
+                    }
+                }
+            }
+            // 保存文件
             for (Part part : parts) {
                 try {
                     if (part.getName().equals("file")) {
                         if (part.getSize() < 1024 * 1024 * 1024) {
                             String fileNames = part.getSubmittedFileName();
-                            String fileName = fileNames.substring(0, fileNames.lastIndexOf("."));
-                            String suffix = fileNames.substring(fileNames.lastIndexOf(".") + 1);
-                            String regexp = "[^A-Za-z_0-9\\u4E00-\\u9FA5]";
-                            String saveName = fileName.replaceAll(regexp, "");
-                            String folderPath = servicePath + "resource/" + folderName;
-                            File temp = new File(folderPath);
-                            if (!temp.exists()) {
-                                temp.mkdirs();
-                            }
 
-                            int randomNum = (int) (Math.random() * 10 + 1);
-                            for (int i = 0; i < 5; i++) {
-                                randomNum = randomNum * 10 + (int) (Math.random() * 10 + 1);
+                            // 保存文件，获取返回文件路径
+                            String pathURL = saveFiles(part, fileNames, servicePath, folderName);
+                            if(pathURL.equals("ERROR")){
+                                uploadInfos.failed.add(part.getSubmittedFileName());
+                                continue;
                             }
-                            String newFileTitle = saveName + randomNum + "." + suffix;
-                            String localPath = temp + "/" + newFileTitle;
-                            System.out.println("资源上传到本地路径：" + localPath);
-                            File file = new File(localPath);
-                            FileOutputStream fileOutputStream = new FileOutputStream(file);
-                            InputStream inputStream = part.getInputStream();
-                            byte[] buffer = new byte[1024 * 1024];
-                            int byteRead;
-                            while ((byteRead = inputStream.read(buffer)) != -1) {
-                                fileOutputStream.write(buffer, 0, byteRead);
-                            }
-                            fileOutputStream.close();
-                            inputStream.close();
-
-                            String pathURL = "/GeoProblemSolving/resource/" + folderName + "/" + newFileTitle;
 
                             // 如果是zip文件
 //                            if(suffix.equals("zip")){
@@ -113,7 +109,9 @@ public class ResourceDaoImpl implements IResourceDao {
 //                                }
 //                            }
 
+                            // 生成resourceId
                             String resourceId = UUID.randomUUID().toString();
+                            // 计算文件大小
                             String fileSize;
                             DecimalFormat df = new DecimalFormat("##0.00");
                             if (part.getSize() > 1024 * 1024) {
@@ -121,6 +119,8 @@ public class ResourceDaoImpl implements IResourceDao {
                             } else {
                                 fileSize = df.format((float) part.getSize() / (float) (1024)) + "KB";
                             }
+
+
                             ResourceEntity resourceEntity = new ResourceEntity();
                             resourceEntity.setResourceId(resourceId);
 
@@ -131,6 +131,7 @@ public class ResourceDaoImpl implements IResourceDao {
                             resourceEntity.setDescription(request.getParameter("description"));
                             resourceEntity.setPrivacy(request.getParameter("privacy"));
                             resourceEntity.setType(request.getParameter("type"));
+                            resourceEntity.setThumbnail(thumbnailPath);
                             resourceEntity.setFileSize(fileSize);
                             resourceEntity.setPathURL(pathURL);
                             resourceEntity.setUploaderId(uploader.getUserId());
@@ -196,47 +197,39 @@ public class ResourceDaoImpl implements IResourceDao {
             // 判断请求中是否包含文件流，如果包含，保存文件，更新资源的文件路径
             if (ServletFileUpload.isMultipartContent(request)) {
 
+                String servicePath = request.getSession().getServletContext().getRealPath("/");//获得绝对路径。
+                ResourceEntity resourceEntity = mongoTemplate.findOne(query, ResourceEntity.class);
+                String folderName = resourceEntity.getUploaderId();
+
                 Collection<Part> parts = request.getParts();
+                // 保存缩略图，获取路径
+                String thumbnailPath = resourceEntity.getThumbnail();
+                for (Part part : parts) {
+                    if(part.getName().equals("thumbnail")){
+                        if (part.getSize() < 1024 * 1024) {
+
+                            thumbnailPath = saveFiles(part, part.getSubmittedFileName(), servicePath, folderName);
+                            if(thumbnailPath.equals("ERROR")){
+                                uploadInfos.failed.add(part.getSubmittedFileName());
+                                continue;
+                            }
+                        } else {
+                            uploadInfos.sizeOver.add(part.getSubmittedFileName());
+                        }
+                    }
+                }
+                // 保存文件
                 for (Part part : parts) {
                     try {
                         if (part.getName().equals("file")) {
-
-                            String servicePath = request.getSession().getServletContext().getRealPath("/");//获得绝对路径。
-                            ResourceEntity resourceEntity = mongoTemplate.findOne(query, ResourceEntity.class);
-                            String folderName = resourceEntity.getUploaderId();
-
                             if (part.getSize() < 1024 * 1024 * 1024) {
                                 String fileNames = part.getSubmittedFileName();
-                                String fileName = fileNames.substring(0, fileNames.lastIndexOf("."));
-                                String suffix = fileNames.substring(fileNames.lastIndexOf(".") + 1);
-                                String regexp = "[^A-Za-z_0-9\\u4E00-\\u9FA5]";
-                                String saveName = fileName.replaceAll(regexp, "");
-                                String folderPath = servicePath + "resource/" + folderName;
-                                File temp = new File(folderPath);
-                                if (!temp.exists()) {
-                                    temp.mkdirs();
-                                }
 
-                                int randomNum = (int) (Math.random() * 10 + 1);
-                                for (int i = 0; i < 5; i++) {
-                                    randomNum = randomNum * 10 + (int) (Math.random() * 10 + 1);
+                                String pathURL = saveFiles(part, fileNames, servicePath, folderName);
+                                if(pathURL.equals("ERROR")) {
+                                    uploadInfos.failed.add(part.getSubmittedFileName());
+                                    continue;
                                 }
-                                String newFileTitle = saveName + randomNum + "." + suffix;
-                                String localPath = temp + "/" + newFileTitle;
-                                System.out.println("资源上传到本地路径：" + localPath);
-                                File file = new File(localPath);
-                                FileOutputStream fileOutputStream = new FileOutputStream(file);
-                                InputStream inputStream = part.getInputStream();
-                                byte[] buffer = new byte[1024 * 1024];
-                                int byteRead;
-                                while ((byteRead = inputStream.read(buffer)) != -1) {
-                                    fileOutputStream.write(buffer, 0, byteRead);
-                                }
-                                fileOutputStream.close();
-                                inputStream.close();
-
-                                String pathURL = "/GeoProblemSolving/resource/" + folderName + "/" + newFileTitle;
-
                                 // 如果是zip文件
                                 //                            if(suffix.equals("zip")){
                                 //                                try {
@@ -277,15 +270,16 @@ public class ResourceDaoImpl implements IResourceDao {
                                 update.set("uploaderId", uploader.getUserId());
                                 update.set("uploaderName", uploader.getUserName());
                                 update.set("uploadTime", uploadTime);
+                                update.set("thumbnail", thumbnailPath);
                                 mongoTemplate.updateFirst(query,update,ResourceEntity.class);
                                 resourceEntity = mongoTemplate.findOne(query, ResourceEntity.class);
                                 uploadInfos.uploaded.add(resourceEntity);
 
                                 break;
                             }
-                        }
-                        else {
-                            uploadInfos.sizeOver.add(part.getSubmittedFileName());
+                            else {
+                                uploadInfos.sizeOver.add(part.getSubmittedFileName());
+                            }
                         }
                     } catch (Exception e) {
                         uploadInfos.failed.add(part.getSubmittedFileName());
@@ -438,5 +432,45 @@ public class ResourceDaoImpl implements IResourceDao {
                 }
             }
         }
+    }
+
+    private String saveFiles(Part part, String fileNames, String servicePath, String folderName){
+
+        String fileName = fileNames.substring(0, fileNames.lastIndexOf("."));
+        String suffix = fileNames.substring(fileNames.lastIndexOf(".") + 1);
+        String regexp = "[^A-Za-z_0-9\\u4E00-\\u9FA5]";
+        String saveName = fileName.replaceAll(regexp, "");
+        String folderPath = servicePath + "resource/" + folderName;
+        File temp = new File(folderPath);
+        if (!temp.exists()) {
+            temp.mkdirs();
+        }
+
+        int randomNum = (int) (Math.random() * 10 + 1);
+        for (int i = 0; i < 5; i++) {
+            randomNum = randomNum * 10 + (int) (Math.random() * 10 + 1);
+        }
+        String newFileTitle = saveName + randomNum + "." + suffix;
+        String localPath = temp + "/" + newFileTitle;
+        System.out.println("资源上传到本地路径：" + localPath);
+        File file = new File(localPath);
+        try {
+            FileOutputStream fileOutputStream = new FileOutputStream(file);
+            InputStream inputStream = part.getInputStream();
+            byte[] buffer = new byte[1024 * 1024];
+            int byteRead;
+            while ((byteRead = inputStream.read(buffer)) != -1) {
+                fileOutputStream.write(buffer, 0, byteRead);
+            }
+            fileOutputStream.close();
+            inputStream.close();
+        }
+        catch (IOException ex){
+            return "ERROR";
+        }
+
+        String pathURL = "/GeoProblemSolving/resource/" + folderName + "/" + newFileTitle;
+
+        return pathURL;
     }
 }

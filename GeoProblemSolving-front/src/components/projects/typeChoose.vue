@@ -128,7 +128,7 @@ export default {
             Step["toolsetList"] = [];
             Step["content"] = {};
             this.axios
-            .post("/GeoProblemSolving/step/create", Step)
+            .post("/GeoProblemSolving/step/createForType", Step)
             .then(res => {
             if (res.data == "Offline") {
                 parent.location.href="/GeoProblemSolving/login"

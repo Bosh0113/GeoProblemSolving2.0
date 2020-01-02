@@ -11,6 +11,10 @@
   color: white;
   background: #f16643;
 }
+.btnHoverGray:hover {
+  background-color: #808695;
+  color: white;
+}
 </style>
 <template>
   <Row>
@@ -66,6 +70,12 @@
           <h3
             style="margin-top:10px"
           >Double click the node, and you can enter the corresponding workspace.</h3>
+          <div style="width:100%;text-align:center;" v-if="scopeType == 'subproject'">
+            <Button class="btnHoverGray" @click="resetSubProjectTypeModalShow()">Reset sub-project's type</Button>
+          </div>
+          <div style="width:100%;text-align:center;margin-top:100px" v-if="scopeType == 'project'">
+            <Button class="btnHoverGray" @click="resetProjectTypeModalShow()">Reset project's type</Button>
+          </div>
         </Row>
       </div>
     </Col>
@@ -77,6 +87,42 @@
       cancel-text="Cancel"
     >
       <p>Do you really want to delete this step?</p>
+    </Modal>
+    <Modal
+      v-model="resetSubProjectTypeNotice"
+      title="Reset sub-project's type"
+    >
+      <h2>Please confirm that all nodes have been deleted.</h2>
+      <div slot="footer">
+        <Button type="primary" @click="resetSubProjectTypeNotice=false">OK</Button>
+      </div>
+    </Modal>
+    <Modal
+      v-model="resetSubProjectTypeModel"
+      title="Reset sub-project's type"
+    >
+      <h2>Are you sure you want to reset the sub-project type?</h2>
+      <div slot="footer">
+        <Button type="primary" @click="resetSubProjectType()">Submit</Button>
+      </div>
+    </Modal>
+    <Modal
+      v-model="resetProjectTypeNotice"
+      title="Reset project's type"
+    >
+      <h2>Please confirm that all nodes have been deleted.</h2>
+      <div slot="footer">
+        <Button type="primary" @click="resetProjectTypeNotice=false">OK</Button>
+      </div>
+    </Modal>
+    <Modal
+      v-model="resetProjectTypeModel"
+      title="Reset project's type"
+    >
+      <h2>Are you sure you want to reset the project type?</h2>
+      <div slot="footer">
+        <Button type="primary" @click="resetProjectType()">Submit</Button>
+      </div>
     </Modal>
     <Modal width="800px" v-model="createStepModal" title="Create a new step" :styles="{top: '20px'}">
       <Carousel
@@ -206,7 +252,11 @@ export default {
       selectStepToolsets: [],
       // step 结构信息
       scopeType: "",
-      scopeId: ""
+      scopeId: "",
+      resetSubProjectTypeNotice:false,
+      resetSubProjectTypeModel:false,
+      resetProjectTypeNotice:false,
+      resetProjectTypeModel:false
     };
   },
   created() {    
@@ -447,8 +497,8 @@ export default {
             lineStyle: {
               normal: {
                 opacity: 1,
-                width: 3,
-                curveness: 0
+                width: 5,
+                curveness: 0.1
               }
             }
           }
@@ -466,7 +516,7 @@ export default {
               x: this.processStructure[i].x,
               y: this.processStructure[i].y,
               category: this.processStructure[i].category,
-              symbolSize: 45
+              symbolSize: 60
             });
             this.selectedStep.push({
               stepId: this.processStructure[i].stepID,
@@ -481,7 +531,7 @@ export default {
               x: this.processStructure[i].x,
               y: this.processStructure[i].y,
               category: this.processStructure[i].category,
-              symbolSize: 30
+              symbolSize: 45
             });
           }
 
@@ -506,8 +556,8 @@ export default {
 
       // 单击选择步骤
       this.stepChart.on("click", function(params) {
-        if (option.series[0].data[params.data.index].symbolSize == 30) {
-          option.series[0].data[params.data.index].symbolSize = 45;
+        if (option.series[0].data[params.data.index].symbolSize == 45) {
+          option.series[0].data[params.data.index].symbolSize = 60;
           _this.formValidate0.stepTitle = params.data.name;
           _this.formValidate0.stepType = _this.getStepType(
             params.data.category
@@ -519,8 +569,8 @@ export default {
             index: params.data.index,
             name: params.data.name
           });
-        } else if (option.series[0].data[params.data.index].symbolSize == 45) {
-          option.series[0].data[params.data.index].symbolSize = 30;
+        } else if (option.series[0].data[params.data.index].symbolSize == 60) {
+          option.series[0].data[params.data.index].symbolSize = 45;
 
           // remove these not selected step nodes
           for (var i = 0; i < _this.selectedStep.length; i++) {
@@ -1243,7 +1293,7 @@ export default {
           } else if (res.data != "Fail") {
             if (this.scopeType == "project") {
               this.$store.commit("setProjectInfo", res.data);
-              parent.projectIngo = res.data;
+              parent.vm.projectInfo = res.data;
               this.$Notice.info({
                 desc: "Project update successfully!"
               });
@@ -1260,6 +1310,64 @@ export default {
         .catch(err => {
           console.log(err.data);
         });
+    },
+    resetSubProjectTypeModalShow(){
+      if(this.processStructure.length > 0){
+        this.resetSubProjectTypeNotice = true;
+      }else{
+        this.resetSubProjectTypeModel = true;
+      }
+    },
+    resetProjectTypeModalShow(){
+      if(this.processStructure.length > 0){
+        this.resetProjectTypeNotice = true;
+      }else{
+        this.resetProjectTypeModel = true;
+      }
+    },
+    resetSubProjectType(){
+      let obj = new URLSearchParams();
+      obj.append("subProjectId", this.scopeId);
+      obj.append("type", "");
+      obj.append("stepId", "");
+      this.axios
+          .post("/GeoProblemSolving/subProject/update", obj)
+          .then(res => {
+              this.resetProjectTypeModel = false;
+              if (res.data == "Offline") {
+                  parent.location.href="/GeoProblemSolving/login"
+              } else if (res.data != "Fail") {
+                  this.$store.commit("setSubProjectInfo", res.data);
+                  this.$emit("changeSubProjectInfo", res.data);
+              } else {
+                  this.$Message.error("Set type failed.");
+              }
+              })
+          .catch(err => {
+            console.log(err.data);
+          });
+    },
+    resetProjectType(){
+      let obj = new URLSearchParams();
+      obj.append("projectId", this.scopeId);
+      obj.append("type", "");
+      obj.append("stepId", "");
+      this.axios
+          .post("/GeoProblemSolving/project/update", obj)
+          .then(res => {
+              this.resetProjectTypeModel = false;
+              if (res.data == "Offline") {
+                  parent.location.href="/GeoProblemSolving/login"
+              } else if (res.data != "Fail") {
+                  this.$store.commit("setProjectInfo", res.data);
+                  this.$emit("changeProjectInfo", res.data);
+              } else {
+                  this.$Message.error("Set type failed.");
+              }
+              })
+          .catch(err => {
+            console.log(err.data);
+          });
     }
   }
 };

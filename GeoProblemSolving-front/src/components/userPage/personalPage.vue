@@ -463,7 +463,7 @@ body {
                         >
                           <Col span="10" offset="1">
                             <div
-                              @click="goSingleProject(item.projectId)"
+                              @click="goSingleProject(item)"
                               class="projectItem"
                             >
                               <Card style="height:320px;margin-top:20px;">
@@ -507,7 +507,7 @@ body {
                           <Col span="10" offset="1">
                             <div
                               class="projectItem"
-                              @click="goSingleProject(mProject.projectId)"
+                              @click="goSingleProject(mProject)"
                             >
                               <Card style="height:320px;margin-top:20px">
                                 <p slot="title" class="projectsTitle">{{mProject.title}}</p>
@@ -1359,8 +1359,9 @@ export default {
       this.personalInfoItem = Object.assign({}, this.userDetail);
     },
     //点击跳转到指定项目的函数
-    goSingleProject(id) {
-      window.location.href="/GeoProblemSolving/projectDetail/"+id;
+    goSingleProject(projectInfo) {
+      sessionStorage.setItem("projectInfo",JSON.stringify(projectInfo));
+      window.location.href="/GeoProblemSolving/projectDetail/"+projectInfo.projectId;
     },
     readPersonalEvent() {
       this.axios

@@ -100,7 +100,7 @@ export default {
             Step["toolsetList"] = [];
             Step["content"] = {};
             this.axios
-            .post("/GeoProblemSolving/step/create", Step)
+            .post("/GeoProblemSolving/step/createForType", Step)
             .then(res => {
             if (res.data == "Offline") {
                 this.$store.commit("userLogout");

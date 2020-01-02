@@ -4,10 +4,13 @@
     <Col span="9" offset="2">
       <div style="margin:20px">
         <Card style="width:100%;height:10%">
+          <div
+            style="text-align:center;margin-bottom:15px;font-weight:bold;font-size:26px"
+          >Introduction</div>
           <div style="text-align:center; width:40%; float:left">
             <img src="../../../src/assets/images/info.png" />
           </div>
-          <div style="width:60%; float:left; min-height: 85px">
+          <div style="width:60%; float:left; min-height: 90px">
             <ul>
               <li>The description of this subproject</li>
               <li>The background of this subproject</li>
@@ -17,8 +20,7 @@
           </div>
           <div style="text-align:center">
             <h3>
-              Click it to check
-              <a @click="gotoIntroduction()">Introduction</a>
+              <a @click="gotoIntroduction()">Click to check it</a>
             </h3>
           </div>
         </Card>
@@ -27,10 +29,13 @@
     <Col span="9" offset="2">
       <div style="margin:20px">
         <Card style="width:100%">
+          <div
+            style="text-align:center;margin-bottom:15px;font-weight:bold;font-size:26px"
+          >Resources</div>
           <div style="text-align:center; width:40%; float:left">
             <img src="../../../src/assets/images/data.png" />
           </div>
-          <div style="width:60%; float:left; min-height: 85px">
+          <div style="width:60%; float:left; min-height: 90px">
             <ul>
               <li>Collect different types of resources</li>
               <li>Support context understanding</li>
@@ -40,8 +45,7 @@
           </div>
           <div style="text-align:center">
             <h3>
-              Click it to check
-              <a @click="gotoResource()">Resources</a>
+              <a @click="gotoResource()">Click to check it</a>
             </h3>
           </div>
         </Card>
@@ -50,10 +54,13 @@
     <Col span="9" offset="2">
       <div style="margin:20px">
         <Card style="width:100%">
+          <div
+            style="text-align:center;margin-bottom:15px;font-weight:bold;font-size:26px"
+          >Workspace</div>
           <div style="text-align:center; width:40%; float:left">
             <img src="../../../src/assets/images/steps.jpg" />
           </div>
-          <div style="width:60%; float:left; min-height: 85px">
+          <div style="width:60%; float:left; min-height: 90px">
             <ul>
               <li>Node-presented steps</li>
               <li>Create, select and delete steps</li>
@@ -62,8 +69,7 @@
           </div>
           <div style="text-align:center">
             <h3>
-              Click it to check
-              <a @click="gotoWorkingsteps()">Working steps</a>
+              <a @click="gotoWorkingsteps()">Click to check it</a>
             </h3>
           </div>
         </Card>
@@ -72,10 +78,13 @@
     <Col span="9" offset="2">
       <div style="margin:20px">
         <Card style="width:100%">
+          <div
+            style="text-align:center;margin-bottom:15px;font-weight:bold;font-size:26px"
+          >Task assignment</div>
           <div style="text-align:center; width:40%; float:left">
             <img src="../../../src/assets/images/tasks.png" />
           </div>
-          <div style="width:60%; float:left; min-height: 85px">
+          <div style="width:60%; float:left; min-height: 90px">
             <ul>
               <li>Task schedule</li>
               <li>"To do" list: tasks that need to be done</li>
@@ -85,8 +94,7 @@
           </div>
           <div style="text-align:center">
             <h3>
-              Click it to check
-              <a @click="gotoTaskassignment()">Task assignment</a>
+              <a @click="gotoTaskassignment()">Click to check it</a>
             </h3>
           </div>
         </Card>
@@ -106,8 +114,7 @@ export default {
   data() {
     return {};
   },
-  mounted(){
-  },
+  mounted() {},
   methods: {
     gotoIntroduction() {
       this.$router.replace({ name: "info" });

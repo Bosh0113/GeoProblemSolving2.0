@@ -67,6 +67,34 @@
           <vue-scroll :ops="scrollOps" :style="{height:sidebarHeight+150+'px'}">
             <Card class="Information">
               <div style="width:100%">
+                <strong>Subproject name:</strong>
+                <template v-if="userRole == 'Manager'">
+                  <Icon
+                    v-if="!edit0"
+                    type="ios-create"
+                    :size="18"
+                    style="float:right;cursor:pointer"
+                    title="Edit"
+                    @click="editTitle"
+                  />
+                  <Icon
+                    v-else
+                    type="md-checkbox-outline"
+                    :size="18"
+                    style="float:right;cursor:pointer"
+                    title="Complete"
+                    @click="editTitle"
+                  />
+                </template>
+              </div>
+              <Divider style="margin:10px 0; background:lightblue" />
+              <div v-if="!edit0" style="overflow-y:auto; height:30px">{{title}}</div>
+              <template v-else>
+                <Input v-model="title" type="text" :rows="1" placeholder="Enter something..." />
+              </template>
+            </Card>
+            <Card class="Information">
+              <div style="width:100%">
                 <strong>Description:</strong>
                 <template v-if="userRole == 'Manager'">
                   <Icon
@@ -135,22 +163,22 @@
               <div style="width:100%">
                 <strong>Limitations / problems:</strong>
                 <template v-if="userRole=='Manager'">
-                <Icon
-                  v-if="!edit3"
-                  type="ios-create"
-                  :size="18"
-                  style="float:right;cursor:pointer"
-                  title="Edit"
-                  @click="editLimitation"
-                />
-                <Icon
-                  v-else
-                  type="md-checkbox-outline"
-                  :size="18"
-                  style="float:right;cursor:pointer"
-                  title="Complete"
-                  @click="editLimitation"
-                />
+                  <Icon
+                    v-if="!edit3"
+                    type="ios-create"
+                    :size="18"
+                    style="float:right;cursor:pointer"
+                    title="Edit"
+                    @click="editLimitation"
+                  />
+                  <Icon
+                    v-else
+                    type="md-checkbox-outline"
+                    :size="18"
+                    style="float:right;cursor:pointer"
+                    title="Complete"
+                    @click="editLimitation"
+                  />
                 </template>
               </div>
               <Divider style="margin:10px 0; background:lightblue" />
@@ -364,12 +392,15 @@ export default {
       // 删除成员的提醒
       removeMemberAlert: false,
       // 编辑子项目信息
+      edit0: false,
       edit1: false,
       edit2: false,
       edit3: false,
+      title: this.subProjectInfo.title,
       background: "",
       limitation: "",
       description: "",
+      oldTitle: this.subProjectInfo.title,
       oldBackground: "",
       oldLimitation: "",
       oldDescription: ""
@@ -384,20 +415,23 @@ export default {
 
   beforeRouteLeave(to, from, next) {
     var editStart = false;
-    if(this.oldLimitation != this.limitation){
+
+    if (this.oldTitle != this.title) {
       editStart = true;
     }
-    if(this.oldBackground != this.background){
+    if (this.oldLimitation != this.limitation) {
       editStart = true;
     }
-    if(this.oldDescription != this.description){
+    if (this.oldBackground != this.background) {
+      editStart = true;
+    }
+    if (this.oldDescription != this.description) {
       editStart = true;
     }
 
-    if((!editStart)||!(this.edit1||this.edit2||this.edit3)){
+    if (!editStart || !(this.edit0 || this.edit1 || this.edit2 || this.edit3)) {
       next();
-    }
-    else{
+    } else {
       this.$Notice.info({
         desc: "The content that you edited has not been submitted!"
       });
@@ -440,7 +474,6 @@ export default {
         this.oldBackground = this.subProjectInfo.background;
       }
 
-      
       if (
         this.subProjectInfo.limitation != undefined &&
         this.subProjectInfo.limitation != null
@@ -727,31 +760,63 @@ export default {
           console.log(err.data);
         });
     },
+    editTitle() {
+      if (this.edit0) {
+        this.edit0 = false;
+        if (this.oldTitle != this.title) {
+          let obj = new URLSearchParams();
+          obj.append("subProjectId", this.subProjectInfo.subProjectId);
+          obj.append("title", this.title);
+          this.axios
+            .post("/GeoProblemSolving/subProject/update", obj)
+            .then(res => {
+              if (res.data == "Offline") {
+                this.$store.commit("userLogout");
+                this.$router.push({ name: "Login" });
+              } else if (res.data != "Fail") {
+                this.$Notice.info({
+                  desc: "Update successfully!"
+                });
+                this.oldTitle = this.title;
+              } else {
+                this.$Message.error("Update subproject failed.");
+              }
+            })
+            .catch(err => {
+              console.log(err.data);
+            });
+        }
+      } else {
+        this.edit0 = true;
+      }
+    },
     editDescription() {
       if (this.edit1) {
         this.edit1 = false;
 
-        let obj = new URLSearchParams();
-        obj.append("subProjectId", this.subProjectInfo.subProjectId);
-        obj.append("description", this.description);
-        this.axios
-          .post("/GeoProblemSolving/subProject/update", obj)
-          .then(res => {
-            if (res.data == "Offline") {
-              this.$store.commit("userLogout");
-              this.$router.push({ name: "Login" });
-            } else if (res.data != "Fail") {
-              this.$Notice.info({
-                desc: "Update successfully!"
-              });
-            } else {
-              this.oldDescription = this.description;
-              this.$Message.error("Update subproject failed.");
-            }
-          })
-          .catch(err => {
-            console.log(err.data);
-          });
+        if (this.oldDescription != this.description) {
+          let obj = new URLSearchParams();
+          obj.append("subProjectId", this.subProjectInfo.subProjectId);
+          obj.append("description", this.description);
+          this.axios
+            .post("/GeoProblemSolving/subProject/update", obj)
+            .then(res => {
+              if (res.data == "Offline") {
+                this.$store.commit("userLogout");
+                this.$router.push({ name: "Login" });
+              } else if (res.data != "Fail") {
+                this.$Notice.info({
+                  desc: "Update successfully!"
+                });
+                this.oldDescription = this.description;
+              } else {
+                this.$Message.error("Update subproject failed.");
+              }
+            })
+            .catch(err => {
+              console.log(err.data);
+            });
+        }
       } else {
         this.edit1 = true;
       }
@@ -760,27 +825,29 @@ export default {
       if (this.edit2) {
         this.edit2 = false;
 
-        let obj = new URLSearchParams();
-        obj.append("subProjectId", this.subProjectInfo.subProjectId);
-        obj.append("background", this.background);
-        this.axios
-          .post("/GeoProblemSolving/subProject/update", obj)
-          .then(res => {
-            if (res.data == "Offline") {
-              this.$store.commit("userLogout");
-              this.$router.push({ name: "Login" });
-            } else if (res.data != "Fail") {
-              this.$Notice.info({
-                desc: "Update successfully!"
-              });
-            } else {
-              this.oldBackground = this.background;
-              this.$Message.error("Update subproject failed.");
-            }
-          })
-          .catch(err => {
-            console.log(err.data);
-          });
+        if (this.oldBackground != this.background) {
+          let obj = new URLSearchParams();
+          obj.append("subProjectId", this.subProjectInfo.subProjectId);
+          obj.append("background", this.background);
+          this.axios
+            .post("/GeoProblemSolving/subProject/update", obj)
+            .then(res => {
+              if (res.data == "Offline") {
+                this.$store.commit("userLogout");
+                this.$router.push({ name: "Login" });
+              } else if (res.data != "Fail") {
+                this.$Notice.info({
+                  desc: "Update successfully!"
+                });
+                this.oldBackground = this.background;
+              } else {
+                this.$Message.error("Update subproject failed.");
+              }
+            })
+            .catch(err => {
+              console.log(err.data);
+            });
+        }
       } else {
         this.edit2 = true;
       }
@@ -789,27 +856,29 @@ export default {
       if (this.edit3) {
         this.edit3 = false;
 
-        let obj = new URLSearchParams();
-        obj.append("subProjectId", this.subProjectInfo.subProjectId);
-        obj.append("limitation", this.limitation);
-        this.axios
-          .post("/GeoProblemSolving/subProject/update", obj)
-          .then(res => {
-            if (res.data == "Offline") {
-              this.$store.commit("userLogout");
-              this.$router.push({ name: "Login" });
-            } else if (res.data != "Fail") {
-              this.$Notice.info({
-                desc: "Update successfully!"
-              });
-            } else {
-              this.oldLimitation=this.limitation;
-              this.$Message.error("Update subproject failed.");
-            }
-          })
-          .catch(err => {
-            console.log(err.data);
-          });
+        if (this.oldLimitation != this.limitation) {
+          let obj = new URLSearchParams();
+          obj.append("subProjectId", this.subProjectInfo.subProjectId);
+          obj.append("limitation", this.limitation);
+          this.axios
+            .post("/GeoProblemSolving/subProject/update", obj)
+            .then(res => {
+              if (res.data == "Offline") {
+                this.$store.commit("userLogout");
+                this.$router.push({ name: "Login" });
+              } else if (res.data != "Fail") {
+                this.$Notice.info({
+                  desc: "Update successfully!"
+                });
+                this.oldLimitation = this.limitation;
+              } else {
+                this.$Message.error("Update subproject failed.");
+              }
+            })
+            .catch(err => {
+              console.log(err.data);
+            });
+        }
       } else {
         this.edit3 = true;
       }

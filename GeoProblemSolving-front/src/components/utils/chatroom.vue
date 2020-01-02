@@ -880,16 +880,10 @@ export default {
     },
 
     initSize() {
-      if (window.innerHeight > 675) {
-        this.panelHeight = window.innerHeight;
-      } else {
-        this.panelHeight = window.innerHeight;
-      }
-      if (window.innerWidth > 1200) {
-        this.panelWidth = window.innerWidth;
-      } else {
-        this.panelWidth = window.innerWidth;
-      }
+      $("#app").css("min-width", "0");
+      $("#app").css("min-height", "0");
+      this.panelHeight = window.innerHeight;
+      this.panelWidth = window.innerWidth;
       this.messageListPanelHeight = this.panelHeight - 144 - 40 + "px";
     },
 

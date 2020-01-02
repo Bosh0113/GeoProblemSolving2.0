@@ -30,6 +30,10 @@ public class EmailDaoImpl implements IEmailDao{
             Properties props=new Properties();
             props.setProperty("mail.transport.protocol", "smtp");  // 使用的协议，javaMail规范要求
             props.setProperty("mail.smtp.host", myEmailSMTPHost);  // 发件人邮箱的SMTP服务器的地址
+            props.setProperty("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+            props.setProperty("mail.smtp.port", "587");
+            props.setProperty("mail.smtp.socketFactory.port", "587");
+            props.setProperty("mail.smtp.socketFactory.fallback", "false");
             props.setProperty("mail.smtp.auth", "true");           // 需要认证的请求
 
             // 2、根据配置创建会话，用于邮件和服务器交互

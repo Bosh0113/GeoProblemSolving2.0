@@ -11,6 +11,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
+import org.springframework.util.DigestUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -247,6 +248,22 @@ public class UpdateDBDao {
                 return 6;
             default:
                 return 7;
+        }
+    }
+
+    public String md5Password(){
+        try{
+            List<UserEntity> userEntities = mongoTemplate.findAll(UserEntity.class);
+            for(UserEntity userEntity:userEntities){
+                String passWordMD5 = DigestUtils.md5DigestAsHex(userEntity.getPassword().getBytes());
+                Query query = new Query(Criteria.where("userId").is(userEntity.getUserId()));
+                Update update = new Update();
+                update.set("password",passWordMD5);
+                mongoTemplate.updateFirst(query,update,UserEntity.class);
+            }
+            return "Success";
+        }catch (Exception e){
+            return "Fail";
         }
     }
 }

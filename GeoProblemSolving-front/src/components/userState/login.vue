@@ -165,8 +165,9 @@ img {
 </template>
 
 <script>
+import md5 from "js-md5";
 export default {
-  components: {},
+  components: { md5 },
   computed: {
     UserState() {
       return this.$store.getters.userState;
@@ -237,7 +238,7 @@ export default {
           if (this.checked == true) {
             localStorage.setItem("user", this.loginForm.user);
             var password = this.loginForm.password;
-            password = this.encrypto(password);
+            // password = this.encrypto(password);
             localStorage.setItem("password", password);
             localStorage.setItem("statusRecord", this.checked);
           } else if (this.checked == false) {
@@ -246,9 +247,10 @@ export default {
             localStorage.setItem("statusRecord", false);
           }
           var email = this.loginForm.user;
-          var passwordFro = this.loginForm.password;
-          var passwordAES = this.encrypto(passwordFro);
-          var passwordAESURI = window.encodeURIComponent(passwordAES);
+          // var passwordFro = this.loginForm.password;
+          // var passwordAES = this.encrypto(passwordFro);
+          // var passwordAESURI = window.encodeURIComponent(passwordAES);
+          var passwordAESURI = md5(this.loginForm.password);
           this.axios
             .get(
               "/GeoProblemSolving/user/login" +
@@ -277,38 +279,38 @@ export default {
       });
     },
     goBack() {
-      window.location.href="/GeoProblemSolving/home";
+      window.location.href = "/GeoProblemSolving/home";
     },
     register() {
       this.$router.push({ name: "Register" });
     },
     goHome() {
-      window.location.href="/GeoProblemSolving/home";
+      window.location.href = "/GeoProblemSolving/home";
     },
     getlocalStorage() {
       this.loginForm.user = localStorage.getItem("user");
-      this.loginForm.password = this.decrypto(localStorage.getItem("password"));
+      this.loginForm.password = localStorage.getItem("password");
       // 将字符串格式的true转换为boolean模式的true
       if (localStorage.getItem("statusRecord")) {
         this.checked = eval(localStorage.getItem("statusRecord"));
       }
     },
     encrypto(context) {
-      var CryptoJS = require("crypto-js");
-      var key = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
-      var iv = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
-      var encrypted = "";
-      if (typeof context == "string") {
-      } else if (typeof context == "object") {
-        context = JSON.stringify(context);
-      }
-      var srcs = CryptoJS.enc.Utf8.parse(context);
-      encrypted = CryptoJS.AES.encrypt(srcs, key, {
-        iv: iv,
-        mode: CryptoJS.mode.CBC,
-        padding: CryptoJS.pad.Pkcs7
-      });
-      return encrypted.toString();
+      // var CryptoJS = require("crypto-js");
+      // var key = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
+      // var iv = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
+      // var encrypted = "";
+      // if (typeof context == "string") {
+      // } else if (typeof context == "object") {
+      //   context = JSON.stringify(context);
+      // }
+      // var srcs = CryptoJS.enc.Utf8.parse(context);
+      // encrypted = CryptoJS.AES.encrypt(srcs, key, {
+      //   iv: iv,
+      //   mode: CryptoJS.mode.CBC,
+      //   padding: CryptoJS.pad.Pkcs7
+      // });
+      // return encrypted.toString();
     },
     decrypto(context) {
       var CryptoJS = require("crypto-js");

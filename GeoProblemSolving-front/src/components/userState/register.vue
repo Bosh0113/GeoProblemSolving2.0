@@ -283,8 +283,9 @@
   </div>
 </template>
 <script>
+import md5 from "js-md5";
 export default {
-  components: {},
+  components: { md5 },
   computed: {
     avatar() {
       return this.$store.getters.avatar;
@@ -439,7 +440,7 @@ export default {
           var userJson = {};
           userJson["userName"] = this.registerForm.userName;
           userJson["email"] = this.registerForm.email;
-          userJson["password"] = this.registerForm.password;
+          userJson["password"] = md5(this.registerForm.password);
           userJson["mobilePhone"] = this.registerForm.mobilePhone;
           userJson["gender"] = this.registerForm.gender;
           userJson["jobTitle"] = this.registerForm.jobTitle;
@@ -451,8 +452,9 @@ export default {
           userJson["homePage"] = this.registerForm.homePage;
           userJson["avatar"] = this.registerForm.avatar;
 
-          var passwordFro = this.registerForm.password;
-          var passwordAES = this.encrypto(passwordFro);
+          // var passwordFro = this.registerForm.password;
+          // var passwordAES = this.encrypto(passwordFro);
+          var passwordAES = md5(this.registerForm.password);
           var email = this.registerForm.email;
           this.axios
             .post("/GeoProblemSolving/user/register", userJson)
@@ -550,21 +552,21 @@ export default {
       // this.eyeIconType = 'ios-eye-on';
     },
     encrypto(context) {
-      var CryptoJS = require("crypto-js");
-      var key = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
-      var iv = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
-      var encrypted = "";
-      if (typeof context == "string") {
-      } else if (typeof context == "object") {
-        context = JSON.stringify(context);
-      }
-      var srcs = CryptoJS.enc.Utf8.parse(context);
-      encrypted = CryptoJS.AES.encrypt(srcs, key, {
-        iv: iv,
-        mode: CryptoJS.mode.CBC,
-        padding: CryptoJS.pad.Pkcs7
-      });
-      return encrypted.toString();
+      // var CryptoJS = require("crypto-js");
+      // var key = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
+      // var iv = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
+      // var encrypted = "";
+      // if (typeof context == "string") {
+      // } else if (typeof context == "object") {
+      //   context = JSON.stringify(context);
+      // }
+      // var srcs = CryptoJS.enc.Utf8.parse(context);
+      // encrypted = CryptoJS.AES.encrypt(srcs, key, {
+      //   iv: iv,
+      //   mode: CryptoJS.mode.CBC,
+      //   padding: CryptoJS.pad.Pkcs7
+      // });
+      // return encrypted.toString();
     }
   }
 };

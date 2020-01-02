@@ -174,16 +174,10 @@ export default {
   },
   methods: {
     initSize() {
-      if (window.innerHeight > 675) {
-        this.windowHeight = window.innerHeight;
-      } else {
-        this.windowHeight = 675;
-      }
-      if (window.innerWidth > 1200) {
-        this.windowWidth = window.innerWidth - 60;
-      } else {
-        this.windowWidth = 1140;
-      }
+      $("#app").css("min-width", "0");
+      $("#app").css("min-height", "0");
+      this.windowHeight = window.innerHeight;
+      this.windowWidth = window.innerWidth - 60;
     },
     getStepInfo() {
       if (

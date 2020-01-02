@@ -201,7 +201,7 @@
                               icon="md-eye"
                               shape="circle"
                               class="btnHoverGray"
-                              title="Preview"
+                              title="Details"
                               size="small"
                               @click="showTool(tool)"
                             ></Button>
@@ -1239,8 +1239,13 @@ export default {
       addToToolsets: [],
       toolsetInfoModal: false,
       editToolsetModal: false,
-      modelListModal: false
+      // 工具窗口
+      panel: null,
     };
+  },
+   beforeDestory() {
+    this.panel.close();
+    next();
   },
   methods: {
     resizeContent() {
@@ -1625,48 +1630,6 @@ export default {
       return resultList;
     },
     showTool(toolInfo) {
-      this.axios
-        .post("/GeoProblemSolving/user/state")
-        .then(res => {
-          if (!res.data) {
-            this.$store.commit("userLogout");
-            this.$router.push({ name: "Login" });
-          } else {
-            let toolURL =
-              '<iframe src="' +
-              toolInfo.toolUrl +
-              "?groupID=" +
-              this.stepId +
-              '" style="width: 100%;height:100%;"></iframe>';
-            var demoPanelTimer = null;
-            let panel = jsPanel.create({
-              theme: "success",
-              headerTitle: toolInfo.toolName,
-              footerToolbar: '<p style="height:10px"></p>',
-              contentSize: "1200 600",
-              content: toolURL,
-              disableOnMaximized: true,
-              dragit: {
-                containment: 5
-              },
-              id: "demoPanel",
-              onclosed: function(panel, status, closedByUser) {
-                window.clearTimeout(demoPanelTimer);
-              },
-              callback: function() {
-                var that = this;
-                demoPanelTimer = window.setInterval(function() {
-                  that.style.zIndex = "9999";
-                }, 1);
-              }
-            });
-            // panel.resizeit("disable");
-            $(".jsPanel-content").css("font-size", "0");
-          }
-        })
-        .catch(err => {
-          console.log("Get user info fail.");
-        });
     },
     editToolShow(tool) {
       this.inputToolTag = "";

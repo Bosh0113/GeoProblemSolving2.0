@@ -139,6 +139,7 @@ public class FolderDaoImpl implements IFolderDao {
             Query queryFolder = new Query(Criteria.where("folderId").is(folderId));
             FolderEntity folderEntity = mongoTemplate.findOne(queryFolder, FolderEntity.class);
             ArrayList<ResourceEntity> files = folderEntity.getFiles();
+            
 
             String resourceId = request.getParameter("resourceId");
             if (resourceId == null) {
