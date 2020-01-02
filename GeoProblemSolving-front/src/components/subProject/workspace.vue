@@ -40,7 +40,7 @@
     </div>
 </template>
 <script>
-import dataList from "./../workingSpace/functionSteps/utils/dataList";
+import dataList from "./../workingSpace/noStep/dataList";
 import toolContainer from "./../workingSpace/functionSteps/utils/toolContainer";
 export default {
     props: ["subProjectInfo", "userRole"],

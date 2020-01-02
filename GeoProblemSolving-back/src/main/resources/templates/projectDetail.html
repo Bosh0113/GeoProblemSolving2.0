@@ -219,8 +219,8 @@
         .ivu-card-body {
             display: inherit;
         }
-        .btnHoverGray:hover {
-        background-color: #808695;
+        .btnHoverRed:hover {
+        background-color: #ed4014;
         color: white;
         }
     </style>
@@ -548,7 +548,6 @@
                               style="height: -webkit-fill-available;min-height: fit-content;">
                               <div slot="title">
                                 <h1 class="projectMenuItemTitle">Subprojects</h1>
-                                <i-button class="btnHoverGray" @click="resetProjectTypeModalShow()">Reset project's type</i-button>
                               </div>
                             <div slot="extra">
                                 <Poptip trigger="hover" content="Create subproject" placement="left">
@@ -560,76 +559,81 @@
                             </div>
                             <div :style="{height:subProjectsCSS}">
                                 <vue-scroll :ops="scrollOps">
-                                    <div v-for="(subProject,index) in subProjectList"
-                                         style="width: 25%;display: inline-block;padding: 5px;">
-                                        <Card style="height: 300px;" class="subProjectCard">
-                                            <div slot="title" style="cursor: pointer;"
-                                                 @click="goSubProjectPage(subProject)">
-                                                <strong style="width: 160px;display: inline-block;" class="overEllipsis"
-                                                        :title="subProject.title">
-                                                    {{subProject.title}}
-                                                </strong>
-                                            </div>
-                                            <div slot="extra" v-if="managerIdentity(subProject.managerId)">
-                                                <Poptip trigger="hover" content="Change manager" placement="bottom">
-                                                    <i-button class="changeInviteColor" icon="ios-people" size="small"
-                                                              shape="circle"
-                                                              @click="handOverModalShow(index)"></i-button>
-                                                </Poptip>
-                                                <Poptip trigger="hover" content="Edit information" placement="bottom">
-                                                    <i-button class="changeEditColor" icon="ios-create" size="small"
-                                                              shape="circle"
-                                                              @click="editSubProjectModalShow(index)"></i-button>
-                                                </Poptip>
-                                                <Poptip trigger="hover" content="Remove subproject" placement="bottom">
-                                                    <i-button class="changeRemoveColor" icon="md-close" size="small"
-                                                              shape="circle"
-                                                              @click="deleteSubProjectModalShow(index)"></i-button>
-                                                </Poptip>
-                                            </div>
-                                            <div slot="extra" v-else-if="memberIdentity(subProject.members)">
-                                                <Icon type="ios-person" :size="20"></Icon>
-                                            </div>
-                                            <div slot="extra" v-else>
-                                                <template v-if="managerIdentity(subProject.managerId)">
-                                                    <Poptip trigger="hover" content="To be member" placement="left">
-                                                        <i-button class="changeInviteColor" icon="md-add-circle"
-                                                                  size="small" shape="circle"
-                                                                  @click="joinSubProject(index)"></i-button>
-                                                    </Poptip>
-                                                </template>
-                                                <template v-else>
-                                                    <Poptip trigger="hover" content="Apply to Join" placement="left">
-                                                        <i-button class="changeInviteColor" icon="md-add" size="small"
-                                                                  shape="circle"
-                                                                  @click="applyJoinSubProjectModalShow(index)"></i-button>
-                                                    </Poptip>
-                                                </template>
-                                            </div>
-                                            <div class="subProjectDes" :title="subProject.description"
-                                                 style="cursor: pointer;" @click="goSubProjectPage(subProject)">
-                                                {{subProject.description}}
-                                            </div>
-                                            <div style="height: 75px;padding: 5px;">
-                                                <p class="subProjectExtraP">
-                                                    <strong style="display: inline-block">Manager: </strong>
-                                                    <span class="subProjectExtraSpan">{{subProject.managerName}}</span>
-                                                </p>
-                                                <p class="subProjectExtraP">
-                                                    <strong style="display: inline-block">Members: </strong>
-                                                    <span class="subProjectExtraSpan">{{memberListStr(subProject.members)}}</span>
-                                                </p>
-                                                <p class="subProjectExtraP">
-                                                    <strong style="display: inline-block">Create time: </strong>
-                                                    <span class="subProjectExtraSpan">{{subProject.createTime}}</span>
-                                                </p>
-                                            </div>
-                                        </Card>
-                                    </div>
                                     <div v-if="!subProjectList.length" style="text-align:center">
                                         <div style="color:lightgray;font-size:4em; font-weight:bold">No sub-projects
                                             have been created.
                                         </div>
+                                    </div>
+                                    <div>
+                                        <div v-for="(subProject,index) in subProjectList"
+                                             style="width: 25%;display: inline-block;padding: 5px;">
+                                            <Card style="height: 300px;" class="subProjectCard">
+                                                <div slot="title" style="cursor: pointer;"
+                                                     @click="goSubProjectPage(subProject)">
+                                                    <strong style="width: 160px;display: inline-block;" class="overEllipsis"
+                                                            :title="subProject.title">
+                                                        {{subProject.title}}
+                                                    </strong>
+                                                </div>
+                                                <div slot="extra" v-if="managerIdentity(subProject.managerId)">
+                                                    <Poptip trigger="hover" content="Change manager" placement="bottom">
+                                                        <i-button class="changeInviteColor" icon="ios-people" size="small"
+                                                                  shape="circle"
+                                                                  @click="handOverModalShow(index)"></i-button>
+                                                    </Poptip>
+                                                    <Poptip trigger="hover" content="Edit information" placement="bottom">
+                                                        <i-button class="changeEditColor" icon="ios-create" size="small"
+                                                                  shape="circle"
+                                                                  @click="editSubProjectModalShow(index)"></i-button>
+                                                    </Poptip>
+                                                    <Poptip trigger="hover" content="Remove subproject" placement="bottom">
+                                                        <i-button class="changeRemoveColor" icon="md-close" size="small"
+                                                                  shape="circle"
+                                                                  @click="deleteSubProjectModalShow(index)"></i-button>
+                                                    </Poptip>
+                                                </div>
+                                                <div slot="extra" v-else-if="memberIdentity(subProject.members)">
+                                                    <Icon type="ios-person" :size="20"></Icon>
+                                                </div>
+                                                <div slot="extra" v-else>
+                                                    <template v-if="managerIdentity(subProject.managerId)">
+                                                        <Poptip trigger="hover" content="To be member" placement="left">
+                                                            <i-button class="changeInviteColor" icon="md-add-circle"
+                                                                      size="small" shape="circle"
+                                                                      @click="joinSubProject(index)"></i-button>
+                                                        </Poptip>
+                                                    </template>
+                                                    <template v-else>
+                                                        <Poptip trigger="hover" content="Apply to Join" placement="left">
+                                                            <i-button class="changeInviteColor" icon="md-add" size="small"
+                                                                      shape="circle"
+                                                                      @click="applyJoinSubProjectModalShow(index)"></i-button>
+                                                        </Poptip>
+                                                    </template>
+                                                </div>
+                                                <div class="subProjectDes" :title="subProject.description"
+                                                     style="cursor: pointer;" @click="goSubProjectPage(subProject)">
+                                                    {{subProject.description}}
+                                                </div>
+                                                <div style="height: 75px;padding: 5px;">
+                                                    <p class="subProjectExtraP">
+                                                        <strong style="display: inline-block">Manager: </strong>
+                                                        <span class="subProjectExtraSpan">{{subProject.managerName}}</span>
+                                                    </p>
+                                                    <p class="subProjectExtraP">
+                                                        <strong style="display: inline-block">Members: </strong>
+                                                        <span class="subProjectExtraSpan">{{memberListStr(subProject.members)}}</span>
+                                                    </p>
+                                                    <p class="subProjectExtraP">
+                                                        <strong style="display: inline-block">Create time: </strong>
+                                                        <span class="subProjectExtraSpan">{{subProject.createTime}}</span>
+                                                    </p>
+                                                </div>
+                                            </Card>
+                                        </div>
+                                    </div>
+                                    <div style="margin:5px 0 5px 80px;text-align:center">
+                                        <i-button class="btnHoverRed" @click="resetProjectTypeModalShow()">Reset project's type</i-button>
                                     </div>
                                 </vue-scroll>
                             </div>

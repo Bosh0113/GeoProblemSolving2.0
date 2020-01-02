@@ -11,7 +11,7 @@
             <h1 slot="title">Workspace</h1>
             <div slot="extra">
             </div>
-            <Row>
+            <!-- <Row>
                 <Col span="5">
                 <Card style="margin-top: 20px 0 0 10px" dis-hover>
                     <h2 slot="title">Members:</h2>
@@ -25,19 +25,20 @@
                 <Row>
                     <Col span="22" offset="1">
                         <Collapse simple v-model="unfold">
-                        <Panel name="tool">
-                            Toolbox
-                            <tool-container slot="content" :stepInfo="stepInfo" :userRole="userRole"></tool-container>
-                        </Panel>
                         <Panel name="data">
                             Data list
                             <data-list slot="content" :stepInfo="stepInfo" :userRole="userRole"></data-list>
+                        </Panel>
+                        <Panel name="tool">
+                            Toolbox
+                            <tool-container slot="content" :stepInfo="stepInfo" :userRole="userRole"></tool-container>
                         </Panel>
                         </Collapse>
                     </Col>
                 </Row>
                 </Col>
-            </Row>
+            </Row> -->
+            <data-list  :stepInfo="stepInfo" :userRole="userRole"></data-list>
             <div style="margin:5px 0 5px 80px;text-align:center">
                 <Button class="btnHoverRed" @click="resetProjectTypeModalShow()">Reset project's type</Button>
             </div>
@@ -55,7 +56,7 @@
     </div>
 </template>
 <script>
-import dataList from "./../workingSpace/functionSteps/utils/dataList";
+import dataList from "./../workingSpace/noStep/dataList";
 import toolContainer from "./../workingSpace/functionSteps/utils/toolContainer";
 import onlineParticipant from "./../workingSpace/functionSteps/utils/onlineParticipants";
 export default {

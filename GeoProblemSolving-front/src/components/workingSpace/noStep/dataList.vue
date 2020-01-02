@@ -47,7 +47,6 @@
   overflow: hidden;
 }
 #toolData {
-  width: 66%;
   height: 400px;
   border: 1px solid #dcdee2;
 }
@@ -61,16 +60,17 @@
 </style>
 <template>
   <div>
-    <Card dis-hover>
-      <div slot="title">
-        <h4>Resources</h4>
-      </div>
-      <div slot="extra">
+    <Row>
+      <Col span="6">
+      <div style="border: 1px solid #dcdee2;padding:0 5px 5px">
+      <div style="height:30px">
+        <div style="margin-top: 15px;">
+        <h4 style="display: inline-block;margin-left:10px">Resources</h4>
         <Select
           v-model="resouceModel"
           size="small"
           @on-change="changeResModel"
-          style="width:150px;margin-right:20px;margin-top:-10px"
+          style="width:150px;margin:-10px 12px 0 15px"
         >
           <Option value="resources">All resources</Option>
           <Option value="data">Data</Option>
@@ -83,9 +83,9 @@
           style="margin-top:-10px"
           title="Upload resources"
         ></Button>
+        </div>
       </div>
-      <div style="display: flex; justify-content: space-between;">
-        <div style="width:33%; height:400px">
+        <div>
             <Table
               :columns="tableColName"
               :data="fileList"
@@ -118,9 +118,16 @@
               </template>
             </Table>
         </div>
+      </div>
+      </Col>
+      <Col span="18">
+      <div style="margin-left:5px">
+    <Card dis-hover>
+      <div slot="title">
+        <h4>Data from tools</h4>
+      </div>
         <div id="toolData">
-          <div id="toolDataHeader">Data from Tools</div>
-          <vue-scroll :ops="ops" style="height:360px">
+          <vue-scroll :ops="ops">
             <div v-for="(item,index) in toolDataList" :key="index">
               <Card style="width:48%; height:150px; float:left; margin:5px">
                 <div style="float:left">
@@ -162,8 +169,16 @@
             </div>
           </vue-scroll>
         </div>
+        <Collapse simple v-model="unfold">
+        <Panel name="tool">
+            Toolbox
+            <tool-container slot="content" :stepInfo="stepInfo" :userRole="userRole"></tool-container>
+        </Panel>
+        </Collapse>
+      </Card>
       </div>
-    </Card>
+      </Col>
+    </Row>
     <Modal v-model="checkDataModal" title="Data Information" width="600">
       <Tabs>
         <TabPane label="Information" name="metadata" icon="md-home">
@@ -281,8 +296,10 @@
 </template>
 <script>
 import Avatar from "vue-avatar";
+import toolContainer from "./../functionSteps/utils/toolContainer";
 export default {
   components: {
+    toolContainer,
     Avatar
   },
   data() {
@@ -292,6 +309,7 @@ export default {
           background: "#808695"
         }
       },
+      unfold: ["tool"],
       userInfo: this.$store.getters.userInfo,
       resouceModel: "resources",
       dataUploadModal: false,
@@ -375,7 +393,7 @@ export default {
       }
     },
     stepInfo(){
-      this.getResList();
+    this.getResList();
     }
   },
   created() {},
