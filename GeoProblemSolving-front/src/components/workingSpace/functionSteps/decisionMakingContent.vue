@@ -36,7 +36,8 @@ export default {
     return {
       unfold: ["tool", "data"],
       stepSocket: null,
-      operationRecords: []
+      operationRecords: [],
+      panelList:[],
     };
   },
   mounted() {

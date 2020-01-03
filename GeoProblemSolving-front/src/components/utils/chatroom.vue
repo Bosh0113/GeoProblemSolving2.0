@@ -1049,7 +1049,7 @@ export default {
           for (let i = 0; i < this.onlineParticipants.length; i++) {
             if (msg.userId == this.onlineParticipants[i].userId) {
               let offperson = this.onlineParticipants.splice(i, 1);
-              this.offlineParticipants.push(offperson);
+              this.offlineParticipants.push(offperson[0]);
             }
           }
         } else if (msg.behavior == "on") {
@@ -1057,7 +1057,7 @@ export default {
           for (let i = 0; i < this.offlineParticipants.length; i++) {
             if (msg.userId == this.offlineParticipants[i].userId) {
               let onperson = this.offlineParticipants.splice(i, 1);
-              this.onlineParticipants.push(onperson);
+              this.onlineParticipants.push(onperson[0]);
             }
           }
         }
