@@ -301,6 +301,10 @@
                     this.$nextTick(function () {
                         this.$refs['pages'].currentPage = 1;
                     });
+                    if(this.selectTag != ""){
+                        document.getElementById(this.selectTag).style.backgroundColor="lightblue";
+                        this.selectTag = "";
+                    }
 
                     if (type == "All" && !this.userState) {
                         this.judgeMember(projectsInfo.projectList);
@@ -311,7 +315,6 @@
                     else {
                         this.changePage(1);
                     }
-
                     if (type == "All") {
                         this.selectCatalog = this.projectCatalog[0];
                     }
@@ -337,27 +340,29 @@
                     else {
                         if(this.selectTag != ""){
                             document.getElementById(this.selectTag).style.backgroundColor="lightblue";
+                            this.selectTag = "";
                         }
 
                         document.getElementById(tagName).style.backgroundColor="deepskyblue";
                         this.selectTag = tagName;
-                        this.tabPageData = this.currentProjectList.filter(project => {
+                        // this.tabPageData = this.currentProjectList.filter(project => {
 
-                            if (project.tag.indexOf(tagName) != -1) {
-                                return true;
-                            }
-                            return false;
-                        });
+                        //     if (project.tag.indexOf(tagName) != -1) {
+                        //         return true;
+                        //     }
+                        //     return false;
+                        // });
                     }
+                    this.changePage(this.currentPage);
                 },
                 changePage(index) {
-                    if (this.currentTab == "All" && index == 1 && !this.userState) {
-                        this.judgeMember(projectsInfo.projectList);
-                        this.tabPageData = Object.assign([], this.currentProjectList);
-                        this.freshEle++;
-                        this.totalCount = projectsInfo.count;
-                    }
-                    else {
+                    // if (this.currentTab == "All" && index == 1 && !this.userState) {
+                    //     this.judgeMember(projectsInfo.projectList);
+                    //     this.tabPageData = Object.assign([], this.currentProjectList);
+                    //     this.freshEle++;
+                    //     this.totalCount = projectsInfo.count;
+                    // }
+                    // else {
                         let userId = "";
                         let joinedProjects = [];
                         if (this.userState) {
@@ -370,6 +375,7 @@
                         axios
                             .get("/GeoProblemSolving/project/inquiryByPage" +
                                 "?category=" + this.currentTab +
+                                "&tag=" + this.selectTag +
                                 "&page=" + index +
                                 "&pageSize=" + this.pageSize +
                                 "&userId=" + userId +
@@ -394,7 +400,7 @@
                             .catch(err => {
                                 console.log(err.data);
                             });
-                    }
+                    // }
                 },
 
                 judgeMember(list) {
