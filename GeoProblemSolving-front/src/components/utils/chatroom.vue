@@ -717,7 +717,6 @@ export default {
       if (subProjectId == undefined || subProjectId == "") {
         this.scopeId = data.data[0].projectId;
         this.scopeType = "project";
-        console.log(this.scopeId);
       } else {
         this.scopeId = subProjectId;
         this.scopeType = "subproject";

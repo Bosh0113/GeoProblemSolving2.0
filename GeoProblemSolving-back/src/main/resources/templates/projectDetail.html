@@ -254,7 +254,7 @@
                 </i-menu>
             </div>
             <div style="margin-left: 90px;height: inherit;min-height: fit-content;">
-                <div v-if="showMenuItem=='projectOverview'" style="height: inherit;min-height: fit-content;">
+                <div v-if="activeMenu=='projectOverview'" style="height: inherit;min-height: fit-content;">
                     <div style="background:#eee;padding: 10px;height: inherit;min-height: fit-content;">
                         <Card :bordered="false" dis-hover
                               style="height: -webkit-fill-available; flex-flow: column;min-height: fit-content;">
@@ -381,7 +381,7 @@
                         </Card>
                     </div>
                 </div>
-                <div v-else-if="showMenuItem=='projectDetail'" style="height: inherit;min-height: fit-content;">
+                <div v-else-if="activeMenu=='projectDetail'" style="height: inherit;min-height: fit-content;">
                     <div style="background:#eee;padding: 10px;height: inherit;min-height: fit-content;">
                         <Card :bordered="false" dis-hover
                               style="height: -webkit-fill-available;flex-flow: column;min-height: fit-content;">
@@ -542,7 +542,7 @@
                         </Card>
                     </div>
                 </div>
-                <div v-else-if="showMenuItem=='subProjects'" style="height: inherit;min-height: fit-content;">
+                <div v-else-if="activeMenu=='subProjects'" style="height: inherit;min-height: fit-content;">
                     <div style="background:#eee;padding: 10px;height: inherit;min-height: fit-content;">
                         <Card v-if="projectInfo.type=='type0'" :bordered="false" dis-hover
                               style="height: -webkit-fill-available;min-height: fit-content;">
@@ -644,7 +644,7 @@
                         </div>
                     </div>
                 </div>
-                <div v-else-if="showMenuItem=='resources'" style="height: inherit;min-height: fit-content;">
+                <div v-else-if="activeMenu=='resources'" style="height: inherit;min-height: fit-content;">
                     <div style="background:#eee;padding: 10px;height: inherit;min-height: fit-content;">
                         <Card :bordered="false" dis-hover
                               style="height: -webkit-fill-available;min-height: 565px;min-height: fit-content;">
@@ -665,7 +665,7 @@
                         </Card>
                     </div>
                 </div>
-                <div v-else-if="showMenuItem=='tasks'" style="height: inherit;min-height: fit-content;">
+                <div v-else-if="activeMenu=='tasks'" style="height: inherit;min-height: fit-content;">
                     <div style="background:#eee;padding: 10px;height: inherit;min-height: fit-content;">
                         <Card :bordered="false" dis-hover
                               style="height: -webkit-fill-available;min-height: 565px;min-height: fit-content;">
@@ -1060,6 +1060,7 @@
                 this.resizeContent();
                 this.getAllSubProjects();
                 this.roleIdentity();
+                this.changeMenuByUrl();
             },
             data() {
                 return {
@@ -1072,7 +1073,6 @@
                     },
                     projectInfo: projectInfo,
                     activeMenu: "projectOverview",
-                    showMenuItem: "projectOverview",
                     contentPageCSS: '',
                     membersContentCSS: '',
                     subProjectsCSS: '',
@@ -1252,6 +1252,15 @@
                 }
             },
             methods: {
+                changeMenuByUrl(){
+                    if (/content/.test(window.location.href)) {
+                        var param = window.location.href.match(/content=(\S*)/)[1];
+                        var array = ["projectOverview","projectDetail","tasks","subProjects","resources"];
+                        if(array.includes(param)){
+                            this.activeMenu = param;
+                        }
+                    }
+                },
                 getProjectInfo(){
                     if(this.projectInfo=={}||this.projectInfo==undefined){
                         $.ajax({
@@ -1331,11 +1340,11 @@
                     this.$refs.navigationEl.sendMessage(recipientId);
                 },
                 changeMenuItem(name) {
-                    this.showMenuItem = name;
                     this.activeMenu = name;
+                    var projectId = this.projectInfo.projectId;
+                    window.history.replaceState(null,null,'/GeoProblemSolving/projectDetail/'+projectId+"?content="+name);
                 },
                 gotoIntroduction() {
-                    this.showMenuItem = "projectDetail";
                     this.activeMenu = "projectDetail";
                 },
                 gotoResource() {
@@ -1343,7 +1352,6 @@
                         this.joinProjectNotice = true;
                     }
                     else{
-                        this.showMenuItem = "resources";
                         this.activeMenu = "resources";
                     }
                 },
@@ -1352,12 +1360,10 @@
                         this.joinProjectNotice = true;
                     }
                     else{
-                        this.showMenuItem = "subProjects";
                         this.activeMenu = "subProjects";
                     }
                 },
                 gotoTaskassignment() {
-                    this.showMenuItem = "tasks";
                     this.activeMenu = "tasks";
                 },
                 getAllSubProjects() {
