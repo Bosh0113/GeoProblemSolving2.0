@@ -271,7 +271,7 @@ export default {
       //表示图片
       img: "",
       pictureUrl:"",
-      createProjectId: ""
+      createProjectInfo: {}
     };
   },
   created() {
@@ -317,8 +317,8 @@ export default {
               else if (res.data === "Fail") {
                 this.$Message.error("Create project fail.");
               } else {
-                this.createProjectId = res.data;
-                this.addHistoryEvent(this.createProjectId);
+                this.createProjectInfo = res.data;
+                this.addHistoryEvent(this.createProjectInfo.projectId);
               }
             })
             .catch(err => {
@@ -346,7 +346,8 @@ export default {
         .post("/GeoProblemSolving/history/save", form)
         .then(res => {
           if (res.data === "Success") {
-                window.location.href="/GeoProblemSolving/projectDetail/"+this.createProjectId;
+            this.$store.commit("setProjectInfo", this.createProjectInfo);
+            window.location.href="/GeoProblemSolving/projectDetail/"+this.createProjectInfo.projectId;
           }else{
             confirm("Created project fail.");
           }

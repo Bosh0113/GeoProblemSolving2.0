@@ -7,7 +7,8 @@
 /* member部分样式 */
 .memberPanel {
   width: 200px;
-  background-color: #515a6e;
+  background-color: #ffffff;
+  box-shadow: 6px 0px 3px -5px #b9b9b9;
 }
 
 .panelHeader {
@@ -26,7 +27,7 @@
   font-size: 20px;
   line-height: 20px;
   text-align: center;
-  color: white;
+  color: rgb(0, 0, 0);
 }
 
 .f_list {
@@ -50,9 +51,26 @@
 
 /* member杨式布局结束 */
 /* 关于右侧的布局 */
-.searchPanel {
+/* .searchPanel {
   width: 250px;
   background-color: white;
+  transition: left linear 0.3s;
+  border:1px solid lightgray
+} */
+
+/* 右边栏动画效果 */
+
+.right-enter,
+.right-leave-to {
+  transform: translate3d(100%, 0, 0);
+}
+.right-leave,
+.right-enter-to {
+  transform: translate3d(0, 0, 0);
+}
+.right-enter-active,
+.right-leave-active {
+  transition: all 0.2s;
 }
 
 .date_pick {
@@ -109,7 +127,7 @@
   padding: 5px;
 }
 
-/* 右侧布局结束 */
+/* 右侧布 */
 .contentPanel {
   display: flex;
   flex-direction: column;
@@ -128,6 +146,7 @@
   flex: 1;
   padding: 25px;
   overflow-y: auto;
+  background-color: #e7e7e73a;
 }
 
 .chat-bubble-r {
@@ -169,6 +188,9 @@
   text-align: center;
   font-size: 10px;
   line-height: 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .chat-bubble-left:before {
@@ -294,6 +316,7 @@
   line-height: 15px;
   font-size: 15px;
   padding: 5px 5px 5px 5px;
+  margin-right: 10px;
   /* float:right; */
 }
 
@@ -309,10 +332,6 @@
   height: 20px;
   padding: 0px 10px;
   width: 100%;
-  /* display: inline-block;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap; */
 }
 
 .memberDetail {
@@ -344,8 +363,8 @@
 
 .chat-notice {
   color: darkgreen;
-  position: absolute;
-  left: 50%;
+  width: 90%;
+  text-align: center;
 }
 
 .offlineparticipantState {
@@ -384,89 +403,76 @@
 </style>
 <template>
   <Row>
-    <Col span="24">
-      <div class="chatPanel" :style="{height:panelHeight+'px',width:panelWidth+'px'}">
-        <div class="memberPanel">
-          <div class="panelHeader">
-            <h4>Groups</h4>
+    <!-- <Col span="24"> -->
+    <div class="chatPanel" :style="{height:panelHeight+'px',width:panelWidth+'px'}">
+      <div class="memberPanel">
+        <div class="participants">
+          <h4>Participants</h4>
+          <div>
+            <Card
+              v-for="(participant,index) in onlineParticipants"
+              :key="'online' +index"
+              style="margin:2.5%"
+              :padding="5"
+            >
+              <div style="display:flex;align-items:center">
+                <div class="memberImg" style="position:relative">
+                  <img
+                    v-if="participant.avatar != '' && participant.avatar!='undefined'"
+                    :src="participant.avatar"
+                    style="width:40px;height:40px"
+                  />
+                  <avatar v-else :username="participant.userName" :size="40" :rounded="false"></avatar>
+                  <div class="onlinecircle"></div>
+                </div>
+                <div class="memberDetail">
+                  <div class="memberName">
+                    <span>{{participant.userName}}</span>
+                  </div>
+                  <div class="memberOrganization">
+                    <span>{{participant.organization}}</span>
+                  </div>
+                </div>
+              </div>
+            </Card>
           </div>
-          <!-- 选择聊天室 -->
-          <Select v-model="selectItem" style="width:195px;margin-left:2.5px;margin-right:2.5px">
-            <Option
-              v-for="(item,index) in itemList"
-              :value="item.value"
-              :key="item.index"
-              @click.native="changeChatroom(index)"
-            >{{ item.label }}</Option>
-          </Select>
-
-          <!-- 参与者 -->
-          <div class="participants">
-            <h4>Participants</h4>
-            <div>
-              <Card
-                v-for="(participant,index) in onlineParticipants"
-                :key="'online' +index"
-                style="margin:2.5%"
-                :padding="5"
-              >
-                <div style="display:flex;align-items:center">
-                  <div class="memberImg" style="position:relative">
-                    <img
-                      v-if="participant.avatar != '' && participant.avatar!='undefined'"
-                      :src="participant.avatar"
-                      style="width:40px;height:40px"
-                    />
-                    <avatar v-else :username="participant.userName" :size="40" :rounded="false"></avatar>
-                    <div class="onlinecircle"></div>
+          <div>
+            <Card
+              v-for="(participant,index) in offlineParticipants"
+              :key=" 'offline' + index"
+              style="margin:2.5%"
+              :padding="5"
+            >
+              <div style="display:flex;align-items:center">
+                <div class="memberImg" style="position:relative">
+                  <img
+                    v-if="participant.avatar != '' && participant.avatar!='undefined'"
+                    :src="participant.avatar"
+                    style="width:40px;height:40px"
+                  />
+                  <avatar v-else :username="participant.userName" :size="40" :rounded="false"></avatar>
+                  <div class="offlinecircle"></div>
+                </div>
+                <div class="memberDetail">
+                  <div class="memberName">
+                    <span>{{participant.userName}}</span>
                   </div>
-                  <div class="memberDetail">
-                    <div class="memberName">
-                      <span>{{participant.userName}}</span>
-                    </div>
-                    <div class="memberOrganization">
-                      <span>{{participant.organization}}</span>
-                    </div>
+                  <div class="memberOrganization">
+                    <span>{{participant.organization}}</span>
                   </div>
                 </div>
-              </Card>
-            </div>
-            <div>
-              <Card
-                v-for="(participant,index) in offlineParticipants"
-                :key=" 'offline' + index"
-                style="margin:2.5%"
-                :padding="5"
-              >
-                <div style="display:flex;align-items:center">
-                  <div class="memberImg" style="position:relative">
-                    <img
-                      v-if="participant.avatar != '' && participant.avatar!='undefined'"
-                      :src="participant.avatar"
-                      style="width:40px;height:40px"
-                    />
-                    <avatar v-else :username="participant.userName" :size="40" :rounded="false"></avatar>
-                    <div class="offlinecircle"></div>
-                  </div>
-                  <div class="memberDetail">
-                    <div class="memberName">
-                      <span>{{participant.userName}}</span>
-                    </div>
-                    <div class="memberOrganization">
-                      <span>{{participant.organization}}</span>
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            </div>
+              </div>
+            </Card>
           </div>
         </div>
-
+      </div>
+      <transition name="left">
         <div class="contentPanel">
           <div class="contentHeader">
             <div class="chatObject">
               <div class="s_name" v-show="selectGroup.selectName!==''">{{selectGroup.selectName}}</div>
             </div>
+
             <div class="chatOperate">
               <Button type="default" class="recordsButton" @click="showRecords">Records</Button>
             </div>
@@ -475,9 +481,9 @@
           <div class="contentBody" :style="message_panelObj" id="contentBody">
             <div style="display:flex" v-for="(list,index) in msglist" :key="index">
               <template v-if="list.type === 'notice'">
-                <div class="chat-notice" :style="message_notice">{{list.content}}</div>
+                <div class="chat-notice">{{list.content}}</div>
               </template>
-              <template v-else-if="list.fromid === this.$store.getters.userId ">
+              <template v-else-if="list.fromid === $store.getters.userId ">
                 <div style="width:95%">
                   <div class="chat-bubble-r chat-bubble-right">{{list.content}}</div>
                 </div>
@@ -523,8 +529,10 @@
             </div>
           </div>
         </div>
+      </transition>
 
-        <div class="searchPanel" v-show="searchPanelShow" style="border:1px solid lightgray">
+      <transition name="right">
+        <div class="searchPanel" v-show="searchPanelShow">
           <div class="searchHeader">
             <p>Message Records</p>
           </div>
@@ -557,20 +565,6 @@
                   <div style="color:gray">{{list.content}}</div>
                 </div>
               </div>
-              <!-- <div style="display:flex" v-for="(list,index) in currentPageDataB" :key="'B'+index">
-              <div class="single_record">
-                <span style="color:#2d8cf0; margin-right:2%">{{list.from}}:</span>
-                <span style="color:lightgray; margin-right:2%">{{list.time}}</span>
-                <div style="color:red">{{list.content}}</div>
-              </div>
-            </div>
-            <div style="display:flex" v-for="(list,index) in currentPageDataC" :key="'C'+index">
-              <div class="single_record">
-                <span style="color:#2d8cf0; margin-right:2%">{{list.from}}:</span>
-                <span style="color:lightgray; margin-right:2%">{{list.time}}</span>
-                <div style="color:gray">{{list.content}}</div>
-              </div>
-              </div>-->
             </div>
           </div>
           <!-- 分页 -->
@@ -588,8 +582,9 @@
             <Button @click="nextPage()"> 下一页 </Button>-->
           </div>
         </div>
-      </div>
-    </Col>
+      </transition>
+    </div>
+    <!-- </Col> -->
   </Row>
 </template>
 <script>
@@ -615,11 +610,10 @@ export default {
         right: "0px",
         borderRight: "0px"
       },
-      // 原有的变量字段
-      projectInfo: {},
-      subProjectInfo: {},
-      stepInfo: {},
+      // 原有的变量字段     
+      groupInfo: {},
       participants: [],
+      participantsDetail: [],
       selectGroup: {
         selectId: "",
         selectName: "",
@@ -647,7 +641,6 @@ export default {
           label: "Project"
         }
       ],
-      selectItem: "Step",
       onlineParticipants: [],
       onlineUserIdList: [],
       offlineParticipants: [],
@@ -663,11 +656,15 @@ export default {
       msgR_datepicker: [], //日期选择器的第一条记录
       msgindex: 0,
       msgR_prev: [],
-      msgR_next: []
+      msgR_next: [],
+      groupId: this.$route.query.groupID,
+      scopeId: "",
+      scopeType: ""
     };
   },
 
   mounted() {
+    $("#app").css("min-width", "0");
     window.addEventListener("blur", this.winBlur); //监听浏览器失焦事件
     window.addEventListener("focus", this.winFocus); //监听浏览器失焦事件
     window.addEventListener("resize", this.initSize);
@@ -704,253 +701,105 @@ export default {
   },
 
   methods: {
-    init() {
+    async init() {
       this.initSize();
-      this.getStepInfo();
+      await this.getGroupId();
+      await this.getGroupInfo();
     },
-    getStepInfo() {
-      let stepId = this.$route.params.id;
-      if (stepId != undefined && stepId != "") {
-        this.axios
-          .get("/GeoProblemSolving/step/inquiry?key=stepId&value=" + stepId)
-          .then(res => {
-            if (res.data == "Offline") {
-              this.$store.commit("userLogout");
-              this.$router.push({ name: "Login" });
-            } else if (res.data != "None" && res.data != "Fail") {
-              this.$set(this, "stepInfo", res.data[0]);
-              this.getSubprojectInfo();
 
-              // initial selected group
-              this.selectGroup.selectName = this.stepInfo.name;
-              this.selectGroup.selectId = this.stepInfo.stepId;
-              // 建立通讯
-              this.startWebSocket(this.stepInfo.stepId);
-            }
-          })
-          .catch(err => {});
+    async getGroupId() {
+      let groupId = this.$route.query.groupID;     
+      let data = await this.axios.get(
+        `/GeoProblemSolving/step/inquiry?key=stepId&value=${groupId}`
+      );
+     
+      let subProjectId = data.data[0].subProjectId;
+      if (subProjectId == undefined || subProjectId == "") {
+        this.scopeId = data.data[0].projectId;
+        this.scopeType = "project";
+        console.log(this.scopeId);
+      } else {
+        this.scopeId = subProjectId;
+        this.scopeType = "subproject";
+      }
+    },
+
+    async getGroupInfo() {
+      let scopeId = this.scopeId;
+      let scopeType = this.scopeType;
+      if (scopeId != undefined && scopeId != "") {
+        if (scopeType == "subproject") {
+          let data = await this.axios.get(
+            `/GeoProblemSolving/subProject/inquiry?key=subProjectId&value=${scopeId}`
+          );
+          if (data.data == "Offline") {
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
+          } else if (data.data != "None" && data.data != "Fail") {
+            this.$set(this, "groupInfo", data.data[0]);
+            this.selectGroup.selectName = this.groupInfo.title;
+            this.selectGroup.selectId = this.groupInfo.subProjectId;
+
+            let membersList = this.groupInfo.members;
+            let manager = {
+              userId: this.groupInfo.managerId,
+              userName: this.groupInfo.managerName
+            };
+            membersList.unshift(manager); //在List开头加入manager元素
+            this.$set(this, "participants", membersList);
+            await this.getParticipants();
+            // 建立通讯
+            this.startWebSocket(scopeId);
+          }
+        } else if (scopeType == "project") {
+          let data = await this.axios.get(
+            `/GeoProblemSolving/project/inquiry?key=projectId&value=${scopeId}`
+          );
+          if (data.data == "Offline") {
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
+          } else if (data.data != "None" && data.data != "Fail") {
+            this.$set(this, "groupInfo", data.data[0]);
+            this.selectGroup.selectName = this.groupInfo.title;
+            this.selectGroup.selectId = this.groupInfo.projectId;
+
+            let membersList = this.groupInfo.members;
+            let manager = {
+              userId: this.groupInfo.managerId,
+              userName: this.groupInfo.managerName
+            };
+            membersList.unshift(manager); //在List开头加入manager元素
+            this.$set(this, "participants", membersList);
+            await this.getParticipants();
+            // 建立通讯
+            this.startWebSocket(scopeId);
+          }
+        }
       } else {
         this.$Notice.error({
-          desc: "Failed to get the step id!"
+          desc: "Failed to get the group id!"
         });
       }
     },
-    getSubprojectInfo() {
-      let subProjectId = this.stepInfo.subProjectId;
-      let subProjectInfo = this.$store.getters.subProject;
-      if (
-        JSON.stringify(subProjectInfo) != "{}" &&
-        subProjectInfo.subProjectId == subProjectId
-      ) {
-        this.$set(this, "subProjectInfo", subProjectInfo);
-      } else {
-        this.axios(
-          "/GeoProblemSolving/subProject/inquiry" +
-            "?key=subProjectId" +
-            "&value=" +
-            subProjectId
-        )
-          .then(res => {
-            if (res.data == "Offline") {
-              this.$store.commit("userLogout");
-              this.$router.push({ name: "Login" });
-            } else if (res.data != "None" && res.data != "Fail") {
-              subProjectInfo = res.data[0];
-              this.$set(this, "subProjectInfo", subProjectInfo);
-              this.$store.commit("setSubProjectInfo", subProjectInfo);
 
-              this.getProjectInfo();
-            }
-          })
-          .catch(err => {});
+    async getParticipants() {
+      let membersList = this.participants;
+      let participantsTemp = [];
+      for (let i = 0; i < membersList.length; i++) {
+        let userId = membersList[i].userId;
+        let data = await this.axios.get(
+          `/GeoProblemSolving/user/inquiry?key=userId&value=${userId}`
+        );
+        participantsTemp.push(data.data);
       }
-    },
-    getProjectInfo() {
-      let projectInfo = this.$store.getters.project;
-      if (
-        JSON.stringify(projectInfo) != "{}" &&
-        projectInfo.projectId == this.subProjectInfo.projectId
-      ) {
-        this.projectInfo = projectInfo;
-        this.$set(this, "projectInfo", projectInfo);
-      } else {
-        this.axios(
-          "/GeoProblemSolving/project/inquiry" +
-            "?key=projectId" +
-            "&value=" +
-            this.subProjectInfo.projectId
-        )
-          .then(res => {
-            if (res.data != "None" && res.data != "Fail") {
-              this.projectInfo = res.data[0];
-              this.$store.commit("setProjectInfo", res.data[0]);
-
-              // set group information
-              this.initGroup();
-            } else {
-              this.$Notice.info({
-                desc: "Failed to get project information!"
-              });
-            }
-          })
-          .catch(err => {});
-      }
-    },
-    changeChatroom(index) {
-      this.socketApi.close();
-      if (index == 0) {
-        if (
-          this.stepInfo.stepId == null ||
-          this.stepInfo.stepId == undefined ||
-          this.stepInfo.stepId == ""
-        ) {
-          this.$Notice.open({
-            desc: "No information about this step"
-          });
-          return;
-        }
-        this.participants = [];
-        this.msglist = [];
-        this.msgRecords = [];
-        this.selectGroup.selectName = this.stepInfo.name;
-        this.selectGroup.selectId = this.stepInfo.stepId;
-        this.startWebSocket(this.stepInfo.stepId);
-        this.selectGroup.selectType = "step";
-      } else if (index == 1) {
-        if (
-          this.subProjectInfo.subProjectId == null ||
-          this.subProjectInfo.subProjectId == undefined ||
-          this.subProjectInfo.subProjectId == ""
-        ) {
-          this.$Notice.open({
-            desc: "No information about this subproject"
-          });
-          return;
-        }
-        this.participants = [];
-        this.msglist = [];
-        this.msgRecords = [];
-        this.getParticipants(this.subProjectInfo.subProjectId, "subproject");
-        this.selectGroup.selectName = this.subProjectInfo.title;
-        this.selectGroup.selectId = this.subProjectInfo.subProjectId;
-        this.startWebSocket(this.subProjectInfo.subProjectId);
-        this.selectGroup.selectType = "subproject";
-      } else if (index == 2) {
-        if (
-          this.projectInfo.projectId == null ||
-          this.projectInfo.projectId == undefined ||
-          this.projectInfo.projectId == ""
-        ) {
-          this.$Notice.open({
-            desc: "No information about this project"
-          });
-          return;
-        }
-        this.participants = [];
-        this.msglist = [];
-        this.msgRecords = [];
-        this.getParticipants(this.projectInfo.projectId, "project");
-        this.selectGroup.selectName = this.projectInfo.title;
-        this.selectGroup.selectId = this.projectInfo.projectId;
-        this.startWebSocket(this.projectInfo.projectId);
-        this.selectGroup.selectType = "project";
-      }
-    },
-
-    getParticipants(id, scope) {
-      if (scope == "subproject") {
-        //let that = this;
-        $.ajax({
-          url:
-            "/GeoProblemSolving/subProject/inquiry" +
-            "?key=subProjectId" +
-            "&value=" +
-            that.subProjectId,
-          type: "GET",
-          async: false,
-          success: data => {
-            if (data != "None" && data != "Fail" && data != "Offline") {
-              let subProjectInfo = data[0];
-              let membersList = subProjectInfo["members"];
-              let manager = {
-                userId: subProjectInfo["managerId"]
-              };
-              membersList.unshift(manager); //在List开头加入manager元素
-              let participantsTemp = [];
-              for (let i = 0; i < membersList.length; i++) {
-                //查找数据库中userId和subProject里面的成员相同的
-                $.ajax({
-                  url:
-                    "/GeoProblemSolving/user/inquiry" +
-                    "?key=" +
-                    "userId" +
-                    "&value=" +
-                    membersList[i].userId,
-                  type: "GET",
-                  async: false,
-                  success: function(data) {
-                    participantsTemp.push(data);
-                  }
-                });
-              }
-              this.$set(this, "participants", participantsTemp);
-            }
-          },
-          error: function(err) {
-            console.log("Get manager name fail.");
-          }
-        });
-      } else if (scope == "project") {
-        let queryObject = {
-          key: "projectId",
-          value: this.projectInfo.projectId
-        };
-        $.ajax({
-          url:
-            "/GeoProblemSolving/project/inquiry" +
-            "?key=" +
-            queryObject["key"] +
-            "&value=" +
-            queryObject["value"],
-          type: "GET",
-          async: false,
-          success: data => {
-            if (data != "None" && data != "Fail") {
-              let projectInfo = data[0];
-              let membersList = projectInfo["members"];
-              let manager = {
-                userId: projectInfo["managerId"]
-              };
-
-              membersList.unshift(manager);
-              let participantsTemp = [];
-              let count = membersList.length;
-              for (let i = 0; i < membersList.length; i++) {
-                $.ajax({
-                  url:
-                    "/GeoProblemSolving/user/inquiry" +
-                    "?key=" +
-                    "userId" +
-                    "&value=" +
-                    membersList[i].userId,
-                  type: "GET",
-                  async: false,
-                  success: function(data) {
-                    participantsTemp.push(data);
-                  }
-                });
-              }
-              this.$set(this, "participants", participantsTemp);
-            }
-          }
-        });
-      }
+      this.$set(this, "participants", participantsTemp);
     },
 
     send(msg) {
       this.message = msg;
       let myDate = new Date().Format("yyyy-MM-dd HH:mm:ss");
       let current_time = myDate.toLocaleString(); //获取日期与时间
+
       // 消息不为空
       if (this.message !== "") {
         this.send_msg = {
@@ -1032,7 +881,7 @@ export default {
 
     //判断在线的用户列表
     judgeonlineParticipant(msg) {
-      if (msg == undefined) {
+      if (msg == undefined || msg == "") {
         // initial
         this.onlineParticipants = [];
         this.offlineParticipants = [];
@@ -1048,7 +897,8 @@ export default {
           // offline
           for (let i = 0; i < this.onlineParticipants.length; i++) {
             if (msg.userId == this.onlineParticipants[i].userId) {
-              let offperson = this.onlineParticipants.splice(i, 1);
+              let offperson = this.onlineParticipants[i];
+              this.onlineParticipants.splice(i, 1);
               this.offlineParticipants.push(offperson);
             }
           }
@@ -1056,7 +906,8 @@ export default {
           // online
           for (let i = 0; i < this.offlineParticipants.length; i++) {
             if (msg.userId == this.offlineParticipants[i].userId) {
-              let onperson = this.offlineParticipants.splice(i, 1);
+              let onperson = this.offlineParticipants[i];
+              this.offlineParticipants.splice(i, 1); //开始位置的索引 要删除元素的个数
               this.onlineParticipants.push(onperson);
             }
           }
@@ -1136,12 +987,7 @@ export default {
       }
       this.$set(this, "msgR_datepicker", this.msgRecords[this.msgindex]); //获得选择日期的第一条记录
 
-      // this.$set(this,"msgR_prevpage",Math.ceil( this.msgindex / this.pageSize));//获取该记录之前的记录的页码数；
-      // this.$set(this,"msgR_nextpage",Math.ceil( (this.totalMsg - this.msgindex + 1 ) / this.pageSize));//获取该记录之后的记录的页码数；总数是this.msgR_prevpage+this.msgR_nextpage
-      //this.$set(this,"msgR_page",Math.ceil((this.msgindex +1) / this.pageSize));//获得记录所在页码
-
       this.msgR_page = Math.ceil(this.msgindex / this.pageSize) + 1; //获得记录所在页码
-      console.log(this.msgindex);
       this.msgR_prev = [];
       this.msgR_next = [];
       for (let j = 0; j < this.msgRecords.length; j++) {
@@ -1151,8 +997,6 @@ export default {
           this.msgR_next.push(this.msgRecords[j]);
         }
       }
-      console.log(this.msgR_prev);
-      console.log(this.msgR_next);
       this.changeRecordPage(this.msgR_page);
       this.msgindex = "";
     },
@@ -1188,7 +1032,6 @@ export default {
               );
               this.currentPage = this.maxPage; //获取最后一页的聊天记录
               this.changeRecordPage(this.maxPage);
-              console.log(this.totalMsg);
             }
           });
       }
