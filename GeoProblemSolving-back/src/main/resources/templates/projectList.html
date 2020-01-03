@@ -58,11 +58,11 @@
 
         .picTag {
             margin-right: 30px;
-            background-color: lightblue;
+            background-color: #608ebded;
             color: white;
             padding: 5px;
             cursor: pointer;
-            border: 1px solid #e8eaec;
+            /*border: 1px solid #e8eaec;*/
             border-radius: 4px;
         }
 
@@ -162,23 +162,24 @@
                     </Tabs>
                 </div>
                 <div class="picscreen">
-                    <div class="picbg"></div>
-                    <div class="home-content">
-                        <div>
-                            <div style="position: absolute; top: 5px; left: 5%;">
+<!--                    <div class="picbg"></div>-->
+                    <div class="picbg">
+                        <div style="height: inherit;display: flex;justify-content: center;flex-direction: column">
+                            <div style="margin-left: 100px;">
                                 <span class="pictitle">{{selectCatalog.name}}</span>
                                 <span class="picdesc">{{selectCatalog.introduction}}</span>
                             </div>
-                            <div style="position: absolute; top: 70px; margin-left: 80px">
-                                <span class="picTag" id="Terrestrial" @click="filtTags('Terrestrial')">Terrestrial</span>
-                                <span class="picTag" id="Coastal" @click="filtTags('Coastal')">Coastal</span>
-                                <span class="picTag" id="Marine" @click="filtTags('Marine')">Marine</span>
-                                <span class="picTag" id="Climate" @click="filtTags('Climate')">Climate</span>
-                                <span class="picTag" id="Ecological" @click="filtTags('Ecological')">Ecological</span>
-                                <span class="picTag" id="Geological" @click="filtTags('Geological')">Geological</span>
-                                <span class="picTag" id="Human" @click="filtTags('Human')">Human</span>
-                                <span class="picTag" id="GIS-RS" @click="filtTags('GIS-RS')">GIS & RS</span>
-                                <span class="picTag" id="General" @click="filtTags('General')">General</span>
+                            <div style="margin-top:10px; margin-left: 100px">
+<!--                                <span class="picTag" id="Terrestrial" @click="filtTags('Terrestrial')">Terrestrial</span>-->
+<!--                                <span class="picTag" id="Coastal" @click="filtTags('Coastal')">Coastal</span>-->
+<!--                                <span class="picTag" id="Marine" @click="filtTags('Marine')">Marine</span>-->
+<!--                                <span class="picTag" id="Climate" @click="filtTags('Climate')">Climate</span>-->
+<!--                                <span class="picTag" id="Ecological" @click="filtTags('Ecological')">Ecological</span>-->
+<!--                                <span class="picTag" id="Geological" @click="filtTags('Geological')">Geological</span>-->
+<!--                                <span class="picTag" id="Human" @click="filtTags('Human')">Human</span>-->
+<!--                                <span class="picTag" id="GIS-RS" @click="filtTags('GIS-RS')">GIS & RS</span>-->
+<!--                                <span class="picTag" id="General" @click="filtTags('General')">General</span>-->
+                                <span class="picTag" v-for="tag in selectCatalog.tags" :key="tag.index" :id="tag" @click=filtTags(tag)>{{tag}}</span>
                             </div>
                         </div>
                     </div>
@@ -224,19 +225,26 @@
                 projectCatalog: [
                     {
                         name: "All projects",
-                        introduction: "All different types of are listed here, including investigational projects, intercomparable projects, reproducible projects, and educational projects. Select the project that you need."
+                        introduction: "All different types of are listed here, including investigational projects, intercomparable projects, reproducible projects, and educational projects. Select the project that you need.",
+                        tags:[]
                     },
                     {
                         name: "Investigational projects",
-                        introduction: "Understanding geographic scales and boundaries, clarifying geographic factors, analyzing geographic phenomena, and simulating geographic processes"
+                        introduction: "Understanding geographic scales and boundaries, clarifying geographic factors, analyzing geographic phenomena, and simulating geographic processes",
+                        tags:["Terrestrial","Coastal", "Marine","Climate","Ecological","Geological", "Human", "GIS & RS", "General"]
                     },
-                    {name: "Intercomparable projects", introduction: "Intercomparable projects"},
-                    {name: "Reproducible projects", introduction: "Reproducible projects"},
-                    {name: "Educational projects", introduction: "Educational projects"},
+                    {
+                        name: "Intercomparable projects",
+                        introduction: "Participatory Intercomparison (PIC) projects can be conducted in an open, configurable and reproducible manner.",
+                        tags:[]
+                    },
+                    {name: "Reproducible projects", introduction: "Reproducible projects",tags:[]},
+                    {name: "Educational projects", introduction: "Educational projects",tags:[]},
                 ],
                 selectCatalog: {
                     name: "All projects",
-                    introduction: "All different types of are listed here, including investigational projects, intercomparable projects, reproducible projects, and educational projects. Select the project that you need."
+                    introduction: "All different types of are listed here, including investigational projects, intercomparable projects, reproducible projects, and educational projects. Select the project that you need.",
+                    tags:[]
                 },
                 // user
                 userInfo: [],
@@ -302,7 +310,7 @@
                         this.$refs['pages'].currentPage = 1;
                     });
                     if(this.selectTag != ""){
-                        document.getElementById(this.selectTag).style.backgroundColor="lightblue";
+                        document.getElementById(this.selectTag).style.backgroundColor="#608ebded";
                         this.selectTag = "";
                     }
 
@@ -335,15 +343,15 @@
                     if (this.selectTag == tagName) {
                         this.selectTag = "";
                         this.tabPageData = Object.assign([], this.currentProjectList);
-                        document.getElementById(tagName).style.backgroundColor="lightblue";
+                        document.getElementById(tagName).style.backgroundColor="#608ebded";
                     }
                     else {
                         if(this.selectTag != ""){
-                            document.getElementById(this.selectTag).style.backgroundColor="lightblue";
+                            document.getElementById(this.selectTag).style.backgroundColor="#608ebded";
                             this.selectTag = "";
                         }
 
-                        document.getElementById(tagName).style.backgroundColor="deepskyblue";
+                        document.getElementById(tagName).style.backgroundColor="#12bd67b8";
                         this.selectTag = tagName;
                         // this.tabPageData = this.currentProjectList.filter(project => {
 
