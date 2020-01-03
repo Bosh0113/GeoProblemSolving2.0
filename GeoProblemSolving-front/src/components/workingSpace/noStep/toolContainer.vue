@@ -23,7 +23,7 @@
 </style>
 <template>
   <div>
-    <Card dis-hover>
+    <Card dis-hover style="width:300px">
       <div slot="title">
         <h4>Toolsets and tools</h4>
       </div>
@@ -159,7 +159,7 @@
   </div>
 </template>
 <script>
-import manageTools from "./../../../tools/toolToStepModal";
+import manageTools from "./../../tools/toolToStepModal";
 import Avatar from "vue-avatar";
 export default {
   props: ["stepInfo", "userRole"],
