@@ -27,7 +27,12 @@
         <BreadcrumbItem>Work space</BreadcrumbItem>
       </Breadcrumb>
       <h1 id="stepType">{{stepInfo.type}}</h1>
-      <step-change style="float:right" :step-info="stepInfo" :solving-process="subProjectInfo.solvingProcess" scope="subProject"></step-change>
+      <step-change
+        style="float:right"
+        :step-info="stepInfo"
+        :solving-process="subProjectInfo.solvingProcess"
+        scope="subProject"
+      ></step-change>
     </div>
     <Divider style="margin:10px 0 3px 0" />
     <div style="display:flex;background-color: #f8f8f9;padding:5px;">
@@ -126,6 +131,9 @@ export default {
       }
     });
   },
+  beforeDestroy() {
+    this.socketApi.close();
+  },
   data() {
     return {
       contentHeight: 560,
@@ -173,6 +181,7 @@ export default {
   },
   watch: {
     $route() {
+      this.socketApi.close();
       this.init();
     }
   },
@@ -420,6 +429,7 @@ export default {
         if (chatMsg.behavior != "" && chatMsg.userId != "") {
           this.receivedChatMsgs.push(chatMsg);
         }
+        this.judgeonlineParticipant(chatMsg);
       } else if (chatMsg.type == undefined && chatMsg.length > 0) {
         for (let i = 0; i < chatMsg.length; i++) {
           if (chatMsg[i].content != "") {
@@ -446,7 +456,7 @@ export default {
           for (let i = 0; i < this.onlineParticipants.length; i++) {
             if (msg.userId == this.onlineParticipants[i].userId) {
               let offperson = this.onlineParticipants.splice(i, 1);
-              this.offlineParticipants.push(offperson);
+              this.offlineParticipants.push(offperson[0]);
             }
           }
         } else if (msg.behavior == "on") {
@@ -454,7 +464,7 @@ export default {
           for (let i = 0; i < this.offlineParticipants.length; i++) {
             if (msg.userId == this.offlineParticipants[i].userId) {
               let onperson = this.offlineParticipants.splice(i, 1);
-              this.onlineParticipants.push(onperson);
+              this.onlineParticipants.push(onperson[0]);
             }
           }
         }

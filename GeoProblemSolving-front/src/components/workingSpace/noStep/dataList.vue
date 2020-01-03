@@ -62,30 +62,30 @@
   <div>
     <Row>
       <Col span="6">
-      <div style="border: 1px solid #dcdee2;padding:0 5px 5px">
-      <div style="height:30px">
-        <div style="margin-top: 15px;">
-        <h4 style="display: inline-block;margin-left:10px">Resources</h4>
-        <Select
-          v-model="resouceModel"
-          size="small"
-          @on-change="changeResModel"
-          style="width:150px;margin:-10px 12px 0 15px"
-        >
-          <Option value="resources">All resources</Option>
-          <Option value="data">Data</Option>
-          <Option value="materials">Related materials</Option>
-        </Select>
-        <Button
-          shape="circle"
-          icon="md-cloud-upload"
-          @click="dataUploadModalShow"
-          style="margin-top:-10px"
-          title="Upload resources"
-        ></Button>
-        </div>
-      </div>
-        <div>
+        <div style="border: 1px solid #dcdee2;padding:0 5px 5px">
+          <div style="height:30px">
+            <div style="margin-top: 15px;">
+              <h4 style="display: inline-block;margin-left:10px">Resources</h4>
+              <Select
+                v-model="resouceModel"
+                size="small"
+                @on-change="changeResModel"
+                style="width:150px;margin:-10px 12px 0 15px"
+              >
+                <Option value="resources">All resources</Option>
+                <Option value="data">Data</Option>
+                <Option value="materials">Related materials</Option>
+              </Select>
+              <Button
+                shape="circle"
+                icon="md-cloud-upload"
+                @click="dataUploadModalShow"
+                style="margin-top:-10px"
+                title="Upload resources"
+              ></Button>
+            </div>
+          </div>
+          <div>
             <Table
               :columns="tableColName"
               :data="fileList"
@@ -117,66 +117,66 @@
                 ></Button>
               </template>
             </Table>
+          </div>
         </div>
-      </div>
       </Col>
       <Col span="18">
-      <div style="margin-left:5px">
-    <Card dis-hover>
-      <div slot="title">
-        <h4>Data from tools</h4>
-      </div>
-        <div id="toolData">
-          <vue-scroll :ops="ops">
-            <div v-for="(item,index) in toolDataList" :key="index">
-              <Card style="width:48%; height:150px; float:left; margin:5px">
-                <div style="float:left">
-                  <img
-                    v-if="item.thumbnail != undefined"
-                    :src="item.thumbnail"
-                    height="118px"
-                    width="118px"
-                  />
-                  <avatar v-else :username="item.name" :size="118" :rounded="false"></avatar>
-                </div>
-                <div style="float:left;margin: 0 10px">
-                  <div>
-                    <Label class="toolDataLabel">Name:</Label>
-                    <div class="toolDataText" :title="item.name">{{item.name}}</div>
-                  </div>
-                  <div>
-                    <Label class="toolDataLabel">Description:</Label>
-                    <div class="toolDataText" :title="item.description">{{item.description}}</div>
-                  </div>
-                  <div>
-                    <Button
-                      size="small"
-                      title="Check"
-                      icon="md-eye"
-                      style="margin: 10px 30px 0 0;"
-                      @click="checkData(item)"
-                    ></Button>
-                    <Button
-                      size="small"
-                      title="Delete"
-                      icon="md-close"
-                      style="margin-top: 10px;"
-                      @click="deleteResourceModalShow(item.resourceId)"
-                    ></Button>
-                  </div>
-                </div>
-              </Card>
+        <div style="margin-left:5px">
+          <Card dis-hover>
+            <div slot="title">
+              <h4>Data from tools</h4>
             </div>
-          </vue-scroll>
+            <div id="toolData">
+              <vue-scroll :ops="ops">
+                <div v-for="(item,index) in toolDataList" :key="index">
+                  <Card style="width:48%; height:150px; float:left; margin:5px">
+                    <div style="float:left">
+                      <img
+                        v-if="item.thumbnail != undefined"
+                        :src="item.thumbnail"
+                        height="118px"
+                        width="118px"
+                      />
+                      <avatar v-else :username="item.name" :size="118" :rounded="false"></avatar>
+                    </div>
+                    <div style="float:left;margin: 0 10px">
+                      <div>
+                        <Label class="toolDataLabel">Name:</Label>
+                        <div class="toolDataText" :title="item.name">{{item.name}}</div>
+                      </div>
+                      <div>
+                        <Label class="toolDataLabel">Description:</Label>
+                        <div class="toolDataText" :title="item.description">{{item.description}}</div>
+                      </div>
+                      <div>
+                        <Button
+                          size="small"
+                          title="Check"
+                          icon="md-eye"
+                          style="margin: 10px 30px 0 0;"
+                          @click="checkData(item)"
+                        ></Button>
+                        <Button
+                          size="small"
+                          title="Delete"
+                          icon="md-close"
+                          style="margin-top: 10px;"
+                          @click="deleteResourceModalShow(item.resourceId)"
+                        ></Button>
+                      </div>
+                    </div>
+                  </Card>
+                </div>
+              </vue-scroll>
+            </div>
+            <Collapse simple v-model="unfold">
+              <Panel name="tool">
+                Toolbox
+                <tool-container slot="content" :stepInfo="stepInfo" :userRole="userRole"></tool-container>
+              </Panel>
+            </Collapse>
+          </Card>
         </div>
-        <Collapse simple v-model="unfold">
-        <Panel name="tool">
-            Toolbox
-            <tool-container slot="content" :stepInfo="stepInfo" :userRole="userRole"></tool-container>
-        </Panel>
-        </Collapse>
-      </Card>
-      </div>
       </Col>
     </Row>
     <Modal v-model="checkDataModal" title="Data Information" width="600">
@@ -392,12 +392,13 @@ export default {
         this.panel.close();
       }
     },
-    stepInfo(){
-    this.getResList();
+    stepInfo() {
+      this.getResList();
     }
   },
   created() {},
   mounted() {
+    console.log(this.userRole);
     this.getResList();
 
     $(".__view").css("width", "inherit");
@@ -513,12 +514,16 @@ export default {
       this.toUploadFiles.splice(index, 1);
     },
     dataUploadModalShow() {
-      this.uploadDataInfo = {
-        privacy: "private",
-        type: "data",
-        description: ""
-      };
-      this.dataUploadModal = true;
+      if (this.userRole != "visitor") {
+        this.uploadDataInfo = {
+          privacy: "private",
+          type: "data",
+          description: ""
+        };
+        this.dataUploadModal = true;
+      } else {
+        this.$Notice.info({ desc: "Please login" });
+      }
     },
     folderUpload(name) {
       this.$refs[name].validate(valid => {
@@ -628,8 +633,12 @@ export default {
       });
     },
     deleteResourceModalShow(id) {
-      this.deleteResourceModal = true;
-      this.deleteResourceId = id;
+      if (this.userRole != "visitor") {
+        this.deleteResourceModal = true;
+        this.deleteResourceId = id;
+      } else {
+        this.$Notice.info({ desc: "Please login" });
+      }
     },
     deleteResource() {
       if (this.deleteResourceId != "") {
@@ -714,8 +723,12 @@ export default {
       }
     },
     checkData(item) {
-      this.selectData = item;
-      this.checkDataModal = true;
+      if (this.userRole != "visitor") {
+        this.selectData = item;
+        this.checkDataModal = true;
+      } else {
+        this.$Notice.info({ desc: "Please login" });
+      }
     },
     editMetadata() {
       if (this.metaDataEdit) {

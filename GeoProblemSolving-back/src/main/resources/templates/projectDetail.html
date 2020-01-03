@@ -500,15 +500,15 @@
                                                 <div slot="extra">
                                                     <div v-if="managerIdentity(projectInfo.managerId)">
                                                         <Poptip trigger="hover" content="Invite members"
-                                                                placement="left">
+                                                                placement="bottom">
                                                             <i-button class="changeInviteColor"
                                                                       @click="inviteModalShow()">
                                                                 <Icon type="md-person-add" :size="20"></Icon>
                                                             </i-button>
                                                         </Poptip>
                                                         <Poptip trigger="hover" content="Remove members"
-                                                                placement="left">
-                                                            <i-button style="margin: 0 0 0 5px;"
+                                                                placement="bottom">
+                                                            <i-button style="margin-left:5px;"
                                                                       class="changeRemoveColor"
                                                                       @click="deleteMemberModelShow">
                                                                 <Icon type="md-remove-circle" :size="20"></Icon>
@@ -981,7 +981,7 @@
                 </Modal>
                 <Modal
                   v-model="resetProjectTypeNotice"
-                  title="Reset project's type"
+                  title="Reset project type"
                 >
                   <h2>Please confirm that all subprojects have been deleted.</h2>
                   <div slot="footer">
@@ -990,7 +990,7 @@
                 </Modal>
                 <Modal
                   v-model="resetProjectTypeModel"
-                  title="Reset project's type"
+                  title="Reset project type"
                 >
                   <h2>Are you sure you want to reset the project type?</h2>
                   <div slot="footer">
@@ -1286,9 +1286,13 @@
                 },
                 userEnter() {
                     if (this.projectInfo.privacy == "Public") {
-
-                    } else if (this.projectInfo.privacy == "Discoverable") {
                         if (!this.userInfo.userState) {
+                            window.location.href = "/GeoProblemSolving/projectList";
+                        }
+                    } else if (this.projectInfo.privacy == "Discoverable") {
+                        let isManager = this.managerIdentity(this.projectInfo.managerId);
+                        let isMember = this.memberIdentity(this.projectInfo.members);
+                        if (!this.userInfo.userState || !(isManager || isMember)) {
                             window.location.href = "/GeoProblemSolving/projectList";
                         }
                     } else if (this.projectInfo.privacy == "Private") {
@@ -1571,15 +1575,13 @@
                                 .then(res => {
                                     if (res.data == "Success") {
                                         this.$Notice.success({
-                                            title: "Email send title",
                                             desc:
-                                                "The invitation has been sent,the receiver will process this request later."
+                                                "The invitation has been sent successfully."
                                         });
                                         this.inviteModal = false;
                                     } else {
                                         this.$Notice.error({
-                                            title: "Email send fail",
-                                            desc: "The invitation isn't be sent successfully."
+                                            desc: "Failed to send the invitation."
                                         });
                                     }
                                 })

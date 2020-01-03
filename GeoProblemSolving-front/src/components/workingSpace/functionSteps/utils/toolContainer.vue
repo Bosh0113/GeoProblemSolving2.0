@@ -27,7 +27,7 @@
       <div slot="title">
         <h4>Toolsets and tools</h4>
       </div>
-      <div slot="extra">
+      <div slot="extra" v-show="userRole!='visitor'">
         <manage-tools
           :step-info="stepInfo"
           @updateStepTools="stepToolListChanged"
