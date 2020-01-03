@@ -74,7 +74,7 @@
             <Button class="btnHoverGray" @click="resetSubProjectTypeModalShow()">Reset sub-project's type</Button>
           </div>
           <div style="width:100%;text-align:center;margin-top:100px" v-if="scopeType == 'project'">
-            <Button class="btnHoverGray" @click="resetProjectTypeModalShow()">Reset project's type</Button>
+            <Button class="btnHoverGray" @click="resetProjectTypeModalShow()">Reset project type</Button>
           </div>
         </Row>
       </div>
@@ -108,7 +108,7 @@
     </Modal>
     <Modal
       v-model="resetProjectTypeNotice"
-      title="Reset project's type"
+      title="Reset project type"
     >
       <h2>Please confirm that all nodes have been deleted.</h2>
       <div slot="footer">
@@ -117,7 +117,7 @@
     </Modal>
     <Modal
       v-model="resetProjectTypeModel"
-      title="Reset project's type"
+      title="Reset project type"
     >
       <h2>Are you sure you want to reset the project type?</h2>
       <div slot="footer">

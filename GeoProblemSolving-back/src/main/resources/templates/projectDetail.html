@@ -1569,15 +1569,13 @@
                                 .then(res => {
                                     if (res.data == "Success") {
                                         this.$Notice.success({
-                                            title: "Email send title",
                                             desc:
-                                                "The invitation has been sent,the receiver will process this request later."
+                                                "The invitation has been sent successfully."
                                         });
                                         this.inviteModal = false;
                                     } else {
                                         this.$Notice.error({
-                                            title: "Email send fail",
-                                            desc: "The invitation isn't be sent successfully."
+                                            desc: "Failed to send the invitation."
                                         });
                                     }
                                 })
