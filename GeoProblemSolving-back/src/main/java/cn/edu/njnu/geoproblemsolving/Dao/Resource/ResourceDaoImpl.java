@@ -4,6 +4,7 @@ import cn.edu.njnu.geoproblemsolving.Dao.Method.CommonMethod;
 import cn.edu.njnu.geoproblemsolving.Entity.Folder.UploadResult;
 import cn.edu.njnu.geoproblemsolving.Entity.ResourceEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.UserEntity;
+import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -137,6 +138,7 @@ public class ResourceDaoImpl implements IResourceDao {
                             resourceEntity.setUploaderId(uploader.getUserId());
                             resourceEntity.setUploaderName(uploader.getUserName());
                             resourceEntity.setUploadTime(uploadTime);
+                            resourceEntity.setEditToolInfo(request.getParameter("editToolInfo"));
                             mongoTemplate.save(resourceEntity);
                             uploadInfos.uploaded.add(resourceEntity);
                         } else {
@@ -271,6 +273,7 @@ public class ResourceDaoImpl implements IResourceDao {
                                 update.set("uploaderName", uploader.getUserName());
                                 update.set("uploadTime", uploadTime);
                                 update.set("thumbnail", thumbnailPath);
+                                update.set("editToolInfo", request.getParameter("editToolInfo"));
                                 mongoTemplate.updateFirst(query,update,ResourceEntity.class);
                                 resourceEntity = mongoTemplate.findOne(query, ResourceEntity.class);
                                 uploadInfos.uploaded.add(resourceEntity);

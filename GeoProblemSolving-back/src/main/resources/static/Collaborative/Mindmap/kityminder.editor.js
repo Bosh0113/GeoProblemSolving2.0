@@ -1,6 +1,6 @@
 /*!
  * ====================================================
- * kityminder-editor - v1.0.67 - 2020-01-02
+ * kityminder-editor - v1.0.67 - 2020-01-03
  * https://github.com/fex-team/kityminder-editor
  * GitHub: https://github.com/fex-team/kityminder-editor 
  * Copyright (c) 2020 ; Licensed 
@@ -3449,7 +3449,7 @@ angular.module('kityminderEditor')
                             scope.draw = true;
                         }
                         else {
-                            alert("Wrong url!");
+                            alert("Missing user information, please log in!");
                         }
                     }
                 }
@@ -3543,8 +3543,11 @@ angular.module('kityminderEditor')
                             }
                         });
                     }
-                    else {
-                        alert("Wrong url!");
+                    else if(info.pageId != "" ){
+                        alert("Missing page information!");
+                    }
+                    else{                        
+                        alert("Missing user information, please log in!");
                     }
                 }
 
@@ -3671,7 +3674,7 @@ angular.module('kityminderEditor')
                         }
                     }
                     else {
-                        alert("Wrong url!");
+                        alert("Missing page information!");
                     }
                 }
 
@@ -3846,12 +3849,16 @@ angular.module('kityminderEditor')
                                         var filename = mindmapInfo.name;
                                         var fileBlob = new File([blob], filename);
 
+                                        // 工具信息
+                                        var toolInfo = {toolName:"Mind map", toolUrl:"/GeoProblemSolving/Collaborative/Mindmap/index.html"};
+
                                         var formData = new FormData();
                                         formData.append("resourceId", mindmapInfo.resourceId);
                                         formData.append("file", fileBlob);
                                         formData.append("uploaderId", info.userId);
                                         formData.append("folderId", info.pageId);
                                         formData.append("thumbnail", thumbnailBlobFile);
+                                        formData.append("editToolInfo", JSON.stringify(toolInfo));
 
                                         try {
                                             $.ajax({
@@ -3879,11 +3886,12 @@ angular.module('kityminderEditor')
 
                                     }
                                 });
-
-
                             }
-                            else {
-                                alert("Wrong url!");
+                            else if(info.pageId != "" ){
+                                alert("Missing page information!");
+                            }
+                            else{                        
+                                alert("Missing user information, please log in!");
                             }
 
                         });
@@ -3914,8 +3922,6 @@ angular.module('kityminderEditor')
 
                             var info = RouteInfo.getInfo();
                             if (info.pageId != "" && info.userId != "") {
-
-
                                 //thumbnail
                                 editor.minder.exportData('png').then(function (content) {
                                     //压缩
@@ -3942,6 +3948,9 @@ angular.module('kityminderEditor')
                                         var filename = $('#mindmapName').val() + '.' + datatype;
                                         var fileBlob = new File([blob], filename);
 
+                                        // 工具信息
+                                        var toolInfo = {toolName:"Mind map", toolUrl:"/GeoProblemSolving/Collaborative/Mindmap/index.html"};
+
                                         var formData = new FormData();
                                         formData.append("file", fileBlob);
                                         formData.append("description", "Collaborative mindmap tool");
@@ -3950,6 +3959,7 @@ angular.module('kityminderEditor')
                                         formData.append("privacy", "private");
                                         formData.append("folderId", info.pageId);
                                         formData.append("thumbnail", thumbnailBlobFile);
+                                        formData.append("editToolInfo", JSON.stringify(toolInfo));
 
                                         try {
                                             $.ajax({
@@ -3983,18 +3993,16 @@ angular.module('kityminderEditor')
                                         }
                                     }
 
-
                                 });
                             }
-                            else {
-                                alert("Wrong url!");
-                                mindmapInfo = {};
+                            else if(info.pageId != "" ){
+                                alert("Missing page information!");
+                            }
+                            else{                        
+                                alert("Missing user information, please log in!");
                             }
 
                         });
-                    }
-                    else {
-
                     }
                 }
 
@@ -4250,7 +4258,7 @@ angular.module('kityminderEditor')
         }
     }]);
 angular.module('kityminderEditor')
-	.directive('kityminderEditor', ['config', 'minder.service', 'revokeDialog', 'Messages', function (config, minderService, revokeDialog, Messages) {
+	.directive('kityminderEditor', ['config', 'minder.service', 'revokeDialog', 'Messages', 'RouteInfo', function (config, minderService, revokeDialog, Messages, RouteInfo) {
 		return {
 			restrict: 'EA',
 			templateUrl: 'ui/directive/kityminderEditor/kityminderEditor.html',
@@ -4284,6 +4292,76 @@ angular.module('kityminderEditor')
 
 						if (window.localStorage.__dev_minder_content) {
 							// editor.minder.importJson(JSON.parse(window.localStorage.__dev_minder_content));
+						}
+
+						// init map
+						var info = RouteInfo.getInfo();
+						if (info.resourceId != "") {
+							updateMaplist(info.resourceId);
+
+							function updateMaplist(resourceId) {
+								var map = {};
+								try {
+									$.ajax({
+										url: 'http://' + RouteInfo.getIPPort() + '/GeoProblemSolving/resource/inquiry?key=resourceId&value=' + resourceId,
+										type: "GET",
+										async: false,
+										success: function (data) {
+											if (data !== "Fail" && data !== "None") {
+												map = data[0];
+												mapImport(map);
+											}
+										},
+										error: function (err) {
+											console.log("fail.");
+										}
+									});
+								}
+								catch (ex) {
+									console.log("fail")
+								}
+							}
+
+							function mapImport(map) {
+								try {
+									var fileType = map.name.substr(map.name.lastIndexOf('.') + 1);
+
+									switch (fileType) {
+										case 'md':
+											fileType = 'markdown';
+											break;
+										case 'km':
+										case 'json':
+											fileType = 'json';
+											break;
+										default:
+											console.log("File not supported!");
+											alert('Only support data format(*.km, *.md, *.json)');
+											return;
+									}
+
+									var url = "http://" + RouteInfo.getIPPort() + map.pathURL;
+									var xhr = new XMLHttpRequest();
+									xhr.open("GET", url, true);
+									xhr.onload = function (e) {
+										if (xhr.status == 200) {
+											var file = xhr.response;
+
+											editor.minder.importData(fileType, file);
+
+											mindmapInfo = {
+												name: map.name,
+												resourceId: map.resourceId
+											}
+										}
+									};
+									xhr.send();
+								}
+								catch (err) {
+									console.log(err);
+								}
+							}
+
 						}
 
 						/*** for collaboration * start ***/

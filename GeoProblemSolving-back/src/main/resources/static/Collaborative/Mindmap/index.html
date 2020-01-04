@@ -41,7 +41,7 @@
         .nav-bar {
             background: #57a3f3
         }
-        
+
         #collaPanel {
             position: relative;
             display: -ms-flexbox;
@@ -65,7 +65,7 @@
             leftApply="leftApply"></collab-panel>
     </h1>
     <kityminder-editor on-init="initEditor(editor, minder)"></kityminder-editor>
-    <div id="edit-mask" style="width:100%;height: 100%; z-index: 100;position: absolute;display: none;" 
+    <div id="edit-mask" style="width:100%;height: 100%; z-index: 100;position: absolute;display: none;"
         title="Other user may be drawing the mind map">
     </div>
 </body>
@@ -102,35 +102,52 @@
 
     // 思维导图ID，标注唯一性
     var mindmapInfo = {};
-    
+
     var app = angular.module('kityminderDemo', ['kityminderEditor', 'ngWebSocket']);
 
     app.factory('RouteInfo', function () {
 
-        var pageId = "", userId = "", userName = "";
+        var pageId = "", userId = "", userName = "", resourceId = "";
 
         var href = window.location.href;
         var url = href.split('&');
         var IP_Port = window.location.host;
-        if(IP_Port == "localhost:8080" || IP_Port == "localhost:3000" ){
+        if (IP_Port == "localhost:8080" || IP_Port == "localhost:3000") {
             IP_Port = "localhost:8081";
         }
 
         for (var i = 0; i < url.length; i++) {
 
-            if (/groupID/.test(url[i])) {
-                pageId = url[i].match(/groupID=(\S*)/)[1];
-                continue;
+            try {
+                if (/groupID/.test(url[i])) {
+                    pageId = url[i].match(/groupID=(\S*)/)[1];
+                    continue;
+                }
+            } catch(err) {            
             }
 
-            if (/userID/.test(url[i])) {
-                userId = url[i].match(/userID=(\S*)/)[1];
-                continue;
+            try {
+                if (/userID/.test(url[i])) {
+                    userId = url[i].match(/userID=(\S*)/)[1];
+                    continue;
+                }
+            } catch(err) {                
             }
 
-            if (/userName/.test(url[i])) {
-                userName = url[i].match(/userName=(\S*)/)[1];
-                continue;
+            try {
+                if (/userName/.test(url[i])) {
+                    userName = url[i].match(/userName=(\S*)/)[1];
+                    continue;
+                }
+            } catch(err) {                
+            }
+
+            try {
+                if (/resourceID/.test(url[i])) {
+                    resourceId = url[i].match(/resourceID=(\S*)/)[1];
+                    continue;
+                }
+            } catch(err) {                
             }
         }
 
@@ -139,7 +156,8 @@
                 var info = {
                     "userId": userId,
                     "userName": userName,
-                    "pageId": pageId
+                    "pageId": pageId,
+                    "resourceId": resourceId
                 }
                 return info;
             },
@@ -166,7 +184,7 @@
 
         function startWebsocket(roomId) {
 
-            var wsUrl = "ws://"+RouteInfo.getIPPort()+"/GeoProblemSolving/Mindmap/" + roomId;
+            var wsUrl = "ws://" + RouteInfo.getIPPort() + "/GeoProblemSolving/Mindmap/" + roomId;
             // var wsUrl = "ws://localhost:8081/GeoProblemSolving/Mindmap/" + roomId;
             dataStream = $websocket(wsUrl);
 
