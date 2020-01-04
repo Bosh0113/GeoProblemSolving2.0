@@ -328,7 +328,7 @@ export default {
       this.showToolsetToolsModal = true;
       }
       else{
-        this.$Notice.info({desc:"Please login before using toolsets."})
+        this.$Notice.info({desc:"Please login before using toolsets and join this project."})
       }
     },
     useTool(toolInfo) {
@@ -380,7 +380,7 @@ export default {
         this.$emit("toolBehavior", toolRecords);
       }
       else{
-        this.$Notice.info({desc:"Please login before using tools."})
+        this.$Notice.info({desc:"Please login before using toolsets and join this project."})
       }
     }
   }

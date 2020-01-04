@@ -94,6 +94,7 @@
                         title="Check"
                         icon="md-eye"
                         style="margin: 10px 20px 0 0;"
+                        type="primary"
                         @click="OpenData(item)"
                       ></Button>
                       <Button
@@ -518,7 +519,7 @@ export default {
         };
         this.dataUploadModal = true;
       } else {
-        this.$Notice.info({ desc: "Please login" });
+        this.$Notice.info({ desc: "Please login and join this project" });
       }
     },
     folderUpload(name) {
@@ -633,7 +634,7 @@ export default {
         this.deleteResourceModal = true;
         this.deleteResourceId = id;
       } else {
-        this.$Notice.info({ desc: "Please login" });
+        this.$Notice.info({ desc: "Please login and join this project" });
       }
     },
     deleteResource() {
@@ -788,7 +789,7 @@ export default {
         this.selectData = item;
         this.checkDataModal = true;
       } else {
-        this.$Notice.info({ desc: "Please login" });
+        this.$Notice.info({ desc: "Please login and join this project" });
       }
     },
     editMetadata() {
