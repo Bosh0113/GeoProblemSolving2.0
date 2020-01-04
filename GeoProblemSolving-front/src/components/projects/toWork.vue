@@ -27,7 +27,7 @@ export default {
             projectId: this.$route.params.projectId,
             userInfo: JSON.parse(sessionStorage.getItem("userInfo")),
             projectInfo: JSON.parse(sessionStorage.getItem("projectInfo")),
-            userRole: 'visitor',
+            userRole: 'Visitor',
         }
     },
     methods:{

@@ -18,14 +18,13 @@
     <Card dis-hover>
       <h1 slot="title">Workspace</h1>
       <div slot="extra">
-        <Button icon="ios-share-alt" @click="startShare()" v-show="userRole=='Manager'">Share</Button>
+        <Button icon="ios-share-alt" @click="shareModal=true" v-show="userRole=='Manager'">Share</Button>
       </div>
       <div style="display: flex;">
         <div style="width:300px;height:735px">
-            
-        <vue-scroll :ops="ops" >
-          <tool-container :stepInfo="stepInfo" :userRole="userRole"></tool-container>
-        </vue-scroll>
+          <vue-scroll :ops="ops">
+            <tool-container :stepInfo="stepInfo" :userRole="userRole"></tool-container>
+          </vue-scroll>
         </div>
         <div style="margin-left:10px" :style="{width:resourceWidth+'px'}">
           <data-list :stepInfo="stepInfo" :userRole="userRole"></data-list>
@@ -48,17 +47,22 @@
     </Modal>
     <Modal v-model="shareModal" title="Share workspace" footer-hide>
       <div style="margin-bottom:20px">
-        <span class="shareLabel">Url:</span>
-        <Input v-model="sharedUrl" readonly style="width:400px;margin-left:10px" />
+        <span class="shareLabel">Token:</span>
+        <Input v-model="sharedToken" readonly style="width: 300px;margin-left:10px" />
+        <Button
+          type="primary"
+          @click="generateToken()"
+          style="margin-right:30px;float:right"
+        >Generate</Button>
       </div>
       <div style="margin-bottom:20px">
-        <span class="shareLabel">Token:</span>
-        <Input v-model="sharedToken" readonly style="width: 200px;margin-left:10px" />
+        <span class="shareLabel">Url:</span>
+        <Input v-model="sharedUrl" readonly style="width:300px;margin-left:10px" />
         <Button type="primary" @click="copySharedUrl()" style="margin-right:30px;float:right">Copy</Button>
       </div>
       <div style="margin-bottom:20px">
         <span class="shareLabel">Email:</span>
-        <Input v-model="sharingEmail" style="width: 300px;margin-left:10px" />
+        <Input v-model="sharingEmail" placeholder="Plase enter the email address" style="width: 300px;margin-left:10px" />
         <Button type="primary" @click="shareWorkspace()" style="margin-right:30px;float:right">Share</Button>
       </div>
     </Modal>
@@ -80,7 +84,7 @@ export default {
     window.addEventListener("resize", this.initSize);
   },
   data() {
-    return {        
+    return {
       ops: {
         bar: {
           background: "#808695"
@@ -256,48 +260,17 @@ export default {
         }
       }
     },
-    startShare() {
-      this.sharedUrl = top.location.href;
-      this.sharedToken = "222";
-      this.shareModal = true;
-    },
-    shareWorkspace() {
-      if (this.sharingEmail == "") {
-        this.$Notice.info({
-          desc: "Please fill in the email address."
-        });
-        return;
-      }
-
-      var url = this.sharedUrl + "/" + this.sharedToken;
-
-      //send url via email
-      var emailFormBody = {};
-      emailFormBody["recipient"] = this.sharingEmail;
-      emailFormBody["mailTitle"] = "Participatory workspace sharing";
-      emailFormBody["mailContent"] =
-        "Open the address:( " + url + " ), and check the latest work progress.";
-      axios
-        .post("/GeoProblemSolving/email/invite", emailFormBody)
+    generateToken() {
+      this.axios
+        .get("/GeoProblemSolving/token/getShareToken?duration=0")
         .then(res => {
-          if (res.data == "Success") {
-            this.$Notice.success({
-              desc: "The share has been sent successfully."
-            });
-            this.inviteModal = false;
-          } else {
-            this.$Notice.error({
-              desc: "Failed to send the share."
-            });
-          }
+          this.sharedToken = res.data;
+          this.sharedUrl = top.location.href + "&token=" + this.sharedToken;
         })
-        .catch(err => {
-          console.log(err.data);
-        });
+        .catch(err => {});
     },
     copySharedUrl() {
-      var url = this.sharedUrl + "/" + this.sharedToken;
-
+      let url = this.sharedUrl;
       var input = document.createElement("input");
       input.style.opacity = 0;
       input.style.position = "absolute";
@@ -312,6 +285,40 @@ export default {
       document.body.removeChild(input);
       this.$Notice.info({ desc: "Copy successfully." });
     }
+  },
+  shareWorkspace() {
+    if (this.sharingEmail == "") {
+      this.$Notice.info({
+        desc: "Please fill in the email address."
+      });
+      return;
+    }
+
+    var url = this.sharedUrl + "&" + this.sharedToken;
+
+    //send url via email
+    var emailFormBody = {};
+    emailFormBody["recipient"] = this.sharingEmail;
+    emailFormBody["mailTitle"] = "Participatory workspace sharing";
+    emailFormBody["mailContent"] =
+      "Open the address:( " + url + " ), and check the latest work progress.";
+    axios
+      .post("/GeoProblemSolving/email/invite", emailFormBody)
+      .then(res => {
+        if (res.data == "Success") {
+          this.$Notice.success({
+            desc: "The share has been sent successfully."
+          });
+          this.inviteModal = false;
+        } else {
+          this.$Notice.error({
+            desc: "Failed to send the share."
+          });
+        }
+      })
+      .catch(err => {
+        console.log(err.data);
+      });
   }
 };
 </script>

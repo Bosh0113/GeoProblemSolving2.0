@@ -510,7 +510,7 @@ export default {
       this.toUploadFiles.splice(index, 1);
     },
     dataUploadModalShow() {
-      if (this.userRole != "visitor") {
+      if (this.userRole != "Visitor" && this.userRole != "Token") {
         this.uploadDataInfo = {
           privacy: "private",
           type: "data",
@@ -629,7 +629,7 @@ export default {
       });
     },
     deleteResourceModalShow(id) {
-      if (this.userRole != "visitor") {
+      if (this.userRole != "Visitor" && this.userRole != "Token") {
         this.deleteResourceModal = true;
         this.deleteResourceId = id;
       } else {
@@ -771,7 +771,7 @@ export default {
       $(".jsPanel-content").css("font-size", "0");
     },
     checkData(item) {
-      if (this.userRole != "visitor") {
+      if (this.userRole != "Visitor" && this.userRole != "Token") {
         this.selectData = item;
         this.checkDataModal = true;
       } else {
