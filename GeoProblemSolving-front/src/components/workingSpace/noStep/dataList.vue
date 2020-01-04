@@ -39,7 +39,7 @@
   color: dodgerblue;
 }
 .toolDataText {
-  width: 100px;
+  width: 100%;
   word-break: break-word;
   /* display: inline-block; */
   text-overflow: ellipsis;
@@ -61,70 +61,10 @@
 <template>
   <div>
     <Row>
-      <Col span="6">
-        <div style="border: 1px solid #dcdee2;padding:0 5px 5px">
-          <div style="height:30px">
-            <div style="margin-top: 15px;">
-              <h4 style="display: inline-block;margin-left:10px">Resources</h4>
-              <Select
-                v-model="resouceModel"
-                size="small"
-                @on-change="changeResModel"
-                style="width:150px;margin:-10px 12px 0 15px"
-              >
-                <Option value="resources">All resources</Option>
-                <Option value="data">Data</Option>
-                <Option value="materials">Related materials</Option>
-              </Select>
-              <Button
-                shape="circle"
-                icon="md-cloud-upload"
-                @click="dataUploadModalShow"
-                style="margin-top:-10px"
-                title="Upload resources"
-              ></Button>
-            </div>
-          </div>
-          <div>
-            <Table
-              :columns="tableColName"
-              :data="fileList"
-              class="table"
-              v-show="fileList!=[] && fileList!='None'"
-              height="400"
-            >
-              <template slot-scope="{ row }" slot="name">
-                <strong>{{ row.name }}</strong>
-              </template>
-              <template slot-scope="{ row }" slot="action">
-                <Button
-                  class="fileBtnHoverGreen"
-                  size="small"
-                  title="Check"
-                  @click="checkData(row)"
-                  icon="md-eye"
-                  shape="circle"
-                  type="text"
-                ></Button>
-                <Button
-                  class="fileBtnHoverRed"
-                  size="small"
-                  shape="circle"
-                  type="text"
-                  icon="md-close"
-                  title="Remove"
-                  @click="deleteResourceModalShow(row.resourceId)"
-                ></Button>
-              </template>
-            </Table>
-          </div>
-        </div>
-      </Col>
-      <Col span="18">
-        <div style="margin-left:5px">
+        <div style="margin-bottom:5px;width:100%">
           <Card dis-hover>
             <div slot="title">
-              <h4>Data from tools</h4>
+              <h4>Historical edits</h4>
             </div>
             <div id="toolData">
               <vue-scroll :ops="ops">
@@ -153,7 +93,14 @@
                           size="small"
                           title="Check"
                           icon="md-eye"
-                          style="margin: 10px 30px 0 0;"
+                          style="margin: 10px 20px 0 0;"
+                          @click="OpenData(item)"
+                        ></Button>
+                        <Button
+                          size="small"
+                          title="Details"
+                          icon="md-information-circle"
+                          style="margin: 10px 20px 0 0;"
                           @click="checkData(item)"
                         ></Button>
                         <Button
@@ -169,15 +116,66 @@
                 </div>
               </vue-scroll>
             </div>
-            <Collapse simple v-model="unfold">
-              <Panel name="tool">
-                Toolbox
-                <tool-container slot="content" :stepInfo="stepInfo" :userRole="userRole"></tool-container>
-              </Panel>
-            </Collapse>
           </Card>
         </div>
-      </Col>
+      <div style="border: 1px solid #dcdee2;padding:0 5px 5px">
+          <div style="height:30px">
+            <div style="margin-top: 15px;">
+              <h4 style="display: inline-block;margin-left:10px">Resources</h4>
+              <Select
+                v-model="resouceModel"
+                size="small"
+                @on-change="changeResModel"
+                style="width:150px;margin:-10px 12px 0 15px"
+              >
+                <Option value="resources">All resources</Option>
+                <Option value="data">Data</Option>
+                <Option value="materials">Related materials</Option>
+              </Select>
+              <Button
+                shape="circle"
+                icon="md-cloud-upload"
+                @click="dataUploadModalShow"
+                style="margin-top:-10px"
+                title="Upload resources"
+              ></Button>
+            </div>
+          </div>
+          <div>
+            <Table
+              :columns="tableColName"
+              :data="fileList"
+              class="table"
+              v-show="fileList!=[] && fileList!='None'"
+              height="200"
+              size="small"
+            >
+              <template slot-scope="{ row }" slot="name">
+                <strong>{{ row.name }}</strong>
+              </template>
+              <template slot-scope="{ row }" slot="action">
+                <Button
+                  class="fileBtnHoverGreen"
+                  size="small"
+                  title="Check"
+                  @click="checkData(row)"
+                  icon="md-eye"
+                  shape="circle"
+                  type="text"
+                ></Button>
+                <Button
+                  class="fileBtnHoverRed"
+                  size="small"
+                  shape="circle"
+                  type="text"
+                  icon="md-close"
+                  title="Remove"
+                  @click="deleteResourceModalShow(row.resourceId)"
+                ></Button>
+              </template>
+            </Table>
+          </div>
+        </div>
     </Row>
     <Modal v-model="checkDataModal" title="Data Information" width="600">
       <Tabs>
@@ -296,10 +294,8 @@
 </template>
 <script>
 import Avatar from "vue-avatar";
-import toolContainer from "./../functionSteps/utils/toolContainer";
 export default {
   components: {
-    toolContainer,
     Avatar
   },
   data() {
@@ -363,14 +359,14 @@ export default {
         {
           title: "Type",
           key: "type",
-          width: 90,
+          width: 200,
           tooltip: true,
           sortable: true
         },
         {
           title: "Action",
           slot: "action",
-          width: 90,
+          width: 200,
           align: "center"
         }
       ],
@@ -464,7 +460,7 @@ export default {
     },
     filterToolData() {
       var filterdata = this.fileList.filter(item => {
-        if (item.type == "toolData") {
+        if (item.type.indexOf("toolData") != -1) {
           return item;
         }
       });
@@ -721,6 +717,58 @@ export default {
             console.log(err.data);
           });
       }
+    },
+    OpenData(item) {
+      let toolInfo = {};
+      // 检测是否有toolInfo信息
+      try {
+        toolInfo = JSON.parse(item.editToolInfo);
+      } catch (err) {
+        this.$Notice.info({ desc: "There is no record of using tools." });
+        return;
+      }
+      if (toolInfo == undefined || toolInfo == null || toolInfo == {}) {
+        this.$Notice.info({ desc: "There is no record of using tools." });
+        return;
+      }
+
+      if (this.panel != null) {
+        this.panel.close();
+      }
+      let toolURL =
+        '<iframe src="' +
+        toolInfo.toolUrl +
+        "?userName=" +
+        this.userInfo.userName +
+        "&userID=" +
+        this.userInfo.userId +
+        "&groupID=" +
+        this.stepInfo.stepId +
+        "&resourceID=" +
+        item.resourceId +
+        '" style="width: 100%;height:100%;"></iframe>';
+      var demoPanelTimer = null;
+      this.panel = jsPanel.create({
+        theme: "success",
+        headerTitle: toolInfo.toolName,
+        footerToolbar: '<p style="height:10px"></p>',
+        contentSize: "800 400",
+        content: toolURL,
+        disableOnMaximized: true,
+        dragit: {
+          containment: 5
+        },
+        onclosed: function() {
+          window.clearTimeout(demoPanelTimer);
+        },
+        callback: function() {
+          var that = this;
+          demoPanelTimer = window.setInterval(function() {
+            that.style.zIndex = "9999";
+          }, 1);
+        }
+      });
+      $(".jsPanel-content").css("font-size", "0");
     },
     checkData(item) {
       if (this.userRole != "visitor") {

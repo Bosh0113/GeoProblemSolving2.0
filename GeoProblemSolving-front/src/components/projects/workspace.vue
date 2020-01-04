@@ -20,39 +20,26 @@
       <div slot="extra">
         <Button icon="ios-share-alt" @click="startShare()" v-show="userRole=='Manager'">Share</Button>
       </div>
-      <!-- <Row>
-                <Col span="5">
-                <Card style="margin-top: 20px 0 0 10px" dis-hover>
-                    <h2 slot="title">Members:</h2>
-                <online-participant
-                    :online-participants="onlineParticipants"
-                    :offline-participants="offlineParticipants"
-                ></online-participant>
-                </Card>
-                </Col>
-                <Col span="19" style="margin-top:20px">
-                <Row>
-                    <Col span="22" offset="1">
-                        <Collapse simple v-model="unfold">
-                        <Panel name="data">
-                            Data list
-                            <data-list slot="content" :stepInfo="stepInfo" :userRole="userRole"></data-list>
-                        </Panel>
-                        <Panel name="tool">
-                            Toolbox
-                            <tool-container slot="content" :stepInfo="stepInfo" :userRole="userRole"></tool-container>
-                        </Panel>
-                        </Collapse>
-                    </Col>
-                </Row>
-                </Col>
-      </Row>-->
-      <data-list :stepInfo="stepInfo" :userRole="userRole"></data-list>
+      <div style="display: flex;">
+        <div style="width:300px;height:735px">
+            
+        <vue-scroll :ops="ops" >
+          <tool-container :stepInfo="stepInfo" :userRole="userRole"></tool-container>
+        </vue-scroll>
+        </div>
+        <div style="margin-left:10px" :style="{width:resourceWidth+'px'}">
+          <data-list :stepInfo="stepInfo" :userRole="userRole"></data-list>
+        </div>
+      </div>
       <div style="margin:5px 0 5px 80px;text-align:center">
-        <Button class="btnHoverRed" @click="resetProjectTypeModalShow()" v-show="userRole=='Manager'">Reset project type</Button>
+        <Button
+          class="btnHoverRed"
+          @click="resetProjectTypeModalShow()"
+          v-show="userRole=='Manager'"
+        >Reset project type</Button>
       </div>
     </Card>
-    <Modal v-model="resetProjectTypeModel" title="Reset project type" >
+    <Modal v-model="resetProjectTypeModel" title="Reset project type">
       <h2>Are you sure you want to reset the project type?</h2>
       <small style="color:red">* All operation and data in this page can't be restore any more.</small>
       <div slot="footer">
@@ -79,7 +66,7 @@
 </template>
 <script>
 import dataList from "./../workingSpace/noStep/dataList";
-import toolContainer from "./../workingSpace/functionSteps/utils/toolContainer";
+import toolContainer from "./../workingSpace/noStep/toolContainer";
 import onlineParticipant from "./../workingSpace/functionSteps/utils/onlineParticipants";
 export default {
   props: ["projectInfo", "userRole"],
@@ -90,9 +77,15 @@ export default {
   },
   created() {
     this.getStepInfo();
+    window.addEventListener("resize", this.initSize);
   },
   data() {
-    return {
+    return {        
+      ops: {
+        bar: {
+          background: "#808695"
+        }
+      },
       stepInfo: {},
       unfold: ["tool", "data"],
       participants: [],
@@ -107,10 +100,16 @@ export default {
       shareModal: false,
       sharedUrl: "",
       sharedToken: "",
-      sharingEmail: ""
+      sharingEmail: "",
+      resourceWidth: window.innerWidth - 350
     };
   },
   methods: {
+    initSize() {
+      if (window.innerWidth > 1100) {
+        this.resourceWidth = window.innerWidth - 350;
+      }
+    },
     getStepInfo() {
       this.axios
         .get(
@@ -270,21 +269,20 @@ export default {
         return;
       }
 
-      var url = this.sharedUrl + this.sharedToken;
+      var url = this.sharedUrl + "/" + this.sharedToken;
 
       //send url via email
       var emailFormBody = {};
       emailFormBody["recipient"] = this.sharingEmail;
       emailFormBody["mailTitle"] = "Participatory workspace sharing";
       emailFormBody["mailContent"] =
-        "Open the address:( " + url +" ), and check the latest work progress.";
+        "Open the address:( " + url + " ), and check the latest work progress.";
       axios
         .post("/GeoProblemSolving/email/invite", emailFormBody)
         .then(res => {
           if (res.data == "Success") {
             this.$Notice.success({
-              desc:
-                "The share has been sent successfully."
+              desc: "The share has been sent successfully."
             });
             this.inviteModal = false;
           } else {
@@ -298,7 +296,7 @@ export default {
         });
     },
     copySharedUrl() {
-      var url = this.sharedUrl + this.sharedToken;
+      var url = this.sharedUrl + "/" + this.sharedToken;
 
       var input = document.createElement("input");
       input.style.opacity = 0;
