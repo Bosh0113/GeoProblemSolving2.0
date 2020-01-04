@@ -659,7 +659,7 @@
                             <div :style="{height:subProjectsCSS}">
                                 <child-folder
                                         :root-folder-id="projectInfo.projectId"
-                                        role=""
+                                        :role="taskRole"
                                         ref="folderTreeEl"></child-folder>
                             </div>
                         </Card>
@@ -1024,7 +1024,7 @@
             created() {
                 var userInfo = {
                     userState: false,
-                    userName: 'visitor',
+                    userName: 'Visitor',
                     userId: '',
                     avatar: ''
                 };
@@ -1086,7 +1086,7 @@
                     ipPort: "/GeoProblemSolving",
                     userInfo: {
                         userState: false,
-                        userName: 'visitor',
+                        userName: 'Visitor',
                         userId: '',
                         avatar: '',
                     },
@@ -1333,14 +1333,14 @@
                     }
                 },
                 roleIdentity() {
-                    if(this.taskRole!='Token'){
-                        if (this.managerIdentity(this.projectInfo.managerId)) {
-                            this.taskRole = 'PManager';
-                        }
-                        else if (this.memberIdentity(this.projectInfo.members)) {
-                            this.taskRole = 'Member';
-                        }
-                        else {
+                    if (this.managerIdentity(this.projectInfo.managerId)) {
+                        this.taskRole = 'PManager';
+                    }
+                    else if (this.memberIdentity(this.projectInfo.members)) {
+                        this.taskRole = 'Member';
+                    }
+                    else {
+                        if(this.taskRole!='Token'){
                             this.taskRole = 'Visitor';
                         }
                     }
@@ -1380,14 +1380,14 @@
                     window.history.replaceState(null,null,'/GeoProblemSolving/projectDetail/'+projectId+"?content="+name);
                 },
                 gotoIntroduction() {
-                    this.activeMenu = "projectDetail";
+                    this.changeMenuItem("projectDetail");
                 },
                 gotoResource() {
                     if(this.taskRole=="Visitor"){
                         this.joinProjectNotice = true;
                     }
                     else{
-                        this.activeMenu = "resources";
+                        this.changeMenuItem("resources");
                     }
                 },
                 gotoWorking() {
@@ -1395,11 +1395,11 @@
                         this.joinProjectNotice = true;
                     }
                     else{
-                        this.activeMenu = "subProjects";
+                        this.changeMenuItem("subProjects");
                     }
                 },
                 gotoTaskassignment() {
-                    this.activeMenu = "tasks";
+                    this.changeMenuItem("tasks");
                 },
                 getAllSubProjects() {
                     if (this.projectInfo.type == "type0") {
@@ -1708,26 +1708,26 @@
                     }
                 },
                 resetProjectType(){
-                let obj = new URLSearchParams();
-                obj.append("projectId", this.projectInfo.projectId);
-                obj.append("type", "");
-                obj.append("stepId", "");
-                axios
-                    .post("/GeoProblemSolving/project/update", obj)
-                    .then(res => {
-                        this.resetProjectTypeModel = false;
-                        if (res.data == "Offline") {
-                            window.location.href="/GeoProblemSolving/login"
-                        } else if (res.data != "Fail") {
-                            sessionStorage.setItem("projectInfo",JSON.stringify(res.data));
-                            this.projectInfo = res.data;
-                        } else {
-                            this.$Message.error("Set type failed.");
-                        }
-                        })
-                    .catch(err => {
-                        console.log(err.data);
-                    });
+                    let obj = new URLSearchParams();
+                    obj.append("projectId", this.projectInfo.projectId);
+                    obj.append("type", "");
+                    obj.append("stepId", "");
+                    axios
+                        .post("/GeoProblemSolving/project/update", obj)
+                        .then(res => {
+                            this.resetProjectTypeModel = false;
+                            if (res.data == "Offline") {
+                                window.location.href="/GeoProblemSolving/login"
+                            } else if (res.data != "Fail") {
+                                sessionStorage.setItem("projectInfo",JSON.stringify(res.data));
+                                this.projectInfo = res.data;
+                            } else {
+                                this.$Message.error("Set type failed.");
+                            }
+                            })
+                        .catch(err => {
+                            console.log(err.data);
+                        });
                 },
                 showSubProjectCreateModel() {
                     this.createSubProjectModel = true;
@@ -2008,14 +2008,14 @@
                     }
                 },
                 cursorStyle() {
-                    if (this.managerIdentity(this.projectInfo.managerId) || this.memberIdentity(this.projectInfo.members)) {
+                    if (this.managerIdentity(this.projectInfo.managerId) || this.memberIdentity(this.projectInfo.members)||this.taskRole=="Token") {
                         return "cursor: pointer;";
                     } else {
                         return "cursor: no-drop;";
                     }
                 },
                 menuDisable() {
-                    if (this.managerIdentity(this.projectInfo.managerId) || this.memberIdentity(this.projectInfo.members)) {
+                    if (this.managerIdentity(this.projectInfo.managerId) || this.memberIdentity(this.projectInfo.members)||this.taskRole=="Token") {
                         return false;
                     } else {
                         return true;
