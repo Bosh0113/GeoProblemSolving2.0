@@ -1253,13 +1253,21 @@
             },
             methods: {
                 changeMenuByUrl(){
-                    if (/content/.test(window.location.href)) {
-                        var param = window.location.href.match(/content=(\S*)/)[1];
+                    var content = this.getURLParameter("content");
+                    if (content!=null) {
                         var array = ["projectOverview","projectDetail","tasks","subProjects","resources"];
-                        if(array.includes(param)){
-                            this.activeMenu = param;
+                        if(array.includes(content)){
+                            this.activeMenu = content;
                         }
                     }
+                },
+                getURLParameter(name){  
+                    var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");  
+                    var r = window.location.search.substr(1).match(reg);  
+                    if(r!=null){
+                        return  unescape(r[2]);
+                    }
+                    return null;  
                 },
                 getProjectInfo(){
                     if(this.projectInfo=={}||this.projectInfo==undefined){
