@@ -323,55 +323,65 @@ export default {
       this.getAllTools(tools, toolsets);
     },
     showTools(toolsetInfo) {
+      if (this.userRole != "Visitor" && this.userRole != "Token") {
       this.toolsetToolList = toolsetInfo.toolList;
       this.showToolsetToolsModal = true;
+      }
+      else{
+        this.$Notice.info({desc:"Please login before using toolsets."})
+      }
     },
     useTool(toolInfo) {
-      let toolURL =
-        '<iframe src="' +
-        toolInfo.toolUrl +
-        "?userName=" +
-        this.userInfo.userName +
-        "&userID=" +
-        this.userInfo.userId +
-        "&groupID=" +
-        this.stepInfo.stepId +
-        '" style="width: 100%;height:100%;"></iframe>';
-      var demoPanelTimer = null;
-      var panel = jsPanel.create({
-        theme: "success",
-        headerTitle: toolInfo.toolName,
-        footerToolbar: '<p style="height:10px"></p>',
-        contentSize: "800 400",
-        content: toolURL,
-        disableOnMaximized: true,
-        dragit: {
-          containment: 5
-        },
-        onclosed: function(panel, status, closedByUser) {
-          window.clearTimeout(demoPanelTimer);
-        },
-        callback: function() {
-          var that = this;
-          demoPanelTimer = window.setInterval(function() {
-            that.style.zIndex = "9999";
-          }, 1);
-        }
-      });
-      // panel.resizeit("disable");
-      $(".jsPanel-content").css("font-size", "0");
-      this.panelList.push(panel);
-      this.$emit("toolPanel",panel);
+      if (this.userRole != "Visitor" && this.userRole != "Token") {
+        let toolURL =
+          '<iframe src="' +
+          toolInfo.toolUrl +
+          "?userName=" +
+          this.userInfo.userName +
+          "&userID=" +
+          this.userInfo.userId +
+          "&groupID=" +
+          this.stepInfo.stepId +
+          '" style="width: 100%;height:100%;"></iframe>';
+        var demoPanelTimer = null;
+        var panel = jsPanel.create({
+          theme: "success",
+          headerTitle: toolInfo.toolName,
+          footerToolbar: '<p style="height:10px"></p>',
+          contentSize: "800 400",
+          content: toolURL,
+          disableOnMaximized: true,
+          dragit: {
+            containment: 5
+          },
+          onclosed: function(panel, status, closedByUser) {
+            window.clearTimeout(demoPanelTimer);
+          },
+          callback: function() {
+            var that = this;
+            demoPanelTimer = window.setInterval(function() {
+              that.style.zIndex = "9999";
+            }, 1);
+          }
+        });
+        // panel.resizeit("disable");
+        $(".jsPanel-content").css("font-size", "0");
+        this.panelList.push(panel);
+        this.$emit("toolPanel", panel);
 
-      // 记录信息
-      let toolRecords = {
-        type: "tools",
-        time: new Date().Format("yyyy-MM-dd HH:mm:ss"),
-        who: this.userInfo.userName,
-        content: "used a tool",
-        toolType: toolInfo.toolName
-      };
-      this.$emit("toolBehavior", toolRecords);
+        // 记录信息
+        let toolRecords = {
+          type: "tools",
+          time: new Date().Format("yyyy-MM-dd HH:mm:ss"),
+          who: this.userInfo.userName,
+          content: "used a tool",
+          toolType: toolInfo.toolName
+        };
+        this.$emit("toolBehavior", toolRecords);
+      }
+      else{
+        this.$Notice.info({desc:"Please login before using tools."})
+      }
     }
   }
 };

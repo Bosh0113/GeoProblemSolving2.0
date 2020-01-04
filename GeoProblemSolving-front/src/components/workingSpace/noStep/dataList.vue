@@ -61,121 +61,121 @@
 <template>
   <div>
     <Row>
-        <div style="margin-bottom:5px;width:100%">
-          <Card dis-hover>
-            <div slot="title">
-              <h4>Historical edits</h4>
-            </div>
-            <div id="toolData">
-              <vue-scroll :ops="ops">
-                <div v-for="(item,index) in toolDataList" :key="index">
-                  <Card style="width:48%; height:150px; float:left; margin:5px">
-                    <div style="float:left">
-                      <img
-                        v-if="item.thumbnail != undefined"
-                        :src="item.thumbnail"
-                        height="118px"
-                        width="118px"
-                      />
-                      <avatar v-else :username="item.name" :size="118" :rounded="false"></avatar>
+      <div style="margin-bottom:5px;width:100%">
+        <Card dis-hover>
+          <div slot="title">
+            <h4>Historical edits</h4>
+          </div>
+          <div id="toolData">
+            <vue-scroll :ops="ops">
+              <div v-for="(item,index) in toolDataList" :key="index">
+                <Card style="width:48%; height:150px; float:left; margin:5px">
+                  <div style="float:left">
+                    <img
+                      v-if="item.thumbnail != undefined"
+                      :src="item.thumbnail"
+                      height="118px"
+                      width="118px"
+                    />
+                    <avatar v-else :username="item.name" :size="118" :rounded="false"></avatar>
+                  </div>
+                  <div style="float:left;margin: 0 10px">
+                    <div>
+                      <Label class="toolDataLabel">Name:</Label>
+                      <div class="toolDataText" :title="item.name">{{item.name}}</div>
                     </div>
-                    <div style="float:left;margin: 0 10px">
-                      <div>
-                        <Label class="toolDataLabel">Name:</Label>
-                        <div class="toolDataText" :title="item.name">{{item.name}}</div>
-                      </div>
-                      <div>
-                        <Label class="toolDataLabel">Description:</Label>
-                        <div class="toolDataText" :title="item.description">{{item.description}}</div>
-                      </div>
-                      <div>
-                        <Button
-                          size="small"
-                          title="Check"
-                          icon="md-eye"
-                          style="margin: 10px 20px 0 0;"
-                          @click="OpenData(item)"
-                        ></Button>
-                        <Button
-                          size="small"
-                          title="Details"
-                          icon="md-information-circle"
-                          style="margin: 10px 20px 0 0;"
-                          @click="checkData(item)"
-                        ></Button>
-                        <Button
-                          size="small"
-                          title="Delete"
-                          icon="md-close"
-                          style="margin-top: 10px;"
-                          @click="deleteResourceModalShow(item.resourceId)"
-                        ></Button>
-                      </div>
+                    <div>
+                      <Label class="toolDataLabel">Description:</Label>
+                      <div class="toolDataText" :title="item.description">{{item.description}}</div>
                     </div>
-                  </Card>
-                </div>
-              </vue-scroll>
-            </div>
-          </Card>
-        </div>
+                    <div>
+                      <Button
+                        size="small"
+                        title="Check"
+                        icon="md-eye"
+                        style="margin: 10px 20px 0 0;"
+                        @click="OpenData(item)"
+                      ></Button>
+                      <Button
+                        size="small"
+                        title="Details"
+                        icon="md-information-circle"
+                        style="margin: 10px 20px 0 0;"
+                        @click="checkData(item)"
+                      ></Button>
+                      <Button
+                        size="small"
+                        title="Delete"
+                        icon="md-close"
+                        style="margin-top: 10px;"
+                        @click="deleteResourceModalShow(item.resourceId)"
+                      ></Button>
+                    </div>
+                  </div>
+                </Card>
+              </div>
+            </vue-scroll>
+          </div>
+        </Card>
+      </div>
       <div style="border: 1px solid #dcdee2;padding:0 5px 5px">
-          <div style="height:30px">
-            <div style="margin-top: 15px;">
-              <h4 style="display: inline-block;margin-left:10px">Resources</h4>
-              <Select
-                v-model="resouceModel"
-                size="small"
-                @on-change="changeResModel"
-                style="width:150px;margin:-10px 12px 0 15px"
-              >
-                <Option value="resources">All resources</Option>
-                <Option value="data">Data</Option>
-                <Option value="materials">Related materials</Option>
-              </Select>
-              <Button
-                shape="circle"
-                icon="md-cloud-upload"
-                @click="dataUploadModalShow"
-                style="margin-top:-10px"
-                title="Upload resources"
-              ></Button>
-            </div>
-          </div>
-          <div>
-            <Table
-              :columns="tableColName"
-              :data="fileList"
-              class="table"
-              v-show="fileList!=[] && fileList!='None'"
-              height="200"
+        <div style="height:30px">
+          <div style="margin-top: 15px;">
+            <h4 style="display: inline-block;margin-left:10px">Resources</h4>
+            <Select
+              v-model="resouceModel"
               size="small"
+              @on-change="changeResModel"
+              style="width:150px;margin:-10px 12px 0 15px"
             >
-              <template slot-scope="{ row }" slot="name">
-                <strong>{{ row.name }}</strong>
-              </template>
-              <template slot-scope="{ row }" slot="action">
-                <Button
-                  class="fileBtnHoverGreen"
-                  size="small"
-                  title="Check"
-                  @click="checkData(row)"
-                  icon="md-eye"
-                  shape="circle"
-                  type="text"
-                ></Button>
-                <Button
-                  class="fileBtnHoverRed"
-                  size="small"
-                  shape="circle"
-                  type="text"
-                  icon="md-close"
-                  title="Remove"
-                  @click="deleteResourceModalShow(row.resourceId)"
-                ></Button>
-              </template>
-            </Table>
+              <Option value="resources">All resources</Option>
+              <Option value="data">Data</Option>
+              <Option value="materials">Related materials</Option>
+            </Select>
+            <Button
+              shape="circle"
+              icon="md-cloud-upload"
+              @click="dataUploadModalShow"
+              style="margin-top:-10px"
+              title="Upload resources"
+            ></Button>
           </div>
         </div>
+        <div>
+          <Table
+            :columns="tableColName"
+            :data="fileList"
+            class="table"
+            v-show="fileList!=[] && fileList!='None'"
+            height="200"
+            size="small"
+          >
+            <template slot-scope="{ row }" slot="name">
+              <strong>{{ row.name }}</strong>
+            </template>
+            <template slot-scope="{ row }" slot="action">
+              <Button
+                class="fileBtnHoverGreen"
+                size="small"
+                title="Check"
+                @click="checkData(row)"
+                icon="md-eye"
+                shape="circle"
+                type="text"
+              ></Button>
+              <Button
+                class="fileBtnHoverRed"
+                size="small"
+                shape="circle"
+                type="text"
+                icon="md-close"
+                title="Remove"
+                @click="deleteResourceModalShow(row.resourceId)"
+              ></Button>
+            </template>
+          </Table>
+        </div>
+      </div>
     </Row>
     <Modal v-model="checkDataModal" title="Data Information" width="600">
       <Tabs>
@@ -720,6 +720,7 @@ export default {
     },
     OpenData(item) {
       let toolInfo = {};
+      let toolURL = "";
       // 检测是否有toolInfo信息
       try {
         toolInfo = JSON.parse(item.editToolInfo);
@@ -731,22 +732,34 @@ export default {
         this.$Notice.info({ desc: "There is no record of using tools." });
         return;
       }
-
       if (this.panel != null) {
         this.panel.close();
       }
-      let toolURL =
-        '<iframe src="' +
-        toolInfo.toolUrl +
-        "?userName=" +
-        this.userInfo.userName +
-        "&userID=" +
-        this.userInfo.userId +
-        "&groupID=" +
-        this.stepInfo.stepId +
-        "&resourceID=" +
-        item.resourceId +
-        '" style="width: 100%;height:100%;"></iframe>';
+      if (this.userRole != "Visitor" && this.userRole != "Token") {
+        toolURL =
+          '<iframe src="' +
+          toolInfo.toolUrl +
+          "?userName=" +
+          this.userInfo.userName +
+          "&userID=" +
+          this.userInfo.userId +
+          "&groupID=" +
+          this.stepInfo.stepId +
+          "&resourceID=" +
+          item.resourceId +
+          '" style="width: 100%;height:100%;"></iframe>';
+      } else {
+        toolURL =
+          '<iframe src="' +
+          toolInfo.toolUrl +
+          "?userName=" +
+          "&userID=" +
+          "&groupID=" +
+          this.stepInfo.stepId +
+          "&resourceID=" +
+          item.resourceId +
+          '" style="width: 100%;height:100%;"></iframe>';
+      }
       var demoPanelTimer = null;
       this.panel = jsPanel.create({
         theme: "success",
