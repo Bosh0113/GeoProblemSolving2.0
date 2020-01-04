@@ -2030,9 +2030,13 @@
                     window.location.href = "/GeoProblemSolving/resourceCenter";
                 },
                 joinApplyModalShow() {
-                    this.applyProjectInfo = Object.assign([], this.projectInfo);
-                    this.applyValidate.reason = "";
-                    this.applyJoinModal = true;
+                    if(this.userState){
+                        this.applyProjectInfo = Object.assign([], this.projectInfo);
+                        this.applyValidate.reason = "";
+                        this.applyJoinModal = true;
+                    }else{
+                        confirm("Please login first.");
+                    }
                 },
                 joinApply(name) {
                     this.$refs[name].validate(valid => {
