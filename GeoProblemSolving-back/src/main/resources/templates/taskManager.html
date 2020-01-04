@@ -89,6 +89,7 @@
                                             </div>
                                         </div>
                                     </Card>
+                                    <Spin size="large" fix v-if="todoLoading"></Spin>
                                 </draggable>
                             </vue-scroll>
                         </Card>
@@ -123,6 +124,7 @@
                                             <Tag color="default" style="cursor:default">{{item.managerName}}</Tag>
                                         </div>
                                     </Card>
+                                    <Spin size="large" fix v-if="doingLoading"></Spin>
                                 </draggable>
                             </vue-scroll>
                         </Card>
@@ -157,6 +159,7 @@
                                             </div>
                                         </div>
                                     </Card>
+                                    <Spin size="large" fix v-if="doneLoading"></Spin>
                                 </draggable>
                             </vue-scroll>
                         </Card>
@@ -257,6 +260,9 @@
         props: ["projectInfo", "userRole"], //子项目管理者Manager，项目管理者PManager,成员Member
         data() {
             return {
+                todoLoading:true,
+                doingLoading:true,
+                doneLoading:true,
                 userInfo:{
                     userState: false,
                     userName: 'Visitor',
@@ -716,6 +722,8 @@
                         this.projectInfo.projectId
                     )
                     .then(res => {
+                        // this.todoLoading=false;
+                this.$set(this, "todoLoading", false);
                         if (res.data != "None" && res.data != "Fail") {
                             this.$set(this, "taskTodo", res.data);
                         } else {
@@ -723,6 +731,7 @@
                         }
                     })
                     .catch(err => {
+                    this.$set(this, "todoLoading", false);
                         console.log(err.data);
                     });
             },
@@ -734,6 +743,8 @@
                         this.projectInfo.projectId
                     )
                     .then(res => {
+                        // this.doingLoading=false;
+                this.$set(this, "doingLoading", false);
                         if (res.data != "None" && res.data != "Fail") {
                             this.$set(this, "taskDoing", res.data);
                         } else {
@@ -741,6 +752,7 @@
                         }
                     })
                     .catch(err => {
+                    this.$set(this, "doingLoading", false);
                         console.log(err.data);
                     });
             },
@@ -752,6 +764,8 @@
                         this.projectInfo.projectId
                     )
                     .then(res => {
+                        // this.doneLoading=false;
+                this.$set(this, "doneLoading", false);
                         if (res.data != "None" && res.data != "Fail") {
                             this.$set(this, "taskDone", res.data);
                         } else {
@@ -759,6 +773,7 @@
                         }
                     })
                     .catch(err => {
+                    this.$set(this, "doneLoading", false);
                         console.log(err.data);
                     });
             },
