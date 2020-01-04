@@ -218,7 +218,7 @@ footer {
       <h2 class="footerTop">
         <i>Open Geographic Modeling and Simulation</i>
       </h2>
-      <p class="footerBottom">Copyright © 2013-2019 OpenGMS. All rights reserved.</p>
+      <p class="footerBottom">Copyright © 2013-2020 OpenGMS. All rights reserved.</p>
     </footer>
   </div>
 </template>

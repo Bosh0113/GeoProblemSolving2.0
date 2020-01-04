@@ -52,18 +52,18 @@
         <Button
           type="primary"
           @click="generateToken()"
-          style="margin-right:30px;float:right"
+          style="margin-right:30px;float:right;width:80px"
         >Generate</Button>
       </div>
       <div style="margin-bottom:20px">
         <span class="shareLabel">Url:</span>
         <Input v-model="sharedUrl" readonly style="width:300px;margin-left:10px" />
-        <Button type="primary" @click="copySharedUrl()" style="margin-right:30px;float:right">Copy</Button>
+        <Button type="primary" @click="copySharedUrl()" style="margin-right:30px;float:right;width:80px">Copy</Button>
       </div>
       <div style="margin-bottom:20px">
         <span class="shareLabel">Email:</span>
         <Input v-model="sharingEmail" placeholder="Plase enter the email address" style="width: 300px;margin-left:10px" />
-        <Button type="primary" @click="shareWorkspace()" style="margin-right:30px;float:right">Share</Button>
+        <Button type="primary" @click="shareWorkspace()" style="margin-right:30px;float:right;width:80px">Share</Button>
       </div>
     </Modal>
   </div>

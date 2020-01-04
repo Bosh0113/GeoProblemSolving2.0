@@ -1029,10 +1029,10 @@
                     avatar: ''
                 };
                 sessionStorage.setItem('userInfo', JSON.stringify(userInfo));
-                var tokenStr = this.getURLParameter("token");
-                if(tokenStr!=null){
+                this.tokenStr = this.getURLParameter("token");
+                if(this.tokenStr!=null){
                     $.ajax({
-                        url: "/GeoProblemSolving/token/checkShareToken"+"?shareToken="+tokenStr,
+                        url: "/GeoProblemSolving/token/checkShareToken"+"?shareToken="+this.tokenStr,
                         type: "GET",
                         async: false,
                         success: data => {
@@ -1084,6 +1084,7 @@
             data() {
                 return {
                     ipPort: "/GeoProblemSolving",
+                    tokenStr:'',
                     userInfo: {
                         userState: false,
                         userName: 'Visitor',
@@ -1377,7 +1378,11 @@
                 changeMenuItem(name) {
                     this.activeMenu = name;
                     var projectId = this.projectInfo.projectId;
-                    window.history.replaceState(null,null,'/GeoProblemSolving/projectDetail/'+projectId+"?content="+name);
+                    var tokenParam='';
+                    if(this.tokenStr!=null){
+                        tokenParam = "&token=" + this.tokenStr;
+                    }
+                    window.history.replaceState(null,null,'/GeoProblemSolving/projectDetail/'+projectId+"?content="+name+tokenParam);
                 },
                 gotoIntroduction() {
                     this.changeMenuItem("projectDetail");
