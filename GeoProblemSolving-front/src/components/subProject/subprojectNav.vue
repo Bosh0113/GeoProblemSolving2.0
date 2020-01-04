@@ -11,37 +11,45 @@
 <template>
   <div>
     <Row>
-      <Menu
-        :active-name="menuActive"
-        style="width:60px;position:absolute;z-index:1"
-        :style="{height:contentHeight}"
-        @on-select="changeContent"
-      >
+      <Menu :active-name="menuActive" style="width:60px;position:absolute;z-index:1" :style="{height:contentHeight}"
+        @on-select="changeContent">
         <MenuItem name="back" style="padding-left: 16px;" title="Project page">
-          <Icon type="md-arrow-round-back" size="30" />
+        <Icon type="md-arrow-round-back" size="30" />
         </MenuItem>
-        <MenuItem name="overview" style="padding-left: 16px;" title="Subproject Home">
-          <Icon type="md-home" size="30" />
-        </MenuItem>
+        <!-- <MenuItem name="overview" style="padding-left: 16px;" title="Subproject Home">
+        <Icon type="md-home" size="30" />
+        </MenuItem> -->
         <MenuItem name="info" style="padding-left: 16px;" title="Subproject introduction">
-          <Icon type="ios-information-circle" size="30" />
-        </MenuItem>
-        <MenuItem name="resource" style="padding-left: 16px;" title="Subproject resources">
-          <Icon type="ios-folder" size="30" />
-        </MenuItem>
-        <MenuItem name="process" style="padding-left: 16px;" title="Working steps">
-          <Icon type="md-git-branch" size="30" />
+        <Icon type="ios-information-circle" size="30" />
         </MenuItem>
         <MenuItem name="task" style="padding-left: 16px;" title="Task arrangement">
-          <Icon type="md-calendar" size="30" />
+        <Icon type="md-calendar" size="30" />
+        </MenuItem>
+
+        <MenuItem name="process" style="padding-left: 16px;" title="Working steps">
+        <!-- <Icon type="md-git-branch" size="30" /> -->
+        <Icon type="md-analytics" size="30" />
+        </MenuItem>
+
+        <MenuItem name="resource" style="padding-left: 16px;" title="Subproject resources">
+        <Icon type="ios-folder" size="30" />
         </MenuItem>
       </Menu>
       <div
-        style="font-size:1.5rem;height:60px;padding-top:10px;border:1px solid lightgrey;margin-left:60px"
-      >
-        <Col span="16" style="margin-left:20px;color: #2d8cf099;">
-          <strong>{{panelTitle}}</strong>
-        </Col>
+        style="height:60px;display:flex;align-items:center;border:1px solid lightgrey;margin-left:60px;justify-content:center;">
+        <div style="margin-left:20px; position:absolute;left:80px;">
+          <strong style="font-size:1.5rem">Subproject</strong>
+          <Divider type="vertical" />
+          <strong style="font-size:1rem;">{{panelTitle}}</strong>
+        </div>
+        <!-- <Col span="16" style="margin-left:20px;color: #2d8cf099;"> -->
+        <!-- <strong style="font-size:1.5rem; color: #2d8cf099;position:absolute;left:48%;">{{panelTitle}}</strong> -->
+        <div>
+          <span
+            style="font-size:1.5rem; color: #2d8cf099;max-width:250px;display:inline-block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{subProjectInfo.title}}</span>
+        </div>
+
+        <!-- </Col> -->
         <!-- <Button
           type="info"
           icon="md-globe"
@@ -50,13 +58,8 @@
           @click="gotoWorkingspace"
         >Working space</Button>-->
       </div>
-      <router-view
-        :subProjectInfo="subProjectInfo"
-        :userRole="userRole"
-        :projectInfo="projectInfo"
-        :scopeInfo="scopeInfo"
-        @changeSubProjectInfo="changeSubProjectInfo"
-      ></router-view>
+      <router-view :subProjectInfo="subProjectInfo" :userRole="userRole" :projectInfo="projectInfo"
+        :scopeInfo="scopeInfo" @changeSubProjectInfo="changeSubProjectInfo"></router-view>
     </Row>
   </div>
 </template>
@@ -64,7 +67,7 @@
 export default {
   data() {
     return {
-      menuActive: "overview",
+      menuActive: "info",
       panelTitle: "Overview",
       // information of project
       projectInfo: {},
@@ -112,7 +115,7 @@ export default {
   beforeRouteLeave(to, from, next) {
     next();
   },
-  beforeDestroy: function() {
+  beforeDestroy: function () {
     window.removeEventListener("resize", this.initSize);
   },
   methods: {
@@ -205,7 +208,7 @@ export default {
               that.$store.commit("setSubProjectInfo", subProjectInfo);
             }
           },
-          error: function(err) {
+          error: function (err) {
             console.log("Get manager name fail.");
           }
         });
@@ -320,7 +323,7 @@ export default {
         });
       }
     },
-    changeSubProjectInfo(newInfo){
+    changeSubProjectInfo(newInfo) {
       this.subProjectInfo = newInfo;
     }
   }
