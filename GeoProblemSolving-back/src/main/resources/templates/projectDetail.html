@@ -1029,6 +1029,23 @@
                     avatar: ''
                 };
                 sessionStorage.setItem('userInfo', JSON.stringify(userInfo));
+                var tokenStr = this.getURLParameter("token");
+                if(tokenStr!=null){
+                    $.ajax({
+                        url: "/GeoProblemSolving/token/checkShareToken"+"?shareToken="+tokenStr,
+                        type: "GET",
+                        async: false,
+                        success: data => {
+                            if(data){
+                                this.taskRole = 'Token';
+                            }
+                        },
+                        error: function (err) {
+                            console.log("Check token info fail.");
+                        }
+                    });
+
+                }
                 $.ajax({
                     url: "/GeoProblemSolving/user/state",
                     type: "POST",
@@ -1039,7 +1056,9 @@
                             sessionStorage.setItem('userInfo', JSON.stringify(data));
                         } else {
                             console.log("Not logged in");
-                            window.location.href = '/GeoProblemSolving/login';
+                            if(this.taskRole!="Token"){
+                                window.location.href = '/GeoProblemSolving/login';
+                            }
                         }
                     },
                     error: function (err) {
@@ -1047,9 +1066,9 @@
                     }
                 });
                 this.userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
-                if (this.userInfo == null || !this.userInfo.userState) {
-                    window.location.href = '/GeoProblemSolving/login';
-                }
+                // if (this.userInfo == null || !this.userInfo.userState) {
+                //     window.location.href = '/GeoProblemSolving/login';
+                // }
                 if (window.location.host == "localhost:8080") {
                     this.ipPort = 'http://localhost:8080';
                 }
@@ -1293,33 +1312,37 @@
                     }
                 },
                 userEnter() {
-                    if (this.projectInfo.privacy == "Public") {
-                        if (!this.userInfo.userState) {
-                            window.location.href = "/GeoProblemSolving/projectList";
-                        }
-                    } else if (this.projectInfo.privacy == "Discoverable") {
-                        let isManager = this.managerIdentity(this.projectInfo.managerId);
-                        let isMember = this.memberIdentity(this.projectInfo.members);
-                        if (!this.userInfo.userState || !(isManager || isMember)) {
-                            window.location.href = "/GeoProblemSolving/projectList";
-                        }
-                    } else if (this.projectInfo.privacy == "Private") {
-                        let isManager = this.managerIdentity(this.projectInfo.managerId);
-                        let isMember = this.memberIdentity(this.projectInfo.members);
-                        if (!this.userInfo.userState || !(isManager || isMember)) {
-                            window.location.href = "/GeoProblemSolving/projectList";
+                    if(this.taskRole!="Token"){
+                        if (this.projectInfo.privacy == "Public") {
+                            if (!this.userInfo.userState) {
+                                window.location.href = "/GeoProblemSolving/projectList";
+                            }
+                        } else if (this.projectInfo.privacy == "Discoverable") {
+                            let isManager = this.managerIdentity(this.projectInfo.managerId);
+                            let isMember = this.memberIdentity(this.projectInfo.members);
+                            if (!this.userInfo.userState || !(isManager || isMember)) {
+                                window.location.href = "/GeoProblemSolving/projectList";
+                            }
+                        } else if (this.projectInfo.privacy == "Private") {
+                            let isManager = this.managerIdentity(this.projectInfo.managerId);
+                            let isMember = this.memberIdentity(this.projectInfo.members);
+                            if (!this.userInfo.userState || !(isManager || isMember)) {
+                                window.location.href = "/GeoProblemSolving/projectList";
+                            }
                         }
                     }
                 },
                 roleIdentity() {
-                    if (this.managerIdentity(this.projectInfo.managerId)) {
-                        this.taskRole = 'PManager';
-                    }
-                    else if (this.memberIdentity(this.projectInfo.members)) {
-                        this.taskRole = 'Member';
-                    }
-                    else {
-                        this.taskRole = 'Visitor';
+                    if(this.taskRole!='Token'){
+                        if (this.managerIdentity(this.projectInfo.managerId)) {
+                            this.taskRole = 'PManager';
+                        }
+                        else if (this.memberIdentity(this.projectInfo.members)) {
+                            this.taskRole = 'Member';
+                        }
+                        else {
+                            this.taskRole = 'Visitor';
+                        }
                     }
                 },
                 resizeContent() {
