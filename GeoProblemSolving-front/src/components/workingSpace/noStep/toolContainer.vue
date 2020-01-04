@@ -23,11 +23,11 @@
 </style>
 <template>
   <div>
-    <Card dis-hover>
+    <Card dis-hover style="width:300px">
       <div slot="title">
         <h4>Toolsets and tools</h4>
       </div>
-      <div slot="extra" v-show="userRole!='Visitor'">
+      <div slot="extra" v-show="userRole!='Visitor'&& userRole!='Token'">
         <manage-tools
           :step-info="stepInfo"
           @updateStepTools="stepToolListChanged"
@@ -159,7 +159,7 @@
   </div>
 </template>
 <script>
-import manageTools from "./../../../tools/toolToStepModal";
+import manageTools from "./../../tools/toolToStepModal";
 import Avatar from "vue-avatar";
 export default {
   props: ["stepInfo", "userRole"],
@@ -323,55 +323,65 @@ export default {
       this.getAllTools(tools, toolsets);
     },
     showTools(toolsetInfo) {
+      if (this.userRole != "Visitor" && this.userRole != "Token") {
       this.toolsetToolList = toolsetInfo.toolList;
       this.showToolsetToolsModal = true;
+      }
+      else{
+        this.$Notice.info({desc:"Please login before using toolsets and join this project."})
+      }
     },
     useTool(toolInfo) {
-      let toolURL =
-        '<iframe src="' +
-        toolInfo.toolUrl +
-        "?userName=" +
-        this.userInfo.userName +
-        "&userID=" +
-        this.userInfo.userId +
-        "&groupID=" +
-        this.stepInfo.stepId +
-        '" style="width: 100%;height:100%;"></iframe>';
-      var demoPanelTimer = null;
-      var panel = jsPanel.create({
-        theme: "success",
-        headerTitle: toolInfo.toolName,
-        footerToolbar: '<p style="height:10px"></p>',
-        contentSize: "800 400",
-        content: toolURL,
-        disableOnMaximized: true,
-        dragit: {
-          containment: 5
-        },
-        onclosed: function(panel, status, closedByUser) {
-          window.clearTimeout(demoPanelTimer);
-        },
-        callback: function() {
-          var that = this;
-          demoPanelTimer = window.setInterval(function() {
-            that.style.zIndex = "9999";
-          }, 1);
-        }
-      });
-      // panel.resizeit("disable");
-      $(".jsPanel-content").css("font-size", "0");
-      this.panelList.push(panel);
-      this.$emit("toolPanel",panel);
+      if (this.userRole != "Visitor" && this.userRole != "Token") {
+        let toolURL =
+          '<iframe src="' +
+          toolInfo.toolUrl +
+          "?userName=" +
+          this.userInfo.userName +
+          "&userID=" +
+          this.userInfo.userId +
+          "&groupID=" +
+          this.stepInfo.stepId +
+          '" style="width: 100%;height:100%;"></iframe>';
+        var demoPanelTimer = null;
+        var panel = jsPanel.create({
+          theme: "success",
+          headerTitle: toolInfo.toolName,
+          footerToolbar: '<p style="height:10px"></p>',
+          contentSize: "800 400",
+          content: toolURL,
+          disableOnMaximized: true,
+          dragit: {
+            containment: 5
+          },
+          onclosed: function(panel, status, closedByUser) {
+            window.clearTimeout(demoPanelTimer);
+          },
+          callback: function() {
+            var that = this;
+            demoPanelTimer = window.setInterval(function() {
+              that.style.zIndex = "9999";
+            }, 1);
+          }
+        });
+        // panel.resizeit("disable");
+        $(".jsPanel-content").css("font-size", "0");
+        this.panelList.push(panel);
+        this.$emit("toolPanel", panel);
 
-      // 记录信息
-      let toolRecords = {
-        type: "tools",
-        time: new Date().Format("yyyy-MM-dd HH:mm:ss"),
-        who: this.userInfo.userName,
-        content: "used a tool",
-        toolType: toolInfo.toolName
-      };
-      this.$emit("toolBehavior", toolRecords);
+        // 记录信息
+        let toolRecords = {
+          type: "tools",
+          time: new Date().Format("yyyy-MM-dd HH:mm:ss"),
+          who: this.userInfo.userName,
+          content: "used a tool",
+          toolType: toolInfo.toolName
+        };
+        this.$emit("toolBehavior", toolRecords);
+      }
+      else{
+        this.$Notice.info({desc:"Please login before using toolsets and join this project."})
+      }
     }
   }
 };

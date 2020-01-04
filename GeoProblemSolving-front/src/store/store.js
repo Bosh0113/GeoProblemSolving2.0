@@ -8,7 +8,7 @@ export default new Vuex.Store({
         //data
         userInfo: {
             userState: false,
-            userName: 'visitor',
+            userName: 'Visitor',
             userId: '',
             avatar: '',
         },
@@ -73,7 +73,7 @@ export default new Vuex.Store({
         userLogout: (state) => {
             state.userInfo = {
                 userState: false,
-                userName: 'visitor',
+                userName: 'Visitor',
                 userId: '',
                 avatar: '',
             };

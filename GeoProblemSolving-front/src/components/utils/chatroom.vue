@@ -717,7 +717,6 @@ export default {
       if (subProjectId == undefined || subProjectId == "") {
         this.scopeId = data.data[0].projectId;
         this.scopeType = "project";
-        console.log(this.scopeId);
       } else {
         this.scopeId = subProjectId;
         this.scopeType = "subproject";
@@ -897,18 +896,16 @@ export default {
           // offline
           for (let i = 0; i < this.onlineParticipants.length; i++) {
             if (msg.userId == this.onlineParticipants[i].userId) {
-              let offperson = this.onlineParticipants[i];
-              this.onlineParticipants.splice(i, 1);
-              this.offlineParticipants.push(offperson);
+              let offperson = this.onlineParticipants.splice(i, 1);
+              this.offlineParticipants.push(offperson[0]);
             }
           }
         } else if (msg.behavior == "on") {
           // online
           for (let i = 0; i < this.offlineParticipants.length; i++) {
             if (msg.userId == this.offlineParticipants[i].userId) {
-              let onperson = this.offlineParticipants[i];
-              this.offlineParticipants.splice(i, 1); //开始位置的索引 要删除元素的个数
-              this.onlineParticipants.push(onperson);
+              let onperson = this.offlineParticipants.splice(i, 1);
+              this.onlineParticipants.push(onperson[0]);
             }
           }
         }

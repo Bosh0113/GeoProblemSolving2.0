@@ -265,7 +265,7 @@
                 doneLoading:true,
                 userInfo:{
                     userState: false,
-                    userName: 'visitor',
+                    userName: 'Visitor',
                     userId: '',
                     avatar: '',
                 },
@@ -793,7 +793,7 @@
                 this.taskOrderUpdate(taskList, type);
             },
             taskOrderUpdate(taskList, type) {
-                if (this.userRole != "Visitor") {
+                if (this.userRole != "Visitor"&&this.userRole != "Token") {
                     let thisUserName = this.userInfo.userName;
                     let stateChangeIndex = 0;
                     let count = taskList.length;

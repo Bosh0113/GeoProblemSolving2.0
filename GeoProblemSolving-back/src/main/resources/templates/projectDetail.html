@@ -254,7 +254,7 @@
                 </i-menu>
             </div>
             <div style="margin-left: 90px;height: inherit;min-height: fit-content;">
-                <div v-if="showMenuItem=='projectOverview'" style="height: inherit;min-height: fit-content;">
+                <div v-if="activeMenu=='projectOverview'" style="height: inherit;min-height: fit-content;">
                     <div style="background:#eee;padding: 10px;height: inherit;min-height: fit-content;">
                         <Card :bordered="false" dis-hover
                               style="height: -webkit-fill-available; flex-flow: column;min-height: fit-content;">
@@ -389,7 +389,7 @@
                         </Card>
                     </div>
                 </div>
-                <div v-else-if="showMenuItem=='projectDetail'" style="height: inherit;min-height: fit-content;">
+                <div v-else-if="activeMenu=='projectDetail'" style="height: inherit;min-height: fit-content;">
                     <div style="background:#eee;padding: 10px;height: inherit;min-height: fit-content;">
                         <Card :bordered="false" dis-hover
                               style="height: -webkit-fill-available;flex-flow: column;min-height: fit-content;">
@@ -516,15 +516,15 @@
                                                 <div slot="extra">
                                                     <div v-if="managerIdentity(projectInfo.managerId)">
                                                         <Poptip trigger="hover" content="Invite members"
-                                                                placement="left">
+                                                                placement="bottom">
                                                             <i-button class="changeInviteColor"
                                                                       @click="inviteModalShow()">
                                                                 <Icon type="md-person-add" :size="20"></Icon>
                                                             </i-button>
                                                         </Poptip>
                                                         <Poptip trigger="hover" content="Remove members"
-                                                                placement="left">
-                                                            <i-button style="margin: 0 0 0 5px;"
+                                                                placement="bottom">
+                                                            <i-button style="margin-left:5px;"
                                                                       class="changeRemoveColor"
                                                                       @click="deleteMemberModelShow">
                                                                 <Icon type="md-remove-circle" :size="20"></Icon>
@@ -558,7 +558,7 @@
                         </Card>
                     </div>
                 </div>
-                <div v-else-if="showMenuItem=='subProjects'" style="height: inherit;min-height: fit-content;">
+                <div v-else-if="activeMenu=='subProjects'" style="height: inherit;min-height: fit-content;">
                     <div style="background:#eee;padding: 10px;height: inherit;min-height: fit-content;">
                         <Card v-if="projectInfo.type=='type0'" :bordered="false" dis-hover
                               style="height: -webkit-fill-available;min-height: fit-content;">
@@ -668,7 +668,7 @@
                         </div>
                     </div>
                 </div>
-                <div v-else-if="showMenuItem=='resources'" style="height: inherit;min-height: fit-content;">
+                <div v-else-if="activeMenu=='resources'" style="height: inherit;min-height: fit-content;">
                     <div style="background:#eee;padding: 10px;height: inherit;min-height: fit-content;">
                         <Card :bordered="false" dis-hover
                               style="height: -webkit-fill-available;min-height: 565px;min-height: fit-content;">
@@ -693,13 +693,13 @@
                             <div :style="{height:subProjectsCSS}">
                                 <child-folder
                                         :root-folder-id="projectInfo.projectId"
-                                        role=""
+                                        :role="taskRole"
                                         ref="folderTreeEl"></child-folder>
                             </div>
                         </Card>
                     </div>
                 </div>
-                <div v-else-if="showMenuItem=='tasks'" style="height: inherit;min-height: fit-content;">
+                <div v-else-if="activeMenu=='tasks'" style="height: inherit;min-height: fit-content;">
                     <div style="background:#eee;padding: 10px;height: inherit;min-height: fit-content;">
                         <Card :bordered="false" dis-hover
                               style="height: -webkit-fill-available;min-height: 565px;min-height: fit-content;">
@@ -1025,7 +1025,7 @@
                 </Modal>
                 <Modal
                   v-model="resetProjectTypeNotice"
-                  title="Reset project's type"
+                  title="Reset project type"
                 >
                   <h2>Please confirm that all subprojects have been deleted.</h2>
                   <div slot="footer">
@@ -1034,7 +1034,7 @@
                 </Modal>
                 <Modal
                   v-model="resetProjectTypeModel"
-                  title="Reset project's type"
+                  title="Reset project type"
                 >
                   <h2>Are you sure you want to reset the project type?</h2>
                   <div slot="footer">
@@ -1068,11 +1068,28 @@
             created() {
                 var userInfo = {
                     userState: false,
-                    userName: 'visitor',
+                    userName: 'Visitor',
                     userId: '',
                     avatar: ''
                 };
                 sessionStorage.setItem('userInfo', JSON.stringify(userInfo));
+                this.tokenStr = this.getURLParameter("token");
+                if(this.tokenStr!=null){
+                    $.ajax({
+                        url: "/GeoProblemSolving/token/checkShareToken"+"?shareToken="+this.tokenStr,
+                        type: "GET",
+                        async: false,
+                        success: data => {
+                            if(data){
+                                this.taskRole = 'Token';
+                            }
+                        },
+                        error: function (err) {
+                            console.log("Check token info fail.");
+                        }
+                    });
+
+                }
                 $.ajax({
                     url: "/GeoProblemSolving/user/state",
                     type: "POST",
@@ -1083,7 +1100,9 @@
                             sessionStorage.setItem('userInfo', JSON.stringify(data));
                         } else {
                             console.log("Not logged in");
-                            window.location.href = '/GeoProblemSolving/login';
+                            if(this.taskRole!="Token"){
+                                window.location.href = '/GeoProblemSolving/login';
+                            }
                         }
                     },
                     error: function (err) {
@@ -1091,9 +1110,9 @@
                     }
                 });
                 this.userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
-                if (this.userInfo == null || !this.userInfo.userState) {
-                    window.location.href = '/GeoProblemSolving/login';
-                }
+                // if (this.userInfo == null || !this.userInfo.userState) {
+                //     window.location.href = '/GeoProblemSolving/login';
+                // }
                 if (window.location.host == "localhost:8080") {
                     this.ipPort = 'http://localhost:8080';
                 }
@@ -1104,19 +1123,20 @@
                 this.resizeContent();
                 this.getAllSubProjects();
                 this.roleIdentity();
+                this.changeMenuByUrl();
             },
             data() {
                 return {
                     ipPort: "/GeoProblemSolving",
+                    tokenStr:'',
                     userInfo: {
                         userState: false,
-                        userName: 'visitor',
+                        userName: 'Visitor',
                         userId: '',
                         avatar: '',
                     },
                     projectInfo: projectInfo,
                     activeMenu: "projectOverview",
-                    showMenuItem: "projectOverview",
                     contentPageCSS: '',
                     membersContentCSS: '',
                     subProjectsCSS: '',
@@ -1296,6 +1316,23 @@
                 }
             },
             methods: {
+                changeMenuByUrl(){
+                    var content = this.getURLParameter("content");
+                    if (content!=null) {
+                        var array = ["projectOverview","projectDetail","tasks","subProjects","resources"];
+                        if(array.includes(content)){
+                            this.activeMenu = content;
+                        }
+                    }
+                },
+                getURLParameter(name){  
+                    var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");  
+                    var r = window.location.search.substr(1).match(reg);  
+                    if(r!=null){
+                        return  unescape(r[2]);
+                    }
+                    return null;  
+                },
                 getProjectInfo(){
                     if(this.projectInfo=={}||this.projectInfo==undefined){
                         $.ajax({
@@ -1320,17 +1357,23 @@
                     }
                 },
                 userEnter() {
-                    if (this.projectInfo.privacy == "Public") {
-
-                    } else if (this.projectInfo.privacy == "Discoverable") {
-                        if (!this.userInfo.userState) {
-                            window.location.href = "/GeoProblemSolving/projectList";
-                        }
-                    } else if (this.projectInfo.privacy == "Private") {
-                        let isManager = this.managerIdentity(this.projectInfo.managerId);
-                        let isMember = this.memberIdentity(this.projectInfo.members);
-                        if (!this.userInfo.userState || !(isManager || isMember)) {
-                            window.location.href = "/GeoProblemSolving/projectList";
+                    if(this.taskRole!="Token"){
+                        if (this.projectInfo.privacy == "Public") {
+                            if (!this.userInfo.userState) {
+                                window.location.href = "/GeoProblemSolving/projectList";
+                            }
+                        } else if (this.projectInfo.privacy == "Discoverable") {
+                            let isManager = this.managerIdentity(this.projectInfo.managerId);
+                            let isMember = this.memberIdentity(this.projectInfo.members);
+                            if (!this.userInfo.userState || !(isManager || isMember)) {
+                                window.location.href = "/GeoProblemSolving/projectList";
+                            }
+                        } else if (this.projectInfo.privacy == "Private") {
+                            let isManager = this.managerIdentity(this.projectInfo.managerId);
+                            let isMember = this.memberIdentity(this.projectInfo.members);
+                            if (!this.userInfo.userState || !(isManager || isMember)) {
+                                window.location.href = "/GeoProblemSolving/projectList";
+                            }
                         }
                     }
                 },
@@ -1342,7 +1385,9 @@
                         this.taskRole = 'Member';
                     }
                     else {
-                        this.taskRole = 'Visitor';
+                        if(this.taskRole!='Token'){
+                            this.taskRole = 'Visitor';
+                        }
                     }
                 },
                 resizeContent() {
@@ -1375,20 +1420,23 @@
                     this.$refs.navigationEl.sendMessage(recipientId);
                 },
                 changeMenuItem(name) {
-                    this.showMenuItem = name;
                     this.activeMenu = name;
+                    var projectId = this.projectInfo.projectId;
+                    var tokenParam='';
+                    if(this.tokenStr!=null){
+                        tokenParam = "&token=" + this.tokenStr;
+                    }
+                    window.history.replaceState(null,null,'/GeoProblemSolving/projectDetail/'+projectId+"?content="+name+tokenParam);
                 },
                 gotoIntroduction() {
-                    this.showMenuItem = "projectDetail";
-                    this.activeMenu = "projectDetail";
+                    this.changeMenuItem("projectDetail");
                 },
                 gotoResource() {
                     if(this.taskRole=="Visitor"){
                         this.joinProjectNotice = true;
                     }
                     else{
-                        this.showMenuItem = "resources";
-                        this.activeMenu = "resources";
+                        this.changeMenuItem("resources");
                     }
                 },
                 gotoWorking() {
@@ -1396,13 +1444,11 @@
                         this.joinProjectNotice = true;
                     }
                     else{
-                        this.showMenuItem = "subProjects";
-                        this.activeMenu = "subProjects";
+                        this.changeMenuItem("subProjects");
                     }
                 },
                 gotoTaskassignment() {
-                    this.showMenuItem = "tasks";
-                    this.activeMenu = "tasks";
+                    this.changeMenuItem("tasks");
                 },
                 getAllSubProjects() {
                     if (this.projectInfo.type == "type0") {
@@ -1609,15 +1655,13 @@
                                 .then(res => {
                                     if (res.data == "Success") {
                                         this.$Notice.success({
-                                            title: "Email send title",
                                             desc:
-                                                "The invitation has been sent,the receiver will process this request later."
+                                                "The invitation has been sent successfully."
                                         });
                                         this.inviteModal = false;
                                     } else {
                                         this.$Notice.error({
-                                            title: "Email send fail",
-                                            desc: "The invitation isn't be sent successfully."
+                                            desc: "Failed to send the invitation."
                                         });
                                     }
                                 })
@@ -1713,26 +1757,26 @@
                     }
                 },
                 resetProjectType(){
-                let obj = new URLSearchParams();
-                obj.append("projectId", this.projectInfo.projectId);
-                obj.append("type", "");
-                obj.append("stepId", "");
-                axios
-                    .post("/GeoProblemSolving/project/update", obj)
-                    .then(res => {
-                        this.resetProjectTypeModel = false;
-                        if (res.data == "Offline") {
-                            window.location.href="/GeoProblemSolving/login"
-                        } else if (res.data != "Fail") {
-                            sessionStorage.setItem("projectInfo",JSON.stringify(res.data));
-                            this.projectInfo = res.data;
-                        } else {
-                            this.$Message.error("Set type failed.");
-                        }
-                        })
-                    .catch(err => {
-                        console.log(err.data);
-                    });
+                    let obj = new URLSearchParams();
+                    obj.append("projectId", this.projectInfo.projectId);
+                    obj.append("type", "");
+                    obj.append("stepId", "");
+                    axios
+                        .post("/GeoProblemSolving/project/update", obj)
+                        .then(res => {
+                            this.resetProjectTypeModel = false;
+                            if (res.data == "Offline") {
+                                window.location.href="/GeoProblemSolving/login"
+                            } else if (res.data != "Fail") {
+                                sessionStorage.setItem("projectInfo",JSON.stringify(res.data));
+                                this.projectInfo = res.data;
+                            } else {
+                                this.$Message.error("Set type failed.");
+                            }
+                            })
+                        .catch(err => {
+                            console.log(err.data);
+                        });
                 },
                 showSubProjectCreateModel() {
                     this.createSubProjectModel = true;
@@ -2013,14 +2057,14 @@
                     }
                 },
                 cursorStyle() {
-                    if (this.managerIdentity(this.projectInfo.managerId) || this.memberIdentity(this.projectInfo.members)) {
+                    if (this.managerIdentity(this.projectInfo.managerId) || this.memberIdentity(this.projectInfo.members)||this.taskRole=="Token") {
                         return "cursor: pointer;";
                     } else {
                         return "cursor: no-drop;";
                     }
                 },
                 menuDisable() {
-                    if (this.managerIdentity(this.projectInfo.managerId) || this.memberIdentity(this.projectInfo.members)) {
+                    if (this.managerIdentity(this.projectInfo.managerId) || this.memberIdentity(this.projectInfo.members)||this.taskRole=="Token") {
                         return false;
                     } else {
                         return true;
@@ -2030,9 +2074,13 @@
                     window.location.href = "/GeoProblemSolving/resourceCenter";
                 },
                 joinApplyModalShow() {
-                    this.applyProjectInfo = Object.assign([], this.projectInfo);
-                    this.applyValidate.reason = "";
-                    this.applyJoinModal = true;
+                    if(this.userState){
+                        this.applyProjectInfo = Object.assign([], this.projectInfo);
+                        this.applyValidate.reason = "";
+                        this.applyJoinModal = true;
+                    }else{
+                        confirm("Please login first.");
+                    }
                 },
                 joinApply(name) {
                     this.$refs[name].validate(valid => {

@@ -1,5 +1,6 @@
 package cn.edu.njnu.geoproblemsolving.Entity;
 
+import com.alibaba.fastjson.JSONObject;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "Resource")
@@ -16,6 +17,7 @@ public class ResourceEntity {
     private String uploadTime;
     private String privacy;     //public/private
     private String thumbnail; //缩略图地址
+    private String editToolInfo;
 
     public void setPrivacy(String privacy) {
         this.privacy = privacy;
@@ -61,6 +63,10 @@ public class ResourceEntity {
         this.thumbnail = thumbnail;
     }
 
+    public void setEditToolInfo(String editToolInfo) {
+        this.editToolInfo = editToolInfo;
+    }
+
     public String getUploadTime() {
         return uploadTime;
     }
@@ -103,5 +109,9 @@ public class ResourceEntity {
 
     public String getThumbnail() {
         return thumbnail;
+    }
+
+    public String getEditToolInfo() {
+        return editToolInfo;
     }
 }
