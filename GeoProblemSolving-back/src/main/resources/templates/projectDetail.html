@@ -259,7 +259,15 @@
                         <Card :bordered="false" dis-hover
                               style="height: -webkit-fill-available; flex-flow: column;min-height: fit-content;">
                             <div slot="title">
-                                <h1 class="projectMenuItemTitle">Overview </h1>
+<!--                                <h1 class="projectMenuItemTitle">Overview </h1>-->
+                                <div style="margin-left:20px;top: 15px; position:absolute;left:50px;">
+                                    <strong style="font-size:1.5rem;">Project</strong>
+                                    <Divider type="vertical"></Divider>
+                                    <strong style="font-size:1rem;">Overview</strong>
+                                </div>
+                                <div style="display:flex;align-items:center;justify-content:center;">
+                                    <span style="font-size:1.5rem; color: #2d8cf099;max-width:250px;display:inline-block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{projectInfo.title}}</span>
+                                </div>
                             </div>
                             <div slot="extra">
                                 <div v-if="!managerIdentity(projectInfo.managerId)&&!memberIdentity(projectInfo.members)">
@@ -386,7 +394,15 @@
                         <Card :bordered="false" dis-hover
                               style="height: -webkit-fill-available;flex-flow: column;min-height: fit-content;">
                             <div slot="title">
-                                <h1 slot="title" class="projectMenuItemTitle">Introduction</h1>
+<!--                                <h1 slot="title" class="projectMenuItemTitle">Introduction</h1>-->
+                                <div style="margin-left:20px;top: 15px; position:absolute;left:50px;">
+                                    <strong style="font-size:1.5rem;">Project</strong>
+                                    <Divider type="vertical"></Divider>
+                                    <strong style="font-size:1rem;">Introduction</strong>
+                                </div>
+                                <div style="display:flex;align-items:center;justify-content:center;">
+                                    <span style="font-size:1.5rem; color: #2d8cf099;max-width:250px;display:inline-block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{projectInfo.title}}</span>
+                                </div>
                             </div>
                             <div slot="extra">
                                 <div v-if="managerIdentity(projectInfo.managerId)">
@@ -547,7 +563,15 @@
                         <Card v-if="projectInfo.type=='type0'" :bordered="false" dis-hover
                               style="height: -webkit-fill-available;min-height: fit-content;">
                               <div slot="title">
-                                <h1 class="projectMenuItemTitle">Subprojects</h1>
+<!--                                <h1 class="projectMenuItemTitle">Subprojects</h1>-->
+                                  <div style="margin-left:20px;top: 15px; position:absolute;left:50px;">
+                                      <strong style="font-size:1.5rem;">Project</strong>
+                                      <Divider type="vertical"></Divider>
+                                      <strong style="font-size:1rem;">Subprojects</strong>
+                                  </div>
+                                  <div style="display:flex;align-items:center;justify-content:center;">
+                                      <span style="font-size:1.5rem; color: #2d8cf099;max-width:250px;display:inline-block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{projectInfo.title}}</span>
+                                  </div>
                               </div>
                             <div slot="extra">
                                 <Poptip trigger="hover" content="Create subproject" placement="left">
@@ -648,7 +672,17 @@
                     <div style="background:#eee;padding: 10px;height: inherit;min-height: fit-content;">
                         <Card :bordered="false" dis-hover
                               style="height: -webkit-fill-available;min-height: 565px;min-height: fit-content;">
-                            <h1 slot="title" class="projectMenuItemTitle">Resources</h1>
+<!--                            <h1 slot="title" class="projectMenuItemTitle">Resources</h1>-->
+                            <div slot="title">
+                                <div style="margin-left:20px;top: 15px; position:absolute;left:50px;">
+                                    <strong style="font-size:1.5rem;">Project</strong>
+                                    <Divider type="vertical"></Divider>
+                                    <strong style="font-size:1rem;">Resources</strong>
+                                </div>
+                                <div style="display:flex;align-items:center;justify-content:center;">
+                                    <span style="font-size:1.5rem; color: #2d8cf099;max-width:250px;display:inline-block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{projectInfo.title}}</span>
+                                </div>
+                            </div>
                             <div slot="extra">
                                 <Tooltip content="Resources center" placement="bottom" class="fileBtn">
                                     <i-button @click="goResourceCenter" class="fileBtnHoverBlue">
@@ -669,7 +703,17 @@
                     <div style="background:#eee;padding: 10px;height: inherit;min-height: fit-content;">
                         <Card :bordered="false" dis-hover
                               style="height: -webkit-fill-available;min-height: 565px;min-height: fit-content;">
-                            <h1 slot="title" class="projectMenuItemTitle">Task assignment</h1>
+<!--                            <h1 slot="title" class="projectMenuItemTitle">Task assignment</h1>-->
+                            <div slot="title">
+                                <div style="margin-left:20px;top: 15px; position:absolute;left:50px;">
+                                    <strong style="font-size:1.5rem;">Project</strong>
+                                    <Divider type="vertical"></Divider>
+                                    <strong style="font-size:1rem;">Task assignment</strong>
+                                </div>
+                                <div style="display:flex;align-items:center;justify-content:center;">
+                                    <span style="font-size:1.5rem; color: #2d8cf099;max-width:250px;display:inline-block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{projectInfo.title}}</span>
+                                </div>
+                            </div>
                             <div>
                                 <child-task
                                         :project-info="projectInfo"
@@ -1029,10 +1073,10 @@
                     avatar: ''
                 };
                 sessionStorage.setItem('userInfo', JSON.stringify(userInfo));
-                var tokenStr = this.getURLParameter("token");
-                if(tokenStr!=null){
+                this.tokenStr = this.getURLParameter("token");
+                if(this.tokenStr!=null){
                     $.ajax({
-                        url: "/GeoProblemSolving/token/checkShareToken"+"?shareToken="+tokenStr,
+                        url: "/GeoProblemSolving/token/checkShareToken"+"?shareToken="+this.tokenStr,
                         type: "GET",
                         async: false,
                         success: data => {
@@ -1084,6 +1128,7 @@
             data() {
                 return {
                     ipPort: "/GeoProblemSolving",
+                    tokenStr:'',
                     userInfo: {
                         userState: false,
                         userName: 'Visitor',
@@ -1377,7 +1422,11 @@
                 changeMenuItem(name) {
                     this.activeMenu = name;
                     var projectId = this.projectInfo.projectId;
-                    window.history.replaceState(null,null,'/GeoProblemSolving/projectDetail/'+projectId+"?content="+name);
+                    var tokenParam='';
+                    if(this.tokenStr!=null){
+                        tokenParam = "&token=" + this.tokenStr;
+                    }
+                    window.history.replaceState(null,null,'/GeoProblemSolving/projectDetail/'+projectId+"?content="+name+tokenParam);
                 },
                 gotoIntroduction() {
                     this.changeMenuItem("projectDetail");
@@ -2025,9 +2074,13 @@
                     window.location.href = "/GeoProblemSolving/resourceCenter";
                 },
                 joinApplyModalShow() {
-                    this.applyProjectInfo = Object.assign([], this.projectInfo);
-                    this.applyValidate.reason = "";
-                    this.applyJoinModal = true;
+                    if(this.userState){
+                        this.applyProjectInfo = Object.assign([], this.projectInfo);
+                        this.applyValidate.reason = "";
+                        this.applyJoinModal = true;
+                    }else{
+                        confirm("Please login first.");
+                    }
                 },
                 joinApply(name) {
                     this.$refs[name].validate(valid => {
