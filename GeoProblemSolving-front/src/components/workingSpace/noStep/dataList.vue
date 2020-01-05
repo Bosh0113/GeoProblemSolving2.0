@@ -106,6 +106,13 @@
                       ></Button>
                       <Button
                         size="small"
+                        title="Details"
+                        icon="md-information-circle"
+                        style="margin: 10px 20px 0 0;"
+                        @click="shareModal=true"
+                      ></Button>
+                      <Button
+                        size="small"
                         title="Delete"
                         icon="md-close"
                         style="margin-top: 10px;"
@@ -160,7 +167,7 @@
                 size="small"
                 title="Check"
                 @click="checkData(row)"
-                icon="md-eye"
+                icon="md-information-circle"
                 shape="circle"
                 type="text"
               ></Button>
