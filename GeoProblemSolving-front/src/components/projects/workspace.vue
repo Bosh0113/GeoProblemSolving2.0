@@ -21,13 +21,14 @@
         <Button icon="ios-share-alt" @click="shareModal=true" v-show="userRole=='Manager'">Share</Button>
       </div>
       <div style="display: flex;">
-        <div style="width:300px;height:735px">
+        <div style="width:300px;height:735px" v-show="this.userRole != 'Visitor' && this.userRole != 'Token'">
           <vue-scroll :ops="ops">
             <tool-container :stepInfo="stepInfo" :userRole="userRole"></tool-container>
           </vue-scroll>
         </div>
         <div style="margin-left:10px" :style="{width:resourceWidth+'px'}">
-          <data-list :stepInfo="stepInfo" :userRole="userRole"></data-list>
+          <data-list :stepInfo="stepInfo" :userRole="userRole" v-show="this.userRole != 'Visitor' && this.userRole != 'Token'"></data-list>
+          <historical-edit-list :stepInfo="stepInfo" :userRole="userRole" v-show="this.userRole == 'Visitor' || this.userRole == 'Token'"></historical-edit-list>
         </div>
       </div>
       <div style="margin:5px 0 5px 80px;text-align:center">
@@ -70,12 +71,14 @@
 </template>
 <script>
 import dataList from "./../workingSpace/noStep/dataList";
+import historicalEditList from "./../workingSpace/noStep/historicalEditList";
 import toolContainer from "./../workingSpace/noStep/toolContainer";
 import onlineParticipant from "./../workingSpace/functionSteps/utils/onlineParticipants";
 export default {
   props: ["projectInfo", "userRole"],
   components: {
     dataList,
+    historicalEditList,
     toolContainer,
     onlineParticipant
   },
