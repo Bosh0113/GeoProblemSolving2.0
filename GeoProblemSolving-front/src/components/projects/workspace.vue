@@ -21,13 +21,25 @@
         <Button icon="ios-share-alt" @click="shareModal=true" v-show="userRole=='Manager'">Share</Button>
       </div>
       <div style="display: flex;">
-        <div style="width:300px;height:735px">
+        <div
+          style="width:300px;height:735px"
+          v-show="this.userRole != 'Visitor' && this.userRole != 'Token'"
+        >
           <vue-scroll :ops="ops">
             <tool-container :stepInfo="stepInfo" :userRole="userRole"></tool-container>
           </vue-scroll>
         </div>
         <div style="margin-left:10px" :style="{width:resourceWidth+'px'}">
-          <data-list :stepInfo="stepInfo" :userRole="userRole"></data-list>
+          <data-list
+            :stepInfo="stepInfo"
+            :userRole="userRole"
+            v-show="this.userRole != 'Visitor' && this.userRole != 'Token'"
+          ></data-list>
+          <historical-edit-list
+            :stepInfo="stepInfo"
+            :userRole="userRole"
+            v-show="this.userRole == 'Visitor' || this.userRole == 'Token'"
+          ></historical-edit-list>
         </div>
       </div>
       <div style="margin:5px 0 5px 80px;text-align:center">
@@ -58,24 +70,38 @@
       <div style="margin-bottom:20px">
         <span class="shareLabel">Url:</span>
         <Input v-model="sharedUrl" readonly style="width:300px;margin-left:10px" />
-        <Button type="primary" @click="copySharedUrl()" style="margin-right:30px;float:right;width:80px">Copy</Button>
+        <Button
+          type="primary"
+          @click="copySharedUrl()"
+          style="margin-right:30px;float:right;width:80px"
+        >Copy</Button>
       </div>
       <div style="margin-bottom:20px">
         <span class="shareLabel">Email:</span>
-        <Input v-model="sharingEmail" placeholder="Plase enter the email address" style="width: 300px;margin-left:10px" />
-        <Button type="primary" @click="shareWorkspace()" style="margin-right:30px;float:right;width:80px">Share</Button>
+        <Input
+          v-model="sharingEmail"
+          placeholder="Plase enter the email address"
+          style="width: 300px;margin-left:10px"
+        />
+        <Button
+          type="primary"
+          @click="shareWorkspace()"
+          style="margin-right:30px;float:right;width:80px"
+        >Share</Button>
       </div>
     </Modal>
   </div>
 </template>
 <script>
 import dataList from "./../workingSpace/noStep/dataList";
+import historicalEditList from "./../workingSpace/noStep/shareEditList";
 import toolContainer from "./../workingSpace/noStep/toolContainer";
 import onlineParticipant from "./../workingSpace/functionSteps/utils/onlineParticipants";
 export default {
   props: ["projectInfo", "userRole"],
   components: {
     dataList,
+    historicalEditList,
     toolContainer,
     onlineParticipant
   },
@@ -284,41 +310,40 @@ export default {
 
       document.body.removeChild(input);
       this.$Notice.info({ desc: "Copy successfully." });
-    }
-  },
-  shareWorkspace() {
-    if (this.sharingEmail == "") {
-      this.$Notice.info({
-        desc: "Please fill in the email address."
-      });
-      return;
-    }
+    },
+    shareWorkspace() {
+      if (this.sharingEmail == "") {
+        this.$Notice.info({
+          desc: "Please fill in the email address."
+        });
+        return;
+      }
 
-    var url = this.sharedUrl + "&" + this.sharedToken;
+      var url = this.sharedUrl;
 
-    //send url via email
-    var emailFormBody = {};
-    emailFormBody["recipient"] = this.sharingEmail;
-    emailFormBody["mailTitle"] = "Participatory workspace sharing";
-    emailFormBody["mailContent"] =
-      "Open the address:( " + url + " ), and check the latest work progress.";
-    axios
-      .post("/GeoProblemSolving/email/invite", emailFormBody)
-      .then(res => {
-        if (res.data == "Success") {
-          this.$Notice.success({
-            desc: "The share has been sent successfully."
-          });
-          this.inviteModal = false;
-        } else {
-          this.$Notice.error({
-            desc: "Failed to send the share."
-          });
-        }
-      })
-      .catch(err => {
-        console.log(err.data);
-      });
+      //send url via email
+      var emailFormBody = {};
+      emailFormBody["recipient"] = this.sharingEmail;
+      emailFormBody["mailTitle"] = "Participatory workspace sharing";
+      emailFormBody["mailContent"] =
+        "Open the address:( " + url + " ), and check the latest work.";
+      axios
+        .post("/GeoProblemSolving/email/send", emailFormBody)
+        .then(res => {
+          if (res.data == "Success") {
+            this.$Notice.success({
+              desc: "The share has been sent successfully."
+            });
+          } else {
+            this.$Notice.error({
+              desc: "Failed to send the share."
+            });
+          }
+        })
+        .catch(err => {
+          console.log(err.data);
+        });
+    }
   }
 };
 </script>

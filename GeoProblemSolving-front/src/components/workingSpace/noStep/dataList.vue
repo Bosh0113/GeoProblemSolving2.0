@@ -46,6 +46,14 @@
   white-space: nowrap;
   overflow: hidden;
 }
+.shareLabel {
+  display: block;
+  width: 50px;
+  float: left;
+  margin-top: 8px;
+  text-align: right;
+  font-weight: bold;
+}
 #toolData {
   height: 400px;
   border: 1px solid #dcdee2;
@@ -106,6 +114,13 @@
                       ></Button>
                       <Button
                         size="small"
+                        title="Share"
+                        icon="ios-share-alt"
+                        style="margin: 10px 20px 0 0;"
+                        @click="shareModal=true"
+                      ></Button>
+                      <Button
+                        size="small"
                         title="Delete"
                         icon="md-close"
                         style="margin-top: 10px;"
@@ -160,7 +175,7 @@
                 size="small"
                 title="Check"
                 @click="checkData(row)"
-                icon="md-eye"
+                icon="md-information-circle"
                 shape="circle"
                 type="text"
               ></Button>
@@ -291,6 +306,39 @@
     >
       <h3>Do you really want to delete this resource?</h3>
     </Modal>
+    <Modal v-model="shareModal" title="Share workspace" footer-hide>
+      <div style="margin-bottom:20px">
+        <span class="shareLabel">Token:</span>
+        <Input v-model="sharedToken" readonly style="width: 300px;margin-left:10px" />
+        <Button
+          type="primary"
+          @click="generateToken()"
+          style="margin-right:30px;float:right;width:80px"
+        >Generate</Button>
+      </div>
+      <div style="margin-bottom:20px">
+        <span class="shareLabel">Url:</span>
+        <Input v-model="sharedUrl" readonly style="width:300px;margin-left:10px" />
+        <Button
+          type="primary"
+          @click="copySharedUrl()"
+          style="margin-right:30px;float:right;width:80px"
+        >Copy</Button>
+      </div>
+      <div style="margin-bottom:20px">
+        <span class="shareLabel">Email:</span>
+        <Input
+          v-model="sharingEmail"
+          placeholder="Plase enter the email address"
+          style="width: 300px;margin-left:10px"
+        />
+        <Button
+          type="primary"
+          @click="shareWorkspace()"
+          style="margin-right:30px;float:right;width:80px"
+        >Share</Button>
+      </div>
+    </Modal>
   </div>
 </template>
 <script>
@@ -379,6 +427,12 @@ export default {
       // 删除资源
       deleteResourceModal: false,
       deleteResourceId: "",
+      //for share
+      shareModal: false,
+      sharedUrl: "",
+      sharedToken: "",
+      sharingEmail: "",
+      // panel
       panel: null
     };
   },
@@ -919,7 +973,69 @@ export default {
         return false;
       }
     },
-    dataVisualize() {}
+    dataVisualize() {},
+    generateToken() {
+      this.axios
+        .get("/GeoProblemSolving/token/getShareToken?duration=0")
+        .then(res => {
+          this.sharedToken = res.data;
+          this.sharedUrl =
+            "http://" +
+            this.$store.state.IP_Port +
+            "/share/"+this.stepInfo.stepId+"?tool=mindmap&token=" +
+            this.sharedToken;
+        })
+        .catch(err => {});
+    },
+    copySharedUrl() {
+      let url = this.sharedUrl;
+      var input = document.createElement("input");
+      input.style.opacity = 0;
+      input.style.position = "absolute";
+      input.style.left = "-100000px";
+      document.body.appendChild(input);
+
+      input.value = url;
+      input.select(); // 选择对象
+      input.setSelectionRange(0, url.length);
+      document.execCommand("Copy"); // 执行浏览器复制命令
+
+      document.body.removeChild(input);
+      this.$Notice.info({ desc: "Copy successfully." });
+    },
+    shareWorkspace() {
+      if (this.sharingEmail == "") {
+        this.$Notice.info({
+          desc: "Please fill in the email address."
+        });
+        return;
+      }
+
+      var url = this.sharedUrl;
+
+      //send url via email
+      var emailFormBody = {};
+      emailFormBody["recipient"] = this.sharingEmail;
+      emailFormBody["mailTitle"] = "Participatory workspace sharing";
+      emailFormBody["mailContent"] =
+        "Open the address:( " + url + " ), and check the latest work.";
+      axios
+        .post("/GeoProblemSolving/email/send", emailFormBody)
+        .then(res => {
+          if (res.data == "Success") {
+            this.$Notice.success({
+              desc: "The share has been sent successfully."
+            });
+          } else {
+            this.$Notice.error({
+              desc: "Failed to send the share."
+            });
+          }
+        })
+        .catch(err => {
+          console.log(err.data);
+        });
+    }
   }
 };
 </script>

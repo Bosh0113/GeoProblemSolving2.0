@@ -5,14 +5,14 @@
     <meta charset="utf-8">
     <title>Collaborative mindmap tool - Powered by KityMinder-Editor</title>
 
-    <link href="favicon.ico" type="image/x-icon" rel="shortcut icon">
+    <link href="../favicon.ico" type="image/x-icon" rel="shortcut icon">
 
     <!-- bower:css -->
-    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" />
-    <link rel="stylesheet" href="bower_components/codemirror/lib/codemirror.css" />
-    <link rel="stylesheet" href="bower_components/hotbox/hotbox.css" />
-    <link rel="stylesheet" href="node_modules/kityminder-core/dist/kityminder.core.css" />
-    <link rel="stylesheet" href="bower_components/color-picker/dist/color-picker.css" />
+    <link rel="stylesheet" href="../bower_components/bootstrap/dist/css/bootstrap.css" />
+    <link rel="stylesheet" href="../bower_components/codemirror/lib/codemirror.css" />
+    <link rel="stylesheet" href="../bower_components/hotbox/hotbox.css" />
+    <link rel="stylesheet" href="../node_modules/kityminder-core/dist/kityminder.core.css" />
+    <link rel="stylesheet" href="../bower_components/color-picker/dist/color-picker.css" />
     <!-- endbower -->
 
     <link rel="stylesheet" href="kityminder.editor.css">
@@ -60,39 +60,34 @@
 </head>
 
 <body ng-app="kityminderDemo" ng-controller="MainController">
-    <h1 class="editor-title">Collaborative mindmap tool - Powered by KityMinder-Editor
-        <collab-panel participants="participants" drawer="drawer" collaboration="collaboration" draw="draw"
-            leftApply="leftApply"></collab-panel>
-    </h1>
-    <kityminder-editor on-init="initEditor(editor, minder)" style="top:0px"></kityminder-editor>
-    <div id="edit-mask" style="width:100%;height: 100%; z-index: 100;position: absolute;display: none;"
-        title="Other user may be drawing the mind map">
-    </div>
+    <h1 class="editor-title">Collaborative mindmap tool <span style="font-size: 10px;"> - Powered by
+            KityMinder-Editor</span> <span style="float: right;">Note: Before using this tool, please login.</span></h1>
+    <kityminder-editor on-init="initEditor(editor, minder)"></kityminder-editor>
 </body>
 
 <!-- bower:js -->
-<script src="bower_components/jquery/dist/jquery.js"></script>
-<script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
-<script src="bower_components/angular/angular.js"></script>
-<script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
-<script src="bower_components/codemirror/lib/codemirror.js"></script>
-<script src="bower_components/codemirror/mode/xml/xml.js"></script>
-<script src="bower_components/codemirror/mode/javascript/javascript.js"></script>
-<script src="bower_components/codemirror/mode/css/css.js"></script>
-<script src="bower_components/codemirror/mode/htmlmixed/htmlmixed.js"></script>
-<script src="bower_components/codemirror/mode/markdown/markdown.js"></script>
-<script src="bower_components/codemirror/addon/mode/overlay.js"></script>
-<script src="bower_components/codemirror/mode/gfm/gfm.js"></script>
-<script src="bower_components/angular-ui-codemirror/ui-codemirror.js"></script>
-<script src="bower_components/marked/lib/marked.js"></script>
-<script src="node_modules/kity/dist/kity.js"></script>
-<script src="bower_components/hotbox/hotbox.js"></script>
-<script src="bower_components/json-diff/json-diff.js"></script>
-<script src="node_modules/kityminder-core/dist/kityminder.core.js"></script>
-<script src="bower_components/color-picker/dist/color-picker.js"></script>
-<script src="bower_components/seajs/dist/sea.js"></script>
-<script src="bower_components/angular/angular.js"></script>
-<script src="bower_components/angular-websocket/dist/angular-websocket.js"></script>
+<script src="../bower_components/jquery/dist/jquery.js"></script>
+<script src="../bower_components/bootstrap/dist/js/bootstrap.js"></script>
+<script src="../bower_components/angular/angular.js"></script>
+<script src="../bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+<script src="../bower_components/codemirror/lib/codemirror.js"></script>
+<script src="../bower_components/codemirror/mode/xml/xml.js"></script>
+<script src="../bower_components/codemirror/mode/javascript/javascript.js"></script>
+<script src="../bower_components/codemirror/mode/css/css.js"></script>
+<script src="../bower_components/codemirror/mode/htmlmixed/htmlmixed.js"></script>
+<script src="../bower_components/codemirror/mode/markdown/markdown.js"></script>
+<script src="../bower_components/codemirror/addon/mode/overlay.js"></script>
+<script src="../bower_components/codemirror/mode/gfm/gfm.js"></script>
+<script src="../bower_components/angular-ui-codemirror/ui-codemirror.js"></script>
+<script src="../bower_components/marked/lib/marked.js"></script>
+<script src="../node_modules/kity/dist/kity.js"></script>
+<script src="../bower_components/hotbox/hotbox.js"></script>
+<script src="../bower_components/json-diff/json-diff.js"></script>
+<script src="../node_modules/kityminder-core/dist/kityminder.core.js"></script>
+<script src="../bower_components/color-picker/dist/color-picker.js"></script>
+<script src="../bower_components/seajs/dist/sea.js"></script>
+<script src="../bower_components/angular/angular.js"></script>
+<script src="../bower_components/angular-websocket/dist/angular-websocket.js"></script>
 <!-- endbower -->
 
 <script src="kityminder.editor.js"></script>
@@ -102,8 +97,6 @@
 
     // 思维导图ID，标注唯一性
     var mindmapInfo = {};
-    var originalMap = "";
-    var currentMap = "";
 
     var app = angular.module('kityminderDemo', ['kityminderEditor', 'ngWebSocket']);
 
@@ -277,16 +270,6 @@
         };
     });
 
-    $(window).bind('beforeunload', function (e) {
-        if (originalMap !== currentMap) {
-            e = e || window.event;
-            e.returnValue = "Are you really leaving?";
-            return "Are you really leaving?";
-        }
-        else {
-            return;
-        }
-    });
 </script>
 
 </html>
