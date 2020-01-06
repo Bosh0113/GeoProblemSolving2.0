@@ -20,6 +20,7 @@
     <script src="/GeoProblemSolving/js/vuescroll.js"></script>
     <script src="/GeoProblemSolving/js/Sortable.min.js"></script>
     <script src="/GeoProblemSolving/js/vuedraggable.umd.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/jspanel4@4.2.1/dist/jspanel.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/jspanel4@4.2.1/dist/jspanel.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jspanel4@4.2.1/dist/extensions/modal/jspanel.modal.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jspanel4@4.2.1/dist/extensions/tooltip/jspanel.tooltip.js"></script>
@@ -240,7 +241,7 @@
         <div :style="{height: contentPageCSS}" style="margin-top: 60px;">
             <div span="2" style="height: inherit;width: 90px;position: absolute;">
                 <i-menu :active-name="activeMenu" @on-select="changeMenuItem"
-                        style="height: inherit;width: fit-content;">
+                        style="height: inherit;width: fit-content;z-index:99">
                     <menu-item name="projectOverview" class="projectMenuItem">
                         <Icon type="md-home" title="Overview" size="35"></Icon>
                     </menu-item>
@@ -2176,6 +2177,24 @@
                         }
                     });
                 },
+                showToolPanel(url, title){
+                    jsPanel.create({
+                        container: "#projectDetailPage",
+                        theme: "success",
+                        headerTitle: title,
+                        footerToolbar: '<p style="height:10px"></p>',
+                        contentSize: "800 400",
+                        content: url,
+                        disableOnMaximized: true,
+                        dragit: {
+                            containment: 5
+                        },
+                        onclosed: function(panel, status, closedByUser) {
+                            window.clearTimeout(null);
+                        },
+                    });
+                    $(".jsPanel-content").css("font-size", "0");//防止出现滚动条
+                }
             }
         }
     );

@@ -1,4 +1,7 @@
 <style scoped>
+#workCard >>> .ivu-card-body{
+  padding: 5px;
+}
 .btnHoverRed:hover {
   background-color: #ed4014;
   color: white;
@@ -15,20 +18,13 @@
 
 <template>
   <div>
-    <Card dis-hover>
+    <Card dis-hover id="workCard">
       <h1 slot="title">Workspace</h1>
       <div slot="extra">
         <Button icon="ios-share-alt" @click="shareModal=true" v-show="userRole=='Manager'">Share</Button>
       </div>
-      <div style="display: flex;">
-        <div style="width:300px;height:735px">
-          <vue-scroll :ops="ops">
-            <tool-container :stepInfo="stepInfo" :userRole="userRole"></tool-container>
-          </vue-scroll>
-        </div>
-        <div style="margin-left:10px" :style="{width:resourceWidth+'px'}">
+      <div>
           <data-list :stepInfo="stepInfo" :userRole="userRole"></data-list>
-        </div>
       </div>
       <div style="margin:5px 0 5px 80px;text-align:center">
         <Button
@@ -70,18 +66,15 @@
 </template>
 <script>
 import dataList from "./../workingSpace/noStep/dataList";
-import toolContainer from "./../workingSpace/noStep/toolContainer";
 import onlineParticipant from "./../workingSpace/functionSteps/utils/onlineParticipants";
 export default {
   props: ["projectInfo", "userRole"],
   components: {
     dataList,
-    toolContainer,
     onlineParticipant
   },
   created() {
     this.getStepInfo();
-    window.addEventListener("resize", this.initSize);
   },
   data() {
     return {
@@ -105,15 +98,9 @@ export default {
       sharedUrl: "",
       sharedToken: "",
       sharingEmail: "",
-      resourceWidth: window.innerWidth - 350
     };
   },
   methods: {
-    initSize() {
-      if (window.innerWidth > 1100) {
-        this.resourceWidth = window.innerWidth - 350;
-      }
-    },
     getStepInfo() {
       this.axios
         .get(

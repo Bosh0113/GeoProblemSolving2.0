@@ -61,7 +61,79 @@
 <template>
   <div>
     <Row>
-      <div style="margin-bottom:5px;width:100%">
+      <Col span="6">
+      <Tabs size="small">
+        <TabPane label="resource">
+          <div style="border: 1px solid #dcdee2;padding:0 5px 5px">
+            <div>
+              <div style="margin-top: 15px;">
+                <h4 style="display: inline-block;margin-left:10px">Resources</h4>
+                <Select
+                  v-model="resouceModel"
+                  size="small"
+                  @on-change="changeResModel"
+                  style="width:150px;margin:-10px 12px 0 15px"
+                >
+                  <Option value="resources">All resources</Option>
+                  <Option value="data">Data</Option>
+                  <Option value="materials">Related materials</Option>
+                </Select>
+                <Button
+                  shape="circle"
+                  icon="md-cloud-upload"
+                  @click="dataUploadModalShow"
+                  style="margin-top:-10px"
+                  title="Upload resources"
+                ></Button>
+              </div>
+            </div>
+            <div>
+              <Table
+                :columns="tableColName"
+                :data="fileList"
+                class="table"
+                v-show="fileList!=[] && fileList!='None'"
+                height="360"
+                size="small"
+              >
+                <template slot-scope="{ row }" slot="name">
+                  <strong>{{ row.name }}</strong>
+                </template>
+                <template slot-scope="{ row }" slot="action">
+                  <Button
+                    class="fileBtnHoverGreen"
+                    size="small"
+                    title="Check"
+                    @click="checkData(row)"
+                    icon="md-eye"
+                    shape="circle"
+                    type="text"
+                  ></Button>
+                  <Button
+                    class="fileBtnHoverRed"
+                    size="small"
+                    shape="circle"
+                    type="text"
+                    icon="md-close"
+                    title="Remove"
+                    @click="deleteResourceModalShow(row.resourceId)"
+                  ></Button>
+                </template>
+              </Table>
+            </div>
+          </div>
+        </TabPane>
+        <TabPane label="tools">
+          <div style="height:400px">
+            <vue-scroll :ops="ops">
+              <tool-container :stepInfo="stepInfo" :userRole="userRole"></tool-container>
+            </vue-scroll>
+          </div>
+        </TabPane>
+      </Tabs>
+      </Col>
+      <Col span="18">
+      <div style="margin-bottom:5px;margin-left:5px">
         <Card dis-hover>
           <div slot="title">
             <h4>Historical edits</h4>
@@ -119,64 +191,7 @@
           </div>
         </Card>
       </div>
-      <div style="border: 1px solid #dcdee2;padding:0 5px 5px">
-        <div style="height:30px">
-          <div style="margin-top: 15px;">
-            <h4 style="display: inline-block;margin-left:10px">Resources</h4>
-            <Select
-              v-model="resouceModel"
-              size="small"
-              @on-change="changeResModel"
-              style="width:150px;margin:-10px 12px 0 15px"
-            >
-              <Option value="resources">All resources</Option>
-              <Option value="data">Data</Option>
-              <Option value="materials">Related materials</Option>
-            </Select>
-            <Button
-              shape="circle"
-              icon="md-cloud-upload"
-              @click="dataUploadModalShow"
-              style="margin-top:-10px"
-              title="Upload resources"
-            ></Button>
-          </div>
-        </div>
-        <div>
-          <Table
-            :columns="tableColName"
-            :data="fileList"
-            class="table"
-            v-show="fileList!=[] && fileList!='None'"
-            height="200"
-            size="small"
-          >
-            <template slot-scope="{ row }" slot="name">
-              <strong>{{ row.name }}</strong>
-            </template>
-            <template slot-scope="{ row }" slot="action">
-              <Button
-                class="fileBtnHoverGreen"
-                size="small"
-                title="Check"
-                @click="checkData(row)"
-                icon="md-eye"
-                shape="circle"
-                type="text"
-              ></Button>
-              <Button
-                class="fileBtnHoverRed"
-                size="small"
-                shape="circle"
-                type="text"
-                icon="md-close"
-                title="Remove"
-                @click="deleteResourceModalShow(row.resourceId)"
-              ></Button>
-            </template>
-          </Table>
-        </div>
-      </div>
+      </Col>
     </Row>
     <Modal v-model="checkDataModal" title="Data Information" width="600">
       <Tabs>
@@ -295,8 +310,10 @@
 </template>
 <script>
 import Avatar from "vue-avatar";
+import toolContainer from ".//toolContainer";
 export default {
   components: {
+    toolContainer,
     Avatar
   },
   data() {
@@ -353,21 +370,20 @@ export default {
         {
           title: "Name",
           key: "name",
-          minWidth: 30,
+          minWidth: 50,
           tooltip: true,
           sortable: true
         },
         {
           title: "Type",
           key: "type",
-          width: 200,
           tooltip: true,
           sortable: true
         },
         {
           title: "Action",
           slot: "action",
-          width: 200,
+          width: 90,
           align: "center"
         }
       ],

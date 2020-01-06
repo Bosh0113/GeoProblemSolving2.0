@@ -45,7 +45,7 @@ public class ProjectDaoImpl implements IProjectDao {
     }
 
     @Override
-    public String createProject(ProjectEntity project) {
+    public Object createProject(ProjectEntity project) {
         Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         String projectId = UUID.randomUUID().toString();
@@ -80,7 +80,7 @@ public class ProjectDaoImpl implements IProjectDao {
         staticPagesBuilder.projectDetailPageBuilder(projectId);
         staticPagesBuilder.projectListPageBuilder();
 
-        return projectId;
+        return project;
     }
 
     @Override
@@ -506,16 +506,16 @@ public class ProjectDaoImpl implements IProjectDao {
             if(!userId.equals("")) {
                 criteriaManager = Criteria.where("managerId").is(userId);
                 if(category.equals("All")) {
-                    query = new Query(new Criteria().andOperator(Criteria.where("tag").regex(tagPattern),new Criteria().orOperator(criteriaDiscoverable,criteriaPublic,criteriaManager)));
+                    query = new Query(new Criteria().andOperator(Criteria.where("tag").regex(tagPattern),new Criteria().orOperator(criteriaDiscoverable,criteriaPublic,criteriaManager))).with(sort);
                 }else {
-                    query = new Query(new Criteria().andOperator(Criteria.where("category").is(category), Criteria.where("tag").regex(tagPattern), new Criteria().orOperator(criteriaDiscoverable,criteriaPublic,criteriaManager)));
+                    query = new Query(new Criteria().andOperator(Criteria.where("category").is(category), Criteria.where("tag").regex(tagPattern), new Criteria().orOperator(criteriaDiscoverable,criteriaPublic,criteriaManager))).with(sort);
                 }
             }
             else {
                 if(category.equals("All")) {
-                    query = new Query(new Criteria().andOperator(Criteria.where("tag").regex(tagPattern),new Criteria().orOperator(criteriaDiscoverable,criteriaPublic)));
+                    query = new Query(new Criteria().andOperator(Criteria.where("tag").regex(tagPattern),new Criteria().orOperator(criteriaDiscoverable,criteriaPublic))).with(sort);
                 }else {
-                    query = new Query(new Criteria().andOperator(Criteria.where("category").is(category), Criteria.where("tag").regex(tagPattern), new Criteria().orOperator(criteriaDiscoverable,criteriaPublic)));
+                    query = new Query(new Criteria().andOperator(Criteria.where("category").is(category), Criteria.where("tag").regex(tagPattern), new Criteria().orOperator(criteriaDiscoverable,criteriaPublic))).with(sort);
                 }
             }
             long count = mongoTemplate.count(query,ProjectEntity.class);

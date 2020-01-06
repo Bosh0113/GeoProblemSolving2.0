@@ -344,26 +344,27 @@ export default {
           this.stepInfo.stepId +
           '" style="width: 100%;height:100%;"></iframe>';
         var demoPanelTimer = null;
-        var panel = jsPanel.create({
-          theme: "success",
-          headerTitle: toolInfo.toolName,
-          footerToolbar: '<p style="height:10px"></p>',
-          contentSize: "800 400",
-          content: toolURL,
-          disableOnMaximized: true,
-          dragit: {
-            containment: 5
-          },
-          onclosed: function(panel, status, closedByUser) {
-            window.clearTimeout(demoPanelTimer);
-          },
-          callback: function() {
-            var that = this;
-            demoPanelTimer = window.setInterval(function() {
-              that.style.zIndex = "9999";
-            }, 1);
-          }
-        });
+        var panel = parent.vm.showToolPanel(toolURL, toolInfo.toolName);
+        // var panel = parent.jsPanel.create({
+        //   theme: "success",
+        //   headerTitle: toolInfo.toolName,
+        //   footerToolbar: '<p style="height:10px"></p>',
+        //   contentSize: "800 400",
+        //   content: toolURL,
+        //   disableOnMaximized: true,
+        //   dragit: {
+        //     containment: 5
+        //   },
+        //   onclosed: function(panel, status, closedByUser) {
+        //     window.clearTimeout(demoPanelTimer);
+        //   },
+        //   // callback: function() {
+        //   //   var that = this;
+        //   //   demoPanelTimer = window.setInterval(function() {
+        //   //     that.style.zIndex = "9999";
+        //   //   }, 1);
+        //   // }
+        // });
         // panel.resizeit("disable");
         $(".jsPanel-content").css("font-size", "0");
         this.panelList.push(panel);
