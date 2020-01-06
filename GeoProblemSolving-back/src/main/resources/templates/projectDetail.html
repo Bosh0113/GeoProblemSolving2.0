@@ -262,7 +262,7 @@
                 </i-menu>
             </div>
             <div style="margin-left: 90px;height: inherit;min-height: fit-content;">
-                <div v-if="activeMenu=='projectOverview'" style="height: inherit;min-height: fit-content;">
+                <div v-show="activeMenu=='projectOverview'" style="height: inherit;min-height: fit-content;">
                     <div style="background:#eee;padding: 10px;height: inherit;min-height: fit-content;">
                         <Card :bordered="false" dis-hover
                               style="height: -webkit-fill-available; flex-flow: column;min-height: fit-content;">
@@ -397,7 +397,7 @@
                         </Card>
                     </div>
                 </div>
-                <div v-else-if="activeMenu=='projectDetail'" style="height: inherit;min-height: fit-content;">
+                <div v-show="activeMenu=='projectDetail'" style="height: inherit;min-height: fit-content;">
                     <div style="background:#eee;padding: 10px;height: inherit;min-height: fit-content;">
                         <Card :bordered="false" dis-hover
                               style="height: -webkit-fill-available;flex-flow: column;min-height: fit-content;">
@@ -566,7 +566,7 @@
                         </Card>
                     </div>
                 </div>
-                <div v-else-if="activeMenu=='subProjects'" style="height: inherit;min-height: fit-content;">
+                <div v-show="activeMenu=='subProjects'" style="height: inherit;min-height: fit-content;">
                     <div style="background:#eee;padding: 10px;height: inherit;min-height: fit-content;">
                         <Card v-if="projectInfo.type=='type0'" :bordered="false" dis-hover
                               style="height: -webkit-fill-available;min-height: fit-content;">
@@ -676,7 +676,7 @@
                         </div>
                     </div>
                 </div>
-                <div v-else-if="activeMenu=='resources'" style="height: inherit;min-height: fit-content;">
+                <div v-show="activeMenu=='resources'" style="height: inherit;min-height: fit-content;">
                     <div style="background:#eee;padding: 10px;height: inherit;min-height: fit-content;">
                         <Card :bordered="false" dis-hover
                               style="height: -webkit-fill-available;min-height: 565px;min-height: fit-content;">
@@ -707,7 +707,7 @@
                         </Card>
                     </div>
                 </div>
-                <div v-else-if="activeMenu=='tasks'" style="height: inherit;min-height: fit-content;">
+                <div v-show="activeMenu=='tasks'" style="height: inherit;min-height: fit-content;">
                     <div style="background:#eee;padding: 10px;height: inherit;min-height: fit-content;">
                         <Card :bordered="false" dis-hover
                               style="height: -webkit-fill-available;min-height: 565px;min-height: fit-content;">
@@ -1320,7 +1320,21 @@
                     taskRole: "",
                     resetProjectTypeNotice:false,
                     resetProjectTypeModel:false,
-                    joinProjectNotice:false
+                    joinProjectNotice:false,
+                    workPanels: []
+                }
+            },
+            watch:{
+                activeMenu(val){
+                    if(val == "subProjects" && this.projectInfo.type !=""&&this.projectInfo.type !="type0"){
+                        this.workPanels.forEach(function(e){
+                            e.normalize();
+                        });
+                    }else{
+                        this.workPanels.forEach(function(e){
+                            e.minimize();
+                        });
+                    }
                 }
             },
             methods: {
@@ -2178,7 +2192,7 @@
                     });
                 },
                 showToolPanel(url, title){
-                    jsPanel.create({
+                    var panel = jsPanel.create({
                         container: "#pageBody",
                         theme: "success",
                         headerTitle: title,
@@ -2194,6 +2208,7 @@
                         },
                     });
                     $(".jsPanel-content").css("font-size", "0");//防止出现滚动条
+                    this.workPanels.push(panel);
                 }
             }
         }

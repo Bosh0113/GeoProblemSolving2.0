@@ -356,7 +356,7 @@ export default {
           '" style="width: 100%;height:100%;"></iframe>';
         var demoPanelTimer = null;
         if(this.scopeType=="project"){
-          var panel = parent.vm.showToolPanel(toolURL, toolInfo.toolName);
+          parent.vm.showToolPanel(toolURL, toolInfo.toolName);
         }
         else{
           var panel = parent.jsPanel.create({
@@ -381,9 +381,9 @@ export default {
           });
           // panel.resizeit("disable");
           $(".jsPanel-content").css("font-size", "0");
+          this.panelList.push(panel);
+          this.$emit("toolPanel", panel);
         }
-        this.panelList.push(panel);
-        this.$emit("toolPanel", panel);
 
         // 记录信息
         let toolRecords = {

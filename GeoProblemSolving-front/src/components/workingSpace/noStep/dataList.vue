@@ -785,27 +785,7 @@ export default {
           '" style="width: 100%;height:100%;"></iframe>';
       }
       var demoPanelTimer = null;
-      this.panel = jsPanel.create({
-        theme: "success",
-        headerTitle: toolInfo.toolName,
-        footerToolbar: '<p style="height:10px"></p>',
-        contentSize: "800 400",
-        content: toolURL,
-        disableOnMaximized: true,
-        dragit: {
-          containment: 5
-        },
-        onclosed: function() {
-          window.clearTimeout(demoPanelTimer);
-        },
-        callback: function() {
-          var that = this;
-          demoPanelTimer = window.setInterval(function() {
-            that.style.zIndex = "9999";
-          }, 1);
-        }
-      });
-      $(".jsPanel-content").css("font-size", "0");
+      this.showPanel(toolURL, toolInfo.toolName);
     },
     checkData(item) {
       if (this.userRole != "Visitor" && this.userRole != "Token") {
@@ -881,7 +861,7 @@ export default {
     },
     showPanel(url, title){
       if(this.scopeType=="project"){
-        this.panel = parent.vm.showToolPanel(url, title);
+        parent.vm.showToolPanel(url, title);
       }
       else{
         this.panel = jsPanel.create({
