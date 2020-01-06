@@ -285,6 +285,7 @@ export default {
       this.showList = this.allSelectedList.slice(_start, _end);
     },
     show(index) {
+      var res = this.showList[index];
       let name = this.showList[index].name;
       if (/\.(doc|docx|xls|xlsx|ppt|pptx)$/.test(name.toLowerCase())) {
         this.$Modal.confirm({

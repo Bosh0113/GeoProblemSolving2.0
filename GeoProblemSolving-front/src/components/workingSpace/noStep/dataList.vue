@@ -310,7 +310,7 @@
 </template>
 <script>
 import Avatar from "vue-avatar";
-import toolContainer from ".//toolContainer";
+import toolContainer from "./toolContainer";
 export default {
   components: {
     toolContainer,
@@ -395,7 +395,8 @@ export default {
       // 删除资源
       deleteResourceModal: false,
       deleteResourceId: "",
-      panel: null
+      panel: null,
+      scopeType:'subproject'
     };
   },
   props: ["stepInfo", "userRole"],
@@ -409,9 +410,9 @@ export default {
       this.getResList();
     }
   },
-  created() {},
+  created() {
+  },
   mounted() {
-    console.log(this.userRole);
     this.getResList();
 
     $(".__view").css("width", "inherit");
@@ -444,6 +445,12 @@ export default {
   },
   methods: {
     getResList() {
+      if(this.stepInfo.subProjectId==null||this.stepInfo.subProjectId==""||this.stepInfo.subProjectId==undefined){
+        this.scopeType = "project";
+      }
+      else{
+        this.scopeType = "subproject";
+      }
       var list = [];
       if (this.stepInfo.stepId != "" && this.stepInfo.stepId != undefined) {
         $.ajax({
@@ -836,28 +843,7 @@ export default {
               url +
               ' style="width: 100%;height:100%"></iframe>';
             var demoPanelTimer = null;
-            this.panel = jsPanel.create({
-              headerControls: {
-                smallify: "remove"
-              },
-              theme: "primary",
-              footerToolbar: '<p style="height:5px"></p>',
-              headerTitle: "Preview",
-              contentSize: "800 600",
-              content: toolURL,
-              disableOnMaximized: true,
-              dragit: {
-                containment: 5
-              },
-              closeOnEscape: true,
-              callback: function() {
-                var that = this;
-                demoPanelTimer = window.setInterval(function() {
-                  that.style.zIndex = "9999";
-                }, 1);
-              }
-            });
-            $(".jsPanel-content").css("font-size", "0");
+            this.showPanel(toolURL, res.name);
           },
           onCancel: () => {
             return;
@@ -873,28 +859,7 @@ export default {
           url +
           ' style="width: 100%;height:100%" controls></video>';
         var demoPanelTimer = null;
-        this.panel = jsPanel.create({
-          headerControls: {
-            smallify: "remove"
-          },
-          theme: "primary",
-          footerToolbar: '<p style="height:10px"></p>',
-          headerTitle: "Preview",
-          contentSize: "800 600",
-          content: toolURL,
-          disableOnMaximized: true,
-          dragit: {
-            containment: 5
-          },
-          closeOnEscape: true,
-          callback: function() {
-            var that = this;
-            demoPanelTimer = window.setInterval(function() {
-              that.style.zIndex = "9999";
-            }, 1);
-          }
-        });
-        $(".jsPanel-content").css("font-size", "0");
+        this.showPanel(toolURL, res.name);
       } else if (/\.(pdf|json|md|gif|jpg|png)$/.test(name.toLowerCase())) {
         if (this.panel != null) {
           this.panel.close();
@@ -905,34 +870,42 @@ export default {
           url +
           ' style="width: 100%;height:100%" controls></iframe>';
         var demoPanelTimer = null;
-        this.panel = jsPanel.create({
-          headerControls: {
-            smallify: "remove"
-          },
-          theme: "primary",
-          footerToolbar: '<p style="height:10px"></p>',
-          headerTitle: "Preview",
-          contentSize: "800 600",
-          content: toolURL,
-          disableOnMaximized: true,
-          dragit: {
-            containment: 5
-          },
-          closeOnEscape: true,
-          callback: function() {
-            var that = this;
-            demoPanelTimer = window.setInterval(function() {
-              that.style.zIndex = "9999";
-            }, 1);
-          }
-        });
-        $(".jsPanel-content").css("font-size", "0");
+        this.showPanel(toolURL, res.name);
       } else {
         this.$Notice.error({
           title: "Open failed",
           desc: "Sorry. Unsupported file format."
         });
         return false;
+      }
+    },
+    showPanel(url, title){
+      if(this.scopeType=="project"){
+        this.panel = parent.vm.showToolPanel(url, title);
+      }
+      else{
+        this.panel = jsPanel.create({
+          headerControls: {
+            smallify: "remove"
+          },
+          theme: "primary",
+          footerToolbar: '<p style="height:5px"></p>',
+          headerTitle: title,
+          contentSize: "800 600",
+          content: url,
+          disableOnMaximized: true,
+          dragit: {
+            containment: 5
+          },
+          closeOnEscape: true,
+          // callback: function() {
+          //   var that = this;
+          //   demoPanelTimer = window.setInterval(function() {
+          //     that.style.zIndex = "9999";
+          //   }, 1);
+          // }
+        });
+        $(".jsPanel-content").css("font-size", "0");
       }
     },
     dataVisualize() {}
