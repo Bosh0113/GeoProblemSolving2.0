@@ -14,14 +14,14 @@ public class TokenController {
     private MongoTemplate mongoTemplate;
 
     @RequestMapping(value = "/getShareToken", produces = {"application/json;charset=UTF-8"}, method = RequestMethod.GET)
-    public String getShareToken(@RequestParam("duration") long ttlMillis){
+    public String getShareToken(@RequestParam("groupId") String groupId, @RequestParam("resourceId") String resourceId, @RequestParam("duration") long ttlMillis){
         ShareTokenDaoImpl shareTokenDao = new ShareTokenDaoImpl(mongoTemplate);
-        return shareTokenDao.getShareToken(ttlMillis);
+        return shareTokenDao.getShareToken(groupId,resourceId,ttlMillis);
     }
 
     @RequestMapping(value = "/checkShareToken", produces = {"application/json;charset=UTF-8"}, method = RequestMethod.GET)
-    public Boolean checkShareToken(@RequestParam("shareToken") String shareToken){
+    public Object checkShareToken(@RequestParam("shareToken") String tokenId){
         ShareTokenDaoImpl shareTokenDao = new ShareTokenDaoImpl(mongoTemplate);
-        return shareTokenDao.checkShareToken(shareToken);
+        return shareTokenDao.checkShareToken(tokenId);
     }
 }
