@@ -1,6 +1,8 @@
 package cn.edu.njnu.geoproblemsolving.Controller;
 
 import cn.edu.njnu.geoproblemsolving.Dao.ShareToken.ShareTokenDaoImpl;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,10 +15,10 @@ public class TokenController {
     @Resource
     private MongoTemplate mongoTemplate;
 
-    @RequestMapping(value = "/getShareToken", produces = {"application/json;charset=UTF-8"}, method = RequestMethod.GET)
-    public String getShareToken(@RequestParam("groupId") String groupId, @RequestParam("resourceId") String resourceId, @RequestParam("duration") long ttlMillis){
+    @RequestMapping(value = "/getShareToken", produces = {"application/json;charset=UTF-8"}, method = RequestMethod.POST)
+    public String getShareToken(@RequestBody JSONObject info, @RequestParam("duration") long ttlMillis){
         ShareTokenDaoImpl shareTokenDao = new ShareTokenDaoImpl(mongoTemplate);
-        return shareTokenDao.getShareToken(groupId,resourceId,ttlMillis);
+        return shareTokenDao.getShareToken(info,ttlMillis);
     }
 
     @RequestMapping(value = "/checkShareToken", produces = {"application/json;charset=UTF-8"}, method = RequestMethod.GET)

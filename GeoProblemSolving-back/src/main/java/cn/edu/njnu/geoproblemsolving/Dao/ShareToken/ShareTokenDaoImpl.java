@@ -25,14 +25,11 @@ public class ShareTokenDaoImpl {
     @Autowired
     public ShareTokenDaoImpl(MongoTemplate mongoTemplate){this.mongoTemplate = mongoTemplate;}
 
-    public String getShareToken(String groupId, String resourceId, long ttlMillis){
+    public String getShareToken(JSONObject info, long ttlMillis){
 
         //暂时只是记录了时间和有效时间，后面按需应该限制使用范围
         long nowMillis = System.currentTimeMillis();
         Date now = new Date(nowMillis);
-        JSONObject info = new JSONObject();
-        info.put("groupId", groupId);
-        info.put("resourceId", resourceId);
 
         SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
         byte[] apiKey = DatatypeConverter.parseBase64Binary("opengms");
