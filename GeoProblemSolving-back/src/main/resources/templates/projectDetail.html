@@ -234,7 +234,7 @@
     </style>
 </head>
 
-<body>
+<body id="pageBody">
 <div id="projectDetailPage" v-cloak>
     <child-navigation ref="navigationEl" active-type="projects" :user-info="userInfo"></child-navigation>
     <template>
@@ -2179,7 +2179,7 @@
                 },
                 showToolPanel(url, title){
                     jsPanel.create({
-                        container: "#projectDetailPage",
+                        container: "#pageBody",
                         theme: "success",
                         headerTitle: title,
                         footerToolbar: '<p style="height:10px"></p>',
