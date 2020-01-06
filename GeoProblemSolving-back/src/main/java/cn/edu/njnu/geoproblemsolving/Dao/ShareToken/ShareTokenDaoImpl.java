@@ -9,6 +9,8 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
 import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
 public class ShareTokenDaoImpl {
 
@@ -23,7 +25,7 @@ public class ShareTokenDaoImpl {
         long nowMillis = System.currentTimeMillis();
         Date now = new Date(nowMillis);
 
-        JwtBuilder builder = Jwts.builder().setIssuedAt(now);
+        JwtBuilder builder = Jwts.builder().setIssuedAt(now).setSubject(UUID.randomUUID().toString());
 
         if (ttlMillis>0){
             long expMillis = nowMillis+ttlMillis;
@@ -31,7 +33,7 @@ public class ShareTokenDaoImpl {
             builder.setExpiration(exp);
         }
 
-        String shareTokenStr = builder.compact();
+        String shareTokenStr = builder.compact().split("\\.")[1];
 
         ShareTokenEntity shareTokenEntity = new ShareTokenEntity();
         shareTokenEntity.setToken(shareTokenStr);
