@@ -284,41 +284,41 @@ export default {
 
       document.body.removeChild(input);
       this.$Notice.info({ desc: "Copy successfully." });
+    },
+    shareWorkspace() {
+        if (this.sharingEmail == "") {
+        this.$Notice.info({
+            desc: "Please fill in the email address."
+        });
+        return;
+        }
+
+        var url = this.sharedUrl;
+
+        //send url via email
+        var emailFormBody = {};
+        emailFormBody["recipient"] = this.sharingEmail;
+        emailFormBody["mailTitle"] = "Participatory workspace sharing";
+        emailFormBody["mailContent"] =
+        "Open the address:( " + url + " ), and check the latest work progress.";
+        this.axios
+        .post("/GeoProblemSolving/email/send", emailFormBody)
+        .then(res => {
+            if (res.data == "Success") {
+            this.$Notice.success({
+                desc: "The share has been sent successfully."
+            });
+            this.shareModal = false;
+            } else {
+            this.$Notice.error({
+                desc: "Failed to send the share."
+            });
+            }
+        })
+        .catch(err => {
+            console.log(err.data);
+        });
     }
   },
-  shareWorkspace() {
-    if (this.sharingEmail == "") {
-      this.$Notice.info({
-        desc: "Please fill in the email address."
-      });
-      return;
-    }
-
-    var url = this.sharedUrl + "&" + this.sharedToken;
-
-    //send url via email
-    var emailFormBody = {};
-    emailFormBody["recipient"] = this.sharingEmail;
-    emailFormBody["mailTitle"] = "Participatory workspace sharing";
-    emailFormBody["mailContent"] =
-      "Open the address:( " + url + " ), and check the latest work progress.";
-    axios
-      .post("/GeoProblemSolving/email/invite", emailFormBody)
-      .then(res => {
-        if (res.data == "Success") {
-          this.$Notice.success({
-            desc: "The share has been sent successfully."
-          });
-          this.inviteModal = false;
-        } else {
-          this.$Notice.error({
-            desc: "Failed to send the share."
-          });
-        }
-      })
-      .catch(err => {
-        console.log(err.data);
-      });
-  }
 };
 </script>
