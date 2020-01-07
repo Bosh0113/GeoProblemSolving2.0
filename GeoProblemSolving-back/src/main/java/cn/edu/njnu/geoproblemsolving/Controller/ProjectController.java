@@ -17,7 +17,7 @@ public class ProjectController {
     private MongoTemplate mongoTemplate;
 
     @RequestMapping(value = "/create", produces = {"application/json;charset=UTF-8"}, method = RequestMethod.POST)
-    public String createProject(@RequestBody ProjectEntity project) {
+    public Object createProject(@RequestBody ProjectEntity project) {
         ProjectDaoImpl projectDao = new ProjectDaoImpl(mongoTemplate);
         try {
             return projectDao.createProject(project);

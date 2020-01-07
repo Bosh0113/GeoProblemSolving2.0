@@ -6,7 +6,7 @@ import cn.edu.njnu.geoproblemsolving.Entity.ProjectEntity;
 import javax.servlet.http.HttpServletRequest;
 
 public interface IProjectDao {
-    String createProject(ProjectEntity project);
+    Object createProject(ProjectEntity project);
 
     Object readProject(String key, String value);
 
