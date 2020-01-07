@@ -1,6 +1,6 @@
 /*!
  * ====================================================
- * kityminder-editor - v1.0.67 - 2020-01-07
+ * kityminder-editor - v1.0.67 - 2020-01-08
  * https://github.com/fex-team/kityminder-editor
  * GitHub: https://github.com/fex-team/kityminder-editor 
  * Copyright (c) 2020 ; Licensed 
@@ -3781,6 +3781,8 @@ angular.module('kityminderEditor')
 
                 function mapDownload(map) {
                     var a = document.createElement("a");
+                    a.download = map.name;
+                    a.target="_blank";
                     a.href = 'http://' + RouteInfo.getIPPort() + map.pathURL;
                     $("body").append(a);
                     a.click();

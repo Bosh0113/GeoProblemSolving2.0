@@ -5500,9 +5500,7 @@ angular.module('kityminderEditor')
                                 if (xhr.status == 200) {
                                     var file = xhr.response;
 
-                                    editor.minder.importData(fileType, file).then(function (data) {
-                                        $(fileInput).val('');
-
+                                    editor.minder.importData(fileType, file).then(function () {
                                         // 初始化原始导图
                                         originalMap = JSON.stringify(editor.minder.exportJson());
                                     });
@@ -5572,6 +5570,8 @@ angular.module('kityminderEditor')
                 function mapDownload(map) {
 
                     var a = document.createElement("a");
+                    a.download = map.name;
+                    a.target="_blank";
                     a.href = 'http://' + RouteInfo.getIPPort() + map.pathURL;
                     $("body").append(a);
                     a.click();

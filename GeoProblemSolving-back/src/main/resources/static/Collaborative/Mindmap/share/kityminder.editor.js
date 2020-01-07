@@ -1,6 +1,6 @@
 /*!
  * ====================================================
- * kityminder-editor - v1.0.67 - 2020-01-07
+ * kityminder-editor - v1.0.67 - 2020-01-08
  * https://github.com/fex-team/kityminder-editor
  * GitHub: https://github.com/fex-team/kityminder-editor 
  * Copyright (c) 2020 ; Licensed 
@@ -3139,20 +3139,52 @@ angular.module('kityminderEditor')
 						// init map
 						var info = RouteInfo.getInfo();
 						if (info.resourceId != "") {
-							updateMaplist(info.resourceId);
+							// updateMaplist(info.resourceId);
+							// function updateMaplist(resourceId) {
+							// 	var map = {};
+							// 	try {
+							// 		$.ajax({
+							// 			url: 'http://' + RouteInfo.getIPPort() + '/GeoProblemSolving/resource/inquiry?key=resourceId&value=' + resourceId,
+							// 			type: "GET",
+							// 			async: false,
+							// 			success: function (data) {
+							// 				if (data !== "Fail" && data !== "None") {
+							// 					map = data[0];
+							// 					mapImport(map);
+							// 				}
+							// 			},
+							// 			error: function (err) {
+							// 				console.log("fail.");
+							// 			}
+							// 		});
+							// 	}
+							// 	catch (ex) {
+							// 		console.log("fail")
+							// 	}
+							// }
 
-							function updateMaplist(resourceId) {
+							updateMaplist();
+							function updateMaplist() {
 								var map = {};
 								try {
 									$.ajax({
-										url: 'http://' + RouteInfo.getIPPort() + '/GeoProblemSolving/resource/inquiry?key=resourceId&value=' + resourceId,
+										url: 'http://' + RouteInfo.getIPPort() + '/GeoProblemSolving/folder/inquiry?folderId=' + info.pageId,
 										type: "GET",
 										async: false,
 										success: function (data) {
-											if (data !== "Fail" && data !== "None") {
-												map = data[0];
-												mapImport(map);
+											if (data == "Fail") {
+												console.log(data);
 											}
+											else if (data.files.length != undefined) {
+												for (var i = data.files.length - 1; i >= 0; i--) {
+													if (data.files[i].type == "toolData:Mindmap") {
+														map = data.files[i];
+														mapImport(map);
+														break;
+													}
+												}
+											}
+
 										},
 										error: function (err) {
 											console.log("fail.");
