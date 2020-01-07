@@ -73,7 +73,7 @@
     <Row>
       <Col span="6">
       <Tabs size="small">
-        <TabPane label="resource">
+        <TabPane label="Resources">
           <div style="border: 1px solid #dcdee2;padding:0 5px 5px">
             <div>
               <div style="margin-top: 15px;">
@@ -134,7 +134,7 @@
             </div>
           </div>
         </TabPane>
-        <TabPane label="tools">
+        <TabPane label="Tools">
           <div style="height:400px">
             <vue-scroll :ops="ops">
               <tool-container :stepInfo="stepInfo" :userRole="userRole"></tool-container>
@@ -460,7 +460,9 @@ export default {
   watch: {
     checkDataModal(value) {
       if (!value) {
-        this.panel.close();
+        if (this.panel != null) {
+          this.panel.close();
+        }
       }
     },
     stepInfo() {

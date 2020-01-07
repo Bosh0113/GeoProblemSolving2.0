@@ -1,9 +1,8 @@
 package cn.edu.njnu.geoproblemsolving.View;
+import cn.edu.njnu.geoproblemsolving.Dao.Project.ProjectDaoImpl;
 import cn.edu.njnu.geoproblemsolving.Entity.ProjectEntity;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -16,7 +15,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.OutputStreamWriter;
-import java.util.List;
 
 @Component
 public class StaticPagesBuilder {
@@ -66,18 +64,8 @@ public class StaticPagesBuilder {
         TemplateEngine templateEngine = new TemplateEngine();
         templateEngine.setTemplateResolver(resolver);
 
-        int pageSize = 18;
-        Pageable pageable = PageRequest.of(0,pageSize);
-        Criteria criteriaPublic = Criteria.where("privacy").is("Public");
-        Criteria criteriaDiscoverable = Criteria.where("privacy").is("Discoverable");
-        Query query = new Query(new Criteria().orOperator(criteriaDiscoverable, criteriaPublic)).with(pageable);
-        List<ProjectEntity> projects = mongoTemplate.find(query, ProjectEntity.class);
-        long count = mongoTemplate.count(query,ProjectEntity.class);
-        int totalPage = (int)Math.ceil((double) count/(double) pageSize);
-        JSONObject result = new JSONObject();
-        result.fluentPut("totalPage",totalPage);
-        result.fluentPut("count",count);
-        result.fluentPut("projectList",projects);
+        ProjectDaoImpl projectDao = new ProjectDaoImpl(mongoTemplate);
+        JSONObject result = (JSONObject)projectDao.inquiryByPage("All", "", 1, 18, "");
 
         Context context = new Context();
         context.setVariable("projectsInfo", result);

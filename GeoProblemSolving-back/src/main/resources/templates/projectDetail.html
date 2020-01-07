@@ -2192,6 +2192,7 @@
                     });
                 },
                 showToolPanel(url, title){
+                    var that = this;
                     var panel = jsPanel.create({
                         container: "#pageBody",
                         theme: "success",
@@ -2208,7 +2209,8 @@
                         return confirm("Please confirm your edit has been saved?");
                         },
                         onclosed: function(panel, status, closedByUser) {
-                            window.clearTimeout(null);
+                            var index = that.workPanels.indexOf(this);
+                            that.workPanels.splice(index, 1);
                         },
                     });
                     $(".jsPanel-content").css("font-size", "0");//防止出现滚动条

@@ -489,7 +489,7 @@ public class ProjectDaoImpl implements IProjectDao {
     }
 
     @Override
-    public Object inquiryByPage(String category, String tag, int page, int pageSize, String userId, String[] joinedProjects){
+    public Object inquiryByPage(String category, String tag, int page, int pageSize, String userId, String... joinedProjects){
         try {
             Sort sort = new Sort(Sort.Direction.DESC,"createTime");
             if(tag.equals("GIS-RS")){
