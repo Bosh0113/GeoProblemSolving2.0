@@ -83,7 +83,7 @@ define(function(require, exports, module) {
             // 屏蔽minder的事件接受，删除receiver和hotbox
             minder.disable();
             editor.receiver.element.parentElement.removeChild(editor.receiver.element);
-            editor.hotbox.$container.removeChild(editor.hotbox.$element);
+            // editor.hotbox.$container.removeChild(editor.hotbox.$element);
         });
 
         // 侦听器，接收到的事件会派发给所有侦听器
