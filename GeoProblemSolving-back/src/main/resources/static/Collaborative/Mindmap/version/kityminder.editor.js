@@ -2105,12 +2105,12 @@ angular.module('kityminderEditor').run(['$templateCache', function($templateCach
 
 
   $templateCache.put('ui/directive/fileImport/fileImport.html',
-    "<div class=\"btn-group-vertical\" dropdown is-open=\"isopen\"><button type=\"button\" class=\"btn btn-default import\" title=\"{{ 'import' | lang:'ui' }}\" ng-class=\"{'active': isopen}\" data-toggle=\"modal\" data-target=\"#importModal\" ng-click=\"updateMaplist()\"></button> <button type=\"button\" class=\"btn btn-default import-caption dropdown-toggle\" data-toggle=\"modal\" data-target=\"#importModal\" title=\"{{ 'import' | lang:'ui' }}\" ng-click=\"updateMaplist()\"><span class=\"caption\">{{ 'import' | lang:'ui' }}</span> <span class=\"sr-only\">{{ 'import' | lang:'ui' }}</span></button><div class=\"modal fade\" id=\"importModal\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"myModalLabel\" aria-hidden=\"true\"><div class=\"modal-dialog\" style=\"width: 800px\"><div class=\"modal-content\"><div class=\"modal-header\"><button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button><h4 class=\"modal-title\" id=\"myModalLabel\">Import mind map</h4></div><div class=\"modal-body\" style=\"font-size: 12px\"><div style=\"width: 95%; margin: auto; border: 1px solid gray\"><table class=\"table\" style=\"width: 90%; margin: auto\"><caption style=\"font-size: 14px;font-weight: 600;color:#333\">Open mindmap from resource center:</caption><thead><tr><th style=\"width: 20%\">Name</th><th style=\"width: 20%\">Type</th><th style=\"width: 40%\">Description</th><th style=\"width: 20%\">Operation</th></tr></thead></table><div style=\"min-height:100px;max-height: 400px; overflow-y: auto\"><table class=\"table\" style=\"width: 90%;margin: auto\"><tbody><tr ng-repeat=\"item in mindmapRes\"><td style=\"width: 20%; overflow: hidden; word-break: break-word\">{{item.name}}</td><td style=\"width: 20%\">{{item.type}}</td><td style=\"width: 40%; overflow: hidden; word-break: break-word\">{{item.description}}</td><td style=\"width: 20%\"><span style=\"cursor:pointer\" class=\"glyphicon glyphicon-ok-circle\" title=\"Load this mindmap\" ng-click=\"mapLoad(item)\"></span> <span style=\"cursor:pointer; margin-left: 10px\" class=\"glyphicon glyphicon-download\" title=\"Load this mindmap\" ng-click=\"mapDownload(item)\"></span> <span style=\"cursor:pointer; margin-left: 10px\" class=\"glyphicon glyphicon-remove-circle\" title=\"Delete this mindmap\" ng-click=\"deleteMap(item)\"></span></td></tr></tbody></table></div></div><hr><div style=\"width: 90%; margin: auto\"><span style=\"font-size: 14px;font-weight: 600\">Open your own mindmap:</span> <input type=\"file\" id=\"fileInput\" style=\"margin-top: 15px\"><button type=\"button\" class=\"btn btn-info\" style=\"margin-top: 15px\" ng-click=\"mapImport()\">Upload</button></div></div><div class=\"modal-footer\"><button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Close</button></div></div></div></div></div>"
+    "<div class=\"btn-group-vertical\" dropdown is-open=\"isopen\"><button type=\"button\" class=\"btn btn-default import\" title=\"{{ 'import' | lang:'ui' }}\" ng-class=\"{'active': isopen}\" data-toggle=\"modal\" data-target=\"#importModal\" ng-click=\"updateMaplist()\"></button> <button type=\"button\" class=\"btn btn-default import-caption dropdown-toggle\" data-toggle=\"modal\" data-target=\"#importModal\" title=\"{{ 'import' | lang:'ui' }}\" ng-click=\"updateMaplist()\"><span class=\"caption\">{{ 'import' | lang:'ui' }}</span> <span class=\"sr-only\">{{ 'import' | lang:'ui' }}</span></button><div class=\"modal fade\" id=\"importModal\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"myModalLabel\" aria-hidden=\"true\"><div class=\"modal-dialog\" style=\"width: 800px\"><div class=\"modal-content\"><div class=\"modal-header\"><button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button><h4 class=\"modal-title\" id=\"myModalLabel\">Import mind map</h4></div><div class=\"modal-body\" style=\"font-size: 12px\"><div style=\"width: 95%; margin: auto; border: 1px solid gray\"><table class=\"table\" style=\"width: 90%; margin: auto\"><caption style=\"font-size: 14px;font-weight: 600;color:#333\">Open mindmap from resource center:</caption><thead><tr><th style=\"width: 20%\">Name</th><th style=\"width: 20%\">Type</th><th style=\"width: 40%\">Description</th><th style=\"width: 20%\">Operation</th></tr></thead></table><div style=\"min-height:100px;max-height: 400px; overflow-y: auto\"><table class=\"table\" style=\"width: 90%;margin: auto\"><tbody><tr ng-repeat=\"item in mindmapRes\"><td style=\"width: 20%; overflow: hidden; word-break: break-word\">{{item.name}}</td><td style=\"width: 20%\">{{item.type}}</td><td style=\"width: 40%; overflow: hidden; word-break: break-word\">{{item.description}}</td><td style=\"width: 20%\"><span style=\"cursor:pointer\" class=\"glyphicon glyphicon-ok-circle\" title=\"Load this mindmap\" ng-click=\"mapLoad(item)\"></span> <span style=\"cursor:pointer; margin-left: 20px\" class=\"glyphicon glyphicon-remove-circle\" title=\"Delete this mindmap\" ng-click=\"deleteMap(item)\"></span></td></tr></tbody></table></div></div></div><div class=\"modal-footer\"><button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Close</button></div></div></div></div></div>"
   );
 
 
   $templateCache.put('ui/directive/fileSave/fileSave.html',
-    "<div class=\"btn-group-vertical\" dropdown is-open=\"isopen\"><button type=\"button\" class=\"btn btn-default save\" title=\"{{ 'save' | lang:'ui' }}\" ng-class=\"{'active': isopen}\"></button> <button type=\"button\" class=\"btn btn-default save-caption dropdown-toggle\" title=\"{{ 'save' | lang:'ui' }}\" dropdown-toggle><span class=\"caption\">{{ 'save' | lang:'ui' }}</span> <span class=\"caret\"></span> <span class=\"sr-only\">{{ 'save' | lang:'ui' }}</span></button><ul class=\"dropdown-menu\" role=\"menu\"><li data-toggle=\"modal\" ng-click=\"saveMapFun()\"><a href>Save (Save to current version)</a></li><li data-toggle=\"modal\" data-target=\"#saveasModal\"><a href>Save as (Save as a new file)</a></li></ul><div class=\"modal fade\" id=\"saveasModal\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"myModalLabel\" aria-hidden=\"true\"><div class=\"modal-dialog\"><div class=\"modal-content\"><div class=\"modal-header\"><button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button><h4 class=\"modal-title\" id=\"myModalLabel\">Save mind map</h4></div><div class=\"modal-body\"><div><span style=\"font-size: 16px; margin-right: 20px\">Save the current mind map as format:</span><select class=\"form-control\" style=\"width:100px; display: initial\" id=\"datatypeSelect\"><option>json</option><option>md</option><option>km</option><option>png</option></select></div><div class=\"input-group\" style=\"margin-top: 20px\"><span class=\"input-group-addon\">File name:</span> <input type=\"text\" class=\"form-control\" id=\"mindmapName\" placeholder=\"Please fill in the name\"></div></div><div class=\"modal-footer\"><button type=\"button\" class=\"btn btn-primary\" data-dismiss=\"modal\" ng-click=\"saveasMapFun()\">Save as</button> <button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Close</button></div></div></div></div></div>"
+    "<div class=\"btn-group-vertical\" dropdown is-open=\"isopen\"><button type=\"button\" class=\"btn btn-default save\" title=\"{{ 'save' | lang:'ui' }}\" ng-class=\"{'active': isopen}\" ng-click=\"saveMapFun(item)\"></button> <button type=\"button\" class=\"btn btn-default save-caption\" title=\"{{ 'save' | lang:'ui' }}\" ng-click=\"saveMapFun(item)\"><span class=\"caption\">{{ 'save' | lang:'ui' }}</span> <span class=\"sr-only\">{{ 'save' | lang:'ui' }}</span></button></div>"
   );
 
 
@@ -2235,7 +2235,7 @@ angular.module('kityminderEditor').run(['$templateCache', function($templateCach
 
 
   $templateCache.put('ui/directive/topTab/topTab.html',
-    "<tabset><tab heading=\"{{ 'file' | lang: 'ui/tabs'; }}\" ng-click=\"toggleTopTab('file')\" select=\"setCurTab('file')\"><file-import minder=\"minder\"></file-import><file-save minder=\"minder\"></file-save><version-manager minder=\"minder\"></version-manager></tab><tab heading=\"{{ 'idea' | lang: 'ui/tabs'; }}\" ng-click=\"toggleTopTab('idea')\" select=\"setCurTab('idea')\"><undo-redo editor=\"editor\"></undo-redo><append-node minder=\"minder\"></append-node><arrange minder=\"minder\"></arrange><operation minder=\"minder\"></operation><hyper-link minder=\"minder\"></hyper-link><image-btn minder=\"minder\"></image-btn><note-btn minder=\"minder\"></note-btn><priority-editor minder=\"minder\"></priority-editor><progress-editor minder=\"minder\"></progress-editor><resource-editor minder=\"minder\"></resource-editor></tab><tab heading=\"{{ 'appearence' | lang: 'ui/tabs'; }}\" ng-click=\"toggleTopTab('appearance')\" select=\"setCurTab('appearance')\"><template-list minder=\"minder\" class=\"inline-directive\"></template-list><theme-list minder=\"minder\"></theme-list><layout minder=\"minder\" class=\"inline-directive\"></layout><style-operator minder=\"minder\" class=\"inline-directive\"></style-operator><font-operator minder=\"minder\" class=\"inline-directive\"></font-operator></tab><tab heading=\"{{ 'view' | lang: 'ui/tabs'; }}\" ng-click=\"toggleTopTab('view')\" select=\"setCurTab('view')\"><expand-level minder=\"minder\"></expand-level><select-all minder=\"minder\"></select-all><search-btn minder=\"minder\"></search-btn></tab></tabset>"
+    "<tabset><tab heading=\"{{ 'file' | lang: 'ui/tabs'; }}\" ng-click=\"toggleTopTab('file')\" select=\"setCurTab('file')\"><version-manager minder=\"minder\"></version-manager><file-save minder=\"minder\"></file-save></tab><tab heading=\"{{ 'idea' | lang: 'ui/tabs'; }}\" ng-click=\"toggleTopTab('idea')\" select=\"setCurTab('idea')\"><undo-redo editor=\"editor\"></undo-redo><append-node minder=\"minder\"></append-node><arrange minder=\"minder\"></arrange><operation minder=\"minder\"></operation><hyper-link minder=\"minder\"></hyper-link><image-btn minder=\"minder\"></image-btn><note-btn minder=\"minder\"></note-btn><priority-editor minder=\"minder\"></priority-editor><progress-editor minder=\"minder\"></progress-editor><resource-editor minder=\"minder\"></resource-editor></tab><tab heading=\"{{ 'appearence' | lang: 'ui/tabs'; }}\" ng-click=\"toggleTopTab('appearance')\" select=\"setCurTab('appearance')\"><template-list minder=\"minder\" class=\"inline-directive\"></template-list><theme-list minder=\"minder\"></theme-list><layout minder=\"minder\" class=\"inline-directive\"></layout><style-operator minder=\"minder\" class=\"inline-directive\"></style-operator><font-operator minder=\"minder\" class=\"inline-directive\"></font-operator></tab><tab heading=\"{{ 'view' | lang: 'ui/tabs'; }}\" ng-click=\"toggleTopTab('view')\" select=\"setCurTab('view')\"><expand-level minder=\"minder\"></expand-level><select-all minder=\"minder\"></select-all><search-btn minder=\"minder\"></search-btn></tab></tabset>"
   );
 
 
@@ -2245,7 +2245,7 @@ angular.module('kityminderEditor').run(['$templateCache', function($templateCach
 
 
   $templateCache.put('ui/directive/versionManager/versionManager.html',
-    "<div class=\"btn-group-vertical\" dropdown is-open=\"isopen\"><button type=\"button\" class=\"btn btn-default version\" title=\"{{ 'version' | lang:'ui' }}\" ng-class=\"{'active': isopen}\" data-toggle=\"modal\" data-target=\"#versinModal\" ng-click=\"updateMaplist()\"></button> <button type=\"button\" class=\"btn btn-default version-caption dropdown-toggle\" data-toggle=\"modal\" data-target=\"#versinModal\" title=\"{{ 'version' | lang:'ui' }}\" ng-click=\"updateMaplist()\"><span class=\"caption\">{{ 'version' | lang:'ui' }}</span> <span class=\"sr-only\">{{ 'version' | lang:'ui' }}</span></button><div class=\"modal fade\" id=\"versinModal\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"myModalLabel\" aria-hidden=\"true\"><div class=\"modal-dialog\" style=\"width: 400px;margin-left: 5px\"><div class=\"modal-content\"><div class=\"modal-header\" style=\"padding:5px 15px\"><h4 class=\"modal-title\" id=\"myModalLabel\" style=\"font-weight: bold\">Version list</h4></div><div class=\"modal-body\" style=\"font-size: 12px; padding: 10px 0\"><div style=\"width: 95%; margin: auto; border: 1px solid gray\"><table class=\"table\" style=\"width: 96%; margin: auto\"><caption style=\"font-size: 14px;font-weight: 600;color:#333\">Historical versions:</caption><thead><tr><th style=\"width: 35%\">Name</th><th style=\"width: 20%\">Editor</th><th style=\"width: 25%\">Edit time</th><th style=\"width: 20%\">Operation</th></tr></thead></table><div style=\"min-height:200px;max-height: 400px; overflow-y: auto\"><table class=\"table\" style=\"width: 96%;margin: auto\"><tbody><tr ng-repeat=\"item in mindmapRes\"><td style=\"width: 35%; overflow: hidden; word-break: break-word\">{{item.name}}</td><td style=\"width: 20%; overflow: hidden; word-break: break-word\">{{item.uploaderName}}</td><td style=\"width: 25%\">{{item.uploadTime}}</td><td style=\"width: 20%\"><span style=\"cursor:pointer\" class=\"glyphicon glyphicon-ok-circle\" title=\"Load this mindmap\" ng-click=\"mapLoad(item)\"></span> <span style=\"cursor:pointer; margin-left: 20px\" class=\"glyphicon glyphicon-remove-circle\" title=\"Delete this mindmap\" ng-click=\"deleteMap(item)\"></span></td></tr></tbody></table></div></div></div><div class=\"modal-footer\" style=\"padding:5px 15px\"><button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Close</button></div></div></div></div></div>"
+    "<div class=\"btn-group-vertical\" dropdown is-open=\"isopen\"><button type=\"button\" class=\"btn btn-default version\" title=\"{{ 'version' | lang:'ui' }}\" ng-class=\"{'active': isopen}\" data-toggle=\"modal\" data-target=\"#versinModal\" ng-click=\"updateMaplist()\"></button> <button type=\"button\" class=\"btn btn-default version-caption dropdown-toggle\" data-toggle=\"modal\" data-target=\"#versinModal\" title=\"{{ 'version' | lang:'ui' }}\" ng-click=\"updateMaplist()\"><span class=\"caption\">{{ 'version' | lang:'ui' }}</span> <span class=\"sr-only\">{{ 'version' | lang:'ui' }}</span></button><div class=\"modal fade\" id=\"versinModal\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"myModalLabel\" aria-hidden=\"true\"><div class=\"modal-dialog\" style=\"width: 400px;margin-left: 5px\"><div class=\"modal-content\"><div class=\"modal-header\" style=\"padding:5px 15px\"><h4 class=\"modal-title\" id=\"myModalLabel\" style=\"font-weight: bold\">Version list</h4></div><div class=\"modal-body\" style=\"font-size: 12px; padding: 10px 0\"><div style=\"width: 95%; margin: auto; border: 1px solid gray\"><table class=\"table\" style=\"width: 96%; margin: auto\"><caption style=\"font-size: 14px;font-weight: 600;color:#333\">Historical versions:</caption><thead><tr><th style=\"width: 35%\">Name</th><th style=\"width: 20%\">Editor</th><th style=\"width: 25%\">Edit time</th><th style=\"width: 20%\">Operation</th></tr></thead></table><div style=\"min-height:200px;max-height: 400px; overflow-y: auto\"><table class=\"table\" style=\"width: 96%;margin: auto\"><tbody><tr ng-repeat=\"item in mindmapRes\"><td style=\"width: 35%; overflow: hidden; word-break: break-word\">{{item.name}}</td><td style=\"width: 20%; overflow: hidden; word-break: break-word\">{{item.uploaderName}}</td><td style=\"width: 25%\">{{item.uploadTime}}</td><td style=\"width: 20%\"><span style=\"cursor:pointer\" class=\"glyphicon glyphicon-ok-circle\" title=\"Load this mindmap\" ng-click=\"mapLoad(item)\"></span> <span style=\"cursor:pointer; margin-left: 5px\" class=\"glyphicon glyphicon-download\" title=\"Download this mindmap\" ng-click=\"downloadMapFun(item)\"></span> <span style=\"cursor:pointer; margin-left: 5px\" class=\"glyphicon glyphicon-remove-circle\" title=\"Delete this mindmap\" ng-click=\"deleteMap(item)\"></span></td></tr></tbody></table></div></div></div><div class=\"modal-footer\" style=\"padding:5px 15px\"><button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Close</button></div></div></div></div></div>"
   );
 
 
@@ -3643,7 +3643,6 @@ angular.module('kityminderEditor')
                 scope.updateMaplist = updateMaplist;
                 scope.mapImport = mapImport;
                 scope.mapLoad = mapLoad;
-                scope.mapDownload = mapDownload;
                 scope.deleteMap = deleteMap;
 
                 function updateMaplist() {
@@ -3779,91 +3778,6 @@ angular.module('kityminderEditor')
                     }
                 }
 
-                function mapDownload() {
-
-                    if (mindmapInfo != {} && mindmapInfo.name != undefined && mindmapInfo.name != "") {
-
-                        var datatype = mindmapInfo.name.substring(mindmapInfo.name.lastIndexOf('.') + 1);
-
-                        switch (datatype) {
-                            case 'km':
-                                exportType = 'json';
-                                break;
-                            case 'md':
-                                exportType = 'markdown';
-                                break;
-                            default:
-                                exportType = datatype;
-                                break;
-                        }
-
-                        editor.minder.exportData(exportType).then(function (content) {
-
-                            // 文件下载
-                            if (datatype == "png") {
-                                var arr = content.split(','), mime = arr[0].match(/:(.*?);/)[1],
-                                    bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
-                                while (n--) {
-                                    u8arr[n] = bstr.charCodeAt(n);
-                                }
-
-                                var blob = new Blob([u8arr], { type: mime }),
-                                    url = URL.createObjectURL(blob);
-                            }
-                            else {
-                                var blob = new Blob([content]),
-                                    url = URL.createObjectURL(blob);
-                            }
-
-                            var a = document.createElement("a");
-                            a.download = mindmapInfo.name;
-                            a.href = url;
-                            $("body").append(a);
-                            a.click();
-                            $(a).remove();
-                        });
-
-                    } else if ($('#mindmapName').val() != "" && $('#mindmapName').val() != undefined) {
-                        datatype = $('#datatypeSelect').val();
-
-                        switch (datatype) {
-                            case 'km':
-                                exportType = 'json';
-                                break;
-                            case 'md':
-                                exportType = 'markdown';
-                                break;
-                            default:
-                                exportType = datatype;
-                                break;
-                        }
-
-                        editor.minder.exportData(exportType).then(function (content) {
-
-                            // 文件下载
-                            if (datatype == "png") {
-                                var blob = getBlobBydataURI(content);
-                                var url = URL.createObjectURL(blob);
-                            }
-                            else {
-                                var blob = new Blob([content]),
-                                    url = URL.createObjectURL(blob);
-                            }
-
-                            var a = document.createElement("a");
-                            a.download = $('#mindmapName').val() + '.' + datatype;
-                            a.href = url;
-                            $("body").append(a);
-                            a.click();
-                            $(a).remove();
-                        });
-                    }
-                    else {
-                        alert("Please click \"Save as (Save as a new version)\" and fill in the mindmap name, before downloading.");
-                    }
-                }
-
-
                 function deleteMap(map) {
                     try {
                         var info = RouteInfo.getInfo();
@@ -3898,20 +3812,7 @@ angular.module('kityminderEditor')
                         console.log("fail")
                     }
                 }
-
-                function getBlobBydataURI(dataurl) {
-                    var arr = dataurl.split(","),
-                        mime = arr[0].match(/:(.*?);/)[1],
-                        bstr = atob(arr[1]),
-                        n = bstr.length,
-                        u8arr = new Uint8Array(n);
-                    while (n--) {
-                        u8arr[n] = bstr.charCodeAt(n);
-                    }
-                    return new Blob([u8arr], { type: mime });
-                }
             }
-            
         }
     }]);
 angular.module('kityminderEditor')
@@ -3925,7 +3826,7 @@ angular.module('kityminderEditor')
             replace: true,
             link: function (scope) {
                 scope.saveMapFun = saveMapFun;
-                scope.saveasMapFun = saveasMapFun;
+                // scope.saveasMapFun = saveasMapFun;
                 // scope.downloadMapFun = downloadMapFun;
 
                 function saveMapFun() {
@@ -3933,7 +3834,7 @@ angular.module('kityminderEditor')
                     if (info.pageId != "" && info.userId != "") {
 
                         if (mindmapInfo != {} && mindmapInfo.name != undefined && mindmapInfo.resourceId != undefined
-                            && mindmapInfo.name != "" && mindmapInfo.resourceId != "" && info.userId == mindmapInfo.uploaderId) {
+                            && mindmapInfo.name != "" && mindmapInfo.resourceId != "") {
 
                             var datatype = mindmapInfo.name.substring(mindmapInfo.name.lastIndexOf('.') + 1);
 
@@ -3977,15 +3878,28 @@ angular.module('kityminderEditor')
                                         var fileBlob = new File([blob], filename);
 
                                         // 工具信息
-                                        var toolInfo = { toolName: "Mind map", toolUrl: "/GeoProblemSolving/Collaborative/Mindmap/index.html" };
+                                        var toolInfo = { toolName: "Mind map", toolUrl: "/GeoProblemSolving/Collaborative/Mindmap/mindmap.html" };
 
+                                        // resourceId
                                         var formData = new FormData();
-                                        formData.append("resourceId", mindmapInfo.resourceId);
-                                        formData.append("file", fileBlob);
-                                        formData.append("uploaderId", info.userId);
-                                        formData.append("folderId", info.pageId);
-                                        formData.append("thumbnail", thumbnailBlobFile);
-                                        formData.append("editToolInfo", JSON.stringify(toolInfo));
+                                        if (mindmapInfo.uploaderId == info.userId) {
+                                            formData.append("resourceId", mindmapInfo.resourceId);
+                                            formData.append("file", fileBlob);
+                                            formData.append("uploaderId", info.userId);
+                                            formData.append("folderId", info.pageId);
+                                            formData.append("thumbnail", thumbnailBlobFile);
+                                            formData.append("editToolInfo", JSON.stringify(toolInfo));
+                                        }
+                                        else {
+                                            formData.append("file", fileBlob);
+                                            formData.append("description", "Collaborative mindmap tool");
+                                            formData.append("type", "toolData:Mindmap");
+                                            formData.append("uploaderId", info.userId);
+                                            formData.append("privacy", "private");
+                                            formData.append("folderId", info.pageId);
+                                            formData.append("thumbnail", thumbnailBlobFile);
+                                            formData.append("editToolInfo", JSON.stringify(toolInfo));
+                                        }
 
                                         try {
                                             $.ajax({
@@ -3994,15 +3908,24 @@ angular.module('kityminderEditor')
                                                 data: formData,
                                                 processData: false,
                                                 contentType: false,
-                                                success: function (data) {                                                    
+                                                success: function (data) {
                                                     if (data == "Size over" || data == "Fail" || data == "Offline") {
                                                         alert("Fail to save...");
                                                     }
-                                                    else if(data.failed.length > 0){
+                                                    else if (data.failed.length > 0) {
                                                         alert("Fail to save...");
                                                     }
                                                     else if (data.uploaded.length > 0) {
                                                         alert("Save this mind map successfully");
+
+                                                        // 如果另存为，更新mindmap 信息
+                                                        if (mindmapInfo.uploaderId != info.userId) {
+                                                            mindmapInfo = {
+                                                                name: filename,
+                                                                resourceId: data.uploaded[0].resourceId,
+                                                                uploaderId: info.userId
+                                                            };
+                                                        }
                                                         // 初始化原始导图
                                                         originalMap = JSON.stringify(editor.minder.exportJson());
                                                     }
@@ -4021,125 +3944,14 @@ angular.module('kityminderEditor')
                             });
                         }
                         else {
-                            alert("Please click \"Save as (Save as a new file)\", and fill in the file name.");
+                            alert("Missing mind map information, please reload the map!");
                         }
                     }
                     else if (info.pageId != "") {
-                        alert("Missing page information!");
+                        alert("Missing mind map information, please confirm the URL of the page!");
                     }
                     else {
                         alert("Missing user information, please log in!");
-                    }
-                }
-
-                function saveasMapFun() {
-                    if ($('#mindmapName').val() != "" && $('#mindmapName').val() != undefined) {
-                        var datatype = $('#datatypeSelect').val();
-
-                        switch (datatype) {
-                            case 'km':
-                                exportType = 'json';
-                                break;
-                            case 'md':
-                                exportType = 'markdown';
-                                break;
-                            default:
-                                exportType = datatype;
-                                break;
-                        }
-
-                        editor.minder.exportData(exportType).then(function (file) {
-
-                            var info = RouteInfo.getInfo();
-                            if (info.pageId != "" && info.userId != "") {
-                                //thumbnail
-                                editor.minder.exportData('png').then(function (content) {
-                                    //压缩
-                                    var canvas = document.createElement('canvas'),
-                                        context = canvas.getContext('2d');
-                                    // canvas对图片进行缩放
-                                    canvas.width = 120;
-                                    canvas.height = 120;
-
-                                    var image = new Image()
-                                    image.src = content;
-                                    image.onload = function () {
-                                        // 清除画布,图片压缩
-                                        context.clearRect(0, 0, 120, 120);
-                                        context.drawImage(image, 0, 0, 120, 120);
-
-                                        var thumbnailUrl = canvas.toDataURL();
-                                        var thumbnailBlob = getBlobBydataURI(thumbnailUrl);
-                                        var thumbnailName = $('#mindmapName').val() + ".png";
-                                        var thumbnailBlobFile = new File([thumbnailBlob], "thumbnail_" + thumbnailName);
-
-                                        // 文件上传
-                                        var blob = new Blob([file]);
-                                        var filename = $('#mindmapName').val() + '.' + datatype;
-                                        var fileBlob = new File([blob], filename);
-
-                                        // 工具信息
-                                        var toolInfo = { toolName: "Mind map", toolUrl: "/GeoProblemSolving/Collaborative/Mindmap/index.html" };
-
-                                        var formData = new FormData();
-                                        formData.append("file", fileBlob);
-                                        formData.append("description", "Collaborative mindmap tool");
-                                        formData.append("type", "toolData:Mindmap");
-                                        formData.append("uploaderId", info.userId);
-                                        formData.append("privacy", "private");
-                                        formData.append("folderId", info.pageId);
-                                        formData.append("thumbnail", thumbnailBlobFile);
-                                        formData.append("editToolInfo", JSON.stringify(toolInfo));
-
-                                        try {
-                                            $.ajax({
-                                                url: 'http://' + RouteInfo.getIPPort() + '/GeoProblemSolving/folder/uploadToFolder',
-                                                type: "POST",
-                                                data: formData,
-                                                processData: false,
-                                                contentType: false,
-                                                success: function (data) {                                                    
-                                                    if (data == "Size over" || data == "Fail" || data == "Offline") {
-                                                        alert("Fail to save...");
-                                                    }
-                                                    else if(data.failed.length > 0){
-                                                        alert("Fail to save...");
-                                                    }
-                                                    else if (data.uploaded.length > 0) {
-                                                        alert("Save this mind map successfully");
-
-                                                        mindmapInfo = {
-                                                            name: filename,
-                                                            resourceId: data.uploaded[0].resourceId,
-                                                            uploaderId: info.userId
-                                                        };
-
-                                                        // 初始化原始导图
-                                                        originalMap = JSON.stringify(editor.minder.exportJson());
-                                                    }
-                                                },
-                                                error: function (err) {
-                                                    console.log("fail.");
-                                                    mindmapInfo = {};
-                                                }
-                                            });
-                                        }
-                                        catch (ex) {
-                                            console.log("fail")
-                                            mindmapInfo = {};
-                                        }
-                                    }
-
-                                });
-                            }
-                            else if (info.pageId != "") {
-                                alert("Missing page information!");
-                            }
-                            else {
-                                alert("Missing user information, please log in!");
-                            }
-
-                        });
                     }
                 }
 
@@ -5587,7 +5399,7 @@ angular.module('kityminderEditor')
                 scope.updateMaplist = updateMaplist;
                 scope.mapLoad = mapLoad;
                 scope.deleteMap = deleteMap;
-                // scope.saveMap = saveMap;
+                scope.downloadMapFun = downloadMapFun;
 
                 function updateMaplist() {
                     var maps = [];
@@ -5726,128 +5538,87 @@ angular.module('kityminderEditor')
                     }
                 }
 
-                function saveMap() {
-                    var info = RouteInfo.getInfo();
-                    if (info.pageId != "" && info.userId != "") {
+                function downloadMapFun() {
 
-                        if (mindmapInfo != {} && mindmapInfo.name != undefined && mindmapInfo.resourceId != undefined
-                            && mindmapInfo.name != "" && mindmapInfo.resourceId != "") {
+                    if (mindmapInfo != {} && mindmapInfo.name != undefined && mindmapInfo.name != "") {
 
-                            var datatype = mindmapInfo.name.substring(mindmapInfo.name.lastIndexOf('.') + 1);
+                        var datatype = mindmapInfo.name.substring(mindmapInfo.name.lastIndexOf('.') + 1);
 
-                            switch (datatype) {
-                                case 'km':
-                                    exportType = 'json';
-                                    break;
-                                case 'md':
-                                    exportType = 'markdown';
-                                    break;
-                                default:
-                                    exportType = datatype;
-                                    break;
+                        switch (datatype) {
+                            case 'km':
+                                exportType = 'json';
+                                break;
+                            case 'md':
+                                exportType = 'markdown';
+                                break;
+                            default:
+                                exportType = datatype;
+                                break;
+                        }
+
+                        editor.minder.exportData(exportType).then(function (content) {
+
+                            // 文件下载
+                            if (datatype == "png") {
+                                var arr = content.split(','), mime = arr[0].match(/:(.*?);/)[1],
+                                    bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+                                while (n--) {
+                                    u8arr[n] = bstr.charCodeAt(n);
+                                }
+
+                                var blob = new Blob([u8arr], { type: mime }),
+                                    url = URL.createObjectURL(blob);
+                            }
+                            else {
+                                var blob = new Blob([content]),
+                                    url = URL.createObjectURL(blob);
                             }
 
-                            editor.minder.exportData(exportType).then(function (file) {
-                                //thumbnail
-                                editor.minder.exportData('png').then(function (content) {
-                                    //压缩
-                                    var canvas = document.createElement('canvas'),
-                                        context = canvas.getContext('2d');
-                                    // canvas对图片进行缩放
-                                    canvas.width = 120;
-                                    canvas.height = 120;
+                            var a = document.createElement("a");
+                            a.download = mindmapInfo.name;
+                            a.href = url;
+                            $("body").append(a);
+                            a.click();
+                            $(a).remove();
+                        });
 
-                                    var image = new Image()
-                                    image.src = content;
-                                    image.onload = function () {
-                                        // 清除画布,图片压缩
-                                        context.clearRect(0, 0, 120, 120);
-                                        context.drawImage(image, 0, 0, 120, 120);
+                    } else if ($('#mindmapName').val() != "" && $('#mindmapName').val() != undefined) {
+                        datatype = $('#datatypeSelect').val();
 
-                                        var thumbnailUrl = canvas.toDataURL();
-                                        var thumbnailBlob = getBlobBydataURI(thumbnailUrl);
-                                        var thumbnailName = $('#mindmapName').val() + ".png";
-                                        var thumbnailBlobFile = new File([thumbnailBlob], "thumbnail_" + thumbnailName);
-
-                                        // 文件上传
-                                        var blob = new Blob([file]);
-                                        var filename = mindmapInfo.name;
-                                        var fileBlob = new File([blob], filename);
-
-                                        // 工具信息
-                                        var toolInfo = { toolName: "Mind map", toolUrl: "/GeoProblemSolving/Collaborative/Mindmap/mindmap.html" };
-
-                                        // resourceId
-                                        var formData = new FormData();
-                                        if (mindmapInfo.uploaderId == info.userId) {
-                                            formData.append("resourceId", mindmapInfo.resourceId);
-                                            formData.append("file", fileBlob);
-                                            formData.append("uploaderId", info.userId);
-                                            formData.append("folderId", info.pageId);
-                                            formData.append("thumbnail", thumbnailBlobFile);
-                                            formData.append("editToolInfo", JSON.stringify(toolInfo));
-                                        }
-                                        else {
-                                            formData.append("file", fileBlob);
-                                            formData.append("description", "Collaborative mindmap tool");
-                                            formData.append("type", "toolData:Mindmap");
-                                            formData.append("uploaderId", info.userId);
-                                            formData.append("privacy", "private");
-                                            formData.append("folderId", info.pageId);
-                                            formData.append("thumbnail", thumbnailBlobFile);
-                                            formData.append("editToolInfo", JSON.stringify(toolInfo));
-                                        }
-
-                                        try {
-                                            $.ajax({
-                                                url: 'http://' + RouteInfo.getIPPort() + '/GeoProblemSolving/folder/uploadToFolder',
-                                                type: "POST",
-                                                data: formData,
-                                                processData: false,
-                                                contentType: false,
-                                                success: function (data) {
-                                                    if (data == "Size over" || data == "Fail" || data == "Offline") {
-                                                        alert("Fail to save...");
-                                                    }
-                                                    else if (data.failed.length > 0) {
-                                                        alert("Fail to save...");
-                                                    }
-                                                    else if (data.uploaded.length > 0) {
-                                                        alert("Save this mind map successfully");
-
-                                                        if (indmapInfo.uploaderId != info.userId) {
-                                                            mindmapInfo = {
-                                                                name: filename,
-                                                                resourceId: data.uploaded[0].resourceId,
-                                                                uploaderId: info.userId
-                                                            }
-                                                        }
-                                                        // 初始化原始导图
-                                                        originalMap = JSON.stringify(editor.minder.exportJson());
-                                                    }
-                                                },
-                                                error: function (err) {
-                                                    console.log("fail.");
-                                                }
-                                            });
-                                        }
-                                        catch (ex) {
-                                            console.log("fail")
-                                        }
-
-                                    }
-                                });
-                            });
+                        switch (datatype) {
+                            case 'km':
+                                exportType = 'json';
+                                break;
+                            case 'md':
+                                exportType = 'markdown';
+                                break;
+                            default:
+                                exportType = datatype;
+                                break;
                         }
-                        else {
-                            alert("Please click \"Save as (Save as a new file)\".");
-                        }
-                    }
-                    else if (info.pageId != "") {
-                        alert("Missing page information!");
+
+                        editor.minder.exportData(exportType).then(function (content) {
+
+                            // 文件下载
+                            if (datatype == "png") {
+                                var blob = getBlobBydataURI(content);
+                                var url = URL.createObjectURL(blob);
+                            }
+                            else {
+                                var blob = new Blob([content]),
+                                    url = URL.createObjectURL(blob);
+                            }
+
+                            var a = document.createElement("a");
+                            a.download = $('#mindmapName').val() + '.' + datatype;
+                            a.href = url;
+                            $("body").append(a);
+                            a.click();
+                            $(a).remove();
+                        });
                     }
                     else {
-                        alert("Missing user information, please log in!");
+                        alert("Please click \"Save as (Save as a new version)\" and fill in the mindmap name, before downloading.");
                     }
                 }
 

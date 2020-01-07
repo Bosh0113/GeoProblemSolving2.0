@@ -1,12 +1,7 @@
 <style scoped>
 </style>
 <template>
-  <iframe
-    :src="pageUrl"
-    style="width:100%"
-    :style="{height:contentHeight+'px'}"
-    frameborder="0"
-  ></iframe>
+  <iframe :src="pageUrl" style="width:100%" :style="{height:contentHeight+'px'}" frameborder="0"></iframe>
 </template>
 <script>
 export default {
@@ -18,25 +13,40 @@ export default {
     };
   },
   mounted() {
+    this.verifyToken();
     window.addEventListener("resize", this.initSize);
-    this.getSharedUrl();
   },
   methods: {
     initSize() {
       this.contentHeight = window.innerHeight - 125;
     },
-    getSharedUrl() {
-      let groupId = "7728e1d9-a5b0-44fd-8522-7dde99a07d92",
-        resourceId = "49fd2d6f-ecbd-4218-b749-8ca21e8cf47f",
-        userInfo = this.userInfo;
+    verifyToken() {
+      let tokenStr = this.$route.query.token;
+      this.axios
+        .get("/GeoProblemSolving/token/checkShareToken?shareToken=" + tokenStr)
+        .then(res => {
+          if (Object.prototype.toString.call(res.data)=="[object Object]") {
+            let groupId = res.data.groupId;
+            let resourceId = res.data.resourceId;
+            this.getSharedUrl(groupId, resourceId);
+          } else {
+            this.pageUrl = "";
+          }
+        })
+        .catch(err => {
+            console.log(err);
+        });
+    },
+    getSharedUrl(groupId, resourceId) {
+      let userInfo = this.userInfo;
       if (
         userInfo.userId != undefined &&
         userInfo.userId != "" &&
         userInfo.userName != undefined &&
-        userInfo.userName != "" 
+        userInfo.userName != ""
       ) {
         this.pageUrl =
-          "/GeoProblemSolving/Collaborative/Mindmap/mindmap.html?userName=" +
+          "/GeoProblemSolving/Collaborative/Mindmap/version/mindmap.html?userName=" +
           userInfo.userName +
           "&userID=" +
           userInfo.userId +

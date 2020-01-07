@@ -45,6 +45,8 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
+  max-width: 250px;
+  word-break: break-word;
 }
 .shareLabel {
   display: block;
@@ -117,7 +119,7 @@
                         title="Share"
                         icon="ios-share-alt"
                         style="margin: 10px 20px 0 0;"
-                        @click="shareModal=true"
+                        @click="shareData(item)"
                       ></Button>
                       <Button
                         size="small"
@@ -816,6 +818,7 @@ export default {
           '" style="width: 100%;height:100%;"></iframe>';
       }
       var demoPanelTimer = null;
+      var that = this;
       this.panel = jsPanel.create({
         theme: "success",
         headerTitle: toolInfo.toolName,
@@ -826,8 +829,13 @@ export default {
         dragit: {
           containment: 5
         },
-        onclosed: function() {
+        onclosed: function(panel) {
           window.clearTimeout(demoPanelTimer);
+          that.panel = null;
+        },
+        onbeforeclose: function(panel, status, closedByUser) {
+          console.log(panel, status, closedByUser);
+          return confirm("Please confirm your edit has been saved?");
         },
         callback: function() {
           var that = this;
@@ -974,9 +982,17 @@ export default {
       }
     },
     dataVisualize() {},
+    shareData(data){
+      this.shareModal=true;
+      this.selectData = data;
+    },
     generateToken() {
+      let info = {
+        groupId: this.stepInfo.stepId,
+        resourceId: this.selectData.resourceId
+      }
       this.axios
-        .get("/GeoProblemSolving/token/getShareToken?duration=0")
+        .post("/GeoProblemSolving/token/getShareToken?duration=0", info)
         .then(res => {
           this.sharedToken = res.data;
           this.sharedUrl =

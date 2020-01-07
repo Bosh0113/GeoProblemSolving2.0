@@ -287,8 +287,11 @@ export default {
       }
     },
     generateToken() {
+      let info = {
+        groupId: this.stepInfo.stepId
+      }
       this.axios
-        .get("/GeoProblemSolving/token/getShareToken?duration=0")
+        .post("/GeoProblemSolving/token/getShareToken?duration=0",info)
         .then(res => {
           this.sharedToken = res.data;
           this.sharedUrl = top.location.href + "&token=" + this.sharedToken;

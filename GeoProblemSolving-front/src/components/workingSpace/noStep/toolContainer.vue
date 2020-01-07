@@ -354,15 +354,10 @@ export default {
           dragit: {
             containment: 5
           },
+          closeOnEscape: true,
           onclosed: function(panel, status, closedByUser) {
             window.clearTimeout(demoPanelTimer);
           },
-          callback: function() {
-            var that = this;
-            demoPanelTimer = window.setInterval(function() {
-              that.style.zIndex = "9999";
-            }, 1);
-          }
         });
         // panel.resizeit("disable");
         $(".jsPanel-content").css("font-size", "0");
