@@ -75,7 +75,7 @@ const routes = [{
     { path: 'resetPassword/:email', name: 'resetPassword', component: resolve => (require(["@/components/userState/resetPwd"], resolve)) },
     { path: 'resourceCenter', name: 'resourceCenter', component: resolve => (require(["@/components/resources/resourceCenter"], resolve)) },
     { path: 'toolsCenter', name: 'toolsCenter', component: resolve => (require(["@/components/tools/toolsCenter"], resolve)) },
-    { path: 'share/:groupId', name: 'shareContainer', component: resolve => (require(["@/components/workingSpace/share/shareContainer"], resolve)) }, //share 
+    { path: 'share', name: 'shareContainer', component: resolve => (require(["@/components/workingSpace/share/shareContainer"], resolve)) }, //share 
   ]
 },
 { path: '/projectTypeContent/:projectId', name: 'projectTypeContent', component: resolve => (require(["@/components/projects/toWork"], resolve)) },
