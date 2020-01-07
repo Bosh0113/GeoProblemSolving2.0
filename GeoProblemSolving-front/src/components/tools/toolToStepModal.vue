@@ -47,6 +47,7 @@
       title="Manage toolset and tools"
       width="800"
       :mask-closable="false"
+      :styles="{top: '15px'}"
     >
       <Row>
         <Col span="16">

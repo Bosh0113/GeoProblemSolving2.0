@@ -95,6 +95,7 @@
                 v-show="fileList!=[] && fileList!='None'"
                 height="360"
                 size="small"
+                no-data-text="No data"
               >
                 <template slot-scope="{ row }" slot="name">
                   <strong>{{ row.name }}</strong>

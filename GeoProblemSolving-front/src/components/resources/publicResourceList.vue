@@ -71,7 +71,7 @@
             <Row style="height:100%; overflow-y:auto">
               <template v-if="$store.getters.userState">
                 <Col span="22" offset="1">
-                  <Table :columns="resourceColumn" :data="showList" border>
+                  <Table :columns="resourceColumn" :data="showList" border no-data-text="No data">
                     <template slot-scope="{ row, index }" slot="action" v-show="showList.length>0">
                       <a
                         :href="showList[index].pathURL"
@@ -89,7 +89,7 @@
               </template>
               <template v-else>
                 <Col span="22" offset="1">
-                  <Table :columns="resourceColumn" :data="showList" border size="small">
+                  <Table :columns="resourceColumn" :data="showList" border size="small" no-data-text="No data">
                     <template slot-scope="{ row, index }" slot="action" v-show="showList.length>0">
                       <a title="Please download after login">
                         <Icon type="md-download" :size="20" color="gray" />

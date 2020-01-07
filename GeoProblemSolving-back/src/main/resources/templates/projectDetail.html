@@ -20,14 +20,14 @@
     <script src="/GeoProblemSolving/js/vuescroll.js"></script>
     <script src="/GeoProblemSolving/js/Sortable.min.js"></script>
     <script src="/GeoProblemSolving/js/vuedraggable.umd.min.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/jspanel4@4.2.1/dist/jspanel.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/jspanel4@4.2.1/dist/jspanel.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jspanel4@4.2.1/dist/extensions/modal/jspanel.modal.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jspanel4@4.2.1/dist/extensions/tooltip/jspanel.tooltip.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jspanel4@4.2.1/dist/extensions/hint/jspanel.hint.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jspanel4@4.2.1/dist/extensions/layout/jspanel.layout.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jspanel4@4.2.1/dist/extensions/contextmenu/jspanel.contextmenu.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jspanel4@4.2.1/dist/extensions/dock/jspanel.dock.js"></script>
+    <link href="/GeoProblemSolving/jspanel/jspanel.css" rel="stylesheet">
+    <script src="/GeoProblemSolving/jspanel/jspanel.js"></script>
+    <script src="/GeoProblemSolving/jspanel/extensions/modal/jspanel.modal.js"></script>
+    <script src="/GeoProblemSolving/jspanel/extensions/tooltip/jspanel.tooltip.js"></script>
+    <script src="/GeoProblemSolving/jspanel/extensions/hint/jspanel.hint.js"></script>
+    <script src="/GeoProblemSolving/jspanel/extensions/layout/jspanel.layout.js"></script>
+    <script src="/GeoProblemSolving/jspanel/extensions/contextmenu/jspanel.contextmenu.js"></script>
+    <script src="/GeoProblemSolving/jspanel/extensions/dock/jspanel.dock.js"></script>
     <script th:replace="navigation::commonHeader-css"></script>
     <script th:replace="navigation::commonHeader-html"></script>
     <script th:replace="navigation::commonHeader-js"></script>
@@ -274,7 +274,7 @@
                                     <strong style="font-size:1rem;">Overview</strong>
                                 </div>
                                 <div style="display:flex;align-items:center;justify-content:center;">
-                                    <span style="font-size:1.5rem; color: #2d8cf099;max-width:250px;display:inline-block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{projectInfo.title}}</span>
+                                    <span style="font-size:1.5rem; color: #2d8cf099;max-width:250px;display:inline-block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" :title="projectInfo.title">{{projectInfo.title}}</span>
                                 </div>
                             </div>
                             <div slot="extra">
@@ -409,7 +409,7 @@
                                     <strong style="font-size:1rem;">Introduction</strong>
                                 </div>
                                 <div style="display:flex;align-items:center;justify-content:center;">
-                                    <span style="font-size:1.5rem; color: #2d8cf099;max-width:250px;display:inline-block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{projectInfo.title}}</span>
+                                    <span style="font-size:1.5rem; color: #2d8cf099;max-width:250px;display:inline-block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" :title="projectInfo.title">{{projectInfo.title}}</span>
                                 </div>
                             </div>
                             <div slot="extra">
@@ -578,7 +578,7 @@
                                       <strong style="font-size:1rem;">Subprojects</strong>
                                   </div>
                                   <div style="display:flex;align-items:center;justify-content:center;">
-                                      <span style="font-size:1.5rem; color: #2d8cf099;max-width:250px;display:inline-block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{projectInfo.title}}</span>
+                                      <span style="font-size:1.5rem; color: #2d8cf099;max-width:250px;display:inline-block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" :title="projectInfo.title">{{projectInfo.title}}</span>
                                   </div>
                               </div>
                             <div slot="extra">
@@ -688,7 +688,7 @@
                                     <strong style="font-size:1rem;">Resources</strong>
                                 </div>
                                 <div style="display:flex;align-items:center;justify-content:center;">
-                                    <span style="font-size:1.5rem; color: #2d8cf099;max-width:250px;display:inline-block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{projectInfo.title}}</span>
+                                    <span style="font-size:1.5rem; color: #2d8cf099;max-width:250px;display:inline-block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" :title="projectInfo.title">{{projectInfo.title}}</span>
                                 </div>
                             </div>
                             <div slot="extra">
@@ -719,7 +719,7 @@
                                     <strong style="font-size:1rem;">Task assignment</strong>
                                 </div>
                                 <div style="display:flex;align-items:center;justify-content:center;">
-                                    <span style="font-size:1.5rem; color: #2d8cf099;max-width:250px;display:inline-block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{projectInfo.title}}</span>
+                                    <span style="font-size:1.5rem; color: #2d8cf099;max-width:250px;display:inline-block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" :title="projectInfo.title">{{projectInfo.title}}</span>
                                 </div>
                             </div>
                             <div>
@@ -2208,6 +2208,7 @@
                         },
                     });
                     $(".jsPanel-content").css("font-size", "0");//防止出现滚动条
+                    $(".jsPanel").css("position","fixed");
                     this.workPanels.push(panel);
                 }
             }

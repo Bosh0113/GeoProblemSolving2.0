@@ -19,7 +19,17 @@
 <template>
   <div>
     <Card dis-hover id="workCard">
-      <h1 slot="title">Workspace</h1>
+      <!-- <h1 slot="title">Workspace</h1> -->
+      <div slot="title">
+        <div style="margin-left:20px;top: 15px; position:absolute;left:50px;">
+            <strong style="font-size:1.5rem;">Project</strong>
+            <Divider type="vertical"></Divider>
+            <strong style="font-size:1rem;">Workspace</strong>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:center;">
+            <span style="font-size:1.5rem; color: #2d8cf099;max-width:250px;display:inline-block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{projectInfo.title}}</span>
+        </div>
+      </div>
       <div slot="extra">
         <Button icon="ios-share-alt" @click="shareModal=true" v-show="userRole=='Manager'">Share</Button>
       </div>

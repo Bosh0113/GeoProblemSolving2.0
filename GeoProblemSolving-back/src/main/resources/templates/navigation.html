@@ -94,6 +94,15 @@
             color: white;
             font-size: 0.8em;
         }
+
+        .menuItemCell{
+        font-weight: 900;
+        }
+
+        .menuItemCell:hover {
+        background-color: #808695;
+        color: white;
+        }
     </style>
     <template th:fragment="commonHeader-html" id="navigation">
         <div style="position: fixed;z-index: 99;">
@@ -158,36 +167,19 @@
                     <Dropdown style="position: fixed;top: 10px;right: 20px;">
                         <i-button icon="md-menu" style="color: white;background-color: #808695"></i-button>
                         <Dropdown-menu slot="list">
-                            <Dropdown-item>
-                                <a href="/GeoProblemSolving/home">Home</a>
-                            </Dropdown-item>
-                            <Dropdown-item>
-                                <a href="/GeoProblemSolving/projectlist">Projects</a>
-                            </Dropdown-item>
-                            <Dropdown-item>
-                                <a href="/GeoProblemSolving/publicResource">Resources</a>
-                            </Dropdown-item>
-                            <Dropdown-item>
-                                <a href="/GeoProblemSolving/toolsCenter">Tools</a>
-                            </Dropdown-item>
-                            <Dropdown-item>
-                                <a href="/GeoProblemSolving/help">Help</a>
-                            </Dropdown-item>
-                            <Dropdown-item v-show="!userInfoNav.userState||userInfoNav.userState==undefined">
-                                <a href="/GeoProblemSolving/login">Login</a>
-                            </Dropdown-item>
-                            <Dropdown-item v-show="!userInfoNav.userState||userInfoNav.userState==undefined">
-                                <a href="/GeoProblemSolving/register">Sign up</a>
-                            </Dropdown-item>
-                            <Dropdown-item v-show="userInfoNav.userState">
-                                <a href="/GeoProblemSolving/notifications">Notification</a>
-                            </Dropdown-item>
-                            <Dropdown-item v-show="userInfoNav.userState">
-                                <a @click="toPersonalPage">Personal Page</a>
-                            </Dropdown-item>
-                            <Dropdown-item v-show="userInfoNav.userState">
-                                <a @click="logout">Log out</a>
-                            </Dropdown-item>
+                          <Cell-group style="width:200px">
+                            <Cell @click.native="turnToURL('/GeoProblemSolving/home')" class="menuItemCell">Home</Cell>
+                            <Cell @click.native="turnToURL('/GeoProblemSolving/projectlist')" class="menuItemCell">Projects</Cell>
+                            <Cell @click.native="turnToURL('/GeoProblemSolving/publicResource')" class="menuItemCell">Resources</Cell>
+                            <Cell @click.native="turnToURL('/GeoProblemSolving/toolsCenter')" class="menuItemCell">Tools</Cell>
+                            <Cell @click.native="turnToURL('/GeoProblemSolving/help')" class="menuItemCell">Help</Cell>
+                            <Divider style="margin: 5px 0"></Divider>
+                            <Cell v-show="!userInfoNav.userState" @click.native="turnToURL('/GeoProblemSolving/login')" class="menuItemCell">Login</Cell>
+                            <Cell v-show="!userInfoNav.userState" @click.native="turnToURL('/GeoProblemSolving/register')" class="menuItemCell">Sign up</Cell>
+                            <Cell  v-show="userInfoNav.userState" @click.native="turnToURL('/GeoProblemSolving/notifications')" class="menuItemCell">Notification</Cell>
+                            <Cell  v-show="userInfoNav.userState" @click.native="toPersonalPage" class="menuItemCell">Personal Page</Cell>
+                            <Cell  v-show="userInfoNav.userState" @click.native="logout" class="menuItemCell">Log out</Cell>
+                          </Cell-group>
                         </Dropdown-menu>
                     </Dropdown>
                 </div>
@@ -209,6 +201,9 @@
             },
             created() {
                 this.identifyUser();
+            },
+            mounted(){
+                this.identityMenuCSS();
             },
             updated() {
                 $("#noticeBadge sup").css("margin", "15px 5px 0 0");
@@ -234,6 +229,9 @@
                 }
             },
             methods: {
+                turnToURL(url){
+                    window.location.href = url;
+                },
                 identifyUser(){
                     if(this.userInfo.userState){
                         this.userInfoNav = this.userInfo;

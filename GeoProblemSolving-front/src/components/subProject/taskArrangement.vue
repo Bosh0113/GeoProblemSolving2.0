@@ -42,7 +42,7 @@
 <template>
   <div>
     <Row>
-      <Col span="4" offset="20" style="margin-top:10px">
+      <Col span="4" offset="20" style="margin-top:8px">
       <span id="todoPanel" style="cursor:pointer;color:#57a3f3" @click="switch2Manager">Task manager</span>
       <Divider type="vertical" />
       <span id="ganttPanel" style="cursor:pointer" @click="switch2Gantt">Gantt chart</span>
@@ -52,7 +52,7 @@
         <template v-if="!chartSwitch">
           <Row type="flex" justify="space-around">
             <Col span="7">
-            <Card :padding="0" :border="false">
+            <Card :padding="0" :border="false" dis-hover>
               <h3 slot="title">Todo</h3>
               <Button slot="extra" type="default" class="createTaskBtn" style="margin-top:-8px"
                 @click="createTaskModalShow()">Add</Button>
@@ -95,7 +95,7 @@
             </Card>
             </Col>
             <Col span="7">
-            <Card :padding="0" :border="false">
+            <Card :padding="0" :border="false" dis-hover>
               <h3 slot="title">Doing</h3>
               <vue-scroll :ops="ops" :style="{height:contentHeight-80+'px'}">
                 <draggable :disabled="taskItemDraggable()" class="taskList" element="ul" :options="{group:'task'}"
@@ -136,7 +136,7 @@
             </Card>
             </Col>
             <Col span="7">
-            <Card :padding="0" :border="false">
+            <Card :padding="0" :border="false" dis-hover>
               <h3 slot="title">Done</h3>
               <vue-scroll :ops="ops" :style="{height:contentHeight-80+'px'}">
                 <draggable :disabled="taskItemDraggable()" class="taskList" element="ul" :options="{group:'task'}"
