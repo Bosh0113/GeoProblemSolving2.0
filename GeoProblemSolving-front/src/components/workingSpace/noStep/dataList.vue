@@ -319,7 +319,7 @@
     <Modal
       v-model="deleteResourceModal"
       @on-ok="deleteResource()"
-      ok-text="Assure"
+      ok-text="Yes"
       cancel-text="Cancel"
     >
       <h3>Do you really want to delete this resource?</h3>
