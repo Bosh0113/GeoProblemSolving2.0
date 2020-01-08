@@ -192,7 +192,7 @@
         </Row>
         <div class="pro-page">
             <Page ref="pages" :total="totalCount" :page-size="pageSize" :current="currentPage" size="small"
-                  @on-change="showPageList" show-elevator show-total></Page>
+                  @on-change="changePage" show-elevator show-total></Page>
         </div>
         <div th:replace="navigation::commonFooter"></div>
 
@@ -362,6 +362,10 @@
                         //     return false;
                         // });
                     }
+                    this.showPageList();
+                },
+                changePage(index){
+                    this.currentPage = index;
                     this.showPageList();
                 },
                 showPageList() {
