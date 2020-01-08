@@ -3709,9 +3709,10 @@ angular.module('kityminderEditor')
                         var reader = new FileReader();
                         reader.onload = function (e) {
                             var content = reader.result;
+                            $("#loading").show();
                             editor.minder.importData(fileType, content).then(function (data) {
                                 $(fileInput).val('');
-
+                                $("#loading").hide();
                                 // 初始化原始导图
                                 originalMap = JSON.stringify(editor.minder.exportJson());
                             });
@@ -3748,10 +3749,10 @@ angular.module('kityminderEditor')
                             xhr.onload = function (e) {
                                 if (xhr.status == 200) {
                                     var file = xhr.response;
-
+                                    
+                                    $("#loading").show();
                                     editor.minder.importData(fileType, file).then(function (data) {
-                                        $(fileInput).val('');
-
+                                        $("#loading").hide();
                                         // 初始化原始导图
                                         originalMap = JSON.stringify(editor.minder.exportJson());
                                     });
@@ -4243,7 +4244,9 @@ angular.module('kityminderEditor')
 										if (xhr.status == 200) {
 											var file = xhr.response;
 
+											$("#loading").show();
 											editor.minder.importData(fileType, file).then(function () {
+												$("#loading").hide();
 												// 初始化原始导图
 												originalMap = JSON.stringify(editor.minder.exportJson());
 											});
@@ -5500,7 +5503,9 @@ angular.module('kityminderEditor')
                                 if (xhr.status == 200) {
                                     var file = xhr.response;
 
+                                    $("#loading").show();
                                     editor.minder.importData(fileType, file).then(function () {
+                                        $("#loading").hide();
                                         // 初始化原始导图
                                         originalMap = JSON.stringify(editor.minder.exportJson());
                                     });
@@ -5568,30 +5573,30 @@ angular.module('kityminderEditor')
                 }
 
                 function mapDownload(map) {
-                    if (map.name.replace(/.+\./, "") == 'json') {
-                        try {
-                            $.ajax({
-                                url: 'http://' + RouteInfo.getIPPort() + map.pathURL,
-                                type: "GET",
-                                async: false,
-                                success: function (data) {
-                                    var result = JSON.stringify(data);
-                                    var a = document.createElement("a");
-                                    a.download = map.name;
-                                    a.target = "_blank";
-                                    a.href = "data:text/json;charset=utf-8,${" + data + "}";
-                                    a.href = 'http://' + RouteInfo.getIPPort() + map.pathURL;
-                                    $("body").append(a);
-                                    a.click();
-                                    $(a).remove();
-                                },
-                                error: function (err) {
-                                    alert("Fail to download");
-                                }
-                            });
-                        }
-                        catch (err) { }
-                    } else {
+                    // if (map.name.replace(/.+\./, "") == 'json') {
+                    //     try {
+                    //         $.ajax({
+                    //             url: 'http://' + RouteInfo.getIPPort() + map.pathURL,
+                    //             type: "GET",
+                    //             async: false,
+                    //             success: function (data) {
+                    //                 var result = JSON.stringify(data);
+                    //                 var a = document.createElement("a");
+                    //                 a.download = map.name;
+                    //                 a.target = "_blank";
+                    //                 a.href = "data:text/json;charset=utf-8,${" + data + "}";
+                    //                 a.href = 'http://' + RouteInfo.getIPPort() + map.pathURL;
+                    //                 $("body").append(a);
+                    //                 a.click();
+                    //                 $(a).remove();
+                    //             },
+                    //             error: function (err) {
+                    //                 alert("Fail to download");
+                    //             }
+                    //         });
+                    //     }
+                    //     catch (err) { }
+                    // } else {
                         var a = document.createElement("a");
                         a.download = map.name;
                         a.target = "_blank";
@@ -5599,7 +5604,7 @@ angular.module('kityminderEditor')
                         $("body").append(a);
                         a.click();
                         $(a).remove();
-                    }
+                    // }
                 }
             }
         }

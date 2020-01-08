@@ -3221,7 +3221,10 @@ angular.module('kityminderEditor')
 										if (xhr.status == 200) {
 											var file = xhr.response;
 
-											editor.minder.importData(fileType, file);
+											$("#loading").show();
+											editor.minder.importData(fileType, file).then(function () {
+												$("#loading").hide();
+											});
 
 											mindmapInfo = {
 												name: map.name,
