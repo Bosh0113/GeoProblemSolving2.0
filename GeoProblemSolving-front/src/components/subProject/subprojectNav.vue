@@ -31,6 +31,10 @@
     white-space: nowrap;
   }
 }
+
+.left_bar_bg{
+  background:lightslategrey;
+}
 </style>
 <template>
   <div>
