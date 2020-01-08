@@ -16,6 +16,7 @@
     <!-- endbower -->
 
     <link rel="stylesheet" href="kityminder.editor.css">
+    <link rel="stylesheet" href="../css/style.css">
 
     <style>
         html,
@@ -63,6 +64,11 @@
     <h1 class="editor-title">Collaborative mindmap tool <span style="font-size: 10px;"> - Powered by
             KityMinder-Editor</span> <span style="float: right;">Note: Before editing the mind map, please login.</span></h1>
     <kityminder-editor on-init="initEditor(editor, minder)"></kityminder-editor>
+    <div id="loading">
+        <div class="circle"></div>
+        <div class="circle"></div>
+        <div class="circle"></div>
+    </div>
 </body>
 
 <!-- bower:js -->
