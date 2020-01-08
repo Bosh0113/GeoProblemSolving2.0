@@ -20,13 +20,14 @@
     <script src="/GeoProblemSolving/js/vuescroll.js"></script>
     <script src="/GeoProblemSolving/js/Sortable.min.js"></script>
     <script src="/GeoProblemSolving/js/vuedraggable.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jspanel4@4.2.1/dist/jspanel.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jspanel4@4.2.1/dist/extensions/modal/jspanel.modal.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jspanel4@4.2.1/dist/extensions/tooltip/jspanel.tooltip.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jspanel4@4.2.1/dist/extensions/hint/jspanel.hint.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jspanel4@4.2.1/dist/extensions/layout/jspanel.layout.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jspanel4@4.2.1/dist/extensions/contextmenu/jspanel.contextmenu.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jspanel4@4.2.1/dist/extensions/dock/jspanel.dock.js"></script>
+    <link href="/GeoProblemSolving/jspanel/jspanel.css" rel="stylesheet">
+    <script src="/GeoProblemSolving/jspanel/jspanel.js"></script>
+    <script src="/GeoProblemSolving/jspanel/extensions/modal/jspanel.modal.js"></script>
+    <script src="/GeoProblemSolving/jspanel/extensions/tooltip/jspanel.tooltip.js"></script>
+    <script src="/GeoProblemSolving/jspanel/extensions/hint/jspanel.hint.js"></script>
+    <script src="/GeoProblemSolving/jspanel/extensions/layout/jspanel.layout.js"></script>
+    <script src="/GeoProblemSolving/jspanel/extensions/contextmenu/jspanel.contextmenu.js"></script>
+    <script src="/GeoProblemSolving/jspanel/extensions/dock/jspanel.dock.js"></script>
     <script th:replace="navigation::commonHeader-css"></script>
     <script th:replace="navigation::commonHeader-html"></script>
     <script th:replace="navigation::commonHeader-js"></script>
@@ -254,14 +255,14 @@
     </style>
 </head>
 
-<body>
+<body id="pageBody">
 <div id="projectDetailPage" v-cloak>
     <child-navigation ref="navigationEl" active-type="projects" :user-info="userInfo"></child-navigation>
     <template>
         <div :style="{height: contentPageCSS}" style="margin-top: 60px;">
             <div span="2" style="height: inherit;width: 90px;position: absolute;">
                 <i-menu :active-name="activeMenu" @on-select="changeMenuItem"
-                        style="height: inherit;width: fit-content;">
+                        style="height: inherit;width: fit-content;z-index:99">
                     <menu-item name="projectOverview" class="projectMenuItem">
                         <Icon type="md-home" title="Overview" size="35"></Icon>
                     </menu-item>
@@ -282,7 +283,7 @@
                 </i-menu>
             </div>
             <div style="margin-left: 90px;height: inherit;min-height: fit-content;">
-                <div v-if="activeMenu=='projectOverview'" style="height: inherit;min-height: fit-content;">
+                <div v-show="activeMenu=='projectOverview'" style="height: inherit;min-height: fit-content;">
                     <div style="background:#eee;padding: 10px;height: inherit;min-height: fit-content;">
                         <Card :bordered="false" dis-hover
                               style="height: -webkit-fill-available; flex-flow: column;min-height: fit-content;">
@@ -417,7 +418,7 @@
                         </Card>
                     </div>
                 </div>
-                <div v-else-if="activeMenu=='projectDetail'" style="height: inherit;min-height: fit-content;">
+                <div v-show="activeMenu=='projectDetail'" style="height: inherit;min-height: fit-content;">
                     <div style="background:#eee;padding: 10px;height: inherit;min-height: fit-content;">
                         <Card :bordered="false" dis-hover
                               style="height: -webkit-fill-available;flex-flow: column;min-height: fit-content;">
@@ -586,7 +587,7 @@
                         </Card>
                     </div>
                 </div>
-                <div v-else-if="activeMenu=='subProjects'" style="height: inherit;min-height: fit-content;">
+                <div v-show="activeMenu=='subProjects'" style="height: inherit;min-height: fit-content;">
                     <div style="background:#eee;padding: 10px;height: inherit;min-height: fit-content;">
                         <Card v-if="projectInfo.type=='type0'" :bordered="false" dis-hover
                               style="height: -webkit-fill-available;min-height: fit-content;">
@@ -696,7 +697,7 @@
                         </div>
                     </div>
                 </div>
-                <div v-else-if="activeMenu=='resources'" style="height: inherit;min-height: fit-content;">
+                <div v-show="activeMenu=='resources'" style="height: inherit;min-height: fit-content;">
                     <div style="background:#eee;padding: 10px;height: inherit;min-height: fit-content;">
                         <Card :bordered="false" dis-hover
                               style="height: -webkit-fill-available;min-height: 565px;min-height: fit-content;">
@@ -727,7 +728,7 @@
                         </Card>
                     </div>
                 </div>
-                <div v-else-if="activeMenu=='tasks'" style="height: inherit;min-height: fit-content;">
+                <div v-show="activeMenu=='tasks'" style="height: inherit;min-height: fit-content;">
                     <div style="background:#eee;padding: 10px;height: inherit;min-height: fit-content;">
                         <Card :bordered="false" dis-hover
                               style="height: -webkit-fill-available;min-height: 565px;min-height: fit-content;">
@@ -1340,7 +1341,21 @@
                     taskRole: "",
                     resetProjectTypeNotice:false,
                     resetProjectTypeModel:false,
-                    joinProjectNotice:false
+                    joinProjectNotice:false,
+                    workPanels: []
+                }
+            },
+            watch:{
+                activeMenu(val){
+                    if(val == "subProjects" && this.projectInfo.type !=""&&this.projectInfo.type !="type0"){
+                        this.workPanels.forEach(function(e){
+                            e.normalize();
+                        });
+                    }else{
+                        this.workPanels.forEach(function(e){
+                            e.minimize();
+                        });
+                    }
                 }
             },
             methods: {
@@ -2197,6 +2212,32 @@
                         }
                     });
                 },
+                showToolPanel(url, title){
+                    var that = this;
+                    var panel = jsPanel.create({
+                        container: "#pageBody",
+                        theme: "success",
+                        headerTitle: title,
+                        footerToolbar: '<p style="height:10px"></p>',
+                        contentSize: "800 400",
+                        content: url,
+                        disableOnMaximized: true,
+                        dragit: {
+                            containment: 5
+                        },
+                        closeOnEscape: true,
+                        onbeforeclose: function(panel, status, closedByUser) {
+                        return confirm("Please confirm your edit has been saved?");
+                        },
+                        onclosed: function(panel, status, closedByUser) {
+                            var index = that.workPanels.indexOf(this);
+                            that.workPanels.splice(index, 1);
+                        },
+                    });
+                    $(".jsPanel-content").css("font-size", "0");//防止出现滚动条
+                    $(".jsPanel").css("position","fixed");
+                    this.workPanels.push(panel);
+                }
             }
         }
     );

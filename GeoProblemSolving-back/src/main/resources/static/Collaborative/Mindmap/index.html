@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="bower_components/hotbox/hotbox.css" />
     <link rel="stylesheet" href="node_modules/kityminder-core/dist/kityminder.core.css" />
     <link rel="stylesheet" href="bower_components/color-picker/dist/color-picker.css" />
+    <link rel="stylesheet" href="css/style.css">
     <!-- endbower -->
 
     <link rel="stylesheet" href="kityminder.editor.css">
@@ -67,6 +68,11 @@
     <kityminder-editor on-init="initEditor(editor, minder)" style="top:0px"></kityminder-editor>
     <div id="edit-mask" style="width:100%;height: 100%; z-index: 100;position: absolute;display: none;"
         title="Other user may be drawing the mind map">
+    </div>
+    <div id="loading">
+        <div class="circle"></div>
+        <div class="circle"></div>
+        <div class="circle"></div>
     </div>
 </body>
 

@@ -1,4 +1,7 @@
 <style scoped>
+#workCard >>> .ivu-card-body{
+  padding: 5px;
+}
 .btnHoverRed:hover {
   background-color: #ed4014;
   color: white;
@@ -10,17 +13,8 @@
     <Row>
       <Col span="23" offset="1">
         <Row>
-          <Col span="22" offset="1">
-            <Collapse simple v-model="unfold">
-              <Panel name="tool">
-                Toolbox
-                <tool-container slot="content" :stepInfo="stepInfo" :userRole="userRole"></tool-container>
-              </Panel>
-              <Panel name="data">
-                Data list
-                <data-list slot="content" :stepInfo="stepInfo" :userRole="userRole"></data-list>
-              </Panel>
-            </Collapse>
+          <Col span="22" offset="1" id="workCard">
+            <data-list :stepInfo="stepInfo" :userRole="userRole"></data-list>
           </Col>
         </Row>
       </Col>
@@ -48,7 +42,6 @@ export default {
   data() {
     return {
       stepInfo: {},
-      unfold: ["tool", "data"],
       resetSubProjectTypeModel: false
     };
   },

@@ -45,6 +45,8 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
+  max-width: 250px;
+  word-break: break-word;
 }
 .shareLabel {
   display: block;
@@ -69,129 +71,145 @@
 <template>
   <div>
     <Row>
-      <div style="margin-bottom:5px;width:100%">
-        <Card dis-hover>
-          <div slot="title">
-            <h4>Historical edits</h4>
-          </div>
-          <div id="toolData">
-            <vue-scroll :ops="ops">
-              <div v-for="(item,index) in toolDataList" :key="index">
-                <Card style="width:48%; height:150px; float:left; margin:5px">
-                  <div style="float:left">
-                    <img
-                      v-if="item.thumbnail != undefined"
-                      :src="item.thumbnail"
-                      height="118px"
-                      width="118px"
-                    />
-                    <avatar v-else :username="item.name" :size="118" :rounded="false"></avatar>
-                  </div>
-                  <div style="float:left;margin: 0 10px">
-                    <div>
-                      <Label class="toolDataLabel">Name:</Label>
-                      <div class="toolDataText" :title="item.name">{{item.name}}</div>
-                    </div>
-                    <div>
-                      <Label class="toolDataLabel">Description:</Label>
-                      <div class="toolDataText" :title="item.description">{{item.description}}</div>
-                    </div>
-                    <div>
-                      <Button
-                        size="small"
-                        title="Check"
-                        icon="md-eye"
-                        style="margin: 10px 20px 0 0;"
-                        type="primary"
-                        @click="OpenData(item)"
-                      ></Button>
-                      <Button
-                        size="small"
-                        title="Details"
-                        icon="md-information-circle"
-                        style="margin: 10px 20px 0 0;"
-                        @click="checkData(item)"
-                      ></Button>
-                      <Button
-                        size="small"
-                        title="Share"
-                        icon="ios-share-alt"
-                        style="margin: 10px 20px 0 0;"
-                        @click="shareModal=true"
-                      ></Button>
-                      <Button
-                        size="small"
-                        title="Delete"
-                        icon="md-close"
-                        style="margin-top: 10px;"
-                        @click="deleteResourceModalShow(item.resourceId)"
-                      ></Button>
-                    </div>
-                  </div>
-                </Card>
+      <Col span="6">
+        <Tabs size="small">
+          <TabPane label="Resources">
+            <div style="border: 1px solid #dcdee2;padding:0 5px 5px">
+              <div>
+                <div style="margin-top: 15px;">
+                  <h4 style="display: inline-block;margin-left:10px">Resources</h4>
+                  <Select
+                    v-model="resouceModel"
+                    size="small"
+                    @on-change="changeResModel"
+                    style="width:150px;margin:-10px 12px 0 15px"
+                  >
+                    <Option value="resources">All resources</Option>
+                    <Option value="data">Data</Option>
+                    <Option value="materials">Related materials</Option>
+                  </Select>
+                  <Button
+                    shape="circle"
+                    icon="md-cloud-upload"
+                    @click="dataUploadModalShow"
+                    style="margin-top:-10px"
+                    title="Upload resources"
+                  ></Button>
+                </div>
               </div>
-            </vue-scroll>
-          </div>
-        </Card>
-      </div>
-      <div style="border: 1px solid #dcdee2;padding:0 5px 5px">
-        <div style="height:30px">
-          <div style="margin-top: 15px;">
-            <h4 style="display: inline-block;margin-left:10px">Resources</h4>
-            <Select
-              v-model="resouceModel"
-              size="small"
-              @on-change="changeResModel"
-              style="width:150px;margin:-10px 12px 0 15px"
-            >
-              <Option value="resources">All resources</Option>
-              <Option value="data">Data</Option>
-              <Option value="materials">Related materials</Option>
-            </Select>
-            <Button
-              shape="circle"
-              icon="md-cloud-upload"
-              @click="dataUploadModalShow"
-              style="margin-top:-10px"
-              title="Upload resources"
-            ></Button>
-          </div>
+              <div>
+                <Table
+                  :columns="tableColName"
+                  :data="fileList"
+                  class="table"
+                  v-show="fileList!=[] && fileList!='None'"
+                  height="360"
+                  size="small"
+                  no-data-text="No data"
+                >
+                  <template slot-scope="{ row }" slot="name">
+                    <strong>{{ row.name }}</strong>
+                  </template>
+                  <template slot-scope="{ row }" slot="action">
+                    <Button
+                      class="fileBtnHoverGreen"
+                      size="small"
+                      title="Details"
+                      @click="checkData(row)"
+                      icon="md-information-circle"
+                      shape="circle"
+                      type="text"
+                    ></Button>
+                    <Button
+                      class="fileBtnHoverRed"
+                      size="small"
+                      shape="circle"
+                      type="text"
+                      icon="md-close"
+                      title="Remove"
+                      @click="deleteResourceModalShow(row.resourceId)"
+                    ></Button>
+                  </template>
+                </Table>
+              </div>
+            </div>
+          </TabPane>
+          <TabPane label="Tools">
+            <div style="height:400px">
+              <vue-scroll :ops="ops">
+                <tool-container :stepInfo="stepInfo" :userRole="userRole"></tool-container>
+              </vue-scroll>
+            </div>
+          </TabPane>
+        </Tabs>
+      </Col>
+      <Col span="18">
+        <div style="margin-bottom:5px;margin-left:5px">
+          <Card dis-hover>
+            <div slot="title">
+              <h4>Historical edits</h4>
+            </div>
+            <div id="toolData">
+              <vue-scroll :ops="ops">
+                <div v-for="(item,index) in toolDataList" :key="index">
+                  <Card style="width:48%; height:150px; float:left; margin:5px">
+                    <div style="float:left">
+                      <img
+                        v-if="item.thumbnail != undefined"
+                        :src="item.thumbnail"
+                        height="118px"
+                        width="118px"
+                      />
+                      <avatar v-else :username="item.name" :size="118" :rounded="false"></avatar>
+                    </div>
+                    <div style="float:left;margin: 0 10px">
+                      <div>
+                        <Label class="toolDataLabel">Name:</Label>
+                        <div class="toolDataText" :title="item.name">{{item.name}}</div>
+                      </div>
+                      <div>
+                        <Label class="toolDataLabel">Description:</Label>
+                        <div class="toolDataText" :title="item.description">{{item.description}}</div>
+                      </div>
+                      <div>
+                        <Button
+                          size="small"
+                          title="Check"
+                          icon="md-eye"
+                          style="margin: 10px 20px 0 0;"
+                          type="primary"
+                          @click="OpenData(item)"
+                        ></Button>
+                        <Button
+                          size="small"
+                          title="Details"
+                          icon="md-information-circle"
+                          style="margin: 10px 20px 0 0;"
+                          @click="checkData(item)"
+                        ></Button>
+                        <Button
+                          size="small"
+                          title="Share"
+                          icon="ios-share-alt"
+                          style="margin: 10px 20px 0 0;"
+                          @click="shareData(item)"
+                        ></Button>
+                        <Button
+                          size="small"
+                          title="Delete"
+                          icon="md-close"
+                          style="margin-top: 10px;"
+                          @click="deleteResourceModalShow(item.resourceId)"
+                        ></Button>
+                      </div>
+                    </div>
+                  </Card>
+                </div>
+              </vue-scroll>
+            </div>
+          </Card>
         </div>
-        <div>
-          <Table
-            :columns="tableColName"
-            :data="fileList"
-            class="table"
-            v-show="fileList!=[] && fileList!='None'"
-            height="200"
-            size="small"
-          >
-            <template slot-scope="{ row }" slot="name">
-              <strong>{{ row.name }}</strong>
-            </template>
-            <template slot-scope="{ row }" slot="action">
-              <Button
-                class="fileBtnHoverGreen"
-                size="small"
-                title="Check"
-                @click="checkData(row)"
-                icon="md-information-circle"
-                shape="circle"
-                type="text"
-              ></Button>
-              <Button
-                class="fileBtnHoverRed"
-                size="small"
-                shape="circle"
-                type="text"
-                icon="md-close"
-                title="Remove"
-                @click="deleteResourceModalShow(row.resourceId)"
-              ></Button>
-            </template>
-          </Table>
-        </div>
-      </div>
+      </Col>
     </Row>
     <Modal v-model="checkDataModal" title="Data Information" width="600">
       <Tabs>
@@ -301,7 +319,7 @@
     <Modal
       v-model="deleteResourceModal"
       @on-ok="deleteResource()"
-      ok-text="Assure"
+      ok-text="Yes"
       cancel-text="Cancel"
     >
       <h3>Do you really want to delete this resource?</h3>
@@ -343,8 +361,10 @@
 </template>
 <script>
 import Avatar from "vue-avatar";
+import toolContainer from "./toolContainer";
 export default {
   components: {
+    toolContainer,
     Avatar
   },
   data() {
@@ -401,21 +421,20 @@ export default {
         {
           title: "Name",
           key: "name",
-          minWidth: 30,
+          minWidth: 50,
           tooltip: true,
           sortable: true
         },
         {
           title: "Type",
           key: "type",
-          width: 200,
           tooltip: true,
           sortable: true
         },
         {
           title: "Action",
           slot: "action",
-          width: 200,
+          width: 90,
           align: "center"
         }
       ],
@@ -433,14 +452,17 @@ export default {
       sharedToken: "",
       sharingEmail: "",
       // panel
-      panel: null
+      panel: null,
+      scopeType: "subproject"
     };
   },
   props: ["stepInfo", "userRole"],
   watch: {
     checkDataModal(value) {
       if (!value) {
-        this.panel.close();
+        if (this.panel != null) {
+          this.panel.close();
+        }
       }
     },
     stepInfo() {
@@ -449,7 +471,6 @@ export default {
   },
   created() {},
   mounted() {
-    console.log(this.userRole);
     this.getResList();
 
     $(".__view").css("width", "inherit");
@@ -482,6 +503,15 @@ export default {
   },
   methods: {
     getResList() {
+      if (
+        this.stepInfo.subProjectId == null ||
+        this.stepInfo.subProjectId == "" ||
+        this.stepInfo.subProjectId == undefined
+      ) {
+        this.scopeType = "project";
+      } else {
+        this.scopeType = "subproject";
+      }
       var list = [];
       if (this.stepInfo.stepId != "" && this.stepInfo.stepId != undefined) {
         $.ajax({
@@ -816,27 +846,7 @@ export default {
           '" style="width: 100%;height:100%;"></iframe>';
       }
       var demoPanelTimer = null;
-      this.panel = jsPanel.create({
-        theme: "success",
-        headerTitle: toolInfo.toolName,
-        footerToolbar: '<p style="height:10px"></p>',
-        contentSize: "800 400",
-        content: toolURL,
-        disableOnMaximized: true,
-        dragit: {
-          containment: 5
-        },
-        onclosed: function() {
-          window.clearTimeout(demoPanelTimer);
-        },
-        callback: function() {
-          var that = this;
-          demoPanelTimer = window.setInterval(function() {
-            that.style.zIndex = "9999";
-          }, 1);
-        }
-      });
-      $(".jsPanel-content").css("font-size", "0");
+      this.showPanel(toolURL, toolInfo.toolName);
     },
     checkData(item) {
       if (this.userRole != "Visitor" && this.userRole != "Token") {
@@ -874,28 +884,7 @@ export default {
               url +
               ' style="width: 100%;height:100%"></iframe>';
             var demoPanelTimer = null;
-            this.panel = jsPanel.create({
-              headerControls: {
-                smallify: "remove"
-              },
-              theme: "primary",
-              footerToolbar: '<p style="height:5px"></p>',
-              headerTitle: "Preview",
-              contentSize: "800 600",
-              content: toolURL,
-              disableOnMaximized: true,
-              dragit: {
-                containment: 5
-              },
-              closeOnEscape: true,
-              callback: function() {
-                var that = this;
-                demoPanelTimer = window.setInterval(function() {
-                  that.style.zIndex = "9999";
-                }, 1);
-              }
-            });
-            $(".jsPanel-content").css("font-size", "0");
+            this.showPanel(toolURL, res.name);
           },
           onCancel: () => {
             return;
@@ -911,28 +900,7 @@ export default {
           url +
           ' style="width: 100%;height:100%" controls></video>';
         var demoPanelTimer = null;
-        this.panel = jsPanel.create({
-          headerControls: {
-            smallify: "remove"
-          },
-          theme: "primary",
-          footerToolbar: '<p style="height:10px"></p>',
-          headerTitle: "Preview",
-          contentSize: "800 600",
-          content: toolURL,
-          disableOnMaximized: true,
-          dragit: {
-            containment: 5
-          },
-          closeOnEscape: true,
-          callback: function() {
-            var that = this;
-            demoPanelTimer = window.setInterval(function() {
-              that.style.zIndex = "9999";
-            }, 1);
-          }
-        });
-        $(".jsPanel-content").css("font-size", "0");
+        this.showPanel(toolURL, res.name);
       } else if (/\.(pdf|json|md|gif|jpg|png)$/.test(name.toLowerCase())) {
         if (this.panel != null) {
           this.panel.close();
@@ -943,28 +911,7 @@ export default {
           url +
           ' style="width: 100%;height:100%" controls></iframe>';
         var demoPanelTimer = null;
-        this.panel = jsPanel.create({
-          headerControls: {
-            smallify: "remove"
-          },
-          theme: "primary",
-          footerToolbar: '<p style="height:10px"></p>',
-          headerTitle: "Preview",
-          contentSize: "800 600",
-          content: toolURL,
-          disableOnMaximized: true,
-          dragit: {
-            containment: 5
-          },
-          closeOnEscape: true,
-          callback: function() {
-            var that = this;
-            demoPanelTimer = window.setInterval(function() {
-              that.style.zIndex = "9999";
-            }, 1);
-          }
-        });
-        $(".jsPanel-content").css("font-size", "0");
+        this.showPanel(toolURL, res.name);
       } else {
         this.$Notice.error({
           title: "Open failed",
@@ -973,19 +920,62 @@ export default {
         return false;
       }
     },
+    showPanel(url, title) {
+      if (this.scopeType == "project") {
+        parent.vm.showToolPanel(url, title);
+      } else {
+        this.panel = jsPanel.create({
+          headerControls: {
+            smallify: "remove"
+          },
+          theme: "primary",
+          footerToolbar: '<p style="height:5px"></p>',
+          headerTitle: title,
+          contentSize: "800 600",
+          content: url,
+          disableOnMaximized: true,
+          dragit: {
+            containment: 5
+          },
+          closeOnEscape: true,
+          onbeforeclose: function(panel, status, closedByUser) {
+            return confirm("Please confirm your edit has been saved?");
+          }
+          // callback: function() {
+          //   var that = this;
+          //   demoPanelTimer = window.setInterval(function() {
+          //     that.style.zIndex = "9999";
+          //   }, 1);
+          // }
+        });
+        $(".jsPanel-content").css("font-size", "0");
+      }
+    },
     dataVisualize() {},
+    shareData(data) {
+      this.shareModal = true;
+      this.selectData = data;
+    },
     generateToken() {
-      this.axios
-        .get("/GeoProblemSolving/token/getShareToken?duration=0")
-        .then(res => {
-          this.sharedToken = res.data;
-          this.sharedUrl =
-            "http://" +
-            this.$store.state.IP_Port +
-            "/share/"+this.stepInfo.stepId+"?tool=mindmap&token=" +
-            this.sharedToken;
-        })
-        .catch(err => {});
+      if (this.selectData.type == "toolData:Mindmap") {
+        let info = {
+          groupId: this.stepInfo.stepId,
+          resourceId: this.selectData.resourceId
+        };
+        this.axios
+          .post("/GeoProblemSolving/token/getShareToken?duration=0", info)
+          .then(res => {
+            this.sharedToken = res.data;
+            this.sharedUrl =
+              "http://" +
+              this.$store.state.IP_Port +
+              "/GeoProblemSolving/share?tool=mindmap&token=" +
+              this.sharedToken;
+          })
+          .catch(err => {});
+      } else {
+        //...
+      }
     },
     copySharedUrl() {
       let url = this.sharedUrl;

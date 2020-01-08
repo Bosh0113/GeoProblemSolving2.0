@@ -1,4 +1,7 @@
 <style scoped>
+#workCard >>> .ivu-card-body{
+  padding: 5px;
+}
 .btnHoverRed:hover {
   background-color: #ed4014;
   color: white;
@@ -15,32 +18,28 @@
 
 <template>
   <div>
-    <Card dis-hover>
-      <h1 slot="title">Workspace</h1>
+    <Card dis-hover id="workCard">
+      <!-- <h1 slot="title">Workspace</h1> -->
+      <div slot="title">
+        <div style="margin-left:20px;top: 15px; position:absolute;left:50px;">
+            <strong style="font-size:1.5rem;">Project</strong>
+            <Divider type="vertical"></Divider>
+            <strong style="font-size:1rem;">Workspace</strong>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:center;">
+            <span style="font-size:1.5rem; color: #2d8cf099;max-width:250px;display:inline-block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{projectInfo.title}}</span>
+        </div>
+      </div>
       <div slot="extra">
         <Button icon="ios-share-alt" @click="shareModal=true" v-show="userRole=='Manager'">Share</Button>
       </div>
-      <div style="display: flex;">
-        <div
-          style="width:300px;height:735px"
-          v-show="this.userRole != 'Visitor' && this.userRole != 'Token'"
-        >
-          <vue-scroll :ops="ops">
-            <tool-container :stepInfo="stepInfo" :userRole="userRole"></tool-container>
-          </vue-scroll>
-        </div>
-        <div style="margin-left:10px" :style="{width:resourceWidth+'px'}">
-          <data-list
-            :stepInfo="stepInfo"
-            :userRole="userRole"
-            v-show="this.userRole != 'Visitor' && this.userRole != 'Token'"
-          ></data-list>
+      <div>
+          <data-list :stepInfo="stepInfo" :userRole="userRole" v-show="this.userRole != 'Visitor' && this.userRole != 'Token'"></data-list>
           <historical-edit-list
             :stepInfo="stepInfo"
             :userRole="userRole"
             v-show="this.userRole == 'Visitor' || this.userRole == 'Token'"
           ></historical-edit-list>
-        </div>
       </div>
       <div style="margin:5px 0 5px 80px;text-align:center">
         <Button
@@ -95,19 +94,16 @@
 <script>
 import dataList from "./../workingSpace/noStep/dataList";
 import historicalEditList from "./../workingSpace/noStep/shareEditList";
-import toolContainer from "./../workingSpace/noStep/toolContainer";
 import onlineParticipant from "./../workingSpace/functionSteps/utils/onlineParticipants";
 export default {
   props: ["projectInfo", "userRole"],
   components: {
     dataList,
     historicalEditList,
-    toolContainer,
     onlineParticipant
   },
   created() {
     this.getStepInfo();
-    window.addEventListener("resize", this.initSize);
   },
   data() {
     return {
@@ -131,15 +127,9 @@ export default {
       sharedUrl: "",
       sharedToken: "",
       sharingEmail: "",
-      resourceWidth: window.innerWidth - 350
     };
   },
   methods: {
-    initSize() {
-      if (window.innerWidth > 1100) {
-        this.resourceWidth = window.innerWidth - 350;
-      }
-    },
     getStepInfo() {
       this.axios
         .get(
@@ -287,8 +277,11 @@ export default {
       }
     },
     generateToken() {
+      let info = {
+        groupId: this.stepInfo.stepId
+      }
       this.axios
-        .get("/GeoProblemSolving/token/getShareToken?duration=0")
+        .post("/GeoProblemSolving/token/getShareToken?duration=0",info)
         .then(res => {
           this.sharedToken = res.data;
           this.sharedUrl = top.location.href + "&token=" + this.sharedToken;

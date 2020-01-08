@@ -21,13 +21,7 @@
         <strong>{{ row.uploadTime }}</strong>
       </template>
       <template slot-scope="{ row }" slot="action">
-        <Button
-          size="small"
-          title="Check"
-          icon="md-eye"
-          type="primary"
-          @click="OpenData(row)"
-        ></Button>
+        <Button size="small" title="Check" icon="md-eye" type="primary" @click="OpenData(row)"></Button>
       </template>
     </Table>
   </div>
@@ -73,12 +67,12 @@ export default {
           align: "center"
         }
       ]
-    }
+    };
   },
-  mounted(){      
+  mounted() {
     this.getResList();
   },
-  methods: {      
+  methods: {
     getResList() {
       var list = [];
       if (this.stepInfo.stepId != "" && this.stepInfo.stepId != undefined) {
@@ -128,20 +122,20 @@ export default {
       }
       if (this.userRole != "Visitor" && this.userRole != "Token") {
         toolURL =
-          '<iframe src="/GeoProblemSolving/Collaborative/Mindmap/index.html?userName=' +
+          '<iframe src="/GeoProblemSolving/Collaborative/Mindmap/version/mindmap.html?userName=' +
           this.userInfo.userName +
-          '&userID=' +
+          "&userID=" +
           this.userInfo.userId +
-          '&groupID=' +
+          "&groupID=" +
           this.stepInfo.stepId +
-          '&resourceID=' +
+          "&resourceID=" +
           item.resourceId +
           '" style="width: 100%;height:100%;"></iframe>';
       } else {
-        toolURL =          
-          '<iframe src="/GeoProblemSolving/Collaborative/Mindmap/share/index.html?userName=&userID=&groupID=' +
+        toolURL =
+          '<iframe src="/GeoProblemSolving/Collaborative/Mindmap/share/mindmap.html?userName=&userID=&groupID=' +
           this.stepInfo.stepId +
-          '&resourceID=' +
+          "&resourceID=" +
           item.resourceId +
           '" style="width: 100%;height:100%;"></iframe>';
       }
@@ -156,6 +150,7 @@ export default {
         dragit: {
           containment: 5
         },
+        closeOnEscape: true,
         onclosed: function() {
           window.clearTimeout(demoPanelTimer);
         },

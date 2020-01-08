@@ -23,7 +23,7 @@
 </style>
 <template>
   <div>
-    <Card dis-hover style="width:300px">
+    <Card dis-hover>
       <div slot="title">
         <h4>Toolsets and tools</h4>
       </div>
@@ -169,6 +169,7 @@ export default {
   },
   watch: {
     stepInfo(val) {
+      this.checkScope();
       this.getAllTools();
     }
   },
@@ -185,10 +186,12 @@ export default {
       toolModal: 0,
       toolsetToolList: [],
       showToolsetToolsModal: false,
-      panelList: []
+      panelList: [],
+      scopeType:"subproject"
     };
   },
   mounted() {
+    this.checkScope();
     this.getAllTools();
 
     Date.prototype.Format = function(fmt) {
@@ -218,6 +221,14 @@ export default {
     };
   },
   methods: {
+    checkScope(){
+      if(this.stepInfo.subProjectId==null||this.stepInfo.subProjectId==""||this.stepInfo.subProjectId==undefined){
+        this.scopeType = "project";
+      }
+      else{
+        this.scopeType = "subproject";
+      }
+    },
     getAllTools() {
       if (
         this.stepInfo.toolList != null &&
@@ -344,30 +355,36 @@ export default {
           this.stepInfo.stepId +
           '" style="width: 100%;height:100%;"></iframe>';
         var demoPanelTimer = null;
-        var panel = jsPanel.create({
-          theme: "success",
-          headerTitle: toolInfo.toolName,
-          footerToolbar: '<p style="height:10px"></p>',
-          contentSize: "800 400",
-          content: toolURL,
-          disableOnMaximized: true,
-          dragit: {
-            containment: 5
-          },
-          onclosed: function(panel, status, closedByUser) {
-            window.clearTimeout(demoPanelTimer);
-          },
-          callback: function() {
-            var that = this;
-            demoPanelTimer = window.setInterval(function() {
-              that.style.zIndex = "9999";
-            }, 1);
-          }
-        });
-        // panel.resizeit("disable");
-        $(".jsPanel-content").css("font-size", "0");
-        this.panelList.push(panel);
-        this.$emit("toolPanel", panel);
+        if(this.scopeType=="project"){
+          parent.vm.showToolPanel(toolURL, toolInfo.toolName);
+        }
+        else{
+          var panel = parent.jsPanel.create({
+            theme: "success",
+            headerTitle: toolInfo.toolName,
+            footerToolbar: '<p style="height:10px"></p>',
+            contentSize: "800 400",
+            content: toolURL,
+            disableOnMaximized: true,
+            dragit: {
+              containment: 5
+            },
+            closeOnEscape: true,
+            onclosed: function(panel, status, closedByUser) {
+              window.clearTimeout(demoPanelTimer);
+            },
+            // callback: function() {
+            //   var that = this;
+            //   demoPanelTimer = window.setInterval(function() {
+            //     that.style.zIndex = "9999";
+            //   }, 1);
+            // }
+          });
+          // panel.resizeit("disable");
+          $(".jsPanel-content").css("font-size", "0");
+          this.panelList.push(panel);
+          this.$emit("toolPanel", panel);
+        }
 
         // 记录信息
         let toolRecords = {

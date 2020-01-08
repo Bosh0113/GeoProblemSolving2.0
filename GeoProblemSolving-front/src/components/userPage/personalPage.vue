@@ -400,7 +400,7 @@ body {
                           </div>
                           <div :style="{height:tabContentHeight-235+'px'}">
                             <vue-scroll :ops="ops">
-                              <Table size="small" :data="userResourceList" :columns="resourceColumn" class="table" @on-selection-change="setSelectedFiles">
+                              <Table size="small" :data="userResourceList" :columns="resourceColumn" class="table" @on-selection-change="setSelectedFiles" no-data-text="No data">
                                 <template slot-scope="{ row }" slot="name">
                                   <strong>{{ row.name }}</strong>
                                 </template>
