@@ -146,8 +146,8 @@
 <body>
 <div id="vueBody" v-cloak style="min-width: 1100px;">
     <child-navigation ref="navigationEl" active-type="projects" :user-info="userInfo"></child-navigation>
-    <i-input class="project-input" placeholder="Enter projects..."></i-input>
-    <i-button class="search-btn" @click=" ">Search</i-button>
+    <i-input class="project-input" placeholder="Enter projects..." v-model="searchText" @keyup.enter.native="showPageList"></i-input>
+    <i-button class="search-btn" @click="showPageList">Search</i-button>
     <i-button class="project-start-btn" @click="newProject" type="default">Establish a project</i-button>
     <div class="tabs">
         <Row :style="{minHeight:contentMinHeight+'px'}">
@@ -192,7 +192,7 @@
         </Row>
         <div class="pro-page">
             <Page ref="pages" :total="totalCount" :page-size="pageSize" :current="currentPage" size="small"
-                  @on-change="changePage" show-elevator show-total></Page>
+                  @on-change="showPageList" show-elevator show-total></Page>
         </div>
         <div th:replace="navigation::commonFooter"></div>
 
@@ -250,6 +250,7 @@
                 userInfo: [],
                 userState: false,
                 freshEle: 0,
+                searchText:"",
                 selectTag: ""
             },
             created() {
@@ -283,7 +284,7 @@
                 this.userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
                 if (this.userInfo != null && this.userInfo.userState) {
                     this.userState = true;
-                    this.changePage(1);
+                    this.showPageList();
                 }
                 else {
                     this.userState = false;
@@ -321,7 +322,7 @@
                         this.totalCount = projectsInfo.count;
                     }
                     else {
-                        this.changePage(1);
+                        this.showPageList();
                     }
                     if (type == "All") {
                         this.selectCatalog = this.projectCatalog[0];
@@ -361,10 +362,10 @@
                         //     return false;
                         // });
                     }
-                    this.changePage(this.currentPage);
+                    this.showPageList();
                 },
-                changePage(index) {
-                    // if (this.currentTab == "All" && index == 1 && !this.userState) {
+                showPageList() {
+                    // if (this.currentTab == "All" && this.currentPage == 1 && !this.userState) {
                     //     this.judgeMember(projectsInfo.projectList);
                     //     this.tabPageData = Object.assign([], this.currentProjectList);
                     //     this.freshEle++;
@@ -384,9 +385,10 @@
                             .get("/GeoProblemSolving/project/inquiryByPage" +
                                 "?category=" + this.currentTab +
                                 "&tag=" + this.selectTag +
-                                "&page=" + index +
+                                "&page=" + this.currentPage +
                                 "&pageSize=" + this.pageSize +
                                 "&userId=" + userId +
+                                "&searchConfig=" + this.searchText +
                                 "&joinedProjects=" + joinedProjects)
                             .then(res => {
                                 // this.$Spin.hide();
