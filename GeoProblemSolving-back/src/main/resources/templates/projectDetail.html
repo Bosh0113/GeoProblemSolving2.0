@@ -231,6 +231,27 @@
         background-color: #ed4014;
         color: white;
         }
+
+        .project_title{
+            font-size:1.5rem;
+            color: rgba(214, 109, 0, 0.82);
+            display:inline-block;
+            overflow:hidden;
+            text-overflow:ellipsis;
+            white-space:nowrap;
+        }
+
+        @media screen and (min-width:1300px){
+            .title_mw{
+                max-width: 600px;
+            }
+        }
+
+        @media screen and (max-width: 1299px){
+            .title_mw{
+                max-width: 350px;
+            }
+        }
     </style>
 </head>
 
@@ -274,7 +295,7 @@
                                     <strong style="font-size:1rem;">Overview</strong>
                                 </div>
                                 <div style="display:flex;align-items:center;justify-content:center;">
-                                    <span style="font-size:1.5rem; color: #2d8cf099;max-width:250px;display:inline-block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" :title="projectInfo.title">{{projectInfo.title}}</span>
+                                    <span class="project_title title_mw">{{projectInfo.title}}</span>
                                 </div>
                             </div>
                             <div slot="extra">
@@ -409,7 +430,7 @@
                                     <strong style="font-size:1rem;">Introduction</strong>
                                 </div>
                                 <div style="display:flex;align-items:center;justify-content:center;">
-                                    <span style="font-size:1.5rem; color: #2d8cf099;max-width:250px;display:inline-block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" :title="projectInfo.title">{{projectInfo.title}}</span>
+                                    <span class="project_title title_mw">{{projectInfo.title}}</span>
                                 </div>
                             </div>
                             <div slot="extra">
@@ -476,7 +497,7 @@
                                                                     {{projectInfo.createTime}}</p>
                                                             </div>
                                                         </div>
-                                                        <div class="statistics">
+                                                        <div style="position: absolute;right: 5px;bottom: 5px;">
                                                             <div>
                                                                 <Icon type="md-git-branch" size="30"></Icon>
                                                                 <span class="showCount">{{SubProjectCount()}}</span>
@@ -578,7 +599,7 @@
                                       <strong style="font-size:1rem;">Subprojects</strong>
                                   </div>
                                   <div style="display:flex;align-items:center;justify-content:center;">
-                                      <span style="font-size:1.5rem; color: #2d8cf099;max-width:250px;display:inline-block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" :title="projectInfo.title">{{projectInfo.title}}</span>
+                                      <span class="project_title title_mw">{{projectInfo.title}}</span>
                                   </div>
                               </div>
                             <div slot="extra">
@@ -688,7 +709,7 @@
                                     <strong style="font-size:1rem;">Resources</strong>
                                 </div>
                                 <div style="display:flex;align-items:center;justify-content:center;">
-                                    <span style="font-size:1.5rem; color: #2d8cf099;max-width:250px;display:inline-block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" :title="projectInfo.title">{{projectInfo.title}}</span>
+                                    <span class="project_title title_mw">{{projectInfo.title}}</span>
                                 </div>
                             </div>
                             <div slot="extra">
@@ -719,7 +740,7 @@
                                     <strong style="font-size:1rem;">Task assignment</strong>
                                 </div>
                                 <div style="display:flex;align-items:center;justify-content:center;">
-                                    <span style="font-size:1.5rem; color: #2d8cf099;max-width:250px;display:inline-block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" :title="projectInfo.title">{{projectInfo.title}}</span>
+                                    <span class="project_title title_mw">{{projectInfo.title}}</span>
                                 </div>
                             </div>
                             <div>
@@ -2066,7 +2087,7 @@
                 },
                 goSubProjectPage(subProject) {
                     if (this.managerIdentity(subProject.managerId) || this.memberIdentity(subProject.members)) {
-                        window.location.href = "/GeoProblemSolving/project/" + subProject.subProjectId + "/subproject/overview";
+                        window.location.href = "/GeoProblemSolving/project/" + subProject.subProjectId + "/subproject/info";
                     } else {
                         this.$Message.warning({
                             render: h => {
