@@ -5568,26 +5568,38 @@ angular.module('kityminderEditor')
                 }
 
                 function mapDownload(map) {
-
-                    var a = document.createElement("a");
-                    a.download = map.name;
-                    a.target="_blank";
-                    a.href = 'http://' + RouteInfo.getIPPort() + map.pathURL;
-                    $("body").append(a);
-                    a.click();
-                    $(a).remove();
-                }
-
-                function getBlobBydataURI(dataurl) {
-                    var arr = dataurl.split(","),
-                        mime = arr[0].match(/:(.*?);/)[1],
-                        bstr = atob(arr[1]),
-                        n = bstr.length,
-                        u8arr = new Uint8Array(n);
-                    while (n--) {
-                        u8arr[n] = bstr.charCodeAt(n);
+                    if (map.name.replace(/.+\./, "") == 'json') {
+                        try {
+                            $.ajax({
+                                url: 'http://' + RouteInfo.getIPPort() + map.pathURL,
+                                type: "GET",
+                                async: false,
+                                success: function (data) {
+                                    var result = JSON.stringify(data);
+                                    var a = document.createElement("a");
+                                    a.download = map.name;
+                                    a.target = "_blank";
+                                    a.href = "data:text/json;charset=utf-8,${" + data + "}";
+                                    a.href = 'http://' + RouteInfo.getIPPort() + map.pathURL;
+                                    $("body").append(a);
+                                    a.click();
+                                    $(a).remove();
+                                },
+                                error: function (err) {
+                                    alert("Fail to download");
+                                }
+                            });
+                        }
+                        catch (err) { }
+                    } else {
+                        var a = document.createElement("a");
+                        a.download = map.name;
+                        a.target = "_blank";
+                        a.href = 'http://' + RouteInfo.getIPPort() + map.pathURL;
+                        $("body").append(a);
+                        a.click();
+                        $(a).remove();
                     }
-                    return new Blob([u8arr], { type: mime });
                 }
             }
         }
