@@ -424,7 +424,6 @@ export default {
                       this.$Message.error("Invalid account or password.");
                     } else {
                       this.$store.commit("userLogin", res.data);
-                      this.$router.push({ path: "/" });
 
                       let registerEmailBody = {};
                       registerEmailBody["recipient"] = this.registerForm.email;
@@ -442,6 +441,7 @@ export default {
                         .catch(err => {
                           // console.log(err.data);
                         });
+                        this.$router.go(-1);
                     }
                   })
                   .catch(err => {
