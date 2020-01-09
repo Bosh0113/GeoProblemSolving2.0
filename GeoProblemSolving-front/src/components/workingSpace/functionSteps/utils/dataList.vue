@@ -742,12 +742,12 @@ export default {
                 containment: 5
               },
               closeOnEscape: true,
-              callback: function() {
-                var that = this;
-                demoPanelTimer = window.setInterval(function() {
-                  that.style.zIndex = "9999";
-                }, 1);
-              }
+              // callback: function() {
+              //   var that = this;
+              //   demoPanelTimer = window.setInterval(function() {
+              //     that.style.zIndex = "9999";
+              //   }, 1);
+              // }
             });
             $(".jsPanel-content").css("font-size", "0");
           },
@@ -779,12 +779,12 @@ export default {
             containment: 5
           },
           closeOnEscape: true,
-          callback: function() {
-            var that = this;
-            demoPanelTimer = window.setInterval(function() {
-              that.style.zIndex = "9999";
-            }, 1);
-          }
+          // callback: function() {
+          //   var that = this;
+          //   demoPanelTimer = window.setInterval(function() {
+          //     that.style.zIndex = "9999";
+          //   }, 1);
+          // }
         });
         $(".jsPanel-content").css("font-size", "0");
       } else if (/\.(pdf|json|md|gif|jpg|png)$/.test(name.toLowerCase())) {
@@ -811,12 +811,12 @@ export default {
             containment: 5
           },
           closeOnEscape: true,
-          callback: function() {
-            var that = this;
-            demoPanelTimer = window.setInterval(function() {
-              that.style.zIndex = "9999";
-            }, 1);
-          }
+          // callback: function() {
+          //   var that = this;
+          //   demoPanelTimer = window.setInterval(function() {
+          //     that.style.zIndex = "9999";
+          //   }, 1);
+          // }
         });
         $(".jsPanel-content").css("font-size", "0");
       } else {

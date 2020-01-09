@@ -319,12 +319,12 @@ export default {
                 containment: 5
               },
               closeOnEscape: true,
-              callback: function() {
-                var that = this;
-                demoPanelTimer = window.setInterval(function() {
-                  that.style.zIndex = "9999";
-                }, 1);
-              }
+              // callback: function() {
+              //   var that = this;
+              //   demoPanelTimer = window.setInterval(function() {
+              //     that.style.zIndex = "9999";
+              //   }, 1);
+              // }
             });
             $(".jsPanel-content").css("font-size", "0");
           },
