@@ -50,8 +50,9 @@ $(document).ready(function () {
     var ws;
     if(WebSocket)
     {
+        thisRoomId = "123"
         // ws = new WebSocket("wss://223.2.44.124:8083/GeoProblemSolving/VideoChatServer/" + thisRoomId);
-        ws = new WebSocket("wss://172.21.212.72:8083/GeoProblemSolving/VideoChatServer/"+thisRoomId);
+        ws = new WebSocket("wss://"+ window.location.hostname +":8083/GeoProblemSolving/VideoChatServer/"+thisRoomId);
         // ws = new WebSocket("wss://172.21.213.185:8083/GeoProblemSolving/VideoChatServer/"+thisRoomId);
 
     }

@@ -1,0 +1,79 @@
+<html>
+    <head>
+        <title>Geo-Problem Solving</title>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <script type="text/javascript" src="./js/jquery-3.3.1.js"></script>
+        <script type="text/javascript" src="./js/jquery.cookie.js" charset="UTF-8"></script>
+        <script type="text/javascript" src="./js/jquery.qrcode.min.js"></script>
+        <script src="/GeoProblemSolving/js/vue.min.js"></script>
+        <script src="/GeoProblemSolving/js/ionicons/ionicons.js"></script>
+        <link href="/GeoProblemSolving/js/ionicons/css/ionicons.min.css" rel="stylesheet">
+        <link href="/GeoProblemSolving/css/iview.css" rel="stylesheet">
+        <script src="/GeoProblemSolving/js/iview.js"></script>
+        <script src="/GeoProblemSolving/js/vue-avatar.min.js"></script>
+        <script src="/GeoProblemSolving/js/axios.min.js"></script>
+        <style>
+            .fileBtnHoverGreen:hover {
+                background-color: #19be6b;
+                color: white;
+            }
+            .fileBtnHoverRed:hover {
+                background-color: #ed4014;
+                color: white;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="vueBody" v-cloak>
+            <Raw>
+                <i-col span="4" style="height: 100%;">
+                    <div style="margin-right: 15px;height: 100%;">
+                        <Card dis-hover>
+                            <h2 slot="title">Members</h2>
+                            <div style="height:100%;">
+                                <Card :padding="1" v-for="member in members" :key="member.index" style="height: inherit;background-color: #f8f8f9">
+                                    <i-button style="width: 100%" @click="selectTargeMember(member)">{{member.userName}}</i-button>
+                                </Card>
+                            </div>
+                        </Card>
+                    </div>
+                </i-col>
+                <i-col span="20">
+                    <div>
+                        <video id="vedio-box1" autoplay="autoplay" src="" controls="controls" style="margin-top:20px;width:400px;height:400px">
+                            video 1
+                        </video>
+                        <video id="vedio-box2" autoplay="autoplay" src="" controls="controls" style="margin-top:20px;width:450px;height:450px">
+                            video 2
+                        </video>
+                    </div>
+                    <div>
+                        <i-button icon="ios-call" class="fileBtnHoverGreen" title="Call" shape="circle" v-show="callState=='Standby'"></i-button>
+                        <span v-show="callState=='Waiting'">Waiting...</span>
+                        <i-button icon="ios-close" class="fileBtnHoverRed" title="Canel" shape="circle" v-show="callState=='Waiting'"></i-button>
+                        <i-button icon="md-checkmark-circle" class="fileBtnHoverGreen" title="Answer" shape="circle" v-show="callState=='Respond'"></i-button>
+                        <i-button icon="md-close-circle" class="fileBtnHoverRed" title="Reject" shape="circle" v-show="callState=='Respond'"></i-button>
+                        <i-button icon="ios-close" class="fileBtnHoverRed" title="Hang up" shape="circle" v-show="callState=='Calling'"></i-button>
+                    </div>
+                </i-col>
+            </Raw>
+        </div>
+    </body>
+    <script>
+        var vm = new Vue({
+            el: '#vueBody',
+            data(){
+                return{
+                    members:[],
+                    callState: "Standby", //Standby|Waiting|Respond|Calling
+                }
+            },
+            methods:{
+                selectTargeMember(memberInfo){
+                    console.log(memberInfo.userName);
+                }
+            }
+        });
+    </script>
+</html>
