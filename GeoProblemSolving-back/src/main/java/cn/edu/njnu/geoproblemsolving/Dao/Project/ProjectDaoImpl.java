@@ -489,13 +489,14 @@ public class ProjectDaoImpl implements IProjectDao {
     }
 
     @Override
-    public Object inquiryByPage(String category, String tag, int page, int pageSize, String userId, String... joinedProjects){
+    public Object inquiryByPage(String category, String tag, int page, int pageSize, String userId, String searchConfig, String... joinedProjects){
         try {
             Sort sort = new Sort(Sort.Direction.DESC,"createTime");
             if(tag.equals("GIS-RS")){
                 tag="GIS & RS";
             }
-            Pattern tagPattern = Pattern.compile("^.*"+tag+"$",Pattern.CASE_INSENSITIVE);
+            Pattern tagPattern = Pattern.compile("^.*"+tag+".*$",Pattern.CASE_INSENSITIVE);
+            Pattern searchPatten = Pattern.compile("^.*"+ searchConfig + ".*$", Pattern.CASE_INSENSITIVE);
             // Public
             Criteria criteriaPublic = Criteria.where("privacy").is("Public");
             // Discoverable
@@ -506,16 +507,46 @@ public class ProjectDaoImpl implements IProjectDao {
             if(!userId.equals("")) {
                 criteriaManager = Criteria.where("managerId").is(userId);
                 if(category.equals("All")) {
-                    query = new Query(new Criteria().andOperator(Criteria.where("tag").regex(tagPattern),new Criteria().orOperator(criteriaDiscoverable,criteriaPublic,criteriaManager))).with(sort);
+                    query = new Query(
+                            new Criteria().andOperator(Criteria.where("tag").regex(tagPattern),
+                                    new Criteria().orOperator(
+                                            Criteria.where("title").regex(searchPatten),
+                                            Criteria.where("description").regex(searchPatten),
+                                            Criteria.where("introduction").regex(searchPatten)),
+                                    new Criteria().orOperator(criteriaDiscoverable,criteriaPublic,criteriaManager)))
+                            .with(sort);
                 }else {
-                    query = new Query(new Criteria().andOperator(Criteria.where("category").is(category), Criteria.where("tag").regex(tagPattern), new Criteria().orOperator(criteriaDiscoverable,criteriaPublic,criteriaManager))).with(sort);
+                    query = new Query(
+                            new Criteria().andOperator(Criteria.where("category").is(category),
+                                    Criteria.where("tag").regex(tagPattern),
+                                    new Criteria().orOperator(
+                                            Criteria.where("title").regex(searchPatten),
+                                            Criteria.where("description").regex(searchPatten),
+                                            Criteria.where("introduction").regex(searchPatten)),
+                                    new Criteria().orOperator(criteriaDiscoverable,criteriaPublic,criteriaManager)))
+                            .with(sort);
                 }
             }
             else {
                 if(category.equals("All")) {
-                    query = new Query(new Criteria().andOperator(Criteria.where("tag").regex(tagPattern),new Criteria().orOperator(criteriaDiscoverable,criteriaPublic))).with(sort);
+                    query = new Query(
+                            new Criteria().andOperator(Criteria.where("tag").regex(tagPattern),
+                                    new Criteria().orOperator(
+                                            Criteria.where("title").regex(searchPatten),
+                                            Criteria.where("description").regex(searchPatten),
+                                            Criteria.where("introduction").regex(searchPatten)),
+                                    new Criteria().orOperator(criteriaDiscoverable,criteriaPublic)))
+                            .with(sort);
                 }else {
-                    query = new Query(new Criteria().andOperator(Criteria.where("category").is(category), Criteria.where("tag").regex(tagPattern), new Criteria().orOperator(criteriaDiscoverable,criteriaPublic))).with(sort);
+                    query = new Query(
+                            new Criteria().andOperator(Criteria.where("category").is(category),
+                                    Criteria.where("tag").regex(tagPattern),
+                                    new Criteria().orOperator(
+                                            Criteria.where("title").regex(searchPatten),
+                                            Criteria.where("description").regex(searchPatten),
+                                            Criteria.where("introduction").regex(searchPatten)),
+                                    new Criteria().orOperator(criteriaDiscoverable,criteriaPublic)))
+                            .with(sort);
                 }
             }
             long count = mongoTemplate.count(query,ProjectEntity.class);
