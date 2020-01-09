@@ -7,32 +7,60 @@
   font-weight: bold;
   border-bottom: 1px solid lightgray;
 }
+
+@media screen and (min-width: 1300px) {
+  .project_title {
+    font-size: 1.5rem;
+    color: rgba(214, 109, 0, 0.82);
+    max-width: 600px;
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+@media screen and (max-width: 1299px) {
+  .project_title {
+    font-size: 1.5rem;
+    color: rgba(214, 109, 0, 0.82);
+    max-width: 350px;
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.left_bar_bg{
+  background:lightslategrey;
+}
 </style>
 <template>
   <div>
     <Row>
       <Menu :active-name="menuActive" style="width:60px;position:absolute;z-index:1" :style="{height:contentHeight}"
-        @on-select="changeContent">
+        @on-select="changeContent" class="left_bar_bg" theme="dark">
         <MenuItem name="back" style="padding-left: 16px;" title="Project page">
-        <Icon type="md-arrow-round-back" size="30" />
+        <Icon type="md-arrow-round-back" color="white" size="30" />
         </MenuItem>
         <!-- <MenuItem name="overview" style="padding-left: 16px;" title="Subproject Home">
         <Icon type="md-home" size="30" />
         </MenuItem> -->
         <MenuItem name="info" style="padding-left: 16px;" title="Subproject introduction">
-        <Icon type="ios-information-circle" size="30" />
+        <Icon type="ios-information-circle" color="white" size="30" />
         </MenuItem>
         <MenuItem name="task" style="padding-left: 16px;" title="Task arrangement">
-        <Icon type="md-calendar" size="30" />
+        <Icon type="md-calendar" size="30" color="white" />
         </MenuItem>
 
         <MenuItem name="process" style="padding-left: 16px;" title="Working steps">
         <!-- <Icon type="md-git-branch" size="30" /> -->
-        <Icon type="md-analytics" size="30" />
+        <Icon type="md-analytics" size="30" color="white" />
         </MenuItem>
 
         <MenuItem name="resource" style="padding-left: 16px;" title="Subproject resources">
-        <Icon type="ios-folder" size="30" />
+        <Icon type="ios-folder" size="30" color="white" />
         </MenuItem>
       </Menu>
       <div
@@ -45,8 +73,7 @@
         <!-- <Col span="16" style="margin-left:20px;color: #2d8cf099;"> -->
         <!-- <strong style="font-size:1.5rem; color: #2d8cf099;position:absolute;left:48%;">{{panelTitle}}</strong> -->
         <div>
-          <span
-            style="font-size:1.5rem; color: #2d8cf099;max-width:250px;display:inline-block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{subProjectInfo.title}}</span>
+          <span class="project_title">{{subProjectInfo.title}}</span>
         </div>
 
         <!-- </Col> -->

@@ -80,6 +80,7 @@ img {
   display: flex;
   text-align: center;
   justify-content: center;
+  margin-top: 10px;
 }
 .reciverSpan {
   width: 100px;
@@ -102,7 +103,7 @@ img {
         <div class="loginTitle">Log in</div>
         <div class="login-content">
           <Form ref="loginForm" :model="loginForm" :rules="loginFormRule">
-            <FormItem prop="user" label="E-mail" :label-width="100">
+            <FormItem prop="user" label="Email" :label-width="100">
               <Input
                 placeholder="Please input your username"
                 style="width: 90%"
@@ -120,11 +121,11 @@ img {
               />
             </FormItem>
             <div class="reUseDiv">
-              <Checkbox v-model="checked">Automatic login within one week</Checkbox>
+              <Checkbox v-model="checked">Keep me logged in</Checkbox>
             </div>
             <div class="reUseDiv">
               <p>
-                Forget password?
+                Forgot password?
                 <a @click="resetModalSHow=true">Reset</a>
               </p>
             </div>

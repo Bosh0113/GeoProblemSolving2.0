@@ -146,7 +146,7 @@
 <body>
 <div id="vueBody" v-cloak style="min-width: 1100px;">
     <child-navigation ref="navigationEl" active-type="projects" :user-info="userInfo"></child-navigation>
-    <i-input class="project-input" placeholder="Enter projects..." v-model="searchText" @keyup.enter.native="showPageList"></i-input>
+    <i-input class="project-input" placeholder="Enter projects name..." v-model="searchText" @keyup.enter.native="showPageList"></i-input>
     <i-button class="search-btn" @click="showPageList">Search</i-button>
     <i-button class="project-start-btn" @click="newProject" type="default">Establish a project</i-button>
     <div class="tabs">
@@ -230,7 +230,7 @@
                     },
                     {
                         name: "Investigational projects",
-                        introduction: "Understanding geographic scales and boundaries, clarifying geographic factors, analyzing geographic phenomena, and simulating geographic processes",
+                        introduction: "Understanding geographic scales and boundaries, clarifying geographic elements, analyzing geographic phenomena, and simulating geographic processes.",
                         tags:["Terrestrial","Coastal", "Marine","Climate","Ecological","Geological", "Human", "GIS & RS", "General"]
                     },
                     {

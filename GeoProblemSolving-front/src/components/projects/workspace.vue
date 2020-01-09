@@ -46,14 +46,14 @@
           class="btnHoverRed"
           @click="resetProjectTypeModalShow()"
           v-show="userRole=='Manager'"
-        >Reset project type</Button>
+        >Reset workspace type</Button>
       </div>
     </Card>
-    <Modal v-model="resetProjectTypeModel" title="Reset project type">
-      <h2>Are you sure you want to reset the project type?</h2>
-      <small style="color:red">* All operation and data in this page can't be restore any more.</small>
+    <Modal v-model="resetProjectTypeModel" title="Reset workspace type">
+      <h2>Are you sure to reset the workspace type?</h2>
+      <small style="color:red">* All operations and data in this workspace will be removed.</small>
       <div slot="footer">
-        <Button type="primary" @click="resetProjectType()">Submit</Button>
+        <Button type="primary" @click="resetProjectType()">OK</Button>
       </div>
     </Modal>
     <Modal v-model="shareModal" title="Share workspace" footer-hide>

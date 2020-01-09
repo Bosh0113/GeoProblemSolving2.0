@@ -20,12 +20,12 @@
       </Col>
     </Row>
     <div style="margin:5px 0 5px 80px;text-align:center">
-      <Button class="btnHoverRed" @click="resetSubProjectTypeModalShow()">Reset sub-project's type</Button>
+      <Button class="btnHoverRed" @click="resetSubProjectTypeModalShow()">Reset workspace type</Button>
     </div>
-    <Modal v-model="resetSubProjectTypeModel" title="Reset sub-project's type">
-      <h2>Are you sure you want to reset the sub-project type?</h2>
+    <Modal v-model="resetSubProjectTypeModel" title="Reset workspace type">
+      <h2>Are you sure to reset the workspace type?</h2>
       <div slot="footer">
-        <Button type="primary" @click="resetSubProjectType()">Submit</Button>
+        <Button type="primary" @click="resetSubProjectType()">OK</Button>
       </div>
     </Modal>
   </div>

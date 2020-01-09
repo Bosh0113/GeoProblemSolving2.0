@@ -36,9 +36,9 @@ export default {
         "Notifications center",
         "Project detail page",
         "Project's resources",
-        "Project's sub-projects",
-        "Sub-project's detail page",
-        "Sub-project's tasks"
+        "Project's subprojects",
+        "Subproject's detail page",
+        "Subproject's tasks"
       ]
     };
   },

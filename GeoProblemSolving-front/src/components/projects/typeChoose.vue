@@ -3,9 +3,9 @@
         <div style="margin-top:20px">
             <div style="text-align: center;">
                 <div style="max-width:80%;text-align: left;display: inline-block;margin-buttom:2%">
-                    <span style="margin:25px 0; font-size:28px">This content</span>
+                    <span style="margin:25px 0; font-size:28px">Here </span>
                     <span style="margin: 0px 10px;font-size: 14px;">
-                        can be customized to support collaborative geo-problem solving. And it provided by this platform can be classified to three types, each designed for different levels of needs. The type of this page will be determined after selection, and the selection will no longer be displayed when you open this page again.
+                        you can select different types of workspaces to support collaborative geo-problem solving. This platform provides three workspace types according to different participatory levels. (Once the workspace type selected, and you will enter the selected workspace the next time.)
                     </span>
                 </div>
             </div>
@@ -17,20 +17,20 @@
                         </div>
                         <div style="margin:10px 0;min-height: 85px;">
                             <p style="text-indent:2em">
-                                In this kind of workspace, you can divide the problem into a series of small problems. Different subprojects are for distinct purposes. 
+                                In this workspace, you can divide a complex problem into a series of sub-problems. Different subprojects can be established for distinct sub-problems. 
                             </p>
                         </div>
                         <div style="padding: 0 5%;min-height: 85px;">
                             <ul>
-                                <li>Clear problem boundaries</li>
-                                <li>Management by department</li>
-                                <li>More levels of workspace</li>
+                                <li>Distinct purposes for sub-problems</li>
+                                <li>Complex relationship of participants</li>
+                                <li>Different participatory levels</li>
                             </ul>
                         </div>
                         <div style="text-align:center;margin-top:2%">
                             <h3>
                             To: 
-                            <a @click="selectTypeModalShow('type0')">Create sub-projects</a>
+                            <a @click="selectTypeModalShow('type0')">Create subprojects</a>
                             </h3>
                         </div>
                     </Card>
@@ -42,21 +42,20 @@
                         </div>
                         <div style="margin:10px 0;min-height: 85px;">
                             <p style="text-indent:2em">
-                                In this kind of workspace, you can design the process of solving a geographic problem into a workflow that uses iterable functional steps. Then collaborate together in each active node. 
+                                In this workspace, you can analyze and design the process for solving a geo-problem. Several iterable steps are used to construct the process. Collaborative activities are conducted in each step.
                             </p>
                         </div>
                         <div style="padding: 0 5%;min-height: 85px;">
                             <ul>
-                                <li>Clear process boundaries</li>
-                                <li>Iterable steps for different functions</li>
-                                <li>Directed graph workflow editing</li>
-                                <li>Provides a large number of tools</li>
+                                <li>Clear problem-solving process</li>
+                                <li>Iterable steps with different functions</li>
+                                <li>Directed graph workflow based process construction</li>
                             </ul>
                         </div>
                         <div style="text-align:center;margin-top:2%">
                             <h3>
                             To: 
-                            <a @click="selectTypeModalShow('type1')">Design workflow graph</a>
+                            <a @click="selectTypeModalShow('type1')">Design problem-solving workflow</a>
                             </h3>
                         </div>
                     </Card>
@@ -68,13 +67,13 @@
                         </div>
                         <div style="margin:10px 0;min-height: 85px;">
                             <p style="text-indent:2em">
-                                In this kind of workspace, You can quickly enter the working state and easily use any resources. You can directly regard this type as a node of the previous type.
+                                In this workspace, You can start your work directly. Kinds of tools are available for you to solve a simple geo-problem.
                             </p>
                         </div>
                         <div style="padding: 0 5%;min-height: 85px;">
                             <ul>
                                 <li>Start working immediately</li>
-                                <li>Provides a large number of tools</li>
+                                <li>A pure workspace with many tools</li>
                             </ul>
                         </div>
                         <div style="text-align:center;margin-top:2%">
@@ -89,13 +88,13 @@
         </div>
         <Modal
         v-model="selectTypeModal"
-        title="Set type of this content"
+        title="Set workspace type"
         @on-ok="setType()"
         ok-text="OK"
         cancel-text="Cancel"
         >
-        <h2>Do you sure to select this type?</h2>
-        <small style="color:#03A9F4">* The type of this page will be determined after selection, and the selection will no longer be displayed when you open this page again.</small>
+        <h2>Are you sure to select this type?</h2>
+        <small style="color:#03A9F4">* Once the workspace type selected, and you will enter the selected workspace the next time.</small>
         </Modal>
     </div>
 </template>

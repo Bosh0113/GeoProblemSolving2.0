@@ -98,8 +98,8 @@ h1 {
             <Radio label="Educational">Educational project</Radio>
           </RadioGroup>
       </FormItem>
-      <FormItem prop="title" label="Title" :label-width="100">
-          <Input v-model="formInline.title" placeholder="Enter Title (less than 60 characters)..."/>
+      <FormItem prop="title" label="Name" :label-width="100">
+          <Input v-model="formInline.title" placeholder="Enter name of the project(less than 60 characters)..."/>
       </FormItem>
       <FormItem prop="description" label="Description" :label-width="100">
           <Input
@@ -180,7 +180,7 @@ h1 {
       </FormItem>
       <FormItem prop="introduction" label="Introduction" :label-width="100">
         <div class="inline_style">
-            <Input v-model="formInline.introduction" type="textarea" placeholder="Enter detailed introduction about this problem..." style="height:100%;width:100%"/>
+            <Input v-model="formInline.introduction" type="textarea" placeholder="Enter detailed introduction about this project..." style="height:100%;width:100%"/>
         </div>
       </FormItem>
       <FormItem>
