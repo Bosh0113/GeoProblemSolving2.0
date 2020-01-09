@@ -24,7 +24,7 @@
     <div style="position:relative;padding:10px 10px 0 10px; margin-top:10px">
       <Breadcrumb style="display: inline-block" separator=">">
         <BreadcrumbItem :to="toSubProjectPage">Subproject</BreadcrumbItem>
-        <BreadcrumbItem>Work space</BreadcrumbItem>
+        <BreadcrumbItem>Workspace</BreadcrumbItem>
       </Breadcrumb>
       <h1 id="stepType">{{stepInfo.type}}</h1>
       <step-change

@@ -12,6 +12,7 @@
   width: 100%;
   max-height: 100%;
   text-align: center;
+  background-color:#d3d3d333;
 }
 /* 注册时上传头像的用户的头像样式 */
 .u_img {
@@ -33,9 +34,12 @@ body {
   font-size: 12px;
   line-height: 15px;
 }
-/* 表示空格间距的 */
-.whitespace {
-  height: 20px;
+.profileInfo {
+  overflow: hidden;
+  word-break: break-word;
+  white-space: nowrap;
+  display: block;
+  text-overflow: ellipsis;
 }
 /* 关于提交用户更改头像信息的样式 */
 .demo-upload-list {
@@ -95,10 +99,10 @@ body {
   border-color: lightslategray;
 }
 
-.projectsTitle{
+.projectsTitle {
   width: 80%;
 }
-.projectItem{
+.projectItem {
   cursor: pointer;
 }
 /* 新定义的样式 */
@@ -119,11 +123,11 @@ body {
   margin-left: 5%;
   height: 120px;
 }
-.parent>>>.ivu-tabs-nav-container {
+.parent >>> .ivu-tabs-nav-container {
   font-size: 15px !important;
   font-weight: bold;
 }
-.parent>>>.ivu-tabs-bar {
+.parent >>> .ivu-tabs-bar {
   margin-bottom: 5px;
 }
 .fileBtnHoverGreen:hover {
@@ -142,36 +146,36 @@ body {
   background-color: #808695;
   color: white;
 }
-.demo-spin-icon-load{
-    animation: ani-demo-spin 1s linear infinite;
+.demo-spin-icon-load {
+  animation: ani-demo-spin 1s linear infinite;
 }
-.editInfoForm>>>.ivu-form-item{
-  margin-bottom:18px;
+.editInfoForm >>> .ivu-form-item {
+  margin-bottom: 18px;
 }
-.historyLine>>>.ivu-card-head{
+.historyLine >>> .ivu-card-head {
   border-bottom-color: white;
   padding: 4px 6px;
 }
-.historyLine>>>.ivu-card-body{
+.historyLine >>> .ivu-card-body {
   padding: 5px;
 }
-.personlResouce>>>.ivu-card-head{
+.personlResouce >>> .ivu-card-head {
   padding: 8px 6px;
 }
-.personlResouce>>>.ivu-card-extra{
-  top:2px;
+.personlResouce >>> .ivu-card-extra {
+  top: 2px;
 }
-.personlResouce>>>.ivu-card-body{
+.personlResouce >>> .ivu-card-body {
   padding: 5px;
 }
-.projectItem>>>.ivu-card-head{
+.projectItem >>> .ivu-card-head {
   padding: 8px 6px;
 }
-.projectItem>>>.ivu-card-head{
+.projectItem >>> .ivu-card-head {
   padding: 8px 6px;
 }
-.projectItem>>>.ivu-card-extra{
-  top:2px;
+.projectItem >>> .ivu-card-extra {
+  top: 2px;
 }
 </style>
 <template>
@@ -187,7 +191,7 @@ body {
                   class="u_img"
                   v-if="userDetail.avatar!=''&&userDetail.avatar!='undefined'
                   &&userDetail.avatar!='null'"
-                >
+                />
                 <avatar
                   style="width:200px"
                   class="avatarStyle"
@@ -197,170 +201,242 @@ body {
                   v-else
                 ></avatar>
               </div>
-              <div class="single-info" :title="`Name: `+ userDetail.userName">
-                <Icon type="ios-contact-outline" :size="20"/>
-                <span>{{userDetail.userName}}</span>
-              </div>
-              <div class="single-info" :title="`Email:  ` + userDetail.email">
-                <Icon type="ios-mail-outline" :size="20"/>
-                <span>{{userDetail.email}}</span>
-              </div>
-              <div class="single-info"  v-show="userDetail.mobilePhone!=''">
-                <Icon type="ios-call-outline" :size="20"/>
-                <span>{{userDetail.mobilePhone}}</span>
-              </div>
-              <div class="single-info" :title="`Job Title:  `+userDetail.jobTitle">
-                <Icon type="ios-hammer-outline" :size="20"/>
-                <span>{{userDetail.jobTitle}}</span>
-              </div>
               <div
-                class="single-info"
-                :title="`Position:  `+ userDetail.city + userDetail.country"
-                v-show="userDetail.city!=''&&userDetail.country!=''"
+                style="margin-top: 10px; border:1px solid lightgray;border-radius: 4px;padding:10px"
               >
-                <Icon type="ios-compass-outline" :size="20"/>
-                <span>{{userDetail.city}}&nbsp{{userDetail.country}}</span>
-              </div>
-              <div
-                class="single-info"
-                :title="`Organization:  `+ userDetail.organization"
-                v-show="userDetail.organization!=''"
-                style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis"
-              >
-                <Icon type="ios-home-outline" :size="20"/><span> {{userDetail.organization}}</span>
-              </div>
-              <div class="single-info" :title="`Direction:  `+ userDetail.direction" v-show="userDetail.direction!=''" style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis">
-                <Icon type="ios-contract" :size="20"/><span> {{userDetail.direction}}</span>
-              </div>
-              <div class="single-info" :title="`Home Page:  `+ userDetail.homePage" v-show="userDetail.homePage!=''" style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis">
-                <Icon type="md-link" :size="20"/>
-                <span> {{userDetail.homePage}}</span>
-              </div>
-              <div
-                style="word-break: break-word;padding:10px;font-size:12px;border:1px dotted lightgray;white-space: pre-line;height: 120px;"
-                title="Introduction"
-                v-show="userDetail.introduction!=''"
-              >
-                <vue-scroll :ops="ops">{{userDetail.introduction}}</vue-scroll>
+                <div class="single-info" :title="`Name: `+ userDetail.userName">
+                  <span class="profileInfo">
+                    <Icon type="ios-contact-outline" :size="20" />
+                    {{userDetail.userName}}
+                  </span>
                 </div>
-              <div class="whitespace"></div>
-              <div style="display:flex;justify-content:center">
-                <Button class="fileBtnHoverBlue" style="height:40px" @click="editModalShow()" title="Edit">
-                  <Icon type="md-create" :size="20"/>
-                </Button>
+                <div class="single-info" :title="`Email:  ` + userDetail.email">
+                  <span class="profileInfo">
+                    <Icon type="ios-mail-outline" :size="20" />
+                    {{userDetail.email}}
+                  </span>
+                </div>
+                <div class="single-info"  :title="`Phone number:  ` + userDetail.mobilePhone" v-show="userDetail.mobilePhone!=''">
+                  <span class="profileInfo">
+                    <Icon type="ios-call-outline" :size="20" />
+                    {{userDetail.mobilePhone}}
+                  </span>
+                </div>
+                <div class="single-info" :title="`Title:  `+userDetail.jobTitle">
+                  <span class="profileInfo">
+                    <Icon type="ios-school-outline" :size="20" />
+                    {{userDetail.jobTitle}}
+                  </span>
+                </div>
+                <div
+                  class="single-info"
+                  :title="`Location:  `+ userDetail.city +`, `+ userDetail.country"
+                  v-show="userDetail.city!=''&&userDetail.country!=''"
+                >
+                  <span class="profileInfo">
+                    <Icon type="ios-compass-outline" :size="20" />
+                    <span>{{userDetail.city}}</span>
+                    <span>&nbsp{{userDetail.country}}</span>
+                  </span>
+                </div>
+                <div
+                  class="single-info"
+                  :title="`Organization:  `+ userDetail.organization"
+                  v-show="userDetail.organization!=''"
+                  style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis"
+                >
+                  <span class="profileInfo">
+                    <Icon type="ios-home-outline" :size="20" />
+                    {{userDetail.organization}}
+                  </span>
+                </div>
+                <div
+                  class="single-info"
+                  :title="`Area of interest:  `+ userDetail.direction"
+                  v-show="userDetail.direction!=''"
+                  style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis"
+                >
+                  <span class="profileInfo">
+                    <Icon type="ios-contract" :size="20" />
+                    {{userDetail.direction}}
+                  </span>
+                </div>
+                <div
+                  class="single-info"
+                  :title="`Home Page:  `+ userDetail.homePage"
+                  v-show="userDetail.homePage!=''"
+                  style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis"
+                >
+                  <span class="profileInfo">
+                    <Icon type="md-link" :size="20" />
+                    {{userDetail.homePage}}
+                  </span>
+                </div>
+                <div
+                  style="word-break: break-word;padding:10px;font-size:12px;border:1px dotted lightgray;white-space: pre-line;height: 120px;"
+                  title="Introduction"
+                  v-show="userDetail.introduction!=''"
+                >
+                  <vue-scroll :ops="ops">{{userDetail.introduction}}</vue-scroll>
+                </div>
+              </div>
+              <div style="display:flex;justify-content:center;margin-bottom:10px">
+                <Button
+                  class="fileBtnHoverBlue"
+                  @click="editModalShow()"
+                  title="Edit"
+                  style="width:100%"
+                  icon="md-create"
+                >Edit your personal profile</Button>
                 <Drawer
-                  title="Profile Edit Panel"
+                  title="Edit your personal profile"
                   placement="left"
                   :closable="true"
                   v-model="editProfileModal"
                   width="600px"
                 >
-                <vue-scroll :ops="ops">
-                  <Form
-                    ref="personalInfoItem"
-                    :model="personalInfoItem"
-                    :rules="ruleValidate"
-                    :label-width="80"
-                    class="editInfoForm"
-                  >
-                    <FormItem label="Name" prop="userName">
-                      <Input v-model="personalInfoItem.userName" :class="{InputStyle: inputstyle}"></Input>
-                    </FormItem>
-                    <FormItem label="Job title" prop="jobTitle">
-                      <Input v-model="personalInfoItem.jobTitle" :class="{InputStyle: inputstyle}"></Input>
-                    </FormItem>
-                    <FormItem label="E-mail" prop="email">
-                      <Input
-                        v-model="personalInfoItem.email"
-                        :class="{InputStyle: inputstyle}"
-                        disabled
-                      ></Input>
-                    </FormItem>
-                    <FormItem label="Phone" prop="mobilePhone">
-                      <Input
-                        v-model="personalInfoItem.mobilePhone"
-                        :class="{InputStyle: inputstyle}"
-                      ></Input>
-                    </FormItem>
-                    <FormItem label="Country" prop="country">
-                      <Input v-model="personalInfoItem.country" :class="{InputStyle: inputstyle}"></Input>
-                    </FormItem>
-                    <FormItem label="City" prop="city">
-                      <Input v-model="personalInfoItem.city" :class="{InputStyle: inputstyle}"></Input>
-                    </FormItem>
-                    <FormItem label="Affiliation" prop="organization">
-                      <Input
-                        v-model="personalInfoItem.organization"
-                        :class="{InputStyle: inputstyle}"
-                      ></Input>
-                    </FormItem>
-                    <FormItem label="Field" prop="direction">
-                      <Input v-model="personalInfoItem.direction" :class="{InputStyle: inputstyle}"></Input>
-                    </FormItem>
-                    <FormItem label="Home page" prop="homePage">
-                      <Input v-model="personalInfoItem.homePage" :class="{InputStyle: inputstyle}"></Input>
-                    </FormItem>
-                    <FormItem label="Introduction" prop="introduction">
-                      <Input
-                        style="word-wrap:break-word"
-                        v-model="personalInfoItem.introduction"
-                        type="textarea"
-                        :autosize="{minRows: 2,maxRows: 5}"
-                      ></Input>
-                    </FormItem>
-                    <FormItem label="Avatar" prop="avatar">
-                      <div>
-                        <div class="demo-upload-list" v-if="personalInfoItem.avatar!=''">
-                          <template>
-                            <img v-bind:src="personalInfoItem.avatar" class="avatarImage">
-                            <div class="demo-upload-list-cover">
-                              <Icon type="ios-eye-outline" @click.native="handleView()"></Icon>
-                              <Icon type="ios-trash-outline" @click.native="handleRemove()"></Icon>
-                            </div>
-                          </template>
+                  <vue-scroll :ops="ops">
+                    <Form
+                      ref="personalInfoItem"
+                      :model="personalInfoItem"
+                      :rules="ruleValidate"
+                      :label-width="130"
+                      class="editInfoForm"
+                    >
+                      <FormItem label="Email" prop="email">
+                        <Input
+                          v-model="personalInfoItem.email"
+                          :class="{InputStyle: inputstyle}"
+                          disabled
+                        ></Input>
+                      </FormItem>
+                      <FormItem label="Name" prop="userName">
+                        <Input
+                          v-model="personalInfoItem.userName"
+                          :class="{InputStyle: inputstyle}"
+                        ></Input>
+                      </FormItem>
+                      <FormItem label="Title" prop="jobTitle">
+                        <Select
+                          v-model="personalInfoItem.jobTitle"
+                          placeholder="Plase enter your title"
+                          :class="{InputStyle: inputstyle}"
+                        >
+                          <Option value="Professor">Professor</Option>
+                          <Option value="Dr">Dr</Option>
+                          <Option value="Miss">Miss</Option>
+                          <Option value="Mr">Mr</Option>
+                          <Option value="Mrs">Mrs</Option>
+                          <Option value="Ms">Ms</Option>
+                          <Option value="Mx">Mx</Option>
+                        </Select>
+                      </FormItem>
+                      <FormItem label="Organization" prop="organization">
+                        <Input
+                          v-model="personalInfoItem.organization"
+                          :class="{InputStyle: inputstyle}"
+                        ></Input>
+                      </FormItem>
+                      <FormItem label="Country / Region" prop="country">
+                        <Input v-model="personalInfoItem.country" :class="{InputStyle: inputstyle}"></Input>
+                      </FormItem>
+                      <FormItem label="City" prop="city">
+                        <Input v-model="personalInfoItem.city" :class="{InputStyle: inputstyle}"></Input>
+                      </FormItem>
+                      <FormItem label="Phone number" prop="mobilePhone">
+                        <Input
+                          v-model="personalInfoItem.mobilePhone"
+                          :class="{InputStyle: inputstyle}"
+                        ></Input>
+                      </FormItem>
+                      <FormItem label="Area of interest" prop="direction">
+                        <Input
+                          v-model="personalInfoItem.direction"
+                          :class="{InputStyle: inputstyle}"
+                        ></Input>
+                      </FormItem>
+                      <FormItem label="Home page" prop="homePage">
+                        <Input
+                          v-model="personalInfoItem.homePage"
+                          :class="{InputStyle: inputstyle}"
+                        ></Input>
+                      </FormItem>
+                      <FormItem label="Personal introduction" prop="introduction">
+                        <Input
+                          style="word-wrap:break-word"
+                          v-model="personalInfoItem.introduction"
+                          type="textarea"
+                          :autosize="{minRows: 2,maxRows: 5}"
+                        ></Input>
+                      </FormItem>
+                      <FormItem label="Avatar" prop="avatar">
+                        <div>
+                          <div class="demo-upload-list" v-if="personalInfoItem.avatar!=''">
+                            <template>
+                              <img v-bind:src="personalInfoItem.avatar" class="avatarImage" />
+                              <div class="demo-upload-list-cover">
+                                <Icon type="ios-eye-outline" @click.native="handleView()"></Icon>
+                                <Icon type="ios-trash-outline" @click.native="handleRemove()"></Icon>
+                              </div>
+                            </template>
+                          </div>
+                          <div class="uploadBox">
+                            <Icon
+                              type="ios-camera"
+                              size="20"
+                              style="position:absolute;margin:18px;"
+                            ></Icon>
+                            <input
+                              id="choosePicture"
+                              @change="uploadPhoto($event)"
+                              type="file"
+                              class="uploadAvatar"
+                            />
+                          </div>
+                          <Modal title="View Image" v-model="visible">
+                            <img :src="personalInfoItem.avatar" v-if="visible" style="width: 100%" />
+                          </Modal>
                         </div>
-                        <div class="uploadBox">
-                          <Icon type="ios-camera" size="20" style="position:absolute;margin:18px;"></Icon>
-                          <input id="choosePicture" @change="uploadPhoto($event)" type="file" class="uploadAvatar">
-                        </div>
-                        <Modal title="View Image" v-model="visible">
-                          <img :src="personalInfoItem.avatar" v-if="visible" style="width: 100%">
-                        </Modal>
-                      </div>
-                    </FormItem>
-                    <FormItem>
-                      <Button type="success" @click="submitProfileEdit('personalInfoItem')">Submit</Button>
-                      <Button @click="resetForm()" style="margin-left: 50%" type="primary">Reset</Button>
-                    </FormItem>
-                  </Form>
+                      </FormItem>
+                    </Form>
+                    <div>
+                      <Button @click="resetForm()" type="default" style="margin-left: 10%">Reset</Button>
+                      <Button
+                        type="primary"
+                        @click="submitProfileEdit('personalInfoItem')"
+                        style="float:right; margin-right: 10%"
+                      >Submit</Button>
+                    </div>
                   </vue-scroll>
                 </Drawer>
               </div>
             </div>
           </Col>
-          <Col span="18" offset="1"
-          >
+          <Col span="18" offset="1">
             <div class="rightContent">
               <div class="parent">
                 <Tabs value="Overview" style="font-size:20px" type="card">
                   <TabPane label="Overview" name="Overview">
-                    <div :style="{height:tabContentHeight+'px'}"  style="padding:5px;border:#dcdee2 solid 1px;">
+                    <div
+                      :style="{height:tabContentHeight+'px'}"
+                      style="padding:5px;border:#dcdee2 solid 1px;"
+                    >
                       <Card dis-hover class="historyLine">
                         <p slot="title">History line</p>
                         <div class="timeLineStyle">
                           <vue-scroll :ops="ops">
-                          <Timeline>
-                            <div v-if="userEventList.length==0">
-                              <div style="display:flex;justify-content:center">
-                                <Icon type="md-alert" size="40" color="gray"/>
+                            <Timeline>
+                              <div v-if="userEventList.length==0">
+                                <div style="display:flex;justify-content:center">
+                                  <Icon type="md-alert" size="40" color="gray" />
+                                </div>
+                                <br />
+                                <div style="display:flex;justify-content:center">
+                                  <h3
+                                    style="text-align:center;width:80%"
+                                  >Sorry, there are no events now.</h3>
+                                </div>
                               </div>
-                              <br>
-                              <div style="display:flex;justify-content:center">
-                                <h3
-                                  style="text-align:center;width:80%"
-                                >Sorry, there are no events now.</h3>
-                              </div>
-                            </div>
                               <TimelineItem
                                 v-for="(item,index) in userEventList"
                                 :key="index"
@@ -371,7 +447,7 @@ body {
                                 </strong>
                                 <p class="content">{{item.description}}</p>
                               </TimelineItem>
-                          </Timeline>
+                            </Timeline>
                           </vue-scroll>
                         </div>
                       </Card>
@@ -379,28 +455,38 @@ body {
                         <Card dis-hover>
                           <p slot="title">Resource list</p>
                           <div slot="extra">
-                            <Button 
-                            class="fileBtnHoverGreen"
-                            title="Upload resource"
-                            @click="uploadModalShow">
-                            <Icon size="20" type="md-cloud-upload"></Icon>
+                            <Button
+                              class="fileBtnHoverGreen"
+                              title="Upload resource"
+                              @click="uploadModalShow"
+                            >
+                              <Icon size="20" type="md-cloud-upload"></Icon>
                             </Button>
-                            <Button 
-                            class="fileBtnHoverGray"
-                            title="Download all selected"
-                            @click="downloadFiles">
-                            <Icon size="20" type="md-cloud-download"></Icon>
+                            <Button
+                              class="fileBtnHoverGray"
+                              title="Download all selected"
+                              @click="downloadFiles"
+                            >
+                              <Icon size="20" type="md-cloud-download"></Icon>
                             </Button>
-                            <Button 
-                            class="fileBtnHoverBlue"
-                            title="Resource center"
-                            @click="goResourceCenter">
-                            <Icon size="20" type="ios-albums"></Icon>
+                            <Button
+                              class="fileBtnHoverBlue"
+                              title="Resource center"
+                              @click="goResourceCenter"
+                            >
+                              <Icon size="20" type="ios-albums"></Icon>
                             </Button>
                           </div>
                           <div :style="{height:tabContentHeight-235+'px'}">
                             <vue-scroll :ops="ops">
-                              <Table size="small" :data="userResourceList" :columns="resourceColumn" class="table" @on-selection-change="setSelectedFiles" no-data-text="No data">
+                              <Table
+                                size="small"
+                                :data="userResourceList"
+                                :columns="resourceColumn"
+                                class="table"
+                                @on-selection-change="setSelectedFiles"
+                                no-data-text="No data"
+                              >
                                 <template slot-scope="{ row }" slot="name">
                                   <strong>{{ row.name }}</strong>
                                 </template>
@@ -413,8 +499,7 @@ body {
                                     icon="md-download"
                                     shape="circle"
                                     type="text"
-                                  >
-                                  </Button>
+                                  ></Button>
                                   <Button
                                     @click="fileEditModalShow(index)"
                                     shape="circle"
@@ -432,8 +517,7 @@ body {
                                     icon="md-close"
                                     title="Remove"
                                     @click="deleteResourceModalShow(userResourceList[index].resourceId)"
-                                  >
-                                  </Button>
+                                  ></Button>
                                 </template>
                               </Table>
                             </vue-scroll>
@@ -443,13 +527,16 @@ body {
                     </div>
                   </TabPane>
                   <TabPane label="Joined projects" name="Participatory">
-                    <div :style="{height:tabContentHeight+'px'}" style="padding:5px;border:#dcdee2 solid 1px;">
+                    <div
+                      :style="{height:tabContentHeight+'px'}"
+                      style="padding:5px;border:#dcdee2 solid 1px;"
+                    >
                       <vue-scroll :ops="ops">
                         <Card :bordered="false" v-if="joinedProjectsList.length == 0">
                           <div style="display:flex;justify-content:center">
-                            <Icon type="md-alert" size="40" color="gray"/>
+                            <Icon type="md-alert" size="40" color="gray" />
                           </div>
-                          <br>
+                          <br />
                           <div style="display:flex;justify-content:center">
                             <h3
                               style="text-align:center;width:80%"
@@ -462,18 +549,24 @@ body {
                           v-show="joinedProjectsList!=[]"
                         >
                           <Col span="10" offset="1">
-                            <div
-                              @click="goSingleProject(item)"
-                              class="projectItem"
-                            >
+                            <div @click="goSingleProject(item)" class="projectItem">
                               <Card style="height:320px;margin-top:20px;">
-                                <p slot="title" style="height:40x" class="projectsTitle">{{item.title}}</p>
-                                <Button class="fileBtnHoverRed" slot="extra" @click.stop="quitModalShow(item)">Quit</Button>
+                                <p
+                                  slot="title"
+                                  style="height:40x"
+                                  class="projectsTitle"
+                                >{{item.title}}</p>
+                                <Button
+                                  class="fileBtnHoverRed"
+                                  slot="extra"
+                                  @click.stop="quitModalShow(item)"
+                                >Quit</Button>
                                 <p
                                   style="height:200px;text-indent:2em;word-break:break-word;white-space: pre-line;"
                                 >
-                                <vue-scroll :ops="ops">{{item.introduction}}</vue-scroll></p>
-                                <br>
+                                  <vue-scroll :ops="ops">{{item.introduction}}</vue-scroll>
+                                </p>
+                                <br />
                                 <div style="height:40px">
                                   <span style="float:left">CreateTime:</span>
                                   <span style="float:right">{{item.createTime}}</span>
@@ -486,13 +579,16 @@ body {
                     </div>
                   </TabPane>
                   <TabPane label="Managed projects" name="Management">
-                    <div :style="{height:tabContentHeight+'px'}" style="padding:5px;border:#dcdee2 solid 1px;">
+                    <div
+                      :style="{height:tabContentHeight+'px'}"
+                      style="padding:5px;border:#dcdee2 solid 1px;"
+                    >
                       <vue-scroll :ops="ops">
                         <Card :bordered="false" v-if="userManagerProjectList.length == 0">
                           <div style="display:flex;justify-content:center">
-                            <Icon type="md-alert" size="40" color="gray"/>
+                            <Icon type="md-alert" size="40" color="gray" />
                           </div>
-                          <br>
+                          <br />
                           <div style="display:flex;justify-content:center">
                             <h3
                               style="text-align:center;width:80%"
@@ -505,10 +601,7 @@ body {
                           :key="index"
                         >
                           <Col span="10" offset="1">
-                            <div
-                              class="projectItem"
-                              @click="goSingleProject(mProject)"
-                            >
+                            <div class="projectItem" @click="goSingleProject(mProject)">
                               <Card style="height:320px;margin-top:20px">
                                 <p slot="title" class="projectsTitle">{{mProject.title}}</p>
                                 <Button
@@ -532,9 +625,11 @@ body {
                                 <!-- 表头结束 -->
                                 <p
                                   style="height:200px;text-indent:2em;word-break:break-word;white-space: pre-line;"
-                                ><vue-scroll :ops="ops">{{mProject.introduction}}</vue-scroll></p>
+                                >
+                                  <vue-scroll :ops="ops">{{mProject.introduction}}</vue-scroll>
+                                </p>
                                 <!-- <hr> -->
-                                <br>
+                                <br />
                                 <div>
                                   <span style="float:left">CreateTime:</span>
                                   <span style="float:right">{{mProject.createTime}}</span>
@@ -736,13 +831,13 @@ export default {
     this.readPersonalEvent();
     // 初始化样式的高度
     this.initStyle();
-    
+
     $(".__view").css("width", "inherit");
     window.onresize = () => {
-        return (() => {
-          this.initStyle();
-        })()
-    }
+      return (() => {
+        this.initStyle();
+      })();
+    };
   },
   components: {
     Avatar
@@ -758,7 +853,7 @@ export default {
       }
     };
     return {
-      tabContentHeight:600,
+      tabContentHeight: 600,
       userDetail: {},
       resourceColumn: [
         {
@@ -848,7 +943,7 @@ export default {
           {
             required: true,
             min: 6,
-            message: "Password must more than 6 words",
+            message: "Password should be more than 6 words",
             trigger: "blur"
           }
         ],
@@ -882,7 +977,7 @@ export default {
         ],
         country: [
           {
-            required: false,
+            required: true,
             message: "Please enter your country",
             trigger: "blur"
           }
@@ -896,7 +991,7 @@ export default {
         ],
         organization: [
           {
-            required: false,
+            required: true,
             message: "Please enter your affiliation",
             trigger: "blur"
           }
@@ -966,12 +1061,12 @@ export default {
           background: "#808695"
         }
       },
-      editFileModel:false,
+      editFileModel: false,
       editFileValidate: {
-        name:"",
-        description:"",
-        type:"",
-        privacy:""
+        name: "",
+        description: "",
+        type: "",
+        privacy: ""
       },
       editFileRuleValidate: {
         privacy: [
@@ -1003,8 +1098,8 @@ export default {
           }
         ]
       },
-      filesToPackage:[],
-      uploadModal:false,
+      filesToPackage: [],
+      uploadModal: false,
       uploadValidate: {
         privacy: "private",
         type: "data",
@@ -1033,18 +1128,17 @@ export default {
           }
         ]
       },
-      toUploadFiles:[],
+      toUploadFiles: [],
       uploadProgress: 0,
-      progressModalShow:false
+      progressModalShow: false
     };
   },
   methods: {
     // 初始化侧边栏样式
     initStyle() {
-      if(window.innerHeight>735){
+      if (window.innerHeight > 735) {
         this.tabContentHeight = window.innerHeight - 200;
-      }
-      else{
+      } else {
         this.tabContentHeight = 600;
       }
     },
@@ -1075,19 +1169,24 @@ export default {
               }
               if (--count == 0) {
                 var participatoryProjectList = [];
-                for(var j=0;j<projectIds.length;j++){
-                  for(var k=0;k<participatoryProjectListTemp.length;k++){
-                    if(projectIds[j].projectId==participatoryProjectListTemp[k].projectId){
-                      participatoryProjectList.push(participatoryProjectListTemp[k]);
+                for (var j = 0; j < projectIds.length; j++) {
+                  for (
+                    var k = 0;
+                    k < participatoryProjectListTemp.length;
+                    k++
+                  ) {
+                    if (
+                      projectIds[j].projectId ==
+                      participatoryProjectListTemp[k].projectId
+                    ) {
+                      participatoryProjectList.push(
+                        participatoryProjectListTemp[k]
+                      );
                       break;
                     }
                   }
                 }
-                this.$set(
-                  this,
-                  "joinedProjectsList",
-                  participatoryProjectList
-                );
+                this.$set(this, "joinedProjectsList", participatoryProjectList);
               }
             })
             .catch(err => {
@@ -1127,7 +1226,7 @@ export default {
             this.$store.getters.userId
         )
         .then(res => {
-            window.location.href="/GeoProblemSolving/home";
+          window.location.href = "/GeoProblemSolving/home";
         })
         .catch(err => {
           console.log(err.data);
@@ -1312,7 +1411,7 @@ export default {
           // 读取到的图片base64 数据编码 将此编码字符串传给后台即可
           imgcode = e.target.result;
           this.personalInfoItem.avatar = imgcode;
-          $('#choosePicture').val('');
+          $("#choosePicture").val("");
         };
       }
     },
@@ -1330,7 +1429,7 @@ export default {
           changedProfile.append("userId", this.$store.getters.userId);
           //筛选出需要修改的信息
           for (var item in data) {
-              changedProfile.append(item, data[item]);
+            changedProfile.append(item, data[item]);
           }
           this.axios
             .post("/GeoProblemSolving/user/update", changedProfile)
@@ -1360,8 +1459,9 @@ export default {
     },
     //点击跳转到指定项目的函数
     goSingleProject(projectInfo) {
-      sessionStorage.setItem("projectInfo",JSON.stringify(projectInfo));
-      window.location.href="/GeoProblemSolving/projectDetail/"+projectInfo.projectId;
+      sessionStorage.setItem("projectInfo", JSON.stringify(projectInfo));
+      window.location.href =
+        "/GeoProblemSolving/projectDetail/" + projectInfo.projectId;
     },
     readPersonalEvent() {
       this.axios
@@ -1464,61 +1564,67 @@ export default {
       this.selectShareProjectId = id;
       this.selectShareProjectName = name;
     },
-    fileEditModalShow(index){
+    fileEditModalShow(index) {
       this.selectResourceIndex = index;
-      var oldFileInfo = this.userResourceList[index]; 
-      this.editFileValidate={
-        name:oldFileInfo.name,
-        description:oldFileInfo.description,
-        type:oldFileInfo.type,
-        privacy:oldFileInfo.privacy
+      var oldFileInfo = this.userResourceList[index];
+      this.editFileValidate = {
+        name: oldFileInfo.name,
+        description: oldFileInfo.description,
+        type: oldFileInfo.type,
+        privacy: oldFileInfo.privacy
       };
       this.editFileModel = true;
     },
-    changeFileInfo(name){
+    changeFileInfo(name) {
       this.$refs[name].validate(valid => {
         if (valid) {
-          var editFormData=new FormData();
-          editFormData.append("resourceId",this.userResourceList[this.selectResourceIndex].resourceId);
-          editFormData.append("name",this.editFileValidate.name);
-          editFormData.append("type",this.editFileValidate.type);
-          editFormData.append("description",this.editFileValidate.description);
-          editFormData.append("privacy",this.editFileValidate.privacy);
+          var editFormData = new FormData();
+          editFormData.append(
+            "resourceId",
+            this.userResourceList[this.selectResourceIndex].resourceId
+          );
+          editFormData.append("name", this.editFileValidate.name);
+          editFormData.append("type", this.editFileValidate.type);
+          editFormData.append("description", this.editFileValidate.description);
+          editFormData.append("privacy", this.editFileValidate.privacy);
           this.axios({
-            url:"/GeoProblemSolving/resource/update",
+            url: "/GeoProblemSolving/resource/update",
             method: "post",
-            data:editFormData
+            data: editFormData
           })
-            .then(res=>{
+            .then(res => {
               this.editFileModel = false;
-              if(res.data!="Fail"&&res.data!="None"){
+              if (res.data != "Fail" && res.data != "None") {
                 var newResourceInfo = res.data;
-                this.userResourceList.splice(this.selectResourceIndex,1,newResourceInfo);
-              }else{
-                this.$Message.error("Edit fail: "+res.data+".");
+                this.userResourceList.splice(
+                  this.selectResourceIndex,
+                  1,
+                  newResourceInfo
+                );
+              } else {
+                this.$Message.error("Edit fail: " + res.data + ".");
               }
             })
-            .catch(err=>{
+            .catch(err => {
               this.$Message.error("Edit error.");
             });
         }
       });
     },
-    setSelectedFiles(selectedFileList){
+    setSelectedFiles(selectedFileList) {
       var selectedFileUrls = [];
-      for(var i=0;i<selectedFileList.length;i++){
+      for (var i = 0; i < selectedFileList.length; i++) {
         selectedFileUrls.push(selectedFileList[i].pathURL);
       }
-      this.$set(this,"filesToPackage",selectedFileUrls);
+      this.$set(this, "filesToPackage", selectedFileUrls);
     },
-    downloadFiles(){
-      if(this.filesToPackage.length>0){
+    downloadFiles() {
+      if (this.filesToPackage.length > 0) {
         this.$Spin.show();
         var filesUrlStr = this.filesToPackage.toString();
         this.axios({
           method: "post",
-          url:
-            "/GeoProblemSolving/resource/packageZIP?fileURLs=" + filesUrlStr,
+          url: "/GeoProblemSolving/resource/packageZIP?fileURLs=" + filesUrlStr,
           responseType: "blob"
         })
           .then(res => {
@@ -1533,7 +1639,7 @@ export default {
           .catch(err => {
             confirm("errror");
           });
-      }else{
+      } else {
         this.$Message.warning("No file be selected.");
       }
     },
@@ -1545,8 +1651,8 @@ export default {
       a.click();
       a.remove();
     },
-    goResourceCenter(){
-      window.location.href="/GeoProblemSolving/resourceCenter";
+    goResourceCenter() {
+      window.location.href = "/GeoProblemSolving/resourceCenter";
     },
     uploadModalShow() {
       this.uploadValidate = {
@@ -1583,7 +1689,7 @@ export default {
     delFileList(index) {
       this.toUploadFiles.splice(index, 1);
     },
-    resourceUpload(name){
+    resourceUpload(name) {
       this.$refs[name].validate(valid => {
         if (valid) {
           var uploadFiles = this.toUploadFiles;

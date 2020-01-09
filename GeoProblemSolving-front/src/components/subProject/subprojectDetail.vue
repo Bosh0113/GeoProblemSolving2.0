@@ -323,7 +323,7 @@
           <Modal
             v-model="quitModal"
             width="400px"
-            title="Quit Sub-Project"
+            title="Quit the subproject"
             @on-ok="quitSubProject()"
             ok-text="Ok"
             cancel-text="Cancel"

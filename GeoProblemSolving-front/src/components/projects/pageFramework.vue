@@ -24,7 +24,7 @@
     <div style="position:relative;padding:10px 10px 0 10px; margin-top:10px">
       <Breadcrumb style="display: inline-block" separator=">">
         <BreadcrumbItem><a @click="toProjectDetailPage">Project</a></BreadcrumbItem>
-        <BreadcrumbItem>Work space</BreadcrumbItem>
+        <BreadcrumbItem>Workspace</BreadcrumbItem>
       </Breadcrumb>
       <h1 id="stepType">{{stepInfo.type}}</h1>
       <step-change style="float:right" :step-info="stepInfo" :solving-process="projectInfo.solvingProcess" scope="project"></step-change>

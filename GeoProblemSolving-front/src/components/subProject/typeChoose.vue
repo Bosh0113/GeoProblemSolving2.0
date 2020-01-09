@@ -5,7 +5,7 @@
                 <div style="max-width:80%;text-align: left;display: inline-block;margin-buttom:2%">
                     <span style="margin:25px 0; font-size:28px">Workspace</span>
                     <span style="margin: 0px 10px;font-size: 14px;">
-                        is a place to support collaborative geo-problem solving. And it provided by this platform can be classified to two types, each designed for different levels of needs. The type of this page will be determined after selection, and the selection will no longer be displayed when you open this page again.
+                        Workspace is a place to support collaborative geo-problem solving. And here provide two workspace types for different participatory levels. (Once the workspace type selected, and you will enter the selected workspace the next time.)
                     </span>
                 </div>
             </div>
@@ -17,15 +17,14 @@
                         </div>
                         <div style="margin:10px 0;min-height: 65px;">
                             <p style="text-indent:2em">
-                                In this kind of workspace, you can design the process of solving a geographic problem into a workflow that uses iterable functional steps. Then collaborate together in each active node. 
+                                In this workspace, you can analyze and design the process for solving a geo-problem. Several iterable steps are used to construct the process. Collaborative activities are conducted in each step.
                             </p>
                         </div>
                         <div style="padding: 0 5%;min-height: 85px;">
                             <ul>
-                                <li>Clear process boundaries</li>
-                                <li>Iterable steps for different functions</li>
-                                <li>Directed graph workflow editing</li>
-                                <li>Provides a large number of tools</li>
+                                <li>Clear problem-solving process</li>
+                                <li>Iterable steps with different functions</li>
+                                <li>Directed graph workflow based process construction</li>
                             </ul>
                         </div>
                         <div style="text-align:center;margin-top:2%">
@@ -43,13 +42,13 @@
                         </div>
                         <div style="margin:10px 0;min-height: 65px;">
                             <p style="text-indent:2em">
-                                In this kind of workspace, You can quickly enter the working state and easily use any resources. You can directly regard this type as a node of the previous type.
+                                 In this workspace, You can start your work directly. Kinds of tools are available for you to solve a simple geo-problem.
                             </p>
                         </div>
                         <div style="padding: 0 5%;min-height: 85px;">
                             <ul>
                                 <li>Start working immediately</li>
-                                <li>Provides a large number of tools</li>
+                                <li>A pure workspace with many tools</li>
                             </ul>
                         </div>
                         <div style="text-align:center;margin-top:2%">
@@ -64,13 +63,13 @@
         </Col>
         <Modal
         v-model="selectTypeModal"
-        title="Set type of this content"
+        title="Set workspace type"
         @on-ok="setType()"
         ok-text="OK"
         cancel-text="Cancel"
         >
-        <h2>Do you sure to select this type?</h2>
-        <small style="color:#03A9F4">* The type of this page will be determined after selection, and the selection will no longer be displayed when you open this page again.</small>
+        <h2>Are you sure to select this type?</h2>
+        <small style="color:#03A9F4">* Once the workspace type selected, and you will enter the selected workspace the next time.</small>
         </Modal>
     </Row>
 </template>

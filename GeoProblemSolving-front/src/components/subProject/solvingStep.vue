@@ -71,10 +71,10 @@
             style="margin-top:10px"
           >Double click the node, and you can enter the corresponding workspace.</h3>
           <div style="width:100%;text-align:center;" v-if="scopeType == 'subproject'">
-            <Button class="btnHoverGray" @click="resetSubProjectTypeModalShow()">Reset sub-project's type</Button>
+            <Button class="btnHoverGray" @click="resetSubProjectTypeModalShow()">Reset workspace type</Button>
           </div>
           <div style="width:100%;text-align:center;margin-top:100px" v-if="scopeType == 'project'">
-            <Button class="btnHoverGray" @click="resetProjectTypeModalShow()">Reset project type</Button>
+            <Button class="btnHoverGray" @click="resetProjectTypeModalShow()">Reset workspace type</Button>
           </div>
         </Row>
       </div>
@@ -90,7 +90,7 @@
     </Modal>
     <Modal
       v-model="resetSubProjectTypeNotice"
-      title="Reset sub-project's type"
+      title="Reset workspace type"
     >
       <h2>Please confirm that all nodes have been deleted.</h2>
       <div slot="footer">
@@ -99,16 +99,16 @@
     </Modal>
     <Modal
       v-model="resetSubProjectTypeModel"
-      title="Reset sub-project's type"
+      title="Reset workspace type"
     >
-      <h2>Are you sure you want to reset the sub-project type?</h2>
+      <h2>Are you sure to reset the workspace type?</h2>
       <div slot="footer">
-        <Button type="primary" @click="resetSubProjectType()">Submit</Button>
+        <Button type="primary" @click="resetSubProjectType()">OK</Button>
       </div>
     </Modal>
     <Modal
       v-model="resetProjectTypeNotice"
-      title="Reset project type"
+      title="Reset workspace type"
     >
       <h2>Please confirm that all nodes have been deleted.</h2>
       <div slot="footer">
@@ -117,11 +117,11 @@
     </Modal>
     <Modal
       v-model="resetProjectTypeModel"
-      title="Reset project type"
+      title="Reset workspace type"
     >
-      <h2>Are you sure you want to reset the project type?</h2>
+      <h2>Are you sure to reset the workspace type?</h2>
       <div slot="footer">
-        <Button type="primary" @click="resetProjectType()">Submit</Button>
+        <Button type="primary" @click="resetProjectType()">OK</Button>
       </div>
     </Modal>
     <Modal width="800px" v-model="createStepModal" title="Create a new step" :styles="{top: '20px'}">
@@ -1304,7 +1304,7 @@ export default {
               });
             }
           } else {
-            this.$Message.error("Update sub-project failed.");
+            this.$Message.error("Update subproject failed.");
           }
         })
         .catch(err => {

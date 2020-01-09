@@ -14,7 +14,7 @@
             <ul>
               <li>The description of this subproject</li>
               <li>The background of this subproject</li>
-              <li>The limitation in this subproject</li>
+              <li>The limitations in this subproject</li>
               <li>The participant list of this subproject</li>
             </ul>
           </div>
@@ -38,9 +38,9 @@
           <div style="width:60%; float:left; min-height: 90px">
             <ul>
               <li>Collect different types of resources</li>
-              <li>Support context understanding</li>
-              <li>Support data processing</li>
-              <li>Support modeling and analysis</li>
+              <li>To support context understanding</li>
+              <li>To support data processing</li>
+              <li>To support modeling and analysis</li>
             </ul>
           </div>
           <div style="text-align:center">
