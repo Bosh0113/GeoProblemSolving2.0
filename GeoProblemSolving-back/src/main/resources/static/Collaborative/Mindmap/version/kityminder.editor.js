@@ -4210,7 +4210,8 @@ angular.module('kityminderEditor')
 											}
 											else if (data.files.length != undefined) {
 												for (var i = data.files.length - 1; i >= 0; i--) {
-													var datatype = mindmapInfo.name.substring(data.files[i].name.lastIndexOf('.') + 1);
+													
+													var datatype = data.files[i].name.substring(data.files[i].name.lastIndexOf('.') + 1);
 													if (data.files[i].type == "toolData:Mindmap" && datatype !== "png") {
 														map = data.files[i];
 														mapImport(map);
@@ -5464,9 +5465,10 @@ angular.module('kityminderEditor')
                                     }
                                     else if (data.files.length != undefined) {
 
-                                        console.log("success!");
                                         for (var i = data.files.length - 1; i >= 0; i--) {
-                                            if (data.files[i].type == "toolData:Mindmap") {
+
+                                            var datatype = data.files[i].name.substring(data.files[i].name.lastIndexOf('.') + 1);
+                                            if (data.files[i].type == "toolData:Mindmap" && datatype !== "png") {
                                                 maps.push(data.files[i]);
                                             }
                                         }
@@ -5608,13 +5610,13 @@ angular.module('kityminderEditor')
                     //     }
                     //     catch (err) { }
                     // } else {
-                        var a = document.createElement("a");
-                        a.download = map.name;
-                        a.target = "_blank";
-                        a.href = 'http://' + RouteInfo.getIPPort() + map.pathURL;
-                        $("body").append(a);
-                        a.click();
-                        $(a).remove();
+                    var a = document.createElement("a");
+                    a.download = map.name;
+                    a.target = "_blank";
+                    a.href = 'http://' + RouteInfo.getIPPort() + map.pathURL;
+                    $("body").append(a);
+                    a.click();
+                    $(a).remove();
                     // }
                 }
             }

@@ -3941,7 +3941,7 @@ angular.module('kityminderEditor')
                 // scope.downloadMapFun = downloadMapFun;
 
                 // 处理输入框按键事件
-                $('body').on('keydown', function(e) {
+                $('body').on('keydown', function (e) {
                     if (e.keyCode == 83 && (e.ctrlKey || e.metaKey) && !e.shiftKey) {
                         saveMapFun();
 
@@ -3949,6 +3949,25 @@ angular.module('kityminderEditor')
                         return false;
                     }
                 });
+
+                // 定时保存
+                var time;
+                setAutoSave();
+
+                function setAutoSave() {
+                    time = setInterval(function () {
+                        var info = RouteInfo.getInfo();
+                        if (info.pageId != "" && info.userId != "") {
+                            if (mindmapInfo != {} && mindmapInfo.name != undefined && mindmapInfo.resourceId != undefined
+                                && mindmapInfo.name != "" && mindmapInfo.resourceId != "" && info.userId == mindmapInfo.uploaderId) {
+                                saveMapFun();
+                            }
+                        }
+                        else {
+                            clearInterval(time);
+                        }
+                    }, 1200000)
+                }
 
                 function saveMapFun() {
                     var info = RouteInfo.getInfo();
@@ -4016,17 +4035,21 @@ angular.module('kityminderEditor')
                                                 data: formData,
                                                 processData: false,
                                                 contentType: false,
-                                                success: function (data) {                                                    
+                                                success: function (data) {
                                                     if (data == "Size over" || data == "Fail" || data == "Offline") {
                                                         alert("Fail to save...");
                                                     }
-                                                    else if(data.failed.length > 0){
+                                                    else if (data.failed.length > 0) {
                                                         alert("Fail to save...");
                                                     }
                                                     else if (data.uploaded.length > 0) {
                                                         alert("Save this mind map successfully");
                                                         // 初始化原始导图
                                                         originalMap = JSON.stringify(editor.minder.exportJson());
+
+                                                        // 重新设定定时保存时间
+                                                        clearInterval(time);
+                                                        setAutoSave();
                                                     }
                                                 },
                                                 error: function (err) {
@@ -4097,10 +4120,10 @@ angular.module('kityminderEditor')
 
                                         // 文件上传
                                         var blob = null;
-                                        if (datatype == "png") {            
-                                            blob =  getBlobBydataURI(file);
+                                        if (datatype == "png") {
+                                            blob = getBlobBydataURI(file);
                                         }
-                                        else{
+                                        else {
                                             blob = new Blob([file]);
                                         }
                                         var filename = $('#mindmapName').val() + '.' + datatype;
@@ -4126,11 +4149,11 @@ angular.module('kityminderEditor')
                                                 data: formData,
                                                 processData: false,
                                                 contentType: false,
-                                                success: function (data) {                                                    
+                                                success: function (data) {
                                                     if (data == "Size over" || data == "Fail" || data == "Offline") {
                                                         alert("Fail to save...");
                                                     }
-                                                    else if(data.failed.length > 0){
+                                                    else if (data.failed.length > 0) {
                                                         alert("Fail to save...");
                                                     }
                                                     else if (data.uploaded.length > 0) {
@@ -4144,6 +4167,10 @@ angular.module('kityminderEditor')
 
                                                         // 初始化原始导图
                                                         originalMap = JSON.stringify(editor.minder.exportJson());
+
+                                                        // 重新设定定时保存时间
+                                                        clearInterval(time);
+                                                        setAutoSave();
                                                     }
                                                 },
                                                 error: function (err) {
@@ -5637,9 +5664,10 @@ angular.module('kityminderEditor')
                                     }
                                     else if (data.files.length != undefined) {
 
-                                        console.log("success!");
                                         for (var i = data.files.length - 1; i >= 0; i--) {
-                                            if (data.files[i].type == "toolData:Mindmap") {
+                                            
+                                            var datatype = data.files[i].name.substring(data.files[i].name.lastIndexOf('.') + 1);
+                                            if (data.files[i].type == "toolData:Mindmap" && datatype !== "png") {
                                                 maps.push(data.files[i]);
                                             }
                                         }
