@@ -1,6 +1,6 @@
 /*!
  * ====================================================
- * kityminder-editor - v1.0.67 - 2020-01-08
+ * kityminder-editor - v1.0.67 - 2020-01-11
  * https://github.com/fex-team/kityminder-editor
  * GitHub: https://github.com/fex-team/kityminder-editor 
  * Copyright (c) 2020 ; Licensed 
@@ -3829,6 +3829,16 @@ angular.module('kityminderEditor')
                 scope.saveMapFun = saveMapFun;
                 // scope.saveasMapFun = saveasMapFun;
                 // scope.downloadMapFun = downloadMapFun;
+                
+                // 处理输入框按键事件
+                $('body').on('keydown', function(e) {
+                    if (e.keyCode == 83 && (e.ctrlKey || e.metaKey) && !e.shiftKey) {
+                        saveMapFun();
+
+                        e.preventDefault();
+                        return false;
+                    }
+                });
 
                 function saveMapFun() {
                     var info = RouteInfo.getInfo();
@@ -4200,7 +4210,8 @@ angular.module('kityminderEditor')
 											}
 											else if (data.files.length != undefined) {
 												for (var i = data.files.length - 1; i >= 0; i--) {
-													if (data.files[i].type == "toolData:Mindmap") {
+													var datatype = mindmapInfo.name.substring(data.files[i].name.lastIndexOf('.') + 1);
+													if (data.files[i].type == "toolData:Mindmap" && datatype !== "png") {
 														map = data.files[i];
 														mapImport(map);
 														break;

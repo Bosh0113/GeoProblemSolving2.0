@@ -186,7 +186,7 @@
       </div>
       </Col>
     </Row>
-    <Modal v-model="taskDeleteModal" title="Delete Task" @on-ok="taskRemove()" ok-text="Assure" cancel-text="Cancel">
+    <Modal v-model="taskDeleteModal" title="Delete Task" @on-ok="taskRemove()" ok-text="OK" cancel-text="Cancel">
       <p>Do yout want to delete this task?</p>
     </Modal>
     <Modal v-model="createTaskModal" title="Create Task" width="800px" :closable="false">

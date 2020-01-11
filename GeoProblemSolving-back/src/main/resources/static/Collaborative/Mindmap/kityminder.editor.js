@@ -1,6 +1,6 @@
 /*!
  * ====================================================
- * kityminder-editor - v1.0.67 - 2020-01-08
+ * kityminder-editor - v1.0.67 - 2020-01-11
  * https://github.com/fex-team/kityminder-editor
  * GitHub: https://github.com/fex-team/kityminder-editor 
  * Copyright (c) 2020 ; Licensed 
@@ -2104,13 +2104,18 @@ angular.module('kityminderEditor').run(['$templateCache', function($templateCach
   );
 
 
+  $templateCache.put('ui/directive/fileDownload/fileDownload.html',
+    "<div class=\"btn-group-vertical\" dropdown is-open=\"isopen\"><button type=\"button\" class=\"btn btn-default download\" title=\"{{ 'download' | lang:'ui' }}\" ng-class=\"{'active': isopen}\" data-toggle=\"modal\" data-target=\"#downloadModal\" ng-click=\"getMapInfo()\"></button> <button type=\"button\" class=\"btn btn-default download-caption dropdown-toggle\" data-toggle=\"modal\" data-target=\"#downloadModal\" title=\"{{ 'download' | lang:'ui' }}\" ng-click=\"getMapInfo()\"><span class=\"caption\">{{ 'download' | lang:'ui' }}</span> <span class=\"sr-only\">{{ 'download' | lang:'ui' }}</span></button><div class=\"modal fade\" id=\"downloadModal\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"myModalLabel\" aria-hidden=\"true\"><div class=\"modal-dialog\"><div class=\"modal-content\"><div class=\"modal-header\"><button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button><h4 class=\"modal-title\" id=\"myModalLabel\">Download mind map</h4></div><div class=\"modal-body\"><div><span style=\"font-size: 16px; margin-right: 20px\">Download the current mind map as format:</span><select class=\"form-control\" style=\"width:100px; display: initial\" id=\"downloadTypeSelect\"><option value=\"json\">json</option><option value=\"md\">md</option><option value=\"km\">km</option><option value=\"png\">png</option></select></div><div class=\"input-group\" style=\"margin-top: 20px\"><span class=\"input-group-addon\">File name:</span> <input type=\"text\" class=\"form-control\" id=\"downloadName\" placeholder=\"Please fill in the name\"></div></div><div class=\"modal-footer\"><button type=\"button\" class=\"btn btn-primary\" data-dismiss=\"modal\" ng-click=\"downloadMapFun()\">Download</button> <button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Close</button></div></div></div></div></div>"
+  );
+
+
   $templateCache.put('ui/directive/fileImport/fileImport.html',
     "<div class=\"btn-group-vertical\" dropdown is-open=\"isopen\"><button type=\"button\" class=\"btn btn-default import\" title=\"{{ 'import' | lang:'ui' }}\" ng-class=\"{'active': isopen}\" data-toggle=\"modal\" data-target=\"#importModal\" ng-click=\"updateMaplist()\"></button> <button type=\"button\" class=\"btn btn-default import-caption dropdown-toggle\" data-toggle=\"modal\" data-target=\"#importModal\" title=\"{{ 'import' | lang:'ui' }}\" ng-click=\"updateMaplist()\"><span class=\"caption\">{{ 'import' | lang:'ui' }}</span> <span class=\"sr-only\">{{ 'import' | lang:'ui' }}</span></button><div class=\"modal fade\" id=\"importModal\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"myModalLabel\" aria-hidden=\"true\"><div class=\"modal-dialog\" style=\"width: 800px\"><div class=\"modal-content\"><div class=\"modal-header\"><button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button><h4 class=\"modal-title\" id=\"myModalLabel\">Import mind map</h4></div><div class=\"modal-body\" style=\"font-size: 12px\"><div style=\"width: 95%; margin: auto; border: 1px solid gray\"><table class=\"table\" style=\"width: 90%; margin: auto\"><caption style=\"font-size: 14px;font-weight: 600;color:#333\">Open mindmap from resource center:</caption><thead><tr><th style=\"width: 20%\">Name</th><th style=\"width: 20%\">Type</th><th style=\"width: 40%\">Description</th><th style=\"width: 20%\">Operation</th></tr></thead></table><div style=\"min-height:100px;max-height: 400px; overflow-y: auto\"><table class=\"table\" style=\"width: 90%;margin: auto\"><tbody><tr ng-repeat=\"item in mindmapRes\"><td style=\"width: 20%; overflow: hidden; word-break: break-word\">{{item.name}}</td><td style=\"width: 20%\">{{item.type}}</td><td style=\"width: 40%; overflow: hidden; word-break: break-word\">{{item.description}}</td><td style=\"width: 20%\"><span style=\"cursor:pointer\" class=\"glyphicon glyphicon-ok-circle\" title=\"Load this mindmap\" ng-click=\"mapLoad(item)\"></span> <span style=\"cursor:pointer; margin-left: 10px\" class=\"glyphicon glyphicon-download\" title=\"Load this mindmap\" ng-click=\"mapDownload(item)\"></span> <span style=\"cursor:pointer; margin-left: 10px\" class=\"glyphicon glyphicon-remove-circle\" title=\"Delete this mindmap\" ng-click=\"deleteMap(item)\"></span></td></tr></tbody></table></div></div><hr><div style=\"width: 90%; margin: auto\"><span style=\"font-size: 14px;font-weight: 600\">Open your own mindmap:</span> <input type=\"file\" id=\"fileInput\" style=\"margin-top: 15px\"><button type=\"button\" class=\"btn btn-info\" style=\"margin-top: 15px\" ng-click=\"mapImport()\">Upload</button></div></div><div class=\"modal-footer\"><button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Close</button></div></div></div></div></div>"
   );
 
 
   $templateCache.put('ui/directive/fileSave/fileSave.html',
-    "<div class=\"btn-group-vertical\" dropdown is-open=\"isopen\"><button type=\"button\" class=\"btn btn-default save\" title=\"{{ 'save' | lang:'ui' }}\" ng-class=\"{'active': isopen}\"></button> <button type=\"button\" class=\"btn btn-default save-caption dropdown-toggle\" title=\"{{ 'save' | lang:'ui' }}\" dropdown-toggle><span class=\"caption\">{{ 'save' | lang:'ui' }}</span> <span class=\"caret\"></span> <span class=\"sr-only\">{{ 'save' | lang:'ui' }}</span></button><ul class=\"dropdown-menu\" role=\"menu\"><li data-toggle=\"modal\" ng-click=\"saveMapFun()\"><a href>Save (Save to current version)</a></li><li data-toggle=\"modal\" data-target=\"#saveasModal\"><a href>Save as (Save as a new file)</a></li></ul><div class=\"modal fade\" id=\"saveasModal\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"myModalLabel\" aria-hidden=\"true\"><div class=\"modal-dialog\"><div class=\"modal-content\"><div class=\"modal-header\"><button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button><h4 class=\"modal-title\" id=\"myModalLabel\">Save mind map</h4></div><div class=\"modal-body\"><div><span style=\"font-size: 16px; margin-right: 20px\">Save the current mind map as format:</span><select class=\"form-control\" style=\"width:100px; display: initial\" id=\"datatypeSelect\"><option>json</option><option>md</option><option>km</option><option>png</option></select></div><div class=\"input-group\" style=\"margin-top: 20px\"><span class=\"input-group-addon\">File name:</span> <input type=\"text\" class=\"form-control\" id=\"mindmapName\" placeholder=\"Please fill in the name\"></div></div><div class=\"modal-footer\"><button type=\"button\" class=\"btn btn-primary\" data-dismiss=\"modal\" ng-click=\"saveasMapFun()\">Save as</button> <button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Close</button></div></div></div></div></div>"
+    "<div class=\"btn-group-vertical\" dropdown is-open=\"isopen\"><button type=\"button\" class=\"btn btn-default save\" title=\"{{ 'save' | lang:'ui' }}\" ng-class=\"{'active': isopen}\" ng-click=\"saveMapFun()\"></button> <button type=\"button\" class=\"btn btn-default save-caption dropdown-toggle\" title=\"{{ 'save' | lang:'ui' }}\" dropdown-toggle><span class=\"caption\">{{ 'save' | lang:'ui' }}</span> <span class=\"caret\"></span> <span class=\"sr-only\">{{ 'save' | lang:'ui' }}</span></button><ul class=\"dropdown-menu\" role=\"menu\"><li data-toggle=\"modal\" ng-click=\"saveMapFun()\"><a href>Save (Save to current version)</a></li><li data-toggle=\"modal\" data-target=\"#saveasModal\"><a href>Save as (Save as a new file)</a></li></ul><div class=\"modal fade\" id=\"saveasModal\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"myModalLabel\" aria-hidden=\"true\"><div class=\"modal-dialog\"><div class=\"modal-content\"><div class=\"modal-header\"><button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button><h4 class=\"modal-title\" id=\"myModalLabel\">Save mind map</h4></div><div class=\"modal-body\"><div><span style=\"font-size: 16px; margin-right: 20px\">Save the current mind map as format:</span><select class=\"form-control\" style=\"width:100px; display: initial\" id=\"datatypeSelect\"><option>json</option><option>md</option><option>km</option><option>png</option></select></div><div class=\"input-group\" style=\"margin-top: 20px\"><span class=\"input-group-addon\">File name:</span> <input type=\"text\" class=\"form-control\" id=\"mindmapName\" placeholder=\"Please fill in the name\"></div></div><div class=\"modal-footer\"><button type=\"button\" class=\"btn btn-primary\" data-dismiss=\"modal\" ng-click=\"saveasMapFun()\">Save as</button> <button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Close</button></div></div></div></div></div>"
   );
 
 
@@ -2235,7 +2240,7 @@ angular.module('kityminderEditor').run(['$templateCache', function($templateCach
 
 
   $templateCache.put('ui/directive/topTab/topTab.html',
-    "<tabset><tab heading=\"{{ 'file' | lang: 'ui/tabs'; }}\" ng-click=\"toggleTopTab('file')\" select=\"setCurTab('file')\"><file-import minder=\"minder\"></file-import><file-save minder=\"minder\"></file-save><version-manager minder=\"minder\"></version-manager></tab><tab heading=\"{{ 'idea' | lang: 'ui/tabs'; }}\" ng-click=\"toggleTopTab('idea')\" select=\"setCurTab('idea')\"><undo-redo editor=\"editor\"></undo-redo><append-node minder=\"minder\"></append-node><arrange minder=\"minder\"></arrange><operation minder=\"minder\"></operation><hyper-link minder=\"minder\"></hyper-link><image-btn minder=\"minder\"></image-btn><note-btn minder=\"minder\"></note-btn><priority-editor minder=\"minder\"></priority-editor><progress-editor minder=\"minder\"></progress-editor><resource-editor minder=\"minder\"></resource-editor></tab><tab heading=\"{{ 'appearence' | lang: 'ui/tabs'; }}\" ng-click=\"toggleTopTab('appearance')\" select=\"setCurTab('appearance')\"><template-list minder=\"minder\" class=\"inline-directive\"></template-list><theme-list minder=\"minder\"></theme-list><layout minder=\"minder\" class=\"inline-directive\"></layout><style-operator minder=\"minder\" class=\"inline-directive\"></style-operator><font-operator minder=\"minder\" class=\"inline-directive\"></font-operator></tab><tab heading=\"{{ 'view' | lang: 'ui/tabs'; }}\" ng-click=\"toggleTopTab('view')\" select=\"setCurTab('view')\"><expand-level minder=\"minder\"></expand-level><select-all minder=\"minder\"></select-all><search-btn minder=\"minder\"></search-btn></tab></tabset>"
+    "<tabset><tab heading=\"{{ 'file' | lang: 'ui/tabs'; }}\" ng-click=\"toggleTopTab('file')\" select=\"setCurTab('file')\"><file-import minder=\"minder\"></file-import><file-save minder=\"minder\"></file-save><file-download minder=\"minder\"></file-download><version-manager minder=\"minder\"></version-manager></tab><tab heading=\"{{ 'idea' | lang: 'ui/tabs'; }}\" ng-click=\"toggleTopTab('idea')\" select=\"setCurTab('idea')\"><undo-redo editor=\"editor\"></undo-redo><append-node minder=\"minder\"></append-node><arrange minder=\"minder\"></arrange><operation minder=\"minder\"></operation><hyper-link minder=\"minder\"></hyper-link><image-btn minder=\"minder\"></image-btn><note-btn minder=\"minder\"></note-btn><priority-editor minder=\"minder\"></priority-editor><progress-editor minder=\"minder\"></progress-editor><resource-editor minder=\"minder\"></resource-editor></tab><tab heading=\"{{ 'appearence' | lang: 'ui/tabs'; }}\" ng-click=\"toggleTopTab('appearance')\" select=\"setCurTab('appearance')\"><template-list minder=\"minder\" class=\"inline-directive\"></template-list><theme-list minder=\"minder\"></theme-list><layout minder=\"minder\" class=\"inline-directive\"></layout><style-operator minder=\"minder\" class=\"inline-directive\"></style-operator><font-operator minder=\"minder\" class=\"inline-directive\"></font-operator></tab><tab heading=\"{{ 'view' | lang: 'ui/tabs'; }}\" ng-click=\"toggleTopTab('view')\" select=\"setCurTab('view')\"><expand-level minder=\"minder\"></expand-level><select-all minder=\"minder\"></select-all><search-btn minder=\"minder\"></search-btn></tab></tabset>"
   );
 
 
@@ -2531,6 +2536,8 @@ angular.module('kityminderEditor')
 					'save':'Save',
 					
 					'import':'Import',
+
+					'download':'Download',
 					
 					'version':'Version list',
 
@@ -3630,6 +3637,83 @@ angular.module('kityminderEditor')
         }
     });
 angular.module('kityminderEditor')
+    .directive('fileDownload', ['RouteInfo', function (RouteInfo) {
+        return {
+            restrict: 'E',
+            templateUrl: 'ui/directive/fileDownload/fileDownload.html',
+            scope: {
+                minder: '='
+            },
+            replace: true,
+            link: function (scope) {
+                scope.getMapInfo = getMapInfo;
+                scope.downloadMapFun = downloadMapFun;
+
+                function getMapInfo(){
+                    
+                    if (mindmapInfo != {} && mindmapInfo.name != undefined && mindmapInfo.name != "") {
+
+                        var datatype = mindmapInfo.name.substring(mindmapInfo.name.lastIndexOf('.') + 1);
+                        var dataname = mindmapInfo.name.substring(0, mindmapInfo.name.lastIndexOf('.'));
+                        $("#downloadTypeSelect").find("option[value="+datatype+"]").prop("selected", true);
+                        $('#downloadName').attr('value', dataname);
+                    }
+                }
+
+                function downloadMapFun() {
+                    
+                    if ($('#downloadName').val() != "" && $('#downloadName').val() != undefined) {
+                        datatype = $('#downloadTypeSelect').val();
+
+                        switch (datatype) {
+                            case 'km':
+                                exportType = 'json';
+                                break;
+                            case 'md':
+                                exportType = 'markdown';
+                                break;
+                            default:
+                                exportType = datatype;
+                                break;
+                        }
+                        editor.minder.exportData(exportType).then(function (content) {
+                            // 文件下载
+                            var blob = null, url = "";
+                            if (datatype == "png") {
+                                blob = getBlobBydataURI(content);
+                                url = URL.createObjectURL(blob);
+                            }
+                            else {
+                                blob = new Blob([content]);
+                                url = URL.createObjectURL(blob);
+                            }
+                            var a = document.createElement("a");
+                            a.download = $('#downloadName').val() + '.' + datatype;
+                            a.href = url;
+                            $("body").append(a);
+                            a.click();
+                            $(a).remove();
+                        });
+                    }
+                    else {
+                    }
+                }
+
+                function getBlobBydataURI(dataurl) {
+                    var arr = dataurl.split(","),
+                        mime = arr[0].match(/:(.*?);/)[1],
+                        bstr = atob(arr[1]),
+                        n = bstr.length,
+                        u8arr = new Uint8Array(n);
+                    while (n--) {
+                        u8arr[n] = bstr.charCodeAt(n);
+                    }
+                    return new Blob([u8arr], { type: mime });
+                }
+            }
+        }
+    }]);
+angular.module('kityminderEditor')
     .directive('fileImport', ['RouteInfo', function (RouteInfo) {
         return {
             restrict: 'E',
@@ -3856,6 +3940,16 @@ angular.module('kityminderEditor')
                 scope.saveasMapFun = saveasMapFun;
                 // scope.downloadMapFun = downloadMapFun;
 
+                // 处理输入框按键事件
+                $('body').on('keydown', function(e) {
+                    if (e.keyCode == 83 && (e.ctrlKey || e.metaKey) && !e.shiftKey) {
+                        saveMapFun();
+
+                        e.preventDefault();
+                        return false;
+                    }
+                });
+
                 function saveMapFun() {
                     var info = RouteInfo.getInfo();
                     if (info.pageId != "" && info.userId != "") {
@@ -4002,7 +4096,13 @@ angular.module('kityminderEditor')
                                         var thumbnailBlobFile = new File([thumbnailBlob], "thumbnail_" + thumbnailName);
 
                                         // 文件上传
-                                        var blob = new Blob([file]);
+                                        var blob = null;
+                                        if (datatype == "png") {            
+                                            blob =  getBlobBydataURI(file);
+                                        }
+                                        else{
+                                            blob = new Blob([file]);
+                                        }
                                         var filename = $('#mindmapName').val() + '.' + datatype;
                                         var fileBlob = new File([blob], filename);
 
