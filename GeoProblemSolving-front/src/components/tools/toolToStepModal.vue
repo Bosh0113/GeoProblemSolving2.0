@@ -699,10 +699,11 @@ export default {
       }
     },
     changeMenuItem(name) {
-      this.showMenuItem = name;
       if(name=="diyTools"){
+        this.stepToolModal = false;
         top.location.href="/GeoProblemSolving/toolsCenter";
       }
+      this.showMenuItem = name;
     },
     typeChanged(type) {
       this.typeSelected = type;

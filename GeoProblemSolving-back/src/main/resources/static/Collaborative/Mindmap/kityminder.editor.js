@@ -3960,7 +3960,9 @@ angular.module('kityminderEditor')
                         if (info.pageId != "" && info.userId != "") {
                             if (mindmapInfo != {} && mindmapInfo.name != undefined && mindmapInfo.resourceId != undefined
                                 && mindmapInfo.name != "" && mindmapInfo.resourceId != "" && info.userId == mindmapInfo.uploaderId) {
-                                saveMapFun();
+                                if(originalMap !== currentMap){                                    
+                                    saveMapFun();
+                                }
                             }
                         }
                         else {

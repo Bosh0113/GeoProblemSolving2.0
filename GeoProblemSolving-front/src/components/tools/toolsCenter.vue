@@ -125,7 +125,7 @@
   <div :style="{height: contentHeight+'px'}" style="min-width:1200px;">
     <Card dis-hover>
       <h1 slot="title">
-        <span style="margin-left:15px">Tools Center</span>
+        <span style="margin-left:15px">Tool center</span>
       </h1>
       <div>
         <Row>
