@@ -18,6 +18,7 @@
                 v-if="workspaceBtn"
                 type="primary"
                 @click="gotoworkspace()"
+                size="small"
                 icon="md-globe"
                 title="Enter the workspace"
                 style="float:right;margin-left:10px;"
@@ -25,14 +26,42 @@
               <Button
                 v-else
                 type="default"
+                size="small"
                 icon="md-globe"
                 title="Enter the workspace"
                 style="float:right;margin-left:10px;cursor:default"
               >Workspace</Button>
+              <Button
+                v-if="nodePositionBtn && procedureDrag"
+                type="warning"
+                @click="editPosition()"
+                size="small"
+                icon="md-globe"
+                title="Adjust the postion of nodes"
+                style="float:right;margin-left:10px;"
+              >Edit node position</Button>
+              <Button
+                v-else-if="nodePositionBtn && !procedureDrag"
+                type="warning"
+                @click="editPosition()"
+                size="small"
+                icon="md-globe"
+                title="Move the postion of procedure"
+                style="float:right;margin-left:10px;"
+              >Move procedure</Button>
+              <Button
+                v-else
+                type="default"
+                size="small"
+                icon="md-globe"
+                title="Adjust the postion of nodes"
+                style="float:right;margin-left:10px;cursor:default"
+              >Edit node position</Button>
               <template v-show="userRole == 'Manager'">
                 <Button
                   v-if="removeBtn"
-                  type="warning"
+                  type="error"
+                  size="small"
                   @click="removeStep()"
                   icon="md-remove"
                   title="Remove the activity"
@@ -41,6 +70,7 @@
                 <Button
                   v-else
                   type="default"
+                  size="small"
                   icon="md-remove"
                   title="Remove the activity"
                   style="float:right;margin-left:10px; cursor:default"
@@ -48,6 +78,7 @@
                 <Button
                   v-if="activeBtn"
                   type="success"
+                  size="small"
                   @click="activateStep()"
                   icon="md-bulb"
                   title="Active the activity"
@@ -56,6 +87,7 @@
                 <Button
                   v-else
                   type="default"
+                  size="small"
                   icon="md-bulb"
                   title="Active the activity"
                   style="float:right;margin-left:10px; cursor:default"
@@ -64,6 +96,7 @@
               <Button
                 v-if="addBtn"
                 type="info"
+                size="small"
                 @click="addNewStep()"
                 icon="md-add"
                 v-show="userRole == 'Manager'"
@@ -73,6 +106,7 @@
               <Button
                 v-else
                 type="default"
+                size="small"
                 icon="md-add"
                 v-show="userRole == 'Manager'"
                 title="Add a new step"
@@ -264,6 +298,7 @@ export default {
       activeBtn: false,
       removeBtn: false,
       workspaceBtn: false,
+      nodePositionBtn: false,
       // 添加/编辑step
       formValidate1: {
         stepTitle: "",
@@ -325,6 +360,8 @@ export default {
       selectStepTools: [],
       selectStepToolsets: [],
       // step 结构信息
+      procedureDrag: true,
+      nodeData: [],
       scopeType: "",
       scopeId: "",
       resetSubProjectTypeNotice: false,
@@ -388,13 +425,18 @@ export default {
       this.showSteps();
     },
     btnFunction() {
-      if (this.processStructure.length == 0) {
+      if (
+        this.processStructure.length <= 0 ||
+        this.processStructure.length == undefined
+      ) {
         this.addBtn = true;
         this.activeBtn = false;
         this.removeBtn = false;
         this.workspaceBtn = false;
+        this.nodePositionBtn = false;
       } else {
         this.workspaceBtn = true;
+        this.nodePositionBtn = true;
         if (this.selectedStep.length == 0) {
           this.addBtn = false;
           this.activeBtn = false;
@@ -582,10 +624,11 @@ export default {
         },
         series: [
           {
+            id: "procedure",
             type: "graph",
             layout: "none",
             legendHoverLink: true,
-            roam: true,
+            roam: this.procedureDrag,
             label: {
               normal: {
                 show: true
@@ -594,7 +637,7 @@ export default {
             edgeSymbol: ["circle", "arrow"],
             edgeSymbolSize: [4, 10],
             focusNodeAdjacency: true,
-            data: [],
+            data: this.nodeData,
             categories: [
               {
                 name: "Context definition & resource collection"
@@ -680,50 +723,126 @@ export default {
         this.stepChart.off("dblclick");
       }
       this.stepChart.setOption(option);
-      let _this = this;
 
+      let _this = this;
       // 单击选择步骤
       this.stepChart.on("click", function(params) {
-        if (option.series[0].data[params.data.index].symbolSize == 45) {
-          option.series[0].data[params.data.index].symbolSize = 60;
-          _this.formValidate0.stepTitle = params.data.name;
-          _this.formValidate0.stepType = _this.getStepType(
-            params.data.category
-          );
+        if (this.procedureDrag) {
+          if (option.series[0].data[params.data.index].symbolSize == 45) {
+            option.series[0].data[params.data.index].symbolSize = 60;
+            _this.formValidate0.stepTitle = params.data.name;
+            _this.formValidate0.stepType = _this.getStepType(
+              params.data.category
+            );
 
-          // record the selected step nodes
-          _this.selectedStep.push({
-            stepId: params.data.stepId,
-            id: params.data.index,
-            name: params.data.name
-          });
-        } else if (option.series[0].data[params.data.index].symbolSize == 60) {
-          option.series[0].data[params.data.index].symbolSize = 45;
+            // record the selected step nodes
+            _this.selectedStep.push({
+              stepId: params.data.stepId,
+              id: params.data.index,
+              name: params.data.name
+            });
+          } else if (
+            option.series[0].data[params.data.index].symbolSize == 60
+          ) {
+            option.series[0].data[params.data.index].symbolSize = 45;
 
-          // remove these not selected step nodes
-          for (var i = 0; i < _this.selectedStep.length; i++) {
-            if (_this.selectedStep[i].stepId == params.data.stepId) {
-              _this.selectedStep.splice(i, 1);
-              break;
+            // remove these not selected step nodes
+            for (var i = 0; i < _this.selectedStep.length; i++) {
+              if (_this.selectedStep[i].stepId == params.data.stepId) {
+                _this.selectedStep.splice(i, 1);
+                break;
+              }
             }
           }
+          _this.stepChart.setOption(option);
+          _this.btnFunction();
         }
-        _this.stepChart.setOption(option);
-        _this.btnFunction();
       });
       // 双击切换当前步骤
       this.stepChart.on("dblclick", function(params) {
-        // _this.enterStep(params.data.category, params.data.stepId);
-        _this.activityInfoModal = true;
-        let stepType = _this.getStepType(params.data.category);
-        let activity = {
-          stepID: params.data.stepId,
-          name: params.data.name,
-          type: stepType
-        };
-        _this.showActivityInfo = activity;
+        if (this.procedureDrag) {
+          // _this.enterStep(params.data.category, params.data.stepId);
+          _this.activityInfoModal = true;
+          let stepType = _this.getStepType(params.data.category);
+          let activity = {
+            stepID: params.data.stepId,
+            name: params.data.name,
+            type: stepType
+          };
+          _this.showActivityInfo = activity;
+        }
       });
     },
+    editPosition() {
+      this.procedureDrag = !this.procedureDrag;
+
+      this.stepChart.setOption({
+        animationDurationUpdate: this.procedureDrag?500:0,
+        series: [
+          {
+            id: "procedure",
+            roam: this.procedureDrag
+          }
+        ]
+      });
+
+      // node的拖拽功能
+      let _this = this;
+      this.stepChart.setOption({
+        // https://www.echartsjs.com/zh/tutorial.html#小例子：自己实现拖拽
+        graphic: echarts.util.map(this.nodeData, function(dataItem, dataIndex) {
+          let x = dataItem.x;
+          let y = dataItem.y;
+          let item = [x, y];
+          let nodePosition = _this.stepChart.convertToPixel(
+            { seriesIndex: 0 },
+            item
+          );
+
+          return {
+            type: "circle",
+            shape: {
+              r: 30
+            },
+            position: nodePosition,
+            invisible: true,
+            draggable: !_this.procedureDrag,
+            z: 100,
+            ondrag: echarts.util.curry(function() {
+              let position = _this.stepChart.convertFromPixel(
+                { seriesIndex: 0 },
+                this.position
+              );
+              _this.nodeData[dataIndex].x = position[0];
+              _this.nodeData[dataIndex].y = position[1];
+              _this.stepChart.setOption({
+                series: [
+                  {
+                    id: "procedure",
+                    data: _this.nodeData
+                  }
+                ]
+              });
+            }, dataIndex)
+          };
+        })
+      });
+      // 缩放
+      window.addEventListener("resize", function() {
+        // 对每个拖拽圆点重新计算位置，并用 setOption 更新
+        this.stepChart.setOption({
+          graphic: echarts.util.map(_this.nodeData, function(
+            dataItem,
+            dataIndex
+          ) {
+            return {
+              position: _this.stepChart.convertToPixel({ seriesIndex: 0 }, item)
+            };
+          })
+        });
+      });
+    },
+    onPointDragging(dataIndex) {},
     getStepType(category) {
       let type;
       if (category == 0) {
