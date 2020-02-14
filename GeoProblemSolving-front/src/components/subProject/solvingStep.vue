@@ -36,16 +36,16 @@
                 type="warning"
                 @click="editPosition()"
                 size="small"
-                icon="md-globe"
+                icon="md-git-commit"
                 title="Adjust the postion of nodes"
                 style="float:right;margin-left:10px;"
-              >Edit node position</Button>
+              >Move node</Button>
               <Button
                 v-else-if="nodePositionBtn && !procedureDrag"
                 type="warning"
                 @click="editPosition()"
                 size="small"
-                icon="md-globe"
+                icon="md-git-network"
                 title="Move the postion of procedure"
                 style="float:right;margin-left:10px;"
               >Move procedure</Button>
@@ -53,7 +53,7 @@
                 v-else
                 type="default"
                 size="small"
-                icon="md-globe"
+                icon="md-git-commit"
                 title="Adjust the postion of nodes"
                 style="float:right;margin-left:10px;cursor:default"
               >Edit node position</Button>
@@ -142,7 +142,7 @@
       v-model="slctActivateModal"
       title="Select an active activity"
       @on-ok="selectAActivity('activate')"
-      ok-text="Ok"
+      ok-text="OK"
       cancel-text="Cancel"
     >
       <div
@@ -156,7 +156,7 @@
       v-model="gotoworkModal"
       title="Select an active activity"
       @on-ok="selectAActivity('workspace')"
-      ok-text="Ok"
+      ok-text="OK"
       cancel-text="Cancel"
     >
       <div
@@ -175,7 +175,7 @@
       v-model="delModal"
       title="Delete this process"
       @on-ok="delStepGraph"
-      ok-text="Ok"
+      ok-text="OK"
       cancel-text="Cancel"
     >
       <p>Do you really want to delete this step?</p>
@@ -236,7 +236,7 @@
               :label-width="120"
             >
               <FormItem label="Name:" prop="stepTitle">
-                <Input v-model="formValidate1.stepTitle" placeholder="Enter step name"></Input>
+                <Input v-model="formValidate1.stepTitle" placeholder="Enter step name" />
               </FormItem>
               <FormItem label="Step type:" prop="stepType" style="margin-top:40px">
                 <Select v-model="formValidate1.stepType" placeholder="Select step type">
@@ -249,7 +249,7 @@
                   type="textarea"
                   :rows="10"
                   placeholder="Enter something..."
-                ></Input>
+                />
               </FormItem>
             </Form>
           </div>
@@ -373,12 +373,6 @@ export default {
   created() {
     this.init();
     this.getProcessSteps();
-  },
-  mounted() {
-    this.showSteps();
-    this.getAllTools();
-    this.getAllToolsets();
-    this.btnFunction();
 
     Array.prototype.contains = function(obj) {
       var i = this.length;
@@ -386,13 +380,20 @@ export default {
         if (
           (this[i].tId != undefined && this[i].tId === obj.tId) ||
           (this[i].tsId != undefined && this[i].tsId === obj.tsId) ||
-          (this[i].id != undefined && this[i].id === obj.id)
+          (this[i].id != undefined && this[i].id === obj.id) ||
+          (this[i].stepId != undefined && this[i].stepId === obj.stepId)
         ) {
           return true;
         }
       }
       return false;
     };
+  },
+  mounted() {
+    this.showSteps();
+    this.getAllTools();
+    this.getAllToolsets();
+    this.btnFunction();
   },
   beforeRouteLeave(to, from, next) {
     next();
@@ -420,6 +421,7 @@ export default {
     updateStepchart() {
       this.btnFunction();
       // 重新渲染
+      this.selectedStep = [];
       this.stepChart.dispose();
       this.stepChart = null;
       this.showSteps();
@@ -574,8 +576,6 @@ export default {
         for (var i = 0; i < this.processStructure.length; i++) {
           if (this.processStructure[i].activeStatus) {
             this.activeStepInfo.push(this.processStructure[i]);
-            // // 请求step数据
-            // this.getStepInfo(this.processStructure[i].stepID);
           }
         }
       }
@@ -637,7 +637,7 @@ export default {
             edgeSymbol: ["circle", "arrow"],
             edgeSymbolSize: [4, 10],
             focusNodeAdjacency: true,
-            data: this.nodeData,
+            data: [],
             categories: [
               {
                 name: "Context definition & resource collection"
@@ -676,34 +676,28 @@ export default {
         ]
       };
       if (this.processStructure.length > 0) {
-        this.selectedStep = [];
+        this.nodeData = [];
         for (var i = 0; i < this.processStructure.length; i++) {
           //get data
+          let datum = {
+            name: this.processStructure[i].name,
+            index: this.processStructure[i].id,
+            stepId: this.processStructure[i].stepID,
+            x: this.processStructure[i].x,
+            y: this.processStructure[i].y,
+            category: this.processStructure[i].category,
+            symbolSize: 45
+          };
           if (this.processStructure[i].activeStatus) {
-            option.series[0].data.push({
-              name: this.processStructure[i].name,
-              index: this.processStructure[i].id,
-              stepId: this.processStructure[i].stepID,
-              x: this.processStructure[i].x,
-              y: this.processStructure[i].y,
-              category: this.processStructure[i].category,
-              symbolSize: 60
-            });
+            datum.symbolSize = 60;
+            this.nodeData.push(datum);
             this.selectedStep.push({
               stepId: this.processStructure[i].stepID,
               id: this.processStructure[i].id,
               name: this.processStructure[i].name
             });
           } else {
-            option.series[0].data.push({
-              name: this.processStructure[i].name,
-              index: this.processStructure[i].id,
-              stepId: this.processStructure[i].stepID,
-              x: this.processStructure[i].x,
-              y: this.processStructure[i].y,
-              category: this.processStructure[i].category,
-              symbolSize: 45
-            });
+            this.nodeData.push(datum);
           }
 
           //get links
@@ -715,7 +709,7 @@ export default {
           }
         }
       }
-
+      option.series[0].data = this.nodeData;
       if (this.stepChart == null) {
         this.stepChart = echarts.init(document.getElementById("steps"));
       } else {
@@ -727,7 +721,7 @@ export default {
       let _this = this;
       // 单击选择步骤
       this.stepChart.on("click", function(params) {
-        if (this.procedureDrag) {
+        if (_this.procedureDrag) {
           if (option.series[0].data[params.data.index].symbolSize == 45) {
             option.series[0].data[params.data.index].symbolSize = 60;
             _this.formValidate0.stepTitle = params.data.name;
@@ -760,7 +754,7 @@ export default {
       });
       // 双击切换当前步骤
       this.stepChart.on("dblclick", function(params) {
-        if (this.procedureDrag) {
+        if (_this.procedureDrag) {
           // _this.enterStep(params.data.category, params.data.stepId);
           _this.activityInfoModal = true;
           let stepType = _this.getStepType(params.data.category);
@@ -777,7 +771,7 @@ export default {
       this.procedureDrag = !this.procedureDrag;
 
       this.stepChart.setOption({
-        animationDurationUpdate: this.procedureDrag?500:0,
+        animationDurationUpdate: this.procedureDrag ? 500 : 0,
         series: [
           {
             id: "procedure",
@@ -788,59 +782,55 @@ export default {
 
       // node的拖拽功能
       let _this = this;
-      this.stepChart.setOption({
-        // https://www.echartsjs.com/zh/tutorial.html#小例子：自己实现拖拽
-        graphic: echarts.util.map(this.nodeData, function(dataItem, dataIndex) {
-          let x = dataItem.x;
-          let y = dataItem.y;
-          let item = [x, y];
-          let nodePosition = _this.stepChart.convertToPixel(
-            { seriesIndex: 0 },
-            item
-          );
-
-          return {
-            type: "circle",
-            shape: {
-              r: 30
-            },
-            position: nodePosition,
-            invisible: true,
-            draggable: !_this.procedureDrag,
-            z: 100,
-            ondrag: echarts.util.curry(function() {
-              let position = _this.stepChart.convertFromPixel(
-                { seriesIndex: 0 },
-                this.position
-              );
-              _this.nodeData[dataIndex].x = position[0];
-              _this.nodeData[dataIndex].y = position[1];
-              _this.stepChart.setOption({
-                series: [
-                  {
-                    id: "procedure",
-                    data: _this.nodeData
-                  }
-                ]
-              });
-            }, dataIndex)
-          };
-        })
-      });
-      // 缩放
-      window.addEventListener("resize", function() {
-        // 对每个拖拽圆点重新计算位置，并用 setOption 更新
+      try {
         this.stepChart.setOption({
+          // https://www.echartsjs.com/zh/tutorial.html#小例子：自己实现拖拽
           graphic: echarts.util.map(_this.nodeData, function(
             dataItem,
             dataIndex
           ) {
+            let x = dataItem.x;
+            let y = dataItem.y;
+            let item = [x, y];
+            let nodePosition = _this.stepChart.convertToPixel(
+              { seriesIndex: 0 },
+              item
+            );
+
             return {
-              position: _this.stepChart.convertToPixel({ seriesIndex: 0 }, item)
+              type: "circle",
+              shape: {
+                r: 20
+              },
+              position: nodePosition,
+              invisible: true,
+              draggable: !_this.procedureDrag,
+              z: 100,
+              ondrag: echarts.util.curry(function() {
+                let position = _this.stepChart.convertFromPixel(
+                  { seriesIndex: 0 },
+                  this.position
+                );
+                _this.nodeData[dataIndex].x = position[0];
+                _this.nodeData[dataIndex].y = position[1];
+                _this.stepChart.setOption({
+                  series: [
+                    {
+                      id: "procedure",
+                      data: _this.nodeData
+                    }
+                  ]
+                });
+              }, dataIndex)
             };
           })
         });
-      });
+      } catch (ex) {
+        this.$Nothis.info({
+          desc: "ERROR!"
+        });
+        tice;
+      }
     },
     onPointDragging(dataIndex) {},
     getStepType(category) {
@@ -1092,27 +1082,6 @@ export default {
     },
     resourceRender(item) {
       return item.type + " - " + item.name;
-    },
-    getStepInfo(stepId) {
-      // this.axios
-      //   .get(
-      //     "/GeoProblemSolving/step/inquiry" + "?key=stepId" + "&value=" + stepId
-      //   )
-      //   .then(res => {
-      //     if (res.data == "Offline") {
-      //       if (this.scopeType == "subproject") {
-      //         this.$store.commit("userLogout");
-      //         this.$router.push({ name: "Login" });
-      //       } else {
-      //         parent.location.href = "/GeoProblemSolving/login";
-      //       }
-      //     } else if (res.data != "None" && res.data != "Fail") {
-      //       this.activeStepInfo = res.data[0];
-      //     } else if (res.data == "None") {
-      //       this.activeStepInfo = [];
-      //     }
-      //   })
-      //   .catch(err => {});
     },
     createStep(name) {
       this.$refs[name].validate(valid => {
@@ -1635,7 +1604,7 @@ export default {
             } else if (this.scopeType == "subproject") {
               this.$store.commit("setSubProjectInfo", res.data);
               this.$Notice.info({
-                desc: "SubProject update successfully!"
+                desc: "Subproject update successfully!"
               });
             }
           } else {
