@@ -56,7 +56,7 @@
                 icon="md-git-commit"
                 title="Adjust the postion of nodes"
                 style="float:right;margin-left:10px;cursor:default"
-              >Edit node position</Button>
+              >Move node</Button>
               <template v-show="userRole == 'Manager'">
                 <Button
                   v-if="removeBtn"
@@ -322,12 +322,12 @@ export default {
       typeList: [
         "Context definition & resource collection",
         "Data processing",
-        "Modeling for geographic process",
-        "Model evaluation",
+        "Data visualization",
+        "Geographic model construction",
+        "Model effectiveness evaluation",
+        "Geographical simulation",
         "Quantitative and qualitative analysis",
-        "Simulation/Prediction",
-        "Visualization & representation",
-        "Decision-making & management"
+        "Decision-making for management"
       ],
       // 步骤逻辑图
       stepChart: null,
@@ -461,7 +461,7 @@ export default {
             }
             if (
               count <= this.activeStepInfo.length &&
-              count < this.selectedStep.length
+              this.selectedStep.length - count == 1
             ) {
               this.activeBtn = true;
             } else {
@@ -597,11 +597,19 @@ export default {
               icon: "circle"
             },
             {
-              name: "Modeling for geographic process",
+              name: "Data visualization",
               icon: "circle"
             },
             {
-              name: "Model evaluation",
+              name: "Geographic model construction",
+              icon: "circle"
+            },
+            {
+              name: "Model effectiveness evaluation",
+              icon: "circle"
+            },
+            {
+              name: "Geographical simulation",
               icon: "circle"
             },
             {
@@ -609,15 +617,7 @@ export default {
               icon: "circle"
             },
             {
-              name: "Simulation/Prediction",
-              icon: "circle"
-            },
-            {
-              name: "Visualization & representation",
-              icon: "circle"
-            },
-            {
-              name: "Decision-making & management",
+              name: "Decision-making for management",
               icon: "circle"
             }
           ]
@@ -646,22 +646,22 @@ export default {
                 name: "Data processing"
               },
               {
-                name: "Modeling for geographic process"
+                name: "Data visualization"
               },
               {
-                name: "Model evaluation"
+                name: "Geographic model construction"
+              },
+              {
+                name: "Model effectiveness evaluation"
+              },
+              {
+                name: "Geographical simulation"
               },
               {
                 name: "Quantitative and qualitative analysis"
               },
               {
-                name: "Simulation/Prediction"
-              },
-              {
-                name: "Visualization & representation"
-              },
-              {
-                name: "Decision-making & management"
+                name: "Decision-making for management"
               }
             ],
             links: [],
@@ -840,17 +840,17 @@ export default {
       } else if (category == 1) {
         type = "Data processing";
       } else if (category == 2) {
-        type = "Modeling for geographic process";
+        type = "Data visualization";
       } else if (category == 3) {
-        type = "Model evaluation";
+        type = "Geographic model construction";
       } else if (category == 4) {
-        type = "Quantitative and qualitative analysis";
+        type = "Model effectiveness evaluation";
       } else if (category == 5) {
-        type = "Simulation/Prediction";
+        type = "Geographical simulation";
       } else if (category == 6) {
-        type = "Visualization & representation";
+        type = "Quantitative and qualitative analysis";
       } else if (category == 7) {
-        type = "Decision-making & management";
+        type = "Decision-making for management";
       }
       return type;
     },
@@ -860,29 +860,22 @@ export default {
         category = 0;
       } else if (type == "Data processing") {
         category = 1;
-      } else if (type == "Modeling for geographic process") {
+      } else if (type == "Data visualization") {
         category = 2;
-      } else if (type == "Model evaluation") {
+      } else if (type == "Geographic model construction") {
         category = 3;
-      } else if (type == "Quantitative and qualitative analysis") {
+      } else if (type == "Model effectiveness evaluation") {
         category = 4;
-      } else if (type == "Simulation/Prediction") {
+      } else if (type == "Geographical simulation") {
         category = 5;
-      } else if (type == "Visualization & representation") {
+      } else if (type == "Quantitative and qualitative analysis") {
         category = 6;
-      } else if (type == "Decision-making & management") {
+      } else if (type == "Decision-making for management") {
         category = 7;
       }
       return category;
     },
     activateStep(activities) {
-      if (this.selectedStep.length - this.activeStepInfo.length != 1) {
-        this.$Notice.info({
-          desc: "Please select one node in advance!"
-        });
-        return;
-      }
-
       // 多个激活的活动
       this.slctActiveStepInfo = [];
       if (this.activeStepInfo.length > 1) {
@@ -912,12 +905,12 @@ export default {
 
               // 前后继承关系
               for (var k = 0; k < this.slctActiveStepInfo.length; k++) {
-                let lastNode = {
+                let lastnode = {
                   name: this.slctActiveStepInfo[k].name,
                   id: this.slctActiveStepInfo[k].id
                 };
-                if (!this.processStructure.last.contains[lastnode]) {
-                  this.processStructure[j].last.push(lastNode);
+                if (!this.processStructure[j].last.contains[lastnode]) {
+                  this.processStructure[j].last.push(lastnode);
                 }
               }
 
@@ -937,7 +930,7 @@ export default {
           if (
             this.slctActiveStepInfo[i].stepID == this.processStructure[j].stepID
           ) {
-            if (!this.processStructure.next.contains[nextnode]) {
+            if (!this.processStructure[j].next.contains[nextnode]) {
               this.processStructure[j].next.push(nextnode);
             }
 

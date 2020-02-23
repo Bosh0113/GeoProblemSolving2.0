@@ -87,11 +87,19 @@ export default {
               icon: "circle"
             },
             {
-              name: "Modeling for geographic process",
+              name: "Data visualization",
               icon: "circle"
             },
             {
-              name: "Model evaluation",
+              name: "Geographic model construction",
+              icon: "circle"
+            },
+            {
+              name: "Model effectiveness evaluation",
+              icon: "circle"
+            },
+            {
+              name: "Geographical simulation",
               icon: "circle"
             },
             {
@@ -99,15 +107,7 @@ export default {
               icon: "circle"
             },
             {
-              name: "Simulation/Prediction",
-              icon: "circle"
-            },
-            {
-              name: "Visualization & representation",
-              icon: "circle"
-            },
-            {
-              name: "Decision-making & management",
+              name: "Decision-making for management",
               icon: "circle"
             }
           ]
@@ -135,22 +135,22 @@ export default {
                 name: "Data processing"
               },
               {
-                name: "Modeling for geographic process"
+                name: "Data visualization"
               },
               {
-                name: "Model evaluation"
+                name: "Geographic model construction"
+              },
+              {
+                name: "Model effectiveness evaluation"
+              },
+              {
+                name: "Geographical simulation"
               },
               {
                 name: "Quantitative and qualitative analysis"
               },
               {
-                name: "Simulation/Prediction"
-              },
-              {
-                name: "Visualization & representation"
-              },
-              {
-                name: "Decision-making & management"
+                name: "Decision-making for management"
               }
             ],
             links: [],

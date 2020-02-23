@@ -1078,12 +1078,12 @@ export default {
         "General step",
         "Context definition & resource collection",
         "Data processing",
-        "Modeling for geographic process",
-        "Model evaluation",
+        "Data visualization",
+        "Geographic model construction",
+        "Model effectiveness evaluation",
+        "Geographical simulation",
         "Quantitative and qualitative analysis",
-        "Simulation/Prediction",
-        "Visualization & representation",
-        "Decision-making & management",
+        "Decision-making for management",
         "Others"
       ],
       toolInfoRule: {
@@ -1120,12 +1120,12 @@ export default {
         "General step",
         "Context definition & resource collection",
         "Data processing",
-        "Modeling for geographic process",
-        "Model evaluation",
+        "Data visualization",
+        "Geographic model construction",
+        "Model effectiveness evaluation",
+        "Geographical simulation",
         "Quantitative and qualitative analysis",
-        "Simulation/Prediction",
-        "Visualization & representation",
-        "Decision-making & management"
+        "Decision-making for management"
       ],
       visible: false,
       //表示图片
@@ -1611,12 +1611,12 @@ export default {
           case "General step":
           case "Context definition & resource collection":
           case "Data processing":
-          case "Modeling for geographic process":
-          case "Model evaluation":
+          case "Data visualization":
+          case "Geographic model construction":
+          case "Model effectiveness evaluation":
+          case "Geographical simulation":
           case "Quantitative and qualitative analysis":
-          case "Simulation/Prediction":
-          case "Visualization & representation":
-          case "Decision-making & management": {
+          case "Decision-making for management": {
             var stepTypes = item.recomStep;
             for (var i = 0; i < stepTypes.length; i++) {
               if (stepTypes[i] == selectedType) {
