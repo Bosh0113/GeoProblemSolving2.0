@@ -1,10 +1,11 @@
 <style scoped>
 .sidebar {
-  width: 60px;
   background-color: #515a6e;
-  height: 100%;
-  justify-content: center;
+  width: 60px;
+  top: 0;
+  left: 0;
   position: absolute;
+  height: calc(100vh);
 }
 .toolContent {
   flex: 1;
@@ -69,7 +70,7 @@
 }
 </style>
 <template>
-  <div class="sidebar" :style="{height:bodyHeight}" style="width:60px;float:left">
+  <div class="sidebar">
     <div
       id="toolMembers"
       style="display:flex;justify-content:center;margin-top:20px"
@@ -149,7 +150,6 @@ export default {
   },
   data() {
     return {
-      bodyHeight: window.innerHeight + "px",
       membersDrawer: false,
       resourceDrawer: false
     };
@@ -161,7 +161,7 @@ export default {
   methods:{
     selectResource(url){
       this.$emit("resourceUrl",url);
-    }
+    },
   }
 };
 </script>

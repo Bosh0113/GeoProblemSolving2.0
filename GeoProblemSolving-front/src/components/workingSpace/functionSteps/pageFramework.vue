@@ -162,12 +162,6 @@ export default {
             required: false,
             message: "Please enter description",
             trigger: "blur"
-          },
-          {
-            type: "string",
-            max: 150,
-            message: "Descript less than 150 words",
-            trigger: "blur"
           }
         ]
       },

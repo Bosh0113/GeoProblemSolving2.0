@@ -86,41 +86,47 @@
       </div>
       <div style="display: flex; justify-content: space-between;">
         <div style="width:33%; height:400px">
-            <Table
-              :columns="tableColName"
-              :data="fileList"
-              class="table"
-              v-show="fileList!=[] && fileList!='None'"
-              height="400"
-              no-data-text="No data"
-            >
-              <template slot-scope="{ row }" slot="name">
-                <strong>{{ row.name }}</strong>
-              </template>
-              <template slot-scope="{ row }" slot="action">
-                <Button
-                  class="fileBtnHoverGreen"
-                  size="small"
-                  title="Check"
-                  @click="checkData(row)"
-                  icon="md-eye"
-                  shape="circle"
-                  type="text"
-                ></Button>
-                <Button
-                  class="fileBtnHoverRed"
-                  size="small"
-                  shape="circle"
-                  type="text"
-                  icon="md-close"
-                  title="Remove"
-                  @click="deleteResourceModalShow(row.resourceId)"
-                ></Button>
-              </template>
-            </Table>
+          <Table
+            :columns="tableColName"
+            :data="fileList"
+            class="table"
+            v-show="fileList!=[] && fileList!='None'"
+            height="400"
+            no-data-text="No data"
+          >
+            <template slot-scope="{ row }" slot="name">
+              <strong>{{ row.name }}</strong>
+            </template>
+            <template slot-scope="{ row }" slot="action">
+              <Button
+                class="fileBtnHoverGreen"
+                size="small"
+                title="Check"
+                @click="checkData(row)"
+                icon="md-eye"
+                shape="circle"
+                type="text"
+              ></Button>
+              <Button
+                class="fileBtnHoverRed"
+                size="small"
+                shape="circle"
+                type="text"
+                icon="md-close"
+                title="Remove"
+                @click="deleteResourceModalShow(row.resourceId)"
+              ></Button>
+            </template>
+          </Table>
         </div>
         <div id="toolData">
           <div id="toolDataHeader">Data from Tools</div>
+          <Card
+            style="width:48%; height:150px; float:left; margin:5px"
+            v-if="toolDataList.length == 0"
+          >
+            <div>There is no records.</div>
+          </Card>
           <vue-scroll :ops="ops" style="height:360px">
             <div v-for="(item,index) in toolDataList" :key="index">
               <Card style="width:48%; height:150px; float:left; margin:5px">
@@ -375,7 +381,7 @@ export default {
         this.panel.close();
       }
     },
-    stepInfo(){
+    stepInfo() {
       this.getResList();
     }
   },

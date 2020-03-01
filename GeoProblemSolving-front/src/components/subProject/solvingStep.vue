@@ -116,10 +116,19 @@
           </template>
           <div
             style="width:90%;margin-top:20px;padding:15px;background-color:#f8f8f9"
-            :style="{height:contentHeight-120+'px'}"
+            :style="{height:contentHeight - 140 + 'px'}"
             id="steps"
+            v-if="scopeType == 'subproject'"
           ></div>
-          <h3 style="margin-top:10px">Steps for solving geo-problem can be created and deleted here.</h3>
+          <div
+            style="width:90%;margin-top:20px;padding:15px;background-color:#f8f8f9"
+            :style="{height:contentHeight+ 40 +'px'}"
+            id="steps"
+            v-else-if="scopeType == 'project'"
+          ></div>
+          <h3
+            style="margin-top:10px"
+          >Activities for solving geo-problem can be created and deleted here.</h3>
           <h3
             style="margin-top:10px"
           >Double click the node, and you can enter the corresponding workspace.</h3>
@@ -132,7 +141,10 @@
               @click="resetSubProjectTypeModalShow()"
             >Reset workspace type</Button>
           </div>
-          <div style="width:100%;text-align:center;margin-top:100px" v-if="scopeType == 'project'">
+          <div
+            style="width:100%;text-align:center;margin-top:10px"
+            v-else-if="scopeType == 'project'"
+          >
             <Button class="btnHoverGray" @click="resetProjectTypeModalShow()">Reset workspace type</Button>
           </div>
         </Row>
@@ -1591,6 +1603,8 @@ export default {
             if (this.scopeType == "project") {
               this.$store.commit("setProjectInfo", res.data);
               parent.vm.projectInfo = res.data;
+              // 如果是项目下的步骤，需要更新sessionStorage
+              sessionStorage.setItem("projectInfo", JSON.stringify(res.data));
               this.$Notice.info({
                 desc: "Project update successfully!"
               });

@@ -188,11 +188,11 @@ export default {
         .then(res => {
           // 写渲染函数，取到所有资源
           if (res.data !== "None") {
-            for (let i = 0; i < res.data.length; i++) {
-              if (res.data[i].type == "paper") {
-                this.paperList.push(res.data[i]);
-              } else if (res.data[i].type == "document") {
-                this.documentList.push(res.data[i]);
+            for (let i = 0; i < res.data.files.length; i++) {
+              if (res.data.files[i].type == "paper") {
+                this.paperList.push(res.data.files[i]);
+              } else if (res.data.files[i].type == "document") {
+                this.documentList.push(res.data.files[i]);
               }
             }
           } else {
