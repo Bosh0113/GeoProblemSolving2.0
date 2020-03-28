@@ -897,7 +897,7 @@
                 }
             },
             isOwner(task){
-                if(task.creatorId==this.$store.getters.userId){
+                if(task.creatorId==this.userInfo.userId){
                     return true;
                 }
                 else{
