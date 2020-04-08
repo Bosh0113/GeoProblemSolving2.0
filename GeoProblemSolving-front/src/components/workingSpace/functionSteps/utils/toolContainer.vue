@@ -327,7 +327,15 @@ export default {
       this.showToolsetToolsModal = true;
     },
     useTool(toolInfo) {
-      let toolURL =
+      var toolURL = "";
+      if(toolInfo.toolName == "Jupyter notebook"){
+        toolURL =
+        '<iframe src="' +
+        toolInfo.toolUrl +
+        '" style="width: 100%;height:100%;"></iframe>';
+      }
+      else{
+        toolURL =
         '<iframe src="' +
         toolInfo.toolUrl +
         "?userName=" +
@@ -337,6 +345,8 @@ export default {
         "&groupID=" +
         this.stepInfo.stepId +
         '" style="width: 100%;height:100%;"></iframe>';
+      }
+      
       var demoPanelTimer = null;
       var panel = jsPanel.create({
         theme: "success",
