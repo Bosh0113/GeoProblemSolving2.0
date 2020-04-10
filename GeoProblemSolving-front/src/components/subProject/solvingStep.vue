@@ -232,60 +232,53 @@
       title="Create a new step"
       :styles="{top: '20px'}"
     >
-      <Carousel
-        v-if="createStepModal"
-        v-model="stepValue"
-        :dots="setting.dots"
-        :trigger="setting.trigger"
-        :arrow="setting.arrow"
-      >
-        <CarouselItem>
-          <div style="height:380px;width:640px;margin-left:50px">
-            <Form
-              ref="formValidate1"
-              :model="formValidate1"
-              :rules="ruleValidate1"
-              :label-width="120"
-            >
-              <FormItem label="Name:" prop="stepTitle">
-                <Input v-model="formValidate1.stepTitle" placeholder="Enter step name" />
-              </FormItem>
-              <FormItem label="Step type:" prop="stepType" style="margin-top:40px">
-                <Select v-model="formValidate1.stepType" placeholder="Select step type">
-                  <Option v-for="item in typeList" :key="item.index" :value="item">{{ item }}</Option>
-                </Select>
-              </FormItem>
-              <FormItem label="Description:" prop="result" style="margin-top:50px">
-                <Input
-                  v-model="formValidate1.result"
-                  type="textarea"
-                  :rows="10"
-                  placeholder="Enter something..."
-                />
-              </FormItem>
-            </Form>
-          </div>
-        </CarouselItem>
-        <CarouselItem>
-          <div style="margin-left:75px">
-            <div style="font-size:14px">Select needed data:</div>
-            <Transfer
-              :data="inheritResource"
-              :target-keys="targetKeys"
-              :list-style="listStyle"
-              :render-format="resourceRender"
-              :titles="['This process', 'The next process']"
-              filter-placeholder="Enter key words..."
-              filterable
-              :filter-method="filterMethod"
-              @on-change="handleChange"
-            ></Transfer>
-          </div>
-        </CarouselItem>
-      </Carousel>
+      <div style="height:380px;width:640px;margin-left:50px">
+        <Form ref="formValidate1" :model="formValidate1" :rules="ruleValidate1" :label-width="120">
+          <FormItem label="Name:" prop="stepTitle">
+            <Input v-model="formValidate1.stepTitle" placeholder="Enter step name" />
+          </FormItem>
+          <FormItem label="Step type:" prop="stepType" style="margin-top:40px">
+            <Select v-model="formValidate1.stepType" placeholder="Select step type">
+              <Option v-for="item in typeList" :key="item.index" :value="item">{{ item }}</Option>
+            </Select>
+          </FormItem>
+          <FormItem label="Description:" prop="result" style="margin-top:50px">
+            <Input
+              v-model="formValidate1.result"
+              type="textarea"
+              :rows="10"
+              placeholder="Enter something..."
+            />
+          </FormItem>
+        </Form>
+      </div>
       <div slot="footer">
         <Button @click="createStepModal=false">Cancel</Button>
         <Button type="primary" @click="createStep('formValidate1')">Submit</Button>
+      </div>
+    </Modal>
+    <Modal
+      width="800px"
+      v-model="inheritResModal"
+      title="Get resources from previous activities"
+      :styles="{top: '20px'}"
+      @on-ok="createStepModal = true"
+      ok-text="OK"
+      cancel-text="Cancel"
+    >
+      <div style="margin-left:75px">
+        <div style="font-size:14px">Select the needed data:</div>
+        <Transfer
+          :data="existingResources"
+          :target-keys="targetKeys"
+          :list-style="listStyle"
+          :render-format="resourceRender"
+          :titles="['The previous activities', 'The new activity']"
+          filter-placeholder="Enter key words..."
+          filterable
+          :filter-method="filterMethod"
+          @on-change="handleChange"
+        ></Transfer>
       </div>
     </Modal>
   </Row>
@@ -348,21 +341,15 @@ export default {
       delModal: false,
       // 创建步骤
       createStepModal: false,
+      inheritResModal: false,
       slctActivateModal: false,
       gotoworkModal: false,
       // 双击展示活动信息
       activityInfoModal: false,
       showActivityInfo: {},
-      stepValue: 0,
-      setting: {
-        dots: "outside",
-        trigger: "click",
-        arrow: "always"
-      },
       //资源继承
-      inheritResource: [],
+      existingResources: [],
       targetKeys: [],
-      selectResource: [],
       listStyle: { width: "280px", height: "375px" },
       // 工具
       personalTools: [],
@@ -485,92 +472,92 @@ export default {
     },
     // 进入具体的step页面
     enterStep(type, stepId) {
-        if (this.scopeInfo.subProjectId != undefined) {
-          if (type == 0) {
-            this.$router.push({
-              name: "contextDefinition",
-              params: { stepId: stepId }
-            });
-          } else if (type == 1) {
-            this.$router.push({
-              name: "dataProcessing",
-              params: { stepId: stepId }
-            });
-          } else if (type == 2) {
-            this.$router.push({
-              name: "modelProcess",
-              params: { stepId: stepId }
-            });
-          } else if (type == 3) {
-            this.$router.push({
-              name: "modelEvaluation",
-              params: { stepId: stepId }
-            });
-          } else if (type == 4) {
-            this.$router.push({
-              name: "analysis",
-              params: { stepId: stepId }
-            });
-          } else if (type == 5) {
-            this.$router.push({
-              name: "simulation",
-              params: { stepId: stepId }
-            });
-          } else if (type == 6) {
-            this.$router.push({
-              name: "visualization",
-              params: { stepId: stepId }
-            });
-          } else if (type == 7) {
-            this.$router.push({
-              name: "decisionMaking",
-              params: { stepId: stepId }
-            });
+      if (this.scopeInfo.subProjectId != undefined) {
+        if (type == 0) {
+          this.$router.push({
+            name: "contextDefinition",
+            params: { stepId: stepId }
+          });
+        } else if (type == 1) {
+          this.$router.push({
+            name: "dataProcessing",
+            params: { stepId: stepId }
+          });
+        } else if (type == 2) {
+          this.$router.push({
+            name: "modelProcess",
+            params: { stepId: stepId }
+          });
+        } else if (type == 3) {
+          this.$router.push({
+            name: "modelEvaluation",
+            params: { stepId: stepId }
+          });
+        } else if (type == 4) {
+          this.$router.push({
+            name: "analysis",
+            params: { stepId: stepId }
+          });
+        } else if (type == 5) {
+          this.$router.push({
+            name: "simulation",
+            params: { stepId: stepId }
+          });
+        } else if (type == 6) {
+          this.$router.push({
+            name: "visualization",
+            params: { stepId: stepId }
+          });
+        } else if (type == 7) {
+          this.$router.push({
+            name: "decisionMaking",
+            params: { stepId: stepId }
+          });
+        }
+      } else {
+        switch (type) {
+          case 0: {
+            parent.location.href =
+              "/GeoProblemSolving/workspaceP/" + stepId + "/contextDefinition";
+            break;
           }
-        } else {
-          switch (type) {
-            case 0: {
-              parent.location.href =
-                "/GeoProblemSolving/workspaceP/" + stepId + "/contextDefinition";
-              break;
-            }
-            case 1: {
-              parent.location.href =
-                "/GeoProblemSolving/workspaceP/" + stepId + "/dataProcessing";
-              break;
-            }
-            case 2: {
-              parent.location.href =
-                "/GeoProblemSolving/workspaceP/" + stepId + "/modelProcess";
-              break;
-            }
-            case 3: {
-              parent.location.href =
-                "/GeoProblemSolving/workspaceP/" + stepId + "/modelEvaluation";
-              break;
-            }
-            case 4: {
-              parent.location.href =
-                "/GeoProblemSolving/workspaceP/" + stepId + "/analysis";
-              break;
-            }
-            case 5: {
-              parent.location.href =
-                "/GeoProblemSolving/workspaceP/" + stepId + "/simulation";
-              break;
-            }
-            case 6: {
-              parent.location.href =
-                "/GeoProblemSolving/workspaceP/" + stepId + "/visualization";
-              break;
-            }
-            case 7: {
-              parent.location.href =
-                "/GeoProblemSolving/workspaceP/" + stepId + "/decisionMaking";
-              break;
-            }
+          case 1: {
+            parent.location.href =
+              "/GeoProblemSolving/workspaceP/" + stepId + "/dataProcessing";
+            break;
+          }
+          case 2: {
+            parent.location.href =
+              "/GeoProblemSolving/workspaceP/" + stepId + "/modelProcess";
+            break;
+          }
+          case 3: {
+            parent.location.href =
+              "/GeoProblemSolving/workspaceP/" + stepId + "/modelEvaluation";
+            break;
+          }
+          case 4: {
+            parent.location.href =
+              "/GeoProblemSolving/workspaceP/" + stepId + "/analysis";
+            break;
+          }
+          case 5: {
+            parent.location.href =
+              "/GeoProblemSolving/workspaceP/" + stepId + "/simulation";
+            break;
+          }
+          case 6: {
+            parent.location.href =
+              "/GeoProblemSolving/workspaceP/" + stepId + "/visualization";
+            break;
+          }
+          case 7: {
+            parent.location.href =
+              "/GeoProblemSolving/workspaceP/" + stepId + "/decisionMaking";
+            break;
           }
         }
+      }
     },
     getProcessSteps() {
       this.processStructure = [];
@@ -909,11 +896,16 @@ export default {
 
       // 新激活的活动
       var nextnode = {};
+      var activityChangeList = [];
       for (var i = 0; i < this.selectedStep.length; i++) {
         for (var j = 0; j < this.processStructure.length; j++) {
           if (this.processStructure[j].stepID == this.selectedStep[i].stepId) {
             if (!this.processStructure[j].activeStatus) {
               this.processStructure[j].activeStatus = true;
+              activityChangeList.push({
+                stepId: this.processStructure[j].stepID,
+                activeStatus: this.processStructure[j].activeStatus
+              });
 
               // 前后继承关系
               for (var k = 0; k < this.slctActiveStepInfo.length; k++) {
@@ -947,6 +939,11 @@ export default {
             }
 
             this.processStructure[j].activeStatus = false;
+            activityChangeList.push({
+              stepId: this.processStructure[j].stepID,
+              activeStatus: this.processStructure[j].activeStatus
+            });
+
             break;
           }
         }
@@ -957,8 +954,9 @@ export default {
       this.getProcessSteps();
       // 重新渲染
       this.updateStepchart();
-      // 存储Step
+      // 更新Step
       this.updateSteps();
+      this.updateStepContent(activityChangeList);
     },
     addNewStep() {
       // 选择父节点检测
@@ -975,65 +973,29 @@ export default {
       // 获取可继承的资源
       this.getInheritResource();
       // 创建步骤模态框
-      this.createStepModal = true;
-      this.stepValue = 0;
+      if (this.processStructure.length > 0) {
+        this.inheritResModal = true;
+      } else {
+        this.createStepModal = true;
+      }
     },
     getInheritResource() {
-      this.inheritResource = this.getMockData();
+      this.existingResources = this.getMockData();
     },
     getMockData() {
       let mockData = [];
       let selectedRes = [];
-      // 继承的子项目资源，项目资源，需要手动拉入子项目
-      $.ajax({
-        url:
-          "/GeoProblemSolving/folder/findByFileType?" +
-          "scopeId=" +
-          this.scopeId +
-          "&type=all",
-        type: "GET",
-        async: false,
-        success: function(data) {
-          if (data !== "Fail") {
-            selectedRes = data;
-            for (var i = 0; i < selectedRes.length; i++) {
-              mockData.push({
-                key: i,
-                name: selectedRes.name,
-                type: selectedRes.type,
-                resourceId: selectedRes.resourceId
-              });
-            }
-          } else {
-            selectedRes = [];
-          }
-        },
-        error: function(err) {
-          selectedRes = [];
-          console.log("err!");
-        }
-      });
+
       // 前驱步骤的资源
       for (var i = 0; i < this.selectedStep.length; i++) {
         let selectedStepId = this.selectedStep[i].stepId;
+        let selectedStepName = this.selectedStep[i].name;
+        let getResUrl =
+          "/GeoProblemSolving/folder/findByFileType?" +
+          "scopeId=" +
+          selectedStepId +
+          "&type=all";
 
-        let getResUrl = "";
-        if (
-          this.formValidate1.stepType ==
-          "Context definition & resource collection"
-        ) {
-          getResUrl =
-            "/GeoProblemSolving/folder/findByFileType?" +
-            "scopeId=" +
-            selectedStepId +
-            "&type=all";
-        } else {
-          getResUrl =
-            "/GeoProblemSolving/folder/findByFileType?" +
-            "scopeId=" +
-            selectedStepId +
-            "&type=data";
-        }
         $.ajax({
           url: getResUrl,
           type: "GET",
@@ -1041,12 +1003,13 @@ export default {
           success: function(data) {
             if (data !== "Fail") {
               selectedRes = data;
-              for (var i = 0; i < selectedRes.length; i++) {
+              for (var j = 0; j < selectedRes.length; j++) {
                 mockData.push({
-                  key: i,
-                  name: selectedRes.name,
-                  type: selectedRes.type,
-                  resourceId: selectedRes.resourceId
+                  key: mockData.length.toString(),
+                  name: selectedRes[j].name,
+                  type: selectedRes[j].type,
+                  resourceId: selectedRes[j].resourceId,
+                  source: selectedStepName
                 });
               }
             } else {
@@ -1063,13 +1026,14 @@ export default {
     },
     getTargetKeys() {
       let mockData = [];
-      if (this.inheritResource.length > 0) {
+      if (this.existingResources.length > 0) {
         for (var i = 0; i < this.targetKeys.length; i++) {
           mockData.push({
             key: this.targetKeys[i],
-            name: this.inheritResource[this.targetKeys[i]].name,
-            type: this.inheritResource[this.targetKeys[i]].type,
-            resourceId: this.inheritResource[this.targetKeys[i]].resourceId
+            name: this.existingResources[this.targetKeys[i]].name,
+            type: this.existingResources[this.targetKeys[i]].type,
+            resourceId: this.existingResources[this.targetKeys[i]].resourceId,
+            source: this.existingResources[this.targetKeys[i]].source
           });
         }
       }
@@ -1079,14 +1043,11 @@ export default {
       this.targetKeys = newTargetKeys;
     },
     filterMethod(data, query) {
-      if (data.length > 0) {
-        return data.type.indexOf(query) > -1;
-      } else {
-        return false;
-      }
+      return data.type.indexOf(query) > -1;
     },
     resourceRender(item) {
-      return item.type + " - " + item.name;
+      // return item.type + " - " + item.name;
+      return `<span title="${item.type} - ${item.source}">${item.name}</span>`;
     },
     createStep(name) {
       this.$refs[name].validate(valid => {
@@ -1107,10 +1068,7 @@ export default {
       });
     },
     createStepContent() {
-      // 新步骤的基本信息、资源（数据）、拓展工具
-      this.selectResource = [];
-      this.selectResource = this.getTargetKeys();
-
+      // 新步骤的拓展工具、基本信息、资源（数据）
       this.filterShowListByType(this.formValidate1.stepType);
 
       let Step = {};
@@ -1127,6 +1085,7 @@ export default {
       Step["creator"] = this.$store.getters.userId;
       Step["toolList"] = this.selectStepTools;
       Step["toolsetList"] = this.selectStepToolsets;
+      Step["activeStatus"] = true;
       Step["content"] = {};
 
       this.axios
@@ -1144,7 +1103,7 @@ export default {
           } else {
             this.createStepGraph(res.data);
 
-            // 更新新Step的资源----------------------------------------------------------------------需要改，留坑
+            // 更新新Step的资源
             this.copyResource(res.data);
           }
         })
@@ -1186,6 +1145,8 @@ export default {
         let nodeLevel = 0;
         let nodeY = 0;
         let nodeCategory = 0;
+        var activityChangeList = [];
+
         for (var i = 0; i < this.selectedStep.length; i++) {
           lastNode.push({
             name: this.selectedStep[i].name,
@@ -1215,6 +1176,11 @@ export default {
           }
           //inactivate selected step
           this.processStructure[this.selectedStep[i].id].activeStatus = false;
+          activityChangeList.push({
+            stepId: this.processStructure[this.selectedStep[i].id].stepID,
+            activeStatus: this.processStructure[this.selectedStep[i].id]
+              .activeStatus
+          });
         }
         let isOverlap = false;
         // 统计每层的节点数
@@ -1273,8 +1239,9 @@ export default {
         this.getProcessSteps();
         // 重新渲染
         this.updateStepchart();
-        // 存储Step
+        // 更新Step
         this.updateSteps();
+        this.updateStepContent(activityChangeList);
       } else {
         this.$Notice.info({
           desc: "Select at least one step as source(s), please!"
@@ -1459,8 +1426,42 @@ export default {
       }
       return resultList;
     },
-    // 数据继承-----------------------------------------
-    copyResource(stepId) {},
+    // 数据继承
+    copyResource(stepId) {
+      let selectResource = [];
+      selectResource = this.getTargetKeys();
+      if (selectResource.length > 0) {
+        // 继承资源的数据id的集合
+        let addFileList = [];
+        for (var i = 0; i < selectResource.length; i++) {
+          addFileList.push(selectResource[i].resourceId);
+        }
+        let addFileListStr = addFileList.toString();
+
+        this.axios
+          .get(
+            "/GeoProblemSolving/folder/shareToFolder" +
+              "?addFileList=" +
+              addFileListStr +
+              "&folderId=" +
+              stepId
+          )
+          .then(res => {
+            this.shareModal = false;
+            if (res.data == "Offline") {
+              this.$store.commit("userLogout");
+              this.$router.push({ name: "Login" });
+            } else if (res.data == "Fail") {
+              this.$Message.error(
+                "Failed to get resources from previous activities."
+              );
+            }
+          })
+          .catch(err => {
+            // console.log(err.data);
+          });
+      }
+    },
     removeStep() {
       if (this.selectedStep.length == 1) {
         this.delModal = true;
@@ -1621,6 +1622,32 @@ export default {
         .catch(err => {
           console.log(err.data);
         });
+    },
+    updateStepContent(activityChangeList) {
+      for (var i = 0; i < activityChangeList.length; i++) {
+        let obj = new URLSearchParams();
+        obj.append("activeStatus", activityChangeList[i].activeStatus);
+        obj.append("stepId", activityChangeList[i].stepId);
+        this.axios
+          .post("/GeoProblemSolving/step/update", obj)
+          .then(res => {
+            if (res.data == "Offline") {
+              this.$store.commit("userLogout");
+              this.$router.push({
+                name: "Login"
+              });
+            } else if (res.data != "Fail") {
+              // this.$Notice.info({
+              //   desc: "Update successfully!"
+              // });
+            } else {
+              // this.$Message.error("Update step failed.");
+            }
+          })
+          .catch(err => {
+            console.log(err.data);
+          });
+      }
     },
     resetSubProjectTypeModalShow() {
       if (this.processStructure.length > 0) {

@@ -77,6 +77,7 @@
           <Option value="materials">Related materials</Option>
         </Select>
         <Button
+          v-show="stepInfo.activeStatus"
           shape="circle"
           icon="md-cloud-upload"
           @click="dataUploadModalShow"
