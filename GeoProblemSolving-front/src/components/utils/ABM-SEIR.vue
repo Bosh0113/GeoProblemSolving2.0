@@ -1,4 +1,7 @@
 <style scoped>
+.paramsCard >>> .ivu-card-body {
+  padding: 10px 16px;
+}
 .mapCard >>> .ivu-card-body {
   padding: 0px;
 }
@@ -9,49 +12,96 @@
 <template>
   <div style="display: flex;background-color:lightgrey">
     <Card
+      class="paramsCard"
       dis-hover
-      style="width: 290px; height: calc(100vh - 10px); background-color: white; margin: 5px;"
+      style="width: 290px; height: calc(100vh - 10px); background-color: white; margin: 5px;overflow-y: auto"
     >
       <p slot="title">Parameters of SEIR model</p>
       <div id="parameters">
+        <Label>Total population:</Label>
+        <InputNumber
+          size="small"
+          :max="1000"
+          :min="1"
+          v-model="total_popu"
+          style="margin: 5px 0 10px 0; width:200px; display:block"
+          title="Population"
+        ></InputNumber>
+        <Label>Number of initial exposed people:</Label>
+        <InputNumber
+          size="small"
+          :max="1000"
+          :min="0"
+          v-model="exposed_popu"
+          style="margin: 5px 0 10px 0; width:200px; display:block"
+          title="Population"
+        ></InputNumber>
+        <Label>Number of initial infected people:</Label>
+        <InputNumber
+          size="small"
+          :max="1000"
+          :min="0"
+          v-model="infectious_popu"
+          style="margin: 5px 0 10px 0; width:200px; display:block"
+          title="Population"
+        ></InputNumber>
+        <Label>Number of initial recovered people:</Label>
+        <InputNumber
+          size="small"
+          :max="1000"
+          :min="0"
+          v-model="recovered_popu"
+          style="margin: 5px 0 10px 0; width:200px; display:block"
+          title="Population"
+        ></InputNumber>
+        <Label>Number of initial dead people:</Label>
+        <InputNumber
+          size="small"
+          :max="1000"
+          :min="0"
+          v-model="death_popu"
+          style="margin: 5px 0 10px 0; width:200px; display:block"
+          title="Population"
+        ></InputNumber>
+        <Divider style="margin: 10px 0;" />
         <Label style="display:block">Infectiousness in exposed duration:</Label>
-        <RadioGroup v-model="exposedInfect" style="margin: 5px 0 20px 0; width:200px">
+        <RadioGroup v-model="exposed_infect" style="margin: 5px 0 10px 0; width:200px">
           <Radio label="Yes"></Radio>
           <Radio label="No"></Radio>
         </RadioGroup>
-        <Label style="display:block">Mean exposed time(days):</Label>
+        <Label style="display:block">Mean incubation period(days):</Label>
         <InputNumber
           size="small"
           :max="30"
           :min="0"
           v-model="exposedTime"
-          style="margin: 5px 0 20px 0; width:200px"
+          style="margin: 5px 0 10px 0; width:200px"
         ></InputNumber>
-        <Label style="display:block">Mean infected time(days):</Label>
+        <Label style="display:block">The probability of transmission(person to person) (%):</Label>
         <InputNumber
           size="small"
           :max="30"
           :min="0"
-          v-model="infectedTime"
-          style="margin: 5px 0 20px 0; width:200px"
+          v-model="transmission_rate"
+          style="margin: 5px 0 10px 0; width:200px"
         ></InputNumber>
-        <Label style="display:block">Basic reproduction number:</Label>
+        <Label style="display:block">The probability of recovery(%/day):</Label>
         <InputNumber
           size="small"
           :max="30"
           :min="0"
-          v-model="R0"
-          style="margin: 5px 0 20px 0; width:200px"
+          v-model="recovery_rate"
+          style="margin: 5px 0 10px 0; width:200px"
         ></InputNumber>
-        <Label style="display:block">Mortality rate:</Label>
+        <Label style="display:block">The probability of death(%/day):</Label>
         <InputNumber
           size="small"
           :max="1"
           :min="0"
-          v-model="mortality"
-          style="margin: 5px 0 20px 0; width:200px"
+          v-model="death_rate"
+          style="margin: 5px 0 10px 0; width:200px"
         ></InputNumber>
-        <Button @click="setSEIRParem">Submit</Button>
+        <Button @click="setSEIRParem" style="margin-right:60px">Submit</Button>
         <Button @click="resetSEIRParem">Reset</Button>
       </div>
     </Card>
@@ -59,40 +109,60 @@
       <Card
         class="mapCard"
         dis-hover
-        style="width: calc(100vw - 310px); height: calc(100vh - 250px); background-color: white; margin: 5px;"
+        style="width: calc(100vw - 310px); height: calc(100vh - 280px); background-color: white; margin: 5px;overflow-x: auto"
       >
         <div id="map" style="width:100%; height:100%; position: absolute;"></div>
       </Card>
       <Card
         dis-hover
         class="agentConsole"
-        style="width: calc(100vw - 310px); height: 235px; background-color: white; margin: 5px;"
+        style="width: calc(100vw - 310px); height: 265px; background-color: white; margin: 5px;"
       >
-        <p slot="title">Agent console</p>
+        <p slot="title">Simulation console</p>
+        <div
+          slot="extra"
+          style="margin-top: -7px; color: grey"
+          v-show="collaborative && !showMembers"
+          @click="showMembers = true"
+        >
+          Status:
+          <span v-if="simulator.Name == undefined">Wait for a simulation.</span>
+          <span v-else>{{simulator.Name}} is conducting the simulation.</span>
+        </div>
+        <div
+          slot="extra"
+          style="margin-top: -7px; color: grey"
+          v-show="collaborative && showMembers"
+          @click="showMembers = false"
+        >
+          Online participants:
+          <span v-for="item in participants" :key="item">
+            <Icon type="md-man" :title="item.Name" />
+          </span>
+        </div>
         <div id="status">
-          <div style="margin-bottom:10px">
-            <Label>Total humans:</Label>
-            <InputNumber
-              size="small"
-              :max="1000"
-              :min="1"
-              v-model="totalNum"
+          <div>
+            <Label>Collaboration:</Label>
+            <i-switch
+              size="large"
+              v-model="collaborative"
+              @on-change="changeCollab"
               style="margin-right:20px"
-            ></InputNumber>
-            <Label>Infected humans:</Label>
-            <InputNumber
-              size="small"
-              :max="1000"
-              :min="0"
-              v-model="infectedNum"
-              style="margin-right:20px"
-            ></InputNumber>
-            <Label>Human activity(km):</Label>
+            >
+              <span slot="open">ON</span>
+              <span slot="close">OFF</span>
+            </i-switch>
+            <Button size="small" style="margin-right:20px" @click="addAgents">Set agents</Button>
+            <Button size="small" @click="removeAgents">Remove agents</Button>
+          </div>
+          <Divider style="margin: 20px 0;" />
+          <div style="margin-top:10px">
+            <Label>Moving speed(m/s):</Label>
             <InputNumber
               size="small"
               :max="5"
               :min="0"
-              v-model="activity"
+              v-model="movement"
               style="margin-right:20px"
             ></InputNumber>
             <Label>Infective distance(m):</Label>
@@ -103,17 +173,6 @@
               v-model="infectiveDist"
               style="margin-right:20px"
             ></InputNumber>
-            <Button size="small" style="margin-right:20px" @click="addAgents">Add agents</Button>
-            <Button
-              size="small"
-              icon="md-refresh"
-              style="margin-right:20px"
-              @click="resetAgents"
-            >Reset</Button>
-          </div>
-          <Divider style="margin: 20px 0;" />
-          <Slider v-model="simuTime" :marks="simuDays"></Slider>
-          <div style="margin-top:40px">
             <Label>Simulation duration(days):</Label>
             <InputNumber
               size="small"
@@ -122,55 +181,79 @@
               v-model="totalSimuDays"
               style="margin-right:20px"
             ></InputNumber>
-            <Button size="small" style="margin-right:20px" @click="setDuration">Set duration</Button>
+            <Button size="small" style="margin-right:40px" @click="submitAgents">Submit</Button>
+            <Label>Quarantine:</Label>
+            <Select style="width:100px" @on-change="changeIsolate" size="small">
+              <Option v-for="item in quaraObjs" :value="item" :key="item">{{ item }}</Option>
+            </Select>
           </div>
-          <div style="margin-top:10px">
+          <Divider style="margin: 20px 0;" />
+          <Slider v-model="simuTime" :marks="simuDays"></Slider>
+          <div style="margin-top:40px">
             <Button size="small" icon="md-play" style="margin-right:20px" @click="startSimu">Start</Button>
             <Button size="small" icon="md-pause" style="margin-right:20px" @click="pauseSimu">Pause</Button>
-            <Button size="small" icon="md-square" style="margin-right:20px" @click="endSimu">End</Button>
-            <Button size="small" style="margin:0 12px" @click="saveSimu">Save simulation data</Button>
+            <Button
+              size="small"
+              icon="ios-play-outline"
+              style="margin-right:20px"
+              @click="continueSimu"
+            >Continue</Button>
+            <Button size="small" icon="md-square" style="margin-right:60px" @click="endSimu">End</Button>
+            <Button size="small" @click="saveSimuModal=true">Save simulation data</Button>
           </div>
         </div>
       </Card>
     </div>
     <Modal
       v-model="modalImport"
-      title="Import GeoJSON data"
+      title="Select and import units/streets data (GeoJson)"
       @on-ok="addData"
       ok-text="OK"
       cancel-text="Cancel"
     >
-      <Upload type="drag" :before-upload="handleUpload" action="-" accept=".json, .zip">
-        <div style="padding: 20px 0">
-          <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
-          <p>
-            Click or drag files here to upload(The file size must control in
-            <span
-              style="color:red"
-            >1GB</span>)
-          </p>
-        </div>
-      </Upload>
-      <div v-show="showFile">
-        <span id="show-file">
-          <i class="ivu-icon ivu-icon-md-document"></i>
-          {{uploadDataName}}
-        </span>
+      <div style="height:300px">
+        <vue-scroll :ops="ops">
+          <CheckboxGroup v-model="selectedResIds" style="margin-left:10px">
+            <Checkbox
+              v-for="item in dataResList"
+              :key="item.index"
+              :label="item.resourceId"
+              style="display:block; margin-bottom:5px"
+            >
+              <span style="margin-left: 10px;">{{item.name}}</span>
+              <div style="margin: 5px 0 5px 25px" title="Description">{{item.description}}</div>
+            </Checkbox>
+          </CheckboxGroup>
+        </vue-scroll>
       </div>
-      <br />
+    </Modal>
+    <Modal v-model="saveSimuModal" title="Save the simulation result">
+      <Label style="margin-left: 20px">File name:</Label>
+      <Input
+        style="margin-left: 10px;width: 300px"
+        v-model="resultName"
+        placeholder="Enter file name (*.csv)"
+      />
+      <div slot="footer">
+        <Button type="primary" @click="saveSimu()">OK</Button>
+      </div>
     </Modal>
   </div>
 </template>
 <script>
 import L from "leaflet";
 import A from "agentmaps";
-import * as socketApi from "./../../api/socket.js";
 import imIcon from "../../../static/Images/import.png";
 import "leaflet/dist/leaflet.css";
 export default {
   data() {
     return {
       //样式
+      ops: {
+        bar: {
+          background: "#808695"
+        }
+      },
       split: 0.5,
       // page info
       pageParams: { pageId: "", userId: "", userName: "" },
@@ -182,30 +265,45 @@ export default {
       //协同
       send_content: {},
       //map数据
-      showFile: false,
-      uploadDataName: "",
-      resources: [],
+      selectedResIds: [],
+      dataResList: [],
       dataUrl: "",
       unit_layers: null,
       street_layers: null,
       //SEIR
-      exposedInfect: "No",
+      exposed_infect: "No",
       exposedTime: 10,
-      infectedTime: 10,
-      R0: 1,
-      mortality: 0,
-      exposedRate: 0.1,
-      infectedRate: 0.1,
-      recoveredRate: 0.1,
+      recovery_rate: 10,
+      transmission_rate: 5,
+      death_rate: 0,
+      total_popu: 100,
+      exposed_popu: 0,
+      infectious_popu: 1,
+      recovered_popu: 0,
+      death_popu: 0,
+      seirParams: {
+        exposedInfect: "No",
+        exposedRate: 0,
+        infectedRate: 0,
+        recoveredRate: 0,
+        mortalityRate: 0,
+        totalNum: 100,
+        exposedNum: 0,
+        infectiousNum: 1,
+        recoveredNum: 0,
+        deathNum: 0
+      },
       //agent 数据
-      totalNum: 100,
-      infectedNum: 1,
-      activity: 0.5,
-      infectiveDist: 2,
-      totalSimuDays: 50,
-      simuTime: 0,
+      agentState: "stop",
+      movement: 1.2, //移动速度
+      infectiveDist: 1, //传染距离
+      totalSimuDays: 50, //模拟天数
+      agentSpeed: 0.12,
+      agentInteractDist: 1,
+      simuTime: 0, //当前的时间
       timeClick: 0,
       simuDays: {
+        0: "0",
         10: "5 days",
         20: "10 days",
         30: "15 days",
@@ -215,14 +313,26 @@ export default {
         70: "35 days",
         80: "40 days",
         90: "45 days"
-      },      
-      contactCount: 0,
-      agentIdList: [],
+      },
+      contact_agentId_list: [],
+      // 模拟数据
+      simu_results: [],
+      currentState: {},
+      saveSimuModal: false,
+      resultName: "",
+      // socket
+      collaborative: false,
+      showMembers: false,
+      quarantine: "No",
+      quaraObjs: ["No", "Infected people", "Exposed and infected people"],
+      participants: [],
+      abseirSocket: null,
+      simulator: {}
     };
   },
   mounted() {
-    // this.getStepInfo();
-    // this.getUserInfo();
+    this.getStepInfo();
+    this.getUserInfo();
     this.initMap();
   },
   methods: {
@@ -340,6 +450,7 @@ export default {
         },
         _importData() {
           that.modalImport = true;
+          that.getMapData();
         }
       });
       L.control.data = function() {
@@ -347,120 +458,153 @@ export default {
       };
       L.control.data().addTo(this.map);
     },
-    handleUpload(file) {
-      // if (this.pageParams.pageId == undefined || this.pageParams.pageId == "") {
-      //   this.$Message.error("Lose the information of current step.");
-      //   return false;
-      // }
-
-      if (!/\.(json)$/.test(file.name.toLowerCase())) {
-        this.$Message.error("Worry format");
+    getMapData() {
+      if (this.pageParams.pageId == undefined || this.pageParams.pageId == "") {
+        this.$Message.error("Lost the information of current step.");
         return false;
       }
 
-      // //上传数据
-      // let formData = new FormData();
-      // formData.append("file", file);
-      // formData.append("description", "for Agent-based SEIR model");
-      // formData.append("type", "data");
-      // formData.append("uploaderId", this.userInfo.userId);
-      // formData.append("privacy", "private");
-      // formData.append("folderId", this.pageParams.pageId);
-      // this.axios
-      //   .post("/GeoProblemSolving/folder/uploadToFolder", formData)
-      //   .then(res => {
-      //     if (
-      //       res.data == "Size over" ||
-      //       res.data == "Fail" ||
-      //       res.data == "Offline"
-      //     ) {
-      //       console.log(res.data);
-      //     } else if (res.data.length > 0) {
-      //       this.showFile = true;
-      //       this.uploadDataName = file.name;
-
-      //       let dataName = res.data[0].fileName;
-      //       this.dataUrl = "/GeoProblemSolving/resource/upload/" + dataName;
-
-      //       let dataItem = {
-      //         name: dataName,
-      //         description: "map tool data",
-      //         pathURL: "/GeoProblemSolving/resource/upload/" + dataName
-      //       };
-      //       this.resources.push(dataItem);
-
-      //       // //文件列表协同
-      //       // this.send_content = {
-      //       //   type: "resourcesUpdate",
-      //       //   name: dataName,
-      //       //   description: "map tool data",
-      //       //   pathURL: "/GeoProblemSolving/resource/upload/" + dataName
-      //       // };
-      //       // this.socketApi.sendSock(this.send_content, this.getSocketConnect);
-      //     }
-      //   })
-      //   .catch(err => {});
-      return false;
-    },
-    addData() {
-      this.axios.get("../../static/testdata.json").then(res => {
-        let mapdata = res.data;
-        let geoJsonLayer = L.geoJSON(mapdata, {
-          style: function(feature) {
-            return { color: "green" };
+      this.dataResList = [];
+      this.axios
+        .get(
+          "/GeoProblemSolving/folder/inquiry?folderId=" + this.pageParams.pageId
+        )
+        .then(res => {
+          // 写渲染函数，取到所有资源
+          if (res.data !== "None") {
+            for (let i = 0; i < res.data.files.length; i++) {
+              if (
+                res.data.files[i].type == "data" &&
+                /\.(json)$/.test(res.data.files[i].name.toLowerCase())
+              ) {
+                this.dataResList.push(res.data.files[i]);
+              }
+            }
+          } else {
+            this.dataResList = [];
           }
-        }).bindPopup(function(layer) {
-          return layer.feature.properties.description;
+        })
+        .catch(err => {
+          console.log(err.data);
         });
-        //平移至数据位置
-        this.map.fitBounds(geoJsonLayer.getBounds());
-        this.agentMap.buildingify(geoJsonLayer.getBounds(), mapdata);
-
-        // 为了提高效率，将street 和 unit 分开
-        // this.agentMap.buildingify(geoJsonLayer.getBounds(), mapdata, style_option, this.unit_layers, this.street_layers);
-      });
-
-      // if (/\.(json)$/.test(this.dataUrl.toLowerCase())) {
-      //   //从url获取GeoJSON数据
-      //   var that = this;
-      //   var xhr = new XMLHttpRequest();
-      //   xhr.open("GET", this.dataUrl, true);
-      //   xhr.onload = function(e) {
-      //     if (this.status == 200) {
-      //       var file = JSON.parse(this.response);
-
-      //       let geoJsonLayer = L.geoJSON(file, {
-      //         style: function(feature) {
-      //           return { color: "green" };
-      //         }
-      //       }).bindPopup(function(layer) {
-      //         return layer.feature.properties.description;
-      //       });
-      //       that.agentMap.addLayer(geoJsonLayer);
-      //       //平移至数据位置
-      //       that.map.fitBounds(geoJsonLayer.getBounds());
-      //     }
-      //   };
-      //   xhr.send();
-      // } else {
-      //   this.$Message.error("GeoJson data supported!");
-      // }
-      // this.showFile = false;
     },
-    setSEIRParem() {
-      this.infectedRate = 1 / this.exposedTime;
-      this.recoveredRate = 1 / this.infectedTime;
-      this.exposedRate = this.R0 * this.recoveredRate;
+    addData(origin) {
+      for (var i = 0; i < this.selectedResIds.length; i++) {
+        for (var j = 0; j < this.dataResList.length; j++) {
+          if (this.selectedResIds[i] == this.dataResList[j].resourceId) {
+            if (/\.(json)$/.test(this.dataResList[j].name)) {
+              let dataUrl = this.dataResList[j].pathURL;
+              // 获取数据
+              this.axios.get(dataUrl).then(res => {
+                let mapdata = res.data;
+                let geoJsonLayer = L.geoJSON(mapdata, {
+                  style: function(feature) {
+                    return { color: "green" };
+                  }
+                }).bindPopup(function(layer) {
+                  return layer.feature.properties.description;
+                });
+                //平移至数据位置
+                this.map.fitBounds(geoJsonLayer.getBounds());
+                this.agentMap.buildingify(geoJsonLayer.getBounds(), mapdata);
+
+                // 为了提高效率，将street 和 unit 分开
+                // this.agentMap.buildingify(geoJsonLayer.getBounds(), mapdata, style_option, this.unit_layers, this.street_layers);
+
+                // websocket 同步
+                if (origin == undefined) {
+                  let messageJson = {
+                    type: "operation",
+                    operation: "import_data",
+                    data: this.selectedResIds
+                  };
+                  this.sendMessage(JSON.stringify(messageJson));
+                }
+              });
+            } else {
+              this.$Message.error("Only GeoJson data format supported.");
+            }
+            break;
+          }
+        }
+      }
+    },
+    setSEIRParem(origin) {
+      if (this.agentState == "stop") {
+        // 传染率
+        this.seirParams.totalNum = this.total_popu;
+        this.seirParams.exposedNum = this.exposed_popu;
+        this.seirParams.infectiousNum = this.infectious_popu;
+        this.seirParams.recoveredNum = this.recovered_popu;
+        this.seirParams.deathNum = this.death_popu;
+        this.seirParams.exposedInfect = this.exposed_infect;
+        this.seirParams.exposedRate = this.transmission_rate / 100;
+        this.seirParams.infectedRate = 1 / this.exposedTime;
+        this.seirParams.recoveredRate = this.recovery_rate / 100;
+        this.seirParams.mortalityRate = this.death_rate / 100;
+
+        // websocket 同步
+        if (origin == undefined) {
+          let messageJson = {
+            type: "operation",
+            operation: "SEIR_params",
+            data: this.seirParams
+          };
+          this.sendMessage(JSON.stringify(messageJson));
+        }
+      } else {
+        this.$Notice.open({
+          title:
+            "A simulation has already been run. Please stop the simulation before."
+        });
+      }
     },
     resetSEIRParem() {
-      this.exposedInfect = "No";
-      this.exposedTime = 1;
-      this.infectedTime = 1;
-      this.R0 = 1;
-      this.mortality = 0;
-      this.exposedRate = 0.1;
-      this.infectedRate = 0.1;
-      this.recoveredRate = 0.1;
+      if (this.agentState == "stop") {
+        // 用户输入参数
+        this.total_popu = 100;
+        this.exposed_popu = 0;
+        this.infectious_popu = 1;
+        this.recovered_popu = 0;
+        this.death_popu = 0;
+        this.exposed_infect = "No";
+        this.exposedTime = 10;
+        this.recovery_rate = 10;
+        this.transmission_rate = 5;
+        this.death_rate = 0;
+
+        // seir模型参数
+        this.seirParams = {
+          exposedInfect: "No",
+          exposedRate: 0,
+          infectedRate: 0,
+          recoveredRate: 0,
+          mortalityRate: 0,
+          totalNum: 100,
+          exposedNum: 0,
+          infectiousNum: 1,
+          recoveredNum: 0,
+          deathNum: 0
+        };
+        // 易感转为暴露、暴露转为感染、感染转为康复(个体)
+        this.seirParams.exposedRate = this.transmission_rate / 100;
+        this.seirParams.infectedRate = 1 / this.exposedTime;
+        this.seirParams.recoveredRate = this.recovery_rate / 100;
+        this.seirParams.mortalityRate = this.death_rate / 100;
+
+        // websocket 同步
+        let messageJson = {
+          type: "operation",
+          operation: "SEIR_params",
+          data: this.seirParams
+        };
+        this.sendMessage(JSON.stringify(messageJson));
+      } else {
+        this.$Notice.open({
+          title:
+            "A simulation has already been run. Please stop the simulation before."
+        });
+      }
     },
     // agents for susceptible human
     susceptibleAgentMaker(id) {
@@ -483,6 +627,36 @@ export default {
             radius: 0.5
           },
           infect_state: "Susceptible"
+        },
+        geometry: {
+          type: "Point",
+          coordinates: agent_coords
+        }
+      };
+
+      return feature;
+    },
+    // agents for exposed human
+    exposedAgentMaker(id) {
+      let random_index = Math.floor(
+          this.agentMap.units.count() * Math.random()
+        ),
+        random_unit = this.agentMap.units.getLayers()[random_index],
+        random_unit_id = this.agentMap.units.getLayerId(random_unit),
+        random_unit_center = random_unit.getBounds().getCenter();
+      let agent_coords = [random_unit_center.lng, random_unit_center.lat];
+      let feature = {
+        type: "Feature",
+        properties: {
+          place: {
+            type: "unit",
+            id: random_unit_id
+          },
+          layer_options: {
+            color: "orange",
+            radius: 0.5
+          },
+          infect_state: "Exposed"
         },
         geometry: {
           type: "Point",
@@ -522,20 +696,52 @@ export default {
 
       return feature;
     },
+    // agents for recovered human
+    recoveredAgentMaker(id) {
+      let random_index = Math.floor(
+          this.agentMap.units.count() * Math.random()
+        ),
+        random_unit = this.agentMap.units.getLayers()[random_index],
+        random_unit_id = this.agentMap.units.getLayerId(random_unit),
+        random_unit_center = random_unit.getBounds().getCenter();
+      let agent_coords = [random_unit_center.lng, random_unit_center.lat];
+      let feature = {
+        type: "Feature",
+        properties: {
+          place: {
+            type: "unit",
+            id: random_unit_id
+          },
+          layer_options: {
+            color: "blue",
+            radius: 0.5
+          },
+          infect_state: "Recovered"
+        },
+        geometry: {
+          type: "Point",
+          coordinates: agent_coords
+        }
+      };
+
+      return feature;
+    },
     agentController() {
       let _this = this;
-
-      let distPerTrick = (this.activity * this.totalSimuDays * 4) / 5;
+      // 移动距离（每个trick）
+      let distPerTrick = (this.agentSpeed * this.totalSimuDays * 4) / 5;
       if (this.agentMap.state.ticks % 300 === 0) {
         //计时器
         this.timeClick++;
+
+        // 每一天
         let day = Math.floor(100 / this.totalSimuDays);
         if (this.timeClick % day === 0 && this.simuTime < 100) {
           this.simuTime++;
+          this.simu_results.push(this.currentState);
         }
         //智能体状态
         this.agentMap.agents.eachLayer(agent => {
-          // 智能体运动
           let random_index = Math.floor(
               _this.agentMap.units.count() * Math.random()
             ),
@@ -543,66 +749,98 @@ export default {
             random_unit_id = _this.agentMap.units.getLayerId(random_unit),
             random_unit_center = random_unit.getBounds().getCenter();
 
-          agent.scheduleTrip(
-            random_unit_center,
-            { type: "unit", id: random_unit_id },
-            distPerTrick,
-            false,
-            true
-          );
+          //是否隔离感染者
+          if (
+            _this.quarantine == "Infected people" &&
+            agent.infect_state == "Infected"
+          ) {
+            let agent_coords = [random_unit_center.lng, random_unit_center.lat];
+            agent.geometry = {
+              type: "Point",
+              coordinates: agent_coords
+            };
+          } else if (
+            _this.quarantine == "Exposed and infected people" &&
+            (agent.infect_state == "Exposed" ||
+              agent.infect_state == "Infected")
+          ) {
+            let agent_coords = [random_unit_center.lng, random_unit_center.lat];
+            agent.geometry = {
+              type: "Point",
+              coordinates: agent_coords
+            };
+          } else {
+            // 智能体运动
+
+            agent.scheduleTrip(
+              random_unit_center,
+              { type: "unit", id: random_unit_id },
+              distPerTrick,
+              false,
+              true
+            );
+          }
 
           // 计算患病状态
-          // 统计接触人数
           if (agent.infect_state == "Exposed") {
             // 暴露期转为发病期
             let probability = Math.random().toFixed(3);
-            if (probability < _this.infectedRate) {
-              agent.infect_state = "Infected";
+            if (probability < _this.seirParams.infectedRate) {
               agent.setStyle({
                 color: "red",
                 radius: 0.5
               });
+              this.currentState.infectious++;
+              this.currentState.exposed--;
             }
           } else if (agent.infect_state == "Infected") {
             // 发病个体转为康复个体
             let probability = Math.random().toFixed(3);
-            if (probability < _this.recoveredRate) {
+            if (probability < _this.seirParams.recoveredRate) {
               agent.infect_state = "Recovered";
               agent.setStyle({
                 color: "blue",
                 radius: 0.5
               });
+              this.currentState.recovered++;
+              this.currentState.infectious--;
             }
           }
         });
-        // 确定暴露个体(有效接触个体)--------------------??????????????????传染率如何确定+收治发病患者
-        for (let i = 0; i < this.agentIdList.length; i++) {
-          let transmission_probability = this.exposedRate / this.contactCount;
+        // 确定暴露个体(有效接触个体)
+        for (let i = 0; i < this.contact_agentId_list.length; i++) {
           let probability = Math.random().toFixed(3);
-          if (probability < transmission_probability) {
-            this.agentMap.agents.getLayer(this.agentIdList[i]).infect_state =
-              "Exposed";
-            this.agentMap.agents.getLayer(this.agentIdList[i]).setStyle({
-              color: "orange",
-              radius: 0.5
-            });
+          if (probability < this.seirParams.exposedRate) {
+            this.agentMap.agents.getLayer(
+              this.contact_agentId_list[i]
+            ).infect_state = "Exposed";
+            this.agentMap.agents
+              .getLayer(this.contact_agentId_list[i])
+              .setStyle({
+                color: "orange",
+                radius: 0.5
+              });
+            this.currentState.exposed++;
+            this.currentState.susceptible--;
           }
         }
-        this.contactCount = 0;
-        this.agentIdList = [];
+        this.contact_agentId_list = [];
       } else {
         this.agentMap.agents.eachLayer(agent => {
+          // 如果未被隔离
+          // 接触感染个体
           // 如果暴露期(潜伏期)具有传染性，接触暴露期个体
           if (
-            agent.infect_state == "Infected" ||
-            (_this.exposedInfect == "Yes" && agent.infect_state == "Exposed")
+            (agent.infect_state == "Infected" && _this.quarantine == "No") ||
+            (_this.seirParams.exposedInfect == "Yes" &&
+              _this.quarantine != "Exposed and infected people" &&
+              agent.infect_state == "Exposed")
           ) {
             _this.agentMap.agents.eachLayer(_agent => {
               if (_agent.infect_state == "Susceptible") {
                 let dist = agent._latlng.distanceTo(_agent._latlng);
-                if (dist <= _this.infectiveDist) {
-                  _this.agentIdList.push(_agent._leaflet_id);
-                  _this.contactCount++;
+                if (dist <= _this.agentInteractDist) {
+                  _this.contact_agentId_list.push(_agent._leaflet_id);
                 }
               }
             });
@@ -611,44 +849,403 @@ export default {
         });
       }
     },
-    addAgents() {
-      this.agentMap.agentify(this.infectedNum, this.infectedAgentMaker);
-      this.agentMap.agentify(
-        this.totalNum - this.infectedNum,
-        this.susceptibleAgentMaker
-      );
-      this.agentMap.controller = this.agentController;
+    changeCollab(status) {
+      if (status) {
+        this.openSocket();
+      } else {
+        this.closeSocket();
+      }
     },
-    resetAgents() {
-      this.totalNum = 100;
-      this.infectedNum = 1;
-      this.activity = 0.5;
-      this.agentMap.agents.clearLayers();
-      this.simuTime = 0;
-      this.timeClick = 0;
+    addAgents(origin) {
+      if (this.agentState == "stop") {
+        if (this.agentMap.units == null || this.agentMap.streets == null)
+          return;
+        // agent重置
+        if (this.agentMap.agents != null && this.agentMap.agents != undefined) {
+          this.agentMap.agents.clearLayers();
+        }
+        // 设置agents
+        this.agentMap.agentify(
+          this.seirParams.totalNum -
+            this.seirParams.exposedNum -
+            this.seirParams.infectiousNum -
+            this.seirParams.recoveredNum,
+          this.susceptibleAgentMaker
+        );
+        this.agentMap.agentify(
+          this.seirParams.exposedNum,
+          this.exposedAgentMaker
+        );
+        this.agentMap.agentify(
+          this.seirParams.infectiousNum,
+          this.infectedAgentMaker
+        );
+        this.agentMap.agentify(
+          this.seirParams.recoveredNum,
+          this.recoveredAgentMaker
+        );
+        this.agentMap.controller = this.agentController;
+
+        // websocket 同步
+        if (origin == undefined) {
+          let messageJson = {
+            type: "operation",
+            operation: "add_agents"
+          };
+          this.sendMessage(JSON.stringify(messageJson));
+        }
+      } else {
+        this.$Notice.open({
+          title:
+            "A simulation has already been run. Please stop the simulation before."
+        });
+      }
     },
-    startSimu() {
-      this.agentMap.run();
+    removeAgents(origin) {
+      if (this.agentState == "stop") {
+        if (this.agentMap.agents != null && this.agentMap.agents != undefined) {
+          this.agentMap.agents.clearLayers();
+
+          // websocket 同步
+          if (origin == undefined) {
+            let messageJson = {
+              type: "operation",
+              operation: "remove_agents"
+            };
+            this.sendMessage(JSON.stringify(messageJson));
+          }
+        }
+      } else {
+        this.$Notice.open({
+          title:
+            "A simulation has already been run. Please stop the simulation before."
+        });
+      }
     },
-    pauseSimu() {
-      this.agentMap.pause();
+    submitAgents(origin) {
+      if (this.agentState == "stop") {
+        this.agentSpeed = this.movement / 10;
+        this.agentInteractDist = this.infectiveDist;
+        let offset = this.totalSimuDays / 10;
+        this.simuDays = {
+          0: offset * 0 + " days",
+          10: offset * 1 + " days",
+          20: offset * 2 + " days",
+          30: offset * 3 + " days",
+          40: offset * 4 + " days",
+          50: offset * 5 + " days",
+          60: offset * 6 + " days",
+          70: offset * 7 + " days",
+          80: offset * 8 + " days",
+          90: offset * 9 + " days"
+        };
+
+        // websocket 同步
+        if (origin == undefined) {
+          let messageJson = {
+            type: "operation",
+            operation: "agent_params",
+            data: {
+              agentSpeed: this.agentSpeed,
+              agentInteractDist: this.agentInteractDist,
+              totalSimuDays: this.totalSimuDays
+            }
+          };
+          this.sendMessage(JSON.stringify(messageJson));
+        }
+      } else {
+        this.$Notice.open({
+          title:
+            "A simulation has already been run. Please stop the simulation before."
+        });
+      }
     },
-    endSimu() {},
-    setDuration() {
-      let offset = this.totalSimuDays / 10;
-      this.simuDays = {
-        10: offset * 1 + " days",
-        20: offset * 2 + " days",
-        30: offset * 3 + " days",
-        40: offset * 4 + " days",
-        50: offset * 5 + " days",
-        60: offset * 6 + " days",
-        70: offset * 7 + " days",
-        80: offset * 8 + " days",
-        90: offset * 9 + " days"
+    changeIsolate(status) {
+      this.quarantine = status;
+
+      // websocket 同步
+      let messageJson = {
+        type: "operation",
+        operation: "quarantine",
+        data: status
       };
+      this.sendMessage(JSON.stringify(messageJson));
     },
-    saveSimu() {}
+    startSimu(origin) {
+      if (this.agentMap.agents == null) return;
+      if (this.agentState == "stop") {
+        this.agentState = "run";
+
+        // 模拟参数重置
+        this.simuTime = 0;
+        this.timeClick = 0;
+        // 模拟数据初始化
+        this.simu_results = [];
+        this.currentState = {
+          susceptible:
+            this.seirParams.totalNum -
+            this.seirParams.exposedNum -
+            this.seirParams.infectiousNum -
+            this.seirParams.recoveredNum,
+          exposed: this.seirParams.exposedNum,
+          infectious: this.seirParams.infectiousNum,
+          recovered: this.seirParams.recoveredNum,
+          death: this.seirParams.deathNum
+        };
+
+        // 模拟者
+        this.simulator = {
+          Id: this.pageParams.userId,
+          Name: this.pageParams.userName
+        };
+
+        this.agentMap.run();
+
+        // websocket 同步
+        if (origin == undefined) {
+          let messageJson = {
+            type: "operation",
+            operation: "run",
+            simulator: this.simulator
+          };
+          this.sendMessage(JSON.stringify(messageJson));
+        }
+      } else {
+        this.$Notice.open({
+          title:
+            "A simulation has already been run. Please stop the simulation before."
+        });
+      }
+    },
+    pauseSimu(origin) {
+      if (this.agentMap.agents == null) return;
+      if (this.agentState == "run") {
+        this.agentMap.pause();
+
+        // websocket 同步
+        if (origin == undefined) {
+          let messageJson = {
+            type: "operation",
+            operation: "pause",
+            simulator: this.simulator
+          };
+          this.sendMessage(JSON.stringify(messageJson));
+        }
+      }
+    },
+    continueSimu(origin) {
+      if (this.agentMap.agents == null) return;
+      if (this.agentState == "run") {
+        this.agentMap.run();
+
+        // websocket 同步
+        if (origin == undefined) {
+          let messageJson = {
+            type: "operation",
+            operation: "continue",
+            simulator: this.simulator
+          };
+          this.sendMessage(JSON.stringify(messageJson));
+        }
+      }
+    },
+    endSimu(origin) {
+      if (this.agentMap.agents == null) return;
+      if (this.agentState == "run") {
+        this.agentState = "stop";
+
+        // 模拟参数重置
+        this.simuTime = 0;
+        this.timeClick = 0;
+
+        // 代理地图
+        this.agentMap.clear();
+        this.agentMap = null;
+        this.agentMap = L.A.agentmap(this.map);
+
+        // 模拟者
+        this.simulator = {};
+
+        // websocket 同步
+        if (origin == undefined) {
+          let messageJson = {
+            type: "operation",
+            operation: "end",
+            simulator: this.simulator
+          };
+          this.sendMessage(JSON.stringify(messageJson));
+        }
+      }
+    },
+    saveSimu() {
+      if (this.simu_results.length > 0) {
+        if (this.resultName != "") {
+          this.saveSimuModal = false;
+
+          //格式化
+          let result = "id,susceptible,exposed,infectious,recovered,death\n";
+          for (var i = 0; i < this.simu_results.length; i++) {
+            result += i.toString() + ",";
+            result += this.simu_results[i].susceptible + ",";
+            result += this.simu_results[i].exposed + ",";
+            result += this.simu_results[i].infectious + ",";
+            result += this.simu_results[i].recovered + ",";
+            result += this.simu_results[i].death + "\n";
+          }
+
+          //创建blob
+          let blob = new Blob(["\ufeff" + result.join("\n")], {
+            type: "text/csv,charset=UTF-8"
+          });
+          var resultBlob = new File([blob], this.resultName + ".csv");
+
+          let resultForm = new FormData();
+          resultForm.append("file", resultBlob);
+          resultForm.append(
+            "description",
+            "The Agnet-based SEIR simulation result"
+          );
+          resultForm.append("type", "data");
+          resultForm.append("uploaderId", this.userInfo.userId);
+          resultForm.append("privacy", "private");
+          resultForm.append("folderId", this.pageParams.pageId);
+
+          this.axios
+            .post("/GeoProblemSolving/folder/uploadToFolder", resultForm)
+            .then(res => {
+              if (
+                res.data.sizeOver.length > 0 ||
+                res.data.failed.length > 0 ||
+                res.data == "Offline"
+              ) {
+                console.log(res.data);
+              } else if (res.data.uploaded.length > 0) {
+                this.$Notice.open({
+                  title: "Save the simulation result successfully."
+                });
+              }
+            })
+            .catch(err => {});
+        } else {
+          this.$Message.error("Please fill in the file name.");
+        }
+      } else {
+        this.saveSimuModal = false;
+        this.$Message.error("There is no simulation result.");
+      }
+    },
+    // socket
+    closeSocket() {
+      if (this.abseirSocket != null) {
+        this.removeTimer();
+        this.abseirSocket.close();
+      }
+    },
+    openSocket() {
+      if (this.abseirSocket != null) {
+        this.abseirSocket = null;
+      }
+      var abseirSocketURL =
+        "ws://" +
+        this.$store.state.IP_Port +
+        "/GeoProblemSolving/Abseir/" +
+        this.pageParams.pageId;
+      if (this.$store.state.IP_Port == "localhost:8080") {
+        abseirSocketURL =
+          "ws://localhost:8081/GeoProblemSolving/Abseir/" +
+          this.pageParams.pageId;
+      }
+      this.abseirSocket = new WebSocket(abseirSocketURL);
+      this.abseirSocket.onopen = this.onOpen;
+      this.abseirSocket.onmessage = this.onMessage;
+      this.abseirSocket.onclose = this.onClose;
+      this.abseirSocket.onerror = this.onError;
+      this.setTimer();
+    },
+    onOpen() {
+      console.log("Socket连接成功！");
+    },
+    onMessage(e) {
+      if (e.type == "operation") {
+        switch (e.operation) {
+          case "import_data": {
+            this.selectedResIds = e.data;
+            this.addData(1);
+            break;
+          }
+          case "SEIR_params": {
+            this.seirParams = e.data;
+            this.setSEIRParem(1);
+            break;
+          }
+          case "add_agents": {
+            this.addAgents();
+            break;
+          }
+          case "remove_agents": {
+            this.removeAgents(1);
+            break;
+          }
+          case "agent_params": {
+            this.agentSpeed = e.data.agentSpeed;
+            this.agentInteractDist = e.data.agentInteractDist;
+            this.totalSimuDays = e.data.totalSimuDays;
+            this.submitAgents(1);
+            break;
+          }
+          case "run": {
+            this.startSimu(1);
+            break;
+          }
+          case "pause": {
+            this.pauseSimu(1);
+            break;
+          }
+          case "continue": {
+            this.continueSimu(1);
+            break;
+          }
+          case "end": {
+            this.endSimu(1);
+            break;
+          }
+          case "members": {
+            this.participants = JSON.parse(e.userList);
+            break;
+          }
+          case "quarantine": {
+            this.quarantine = e.data;
+          }
+        }
+      }
+    },
+    onClose(e) {
+      this.removeTimer();
+      this.collaborative = false;
+      console.log("Socket连接断开！");
+    },
+    onError(e) {
+      this.removeTimer();
+      this.collaborative = false;
+      console.log("Socket连接错误！");
+    },
+    sendMessage(socketContent) {
+      this.abseirSocket.send(socketContent);
+    },
+    setTimer() {
+      var that = this;
+      this.timer = setInterval(() => {
+        var messageJson = {};
+        messageJson["type"] = "ping";
+        messageJson["message"] = "ping";
+        if (that.abseirSocket != null && that.abseirSocket != undefined) {
+          that.sendMessage(JSON.stringify(messageJson));
+        }
+      }, 20000);
+    },
+    removeTimer() {
+      clearInterval(this.timer);
+    }
   }
 };
 </script>

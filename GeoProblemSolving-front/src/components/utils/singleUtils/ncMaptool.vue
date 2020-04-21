@@ -450,7 +450,7 @@ export default {
             this.axios
               .post("/GeoProblemSolving/folder/uploadToFolder", formData)
               .then(res => {
-                if (res.data != "Size over" && res.data.length > 0) {
+                if (res.data.uploaded.length > 0) {
                   this.showFile = true;
                   this.uploadDataName = filename;
 
@@ -504,7 +504,7 @@ export default {
       this.axios
         .post("/GeoProblemSolving/folder/uploadToFolder", formData)
         .then(res => {
-          if (res.data != "Size over" && res.data.length > 0) {
+          if (res.data.uploaded.length > 0) {
             this.showFile = true;
             this.uploadDataName = file.name;
 

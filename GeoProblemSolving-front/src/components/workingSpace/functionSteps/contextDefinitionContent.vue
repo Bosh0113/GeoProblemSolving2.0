@@ -97,7 +97,7 @@ export default {
       this.setTimer();
     },
     onOpen() {
-      console.log("NoticeSocket连接成功！");
+      console.log("StepSocket连接成功！");
     },
     onMessage(e) {
       if (e.data == "Notice") {

@@ -158,6 +158,7 @@ export default {
     window.addEventListener("resize", this.initSize);
     this.initSize();
     this.getStepInfo();
+    this.getUserInfo();
     this.getResources();
     this.startWebSocket();
     this.initMap();
@@ -165,7 +166,6 @@ export default {
     this.initControl();
     this.startWebSocket();
     this.listenDraw();
-    this.getResources();
   },
   beforeDestroy() {
     window.removeEventListener("resize", this.initSize);
@@ -459,12 +459,12 @@ export default {
               .post("/GeoProblemSolving/folder/uploadToFolder", formData)
               .then(res => {
                 if (
-                  res.data == "Size over" ||
-                  res.data == "Fail" ||
+                  res.data.sizeOver.length > 0 ||
+                  res.data.failed.length > 0 ||
                   res.data == "Offline"
                 ) {
                   console.log(res.data);
-                } else if (res.data.length > 0) {
+                } else if (res.data.uploaded.length > 0) {
                   this.showFile = true;
                   this.uploadDataName = filename;
 
@@ -502,7 +502,9 @@ export default {
                   };
                 }
               })
-              .catch(err => {});
+              .catch(err => {
+                console.log(err.data);
+              });
           }
         } else {
           this.$Message.error("Please enter the necessary information!");
@@ -532,12 +534,12 @@ export default {
         .post("/GeoProblemSolving/folder/uploadToFolder", formData)
         .then(res => {
           if (
-            res.data == "Size over" ||
-            res.data == "Fail" ||
+            res.data.sizeOver.length > 0 ||
+            res.data.failed.length > 0 ||
             res.data == "Offline"
           ) {
             console.log(res.data);
-          } else if (res.data.length > 0) {
+          } else if (res.data.uploaded.length > 0) {
             this.showFile = true;
             this.uploadDataName = file.name;
 
@@ -561,7 +563,9 @@ export default {
             this.socketApi.sendSock(this.send_content, this.getSocketConnect);
           }
         })
-        .catch(err => {});
+        .catch(err => {
+          console.log(err.data);
+        });
       return false;
     },
     viewData() {

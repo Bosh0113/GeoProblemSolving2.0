@@ -186,12 +186,12 @@ export default {
         .post("/GeoProblemSolving/folder/uploadToFolder", formData)
         .then(res => {
           if (
-            res.data == "Size over" ||
-            res.data == "Fail" ||
-            res.data == "Offline"
-          ) {
-            console.log(res.data);
-          } else if (res.data.length > 0) {
+            res.data.sizeOver.length > 0 ||
+              res.data.failed.length > 0 ||
+              res.data == "Offline"
+            ) {
+              console.log(res.data);
+            } else if (res.data.uploaded.length > 0) {
             let videoName = res.data[0].fileName;
             this.videoUrl = "/GeoProblemSolving/resource/upload/" + videoName;
 

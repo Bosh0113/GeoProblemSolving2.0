@@ -565,7 +565,7 @@ export default {
           this.axios
             .post("/GeoProblemSolving/folder/uploadToFolder", imageForm)
             .then(res => {
-              if (res.data != "Size over" && res.data.length > 0) {
+              if (res.data.uploaded.length > 0) {
                 this.$Notice.open({
                   title: "Upload notification title",
                   desc: "File uploaded successfully",
