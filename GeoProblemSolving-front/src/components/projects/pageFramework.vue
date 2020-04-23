@@ -239,7 +239,7 @@ export default {
             "/GeoProblemSolving/project/inquiry" +
             "?key=projectId" +
             "&value=" +
-            that.stepInfo.projectId,
+            this.stepInfo.projectId,
           type: "GET",
           async: false,
           success: data => {

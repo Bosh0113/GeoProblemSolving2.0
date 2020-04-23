@@ -1,6 +1,7 @@
 package cn.edu.njnu.geoproblemsolving.Entity;
 
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 
@@ -23,17 +24,10 @@ public class ProjectEntity {
     private String type; //type0|type1|type2
     private String stepId;
     private String solvingProcess;
+    private JSONObject authorityManager;
 
     public String getSolvingProcess() {
         return solvingProcess;
-    }
-
-    public void setSolvingProcess(String solvingProcess) {
-        this.solvingProcess = solvingProcess;
-    }
-
-    public void setStepId(String stepId) {
-        this.stepId = stepId;
     }
 
     public String getStepId() {
@@ -42,10 +36,6 @@ public class ProjectEntity {
 
     public String getType() {
         return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
     }
 
     public String getManagerName() {
@@ -100,6 +90,22 @@ public class ProjectEntity {
         return managerId;
     }
 
+    public JSONObject getAuthorityManager() {
+        return authorityManager;
+    }
+
+    public void setSolvingProcess(String solvingProcess) {
+        this.solvingProcess = solvingProcess;
+    }
+
+    public void setStepId(String stepId) {
+        this.stepId = stepId;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
     public void setCategory(String category) {
         this.category = category;
     }
@@ -150,5 +156,9 @@ public class ProjectEntity {
 
     public void setManagerName(String managerName) {
         this.managerName = managerName;
+    }
+
+    public void setAuthorityManager(JSONObject authorityManager) {
+        this.authorityManager = authorityManager;
     }
 }
