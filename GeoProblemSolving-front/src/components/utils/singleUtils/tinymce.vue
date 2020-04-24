@@ -166,12 +166,12 @@ export default {
         .post("/GeoProblemSolving/folder/uploadToFolder", formData)
         .then(res => {
           if (
-            res.data == "Size over" ||
-            res.data == "Fail" ||
-            res.data == "Offline"
+            res.data.sizeOver.length > 0 ||
+              res.data.failed.length > 0 ||
+              res.data == "Offline"
           ) {
             console.log(res.data);
-          } else if (res.data.length > 0) {
+          } else if (res.data.uploaded.length > 0) {
             this.$Notice.open({
               title: "Upload notification title",
               desc: "File uploaded successfully"

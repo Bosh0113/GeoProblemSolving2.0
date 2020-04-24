@@ -25,6 +25,7 @@ const routes = [{
     // { path: 'project/workspace/simulationprediction/:id', name: 'simulationPrediction', component: resolve => (require(["@/components/workingSpace/simulationPrediction"], resolve)) },
     // { path: 'project/workspace/datavisualization/:id', name: 'dataVisualization', component: resolve => (require(["@/components/workingSpace/dataVisualization"], resolve)) },
     // { path: 'project/workspace/decisionmakingandmanagement/:id', name: 'decisionMakingAndManagement', component: resolve => (require(["@/components/workingSpace/decisionMakingAndManagement"], resolve)) },
+     { path: 'project/:id/authority', name: 'authority', component: resolve => (require(["@/components/projects/authorityManager"], resolve)) },
     {
       path: 'project/:id/subproject/', name: 'subproject', component: resolve => (require(["@/components/subProject/subprojectNav"], resolve)), children: [
         { path: '', redirect: 'overview' },
@@ -82,12 +83,19 @@ const routes = [{
 { path: '/chat', name: 'chatUtil', component: resolve => (require(["@/components/utils/chatroom"], resolve)) },
 { path: '/draw', name: 'drawUtil', component: resolve => (require(["@/components/utils/drawBoard"], resolve)) },
 { path: '/map', name: 'mapTool', component: resolve => (require(["@/components/utils/mapTool"], resolve)) },
-{ path: '/charts', name: 'dataCharts', component: resolve => (require(["@/components/utils/charts"], resolve)) },
+{ path: '/lineChart', name: 'lineChart', component: resolve => (require(["@/components/utils/charts/lineChart"], resolve)) },
+{ path: '/basicScatter', name: 'basicScatter', component: resolve => (require(["@/components/utils/charts/basicScatter"], resolve)) },
+{ path: '/mapScatter', name: 'mapScatter', component: resolve => (require(["@/components/utils/charts/mapScatter"], resolve)) },
+{ path: '/histogram', name: 'histogram', component: resolve => (require(["@/components/utils/charts/histogram"], resolve)) },
+{ path: '/pieChart', name: 'pieChart', component: resolve => (require(["@/components/utils/charts/pieChart"], resolve)) },
+{ path: '/radarChart', name: 'radarChart', component: resolve => (require(["@/components/utils/charts/radarChart"], resolve)) },
+{ path: '/funnelChart', name: 'funnelChart', component: resolve => (require(["@/components/utils/charts/funnelChart"], resolve)) },
 { path: '/nc/draw', name: 'drawUtilNC', component: resolve => (require(["@/components/utils/singleUtils/ncDrawBoard"], resolve)) },
 { path: '/nc/map', name: 'mapToolNC', component: resolve => (require(["@/components/utils/singleUtils/ncMapTool"], resolve)) },
 { path: '/nc/charts', name: 'dataChartsNC', component: resolve => (require(["@/components/utils/singleUtils/ncCharts"], resolve)) },
 { path: '/video', name: 'videoViewer', component: resolve => (require(["@/components/utils/videoViewer"], resolve)) },
 { path: '/preview', name: 'pdfViewer', component: resolve => (require(["@/components/utils/filePreview"], resolve)) },
+{ path: '/abseir', name: 'abSeir', component: resolve => (require(["@/components/utils/ABM-SEIR"], resolve)) },
 { path: '/tinymce', name: 'tinymce', component: resolve => (require(["@/components/utils/singleUtils/tinymce"], resolve)) }
 ]
 

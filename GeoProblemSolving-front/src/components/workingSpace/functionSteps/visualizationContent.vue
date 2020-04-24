@@ -7,7 +7,7 @@
         Resource list
         <data-list slot="content" :stepInfo="stepInfo" :userRole="userRole" @dataBehavior="listenDatalist"></data-list>
       </Panel>
-      <Panel name="tool">
+      <Panel name="tool" v-show="stepInfo.activeStatus">
         Toolbox
         <tool-container slot="content" :stepInfo="stepInfo" :userRole="userRole" @toolBehavior="listenToolbox" @toolPanel="listenToolPanel"></tool-container>
       </Panel>
@@ -94,7 +94,7 @@ export default {
       this.setTimer();
     },
     onOpen() {
-      console.log("NoticeSocket连接成功！");
+      console.log("StepSocket连接成功！");
     },
     onMessage(e) {
       if (e.data == "Notice") {

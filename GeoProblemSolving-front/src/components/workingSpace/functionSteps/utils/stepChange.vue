@@ -26,29 +26,42 @@ export default {
   },
   props: ["stepInfo", "solvingProcess", "scope"],
   created() {},
-  mounted() {},
+  mounted() {
+    Array.prototype.contains = function(obj) {
+      var i = this.length;
+      while (i--) {
+        if (this[i].id != undefined && this[i].id === obj.id) {
+          return true;
+        }
+      }
+      return false;
+    };
+  },
   methods: {
     getProcessSteps() {
       this.partProcesses = [];
-      if (
-        this.solvingProcess != undefined &&
-        this.solvingProcess.length > 0
-      ) {
+      if (this.solvingProcess != undefined && this.solvingProcess.length > 0) {
         let processStructure = JSON.parse(this.solvingProcess);
         for (let i = 0; i < processStructure.length; i++) {
           //get data
           if (processStructure[i].stepID == this.stepInfo.stepId) {
             // last
             let lastSteps = processStructure[i].last;
-            for(let j=0; j<lastSteps.length;j++){    
-              this.partProcesses.push(processStructure[lastSteps[j].id]);
+            for (let j = 0; j < lastSteps.length; j++) {
+              let lastnode = processStructure[lastSteps[j].id];
+              if (!this.partProcesses.contains(lastnode)) {
+                this.partProcesses.push(lastnode);
+              }
             }
             // current
             this.partProcesses.push(processStructure[i]);
             // next
             let nextSteps = processStructure[i].next;
-            for(let j=0; j<nextSteps.length;j++){              
-              this.partProcesses.push(processStructure[nextSteps[j].id]);
+            for (let j = 0; j < nextSteps.length; j++) {
+              let nextnode = processStructure[nextSteps[j].id];
+              if (!this.partProcesses.contains(nextnode)) {
+                this.partProcesses.push(nextnode);
+              }
             }
           }
         }
@@ -74,11 +87,19 @@ export default {
               icon: "circle"
             },
             {
-              name: "Modeling for geographic process",
+              name: "Data visualization",
               icon: "circle"
             },
             {
-              name: "Model evaluation",
+              name: "Geographic model construction",
+              icon: "circle"
+            },
+            {
+              name: "Model effectiveness evaluation",
+              icon: "circle"
+            },
+            {
+              name: "Geographical simulation",
               icon: "circle"
             },
             {
@@ -86,15 +107,7 @@ export default {
               icon: "circle"
             },
             {
-              name: "Simulation/Prediction",
-              icon: "circle"
-            },
-            {
-              name: "Visualization & representation",
-              icon: "circle"
-            },
-            {
-              name: "Decision-making & management",
+              name: "Decision-making for management",
               icon: "circle"
             }
           ]
@@ -122,22 +135,22 @@ export default {
                 name: "Data processing"
               },
               {
-                name: "Modeling for geographic process"
+                name: "Data visualization"
               },
               {
-                name: "Model evaluation"
+                name: "Geographic model construction"
+              },
+              {
+                name: "Model effectiveness evaluation"
+              },
+              {
+                name: "Geographical simulation"
               },
               {
                 name: "Quantitative and qualitative analysis"
               },
               {
-                name: "Simulation/Prediction"
-              },
-              {
-                name: "Visualization & representation"
-              },
-              {
-                name: "Decision-making & management"
+                name: "Decision-making for management"
               }
             ],
             links: [],
@@ -201,68 +214,66 @@ export default {
       this.stepChart.setOption(option);
       let _this = this;
       // 单击选择步骤
-      this.stepChart.on("click", function(params) {
-        
-      });
+      this.stepChart.on("click", function(params) {});
       // 双击切换当前步骤
       this.stepChart.on("dblclick", function(params) {
-         _this.stepChanged = false;
+        _this.stepChanged = false;
         _this.enterStep(params.data.category, params.data.stepId);
       });
     },
     enterStep(type, stepId) {
-      if(this.scope=="project"){
-        switch(type){
-          case 0:{
+      if (this.scope == "project") {
+        switch (type) {
+          case 0: {
             this.$router.push({
               name: "contextDefinitionP",
               params: { stepId: stepId }
             });
             break;
           }
-          case 1:{
+          case 1: {
             this.$router.push({
               name: "dataProcessingP",
               params: { stepId: stepId }
             });
             break;
           }
-          case 2:{
+          case 2: {
             this.$router.push({
               name: "modelProcessP",
               params: { stepId: stepId }
             });
             break;
           }
-          case 3:{
+          case 3: {
             this.$router.push({
               name: "modelEvaluationP",
               params: { stepId: stepId }
             });
             break;
           }
-          case 4:{
+          case 4: {
             this.$router.push({
               name: "analysisP",
               params: { stepId: stepId }
             });
             break;
           }
-          case 5:{
+          case 5: {
             this.$router.push({
               name: "simulationP",
               params: { stepId: stepId }
             });
             break;
           }
-          case 6:{
+          case 6: {
             this.$router.push({
               name: "visualizationP",
               params: { stepId: stepId }
             });
             break;
           }
-          case 7:{
+          case 7: {
             this.$router.push({
               name: "decisionMakingP",
               params: { stepId: stepId }
@@ -270,8 +281,7 @@ export default {
             break;
           }
         }
-      }
-      else{
+      } else {
         if (type == 0) {
           this.$router.push({
             name: "contextDefinition",
@@ -314,7 +324,7 @@ export default {
           });
         }
       }
-    },
+    }
   }
 };
 </script>
