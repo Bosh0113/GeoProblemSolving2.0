@@ -90,6 +90,7 @@ const routes = [{
 { path: '/preview', name: 'pdfViewer', component: resolve => (require(["@/components/utils/filePreview"], resolve)) },
 { path: '/tinymce', name: 'tinymce', component: resolve => (require(["@/components/utils/singleUtils/tinymce"], resolve)) }
 ]
+
 export default new Router({
   routes,
   mode: 'history',

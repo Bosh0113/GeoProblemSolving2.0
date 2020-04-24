@@ -19,7 +19,7 @@ public class TokenController {
     public String getShareToken(@RequestBody JSONObject info, @RequestParam("duration") long ttlMillis){
         ShareTokenDaoImpl shareTokenDao = new ShareTokenDaoImpl(mongoTemplate);
         return shareTokenDao.getShareToken(info,ttlMillis);
-    }
+}
 
     @RequestMapping(value = "/checkShareToken", produces = {"application/json;charset=UTF-8"}, method = RequestMethod.GET)
     public Object checkShareToken(@RequestParam("shareToken") String tokenId){
