@@ -12,6 +12,7 @@
     <meta name="author" content="OpenGMS">
     <script src="/GeoProblemSolving/js/jquery.js"></script>
     <script src="/GeoProblemSolving/js/vue.min.js"></script>
+    <script src="/GeoProblemSolving/js/crypto-js.js"></script>
     <link href="/GeoProblemSolving/css/iview.css" rel="stylesheet">
     <script src="/GeoProblemSolving/js/iview.js"></script>
     <script src="/GeoProblemSolving/js/vue-avatar.min.js"></script>
@@ -1823,7 +1824,8 @@
                             if (res.data == "Offline") {
                                 window.location.href = "/GeoProblemSolving/login"
                             } else if (res.data != "Fail") {
-                                sessionStorage.setItem("projectInfo", JSON.stringify(res.data));
+                                // sessionStorage.setItem("projectInfo", JSON.stringify(res.data));
+                                sessionStorage.setItem("projectInfo", this.encrypto(res.data));
                                 this.projectInfo = res.data;
                             } else {
                                 this.$Message.error("Set type failed.");
@@ -2249,7 +2251,23 @@
                     $(".jsPanel-content").css("font-size", "0");//防止出现滚动条
                     $(".jsPanel").css("position", "fixed");
                     this.workPanels.push(panel);
-                }
+                },
+                encrypto(context) {
+                    var key = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
+                    var iv = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
+                    var encrypted = "";
+                    if (typeof context == "string") {
+                    } else if (typeof context == "object") {
+                        context = JSON.stringify(context);
+                    }
+                    var srcs = CryptoJS.enc.Utf8.parse(context);
+                    encrypted = CryptoJS.AES.encrypt(srcs, key, {
+                        iv: iv,
+                        mode: CryptoJS.mode.CBC,
+                        padding: CryptoJS.pad.Pkcs7
+                    });
+                    return encrypted.toString();
+                },
             }
         }
     );

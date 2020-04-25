@@ -1,6 +1,6 @@
 <style scoped>
 .btnAuthority {
-  margin-top: 20px;
+  margin-top: 50px;
   display: flex;
   justify-content: space-around;
 }
@@ -9,10 +9,15 @@
   <Row>
     <Col span="6" offset="2">
       <h1 style="margin-top: 20px;">Authority management</h1>
-      <div style="margin: 20px 0">
+      <div style="margin: 40px 0 20px 0">
         <h2>Project name</h2>
         <Divider style="margin: 5px 0" />
         <div>{{projectInfo.title}}</div>
+      </div>
+      <div style="margin: 20px 0">
+        <h2>Privacy</h2>
+        <Divider style="margin: 5px 0" />
+        <div>{{projectInfo.privacy}}</div>
       </div>
       <div style="margin: 20px 0">
         <h2>Project description</h2>
@@ -39,7 +44,7 @@
 export default {
   data() {
     return {
-      //权限------------------------------??双向绑定
+      //权限
       authorityHead: [
         { title: "Operation", key: "operation", width: 200 },
         {
@@ -57,7 +62,7 @@ export default {
                 },
                 on: {
                   "on-change": e => {
-                    this.saveAuthority(e, 1, params.row.operation);
+                    this.saveAuthority(e, 1, params.index, params.row.operation);
                   }
                 }
               });
@@ -69,34 +74,32 @@ export default {
                 {
                   props: {
                     value: row_value,
-                    size: "small"
+                    size: "small",
+                    placeholder: row_value
                   },
                   attrs: {
                     title: row_value
                   },
                   on: {
                     "on-change": e => {
-                      this.saveAuthority(e, 1, params.row.operation);
+                      this.saveAuthority(e, 1, params.index, params.row.operation);
                     }
                   }
                 },
                 [
                   h("Option", {
                     props: {
-                      value: "Yes",
-                      key: "Yes"
+                      value: "Yes"
                     }
                   }),
                   h("Option", {
                     props: {
-                      value: "Yes, partly",
-                      key: "Yes, partly"
+                      value: "Yes, partly"
                     }
                   }),
                   h("Option", {
                     props: {
                       value: "No",
-                      key: "No"
                     }
                   })
                 ]
@@ -123,7 +126,7 @@ export default {
                 },
                 on: {
                   "on-change": e => {
-                    this.saveAuthority(e, 2, params.row.operation);
+                    this.saveAuthority(e, 2, params.index, params.row.operation);
                   }
                 }
               });
@@ -135,34 +138,32 @@ export default {
                 {
                   props: {
                     value: row_value,
-                    size: "small"
+                    size: "small",
+                    placeholder: row_value
                   },
                   attrs: {
                     title: row_value
                   },
                   on: {
                     "on-change": e => {
-                      this.saveAuthority(e, 2, params.row.operation);
+                      this.saveAuthority(e, 2, params.index, params.row.operation);
                     }
                   }
                 },
                 [
                   h("Option", {
                     props: {
-                      value: "Yes",
-                      key: "Yes"
+                      value: "Yes"
                     }
                   }),
                   h("Option", {
                     props: {
-                      value: "Yes, partly",
-                      key: "Yes, partly"
+                      value: "Yes, partly"
                     }
                   }),
                   h("Option", {
                     props: {
-                      value: "No",
-                      key: "No"
+                      value: "No"
                     }
                   })
                 ]
@@ -189,7 +190,7 @@ export default {
                 },
                 on: {
                   "on-change": e => {
-                    this.saveAuthority(e, 3, params.row.operation);
+                    this.saveAuthority(e, 3, params.index, params.row.operation);
                   }
                 }
               });
@@ -201,34 +202,32 @@ export default {
                 {
                   props: {
                     value: row_value,
-                    size: "small"
+                    size: "small",
+                    placeholder: row_value
                   },
                   attrs: {
                     title: row_value
                   },
                   on: {
                     "on-change": e => {
-                      this.saveAuthority(e, 3, params.row.operation);
+                      this.saveAuthority(e, 3, params.index, params.row.operation);
                     }
                   }
                 },
                 [
                   h("Option", {
                     props: {
-                      value: "Yes",
-                      key: "Yes"
+                      value: "Yes"
                     }
                   }),
                   h("Option", {
                     props: {
-                      value: "Yes, partly",
-                      key: "Yes, partly"
+                      value: "Yes, partly"
                     }
                   }),
                   h("Option", {
                     props: {
-                      value: "No",
-                      key: "No"
+                      value: "No"
                     }
                   })
                 ]
@@ -241,7 +240,7 @@ export default {
           }
         },
         {
-          title: "Visitor",
+          title: "Visitor (Logged in)",
           key: "visitor",
           align: "center",
           render: (h, params) => {
@@ -255,7 +254,7 @@ export default {
                 },
                 on: {
                   "on-change": e => {
-                    this.saveAuthority(e, 4, params.row.operation);
+                    this.saveAuthority(e, 4, params.index, params.row.operation);
                   }
                 }
               });
@@ -267,34 +266,37 @@ export default {
                 {
                   props: {
                     value: row_value,
-                    size: "small"
+                    size: "small",
+                    placeholder: row_value
                   },
                   attrs: {
                     title: row_value
                   },
                   on: {
                     "on-change": e => {
-                      this.saveAuthority(e, 4, params.row.operation);
+                      this.saveAuthority(e, 4, params.index, params.row.operation);
                     }
                   }
                 },
                 [
                   h("Option", {
                     props: {
-                      value: "Yes",
-                      key: "Yes"
+                      value: "All"
                     }
                   }),
                   h("Option", {
                     props: {
-                      value: "Yes, partly",
-                      key: "Yes, partly"
+                      value: "At subproject level"
                     }
                   }),
                   h("Option", {
                     props: {
-                      value: "No",
-                      key: "No"
+                      value: "At project level"
+                    }
+                  }),
+                  h("Option", {
+                    props: {
+                      value: "No"
                     }
                   })
                 ]
@@ -308,108 +310,352 @@ export default {
         }
       ],
       authorityList: [],
-      defaultAuthority: {
+      defaultPublic: {
+        observe: {
+          project_manager: null,
+          subproject_manager: null,
+          member: null,
+          visitor: "All"          
+        },
+        auto_join: {
+          project_manager: null,
+          subproject_manager: null,
+          member: null,
+          visitor: true          
+        },
         project_edit_info: {
           project_manager: true,
           subproject_manager: null,
           member: false,
-          visitor: false
+          visitor: null
         },
         project_invite_member: {
           project_manager: true,
           subproject_manager: null,
-          member: false,
-          visitor: false
+          member: true,
+          visitor: null
         },
         project_remove_member: {
           project_manager: true,
           subproject_manager: null,
           member: false,
-          visitor: false
+          visitor: null
         },
         project_task_assignment: {
           project_manager: true,
           subproject_manager: null,
-          member: true,
-          visitor: false
+          member: "Yes, partly",
+          visitor: null
         },
         project_resource_manage: {
           project_manager: true,
           subproject_manager: null,
           member: "Yes, partly",
-          visitor: false
+          visitor: null
         },
         project_workspace_type_manage: {
           project_manager: true,
           subproject_manager: null,
           member: false,
-          visitor: false
+          visitor: null
         },
         subprojects_manage: {
           project_manager: true,
           subproject_manager: null,
           member: "Yes, partly",
-          visitor: false
+          visitor: null
         },
         subproject_edit_info: {
-          project_manager: false,
+          project_manager: true,
           subproject_manager: true,
           member: false,
-          visitor: false
+          visitor: null
         },
         subproject_invite_member: {
-          project_manager: false,
-          subproject_manager: true,
-          member: false,
-          visitor: false
-        },
-        subproject_remove_member: {
-          project_manager: false,
-          subproject_manager: true,
-          member: false,
-          visitor: false
-        },
-        subproject_task_assignment: {
-          project_manager: false,
+          project_manager: true,
           subproject_manager: true,
           member: true,
-          visitor: false
+          visitor: null
+        },
+        subproject_remove_member: {
+          project_manager: true,
+          subproject_manager: true,
+          member: false,
+          visitor: null
+        },
+        subproject_task_assignment: {
+          project_manager: true,
+          subproject_manager: true,
+          member: "Yes, partly",
+          visitor: null
         },
         subproject_resource_manage: {
           project_manager: "Yes, partly",
           subproject_manager: true,
           member: "Yes, partly",
-          visitor: false
+          visitor: null
         },
         subproject_workspace_type_manage: {
           project_manager: true,
           subproject_manager: true,
           member: false,
-          visitor: false
+          visitor: null
         },
         activity_manage: {
-          project_manager: false,
+          project_manager: true,
           subproject_manager: true,
-          member: false,
-          visitor: false
+          member: true,
+          visitor: null
         },
         workspace_resource: {
           project_manager: true,
           subproject_manager: true,
           member: true,
-          visitor: false
+          visitor: null
         },
         workspace_tool: {
           project_manager: true,
           subproject_manager: true,
           member: true,
-          visitor: false
+          visitor: null
+        },
+        workspace_edit: {
+          project_manager: true,
+          subproject_manager: true,
+          member: true,
+          visitor: null
+        }
+      },
+      defaultPrivate: {
+        observe: {
+          project_manager: null,
+          subproject_manager: null,
+          member: null,
+          visitor: "No"          
+        },
+        auto_join: {
+          project_manager: null,
+          subproject_manager: null,
+          member: null,
+          visitor: null          
+        },
+        project_edit_info: {
+          project_manager: true,
+          subproject_manager: null,
+          member: false,
+          visitor: null
+        },
+        project_invite_member: {
+          project_manager: true,
+          subproject_manager: null,
+          member: false,
+          visitor: null
+        },
+        project_remove_member: {
+          project_manager: true,
+          subproject_manager: null,
+          member: false,
+          visitor: null
+        },
+        project_task_assignment: {
+          project_manager: true,
+          subproject_manager: null,
+          member: "Yes, partly",
+          visitor: null
+        },
+        project_resource_manage: {
+          project_manager: true,
+          subproject_manager: null,
+          member: "Yes, partly",
+          visitor: null
+        },
+        project_workspace_type_manage: {
+          project_manager: true,
+          subproject_manager: null,
+          member: false,
+          visitor: null
+        },
+        subprojects_manage: {
+          project_manager: true,
+          subproject_manager: null,
+          member: "Yes, partly",
+          visitor: null
+        },
+        subproject_edit_info: {
+          project_manager: false,
+          subproject_manager: true,
+          member: false,
+          visitor: null
+        },
+        subproject_invite_member: {
+          project_manager: false,
+          subproject_manager: true,
+          member: false,
+          visitor: null
+        },
+        subproject_remove_member: {
+          project_manager: false,
+          subproject_manager: true,
+          member: false,
+          visitor: null
+        },
+        subproject_task_assignment: {
+          project_manager: false,
+          subproject_manager: true,
+          member: "Yes, partly",
+          visitor: null
+        },
+        subproject_resource_manage: {
+          project_manager: "Yes, partly",
+          subproject_manager: true,
+          member: "Yes, partly",
+          visitor: null
+        },
+        subproject_workspace_type_manage: {
+          project_manager: true,
+          subproject_manager: true,
+          member: false,
+          visitor: null
+        },
+        activity_manage: {
+          project_manager: false,
+          subproject_manager: true,
+          member: false,
+          visitor: null
+        },
+        workspace_resource: {
+          project_manager: true,
+          subproject_manager: true,
+          member: true,
+          visitor: null
+        },
+        workspace_tool: {
+          project_manager: true,
+          subproject_manager: true,
+          member: true,
+          visitor: null
         },
         workspace_edit: {
           project_manager: false,
           subproject_manager: true,
           member: false,
-          visitor: false
+          visitor: null
+        }
+      },
+      defaultDiscoverable: {
+        observe: {
+          project_manager: null,
+          subproject_manager: null,
+          member: null,
+          visitor: "No"          
+        },
+        auto_join: {
+          project_manager: null,
+          subproject_manager: null,
+          member: null,
+          visitor: null          
+        },
+        project_edit_info: {
+          project_manager: true,
+          subproject_manager: null,
+          member: false,
+          visitor: null
+        },
+        project_invite_member: {
+          project_manager: true,
+          subproject_manager: null,
+          member: false,
+          visitor: null
+        },
+        project_remove_member: {
+          project_manager: true,
+          subproject_manager: null,
+          member: false,
+          visitor: null
+        },
+        project_task_assignment: {
+          project_manager: true,
+          subproject_manager: null,
+          member: "Yes, partly",
+          visitor: null
+        },
+        project_resource_manage: {
+          project_manager: true,
+          subproject_manager: null,
+          member: "Yes, partly",
+          visitor: null
+        },
+        project_workspace_type_manage: {
+          project_manager: true,
+          subproject_manager: null,
+          member: false,
+          visitor: null
+        },
+        subprojects_manage: {
+          project_manager: true,
+          subproject_manager: null,
+          member: "Yes, partly",
+          visitor: null
+        },
+        subproject_edit_info: {
+          project_manager: false,
+          subproject_manager: true,
+          member: false,
+          visitor: null
+        },
+        subproject_invite_member: {
+          project_manager: false,
+          subproject_manager: true,
+          member: false,
+          visitor: null
+        },
+        subproject_remove_member: {
+          project_manager: false,
+          subproject_manager: true,
+          member: false,
+          visitor: null
+        },
+        subproject_task_assignment: {
+          project_manager: true,
+          subproject_manager: true,
+          member: "Yes, partly",
+          visitor: null
+        },
+        subproject_resource_manage: {
+          project_manager: "Yes, partly",
+          subproject_manager: true,
+          member: "Yes, partly",
+          visitor: null
+        },
+        subproject_workspace_type_manage: {
+          project_manager: false,
+          subproject_manager: true,
+          member: false,
+          visitor: null
+        },
+        activity_manage: {
+          project_manager: false,
+          subproject_manager: true,
+          member: false,
+          visitor: null
+        },
+        workspace_resource: {
+          project_manager: false,
+          subproject_manager: true,
+          member: true,
+          visitor: null
+        },
+        workspace_tool: {
+          project_manager: false,
+          subproject_manager: true,
+          member: true,
+          visitor: null
+        },
+        workspace_edit: {
+          project_manager: false,
+          subproject_manager: true,
+          member: false,
+          visitor: null
         }
       },
       authority: {},
@@ -430,7 +676,15 @@ export default {
         if (this.projectInfo.authorityManager != undefined) {
           this.authority = this.projectInfo.authorityManager;
         } else {
-          this.authority = JSON.parse(JSON.stringify(this.defaultAuthority));
+          if (this.projectInfo.privacy == "Public") {
+            this.authority = JSON.parse(JSON.stringify(this.defaultPublic));
+          } else if (this.projectInfo.privacy == "Discoverable") {
+            this.authority = JSON.parse(
+              JSON.stringify(this.defaultDiscoverable)
+            );
+          } else if (this.projectInfo.privacy == "Private") {
+            this.authority = JSON.parse(JSON.stringify(this.defaultPrivate));
+          }
         }
         this.getAuthorityList();
       } else {
@@ -453,9 +707,19 @@ export default {
               if (this.projectInfo.authorityManager != undefined) {
                 this.authority = this.projectInfo.authorityManager;
               } else {
-                this.authority = JSON.parse(
-                  JSON.stringify(this.defaultAuthority)
-                );
+                if (this.projectInfo.privacy == "Public") {
+                  this.authority = JSON.parse(
+                    JSON.stringify(this.defaultPublic)
+                  );
+                } else if (this.projectInfo.privacy == "Discoverable") {
+                  this.authority = JSON.parse(
+                    JSON.stringify(this.defaultDiscoverable)
+                  );
+                } else if (this.projectInfo.privacy == "Private") {
+                  this.authority = JSON.parse(
+                    JSON.stringify(this.defaultPrivate)
+                  );
+                }
               }
               this.getAuthorityList();
             } else {
@@ -467,6 +731,28 @@ export default {
     },
     getAuthorityList() {
       this.authorityList = [];
+      if (this.authority.observe != undefined) {
+        let row = {
+          operation: "Observe the project",
+          project_manager: this.authority.observe.project_manager,
+          subproject_manager: this.authority.observe
+            .subproject_manager,
+          member: this.authority.observe.member,
+          visitor: this.authority.observe.visitor
+        };
+        this.authorityList.push(row);
+      }
+      if (this.authority.auto_join!= undefined && this.projectInfo.privacy == "Public") {
+        let row = {
+          operation: "Join automatically",
+          project_manager: this.authority.auto_join.project_manager,
+          subproject_manager: this.authority.auto_join
+            .subproject_manager,
+          member: this.authority.auto_join.member,
+          visitor: this.authority.auto_join.visitor
+        };
+        this.authorityList.push(row);
+      }
       if (this.authority.project_edit_info != undefined) {
         let row = {
           operation: "Edit project information",
@@ -660,200 +946,326 @@ export default {
         this.authorityList.push(row);
       }
     },
-    saveAuthority(value, key, operation) {
+    saveAuthority(value, key, index, operation) {      
+      if (operation == "Observe the project") {
+        if (key == 1) {
+          this.authority.observe.project_manager = value;
+          this.authorityList[index].project_manager = value;
+        } else if (key == 2) {
+          this.authority.observe.subproject_manager = value;
+          this.authorityList[index].subproject_manager = value;
+        } else if (key == 3) {
+          this.authority.observe.member = value;
+          this.authorityList[index].member = value;
+        } else if (key == 4) {
+          this.authority.observe.visitor = value;
+          this.authorityList[index].visitor = value;
+        }
+      }
+      if (operation == "Join automatically") {
+        if (key == 1) {
+          this.authority.auto_join.project_manager = value;
+          this.authorityList[index].project_manager = value;
+        } else if (key == 2) {
+          this.authority.auto_join.subproject_manager = value;
+          this.authorityList[index].subproject_manager = value;
+        } else if (key == 3) {
+          this.authority.auto_join.member = value;
+          this.authorityList[index].member = value;
+        } else if (key == 4) {
+          this.authority.auto_join.visitor = value;
+          this.authorityList[index].visitor = value;
+        }
+      }
       if (operation == "Edit project information") {
         if (key == 1) {
           this.authority.project_edit_info.project_manager = value;
+          this.authorityList[index].project_manager = value;
         } else if (key == 2) {
           this.authority.project_edit_info.subproject_manager = value;
+          this.authorityList[index].subproject_manager = value;
         } else if (key == 3) {
           this.authority.project_edit_info.member = value;
+          this.authorityList[index].member = value;
         } else if (key == 4) {
           this.authority.project_edit_info.visitor = value;
+          this.authorityList[index].visitor = value;
         }
       }
       if (operation == "Invite to join project") {
         if (key == 1) {
           this.authority.project_invite_member.project_manager = value;
+          this.authorityList[index].project_manager = value;
         } else if (key == 2) {
           this.authority.project_invite_member.subproject_manager = value;
+          this.authorityList[index].subproject_manager = value;
         } else if (key == 3) {
           this.authority.project_invite_member.member = value;
+          this.authorityList[index].member = value;
         } else if (key == 4) {
           this.authority.project_invite_member.visitor = value;
+          this.authorityList[index].visitor = value;
         }
       }
       if (operation == "Remove the project member") {
         if (key == 1) {
           this.authority.project_remove_member.project_manager = value;
+          this.authorityList[index].project_manager = value;
         } else if (key == 2) {
           this.authority.project_remove_member.subproject_manager = value;
+          this.authorityList[index].subproject_manager = value;
         } else if (key == 3) {
           this.authority.project_remove_member.member = value;
+          this.authorityList[index].member = value;
         } else if (key == 4) {
           this.authority.project_remove_member.visitor = value;
+          this.authorityList[index].visitor = value;
         }
       }
       if (operation == "Manage project tasks") {
         if (key == 1) {
           this.authority.project_task_assignment.project_manager = value;
+          this.authorityList[index].project_manager = value;
         } else if (key == 2) {
           this.authority.project_task_assignment.subproject_manager = value;
+          this.authorityList[index].subproject_manager = value;
         } else if (key == 3) {
           this.authority.project_task_assignment.member = value;
+          this.authorityList[index].member = value;
         } else if (key == 4) {
           this.authority.project_task_assignment.visitor = value;
+          this.authorityList[index].visitor = value;
         }
       }
       if (operation == "Manage project resources") {
         if (key == 1) {
           this.authority.project_resource_manage.project_manager = value;
+          this.authorityList[index].project_manager = value;
         } else if (key == 2) {
           this.authority.project_resource_manage.subproject_manager = value;
+          this.authorityList[index].subproject_manager = value;
         } else if (key == 3) {
           this.authority.project_resource_manage.member = value;
+          this.authorityList[index].member = value;
         } else if (key == 4) {
           this.authority.project_resource_manage.visitor = value;
+          this.authorityList[index].visitor = value;
         }
       }
       if (operation == "Change the type of workspace in the project") {
         if (key == 1) {
           this.authority.project_workspace_type_manage.project_manager = value;
+          this.authorityList[index].project_manager = value;
         } else if (key == 2) {
           this.authority.project_workspace_type_manage.subproject_manager = value;
+          this.authorityList[index].subproject_manager = value;
         } else if (key == 3) {
           this.authority.project_workspace_type_manage.member = value;
+          this.authorityList[index].member = value;
         } else if (key == 4) {
           this.authority.project_workspace_type_manage.visitor = value;
+          this.authorityList[index].visitor = value;
         }
       }
       if (operation == "Manage subprojects") {
         if (key == 1) {
           this.authority.subprojects_manage.project_manager = value;
+          this.authorityList[index].project_manager = value;
         } else if (key == 2) {
           this.authority.subprojects_manage.subproject_manager = value;
+          this.authorityList[index].subproject_manager = value;
         } else if (key == 3) {
           this.authority.subprojects_manage.member = value;
+          this.authorityList[index].member = value;
         } else if (key == 4) {
           this.authority.subprojects_manage.visitor = value;
+          this.authorityList[index].visitor = value;
         }
       }
       if (operation == "Edit subproject information") {
         if (key == 1) {
           this.authority.subproject_edit_info.project_manager = value;
+          this.authorityList[index].project_manager = value;
         } else if (key == 2) {
           this.authority.subproject_edit_info.subproject_manager = value;
+          this.authorityList[index].subproject_manager = value;
         } else if (key == 3) {
           this.authority.subproject_edit_info.member = value;
+          this.authorityList[index].member = value;
         } else if (key == 4) {
           this.authority.subproject_edit_info.visitor = value;
+          this.authorityList[index].visitor = value;
         }
       }
       if (operation == "Invite to join subproject") {
         if (key == 1) {
           this.authority.subproject_invite_member.project_manager = value;
+          this.authorityList[index].project_manager = value;
         } else if (key == 2) {
           this.authority.subproject_invite_member.subproject_manager = value;
+          this.authorityList[index].subproject_manager = value;
         } else if (key == 3) {
           this.authority.subproject_invite_member.member = value;
+          this.authorityList[index].member = value;
         } else if (key == 4) {
           this.authority.subproject_invite_member.visitor = value;
+          this.authorityList[index].visitor = value;
         }
       }
       if (operation == "Remove the subproject member") {
         if (key == 1) {
           this.authority.subproject_remove_member.project_manager = value;
+          this.authorityList[index].project_manager = value;
         } else if (key == 2) {
           this.authority.subproject_remove_member.subproject_manager = value;
+          this.authorityList[index].subproject_manager = value;
         } else if (key == 3) {
           this.authority.subproject_remove_member.member = value;
+          this.authorityList[index].member = value;
         } else if (key == 4) {
           this.authority.subproject_remove_member.visitor = value;
+          this.authorityList[index].visitor = value;
         }
       }
       if (operation == "Manage subproject tasks") {
         if (key == 1) {
           this.authority.subproject_task_assignment.project_manager = value;
+          this.authorityList[index].project_manager = value;
         } else if (key == 2) {
           this.authority.subproject_task_assignment.subproject_manager = value;
+          this.authorityList[index].subproject_manager = value;
         } else if (key == 3) {
           this.authority.subproject_task_assignment.member = value;
+          this.authorityList[index].member = value;
         } else if (key == 4) {
           this.authority.subproject_task_assignment.visitor = value;
+          this.authorityList[index].visitor = value;
         }
       }
       if (operation == "Manage subproject resources") {
         if (key == 1) {
           this.authority.subproject_resource_manage.project_manager = value;
+          this.authorityList[index].project_manager = value;
         } else if (key == 2) {
           this.authority.subproject_resource_manage.subproject_manager = value;
+          this.authorityList[index].subproject_manager = value;
         } else if (key == 3) {
           this.authority.subproject_resource_manage.member = value;
+          this.authorityList[index].member = value;
         } else if (key == 4) {
           this.authority.subproject_resource_manage.visitor = value;
+          this.authorityList[index].visitor = value;
         }
       }
       if (operation == "Change the type of workspace in the subproject") {
         if (key == 1) {
           this.authority.subproject_workspace_type_manage.project_manager = value;
+          this.authorityList[index].project_manager = value;
         } else if (key == 2) {
           this.authority.subproject_workspace_type_manage.subproject_manager = value;
+          this.authorityList[index].subproject_manager = value;
         } else if (key == 3) {
           this.authority.subproject_workspace_type_manage.member = value;
+          this.authorityList[index].member = value;
         } else if (key == 4) {
           this.authority.subproject_workspace_type_manage.visitor = value;
+          this.authorityList[index].visitor = value;
         }
       }
       if (operation == "Manage activities") {
         if (key == 1) {
           this.authority.activity_manage.project_manager = value;
+          this.authorityList[index].project_manager = value;
         } else if (key == 2) {
           this.authority.activity_manage.subproject_manager = value;
+          this.authorityList[index].subproject_manager = value;
         } else if (key == 3) {
           this.authority.activity_manage.member = value;
+          this.authorityList[index].member = value;
         } else if (key == 4) {
           this.authority.activity_manage.visitor = value;
+          this.authorityList[index].visitor = value;
         }
       }
       if (operation == "Manage workspace resources") {
         if (key == 1) {
           this.authority.workspace_resource.project_manager = value;
+          this.authorityList[index].project_manager = value;
         } else if (key == 2) {
           this.authority.workspace_resource.subproject_manager = value;
+          this.authorityList[index].subproject_manager = value;
         } else if (key == 3) {
           this.authority.workspace_resource.member = value;
+          this.authorityList[index].member = value;
         } else if (key == 4) {
           this.authority.workspace_resource.visitor = value;
+          this.authorityList[index].visitor = value;
         }
       }
       if (operation == "Manage workspace tools") {
         if (key == 1) {
           this.authority.workspace_tool.project_manager = value;
+          this.authorityList[index].project_manager = value;
         } else if (key == 2) {
           this.authority.workspace_tool.subproject_manager = value;
+          this.authorityList[index].subproject_manager = value;
         } else if (key == 3) {
           this.authority.workspace_tool.member = value;
+          this.authorityList[index].member = value;
         } else if (key == 4) {
           this.authority.workspace_tool.visitor = value;
+          this.authorityList[index].visitor = value;
         }
       }
       if (operation == "Edit workspace information") {
         if (key == 1) {
           this.authority.workspace_edit.project_manager = value;
+          this.authorityList[index].project_manager = value;
         } else if (key == 2) {
           this.authority.workspace_edit.subproject_manager = value;
+          this.authorityList[index].subproject_manager = value;
         } else if (key == 3) {
           this.authority.workspace_edit.member = value;
+          this.authorityList[index].member = value;
         } else if (key == 4) {
           this.authority.workspace_edit.visitor = value;
+          this.authorityList[index].visitor = value;
         }
       }
     },
     setDefault() {
-      this.authority = JSON.parse(JSON.stringify(this.defaultAuthority));
+      if (this.projectInfo.privacy == "Public") {
+        this.authority = JSON.parse(JSON.stringify(this.defaultPublic));
+      } else if (this.projectInfo.privacy == "Discoverable") {
+        this.authority = JSON.parse(JSON.stringify(this.defaultDiscoverable));
+      } else if (this.projectInfo.privacy == "Private") {
+        this.authority = JSON.parse(JSON.stringify(this.defaultPrivate));
+      }
       this.getAuthorityList();
     },
-    save2Project() {}
+    save2Project() {
+      let obj = new URLSearchParams();
+      obj.append("projectId", this.projectId);
+      obj.append("authorityManager", this.authority);
+      this.axios
+        .post("/GeoProblemSolving/project/update", obj)
+        .then(res => {
+          this.resetProjectTypeModel = false;
+          if (res.data == "Offline") {
+            parent.location.href = "/GeoProblemSolving/login";
+          } else if (res.data != "Fail") {
+            this.$store.commit("setProjectInfo", res.data);
+            this.$Notice.info({
+              desc: "Update authorities successfully. "
+            });
+          } else {
+            this.$Message.error("failed to save authorities.");
+          }
+        })
+        .catch(err => {
+          console.log(err.data);
+        });
+    }
   }
 };
 </script>

@@ -1605,7 +1605,8 @@ export default {
               this.$store.commit("setProjectInfo", res.data);
               parent.vm.projectInfo = res.data;
               // 如果是项目下的步骤，需要更新sessionStorage
-              sessionStorage.setItem("projectInfo", JSON.stringify(res.data));
+              // sessionStorage.setItem("projectInfo", JSON.stringify(res.data));
+              sessionStorage.setItem("projectInfo", this.encrypto(res.data));
               this.$Notice.info({
                 desc: "Project update successfully!"
               });
@@ -1739,7 +1740,24 @@ export default {
         this.activateStep(this.aActivitiesName);
         this.aActivitiesName = [];
       }
-    }
+    },
+    encrypto(context) {
+      var CryptoJS = require("crypto-js");
+      var key = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
+      var iv = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
+      var encrypted = "";
+      if (typeof context == "string") {
+      } else if (typeof context == "object") {
+        context = JSON.stringify(context);
+      }
+      var srcs = CryptoJS.enc.Utf8.parse(context);
+      encrypted = CryptoJS.AES.encrypt(srcs, key, {
+        iv: iv,
+        mode: CryptoJS.mode.CBC,
+        padding: CryptoJS.pad.Pkcs7
+      });
+      return encrypted.toString();
+    },
   }
 };
 </script>

@@ -9,6 +9,7 @@
     <link href="https://cdn.bootcss.com/iview/3.4.2/styles/iview.css" rel="stylesheet">
     <script src="https://cdn.bootcss.com/iview/3.4.2/iview.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue-avatar@2.1.7/dist/vue-avatar.min.js"></script>
+    <script src="/GeoProblemSolving/js/crypto-js.js"></script>
 
     <style scoped th:fragment="tab-style">
         img {
@@ -226,7 +227,8 @@
             methods:{
                 projectInfoModalShow(projectInfo) {
                     if (projectInfo.isMember || projectInfo.isManager) {
-                        window.sessionStorage.setItem("projectInfo",JSON.stringify(projectInfo));
+                        // window.sessionStorage.setItem("projectInfo",JSON.stringify(projectInfo));
+                        window.sessionStorage.setItem("projectInfo", this.encrypto(projectInfo));
                         window.location.href="/GeoProblemSolving/projectDetail/"+projectInfo.projectId;
                     } else {
                         this.selectedProjectInfo = Object.assign({}, projectInfo);
@@ -297,7 +299,6 @@
                         window.location.href = "/GeoProblemSolving/login";
                     }
                 },
-
                 joinApply(name) {
                     this.$refs[name].validate(valid => {
                         if (valid) {
@@ -390,16 +391,30 @@
                         }
                     });
                 },
-
                 login() {
                     window.location.href="/GeoProblemSolving/login"
                 },
-
                 enterProject(projectInfo) {
-                    window.sessionStorage.setItem("projectInfo",JSON.stringify(projectInfo));
+                    // window.sessionStorage.setItem("projectInfo",JSON.stringify(projectInfo));
+                    window.sessionStorage.setItem("projectInfo", this.encrypto(projectInfo));
                     window.location.href="/GeoProblemSolving/projectDetail/"+projectInfo.projectId;
                 },
-
+                encrypto(context) {
+                    var key = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
+                    var iv = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
+                    var encrypted = "";
+                    if (typeof context == "string") {
+                    } else if (typeof context == "object") {
+                        context = JSON.stringify(context);
+                    }
+                    var srcs = CryptoJS.enc.Utf8.parse(context);
+                    encrypted = CryptoJS.AES.encrypt(srcs, key, {
+                        iv: iv,
+                        mode: CryptoJS.mode.CBC,
+                        padding: CryptoJS.pad.Pkcs7
+                    });
+                    return encrypted.toString();
+                }
             }
         });
 
