@@ -88,30 +88,25 @@ export default new Vuex.Store({
             state.userInfo = userInfo;
         },
         setProjectInfo: (state, project) => {
-            // sessionStorage.setItem("projectInfo", JSON.stringify(project));
-            sessionStorage.setItem("projectInfo", encrypto(project));
             state.project = project;
-        },
-        setSubProjectInfo: (state, subProject) => {
-            sessionStorage.setItem("subProjectInfo", JSON.stringify(subProject));
-            state.subProject = subProject;
-        },
-        encrypto(context) {
+
+            // sessionStorage.setItem("projectInfo", JSON.stringify(project));
             var CryptoJS = require("crypto-js");
             var key = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
             var iv = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
-            var encrypted = "";
-            if (typeof context == "string") {
-            } else if (typeof context == "object") {
-                context = JSON.stringify(context);
-            }
+            var context = JSON.stringify(project);
             var srcs = CryptoJS.enc.Utf8.parse(context);
-            encrypted = CryptoJS.AES.encrypt(srcs, key, {
+            var encrypted = CryptoJS.AES.encrypt(srcs, key, {
                 iv: iv,
                 mode: CryptoJS.mode.CBC,
                 padding: CryptoJS.pad.Pkcs7
             });
-            return encrypted.toString();
+            sessionStorage.setItem("projectInfo", encrypted.toString());
+
         },
-    },
+        setSubProjectInfo: (state, subProject) => {
+            sessionStorage.setItem("subProjectInfo", JSON.stringify(subProject));
+            state.subProject = subProject;
+        }
+    }
 })

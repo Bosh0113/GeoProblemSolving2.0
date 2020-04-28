@@ -27,11 +27,12 @@
       <div slot="title">
         <h4>Toolsets and tools</h4>
       </div>
-      <div slot="extra" v-show="userRole!='Visitor'&& userRole!='Token'">
+      <div slot="extra" v-if="permissionIdentity('workspace_tool')">
         <manage-tools
           :step-info="stepInfo"
           @updateStepTools="stepToolListChanged"
           :key="toolModal"
+          title="Manage toolsets and tools"
           style="margin-top:-10px"
         ></manage-tools>
       </div>
@@ -221,6 +222,29 @@ export default {
     };
   },
   methods: {
+    permissionIdentity(operation) {
+      if (
+        this.projectInfo.permissionManager != undefined &&
+        operation === "workspace_tool"
+      ) {
+        if (
+          this.userRole == "PManager" &&
+          this.projectInfo.permissionManager.workspace_tool.project_manager
+        ) {
+          return true;
+        } else if (
+          this.userRole == "Manager" &&
+          this.projectInfo.permissionManager.workspace_tool.subproject_manager
+        ) {
+          return true;
+        } else if (
+          this.userRole == "Member" &&
+          this.projectInfo.permissionManager.workspace_tool.member
+        ) {
+          return true;
+        }
+      }
+    },
     checkScope() {
       if (
         this.stepInfo.subProjectId == null ||

@@ -34,7 +34,7 @@
         <Button icon="ios-share-alt" @click="shareModal=true" v-show="userRole=='Manager'">Share</Button>
       </div>
       <div>
-          <data-list :stepInfo="stepInfo" :userRole="userRole" v-show="this.userRole != 'Visitor' && this.userRole != 'Token'"></data-list>
+          <data-list :stepInfo="stepInfo" :userRole="userRole" :projectInfo="projectInfo" v-show="this.userRole != 'Visitor' && this.userRole != 'Token'"></data-list>
           <historical-edit-list
             :stepInfo="stepInfo"
             :userRole="userRole"
@@ -45,7 +45,7 @@
         <Button
           class="btnHoverRed"
           @click="resetProjectTypeModalShow()"
-          v-show="userRole=='Manager'"
+          v-if="permissionIdentity('project_workspace_type_manage')"
         >Reset workspace type</Button>
       </div>
     </Card>
@@ -130,6 +130,25 @@ export default {
     };
   },
   methods: {
+    permissionIdentity(operation) {
+      if (
+        this.projectInfo.permissionManager != undefined &&
+        operation === "project_workspace_type_manage"
+      ) {
+        if (
+          this.userRole == "PManager" &&
+          this.projectInfo.permissionManager.project_workspace_type_manage
+            .project_manager
+        ) {
+          return true;
+        } else if (
+          this.userRole == "Member" &&
+          this.projectInfo.permissionManager.project_workspace_type_manage.member
+        ) {
+          return true;
+        }
+      }
+    },
     getStepInfo() {
       this.axios
         .get(

@@ -121,6 +121,7 @@
                       type="text"
                     ></Button>
                     <Button
+                      v-if="permissionIdentity('workspace_resource')"
                       class="fileBtnHoverRed"
                       size="small"
                       shape="circle"
@@ -180,27 +181,29 @@
                           type="primary"
                           @click="OpenData(item)"
                         ></Button>
-                        <Button
-                          size="small"
-                          title="Details"
-                          icon="md-information-circle"
-                          style="margin: 10px 20px 0 0;"
-                          @click="checkData(item)"
-                        ></Button>
-                        <Button
-                          size="small"
-                          title="Share"
-                          icon="ios-share-alt"
-                          style="margin: 10px 20px 0 0;"
-                          @click="shareData(item)"
-                        ></Button>
-                        <Button
-                          size="small"
-                          title="Delete"
-                          icon="md-close"
-                          style="margin-top: 10px;"
-                          @click="deleteResourceModalShow(item.resourceId)"
-                        ></Button>
+                        <template v-if="permissionIdentity('workspace_resource')">
+                          <Button
+                            size="small"
+                            title="Details"
+                            icon="md-information-circle"
+                            style="margin: 10px 20px 0 0;"
+                            @click="checkData(item)"
+                          ></Button>
+                          <Button
+                            size="small"
+                            title="Share"
+                            icon="ios-share-alt"
+                            style="margin: 10px 20px 0 0;"
+                            @click="shareData(item)"
+                          ></Button>
+                          <Button
+                            size="small"
+                            title="Delete"
+                            icon="md-close"
+                            style="margin-top: 10px;"
+                            @click="deleteResourceModalShow(item.resourceId)"
+                          ></Button>
+                        </template>
                       </div>
                     </div>
                   </Card>
@@ -456,7 +459,7 @@ export default {
       scopeType: "subproject"
     };
   },
-  props: ["stepInfo", "userRole"],
+  props: ["stepInfo", "userRole", "projectInfo"],
   watch: {
     checkDataModal(value) {
       if (!value) {
@@ -502,6 +505,44 @@ export default {
     };
   },
   methods: {
+    permissionIdentity(operation) {
+      if (
+        this.projectInfo.permissionManager != undefined &&
+        operation === "workspace_resource"
+      ) {
+        if (this.userRole == "PManager") {
+          if (
+            this.projectInfo.permissionManager.workspace_resource
+              .project_manager === "Yes"
+          ) {
+            return true;
+          } else if (
+            this.projectInfo.permissionManager.workspace_resource
+              .project_manager === "Yes, partly" &&
+            resource.uploaderId === this.userInfo.userId
+          ) {
+          }
+        } else if (
+          this.userRole == "Manager" &&
+          this.projectInfo.permissionManager.workspace_resource
+            .subproject_manager
+        ) {
+          return true;
+        } else if (this.userRole == "Member") {
+          if (
+            this.projectInfo.permissionManager.workspace_resource.member ===
+            "Yes"
+          ) {
+            return true;
+          } else if (
+            this.projectInfo.permissionManager.workspace_resource.member ===
+              "Yes, partly" &&
+            resource.uploaderId === this.userInfo.userId
+          ) {
+          }
+        }
+      }
+    },
     getResList() {
       if (
         this.stepInfo.subProjectId == null ||

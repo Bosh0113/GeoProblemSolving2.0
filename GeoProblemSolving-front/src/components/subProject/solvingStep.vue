@@ -14,50 +14,52 @@
               <span
                 style="font-weight: bold; font-size:16px"
               >Procedure of iterative attempts for geo-problem solving</span>
-              <Button
-                v-if="workspaceBtn"
-                type="primary"
-                @click="gotoworkspace()"
-                size="small"
-                icon="md-globe"
-                title="Enter the workspace"
-                style="float:right;margin-left:10px;"
-              >Workspace</Button>
-              <Button
-                v-else
-                type="default"
-                size="small"
-                icon="md-globe"
-                title="Enter the workspace"
-                style="float:right;margin-left:10px;cursor:default"
-              >Workspace</Button>
-              <Button
-                v-if="nodePositionBtn && procedureDrag"
-                type="warning"
-                @click="editPosition()"
-                size="small"
-                icon="md-git-commit"
-                title="Adjust the postion of nodes"
-                style="float:right;margin-left:10px;"
-              >Move node</Button>
-              <Button
-                v-else-if="nodePositionBtn && !procedureDrag"
-                type="warning"
-                @click="editPosition()"
-                size="small"
-                icon="md-git-network"
-                title="Move the postion of procedure"
-                style="float:right;margin-left:10px;"
-              >Move procedure</Button>
-              <Button
-                v-else
-                type="default"
-                size="small"
-                icon="md-git-commit"
-                title="Adjust the postion of nodes"
-                style="float:right;margin-left:10px;cursor:default"
-              >Move node</Button>
-              <template v-show="userRole == 'Manager'">
+              <template v-if="permissionIdentity('observe')">
+                <Button
+                  v-if="workspaceBtn"
+                  type="primary"
+                  @click="gotoworkspace()"
+                  size="small"
+                  icon="md-globe"
+                  title="Enter the workspace"
+                  style="float:right;margin-left:10px;"
+                >Workspace</Button>
+                <Button
+                  v-else
+                  type="default"
+                  size="small"
+                  icon="md-globe"
+                  title="Enter the workspace"
+                  style="float:right;margin-left:10px;cursor:default"
+                >Workspace</Button>
+              </template>
+              <template v-if="permissionIdentity('activity_manage')">
+                <Button
+                  v-if="nodePositionBtn && procedureDrag"
+                  type="warning"
+                  @click="editPosition()"
+                  size="small"
+                  icon="md-git-commit"
+                  title="Adjust the postion of nodes"
+                  style="float:right;margin-left:10px;"
+                >Move node</Button>
+                <Button
+                  v-else-if="nodePositionBtn && !procedureDrag"
+                  type="warning"
+                  @click="editPosition()"
+                  size="small"
+                  icon="md-git-network"
+                  title="Move the postion of procedure"
+                  style="float:right;margin-left:10px;"
+                >Move procedure</Button>
+                <Button
+                  v-else
+                  type="default"
+                  size="small"
+                  icon="md-git-commit"
+                  title="Adjust the postion of nodes"
+                  style="float:right;margin-left:10px;cursor:default"
+                >Move node</Button>
                 <Button
                   v-if="removeBtn"
                   type="error"
@@ -92,26 +94,26 @@
                   title="Active the activity"
                   style="float:right;margin-left:10px; cursor:default"
                 >Active</Button>
+                <Button
+                  v-if="addBtn"
+                  type="info"
+                  size="small"
+                  @click="addNewStep()"
+                  icon="md-add"
+                  v-show="userRole == 'Manager'"
+                  title="Add a new step"
+                  style="float:right;margin-left:10px"
+                >Add</Button>
+                <Button
+                  v-else
+                  type="default"
+                  size="small"
+                  icon="md-add"
+                  v-show="userRole == 'Manager'"
+                  title="Add a new step"
+                  style="float:right;margin-left:10px; cursor:default"
+                >Add</Button>
               </template>
-              <Button
-                v-if="addBtn"
-                type="info"
-                size="small"
-                @click="addNewStep()"
-                icon="md-add"
-                v-show="userRole == 'Manager'"
-                title="Add a new step"
-                style="float:right;margin-left:10px"
-              >Add</Button>
-              <Button
-                v-else
-                type="default"
-                size="small"
-                icon="md-add"
-                v-show="userRole == 'Manager'"
-                title="Add a new step"
-                style="float:right;margin-left:10px; cursor:default"
-              >Add</Button>
             </div>
           </template>
           <div
@@ -139,13 +141,18 @@
             <Button
               class="btnHoverGray"
               @click="resetSubProjectTypeModalShow()"
+              v-if="permissionIdentity('subproject_workspace_type_manage')"
             >Reset workspace type</Button>
           </div>
           <div
             style="width:100%;text-align:center;margin-top:10px"
             v-else-if="scopeType == 'project'"
           >
-            <Button class="btnHoverGray" @click="resetProjectTypeModalShow()">Reset workspace type</Button>
+            <Button
+              class="btnHoverGray"
+              @click="resetProjectTypeModalShow()"
+              v-if="permissionIdentity('project_workspace_type_manage')"
+            >Reset workspace type</Button>
           </div>
         </Row>
       </div>
@@ -263,7 +270,7 @@
       title="Get resources from previous activities"
       :styles="{top: '20px'}"
       @on-ok="createStepModal = true"
-      ok-text="OK"
+      ok-text="Next"
       cancel-text="Cancel"
     >
       <div style="margin-left:75px">
@@ -286,7 +293,7 @@
 <script>
 import echarts from "echarts";
 export default {
-  props: ["userRole", "scopeInfo"],
+  props: ["userRole", "scopeInfo", "projectInfo"],
   data() {
     return {
       scrollOps: {
@@ -416,6 +423,98 @@ export default {
       }
       window.addEventListener("resize", this.initSize);
       window.addEventListener("resize", this.updateStepchart);
+    },
+    permissionIdentity(operation) {
+      // 获取projectInfo
+      let project;
+      if (this.scopeType == "project") {
+        project = this.scopeInfo;
+      } else {
+        project = this.projectInfo;
+      }
+
+      // 判断权限
+      if (
+        project.permissionManager != undefined &&
+        operation === "project_workspace_type_manage"
+      ) {
+        if (
+          this.userRole == "PManager" &&
+          project.permissionManager.project_workspace_type_manage
+            .project_manager
+        ) {
+          return true;
+        } else if (
+          this.userRole == "Manager" &&
+          project.permissionManager.project_workspace_type_manage
+            .subproject_manager
+        ) {
+          return true;
+        } else if (
+          this.userRole == "Member" &&
+          project.permissionManager.project_workspace_type_manage.member
+        ) {
+          return true;
+        }
+      }
+      if (
+        project.permissionManager != undefined &&
+        operation === "subproject_workspace_type_manage"
+      ) {
+        if (
+          this.userRole == "PManager" &&
+          project.permissionManager.subproject_workspace_type_manage
+            .project_manager
+        ) {
+          return true;
+        } else if (
+          this.userRole == "Manager" &&
+          project.permissionManager.subproject_workspace_type_manage
+            .subproject_manager
+        ) {
+          return true;
+        } else if (
+          this.userRole == "Member" &&
+          project.permissionManager.subproject_workspace_type_manage.member
+        ) {
+          return true;
+        }
+      }
+      if (
+        project.permissionManager != undefined &&
+        operation === "activity_manage"
+      ) {
+        if (
+          this.userRole == "PManager" &&
+          project.permissionManager.activity_manage.project_manager
+        ) {
+          return true;
+        } else if (
+          this.userRole == "Manager" &&
+          project.permissionManager.activity_manage.subproject_manager
+        ) {
+          return true;
+        } else if (
+          this.userRole == "Member" &&
+          project.permissionManager.activity_manage.member
+        ) {
+          return true;
+        }
+      }
+      if (project.permissionManager != undefined && operation === "observe") {
+        if (this.userRole == "PManager") {
+          return true;
+        } else if (this.userRole == "Manager") {
+          return true;
+        } else if (this.userRole == "Member") {
+          return true;
+        } else if (
+          this.userRole == "Visitor" &&
+          project.permissionManager.observe.visitor == "All"
+        ) {
+          return true;
+        }
+      }
     },
     updateStepchart() {
       // 重新渲染
@@ -1757,7 +1856,7 @@ export default {
         padding: CryptoJS.pad.Pkcs7
       });
       return encrypted.toString();
-    },
+    }
   }
 };
 </script>
