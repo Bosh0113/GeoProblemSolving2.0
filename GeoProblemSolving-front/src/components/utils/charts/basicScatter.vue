@@ -4,48 +4,40 @@
 <template>
   <Row>
     <toolStyle
-      :style="{height:sidebarHeight}"
+      :participants="participants"
       :resources="resources"
       v-on:resourceUrl="selecetResource"
     ></toolStyle>
-    <Col span="4" style="padding:30px;margin-left:60px">
-      <Upload :before-upload="handleUpload" action="-" accept=".csv, .xls, .xlsx">
-        <Button icon="ios-cloud-upload-outline">Upload to resource center</Button>
-      </Upload>
+    <div style="width: 300px; padding:30px;margin-left:60px; float:left">
+      <h3>Select X-axis and Y-axis:</h3>
       <RadioGroup v-model="SelectAxis">
         <Radio label="X-Axis" style="padding:20px 0 10px 0"></Radio>
         <Input v-model="SelectX" style="width:200px" readonly />
         <Radio label="Y-Axis" style="padding:20px 0 10px 0"></Radio>
         <Input v-model="SelectY" style="width:200px" readonly />
       </RadioGroup>
-      <h3 style="padding-top:20px">Type of chart:</h3>
-      <Select
-        v-model="chooseType"
-        style="width:200px;padding-top:10px"
-        :placeholder="chartTypePlaceholder"
-      >
-        <Option v-for="item in normalChart" :value="item.value" :key="item.value">{{ item.label }}</Option>
-      </Select>
       <Button @click="Visualize" style="margin-top:30px">Visualization</Button>
       <Button v-if="visualization" @click="back2Table" style="margin-top:30px">Select data</Button>
-    </Col>
-    <Col span="17" offset="1" style="padding-top:30px">
-      <div v-if="visualization" title="Data visualization" style="padding-right:20px">
-        <ve-scatter v-if="chooseType == 'scatter'" :data="chartData"></ve-scatter>
-        <ve-chart v-else :data="chartData" :settings="chartSettings"></ve-chart>
-      </div>
+    </div>
+    <div style="padding-top:30px; float:left; width: calc(100vw - 400px)">
+      <div
+        v-show="visualization"
+        id="visualization"
+        style="width: calc(100vw - 400px); height:calc(90vh);background-color:#f8f8f9"
+      ></div>
       <div v-show="!visualization">
-        <div id="mytable" style="height:400px"></div>
+        <div id="mytable" style="height:calc(90vh)"></div>
       </div>
-    </Col>
+    </div>
   </Row>
 </template>
 <script>
+import * as socketApi from "./../../../api/socket.js";
 import csv from "../../../../static/js/jquery.csv.min.js";
 import jexcel from "../../../../static/js/jquery.jexcel.js";
 import XLSX from "xlsx";
-import VCharts from "./../../../utils/VCharts";
-import toolStyle from "./toolStyle";
+import echarts from "echarts";
+import toolStyle from "../toolStyle";
 export default {
   components: { toolStyle },
   data() {
@@ -56,20 +48,7 @@ export default {
       columnHeader: [],
       excelData: [],
       columnNameList: [],
-      // 选中的参考值
-      selectName: [],
-      normalChart: [
-        { value: "line", label: "line" },
-        { value: "histogram", label: "histogram" },
-        { value: "bar", label: "bar" },
-        { value: "pie", label: "pie" },
-        { value: "ring", label: "ring" },
-        { value: "waterfall", label: "waterfall" },
-        { value: "radar", label: "radar" },
-        { value: "funnel", label: "funnel" },
-        { value: "scatter", label: "scatter" }
-      ],
-      chartTypePlaceholder: "Choose one type of charts",
+      //data and params
       DataX: [],
       DataY: [],
       SelectX: "",
@@ -77,17 +56,26 @@ export default {
       SelectAxis: "",
       chartData: [],
       chooseType: "",
+      Charts: null,
       chartSettings: {},
+      // page info
       pageParams: { pageId: "", userId: "", userName: "" },
-      userInfo: {}
+      userInfo: {},
+      //协同消息
+      socket_content: {},
+      participants: [],
+      olParticipants: [],
+      resources: [],
+      dataUrl: ""
     };
   },
-  beforeDestroy() {},
+  beforeDestroy() {
+    // this.socketApi.close();
+  },
   mounted() {
     this.init();
-    this.getStepInfo();
-    this.getUserInfo();
     this.getResources();
+    this.startWebSocket();
   },
   methods: {
     init() {
@@ -99,6 +87,8 @@ export default {
         minDimensions: [20, 20],
         onselection: this.selectData
       });
+      this.getStepInfo();
+      this.getUserInfo();
     },
     getStepInfo() {
       if (
@@ -148,54 +138,6 @@ export default {
           })
           .catch(err => {});
       }
-    },
-    handleUpload(file) {
-      if (this.pageParams.pageId == undefined || this.pageParams.pageId == "") {
-        this.$Message.error("Lose the information of current step.");
-        return false;
-      }
-
-      if (!/\.(xls|xlsx|csv)$/.test(file.name.toLowerCase())) {
-        this.$Message.error("Wrong format");
-        return false;
-      }
-
-      //上传数据
-      let formData = new FormData();
-      formData.append("file", file);
-      formData.append("description", "Data chart tool");
-      formData.append("type", "data");
-      formData.append("uploaderId", this.userInfo.userId);
-      formData.append("privacy", "private");
-      formData.append("folderId", this.pageParams.pageId);
-      this.axios
-        .post("/GeoProblemSolving/folder/uploadToFolder", formData)
-        .then(res => {
-          if (
-            res.data.sizeOver.length > 0 ||
-              res.data.failed.length > 0 ||
-              res.data == "Offline"
-            ) {
-              console.log(res.data);
-            } else if (res.data.uploaded.length > 0) {
-            let dataName = res.data[0].fileName;
-
-            this.dataUrl = "/GeoProblemSolving/resource/upload/" + dataName;
-
-            let dataItem = {
-              name: file.name,
-              description: "charts tool data",
-              pathURL: "/GeoProblemSolving/resource/upload/" + dataName
-            };
-            this.resources.push(dataItem);
-          }
-        })
-        .catch(err => {});
-
-      // 渲染表格
-      this.fillTable(file);
-
-      return false;
     },
     fillTable(file) {
       var that = this;
@@ -262,9 +204,13 @@ export default {
       } catch (e) {}
 
       if (this.SelectAxis == "X-Axis") {
+        this.socket_content["startX"] = startXY;
+        this.socket_content["endX"] = endXY;
         this.SelectX = start + "->" + end;
         this.DataX = this.getData(startXY, endXY);
       } else if (this.SelectAxis == "Y-Axis") {
+        this.socket_content["startY"] = startXY;
+        this.socket_content["endY"] = endXY;
         this.SelectY = start + "->" + end;
         this.DataY = this.getData(startXY, endXY);
       }
@@ -307,110 +253,119 @@ export default {
     },
     showCharts() {
       this.visualization = true;
-
-      //数据标准化
-      let dimension = [],
-        metrics = [],
-        columns = [],
-        rows = [];
-      dimension.push(this.DataX[0][0]);
-      columns.push(this.DataX[0][0]);
       let dataLength =
         this.DataX[0].length <= this.DataY[0].length
           ? this.DataX[0].length
           : this.DataY[0].length;
 
-      if (
-        this.chooseType === "pie" ||
-        this.chooseType === "ring" ||
-        this.chooseType === "waterfall"
-      ) {
-        metrics.push(this.DataY[0][0]);
-        columns.push(this.DataY[0][0]);
-        for (let i = 1; i < dataLength; i++) {
-          let row = {};
-          row[this.DataX[0][0]] = this.DataX[0][i];
-          row[this.DataY[0][0]] = this.DataY[0][i];
-          rows.push(row);
-        }
-        //排序
-        var that = this;
-        rows.sort(function(a, b) {
-          return a[that.DataX[0][0]] - b[that.DataX[0][0]];
-        });
-
-        if (this.chooseType == "funnel") {
-          this.chartSettings = {
-            type: this.chooseType,
-            metrics: metrics,
-            dimension: dimension,
-            ascending: true,
-            useDefaultOrder: true
-          };
-          this.chartData = {
-            columns: columns,
-            rows: rows
-          };
-        } else {
-          this.chartSettings = {
-            type: this.chooseType,
-            metrics: metrics,
-            dimension: dimension
-          };
-          this.chartData = {
-            columns: columns,
-            rows: rows
-          };
-        }
-      } else {
-        for (let i = 0; i < this.DataY.length; i++) {
-          metrics.push(this.DataY[i][0]);
-        }
-        for (let i = 0; i < this.DataY.length; i++) {
-          columns.push(this.DataY[i][0]);
-        }
-        for (let i = 1; i < dataLength; i++) {
-          let row = {};
-          row[this.DataX[0][0]] = this.DataX[0][i];
-          for (let j = 0; j < this.DataY.length; j++) {
-            row[this.DataY[j][0]] = this.DataY[j][i];
+      var option = {
+        tooltip: {
+          trigger: "item"
+        },
+        xAxis: {
+          name: this.DataX[0][0]
+        },
+        yAxis: {
+          name: this.DataY[0][0]
+        },
+        series: [
+          {
+            symbolSize: 10,
+            data: [],
+            type: "scatter"
           }
-          rows.push(row);
-        }
-        //排序
-        var that = this;
-        rows.sort(function(a, b) {
-          return a[that.DataX[0][0]] - b[that.DataX[0][0]];
-        });
-
-        if (this.chooseType == "scatter") {
-          this.chartSettings = {
-            type: this.chooseType,
-            metrics: metrics,
-            dimension: dimension
-          };
-          this.chartData = {
-            columns: columns,
-            rows: rows
-          };
-        } else {
-          this.chartSettings = {
-            type: this.chooseType,
-            metrics: metrics,
-            dimension: dimension
-          };
-          this.chartData = {
-            columns: columns,
-            rows: rows
-          };
-        }
+        ]
+      };
+      for (let i = 1; i < dataLength; i++) {
+        let datum = [];
+        datum.push(this.DataX[0][i]);
+        datum.push(this.DataY[0][i]);
+        option.series[0].data.push(datum);
       }
+      if (this.Charts == null) {
+        this.Charts = echarts.init(document.getElementById("visualization"));
+      }
+      this.Charts.setOption(option);
     },
     Visualize() {
       if (this.DataX.length == 0 || this.DataY.length == 0) {
         return;
       }
+      this.socket_content["chartType"] = this.chooseType;
+      this.socket_content["operate"] = "visualize";
+      this.socketApi.sendSock(this.socket_content, this.getSocketConnect);
+      this.socket_content = {};
+
       this.showCharts();
+    },
+    getSocketConnect(data) {
+      let socketData = data;
+
+      if (socketData.from === "Test") {
+      } else if (socketData.type === "members") {
+        let members = data.message
+          .replace("[", "")
+          .replace("]", "")
+          .replace(/\s/g, "")
+          .split(",");
+        this.olParticipants = members;
+        this.olParticipantChange();
+      } else {
+        if (socketData.operate === "visualize") {
+          this.chooseType = socketData.chartType;
+          try {
+            let start =
+              String.fromCharCode(
+                parseInt(socketData.startX[0]) + "A".charCodeAt()
+              ) +
+              (parseInt(socketData.startX[1]) + 1);
+            let end =
+              String.fromCharCode(
+                parseInt(socketData.endX[0]) + "A".charCodeAt()
+              ) +
+              (parseInt(socketData.endX[1]) + 1);
+            this.SelectX = start + "->" + end;
+            this.DataX = this.getData(socketData.startX, socketData.endX);
+
+            start =
+              String.fromCharCode(
+                parseInt(socketData.startY[0]) + "A".charCodeAt()
+              ) +
+              (parseInt(socketData.startY[1]) + 1);
+            end =
+              String.fromCharCode(
+                parseInt(socketData.endY[0]) + "A".charCodeAt()
+              ) +
+              (parseInt(socketData.endY[1]) + 1);
+            this.SelectY = start + "->" + end;
+            this.DataY = this.getData(socketData.startY, socketData.endY);
+          } catch (e) {}
+          this.showCharts();
+        } else if (socketData.operate === "selectdata") {
+          this.dataUrl = socketData.pathURL;
+          this.viewData();
+        }
+      }
+    },
+    startWebSocket() {
+      if (this.pageParams.pageId == undefined || this.pageParams.pageId == "") {
+        this.$Message.error("Lose the information of current step.");
+        return false;
+      }
+
+      let roomId = this.pageParams.pageId;
+      this.socketApi.initWebSocket(
+        "ChartsServer/" + "bscatter" + roomId,
+        this.$store.state.IP_Port
+      );
+
+      this.send_msg = {
+        type: "test",
+        from: "Test",
+        content: "TestChat"
+      };
+      this.socketApi.sendSock(this.send_msg, this.getSocketConnect);
+      this.socket_content = {};
     },
     getResources() {
       if (this.pageParams.pageId == undefined || this.pageParams.pageId == "") {
@@ -444,6 +399,14 @@ export default {
     },
     selecetResource(url) {
       this.dataUrl = url;
+
+      // 协同
+      this.send_content = {
+        operate: "selectdata",
+        pathURL: this.dataUrl
+      };
+      this.socketApi.sendSock(this.send_content, this.getSocketConnect);
+
       this.viewData();
     },
     viewData() {
@@ -462,7 +425,78 @@ export default {
       } else {
         this.$Message.error("Worry data format!");
       }
+
       this.showFile = false;
+    },
+    olParticipantChange() {
+      let userIndex = -1;
+
+      // 自己刚上线，olParticipants空
+      if (this.participants.length == 0) {
+        for (let i = 0; i < this.olParticipants.length; i++) {
+          this.axios
+            .get(
+              "/GeoProblemSolving/user/inquiry" +
+                "?key=" +
+                "userId" +
+                "&value=" +
+                this.olParticipants[i]
+            )
+            .then(res => {
+              if (res.data != "None" && res.data != "Fail") {
+                this.participants.push(res.data);
+              } else if (res.data == "None") {
+              }
+            });
+        }
+      } else {
+        // members大于olParticipants，有人上线；小于olParticipants，离线
+        if (this.olParticipants.length > this.participants.length) {
+          for (var i = 0; i < this.olParticipants.length; i++) {
+            for (var j = 0; j < this.participants.length; j++) {
+              if (this.olParticipants[i] == this.participants[j].userId) {
+                break;
+              }
+            }
+            if (j == this.participants.length) {
+              userIndex = i;
+              break;
+            }
+          }
+
+          // 人员渲染
+          var that = this;
+          this.axios
+            .get(
+              "/GeoProblemSolving/user/inquiry" +
+                "?key=" +
+                "userId" +
+                "&value=" +
+                this.olParticipants[userIndex]
+            )
+            .then(res => {
+              if (res.data != "None" && res.data != "Fail") {
+                that.participants.push(res.data);
+                if (userIndex != -1) {
+                }
+              } else if (res.data == "None") {
+              }
+            });
+        } else if (this.olParticipants.length < this.participants.length) {
+          for (var i = 0; i < this.participants.length; i++) {
+            for (var j = 0; j < this.olParticipants.length; j++) {
+              if (this.participants[i].userId == this.olParticipants[j]) {
+                break;
+              }
+            }
+            if (j == this.olParticipants.length) {
+              userIndex = i;
+              break;
+            }
+          }
+          this.participants.splice(userIndex, 1);
+        }
+      }
     }
   }
 };

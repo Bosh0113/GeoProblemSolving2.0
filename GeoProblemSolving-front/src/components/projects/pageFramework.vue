@@ -49,7 +49,7 @@
           <Divider style="margin:10px 0" />
           <h2>Description:</h2>
           <span
-            style="font-size: larger;white-space: pre-line;word-break: break-all;"
+            style="font-size: larger;white-space: pre-line;word-break: break-word;"
           >{{stepInfo.description}}</span>
           <Divider style="margin:10px 0" />
           <h2>Members:</h2>
@@ -154,12 +154,6 @@ export default {
             required: false,
             message: "Please enter description",
             trigger: "blur"
-          },
-          {
-            type: "string",
-            max: 150,
-            message: "Descript less than 150 words",
-            trigger: "blur"
           }
         ]
       },
@@ -245,7 +239,7 @@ export default {
             "/GeoProblemSolving/project/inquiry" +
             "?key=projectId" +
             "&value=" +
-            that.stepInfo.projectId,
+            this.stepInfo.projectId,
           type: "GET",
           async: false,
           success: data => {

@@ -20,7 +20,7 @@ public class StepController {
         StepDaoImpl stepDao = new StepDaoImpl(mongoTemplate);
         try {
             return stepDao.createStep(step);
-        }catch (Exception e){
+        } catch (Exception e){
             return "Fail";
         }
     }

@@ -450,7 +450,7 @@ export default {
             this.axios
               .post("/GeoProblemSolving/folder/uploadToFolder", formData)
               .then(res => {
-                if (res.data != "Size over" && res.data.length > 0) {
+                if (res.data.uploaded.length > 0) {
                   this.showFile = true;
                   this.uploadDataName = filename;
 
@@ -504,7 +504,7 @@ export default {
       this.axios
         .post("/GeoProblemSolving/folder/uploadToFolder", formData)
         .then(res => {
-          if (res.data != "Size over" && res.data.length > 0) {
+          if (res.data.uploaded.length > 0) {
             this.showFile = true;
             this.uploadDataName = file.name;
 
@@ -582,12 +582,12 @@ export default {
         .then(res => {
           // 写渲染函数，取到所有资源
           if (res.data !== "None") {
-            for (let i = 0; i < res.data.length; i++) {
+            for (let i = 0; i < res.data.files.length; i++) {
               if (
-                res.data[i].type == "data" &&
-                /\.(json|zip)$/.test(res.data[i].name.toLowerCase())
+                res.data.files[i].type == "data" &&
+                /\.(json|zip)$/.test(res.data.files[i].name.toLowerCase())
               ) {
-                this.resources.push(res.data[i]);
+                this.resources.push(res.data.files[i]);
               }
             }
           } else {

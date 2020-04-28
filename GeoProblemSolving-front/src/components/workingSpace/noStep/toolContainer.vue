@@ -187,7 +187,7 @@ export default {
       toolsetToolList: [],
       showToolsetToolsModal: false,
       panelList: [],
-      scopeType:"subproject"
+      scopeType: "subproject"
     };
   },
   mounted() {
@@ -221,11 +221,14 @@ export default {
     };
   },
   methods: {
-    checkScope(){
-      if(this.stepInfo.subProjectId==null||this.stepInfo.subProjectId==""||this.stepInfo.subProjectId==undefined){
+    checkScope() {
+      if (
+        this.stepInfo.subProjectId == null ||
+        this.stepInfo.subProjectId == "" ||
+        this.stepInfo.subProjectId == undefined
+      ) {
         this.scopeType = "project";
-      }
-      else{
+      } else {
         this.scopeType = "subproject";
       }
     },
@@ -335,30 +338,38 @@ export default {
     },
     showTools(toolsetInfo) {
       if (this.userRole != "Visitor" && this.userRole != "Token") {
-      this.toolsetToolList = toolsetInfo.toolList;
-      this.showToolsetToolsModal = true;
-      }
-      else{
-        this.$Notice.info({desc:"Please login before using toolsets and join this project."})
+        this.toolsetToolList = toolsetInfo.toolList;
+        this.showToolsetToolsModal = true;
+      } else {
+        this.$Notice.info({
+          desc: "Please login before using toolsets and join this project."
+        });
       }
     },
     useTool(toolInfo) {
       if (this.userRole != "Visitor" && this.userRole != "Token") {
-        let toolURL =
-          '<iframe src="' +
-          toolInfo.toolUrl +
-          "?userName=" +
-          this.userInfo.userName +
-          "&userID=" +
-          this.userInfo.userId +
-          "&groupID=" +
-          this.stepInfo.stepId +
-          '" style="width: 100%;height:100%;"></iframe>';
-        var demoPanelTimer = null;
-        if(this.scopeType=="project"){
-          parent.vm.showToolPanel(toolURL, toolInfo.toolName);
+        var toolURL = "";
+        if (toolInfo.toolName == "Jupyter notebook") {
+          toolURL =
+            '<iframe src="' +
+            toolInfo.toolUrl +
+            '" style="width: 100%;height:100%;"></iframe>';
+        } else {
+          toolURL =
+            '<iframe src="' +
+            toolInfo.toolUrl +
+            "?userName=" +
+            this.userInfo.userName +
+            "&userID=" +
+            this.userInfo.userId +
+            "&groupID=" +
+            this.stepInfo.stepId +
+            '" style="width: 100%;height:100%;"></iframe>';
         }
-        else{
+        var demoPanelTimer = null;
+        if (this.scopeType == "project") {
+          parent.vm.showToolPanel(toolURL, toolInfo.toolName);
+        } else {
           var panel = parent.jsPanel.create({
             theme: "success",
             headerTitle: toolInfo.toolName,
@@ -372,7 +383,7 @@ export default {
             closeOnEscape: true,
             onclosed: function(panel, status, closedByUser) {
               window.clearTimeout(demoPanelTimer);
-            },
+            }
             // callback: function() {
             //   var that = this;
             //   demoPanelTimer = window.setInterval(function() {
@@ -395,9 +406,10 @@ export default {
           toolType: toolInfo.toolName
         };
         this.$emit("toolBehavior", toolRecords);
-      }
-      else{
-        this.$Notice.info({desc:"Please login before using toolsets and join this project."})
+      } else {
+        this.$Notice.info({
+          desc: "Please login before using toolsets and join this project."
+        });
       }
     }
   }

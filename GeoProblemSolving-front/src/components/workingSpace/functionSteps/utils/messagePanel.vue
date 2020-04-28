@@ -64,7 +64,7 @@
   position: relative;
   margin: 12px;
   padding: 5px 8px;
-  word-break: break-all;
+  word-break: break-word;
   background: #fff;
   border: 1px solid lightgray;
   border-radius: 5px;
@@ -76,7 +76,7 @@
   position: relative;
   margin: 12px;
   padding: 5px 8px;
-  word-break: break-all;
+  word-break: break-word;
   background: #fff;
   border: 1px solid lightgray;
   border-radius: 5px;
