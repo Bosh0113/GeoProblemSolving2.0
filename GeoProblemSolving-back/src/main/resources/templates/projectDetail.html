@@ -482,7 +482,8 @@
                                                                 </p>
                                                                 <p><strong>Privacy: </strong><span id="projectPrivacy"
                                                                                                    th:text="${projectInfo.privacy}">Project privacy</span>
-                                                                    <span style="margin-left: 10px; cursor: pointer" title="Modify the permission of participants" @click="modifyPermission">
+                                                                    <span style="margin-left: 10px; cursor: pointer" title="Modify the permission of participants"
+                                                                          v-if="projectInfo.managerId == userInfo.userId" @click="modifyPermission">
                                                                        <Icon type="md-cog" size="16" color="grey"></Icon>
                                                                     </span>
                                                                 </p>
