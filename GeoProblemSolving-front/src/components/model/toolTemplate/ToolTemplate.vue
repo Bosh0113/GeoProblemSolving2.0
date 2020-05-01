@@ -29,12 +29,12 @@
 <script>
 import Avatar from "vue-avatar";
 import TemplateGeneral from "./TemplateGeneral";
-import ToolFromModel from "./ToolFromModel";
+// import ToolFromModel from "./ToolFromModel";
 export default {
   components: {
     Avatar,
     TemplateGeneral,
-    ToolFromModel,
+    // ToolFromModel,
   },
   data() {
     return {
