@@ -119,9 +119,9 @@
         <tinymce ref="editor" v-model="toolInfo.detail" :height="300" />
       </FormItem>
     </Form>
-    <Col span="8" offset="4">
+    <!-- <Col span="8" offset="4">
       <Button type="success" class="createToolBtn" long @click="createTool">Create</Button>
-    </Col>
+    </Col> -->
 
     <!-- model modal -->
     <Modal v-model="modelModal" width="1000px">
@@ -196,7 +196,7 @@
   </div>
 </template>
 <script>
-import tinymce from "./../../tinymce";
+import tinymce from "./../tinymce";
 import Avatar from "vue-avatar";
 export default {
   components: {
@@ -306,7 +306,8 @@ export default {
       selectModel: {
         name: "",
         md5: ""
-      }
+      },
+      createToolFlag:null
     };
   },
 
@@ -328,41 +329,37 @@ export default {
       this.selectModel.md5 = modelMd5;
       this.toolInfo.toolUrl = modelMd5
     },
-    createTool(){
-      console.log(this.toolInfo.toolName);
-          let createToolForm = {};
-          createToolForm["toolName"] = this.toolInfo.toolName;
-          createToolForm["description"] = this.toolInfo.description;
-          createToolForm["toolUrl"] = this.toolInfo.toolUrl;
-          createToolForm["categoryTag"] = this.toolInfo.categoryTag;
-          createToolForm["privacy"] = this.toolInfo.privacy;
-          createToolForm["detail"] = this.toolInfo.detail;
 
-          this.axios
-            .post("/GeoProblemSolving/tool/create", createToolForm)
-            .then(res => {
-              // if(res.data == "Offline"){
-              //   this.$store.commit("userLogout");
-              //   this.$router.push({ name: "Login" });
-              // }
-              // else 
-              if (res.data === "Fail") {
-                this.$Message.error("Create tool fail.");
-              } else {
-                // this.createProjectId = res.data;
-                // this.addHistoryEvent(this.createProjectId);
-                console.log(res.data);
-              }
-            })
-            .catch(err => {
-              console.log(err);
-            });
-    }
-  },
-  props: {
-    generalChange: {
-      type: Boolean
-    }
+    // createTool(){
+    //   console.log(this.toolInfo.toolName);
+    //       let createToolForm = {};
+    //       createToolForm["toolName"] = this.toolInfo.toolName;
+    //       createToolForm["description"] = this.toolInfo.description;
+    //       createToolForm["toolUrl"] = this.toolInfo.toolUrl;
+    //       createToolForm["categoryTag"] = this.toolInfo.categoryTag;
+    //       createToolForm["privacy"] = this.toolInfo.privacy;
+    //       createToolForm["detail"] = this.toolInfo.detail;
+
+    //       this.axios
+    //         .post("/GeoProblemSolving/tool/create", createToolForm)
+    //         .then(res => {
+    //           // if(res.data == "Offline"){
+    //           //   this.$store.commit("userLogout");
+    //           //   this.$router.push({ name: "Login" });
+    //           // }
+    //           // else 
+    //           if (res.data === "Fail") {
+    //             this.$Message.error("Create tool fail.");
+    //           } else {
+    //             // this.createProjectId = res.data;
+    //             // this.addHistoryEvent(this.createProjectId);
+    //             console.log(res.data);
+    //           }
+    //         })
+    //         .catch(err => {
+    //           console.log(err);
+    //         });
+    // }
   },
 
   watch: {

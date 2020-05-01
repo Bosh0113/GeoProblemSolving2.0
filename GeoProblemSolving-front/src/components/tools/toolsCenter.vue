@@ -398,111 +398,19 @@
     </Card>
 
     <Modal v-model="createToolModal" title="Create Tool" width="800" draggable scrollable >
-      <Form
-        ref="toolInfo"
-        :model="toolInfo"
-        :rules="toolInfoRule"
-        :label-width="80"
-        class="toolForm"
-      >
-        <FormItem label="Tool name:" prop="name" :label-width="140">
-          <Input v-model="toolInfo.name" placeholder="Enter the name of your tool"></Input>
-        </FormItem>
-        <FormItem label="Tool description:" prop="description" :label-width="140">
-          <Input
-            v-model="toolInfo.description"
-            type="textarea"
-            placeholder="Enter description of your tool"
-          />
-        </FormItem>
-        <FormItem label="Tool url:" prop="tool_url" :label-width="140">
-          <Input v-model="toolInfo.tool_url" placeholder="Enter the tool url of your tool"></Input>       
-        </FormItem>
-        <FormItem label="Recommended step:" prop="recomStep" :label-width="140">
-          <Select
-            v-model="toolInfo.recomStep"
-            multiple
-            placeholder="Select the recommended step of your tool"
-          >
-            <Option v-for="item in stepList" :key="item.index" :value="item">{{ item }}</Option>
-          </Select>
-        </FormItem>
-        <FormItem label="Categroy tag:" prop="categoryTag" :label-width="140">
-          <Input
-            v-model="inputToolTag"
-            placeholder="Enter some tag to classify your tools"
-            style="width: 400px"
-            @keyup.enter.native="addCreateToolTag(inputToolTag)"
-          />
-          <Button
-            icon="ios-add"
-            type="dashed"
-            size="small"
-            @click="addCreateToolTag(inputToolTag)"
-            style="margin-left:2.5%"
-          >Add tag</Button>
-          <div>
-            <Tag
-              color="primary"
-              v-for="(item,index) in this.toolInfo.categoryTag"
-              :key="index"
-              closable
-              @on-close="deleteCreateToolTag(index)"
-            >{{item}}</Tag>
-          </div>
-          <div>
-            <span>Example:</span>
-            <Tag style="cursor:default">vector</Tag>
-            <Tag style="cursor:default">raster</Tag>
-            <Tag style="cursor:default">evaluation</Tag>
-          </div>
-        </FormItem>
-        <FormItem label="Image:" prop="toolImg" :label-width="140">
-          <div class="inline_style">
-            <div class="demo-upload-list" v-if="image!=''">
-              <template>
-                <img :src="image" />
-                <div class="demo-upload-list-cover">
-                  <Icon type="ios-eye-outline" @click.native="handleView()"></Icon>
-                  <Icon type="ios-trash-outline" @click.native="handleRemove()"></Icon>
-                </div>
-              </template>
-            </div>
-            <div class="uploadBox">
-              <Icon type="ios-camera" size="20" style="position:absolute;margin:18px;"></Icon>
-              <input
-                id="choosePicture"
-                @change="uploadPhoto($event)"
-                type="file"
-                class="uploadAvatar"
-                accept="image/*"
-              />
-            </div>
-            <br />
-            <Modal title="View Image" v-model="visible">
-              <img :src="image" v-if="visible" style="width: 100%" />
-            </Modal>
-          </div>
-        </FormItem>
-        <FormItem label="Privacy:" prop="privacy" :label-width="140">
-          <RadioGroup v-model="toolInfo.privacy">
-            <Radio label="Public">Public</Radio>
-            <Radio label="Private">Private</Radio>
-          </RadioGroup>
-        </FormItem>
-      </Form>
+     <template-general @generalInfo="getGeneralInfo" ref="toolInfoRef"></template-general>
       <div slot="footer">
         <Button @click="createToolModal=false">Cancel</Button>
         <Button
           type="success"
-          @click="createTool('toolInfo')"
+          @click="createTool"
           class="create"
           :disabled="clickForbidden"
         >Create</Button>
       </div>
     </Modal>
 
-    <Modal v-model="modelListModal" title="Select Model" draggable scrollable >tst</Modal>
+    <!-- <Modal v-model="modelListModal" title="Select Model" draggable scrollable >tst</Modal> -->
 
     <Modal v-model="createToolsetModal" title="Create Toolset" width="600" :mask-closable="false">
       <Form
@@ -1019,10 +927,12 @@
 <script>
 import Avatar from "vue-avatar";
 import draggable from "vuedraggable";
+import TemplateGeneral from "./TemplateGeneral";
 export default {
   components: {
     draggable,
-    Avatar
+    Avatar,
+    TemplateGeneral
   },
   mounted() {
     this.resizeContent();
@@ -1063,7 +973,8 @@ export default {
         recomStep: [],
         categoryTag: [],
         toolImg: "",
-        privacy: "Private"
+        privacy: "Private",
+        detail:""
       },
       typeSelected: "All",
       typeOptions: [
@@ -1380,12 +1291,22 @@ export default {
       this.createToolModal = true;
       this.clickForbidden = false;
     },
-    createTool(tool) {
-      this.$refs[tool].validate(valid => {
-        if (valid) {
-          this.clickForbidden = true;
+    getGeneralInfo(form) {
+      this.toolInfo.name = form.toolName;
+      this.toolInfo.description = form.description;
+      this.toolInfo.privacy = form.privacy;
+      this.toolInfo.detail = form.detail;
+      this.toolInfo.tool_url = form.toolUrl;
+      this.toolInfo.categoryTag = form.categoryTag;
 
+    },
+    createTool() {
+       const userInfo = new Promise((resolve, reject) => {
+        return this.$refs['toolInfoRef'].$refs['toolInfo'].validate((valid) => {
+           if (valid) {
+          this.clickForbidden = true;
           let createToolForm = {};
+
           createToolForm["toolName"] = this.toolInfo.name;
           createToolForm["toolUrl"] = this.toolInfo.tool_url;
           createToolForm["modelInfo"] = {
@@ -1399,6 +1320,7 @@ export default {
           createToolForm["provider"] = this.$store.getters.userId;
           createToolForm["toolImg"] = this.toolInfo.toolImg;
           createToolForm["privacy"] = this.toolInfo.privacy;
+          createToolForm["detail"] = this.toolInfo.detail;
 
           this.axios
             .post("/GeoProblemSolving/tool/create", createToolForm)
@@ -1425,7 +1347,8 @@ export default {
             });
         } else {
         }
-      });
+        })
+      }); 
     },
     addCreateToolTag(tag) {
       if (tag != "") {

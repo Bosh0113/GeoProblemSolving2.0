@@ -101,7 +101,7 @@ const routes = [{
 { path: '/modelRecords', name: 'ModelRecords', component: resolve => (require(["@/components/model/ModelRecords"], resolve)) },
 { path: '/modelPost', name: 'ModelRecords', component: resolve => (require(["@/components/model/ModalPost"], resolve)) },
 // { path: '/toolmodel', name: 'toolTemplate', component: resolve => (require(["@/components/model/toolTemplate/ToolFromModel"], resolve)) },
-{ path: '/tooldetail', name: 'toolTemplate', component: resolve => (require(["@/components/model/toolTemplate/TemplateDetail"], resolve)) },
+// { path: '/tooldetail', name: 'toolTemplate', component: resolve => (require(["@/components/model/toolTemplate/TemplateDetail"], resolve)) },
 { path: '/toolTemplate', name: 'toolTemplate', component: resolve => (require(["@/components/model/toolTemplate/ToolTemplate"], resolve)) },
 ]
 
