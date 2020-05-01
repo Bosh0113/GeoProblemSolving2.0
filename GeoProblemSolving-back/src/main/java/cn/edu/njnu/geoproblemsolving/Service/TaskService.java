@@ -2,6 +2,7 @@ package cn.edu.njnu.geoproblemsolving.Service;
 
 import cn.edu.njnu.geoproblemsolving.Dao.CModel.*;
 import cn.edu.njnu.geoproblemsolving.Entity.ModelTools.CModel.support.JsonResult;
+import cn.edu.njnu.geoproblemsolving.Entity.ProjectEntity;
 import cn.edu.njnu.geoproblemsolving.Enums.ResultEnum;
 import cn.edu.njnu.geoproblemsolving.Exception.MyException;
 import cn.edu.njnu.geoproblemsolving.Utils.ResultUtils;
@@ -11,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -42,14 +45,36 @@ public class TaskService {
 
     @Resource
     private MongoTemplate mongoTemplate;
+    public JSONArray getAllModel(){
+        String urlStr = "http://" + managerServerIpAndPort + "/GeoModeling/taskNode/getAllServices";//获得服务容器中的所有模型
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<JSONObject> jsonObjectResponseEntity = restTemplate.getForEntity(urlStr,  JSONObject.class);
+        if (!jsonObjectResponseEntity.getStatusCode().is2xxSuccessful()) {
+            throw new MyException(ResultEnum.ERROR);
+        }
+        JSONArray result = jsonObjectResponseEntity.getBody().getJSONArray("data");
 
-    public JsonResult getComputeModel(String oid) {//根据oid获得
         ModelItemDaoImpl modelItemDao = new ModelItemDaoImpl(mongoTemplate);
-        Object computableModel = modelItemDao.readComputableModel(oid);
+        JSONArray modelList = new JSONArray();
+        for (int i = 0; i < result.size(); i++) {
+            String modelPid = result.getString(i);
+            Object computableModel = modelItemDao.readComputableModel(modelPid);
+            modelList.add(computableModel);
+        }
+
+        //获得所有的 分页
+        Query query = new Query();
+        long count = mongoTemplate.count(query, ProjectEntity.class);
+
+        return modelList;
+    }
+
+    public JsonResult getComputeModel(String pid) {//根据pid.md5获得
+
+        Object computableModel = modelItemDao.readComputableModel(pid);
 //        Object data=computableModel.getJSON;
         return ResultUtils.success(((ArrayList) computableModel).get(0));
     }
-
 
     public JSONObject createTask(String pid) {
         // 获得任务服务器

@@ -153,7 +153,6 @@ public class ToolDaoImpl implements IToolDao {
                     if (matcher.find()) {
                         pathURL = matcher.group(1);
                     }
-//                    System.out.println("图片的请求地址："+pathURL);
                     break;
                 }
             }

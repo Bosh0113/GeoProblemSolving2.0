@@ -610,11 +610,8 @@ export default {
         right: "0px",
         borderRight: "0px"
       },
-      // 原有的变量字段
-      projectInfo: {},
-      subProjectInfo: {},
+      // 原有的变量字段     
       groupInfo: {},
-      stepInfo: {},
       participants: [],
       participantsDetail: [],
       selectGroup: {
@@ -644,7 +641,6 @@ export default {
           label: "Project"
         }
       ],
-      selectItem: "Step",
       onlineParticipants: [],
       onlineUserIdList: [],
       offlineParticipants: [],
@@ -662,7 +658,6 @@ export default {
       msgR_prev: [],
       msgR_next: [],
       groupId: this.$route.query.groupID,
-      subProjectId: "",
       scopeId: "",
       scopeType: ""
     };
@@ -713,20 +708,20 @@ export default {
     },
 
     async getGroupId() {
-      let groupId = this.$route.query.groupID;
+      let groupId = this.$route.query.groupID;     
       let data = await this.axios.get(
         `/GeoProblemSolving/step/inquiry?key=stepId&value=${groupId}`
       );
-      this.subProjectId = data.data[0].subProjectId;
-      if (this.subProjectId == undefined) {
+     
+      let subProjectId = data.data[0].subProjectId;
+      if (subProjectId == undefined || subProjectId == "") {
         this.scopeId = data.data[0].projectId;
         this.scopeType = "project";
+        console.log(this.scopeId);
       } else {
-        this.scopeId = this.subProjectId;
+        this.scopeId = subProjectId;
         this.scopeType = "subproject";
       }
-
-      //  console.log(this.scopeId);
     },
 
     async getGroupInfo() {
@@ -758,13 +753,12 @@ export default {
           }
         } else if (scopeType == "project") {
           let data = await this.axios.get(
-            `/GeoProblemSolving/subProject/inquiry?key=projectId&value=${scopeId}`
+            `/GeoProblemSolving/project/inquiry?key=projectId&value=${scopeId}`
           );
           if (data.data == "Offline") {
             this.$store.commit("userLogout");
             this.$router.push({ name: "Login" });
           } else if (data.data != "None" && data.data != "Fail") {
-            // console.log(data.data[0]);
             this.$set(this, "groupInfo", data.data[0]);
             this.selectGroup.selectName = this.groupInfo.title;
             this.selectGroup.selectId = this.groupInfo.projectId;
@@ -799,8 +793,6 @@ export default {
         participantsTemp.push(data.data);
       }
       this.$set(this, "participants", participantsTemp);
-
-      console.log(this.participants);
     },
 
     send(msg) {
@@ -917,8 +909,6 @@ export default {
               let onperson = this.offlineParticipants[i];
               this.offlineParticipants.splice(i, 1); //开始位置的索引 要删除元素的个数
               this.onlineParticipants.push(onperson);
-              console.log(this.onlineParticipants);
-              console.log(this.offlineParticipants);
             }
           }
         }
@@ -997,12 +987,7 @@ export default {
       }
       this.$set(this, "msgR_datepicker", this.msgRecords[this.msgindex]); //获得选择日期的第一条记录
 
-      // this.$set(this,"msgR_prevpage",Math.ceil( this.msgindex / this.pageSize));//获取该记录之前的记录的页码数；
-      // this.$set(this,"msgR_nextpage",Math.ceil( (this.totalMsg - this.msgindex + 1 ) / this.pageSize));//获取该记录之后的记录的页码数；总数是this.msgR_prevpage+this.msgR_nextpage
-      //this.$set(this,"msgR_page",Math.ceil((this.msgindex +1) / this.pageSize));//获得记录所在页码
-
       this.msgR_page = Math.ceil(this.msgindex / this.pageSize) + 1; //获得记录所在页码
-      // console.log(this.msgindex);
       this.msgR_prev = [];
       this.msgR_next = [];
       for (let j = 0; j < this.msgRecords.length; j++) {
@@ -1012,8 +997,6 @@ export default {
           this.msgR_next.push(this.msgRecords[j]);
         }
       }
-      // console.log(this.msgR_prev);
-      // console.log(this.msgR_next);
       this.changeRecordPage(this.msgR_page);
       this.msgindex = "";
     },
@@ -1049,7 +1032,6 @@ export default {
               );
               this.currentPage = this.maxPage; //获取最后一页的聊天记录
               this.changeRecordPage(this.maxPage);
-              // console.log(this.totalMsg);
             }
           });
       }

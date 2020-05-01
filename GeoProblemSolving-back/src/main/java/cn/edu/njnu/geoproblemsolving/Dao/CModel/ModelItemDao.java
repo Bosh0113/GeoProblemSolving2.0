@@ -4,7 +4,8 @@ import com.alibaba.fastjson.JSONObject;
 
 
 public interface ModelItemDao  {
-    Object readComputableModel(String oid);
+//    JSONObject getAllModelPid();
+    Object readComputableModel(String pid);
     String updateComputableModel(JSONObject obj);
     String saveOutputLists(JSONObject lists);
 }

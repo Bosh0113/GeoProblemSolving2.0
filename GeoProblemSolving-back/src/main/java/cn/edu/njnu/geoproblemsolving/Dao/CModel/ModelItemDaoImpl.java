@@ -19,9 +19,14 @@ public class ModelItemDaoImpl implements ModelItemDao {
         this.mongoTemplate = mongoTemplate;
     }
 
+//    @Override
+//    public  JSONObject getAllModelPid(){
+//
+//    }
+
     @Override
-    public Object readComputableModel(String oid) {
-        Query query = Query.query(Criteria.where("oid").is(oid));
+    public Object readComputableModel(String pid) {
+        Query query = Query.query(Criteria.where("md5").is(pid));
         if (mongoTemplate.find(query, ModelItemEntity.class).isEmpty()) {
             return "None";
         } else {

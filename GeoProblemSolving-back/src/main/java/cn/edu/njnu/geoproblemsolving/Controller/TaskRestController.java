@@ -22,9 +22,14 @@ public class TaskRestController {
     @Autowired
     TaskService taskService;
 
-    @RequestMapping(value = "/getModelItem/{oid}",method = RequestMethod.GET)
-    public Object readProject(@PathVariable("oid") String oid) {
-        return taskService.getComputeModel(oid);
+    @RequestMapping(value = "/getAllModelPid",method = RequestMethod.GET)
+    public Object getAllModelPid() {
+        return taskService.getAllModel();
+    }
+
+    @RequestMapping(value = "/getModelItem/{pid}",method = RequestMethod.GET)
+    public Object readProject(@PathVariable("pid") String pid) {
+        return taskService.getComputeModel(pid);
     }
 
     @RequestMapping(value = "/createTask/{pid}", method = RequestMethod.GET)
@@ -64,11 +69,6 @@ public class TaskRestController {
     JsonResult getResult(@RequestBody JSONObject data) {
         return ResultUtils.success(taskService.refresh(data));
     }
-
-//    @RequestMapping(value = "/updataModelItem",method = RequestMethod.POST)
-//    JsonResult updataModelItem(@RequestBody JSONObject obj) {
-//        return ResultUtils.success(taskService.updataModelItem(obj));
-//    }
 
     @RequestMapping(value = "/addCModel",method = RequestMethod.POST)
     JsonResult addCModel(HttpServletRequest request){

@@ -13,7 +13,7 @@ import java.util.ArrayList;
 public class ToolEntity {
     private String tId;
     private String toolName;
-    private String toolUrl;
+    private String toolUrl;//stateId, oid,mdlId,模型条目？
     private JSONObject modelInfo; //stateId, oid,mdlId,模型条目？
     private String description; // 可在多个不同的toolset内，或没有dataset
     private ArrayList<String> recomStep; // step类型 or general
@@ -22,6 +22,7 @@ public class ToolEntity {
     private String privacy;
     private String toolImg;
     private String createTime;
+    private String detail;
 
     public String getTId(){
         return tId;
@@ -65,6 +66,10 @@ public class ToolEntity {
 
     public String getCreateTime() {
         return createTime;
+    }
+
+    public String getDetail() {
+        return detail;
     }
 
     @JsonProperty("tId")
@@ -111,4 +116,6 @@ public class ToolEntity {
     public void setCreateTime(String createTime) {
         this.createTime = createTime;
     }
+
+    public void setDetail(String detail) {this.detail =detail;}
 }
