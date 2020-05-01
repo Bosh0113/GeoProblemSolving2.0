@@ -163,7 +163,7 @@
 import manageTools from "./../../tools/toolToStepModal";
 import Avatar from "vue-avatar";
 export default {
-  props: ["stepInfo", "userRole"],
+  props: ["stepInfo", "userRole", "projectInfo"],
   components: {
     manageTools,
     Avatar

@@ -138,7 +138,7 @@
           <TabPane label="Tools">
             <div style="height:400px">
               <vue-scroll :ops="ops">
-                <tool-container :stepInfo="stepInfo" :userRole="userRole"></tool-container>
+                <tool-container :stepInfo="stepInfo" :userRole="userRole" :projectInfo="projectInfo"></tool-container>
               </vue-scroll>
             </div>
           </TabPane>

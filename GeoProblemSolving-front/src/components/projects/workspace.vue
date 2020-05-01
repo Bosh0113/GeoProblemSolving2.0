@@ -136,7 +136,7 @@ export default {
         operation === "project_workspace_type_manage"
       ) {
         if (
-          this.userRole == "PManager" &&
+          this.userRole == "Manager" &&
           this.projectInfo.permissionManager.project_workspace_type_manage
             .project_manager
         ) {
