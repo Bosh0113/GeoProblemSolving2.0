@@ -8,7 +8,8 @@
           <folder-tree
             :rootFolderId="subProjectInfo.subProjectId"
             :role="userRole"
-             @toolPanel="listenToolPanel"
+            :project="projectInfo"
+            @toolPanel="listenToolPanel"
             ref="folderTreeEle"
           ></folder-tree>
         </div>
@@ -22,7 +23,7 @@ export default {
   components: {
     folderTree
   },
-  props: ["subProjectInfo", "userRole"],
+  props: ["subProjectInfo", "userRole", "projectInfo"],
   data() {
     return {
       panel: null
@@ -31,12 +32,11 @@ export default {
   beforeDestroy() {
     this.panel.close();
   },
-  mounted() {
-  },
-  methods: {    
-    listenToolPanel(data){
+  mounted() {},
+  methods: {
+    listenToolPanel(data) {
       this.panel = data;
-    },
+    }
   }
 };
 </script>

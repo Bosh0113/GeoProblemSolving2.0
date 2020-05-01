@@ -104,7 +104,6 @@ canvas {
 <template>
   <div>
     <toolStyle
-      :style="{height:windowHeight+'px'}"
       :participants="participants"
       :resources="resources"
       v-on:resourceUrl="selecetResource"
@@ -591,12 +590,12 @@ export default {
             .post("/GeoProblemSolving/folder/uploadToFolder", imageForm)
             .then(res => {
               if (
-                res.data == "Size over" ||
-                res.data == "Fail" ||
-                res.data == "Offline"
-              ) {
-                console.log(res.data);
-              } else if (res.data.length > 0) {
+                res.data.sizeOver.length > 0 ||
+              res.data.failed.length > 0 ||
+              res.data == "Offline"
+            ) {
+              console.log(res.data);
+            } else if (res.data.uploaded.length > 0) {
                 that.$Notice.open({
                   title: "Upload notification title",
                   desc: "File uploaded successfully"
@@ -1294,12 +1293,12 @@ export default {
         .then(res => {
           // 写渲染函数，取到所有资源
           if (res.data !== "None") {
-            for (let i = 0; i < res.data.length; i++) {
+            for (let i = 0; i < res.data.files.length; i++) {
               if (
-                res.data[i].type == "Image" &&
-                /\.(jpg|jpeg|png|bmp|gif)$/.test(res.data[i].name.toLowerCase())
+                res.data.files[i].type == "Image" &&
+                /\.(jpg|jpeg|png|bmp|gif)$/.test(res.data.files[i].name.toLowerCase())
               ) {
-                this.resources.push(res.data[i]);
+                this.resources.push(res.data.files[i]);
               }
             }
           } else {

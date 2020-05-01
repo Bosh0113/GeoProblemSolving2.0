@@ -172,12 +172,12 @@ export default {
         .post("/GeoProblemSolving/folder/uploadToFolder", formData)
         .then(res => {
           if (
-            res.data == "Size over" ||
-            res.data == "Fail" ||
-            res.data == "Offline"
-          ) {
-            console.log(res.data);
-          } else if (res.data.length > 0) {
+            res.data.sizeOver.length > 0 ||
+              res.data.failed.length > 0 ||
+              res.data == "Offline"
+            ) {
+              console.log(res.data);
+            } else if (res.data.uploaded.length > 0) {
             let dataName = res.data[0].fileName;
 
             this.dataUrl = "/GeoProblemSolving/resource/upload/" + dataName;
@@ -426,12 +426,12 @@ export default {
         .then(res => {
           // 写渲染函数，取到所有资源
           if (res.data !== "None") {
-            for (let i = 0; i < res.data.length; i++) {
+            for (let i = 0; i < res.data.files.length; i++) {
               if (
-                res.data[i].type == "data" &&
-                /\.(xls|xlsx|csv)$/.test(res.data[i].name.toLowerCase())
+                res.data.files[i].type == "data" &&
+                /\.(xls|xlsx|csv)$/.test(res.data.files[i].name.toLowerCase())
               ) {
-                this.resources.push(res.data[i]);
+                this.resources.push(res.data.files[i]);
               }
             }
           } else {

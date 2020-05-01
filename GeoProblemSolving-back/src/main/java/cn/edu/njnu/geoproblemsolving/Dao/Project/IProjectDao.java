@@ -6,7 +6,7 @@ import cn.edu.njnu.geoproblemsolving.Entity.ProjectEntity;
 import javax.servlet.http.HttpServletRequest;
 
 public interface IProjectDao {
-    String createProject(ProjectEntity project);
+    Object createProject(ProjectEntity project);
 
     Object readProject(String key, String value);
 
@@ -30,5 +30,5 @@ public interface IProjectDao {
 
     String uploadPicture(HttpServletRequest request);
 
-    Object inquiryByPage(String category, int page, int pageSize, String userId, String[] joinedProjects);
+    Object inquiryByPage(String category, String tag, int page, int pageSize, String userId, String searchConfig, String[] joinedProjects);
 }

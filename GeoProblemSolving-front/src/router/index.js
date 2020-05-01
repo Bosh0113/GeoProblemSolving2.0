@@ -16,7 +16,7 @@ const routes = [{
     // { path: 'project/:id', name: 'ProjectDetail', component: resolve => (require(["@/components/projects/projectDetail"], resolve)) },
     // { path: 'project/:id/workspace', name: 'workspace', component: resolve => (require(["@/components/workingSpace/moduleList"], resolve)) },
     // { path: 'markdown', name: 'markDown', component: resolve => (require(["@/components/workingSpace/utils/markDown"], resolve)) },
-    
+
     // { path: 'project/workspace/contextdefinition/:id', name: 'contextDefinition', component: resolve => (require(["@/components/workingSpace/contextDefinition"], resolve)) },
     // { path: 'project/workspace/dataprocessing/:id', name: 'dataProcessing', component: resolve => (require(["@/components/workingSpace/dataProcessing"], resolve)) },
     // { path: 'project/workspace/modelprocess/:id', name: 'modelProcess', component: resolve => (require(["@/components/workingSpace/modelProcess"], resolve)) },
@@ -25,6 +25,7 @@ const routes = [{
     // { path: 'project/workspace/simulationprediction/:id', name: 'simulationPrediction', component: resolve => (require(["@/components/workingSpace/simulationPrediction"], resolve)) },
     // { path: 'project/workspace/datavisualization/:id', name: 'dataVisualization', component: resolve => (require(["@/components/workingSpace/dataVisualization"], resolve)) },
     // { path: 'project/workspace/decisionmakingandmanagement/:id', name: 'decisionMakingAndManagement', component: resolve => (require(["@/components/workingSpace/decisionMakingAndManagement"], resolve)) },
+     { path: 'project/:id/permission', name: 'permission', component: resolve => (require(["@/components/projects/permissionManager"], resolve)) },
     {
       path: 'project/:id/subproject/', name: 'subproject', component: resolve => (require(["@/components/subProject/subprojectNav"], resolve)), children: [
         { path: '', redirect: 'overview' },
@@ -74,29 +75,36 @@ const routes = [{
     { path: 'register', name: 'Register', component: resolve => (require(["@/components/userState/register"], resolve)) },
     { path: 'resetPassword/:email', name: 'resetPassword', component: resolve => (require(["@/components/userState/resetPwd"], resolve)) },
     { path: 'resourceCenter', name: 'resourceCenter', component: resolve => (require(["@/components/resources/resourceCenter"], resolve)) },
-    { path: 'toolsCenter', name: 'toolsCenter', component: resolve => (require(["@/components/tools/toolsCenter"], resolve)) }, 
-    
+    { path: 'toolsCenter', name: 'toolsCenter', component: resolve => (require(["@/components/tools/toolsCenter"], resolve)) },
+    { path: 'share', name: 'shareContainer', component: resolve => (require(["@/components/workingSpace/share/shareContainer"], resolve)) }, //share 
   ]
 },
-{ path: '/projectTypeContent/:projectId', name: 'projectTypeContent', component: resolve=>(require(["@/components/projects/toWork"],resolve)) },
-{ path: '/chat', name: 'chatUtil', component: resolve=>(require(["@/components/utils/chatroom"],resolve)) },
-{ path: '/draw', name: 'drawUtil', component: resolve=>(require(["@/components/utils/drawBoard"],resolve)) },
-{ path: '/map', name: 'mapTool', component: resolve=>(require(["@/components/utils/mapTool"],resolve)) },
-{ path: '/charts', name: 'dataCharts', component: resolve=>(require(["@/components/utils/charts"],resolve)) },
-{ path: '/nc/draw', name: 'drawUtilNC', component: resolve=>(require(["@/components/utils/singleUtils/ncDrawBoard"],resolve)) },
-{ path: '/nc/map', name: 'mapToolNC', component: resolve=>(require(["@/components/utils/singleUtils/ncMapTool"],resolve)) },
-{ path: '/nc/charts', name: 'dataChartsNC', component: resolve=>(require(["@/components/utils/singleUtils/ncCharts"],resolve)) },
-{ path: '/video', name: 'videoViewer', component: resolve=>(require(["@/components/utils/videoViewer"],resolve)) },
-{ path: '/preview', name: 'pdfViewer', component: resolve=>(require(["@/components/utils/filePreview"],resolve)) },
-{ path: '/tinymce', name: 'tinymce', component: resolve=>(require(["@/components/utils/singleUtils/tinymce"],resolve)) },
+{ path: '/projectTypeContent/:projectId', name: 'projectTypeContent', component: resolve => (require(["@/components/projects/toWork"], resolve)) },
+{ path: '/chat', name: 'chatUtil', component: resolve => (require(["@/components/utils/chatroom"], resolve)) },
+{ path: '/draw', name: 'drawUtil', component: resolve => (require(["@/components/utils/drawBoard"], resolve)) },
+{ path: '/map', name: 'mapTool', component: resolve => (require(["@/components/utils/mapTool"], resolve)) },
+{ path: '/lineChart', name: 'lineChart', component: resolve => (require(["@/components/utils/charts/lineChart"], resolve)) },
+{ path: '/basicScatter', name: 'basicScatter', component: resolve => (require(["@/components/utils/charts/basicScatter"], resolve)) },
+{ path: '/mapScatter', name: 'mapScatter', component: resolve => (require(["@/components/utils/charts/mapScatter"], resolve)) },
+{ path: '/histogram', name: 'histogram', component: resolve => (require(["@/components/utils/charts/histogram"], resolve)) },
+{ path: '/pieChart', name: 'pieChart', component: resolve => (require(["@/components/utils/charts/pieChart"], resolve)) },
+{ path: '/radarChart', name: 'radarChart', component: resolve => (require(["@/components/utils/charts/radarChart"], resolve)) },
+{ path: '/funnelChart', name: 'funnelChart', component: resolve => (require(["@/components/utils/charts/funnelChart"], resolve)) },
+{ path: '/nc/draw', name: 'drawUtilNC', component: resolve => (require(["@/components/utils/singleUtils/ncDrawBoard"], resolve)) },
+{ path: '/nc/map', name: 'mapToolNC', component: resolve => (require(["@/components/utils/singleUtils/ncMapTool"], resolve)) },
+{ path: '/nc/charts', name: 'dataChartsNC', component: resolve => (require(["@/components/utils/singleUtils/ncCharts"], resolve)) },
+{ path: '/video', name: 'videoViewer', component: resolve => (require(["@/components/utils/videoViewer"], resolve)) },
+{ path: '/preview', name: 'pdfViewer', component: resolve => (require(["@/components/utils/filePreview"], resolve)) },
+{ path: '/abseir', name: 'abSeir', component: resolve => (require(["@/components/utils/ABM-SEIR"], resolve)) },
+{ path: '/tinymce', name: 'tinymce', component: resolve => (require(["@/components/utils/singleUtils/tinymce"], resolve)) },
 { path: '/modelItem', name: 'Model', component: resolve => (require(["@/components/model/Model"], resolve)) },
 { path: '/modelRecords', name: 'ModelRecords', component: resolve => (require(["@/components/model/ModelRecords"], resolve)) },
 { path: '/modelPost', name: 'ModelRecords', component: resolve => (require(["@/components/model/ModalPost"], resolve)) },
 { path: '/toolmodel', name: 'toolTemplate', component: resolve => (require(["@/components/model/toolTemplate/ToolFromModel"], resolve)) },
 { path: '/tooldetail', name: 'toolTemplate', component: resolve => (require(["@/components/model/toolTemplate/TemplateDetail"], resolve)) },
 { path: '/toolTemplate', name: 'toolTemplate', component: resolve => (require(["@/components/model/toolTemplate/ToolTemplate"], resolve)) },
-{ path: '/tooltest', name: 'toolTemplate', component: resolve => (require(["@/components/model/toolTemplate/test"], resolve)) },
 ]
+
 export default new Router({
   routes,
   mode: 'history',

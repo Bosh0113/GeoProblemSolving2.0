@@ -24,7 +24,7 @@
     <div style="position:relative;padding:10px 10px 0 10px; margin-top:10px">
       <Breadcrumb style="display: inline-block" separator=">">
         <BreadcrumbItem><a @click="toProjectDetailPage">Project</a></BreadcrumbItem>
-        <BreadcrumbItem>Work space</BreadcrumbItem>
+        <BreadcrumbItem>Workspace</BreadcrumbItem>
       </Breadcrumb>
       <h1 id="stepType">{{stepInfo.type}}</h1>
       <step-change style="float:right" :step-info="stepInfo" :solving-process="projectInfo.solvingProcess" scope="project"></step-change>
@@ -49,7 +49,7 @@
           <Divider style="margin:10px 0" />
           <h2>Description:</h2>
           <span
-            style="font-size: larger;white-space: pre-line;word-break: break-all;"
+            style="font-size: larger;white-space: pre-line;word-break: break-word;"
           >{{stepInfo.description}}</span>
           <Divider style="margin:10px 0" />
           <h2>Members:</h2>
@@ -65,6 +65,7 @@
           :stepInfo="stepInfo"
           :userRole="userRole"
           :received-chat-msgs="receivedChatMsgs"
+          :projectInfo="projectInfo"
         ></router-view>
       </div>
     </div>
@@ -114,7 +115,8 @@ export default {
           !(
             vm.userRole == "Manager" ||
             vm.userRole == "Member" ||
-            vm.userRole == "PManager"
+            vm.userRole == "PManager" ||
+            vm.getVisitorAccess()
           )
         ) {
           vm.$Message.error("You have no property to access it");
@@ -154,12 +156,6 @@ export default {
             required: false,
             message: "Please enter description",
             trigger: "blur"
-          },
-          {
-            type: "string",
-            max: 150,
-            message: "Descript less than 150 words",
-            trigger: "blur"
           }
         ]
       },
@@ -190,6 +186,17 @@ export default {
         this.contentHeight = window.innerHeight - 175;
       } else {
         this.contentHeight = 490;
+      }
+    },
+    getVisitorAccess() {
+      let visitorPermission = this.projectInfo.permissionManager.observe
+        .visitor;
+      if (
+        this.projectInfo.permissionManager != undefined &&
+        this.userRole == "Visitor" &&
+        (visitorPermission == "All")
+      ) {
+        return true;
       }
     },
     toProjectDetailPage(){
@@ -245,7 +252,7 @@ export default {
             "/GeoProblemSolving/project/inquiry" +
             "?key=projectId" +
             "&value=" +
-            that.stepInfo.projectId,
+            this.stepInfo.projectId,
           type: "GET",
           async: false,
           success: data => {

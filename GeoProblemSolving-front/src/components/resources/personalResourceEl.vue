@@ -34,7 +34,7 @@
             </div>
             <div style="height:500px">
                 <vue-scroll :ops="ops">
-                <Table :data="userResourceList" :columns="resourceColumn" class="table" @on-selection-change="setSelectedFiles">
+                <Table :data="userResourceList" :columns="resourceColumn" class="table" @on-selection-change="setSelectedFiles" no-data-text="No data">
                     <template slot-scope="{ row }" slot="name">
                     <strong>{{ row.name }}</strong>
                     </template>

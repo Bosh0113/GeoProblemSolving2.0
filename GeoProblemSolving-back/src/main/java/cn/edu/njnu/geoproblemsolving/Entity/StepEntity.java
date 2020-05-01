@@ -18,6 +18,7 @@ public class StepEntity {
     private String subProjectId;
     private String creator;
     private String createTime;
+    private Boolean activeStatus;
     // 功能模块
     private ArrayList<String> toolList;
     private ArrayList<String> toolsetList;
@@ -26,10 +27,6 @@ public class StepEntity {
 
     public String getProjectId() {
         return projectId;
-    }
-
-    public void setProjectId(String projectId) {
-        this.projectId = projectId;
     }
 
     public String getStepId() {
@@ -60,6 +57,10 @@ public class StepEntity {
         return createTime;
     }
 
+    public Boolean getActiveStatus() {
+        return activeStatus;
+    }
+
     public ArrayList<String> getToolList() {
         return toolList;
     }
@@ -70,6 +71,10 @@ public class StepEntity {
 
     public JSONObject getContent() {
         return content;
+    }
+
+    public void setProjectId(String projectId) {
+        this.projectId = projectId;
     }
 
     public void setStepId(String stepId) {
@@ -98,6 +103,10 @@ public class StepEntity {
 
     public void setCreateTime(String createTime) {
         this.createTime = createTime;
+    }
+
+    public void setActiveStatus(Boolean activeStatus) {
+        this.activeStatus = activeStatus;
     }
 
     public void setToolList(ArrayList<String> toolList) {

@@ -9,6 +9,7 @@
     <link href="https://cdn.bootcss.com/iview/3.4.2/styles/iview.css" rel="stylesheet">
     <script src="https://cdn.bootcss.com/iview/3.4.2/iview.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue-avatar@2.1.7/dist/vue-avatar.min.js"></script>
+    <script src="/GeoProblemSolving/js/crypto-js.js"></script>
 
     <style scoped th:fragment="tab-style">
         img {
@@ -149,7 +150,7 @@
                 <i-button
                         v-show="!selectedProjectInfo.isMember&&!selectedProjectInfo.isManager && UserState && selectedProjectInfo.privacy=='Public'"
                         type="success"
-                        title="Enter project directly"
+                        title="Enter the project and check it"
                         @click="enterProject(selectedProjectInfo)"
                 >Enter</i-button>
                 <i-button
@@ -212,8 +213,6 @@
                     applyJoinModal: false,
                     // 记录已经申请的情况
                     haveApplied: false,
-                    // // 申请加入公共项目的模态框
-                    // publicApplyAssureModal: false
                     UserState:false,
                     userInfo:[],
                 }
@@ -226,7 +225,8 @@
             methods:{
                 projectInfoModalShow(projectInfo) {
                     if (projectInfo.isMember || projectInfo.isManager) {
-                        window.sessionStorage.setItem("projectInfo",JSON.stringify(projectInfo));
+                        // window.sessionStorage.setItem("projectInfo",JSON.stringify(projectInfo));
+                        window.sessionStorage.setItem("projectInfo", this.encrypto(projectInfo));
                         window.location.href="/GeoProblemSolving/projectDetail/"+projectInfo.projectId;
                     } else {
                         this.selectedProjectInfo = Object.assign({}, projectInfo);
@@ -284,12 +284,30 @@
                 },
                 joinApplyModalShow(applyProjectInfo) {
                     if (this.UserState) {
-                        this.applyProjectInfo=Object.assign([], applyProjectInfo);
+                        this.applyProjectInfo = Object.assign([], applyProjectInfo);
                         this.applyValidate.reason = "";
                         if (this.applyProjectInfo.privacy == "Public") {
-                            // 加个模态框
-                            // this.publicApplyAssureModal = true;
-                            this.applyJoinModal = true;
+                            if(this.applyProjectInfo.permissionManager != undefined && this.applyProjectInfo.permissionManager.auto_join.visitor) {
+
+                                // join the project directly
+                                this.axios
+                                    .get("/GeoProblemSolving/project/join"+"projectId"+  this.applyProjectInfo.projectId+"&userId" +this.userInfo.userId)
+                                    .then(res => {
+                                        if (res.data === "Success") {
+                                            this.$Message.info("Join the project successfuly");
+
+                                            window.location.href="/GeoProblemSolving/projectDetail/" + this.applyProjectInfo.projectId;
+                                        } else if (res.data === "Fail") {
+                                            this.$Message.info("Fail to join in this project");
+                                        }
+                                    })
+                                    .catch(err => {
+                                        console.log(err.data);
+                                    });
+                            }
+                            else {
+                                this.applyJoinModal = true;
+                            }
                         } else if (this.applyProjectInfo.privacy == "Discoverable") {
                             this.applyJoinModal = true;
                         }
@@ -297,7 +315,6 @@
                         window.location.href = "/GeoProblemSolving/login";
                     }
                 },
-
                 joinApply(name) {
                     this.$refs[name].validate(valid => {
                         if (valid) {
@@ -390,16 +407,32 @@
                         }
                     });
                 },
-
                 login() {
                     window.location.href="/GeoProblemSolving/login"
                 },
-
                 enterProject(projectInfo) {
-                    window.sessionStorage.setItem("projectInfo",JSON.stringify(projectInfo));
-                    window.location.href="/GeoProblemSolving/projectDetail/"+projectInfo.projectId;
+                    // window.sessionStorage.setItem("projectInfo",JSON.stringify(projectInfo));
+                    if(this.applyProjectInfo.permissionManager == undefined || this.applyProjectInfo.permissionManager.observe.visitor != "No") {
+                        window.sessionStorage.setItem("projectInfo", this.encrypto(projectInfo));
+                        window.location.href="/GeoProblemSolving/projectDetail/"+projectInfo.projectId;
+                    }
                 },
-
+                encrypto(context) {
+                    var key = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
+                    var iv = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
+                    var encrypted = "";
+                    if (typeof context == "string") {
+                    } else if (typeof context == "object") {
+                        context = JSON.stringify(context);
+                    }
+                    var srcs = CryptoJS.enc.Utf8.parse(context);
+                    encrypted = CryptoJS.AES.encrypt(srcs, key, {
+                        iv: iv,
+                        mode: CryptoJS.mode.CBC,
+                        padding: CryptoJS.pad.Pkcs7
+                    });
+                    return encrypted.toString();
+                }
             }
         });
 

@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Collaborative mindmap tool - Powered by KityMinder-Editor</title>
+
+    <link href="../favicon.ico" type="image/x-icon" rel="shortcut icon">
+
+    <!-- bower:css -->
+    <link rel="stylesheet" href="../bower_components/bootstrap/dist/css/bootstrap.css" />
+    <link rel="stylesheet" href="../bower_components/codemirror/lib/codemirror.css" />
+    <link rel="stylesheet" href="../bower_components/hotbox/hotbox.css" />
+    <link rel="stylesheet" href="../node_modules/kityminder-core/dist/kityminder.core.css" />
+    <link rel="stylesheet" href="../bower_components/color-picker/dist/color-picker.css" />
+    <!-- endbower -->
+
+    <link rel="stylesheet" href="kityminder.editor.css">
+    <link rel="stylesheet" href="../css/style.css">
+
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        h1.editor-title {
+            background: #393F4F;
+            color: white;
+            margin: 0;
+            height: 40px;
+            font-size: 14px;
+            line-height: 40px;
+            font-family: 'Hiragino Sans GB', 'Arial', 'Microsoft Yahei';
+            font-weight: normal;
+            padding: 0 20px;
+        }
+
+        .nav-bar {
+            background: #57a3f3
+        }
+
+        #collaPanel {
+            position: relative;
+            display: -ms-flexbox;
+            -ms-flex-direction: column;
+            flex-direction: column;
+            min-width: 0;
+            word-wrap: break-word;
+            background-color: #fff;
+            background-clip: border-box;
+            border: 1px solid rgba(0, 0, 0, .125);
+            border-radius: .25rem;
+            padding: 0 10px;
+            margin-right: 15px;
+        }
+    </style>
+</head>
+
+<body ng-app="kityminderDemo" ng-controller="MainController">
+    <h1 class="editor-title">Collaborative mindmap tool <span style="font-size: 10px;"> - Powered by
+            KityMinder-Editor</span> <span style="float: right;">Note: Before editing the mind map, please login.</span></h1>
+    <kityminder-editor on-init="initEditor(editor, minder)"></kityminder-editor>
+    <div id="loading">
+        <div class="circle"></div>
+        <div class="circle"></div>
+        <div class="circle"></div>
+    </div>
+</body>
+
+<!-- bower:js -->
+<script src="../bower_components/jquery/dist/jquery.js"></script>
+<script src="../bower_components/bootstrap/dist/js/bootstrap.js"></script>
+<script src="../bower_components/angular/angular.js"></script>
+<script src="../bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+<script src="../bower_components/codemirror/lib/codemirror.js"></script>
+<script src="../bower_components/codemirror/mode/xml/xml.js"></script>
+<script src="../bower_components/codemirror/mode/javascript/javascript.js"></script>
+<script src="../bower_components/codemirror/mode/css/css.js"></script>
+<script src="../bower_components/codemirror/mode/htmlmixed/htmlmixed.js"></script>
+<script src="../bower_components/codemirror/mode/markdown/markdown.js"></script>
+<script src="../bower_components/codemirror/addon/mode/overlay.js"></script>
+<script src="../bower_components/codemirror/mode/gfm/gfm.js"></script>
+<script src="../bower_components/angular-ui-codemirror/ui-codemirror.js"></script>
+<script src="../bower_components/marked/lib/marked.js"></script>
+<script src="./node_modules/kity/dist/kity.js"></script>
+<script src="../bower_components/hotbox/hotbox.js"></script>
+<script src="../bower_components/json-diff/json-diff.js"></script>
+<script src="./node_modules/kityminder-core/dist/kityminder.core.js"></script>
+<script src="../bower_components/color-picker/dist/color-picker.js"></script>
+<script src="../bower_components/seajs/dist/sea.js"></script>
+<script src="../bower_components/angular/angular.js"></script>
+<script src="../bower_components/angular-websocket/dist/angular-websocket.js"></script>
+<!-- endbower -->
+
+<script src="kityminder.editor.js"></script>
+
+<script>
+    // 'use strict';
+
+    // 思维导图ID，标注唯一性
+    var mindmapInfo = {};
+
+    var app = angular.module('kityminderDemo', ['kityminderEditor', 'ngWebSocket']);
+
+    app.factory('RouteInfo', function () {
+
+        var pageId = "", userId = "", userName = "", resourceId = "";
+
+        var href = window.location.href;
+        var url = href.split('&');
+        var IP_Port = window.location.host;
+        if (IP_Port == "localhost:8080" || IP_Port == "localhost:3000") {
+            IP_Port = "localhost:8081";
+        }
+
+        for (var i = 0; i < url.length; i++) {
+
+            try {
+                if (/groupID/.test(url[i])) {
+                    pageId = url[i].match(/groupID=(\S*)/)[1];
+                    continue;
+                }
+            } catch (err) {
+            }
+
+            try {
+                if (/userID/.test(url[i])) {
+                    userId = url[i].match(/userID=(\S*)/)[1];
+                    continue;
+                }
+            } catch (err) {
+            }
+
+            try {
+                if (/userName/.test(url[i])) {
+                    userName = url[i].match(/userName=(\S*)/)[1];
+                    continue;
+                }
+            } catch (err) {
+            }
+
+            try {
+                if (/resourceID/.test(url[i])) {
+                    resourceId = url[i].match(/resourceID=(\S*)/)[1];
+                    continue;
+                }
+            } catch (err) {
+            }
+        }
+
+        var methods = {
+            getInfo: function () {
+                var info = {
+                    "userId": userId,
+                    "userName": userName,
+                    "pageId": pageId,
+                    "resourceId": resourceId
+                }
+                return info;
+            },
+            getIPPort: function () {
+                return IP_Port;
+            }
+        }
+
+        return methods;
+    });
+
+    app.factory('Messages', function ($websocket, RouteInfo) {
+
+        var connection = false;
+        var msgType = "";
+        var map_callback = null;
+        var collab_callback = null;
+        var dataStream = null;
+        // var msgData = {};
+
+        function isConnection() {
+            return connection;
+        }
+
+        function startWebsocket(roomId) {
+
+            var wsUrl = "ws://" + RouteInfo.getIPPort() + "/GeoProblemSolving/Mindmap/" + roomId;
+            // var wsUrl = "ws://localhost:8081/GeoProblemSolving/Mindmap/" + roomId;
+            dataStream = $websocket(wsUrl);
+
+            dataStream.onOpen(function (msg) {
+                console.log("Websocket open..");
+                connection = true;
+            });
+
+            dataStream.onMessage(function (msg) {
+                recieveMsg(msg.data);
+                connection = true;
+            });
+
+            dataStream.onClose(function (msg) {
+                console.log("Websocket close..");
+                connection = false;
+            });
+
+            dataStream.onError(function (msg) {
+                console.log("Websocket error..");
+                connection = false;
+            });
+        }
+
+        function sendSock(type, agentData, callback) {
+
+            if (type == "collaboration") {
+                msgType = type;
+                collab_callback = callback;
+            }
+            else if (type == "mindmap" || type == "ping") {
+                msgType = type;
+                map_callback = callback;
+            }
+
+
+            if (dataStream.readyState === 1) {
+                // 若是ws开启状态
+                sendMsg(agentData)
+            } else if (dataStream.readyState === dataStream.CONNECTING) {
+                // 若是 正在开启状态，则等待1s后重新调用
+                setTimeout(function () {
+                    sendSock(type, agentData, callback);
+                }, 1000);
+            } else {
+                // 若未开启 ，则等待1s后重新调用
+                setTimeout(function () {
+                    sendSock(type, agentData, callback);
+                }, 1000);
+            }
+        }
+
+        function recieveMsg(msg) {
+            var data = JSON.parse(msg);
+
+            if (map_callback != null && map_callback != undefined) {
+                map_callback(data);
+            }
+            if (collab_callback != null && collab_callback != undefined) {
+                collab_callback(data);
+            }
+        }
+
+        function sendMsg(data) {
+            dataStream.send(JSON.stringify(data));
+        }
+
+        function endWebsocket() {
+            dataStream.close();
+        }
+
+        var methods = {
+            isConnection: isConnection,
+            // msgData: msgData,
+            startWebsocket: startWebsocket,
+            sendSock: sendSock,
+            endWebsocket: endWebsocket
+        };
+
+        return methods;
+    });
+
+    app.controller('MainController', function ($scope) {
+
+        $scope.initEditor = function (editor, minder) {
+            window.editor = editor;
+            window.minder = minder;
+        };
+    });
+
+</script>
+
+</html>

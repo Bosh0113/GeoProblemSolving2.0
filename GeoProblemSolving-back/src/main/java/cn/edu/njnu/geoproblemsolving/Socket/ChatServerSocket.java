@@ -130,11 +130,13 @@ public class ChatServerSocket {
         String message = messageObject.toString();
 
         for (Map.Entry<String, Session> server : rooms.get(roomId).entrySet()) {
+//            if (userId.equals(server.getKey())) {
                 try {
                     server.getValue().getBasicRemote().sendText(message);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+//            }
         }
     }
 
@@ -168,7 +170,7 @@ public class ChatServerSocket {
         String message = messageObject.toString();
 
         for (Map.Entry<String, Session> server : rooms.get(roomId).entrySet()) {
-//            if (userId.equals(server.getKey())) {
+//            if (!userId.equals(server.getKey())) {
                 try {
                     server.getValue().getBasicRemote().sendText(message);
                 } catch (Exception e) {

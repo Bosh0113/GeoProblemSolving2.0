@@ -36,6 +36,8 @@ public class UserDaoImpl implements IUserDao {
         Query queryEmail = Query.query(Criteria.where("email").is(user.getEmail()));
         if (!mongoTemplate.find(queryEmail, UserEntity.class).isEmpty()) {
             return "Email";
+//        } else if (!mongoTemplate.find(queryPhone, UserEntity.class).isEmpty()) {
+//            return "MobilePhone";mongodb
         } else {
             mongoTemplate.save(user);
             return user.getUserId();

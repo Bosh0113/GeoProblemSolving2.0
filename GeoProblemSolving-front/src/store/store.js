@@ -8,7 +8,7 @@ export default new Vuex.Store({
         //data
         userInfo: {
             userState: false,
-            userName: 'visitor',
+            userName: 'Visitor',
             userId: '',
             avatar: '',
         },
@@ -73,7 +73,7 @@ export default new Vuex.Store({
         userLogout: (state) => {
             state.userInfo = {
                 userState: false,
-                userName: 'visitor',
+                userName: 'Visitor',
                 userId: '',
                 avatar: '',
             };
@@ -88,12 +88,25 @@ export default new Vuex.Store({
             state.userInfo = userInfo;
         },
         setProjectInfo: (state, project) => {
-            sessionStorage.setItem("projectInfo",JSON.stringify(project));
             state.project = project;
+
+            // sessionStorage.setItem("projectInfo", JSON.stringify(project));
+            var CryptoJS = require("crypto-js");
+            var key = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
+            var iv = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
+            var context = JSON.stringify(project);
+            var srcs = CryptoJS.enc.Utf8.parse(context);
+            var encrypted = CryptoJS.AES.encrypt(srcs, key, {
+                iv: iv,
+                mode: CryptoJS.mode.CBC,
+                padding: CryptoJS.pad.Pkcs7
+            });
+            sessionStorage.setItem("projectInfo", encrypted.toString());
+
         },
         setSubProjectInfo: (state, subProject) => {
-            sessionStorage.setItem("subProjectInfo",JSON.stringify(subProject));
+            sessionStorage.setItem("subProjectInfo", JSON.stringify(subProject));
             state.subProject = subProject;
         }
-    },
+    }
 })

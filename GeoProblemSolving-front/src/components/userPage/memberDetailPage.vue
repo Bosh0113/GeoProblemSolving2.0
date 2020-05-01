@@ -17,41 +17,83 @@
                   v-else>
                 </avatar>
               </div>
-              <div class="single-info" :title="`Name: `+ userDetail.userName">
-                <Icon type="ios-contact-outline" :size="20"/>
-                <span>{{userDetail.userName}}</span>
-              </div>
+              <div
+                style="margin-top: 10px; border:1px solid lightgray;border-radius: 4px;padding:10px"
+              >
+                <div class="single-info" :title="`Name: `+ userDetail.userName">
+                  <span class="profileInfo">
+                    <Icon type="ios-contact-outline" :size="20" />
+                    {{userDetail.userName}}
+                  </span>
+                </div>
                 <div class="single-info" :title="`Email:  ` + userDetail.email">
-                  <!-- <span>email:</span> -->
-                  <Icon type="ios-mail-outline" :size="20"/>
-                  <span>{{userDetail.email}}</span>
+                  <span class="profileInfo">
+                    <Icon type="ios-mail-outline" :size="20" />
+                    {{userDetail.email}}
+                  </span>
                 </div>
-                <div class="single-info" v-show="userDetail.mobilePhone!=''" :title="`Phone:  `+ userDetail.mobilePhone ">
-                  <Icon type="ios-call-outline" :size="20"/>
-                  <span>{{userDetail.mobilePhone}}</span>
+                <div class="single-info"  :title="`Phone number:  ` + userDetail.mobilePhone" v-show="userDetail.mobilePhone!=''">
+                  <span class="profileInfo">
+                    <Icon type="ios-call-outline" :size="20" />
+                    {{userDetail.mobilePhone}}
+                  </span>
                 </div>
-                <div class="single-info" :title="`Job Title:  `+userDetail.jobTitle">
-                  <Icon type="ios-hammer-outline" :size="20"/>
-                  <span>{{userDetail.jobTitle}}</span>
+                <div class="single-info" :title="`Title:  `+userDetail.jobTitle">
+                  <span class="profileInfo">
+                    <Icon type="ios-school-outline" :size="20" />
+                    {{userDetail.jobTitle}}
+                  </span>
                 </div>
-                <div class="single-info" v-show="userDetail.city!=''&&userDetail.country!=''" :title="`Position:  `+ userDetail.city + ' ' + userDetail.country">
-                  <Icon type="ios-compass-outline" :size="20"/>
-                  <span>{{userDetail.country}}&nbsp{{userDetail.city}}</span>
+                <div
+                  class="single-info"
+                  :title="`Location:  `+ userDetail.city +`, `+ userDetail.country"
+                  v-show="userDetail.city!=''&&userDetail.country!=''"
+                >
+                  <span class="profileInfo">
+                    <Icon type="ios-compass-outline" :size="20" />
+                    <span>{{userDetail.city}}</span>
+                    <span>&nbsp{{userDetail.country}}</span>
+                  </span>
                 </div>
-                <div class="single-info" v-show="userDetail.organization!=''" :title="`Organization:  `+ userDetail.organization" style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis">
-                  <Icon type="ios-home-outline" :size="20"/>
-                  <span> {{userDetail.organization}}</span>
+                <div
+                  class="single-info"
+                  :title="`Organization:  `+ userDetail.organization"
+                  v-show="userDetail.organization!=''"
+                  style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis"
+                >
+                  <span class="profileInfo">
+                    <Icon type="ios-home-outline" :size="20" />
+                    {{userDetail.organization}}
+                  </span>
                 </div>
-                <div class="single-info" v-show="userDetail.direction!=''" :title="`Direction:  `+ userDetail.direction" style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis">
-                  <Icon type="ios-contract" :size="20"/>
-                  <span> {{userDetail.direction}}</span>
+                <div
+                  class="single-info"
+                  :title="`Area of interest:  `+ userDetail.direction"
+                  v-show="userDetail.direction!=''"
+                  style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis"
+                >
+                  <span class="profileInfo">
+                    <Icon type="ios-contract" :size="20" />
+                    {{userDetail.direction}}
+                  </span>
                 </div>
-                <div class="single-info" v-show="userDetail.homePage!=''" :title="`Home Page:  `+ userDetail.homePage" style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis">
-                  <Icon type="md-link" :size="20"/>
-                  <span> {{userDetail.homePage}}</span>
-                <br>
-                <div style="padding:20px 20px 0 20px;font-size:12px;text-indent:2em;border:1px dotted lightgray;white-space: pre-line;" v-show="userDetail.introduction!=''">
-                  {{this.userDetail.introduction}}
+                <div
+                  class="single-info"
+                  :title="`Home Page:  `+ userDetail.homePage"
+                  v-show="userDetail.homePage!=''"
+                  style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis"
+                >
+                  <span class="profileInfo">
+                    <Icon type="md-link" :size="20" />
+                    {{userDetail.homePage}}
+                  </span>
+                </div>
+                <div
+                  style="word-break: break-word;padding:10px;font-size:12px;border:1px dotted lightgray;white-space: pre-line;height: 120px;"
+                  title="Introduction"
+                  v-show="userDetail.introduction!=''"
+                >
+                  <vue-scroll :ops="ops">{{userDetail.introduction}}</vue-scroll>
                 </div>
               </div>
             </div>
@@ -219,7 +261,8 @@ body {
   margin-top: 20px;
   width: 100%;
   max-height: 100%;
-  text-align: center;
+  text-align: center;  
+  background-color:#d3d3d333;
 }
 .u_img {
   max-width: 100%;
@@ -233,6 +276,14 @@ body {
   height: 30px;
   font-size: 12px;
   line-height: 15px;
+}
+
+.profileInfo {
+  overflow: hidden;
+  word-break: break-word;
+  white-space: nowrap;
+  display: block;
+  text-overflow: ellipsis;
 }
 .userDescription {
   height: auto;

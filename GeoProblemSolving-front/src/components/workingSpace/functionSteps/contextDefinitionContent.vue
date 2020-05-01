@@ -5,15 +5,15 @@
     <Collapse simple v-model="unfold">
       <Panel name="context">
         Problem context
-        <context-info slot="content" :stepInfo="stepInfo" :userRole="userRole"></context-info>
+        <context-info slot="content" :stepInfo="stepInfo" :userRole="userRole" :projectInfo="projectInfo"></context-info>
       </Panel>
       <Panel name="data">
         Resource list
-        <data-list slot="content" :stepInfo="stepInfo" :userRole="userRole" @dataBehavior="listenDatalist"></data-list>
+        <data-list slot="content" :stepInfo="stepInfo" :userRole="userRole" :projectInfo="projectInfo" @dataBehavior="listenDatalist"></data-list>
       </Panel>
-      <Panel name="tool">
+      <Panel name="tool" v-show="stepInfo.activeStatus">
         Toolbox
-        <tool-container slot="content" :stepInfo="stepInfo" :userRole="userRole" @toolBehavior="listenToolbox" @toolPanel="listenToolPanel"></tool-container>
+        <tool-container slot="content" :stepInfo="stepInfo" :userRole="userRole" :projectInfo="projectInfo" @toolBehavior="listenToolbox" @toolPanel="listenToolPanel"></tool-container>
       </Panel>
     </Collapse>
     <message-panel :stepInfo="stepInfo" :received-chat-msgs="receivedChatMsgs" :operation-records="operationRecords"></message-panel>
@@ -34,7 +34,7 @@ export default {
     messagePanel,
     contextInfo
   },
-  props: ["stepInfo", "userRole", "receivedChatMsgs"],
+  props: ["stepInfo", "userRole", "receivedChatMsgs","projectInfo"],
   data() {
     return {
       unfold: ["context","tool", "data"],
@@ -97,7 +97,7 @@ export default {
       this.setTimer();
     },
     onOpen() {
-      console.log("NoticeSocket连接成功！");
+      console.log("StepSocket连接成功！");
     },
     onMessage(e) {
       if (e.data == "Notice") {

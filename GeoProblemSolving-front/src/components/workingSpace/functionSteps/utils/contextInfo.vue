@@ -13,22 +13,24 @@
       <div style="margin: 0 20px">
         <div style="margin-bottom:20px">
           <span style="font-size:12px;font-weight:bold">Problem boundary</span>
-          <Icon
-            v-if="!edit1"
-            type="ios-create"
-            :size="18"
-            style="float:right;cursor:pointer"
-            title="Edit"
-            @click="editBoundary"
-          />
-          <Icon
-            v-else
-            type="md-checkbox-outline"
-            :size="18"
-            style="float:right;cursor:pointer"
-            title="Complete"
-            @click="editBoundary"
-          />
+          <div v-show="stepInfo.activeStatus" v-if="permissionIdentity('workspace_edit')">
+            <Icon
+              v-if="!edit1"
+              type="ios-create"
+              :size="18"
+              style="float:right;cursor:pointer"
+              title="Edit"
+              @click="editBoundary"
+            />
+            <Icon
+              v-else
+              type="md-checkbox-outline"
+              :size="18"
+              style="float:right;cursor:pointer"
+              title="Complete"
+              @click="editBoundary"
+            />
+          </div>
           <Divider style="margin:5px 0; background:lightblue" />
           <div v-if="!edit1" class="subProjectDesc" style="overflow-y:auto">{{contextForm.boundary}}</div>
           <template v-else>
@@ -43,22 +45,24 @@
         </div>
         <div style="margin-bottom:20px">
           <span style="font-size:12px;font-weight:bold">Spatiotemporal scale</span>
-          <Icon
-            v-if="!edit2"
-            type="ios-create"
-            :size="18"
-            style="float:right;cursor:pointer"
-            title="Edit"
-            @click="editScale"
-          />
-          <Icon
-            v-else
-            type="md-checkbox-outline"
-            :size="18"
-            style="float:right;cursor:pointer"
-            title="Complete"
-            @click="editScale"
-          />
+          <div v-show="stepInfo.activeStatus" v-if="permissionIdentity('workspace_edit')">
+            <Icon
+              v-if="!edit2"
+              type="ios-create"
+              :size="18"
+              style="float:right;cursor:pointer"
+              title="Edit"
+              @click="editScale"
+            />
+            <Icon
+              v-else
+              type="md-checkbox-outline"
+              :size="18"
+              style="float:right;cursor:pointer"
+              title="Complete"
+              @click="editScale"
+            />
+          </div>
           <Divider style="margin:5px 0; background:lightblue" />
           <div v-if="!edit2" class="subProjectDesc" style="overflow-y:auto">{{contextForm.scale}}</div>
           <template v-else>
@@ -73,22 +77,24 @@
         </div>
         <div style="margin-bottom:20px">
           <span style="font-size:12px;font-weight:bold">Main methods</span>
-          <Icon
-            v-if="!edit3"
-            type="ios-create"
-            :size="18"
-            style="float:right;cursor:pointer"
-            title="Edit"
-            @click="editMethods"
-          />
-          <Icon
-            v-else
-            type="md-checkbox-outline"
-            :size="18"
-            style="float:right;cursor:pointer"
-            title="Complete"
-            @click="editMethods"
-          />
+          <div v-show="stepInfo.activeStatus" v-if="permissionIdentity('workspace_edit')">
+            <Icon
+              v-if="!edit3"
+              type="ios-create"
+              :size="18"
+              style="float:right;cursor:pointer"
+              title="Edit"
+              @click="editMethods"
+            />
+            <Icon
+              v-else
+              type="md-checkbox-outline"
+              :size="18"
+              style="float:right;cursor:pointer"
+              title="Complete"
+              @click="editMethods"
+            />
+          </div>
           <Divider style="margin:5px 0; background:lightblue" />
           <div v-if="!edit3" class="subProjectDesc" style="overflow-y:auto">{{contextForm.methods}}</div>
           <template v-else>
@@ -103,22 +109,24 @@
         </div>
         <div style="margin-bottom:20px">
           <span style="font-size:12px;font-weight:bold">Goals and purposes</span>
-          <Icon
-            v-if="!edit4"
-            type="ios-create"
-            :size="18"
-            style="float:right;cursor:pointer"
-            title="Edit"
-            @click="editPurposes"
-          />
-          <Icon
-            v-else
-            type="md-checkbox-outline"
-            :size="18"
-            style="float:right;cursor:pointer"
-            title="Complete"
-            @click="editPurposes"
-          />
+          <div v-show="stepInfo.activeStatus" v-if="permissionIdentity('workspace_edit')">
+            <Icon
+              v-if="!edit4"
+              type="ios-create"
+              :size="18"
+              style="float:right;cursor:pointer"
+              title="Edit"
+              @click="editPurposes"
+            />
+            <Icon
+              v-else
+              type="md-checkbox-outline"
+              :size="18"
+              style="float:right;cursor:pointer"
+              title="Complete"
+              @click="editPurposes"
+            />
+          </div>
           <Divider style="margin:5px 0; background:lightblue" />
           <div v-if="!edit4" class="subProjectDesc" style="overflow-y:auto">{{contextForm.purposes}}</div>
           <template v-else>
@@ -133,22 +141,24 @@
         </div>
         <div style="margin-bottom:20px">
           <span style="font-size:12px;font-weight:bold">Difficulties or limitations</span>
-          <Icon
-            v-if="!edit5"
-            type="ios-create"
-            :size="18"
-            style="float:right;cursor:pointer"
-            title="Edit"
-            @click="editLimitations"
-          />
-          <Icon
-            v-else
-            type="md-checkbox-outline"
-            :size="18"
-            style="float:right;cursor:pointer"
-            title="Complete"
-            @click="editLimitations"
-          />
+          <div v-show="stepInfo.activeStatus" v-if="permissionIdentity('workspace_edit')">
+            <Icon
+              v-if="!edit5"
+              type="ios-create"
+              :size="18"
+              style="float:right;cursor:pointer"
+              title="Edit"
+              @click="editLimitations"
+            />
+            <Icon
+              v-else
+              type="md-checkbox-outline"
+              :size="18"
+              style="float:right;cursor:pointer"
+              title="Complete"
+              @click="editLimitations"
+            />
+          </div>
           <Divider style="margin:5px 0; background:lightblue" />
           <div
             v-if="!edit5"
@@ -167,22 +177,24 @@
         </div>
         <div style="margin-bottom:20px">
           <span style="font-size:12px;font-weight:bold">Supplementary information</span>
-          <Icon
-            v-if="!edit6"
-            type="ios-create"
-            :size="18"
-            style="float:right;cursor:pointer"
-            title="Edit"
-            @click="editOthers"
-          />
-          <Icon
-            v-else
-            type="md-checkbox-outline"
-            :size="18"
-            style="float:right;cursor:pointer"
-            title="Complete"
-            @click="editOthers"
-          />
+          <div v-show="stepInfo.activeStatus" v-if="permissionIdentity('workspace_edit')">
+            <Icon
+              v-if="!edit6"
+              type="ios-create"
+              :size="18"
+              style="float:right;cursor:pointer"
+              title="Edit"
+              @click="editOthers"
+            />
+            <Icon
+              v-else
+              type="md-checkbox-outline"
+              :size="18"
+              style="float:right;cursor:pointer"
+              title="Complete"
+              @click="editOthers"
+            />
+          </div>
           <Divider style="margin:5px 0; background: lightblue" />
           <div v-if="!edit6" class="subProjectDesc" style="overflow-y:auto">{{contextForm.others}}</div>
           <template v-else>
@@ -201,7 +213,7 @@
 </template>
 <script>
 export default {
-  props: ["stepInfo", "userRole"],
+  props: ["stepInfo", "userRole", "projectInfo"],
   data() {
     return {
       scrollOps: {
@@ -254,6 +266,29 @@ export default {
     }
   },
   methods: {
+    permissionIdentity(operation) {
+      if (
+        this.projectInfo.permissionManager != undefined &&
+        operation === "workspace_edit"
+      ) {
+        if (
+          this.userRole == "PManager" &&
+          this.projectInfo.permissionManager.workspace_edit.project_manager
+        ) {
+          return true;
+        } else if (
+          this.userRole == "Manager" &&
+          this.projectInfo.permissionManager.workspace_edit.subproject_manager
+        ) {
+          return true;
+        } else if (
+          this.userRole == "Member" &&
+          this.projectInfo.permissionManager.workspace_edit.member
+        ) {
+          return true;
+        }
+      }
+    },
     getContext() {
       this.axios
         .get(
@@ -266,7 +301,9 @@ export default {
           if (res.data != "Fail") {
             if (JSON.stringify(res.data[0].content) != "{}") {
               this.contextForm = res.data[0].content;
-              this.originalContext = JSON.parse(JSON.stringify(res.data[0].content));
+              this.originalContext = JSON.parse(
+                JSON.stringify(res.data[0].content)
+              );
             }
           } else {
             this.$Notice.info({

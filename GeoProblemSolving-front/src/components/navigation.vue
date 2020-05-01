@@ -72,6 +72,13 @@ footer {
   color: white;
   font-size: 0.8em;
 }
+.menuItemCell{
+  font-weight: 900;
+}
+.menuItemCell:hover {
+  background-color: #808695;
+  color: white;
+}
 </style>
 <template>
   <div class="container">
@@ -176,36 +183,19 @@ footer {
           <Dropdown style="position: fixed;top: 10px;right: 20px;">
             <Button icon="md-menu" style="color: white;background-color: #808695"></Button>
             <DropdownMenu slot="list">
-              <DropdownItem>
-                <a href="/GeoProblemSolving/home">Home</a>
-              </DropdownItem>
-              <DropdownItem>
-                <a href="/GeoProblemSolving/projectlist">Projects</a>
-              </DropdownItem>
-              <DropdownItem>
-                <a href="/GeoProblemSolving/publicResource">Resources</a>
-              </DropdownItem>
-              <DropdownItem>
-                <a href="/GeoProblemSolving/toolsCenter">Tools</a>
-              </DropdownItem>
-              <DropdownItem>
-                <a href="/GeoProblemSolving/help">Help</a>
-              </DropdownItem>
-              <DropdownItem v-show="!userState">
-                <a href="/GeoProblemSolving/login">Login</a>
-              </DropdownItem>
-              <DropdownItem v-show="!userState">
-                <a href="/GeoProblemSolving/register">Sign up</a>
-              </DropdownItem>
-              <DropdownItem v-show="userState">
-                <a href="/GeoProblemSolving/notifications">Notification</a>
-              </DropdownItem>
-              <DropdownItem v-show="userState">
-                <a @click="toPersonalPage">Personal Page</a>
-              </DropdownItem>
-              <DropdownItem v-show="userState">
-                <a @click="logout">Log out</a>
-              </DropdownItem>
+              <CellGroup style="width:200px">
+                <Cell @click.native="turnToURL('/GeoProblemSolving/home')" class="menuItemCell">Home</Cell>
+                <Cell @click.native="turnToURL('/GeoProblemSolving/projectlist')" class="menuItemCell">Projects</Cell>
+                <Cell @click.native="turnToURL('/GeoProblemSolving/publicResource')" class="menuItemCell">Resources</Cell>
+                <Cell @click.native="turnToURL('/GeoProblemSolving/toolsCenter')" class="menuItemCell">Tools</Cell>
+                <Cell @click.native="turnToURL('/GeoProblemSolving/help')" class="menuItemCell">Help</Cell>
+                <Divider style="margin: 5px 0"/>
+                <Cell v-show="!userState" @click.native="turnToURL('/GeoProblemSolving/login')" class="menuItemCell">Login</Cell>
+                <Cell v-show="!userState" @click.native="turnToURL('/GeoProblemSolving/register')" class="menuItemCell">Sign up</Cell>
+                <Cell  v-show="userState" @click.native="turnToURL('/GeoProblemSolving/notifications')" class="menuItemCell">Notification</Cell>
+                <Cell  v-show="userState" @click.native="toPersonalPage" class="menuItemCell">Personal Page</Cell>
+                <Cell  v-show="userState" @click.native="logout" class="menuItemCell">Log out</Cell>
+              </CellGroup>
             </DropdownMenu>
           </Dropdown>
         </div>
@@ -218,7 +208,7 @@ footer {
       <h2 class="footerTop">
         <i>Open Geographic Modeling and Simulation</i>
       </h2>
-      <p class="footerBottom">Copyright © 2013-2019 OpenGMS. All rights reserved.</p>
+      <p class="footerBottom">Copyright © 2013-2020 OpenGMS. All rights reserved.</p>
     </footer>
   </div>
 </template>
@@ -281,6 +271,9 @@ export default {
     }
   },
   methods: {
+    turnToURL(url){
+      window.location.href = url;
+    },
     linkSocket(){
       if (this.$store.getters.userState) {
         this.setTimer();

@@ -24,10 +24,15 @@
     <div style="position:relative;padding:10px 10px 0 10px; margin-top:10px">
       <Breadcrumb style="display: inline-block" separator=">">
         <BreadcrumbItem :to="toSubProjectPage">Subproject</BreadcrumbItem>
-        <BreadcrumbItem>Work space</BreadcrumbItem>
+        <BreadcrumbItem>Workspace</BreadcrumbItem>
       </Breadcrumb>
       <h1 id="stepType">{{stepInfo.type}}</h1>
-      <step-change style="float:right" :step-info="stepInfo" :solving-process="subProjectInfo.solvingProcess" scope="subProject"></step-change>
+      <step-change
+        style="float:right"
+        :step-info="stepInfo"
+        :solving-process="subProjectInfo.solvingProcess"
+        scope="subProject"
+      ></step-change>
     </div>
     <Divider style="margin:10px 0 3px 0" />
     <div style="display:flex;background-color: #f8f8f9;padding:5px;">
@@ -65,6 +70,7 @@
           :stepInfo="stepInfo"
           :userRole="userRole"
           :received-chat-msgs="receivedChatMsgs"
+          :projectInfo="projectInfo"
         ></router-view>
       </div>
     </div>
@@ -114,7 +120,8 @@ export default {
           !(
             vm.userRole == "Manager" ||
             vm.userRole == "Member" ||
-            vm.userRole == "PManager"
+            vm.userRole == "PManager" ||
+            vm.getVisitorAccess()
           )
         ) {
           vm.$Message.error("You have no property to access it");
@@ -125,6 +132,9 @@ export default {
         }
       }
     });
+  },
+  beforeDestroy() {
+    this.socketApi.close();
   },
   data() {
     return {
@@ -154,12 +164,6 @@ export default {
             required: false,
             message: "Please enter description",
             trigger: "blur"
-          },
-          {
-            type: "string",
-            max: 150,
-            message: "Descript less than 150 words",
-            trigger: "blur"
           }
         ]
       },
@@ -173,6 +177,7 @@ export default {
   },
   watch: {
     $route() {
+      this.socketApi.close();
       this.init();
     }
   },
@@ -191,6 +196,17 @@ export default {
         this.contentHeight = window.innerHeight - 175;
       } else {
         this.contentHeight = 490;
+      }
+    },
+    getVisitorAccess() {
+      let visitorPermission = this.projectInfo.permissionManager.observe
+        .visitor;
+      if (
+        this.projectInfo.permissionManager != undefined &&
+        this.userRole == "Visitor" &&
+        (visitorPermission == "All")
+      ) {
+        return true;
       }
     },
     getStepInfo() {
@@ -420,6 +436,7 @@ export default {
         if (chatMsg.behavior != "" && chatMsg.userId != "") {
           this.receivedChatMsgs.push(chatMsg);
         }
+        this.judgeonlineParticipant(chatMsg);
       } else if (chatMsg.type == undefined && chatMsg.length > 0) {
         for (let i = 0; i < chatMsg.length; i++) {
           if (chatMsg[i].content != "") {
@@ -446,7 +463,7 @@ export default {
           for (let i = 0; i < this.onlineParticipants.length; i++) {
             if (msg.userId == this.onlineParticipants[i].userId) {
               let offperson = this.onlineParticipants.splice(i, 1);
-              this.offlineParticipants.push(offperson);
+              this.offlineParticipants.push(offperson[0]);
             }
           }
         } else if (msg.behavior == "on") {
@@ -454,7 +471,7 @@ export default {
           for (let i = 0; i < this.offlineParticipants.length; i++) {
             if (msg.userId == this.offlineParticipants[i].userId) {
               let onperson = this.offlineParticipants.splice(i, 1);
-              this.onlineParticipants.push(onperson);
+              this.onlineParticipants.push(onperson[0]);
             }
           }
         }

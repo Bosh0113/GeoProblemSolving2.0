@@ -10,6 +10,7 @@ import cn.edu.njnu.geoproblemsolving.Entity.ProjectEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.SubProjectEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.UserEntity;
 import cn.edu.njnu.geoproblemsolving.View.StaticPagesBuilder;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
@@ -45,7 +46,7 @@ public class ProjectDaoImpl implements IProjectDao {
     }
 
     @Override
-    public String createProject(ProjectEntity project) {
+    public Object createProject(ProjectEntity project) {
         Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         String projectId = UUID.randomUUID().toString();
@@ -80,7 +81,7 @@ public class ProjectDaoImpl implements IProjectDao {
         staticPagesBuilder.projectDetailPageBuilder(projectId);
         staticPagesBuilder.projectListPageBuilder();
 
-        return projectId;
+        return project;
     }
 
     @Override
@@ -177,6 +178,9 @@ public class ProjectDaoImpl implements IProjectDao {
             Query query = new Query(Criteria.where("projectId").is(projectId));
             CommonMethod method = new CommonMethod();
             Update update = method.setUpdate(request);
+            if(request.getParameter("permissionManager") != null){
+                update.set("permissionManager", JSONObject.parse(request.getParameter("permissionManager")));
+            }
             mongoTemplate.updateFirst(query, update, ProjectEntity.class);
             ProjectEntity projectEntity = mongoTemplate.findOne(query, ProjectEntity.class);
             try {
@@ -489,9 +493,14 @@ public class ProjectDaoImpl implements IProjectDao {
     }
 
     @Override
-    public Object inquiryByPage(String category, int page, int pageSize, String userId, String[] joinedProjects){
+    public Object inquiryByPage(String category, String tag, int page, int pageSize, String userId, String searchConfig, String... joinedProjects){
         try {
             Sort sort = new Sort(Sort.Direction.DESC,"createTime");
+            if(tag.equals("GIS-RS")){
+                tag="GIS & RS";
+            }
+            Pattern tagPattern = Pattern.compile("^.*"+tag+".*$",Pattern.CASE_INSENSITIVE);
+            Pattern searchPatten = Pattern.compile("^.*"+ searchConfig + ".*$", Pattern.CASE_INSENSITIVE);
             // Public
             Criteria criteriaPublic = Criteria.where("privacy").is("Public");
             // Discoverable
@@ -502,16 +511,46 @@ public class ProjectDaoImpl implements IProjectDao {
             if(!userId.equals("")) {
                 criteriaManager = Criteria.where("managerId").is(userId);
                 if(category.equals("All")) {
-                    query = new Query(new Criteria().orOperator(criteriaDiscoverable,criteriaPublic,criteriaManager));
+                    query = new Query(
+                            new Criteria().andOperator(Criteria.where("tag").regex(tagPattern),
+                                    new Criteria().orOperator(
+                                            Criteria.where("title").regex(searchPatten),
+                                            Criteria.where("description").regex(searchPatten),
+                                            Criteria.where("introduction").regex(searchPatten)),
+                                    new Criteria().orOperator(criteriaDiscoverable,criteriaPublic,criteriaManager)))
+                            .with(sort);
                 }else {
-                    query = new Query(new Criteria().andOperator(Criteria.where("category").is(category),new Criteria().orOperator(criteriaDiscoverable,criteriaPublic,criteriaManager)));
+                    query = new Query(
+                            new Criteria().andOperator(Criteria.where("category").is(category),
+                                    Criteria.where("tag").regex(tagPattern),
+                                    new Criteria().orOperator(
+                                            Criteria.where("title").regex(searchPatten),
+                                            Criteria.where("description").regex(searchPatten),
+                                            Criteria.where("introduction").regex(searchPatten)),
+                                    new Criteria().orOperator(criteriaDiscoverable,criteriaPublic,criteriaManager)))
+                            .with(sort);
                 }
             }
             else {
                 if(category.equals("All")) {
-                    query = new Query(new Criteria().orOperator(criteriaDiscoverable,criteriaPublic));
+                    query = new Query(
+                            new Criteria().andOperator(Criteria.where("tag").regex(tagPattern),
+                                    new Criteria().orOperator(
+                                            Criteria.where("title").regex(searchPatten),
+                                            Criteria.where("description").regex(searchPatten),
+                                            Criteria.where("introduction").regex(searchPatten)),
+                                    new Criteria().orOperator(criteriaDiscoverable,criteriaPublic)))
+                            .with(sort);
                 }else {
-                    query = new Query(new Criteria().andOperator(Criteria.where("category").is(category), new Criteria().orOperator(criteriaDiscoverable,criteriaPublic)));
+                    query = new Query(
+                            new Criteria().andOperator(Criteria.where("category").is(category),
+                                    Criteria.where("tag").regex(tagPattern),
+                                    new Criteria().orOperator(
+                                            Criteria.where("title").regex(searchPatten),
+                                            Criteria.where("description").regex(searchPatten),
+                                            Criteria.where("introduction").regex(searchPatten)),
+                                    new Criteria().orOperator(criteriaDiscoverable,criteriaPublic)))
+                            .with(sort);
                 }
             }
             long count = mongoTemplate.count(query,ProjectEntity.class);

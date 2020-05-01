@@ -1415,6 +1415,78 @@ div a.theme-item {
 .btn-group-vertical .import-caption .caption {
   font-size: 12px;
 }
+.btn-group-vertical {
+  vertical-align: middle;
+  margin: 5px;
+}
+.btn-group-vertical .download,
+.btn-group-vertical .download-caption {
+  width: 56px;
+  margin: 0;
+  padding: 0;
+  border: none!important;
+  border-radius: 0!important;
+}
+.btn-group-vertical .download:hover,
+.btn-group-vertical .download-caption:hover {
+  background-color: #eff3fa;
+}
+.btn-group-vertical .download:active,
+.btn-group-vertical .download-caption:active {
+  background-color: #c4d0ee;
+}
+.btn-group-vertical .download.active,
+.btn-group-vertical .download-caption.active {
+  box-shadow: none;
+  background-color: #eff3fa;
+}
+.btn-group-vertical .download {
+  height: 25px;
+  background: url(images/icons.png) no-repeat 0 -595px;
+  background-position-x: 50%;
+}
+.btn-group-vertical .download-caption {
+  height: 20px;
+}
+.btn-group-vertical .download-caption .caption {
+  font-size: 12px;
+}
+.btn-group-vertical {
+  vertical-align: middle;
+  margin: 5px;
+}
+.btn-group-vertical .version,
+.btn-group-vertical .version-caption {
+  width: 56px;
+  margin: 0;
+  padding: 0;
+  border: none!important;
+  border-radius: 0!important;
+}
+.btn-group-vertical .version:hover,
+.btn-group-vertical .version-caption:hover {
+  background-color: #eff3fa;
+}
+.btn-group-vertical .version:active,
+.btn-group-vertical .version-caption:active {
+  background-color: #c4d0ee;
+}
+.btn-group-vertical .version.active,
+.btn-group-vertical .version-caption.active {
+  box-shadow: none;
+  background-color: #eff3fa;
+}
+.btn-group-vertical .version {
+  height: 25px;
+  background: url(images/icons.png) no-repeat 0 -1060px;
+  background-position-x: 50%;
+}
+.btn-group-vertical .version-caption {
+  height: 20px;
+}
+.btn-group-vertical .version-caption .caption {
+  font-size: 12px;
+}
 .search-box {
   float: right;
   background-color: #fff;

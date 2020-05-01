@@ -50,7 +50,7 @@
                             <Select class="selector" v-model="selectedProjectId" @on-change="changeProject">
                                 <Option v-for="project in projectList" :key="project.projectId" :value="project.projectId">{{project.title}}</Option>
                             </Select>
-                            <span style="margin-left:15px">->  Sub-project:</span>
+                            <span style="margin-left:15px">->  Subproject:</span>
                             <Select class="selector" v-model="selectedSubProejctId" :disabled="subProjectDisable"  @on-change="changeSubProject">
                                 <Option v-for="subProject in subProjectList" :key="subProject.subProjectId" :value="subProject.subProjectId">{{subProject.title}}</Option>
                             </Select>
@@ -114,7 +114,7 @@
                                         </div>
                                         <div style="height:500px">
                                             <vue-scroll :ops="ops">
-                                            <Table :data="showResourceList" :columns="resourceColumn" class="table" @on-selection-change="setSelectedFiles">
+                                            <Table :data="showResourceList" :columns="resourceColumn" class="table" @on-selection-change="setSelectedFiles" no-data-text="No data">
                                                 <template slot-scope="{ row }" slot="name">
                                                 <strong>{{ row.name }}</strong>
                                                 </template>
@@ -255,7 +255,7 @@ export default {
             this.getResourceInfo();
         },
         getSubProjectList(projectId){
-            var defaultOption = [{name:"—show sub-project's resource—",stepID:"all"}];
+            var defaultOption = [{name:"—show subproject's resource—",stepID:"all"}];
             this.selectedStepId = defaultOption[0].stepID;
             this.stepDisable = true;
             this.axios
@@ -281,7 +281,7 @@ export default {
                     this.selectedSubProejctId = subProjectOptions[0].subProjectId;
                     this.subProjectDisable = false;
                 } else {
-                    this.$Message.warning("Get sub-projects info fail.");
+                    this.$Message.warning("Get subprojects info fail.");
                 }
             })
             .catch(err=>{console.log(err.data);})
@@ -294,7 +294,7 @@ export default {
                     break;
                 }
             }
-            var defaultOption = [{name:"—show sub-project's resource—",stepID:"all"}];
+            var defaultOption = [{name:"—show subproject's resource—",stepID:"all"}];
             var stepOptions = [];
             if(thisSubProject.solvingProcess!=undefined){
                 var stepInfos = JSON.parse(thisSubProject.solvingProcess);
@@ -315,7 +315,7 @@ export default {
         changeSubProject(subProjectId){
             if(subProjectId=="all"){
                 this.scopeId = this.selectedProjectId;
-                var defaultOption = [{title:"—show sub-project's resource—",stepID:"all"}];
+                var defaultOption = [{title:"—show subproject's resource—",stepID:"all"}];
                 this.selectedStepId = defaultOption[0].stepID;
                 this.stepDisable = true;
             }

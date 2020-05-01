@@ -100,7 +100,7 @@
           <Col :xs="{ span: 12, offset: 6 }" :lg="{ span: 12, offset: 6 }">
             <div class="registerForm">
               <Card>
-                <h2 slot="title" class="register_title">Register</h2>
+                <h2 slot="title" class="register_title">Sign up</h2>
                 <!-- 实现注册的样式 -->
                 <Form
                   ref="registerForm"
@@ -111,10 +111,60 @@
                   inline
                 >
                   <div class="formStyle">
+                    <FormItem label="Email" prop="email">
+                      <Input
+                        v-model="registerForm.email"
+                        placeholder="Plase enter your email"
+                        :class="{InputStyle: inputstyle}"
+                      ></Input>
+                    </FormItem>
+                  </div>
+                  <div class="formStyle">
                     <FormItem label="Name" prop="userName">
                       <Input
                         v-model="registerForm.userName"
                         placeholder="Plase enter username"
+                        :class="{InputStyle: inputstyle}"
+                      ></Input>
+                    </FormItem>
+                  </div>
+                  <!-- <div class="formStyle">
+                  <FormItem label="Phone" prop="mobilePhone">
+                    <Input v-model="registerForm.mobilePhone" placeholder="Plase enter your mobilePhone"
+                      :class="{InputStyle: inputstyle}"></Input>
+                  </FormItem>
+                  </div>-->
+                  <div class="formStyle">
+                    <FormItem label="Title" prop="jobTitle">
+                      <Select
+                        v-model="registerForm.jobTitle"
+                        placeholder="Plase enter your title"
+                        :class="{InputStyle: inputstyle}"
+                      >
+                        <Option value="Professor">Professor</Option>
+                        <Option value="Dr">Dr</Option>
+                        <Option value="Miss">Miss</Option>
+                        <Option value="Mr">Mr</Option>
+                        <Option value="Mrs">Mrs</Option>
+                        <Option value="Ms">Ms</Option>
+                        <Option value="Mx">Mx</Option>
+                      </Select>
+                    </FormItem>
+                  </div>
+                  <div class="formStyle">
+                    <FormItem label="Country / Region " prop="country">
+                      <Input
+                        v-model="registerForm.country"
+                        placeholder="Plase enter your country"
+                        :class="{InputStyle: inputstyle}"
+                      ></Input>
+                    </FormItem>
+                  </div>
+                  <div class="formStyle">
+                    <FormItem label="Organization" prop="organization">
+                      <Input
+                        v-model="registerForm.organization"
+                        placeholder="Plase enter your affiliation"
                         :class="{InputStyle: inputstyle}"
                       ></Input>
                     </FormItem>
@@ -135,7 +185,6 @@
                     </FormItem>
                   </div>
                   <div class="formStyle">
-                    <!-- Confirm Password -->
                     <FormItem label="Confirm password" prop="confimPassword">
                       <Input
                         v-model="registerForm.confimPassword"
@@ -145,131 +194,67 @@
                       ></Input>
                     </FormItem>
                   </div>
-                  <div class="formStyle">
-                    <FormItem label="Job title" prop="jobTitle">
-                      <Input
-                        v-model="registerForm.jobTitle"
-                        placeholder="Plase enter your job title"
-                        :class="{InputStyle: inputstyle}"
-                      ></Input>
-                    </FormItem>
-                  </div>
-                  <div class="formStyle">
-                    <FormItem label="E-mail" prop="email">
-                      <Input
-                        v-model="registerForm.email"
-                        placeholder="Plase enter your e-mail"
-                        :class="{InputStyle: inputstyle}"
-                      ></Input>
-                    </FormItem>
-                  </div>
-                  <div class="formStyle">
-                    <FormItem label="Phone" prop="mobilePhone">
-                      <Input
-                        v-model="registerForm.mobilePhone"
-                        placeholder="Plase enter your mobilePhone"
-                        :class="{InputStyle: inputstyle}"
-                      ></Input>
-                    </FormItem>
-                  </div>
-                  <div class="formStyle">
-                    <FormItem label="Country" prop="country">
-                      <Input
-                        v-model="registerForm.country"
-                        placeholder="Plase enter your country"
-                        :class="{InputStyle: inputstyle}"
-                      ></Input>
-                    </FormItem>
-                  </div>
-                  <div class="formStyle">
-                    <FormItem label="City" prop="city">
-                      <Input
-                        v-model="registerForm.city"
-                        placeholder="Plase enter your city"
-                        :class="{InputStyle: inputstyle}"
-                      ></Input>
-                    </FormItem>
-                  </div>
-                  <div class="formStyle">
-                    <FormItem label="Affiliation" prop="organization">
-                      <Input
-                        v-model="registerForm.organization"
-                        placeholder="Plase enter your affiliation"
-                        :class="{InputStyle: inputstyle}"
-                      ></Input>
-                    </FormItem>
-                  </div>
-                  <div class="formStyle">
-                    <FormItem label="Field" prop="field">
-                      <Input
-                        v-model="registerForm.field"
-                        placeholder="Plase enter your research field"
-                        :class="{InputStyle: inputstyle}"
-                      ></Input>
-                    </FormItem>
-                  </div>
-                  <div class="formStyle">
-                    <FormItem label="Home page" prop="homePage">
-                      <Input
-                        v-model="registerForm.homePage"
-                        placeholder="Plase enter your homepage url"
-                        :class="{InputStyle: inputstyle}"
-                      ></Input>
-                    </FormItem>
-                  </div>
-                  <div class="formStyle">
-                    <FormItem label="Gender" prop="gender">
-                      <RadioGroup v-model="registerForm.gender" :class="{InputStyle: inputstyle}">
-                        <Radio label="male">Male</Radio>
-                        <Radio label="female">Female</Radio>
-                      </RadioGroup>
-                    </FormItem>
-                  </div>
-                  <div class="formStyle">
-                    <FormItem label="Avatar" prop="avatar">
-                      <div :class="{InputStyle: inputstyle}">
-                        <div class="demo-upload-list" v-if="avatar!=''">
-                          <template>
-                            <img v-bind:src="avatar" />
-                            <div class="demo-upload-list-cover">
-                              <Icon type="ios-eye-outline" @click.native="handleView()"></Icon>
-                              <Icon type="ios-trash-outline" @click.native="handleRemove()"></Icon>
-                            </div>
-                          </template>
-                        </div>
-                        <div class="uploadBox">
-                          <Icon type="ios-camera" size="20" style="position:absolute;margin:18px;"></Icon>
-                          <input
-                            @change="uploadPhoto($event)"
-                            type="file"
-                            class="uploadAvatar"
-                            id="avatarInput"
-                          />
-                        </div>
-                        <Modal title="View Image" v-model="visible">
-                          <img :src="avatar" v-if="visible" style="width: 100%" />
-                        </Modal>
+                  <!-- <div class="formStyle">
+                  <FormItem label="City" prop="city">
+                    <Input v-model="registerForm.city" placeholder="Plase enter your city"
+                      :class="{InputStyle: inputstyle}"></Input>
+                  </FormItem>
+                </div>
+                <div class="formStyle">
+                  <FormItem label="Field" prop="field">
+                    <Input v-model="registerForm.field" placeholder="Plase enter your research field"
+                      :class="{InputStyle: inputstyle}"></Input>
+                  </FormItem>
+                </div>
+                <div class="formStyle">
+                  <FormItem label="Home page" prop="homePage">
+                    <Input v-model="registerForm.homePage" placeholder="Plase enter your homepage url"
+                      :class="{InputStyle: inputstyle}"></Input>
+                  </FormItem>
+                  </div>-->
+                  <!-- <div class="formStyle">
+                  <FormItem label="Gender" prop="gender">
+                    <RadioGroup v-model="registerForm.gender" :class="{InputStyle: inputstyle}">
+                      <Radio label="male">Male</Radio>
+                      <Radio label="female">Female</Radio>
+                    </RadioGroup>
+                  </FormItem>
+                  </div>-->
+                  <!-- <div class="formStyle">
+                  <FormItem label="Avatar" prop="avatar">
+                    <div :class="{InputStyle: inputstyle}">
+                      <div class="demo-upload-list" v-if="avatar!=''">
+                        <template>
+                          <img v-bind:src="avatar" />
+                          <div class="demo-upload-list-cover">
+                            <Icon type="ios-eye-outline" @click.native="handleView()"></Icon>
+                            <Icon type="ios-trash-outline" @click.native="handleRemove()"></Icon>
+                          </div>
+                        </template>
                       </div>
-                    </FormItem>
-                  </div>
+                      <div class="uploadBox">
+                        <Icon type="ios-camera" size="20" style="position:absolute;margin:18px;"></Icon>
+                        <input @change="uploadPhoto($event)" type="file" class="uploadAvatar" id="avatarInput" />
+                      </div>
+                      <Modal title="View Image" v-model="visible">
+                        <img :src="avatar" v-if="visible" style="width: 100%" />
+                      </Modal>
+                    </div>
+                  </FormItem>
+                  </div>-->
+                  <!-- <div class="formStyle">
+                  <FormItem label="Introduction" prop="introduction">
+                    <Input v-model="registerForm.introduction" type="textarea" :autosize="{minRows: 2,maxRows: 5}"
+                      placeholder="Plase introduce yourself" :class="{InputStyle: inputstyle}"></Input>
+                  </FormItem>
+                  </div>-->
                   <div class="formStyle">
-                    <FormItem label="Introduction" prop="introduction">
-                      <Input
-                        v-model="registerForm.introduction"
-                        type="textarea"
-                        :autosize="{minRows: 2,maxRows: 5}"
-                        placeholder="Plase introduce yourself"
-                        :class="{InputStyle: inputstyle}"
-                      ></Input>
-                    </FormItem>
-                  </div>
-                  <div class="formStyle">
+                    <Button @click="handleReset('registerForm')" style="float:left">Reset</Button>
                     <Button
                       type="primary"
                       @click="handleSubmit('registerForm')"
-                      style="float:left"
-                    >Submit</Button>
-                    <Button @click="handleReset('registerForm')" style="margin-left: 8px">Reset</Button>
+                      style="margin-left: 50%"
+                    >Create</Button>
                   </div>
                 </Form>
                 <!-- 注册样式结束 -->
@@ -365,68 +350,68 @@ export default {
             trigger: "blur"
           }
         ],
-        gender: [
-          {
-            required: true,
-            message: "Please select gender",
-            trigger: "change"
-          }
-        ],
-        mobilePhone: [
-          {
-            required: false,
-            message: "Please enter your phone number",
-            trigger: "blur"
-          }
-        ],
+        // gender: [
+        //   {
+        //     required: false,
+        //     message: "Please select gender",
+        //     trigger: "change"
+        //   }
+        // ],
+        // mobilePhone: [
+        //   {
+        //     required: false,
+        //     message: "Please enter your phone number",
+        //     trigger: "blur"
+        //   }
+        // ],
         country: [
           {
-            required: false,
+            required: true,
             message: "Please enter your country",
             trigger: "blur"
           }
         ],
-        city: [
-          {
-            required: false,
-            message: "Please enter your city",
-            trigger: "blur"
-          }
-        ],
+        // city: [
+        //   {
+        //     required: false,
+        //     message: "Please enter your city",
+        //     trigger: "blur"
+        //   }
+        // ],
         organization: [
           {
-            required: false,
+            required: true,
             message: "Please enter your affiliation",
             trigger: "blur"
           }
-        ],
-        introduction: [
-          {
-            required: false,
-            message: "Please enter a personal introduction",
-            trigger: "blur"
-          },
-          {
-            type: "string",
-            min: 20,
-            message: "Introduction no less than 20 characters",
-            trigger: "blur"
-          }
-        ],
-        field: [
-          {
-            required: false,
-            message: "Please enter your research field",
-            trigger: "blur"
-          }
-        ],
-        homePage: [
-          {
-            required: false,
-            message: "Please enter your home page url",
-            trigger: "blur"
-          }
         ]
+        // introduction: [
+        //   {
+        //     required: false,
+        //     message: "Please enter a personal introduction",
+        //     trigger: "blur"
+        //   },
+        //   {
+        //     type: "string",
+        //     min: 20,
+        //     message: "Introduction no less than 20 characters",
+        //     trigger: "blur"
+        //   }
+        // ],
+        // field: [
+        //   {
+        //     required: false,
+        //     message: "Please enter your research field",
+        //     trigger: "blur"
+        //   }
+        // ],
+        // homePage: [
+        //   {
+        //     required: false,
+        //     message: "Please enter your home page url",
+        //     trigger: "blur"
+        //   }
+        // ]
       },
       visible: false,
       // 隐藏密码图标样式
@@ -479,7 +464,6 @@ export default {
                       this.$Message.error("Invalid account or password.");
                     } else {
                       this.$store.commit("userLogin", res.data);
-                      this.$router.push({ path: "/" });
 
                       let registerEmailBody = {};
                       registerEmailBody["recipient"] = this.registerForm.email;
@@ -497,6 +481,7 @@ export default {
                         .catch(err => {
                           // console.log(err.data);
                         });
+                      this.$router.go(-1);
                     }
                   })
                   .catch(err => {

@@ -5,11 +5,11 @@
     <Collapse simple v-model="unfold">
       <Panel name="data">
         Resource list
-        <data-list slot="content" :stepInfo="stepInfo" :userRole="userRole" @dataBehavior="listenDatalist"></data-list>
+        <data-list slot="content" :stepInfo="stepInfo" :userRole="userRole" :projectInfo="projectInfo" @dataBehavior="listenDatalist"></data-list>
       </Panel>
-      <Panel name="tool">
+      <Panel name="tool" v-show="stepInfo.activeStatus">
         Toolbox
-        <tool-container slot="content" :stepInfo="stepInfo" :userRole="userRole" @toolBehavior="listenToolbox" @toolPanel="listenToolPanel"></tool-container>
+        <tool-container slot="content" :stepInfo="stepInfo" :userRole="userRole" :projectInfo="projectInfo" @toolBehavior="listenToolbox" @toolPanel="listenToolPanel"></tool-container>
       </Panel>
     </Collapse>
     <p style="margin: 10px 0">Map</p>
@@ -31,12 +31,13 @@ export default {
     toolContainer,
     messagePanel
   },
-  props: ["stepInfo", "userRole", "receivedChatMsgs"],
+  props: ["stepInfo", "userRole", "receivedChatMsgs","projectInfo"],
   data() {
     return {
       unfold: ["tool", "data"],
       stepSocket: null,
-      operationRecords: []
+      operationRecords: [],
+      panelList:[],
     };
   },
   mounted() {
@@ -52,6 +53,31 @@ export default {
     }
   },
   methods: {
+    permissionIdentity(operation) {
+      if (
+        this.projectInfo.permissionManager != undefined &&
+        operation === "project_workspace_type_manage"
+      ) {
+        if (
+          this.userRole == "PManager" &&
+          this.projectInfo.permissionManager.project_workspace_type_manage
+            .project_manager
+        ) {
+          return true;
+        } else if (
+          this.userRole == "Manager" &&
+          this.projectInfo.permissionManager.project_workspace_type_manage
+            .subproject_manager
+        ) {
+          return true;
+        } else if (
+          this.userRole == "Member" &&
+          this.projectInfo.permissionManager.project_workspace_type_manage.member
+        ) {
+          return true;
+        }
+      }
+    },
     listenDatalist(data) {
       this.operationRecords = JSON.stringify(data);
     },
@@ -93,7 +119,7 @@ export default {
       this.setTimer();
     },
     onOpen() {
-      console.log("NoticeSocket连接成功！");
+      console.log("StepSocket连接成功！");
     },
     onMessage(e) {
       if (e.data == "Notice") {

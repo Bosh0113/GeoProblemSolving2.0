@@ -68,7 +68,7 @@
             <Card class="Information">
               <div style="width:100%">
                 <strong>Subproject name:</strong>
-                <template v-if="userRole == 'Manager'">
+                <template v-if="permissionIdentity('subproject_edit_info')">
                   <Icon
                     v-if="!edit0"
                     type="ios-create"
@@ -96,7 +96,7 @@
             <Card class="Information">
               <div style="width:100%">
                 <strong>Description:</strong>
-                <template v-if="userRole == 'Manager'">
+                <template v-if="permissionIdentity('subproject_edit_info')">
                   <Icon
                     v-if="!edit1"
                     type="ios-create"
@@ -129,7 +129,7 @@
             <Card class="Information">
               <div style="width:100%">
                 <strong>Background:</strong>
-                <template v-if="userRole=='Manager'">
+                <template v-if="permissionIdentity('subproject_edit_info')">
                   <Icon
                     v-if="!edit2"
                     type="ios-create"
@@ -162,7 +162,7 @@
             <Card class="Information">
               <div style="width:100%">
                 <strong>Limitations / problems:</strong>
-                <template v-if="userRole=='Manager'">
+                <template v-if="permissionIdentity('subproject_edit_info')">
                   <Icon
                     v-if="!edit3"
                     type="ios-create"
@@ -209,7 +209,7 @@
           </div>
           <div slot="extra">
             <Icon
-              v-if="userRole=='Manager'"
+              v-if="permissionIdentity('subproject_invite_member')"
               type="md-add"
               :size="18"
               style="cursor:pointer"
@@ -217,7 +217,7 @@
               @click="inviteMembersModalShow"
             />
             <Icon
-              v-else-if="userRole=='Member'"
+              v-if="userRole == 'Member' || userRole == 'PManager'"
               type="ios-log-out"
               :size="18"
               style="cursor:pointer"
@@ -296,10 +296,14 @@
                     </div>
                   </div>
                 </template>
-                <div style="line-height:50px" type="default">
+                <div
+                  style="line-height:50px"
+                  type="default"
+                  v-if="permissionIdentity('subproject_remove_member')"
+                >
                   <span
                     style="cursor:pointer"
-                    title="Out"
+                    title="Remove this member"
                     v-show="giveDeleteProperty(index)"
                     @click="removeMemberAlert=true"
                   >
@@ -323,7 +327,7 @@
           <Modal
             v-model="quitModal"
             width="400px"
-            title="Quit Sub-Project"
+            title="Quit the subproject"
             @on-ok="quitSubProject()"
             ok-text="Ok"
             cancel-text="Cancel"
@@ -450,6 +454,75 @@ export default {
       this.initSize();
       this.getSubprojectDes();
       this.showMembers();
+    },
+    permissionIdentity(operation) {
+      if (
+        this.projectInfo.permissionManager != undefined &&
+        operation === "subproject_edit_info"
+      ) {
+        if (
+          this.userRole == "PManager" &&
+          this.projectInfo.permissionManager.subproject_edit_info
+            .project_manager
+        ) {
+          return true;
+        } else if (
+          this.userRole == "Manager" &&
+          this.projectInfo.permissionManager.subproject_edit_info
+            .subproject_manager
+        ) {
+          return true;
+        } else if (
+          this.userRole == "Member" &&
+          this.projectInfo.permissionManager.subproject_edit_info.member
+        ) {
+          return true;
+        }
+      } else if (
+        this.projectInfo.permissionManager != undefined &&
+        operation === "subproject_invite_member"
+      ) {
+        if (
+          this.userRole == "PManager" &&
+          this.projectInfo.permissionManager.subproject_invite_member
+            .project_manager
+        ) {
+          return true;
+        } else if (
+          this.userRole == "Manager" &&
+          this.projectInfo.permissionManager.subproject_invite_member
+            .subproject_manager
+        ) {
+          return true;
+        } else if (
+          this.userRole == "Member" &&
+          this.projectInfo.permissionManager.subproject_invite_member.member
+        ) {
+          return true;
+        }
+      } else if (
+        this.projectInfo.permissionManager != undefined &&
+        operation === "subproject_remove_member"
+      ) {
+        if (
+          this.userRole == "PManager" &&
+          this.projectInfo.permissionManager.subproject_remove_member
+            .project_manager
+        ) {
+          return true;
+        } else if (
+          this.userRole == "Manager" &&
+          this.projectInfo.permissionManager.subproject_remove_member
+            .subproject_manager
+        ) {
+          return true;
+        } else if (
+          this.userRole == "Member" &&
+          this.projectInfo.permissionManager.subproject_remove_member.member
+        ) {
+          return true;
+        }
+      }
     },
     getSubprojectDes() {
       if (
