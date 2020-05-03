@@ -6,6 +6,7 @@ import cn.edu.njnu.geoproblemsolving.Entity.ProjectEntity;
 import cn.edu.njnu.geoproblemsolving.Enums.ResultEnum;
 import cn.edu.njnu.geoproblemsolving.Exception.MyException;
 import cn.edu.njnu.geoproblemsolving.Utils.ResultUtils;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,11 +70,23 @@ public class TaskService {
         return modelList;
     }
 
-    public JsonResult getComputeModel(String pid) {//根据pid.md5获得
+    public JSONObject getComputeModel(String doi) {//根据pid.md5获得
+        RestTemplate restTemplate = new RestTemplate();
+        String urlStr = "http://geomodeling.njnu.edu.cn/computableModel/getInfo/" + doi; ////Step0:根据MD5获取可用的任务服务器
 
-        Object computableModel = modelItemDao.readComputableModel(pid);
-//        Object data=computableModel.getJSON;
-        return ResultUtils.success(((ArrayList) computableModel).get(0));
+        ResponseEntity<JSONObject> jsonObjectResponseEntity = restTemplate.getForEntity(urlStr, JSONObject.class);//虚拟http请求
+        if (!jsonObjectResponseEntity.getStatusCode().is2xxSuccessful()) {
+            throw new MyException(ResultEnum.ERROR);
+        }
+        JSONObject result = jsonObjectResponseEntity.getBody().getJSONObject("data");
+
+        String md5 = result.getString("md5");
+        String modelname = result.getString("name");
+//        String mdl = result.getString("mdl");
+        JSONObject mdlJson = JSON.parseObject(JSONObject.toJSONString(result.get("mdlJson")));
+        JSONObject behavior = mdlJson.getJSONArray("ModelClass").getJSONObject(0).getJSONArray("Behavior").getJSONObject(0).getJSONArray("StateGroup").getJSONObject(0);
+        JSONObject result2 = JSON.parseObject(JSONObject.toJSONString(behavior));
+        return result2;
     }
 
     public JSONObject createTask(String pid) {

@@ -27,9 +27,9 @@ public class TaskRestController {
         return taskService.getAllModel();
     }
 
-    @RequestMapping(value = "/getModelItem/{pid}",method = RequestMethod.GET)
-    public Object readProject(@PathVariable("pid") String pid) {
-        return taskService.getComputeModel(pid);
+    @RequestMapping(value = "/getModelBehavior/{doi}",method = RequestMethod.GET)
+    public Object readProject(@PathVariable("doi") String doi) {
+        return taskService.getComputeModel(doi);
     }
 
     @RequestMapping(value = "/createTask/{pid}", method = RequestMethod.GET)

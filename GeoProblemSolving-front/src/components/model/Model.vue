@@ -5,13 +5,13 @@
     <el-row class="title">
       <el-col>
         <i class="fa fa-cogs"></i>
-        {{modelItem.name}}
+        <!-- {{modelItem.name}} -->
       </el-col>
     </el-row>
 
     <el-row class="des">
       <el-col>
-        <p>{{modelItem.des}}</p>
+        <!-- <p>{{modelItem}}</p> -->
       </el-col>
     </el-row>
     <el-row>
@@ -26,17 +26,13 @@
         </el-button>
       </el-col>
     </el-row>
-
-    <el-tabs v-model="activeTab" tab-position="left">
-      <el-tab-pane
-        v-for="(state,index) in modelItem.stateList"
-        :label="state.name"
-        :name="state.name"
-        :key="index"
-      >
-        <div class="state-desc">{{state.des}}</div>
-
-        <div class="params-group">
+    <el-tabs tab-position="left">
+      <!-- <el-tabs v-model="activeTab" tab-position="left"> -->
+      <el-tab-pane v-for="(state,index) in stateList" :key="index">
+        <!-- <div class="state-desc">{{state}}</div> -->
+         {{state}}
+        <div class="event" v-for="(event,eventIndex) in filterEvent(state.State)" :key="eventIndex">{{event}}</div>
+        <!-- <div class="params-group">
           <el-row class="title">Input</el-row>
           <div class="items">
             <el-row
@@ -73,9 +69,9 @@
               </el-row>
             </el-row>
           </div>
-        </div>
+        </div>-->
 
-        <div class="params-group" v-if="outEventList(state).length">
+        <!-- <div class="params-group" v-if="outEventList(state).length">
           <el-row class="title">Output</el-row>
           <div class="items">
             <el-row
@@ -103,7 +99,7 @@
               </el-row>
             </el-row>
           </div>
-        </div>
+        </div>-->
       </el-tab-pane>
     </el-tabs>
   </div>
@@ -120,8 +116,8 @@ import parameter_range from "./../dataTemplate/ParameterRange";
 export default {
   data() {
     return {
-      id: this.$route.query.id,
-      modelItem: {},
+      doi: this.$route.params.doi,
+      stateList: {},
       modelInstance: {},
       timer: {},
       fullscreenLoading: "",
@@ -134,14 +130,14 @@ export default {
   },
 
   computed: {
-    activeTab: {
-      get() {
-        return this.modelItem.stateList
-          ? this.modelItem.stateList[0].name
-          : "defaultState";
-      },
-      set() {}
-    }
+    // activeTab: {
+    //   get() {
+    //     return this.stateList.States
+    //       ? this.stateList.States[0].name
+    //       : "defaultState";
+    //   },
+    //   set() {}
+    // }
   },
 
   methods: {
@@ -155,44 +151,65 @@ export default {
     },
 
     async init() {
-      let data = await this.axios.get(
-        "/GeoProblemSolving/modelItem/getModelItem/" + this.id
+      let {data} = await this.axios.get(
+        "/GeoProblemSolving/task/getModelBehavior/" + this.doi
       );
-      let modelItem = data.data.data;
+      this.stateList= data.States;
+    
 
-      //利用defaultValue对UI进行初始化
-      modelItem.stateList.forEach(state => {
-        state.eventList.forEach((event, index, eventList) => {
-          let dataTemplate = event.dataTemplate;
-          if (
-            dataTemplate.value == "" ||
-            dataTemplate.value == null ||
-            dataTemplate.value == undefined
-          ) {
-            if (
-              dataTemplate.defaultValue != "" &&
-              dataTemplate.defaultValue != null &&
-              dataTemplate.defaultValue != undefined
-            ) {
-              if (dataTemplate.type === "parameter_slider") {
-                //TODO 无奈之举，因为后台是存储的字符串
-                eventList[index].dataTemplate.value = new Number(
-                  dataTemplate.defaultValue
-                ).valueOf();
-              } else {
-                eventList[index].dataTemplate.value = dataTemplate.defaultValue;
-              }
-            }
-          }
-        });
-      });
-      this.modelItem = modelItem;
+
+
+
+      // modelItem.States.forEach(states => {
+      //   states.State.forEach(state => {
+      //     // console.log(state);
+      //     let stateId = state.id;
+      //     let name = state.name;
+      //     let description = state.description;
+      //     let eventList = state.Event;
+      //     eventList.forEach(event => {
+      //       // console.log(event);
+      //       let eventName = event.name;
+      //       let optional = event.optional;
+      //       let type = event.type;
+      //     });
+      //   });
+      // });
+
+      // let dataTemplate = event.dataTemplate;
+      // if (
+      //   dataTemplate.value == "" ||
+      //   dataTemplate.value == null ||
+      //   dataTemplate.value == undefined
+      // ) {
+      //   if (
+      //     dataTemplate.defaultValue != "" &&
+      //     dataTemplate.defaultValue != null &&
+      //     dataTemplate.defaultValue != undefined
+      //   ) {
+      //     if (dataTemplate.type === "parameter_slider") {
+      //       //TODO 无奈之举，因为后台是存储的字符串
+      //       eventList[index].dataTemplate.value = new Number(
+      //         dataTemplate.defaultValue
+      //       ).valueOf();
+      //     } else {
+      //       eventList[index].dataTemplate.value = dataTemplate.defaultValue;
+      //     }
+      //   }
+      // }
     },
 
-    inEventList(state) {
-      return state.eventList.filter(value => {
-        return value.ioFlagEnum === "INPUT";
-      });
+    filterEvent(EventList) {
+      EventList.forEach(el=>{
+        let events=el.Event;
+        let inputEvents= Event.filter((event)=>{
+          return event.type==="response";
+       })
+      })
+
+
+       console.log(inputEvents)
+       return inputEvents
     },
 
     outEventList(state) {
@@ -202,7 +219,7 @@ export default {
     },
 
     testInputValue() {
-      let modelItem = this.modelItem;
+      let modelItem = this.stateList;
       try {
         modelItem.stateList.forEach(state => {
           state.eventList.forEach((event, index, eventList) => {
@@ -239,8 +256,8 @@ export default {
         let data = await this.axios.post(
           "/GeoProblemSolving/modelItem/addModelInstance",
           {
-            name: "`${this.modelItem.name}` + `${this.$store.state.user.name}`",
-            modelItem: this.modelItem
+            name: "`${this.stateList.name}` + `${this.$store.state.user.name}`",
+            modelItem: this.stateList
           }
         );
         let modelInstance = data.data.data;
@@ -256,7 +273,7 @@ export default {
             this.loadingClose();
             console.log("完成");
             clearInterval(this.timer);
-            this.modelItem = modelInstance.modelItem;
+            this.stateList = modelInstance.modelItem;
             this.modelInstance = modelInstance;
             console.log(this.modelInstanceId);
             this.saveRecords(modelInstance.id); //save model instance records
@@ -311,7 +328,7 @@ export default {
         // this.recordList = data.data.data;
         let recordList = data.data.data;
         console.log(recordList);
-        for (let i = 0; i < recordList.length ; i++) {
+        for (let i = 0; i < recordList.length; i++) {
           let modelInstanceId = recordList[i].modelInstanceId;
           console.log(modelInstanceId);
           let item = await this.axios.get(
