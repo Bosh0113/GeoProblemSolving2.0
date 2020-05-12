@@ -5,11 +5,11 @@
     <Collapse simple v-model="unfold">
       <Panel name="data">
         Resource list
-        <data-list slot="content" :stepInfo="stepInfo" :userRole="userRole" @dataBehavior="listenDatalist"></data-list>
+        <data-list slot="content" :stepInfo="stepInfo" :userRole="userRole" :projectInfo="projectInfo" @dataBehavior="listenDatalist"></data-list>
       </Panel>
       <Panel name="tool" v-show="stepInfo.activeStatus">
         Toolbox
-        <tool-container slot="content" :stepInfo="stepInfo" :userRole="userRole" @toolBehavior="listenToolbox" @toolPanel="listenToolPanel"></tool-container>
+        <tool-container slot="content" :stepInfo="stepInfo" :userRole="userRole" :projectInfo="projectInfo" @toolBehavior="listenToolbox" @toolPanel="listenToolPanel"></tool-container>
       </Panel>
     </Collapse>
     <p style="margin: 10px 0">Map</p>
@@ -31,7 +31,7 @@ export default {
     toolContainer,
     messagePanel
   },
-  props: ["stepInfo", "userRole", "receivedChatMsgs"],
+  props: ["stepInfo", "userRole", "receivedChatMsgs","projectInfo"],
   data() {
     return {
       unfold: ["tool", "data"],

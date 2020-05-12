@@ -60,7 +60,7 @@
                         <i-col span="7">
                         <Card :padding="0" :border="false">
                             <h3 slot="title">Todo</h3>
-                            <i-button slot="extra" type="default" class="createTaskBtn" style="margin-top:-8px" @click="createTaskModalShow()" v-show="isManager()">Add</i-button>
+                            <i-button slot="extra" type="default" class="createTaskBtn" style="margin-top:-8px" @click="createTaskModalShow()" v-if="permissionIdentity('project_task_create')">Add</i-button>
                             <vue-scroll :ops="ops" :style="{height:contentHeight-80+'px'}">
                                 <draggable :disabled="taskItemDraggable()" class="taskList" element="ul" :options="{group:'task'}" v-model="taskTodo" :style="{height:contentHeight-80+'px'}"
                                     @start="setMoveCount()" @update="updateMoveTask(taskTodo,'todo')" @add="addMoveTask(taskTodo,'todo')"
@@ -74,14 +74,16 @@
                                                 <strong style="color:#57a3f3" class="taskName" :title="item.taskName">{{item.taskName}}</strong>
                                             </span>
                                             <div style="float:right">
-                                                <Rate :disabled="!(isManager()||isOwner(item))" v-model="item.importance" :count="1" clearable title="Importance" @on-change="changeImportance(item)"
+                                                <Rate :disabled="!(permissionIdentity('project_task_manage', item))" v-model="item.importance" :count="1" clearable title="Importance" @on-change="changeImportance(item)"
                                                 ></Rate>
-                                                <span title="Edit" v-if="isManager()||isOwner(item)">
-                                                    <Icon type="ios-create" color="gray" :size="20" style="cursor:pointer" @click="editOneTask(index, taskTodo)" ></Icon>
-                                                </span>
-                                                <span v-if="isManager()||isOwner(item)" style="margin-left:5px;margin-right:3px;cursor: pointer;color:gray;" title="Delete" @click="taskRemoveAssure(index,taskTodo)">
-                                                    <Icon type="ios-trash" :size="20" color="gray" ></Icon>
-                                                </span>
+                                                <template v-if="permissionIdentity('project_task_manage', item)">
+                                                    <span title="Edit">
+                                                        <Icon type="ios-create" color="gray" :size="20" style="cursor:pointer" @click="editOneTask(index, taskTodo)" ></Icon>
+                                                    </span>
+                                                    <span style="margin-left:5px;margin-right:3px;cursor: pointer;color:gray;" title="Delete" @click="taskRemoveAssure(index,taskTodo)">
+                                                        <Icon type="ios-trash" :size="20" color="gray" ></Icon>
+                                                    </span>
+                                                </template>
                                             </div>
                                             <p style="word-break:break-word;padding:5px;cursor:pointer" @click="showTask(index, taskTodo)">{{item.description}}</p>
                                             <div style="display:flex;justify-content:flex-end">
@@ -110,13 +112,15 @@
                                                 <strong style="color:#57a3f3" class="taskName" :title="item.taskName">{{item.taskName}}</strong>
                                             </span>
                                             <div style="float:right">
-                                                <Rate :disabled="!(isManager()||isOwner(item))" v-model="item.importance" :count="1" clearable title="Importance" @on-change="changeImportance(item)" ></Rate>
-                                                <span title="Edit" v-if="isManager()||isOwner(item)">
-                                                    <Icon type="ios-create" color="gray" :size="20" style="cursor:pointer" @click="editOneTask(index,taskDoing)" ></Icon>
-                                                </span>
-                                                <span v-if="isManager()||isOwner(item)" style="margin-left:5px;margin-right:3px;cursor: pointer;color:gray;" title="Delete" @click="taskRemoveAssure(index,taskDoing)">
-                                                    <Icon type="ios-trash" :size="20" color="gray" ></Icon>
-                                                </span>
+                                                <Rate :disabled="!permissionIdentity('project_task_manage', item)" v-model="item.importance" :count="1" clearable title="Importance" @on-change="changeImportance(item)" ></Rate>
+                                                <template v-if="permissionIdentity('project_task_manage', item)">
+                                                    <span title="Edit">
+                                                        <Icon type="ios-create" color="gray" :size="20" style="cursor:pointer" @click="editOneTask(index,taskDoing)" ></Icon>
+                                                    </span>
+                                                    <span style="margin-left:5px;margin-right:3px;cursor: pointer;color:gray;" title="Delete" @click="taskRemoveAssure(index,taskDoing)">
+                                                        <Icon type="ios-trash" :size="20" color="gray" ></Icon>
+                                                    </span>
+                                                </template>
                                             </div>
                                         </div>
                                         <p style="word-break:break-word;padding:5px;cursor:pointer" @click="showTask(index,taskDoing)">{{item.description}}</p>
@@ -145,13 +149,15 @@
                                                 <strong style="color:#57a3f3" class="taskName" :title="item.taskName">{{item.taskName}}</strong>
                                             </span>
                                             <div style="float:right">
-                                                <Rate :disabled="!(isManager()||isOwner(item))" v-model="item.importance" :count="1" clearable title="Importance" @on-change="changeImportance(item)" ></Rate>
-                                                <span title="Edit" v-if="isManager()||isOwner(item)">
-                                                    <Icon type="ios-create" color="gray" :size="20" style="cursor:pointer" @click="editOneTask(index,taskDone)"></Icon>
-                                                </span>
-                                                <span v-if="isManager()||isOwner(item)" style="margin-left:5px;margin-right:3px;cursor: pointer;color:gray;" title="Delete" @click="taskRemoveAssure(index,taskDone)">
-                                                    <Icon type="ios-trash" :size="20" color="gray"></Icon>
-                                                </span>
+                                                <Rate :disabled="!permissionIdentity('project_task_manage', item)" v-model="item.importance" :count="1" clearable title="Importance" @on-change="changeImportance(item)" ></Rate>
+                                                <template v-if="permissionIdentity('project_task_manage', item)">
+                                                    <span title="Edit">
+                                                        <Icon type="ios-create" color="gray" :size="20" style="cursor:pointer" @click="editOneTask(index,taskDone)"></Icon>
+                                                    </span>
+                                                    <span style="margin-left:5px;margin-right:3px;cursor: pointer;color:gray;" title="Delete" @click="taskRemoveAssure(index,taskDone)">
+                                                        <Icon type="ios-trash" :size="20" color="gray"></Icon>
+                                                    </span>
+                                                </template>
                                             </div>
                                             <p style="word-break:break-word;padding:5px;cursor:pointer" @click="showTask(index,taskDone)">{{item.description}}</p>
                                             <div style="display:flex;justify-content:flex-end">
@@ -888,20 +894,40 @@
                         this.$Message.error("Fail!");
                     });
             },
-            isManager() {
-                if (this.userRole == 'Manager' || this.userRole == 'PManager') {
-                    return true;
+            isMmember(members) {
+                let isMember = false;
+                for (let i = 0; i < members.length; i++) {
+                    if (members[i].userId === this.userInfo.userId) {
+                        isMember = true;
+                        break;
+                    }
                 }
-                else {
+                if (isMember) {
+                    return true;
+                } else {
                     return false;
                 }
             },
-            isOwner(task){
-                if(task.creatorId==this.userInfo.userId){
-                    return true;
-                }
-                else{
-                    return false;
+            permissionIdentity(operation, task){
+                if(this.projectInfo.permissionManager != undefined && operation === "project_task_create"){
+                    if(this.projectInfo.managerId === this.userInfo.userId && this.projectInfo.permissionManager.project_task_create.project_manager){
+                        return true;
+                    }
+                    else if(this.isMmember(this.projectInfo.members) && this.projectInfo.permissionManager.project_task_create.member ){
+                        return true;
+                    }
+                } else if(this.projectInfo.permissionManager != undefined && operation === "project_task_manage") {
+                    if(this.projectInfo.managerId === this.userInfo.userId && this.projectInfo.permissionManager.project_task_manage.project_manager){
+                        return true;
+                    }
+                    else if(this.isMmember(this.projectInfo.members)){
+                        if(this.projectInfo.permissionManager.project_task_manage.member === "Yes") {
+                            return true;
+                        }
+                        else if(this.projectInfo.permissionManager.project_task_manage.member === "Yes, partly" && task.creatorId === this.userInfo.userId){
+                            return true;
+                        }
+                    }
                 }
             },
             taskItemDraggable() {

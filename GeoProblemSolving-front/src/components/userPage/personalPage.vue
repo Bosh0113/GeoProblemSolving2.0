@@ -12,7 +12,7 @@
   width: 100%;
   max-height: 100%;
   text-align: center;
-  background-color:#d3d3d333;
+  background-color: #d3d3d333;
 }
 /* 注册时上传头像的用户的头像样式 */
 .u_img {
@@ -216,7 +216,11 @@ body {
                     {{userDetail.email}}
                   </span>
                 </div>
-                <div class="single-info"  :title="`Phone number:  ` + userDetail.mobilePhone" v-show="userDetail.mobilePhone!=''">
+                <div
+                  class="single-info"
+                  :title="`Phone number:  ` + userDetail.mobilePhone"
+                  v-show="userDetail.mobilePhone!=''"
+                >
                   <span class="profileInfo">
                     <Icon type="ios-call-outline" :size="20" />
                     {{userDetail.mobilePhone}}
@@ -1459,7 +1463,8 @@ export default {
     },
     //点击跳转到指定项目的函数
     goSingleProject(projectInfo) {
-      sessionStorage.setItem("projectInfo", JSON.stringify(projectInfo));
+      // sessionStorage.setItem("projectInfo", JSON.stringify(projectInfo));
+      sessionStorage.setItem("projectInfo", this.encrypto(projectInfo));
       window.location.href =
         "/GeoProblemSolving/projectDetail/" + projectInfo.projectId;
     },
@@ -1753,7 +1758,24 @@ export default {
           }
         }
       });
-    }
+    },
+    encrypto(context) {
+      var CryptoJS = require("crypto-js");
+      var key = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
+      var iv = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
+      var encrypted = "";
+      if (typeof context == "string") {
+      } else if (typeof context == "object") {
+        context = JSON.stringify(context);
+      }
+      var srcs = CryptoJS.enc.Utf8.parse(context);
+      encrypted = CryptoJS.AES.encrypt(srcs, key, {
+        iv: iv,
+        mode: CryptoJS.mode.CBC,
+        padding: CryptoJS.pad.Pkcs7
+      });
+      return encrypted.toString();
+    },
   }
 };
 </script>

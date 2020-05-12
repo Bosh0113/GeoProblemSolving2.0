@@ -141,7 +141,7 @@
                 >{{folderName}}</BreadcrumbItem>
               </Breadcrumb>
             </div>
-            <div style="align-items:flex-end">
+            <div style="align-items:flex-end" v-if="role != 'Visitor'">
               <Tooltip content="Download" placement="bottom" class="fileBtn">
                 <Button
                   @click="downloadSelectFile"
@@ -180,7 +180,7 @@
                   class="fileItemName"
                   :title="folder.name"
                 >{{folder.name}}</a>
-                <div style="float:right">
+                <div style="float:right" v-if="role != 'Visitor'">
                   <Button
                     @click="renameFolderModalShow(folder)"
                     class="fileBtnHoverBlue"
@@ -214,7 +214,7 @@
                 >{{file.name}}</span>
                 <span class="fileItemSize">{{file.fileSize}}</span>
                 <span style="width:20%;margin-right:5%">{{file.uploadTime.substring(0,10)}}</span>
-                <div style="float:right">
+                <div style="float:right" v-if="role != 'Visitor'">
                   <Button
                     @click="filePreview(file)"
                     shape="circle"
@@ -242,24 +242,26 @@
                     class="fileBtnHoverOrange"
                     type="text"
                   ></Button>
-                  <Button
-                    @click="fileEditModelShow(file)"
-                    shape="circle"
-                    icon="md-create"
-                    title="Edit info"
-                    size="small"
-                    class="fileBtnHoverBlue"
-                    type="text"
-                  ></Button>
-                  <Button
-                    @click="fileDelete(file)"
-                    shape="circle"
-                    icon="ios-trash"
-                    title="Remove"
-                    size="small"
-                    class="fileBtnHoverRed"
-                    type="text"
-                  ></Button>
+                  <template v-if="permissionIdentity('subproject_resource_manage', file)">
+                    <Button
+                      @click="fileEditModelShow(file)"
+                      shape="circle"
+                      icon="md-create"
+                      title="Edit info"
+                      size="small"
+                      class="fileBtnHoverBlue"
+                      type="text"
+                    ></Button>
+                    <Button
+                      @click="fileDelete(file)"
+                      shape="circle"
+                      icon="ios-trash"
+                      title="Remove"
+                      size="small"
+                      class="fileBtnHoverRed"
+                      type="text"
+                    ></Button>
+                  </template>
                 </div>
               </Card>
             </CheckboxGroup>
@@ -483,7 +485,7 @@
 </template>
 <script>
 export default {
-  props: ["rootFolderId", "role"],
+  props: ["rootFolderId", "role", "project"],
   data() {
     return {
       currentFolder: {
@@ -626,6 +628,46 @@ export default {
   methods: {
     initSize() {
       this.contentHeight = window.innerHeight - 350;
+    },
+    permissionIdentity(operation, file) {
+      if (
+        this.project.permissionManager != undefined &&
+        operation === "subproject_resource_manage"
+      ) {
+        if (this.role == "PManager") {
+          if (
+            this.project.permissionManager.subproject_resource_manage
+              .project_manager === "Yes"
+          ) {
+            return true;
+          } else if (
+            this.project.permissionManager.subproject_resource_manage
+              .project_manager === "Yes, partly" &&
+            file.uploaderId === this.$store.getters.userId
+          ) {
+            return true;
+          }
+        } else if (
+          this.role == "Manager" &&
+          this.project.permissionManager.subproject_resource_manage
+            .subproject_manager
+        ) {
+          return true;
+        } else if (this.role == "Member") {
+          if (
+            this.project.permissionManager.subproject_resource_manage.member ===
+            "Yes"
+          ) {
+            return true;
+          } else if (
+            this.project.permissionManager.subproject_resource_manage.member ===
+              "Yes, partly" &&
+            file.uploaderId === this.$store.getters.userId
+          ) {
+            return true;
+          }
+        }
+      }
     },
     enterFolder(currentFolderId) {
       this.chooseFilesArray = [];
@@ -979,7 +1021,6 @@ export default {
         });
         $(".jsPanel-content").css("font-size", "0");
         this.$emit("toolPanel", this.panel);
-
       } else if (/\.(pdf|json|md|gif|jpg|png)$/.test(name.toLowerCase())) {
         if (this.panel != null) {
           this.panel.close();
@@ -1006,7 +1047,6 @@ export default {
         });
         $(".jsPanel-content").css("font-size", "0");
         this.$emit("toolPanel", this.panel);
-
       } else {
         this.$Notice.error({
           title: "Open failed",

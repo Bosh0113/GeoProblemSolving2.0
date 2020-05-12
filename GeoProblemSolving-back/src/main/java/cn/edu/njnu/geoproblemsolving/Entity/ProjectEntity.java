@@ -24,7 +24,7 @@ public class ProjectEntity {
     private String type; //type0|type1|type2
     private String stepId;
     private String solvingProcess;
-    private JSONObject authorityManager;
+    private JSONObject permissionManager;
 
     public String getSolvingProcess() {
         return solvingProcess;
@@ -90,8 +90,8 @@ public class ProjectEntity {
         return managerId;
     }
 
-    public JSONObject getAuthorityManager() {
-        return authorityManager;
+    public JSONObject getPermissionManager() {
+        return permissionManager;
     }
 
     public void setSolvingProcess(String solvingProcess) {
@@ -158,7 +158,7 @@ public class ProjectEntity {
         this.managerName = managerName;
     }
 
-    public void setAuthorityManager(JSONObject authorityManager) {
-        this.authorityManager = authorityManager;
+    public void setPermissionManager(JSONObject permissionManager) {
+        this.permissionManager = permissionManager;
     }
 }

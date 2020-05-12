@@ -65,6 +65,7 @@
           :stepInfo="stepInfo"
           :userRole="userRole"
           :received-chat-msgs="receivedChatMsgs"
+          :projectInfo="projectInfo"
         ></router-view>
       </div>
     </div>
@@ -114,7 +115,8 @@ export default {
           !(
             vm.userRole == "Manager" ||
             vm.userRole == "Member" ||
-            vm.userRole == "PManager"
+            vm.userRole == "PManager" ||
+            vm.getVisitorAccess()
           )
         ) {
           vm.$Message.error("You have no property to access it");
@@ -184,6 +186,17 @@ export default {
         this.contentHeight = window.innerHeight - 175;
       } else {
         this.contentHeight = 490;
+      }
+    },
+    getVisitorAccess() {
+      let visitorPermission = this.projectInfo.permissionManager.observe
+        .visitor;
+      if (
+        this.projectInfo.permissionManager != undefined &&
+        this.userRole == "Visitor" &&
+        (visitorPermission == "All")
+      ) {
+        return true;
       }
     },
     toProjectDetailPage(){

@@ -27,11 +27,12 @@
       <div slot="title">
         <h4>Toolsets and tools</h4>
       </div>
-      <div slot="extra" v-show="userRole!='Visitor'">
+      <div slot="extra" v-if="permissionIdentity('workspace_tool')">
         <manage-tools
           :step-info="stepInfo"
           @updateStepTools="stepToolListChanged"
           :key="toolModal"
+          title="Manage toolsets and tools"
           style="margin-top:-10px"
         ></manage-tools>
       </div>
@@ -162,7 +163,7 @@
 import manageTools from "./../../../tools/toolToStepModal";
 import Avatar from "vue-avatar";
 export default {
-  props: ["stepInfo", "userRole"],
+  props: ["stepInfo", "userRole", "projectInfo"],
   components: {
     manageTools,
     Avatar
@@ -218,6 +219,29 @@ export default {
     };
   },
   methods: {
+    permissionIdentity(operation) {
+      if (
+        this.projectInfo.permissionManager != undefined &&
+        operation === "workspace_tool"
+      ) {
+        if (
+          this.userRole == "PManager" &&
+          this.projectInfo.permissionManager.workspace_tool.project_manager
+        ) {
+          return true;
+        } else if (
+          this.userRole == "Manager" &&
+          this.projectInfo.permissionManager.workspace_tool.subproject_manager
+        ) {
+          return true;
+        } else if (
+          this.userRole == "Member" &&
+          this.projectInfo.permissionManager.workspace_tool.member
+        ) {
+          return true;
+        }
+      }
+    },
     getAllTools() {
       if (
         this.stepInfo.toolList != null &&

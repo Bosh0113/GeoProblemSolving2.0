@@ -32,39 +32,46 @@
   }
 }
 
-.left_bar_bg{
-  background:lightslategrey;
+.left_bar_bg {
+  background: lightslategrey;
 }
 </style>
 <template>
   <div>
     <Row>
-      <Menu :active-name="menuActive" style="width:60px;position:absolute;z-index:1" :style="{height:contentHeight}"
-        @on-select="changeContent" class="left_bar_bg" theme="dark">
+      <Menu
+        :active-name="menuActive"
+        style="width:60px;position:absolute;z-index:1"
+        :style="{height:contentHeight}"
+        @on-select="changeContent"
+        class="left_bar_bg"
+        theme="dark"
+      >
         <MenuItem name="back" style="padding-left: 16px;" title="Project page">
-        <Icon type="md-arrow-round-back" color="white" size="30" />
+          <Icon type="md-arrow-round-back" color="white" size="30" />
         </MenuItem>
         <!-- <MenuItem name="overview" style="padding-left: 16px;" title="Subproject Home">
         <Icon type="md-home" size="30" />
-        </MenuItem> -->
+        </MenuItem>-->
         <MenuItem name="info" style="padding-left: 16px;" title="Subproject introduction">
-        <Icon type="ios-information-circle" color="white" size="30" />
+          <Icon type="ios-information-circle" color="white" size="30" />
         </MenuItem>
         <MenuItem name="task" style="padding-left: 16px;" title="Task arrangement">
-        <Icon type="md-calendar" size="30" color="white" />
+          <Icon type="md-calendar" size="30" color="white" />
         </MenuItem>
 
         <MenuItem name="process" style="padding-left: 16px;" title="Working steps">
-        <!-- <Icon type="md-git-branch" size="30" /> -->
-        <Icon type="md-analytics" size="30" color="white" />
+          <!-- <Icon type="md-git-branch" size="30" /> -->
+          <Icon type="md-analytics" size="30" color="white" />
         </MenuItem>
 
         <MenuItem name="resource" style="padding-left: 16px;" title="Subproject resources">
-        <Icon type="ios-folder" size="30" color="white" />
+          <Icon type="ios-folder" size="30" color="white" />
         </MenuItem>
       </Menu>
       <div
-        style="height:60px;display:flex;align-items:center;border:1px solid lightgrey;margin-left:60px;justify-content:center;">
+        style="height:60px;display:flex;align-items:center;border:1px solid lightgrey;margin-left:60px;justify-content:center;"
+      >
         <div style="margin-left:20px; position:absolute;left:80px;">
           <strong style="font-size:1.5rem">Subproject</strong>
           <Divider type="vertical" />
@@ -85,8 +92,13 @@
           @click="gotoWorkingspace"
         >Working space</Button>-->
       </div>
-      <router-view :subProjectInfo="subProjectInfo" :userRole="userRole" :projectInfo="projectInfo"
-        :scopeInfo="scopeInfo" @changeSubProjectInfo="changeSubProjectInfo"></router-view>
+      <router-view
+        :subProjectInfo="subProjectInfo"
+        :userRole="userRole"
+        :projectInfo="projectInfo"
+        :scopeInfo="scopeInfo"
+        @changeSubProjectInfo="changeSubProjectInfo"
+      ></router-view>
     </Row>
   </div>
 </template>
@@ -127,7 +139,8 @@ export default {
           !(
             vm.userRole == "Manager" ||
             vm.userRole == "Member" ||
-            vm.userRole == "PManager"
+            vm.userRole == "PManager" ||
+            vm.getVisitorAccess()
           )
         ) {
           vm.$Message.error("You have no property to access it");
@@ -142,7 +155,7 @@ export default {
   beforeRouteLeave(to, from, next) {
     next();
   },
-  beforeDestroy: function () {
+  beforeDestroy: function() {
     window.removeEventListener("resize", this.initSize);
   },
   methods: {
@@ -174,6 +187,18 @@ export default {
       } else if (type == "task") {
         this.menuActive = type;
         this.panelTitle = "Task assignment";
+      }
+    },
+    getVisitorAccess() {
+      let visitorPermission = this.projectInfo.permissionManager.observe
+        .visitor;
+      if (
+        this.projectInfo.permissionManager != undefined &&
+        this.userRole == "Visitor" &&
+        (visitorPermission == "All" ||
+          visitorPermission == "At subproject level")
+      ) {
+        return true;
       }
     },
     getProjectInfo() {
@@ -235,7 +260,7 @@ export default {
               that.$store.commit("setSubProjectInfo", subProjectInfo);
             }
           },
-          error: function (err) {
+          error: function(err) {
             console.log("Get manager name fail.");
           }
         });

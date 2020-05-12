@@ -77,7 +77,7 @@
           <Option value="materials">Related materials</Option>
         </Select>
         <Button
-          v-show="stepInfo.activeStatus"
+          v-if="stepInfo.activeStatus"
           shape="circle"
           icon="md-cloud-upload"
           @click="dataUploadModalShow"
@@ -109,6 +109,7 @@
                 type="text"
               ></Button>
               <Button
+                v-if="permissionIdentity('workspace_resource')"
                 class="fileBtnHoverRed"
                 size="small"
                 shape="circle"
@@ -158,6 +159,7 @@
                       @click="checkData(item)"
                     ></Button>
                     <Button
+                      v-if="permissionIdentity('workspace_resource', item)"
                       size="small"
                       title="Delete"
                       icon="md-close"
@@ -375,7 +377,7 @@ export default {
       panel: null
     };
   },
-  props: ["stepInfo", "userRole"],
+  props: ["stepInfo", "userRole", "projectInfo"],
   watch: {
     checkDataModal(value) {
       if (!value) {
@@ -419,6 +421,44 @@ export default {
     };
   },
   methods: {
+    permissionIdentity(operation, resource) {
+      if (
+        this.projectInfo.permissionManager != undefined &&
+        operation === "workspace_resource"
+      ) {
+        if (this.userRole == "PManager") {
+          if (
+            this.projectInfo.permissionManager.workspace_resource
+              .project_manager === "Yes"
+          ) {
+            return true;
+          } else if (
+            this.projectInfo.permissionManager.workspace_resource
+              .project_manager === "Yes, partly" &&
+            resource.uploaderId === this.userInfo.userId
+          ) {
+          }
+        } else if (
+          this.userRole == "Manager" &&
+          this.projectInfo.permissionManager.workspace_resource
+            .subproject_manager
+        ) {
+          return true;
+        } else if (this.userRole == "Member") {
+          if (
+            this.projectInfo.permissionManager.workspace_resource.member ===
+            "Yes"
+          ) {
+            return true;
+          } else if (
+            this.projectInfo.permissionManager.workspace_resource.member ===
+              "Yes, partly" &&
+            resource.uploaderId === this.userInfo.userId
+          ) {
+          }
+        }
+      }
+    },
     getResList() {
       var list = [];
       if (this.stepInfo.stepId != "" && this.stepInfo.stepId != undefined) {
