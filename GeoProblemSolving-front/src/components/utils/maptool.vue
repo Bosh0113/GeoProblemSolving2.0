@@ -325,7 +325,7 @@ export default {
         drawPolygon: true, // adds button to draw a polygon
         drawCircle: true, // adds button to draw a cricle
         cutPolygon: false, // adds button to cut a hole in a polygon
-        editMode: false, // adds button to toggle edit mode for all layers
+        editMode: true, // adds button to toggle edit mode for all layers
         dragMode: false,
         removalMode: true // adds a button to remove layers
       };

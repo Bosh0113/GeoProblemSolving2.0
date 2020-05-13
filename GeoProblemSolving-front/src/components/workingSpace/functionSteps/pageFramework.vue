@@ -307,13 +307,15 @@ export default {
     },
     getParticipants() {
       let members = this.subProjectInfo.members;
-      let manager = [
-        {
-          userId: this.subProjectInfo["managerId"],
-          userName: this.subProjectInfo["managerName"]
-        }
-      ];
-      let membersList = manager.concat(members);
+      if(members[0].userId!=this.subProjectInfo["managerId"]){
+        let manager = [
+          {
+            userId: this.subProjectInfo["managerId"],
+            userName: this.subProjectInfo["managerName"]
+          }
+        ];
+        let membersList = manager.concat(members);
+      }
 
       let participantsTemp = [];
       let count = membersList.length;
