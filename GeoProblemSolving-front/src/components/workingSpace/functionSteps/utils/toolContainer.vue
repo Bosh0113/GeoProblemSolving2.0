@@ -157,6 +157,15 @@
       </div>
       <div slot="footer"></div>
     </Modal>
+    <Modal
+      v-model="jupyterModal"
+      title="Open a jupyter notebook environment"
+      @on-ok="checkJupyterUser"
+      ok-text="Yes"
+      cancel-text="Cancel"
+    >
+      <h3>Note: Jupyter notebooks will be accessed by all members in this project.</h3>
+    </Modal>
   </div>
 </template>
 <script>
@@ -186,7 +195,8 @@ export default {
       toolModal: 0,
       toolsetToolList: [],
       showToolsetToolsModal: false,
-      panelList: []
+      panelList: [],
+      jupyterModal: false
     };
   },
   mounted() {
@@ -351,15 +361,22 @@ export default {
       this.showToolsetToolsModal = true;
     },
     useTool(toolInfo) {
-      var toolURL = "";
-      if(toolInfo.toolName == "Jupyter notebook"){
-        toolURL =
-        '<iframe src="' +
-        toolInfo.toolUrl +
-        '" style="width: 100%;height:100%;"></iframe>';
+      // 记录信息
+      let toolRecords = {
+        type: "tools",
+        time: new Date().Format("yyyy-MM-dd HH:mm:ss"),
+        who: this.userInfo.userName,
+        content: "used a tool",
+        toolType: toolInfo.toolName
+      };
+      this.$emit("toolBehavior", toolRecords);
+
+      if (toolInfo.toolName == "Jupyter notebook") {
+        this.jupyterModal = true;
+        return;
       }
-      else{
-        toolURL =
+
+      var toolURL =
         '<iframe src="' +
         toolInfo.toolUrl +
         "?userName=" +
@@ -368,9 +385,8 @@ export default {
         this.userInfo.userId +
         "&groupID=" +
         this.stepInfo.stepId +
-        '" style="width: 100%;height:100%;"></iframe>';
-      }
-      
+        '" style="width: 100%;height:100%;" frameborder="0"></iframe>';
+
       var demoPanelTimer = null;
       var panel = jsPanel.create({
         theme: "success",
@@ -391,16 +407,84 @@ export default {
       $(".jsPanel-content").css("font-size", "0");
       this.panelList.push(panel);
       this.$emit("toolPanel", panel);
+    },
+    checkJupyterUser() {
+      this.axios
+        .get(
+          "/GeoProblemSolving/jupyter/inquiry?projectId=" +
+            this.projectInfo.projectId
+        )
+        .then(res => {
+          if (res.data == "None") {
+            this.prepareJupyter();
+          } else {
+            this.jupyterLogin(res.data[0].jupyterUserId);
+          }
+        })
+        .catch(err => {});
+    },
+    jupyterLogin(jupyterUserId) {
+      let name_jupyterhub = jupyterUserId;
 
-      // 记录信息
-      let toolRecords = {
-        type: "tools",
-        time: new Date().Format("yyyy-MM-dd HH:mm:ss"),
-        who: this.userInfo.userName,
-        content: "used a tool",
-        toolType: toolInfo.toolName
+      let data = new FormData();
+      data.append("username", name_jupyterhub);
+      let info = {
+        userId: this.userInfo.userId,
+        projectId: this.projectInfo.projectId
       };
-      this.$emit("toolBehavior", toolRecords);
+      this.axios
+        .post(
+          "http://172.21.212.83/hub/login?next=/hub/user/" + name_jupyterhub,
+          data,
+          {
+            headers: {
+              "project-user": JSON.stringify(info)
+            }
+          }
+        )
+        .then(res => {
+          let url = "http://172.21.212.83/hub/user/" + name_jupyterhub;
+          window.open(url);
+        })
+        .catch(err => {
+          let url = "http://172.21.212.83/hub/user/" + name_jupyterhub;
+          window.open(url);
+        });
+    },
+    prepareJupyter(jupyterUserId) {
+      let name_jupyterhub = this.projectInfo.projectId;
+      name_jupyterhub = name_jupyterhub.replace(/[-]/g, "");
+
+      this.axios
+        .post(
+          "http://172.21.212.83:80/hub/api/users/" + name_jupyterhub,
+          { name: name_jupyterhub },
+          {
+            headers: {
+              Authorization: "token 125233d022884cf982d43ed9890aba70"
+            }
+          }
+        )
+        .then(res => {
+          this.createJupyterUser(name_jupyterhub);
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    },
+    createJupyterUser(name_jupyterhub) {
+      let data = {
+        projectId: this.projectInfo.projectId,
+        jupyterUserId: name_jupyterhub 
+      };
+      this.axios
+        .post("/GeoProblemSolving/jupyter/create", data)
+        .then(res => {
+          if (res.data == "Success") {
+            this.$Notice.info({desc: "Create Jupyter notebook successfully. It can be used now."});
+          }
+        })
+        .catch(err => {});
     }
   }
 };

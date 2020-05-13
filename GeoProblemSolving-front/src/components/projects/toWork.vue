@@ -66,10 +66,12 @@ export default {
       }
     },
     getProjectInfo() {
-      this.projectInfo = JSON.parse(
-        this.decrypto(sessionStorage.getItem("projectInfo"))
-      );
-      if (this.projectInfo == {} || this.projectInfo == undefined) {
+      try {
+        this.projectInfo = JSON.parse(
+          this.decrypto(sessionStorage.getItem("projectInfo"))
+        );
+      } catch (err) {}
+      if (JSON.stringify(this.projectInfo) == "{}" || this.projectInfo == undefined) {
         $.ajax({
           url:
             "/GeoProblemSolving/project/inquiry" +

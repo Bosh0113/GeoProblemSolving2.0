@@ -290,8 +290,8 @@
                             if(this.applyProjectInfo.permissionManager != undefined && this.applyProjectInfo.permissionManager.auto_join.visitor) {
 
                                 // join the project directly
-                                this.axios
-                                    .get("/GeoProblemSolving/project/join"+"projectId"+  this.applyProjectInfo.projectId+"&userId" +this.userInfo.userId)
+                                axios
+                                    .get("/GeoProblemSolving/project/join?"+"projectId="+  this.applyProjectInfo.projectId+"&userId=" +this.userInfo.userId)
                                     .then(res => {
                                         if (res.data === "Success") {
                                             this.$Message.info("Join the project successfuly");

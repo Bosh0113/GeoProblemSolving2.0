@@ -61,7 +61,7 @@
     </div>
     <div :style="{height:windowHeight+'px'}" style="margin-left:60px">
       <template v-if="fileURL != ''" class="pfdPanel">
-        <iframe :width="fileWidth" :height="fileHeight-5" :src="fileURL">
+        <iframe :width="fileWidth" :height="fileHeight-5" :src="fileURL" frameborder="0">
           This browser does not support Files. Please download the file to view it:
           <a
             :href="fileURL"
