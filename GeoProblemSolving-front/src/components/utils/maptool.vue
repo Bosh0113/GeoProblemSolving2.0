@@ -175,8 +175,7 @@ export default {
     next(vm => {
       if (!vm.$store.getters.userState || vm.$store.getters.userId == "") {
         vm.$router.push({ name: "Login" });
-      } else {
-      }
+      } 
     });
   },
   methods: {
@@ -626,7 +625,6 @@ export default {
       });
 
       this.map.on("mouseup", e => {
-        isMouseDown = false;
         isLayerCtrlClick = true;
       });
 
@@ -678,6 +676,7 @@ export default {
           };
           this.socketApi.sendSock(this.send_content, this.getSocketConnect);
         }
+        isMouseDown = false;
       });
 
       // 裁剪事件

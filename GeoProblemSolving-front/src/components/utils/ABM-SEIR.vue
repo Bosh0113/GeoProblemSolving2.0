@@ -512,7 +512,7 @@ export default {
                 // this.agentMap.buildingify(geoJsonLayer.getBounds(), mapdata, style_option, this.unit_layers, this.street_layers);
 
                 // websocket 同步
-                if (origin == undefined) {
+                if (this.collaborative && origin == undefined) {
                   let messageJson = {
                     type: "operation",
                     operation: "import_data",
@@ -544,7 +544,7 @@ export default {
         this.seirParams.mortalityRate = this.death_rate / 100;
 
         // websocket 同步
-        if (origin == undefined) {
+        if (this.collaborative && origin == undefined) {
           let messageJson = {
             type: "operation",
             operation: "SEIR_params",
@@ -593,12 +593,14 @@ export default {
         this.seirParams.mortalityRate = this.death_rate / 100;
 
         // websocket 同步
-        let messageJson = {
-          type: "operation",
-          operation: "SEIR_params",
-          data: this.seirParams
-        };
-        this.sendMessage(JSON.stringify(messageJson));
+        if (this.collaborative) {
+          let messageJson = {
+            type: "operation",
+            operation: "SEIR_params",
+            data: this.seirParams
+          };
+          this.sendMessage(JSON.stringify(messageJson));
+        }
       } else {
         this.$Notice.open({
           title:
@@ -626,7 +628,8 @@ export default {
             color: "green",
             radius: 0.5
           },
-          infect_state: "Susceptible"
+          infect_state: "Susceptible",
+          contact: false
         },
         geometry: {
           type: "Point",
@@ -729,17 +732,26 @@ export default {
     agentController() {
       let _this = this;
       // 移动距离（每个trick）
-      let distPerTrick = (this.agentSpeed * this.totalSimuDays * 4) / 5;
-      if (this.agentMap.state.ticks % 300 === 0) {
+      let distPerTrick = this.agentSpeed * 10;
+
+      if (this.agentMap.state.ticks % 800 === 0) {
         //计时器
         this.timeClick++;
 
         // 每一天
-        let day = Math.floor(100 / this.totalSimuDays);
-        if (this.timeClick % day === 0 && this.simuTime < 100) {
-          this.simuTime++;
-          this.simu_results.push(this.currentState);
+        let activitiesPerDay = 2; //每天活动次数
+        let offset = 100 / this.totalSimuDays;
+        if (this.timeClick % activitiesPerDay === 0 && this.simuTime < 100) {
+          this.simuTime = this.simuTime + offset;
+          this.simu_results.push({
+            susceptible: this.currentState.susceptible,
+            exposed: this.currentState.exposed,
+            infectious: this.currentState.infectious,
+            recovered: this.currentState.recovered,
+            death: this.currentState.death
+          });
         }
+
         //智能体状态
         this.agentMap.agents.eachLayer(agent => {
           let random_index = Math.floor(
@@ -786,6 +798,7 @@ export default {
             // 暴露期转为发病期
             let probability = Math.random().toFixed(3);
             if (probability < _this.seirParams.infectedRate) {
+              agent.infect_state = "Infected";
               agent.setStyle({
                 color: "red",
                 radius: 0.5
@@ -810,7 +823,7 @@ export default {
         // 确定暴露个体(有效接触个体)
         for (let i = 0; i < this.contact_agentId_list.length; i++) {
           let probability = Math.random().toFixed(3);
-          if (probability < this.seirParams.exposedRate) {
+          if (probability < this.seirParams.exposedRate / activitiesPerDay) {
             this.agentMap.agents.getLayer(
               this.contact_agentId_list[i]
             ).infect_state = "Exposed";
@@ -822,6 +835,10 @@ export default {
               });
             this.currentState.exposed++;
             this.currentState.susceptible--;
+          } else {
+            this.agentMap.agents.getLayer(
+              this.contact_agentId_list[i]
+            ).contact = false;
           }
         }
         this.contact_agentId_list = [];
@@ -839,8 +856,12 @@ export default {
             _this.agentMap.agents.eachLayer(_agent => {
               if (_agent.infect_state == "Susceptible") {
                 let dist = agent._latlng.distanceTo(_agent._latlng);
-                if (dist <= _this.agentInteractDist) {
+                if (
+                  dist <= _this.agentInteractDist &&
+                  _agent.contact == false
+                ) {
                   _this.contact_agentId_list.push(_agent._leaflet_id);
+                  _agent.contact = true;
                 }
               }
             });
@@ -887,7 +908,7 @@ export default {
         this.agentMap.controller = this.agentController;
 
         // websocket 同步
-        if (origin == undefined) {
+        if (this.collaborative && origin == undefined) {
           let messageJson = {
             type: "operation",
             operation: "add_agents"
@@ -907,7 +928,7 @@ export default {
           this.agentMap.agents.clearLayers();
 
           // websocket 同步
-          if (origin == undefined) {
+          if (this.collaborative && origin == undefined) {
             let messageJson = {
               type: "operation",
               operation: "remove_agents"
@@ -941,7 +962,7 @@ export default {
         };
 
         // websocket 同步
-        if (origin == undefined) {
+        if (this.collaborative && origin == undefined) {
           let messageJson = {
             type: "operation",
             operation: "agent_params",
@@ -964,12 +985,14 @@ export default {
       this.quarantine = status;
 
       // websocket 同步
-      let messageJson = {
-        type: "operation",
-        operation: "quarantine",
-        data: status
-      };
-      this.sendMessage(JSON.stringify(messageJson));
+      if (this.collaborative) {
+        let messageJson = {
+          type: "operation",
+          operation: "quarantine",
+          data: status
+        };
+        this.sendMessage(JSON.stringify(messageJson));
+      }
     },
     startSimu(origin) {
       if (this.agentMap.agents == null) return;
@@ -1002,7 +1025,7 @@ export default {
         this.agentMap.run();
 
         // websocket 同步
-        if (origin == undefined) {
+        if (this.collaborative && origin == undefined) {
           let messageJson = {
             type: "operation",
             operation: "run",
@@ -1023,7 +1046,7 @@ export default {
         this.agentMap.pause();
 
         // websocket 同步
-        if (origin == undefined) {
+        if (this.collaborative && origin == undefined) {
           let messageJson = {
             type: "operation",
             operation: "pause",
@@ -1039,7 +1062,7 @@ export default {
         this.agentMap.run();
 
         // websocket 同步
-        if (origin == undefined) {
+        if (this.collaborative && origin == undefined) {
           let messageJson = {
             type: "operation",
             operation: "continue",
@@ -1059,15 +1082,21 @@ export default {
         this.timeClick = 0;
 
         // 代理地图
+        if (this.agentMap.agents != null && this.agentMap.agents != undefined) {
+          this.agentMap.agents.clearLayers();
+        }
         this.agentMap.clear();
         this.agentMap = null;
         this.agentMap = L.A.agentmap(this.map);
+
+        // 接触的agents
+        this.contact_agentId_list = [];
 
         // 模拟者
         this.simulator = {};
 
         // websocket 同步
-        if (origin == undefined) {
+        if (this.collaborative && origin == undefined) {
           let messageJson = {
             type: "operation",
             operation: "end",
@@ -1083,7 +1112,7 @@ export default {
           this.saveSimuModal = false;
 
           //格式化
-          let result = "id,susceptible,exposed,infectious,recovered,death\n";
+          let result = "Days,Susceptible,Exposed,Infectious,Rrecovered,Death\n";
           for (var i = 0; i < this.simu_results.length; i++) {
             result += i.toString() + ",";
             result += this.simu_results[i].susceptible + ",";
@@ -1094,7 +1123,7 @@ export default {
           }
 
           //创建blob
-          let blob = new Blob(["\ufeff" + result.join("\n")], {
+          let blob = new Blob(["\ufeff" + result], {
             type: "text/csv,charset=UTF-8"
           });
           var resultBlob = new File([blob], this.resultName + ".csv");
@@ -1238,7 +1267,7 @@ export default {
         var messageJson = {};
         messageJson["type"] = "ping";
         messageJson["message"] = "ping";
-        if (that.abseirSocket != null && that.abseirSocket != undefined) {
+        if (this.collaborative && that.abseirSocket != null && that.abseirSocket != undefined) {
           that.sendMessage(JSON.stringify(messageJson));
         }
       }, 20000);

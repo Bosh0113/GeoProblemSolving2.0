@@ -873,7 +873,7 @@ export default {
           this.stepInfo.stepId +
           "&resourceID=" +
           item.resourceId +
-          '" style="width: 100%;height:100%;"></iframe>';
+          '" style="width: 100%;height:100%;" frameborder="0"></iframe>';
       } else {
         toolURL =
           '<iframe src="' +
@@ -884,7 +884,7 @@ export default {
           this.stepInfo.stepId +
           "&resourceID=" +
           item.resourceId +
-          '" style="width: 100%;height:100%;"></iframe>';
+          '" style="width: 100%;height:100%;" frameborder="0"></iframe>';
       }
       var demoPanelTimer = null;
       this.showPanel(toolURL, toolInfo.toolName);
@@ -923,7 +923,7 @@ export default {
             var toolURL =
               "<iframe src=" +
               url +
-              ' style="width: 100%;height:100%"></iframe>';
+              ' style="width: 100%;height:100%" frameborder="0"></iframe>';
             var demoPanelTimer = null;
             this.showPanel(toolURL, res.name);
           },
@@ -950,7 +950,7 @@ export default {
         var toolURL =
           "<iframe src=" +
           url +
-          ' style="width: 100%;height:100%" controls></iframe>';
+          ' style="width: 100%;height:100%" frameborder="0" controls></iframe>';
         var demoPanelTimer = null;
         this.showPanel(toolURL, res.name);
       } else {

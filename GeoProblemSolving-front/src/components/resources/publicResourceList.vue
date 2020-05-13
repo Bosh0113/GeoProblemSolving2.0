@@ -304,7 +304,7 @@ export default {
             var toolURL =
               "<iframe src=" +
               url +
-              ' style="width: 100%;height:100%"></iframe>';
+              ' style="width: 100%;height:100%" frameborder="0"></iframe>';
             this.panel = jsPanel.create({
               headerControls: {
                 smallify: "remove"
@@ -367,7 +367,7 @@ export default {
         var toolURL =
           "<iframe src=" +
           url +
-          ' style="width: 100%;height:100%" controls></iframe>';
+          ' style="width: 100%;height:100%" frameborder="0" controls></iframe>';
         this.panel = jsPanel.create({
           headerControls: {
             smallify: "remove"

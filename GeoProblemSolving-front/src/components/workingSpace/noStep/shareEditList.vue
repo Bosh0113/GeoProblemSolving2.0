@@ -130,14 +130,14 @@ export default {
           this.stepInfo.stepId +
           "&resourceID=" +
           item.resourceId +
-          '" style="width: 100%;height:100%;"></iframe>';
+          '" style="width: 100%;height:100%;" frameborder="0"></iframe>';
       } else {
         toolURL =
           '<iframe src="/GeoProblemSolving/Collaborative/Mindmap/share/mindmap.html?userName=&userID=&groupID=' +
           this.stepInfo.stepId +
           "&resourceID=" +
           item.resourceId +
-          '" style="width: 100%;height:100%;"></iframe>';
+          '" style="width: 100%;height:100%;" frameborder="0"></iframe>';
       }
       var demoPanelTimer = null;
       this.panel = jsPanel.create({
