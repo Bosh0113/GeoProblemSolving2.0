@@ -458,8 +458,8 @@ export default {
         userId: this.userInfo.userId,
         projectId: this.projectInfo.projectId
       };
-      let info = this.encrypto(loginInfo)
-
+      let info = JSON.stringify(loginInfo);
+      
       let data = new FormData();
       data.append("login-info", info);
       this.axios
@@ -512,23 +512,6 @@ export default {
           }
         })
         .catch(err => {});
-    },
-    encrypto(context) {
-      var CryptoJS = require("crypto-js");
-      var key = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
-      var iv = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
-      var encrypted = "";
-      if (typeof context == "string") {
-      } else if (typeof context == "object") {
-        context = JSON.stringify(context);
-      }
-      var srcs = CryptoJS.enc.Utf8.parse(context);
-      encrypted = CryptoJS.AES.encrypt(srcs, key, {
-        iv: iv,
-        mode: CryptoJS.mode.CBC,
-        padding: CryptoJS.pad.Pkcs7
-      });
-      return encrypted.toString();
     }
   }
 };
