@@ -27,7 +27,7 @@
                                 <li>Directed graph workflow based process construction</li>
                             </ul>
                         </div>
-                        <div style="text-align:center;margin-top:2%">
+                        <div style="text-align:center;margin-top:2%" v-if="userRole != 'Visitor'">
                             <h3>
                             Set this content as 
                             <a @click="selectTypeModalShow('type0')">Design workflow graph</a>
@@ -51,7 +51,7 @@
                                 <li>A pure workspace with many tools</li>
                             </ul>
                         </div>
-                        <div style="text-align:center;margin-top:2%">
+                        <div style="text-align:center;margin-top:2%" v-if="userRole != 'Visitor'">
                             <h3>
                             Set this content as 
                             <a @click="selectTypeModalShow('type1')">Do it right now</a>

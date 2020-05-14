@@ -424,34 +424,30 @@ export default {
         .catch(err => {});
     },
     jupyterLogin(jupyterUserId) {
-      let name_jupyterhub = jupyterUserId;
-
-      let data = new FormData();
-      data.append("username", name_jupyterhub);
-      let info = {
+      let loginInfo = {
+        JupyterUser: jupyterUserId,
         userId: this.userInfo.userId,
         projectId: this.projectInfo.projectId
       };
+      let info = this.encrypto(loginInfo)
+
+      let data = new FormData();
+      data.append("login-info", info);
       this.axios
         .post(
-          "http://172.21.212.83/hub/login?next=/hub/user/" + name_jupyterhub,
-          data,
-          {
-            headers: {
-              "project-user": JSON.stringify(info)
-            }
-          }
+          "http://172.21.212.83/hub/login?next=/hub/user/" + jupyterUserId,
+          data
         )
         .then(res => {
-          let url = "http://172.21.212.83/hub/user/" + name_jupyterhub;
+          let url = "http://172.21.212.83/hub/user/" + jupyterUserId;
           window.open(url);
         })
         .catch(err => {
-          let url = "http://172.21.212.83/hub/user/" + name_jupyterhub;
+          let url = "http://172.21.212.83/hub/user/" + jupyterUserId;
           window.open(url);
         });
     },
-    prepareJupyter(jupyterUserId) {
+    prepareJupyter() {
       let name_jupyterhub = this.projectInfo.projectId;
       name_jupyterhub = name_jupyterhub.replace(/[-]/g, "");
 
@@ -485,6 +481,23 @@ export default {
           }
         })
         .catch(err => {});
+    },
+    encrypto(context) {
+      var CryptoJS = require("crypto-js");
+      var key = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
+      var iv = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
+      var encrypted = "";
+      if (typeof context == "string") {
+      } else if (typeof context == "object") {
+        context = JSON.stringify(context);
+      }
+      var srcs = CryptoJS.enc.Utf8.parse(context);
+      encrypted = CryptoJS.AES.encrypt(srcs, key, {
+        iv: iv,
+        mode: CryptoJS.mode.CBC,
+        padding: CryptoJS.pad.Pkcs7
+      });
+      return encrypted.toString();
     }
   }
 };
