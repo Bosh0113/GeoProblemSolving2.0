@@ -308,7 +308,7 @@ export default {
     getParticipants() {
       let members = this.subProjectInfo.members;
       let membersList = members;
-      if(members[0].userId!=this.subProjectInfo["managerId"]){
+      if(members.length<1||members[0].userId!=this.subProjectInfo["managerId"]){
         let manager = [
           {
             userId: this.subProjectInfo["managerId"],
