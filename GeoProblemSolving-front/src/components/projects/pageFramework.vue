@@ -271,6 +271,7 @@ export default {
     },
     getParticipants() {
       let members = this.projectInfo.members;
+      let membersList = members;
       if(members[0].userId!=this.projectInfo["managerId"]){
         let manager = [
           {
@@ -278,7 +279,7 @@ export default {
             userName: this.projectInfo["managerName"]
           }
         ];
-        let membersList = manager.concat(members);
+        membersList = manager.concat(members);
       }
 
       let participantsTemp = [];
