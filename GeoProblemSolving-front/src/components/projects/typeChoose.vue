@@ -27,7 +27,7 @@
                                 <li>Different participatory levels</li>
                             </ul>
                         </div>
-                        <div style="text-align:center;margin-top:2%">
+                        <div style="text-align:center;margin-top:2%" v-if="userRole != 'Visitor'">
                             <h3>
                             To: 
                             <a @click="selectTypeModalShow('type0')">Create subprojects</a>
@@ -52,7 +52,7 @@
                                 <li>Directed graph workflow based process construction</li>
                             </ul>
                         </div>
-                        <div style="text-align:center;margin-top:2%">
+                        <div style="text-align:center;margin-top:2%" v-if="userRole != 'Visitor'">
                             <h3>
                             To: 
                             <a @click="selectTypeModalShow('type1')">Design problem-solving workflow</a>
@@ -76,7 +76,7 @@
                                 <li>A pure workspace with many tools</li>
                             </ul>
                         </div>
-                        <div style="text-align:center;margin-top:2%">
+                        <div style="text-align:center;margin-top:2%" v-if="userRole != 'Visitor'">
                             <h3>
                             To: 
                             <a @click="selectTypeModalShow('type2')">Do it right now</a>

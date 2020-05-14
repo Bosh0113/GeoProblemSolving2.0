@@ -9,7 +9,7 @@
     <Col span="23" offset="1" style="margin-top:20px">
       <div :style="{height:contentHeight+'px'}">
         <Row type="flex" justify="space-around">
-          <template v-if="$store.getters.userInfo.userId == scopeInfo.managerId">
+          <template>
             <div style="width: 80%; height: 25px">
               <span
                 style="font-weight: bold; font-size:16px"

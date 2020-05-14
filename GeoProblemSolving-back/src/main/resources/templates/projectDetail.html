@@ -608,7 +608,7 @@
                                       <span class="project_title title_mw">{{projectInfo.title}}</span>
                                   </div>
                               </div>
-                            <div slot="extra">
+                            <div slot="extra" v-if="taskRole!='Visitor'">
                                 <Poptip trigger="hover" content="Create subproject" placement="left">
                                     <i-button style="margin: 0 5px;" class="changeInviteColor"
                                               @click="showSubProjectCreateModel">
@@ -635,38 +635,31 @@
                                                         {{subProject.title}}
                                                     </strong>
                                                 </div>
-                                                <div slot="extra" v-if="permissionIdentity('subprojects_manage', subProject)">
-                                                    <Poptip trigger="hover" content="Change manager" placement="bottom">
-                                                        <i-button class="changeInviteColor" icon="ios-people"
-                                                                  size="small"
-                                                                  shape="circle"
-                                                                  @click="handOverModalShow(index)"></i-button>
-                                                    </Poptip>
-                                                    <Poptip trigger="hover" content="Edit information"
-                                                            placement="bottom">
-                                                        <i-button class="changeEditColor" icon="ios-create" size="small"
-                                                                  shape="circle"
-                                                                  @click="editSubProjectModalShow(index)"></i-button>
-                                                    </Poptip>
-                                                    <Poptip trigger="hover" content="Remove subproject"
-                                                            placement="bottom">
-                                                        <i-button class="changeRemoveColor" icon="md-close" size="small"
-                                                                  shape="circle"
-                                                                  @click="deleteSubProjectModalShow(index)"></i-button>
-                                                    </Poptip>
-                                                </div>
-                                                <div slot="extra" v-else-if="memberIdentity(subProject.members)">
-                                                    <Icon type="ios-person" :size="20"></Icon>
-                                                </div>
-                                                <div slot="extra" v-else>
-                                                    <template v-if="managerIdentity(subProject.managerId)">
-                                                        <Poptip trigger="hover" content="To be member" placement="left">
-                                                            <i-button class="changeInviteColor" icon="md-add-circle"
-                                                                      size="small" shape="circle"
-                                                                      @click="joinSubProject(index)"></i-button>
+                                                <template v-if="taskRole!='Visitor'">
+                                                    <div slot="extra" v-if="permissionIdentity('subprojects_manage', subProject)">
+                                                        <Poptip trigger="hover" content="Change manager" placement="bottom">
+                                                            <i-button class="changeInviteColor" icon="ios-people"
+                                                                      size="small"
+                                                                      shape="circle"
+                                                                      @click="handOverModalShow(index)"></i-button>
                                                         </Poptip>
-                                                    </template>
-                                                    <template v-else>
+                                                        <Poptip trigger="hover" content="Edit information"
+                                                                placement="bottom">
+                                                            <i-button class="changeEditColor" icon="ios-create" size="small"
+                                                                      shape="circle"
+                                                                      @click="editSubProjectModalShow(index)"></i-button>
+                                                        </Poptip>
+                                                        <Poptip trigger="hover" content="Remove subproject"
+                                                                placement="bottom">
+                                                            <i-button class="changeRemoveColor" icon="md-close" size="small"
+                                                                      shape="circle"
+                                                                      @click="deleteSubProjectModalShow(index)"></i-button>
+                                                        </Poptip>
+                                                    </div>
+                                                    <div slot="extra" v-else-if="memberIdentity(subProject.members)">
+                                                        <Icon type="ios-person" :size="20"></Icon>
+                                                    </div>
+                                                    <div slot="extra" v-else>
                                                         <Poptip trigger="hover" content="Apply to Join"
                                                                 placement="left">
                                                             <i-button class="changeInviteColor" icon="md-add"
@@ -674,8 +667,8 @@
                                                                       shape="circle"
                                                                       @click="applyJoinSubProjectModalShow(index)"></i-button>
                                                         </Poptip>
-                                                    </template>
-                                                </div>
+                                                    </div>
+                                                </template>
                                                 <div class="subProjectDes" :title="subProject.description"
                                                      style="cursor: pointer;" @click="goSubProjectPage(subProject)" >
                                                     {{subProject.description}}
@@ -1975,6 +1968,9 @@
                                 return true;
                             }
                         }
+                    }
+                    else {
+                        return false;
                     }
                 },
                 memberListStr(members) {
