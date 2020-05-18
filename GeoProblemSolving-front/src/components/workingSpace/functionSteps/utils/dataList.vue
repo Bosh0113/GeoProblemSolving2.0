@@ -491,6 +491,7 @@ export default {
       });
       this.$set(this, "stepDataList", filterdata);
     },
+    
     filterToolData() {
       var filterdata = this.fileList.filter(item => {
         if (item.type.indexOf("toolData") != -1) {

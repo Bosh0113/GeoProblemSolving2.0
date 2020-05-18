@@ -58,15 +58,8 @@
       </FormItem>
 
       <FormItem label="Tool Url:" prop="toolUrl" :label-width="140">
-      
-          <Input v-model="toolInfo.toolUrl" placeholder="Enter the url of your tool" />
-        <!-- </div>
-        <div v-else>
-          <Input v-model="toolInfo.toolUrl">{{selectModel.md5}}</Input>
-        </div> -->
-        <!-- <div style="margin-top:5px">
-          <Button type="info" target="https://geomodeling.njnu.edu.cn/modelItem/repository">Select Model From ...</Button>
-        </div> -->
+        <Input v-model="toolInfo.toolUrl" placeholder="Enter the url of your tool" />
+        <p>If you copy the doi from Open Geographic Modeling System, please enter the ... first</p>
       </FormItem>
 
       <FormItem label="Tool description:" prop="description" :label-width="140">
@@ -121,10 +114,10 @@
     </Form>
     <!-- <Col span="8" offset="4">
       <Button type="success" class="createToolBtn" long @click="createTool">Create</Button>
-    </Col> -->
+    </Col>-->
 
     <!-- model modal -->
-    <Modal v-model="modelModal" width="1000px">
+    <!-- <Modal v-model="modelModal" width="1000px">
       <p slot="header" style="color:#2d8cf0;text-align:center;font-size:20px">
         <Icon type="ios-information-circle"></Icon>
         <span>Choose the model exists</span>
@@ -192,7 +185,7 @@
           </Col>
         </Row>
       </div>
-    </Modal>
+    </Modal>-->
   </div>
 </template>
 <script>
@@ -244,70 +237,9 @@ export default {
       userId: "testUserId",
       inputToolTag: "",
       visible: false,
-      modelModal: false, //选择的模型模态框
-      modelList: [
-        {
-          name: "SWAT_Model",
-          des:
-            "The Soil & Water Assessment Tool is a small watershed to river basin-scale model used to simulate the quality and quantity of surface and ground water and predict the environmental impact of land use, land management practices, and climate change.",
-          md5: 1,
-          relatedModelInfoId: 2
-        },
-        {
-          name: "TaiHu_Fvcom",
-          des:
-            "FVCOM is a prognostic, unstructured-grid, finite-volume, free-surface, 3-D primitive equation coastal ocean circulation model developed by UMASSD-WHOI joint efforts.",
-          md5: 1,
-          relatedModelInfoId: 2
-        },
-        {
-          name: "grid_tools_15-Reclassify_Grid_Values",
-          des: "Reclassify Grid Values",
-          md5: 1,
-          relatedModelInfoId: 2
-        },
-        {
-          name: "SWMM",
-          des:
-            "The EPA Storm Water Management Model (SWMM) is a dynamic rainfall-runoff simulation model used for single event or long-term (continuous) simulation of runoff quantity and quality from primarily urban areas(EPA SWMM Help).",
-          md5: 1,
-          relatedModelInfoId: 2
-        },
-        {
-          name: "GCAM-CA",
-          des:
-            "The EPA Storm Water Management Model (SWMM) is a dynamic rainfall-runoff simulation model used for single event or long-term (continuous) simulation of runoff quantity and quality from primarily urban areas(EPA SWMM Help).",
-          md5: 1,
-          relatedModelInfoId: 2
-        },
-        {
-          name: "Biome - Bio Geochemical Cycles",
-          des:
-            "The Biome-BGC (BioGeochemical Cycles) model simulates NPP for multiple biomes. Because NPP is computed as the difference between simulated GPP and autotrophic respiration, environmental controls operate on both the process of photosynthesis and respiration. Although nitrogen dynamics have been added, Biome-BGC relies primarily on the hydrologic cycle and how water availability controls C uptake and storage. The response of NPP to elevated CO2 is determined mainly by changes in transpiration associated with reduced leaf conductance, rather than feedbacks from nutrient cycling.",
-          md5: 1,
-          relatedModelInfoId: 2
-        },
-        {
-          name: "DBH_QYP",
-          des:
-            "It is a model which can predict the individual-tree growth of diameter at breast height (DBH).",
-          md5: 1,
-          relatedModelInfoId: 2
-        },
-
-        {
-          name: "Integrated Terrestrial Ecosystem Carbon-budget Model",
-          des:
-            "The InTEC model is a process-based biogeochemical C-budget model and considers all major C cycle components. This model adopts a distinct approach to simulate C components by combining (a) Farquhar’s leaf-level biochemical model , (b) a soil biochemical model CENTURY modified to include forest-specific C pools such as coarse roots and woody detritus, and (c) a set of empirical NPP and age relationships derived from forest growth and yield data.",
-          md5: 1,
-          relatedModelInfoId: 2
-        }
-      ], //所有的模型信息 List
-      selectModel: {
-        name: "",
-        md5: ""
-      },
-      createToolFlag:null
+      createToolFlag: null,
+      pageParams: { pageId: "", userId: "", userName: "" },
+      href:""//获得url前缀 重新拼tool url
     };
   },
 
@@ -322,44 +254,54 @@ export default {
     deleteCreateToolTag(index) {
       this.toolInfo.categoryTag.splice(index, 1);
     },
-    selectModelFunction(modelName, modelMd5) {
-      console.log(modelName);
-      console.log(modelMd5);
-      this.selectModel.name = modelName;
-      this.selectModel.md5 = modelMd5;
-      this.toolInfo.toolUrl = modelMd5
-    },
 
-    // createTool(){
-    //   console.log(this.toolInfo.toolName);
-    //       let createToolForm = {};
-    //       createToolForm["toolName"] = this.toolInfo.toolName;
-    //       createToolForm["description"] = this.toolInfo.description;
-    //       createToolForm["toolUrl"] = this.toolInfo.toolUrl;
-    //       createToolForm["categoryTag"] = this.toolInfo.categoryTag;
-    //       createToolForm["privacy"] = this.toolInfo.privacy;
-    //       createToolForm["detail"] = this.toolInfo.detail;
-
-    //       this.axios
-    //         .post("/GeoProblemSolving/tool/create", createToolForm)
-    //         .then(res => {
-    //           // if(res.data == "Offline"){
-    //           //   this.$store.commit("userLogout");
-    //           //   this.$router.push({ name: "Login" });
-    //           // }
-    //           // else 
-    //           if (res.data === "Fail") {
-    //             this.$Message.error("Create tool fail.");
-    //           } else {
-    //             // this.createProjectId = res.data;
-    //             // this.addHistoryEvent(this.createProjectId);
-    //             console.log(res.data);
-    //           }
-    //         })
-    //         .catch(err => {
-    //           console.log(err);
-    //         });
+    // selectModelFunction(modelName, modelMd5) {
+    //   console.log(modelName);
+    //   console.log(modelMd5);
+    //   this.selectModel.name = modelName;
+    //   this.selectModel.md5 = modelMd5;
+    //   this.toolInfo.toolUrl = modelMd5;
     // }
+    // getUrl() {
+      // let hrefArray = window.location.href.split('/');     
+      // this.href = `${hrefArray[0]}://${hrefArray[2]}/modelItem/` 
+    // },
+
+    createTool() {
+      let createToolForm = {};
+      createToolForm["toolName"] = this.toolInfo.toolName;
+      createToolForm["description"] = this.toolInfo.description;
+      createToolForm[
+        "toolUrl"
+      ] = `${this.href}${this.toolInfo.toolUrl}`;
+      createToolForm["categoryTag"] = this.toolInfo.categoryTag;
+      createToolForm["privacy"] = this.toolInfo.privacy;
+      createToolForm["detail"] = this.toolInfo.detail;
+      console.log(createToolForm);
+
+      // this.axios
+      //   .post("/GeoProblemSolving/tool/create", createToolForm)
+      //   .then(res => {
+      //     // if(res.data == "Offline"){
+      //     //   this.$store.commit("userLogout");
+      //     //   this.$router.push({ name: "Login" });
+      //     // }
+      //     // else
+      //     if (res.data === "Fail") {
+      //       this.$Message.error("Create tool fail.");
+      //     } else {
+      //       // this.createProjectId = res.data;
+      //       // this.addHistoryEvent(this.createProjectId);
+      //       console.log(res.data);
+      //     }
+      //   })
+      //   .catch(err => {
+      //     console.log(err);
+      //   });
+    }
+  },
+  created(){
+    this.getUrl();
   },
 
   watch: {

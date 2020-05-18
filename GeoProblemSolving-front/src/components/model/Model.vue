@@ -1,143 +1,178 @@
 <template>
   <div class="main">
-    <el-button @click="getAllRecords">getAllRecords</el-button>
-    <el-button @click="loadingClose">close</el-button>
+    <!-- <el-button @click="getAllRecords">getAllRecords</el-button>
+    <el-button @click="loadingClose">close</el-button>-->
     <el-row class="title">
-      <el-col>
-        <i class="fa fa-cogs"></i>
-        <!-- {{modelItem.name}} -->
-      </el-col>
+      <el-col>{{modelIntroduction.modelName}}</el-col>
     </el-row>
 
-    <el-row class="des">
-      <el-col>
-        <!-- <p>{{modelItem}}</p> -->
-      </el-col>
-    </el-row>
     <el-row>
-      <el-col :span="2" :offset="16" class="save-btn">
-        <el-button plain type="primary" @click="invoke">
+      <el-col :span="6">
+        <p class="des">{{modelIntroduction.modelIntro}}</p>
+      </el-col>
+      <el-col :span="2" :offset="12" class="save-btn">
+        <el-button plain type="primary" @click="invokeTest">
           <i class="el-icon-setting"></i>&nbsp;invoke
         </el-button>
       </el-col>
+    </el-row>
+    <!-- <el-row>
       <el-col :span="2" :offset="18" class="save-btn">
         <el-button plain type="primary" @click="saveRecords">
           <i class="el-icon-setting"></i>&nbsp;save
         </el-button>
       </el-col>
-    </el-row>
-    <el-tabs tab-position="left">
-      <!-- <el-tabs v-model="activeTab" tab-position="left"> -->
-      <el-tab-pane v-for="(state,index) in stateList" :key="index">
-        <!-- <div class="state-desc">{{state}}</div> -->
-         {{state}}
-        <div class="event" v-for="(event,eventIndex) in filterEvent(state.State)" :key="eventIndex">{{event}}</div>
-        <!-- <div class="params-group">
-          <el-row class="title">Input</el-row>
-          <div class="items">
+    </el-row>-->
+    <el-divider></el-divider>
+    <el-row class="state-container" v-for="(state,index) in stateList" :key="index">
+      <el-col class="leftContainer" :span="5">
+        <el-col :offset="1" :span="22">
+          <div class="modelState">
+            <p class="state-name">{{state.name}}</p>
+            <p class="state-desc">{{state.description}}</p>
+          </div>
+        </el-col>
+      </el-col>
+      <el-col class="dataContainer" :span="18" :offset="1">
+        <div class="_params-group">
+          <el-row v-if="inEventList(state).length!==0" class="stateTitle">Input</el-row>
+          <el-divider class="stateTitleDivider"></el-divider>
+          <div class="events">
             <el-row
-              v-for="(inEvent,inEventIndex) in inEventList(state)"
+              v-for="(modelInEvent,inEventIndex) in inEventList(state)"
               :key="inEventIndex"
-              class="item"
+              class="event"
             >
               <el-row>
-                <div class="itemContent">
-                  <el-col :span="16">
-                    <span class="event-name">
-                      <span v-show="!inEvent.isOptional" style="color:red">*</span>
-                      {{inEvent.name}}
-                    </span>
-                  </el-col>
-                  <el-col :span="3" :offset="2">
-                    <el-tooltip
-                      :content="inEvent.dataTemplate.tooltip"
-                      placement="top"
-                      effect="light"
-                    >
-                      <component
-                        :disabled="componentDisables"
-                        :is="inEvent.dataTemplate.type"
-                        :initDataTemplate="inEvent.dataTemplate"
-                      ></component>
-                    </el-tooltip>
-                  </el-col>
-                </div>
-              </el-row>
+                <el-col :span="17" class="_event-desc">
+                  <span class="event_name" :title="modelInEvent.name">
+                    <span v-show="modelInEvent.optional=='False'" style="color:red">*</span>
+                    {{modelInEvent.name}}
+                  </span>
+                  <p
+                    class="event_desc"
+                    :title="modelInEvent.description"
+                  >{{modelInEvent.description}}</p>
+                </el-col>
 
+                <el-col :span="6" :offset="1">
+                  <file
+                    @newStateList="getNewStateList"
+                    :fileIndex="{'stateIndex':index,'eventIndex':inEventIndex}"
+                    :initStateList="stateList"
+                    :disabled="!status"
+                    :datasetItem="datasetItem"
+                  ></file>
+                </el-col>
+              </el-row>
               <el-row>
-                <p class="event-desc" :title="inEvent.des">{{inEvent.des}}</p>
+                <el-divider class="eventDivider"></el-divider>
               </el-row>
             </el-row>
           </div>
-        </div>-->
+        </div>
 
-        <!-- <div class="params-group" v-if="outEventList(state).length">
-          <el-row class="title">Output</el-row>
-          <div class="items">
+        <div class="_params-group">
+          <el-row v-if="outEventList(state).length!==0" class="stateTitle">Output</el-row>
+          <div class="events">
             <el-row
-              v-for="(outEvent,outEventIndex) in outEventList(state)"
+              v-for="(modelOutEvent,outEventIndex) in outEventList(state)"
               :key="outEventIndex"
-              class="item"
+              class="event"
             >
               <el-row>
-                <el-col :span="16">{{outEvent.name}}</el-col>
-                <el-col :span="3" :offset="2">
-                  <div>
+                <el-col :span="17" class="_event-desc">
+                  <span class="event_name" :title="modelOutEvent.name">{{modelOutEvent.name}}</span>
+                  <p
+                    class="event_desc"
+                    :title="modelOutEvent.eventDesc"
+                  >{{modelOutEvent.description}}</p>
+                </el-col>
+                <el-col :span="6" :offset="1">
+                  <div class="_btn-group">
                     <el-button
+                      size="small"
                       plain
+                      round
                       type="warning"
-                      icon="el-icon-download"
-                      v-show="outEvent.dataTemplate.value!=''"
-                      @click="download(outEvent.dataTemplate.value)"
-                    ></el-button>
+                      @click="download(modelOutEvent)"
+                      :disabled="status"
+                    >Download</el-button>
+
+                    <el-button
+                      size="small"
+                      plain
+                      round
+                      type="warning"
+                      @click="bind(modelOutEvent)"
+                      :disabled="status"
+                    >Bind</el-button>
                   </div>
                 </el-col>
               </el-row>
-
-              <el-row>
-                <p class="event-desc" :title="outEvent.des">{{outEvent.des}}</p>
-              </el-row>
             </el-row>
           </div>
-        </div>-->
-      </el-tab-pane>
-    </el-tabs>
+        </div>
+      </el-col>
+    </el-row>
   </div>
 </template>
 
 <script>
 import file from "./../dataTemplate/File";
-import parameter_input from "./../dataTemplate/ParameterInput";
-import parameter_select from "./../dataTemplate/ParameterSelect";
-import parameter_slider from "./../dataTemplate/ParameterSlider";
-import parameter_table from "./../dataTemplate/ParameterTable";
-import parameter_range from "./../dataTemplate/ParameterRange";
 
 export default {
+  mounted() {
+    this.getStepInfo();
+    this.getUserInfo();
+  },
+
   data() {
     return {
       doi: this.$route.params.doi,
+      modelIntroduction: {},
       stateList: {},
       modelInstance: {},
+      datasetItem: {},
       timer: {},
-      fullscreenLoading: "",
+      fullscreenLoading: {},
       componentDisables: false,
       inputFile: false,
       userId: "testUserId1234",
       stepId: "testStepId1234",
-      recordList: []
+      recordList: [],
+      md5: "",
+      invokeForm: {
+        ip: "",
+        port: "",
+        pid: "",
+        username: "",
+        inputs: [
+          {
+            statename: "",
+            event: "",
+            url: "",
+            tag: ""
+          }
+        ],
+        outputs: [
+          {
+            statename: "",
+            event: "",
+            template: {
+              type: "", //id|none
+              value: "" //if tyoe=none value=""
+            }
+          }
+        ]
+      },
+      status: true,
+      record: {},
+      // page info
+      pageParams: { pageId: "", userId: "", userName: "" },
+      userInfo: {},
+      bindFileName: ""
     };
-  },
-
-  computed: {
-    // activeTab: {
-    //   get() {
-    //     return this.stateList.States
-    //       ? this.stateList.States[0].name
-    //       : "defaultState";
-    //   },
-    //   set() {}
-    // }
   },
 
   methods: {
@@ -145,152 +180,261 @@ export default {
       this.save();
     },
 
-    download(value) {
-      let url = `/GeoProblemSolving/dataItem/download/${value}`;
-      window.open(url);
+    getStepInfo() {
+      if (
+        this.$route.params.groupID == undefined ||
+        this.$route.params.groupID == ""
+      ) {
+        var href = window.location.href;
+        var url = href.split("&");
+
+        for (var i = 0; i < url.length; i++) {
+          if (/groupID/.test(url[i])) {
+            this.pageParams.pageId = url[i].match(/groupID=(\S*)/)[1];
+            continue;
+          }
+
+          if (/userID/.test(url[i])) {
+            this.pageParams.userId = url[i].match(/userID=(\S*)/)[1];
+            continue;
+          }
+
+          if (/userName/.test(url[i])) {
+            this.pageParams.userName = url[i].match(/userName=(\S*)/)[1];
+            continue;
+          }
+        }
+      } else {
+        this.pageParams.pageId = this.$route.params.groupID;
+        this.pageParams.userId = this.$route.params.userID;
+        this.pageParams.userName = this.$route.params.userName;
+      }
+    },
+
+    getUserInfo() {
+      this.userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
+      if (this.userInfo == {}) {
+        this.axios
+          .get(
+            "/GeoProblemSolving/user/inquiry" +
+              "?key=" +
+              "userId" +
+              "&value=" +
+              this.pageParams.userId
+          )
+          .then(res => {
+            if (res.data != "Fail" && res.data != "None") {
+              this.$set(this, "userInfo", res.data);
+            }
+          })
+          .catch(err => {});
+      }
     },
 
     async init() {
-      let {data} = await this.axios.get(
+      this.initLoading();
+      let { data } = await this.axios.get(
         "/GeoProblemSolving/task/getModelBehavior/" + this.doi
+      ); //获得模型所有信息
+      this.md5 = data.md5;
+      this.modelIntroduction["modelName"] = data.name;
+      this.modelIntroduction["modelIntro"] = data.description;
+      this.modelIntroduction["modelAuthor"] = data.author;
+      this.modelIntroduction["modelDetail"] = data.detail;
+      this.stateList =
+        data.mdlJson.ModelClass[0].Behavior[0].StateGroup[0].States[0].State;
+      this.datasetItem =
+        data.mdlJson.ModelClass[0].Behavior[0].RelatedDatasets[0].DatasetItem;
+
+      //预处理过程 STEP0
+      let data2 = await this.axios.get(
+        `/GeoProblemSolving/task/createTask/${this.md5}/${this.pageParams.userId}`
       );
-      this.stateList= data.States;
-    
+      let creatTaskResult = data2.data.data;
 
-
-
-
-      // modelItem.States.forEach(states => {
-      //   states.State.forEach(state => {
-      //     // console.log(state);
-      //     let stateId = state.id;
-      //     let name = state.name;
-      //     let description = state.description;
-      //     let eventList = state.Event;
-      //     eventList.forEach(event => {
-      //       // console.log(event);
-      //       let eventName = event.name;
-      //       let optional = event.optional;
-      //       let type = event.type;
-      //     });
-      //   });
-      // });
-
-      // let dataTemplate = event.dataTemplate;
-      // if (
-      //   dataTemplate.value == "" ||
-      //   dataTemplate.value == null ||
-      //   dataTemplate.value == undefined
-      // ) {
-      //   if (
-      //     dataTemplate.defaultValue != "" &&
-      //     dataTemplate.defaultValue != null &&
-      //     dataTemplate.defaultValue != undefined
-      //   ) {
-      //     if (dataTemplate.type === "parameter_slider") {
-      //       //TODO 无奈之举，因为后台是存储的字符串
-      //       eventList[index].dataTemplate.value = new Number(
-      //         dataTemplate.defaultValue
-      //       ).valueOf();
-      //     } else {
-      //       eventList[index].dataTemplate.value = dataTemplate.defaultValue;
-      //     }
-      //   }
-      // }
+      this.invokeForm.ip = creatTaskResult.ip;
+      this.invokeForm.port = creatTaskResult.port;
+      this.invokeForm.pid = creatTaskResult.pid;
+      this.invokeForm.username = this.pageParams.userId;
+      this.fullscreenLoading.close();
     },
 
-    filterEvent(EventList) {
-      EventList.forEach(el=>{
-        let events=el.Event;
-        let inputEvents= Event.filter((event)=>{
-          return event.type==="response";
-       })
-      })
-
-
-       console.log(inputEvents)
-       return inputEvents
+    //获得上传到数据容器的数据的id
+    getNewStateList(data) {
+      this.stateList = data;
+      this.getStateEvent();
     },
 
-    outEventList(state) {
-      return state.eventList.filter(value => {
-        return value.ioFlagEnum === "OUTPUT";
-      });
-    },
-
-    testInputValue() {
-      let modelItem = this.stateList;
+    //invoke --form表单创建
+    getStateEvent() {
       try {
-        modelItem.stateList.forEach(state => {
-          state.eventList.forEach((event, index, eventList) => {
-            let dataTemplate = event.dataTemplate;
-            let ioFlag = event.ioFlagEnum;
-            if (dataTemplate.type == "file" && ioFlag == "INPUT") {
-              if (
-                dataTemplate.value == "" ||
-                dataTemplate.value == null ||
-                dataTemplate.value == undefined
-              ) {
-                this.inputFile = false;
-                throw new Error("breakForEach"); //终止foreach循环
+        let stateList = this.stateList;
+        let datasetItem = this.datasetItem;
+        let input = [];
+        let output = [];
+        for (let i = 0; i < stateList.length; i++) {
+          let events = stateList[i].Event;
+          for (let j = 0; j < events.length; j++) {
+            //判断数据类型 如果是input--对应url
+            let detail = {};
+            detail["statename"] = stateList[i].name;
+            detail["event"] = events[j].name;
+            if (events[j].type == "response") {
+              if (events[j].hasOwnProperty("url")) {
+                detail["tag"] = events[j].name;
+                detail["url"] = events[j].url;
+                input.push(detail);
               } else {
-                this.inputFile = true;
+                continue;
               }
+            } else {
+              //如果是output --对应template
+              let outputTemplate = datasetItem.filter(dataset => {
+                return (
+                  dataset.name ===
+                  events[j].DispatchParameter[0].datasetReference
+                );
+              });
+              let template = {};
+              //如果是external template["type"] = id,不然为空
+              if (outputTemplate[0].type === "external") {
+                template["type"] = outputTemplate[0].id;
+                template["value"] = outputTemplate[0].externalId;
+              } else {
+                template["type"] = "none";
+                template["value"] = "";
+              }
+              detail["template"] = template;
+              output.push(detail);
             }
-          });
-        });
+          }
+        }
+        this.invokeForm.inputs = input;
+        this.invokeForm.outputs = output;
       } catch (e) {
         if (e.message != "breakForEach") throw e;
       }
     },
 
-    async invoke() {
-      this.testInputValue();
-      if (this.inputFile == false) {
-        this.$notify.error({
-          title: "Error",
-          message: "There is no input file !"
+    async invokeTest() {
+      this.loading();
+      //测试数据没有弄 直接运行 根据ip+id
+      //invoke
+      let { data } = await this.axios.post(
+        "/GeoProblemSolving/task/invoke",
+        this.invokeForm
+      );
+      let invokeResultId = data.data;
+      let refreshForm = {};
+      refreshForm["ip"] = this.invokeForm.ip;
+      refreshForm["port"] = this.invokeForm.port;
+      refreshForm["tid"] = data.data;
+      this.status = false;
+      this.getOutputs(refreshForm);
+    },
+
+    async getOutputs(refreshForm) {
+      //获得结果
+      this.timer = setInterval(async () => {
+        if (this.record.status == 2) {
+          this.fullscreenLoading.close();
+          clearInterval(this.timer);
+          let outputUrl = this.record.outputs;
+          this.getStateEventOut(outputUrl);
+          return;
+        } else {
+          let { data } = await this.axios.post(
+            "/GeoProblemSolving/task/getRecord",
+            refreshForm
+          );
+          this.record = data.data.data;
+        }
+      }, 2000);
+    },
+
+    getStateEventOut(outputUrl) {
+      console.log(outputUrl);
+      let outList = this.stateList;
+      outList.forEach((state, index) => {
+        state.Event.forEach((event, eventIndex) => {
+          outputUrl.forEach(el => {
+            if (el.statename == state.name && el.event == event.name) {
+              this.$set(this.stateList[index].Event[eventIndex], "url", el.url);
+            }
+          });
         });
-      } else {
-        this.loading();
-        let data = await this.axios.post(
-          "/GeoProblemSolving/modelItem/addModelInstance",
-          {
-            name: "`${this.stateList.name}` + `${this.$store.state.user.name}`",
-            modelItem: this.stateList
+      });
+    },
+
+    download(event) {
+      window.open(event.url);
+    },
+
+    dataURItoBlob(event) {
+      this.urlToBlob(event.url, blob => {
+        let file = new File([blob], this.bindFileName);
+        let formData = new FormData();
+
+        formData.append("file", file);
+        formData.append("description", event.description);
+        formData.append("type", "toolData");
+        formData.append("uploaderId", this.pageParams.userId);
+        formData.append("privacy", "private");
+        formData.append("folderId", this.pageParams.pageId);
+
+        this.axios
+          .post("/GeoProblemSolving/folder/uploadToFolder", formData)
+          .then(res => {
+            console.log(res);
+            if (res.data.uploaded != null) {
+              this.$message({
+                message: "You have binded the resource Successfully!",
+                type: "success"
+              });
+            }
+          })
+          .catch(function(err) {
+            console.log(err);
+          });
+      });
+    },
+
+    urlToBlob(the_url, callback) {
+      let xhr = new XMLHttpRequest();
+      xhr.open("get", the_url, true);
+      xhr.send();
+      var that = this;
+      xhr.onreadystatechange = function() {
+        if (this.readyState === 4) {
+          let headers = xhr.getAllResponseHeaders();
+          //打印文件名，这里打印的是编码（因为兼容不同语言的数据文件名字）后的，前端用unescape('xxx')去解码，解码后是对应的名字
+          that.bindFileName = headers.split(";")[1].split("=")[1];
+        }
+      };
+
+      xhr.onload = function() {
+        if (this.status == 200) {
+          if (callback) {
+            callback(this.response);
           }
-        );
-        let modelInstance = data.data.data;
-        let modelInstanceId = data.data.data.id;
+        }
+      };
+    },
 
-        await this.axios.post(
-          `/GeoProblemSolving/modelItem/modelInstance/${modelInstanceId}/invoke`
-        );
+    async bind(event) {
+      this.dataURItoBlob(event);
+    },
 
-        this.timer = setInterval(async () => {
-          console.log("轮询");
-          if (modelInstance.statusEnum == "FINISH") {
-            this.loadingClose();
-            console.log("完成");
-            clearInterval(this.timer);
-            this.stateList = modelInstance.modelItem;
-            this.modelInstance = modelInstance;
-            console.log(this.modelInstanceId);
-            this.saveRecords(modelInstance.id); //save model instance records
-            console.log(this.modelInstance);
-            return;
-          } else {
-            let data = await this.axios.get(
-              `/GeoProblemSolving/modelItem/getModelInstance/${modelInstanceId}`
-            );
-            modelInstance = data.data.data;
-            this.modelInstance = modelInstance;
-            // console.log(this.modelInstance);
-          }
-        }, 2000);
+    inEventList(state) {
+      return state.Event.filter(value => {
+        return value.type === "response";
+      });
+    },
 
-        this.componentDisables = true;
-      }
+    outEventList(state) {
+      return state.Event.filter(value => {
+        return value.type === "noresponse";
+      });
     },
 
     loading() {
@@ -301,9 +445,13 @@ export default {
         background: "rgba(0, 0, 0, 0.7)"
       });
     },
-
-    loadingClose() {
-      this.fullscreenLoading.close();
+    initLoading() {
+      this.fullscreenLoading = this.$loading({
+        lock: true,
+        text: "Initialization",
+        spinner: "el-icon-loading",
+        background: "rgba(0, 0, 0, 0.7)"
+      });
     },
 
     async saveRecords(modelInstanceId) {
@@ -343,19 +491,17 @@ export default {
       console.log(this.recordList);
     }
   },
-  created() {
+  mounted() {
+    this.getStepInfo();
+    this.getUserInfo();
     this.init();
   },
+
   beforeDestroy() {
     clearInterval(this.timer);
   },
   components: {
-    file,
-    parameter_input,
-    parameter_select,
-    parameter_slider,
-    parameter_table,
-    parameter_range
+    file
   }
 };
 </script>
@@ -364,46 +510,7 @@ export default {
 .main {
   position: relative;
 }
-.title {
-  position: relative;
-  font-size: 18px;
-  padding: 0px 0px 30px 0px;
-}
-.title i {
-  font-size: 30px !important;
-}
 
-.el-button {
-  padding: 12px;
-}
-.params-group {
-  /* position: relative; */
-  padding-bottom: 30px;
-}
-.params-group > .title {
-  font-style: italic;
-  font-size: 16px;
-  padding-bottom: 10px;
-  border-bottom: solid 2px #05889c;
-  color: #05889c;
-  font-weight: 600;
-}
-
-.params-group > .items > .item {
-  padding: 15px 0px 5px 0px;
-  border-bottom: solid 0.5px rgba(153, 153, 153, 0.671);
-  line-height: 2;
-  color: #696969;
-  font-size: 16px;
-}
-
-.params-group > .items > .item > .itemContent {
-  padding: 0px 0px 0px 50px;
-}
-
-.save-btn {
-  margin-top: 20px;
-}
 .state-desc {
   margin: 0px 0px 15px 0px;
   padding: 4px 0px;
@@ -425,14 +532,64 @@ export default {
 .el-tabs__active-bar {
   background-color: #00bbd8;
 }
-.item:hover {
-  background-color: #c4f0f734;
+.leftContainer {
+  background-color: rgba(142, 200, 255, 0.2);
+  border-radius: 5px;
+  box-shadow: 0px 0px 4px rgb(203, 207, 212);
+  padding: 20px 0;
 }
 .modelState {
-  color: rgb(112, 30, 30);
+  color: rgb(37, 44, 66);
   font-size: 18px;
   font-family: "微软雅黑";
   margin: 1% 0;
+}
+.stateTitle {
+  font-size: 20px;
   font-weight: 600;
+  color: rgb(87, 173, 253);
+  font-style: italic;
+}
+.stateTitleDivider.el-divider--horizontal {
+  height: 2px;
+  margin: 10px 0;
+}
+.stateTitleDivider.el-divider {
+  background-color: rgb(140, 144, 148);
+}
+.event {
+  padding: 15px 0 0 50px;
+}
+.event:hover {
+  background-color: #c4d9f734;
+}
+.event_name {
+  font-size: 16px;
+  font-weight: 600;
+  /* padding: 10px 0; */
+}
+.event_desc {
+  font-size: 14px;
+  font-style: italic;
+  margin: 10px 0;
+  color: rgb(94, 94, 94);
+  word-wrap: break-word;
+}
+.eventDivider.el-divider--horizontal {
+  margin: 10px 0;
+}
+.des {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  /* !autoprefixer: off */
+  -webkit-box-orient: vertical;
+  font-size: 14px;
+}
+.title {
+  font-weight: 600;
+  font-size: 20px;
+  margin: 20px 0 10px 0;
 }
 </style>

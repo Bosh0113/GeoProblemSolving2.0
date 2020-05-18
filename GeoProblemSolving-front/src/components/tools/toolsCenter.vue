@@ -397,16 +397,11 @@
       </div>
     </Card>
 
-    <Modal v-model="createToolModal" title="Create Tool" width="800" draggable scrollable >
-     <template-general @generalInfo="getGeneralInfo" ref="toolInfoRef"></template-general>
+    <Modal v-model="createToolModal" title="Create Tool" width="800" draggable scrollable>
+      <template-general @generalInfo="getGeneralInfo" ref="toolInfoRef"></template-general>
       <div slot="footer">
         <Button @click="createToolModal=false">Cancel</Button>
-        <Button
-          type="success"
-          @click="createTool"
-          class="create"
-          :disabled="clickForbidden"
-        >Create</Button>
+        <Button type="success" @click="createTool" class="create" :disabled="clickForbidden">Create</Button>
       </div>
     </Modal>
 
@@ -920,8 +915,6 @@
         <Button type="success" @click="editToolset('selectedToolset')" class="create">Save</Button>
       </div>
     </Modal>
-
-    
   </div>
 </template>
 <script>
@@ -937,7 +930,7 @@ export default {
   mounted() {
     this.resizeContent();
     this.getPublicTools();
-    if(this.userInfo.userState){
+    if (this.userInfo.userState) {
       this.getPersonalToolsets();
       this.getPersonalTools();
     } else {
@@ -974,7 +967,7 @@ export default {
         categoryTag: [],
         toolImg: "",
         privacy: "Private",
-        detail:""
+        detail: ""
       },
       typeSelected: "All",
       typeOptions: [
@@ -1151,12 +1144,14 @@ export default {
       toolsetInfoModal: false,
       editToolsetModal: false,
       // 工具窗口
-      panel: null,
+      panel: null
     };
   },
-   beforeDestory() {
+  beforeDestory() {
     this.panel.close();
     next();
+  },
+  created(){
   },
   methods: {
     resizeContent() {
@@ -1298,57 +1293,63 @@ export default {
       this.toolInfo.detail = form.detail;
       this.toolInfo.tool_url = form.toolUrl;
       this.toolInfo.categoryTag = form.categoryTag;
+    },
 
+    getUrl() {
+      let hrefArray = window.location.href.split('/');     
+      this.href = `${hrefArray[0]}://${hrefArray[2]}/modelItem/` 
     },
     createTool() {
-       const userInfo = new Promise((resolve, reject) => {
-        return this.$refs['toolInfoRef'].$refs['toolInfo'].validate((valid) => {
-           if (valid) {
-          this.clickForbidden = true;
-          let createToolForm = {};
+      const userInfo = new Promise((resolve, reject) => {
+        return this.$refs["toolInfoRef"].$refs["toolInfo"].validate(valid => {
+          if (valid) {
+            this.clickForbidden = true;
+            let createToolForm = {};
 
-          createToolForm["toolName"] = this.toolInfo.name;
-          createToolForm["toolUrl"] = this.toolInfo.tool_url;
-          createToolForm["modelInfo"] = {
-            stateId: this.toolInfo.model_stateId,
-            oid: this.toolInfo.model_oid,
-            mdlId: this.toolInfo.model_mdlId
-          };
-          createToolForm["description"] = this.toolInfo.description;
-          createToolForm["recomStep"] = this.toolInfo.recomStep;
-          createToolForm["categoryTag"] = this.toolInfo.categoryTag;
-          createToolForm["provider"] = this.$store.getters.userId;
-          createToolForm["toolImg"] = this.toolInfo.toolImg;
-          createToolForm["privacy"] = this.toolInfo.privacy;
-          createToolForm["detail"] = this.toolInfo.detail;
+            createToolForm["toolName"] = this.toolInfo.name;
+            createToolForm[
+              "toolUrl"
+            ] = this.toolInfo.tool_url;
+            createToolForm["modelInfo"] = {
+              stateId: this.toolInfo.model_stateId,
+              oid: this.toolInfo.model_oid,
+              mdlId: this.toolInfo.model_mdlId
+            };
+            createToolForm["description"] = this.toolInfo.description;
+            createToolForm["recomStep"] = this.toolInfo.recomStep;
+            createToolForm["categoryTag"] = this.toolInfo.categoryTag;
+            createToolForm["provider"] = this.$store.getters.userId;
+            createToolForm["toolImg"] = this.toolInfo.toolImg;
+            createToolForm["privacy"] = this.toolInfo.privacy;
+            createToolForm["detail"] = this.toolInfo.detail;
 
-          this.axios
-            .post("/GeoProblemSolving/tool/create", createToolForm)
-            .then(res => {
-              if (res.data == "Offline") {
-                this.$store.commit("userLogout");
-                this.$router.push({ name: "Login" });
-              } else if (res.data === "Fail") {
-                this.$Notice.error({ desc: "Create tool fail." });
-              } else if (res.data === "Duplicate naming") {
-                this.$Notice.error({ desc: "The name already exists." });
-              } else {
-                this.createToolModal = false;
-                this.$Notice.info({ desc: "Create successfully" });
-                this.personalTools.push(res.data);
-                if (this.toolInfo.privacy == "Public") {
-                  this.publicTools.push(res.data);
+            this.axios
+              .post("/GeoProblemSolving/tool/create", createToolForm)
+              .then(res => {
+                if (res.data == "Offline") {
+                  this.$store.commit("userLogout");
+                  this.$router.push({ name: "Login" });
+                } else if (res.data === "Fail") {
+                  this.$Notice.error({ desc: "Create tool fail." });
+                } else if (res.data === "Duplicate naming") {
+                  this.$Notice.error({ desc: "The name already exists." });
+                } else {
+                  this.createToolModal = false;
+                  this.$Notice.info({ desc: "Create successfully" });
+                  this.personalTools.push(res.data);
+                  if (this.toolInfo.privacy == "Public") {
+                    this.publicTools.push(res.data);
+                  }
+                  this.filterShowListByType();
                 }
-                this.filterShowListByType();
-              }
-            })
-            .catch(err => {
-              console.log(err);
-            });
-        } else {
-        }
-        })
-      }); 
+              })
+              .catch(err => {
+                console.log(err);
+              });
+          } else {
+          }
+        });
+      });
     },
     addCreateToolTag(tag) {
       if (tag != "") {
@@ -1552,8 +1553,7 @@ export default {
       });
       return resultList;
     },
-    showTool(toolInfo) {
-    },
+    showTool(toolInfo) {},
     editToolShow(tool) {
       this.inputToolTag = "";
       this.selectedTool = JSON.parse(JSON.stringify(tool));

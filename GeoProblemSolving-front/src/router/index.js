@@ -98,11 +98,7 @@ const routes = [{
 { path: '/abseir', name: 'abSeir', component: resolve => (require(["@/components/utils/ABM-SEIR"], resolve)) },
 { path: '/tinymce', name: 'tinymce', component: resolve => (require(["@/components/utils/singleUtils/tinymce"], resolve)) },
 { path: '/modelItem/:doi', name: 'Model', component: resolve => (require(["@/components/model/Model"], resolve)) },
-{ path: '/modelRecords', name: 'ModelRecords', component: resolve => (require(["@/components/model/ModelRecords"], resolve)) },
-{ path: '/modelPost', name: 'ModelRecords', component: resolve => (require(["@/components/model/ModalPost"], resolve)) },
-// { path: '/toolmodel', name: 'toolTemplate', component: resolve => (require(["@/components/model/toolTemplate/ToolFromModel"], resolve)) },
-// { path: '/tooldetail', name: 'toolTemplate', component: resolve => (require(["@/components/model/toolTemplate/TemplateDetail"], resolve)) },
-{ path: '/toolTemplate', name: 'toolTemplate', component: resolve => (require(["@/components/model/toolTemplate/ToolTemplate"], resolve)) },
+{ path: '/toolTemplate', name: 'toolTemplate', component: resolve => (require(["@/components/tools/TemplateGeneral"], resolve)) },
 ]
 
 export default new Router({

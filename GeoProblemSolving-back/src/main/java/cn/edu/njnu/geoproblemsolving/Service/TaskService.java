@@ -9,6 +9,8 @@ import cn.edu.njnu.geoproblemsolving.Utils.ResultUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
@@ -20,10 +22,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import javax.servlet.http.Part;
 import java.io.File;
-import java.util.ArrayList;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.*;
 
 
 @Service
@@ -63,10 +69,6 @@ public class TaskService {
             modelList.add(computableModel);
         }
 
-        //获得所有的 分页
-        Query query = new Query();
-        long count = mongoTemplate.count(query, ProjectEntity.class);
-
         return modelList;
     }
 
@@ -86,10 +88,10 @@ public class TaskService {
         JSONObject mdlJson = JSON.parseObject(JSONObject.toJSONString(result.get("mdlJson")));
         JSONObject behavior = mdlJson.getJSONArray("ModelClass").getJSONObject(0).getJSONArray("Behavior").getJSONObject(0).getJSONArray("StateGroup").getJSONObject(0);
         JSONObject result2 = JSON.parseObject(JSONObject.toJSONString(behavior));
-        return result2;
+        return result;
     }
 
-    public JSONObject createTask(String pid) {
+    public JSONObject createTask(String pid ,String userId) {
         // 获得任务服务器
         RestTemplate restTemplate = new RestTemplate();
         String urlStr = "http://" + managerServerIpAndPort + "/GeoModeling/taskNode/getServiceTask/" + pid; ////Step0:根据MD5获取可用的任务服务器
@@ -107,7 +109,7 @@ public class TaskService {
         initTaskJson.put("ip", ip);
         initTaskJson.put("port", port);
         initTaskJson.put("pid", pid);
-        initTaskJson.put("username", "testzzy");
+        initTaskJson.put("username", userId);
 
         urlStr = "http://" + managerServerIpAndPort + "/GeoModeling/computableModel/createTask";//Step1:createTask
         jsonObjectResponseEntity = restTemplate.postForEntity(urlStr, initTaskJson, JSONObject.class);
@@ -115,10 +117,9 @@ public class TaskService {
             throw new MyException(ResultEnum.ERROR);
         }
         result = jsonObjectResponseEntity.getBody().getJSONObject("data");
-        //保存url到相应的event 和 value
+        //保存url到相应的event和value
         return result;
     }
-
 
     public String invoke(JSONObject obj) {
         String urlStr = "http://" + managerServerIpAndPort + "/GeoModeling/computableModel/invoke";//Step3:配置完数据数据，开始调用模型
@@ -131,29 +132,28 @@ public class TaskService {
         return taskTid;
     }
 
-    public JSONObject refresh(JSONObject data) {
+    public JSONObject getRecord(JSONObject data) {
         String urlStr = "http://" + managerServerIpAndPort + "/GeoModeling/computableModel/refreshTaskRecord"; //Step4:根据task id去查询模型运行记录
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<JSONObject> jsonObjectResponseEntity = restTemplate.postForEntity(urlStr, data, JSONObject.class);
         if (!jsonObjectResponseEntity.getStatusCode().is2xxSuccessful()) {
             throw new MyException(ResultEnum.ERROR);
         }
-
         JSONObject result = jsonObjectResponseEntity.getBody();
         return result;
     }
 
-    public String upload(File file, String ip, String port) {
+    public String upload(File file) {
         FileSystemResource resource = new FileSystemResource(file);      //临时文件
         MultiValueMap<String, Object> form = new LinkedMultiValueMap<>();
-        form.add("host", ip);             //dxServer里面的
-        form.add("port", port);
-        form.add("type", 2);
-        form.add("file", resource);
-        form.add("UserName", "zzy");
+        form.add("serverNode", "china");
+        form.add("userId", 2);
+        form.add("ogmsdata", resource);
+        form.add("name", "zzyTest");
+        form.add("origination","GeoProblemSolving");
 
-        String urlStr = "http://" + managerServer + "/GeoModeling/computableModel/uploadData";// Step2：上传输入数据到特定的数据交换服务器
-
+//        String urlStr = "http://" + managerServer + "/GeoModeling/computableModel/uploadData";// Step2：上传输入数据到特定的数据交换服务器
+        String urlStr = "http://111.229.14.128:8899/data";
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<JSONObject> jsonObjectResponseEntity = restTemplate.postForEntity(urlStr, form, JSONObject.class);
         if (!jsonObjectResponseEntity.getStatusCode().is2xxSuccessful()) {
@@ -164,26 +164,62 @@ public class TaskService {
         return urlResult;
     }
 
-    public JSONObject slefInvoke(JSONObject obj) {
-        //传入task在初始化页面时已经创建了Task 不需要再创建且获得了上传数据的URL
-        JSONObject invokeBody = new JSONObject();
-        JSONObject modelInstance =  obj.getJSONObject("modelItem");
+//    public getFileEvent(JSONObject obj){
+//
+//
+//    }
 
-        modelItemDao.updateComputableModel(modelInstance);//更新数据库
+    public Object uploadFileForm(Collection<Part> parts) throws IOException {
+        MultiValueMap<String, Object> form = new LinkedMultiValueMap<>();
+        for (Part part : parts) {
+            String header = part.getHeader("Content-Disposition");
+            String filename2 = header.substring(header.indexOf("filename=\"") + 10,header.lastIndexOf("\""));//filename=" (整个字符串长度为10，所以要加10)
+            // 获取文件名
+            String fileName = part.getName();
+            //  获取文件后缀名
+            String suffix ="." + FilenameUtils.getExtension(filename2);
+            File file=File.createTempFile(part.getName(),suffix);//创建临时文件
+            FileUtils.copyInputStreamToFile(part.getInputStream(),file);
+            FileSystemResource fileSystemResource=new FileSystemResource(file);
+            form.add("ogmsdata",fileSystemResource);
+        }
 
-        invokeBody.put("inputs", getInvokeItem(modelInstance));//上传数据的 inputs数组
-        invokeBody.put("ip", obj.getString("ip"));
-        invokeBody.put("port", obj.getString("port"));
-        invokeBody.put("pid", obj.getString("pid"));
-        invokeBody.put("username", "testzzy");
-        String tid = invoke(invokeBody);
+        form.add("serverNode", "china");
+        form.add("userId", "2");
+        form.add("name", "zzyTest");
+        form.add("origination","GeoProblemSolving");
 
-        JSONObject refreshBody = new JSONObject();
-        refreshBody.put("tid", tid);
-        refreshBody.put("ip",obj.getString("ip"));
-        refreshBody.put("port", obj.getString("port"));
-        return refresh(refreshBody);
+        String urlStr = "http://111.229.14.128:8899/data";
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<JSONObject> jsonObjectResponseEntity = restTemplate.postForEntity(urlStr, form, JSONObject.class);
+        if (!jsonObjectResponseEntity.getStatusCode().is2xxSuccessful()) {
+            throw new MyException(ResultEnum.ERROR);
+        }
+        JSONObject result = jsonObjectResponseEntity.getBody();//获得上传数据的URL
+        String resultId = result.getJSONObject("data").getString("source_store_id");
+        return resultId;
     }
+
+//    public JSONObject slefInvoke(JSONObject obj) {
+//        //传入task在初始化页面时已经创建了Task 不需要再创建且获得了上传数据的URL
+//        JSONObject invokeBody = new JSONObject();
+//        JSONObject modelInstance =  obj.getJSONObject("modelItem");
+//
+//        modelItemDao.updateComputableModel(modelInstance);//更新数据库
+//
+//        invokeBody.put("inputs", getInvokeItem(modelInstance));//上传数据的 inputs数组
+//        invokeBody.put("ip", obj.getString("ip"));
+//        invokeBody.put("port", obj.getString("port"));
+//        invokeBody.put("pid", obj.getString("pid"));
+//        invokeBody.put("username", "testzzy");
+//        String tid = invoke(invokeBody);
+//
+//        JSONObject refreshBody = new JSONObject();
+//        refreshBody.put("tid", tid);
+//        refreshBody.put("ip",obj.getString("ip"));
+//        refreshBody.put("port", obj.getString("port"));
+//        return refresh(refreshBody);
+//    }
 
     public ArrayList<Object> getInvokeItem(JSONObject obj) {
         ArrayList<Object> inputList = new ArrayList<>();
@@ -213,5 +249,17 @@ public class TaskService {
         ComputableModelDaoImpl modelItemDao = new ComputableModelDaoImpl(mongoTemplate);
         return modelItemDao.addDataTemplate();
     }
+
+//    public Object download(String uid) {
+//        String urlStr = "http://111.229.14.128:8899/data";
+//        RestTemplate restTemplate = new RestTemplate();
+//        ResponseEntity<JSONObject> jsonObjectResponseEntity = restTemplate.postForEntity(urlStr, form, JSONObject.class);
+//        if (!jsonObjectResponseEntity.getStatusCode().is2xxSuccessful()) {
+//            throw new MyException(ResultEnum.ERROR);
+//        }
+//        JSONObject result = jsonObjectResponseEntity.getBody();//获得上传数据的URL
+//        String resultId = result.getJSONObject("data").getString("source_store_id");
+//        return resultId;
+//    }
 }
 
