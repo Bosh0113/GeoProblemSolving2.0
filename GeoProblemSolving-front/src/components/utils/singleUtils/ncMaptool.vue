@@ -461,7 +461,7 @@ export default {
                   });
 
                   // 文件列表更新
-                  let dataName = res.data[0].fileName;
+                  let dataName = res.data.uploaded[0].name;
                   let dataItem = {
                     name: filename,
                     description: "map tool data",
@@ -508,7 +508,7 @@ export default {
             this.showFile = true;
             this.uploadDataName = file.name;
 
-            let dataName = res.data[0].fileName;
+            let dataName = res.data.uploaded[0].name;
             this.dataUrl = "/GeoProblemSolving/resource/upload/" + dataName;
 
             let dataItem = {

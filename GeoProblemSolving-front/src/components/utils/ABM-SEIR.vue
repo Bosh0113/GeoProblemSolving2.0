@@ -188,7 +188,7 @@
             </Select>
           </div>
           <Divider style="margin: 20px 0;" />
-          <Slider v-model="simuTime" :marks="simuDays"></Slider>
+          <Slider v-model="simuTime" :marks="simuDays" disabled></Slider>
           <div style="margin-top:40px">
             <Button size="small" icon="md-play" style="margin-right:20px" @click="startSimu">Start</Button>
             <Button size="small" icon="md-pause" style="margin-right:20px" @click="pauseSimu">Pause</Button>

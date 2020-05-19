@@ -573,7 +573,7 @@ export default {
                 });
 
                 // 文件列表更新
-                let dataName = res.data[0].fileName;
+                let dataName = res.data.uploaded[0].name;
                 let dataItem = {
                   name: filename,
                   description: "drawing tool data",
