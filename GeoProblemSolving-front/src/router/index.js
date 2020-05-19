@@ -93,6 +93,7 @@ const routes = [{
 { path: '/nc/draw', name: 'drawUtilNC', component: resolve => (require(["@/components/utils/singleUtils/ncDrawBoard"], resolve)) },
 { path: '/nc/map', name: 'mapToolNC', component: resolve => (require(["@/components/utils/singleUtils/ncMapTool"], resolve)) },
 { path: '/nc/charts', name: 'dataChartsNC', component: resolve => (require(["@/components/utils/singleUtils/ncCharts"], resolve)) },
+{ path: '/nc/taskManager', name: 'taskManager', component: resolve => (require(["@/components/utils/singleUtils/taskManager"], resolve)) },
 { path: '/video', name: 'videoViewer', component: resolve => (require(["@/components/utils/videoViewer"], resolve)) },
 { path: '/preview', name: 'pdfViewer', component: resolve => (require(["@/components/utils/filePreview"], resolve)) },
 { path: '/abseir', name: 'abSeir', component: resolve => (require(["@/components/utils/ABM-SEIR"], resolve)) },
