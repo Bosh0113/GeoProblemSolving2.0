@@ -303,7 +303,7 @@ export default {
       receivedChats: []
     };
   },
-  props: ["stepInfo", "receivedChatMsgs", "operationRecords"],
+  props: ["stepInfo", "receivedChatMsgs", "operationRecords","getSocketConnect"],
   watch: {
     receivedChatMsgs(val) {
       for (let i = 0; i < this.receivedChatMsgs.length; i++) {

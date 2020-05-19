@@ -178,7 +178,7 @@ export default {
             ) {
               console.log(res.data);
             } else if (res.data.uploaded.length > 0) {
-            let dataName = res.data[0].fileName;
+            let dataName = res.data.uploaded[0].name;
 
             this.dataUrl = "/GeoProblemSolving/resource/upload/" + dataName;
 
