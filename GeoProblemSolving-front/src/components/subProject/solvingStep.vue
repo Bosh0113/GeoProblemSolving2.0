@@ -436,8 +436,8 @@ export default {
       let role = this.userRole;
       if (this.scopeType == "project") {
         project = this.scopeInfo;
-        if (role == "Manager") {
-          role = "PManager";
+        if (role == "PManager") {
+          role = "Manager";
         }
       } else {
         project = this.projectInfo;
