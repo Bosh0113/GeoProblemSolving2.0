@@ -37,7 +37,7 @@ const routes = [{
       ],
     },
     {
-      path: 'workspace/:stepId/', name: 'stepFramework', component: resolve => (require(["@/components/workingSpace/functionSteps/pageFramework"], resolve)), children: [
+      path: 'workspace/:stepId/', name: 'stepFramework', component: resolve => (require(["@/components/subProject/pageFramework"], resolve)), children: [
         { path: 'contextDefinition', name: 'contextDefinition', component: resolve => (require(["@/components/workingSpace/functionSteps/contextDefinitionContent"], resolve)) },
         { path: 'dataProcessing', name: 'dataProcessing', component: resolve => (require(["@/components/workingSpace/functionSteps/dataProcessingContent"], resolve)) },
         { path: 'modelProcess', name: 'modelProcess', component: resolve => (require(["@/components/workingSpace/functionSteps/modelProcessContent"], resolve)) },

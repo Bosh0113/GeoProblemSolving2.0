@@ -138,7 +138,11 @@
           <TabPane label="Tools">
             <div style="height:400px">
               <vue-scroll :ops="ops">
-                <tool-container :stepInfo="stepInfo" :userRole="userRole" :projectInfo="projectInfo"></tool-container>
+                <tool-container
+                  :stepInfo="stepInfo"
+                  :userRole="userRole"
+                  :projectInfo="projectInfo"
+                ></tool-container>
               </vue-scroll>
             </div>
           </TabPane>
@@ -510,18 +514,11 @@ export default {
         this.projectInfo.permissionManager != undefined &&
         operation === "workspace_resource"
       ) {
-        if (this.userRole == "PManager") {
-          if (
-            this.projectInfo.permissionManager.workspace_resource
-              .project_manager === "Yes"
-          ) {
-            return true;
-          } else if (
-            this.projectInfo.permissionManager.workspace_resource
-              .project_manager === "Yes, partly" &&
-            resource.uploaderId === this.userInfo.userId
-          ) {
-          }
+        if (
+          this.userRole == "PManager" &&
+          this.projectInfo.permissionManager.workspace_resource.project_manager
+        ) {
+          return true;
         } else if (
           this.userRole == "Manager" &&
           this.projectInfo.permissionManager.workspace_resource

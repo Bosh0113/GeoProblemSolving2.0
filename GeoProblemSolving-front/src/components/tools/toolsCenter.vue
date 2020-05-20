@@ -613,7 +613,7 @@
         >Create</Button>
       </div>
     </Modal>
-    <Modal v-model="editToolModal" title="Edit Tool" width="800" :mask-closable="false">
+    <Modal v-model="editToolModal" title="Edit tool" width="800" :mask-closable="false">
       <Form
         ref="selectedTool"
         :model="selectedTool"
