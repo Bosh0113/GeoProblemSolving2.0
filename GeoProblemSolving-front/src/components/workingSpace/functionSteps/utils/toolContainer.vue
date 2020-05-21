@@ -424,6 +424,16 @@ export default {
         .catch(err => {});
     },
     jupyterLogin(jupyterUserId) {
+      let jupyterUrl = "";
+      if (this.$store.state.IP_Port == "localhost:8080") {
+        jupyterUrl =
+          "http://172.21.212.83";
+      }
+      else if(this.$store.state.IP_Port == "118.190.246.198:80" || this.$store.state.IP_Port == "www.geofuturelab.com"){
+        jupyterUrl =
+          "http://118.190.246.19";
+      }
+
       let loginInfo = {
         JupyterUser: jupyterUserId,
         userId: this.userInfo.userId,
@@ -435,25 +445,35 @@ export default {
       data.append("login-info", info);
       this.axios
         .post(
-          "http://172.21.212.83/hub/login?next=/hub/user/" + jupyterUserId,
+          jupyterUrl+ "/hub/login?next=/hub/user/" + jupyterUserId,
           data
         )
         .then(res => {
-          let url = "http://172.21.212.83/hub/user/" + jupyterUserId;
+          let url = jupyterUrl + "/hub/user/" + jupyterUserId;
           window.open(url);
         })
         .catch(err => {
-          let url = "http://172.21.212.83/hub/user/" + jupyterUserId;
+          let url = jupyterUrl + "/hub/user/" + jupyterUserId;
           window.open(url);
         });
     },
     prepareJupyter() {
+      let jupyterUrl = "";
+      if (this.$store.state.IP_Port == "localhost:8080") {
+        jupyterUrl =
+          "http://172.21.212.83";
+      }
+      else if(this.$store.state.IP_Port == "118.190.246.198:80" || this.$store.state.IP_Port == "www.geofuturelab.com"){
+        jupyterUrl =
+          "http://118.190.246.19";
+      }
+
       let name_jupyterhub = this.projectInfo.projectId;
       name_jupyterhub = name_jupyterhub.replace(/[-]/g, "");
 
       this.axios
         .post(
-          "http://172.21.212.83:80/hub/api/users/" + name_jupyterhub,
+          jupyterUrl + "/hub/api/users/" + name_jupyterhub,
           { name: name_jupyterhub },
           {
             headers: {

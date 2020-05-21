@@ -121,7 +121,7 @@
                       type="text"
                     ></Button>
                     <Button
-                      v-if="permissionIdentity('workspace_resource')"
+                      v-if="permissionIdentity('workspace_resource', row)"
                       class="fileBtnHoverRed"
                       size="small"
                       shape="circle"
@@ -185,7 +185,7 @@
                           type="primary"
                           @click="OpenData(item)"
                         ></Button>
-                        <template v-if="permissionIdentity('workspace_resource')">
+                        <template v-if="permissionIdentity('workspace_resource', row)">
                           <Button
                             size="small"
                             title="Details"
