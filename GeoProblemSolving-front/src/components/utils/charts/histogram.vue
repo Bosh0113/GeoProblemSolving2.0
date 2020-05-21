@@ -356,7 +356,7 @@ export default {
       this.socket_content["chartType"] = this.chooseType;
       this.socket_content["operate"] = "visualize";
       this.socketApi.sendSock(this.socket_content, this.getSocketConnect);
-      this.socket_content = {};
+      // this.socket_content = {};
 
       this.showCharts();
     },
@@ -427,7 +427,6 @@ export default {
         content: "TestChat"
       };
       this.socketApi.sendSock(this.send_msg, this.getSocketConnect);
-      this.socket_content = {};
     },
     getResources() {
       if (this.pageParams.pageId == undefined || this.pageParams.pageId == "") {

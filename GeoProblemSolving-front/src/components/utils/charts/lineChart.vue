@@ -157,7 +157,7 @@ export default {
           })
           .catch(err => {});
       }
-    },    
+    },
     fillTable(file) {
       var that = this;
       var fileReader = new FileReader();
@@ -299,9 +299,11 @@ export default {
           option.xAxis.data.push(this.DataX[0][i]);
           option.series[0].data.push(this.DataY[0][i]);
         }
-        if (this.Charts == null) {
-          this.Charts = echarts.init(document.getElementById("visualization"));
+        if (this.Charts != null) {
+          this.Charts.dispose();
+          this.Charts = null;
         }
+        this.Charts = echarts.init(document.getElementById("visualization"));
         this.Charts.setOption(option);
       } else if (this.chooseType == "Stacked-line") {
         var option = {
@@ -321,11 +323,11 @@ export default {
           },
           series: []
         };
-        //X axis
+        // X axis
         for (var i = 1; i < dataLength; i++) {
           option.xAxis.data.push(this.DataX[0][i]);
         }
-        //Y axis
+        // Y axis
         for (var j = 0; j < this.DataY.length; j++) {
           let line = {
             data: [],
@@ -339,9 +341,12 @@ export default {
           }
           option.series.push(line);
         }
-        if (this.Charts == null) {
-          this.Charts = echarts.init(document.getElementById("visualization"));
+
+        if (this.Charts != null) {
+          this.Charts.dispose();
+          this.Charts = null;
         }
+        this.Charts = echarts.init(document.getElementById("visualization"));
         this.Charts.setOption(option);
       }
     },
@@ -352,7 +357,7 @@ export default {
       this.socket_content["chartType"] = this.chooseType;
       this.socket_content["operate"] = "visualize";
       this.socketApi.sendSock(this.socket_content, this.getSocketConnect);
-      this.socket_content = {};
+      // this.socket_content = {};
 
       this.showCharts();
     },
@@ -423,7 +428,6 @@ export default {
         content: "TestChat"
       };
       this.socketApi.sendSock(this.send_msg, this.getSocketConnect);
-      this.socket_content = {};
     },
     getResources() {
       if (this.pageParams.pageId == undefined || this.pageParams.pageId == "") {

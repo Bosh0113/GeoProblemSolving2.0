@@ -98,8 +98,8 @@
 </template>
 
 <script>
-import onlineParticipant from "./utils/onlineParticipants";
-import stepChange from "./utils/stepChange";
+import onlineParticipant from "./../workingSpace/functionSteps/utils/onlineParticipants";
+import stepChange from "./../workingSpace/functionSteps/utils/stepChange";
 export default {
   components: {
     onlineParticipant,

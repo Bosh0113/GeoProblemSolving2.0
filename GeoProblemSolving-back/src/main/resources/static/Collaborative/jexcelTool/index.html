@@ -93,7 +93,7 @@
                 You can open the file that exists in the resource center. After that, you can save your file into the
                 resource center.
             </p>
-            <h2>How to Use</h2>
+            <h2>How to use</h2>
             <p>
                 1. Click <strong>Open</strong> button, choose your file, and edit it.
             </p>
@@ -129,7 +129,7 @@
                 <el-table-column property="description" label="Description"></el-table-column>
                 <el-table-column label="Operation">
                     <template slot-scope="scope">
-                        <el-button size="mini" @click="uploadData(scope.row)">Select</el-button>
+                        <el-button size="mini" @click="uploadData(scope.row, true)">Select</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -168,7 +168,7 @@
             pageParams: {pageId: "", userId: "", userName: ""},
             userInfo: {},
             fileList: [],
-            dataName:"",
+            dataName: "",
             fileSelectVisible: false
         },
         computed: {
@@ -312,7 +312,7 @@
                 }
                 result += "\n";
                 // set content
-                for(var j = 0; j < data.length; j++) {
+                for (var j = 0; j < data.length; j++) {
                     result += data[j][0];
                     for (var i = 1; i < row.length; i++) {
                         result += "," + data[j][i];
@@ -328,7 +328,7 @@
 
                 let resultForm = new FormData();
                 resultForm.append("file", resultBlob);
-                resultForm.append("description", "The result of table editor tool" );
+                resultForm.append("description", "The result of table editor tool");
                 resultForm.append("type", "data");
                 resultForm.append("uploaderId", this.pageParams.userId);
                 resultForm.append("privacy", "private");
@@ -440,7 +440,7 @@
             removeTimer() {
                 clearInterval(this.timer);
             },
-            uploadData(file) {
+            uploadData(file, collaborate) {
                 this.dataName = file.name;
                 var pathURL = file.pathURL;
                 var inThis = this;
@@ -538,6 +538,13 @@
                     };
                     xhr.send();
                 }
+                if (collaborate) {
+                    var socket_content = {
+                        type: "open",
+                        file: file
+                    };
+                    _this.excelSocket.send(JSON.stringify(socket_content));
+                }
             },
             insertrow(obj, mixed, rowNumber) {
                 if (!this.boolCollaborate) {
@@ -620,8 +627,8 @@
             getSocketContent(data) {
                 this.boolCollaborate = true;
                 switch (data.type) {
-                    case "upload" : {
-                        this.uploadData(data.fileName);
+                    case "open" : {
+                        this.uploadData(data.file, false);
                         break;
                     }
                     case "insert_row" : {

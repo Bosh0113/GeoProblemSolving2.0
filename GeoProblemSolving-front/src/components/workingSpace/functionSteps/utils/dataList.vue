@@ -426,18 +426,11 @@ export default {
         this.projectInfo.permissionManager != undefined &&
         operation === "workspace_resource"
       ) {
-        if (this.userRole == "PManager") {
-          if (
-            this.projectInfo.permissionManager.workspace_resource
-              .project_manager === "Yes"
-          ) {
-            return true;
-          } else if (
-            this.projectInfo.permissionManager.workspace_resource
-              .project_manager === "Yes, partly" &&
-            resource.uploaderId === this.userInfo.userId
-          ) {
-          }
+        if (
+          this.userRole == "PManager" &&
+          this.projectInfo.permissionManager.workspace_resource.project_manager
+        ) {
+          return true;
         } else if (
           this.userRole == "Manager" &&
           this.projectInfo.permissionManager.workspace_resource
@@ -788,7 +781,7 @@ export default {
               dragit: {
                 containment: 5
               },
-              closeOnEscape: true,
+              closeOnEscape: true
               // callback: function() {
               //   var that = this;
               //   demoPanelTimer = window.setInterval(function() {
@@ -825,7 +818,7 @@ export default {
           dragit: {
             containment: 5
           },
-          closeOnEscape: true,
+          closeOnEscape: true
           // callback: function() {
           //   var that = this;
           //   demoPanelTimer = window.setInterval(function() {
@@ -857,7 +850,7 @@ export default {
           dragit: {
             containment: 5
           },
-          closeOnEscape: true,
+          closeOnEscape: true
           // callback: function() {
           //   var that = this;
           //   demoPanelTimer = window.setInterval(function() {

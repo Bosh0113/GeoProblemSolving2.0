@@ -301,7 +301,7 @@ export default {
       this.userRole = "Visitor";
       if (this.userInfo.userState) {
         if (this.projectInfo.managerId === this.userInfo.userId) {
-          this.userRole = "PManager";
+          this.userRole = "Manager";
         }
         else {
           for (let i = 0; i < this.projectInfo.members.length; i++) {

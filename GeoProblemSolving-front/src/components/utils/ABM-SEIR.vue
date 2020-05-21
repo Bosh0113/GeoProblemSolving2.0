@@ -157,12 +157,12 @@
           </div>
           <Divider style="margin: 20px 0;" />
           <div style="margin-top:10px">
-            <Label>Moving speed(m/s):</Label>
+            <Label>Outside activities(per day):</Label>
             <InputNumber
               size="small"
               :max="5"
               :min="0"
-              v-model="movement"
+              v-model="numActivity"
               style="margin-right:20px"
             ></InputNumber>
             <Label>Infective distance(m):</Label>
@@ -295,10 +295,9 @@ export default {
       },
       //agent 数据
       agentState: "stop",
-      movement: 1.2, //移动速度
+      numActivity: 2, //每天外出次数
       infectiveDist: 1, //传染距离
       totalSimuDays: 50, //模拟天数
-      agentSpeed: 0.12,
       agentInteractDist: 1,
       simuTime: 0, //当前的时间
       timeClick: 0,
@@ -732,14 +731,14 @@ export default {
     agentController() {
       let _this = this;
       // 移动距离（每个trick）
-      let distPerTrick = this.agentSpeed * 10;
+      let distPerTrick = 1.2;
 
       if (this.agentMap.state.ticks % 800 === 0) {
         //计时器
         this.timeClick++;
 
         // 每一天
-        let activitiesPerDay = 2; //每天活动次数
+        let activitiesPerDay = this.numActivity; //每天活动次数
         let offset = 100 / this.totalSimuDays;
         if (this.timeClick % activitiesPerDay === 0 && this.simuTime < 100) {
           this.simuTime = this.simuTime + offset;
@@ -945,7 +944,6 @@ export default {
     },
     submitAgents(origin) {
       if (this.agentState == "stop") {
-        this.agentSpeed = this.movement / 10;
         this.agentInteractDist = this.infectiveDist;
         let offset = this.totalSimuDays / 10;
         this.simuDays = {
@@ -967,7 +965,7 @@ export default {
             type: "operation",
             operation: "agent_params",
             data: {
-              agentSpeed: this.agentSpeed,
+              numActivity: this.numActivity,
               agentInteractDist: this.agentInteractDist,
               totalSimuDays: this.totalSimuDays
             }
@@ -1216,7 +1214,7 @@ export default {
             break;
           }
           case "agent_params": {
-            this.agentSpeed = e.data.agentSpeed;
+            this.numActivity = e.data.numActivity;
             this.agentInteractDist = e.data.agentInteractDist;
             this.totalSimuDays = e.data.totalSimuDays;
             this.submitAgents(1);
