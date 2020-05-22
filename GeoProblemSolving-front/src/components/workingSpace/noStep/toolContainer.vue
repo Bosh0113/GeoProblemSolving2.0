@@ -460,7 +460,7 @@ export default {
       }
       else if(this.$store.state.IP_Port == "118.190.246.198:80" || this.$store.state.IP_Port == "www.geofuturelab.com"){
         jupyterUrl =
-          "http://118.190.246.19";
+          "http://118.190.246.19:8000";
       }
 
       let loginInfo = {
@@ -494,7 +494,7 @@ export default {
       }
       else if(this.$store.state.IP_Port == "118.190.246.198:80" || this.$store.state.IP_Port == "www.geofuturelab.com"){
         jupyterUrl =
-          "http://118.190.246.19";
+          "http://118.190.246.19:8000";
       }
 
       let name_jupyterhub = this.projectInfo.projectId;
@@ -506,7 +506,7 @@ export default {
           { name: name_jupyterhub },
           {
             headers: {
-              Authorization: "token 125233d022884cf982d43ed9890aba70"
+              Authorization: "token 50e3fa2f34c74d36b09e967733a621b0"
             }
           }
         )
