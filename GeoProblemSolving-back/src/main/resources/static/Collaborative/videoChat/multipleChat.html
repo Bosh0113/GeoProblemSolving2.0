@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head >
+    <title>Multiple video chat</title>
+    <meta http-equiv="Content-Type" content=" charset=UTF-8" />
+    <meta name="description" content="Participatory|GeoProblem Solving|GIS">
+    <meta name="keywords" content="Participatory|GeoProblem Solving|GIS">
+    <meta name="author" content="OpenGMS">
+    <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/vue/2.6.10/vue.min.js"></script>
+    <link href="https://cdn.bootcss.com/iview/3.4.2/styles/iview.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/iview/3.4.2/iview.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-avatar@2.1.7/dist/vue-avatar.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <style >
+    </style>
+
+</head>
+
+<body>
+<div id="vueBody" v-cloak style="min-width: 1100px">
+    <div>
+        <h1>Online members:</h1>
+        <p v-for="member in participants" :key="member.index">{{member.userName}}</p>
+        <h1>Chating members:</h1>
+        <p v-for="chatUser in chatingUsers" :key="chatUser.index">{{chatUser.userName}}</p>
+    </div>
+    <i-button @click="applyToJoin" :disabled="applyDisabled">Join chat</i-button>
+    <i-button @click="quitFromChat" :disabled="!applyDisabled">Quit chat</i-button>
+    <h1>Video list:</h1>
+    <p v-for="chatVideo in chatVideos" :key="chatVideo.index">{{chatVideo.userName}}</p>
+</div>
+
+<script>
+    const configuration = {"iceServers": [
+        {"url": "stun:stun.l.google.com:19302"},
+        // TURN 一般需要自己去定义
+        {
+            'url': 'turn:223.2.40.150:3478?transport=udp',
+            'credential': 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
+            'username': '28224511:1379330808'
+        }
+    ]};
+    new Vue({
+        el: '#vueBody',
+        data:{
+            pageParams:{},
+            videoChatSocket: null,
+            participants:[],
+            chatingUsers:[],
+            applyDisabled:false,
+            chatVideos:[],
+        },
+        created(){
+            this.getPageInfo();
+        },
+        mounted(){
+            this.initWebSocket();
+        },
+        methods: {
+            getPageInfo(){
+                var href = window.location.href;
+                var url = href.split("&");
+
+                for (var i = 0; i < url.length; i++) {
+                    if (/groupID/.test(url[i])) {
+                        this.pageParams.pageId = url[i].match(/groupID=(\S*)/)[1];
+                        continue;
+                    }
+
+                    if (/userID/.test(url[i])) {
+                        this.pageParams.userId = url[i].match(/userID=(\S*)/)[1];
+                        continue;
+                    }
+
+                    if (/userName/.test(url[i])) {
+                        this.pageParams.userName = url[i].match(/userName=(\S*)/)[1];
+                        continue;
+                    }
+                }
+            },
+            initWebSocket(){
+                if(this.videoChatSocket!=null){
+                    this.videoChatSocket = null;
+                }
+                var socketUrl = "wss://"+ window.location.hostname +":8083/GeoProblemSolving/VideoChatSignalSocket/"+this.pageParams.pageId;
+                this.videoChatSocket = new WebSocket(socketUrl);
+                this.videoChatSocket.onopen = this.onOpen;
+                this.videoChatSocket.onmessage = this.onMessage;
+                this.videoChatSocket.onclose = this.onClose;
+                this.videoChatSocket.onerror = this.onError;
+            },
+            onOpen(){
+                console.log("Socket连接成功！");
+                this.sendMessage("connect",{});
+            },
+            onMessage(evt){
+                var messageObject = JSON.parse(evt.data);
+                switch(messageObject.type){
+                    case "members":{
+                        this.participants = messageObject.memberList;
+                        this.chatingUsers = messageObject.chatList;
+                        break;
+                    }
+                    case "apply":{
+                        console.log("Someone apply to chat with you.");
+                        //增加视频窗口
+                        var newVideo = {
+                            userId:messageObject.userInfo.userId,
+                            userName:messageObject.userInfo.userName,
+                            videoUid:messageObject.content.videoUid
+                        }
+                        this.chatVideos.push(newVideo);
+                        //构建reply消息
+                        var applyerId = messageObject.userInfo.userId;
+                        var content = {
+                            to: applyerId,
+                            videoUid:"******************"
+                        }
+                        this.sendMessage("reply", content);
+                        break;
+                    }
+                    case "reply":{
+                        console.log("Someone reply you.");
+                        //增加视频窗口
+                        var newVideo = {
+                            userId:messageObject.userInfo.userId,
+                            userName:messageObject.userInfo.userName,
+                            videoUid:messageObject.content.videoUid
+                        }
+                        this.chatVideos.push(newVideo);
+                        break;
+                    }
+                    case "quit":{
+                        var quitUserId = messageObject.userInfo.userId;
+                        for(var i=0;i<this.chatVideos.length;i++){
+                            if(this.chatVideos[i].userId==quitUserId){
+                                this.chatVideos.splice(i,1);
+                                break;
+                            }
+                        }
+                    }
+                }
+            },
+            onClose(){
+                console.log("Socket连接断开！");
+            },
+            onError(){
+                console.log("Socket连接错误！");
+            },
+            sendMessage(type, content){
+                var userId = this.pageParams.userId;
+                var userName = this.pageParams.userName;
+                var message ={
+                    type: type,
+                    userInfo:{
+                        userId: userId,
+                        userName: userName
+                    },
+                    content: content
+                }
+                this.videoChatSocket.send(JSON.stringify(message));
+            },
+            applyToJoin(){
+                var content = {
+                    message:"apply"
+                }
+                this.sendMessage("apply", content);
+                this.applyDisabled = true;
+                var thisVideo = {
+                    userId:this.pageParams.userId,
+                    userName:this.pageParams.userName,
+                    videoUid:"-------"
+                }
+                this.chatVideos.push(thisVideo);
+            },
+            quitFromChat(){
+                this.sendMessage("quit", {});
+                this.chatVideos=[];
+                this.applyDisabled = false;
+            }
+        }
+    })
+</script>
+
+
+</body>

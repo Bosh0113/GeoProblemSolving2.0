@@ -431,7 +431,7 @@ export default {
       }
       else if(this.$store.state.IP_Port == "118.190.246.198:80" || this.$store.state.IP_Port == "www.geofuturelab.com"){
         jupyterUrl =
-          "http://118.190.246.19:8000";
+          "http://118.190.246.198:8000";
       }
 
       let loginInfo = {
@@ -465,7 +465,7 @@ export default {
       }
       else if(this.$store.state.IP_Port == "118.190.246.198:80" || this.$store.state.IP_Port == "www.geofuturelab.com"){
         jupyterUrl =
-          "http://118.190.246.19:8000";
+          "http://118.190.246.198:8000";
       }
 
       let name_jupyterhub = this.projectInfo.projectId;
