@@ -188,6 +188,10 @@
                 return data;
             }
         },
+        beforeRouteLeave(to, from, next) {
+            this.closeExcelSocket();
+            next();
+        },
         created() {
             this.$nextTick(function () {
                 this.init();
@@ -196,6 +200,7 @@
         mounted() {
             this.getStepInfo();
             this.getUserInfo();
+            this.openExcelSocket();
         },
         methods: {
             init() {
@@ -212,11 +217,6 @@
                     onsort: this.tableSort,
                     onmoverow: this.rowMove
                 });
-                if (WebSocket) {
-                    this.openExcelSocket();
-                } else {
-                    alert("不支持");
-                }
             },
             getStepInfo() {
                 var href = window.location.href;
@@ -393,9 +393,9 @@
                 }
                 this.boolCollaborate = false;
             },
-            closeModuleSocket() {
-                if (this.moduleSocket != null) {
-                    this.moduleSocket.close();
+            closeExcelSocket() {
+                if (this.excelSocket != null) {
+                    this.excelSocket.close();
                 }
             },
             openExcelSocket() {
@@ -404,9 +404,17 @@
                     return false;
                 }
 
+                if (this.excelSocket != null) {
+                    this.closeExcelSocket();
+                    this.excelSocket = null;
+                }
+
                 var roomId = this.pageParams.pageId;
-                var moduleSocketURL = "ws://" + window.location.host + "/GeoProblemSolving/ExcelTool/" + roomId;
-                this.excelSocket = new WebSocket(moduleSocketURL);
+                var excelSocketURL = "ws://" + window.location.host + "/GeoProblemSolving/ExcelTool/" + roomId;
+                if (window.location.host == "localhost:8080") {
+                    excelSocketURL = "ws://localhost:8081/GeoProblemSolving/ExcelTool/" + roomId;
+                }
+                this.excelSocket = new WebSocket(excelSocketURL);
                 this.excelSocket.onopen = this.onOpen;
                 this.excelSocket.onmessage = this.onMessage;
                 this.excelSocket.onclose = this.onClose;
@@ -464,11 +472,6 @@
                         onmoverow: inThis.rowMove,
                         onload() {
                             inThis.headers = inThis.computeHeaders();
-                            inThis.$notify({
-                                title: "成功",
-                                message: "上传成功",
-                                type: "success"
-                            });
                         }
                     });
                 }
@@ -522,11 +525,6 @@
                                         onmoverow: inThis.rowMove,
                                         onload() {
                                             inThis.headers = inThis.computeHeaders();
-                                            inThis.$notify({
-                                                title: "成功",
-                                                message: "上传成功",
-                                                type: "success"
-                                            });
                                         }
                                     });
 
@@ -543,7 +541,7 @@
                         type: "open",
                         file: file
                     };
-                    _this.excelSocket.send(JSON.stringify(socket_content));
+                    this.excelSocket.send(JSON.stringify(socket_content));
                 }
             },
             insertrow(obj, mixed, rowNumber) {

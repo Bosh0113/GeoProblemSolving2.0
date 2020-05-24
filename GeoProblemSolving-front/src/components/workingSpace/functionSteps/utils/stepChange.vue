@@ -294,17 +294,17 @@ export default {
           });
         } else if (type == 2) {
           this.$router.push({
-            name: "modelProcess",
+            name: "visualization",
             params: { stepId: stepId }
           });
         } else if (type == 3) {
           this.$router.push({
-            name: "modelEvaluation",
+            name: "modelBuild",
             params: { stepId: stepId }
           });
         } else if (type == 4) {
           this.$router.push({
-            name: "analysis",
+            name: "modelEvaluation",
             params: { stepId: stepId }
           });
         } else if (type == 5) {
@@ -314,7 +314,7 @@ export default {
           });
         } else if (type == 6) {
           this.$router.push({
-            name: "visualization",
+            name: "analysis",
             params: { stepId: stepId }
           });
         } else if (type == 7) {

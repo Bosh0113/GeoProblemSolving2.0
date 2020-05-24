@@ -340,32 +340,32 @@ export default {
           });
         } else if (activeStep.category == 2) {
           this.$router.push({
-            name: "modelProcess",
+            name: "visualization",
             params: { id: stepId }
           });
         } else if (activeStep.category == 3) {
           this.$router.push({
-            name: "modelEvaluation",
+            name: "modelBuild",
             params: { id: stepId }
           });
         } else if (activeStep.category == 4) {
           this.$router.push({
-            name: "quantitativeAndQualitative",
+            name: "modelEvaluation",
             params: { id: stepId }
           });
         } else if (activeStep.category == 5) {
           this.$router.push({
-            name: "simulationPrediction",
+            name: "simulation",
             params: { id: stepId }
           });
         } else if (activeStep.category == 6) {
           this.$router.push({
-            name: "dataVisualization",
+            name: "analysis",
             params: { id: stepId }
           });
         } else if (activeStep.category == 7) {
           this.$router.push({
-            name: "decisionMakingAndManagement",
+            name: "decisionMaking",
             params: { id: stepId }
           });
         }

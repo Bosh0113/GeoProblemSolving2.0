@@ -448,6 +448,7 @@ export default {
               "Yes, partly" &&
             resource.uploaderId === this.userInfo.userId
           ) {
+            return true;
           }
         }
       }

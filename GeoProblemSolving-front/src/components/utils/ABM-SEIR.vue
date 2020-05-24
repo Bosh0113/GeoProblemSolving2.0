@@ -116,7 +116,7 @@
       <Card
         dis-hover
         class="agentConsole"
-        style="width: calc(100vw - 310px); height: 265px; background-color: white; margin: 5px;"
+        style="width: calc(100vw - 310px); height: 265px; background-color: white; margin: 5px; overflow-x: auto"
       >
         <p slot="title">Simulation console</p>
         <div
@@ -183,7 +183,7 @@
             ></InputNumber>
             <Button size="small" style="margin-right:40px" @click="submitAgents()">Submit</Button>
             <Label>Quarantine:</Label>
-            <Select style="width:100px" @on-change="changeIsolate" size="small">
+            <Select style="width:100px" @on-change="changeIsolate" size="small" v-model="quarantine">
               <Option v-for="item in quaraObjs" :value="item" :key="item">{{ item }}</Option>
             </Select>
           </div>
@@ -567,26 +567,41 @@ export default {
     },
     setSEIRParem(origin) {
       if (this.agentState == "stop") {
-        // 传染率
-        this.seirParams.totalNum = this.total_popu;
-        this.seirParams.exposedNum = this.exposed_popu;
-        this.seirParams.infectiousNum = this.infectious_popu;
-        this.seirParams.recoveredNum = this.recovered_popu;
-        this.seirParams.deathNum = this.death_popu;
-        this.seirParams.exposedInfect = this.exposed_infect;
-        this.seirParams.exposedRate = this.transmission_rate / 100;
-        this.seirParams.infectedRate = 1 / this.exposedTime;
-        this.seirParams.recoveredRate = this.recovery_rate / 100;
-        this.seirParams.mortalityRate = this.death_rate / 100;
+        if (origin == undefined) {
+          // 传染率
+          this.seirParams.totalNum = this.total_popu;
+          this.seirParams.exposedNum = this.exposed_popu;
+          this.seirParams.infectiousNum = this.infectious_popu;
+          this.seirParams.recoveredNum = this.recovered_popu;
+          this.seirParams.deathNum = this.death_popu;
+          this.seirParams.exposedInfect = this.exposed_infect;
+          this.seirParams.exposedRate = this.transmission_rate / 100;
+          this.seirParams.infectedRate = 1 / this.exposedTime;
+          this.seirParams.recoveredRate = this.recovery_rate / 100;
+          this.seirParams.mortalityRate = this.death_rate / 100;
 
-        // websocket 同步
-        if (this.collaborative && origin == undefined) {
-          let messageJson = {
-            type: "operation",
-            operation: "SEIR_params",
-            data: this.seirParams
-          };
-          this.sendMessage(JSON.stringify(messageJson));
+          if (this.collaborative) {
+            // websocket 同步
+            let messageJson = {
+              type: "operation",
+              operation: "SEIR_params",
+              data: this.seirParams
+            };
+            this.sendMessage(JSON.stringify(messageJson));
+          }
+        } else if (origin == 1) {
+          // 用户输入参数
+          this.total_popu = this.seirParams.totalNum;
+          this.exposed_popu = this.seirParams.exposedNum;
+          this.infectious_popu = this.seirParams.infectiousNum;
+          this.recovered_popu = this.seirParams.recoveredNum;
+          this.death_popu = this.seirParams.deathNum;
+
+          this.exposed_infect = this.seirParams.exposedInfect;
+          this.transmission_rate = this.seirParams.exposedRate * 100;
+          this.exposedTime = 1 / this.seirParams.infectedRate;
+          this.recovery_rate = this.seirParams.recoveredRate * 100;
+          this.death_rate = this.seirParams.mortalityRate * 100;
         }
       } else {
         this.$Notice.open({
@@ -787,6 +802,9 @@ export default {
               recovered: this.currentState.recovered,
               death: this.currentState.death
             });
+          }
+          if (this.simuTime == 100) {
+            this.pauseSimu();
           }
         }
 
