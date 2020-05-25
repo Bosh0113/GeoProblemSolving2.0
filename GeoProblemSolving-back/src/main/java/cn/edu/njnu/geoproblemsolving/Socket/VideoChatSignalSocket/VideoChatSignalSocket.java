@@ -48,14 +48,24 @@ public class VideoChatSignalSocket {
                 broadcastMembersToRoom(roomId);
                 break;
             }
+            case "initiate":{
+                rooms_chat.get(roomId).put(userId, this);
+                broadcastMembersToRoom(roomId);
+                break;
+            }
             case "apply":{
                 rooms_chat.get(roomId).put(userId, this);
                 broadcastMembersToRoom(roomId);
-                broadcastMessageToChatRoom(roomId, message);
+                JSONObject messageContent = messageObject.getContent();
+                String toUserId = messageContent.getString("applyTo");
+                broadcastMessageToSomeone(roomId, toUserId, message);
                 break;
             }
             case "candidate":{
-                broadcastMessageToChatRoom(roomId, message);
+                broadcastMessageToChatRoom(roomId,message);
+//                JSONObject messageContent = messageObject.getContent();
+//                String toUserId = messageContent.getString("candidateTo");
+//                broadcastMessageToSomeone(roomId, toUserId, message);
                 break;
             }
             case "reply":{
@@ -81,6 +91,7 @@ public class VideoChatSignalSocket {
     @OnError
     public void onError(@PathParam("roomId") String roomId, Throwable error)
     {
+        System.out.println(error);
         someoneOffline(roomId);
     }
 
@@ -124,7 +135,7 @@ public class VideoChatSignalSocket {
         for (Map.Entry<String, VideoChatSignalSocket> server : rooms_chat.get(roomId).entrySet()) {
             if (!this.equals(server.getValue())) {
                 try {
-                    server.getValue().session.getBasicRemote().sendText(message);
+                    server.getValue().session.getAsyncRemote().sendText(message);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
