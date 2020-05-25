@@ -579,7 +579,7 @@ export default {
 
             let geoJsonLayer = L.geoJSON(file, {
               style: function(feature) {
-                return { color: "green" };
+                return { color: "red" };
               }
             }).bindPopup(function(layer) {
               return layer.feature.properties.description;

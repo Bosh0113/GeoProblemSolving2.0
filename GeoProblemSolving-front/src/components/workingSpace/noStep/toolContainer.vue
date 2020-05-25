@@ -506,7 +506,7 @@ export default {
           { name: name_jupyterhub },
           {
             headers: {
-              Authorization: "token 125233d022884cf982d43ed9890aba70"
+              Authorization: "token 50e3fa2f34c74d36b09e967733a621b0"
             }
           }
         )
