@@ -54,9 +54,13 @@ public class VideoChatSignalSocket {
                 broadcastMessageToChatRoom(roomId, message);
                 break;
             }
+            case "candidate":{
+                broadcastMessageToChatRoom(roomId, message);
+                break;
+            }
             case "reply":{
                 JSONObject messageContent = messageObject.getContent();
-                String toUserId = messageContent.getString("to");
+                String toUserId = messageContent.getString("replyTo");
                 broadcastMessageToSomeone(roomId, toUserId,message);
                 break;
             }
@@ -138,8 +142,10 @@ public class VideoChatSignalSocket {
     }
 
     private void someoneOffline(String roomId){
+        String userId = "";
         for (Map.Entry<String, VideoChatSignalSocket> server : rooms_chat.get(roomId).entrySet()) {
             if (server.getValue().equals(this)) {
+                userId = server.getKey();
                 rooms_chat.get(roomId).remove(server.getKey());
                 break;
             }
@@ -152,5 +158,11 @@ public class VideoChatSignalSocket {
             }
         }
         broadcastMembersToRoom(roomId);
+        JSONObject quitMessage = new JSONObject();
+        quitMessage.put("type","quit");
+        JSONObject userInfo = new JSONObject();
+        userInfo.put("userId",userId);
+        quitMessage.put("userInfo",userInfo);
+        broadcastMessageToChatRoom(roomId,quitMessage.toJSONString());
     }
 }

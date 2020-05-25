@@ -28,7 +28,40 @@
     <i-button @click="applyToJoin" :disabled="applyDisabled">Join chat</i-button>
     <i-button @click="quitFromChat" :disabled="!applyDisabled">Quit chat</i-button>
     <h1>Video list:</h1>
-    <p v-for="chatVideo in chatVideos" :key="chatVideo.index">{{chatVideo.userName}}</p>
+    <div v-show="localVideoShow">
+        <Row>
+            <i-col span="8" style="padding: 15px">
+                <div style="height: 80%;width: 100%;padding: 5px">
+                    <video id="localVideo" autoplay="autoplay" src="" controls="controls" style="width:100%;height:100%">
+                        local video
+                    </video>
+                </div>
+                <div style="height:20%;text-align: center">
+                    <h4>You</h4>
+                </div>
+            </i-col>
+            <i-col span="8" style="padding: 15px">
+                <div style="height: 80%;width: 100%;padding: 5px">
+                    <video id="remoteVideo" autoplay="autoplay" src="" controls="controls" style="width:100%;height:100%">
+                        remote video
+                    </video>
+                </div>
+                <div style="height:20%;text-align: center">
+                    <h4>Remote</h4>
+                </div>
+            </i-col>
+            <i-col span="8" style="padding: 15px" v-for="chatVideo in chatVideos" :key="chatVideo.index">
+                <div style="height: 80%;width: 100%;padding: 5px">
+                    <video :id="chatVideo.userId" autoplay="autoplay" src="" controls="controls" style="width:100%;height:100%">
+                        remote videos
+                    </video>
+                </div>
+                <div style="height:20%;text-align: center">
+                    <h4>{{chatVideo.userName}}</h4>
+                </div>
+            </i-col>
+        </Row>
+    </div>
 </div>
 
 <script>
@@ -41,6 +74,7 @@
             'username': '28224511:1379330808'
         }
     ]};
+    var constraints = { audio: false, video: true };
     new Vue({
         el: '#vueBody',
         data:{
@@ -49,12 +83,18 @@
             participants:[],
             chatingUsers:[],
             applyDisabled:false,
+            localVideoShow:false,
             chatVideos:[],
+            peerConnection:null,
+            localStream:null,
+            remoteView:null,
+            remoteStream:null
         },
         created(){
             this.getPageInfo();
         },
         mounted(){
+            this.remoteView = document.getElementById('remoteVideo');
             this.initWebSocket();
         },
         methods: {
@@ -93,8 +133,9 @@
             onOpen(){
                 console.log("Socket连接成功！");
                 this.sendMessage("connect",{});
+                this.initiate();
             },
-            onMessage(evt){
+            async onMessage(evt){
                 var messageObject = JSON.parse(evt.data);
                 switch(messageObject.type){
                     case "members":{
@@ -111,13 +152,15 @@
                             videoUid:messageObject.content.videoUid
                         }
                         this.chatVideos.push(newVideo);
-                        //构建reply消息
-                        var applyerId = messageObject.userInfo.userId;
-                        var content = {
-                            to: applyerId,
-                            videoUid:"******************"
+                        //设置远程视频
+                        this.applySetRemoteConfig(messageObject);
+                        break;
+                    }
+                    case "candidate":{
+                        console.log("[接收candidate]: " + messageObject.content.candidate);
+                        if (messageObject.content.candidate != null) {
+                            await this.peerConnection.addIceCandidate(await new RTCIceCandidate(messageObject.content.candidate));
                         }
-                        this.sendMessage("reply", content);
                         break;
                     }
                     case "reply":{
@@ -129,6 +172,8 @@
                             videoUid:messageObject.content.videoUid
                         }
                         this.chatVideos.push(newVideo);
+                        //设置远程视频
+                        this.setRemoteConfig(messageObject);
                         break;
                     }
                     case "quit":{
@@ -143,9 +188,11 @@
                 }
             },
             onClose(){
+                this.closeConnection();
                 console.log("Socket连接断开！");
             },
             onError(){
+                this.closeConnection();
                 console.log("Socket连接错误！");
             },
             sendMessage(type, content){
@@ -162,22 +209,163 @@
                 this.videoChatSocket.send(JSON.stringify(message));
             },
             applyToJoin(){
-                var content = {
-                    message:"apply"
-                }
-                this.sendMessage("apply", content);
-                this.applyDisabled = true;
-                var thisVideo = {
-                    userId:this.pageParams.userId,
-                    userName:this.pageParams.userName,
-                    videoUid:"-------"
-                }
-                this.chatVideos.push(thisVideo);
+                this.getLocalConfig();
+                // var content = {
+                //     videoUid:this.peerConnection.localDescription
+                // }
+                // this.sendMessage("apply", content);
+                // this.applyDisabled = true;
+                // this.localVideoShow = true;
             },
             quitFromChat(){
                 this.sendMessage("quit", {});
+                this.closeConnection();
                 this.chatVideos=[];
                 this.applyDisabled = false;
+                this.localVideoShow = false;
+            },
+            initiate(){
+                // 浏览器适配
+                let audioContext;
+                if (typeof AudioContext === 'function') {
+                    audioContext = new AudioContext();
+                } else if (typeof webkitAudioContext === 'function') {
+                    audioContext = new webkitAudioContext(); // eslint-disable-line new-cap
+                } else {
+                    console.log('Sorry! Web Audio not supported.');
+                }
+
+                // 视频过滤节点
+                var filterNode = audioContext.createBiquadFilter();
+                // see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html#BiquadFilterNode-section
+                filterNode.type = 'highpass';  //高通
+                // cutoff frequency: for highpass, audio is attenuated below this frequency 截止频率
+                filterNode.frequency.value = 10000;
+
+                // create a gain node (to change audio volume) 控制音量 小于1表示音量衰减，反之亦然
+                var gainNode = audioContext.createGain();
+                // default is 1 (no change); less than 1 means audio is attenuated
+                // and vice versa
+                gainNode.gain.value = 0.5;
+
+
+                // 判断是否有 navigator.mediaDevices，没有赋成空对象
+                if (navigator.mediaDevices === undefined) {
+                    navigator.mediaDevices = {};
+                }
+
+                navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+                this.peerConnection = new RTCPeerConnection(configuration);
+                this.peerConnection.ontrack = (event) => {
+                    // don't set srcObject again if it is already set.
+                    this.remoteStream = event.streams[0];
+                    if ('srcObject' in this.remoteView)
+                    {
+                        this.remoteView.srcObject = this.remoteStream;
+                    }
+                    else {
+                        this.remoteView.src = window.URL.createObjectURL(this.remoteStream);
+                    }
+                    this.remoteView.play();
+                };
+
+                this.peerConnection.onicecandidate = ({candidate}) =>
+                {
+                    console.log("[发送的candidate] " + JSON.stringify({"type":"candidate","value":candidate}))
+                    var content = {
+                        candidate: candidate
+                    }
+                    this.sendMessage("candidate",content);
+                };
+
+                this.peerConnection.oniceconnectionstatechange = function (event) {
+                    if (this.peerConnection.iceConnectionState === "failed" ||
+                    this.peerConnection.iceConnectionState === "disconnected" ||
+                    this.peerConnection.iceConnectionState === "closed") {
+                        console.error(event);
+                        console.error("Connection interruption please refresh");
+                    }
+                };
+
+            },
+            async getLocalConfig(){
+                try {
+                    var localView = document.getElementById('localVideo');
+                    // get local stream, show it in self-view and add it to be sent
+                    this.localStream = await navigator.mediaDevices.getUserMedia(constraints);
+                    var that = this;
+                    this.localStream.getTracks().forEach((track) =>
+                        this.peerConnection.addTrack(track, that.localStream));
+                    if ('srcObject' in localView) { // 判断是否支持 srcObject 属性
+                        localView.srcObject = this.localStream;
+                    } else {
+                        localView.src = window.URL.createObjectURL(this.localStream);
+                    }
+                } catch (err) {
+                    alert("系统未检测到摄像头!");
+                    console.error(err);
+                }
+                await this.peerConnection.createOffer().then( offer => {
+                    return this.peerConnection.setLocalDescription(new RTCSessionDescription(offer));
+                });
+                var content = {
+                    videoUid:this.peerConnection.localDescription
+                }
+                this.sendMessage("apply", content);
+                this.applyDisabled = true;
+                this.localVideoShow = true;
+            },
+            async applySetRemoteConfig(messageObject){
+                if (messageObject.content.videoUid != null ){
+                    await this.peerConnection.setRemoteDescription(messageObject.content.videoUid);
+                }
+                try {
+                    var localView = document.getElementById('localVideo');
+                    // get local stream, show it in self-view and add it to be sent
+                    this.localStream = await navigator.mediaDevices.getUserMedia(constraints);
+                    if ('srcObject' in localView) { // 判断是否支持 srcObject 属性
+                        localView.srcObject = this.localStream;
+                    } else {
+                        localView.src = window.URL.createObjectURL(this.localStream);
+                    }
+                    var that = this;
+                    await this.localStream.getTracks().forEach((track) => that.peerConnection.addTrack(track, that.localStream));
+                } catch (err) {
+                    alert("系统未检测到摄像头!");
+                    console.error(err);
+                }
+                await this.peerConnection.createAnswer().then((answer)=> {
+                    that.peerConnection.setLocalDescription(new RTCSessionDescription(answer))
+                });
+                //构建reply消息
+                var applyerId = messageObject.userInfo.userId;
+                var content = {
+                    replyTo: applyerId,
+                    videoUid:this.peerConnection.localDescription
+                }
+                this.sendMessage("reply", content);
+                this.remoteView.onloadedmetadata = ()=>{
+                    this.remoteView.play();
+                }
+            },
+            async setRemoteConfig(messageObject){
+                if (messageObject.content.videoUid != null ){
+                    await this.peerConnection.setRemoteDescription(messageObject.content.videoUid);
+                }
+                // this.remoteView.onloadedmetadata = ()=>{
+                //     this.remoteView.play();
+                // }
+            },
+            closeConnection() {
+                var that = this;
+                if(that.remoteStream!=null){
+                    const tracks = this.localStream.getTracks().concat(that.remoteStream.getTracks());
+                    tracks.forEach((track) => {
+                        track.stop();
+                    });
+                }
+                this.peerConnection.close();
+                this.initiate();
             }
         }
     })
