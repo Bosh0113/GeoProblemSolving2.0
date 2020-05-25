@@ -40,7 +40,7 @@
                     <h4>You</h4>
                 </div>
             </i-col>
-            <i-col span="8" style="padding: 15px">
+            <!-- <i-col span="8" style="padding: 15px" v-show="remoteStream!=null">
                 <div style="height: 80%;width: 100%;padding: 5px">
                     <video id="remoteVideo" autoplay="autoplay" src="" controls="controls" style="width:100%;height:100%">
                         remote video
@@ -49,8 +49,8 @@
                 <div style="height:20%;text-align: center">
                     <h4>Remote</h4>
                 </div>
-            </i-col>
-            <i-col span="8" style="padding: 15px" v-for="chatVideo in chatVideos" :key="chatVideo.index">
+            </i-col> -->
+            <i-col span="8" style="padding: 15px" v-for="chatVideo in participants" :key="chatVideo.index" v-show="videoDisabled(chatVideo.userId)">
                 <div style="height: 80%;width: 100%;padding: 5px">
                     <video :id="chatVideo.userId" autoplay="autoplay" src="" controls="controls" style="width:100%;height:100%">
                         remote videos
@@ -94,10 +94,17 @@
             this.getPageInfo();
         },
         mounted(){
-            this.remoteView = document.getElementById('remoteVideo');
             this.initWebSocket();
         },
         methods: {
+            videoDisabled(userId){
+                for(var i=0;i<this.chatVideos.length;i++){
+                    if(userId==this.chatVideos[i].userId){
+                        return true;
+                    }
+                }
+                return false;
+            },
             getPageInfo(){
                 var href = window.location.href;
                 var url = href.split("&");
@@ -251,18 +258,6 @@
 
                 navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
                 this.peerConnection = new RTCPeerConnection(configuration);
-                this.peerConnection.ontrack = (event) => {
-                    // don't set srcObject again if it is already set.
-                    this.remoteStream = event.streams[0];
-                    if ('srcObject' in this.remoteView)
-                    {
-                        this.remoteView.srcObject = this.remoteStream;
-                    }
-                    else {
-                        this.remoteView.src = window.URL.createObjectURL(this.remoteStream);
-                    }
-                    this.remoteView.play();
-                };
 
                 this.peerConnection.onicecandidate = ({candidate}) =>
                 {
@@ -273,7 +268,7 @@
                     this.sendMessage("candidate",content);
                 };
 
-                this.peerConnection.oniceconnectionstatechange = function (event) {
+                this.peerConnection.oniceconnectionstatechange = (event)=> {
                     if (this.peerConnection.iceConnectionState === "failed" ||
                     this.peerConnection.iceConnectionState === "disconnected" ||
                     this.peerConnection.iceConnectionState === "closed") {
@@ -310,7 +305,23 @@
                 this.applyDisabled = true;
                 this.localVideoShow = true;
             },
+            setRemoteVideo(videoId){
+                this.remoteView = document.getElementById(videoId);
+                this.peerConnection.ontrack = (event) => {
+                    // don't set srcObject again if it is already set.
+                    this.remoteStream = event.streams[0];
+                    if ('srcObject' in this.remoteView)
+                    {
+                        this.remoteView.srcObject = this.remoteStream;
+                    }
+                    else {
+                        this.remoteView.src = window.URL.createObjectURL(this.remoteStream);
+                    }
+                    this.remoteView.play();
+                };
+            },
             async applySetRemoteConfig(messageObject){
+                this.setRemoteVideo(messageObject.userInfo.userId);
                 if (messageObject.content.videoUid != null ){
                     await this.peerConnection.setRemoteDescription(messageObject.content.videoUid);
                 }
@@ -339,11 +350,9 @@
                     videoUid:this.peerConnection.localDescription
                 }
                 this.sendMessage("reply", content);
-                this.remoteView.onloadedmetadata = ()=>{
-                    this.remoteView.play();
-                }
             },
             async replySetRemoteConfig(messageObject){
+                this.setRemoteVideo(messageObject.userInfo.userId);
                 if (messageObject.content.videoUid != null ){
                     await this.peerConnection.setRemoteDescription(messageObject.content.videoUid);
                 }
