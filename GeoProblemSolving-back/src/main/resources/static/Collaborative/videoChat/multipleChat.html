@@ -152,7 +152,7 @@
                             videoUid:messageObject.content.videoUid
                         }
                         this.chatVideos.push(newVideo);
-                        //设置远程视频
+                        //设置请求者远程视频
                         this.applySetRemoteConfig(messageObject);
                         break;
                     }
@@ -172,8 +172,8 @@
                             videoUid:messageObject.content.videoUid
                         }
                         this.chatVideos.push(newVideo);
-                        //设置远程视频
-                        this.setRemoteConfig(messageObject);
+                        //设置接收者远程视频
+                        this.replySetRemoteConfig(messageObject);
                         break;
                     }
                     case "quit":{
@@ -209,13 +209,8 @@
                 this.videoChatSocket.send(JSON.stringify(message));
             },
             applyToJoin(){
-                this.getLocalConfig();
-                // var content = {
-                //     videoUid:this.peerConnection.localDescription
-                // }
-                // this.sendMessage("apply", content);
-                // this.applyDisabled = true;
-                // this.localVideoShow = true;
+                //设置本地视频窗口
+                this.setLocalConfig();
             },
             quitFromChat(){
                 this.sendMessage("quit", {});
@@ -288,7 +283,7 @@
                 };
 
             },
-            async getLocalConfig(){
+            async setLocalConfig(){
                 try {
                     var localView = document.getElementById('localVideo');
                     // get local stream, show it in self-view and add it to be sent
@@ -348,13 +343,10 @@
                     this.remoteView.play();
                 }
             },
-            async setRemoteConfig(messageObject){
+            async replySetRemoteConfig(messageObject){
                 if (messageObject.content.videoUid != null ){
                     await this.peerConnection.setRemoteDescription(messageObject.content.videoUid);
                 }
-                // this.remoteView.onloadedmetadata = ()=>{
-                //     this.remoteView.play();
-                // }
             },
             closeConnection() {
                 var that = this;
