@@ -7,6 +7,7 @@ var userID="";
 var olParticipants=[];
 var thisUserId="";
 var thisRoomId="";
+var thisUserName="";
 
 var href = window.location.href;
 var url = href.split("&");
@@ -22,7 +23,7 @@ for (var i = 0; i < url.length; i++) {
     }
 
     if (/userName/.test(url[i])) {
-        this.pageParams.userName = url[i].match(/userName=(\S*)/)[1];
+       thisUserName = url[i].match(/userName=(\S*)/)[1];
         continue;
     }
 }
