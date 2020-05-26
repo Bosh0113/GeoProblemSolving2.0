@@ -190,7 +190,6 @@
             </Timeline>
           </div>
         </TabPane>
-
         <TabPane :label="label2" name="chats" style="margin-top: -16px;">
           <div>
             <div class="contentPanel">
@@ -303,7 +302,12 @@ export default {
       receivedChats: []
     };
   },
-  props: ["stepInfo", "receivedChatMsgs", "operationRecords","getSocketConnect"],
+  props: [
+    "stepInfo",
+    "receivedChatMsgs",
+    "operationRecords",
+    "getSocketConnect"
+  ],
   watch: {
     receivedChatMsgs(val) {
       for (let i = 0; i < this.receivedChatMsgs.length; i++) {
@@ -339,7 +343,31 @@ export default {
       // go to chatroom
     },
     toolPanel(toolType) {},
-
+    // 查询记录
+    readHistoricalRecords() {
+      this.axios
+        .get(
+          "/GeoProblemSolving/history/inquiry?" +
+            "eventType=step" +
+            "&key=scopeId" +
+            "&value=" +
+            this.stepInfo.stepId
+        )
+        .then(res => {
+          if (res.data == "Offline") {
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
+          } else if (res.data != "None" && res.data != "Fail") {
+            for (let i = 0; i < res.data.length; i++) {
+              let record = JSON.parse(res.data[i].description);
+              this.allRecords.push(record);
+            }
+          }
+        })
+        .catch(err => {
+          console.log(err.data);
+        });
+    },
     //chat
     send(msg) {
       //修改时间格式使其统一

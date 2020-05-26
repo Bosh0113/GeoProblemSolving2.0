@@ -360,6 +360,21 @@ export default {
       this.toolsetToolList = toolsetInfo.toolList;
       this.showToolsetToolsModal = true;
     },
+    addHistoryEvent(scopeId, record) {
+      let form = {};
+      form["description"] = JSON.stringify(record);
+      form["scopeId"] = scopeId;
+      form["eventType"] = "step";
+      form["userId"] = this.$store.getters.userId;
+      this.axios
+        .post("/GeoProblemSolving/history/save", form)
+        .then(res => {
+          console.log(res.data);
+        })
+        .catch(err => {
+          console.log(err.data);
+        });
+    },
     useTool(toolInfo) {
       // 记录信息
       let toolRecords = {
@@ -370,6 +385,7 @@ export default {
         toolType: toolInfo.toolName
       };
       this.$emit("toolBehavior", toolRecords);
+      this.addHistoryEvent(this.stepInfo.stepId, toolRecords);
 
       if (toolInfo.toolName == "Jupyter notebook") {
         this.jupyterModal = true;
