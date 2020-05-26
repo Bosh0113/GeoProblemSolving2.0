@@ -62,10 +62,10 @@ public class VideoChatSignalSocket {
                 break;
             }
             case "candidate":{
-                broadcastMessageToChatRoom(roomId,message);
-//                JSONObject messageContent = messageObject.getContent();
-//                String toUserId = messageContent.getString("candidateTo");
-//                broadcastMessageToSomeone(roomId, toUserId, message);
+//                broadcastMessageToChatRoom(roomId,message);
+                JSONObject messageContent = messageObject.getContent();
+                String toUserId = messageContent.getString("candidateTo");
+                broadcastMessageToSomeone(roomId, toUserId, message);
                 break;
             }
             case "reply":{

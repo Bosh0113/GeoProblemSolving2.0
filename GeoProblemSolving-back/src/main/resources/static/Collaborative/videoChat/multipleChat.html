@@ -248,6 +248,7 @@
                 {
                     console.log("[发送的candidate] " + JSON.stringify({"type":"candidate","value":candidate}))
                     var content = {
+                        candidateTo: userId,
                         candidate: candidate
                     }
                     this.sendMessage("candidate",content);
