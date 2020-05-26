@@ -47,7 +47,7 @@
   overflow: hidden;
 }
 #toolData {
-  width: 66%;
+  width: 100%;
   height: 400px;
   border: 1px solid #dcdee2;
 }
@@ -66,6 +66,20 @@
         <h4>Resources</h4>
       </div>
       <div slot="extra">
+        <Icon
+          v-if="dataListStyle"
+          type="md-list"
+          size="24"
+          @click="dataListStyle = false"
+          style="margin-right:20px;margin-top:-10px; cursor: pointer"
+        />
+        <Icon
+          v-else
+          type="md-apps"
+          size="24"
+          @click="dataListStyle = true"
+          style="margin-right:20px;margin-top:-10px; cursor: pointer"
+        />
         <Select
           v-model="resouceModel"
           size="small"
@@ -75,6 +89,7 @@
           <Option value="resources">All resources</Option>
           <Option value="data">Data</Option>
           <Option value="materials">Related materials</Option>
+          <Option value="toolData">Tool-generated results</Option>
         </Select>
         <Button
           v-if="stepInfo.activeStatus"
@@ -86,7 +101,7 @@
         ></Button>
       </div>
       <div style="display: flex; justify-content: space-between;">
-        <div style="width:33%; height:400px">
+        <div style="width:99%; height:400px" v-if="dataListStyle">
           <Table
             :columns="tableColName"
             :data="fileList"
@@ -121,25 +136,61 @@
             </template>
           </Table>
         </div>
-        <div id="toolData">
-          <div id="toolDataHeader">Data from Tools</div>
-          <Card
-            style="width:48%; height:150px; float:left; margin:5px"
-            v-if="toolDataList.length == 0"
-          >
-            <div>There is no records.</div>
+        <div id="toolData" v-else>
+          <Card style="width:30%; height:150px; float:left; margin:5px" v-if="fileList.length == 0">
+            <div>There is no resource.</div>
           </Card>
           <vue-scroll :ops="ops" style="height:360px">
-            <div v-for="(item,index) in toolDataList" :key="index">
-              <Card style="width:48%; height:150px; float:left; margin:5px">
+            <div v-for="(item,index) in fileList" :key="index">
+              <Card style="width:32%; height:150px; float:left; margin:5px">
                 <div style="float:left">
-                  <img
-                    v-if="item.thumbnail != undefined"
-                    :src="item.thumbnail"
-                    height="118px"
-                    width="118px"
-                  />
-                  <avatar v-else :username="item.name" :size="118" :rounded="false"></avatar>
+                  <template v-if="item.thumbnail == ''||item.thumbnail == undefined">
+                    <img
+                      v-if="item.type == 'data'"
+                      :src="dataUrl"
+                      height="72px"
+                      width="72px"
+                    />
+                    <img
+                      v-else-if="item.type == 'model'"
+                      :src="modelUrl"
+                      height="72px"
+                      width="72px"
+                    />
+                    <img
+                      v-else-if="item.type == 'paper'"
+                      :src="paperUrl"
+                      height="72px"
+                      width="72px"
+                    />
+                    <img
+                      v-else-if="item.type == 'document'"
+                     :src="documentUrl"
+                      height="72px"
+                      width="72px"
+                    />
+                    <img
+                      v-else-if="item.type == 'image'"
+                     :src="imageUrl"
+                      height="72px"
+                      width="72px"
+                    />
+                    <img
+                      v-else-if="item.type == 'video'"
+                      :src="videoUrl"
+                      height="72px"
+                      width="72px"
+                    />
+                    <img
+                      v-else-if="item.type == 'others'"
+                      :src="otherUrl"
+                      height="72px"
+                      width="72px"
+                    />
+                  </template>
+                  <template v-else>
+                    <img :src="item.thumbnail" height="118px" width="118px" />
+                  </template>
                 </div>
                 <div style="float:left;margin: 0 10px">
                   <div>
@@ -342,6 +393,16 @@ export default {
       stepDataList: [], //data in the step
       relatedResList: [], //related materials in the step
       toolDataList: [], //data from tools in the step
+      dataListStyle: false, // 数据列表展示样式
+      // 资源avatar 图片路径
+      dataUrl: require("@/assets/images/data.png"),
+      modelUrl: require("@/assets/images/model.png"),
+      paperUrl: require("@/assets/images/paper.png"),
+      documentUrl: require("@/assets/images/document.png"),
+      imageUrl: require("@/assets/images/image.png"),
+      videoUrl: require("@/assets/images/video.png"),
+      otherUrl: require("@/assets/images/otherfile.png"),
+      // 
       showType: "resources",
       checkDataModal: false,
       tableColName: [
@@ -358,6 +419,17 @@ export default {
           width: 90,
           tooltip: true,
           sortable: true
+        },
+        {
+          title: "Description",
+          key: "description",
+          tooltip: true
+        },
+        {
+          title: "Uploader",
+          key: "uploaderName",
+          sortable: true,
+          width: 120
         },
         {
           title: "Action",
@@ -448,6 +520,7 @@ export default {
               "Yes, partly" &&
             resource.uploaderId === this.userInfo.userId
           ) {
+            return true;
           }
         }
       }
@@ -507,6 +580,9 @@ export default {
         this.showType = value;
       } else if (value == "materials") {
         this.fileList = this.relatedResList;
+        this.showType = value;
+      } else if (value == "toolData") {
+        this.fileList = this.toolDataList;
         this.showType = value;
       }
     },
@@ -723,12 +799,12 @@ export default {
                   }
                 }
               }
-              // 如果删除的是ToolData, 同步删除
-              for (var i = 0; i < this.toolDataList.length; i++) {
-                if (this.toolDataList[i].resourceId == this.deleteResourceId) {
-                  this.toolDataList.splice(i, 1);
-                }
-              }
+              // // 如果删除的是ToolData, 同步删除
+              // for (var i = 0; i < this.toolDataList.length; i++) {
+              //   if (this.toolDataList[i].resourceId == this.deleteResourceId) {
+              //     this.toolDataList.splice(i, 1);
+              //   }
+              // }
             }
           })
           .catch(err => {
