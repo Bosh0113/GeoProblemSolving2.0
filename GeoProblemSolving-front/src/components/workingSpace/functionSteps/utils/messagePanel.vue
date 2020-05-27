@@ -170,20 +170,12 @@
                     <span class="time" style="color:#0664a2;margin-left:10px">{{item.who}}</span>
                     <span class="content" style="color:#0664a2;">{{item.content}}</span>
                     <span class="content" style="color:grey;">{{item.file}}</span>
-                    <a
-                      style="color:green;margin-left:5px"
-                      :href="'http://'+$store.state.IP_Port+'/GeoProblemSolving/resource/upload/'+item.file"
-                      target="_blank"
-                    >Download</a>
                   </template>
                   <template v-if="item.type == 'tools'">
                     <span class="time" style="color:#0664a2">{{item.time}}</span>
                     <span class="time" style="color:#0664a2; margin-left:10px">{{item.who}}</span>
                     <span class="content" style="color:#0664a2;">{{item.content}}</span>
-                    <span
-                      style="cursor:pointer;color:green;margin-left:5px"
-                      @click="toolPanel(item.toolType)"
-                    >Check</span>
+                    <span style="color:green;margin-left:5px">{{item.toolType}}</span>
                   </template>
                 </TimelineItem>
               </vue-scroll>
@@ -318,7 +310,9 @@ export default {
       this.receivedRecords.push(JSON.parse(this.operationRecords));
     }
   },
-  mounted() {},
+  mounted() {
+    this.readHistoricalRecords();
+  },
   updated: function() {
     // this.$refs["vs"].scrollTo(
     //   {
@@ -342,7 +336,6 @@ export default {
       this.openPanel = false;
       // go to chatroom
     },
-    toolPanel(toolType) {},
     // 查询记录
     readHistoricalRecords() {
       this.axios

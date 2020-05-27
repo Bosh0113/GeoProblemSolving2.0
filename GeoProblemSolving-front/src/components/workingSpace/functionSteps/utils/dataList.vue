@@ -108,7 +108,7 @@
             class="table"
             v-show="fileList!=[] && fileList!='None'"
             height="400"
-            no-data-text="No data"
+            no-data-text="No resource"
           >
             <template slot-scope="{ row }" slot="name">
               <strong>{{ row.name }}</strong>
