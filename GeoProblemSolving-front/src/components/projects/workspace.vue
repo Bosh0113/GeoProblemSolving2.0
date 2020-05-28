@@ -27,7 +27,7 @@
             <strong style="font-size:1rem;">Workspace</strong>
         </div>
         <div style="display:flex;align-items:center;justify-content:center;">
-            <span style="font-size:1.5rem; color: #2d8cf099;max-width:250px;display:inline-block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{projectInfo.title}}</span>
+            <span style="font-size:1.5rem; color: #2d8cf099;max-width:250px;display:inline-block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color: rgba(214, 109, 0, 0.82);">{{projectInfo.title}}</span>
         </div>
       </div>
       <div slot="extra">
@@ -136,7 +136,7 @@ export default {
         operation === "project_workspace_type_manage"
       ) {
         if (
-          this.userRole == "PManager" &&
+          this.userRole == "Manager" &&
           this.projectInfo.permissionManager.project_workspace_type_manage
             .project_manager
         ) {
@@ -192,13 +192,16 @@ export default {
     },
     getParticipants() {
       let members = this.projectInfo.members;
-      let manager = [
-        {
-          userId: this.projectInfo["managerId"],
-          userName: this.projectInfo["managerName"]
-        }
-      ];
-      let membersList = manager.concat(members);
+      let membersList = members;
+      if(members.length<1||members[0].userId!=this.projectInfo["managerId"]){
+        let manager = [
+          {
+            userId: this.projectInfo["managerId"],
+            userName: this.projectInfo["managerName"]
+          }
+        ];
+        membersList = manager.concat(members);
+      }
 
       let participantsTemp = [];
       let count = membersList.length;

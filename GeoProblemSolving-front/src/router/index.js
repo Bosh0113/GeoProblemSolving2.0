@@ -17,15 +17,7 @@ const routes = [{
     // { path: 'project/:id/workspace', name: 'workspace', component: resolve => (require(["@/components/workingSpace/moduleList"], resolve)) },
     // { path: 'markdown', name: 'markDown', component: resolve => (require(["@/components/workingSpace/utils/markDown"], resolve)) },
 
-    // { path: 'project/workspace/contextdefinition/:id', name: 'contextDefinition', component: resolve => (require(["@/components/workingSpace/contextDefinition"], resolve)) },
-    // { path: 'project/workspace/dataprocessing/:id', name: 'dataProcessing', component: resolve => (require(["@/components/workingSpace/dataProcessing"], resolve)) },
-    // { path: 'project/workspace/modelprocess/:id', name: 'modelProcess', component: resolve => (require(["@/components/workingSpace/modelProcess"], resolve)) },
-    // { path: 'project/workspace/modelevaluation/:id', name: 'modelEvaluation', component: resolve => (require(["@/components/workingSpace/modelEvaluation"], resolve)) },
-    // { path: 'project/workspace/quantitativeandqualitative/:id', name: 'quantitativeAndQualitative', component: resolve => (require(["@/components/workingSpace/quantitativeAndQualitative"], resolve)) },
-    // { path: 'project/workspace/simulationprediction/:id', name: 'simulationPrediction', component: resolve => (require(["@/components/workingSpace/simulationPrediction"], resolve)) },
-    // { path: 'project/workspace/datavisualization/:id', name: 'dataVisualization', component: resolve => (require(["@/components/workingSpace/dataVisualization"], resolve)) },
-    // { path: 'project/workspace/decisionmakingandmanagement/:id', name: 'decisionMakingAndManagement', component: resolve => (require(["@/components/workingSpace/decisionMakingAndManagement"], resolve)) },
-     { path: 'project/:id/permission', name: 'permission', component: resolve => (require(["@/components/projects/permissionManager"], resolve)) },
+    { path: 'project/:id/permission', name: 'permission', component: resolve => (require(["@/components/projects/permissionManager"], resolve)) },
     {
       path: 'project/:id/subproject/', name: 'subproject', component: resolve => (require(["@/components/subProject/subprojectNav"], resolve)), children: [
         { path: '', redirect: 'overview' },
@@ -37,10 +29,10 @@ const routes = [{
       ],
     },
     {
-      path: 'workspace/:stepId/', name: 'stepFramework', component: resolve => (require(["@/components/workingSpace/functionSteps/pageFramework"], resolve)), children: [
+      path: 'workspace/:stepId/', name: 'stepFramework', component: resolve => (require(["@/components/subProject/pageFramework"], resolve)), children: [
         { path: 'contextDefinition', name: 'contextDefinition', component: resolve => (require(["@/components/workingSpace/functionSteps/contextDefinitionContent"], resolve)) },
         { path: 'dataProcessing', name: 'dataProcessing', component: resolve => (require(["@/components/workingSpace/functionSteps/dataProcessingContent"], resolve)) },
-        { path: 'modelProcess', name: 'modelProcess', component: resolve => (require(["@/components/workingSpace/functionSteps/modelProcessContent"], resolve)) },
+        { path: 'modelBuild', name: 'modelBuild', component: resolve => (require(["@/components/workingSpace/functionSteps/modelBuildContent"], resolve)) },
         { path: 'modelEvaluation', name: 'modelEvaluation', component: resolve => (require(["@/components/workingSpace/functionSteps/modelEvaluationContent"], resolve)) },
         { path: 'analysis', name: 'analysis', component: resolve => (require(["@/components/workingSpace/functionSteps/analysisContent"], resolve)) },
         { path: 'simulation', name: 'simulation', component: resolve => (require(["@/components/workingSpace/functionSteps/simulationContent"], resolve)) },
@@ -52,7 +44,7 @@ const routes = [{
       path: '/workspaceP/:stepId/', name: 'stepFrameworkP', component: resolve => (require(["@/components/projects/pageFramework"], resolve)), children: [
         { path: 'contextDefinition', name: 'contextDefinitionP', component: resolve => (require(["@/components/workingSpace/functionSteps/contextDefinitionContent"], resolve)) },
         { path: 'dataProcessing', name: 'dataProcessingP', component: resolve => (require(["@/components/workingSpace/functionSteps/dataProcessingContent"], resolve)) },
-        { path: 'modelProcess', name: 'modelProcessP', component: resolve => (require(["@/components/workingSpace/functionSteps/modelProcessContent"], resolve)) },
+        { path: 'modelBuild', name: 'modelBuildP', component: resolve => (require(["@/components/workingSpace/functionSteps/modelBuildContent"], resolve)) },
         { path: 'modelEvaluation', name: 'modelEvaluationP', component: resolve => (require(["@/components/workingSpace/functionSteps/modelEvaluationContent"], resolve)) },
         { path: 'analysis', name: 'analysisP', component: resolve => (require(["@/components/workingSpace/functionSteps/analysisContent"], resolve)) },
         { path: 'simulation', name: 'simulationP', component: resolve => (require(["@/components/workingSpace/functionSteps/simulationContent"], resolve)) },
@@ -93,6 +85,7 @@ const routes = [{
 { path: '/nc/draw', name: 'drawUtilNC', component: resolve => (require(["@/components/utils/singleUtils/ncDrawBoard"], resolve)) },
 { path: '/nc/map', name: 'mapToolNC', component: resolve => (require(["@/components/utils/singleUtils/ncMapTool"], resolve)) },
 { path: '/nc/charts', name: 'dataChartsNC', component: resolve => (require(["@/components/utils/singleUtils/ncCharts"], resolve)) },
+{ path: '/nc/taskManager', name: 'taskManager', component: resolve => (require(["@/components/utils/singleUtils/taskManager"], resolve)) },
 { path: '/video', name: 'videoViewer', component: resolve => (require(["@/components/utils/videoViewer"], resolve)) },
 { path: '/preview', name: 'pdfViewer', component: resolve => (require(["@/components/utils/filePreview"], resolve)) },
 { path: '/abseir', name: 'abSeir', component: resolve => (require(["@/components/utils/ABM-SEIR"], resolve)) },

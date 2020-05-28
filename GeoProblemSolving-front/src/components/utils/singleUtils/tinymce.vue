@@ -7,7 +7,7 @@
     </div>
     <div id="main" style="flex:4;margin-left:60px;overflow:hidden">
       <tinymce id="d1" v-model="data" :other_options="options"></tinymce>
-      <iframe id="form_target" name="form_target" style="display:none"></iframe>
+      <iframe id="form_target" name="form_target" style="display:none" frameborder="0"></iframe>
       <form
         id="my_form"
         action="/upload/"

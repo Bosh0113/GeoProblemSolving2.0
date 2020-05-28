@@ -175,7 +175,6 @@ export default {
     next(vm => {
       if (!vm.$store.getters.userState || vm.$store.getters.userId == "") {
         vm.$router.push({ name: "Login" });
-      } else {
       }
     });
   },
@@ -325,7 +324,7 @@ export default {
         drawPolygon: true, // adds button to draw a polygon
         drawCircle: true, // adds button to draw a cricle
         cutPolygon: false, // adds button to cut a hole in a polygon
-        editMode: false, // adds button to toggle edit mode for all layers
+        editMode: true, // adds button to toggle edit mode for all layers
         dragMode: false,
         removalMode: true // adds a button to remove layers
       };
@@ -475,7 +474,7 @@ export default {
                   });
 
                   // 文件列表更新
-                  let dataName = res.data[0].fileName;
+                  let dataName = res.data.uploaded[0].name;
                   let dataItem = {
                     name: filename,
                     description: "map tool data",
@@ -543,7 +542,7 @@ export default {
             this.showFile = true;
             this.uploadDataName = file.name;
 
-            let dataName = res.data[0].fileName;
+            let dataName = res.data.uploaded[0].name;
             this.dataUrl = "/GeoProblemSolving/resource/upload/" + dataName;
 
             let dataItem = {
@@ -580,12 +579,12 @@ export default {
 
             let geoJsonLayer = L.geoJSON(file, {
               style: function(feature) {
-                return { color: "green" };
+                return { color: "red" };
               }
             }).bindPopup(function(layer) {
               return layer.feature.properties.description;
             });
-            that.drawingLayerGroup.addLayer(geoJsonLayer);
+            that.loadFeatures(geoJsonLayer);
             //平移至数据位置
             that.map.fitBounds(geoJsonLayer.getBounds());
           }
@@ -602,7 +601,7 @@ export default {
             }).bindPopup(function(layer) {
               return layer.feature.properties.description;
             });
-            that.drawingLayerGroup.addLayer(geoJsonLayer);
+            that.loadFeatures(geoJsonLayer);
             that.map.fitBounds(geoJsonLayer.getBounds());
           });
         } catch (res) {
@@ -611,8 +610,24 @@ export default {
       } else {
         this.$Message.error("Worry data format!");
       }
-
       this.showFile = false;
+    },
+    loadFeatures(featureCollection) {
+      featureCollection.eachLayer(layer => {
+        this.drawingLayerGroup.addLayer(layer);
+      });
+    },
+    setEditListen() {
+      this.drawingLayerGroup.eachLayer(layer => {
+        let _this = this;
+        layer.on("pm:edit", e => {
+          _this.send_content = {
+            type: "edit",
+            layer: _this.drawingLayerGroup.toGeoJSON()
+          };
+          _this.socketApi.sendSock(_this.send_content, _this.getSocketConnect);
+        });
+      });
     },
     listenDraw() {
       this.send_content = {};
@@ -626,7 +641,6 @@ export default {
       });
 
       this.map.on("mouseup", e => {
-        isMouseDown = false;
         isLayerCtrlClick = true;
       });
 
@@ -678,6 +692,7 @@ export default {
           };
           this.socketApi.sendSock(this.send_content, this.getSocketConnect);
         }
+        isMouseDown = false;
       });
 
       // 裁剪事件
@@ -692,54 +707,49 @@ export default {
       });
 
       // 删除事件
+      let _this = this;
       this.map.on("pm:remove", e => {
-        this.drawingLayerGroup.removeLayer(e.layer);
+        _this.drawingLayerGroup.removeLayer(e.layer);
         this.send_content = {
           type: "remove",
-          layer: this.drawingLayerGroup.toGeoJSON()
+          layer: _this.drawingLayerGroup.toGeoJSON()
         };
         this.socketApi.sendSock(this.send_content, this.getSocketConnect);
       });
 
+      this.map.on("pm:globaleditmodetoggled", e => {
+        this.setEditListen();
+      });
+
       // 画图事件
       this.map.on("pm:create", e => {
-        this.drawingLayerGroup.addLayer(e.layer);
-        let points = null;
-        switch (e.shape) {
-          case "Marker":
-            this.traces = [];
-            points = e.layer._latlng;
-            this.traces.push(points);
-            break;
-          case "Line":
-            this.traces = [];
-            points = e.layer._latlngs;
-            this.traces.push(points);
-            break;
-          case "Rectangle":
-            this.traces = [];
-            points = e.layer._latlngs;
-            this.traces.push(points);
-            break;
-          case "Poly":
-            this.traces = [];
-            points = e.layer._latlngs;
-            this.traces.push(points);
-            break;
-          case "Circle":
-            this.traces = [];
-            points = e.layer._latlng;
-            this.traces.push(points);
-            let radius = e.layer._mRadius;
-            this.traces.push(radius);
-            break;
-        }
+        this.map.removeLayer(e.layer);
+        if (e.shape == "Circle") {
+          this.traces = [];
+          let points = e.layer._latlng;
+          this.traces.push(points);
+          let radius = e.layer._mRadius;
+          this.traces.push(radius);
 
-        this.send_content = {
-          type: "add",
-          shape: e.shape,
-          layer: this.traces
-        };
+          let drawingLayer = L.circle(points, {
+            radius: radius
+          });
+          this.drawingLayerGroup.addLayer(drawingLayer);
+
+          this.send_content = {
+            type: "add",
+            shape: e.shape,
+            layer: this.traces
+          };
+        } else {
+          this.drawingLayerGroup.addLayer(e.layer);
+
+          this.send_content = {
+            type: "add",
+            shape: "Others",
+            layer: e.layer.toGeoJSON()
+          };
+        }
         this.socketApi.sendSock(this.send_content, this.getSocketConnect);
       });
     },
@@ -789,32 +799,32 @@ export default {
             }).bindPopup(function(layer) {
               // return layer.feature.properties.description;
             });
-            this.drawingLayerGroup.addLayer(geoJsonLayer);
+            this.loadFeatures(geoJsonLayer);
+            break;
+          }
+          case "edit": {
+            this.drawingLayerGroup.clearLayers();
+            let geoJson = socketMsg.layer;
+            let geoJsonLayer = L.geoJSON(geoJson, {
+              style: function(feature) {}
+            }).bindPopup(function(layer) {
+              // return layer.feature.properties.description;
+            });
+            this.loadFeatures(geoJsonLayer);
             break;
           }
           case "add": {
             let drawingLayer = null;
-            switch (socketMsg.shape) {
-              case "Marker":
-                drawingLayer = L.marker(socketMsg.layer[0]);
-                break;
-              case "Line":
-                drawingLayer = L.polyline(socketMsg.layer);
-                break;
-              case "Rectangle":
-                drawingLayer = L.rectangle(socketMsg.layer);
-                break;
-              case "Poly":
-                drawingLayer = L.polygon(socketMsg.layer);
-                break;
-              case "Circle":
-                drawingLayer = L.circle(socketMsg.layer[0], {
-                  radius: socketMsg.layer[1]
-                });
-                break;
+            if (socketMsg.shape == "Circle") {
+              drawingLayer = L.circle(socketMsg.layer[0], {
+                radius: socketMsg.layer[1]
+              });
+            } else {
+              drawingLayer = L.geoJSON(socketMsg.layer, {
+                style: function(feature) {}
+              }).bindPopup(function(layer) {});
             }
             this.drawingLayerGroup.addLayer(drawingLayer);
-
             break;
           }
           case "cut": {
@@ -851,7 +861,7 @@ export default {
                 }).bindPopup(function(layer) {
                   return layer.feature.properties.description;
                 });
-                that.drawingLayerGroup.addLayer(geoJsonLayer);
+                that.loadFeatures(geoJsonLayer);
               }
             };
             xhr.send();

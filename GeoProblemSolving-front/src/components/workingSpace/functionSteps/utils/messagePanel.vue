@@ -170,27 +170,18 @@
                     <span class="time" style="color:#0664a2;margin-left:10px">{{item.who}}</span>
                     <span class="content" style="color:#0664a2;">{{item.content}}</span>
                     <span class="content" style="color:grey;">{{item.file}}</span>
-                    <a
-                      style="color:green;margin-left:5px"
-                      :href="'http://'+$store.state.IP_Port+'/GeoProblemSolving/resource/upload/'+item.file"
-                      target="_blank"
-                    >Download</a>
                   </template>
                   <template v-if="item.type == 'tools'">
                     <span class="time" style="color:#0664a2">{{item.time}}</span>
                     <span class="time" style="color:#0664a2; margin-left:10px">{{item.who}}</span>
                     <span class="content" style="color:#0664a2;">{{item.content}}</span>
-                    <span
-                      style="cursor:pointer;color:green;margin-left:5px"
-                      @click="toolPanel(item.toolType)"
-                    >Check</span>
+                    <span style="color:green;margin-left:5px">{{item.toolType}}</span>
                   </template>
                 </TimelineItem>
               </vue-scroll>
             </Timeline>
           </div>
         </TabPane>
-
         <TabPane :label="label2" name="chats" style="margin-top: -16px;">
           <div>
             <div class="contentPanel">
@@ -303,7 +294,12 @@ export default {
       receivedChats: []
     };
   },
-  props: ["stepInfo", "receivedChatMsgs", "operationRecords"],
+  props: [
+    "stepInfo",
+    "receivedChatMsgs",
+    "operationRecords",
+    "getSocketConnect"
+  ],
   watch: {
     receivedChatMsgs(val) {
       for (let i = 0; i < this.receivedChatMsgs.length; i++) {
@@ -314,7 +310,9 @@ export default {
       this.receivedRecords.push(JSON.parse(this.operationRecords));
     }
   },
-  mounted() {},
+  mounted() {
+    this.readHistoricalRecords();
+  },
   updated: function() {
     // this.$refs["vs"].scrollTo(
     //   {
@@ -338,8 +336,31 @@ export default {
       this.openPanel = false;
       // go to chatroom
     },
-    toolPanel(toolType) {},
-
+    // 查询记录
+    readHistoricalRecords() {
+      this.axios
+        .get(
+          "/GeoProblemSolving/history/inquiry?" +
+            "eventType=step" +
+            "&key=scopeId" +
+            "&value=" +
+            this.stepInfo.stepId
+        )
+        .then(res => {
+          if (res.data == "Offline") {
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
+          } else if (res.data != "None" && res.data != "Fail") {
+            for (let i = 0; i < res.data.length; i++) {
+              let record = JSON.parse(res.data[i].description);
+              this.allRecords.push(record);
+            }
+          }
+        })
+        .catch(err => {
+          console.log(err.data);
+        });
+    },
     //chat
     send(msg) {
       //修改时间格式使其统一

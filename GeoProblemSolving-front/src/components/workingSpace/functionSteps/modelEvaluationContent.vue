@@ -15,7 +15,7 @@
     <p style="margin: 10px 0">Map</p>
     <Divider style="margin:10px 0" />
     <map-canvas :stepInfo="stepInfo" :userRole="userRole"></map-canvas>
-    <message-panel :stepInfo="stepInfo" :received-chat-msgs="receivedChatMsgs" :operation-records="operationRecords"></message-panel>
+    <message-panel :stepInfo="stepInfo" :received-chat-msgs="receivedChatMsgs" :operation-records="operationRecords" :getSocketConnect="getSocketConnect"></message-panel>
     <BackTop></BackTop>
   </div>
 </template>
@@ -31,17 +31,20 @@ export default {
     toolContainer,
     messagePanel
   },
-  props: ["stepInfo", "userRole", "receivedChatMsgs","projectInfo"],
+  props: ["stepInfo", "userRole", "projectInfo"],
   data() {
     return {
       unfold: ["tool", "data"],
       stepSocket: null,
       operationRecords: [],
       panelList:[],
+      // messagePanel.vue -- chat
+      receivedChatMsgs: []
     };
   },
   mounted() {
     this.openStepSocket();
+    this.startWebSocket();
   },
   beforeDestroy(){
     this.closeStepSocket();
@@ -129,6 +132,57 @@ export default {
     },
     removeTimer() {
       clearInterval(this.timer);
+    },
+
+    // websocket
+    startWebSocket() {
+      this.socketApi.initWebSocket(
+        "ChatServer/" + this.stepInfo.stepId,
+        this.$store.state.IP_Port
+      );
+      let send_msg = {
+        type: "test",
+        from: "Test",
+        content: "TestChat"
+      };
+      this.socketApi.sendSock(send_msg, this.getSocketConnect);
+    },
+    getSocketConnect(data) {
+      this.receivedChatMsgs = [];
+      var chatMsg = data; //data传回onopen方法里的值
+      if (data.type === "members") {
+        let members = data.content
+          .replace("[", "")
+          .replace("]", "")
+          .replace(/\s/g, "")
+          .split(",");
+        let participantMsg = {
+          content: "members",
+          msg: members
+        };
+        this.$emit("participantsChange", participantMsg);
+      } else if (data.type === "message") {
+        //判断消息的发出者
+        if (chatMsg.content != "") {
+          this.receivedChatMsgs.push(chatMsg);
+        }
+      } else if (data.type === "notice") {
+        //上线下线提示
+        if (chatMsg.behavior != "" && chatMsg.userId != "") {
+          this.receivedChatMsgs.push(chatMsg);
+        }
+        let participantMsg = {
+          content: "notice",
+          msg: chatMsg
+        };
+        this.$emit("participantsChange", participantMsg);
+      } else if (chatMsg.type == undefined && chatMsg.length > 0) {
+        for (let i = 0; i < chatMsg.length; i++) {
+          if (chatMsg[i].content != "") {
+            this.receivedChatMsgs.push(chatMsg[i]);
+          }
+        }
+      }
     }
   }
 };

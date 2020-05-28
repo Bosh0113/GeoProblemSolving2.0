@@ -86,32 +86,30 @@
         <el-aside width="400px">
             <h2>Introduction</h2>
             <p>
-                This table edit tool is offers the following functions to help you create edit
-                <strong>csv,excel</strong> data,you can open the file existed in loacl storage,except that,
-                you can download your file just edit.
+                This table edit tool offers the following functions to help you create edit <strong>CSV, excel</strong>
+                data.
             </p>
-            <h2>How to Use</h2>
             <p>
-                1.click open button , and choose your local file,and edit it.
+                You can open the file that exists in the resource center. After that, you can save your file into the
+                resource center.
+            </p>
+            <h2>How to use</h2>
+            <p>
+                1. Click <strong>Open</strong> button, choose your file, and edit it.
             </p>
             <el-input type="textarea" :autosize="true" resize="none" :disabled="true" v-model="textarea">
             </el-input>
-            <p>2.Double click the cell , you can edit the content table cell.</p>
-            <p>3.Click donwload button,you can download the file in your own PC</p>
-
+            <p>2. Double-click the cell, and you can edit the content table cell.</p>
+            <p>3. Click <strong>Save</strong> button,you can download the file in your own PC</p>
             <el-row>
                 <el-col :span="2">
-                    <el-upload action="-" :before-upload="beforeUpload"
-                               multiple="false"
-                               ref="upload" limit="1" name="myfile">
-                        <el-button>open</el-button>
-                    </el-upload>
+                    <el-button @click="open">Open</el-button>
                 </el-col>
                 <el-col :span="2" :offset="3">
-                    <el-button @click="destroy">clear</el-button>
+                    <el-button @click="destroy">Clear</el-button>
                 </el-col>
                 <el-col :span="2" :offset="3">
-                    <el-button @click="download">download</el-button>
+                    <el-button @click="save">Save</el-button>
                 </el-col>
             </el-row>
         </el-aside>
@@ -124,6 +122,18 @@
                 </el-tabs>
             </el-main>
         </div>
+        <el-dialog title="Resouces list" :visible.sync="fileSelectVisible">
+            <el-table :data="fileList" style="max-height: 400px; overflow-y: auto">
+                <el-table-column property="name" label="Name" width="200"></el-table-column>
+                <el-table-column property="type" label="Type" width="80"></el-table-column>
+                <el-table-column property="description" label="Description"></el-table-column>
+                <el-table-column label="Operation">
+                    <template slot-scope="scope">
+                        <el-button size="mini" @click="uploadData(scope.row, true)">Select</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </el-dialog>
     </el-container>
 </div>
 </body>
@@ -155,8 +165,11 @@
             // 表格的socket工具
             excelSocket: null,
             boolCollaborate: false,
-            pageParams: { pageId: "", userId: "", userName: "" },
+            pageParams: {pageId: "", userId: "", userName: ""},
             userInfo: {},
+            fileList: [],
+            dataName: "",
+            fileSelectVisible: false
         },
         computed: {
             transferHeaders() {
@@ -175,6 +188,10 @@
                 return data;
             }
         },
+        beforeRouteLeave(to, from, next) {
+            this.closeExcelSocket();
+            next();
+        },
         created() {
             this.$nextTick(function () {
                 this.init();
@@ -183,6 +200,7 @@
         mounted() {
             this.getStepInfo();
             this.getUserInfo();
+            this.openExcelSocket();
         },
         methods: {
             init() {
@@ -199,65 +217,146 @@
                     onsort: this.tableSort,
                     onmoverow: this.rowMove
                 });
-                if (WebSocket) {
-                    this.openExcelSocket();
-                } else {
-                    alert("不支持");
-                }
             },
             getStepInfo() {
-                if (
-                    this.$route.params.groupID == undefined ||
-                    this.$route.params.groupID == ""
-                ) {
-                    var href = window.location.href;
-                    var url = href.split("&");
+                var href = window.location.href;
+                var url = href.split("&");
 
-                    for (var i = 0; i < url.length; i++) {
-                        if (/groupID/.test(url[i])) {
-                            this.pageParams.pageId = url[i].match(/groupID=(\S*)/)[1];
-                            continue;
-                        }
-
-                        if (/userID/.test(url[i])) {
-                            this.pageParams.userId = url[i].match(/userID=(\S*)/)[1];
-                            continue;
-                        }
-
-                        if (/userName/.test(url[i])) {
-                            this.pageParams.userName = url[i].match(/userName=(\S*)/)[1];
-                            continue;
-                        }
+                for (var i = 0; i < url.length; i++) {
+                    if (/groupID/.test(url[i])) {
+                        this.pageParams.pageId = url[i].match(/groupID=(\S*)/)[1];
+                        continue;
                     }
-                } else {
-                    this.pageParams.pageId = this.$route.params.groupID;
-                    this.pageParams.userId = this.$route.params.userID;
-                    this.pageParams.userName = this.$route.params.userName;
+
+                    if (/userID/.test(url[i])) {
+                        this.pageParams.userId = url[i].match(/userID=(\S*)/)[1];
+                        continue;
+                    }
+
+                    if (/userName/.test(url[i])) {
+                        this.pageParams.userName = url[i].match(/userName=(\S*)/)[1];
+                        continue;
+                    }
                 }
             },
             getUserInfo() {
+                var _this = this;
                 this.userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
-                if (this.userInfo == {}) {
-                    this.axios
-                        .get(
-                            "/GeoProblemSolving/user/inquiry" +
-                            "?key=" +
-                            "userId" +
-                            "&value=" +
-                            this.pageParams.userId
-                        )
-                        .then(res => {
-                            if (res.data != "Fail" && res.data != "None") {
-                                this.$set(this, "userInfo", res.data);
+                if (this.userInfo == null || JSON.stringify(this.userInfo) == "{}") {
+                    $.ajax({
+                        type: "GET",
+                        url: "/GeoProblemSolving/user/inquiry" +
+                        "?key=" +
+                        "userId" +
+                        "&value=" +
+                        this.pageParams.userId,
+                        cache: false,        //不设置缓存
+                        processData: false,  // 不处理数据
+                        contentType: false,  // 不设置内容类型
+                        success: function (data) {
+                            if (data != "Fail" && data != "None") {
+                                _this.userInfo = data;
                             }
-                        })
-                        .catch(err => {});
+                        },
+                        error: function () {
+                            console.log("Fail");
+                        }
+                    });
                 }
             },
+            open() {
+                if (this.pageParams.pageId == undefined || this.pageParams.pageId == "") {
+                    this.$Message.error("Lost the information of current step.");
+                    return false;
+                }
+
+                var _this = this;
+                this.fileList = [];
+                $.ajax({
+                    type: "GET",
+                    url: "/GeoProblemSolving/folder/inquiry?folderId=" + this.pageParams.pageId,
+                    cache: false,        //不设置缓存
+                    processData: false,  // 不处理数据
+                    contentType: false,  // 不设置内容类型
+                    success: function (data) {
+                        // 写渲染函数，取到所有资源
+                        if (data !== "None") {
+                            for (let i = 0; i < data.files.length; i++) {
+                                if (
+                                    data.files[i].type == "data" &&
+                                    /\.(xls|xlsx|csv)$/.test(data.files[i].name.toLowerCase())) {
+                                    _this.fileList.push(data.files[i]);
+                                }
+                            }
+                            _this.fileSelectVisible = true;
+                        } else {
+                            _this.fileList = [];
+                        }
+                    },
+                    error: function () {
+                        console.log("Fail");
+                    }
+                });
+            },
             // 下载文件
-            download() {
-                $("#tablePanel").jexcel("download");
+            save() {
+                // $("#tablePanel").jexcel("download");
                 var data = $('#tablePanel').jexcel('getData', false);
+                var row = $('#tablePanel').jexcel('getRowData', 1);
+
+                //格式化
+                // set header
+                let result = $('#tablePanel').jexcel('getHeader', 0);
+                for (var i = 1; i < row.length; i++) {
+                    result += "," + $('#tablePanel').jexcel('getHeader', i);
+                }
+                result += "\n";
+                // set content
+                for (var j = 0; j < data.length; j++) {
+                    result += data[j][0];
+                    for (var i = 1; i < row.length; i++) {
+                        result += "," + data[j][i];
+                    }
+                    result += "\n";
+                }
+
+                //创建blob
+                let blob = new Blob(["\ufeff" + result], {
+                    type: "text/csv,charset=UTF-8"
+                });
+                var resultBlob = new File([blob], this.dataName + ".csv");
+
+                let resultForm = new FormData();
+                resultForm.append("file", resultBlob);
+                resultForm.append("description", "The result of table editor tool");
+                resultForm.append("type", "data");
+                resultForm.append("uploaderId", this.pageParams.userId);
+                resultForm.append("privacy", "private");
+                resultForm.append("folderId", this.pageParams.pageId);
+
+                $.ajax({
+                    type: "POST",
+                    url: "/GeoProblemSolving/folder/uploadToFolder",
+                    data: resultForm,
+                    cache: false,        //不设置缓存
+                    processData: false,  // 不处理数据
+                    contentType: false,  // 不设置内容类型
+                    success: function (data) {
+                        if (
+                            data.sizeOver.length > 0 ||
+                            data.failed.length > 0 ||
+                            data == "Offline"
+                        ) {
+                            console.log(data);
+                        } else if (data.uploaded.length > 0) {
+                            alert("Save successfully!")
+                        }
+                    },
+                    error: function () {
+                        alert("fail");
+                    }
+                });
+
             },
             computeHeaders() {
                 var h = [];
@@ -294,58 +393,9 @@
                 }
                 this.boolCollaborate = false;
             },
-            beforeUpload(file){
-                if (this.pageParams.pageId == undefined || this.pageParams.pageId == "") {
-                    this.$Message.error("Lose the information of current step.");
-                    return false;
-                }
-
-                if (!/\.(xls|xlsx|csv)$/.test(file.name.toLowerCase())) {
-                    this.$Message.error("上传格式不正确，请上传xls或者xlsx格式");
-                    return false;
-                }
-
-                //上传数据
-                var formData = new FormData();
-                formData.append("file", file);
-                formData.append("description", "Data chart tool");
-                formData.append("type", "data");
-                formData.append("uploaderId", this.userInfo.userId);
-                formData.append("privacy", "private");
-                formData.append("folderId", this.pageParams.pageId);
-
-                var _this = this;
-                $.ajax({
-                    type: "POST",
-                    url: "/GeoProblemSolving/folder/uploadToFolder",
-                    data: formData,
-                    cache: false,        //不设置缓存
-                    processData: false,  // 不处理数据
-                    contentType: false,  // 不设置内容类型
-                    success: function (data) {
-                        if (data != "Size over" && data.length > 0) {
-
-                            // this.$refs.upload.clearFiles();
-                            var dataName = data[0].fileName;
-                            _this.uploadData(dataName);
-
-                            var socket_content = {
-                                type: "upload",
-                                fileName: dataName
-                            };
-                            _this.excelSocket.send(JSON.stringify(socket_content));
-
-                        }
-                    },
-                    error: function () {
-                        alert("fail");
-                    }
-                });
-                return false;
-            },
-            closeModuleSocket() {
-                if (this.moduleSocket != null) {
-                    this.moduleSocket.close();
+            closeExcelSocket() {
+                if (this.excelSocket != null) {
+                    this.excelSocket.close();
                 }
             },
             openExcelSocket() {
@@ -354,20 +404,24 @@
                     return false;
                 }
 
+                if (this.excelSocket != null) {
+                    this.closeExcelSocket();
+                    this.excelSocket = null;
+                }
+
                 var roomId = this.pageParams.pageId;
-                var moduleSocketURL = "ws://"+window.location.host+"/GeoProblemSolving/ExcelTool/" + roomId;
-                // var moduleSocketURL = "ws://localhost:8081/GeoProblemSolving/ExcelTool/" + roomId;
-                // var moduleSocketURL = "ws://172.21.212.72:8082/GeoProblemSolving/ExcelTool/" + roomId;
-                // var moduleSocketURL = "ws://94.191.49.160:8080/GeoProblemSolving/ExcelTool/" + roomId;
-                // var moduleSocketURL = "ws://172.21.213.185:8080/GeoProblemSolving/ExcelTool/" + roomId;
-                this.excelSocket = new WebSocket(moduleSocketURL);
+                var excelSocketURL = "ws://" + window.location.host + "/GeoProblemSolving/ExcelTool/" + roomId;
+                if (window.location.host == "localhost:8080") {
+                    excelSocketURL = "ws://localhost:8081/GeoProblemSolving/ExcelTool/" + roomId;
+                }
+                this.excelSocket = new WebSocket(excelSocketURL);
                 this.excelSocket.onopen = this.onOpen;
                 this.excelSocket.onmessage = this.onMessage;
                 this.excelSocket.onclose = this.onClose;
                 this.excelSocket.onerror = this.onError;
             },
             onOpen() {
-                console.log("ModuleSocket连接成功！");
+                console.log("ExcelSocket连接成功！");
                 this.setTimer();
             },
             onMessage(e) {
@@ -376,11 +430,11 @@
             },
             onClose(e) {
                 this.removeTimer();
-                console.log("ModuleSocket连接断开！");
+                console.log("ExcelSocket连接断开！");
             },
             onError(e) {
                 this.removeTimer();
-                console.log("ModuleSocket连接错误！");
+                console.log("ExcelSocket连接错误！");
             },
             setTimer() {
                 var _this = this;
@@ -394,18 +448,21 @@
             removeTimer() {
                 clearInterval(this.timer);
             },
-            uploadData(name){
+            uploadData(file, collaborate) {
+                this.dataName = file.name;
+                var pathURL = file.pathURL;
                 var inThis = this;
-                if (/\S*.csv/.test(name)) {
+                if (/\S*.csv/.test(this.dataName)) {
+                    this.fileSelectVisible = false;
                     $("#tablePanel").jexcel({
                         // Full CSV URL
-                        csv: "/GeoProblemSolving/resource/upload/" + name,
+                        csv: pathURL,
                         // // Use the first row of your CSV as the headers
                         csvHeaders: true,
                         // Headers
                         colWidths: [100, 100, 100, 100],
                         tableOverflow: false,
-                        minDimensions: [20, 20],
+                        // minDimensions: [20, 20],
                         onchange: inThis.handler,
                         oninsertrow: inThis.insertrow,
                         oninsertcolumn: inThis.insertcol,
@@ -415,20 +472,16 @@
                         onmoverow: inThis.rowMove,
                         onload() {
                             inThis.headers = inThis.computeHeaders();
-                            inThis.$notify({
-                                title: "成功",
-                                message: "上传成功",
-                                type: "success"
-                            });
                         }
                     });
                 }
-                else if (/\S*.xls/.test(name) || /\S*.xlsx/.test(name)) {
+                else if (/\S*.xls/.test(this.dataName) || /\S*.xlsx/.test(this.dataName)) {
+                    this.fileSelectVisible = false;
                     // 获取数据
                     var xhr = new XMLHttpRequest();
-                    xhr.open("GET", "/GeoProblemSolving/resource/upload/" + name, true);
+                    xhr.open("GET", pathURL, true);
                     xhr.responseType = 'blob';
-                    xhr.onload = function(e) {
+                    xhr.onload = function (e) {
                         if (this.status == 200) {
                             var myBlob = this.response;
 
@@ -462,7 +515,7 @@
                                         colHeaders: arr,
                                         tableOverflow: false,
                                         csvHeaders: true,
-                                        minDimensions: [20, 20],
+                                        // minDimensions: [20, 20],
                                         onchange: inThis.handler,
                                         oninsertrow: inThis.insertrow,
                                         oninsertcolumn: inThis.insertcol,
@@ -472,11 +525,6 @@
                                         onmoverow: inThis.rowMove,
                                         onload() {
                                             inThis.headers = inThis.computeHeaders();
-                                            inThis.$notify({
-                                                title: "成功",
-                                                message: "上传成功",
-                                                type: "success"
-                                            });
                                         }
                                     });
 
@@ -488,8 +536,15 @@
                     };
                     xhr.send();
                 }
+                if (collaborate) {
+                    var socket_content = {
+                        type: "open",
+                        file: file
+                    };
+                    this.excelSocket.send(JSON.stringify(socket_content));
+                }
             },
-            insertrow(obj, mixed, rowNumber){
+            insertrow(obj, mixed, rowNumber) {
                 if (!this.boolCollaborate) {
                     var socket_content = {
                         type: "insert_row",
@@ -500,7 +555,7 @@
                 }
                 this.boolCollaborate = false;
             },
-            insertcol(obj, mixed, properties, columnNumber){
+            insertcol(obj, mixed, properties, columnNumber) {
                 if (!this.boolCollaborate) {
                     var socket_content = {
                         type: "insert_col",
@@ -567,11 +622,11 @@
                 }
                 this.boolCollaborate = false;
             },
-            getSocketContent(data){
+            getSocketContent(data) {
                 this.boolCollaborate = true;
                 switch (data.type) {
-                    case "upload" : {
-                        this.uploadData(data.fileName);
+                    case "open" : {
+                        this.uploadData(data.file, false);
                         break;
                     }
                     case "insert_row" : {
@@ -602,7 +657,7 @@
                         $('#tablePanel').jexcel('orderBy', data.column, data.order);
                         break;
                     }
-                    case "clear":{
+                    case "clear": {
                         this.destroy();
                         break;
                     }

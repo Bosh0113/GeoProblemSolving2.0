@@ -9,7 +9,7 @@
     <Col span="23" offset="1" style="margin-top:20px">
       <div :style="{height:contentHeight+'px'}">
         <Row type="flex" justify="space-around">
-          <template v-if="$store.getters.userInfo.userId == scopeInfo.managerId">
+          <template>
             <div style="width: 80%; height: 25px">
               <span
                 style="font-weight: bold; font-size:16px"
@@ -18,7 +18,7 @@
                 <Button
                   v-if="workspaceBtn"
                   type="primary"
-                  @click="gotoworkspace()"
+                  @click="gotoCurrentWorkspace()"
                   size="small"
                   icon="md-globe"
                   title="Enter the workspace"
@@ -223,7 +223,7 @@
         <Button type="primary" @click="resetProjectType()">OK</Button>
       </div>
     </Modal>
-    <Modal v-model="activityInfoModal" title="Information of the activity" footer-hide>
+    <Modal v-model="activityInfoModal" title="Information of the activity">
       <div>
         <label style="margin-left:20px">Activity name:</label>
         <Input v-model="showActivityInfo.name" style="width: 300px;margin-left:10px" readonly />
@@ -231,6 +231,12 @@
       <div style="margin-top:20px">
         <label style="margin-left:20px">Activity type:</label>
         <Input v-model="showActivityInfo.type" style="width:300px;margin-left:17px" readonly />
+      </div>
+      <div slot="footer">
+        <Button
+          type="primary"
+          @click="gotoThisWorkspace(showActivityInfo.type, showActivityInfo.stepID)"
+        >Go to this workspace</Button>
       </div>
     </Modal>
     <Modal
@@ -427,8 +433,12 @@ export default {
     permissionIdentity(operation) {
       // 获取projectInfo
       let project;
+      let role = this.userRole;
       if (this.scopeType == "project") {
         project = this.scopeInfo;
+        if (role == "PManager") {
+          role = "Manager";
+        }
       } else {
         project = this.projectInfo;
       }
@@ -439,19 +449,19 @@ export default {
         operation === "project_workspace_type_manage"
       ) {
         if (
-          this.userRole == "PManager" &&
+          role == "PManager" &&
           project.permissionManager.project_workspace_type_manage
             .project_manager
         ) {
           return true;
         } else if (
-          this.userRole == "Manager" &&
+          role == "Manager" &&
           project.permissionManager.project_workspace_type_manage
             .subproject_manager
         ) {
           return true;
         } else if (
-          this.userRole == "Member" &&
+          role == "Member" &&
           project.permissionManager.project_workspace_type_manage.member
         ) {
           return true;
@@ -462,19 +472,19 @@ export default {
         operation === "subproject_workspace_type_manage"
       ) {
         if (
-          this.userRole == "PManager" &&
+          role == "PManager" &&
           project.permissionManager.subproject_workspace_type_manage
             .project_manager
         ) {
           return true;
         } else if (
-          this.userRole == "Manager" &&
+          role == "Manager" &&
           project.permissionManager.subproject_workspace_type_manage
             .subproject_manager
         ) {
           return true;
         } else if (
-          this.userRole == "Member" &&
+          role == "Member" &&
           project.permissionManager.subproject_workspace_type_manage.member
         ) {
           return true;
@@ -485,31 +495,31 @@ export default {
         operation === "activity_manage"
       ) {
         if (
-          this.userRole == "PManager" &&
+          role == "PManager" &&
           project.permissionManager.activity_manage.project_manager
         ) {
           return true;
         } else if (
-          this.userRole == "Manager" &&
+          role == "Manager" &&
           project.permissionManager.activity_manage.subproject_manager
         ) {
           return true;
         } else if (
-          this.userRole == "Member" &&
+          role == "Member" &&
           project.permissionManager.activity_manage.member
         ) {
           return true;
         }
       }
       if (project.permissionManager != undefined && operation === "observe") {
-        if (this.userRole == "PManager") {
+        if (role == "PManager") {
           return true;
-        } else if (this.userRole == "Manager") {
+        } else if (role == "Manager") {
           return true;
-        } else if (this.userRole == "Member") {
+        } else if (role == "Member") {
           return true;
         } else if (
-          this.userRole == "Visitor" &&
+          role == "Visitor" &&
           project.permissionManager.observe.visitor == "All"
         ) {
           return true;
@@ -584,17 +594,17 @@ export default {
           });
         } else if (type == 2) {
           this.$router.push({
-            name: "modelProcess",
+            name: "visualization",
             params: { stepId: stepId }
           });
         } else if (type == 3) {
           this.$router.push({
-            name: "modelEvaluation",
+            name: "modelBuild",
             params: { stepId: stepId }
           });
         } else if (type == 4) {
           this.$router.push({
-            name: "analysis",
+            name: "modelEvaluation",
             params: { stepId: stepId }
           });
         } else if (type == 5) {
@@ -604,7 +614,7 @@ export default {
           });
         } else if (type == 6) {
           this.$router.push({
-            name: "visualization",
+            name: "analysis",
             params: { stepId: stepId }
           });
         } else if (type == 7) {
@@ -627,17 +637,17 @@ export default {
           }
           case 2: {
             parent.location.href =
-              "/GeoProblemSolving/workspaceP/" + stepId + "/modelProcess";
+              "/GeoProblemSolving/workspaceP/" + stepId + "/visualization";
             break;
           }
           case 3: {
             parent.location.href =
-              "/GeoProblemSolving/workspaceP/" + stepId + "/modelEvaluation";
+              "/GeoProblemSolving/modelBuildP/" + stepId + "/modelBuild";
             break;
           }
           case 4: {
             parent.location.href =
-              "/GeoProblemSolving/workspaceP/" + stepId + "/analysis";
+              "/GeoProblemSolving/workspaceP/" + stepId + "/modelEvaluation";
             break;
           }
           case 5: {
@@ -647,7 +657,7 @@ export default {
           }
           case 6: {
             parent.location.href =
-              "/GeoProblemSolving/workspaceP/" + stepId + "/visualization";
+              "/GeoProblemSolving/workspaceP/" + stepId + "/analysis";
             break;
           }
           case 7: {
@@ -1807,7 +1817,7 @@ export default {
           console.log(err.data);
         });
     },
-    gotoworkspace() {
+    gotoCurrentWorkspace() {
       if (this.activeStepInfo.length == 1) {
         this.enterStep(
           this.activeStepInfo[0].category,
@@ -1823,6 +1833,10 @@ export default {
           this.processStructure[0].stepID
         );
       }
+    },
+    gotoThisWorkspace(type, stepID) {
+      let category = this.getStepCategroy(type);
+      this.enterStep(category, stepID);
     },
     selectAActivity(value) {
       if (value == "workspace") {

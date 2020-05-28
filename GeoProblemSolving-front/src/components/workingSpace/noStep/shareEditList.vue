@@ -130,14 +130,14 @@ export default {
           this.stepInfo.stepId +
           "&resourceID=" +
           item.resourceId +
-          '" style="width: 100%;height:100%;"></iframe>';
+          '" style="width: 100%;height:100%;" frameborder="0"></iframe>';
       } else {
         toolURL =
           '<iframe src="/GeoProblemSolving/Collaborative/Mindmap/share/mindmap.html?userName=&userID=&groupID=' +
           this.stepInfo.stepId +
           "&resourceID=" +
           item.resourceId +
-          '" style="width: 100%;height:100%;"></iframe>';
+          '" style="width: 100%;height:100%;" frameborder="0"></iframe>';
       }
       var demoPanelTimer = null;
       this.panel = jsPanel.create({
@@ -154,12 +154,12 @@ export default {
         onclosed: function() {
           window.clearTimeout(demoPanelTimer);
         },
-        callback: function() {
-          var that = this;
-          demoPanelTimer = window.setInterval(function() {
-            that.style.zIndex = "9999";
-          }, 1);
-        }
+        // callback: function() {
+        //   var that = this;
+        //   demoPanelTimer = window.setInterval(function() {
+        //     that.style.zIndex = "9999";
+        //   }, 1);
+        // }
       });
       $(".jsPanel-content").css("font-size", "0");
     }

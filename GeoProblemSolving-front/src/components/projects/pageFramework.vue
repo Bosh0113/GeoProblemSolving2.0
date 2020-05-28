@@ -64,8 +64,8 @@
         <router-view
           :stepInfo="stepInfo"
           :userRole="userRole"
-          :received-chat-msgs="receivedChatMsgs"
           :projectInfo="projectInfo"
+          @participantsChange="participantsChange"
         ></router-view>
       </div>
     </div>
@@ -160,11 +160,8 @@ export default {
         ]
       },
       // onlineParticipants.vue
-      onlineUserIdList: [],
       onlineParticipants: [],
       offlineParticipants: [],
-      // messagePanel.vue -- chat
-      receivedChatMsgs: []
     };
   },
   watch: {
@@ -179,7 +176,6 @@ export default {
       this.getProjectInfo();
       this.getParticipants();
       this.userRoleIdentity();
-      this.startWebSocket();
     },
     initSize() {
       if (window.innerHeight > 675) {
@@ -271,13 +267,16 @@ export default {
     },
     getParticipants() {
       let members = this.projectInfo.members;
-      let manager = [
-        {
-          userId: this.projectInfo["managerId"],
-          userName: this.projectInfo["managerName"]
-        }
-      ];
-      let membersList = manager.concat(members);
+      let membersList = members;
+      if(members.length<1||members[0].userId!=this.projectInfo["managerId"]){
+        let manager = [
+          {
+            userId: this.projectInfo["managerId"],
+            userName: this.projectInfo["managerName"]
+          }
+        ];
+        membersList = manager.concat(members);
+      }
 
       let participantsTemp = [];
       let count = membersList.length;
@@ -302,7 +301,7 @@ export default {
       this.userRole = "Visitor";
       if (this.userInfo.userState) {
         if (this.projectInfo.managerId === this.userInfo.userId) {
-          this.userRole = "PManager";
+          this.userRole = "Manager";
         }
         else {
           for (let i = 0; i < this.projectInfo.members.length; i++) {
@@ -357,80 +356,41 @@ export default {
         }
       });
     },
-    // websocket
-    startWebSocket() {
-      this.socketApi.initWebSocket(
-        "ChatServer/" + this.stepInfo.stepId,
-        this.$store.state.IP_Port
-      );
-      this.send_msg = {
-        type: "test",
-        from: "Test",
-        content: "TestChat"
-      };
-      this.socketApi.sendSock(this.send_msg, this.getSocketConnect);
-    },
 
-    getSocketConnect(data) {
-      this.receivedChatMsgs = [];
-      var chatMsg = data; //data传回onopen方法里的值
-      if (data.type === "members") {
-        let members = data.content
-          .replace("[", "")
-          .replace("]", "")
-          .replace(/\s/g, "")
-          .split(",");
-        this.onlineUserIdList = members;
-        this.judgeonlineParticipant();
-      } else if (data.type === "message") {
-        //判断消息的发出者
-        if (chatMsg.content != "") {
-          this.receivedChatMsgs.push(chatMsg);
-        }
-      } else if (data.type === "notice") {
-        //上线下线提示
-        if (chatMsg.behavior != "" && chatMsg.userId != "") {
-          this.receivedChatMsgs.push(chatMsg);
-        }
-      } else if (chatMsg.type == undefined && chatMsg.length > 0) {
-        for (let i = 0; i < chatMsg.length; i++) {
-          if (chatMsg[i].content != "") {
-            this.receivedChatMsgs.push(chatMsg[i]);
-          }
-        }
-      }
-    },
-    judgeonlineParticipant(msg) {
-      if (msg == undefined) {
+    judgeonlineParticipant(message) {
+      if (message.content == "members") {
         // initial
         this.onlineParticipants = [];
         this.offlineParticipants = [];
         for (let i = 0; i < this.participants.length; i++) {
-          if (this.onlineUserIdList.includes(this.participants[i].userId)) {
+          if (message.msg.includes(this.participants[i].userId)) {
             this.onlineParticipants.push(this.participants[i]);
           } else {
             this.offlineParticipants.push(this.participants[i]);
           }
         }
-      } else {
-        if (msg.behavior == "off") {
+      } else if(message.content == "notice") {
+        if (message.msg.behavior == "off") {
           // offline
           for (let i = 0; i < this.onlineParticipants.length; i++) {
-            if (msg.userId == this.onlineParticipants[i].userId) {
+            if (message.msg.userId == this.onlineParticipants[i].userId) {
               let offperson = this.onlineParticipants.splice(i, 1);
-              this.offlineParticipants.push(offperson);
+              this.offlineParticipants.push(offperson[0]);
             }
           }
-        } else if (msg.behavior == "on") {
+        } else if (message.msg.behavior == "on") {
           // online
           for (let i = 0; i < this.offlineParticipants.length; i++) {
-            if (msg.userId == this.offlineParticipants[i].userId) {
+            if (message.msg.userId == this.offlineParticipants[i].userId) {
               let onperson = this.offlineParticipants.splice(i, 1);
-              this.onlineParticipants.push(onperson);
+              this.onlineParticipants.push(onperson[0]);
             }
           }
         }
       }
+    },
+    participantsChange: function (msg) {
+      this.judgeonlineParticipant(msg);
     }
   }
 };

@@ -121,7 +121,7 @@
                       type="text"
                     ></Button>
                     <Button
-                      v-if="permissionIdentity('workspace_resource')"
+                      v-if="permissionIdentity('workspace_resource', row)"
                       class="fileBtnHoverRed"
                       size="small"
                       shape="circle"
@@ -138,7 +138,11 @@
           <TabPane label="Tools">
             <div style="height:400px">
               <vue-scroll :ops="ops">
-                <tool-container :stepInfo="stepInfo" :userRole="userRole"></tool-container>
+                <tool-container
+                  :stepInfo="stepInfo"
+                  :userRole="userRole"
+                  :projectInfo="projectInfo"
+                ></tool-container>
               </vue-scroll>
             </div>
           </TabPane>
@@ -181,7 +185,7 @@
                           type="primary"
                           @click="OpenData(item)"
                         ></Button>
-                        <template v-if="permissionIdentity('workspace_resource')">
+                        <template v-if="permissionIdentity('workspace_resource', row)">
                           <Button
                             size="small"
                             title="Details"
@@ -510,18 +514,11 @@ export default {
         this.projectInfo.permissionManager != undefined &&
         operation === "workspace_resource"
       ) {
-        if (this.userRole == "PManager") {
-          if (
-            this.projectInfo.permissionManager.workspace_resource
-              .project_manager === "Yes"
-          ) {
-            return true;
-          } else if (
-            this.projectInfo.permissionManager.workspace_resource
-              .project_manager === "Yes, partly" &&
-            resource.uploaderId === this.userInfo.userId
-          ) {
-          }
+        if (
+          this.userRole == "PManager" &&
+          this.projectInfo.permissionManager.workspace_resource.project_manager
+        ) {
+          return true;
         } else if (
           this.userRole == "Manager" &&
           this.projectInfo.permissionManager.workspace_resource
@@ -539,6 +536,7 @@ export default {
               "Yes, partly" &&
             resource.uploaderId === this.userInfo.userId
           ) {
+            return true;
           }
         }
       }
@@ -873,7 +871,7 @@ export default {
           this.stepInfo.stepId +
           "&resourceID=" +
           item.resourceId +
-          '" style="width: 100%;height:100%;"></iframe>';
+          '" style="width: 100%;height:100%;" frameborder="0"></iframe>';
       } else {
         toolURL =
           '<iframe src="' +
@@ -884,7 +882,7 @@ export default {
           this.stepInfo.stepId +
           "&resourceID=" +
           item.resourceId +
-          '" style="width: 100%;height:100%;"></iframe>';
+          '" style="width: 100%;height:100%;" frameborder="0"></iframe>';
       }
       var demoPanelTimer = null;
       this.showPanel(toolURL, toolInfo.toolName);
@@ -923,7 +921,7 @@ export default {
             var toolURL =
               "<iframe src=" +
               url +
-              ' style="width: 100%;height:100%"></iframe>';
+              ' style="width: 100%;height:100%" frameborder="0"></iframe>';
             var demoPanelTimer = null;
             this.showPanel(toolURL, res.name);
           },
@@ -950,7 +948,7 @@ export default {
         var toolURL =
           "<iframe src=" +
           url +
-          ' style="width: 100%;height:100%" controls></iframe>';
+          ' style="width: 100%;height:100%" frameborder="0" controls></iframe>';
         var demoPanelTimer = null;
         this.showPanel(toolURL, res.name);
       } else {

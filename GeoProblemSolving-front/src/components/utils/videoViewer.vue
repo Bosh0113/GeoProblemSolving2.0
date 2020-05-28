@@ -187,12 +187,12 @@ export default {
         .then(res => {
           if (
             res.data.sizeOver.length > 0 ||
-              res.data.failed.length > 0 ||
-              res.data == "Offline"
-            ) {
-              console.log(res.data);
-            } else if (res.data.uploaded.length > 0) {
-            let videoName = res.data[0].fileName;
+            res.data.failed.length > 0 ||
+            res.data == "Offline"
+          ) {
+            console.log(res.data);
+          } else if (res.data.uploaded.length > 0) {
+            let videoName = res.data.uploaded[0].name;
             this.videoUrl = "/GeoProblemSolving/resource/upload/" + videoName;
 
             let videoItem = {

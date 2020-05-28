@@ -264,7 +264,7 @@
         <div :style="{height: contentPageCSS}" style="margin-top: 60px;">
             <div span="2" style="height: inherit;width: 90px;position: absolute;">
                 <i-menu :active-name="activeMenu" @on-select="changeMenuItem"
-                        style="height: inherit;width: fit-content;z-index:99">
+                        style="height: inherit;width: fit-content;z-index:98">
                     <menu-item name="projectOverview" class="projectMenuItem">
                         <Icon type="md-home" title="Overview" size="35"></Icon>
                     </menu-item>
@@ -608,7 +608,7 @@
                                       <span class="project_title title_mw">{{projectInfo.title}}</span>
                                   </div>
                               </div>
-                            <div slot="extra">
+                            <div slot="extra" v-if="taskRole!='Visitor'">
                                 <Poptip trigger="hover" content="Create subproject" placement="left">
                                     <i-button style="margin: 0 5px;" class="changeInviteColor"
                                               @click="showSubProjectCreateModel">
@@ -635,38 +635,31 @@
                                                         {{subProject.title}}
                                                     </strong>
                                                 </div>
-                                                <div slot="extra" v-if="permissionIdentity('subprojects_manage', subProject)">
-                                                    <Poptip trigger="hover" content="Change manager" placement="bottom">
-                                                        <i-button class="changeInviteColor" icon="ios-people"
-                                                                  size="small"
-                                                                  shape="circle"
-                                                                  @click="handOverModalShow(index)"></i-button>
-                                                    </Poptip>
-                                                    <Poptip trigger="hover" content="Edit information"
-                                                            placement="bottom">
-                                                        <i-button class="changeEditColor" icon="ios-create" size="small"
-                                                                  shape="circle"
-                                                                  @click="editSubProjectModalShow(index)"></i-button>
-                                                    </Poptip>
-                                                    <Poptip trigger="hover" content="Remove subproject"
-                                                            placement="bottom">
-                                                        <i-button class="changeRemoveColor" icon="md-close" size="small"
-                                                                  shape="circle"
-                                                                  @click="deleteSubProjectModalShow(index)"></i-button>
-                                                    </Poptip>
-                                                </div>
-                                                <div slot="extra" v-else-if="memberIdentity(subProject.members)">
-                                                    <Icon type="ios-person" :size="20"></Icon>
-                                                </div>
-                                                <div slot="extra" v-else>
-                                                    <template v-if="managerIdentity(subProject.managerId)">
-                                                        <Poptip trigger="hover" content="To be member" placement="left">
-                                                            <i-button class="changeInviteColor" icon="md-add-circle"
-                                                                      size="small" shape="circle"
-                                                                      @click="joinSubProject(index)"></i-button>
+                                                <template v-if="taskRole!='Visitor'">
+                                                    <div slot="extra" v-if="permissionIdentity('subprojects_manage', subProject)">
+                                                        <Poptip trigger="hover" content="Change manager" placement="bottom">
+                                                            <i-button class="changeInviteColor" icon="ios-people"
+                                                                      size="small"
+                                                                      shape="circle"
+                                                                      @click="handOverModalShow(index)"></i-button>
                                                         </Poptip>
-                                                    </template>
-                                                    <template v-else>
+                                                        <Poptip trigger="hover" content="Edit information"
+                                                                placement="bottom">
+                                                            <i-button class="changeEditColor" icon="ios-create" size="small"
+                                                                      shape="circle"
+                                                                      @click="editSubProjectModalShow(index)"></i-button>
+                                                        </Poptip>
+                                                        <Poptip trigger="hover" content="Remove subproject"
+                                                                placement="bottom">
+                                                            <i-button class="changeRemoveColor" icon="md-close" size="small"
+                                                                      shape="circle"
+                                                                      @click="deleteSubProjectModalShow(index)"></i-button>
+                                                        </Poptip>
+                                                    </div>
+                                                    <div slot="extra" v-else-if="memberIdentity(subProject.members)">
+                                                        <Icon type="ios-person" :size="20"></Icon>
+                                                    </div>
+                                                    <div slot="extra" v-else>
                                                         <Poptip trigger="hover" content="Apply to Join"
                                                                 placement="left">
                                                             <i-button class="changeInviteColor" icon="md-add"
@@ -674,8 +667,8 @@
                                                                       shape="circle"
                                                                       @click="applyJoinSubProjectModalShow(index)"></i-button>
                                                         </Poptip>
-                                                    </template>
-                                                </div>
+                                                    </div>
+                                                </template>
                                                 <div class="subProjectDes" :title="subProject.description"
                                                      style="cursor: pointer;" @click="goSubProjectPage(subProject)" >
                                                     {{subProject.description}}
@@ -1357,7 +1350,392 @@
                     resetProjectTypeNotice: false,
                     resetProjectTypeModel: false,
                     joinProjectNotice: false,
-                    workPanels: []
+                    workPanels: [],
+                    // 权限的具体功能
+                    defaultPublic: {
+                        observe: {
+                            project_manager: null,
+                            subproject_manager: null,
+                            member: null,
+                            visitor: "All"
+                        },
+                        auto_join: {
+                            project_manager: null,
+                            subproject_manager: null,
+                            member: null,
+                            visitor: true
+                        },
+                        project_edit_info: {
+                            project_manager: true,
+                            subproject_manager: null,
+                            member: false,
+                            visitor: null
+                        },
+                        project_invite_member: {
+                            project_manager: true,
+                            subproject_manager: null,
+                            member: true,
+                            visitor: null
+                        },
+                        project_remove_member: {
+                            project_manager: true,
+                            subproject_manager: null,
+                            member: false,
+                            visitor: null
+                        },
+                        project_task_create: {
+                            project_manager: true,
+                            subproject_manager: null,
+                            member: true,
+                            visitor: null
+                        },
+                        project_task_manage: {
+                            project_manager: true,
+                            subproject_manager: null,
+                            member: "Yes, partly",
+                            visitor: null
+                        },
+                        project_resource_manage: {
+                            project_manager: true,
+                            subproject_manager: null,
+                            member: "Yes, partly",
+                            visitor: null
+                        },
+                        project_workspace_type_manage: {
+                            project_manager: true,
+                            subproject_manager: null,
+                            member: false,
+                            visitor: null
+                        },
+                        subprojects_manage: {
+                            project_manager: true,
+                            subproject_manager: null,
+                            member: "Yes, partly",
+                            visitor: null
+                        },
+                        subproject_edit_info: {
+                            project_manager: true,
+                            subproject_manager: true,
+                            member: false,
+                            visitor: null
+                        },
+                        subproject_invite_member: {
+                            project_manager: true,
+                            subproject_manager: true,
+                            member: true,
+                            visitor: null
+                        },
+                        subproject_remove_member: {
+                            project_manager: true,
+                            subproject_manager: true,
+                            member: false,
+                            visitor: null
+                        },
+                        subproject_task_create: {
+                            project_manager: true,
+                            subproject_manager: true,
+                            member: true,
+                            visitor: null
+                        },
+                        subproject_task_manage: {
+                            project_manager: true,
+                            subproject_manager: true,
+                            member: "Yes, partly",
+                            visitor: null
+                        },
+                        subproject_resource_manage: {
+                            project_manager: "Yes, partly",
+                            subproject_manager: true,
+                            member: "Yes, partly",
+                            visitor: null
+                        },
+                        subproject_workspace_type_manage: {
+                            project_manager: true,
+                            subproject_manager: true,
+                            member: false,
+                            visitor: null
+                        },
+                        activity_manage: {
+                            project_manager: true,
+                            subproject_manager: true,
+                            member: true,
+                            visitor: null
+                        },
+                        workspace_resource: {
+                            project_manager: true,
+                            subproject_manager: true,
+                            member: true,
+                            visitor: null
+                        },
+                        workspace_tool: {
+                            project_manager: true,
+                            subproject_manager: true,
+                            member: true,
+                            visitor: null
+                        },
+                        workspace_edit: {
+                            project_manager: true,
+                            subproject_manager: true,
+                            member: true,
+                            visitor: null
+                        }
+                    },
+                    defaultPrivate: {
+                        observe: {
+                            project_manager: null,
+                            subproject_manager: null,
+                            member: null,
+                            visitor: "No"
+                        },
+                        auto_join: {
+                            project_manager: null,
+                            subproject_manager: null,
+                            member: null,
+                            visitor: null
+                        },
+                        project_edit_info: {
+                            project_manager: true,
+                            subproject_manager: null,
+                            member: false,
+                            visitor: null
+                        },
+                        project_invite_member: {
+                            project_manager: true,
+                            subproject_manager: null,
+                            member: false,
+                            visitor: null
+                        },
+                        project_remove_member: {
+                            project_manager: true,
+                            subproject_manager: null,
+                            member: false,
+                            visitor: null
+                        },
+                        project_task_create: {
+                            project_manager: true,
+                            subproject_manager: null,
+                            member: true,
+                            visitor: null
+                        },
+                        project_task_manage: {
+                            project_manager: true,
+                            subproject_manager: null,
+                            member: "Yes, partly",
+                            visitor: null
+                        },
+                        project_resource_manage: {
+                            project_manager: true,
+                            subproject_manager: null,
+                            member: "Yes, partly",
+                            visitor: null
+                        },
+                        project_workspace_type_manage: {
+                            project_manager: true,
+                            subproject_manager: null,
+                            member: false,
+                            visitor: null
+                        },
+                        subprojects_manage: {
+                            project_manager: true,
+                            subproject_manager: null,
+                            member: "Yes, partly",
+                            visitor: null
+                        },
+                        subproject_edit_info: {
+                            project_manager: false,
+                            subproject_manager: true,
+                            member: false,
+                            visitor: null
+                        },
+                        subproject_invite_member: {
+                            project_manager: false,
+                            subproject_manager: true,
+                            member: false,
+                            visitor: null
+                        },
+                        subproject_remove_member: {
+                            project_manager: false,
+                            subproject_manager: true,
+                            member: false,
+                            visitor: null
+                        },
+                        subproject_task_create: {
+                            project_manager: true,
+                            subproject_manager: true,
+                            member: true,
+                            visitor: null
+                        },
+                        subproject_task_manage: {
+                            project_manager: false,
+                            subproject_manager: true,
+                            member: "Yes, partly",
+                            visitor: null
+                        },
+                        subproject_resource_manage: {
+                            project_manager: "Yes, partly",
+                            subproject_manager: true,
+                            member: "Yes, partly",
+                            visitor: null
+                        },
+                        subproject_workspace_type_manage: {
+                            project_manager: true,
+                            subproject_manager: true,
+                            member: false,
+                            visitor: null
+                        },
+                        activity_manage: {
+                            project_manager: false,
+                            subproject_manager: true,
+                            member: false,
+                            visitor: null
+                        },
+                        workspace_resource: {
+                            project_manager: "Yes, partly",
+                            subproject_manager: true,
+                            member: "Yes, partly",
+                            visitor: null
+                        },
+                        workspace_tool: {
+                            project_manager: true,
+                            subproject_manager: true,
+                            member: true,
+                            visitor: null
+                        },
+                        workspace_edit: {
+                            project_manager: false,
+                            subproject_manager: true,
+                            member: false,
+                            visitor: null
+                        }
+                    },
+                    defaultDiscoverable: {
+                        observe: {
+                            project_manager: null,
+                            subproject_manager: null,
+                            member: null,
+                            visitor: "No"
+                        },
+                        auto_join: {
+                            project_manager: null,
+                            subproject_manager: null,
+                            member: null,
+                            visitor: null
+                        },
+                        project_edit_info: {
+                            project_manager: true,
+                            subproject_manager: null,
+                            member: false,
+                            visitor: null
+                        },
+                        project_invite_member: {
+                            project_manager: true,
+                            subproject_manager: null,
+                            member: false,
+                            visitor: null
+                        },
+                        project_remove_member: {
+                            project_manager: true,
+                            subproject_manager: null,
+                            member: false,
+                            visitor: null
+                        },
+                        project_task_create: {
+                            project_manager: true,
+                            subproject_manager: null,
+                            member: true,
+                            visitor: null
+                        },
+                        project_task_manage: {
+                            project_manager: true,
+                            subproject_manager: null,
+                            member: "Yes, partly",
+                            visitor: null
+                        },
+                        project_resource_manage: {
+                            project_manager: true,
+                            subproject_manager: null,
+                            member: "Yes, partly",
+                            visitor: null
+                        },
+                        project_workspace_type_manage: {
+                            project_manager: true,
+                            subproject_manager: null,
+                            member: false,
+                            visitor: null
+                        },
+                        subprojects_manage: {
+                            project_manager: true,
+                            subproject_manager: null,
+                            member: "Yes, partly",
+                            visitor: null
+                        },
+                        subproject_edit_info: {
+                            project_manager: false,
+                            subproject_manager: true,
+                            member: false,
+                            visitor: null
+                        },
+                        subproject_invite_member: {
+                            project_manager: false,
+                            subproject_manager: true,
+                            member: false,
+                            visitor: null
+                        },
+                        subproject_remove_member: {
+                            project_manager: false,
+                            subproject_manager: true,
+                            member: false,
+                            visitor: null
+                        },
+                        subproject_task_create: {
+                            project_manager: true,
+                            subproject_manager: true,
+                            member: true,
+                            visitor: null
+                        },
+                        subproject_task_manage: {
+                            project_manager: "Yes, partly",
+                            subproject_manager: true,
+                            member: "Yes, partly",
+                            visitor: null
+                        },
+                        subproject_resource_manage: {
+                            project_manager: "Yes, partly",
+                            subproject_manager: true,
+                            member: "Yes, partly",
+                            visitor: null
+                        },
+                        subproject_workspace_type_manage: {
+                            project_manager: false,
+                            subproject_manager: true,
+                            member: false,
+                            visitor: null
+                        },
+                        activity_manage: {
+                            project_manager: false,
+                            subproject_manager: true,
+                            member: false,
+                            visitor: null
+                        },
+                        workspace_resource: {
+                            project_manager: true,
+                            subproject_manager: true,
+                            member: "Yes, partly",
+                            visitor: null
+                        },
+                        workspace_tool: {
+                            project_manager: true,
+                            subproject_manager: true,
+                            member: true,
+                            visitor: null
+                        },
+                        workspace_edit: {
+                            project_manager: false,
+                            subproject_manager: true,
+                            member: false,
+                            visitor: null
+                        }
+                    }
                 }
             },
             watch: {
@@ -1591,6 +1969,9 @@
                             }
                         }
                     }
+                    else {
+                        return false;
+                    }
                 },
                 memberListStr(members) {
                     let membersStr = '';
@@ -1669,6 +2050,16 @@
                     this.projectEditForm.editTags.splice(index, 1);
                 },
                 editProjectSubmit(form) {
+
+                    let permission;
+                    if (this.projectEditForm.privacy === "Public") {
+                        permission = this.defaultPublic;
+                    } else if (this.projectEditForm.privacy === "Discoverable") {
+                        permission = this.defaultDiscoverable;
+                    } else if (this.projectEditForm.privacy === "Private") {
+                        permission = this.defaultPrivate;
+                    }
+
                     this.$refs[form].validate(valid => {
                         if (valid) {
                             let form = new URLSearchParams();
@@ -1681,6 +2072,7 @@
                             form.append("projectId", this.projectInfo.projectId);
                             form.append("managerId", this.userInfo.userId);
                             form.append("picture", this.pictureUrl);
+                            form.append("permissionManager", JSON.stringify(permission));
                             axios
                                 .post("/GeoProblemSolving/project/update ", form)
                                 .then(res => {
@@ -1730,7 +2122,7 @@
                                     title: "Success",
                                     desc: "Delete project successfully."
                                 });
-                                window.location.href = '/GeoProblemSolving/projectList.html';
+                                window.location.href = '/GeoProblemSolving/projectList';
                             }
                         })
                         .catch(err => {
@@ -2177,8 +2569,8 @@
                         if( this.applyProjectInfo.permissionManager != undefined && this.applyProjectInfo.permissionManager.auto_join.visitor) {
 
                             // join the project directly
-                            this.axios
-                                .get("/GeoProblemSolving/project/join"+"projectId"+  this.applyProjectInfo.projectId+"&userId" +this.userInfo.userId)
+                            axios
+                                .get("/GeoProblemSolving/project/join?"+"projectId="+  this.applyProjectInfo.projectId+"&userId=" +this.userInfo.userId)
                                 .then(res => {
                                     if (res.data === "Success") {
                                         this.$Message.info("Join the project successfuly");
