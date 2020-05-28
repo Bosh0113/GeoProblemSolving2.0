@@ -120,6 +120,29 @@
   border-color: lightslategray;
 }
 /* 结束 */
+/* 遮盖罩 */
+.mask {
+  position: fixed;
+  /* 最顶层 */
+  z-index: 1;
+  left: 0px;
+  top: 60px;
+  right: 0px;
+  bottom: 0px;
+  background-color: rgba(247, 241, 241, 0.938);
+  padding: 3% 10% 0 10%;
+  overflow-y: scroll;
+
+  /* overflow-x:hidden; */
+}
+.maskBtn {
+  position: absolute;
+  z-index: 2;
+  right: 10%;
+}
+.maskBtn:hover {
+  cursor: pointer;
+}
 </style>
 <template>
   <div :style="{height: contentHeight+'px'}" style="min-width:1200px;">
@@ -397,15 +420,20 @@
       </div>
     </Card>
 
-    <Modal v-model="createToolModal" title="Create Tool" width="800" draggable scrollable>
-      <template-general @generalInfo="getGeneralInfo" ref="toolInfoRef"></template-general>
+    <Modal v-model="createToolModal" title="Create Tool" width="800">
+      <template-general @generalInfo="getGeneralInfo" ref="toolInfoRef" :step="currentStep"></template-general>
       <div slot="footer">
-        <Button @click="createToolModal=false">Cancel</Button>
-        <Button type="success" @click="createTool" class="create" :disabled="clickForbidden">Create</Button>
+        <Button type="warning" @click="previousStep" v-show="this.currentStep == 1">Previous</Button>
+        <Button type="primary" @click="nextStep" v-show="this.currentStep == 0">Next</Button>
+        <Button
+          type="success"
+          @click="createTool"
+          class="create"
+          :disabled="clickForbidden"
+          v-show="this.currentStep == 1"
+        >Create</Button>
       </div>
     </Modal>
-
-    <!-- <Modal v-model="modelListModal" title="Select Model" draggable scrollable >tst</Modal> -->
 
     <Modal v-model="createToolsetModal" title="Create Toolset" width="600" :mask-closable="false">
       <Form
@@ -508,119 +536,39 @@
         >Create</Button>
       </div>
     </Modal>
-    <Modal v-model="editToolModal" title="Edit Tool" width="800" :mask-closable="false">
-      <Form
+
+    <Modal v-model="editToolModal" title="Edit tool" width="800" :mask-closable="false">
+      <template-edit
+        @generalInfo="getEditInfo"
         ref="selectedTool"
-        :model="selectedTool"
-        :rules="toolEditRule"
-        :label-width="80"
-        class="toolForm"
-      >
-        <FormItem label="Name:" prop="toolName" :label-width="140">
-          <Input v-model="selectedTool.toolName" placeholder="Enter the name of your tool"></Input>
-        </FormItem>
-        <FormItem label="Model stateId:" prop="model_stateId" :label-width="140">
-          <Input
-            v-model="selectedTool.modelInfo.stateId"
-            placeholder="Enter the model stateId of your tool"
-          ></Input>
-        </FormItem>
-        <FormItem label="Model oid:" prop="model_oid" :label-width="140">
-          <Input
-            v-model="selectedTool.modelInfo.oid"
-            placeholder="Enter the model oid of your tool"
-          ></Input>
-        </FormItem>
-        <FormItem label="Model mdlId:" prop="model_mdlId" :label-width="140">
-          <Input
-            v-model="selectedTool.modelInfo.mdlId"
-            placeholder="Enter the model mdlId of your tool"
-          ></Input>
-        </FormItem>
-        <FormItem label="Tool description:" prop="description" :label-width="140">
-          <Input
-            v-model="selectedTool.description"
-            type="textarea"
-            placeholder="Enter description of your tool"
-          />
-        </FormItem>
-        <FormItem label="Tool url:" prop="toolUrl" :label-width="140">
-          <Input v-model="selectedTool.toolUrl" placeholder="Enter the tool url of your tool"></Input>
-        </FormItem>
-        <FormItem label="Recommended step:" prop="recomStep" :label-width="140">
-          <Select
-            v-model="selectedTool.recomStep"
-            multiple
-            placeholder="Select the recommended step of your tool"
-          >
-            <Option v-for="item in stepList" :key="item.index" :value="item">{{ item }}</Option>
-          </Select>
-        </FormItem>
-        <FormItem label="Categroy tag:" prop="categoryTag" :label-width="140">
-          <Input
-            v-model="inputToolTag"
-            placeholder="Enter some tag to classify your tools"
-            style="width: 400px"
-            @keyup.enter.native="addEditToolTag(inputToolTag)"
-          />
-          <Button
-            icon="ios-add"
-            type="dashed"
-            size="small"
-            @click="addEditToolTag(inputToolTag)"
-            style="margin-left:2.5%"
-          >Add tag</Button>
-          <div>
-            <Tag
-              color="primary"
-              v-for="(item,index) in this.selectedTool.categoryTag"
-              :key="index"
-              closable
-              @on-close="deleteEditToolTag(index)"
-            >{{item}}</Tag>
-          </div>
-          <div>
-            <span>Example:</span>
-            <Tag style="cursor:default">vector</Tag>
-            <Tag style="cursor:default">raster</Tag>
-            <Tag style="cursor:default">evaluation</Tag>
-          </div>
-        </FormItem>
-        <FormItem label="Image:" prop="toolImg" :label-width="140">
-          <div class="inline_style">
-            <div class="demo-upload-list" v-if="image!=''">
-              <template>
-                <img :src="image" />
-                <div class="demo-upload-list-cover">
-                  <Icon type="ios-eye-outline" @click.native="handleView()"></Icon>
-                  <Icon type="ios-trash-outline" @click.native="handleRemove()"></Icon>
-                </div>
-              </template>
-            </div>
-            <div class="uploadBox">
-              <Icon type="ios-camera" size="20" style="position:absolute;margin:18px;"></Icon>
-              <input
-                id="choosePicture"
-                @change="uploadPhoto($event)"
-                type="file"
-                class="uploadAvatar"
-                accept="image/*"
-              />
-            </div>
-          </div>
-        </FormItem>
-        <FormItem label="Privacy:" prop="privacy" :label-width="140">
-          <RadioGroup v-model="selectedTool.privacy">
-            <Radio label="Public">Public</Radio>
-            <Radio label="Private">Private</Radio>
-          </RadioGroup>
-        </FormItem>
-      </Form>
+        :step="currentStep"
+        :selectTool="selectedTool"
+      ></template-edit>
       <div slot="footer">
-        <Button @click="editToolModal=false">Cancel</Button>
-        <Button type="primary" @click="editTool('selectedTool')" class="create">Edit</Button>
+        <Button type="warning" @click="previousStep" v-show="this.currentStep == 1">Previous</Button>
+        <Button type="primary" @click="nextStep" v-show="this.currentStep == 0">Next</Button>
+        <Button
+          type="success"
+          @click="editTool"
+          class="create"
+          :disabled="clickForbidden"
+          v-show="this.currentStep == 1"
+        >Create</Button>
       </div>
     </Modal>
+
+    <div v-show="toolPreview" title="Tool preview" width="800" class="mask">
+      <!-- <Button icon="md-close" @click="closeTool" class="maskBtn" title="Close the tool information"></Button> -->
+      <Icon
+        type="md-close"
+        @click="closeTool"
+        class="maskBtn"
+        title="Close the tool information"
+        size="30"
+      />
+      <tool-preview :selectTool="selectedTool"></tool-preview>
+    </div>
+
     <Modal v-model="removeToolModal" title="Remove Tool" width="400">
       <div style="text-align: center;">
         <h3>Are you sure to remove the tool: {{selectedTool.toolName}} ?</h3>
@@ -921,11 +869,16 @@
 import Avatar from "vue-avatar";
 import draggable from "vuedraggable";
 import TemplateGeneral from "./TemplateGeneral";
+import TemplateEdit from "./TemplateEdit";
+import { get, del, post, put } from "../../axios";
+import ToolPreview from "./toolPreview";
 export default {
   components: {
     draggable,
     Avatar,
-    TemplateGeneral
+    TemplateGeneral,
+    TemplateEdit,
+    ToolPreview
   },
   mounted() {
     this.resizeContent();
@@ -957,12 +910,14 @@ export default {
       personalToolShow: [],
       createToolModal: false,
       toolInfo: {
-        name: "",
-        model_stateId: "",
-        model_oid: "",
-        model_mdlId: "",
+        toolName: "",
+        modelInfo: {
+          stateId: "",
+          oid: "",
+          mdlId: ""
+        },
         description: "",
-        tool_url: "",
+        toolUrl: "",
         recomStep: [],
         categoryTag: [],
         toolImg: "",
@@ -984,7 +939,7 @@ export default {
         "Others"
       ],
       toolInfoRule: {
-        name: [
+        toolName: [
           {
             required: true,
             message: "The name cannot be empty",
@@ -998,7 +953,7 @@ export default {
             trigger: "blur"
           }
         ],
-        tool_url: [
+        toolUrl: [
           {
             required: true,
             message: "The tool url cannot be empty",
@@ -1061,6 +1016,7 @@ export default {
         ]
       },
       selectedTool: {
+        tId:"",
         toolName: "",
         modelInfo: {
           stateId: "",
@@ -1144,15 +1100,17 @@ export default {
       toolsetInfoModal: false,
       editToolsetModal: false,
       // 工具窗口
-      panel: null
+      panel: null,
+      currentStep: 0, //create tool step
+      //显示工具细节
+      toolPreview: false
     };
   },
   beforeDestory() {
     this.panel.close();
     next();
   },
-  created(){
-  },
+  created() {},
   methods: {
     resizeContent() {
       if (window.innerHeight > 675) {
@@ -1216,153 +1174,126 @@ export default {
           console.log(err);
         });
     },
-    getPublicTools() {
-      this.axios
-        .get(
-          "/GeoProblemSolving/tool/inquiry" +
-            "?key=" +
-            "privacy" +
-            "&value=" +
-            "Public"
-        )
-        .then(res => {
-          if (res.data == "Offline") {
-            this.$store.commit("userLogout");
-            this.$router.push({ name: "Login" });
-          } else if (res.data === "Fail") {
-            this.$Notice.error({ desc: "Loading tools fail." });
-          } else if (res.data === "None") {
-            // this.$Notice.error({ desc: "There is no existing tool" });
-          } else {
-            this.$set(this, "publicTools", res.data);
-            this.filterShowListByType();
-          }
-        })
-        .catch(err => {
-          console.log(err);
-        });
+    async getPublicTools() {
+      let data = await get(
+        "/GeoProblemSolving/tool/inquiry/?key=privacy&value=Public"
+      );
+      this.$set(this, "publicTools", data);
     },
-    getPersonalTools() {
-      this.axios
-        .get(
-          "/GeoProblemSolving/tool/inquiryAll" +
-            "?provider=" +
-            this.userInfo.userId
-        )
-        .then(res => {
-          if (res.data == "Offline") {
-            this.$store.commit("userLogout");
-            this.$router.push({ name: "Login" });
-          } else if (res.data === "Fail") {
-            this.$Notice.error({ desc: "Loading personal tools fail." });
-          } else if (res.data === "None") {
-            // this.$Notice.error({ desc: "There is no existing tool" });
-          } else {
-            this.$set(this, "personalTools", res.data);
-            this.filterShowListByType();
-          }
-        })
-        .catch(err => {
-          console.log(err);
-        });
+    async getPersonalTools() {
+      let data = await get(
+        `/GeoProblemSolving/tool/findByProvider/${this.userInfo.userId}`
+      );
+      this.$set(this, "personalTools", data);
+      this.filterShowListByType();
     },
+
     changeMenuItem(name) {
       this.showMenuItem = name;
     },
+
     createToolModalShow() {
       this.inputToolTag = "";
       this.toolInfo = {
-        name: "",
-        model_stateId: "",
-        model_oid: "",
-        model_mdlId: "",
+        toolName: "",
+        modelInfo: {
+          stateId: "",
+          oid: "",
+          mdlId: ""
+        },
         description: "",
-        tool_url: "",
+        toolUrl: "",
         recomStep: [],
         categoryTag: [],
         toolImg: "",
         privacy: "Private"
       };
+      this.currentStep = 0;
       this.createToolModal = true;
       this.clickForbidden = false;
     },
+    //显示工具预览界面
+    showTool(toolInfo) {
+      this.toolPreview = true;
+      this.selectedTool = toolInfo;
+    },
+    closeTool() {
+      this.toolPreview = false;
+    },
+    //创建Tool里面的Step切换
+    nextStep() {
+      if (this.currentStep != 1) {
+        this.currentStep += 1;
+      }
+    },
+    previousStep() {
+      if (this.currentStep != 0) {
+        this.currentStep -= 1;
+      }
+    },
+
+    //从子组件获取form表单
     getGeneralInfo(form) {
-      this.toolInfo.name = form.toolName;
-      this.toolInfo.description = form.description;
-      this.toolInfo.privacy = form.privacy;
-      this.toolInfo.detail = form.detail;
-      this.toolInfo.tool_url = form.toolUrl;
-      this.toolInfo.categoryTag = form.categoryTag;
+      this.toolInfo = form;
+    },
+    //创建工具
+    async createTool() {
+      this.clickForbidden = true;
+      let createToolForm = this.toolInfo;
+      createToolForm["provider"] = this.$store.getters.userId;
+
+      let data = await post("/GeoProblemSolving/tool/create", createToolForm);
+      this.createToolModal = false;
+      this.$Notice.info({ desc: "Create successfully" });
+      this.personalTools.push(data);
+      if (this.toolInfo.privacy == "Public") {
+        this.publicTools.push(data);
+      }
+      this.filterShowListByType();
+    },
+    //从子组件获取修改的form表单
+    getEditInfo(form) {
+      this.selectedTool = form;
+    },
+    //获得选中的Tool的信息
+    editToolShow(tool) {
+      this.currentStep = 0;
+      this.inputToolTag = "";
+      this.selectedTool = JSON.parse(JSON.stringify(tool));
+      this.editToolModal = true;
+    },
+    //创建修改的工具
+
+    async editTool() {
+      this.clickForbidden = true;
+      let editTool = this.selectedTool;
+      console.log(editTool.tid);
+      let data = await post(`/GeoProblemSolving/tool/update/${editTool.tid}`, editTool);
+      this.editToolModal = false;
+      var newToolInfo = this.selectedTool;
+      for (var i = 0; i < this.publicTools.length; i++) {
+        if (this.publicTools[i].tId == newToolInfo.tId) {
+          this.publicTools.splice(i, 1, newToolInfo);
+          break;
+        }
+      }
+      for (var i = 0; i < this.personalTools.length; i++) {
+        if (this.personalTools[i].tId == newToolInfo.tId) {
+          this.personalTools.splice(i, 1, newToolInfo);
+          break;
+        }
+      }
+      this.filterShowListByType();
+      this.$Notice.info({ desc: "Edit successfully" });
     },
 
-    getUrl() {
-      let hrefArray = window.location.href.split('/');     
-      this.href = `${hrefArray[0]}://${hrefArray[2]}/modelItem/` 
-    },
-    createTool() {
-      const userInfo = new Promise((resolve, reject) => {
-        return this.$refs["toolInfoRef"].$refs["toolInfo"].validate(valid => {
-          if (valid) {
-            this.clickForbidden = true;
-            let createToolForm = {};
-
-            createToolForm["toolName"] = this.toolInfo.name;
-            createToolForm[
-              "toolUrl"
-            ] = this.toolInfo.tool_url;
-            createToolForm["modelInfo"] = {
-              stateId: this.toolInfo.model_stateId,
-              oid: this.toolInfo.model_oid,
-              mdlId: this.toolInfo.model_mdlId
-            };
-            createToolForm["description"] = this.toolInfo.description;
-            createToolForm["recomStep"] = this.toolInfo.recomStep;
-            createToolForm["categoryTag"] = this.toolInfo.categoryTag;
-            createToolForm["provider"] = this.$store.getters.userId;
-            createToolForm["toolImg"] = this.toolInfo.toolImg;
-            createToolForm["privacy"] = this.toolInfo.privacy;
-            createToolForm["detail"] = this.toolInfo.detail;
-
-            this.axios
-              .post("/GeoProblemSolving/tool/create", createToolForm)
-              .then(res => {
-                if (res.data == "Offline") {
-                  this.$store.commit("userLogout");
-                  this.$router.push({ name: "Login" });
-                } else if (res.data === "Fail") {
-                  this.$Notice.error({ desc: "Create tool fail." });
-                } else if (res.data === "Duplicate naming") {
-                  this.$Notice.error({ desc: "The name already exists." });
-                } else {
-                  this.createToolModal = false;
-                  this.$Notice.info({ desc: "Create successfully" });
-                  this.personalTools.push(res.data);
-                  if (this.toolInfo.privacy == "Public") {
-                    this.publicTools.push(res.data);
-                  }
-                  this.filterShowListByType();
-                }
-              })
-              .catch(err => {
-                console.log(err);
-              });
-          } else {
-          }
-        });
-      });
-    },
     addCreateToolTag(tag) {
       if (tag != "") {
         this.toolInfo.categoryTag.push(tag);
         this.inputToolTag = "";
       }
     },
-    addEditToolTag(tag) {
-      if (tag != "") {
-        this.selectedTool.categoryTag.push(tag);
-        this.inputToolTag = "";
-      }
-    },
+
     addCreateToolsetTag(tag) {
       if (tag != "") {
         this.toolsetInfo.categoryTag.push(tag);
@@ -1375,9 +1306,6 @@ export default {
         this.inputToolsetTag = "";
       }
     },
-    deleteCreateToolTag(index) {
-      this.toolInfo.categoryTag.splice(index, 1);
-    },
     deleteEditToolTag(index) {
       this.selectedTool.categoryTag.splice(index, 1);
     },
@@ -1387,7 +1315,7 @@ export default {
     deleteEditToolsetTag(index) {
       this.selectedToolset.categoryTag.splice(index, 1);
     },
-    uploadPhoto(e) {
+    async uploadPhoto(e) {
       // 利用fileReader对象获取file
       var file = e.target.files[0];
       var filesize = file.size;
@@ -1402,6 +1330,7 @@ export default {
           // 读取到的图片base64 数据编码 将此编码字符串传给后台即可
           let formData = new FormData();
           formData.append("toolImg", file);
+
           this.axios
             .post("/GeoProblemSolving/tool/picture", formData)
             .then(res => {
@@ -1512,6 +1441,7 @@ export default {
         this.publicTools,
         this.typeSelected
       );
+
       this.personalToolShow = this.getFilterResult(
         this.personalTools,
         this.typeSelected
@@ -1519,7 +1449,7 @@ export default {
     },
     getFilterResult(foreList, type) {
       var selectedType = type;
-      var resultList = foreList.filter(function(item) {
+      var resultList = foreList.filter(item => {
         switch (selectedType) {
           case "All": {
             return item;
@@ -1553,105 +1483,31 @@ export default {
       });
       return resultList;
     },
-    showTool(toolInfo) {},
-    editToolShow(tool) {
-      this.inputToolTag = "";
-      this.selectedTool = JSON.parse(JSON.stringify(tool));
-      this.editToolModal = true;
-    },
-    editTool(tool) {
-      this.$refs[tool].validate(valid => {
-        if (valid) {
-          let editToolForm = new URLSearchParams();
-          editToolForm.append("tId", this.selectedTool.tId);
-          editToolForm.append("toolName", this.selectedTool.toolName);
-          editToolForm.append("toolUrl", this.selectedTool.toolUrl);
-          editToolForm.append(
-            "modelInfo.stateId",
-            this.selectedTool.modelInfo.stateId
-          );
-          editToolForm.append("modelInfo.oid", this.selectedTool.modelInfo.oid);
-          editToolForm.append(
-            "modelInfo.mdlId",
-            this.selectedTool.modelInfo.mdlId
-          );
-          editToolForm.append("description", this.selectedTool.description);
-          editToolForm.append("recomStep", this.selectedTool.recomStep);
-          editToolForm.append("categoryTag", this.selectedTool.categoryTag);
-          editToolForm.append("toolImg", this.selectedTool.toolImg);
-          editToolForm.append("privacy", this.selectedTool.privacy);
 
-          this.axios
-            .post("/GeoProblemSolving/tool/update", editToolForm)
-            .then(res => {
-              if (res.data == "Offline") {
-                this.$store.commit("userLogout");
-                this.$router.push({ name: "Login" });
-              } else if (res.data === "Fail") {
-                this.$Notice.error({ desc: "Edit tool fail." });
-              } else {
-                this.editToolModal = false;
-                var newToolInfo = this.selectedTool;
-                for (var i = 0; i < this.publicTools.length; i++) {
-                  if (this.publicTools[i].tId == newToolInfo.tId) {
-                    this.publicTools.splice(i, 1, newToolInfo);
-                    break;
-                  }
-                }
-                for (var i = 0; i < this.personalTools.length; i++) {
-                  if (this.personalTools[i].tId == newToolInfo.tId) {
-                    this.personalTools.splice(i, 1, newToolInfo);
-                    break;
-                  }
-                }
-                this.filterShowListByType();
-                this.$Notice.info({ desc: "Edit successfully" });
-              }
-            })
-            .catch(err => {
-              console.log(err);
-            });
-        } else {
-        }
-      });
-    },
     removeToolShow(tool) {
       this.selectedTool = tool;
       this.removeToolModal = true;
     },
-    removeTool() {
-      this.axios
-        .get("/GeoProblemSolving/tool/delete" + "?tId=" + this.selectedTool.tId)
-        .then(res => {
-          if (res.data == "Offline") {
-            this.$store.commit("userLogout");
-            this.$router.push({ name: "Login" });
-          } else if (res.data === "Fail") {
-            this.$Notice.error({ desc: "Remove tool fail." });
-          } else {
-            this.removeToolModal = false;
-            var removedTool = this.selectedTool;
-            for (var i = 0; i < this.publicTools.length; i++) {
-              if (this.publicTools[i].tId == removedTool.tId) {
-                this.publicTools.splice(i, 1);
-                break;
-              }
-            }
-            for (var i = 0; i < this.personalTools.length; i++) {
-              if (this.personalTools[i].tId == removedTool.tId) {
-                this.personalTools.splice(i, 1);
-                break;
-              }
-            }
-          }
-          this.filterShowListByType();
-          this.$Notice.info({
-            desc: "The tool(" + removedTool.toolName + ") has been removed."
-          });
-        })
-        .catch(err => {
-          console.log(err.data);
-        });
+    async removeTool() {
+      await del(`/GeoProblemSolving/tool/delete/?tId=${this.selectedTool.id}`);
+      this.removeToolModal = false;
+      var removedTool = this.selectedTool;
+      for (var i = 0; i < this.publicTools.length; i++) {
+        if (this.publicTools[i].tId == removedTool.tId) {
+          this.publicTools.splice(i, 1);
+          break;
+        }
+      }
+      for (var i = 0; i < this.personalTools.length; i++) {
+        if (this.personalTools[i].tId == removedTool.tId) {
+          this.personalTools.splice(i, 1);
+          break;
+        }
+      }
+      this.filterShowListByType();
+      this.$Notice.info({
+        desc: "The tool(" + removedTool.toolName + ") has been removed."
+      });
     },
     removeToolsetShow(toolset) {
       this.selectedToolset = toolset;

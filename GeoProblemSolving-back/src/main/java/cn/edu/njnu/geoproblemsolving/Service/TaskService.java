@@ -1,11 +1,9 @@
 package cn.edu.njnu.geoproblemsolving.Service;
 
-import cn.edu.njnu.geoproblemsolving.Dao.CModel.*;
-import cn.edu.njnu.geoproblemsolving.Entity.ModelTools.CModel.support.JsonResult;
-import cn.edu.njnu.geoproblemsolving.Entity.ProjectEntity;
+import cn.edu.njnu.geoproblemsolving.Dao.CModel.ModelItemDao;
+import cn.edu.njnu.geoproblemsolving.Dao.CModel.ModelItemDaoImpl;
 import cn.edu.njnu.geoproblemsolving.Enums.ResultEnum;
 import cn.edu.njnu.geoproblemsolving.Exception.MyException;
-import cn.edu.njnu.geoproblemsolving.Utils.ResultUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -15,21 +13,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.Part;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
 
 
 @Service
@@ -152,8 +147,7 @@ public class TaskService {
         form.add("name", "zzyTest");
         form.add("origination","GeoProblemSolving");
 
-//        String urlStr = "http://" + managerServer + "/GeoModeling/computableModel/uploadData";// Step2：上传输入数据到特定的数据交换服务器
-        String urlStr = "http://111.229.14.128:8899/data";
+     String urlStr = "http://111.229.14.128:8899/data";
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<JSONObject> jsonObjectResponseEntity = restTemplate.postForEntity(urlStr, form, JSONObject.class);
         if (!jsonObjectResponseEntity.getStatusCode().is2xxSuccessful()) {
@@ -163,11 +157,6 @@ public class TaskService {
         String urlResult = result.getJSONObject("data").getString("url");
         return urlResult;
     }
-
-//    public getFileEvent(JSONObject obj){
-//
-//
-//    }
 
     public Object uploadFileForm(Collection<Part> parts) throws IOException {
         MultiValueMap<String, Object> form = new LinkedMultiValueMap<>();
@@ -245,10 +234,10 @@ public class TaskService {
         return inputList;
     }
 
-    public Object add() {
-        ComputableModelDaoImpl modelItemDao = new ComputableModelDaoImpl(mongoTemplate);
-        return modelItemDao.addDataTemplate();
-    }
+//    public Object add() {
+//        ComputableModelDaoImpl modelItemDao = new ComputableModelDaoImpl(mongoTemplate);
+//        return modelItemDao.addDataTemplate();
+//    }
 
 //    public Object download(String uid) {
 //        String urlStr = "http://111.229.14.128:8899/data";

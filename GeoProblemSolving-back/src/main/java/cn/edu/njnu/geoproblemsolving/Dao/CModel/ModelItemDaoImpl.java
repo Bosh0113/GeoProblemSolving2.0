@@ -19,10 +19,6 @@ public class ModelItemDaoImpl implements ModelItemDao {
         this.mongoTemplate = mongoTemplate;
     }
 
-//    @Override
-//    public  JSONObject getAllModelPid(){
-//
-//    }
 
     @Override
     public Object readComputableModel(String pid) {

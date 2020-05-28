@@ -10,7 +10,7 @@ const routes = [{
   path: '/', name: 'Navigation', component: resolve => (require(["@/components/navigation"], resolve)), children: [
     { path: '', redirect: 'staticPage' },
     { path: 'staticPage', name: 'StaticPage', component: resolve => (require(["@/components/navigationContent/staticPage"], resolve)) },
-  
+
     // { path: 'home', name: 'Home', component: resolve => (require(["@/components/navigationContent/home"], resolve)) },
     // { path: 'projectlist', name: 'Projects', component: resolve => (require(["@/components/navigationContent/projectList"], resolve)) },
     // { path: 'project/:id', name: 'ProjectDetail', component: resolve => (require(["@/components/projects/projectDetail"], resolve)) },
@@ -76,7 +76,7 @@ const routes = [{
     { path: 'resetPassword/:email', name: 'resetPassword', component: resolve => (require(["@/components/userState/resetPwd"], resolve)) },
     { path: 'resourceCenter', name: 'resourceCenter', component: resolve => (require(["@/components/resources/resourceCenter"], resolve)) },
     { path: 'toolsCenter', name: 'toolsCenter', component: resolve => (require(["@/components/tools/toolsCenter"], resolve)) },
-    { path: 'share', name: 'shareContainer', component: resolve => (require(["@/components/workingSpace/share/shareContainer"], resolve)) }, //share 
+    { path: 'share', name: 'shareContainer', component: resolve => (require(["@/components/workingSpace/share/shareContainer"], resolve)) }, //share
   ]
 },
 { path: '/projectTypeContent/:projectId', name: 'projectTypeContent', component: resolve => (require(["@/components/projects/toWork"], resolve)) },
@@ -98,7 +98,7 @@ const routes = [{
 { path: '/abseir', name: 'abSeir', component: resolve => (require(["@/components/utils/ABM-SEIR"], resolve)) },
 { path: '/tinymce', name: 'tinymce', component: resolve => (require(["@/components/utils/singleUtils/tinymce"], resolve)) },
 { path: '/modelItem/:doi', name: 'Model', component: resolve => (require(["@/components/model/Model"], resolve)) },
-{ path: '/toolTemplate', name: 'toolTemplate', component: resolve => (require(["@/components/tools/TemplateGeneral"], resolve)) },
+{ path: '/toolShow', name: 'toolTemplate', component: resolve => (require(["@/components/tools/toolPreview"], resolve)) },
 ]
 
 export default new Router({

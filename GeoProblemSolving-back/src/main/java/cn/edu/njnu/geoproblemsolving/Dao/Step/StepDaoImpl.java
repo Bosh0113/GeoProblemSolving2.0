@@ -3,10 +3,9 @@ package cn.edu.njnu.geoproblemsolving.Dao.Step;
 import cn.edu.njnu.geoproblemsolving.Dao.Method.CommonMethod;
 import cn.edu.njnu.geoproblemsolving.Entity.Folder.FolderEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.StepEntity;
-
 import cn.edu.njnu.geoproblemsolving.Entity.SubProjectEntity;
-import cn.edu.njnu.geoproblemsolving.Entity.ToolEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.ToolsetEntity;
+import cn.edu.njnu.geoproblemsolving.domain.tool.ToolEntity;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +16,8 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.*;
 import java.text.SimpleDateFormat;
+import java.util.*;
 
 
 @Component

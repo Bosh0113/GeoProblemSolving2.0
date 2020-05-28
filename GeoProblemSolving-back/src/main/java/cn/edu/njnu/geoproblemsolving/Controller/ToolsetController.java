@@ -1,7 +1,7 @@
 package cn.edu.njnu.geoproblemsolving.Controller;
 
 import cn.edu.njnu.geoproblemsolving.Dao.Tool_related.ToolsetDaoImpl;
-import cn.edu.njnu.geoproblemsolving.Entity.ToolEntity;
+
 import cn.edu.njnu.geoproblemsolving.Entity.ToolReq.AddToolReq;
 import cn.edu.njnu.geoproblemsolving.Entity.ToolReq.UpdateToolListReq;
 import cn.edu.njnu.geoproblemsolving.Entity.ToolsetEntity;

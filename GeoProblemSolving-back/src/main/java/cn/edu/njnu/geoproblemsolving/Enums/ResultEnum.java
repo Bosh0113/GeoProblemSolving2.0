@@ -10,6 +10,7 @@ package cn.edu.njnu.geoproblemsolving.Enums;
 public enum ResultEnum {
     SUCCESS(0, "成功"),
     NO_OBJECT(-1, "没有对应的对象"),
+    EXISTS_OBJECT(-3,"已存在对象"),
     ERROR(-2,"失败");
 
     private Integer code;

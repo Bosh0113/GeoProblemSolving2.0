@@ -49,15 +49,16 @@
   line-height: 60px;
   border: 1px solid transparent;
   border-radius: 4px;
-  overflow: hidden;
+  /* overflow-x: hidden; */
+  /* overflow-y: scroll; */
   background: #fff;
   position: relative;
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
   margin-right: 4px;
 }
 .demo-upload-list img {
-  width: 100%;
-  height: 100%;
+  width: 110%;
+  height: 110%;
 }
 .demo-upload-list-cover {
   display: none;
@@ -100,19 +101,19 @@
     </Row>
     <Row>
       <Form
-        ref="toolInfo"
-        :model="toolInfo"
+        ref="selectedTool"
+        :model="selectedTool"
         :rules="toolInfoRule"
         :label-width="110"
         class="toolForm"
       >
         <div v-show="this.currentStep === 0">
           <FormItem label="Name:" prop="toolName">
-            <Input v-model="toolInfo.toolName" placeholder="Enter the toolName of your tool"></Input>
+            <Input v-model="selectedTool.toolName"  disabled></Input>
           </FormItem>
 
           <FormItem label="Url:" prop="toolUrl">
-            <Input v-model="toolInfo.toolUrl" placeholder="Enter the url of your tool" />
+            <Input v-model="selectedTool.toolUrl" placeholder="Enter the url of your tool" />
             <p
               style="font-style:italic"
             >If you copy the doi from Open Geographic Modeling System, please enter the ... first</p>
@@ -120,7 +121,7 @@
 
           <FormItem label="Description:" prop="description" :label-width="110">
             <Input
-              v-model="toolInfo.description"
+              v-model="selectedTool.description"
               type="textarea"
               placeholder="Enter description of your tool"
             />
@@ -143,7 +144,7 @@
             <div>
               <Tag
                 color="primary"
-                v-for="(item, index) in this.toolInfo.categoryTag"
+                v-for="(item, index) in this.selectedTool.categoryTag"
                 :key="index"
                 closable
                 @on-close="deleteCreateToolTag(index)"
@@ -158,7 +159,7 @@
           </FormItem>
 
           <FormItem label="Privacy:" prop="privacy">
-            <RadioGroup v-model="toolInfo.privacy">
+            <RadioGroup v-model="selectedTool.privacy">
               <Radio label="Public">Public</Radio>
               <Radio label="Private">Private</Radio>
             </RadioGroup>
@@ -166,9 +167,9 @@
 
           <FormItem label="Image:" prop="toolImg">
             <div class="inline_style">
-              <div class="demo-upload-list" v-if="toolInfo.toolImg!=''">
+              <div class="demo-upload-list" v-if="selectedTool.toolImg!=''">
                 <template>
-                  <img :src="toolInfo.toolImg" />
+                  <img :src="selectedTool.toolImg" />
                   <div class="demo-upload-list-cover">
                     <Icon type="ios-eye-outline" @click.native="handleView()"></Icon>
                     <Icon type="ios-trash-outline" @click.native="handleRemove()"></Icon>
@@ -192,14 +193,14 @@
                 </Upload>
               </div>
               <Modal title="View Image" v-model="visible">
-                <img :src="toolInfo.toolImg" v-if="visible" style="width: 100%" />
+                <img :src="selectedTool.toolImg" v-if="visible" style="width: 100%" />
               </Modal>
             </div>
           </FormItem>
         </div>
         <div v-show="this.currentStep === 1">
           <FormItem label="Detail:" prop="detail" :label-width="0">
-            <tinymce ref="editor" v-model="toolInfo.detail" :height="300" />
+            <tinymce ref="editor" v-model="selectedTool.detail" :height="300" />
           </FormItem>
         </div>
       </Form>
@@ -209,7 +210,6 @@
 <script>
 import tinymce from "./../tinymce";
 import Avatar from "vue-avatar";
-import { post } from "../../axios";
 export default {
   components: {
     tinymce,
@@ -218,20 +218,14 @@ export default {
   props: {
     step: {
       type: Number
+    },
+    selectTool: {
+      type: Object
     }
   },
   data() {
     return {
-      toolInfo: {
-        toolName: "",
-        description: "",
-        toolUrl: "",
-        recomStep: [],
-        categoryTag: [],
-        privacy: "Private",
-        detail: "",
-        toolImg: ""
-      },
+      selectedTool: this.selectTool,
       toolInfoRule: {
         toolName: [
           {
@@ -263,6 +257,7 @@ export default {
           }
         ]
       },
+      userId: "testUserId",
       inputToolTag: "",
       visible: false,
       createToolFlag: null,
@@ -275,13 +270,13 @@ export default {
   methods: {
     addCreateToolTag(tag) {
       if (tag != "") {
-        this.toolInfo.categoryTag.push(tag);
+        this.selectedTool.categoryTag.push(tag);
         this.inputToolTag = "";
       }
     },
 
     deleteCreateToolTag(index) {
-      this.toolInfo.categoryTag.splice(index, 1);
+      this.selectedTool.categoryTag.splice(index, 1);
     },
 
     async handleBeforeUpload(file) {
@@ -296,21 +291,37 @@ export default {
     },
 
     handleRemove() {
-      this.toolInfo.toolImg = "";
+      this.selectedTool.toolImg = "";
+    },
+
+    addEditToolTag(tag) {
+      if (tag != "") {
+        this.selectedTool.categoryTag.push(tag);
+        this.inputToolTag = "";
+      }
+    },
+    deleteEditToolTag(index) {
+      this.selectedTool.categoryTag.splice(index, 1);
     }
   },
 
   watch: {
-    toolInfo: {
-      handler(val) {
-        this.$emit("generalInfo", this.toolInfo);
-      },
-      deep: true
-    },
     //监听step切换
     step: {
       handler(val) {
         this.currentStep = val;
+      },
+      deep: true
+    },
+    selectTool: {
+      handler(val) {
+        this.selectedTool = val;
+      },
+      deep: true
+    },
+    selectedTool: {
+      handler(val) {
+        this.$emit("generalInfo", this.selectedTool);
       },
       deep: true
     }

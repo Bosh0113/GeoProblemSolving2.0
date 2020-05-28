@@ -10,7 +10,7 @@ import cn.edu.njnu.geoproblemsolving.Enums.ResultEnum;
  * @Date 2019/2/15
  * @Version 1.0.0
  */
-public class MyException extends RuntimeException {
+public class MyException extends RuntimeException  {
     private Integer code;
 
     public MyException(ResultEnum resultEnum) {
@@ -26,5 +26,13 @@ public class MyException extends RuntimeException {
 
     public Integer getCode() {
         return code;
+    }
+
+    public static MyException noObject(){
+        return new MyException(ResultEnum.NO_OBJECT);
+    }
+
+    public static MyException existObject(){
+        return new MyException(ResultEnum.EXISTS_OBJECT);
     }
 }

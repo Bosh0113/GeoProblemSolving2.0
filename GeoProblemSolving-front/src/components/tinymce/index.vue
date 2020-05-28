@@ -160,7 +160,7 @@ export default {
           if (blobInfo.blob().size > self.maxSize) {
             failure("The size of picture > 4M");
           }
-      
+
             let formData = new FormData();
             // 服务端接收文件的参数名，文件数据，文件名
             formData.append("toolImg", blobInfo.blob(), blobInfo.filename());
@@ -171,14 +171,14 @@ export default {
               data: formData
             })
               .then(res => {
-                console.log(res.data);
+                console.log(res.data.data);
                 // 返回de图片的地址
-                success(res.data);
+                success(res.data.data);
               })
               .catch(() => {
                 failure("上传失败");
               });
-          
+
         }
       });
     },

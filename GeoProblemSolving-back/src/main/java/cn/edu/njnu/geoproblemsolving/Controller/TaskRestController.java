@@ -76,10 +76,4 @@ public class TaskRestController {
         return ResultUtils.success(taskService.getRecord(data));
     }
 
-//    @RequestMapping(value = "/download",method = RequestMethod.GET)
-//    JsonResult addCModel(@PathVariable("pid") String pid){
-//        return  ResultUtils.success(taskService.download(pid));
-//    }
-
-
 }

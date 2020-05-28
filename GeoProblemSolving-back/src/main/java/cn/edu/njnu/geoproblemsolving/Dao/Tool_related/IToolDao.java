@@ -1,6 +1,7 @@
 package cn.edu.njnu.geoproblemsolving.Dao.Tool_related;
 
-import cn.edu.njnu.geoproblemsolving.Entity.ToolEntity;
+
+import cn.edu.njnu.geoproblemsolving.domain.tool.ToolEntity;
 
 import javax.servlet.http.HttpServletRequest;
 

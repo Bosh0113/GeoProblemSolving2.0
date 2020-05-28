@@ -32,6 +32,7 @@
     "marked": "^0.7.0",
     "mavon-editor": "^2.7.6",
     "shpjs": "^3.4.3",
+    "string-format": "^2.0.0",
     "tinymce": "^5.1.5",
     "v-charts": "^1.19.0",
     "vue": "^2.5.2",

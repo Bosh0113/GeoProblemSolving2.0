@@ -1,10 +1,9 @@
 package cn.edu.njnu.geoproblemsolving.Dao.Tool_related;
 
 import cn.edu.njnu.geoproblemsolving.Dao.Method.CommonMethod;
-import cn.edu.njnu.geoproblemsolving.Entity.ToolEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.ToolReq.UpdateToolListReq;
 import cn.edu.njnu.geoproblemsolving.Entity.ToolsetEntity;
-import com.alibaba.fastjson.JSONArray;
+import cn.edu.njnu.geoproblemsolving.domain.tool.ToolEntity;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
