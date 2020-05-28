@@ -1543,28 +1543,6 @@ export default {
           });
       }
     },
-    addUploadEvent(scopeId) {
-      let form = {};
-      let description =
-        this.$store.getters.userName +
-        " share a " +
-        this.fileType +
-        " file to " +
-        " project called " +
-        this.selectShareProjectName;
-      form["description"] = description;
-      form["scopeId"] = scopeId;
-      form["eventType"] = "project";
-      form["userId"] = this.$store.getters.userId;
-      this.axios
-        .post("/GeoProblemSolving/history/save", form)
-        .then(res => {
-          console.log(res.data);
-        })
-        .catch(err => {
-          console.log(err.data);
-        });
-    },
     selectPID(id, name) {
       this.selectShareProjectId = id;
       this.selectShareProjectName = name;

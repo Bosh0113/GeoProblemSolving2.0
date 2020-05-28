@@ -469,7 +469,7 @@ export default {
                       registerEmailBody["recipient"] = this.registerForm.email;
                       registerEmailBody["mailTitle"] = "Register result";
                       registerEmailBody["mailContent"] =
-                        "Welcome to join in GeoProblem-Solving platform, you can solve complex problems in this platform with others collaboratively.";
+                        "Welcome to join in Geo-Future Lab. In this platform, you can deal with geo-problems with your colleagues collaboratively.";
                       this.axios
                         .post(
                           "/GeoProblemSolving/email/send",

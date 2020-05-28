@@ -1016,8 +1016,7 @@ export default {
           )
           .then(res => {
             if (res.data != "None" && res.data != "Fail") {
-              let i = 0;
-              for (i; i < res.data.length; i++) {
+              for (let i = 0; i < res.data.length; i++) {
                 let message = JSON.parse(res.data[i].content);
                 this.msgRecords.push(message);
               }
