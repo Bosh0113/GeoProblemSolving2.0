@@ -2,8 +2,26 @@ var mxGraphSocket = null;
 var foreControllerId = "";
 var controllerId = "";
 var graph;
-var userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
-var userId = userInfo.userId;
+
+var pageParams={};
+var href = window.location.href;
+var url = href.split("&");
+for (var i = 0; i < url.length; i++) {
+  if (/groupID/.test(url[i])) {
+    pageParams.pageId = url[i].match(/groupID=(\S*)/)[1];
+    continue;
+  }
+
+  if (/userID/.test(url[i])) {
+    pageParams.userId = url[i].match(/userID=(\S*)/)[1];
+    continue;
+  }
+
+  if (/userName/.test(url[i])) {
+    pageParams.userName = url[i].match(/userName=(\S*)/)[1];
+    continue;
+  }
+}
 var waitingList = [];
 // Extends EditorUi to update I/O action states based on availability of backend
 (function () {
@@ -49,21 +67,18 @@ var waitingList = [];
         $(".geToolbar").append(memberList);
         graph = editorUI.toolbar.editorUi.editor.graph;
         if (WebSocket) {
-            var reg = /groupID=(\S*)/;
-            var url = window.location.href;
-            if (url.search(reg) != -1) {
-                let groupID = url.match(reg)[1];
-                mxGraphSocket = new WebSocket("ws://"+window.location.host+"/GeoProblemSolving/GraphEditorSocket/" + groupID);
-                // mxGraphSocket = new WebSocket("ws://localhost:8081/GeoProblemSolving/GraphEditorSocket/" + groupID);
-                // mxGraphSocket = new WebSocket("ws://172.21.212.72:8082/GeoProblemSolving/GraphEditorSocket/" + groupID);
-                // mxGraphSocket = new WebSocket("ws://94.191.49.160:8080/GeoProblemSolving/GraphEditorSocket/" + groupID);
-                // mxGraphSocket = new WebSocket("ws://172.21.213.185:8080/GeoProblemSolving/GraphEditorSocket/" + groupID);
+            if (pageParams.pageId!=null) {
+                var socketUrl=window.location.host;
+                if(window.location.port=="5500"){
+                    socketUrl="localhost:8081";
+                }
+                mxGraphSocket = new WebSocket("ws://"+window.location.host+"/GeoProblemSolving/GraphEditorSocket/" + pageParams.pageId);
                 mxGraphSocket.onopen = function () {
                     console.log("Websocket connected.");
                     var messageObject={
                         type:"Join",
-                        userId:userInfo.userId,
-                        userName:userInfo.userName
+                        userId:pageParams.userId,
+                        userName:pageParams.userName
                     };
                     mxGraphSocket.send(JSON.stringify(messageObject));
                 }
@@ -107,7 +122,7 @@ var waitingList = [];
                 }
                 //timer
                 var timer = window.setInterval(function () {
-                    if (controllerId == userId) {
+                    if (controllerId == pageParams.userId) {
                         var graphXML = getGraphXML();
                         // console.log(graphXML);
                         var messageObject = {
@@ -148,8 +163,8 @@ function setGraphXML(xml) {
 
 //演示权限转交
 function pTransfer(newControllerId) {
-    if (controllerId === userId) {
-        if (newControllerId === userId) {
+    if (controllerId === uspageParams.userIderId) {
+        if (newControllerId === pageParams.userId) {
             confirm("You already have demo authority.");
         }
         else {
@@ -173,7 +188,7 @@ function demoRequire() {
     var messageObject = {};
     messageObject["type"] = "Authority";
     messageObject["message"] = "Require";
-    messageObject["userId"] = userId;
+    messageObject["userId"] = pageParams.userId;
     if (mxGraphSocket) {
         mxGraphSocket.send(JSON.stringify(messageObject));
     }
@@ -184,7 +199,7 @@ function demoRelease() {
     var messageObject = {};
     messageObject["type"] = "Authority";
     messageObject["message"] = "Release";
-    messageObject["userId"] = userId;
+    messageObject["userId"] = pageParams.userId;
     if (mxGraphSocket) {
         mxGraphSocket.send(JSON.stringify(messageObject));
     }
@@ -192,7 +207,7 @@ function demoRelease() {
 
 //检查身份及权限
 function checkIdentity() {
-    if (controllerId == userId && waitingList.length < 1) {//若为演示者且不存在申请者
+    if (controllerId == pageParams.userId && waitingList.length < 1) {//若为演示者且不存在申请者
         $('#release').show();
         $('#waiting').hide();
         $('#waitingNum').show();
@@ -204,7 +219,7 @@ function checkIdentity() {
             graph.setEnabled(true);
         }
     }
-    else if (controllerId == userId && waitingList.length > 0) {//若为演示者且存在申请者
+    else if (controllerId == pageParams.userId && waitingList.length > 0) {//若为演示者且存在申请者
         $('#release').show();
         $('#waiting').show();
         $('#waitingNum').show();
@@ -216,20 +231,20 @@ function checkIdentity() {
         }
         var num = 0;
         for (var i = 0; i < waitingList.length; i++) {
-            if (waitingList[i] == userId) {
+            if (waitingList[i] == pageParams.userId) {
                 continue;
             }
             num++;
         }
         $('#waitingNum').html(num);
-    } else if (controllerId != userId) { //观众
+    } else if (controllerId != pageParams.userId) { //观众
         var apply = 0;
         num = 0;
         for (i = 0; i < waitingList.length; i++) {
             if (controllerId == waitingList[i]) {//若演示者在队列中，则跳过计数
                 continue;
             }
-            if (waitingList[i] == userId) {
+            if (waitingList[i] == pageParams.userId) {
                 apply = 1;//已申请
                 break;
             }
@@ -257,7 +272,7 @@ window.time = 0;
 window.setInterval(function () {
     window.time++;
     if (window.time >= 60) {//60秒无动作则触发
-        if (controllerId == userId) {//若为演示者则释放权限
+        if (controllerId == pageParams.userId) {//若为演示者则释放权限
             demoRelease();
         }
     }
