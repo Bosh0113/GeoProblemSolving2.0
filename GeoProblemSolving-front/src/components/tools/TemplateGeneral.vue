@@ -118,7 +118,17 @@
             >If you copy the doi from Open Geographic Modeling System, please enter the ... first</p>
           </FormItem>
 
-          <FormItem label="Description:" prop="description" :label-width="110">
+          <FormItem label="Step:" prop="recomStep">
+            <Select
+              v-model="toolInfo.recomStep"
+              multiple
+              placeholder="Select the recommended step of your tool"
+            >
+              <Option v-for="item in stepList" :key="item.index" :value="item">{{ item }}</Option>
+            </Select>
+          </FormItem>
+
+          <FormItem label="Description:" prop="description">
             <Input
               v-model="toolInfo.description"
               type="textarea"
@@ -232,6 +242,17 @@ export default {
         detail: "",
         toolImg: ""
       },
+      stepList: [
+        "General step",
+        "Context definition & resource collection",
+        "Data processing",
+        "Data visualization",
+        "Geographic model construction",
+        "Model effectiveness evaluation",
+        "Geographical simulation",
+        "Quantitative and qualitative analysis",
+        "Decision-making for management"
+      ],
       toolInfoRule: {
         toolName: [
           {

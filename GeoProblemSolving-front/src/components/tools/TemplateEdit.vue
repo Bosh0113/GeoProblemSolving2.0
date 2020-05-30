@@ -109,7 +109,7 @@
       >
         <div v-show="this.currentStep === 0">
           <FormItem label="Name:" prop="toolName">
-            <Input v-model="selectedTool.toolName"  disabled></Input>
+            <Input v-model="selectedTool.toolName" disabled></Input>
           </FormItem>
 
           <FormItem label="Url:" prop="toolUrl">
@@ -117,6 +117,16 @@
             <p
               style="font-style:italic"
             >If you copy the doi from Open Geographic Modeling System, please enter the ... first</p>
+          </FormItem>
+
+          <FormItem label="Step:" prop="recomStep" :label-width="140">
+            <Select
+              v-model="selectedTool.recomStep"
+              multiple
+              placeholder="Select the recommended step of your tool"
+            >
+              <Option v-for="item in stepList" :key="item.index" :value="item">{{ item }}</Option>
+            </Select>
           </FormItem>
 
           <FormItem label="Description:" prop="description" :label-width="110">
@@ -263,7 +273,18 @@ export default {
       createToolFlag: null,
       pageParams: { pageId: "", userId: "", userName: "" },
       //step
-      currentStep: this.step
+      currentStep: this.step,
+      stepList: [
+        "General step",
+        "Context definition & resource collection",
+        "Data processing",
+        "Data visualization",
+        "Geographic model construction",
+        "Model effectiveness evaluation",
+        "Geographical simulation",
+        "Quantitative and qualitative analysis",
+        "Decision-making for management"
+      ]
     };
   },
 
@@ -283,7 +304,7 @@ export default {
       let formData = new FormData();
       formData.append("toolImg", file);
       let data = await post("/GeoProblemSolving/tool/picture", formData);
-      this.toolInfo.toolImg = data;
+      this.selectedTool.toolImg = data;
     },
 
     handleView() {

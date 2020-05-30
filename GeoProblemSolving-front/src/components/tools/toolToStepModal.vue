@@ -376,6 +376,7 @@
 // import JPanel from 'JSPanel'
 import Avatar from "vue-avatar";
 import draggable from "vuedraggable";
+import { get, del, post, put } from "../../axios";
 export default {
   props: ["stepInfo"],
   components: {
@@ -469,6 +470,7 @@ export default {
       this.getPublicToolsets();
       this.getPersonalToolsets();
       this.getPublicTools();
+
       this.getPersonalTools();
       this.getStepToolsets();
       this.getStepTools();
@@ -597,59 +599,26 @@ export default {
           });
       }
     },
-    getPublicTools() {
-      this.axios
-        .get(
-          "/GeoProblemSolving/tool/inquiry" +
-            "?key=" +
-            "privacy" +
-            "&value=" +
-            "Public"
-        )
-        .then(res => {
-          if (res.data == "Offline") {
-            this.$store.commit("userLogout");
-            this.$router.push({ name: "Login" });
-          } else if (res.data === "Fail") {
-            this.$Notice.error({ desc: "Loading tools fail." });
-          } else if (res.data === "None") {
-            // this.$Notice.error({ desc: "There is no existing tool" });
-          } else {
-            this.$set(this, "publicTools", res.data);
-            this.filterDuplicateTools();
-            this.filterShowListByType();
-          }
-        })
-        .catch(err => {
-          console.log(err);
-        });
+    async getPublicTools() {
+      let data = await get(
+        "/GeoProblemSolving/tool/inquiry?key=privacy&value=Public"
+      );
+      console.log(data);
+      this.$set(this, "publicTools", data);
+      this.filterDuplicateTools();
+      this.filterShowListByType();
     },
-    getPersonalTools() {
-      this.axios
-        .get(
-          "/GeoProblemSolving/tool/inquiryAll" +
-            "?provider=" +
-            this.userInfo.userId
-        )
-        .then(res => {
-          if (res.data == "Offline") {
-            this.$store.commit("userLogout");
-            this.$router.push({ name: "Login" });
-          } else if (res.data === "Fail") {
-            this.$Notice.error({ desc: "Loading tool fail." });
-          } else if (res.data === "None") {
-            // this.$Notice.error({ desc: "There is no existing tool" });
-          } else {
-            this.$set(this, "personalTools", res.data);
-            this.filterDuplicateTools();
-            this.filterShowListByType();
-          }
-        })
-        .catch(err => {
-          console.log(err);
-        });
+
+    async getPersonalTools() {
+      let data = await get(
+        `/GeoProblemSolving/tool/findByProvider/${this.userInfo.userId}`
+      );
+      this.$set(this, "personalTools", data);
+      this.filterDuplicateTools();
+      this.filterShowListByType();
     },
-    getStepTools() {
+
+    async getStepTools() {
       if (this.stepToolIds == null || this.stepToolIds == undefined) {
         this.stepToolIds = [];
       }
@@ -659,49 +628,31 @@ export default {
       var flagCount = toolsCount;
       var stepToolInfos = [];
       for (var i = 0; i < toolsCount; i++) {
-        this.axios
-          .get(
-            "/GeoProblemSolving/tool/inquiry" +
-              "?key=" +
-              "tId" +
-              "&value=" +
-              stepToolIds[i]
-          )
-          .then(res => {
-            if (res.data == "Offline") {
-              this.$store.commit("userLogout");
-              this.$router.push({ name: "Login" });
-            } else if (res.data === "Fail") {
-              this.$Notice.error({ desc: "Loading tools fail." });
-            } else if (res.data === "None") {
-              // this.$Notice.error({ desc: "There is no existing tool" });
-            } else {
-              stepToolInfos.push(res.data[0]);
-              if (--flagCount < 1) {
-                var sortTools = [];
-                for (var j = 0; j < toolsCount; j++) {
-                  for (var k = 0; k < toolsCount; k++) {
-                    if (stepToolIds[j] == stepToolInfos[k].tId) {
-                      sortTools.push(stepToolInfos[k]);
-                      break;
-                    }
-                  }
-                }
-                this.$set(this, "stepToolsShow", sortTools);
-                this.filterDuplicateTools();
-                this.filterShowListByType();
+        let data = await get(
+          `/GeoProblemSolving/tool/inquiry?key=tid&value=${stepToolIds[i]}`
+        );
+        console.log(data);
+        stepToolInfos.push(data[0]);
+        if (--flagCount < 1) {
+          var sortTools = [];
+          for (var j = 0; j < toolsCount; j++) {
+            for (var k = 0; k < toolsCount; k++) {
+              if (stepToolIds[j] == stepToolInfos[k].tid) {
+                sortTools.push(stepToolInfos[k]);
+                break;
               }
             }
-          })
-          .catch(err => {
-            console.log(err);
-          });
+          }
+          this.$set(this, "stepToolsShow", sortTools);
+          this.filterDuplicateTools();
+          this.filterShowListByType();
+        }
       }
     },
     changeMenuItem(name) {
-      if(name=="diyTools"){
+      if (name == "diyTools") {
         this.stepToolModal = false;
-        top.location.href="/GeoProblemSolving/toolsCenter";
+        top.location.href = "/GeoProblemSolving/toolsCenter";
       }
       this.showMenuItem = name;
     },
@@ -744,7 +695,7 @@ export default {
       for (var i = 0; i < this.publicTools.length; i++) {
         var exist = false;
         for (var j = 0; j < this.stepToolsShow.length; j++) {
-          if (this.publicTools[i].tId == this.stepToolsShow[j].tId) {
+          if (this.publicTools[i].tid == this.stepToolsShow[j].tid) {
             exist = true;
             break;
           }
@@ -758,7 +709,7 @@ export default {
       for (var i = 0; i < this.personalTools.length; i++) {
         var exist = false;
         for (var j = 0; j < this.stepToolsShow.length; j++) {
-          if (this.personalTools[i].tId == this.stepToolsShow[j].tId) {
+          if (this.personalTools[i].tid == this.stepToolsShow[j].tid) {
             exist = true;
             continue;
           }
@@ -839,15 +790,16 @@ export default {
       this.filterShowListByType();
     },
     addTooltoStep(evt) {
-      var addedToolId = this.stepToolsShow[evt.newDraggableIndex].tId;
+      var addedToolId = this.stepToolsShow[evt.newDraggableIndex].tid;
+      console.log(addedToolId);
       for (var i = 0; i < this.publicTools.length; i++) {
-        if (this.publicTools[i].tId == addedToolId) {
+        if (this.publicTools[i].tid == addedToolId) {
           this.publicTools.splice(i, 1);
           break;
         }
       }
       for (var i = 0; i < this.personalTools.length; i++) {
-        if (this.personalTools[i].tId == addedToolId) {
+        if (this.personalTools[i].tid == addedToolId) {
           this.personalTools.splice(i, 1);
           break;
         }
@@ -872,7 +824,7 @@ export default {
         newStepToolsets.push(toolset.tsId);
       });
       this.stepToolsShow.forEach(tool => {
-        newStepTools.push(tool.tId);
+        newStepTools.push(tool.tid);
       });
       let obj = new URLSearchParams();
       obj.append("stepId", this.stepInfo.stepId);
@@ -917,7 +869,6 @@ export default {
       //         "e2b02056-82c9-4dda-8916-17fb66a21634" +
       //         '" style="width: 100%;height:100%;"></iframe>';
       //       var demoPanelTimer = null;
-
       //       if (this.panel != null) {
       //         this.panel.close();
       //       }

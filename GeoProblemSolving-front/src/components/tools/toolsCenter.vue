@@ -189,7 +189,6 @@
               <div slot="extra">
                 <Select
                   v-model="typeSelected"
-                  @on-change="filterShowListByType"
                   style="width:160px"
                 >
                   <Option v-for="item in typeOptions" :key="item.index" :value="item">{{ item }}</Option>
@@ -283,9 +282,10 @@
                 :style="{height: contentHeight-187+'px'}"
                 class="toolList"
               >
+                <!-- 修---------------------------------------------------------------------------------------------改 -->
                 <vue-scroll :ops="ops">
                   <Row>
-                    <Col span="8" v-for="tool in personalToolShow" :key="tool.index">
+                    <Col span="8" v-for="tool in filterPersonalTools" :key="tool.index">
                       <div style="margin:0 5px 15px 5px">
                         <Card style="background-color: #faebd75c">
                           <p
@@ -429,7 +429,6 @@
           type="success"
           @click="createTool"
           class="create"
-          :disabled="clickForbidden"
           v-show="this.currentStep == 1"
         >Create</Button>
       </div>
@@ -551,7 +550,6 @@
           type="success"
           @click="editTool"
           class="create"
-          :disabled="clickForbidden"
           v-show="this.currentStep == 1"
         >Create</Button>
       </div>
@@ -880,6 +878,7 @@ export default {
     TemplateEdit,
     ToolPreview
   },
+
   mounted() {
     this.resizeContent();
     this.getPublicTools();
@@ -888,6 +887,31 @@ export default {
       this.getPersonalTools();
     } else {
       this.getPublicToolsets();
+    }
+  },
+
+  computed: {
+    filterPersonalTools() {
+      let tools = this.personalTools;
+      let type = this.typeSelected;
+      if (type == "All") {
+        return tools;
+      } else {
+        return tools.filter(tool => {
+          return tool.recomStep.includes(type);
+        });
+      }
+    },
+    filterPublicTools() {
+      let tools = this.publicTools;
+      let type = this.typeSelected;
+      if (type == "All") {
+        return tools;
+      } else {
+        return tools.filter(tool => {
+          return tool.recomStep.includes(type);
+        });
+      }
     }
   },
   data() {
@@ -1016,7 +1040,7 @@ export default {
         ]
       },
       selectedTool: {
-        tId:"",
+        tid: "",
         toolName: "",
         modelInfo: {
           stateId: "",
@@ -1141,7 +1165,7 @@ export default {
             // this.$Notice.error({ desc: "There is no existing toolset" });
           } else {
             this.$set(this, "toolsetList", res.data.reverse());
-            this.filterShowListByType();
+            // this.filterShowListByType();
           }
         })
         .catch(err => {
@@ -1167,7 +1191,7 @@ export default {
             // this.$Notice.error({ desc: "There is no existing toolset" });
           } else {
             this.$set(this, "toolsetList", res.data.reverse());
-            this.filterShowListByType();
+            // this.filterShowListByType();
           }
         })
         .catch(err => {
@@ -1185,7 +1209,7 @@ export default {
         `/GeoProblemSolving/tool/findByProvider/${this.userInfo.userId}`
       );
       this.$set(this, "personalTools", data);
-      this.filterShowListByType();
+      // this.filterShowListByType();
     },
 
     changeMenuItem(name) {
@@ -1210,7 +1234,7 @@ export default {
       };
       this.currentStep = 0;
       this.createToolModal = true;
-      this.clickForbidden = false;
+      // this.clickForbidden = false;
     },
     //显示工具预览界面
     showTool(toolInfo) {
@@ -1249,7 +1273,7 @@ export default {
       if (this.toolInfo.privacy == "Public") {
         this.publicTools.push(data);
       }
-      this.filterShowListByType();
+      // this.filterShowListByType();
     },
     //从子组件获取修改的form表单
     getEditInfo(form) {
@@ -1268,22 +1292,25 @@ export default {
       this.clickForbidden = true;
       let editTool = this.selectedTool;
       console.log(editTool.tid);
-      let data = await post(`/GeoProblemSolving/tool/update/${editTool.tid}`, editTool);
+      let data = await post(
+        `/GeoProblemSolving/tool/update/${editTool.tid}`,
+        editTool
+      );
       this.editToolModal = false;
       var newToolInfo = this.selectedTool;
       for (var i = 0; i < this.publicTools.length; i++) {
-        if (this.publicTools[i].tId == newToolInfo.tId) {
+        if (this.publicTools[i].tid == newToolInfo.tid) {
           this.publicTools.splice(i, 1, newToolInfo);
           break;
         }
       }
       for (var i = 0; i < this.personalTools.length; i++) {
-        if (this.personalTools[i].tId == newToolInfo.tId) {
+        if (this.personalTools[i].tid == newToolInfo.tid) {
           this.personalTools.splice(i, 1, newToolInfo);
           break;
         }
       }
-      this.filterShowListByType();
+      // this.filterShowListByType();
       this.$Notice.info({ desc: "Edit successfully" });
     },
 
@@ -1436,75 +1463,28 @@ export default {
         };
       }
     },
-    filterShowListByType() {
-      this.publicToolShow = this.getFilterResult(
-        this.publicTools,
-        this.typeSelected
-      );
-
-      this.personalToolShow = this.getFilterResult(
-        this.personalTools,
-        this.typeSelected
-      );
-    },
-    getFilterResult(foreList, type) {
-      var selectedType = type;
-      var resultList = foreList.filter(item => {
-        switch (selectedType) {
-          case "All": {
-            return item;
-            break;
-          }
-          case "General step":
-          case "Context definition & resource collection":
-          case "Data processing":
-          case "Data visualization":
-          case "Geographic model construction":
-          case "Model effectiveness evaluation":
-          case "Geographical simulation":
-          case "Quantitative and qualitative analysis":
-          case "Decision-making for management": {
-            var stepTypes = item.recomStep;
-            for (var i = 0; i < stepTypes.length; i++) {
-              if (stepTypes[i] == selectedType) {
-                return item;
-                break;
-              }
-            }
-            break;
-          }
-          case "Others": {
-            if (item.recomStep.length < 1) {
-              return item;
-            }
-            break;
-          }
-        }
-      });
-      return resultList;
-    },
 
     removeToolShow(tool) {
       this.selectedTool = tool;
       this.removeToolModal = true;
     },
     async removeTool() {
-      await del(`/GeoProblemSolving/tool/delete/?tId=${this.selectedTool.id}`);
+      await del(`/GeoProblemSolving/tool/delete/?tid=${this.selectedTool.id}`);
       this.removeToolModal = false;
       var removedTool = this.selectedTool;
       for (var i = 0; i < this.publicTools.length; i++) {
-        if (this.publicTools[i].tId == removedTool.tId) {
+        if (this.publicTools[i].tid == removedTool.tid) {
           this.publicTools.splice(i, 1);
           break;
         }
       }
       for (var i = 0; i < this.personalTools.length; i++) {
-        if (this.personalTools[i].tId == removedTool.tId) {
+        if (this.personalTools[i].tid == removedTool.tid) {
           this.personalTools.splice(i, 1);
           break;
         }
       }
-      this.filterShowListByType();
+      // this.filterShowListByType();
       this.$Notice.info({
         desc: "The tool(" + removedTool.toolName + ") has been removed."
       });
@@ -1563,7 +1543,7 @@ export default {
     checkBoxDisabled(toolset) {
       var toolList = toolset.toolList;
       for (var i = 0; i < toolList.length; i++) {
-        if (toolList[i].tId == this.selectedTool.tId) {
+        if (toolList[i].tid == this.selectedTool.tid) {
           return true;
         }
       }
@@ -1614,10 +1594,12 @@ export default {
           console.log(err.data);
         });
     },
+
     toolsetInfoShow(toolset) {
       this.selectedToolset = toolset;
       this.toolsetInfoModal = true;
     },
+
     editToolsetShow(toolset) {
       this.inputToolsetTag = "";
       this.selectedToolset = JSON.parse(JSON.stringify(toolset));

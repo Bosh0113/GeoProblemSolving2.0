@@ -42,13 +42,13 @@ public class ToolService  {
             throw new MyException(ResultEnum.EXISTS_OBJECT);
         });
         ToolEntity toolEntity = new ToolEntity();
-        String tId = UUID.randomUUID().toString();
-        add.setTId(tId);
+        String tid = UUID.randomUUID().toString();
+        add.setTid(tid);
         add.convertTo(toolEntity);
         return toolRepository.insert(toolEntity);
     }
 
-    public void deleteByTId(String tid) {
+    public void deleteByTid(String tid) {
         toolRepository.deleteById(tid);
     }
 
@@ -56,8 +56,8 @@ public class ToolService  {
         return toolRepository.findAllByProvider(provider);
     }
 
-    public Object updateTool(String tId,UpdateToolEntityDTO update) {
-        ToolEntity toolEntity = toolRepository.findFirstByTId(tId).orElseThrow(MyException::noObject);
+    public Object updateTool(String tid,UpdateToolEntityDTO update) {
+        ToolEntity toolEntity = toolRepository.findFirstByTid(tid).orElseThrow(MyException::noObject);
         update.updateTo(toolEntity);
         return toolRepository.save(toolEntity);
     }

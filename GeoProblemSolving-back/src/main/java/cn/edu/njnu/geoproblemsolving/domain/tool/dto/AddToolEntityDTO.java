@@ -14,7 +14,7 @@ import java.util.ArrayList;
  */
 @Data
 public class AddToolEntityDTO implements ToDomainConverter<ToolEntity> {
-    private String tId;
+    private String tid;
     private String toolName;
     private String toolUrl;//stateId, oid,mdlId,模型条目？
     private JSONObject modelInfo; //stateId, oid,mdlId,模型条目？

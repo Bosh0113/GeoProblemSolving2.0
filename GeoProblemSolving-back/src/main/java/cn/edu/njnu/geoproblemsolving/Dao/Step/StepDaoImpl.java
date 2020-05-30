@@ -67,7 +67,7 @@ public class StepDaoImpl implements IStepDao {
         List<ToolEntity> toolEntities = mongoTemplate.find(queryPublic, ToolEntity.class);
         ArrayList<String> toolStrs = new ArrayList<>();
         for (ToolEntity toolEntity:toolEntities){
-            toolStrs.add(toolEntity.getTId());
+            toolStrs.add(toolEntity.getTid());
         }
         step.setToolList(toolStrs);
         List<ToolsetEntity> toolsetEntities = mongoTemplate.find(queryPublic,ToolsetEntity.class);

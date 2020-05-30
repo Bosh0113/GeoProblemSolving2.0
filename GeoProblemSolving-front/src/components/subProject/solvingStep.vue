@@ -390,7 +390,7 @@ export default {
       var i = this.length;
       while (i--) {
         if (
-          (this[i].tId != undefined && this[i].tId === obj.tId) ||
+          (this[i].tid != undefined && this[i].tid === obj.tid) ||
           (this[i].tsId != undefined && this[i].tsId === obj.tsId) ||
           (this[i].id != undefined && this[i].id === obj.id) ||
           (this[i].stepId != undefined && this[i].stepId === obj.stepId)
@@ -1389,9 +1389,7 @@ export default {
     getPersonalTools() {
       this.axios
         .get(
-          "/GeoProblemSolving/tool/inquiryAll" +
-            "?provider=" +
-            this.$store.getters.userInfo.userId
+          `/GeoProblemSolving/tool/findByProvider/${this.$store.getters.userInfo.userId}`
         )
         .then(res => {
           if (res.data == "Offline") {
@@ -1515,7 +1513,7 @@ export default {
         var stepTypes = foreList[i].recomStep;
         for (var j = 0; j < stepTypes.length; j++) {
           if (stepTypes[j] == stepType || stepTypes[j] == "General step") {
-            resultList.push(foreList[i].tId);
+            resultList.push(foreList[i].tid);
             break;
           }
         }

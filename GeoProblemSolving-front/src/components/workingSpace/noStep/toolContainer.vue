@@ -49,21 +49,19 @@
         >
           <Card style="background-color: #3f51b530;cursor: pointer;margin: 0 5px 10px 5px">
             <div style="text-align:center" @click="showTools(toolset)">
-              <Tooltip placement="bottom" max-width="600">
-                <img
-                  :src="toolset.toolsetImg"
-                  v-if="toolset.toolsetImg!=''"
-                  style="height:100%;max-height:50px;"
-                />
-                <avatar :username="toolset.toolsetName" :size="50" style="margin-bottom:6px" v-else></avatar>
-                <div slot="content">
-                  <span>{{toolset.description}}</span>
-                  <br v-if="toolset.categoryTag.length>0" />
-                  <p>
-                    <i>{{toolset.categoryTag.join(',')}}</i>
-                  </p>
-                </div>
-              </Tooltip>
+              <img
+                :src="toolset.toolsetImg"
+                v-if="toolset.toolsetImg!=''"
+                style="height:100%;max-height:50px;"
+              />
+              <avatar :username="toolset.toolsetName" :size="50" style="margin-bottom:6px" v-else></avatar>
+              <div slot="content">
+                <span>{{toolset.description}}</span>
+                <br v-if="toolset.categoryTag.length>0" />
+                <p>
+                  <i>{{toolset.categoryTag.join(',')}}</i>
+                </p>
+              </div>
               <h4
                 :title="toolset.toolsetName"
                 style="width:75px;"
@@ -171,6 +169,7 @@
 <script>
 import manageTools from "./../../tools/toolToStepModal";
 import Avatar from "vue-avatar";
+import { get, del, post, put } from "../../../axios";
 export default {
   props: ["stepInfo", "userRole", "projectInfo"],
   components: {
@@ -280,46 +279,28 @@ export default {
         this.getToolsetInfos(this.stepInfo.toolsetList);
       }
     },
-    getToolInfos(toolIds) {
+    async getToolInfos(toolIds) {
       var toolsCount = toolIds.length;
       var flagCount = toolsCount;
       var ToolInfos = [];
       for (var i = 0; i < toolsCount; i++) {
-        this.axios
-          .get(
-            "/GeoProblemSolving/tool/inquiry" +
-              "?key=" +
-              "tId" +
-              "&value=" +
-              toolIds[i]
-          )
-          .then(res => {
-            if (res.data == "Offline") {
-              this.$store.commit("userLogout");
-              this.$router.push({ name: "Login" });
-            } else if (res.data === "Fail") {
-              this.$Notice.error({ desc: "Loading tools fail." });
-            } else if (res.data === "None") {
-              // this.$Notice.error({ desc: "There is no existing tool" });
-            } else {
-              ToolInfos.push(res.data[0]);
-              if (--flagCount < 1) {
-                var sortTools = [];
-                for (var j = 0; j < toolsCount; j++) {
-                  for (var k = 0; k < toolsCount; k++) {
-                    if (toolIds[j] == ToolInfos[k].tId) {
-                      sortTools.push(ToolInfos[k]);
-                      break;
-                    }
-                  }
-                }
-                this.$set(this, "toolList", sortTools);
+        let data = await get(
+          `/GeoProblemSolving/tool/inquiry?key=tid&value=${toolIds[i]}`
+        );
+        console.log(data);
+        ToolInfos.push(data[0]);
+        if (--flagCount < 1) {
+          var sortTools = [];
+          for (var j = 0; j < toolsCount; j++) {
+            for (var k = 0; k < toolsCount; k++) {
+              if (toolIds[j] == ToolInfos[k].tid) {
+                sortTools.push(ToolInfos[k]);
+                break;
               }
             }
-          })
-          .catch(err => {
-            console.log(err);
-          });
+          }
+          this.$set(this, "toolList", sortTools);
+        }
       }
     },
     getToolsetInfos(toolsetIds) {
@@ -455,12 +436,12 @@ export default {
     jupyterLogin(jupyterUserId) {
       let jupyterUrl = "";
       if (this.$store.state.IP_Port == "localhost:8080") {
-        jupyterUrl =
-          "http://172.21.212.83";
-      }
-      else if(this.$store.state.IP_Port == "118.190.246.198:80" || this.$store.state.IP_Port == "www.geofuturelab.com"){
-        jupyterUrl =
-          "http://118.190.246.198:8000";
+        jupyterUrl = "http://172.21.212.83";
+      } else if (
+        this.$store.state.IP_Port == "118.190.246.198:80" ||
+        this.$store.state.IP_Port == "www.geofuturelab.com"
+      ) {
+        jupyterUrl = "http://118.190.246.198:8000";
       }
 
       let loginInfo = {
@@ -469,14 +450,11 @@ export default {
         projectId: this.projectInfo.projectId
       };
       let info = JSON.stringify(loginInfo);
-      
+
       let data = new FormData();
       data.append("login-info", info);
       this.axios
-        .post(
-          jupyterUrl + "/hub/login?next=/hub/user/" + jupyterUserId,
-          data
-        )
+        .post(jupyterUrl + "/hub/login?next=/hub/user/" + jupyterUserId, data)
         .then(res => {
           let url = jupyterUrl + "/hub/user/" + jupyterUserId;
           window.open(url);
@@ -489,12 +467,12 @@ export default {
     prepareJupyter() {
       let jupyterUrl = "";
       if (this.$store.state.IP_Port == "localhost:8080") {
-        jupyterUrl =
-          "http://172.21.212.83";
-      }
-      else if(this.$store.state.IP_Port == "118.190.246.198:80" || this.$store.state.IP_Port == "www.geofuturelab.com"){
-        jupyterUrl =
-          "http://118.190.246.198:8000";
+        jupyterUrl = "http://172.21.212.83";
+      } else if (
+        this.$store.state.IP_Port == "118.190.246.198:80" ||
+        this.$store.state.IP_Port == "www.geofuturelab.com"
+      ) {
+        jupyterUrl = "http://118.190.246.198:8000";
       }
 
       let name_jupyterhub = this.projectInfo.projectId;

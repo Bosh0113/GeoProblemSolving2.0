@@ -28,14 +28,14 @@ public class ToolController {
 
 
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    public JsonResult deleteTool(@RequestParam("tId") String tid){
-        toolService.deleteByTId(tid);
+    public JsonResult deleteTool(@RequestParam("tid") String tid){
+        toolService.deleteByTid(tid);
         return ResultUtils.success();
     }
 
-    @RequestMapping(value = "/update/{tId}", produces = {"application/json;charset=UTF-8"},method = RequestMethod.POST)
-    public JsonResult updateTool(@PathVariable("tId") String tId,@RequestBody UpdateToolEntityDTO updateToolEntityDTO){
-        return ResultUtils.success(toolService.updateTool(tId,updateToolEntityDTO));
+    @RequestMapping(value = "/update/{tid}", produces = {"application/json;charset=UTF-8"},method = RequestMethod.POST)
+    public JsonResult updateTool(@PathVariable("tid") String tid,@RequestBody UpdateToolEntityDTO updateToolEntityDTO){
+        return ResultUtils.success(toolService.updateTool(tid,updateToolEntityDTO));
     }
 
     @RequestMapping(value = "/picture", method = RequestMethod.POST)
@@ -45,7 +45,7 @@ public class ToolController {
 
 
     @RequestMapping(value = "/inquiry", method = RequestMethod.GET)
-    public JsonResult readTool(@RequestParam("key") String key,@RequestParam("value") String value){
+    public Object readTool(@RequestParam("key") String key,@RequestParam("value") String value){
         return ResultUtils.success(toolService.readTool(key,value));
     }
 

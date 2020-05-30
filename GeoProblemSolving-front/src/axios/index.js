@@ -1,7 +1,9 @@
 import axios from "axios";
 import sf from "string-format";
 import router from "@/router";
-
+import {
+  Message
+} from 'element-ui';
 
 const baseRequestUrl = "";
 
@@ -28,7 +30,13 @@ axiosInstance.interceptors.response.use(
       });
     }
     // 状态码小于0属于异常情况
-    if (res.data.code < 0 ) {
+    if (res.data.code == -3) {
+      Message({
+        message: "Duplicate Naming",
+        type: 'error'
+      });
+      throw new Error(res.data.msg);
+    } else if (res.data.code < 0) {
       throw new Error(res.data.msg);
     }
     return res.data.data;
