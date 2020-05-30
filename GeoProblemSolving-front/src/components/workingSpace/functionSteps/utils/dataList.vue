@@ -7,6 +7,10 @@
   background-color: #19be6b;
   color: white;
 }
+.fileBtnHoverBlue:hover {
+  background-color: dodgerblue;
+  color: white;
+}
 .fileBtnHoverRed:hover {
   background-color: #ed4014;
   color: white;
@@ -123,16 +127,27 @@
                 shape="circle"
                 type="text"
               ></Button>
-              <Button
-                v-if="permissionIdentity('workspace_resource', row)"
-                class="fileBtnHoverRed"
-                size="small"
-                shape="circle"
-                type="text"
-                icon="md-close"
-                title="Remove"
-                @click="deleteResourceModalShow(row.resourceId)"
-              ></Button>
+              <template v-if="permissionIdentity('workspace_resource', row)">
+                <a :href="row.pathURL" :download="row.name" title="Download">
+                  <Button
+                    class="fileBtnHoverBlue"
+                    size="small"
+                    shape="circle"
+                    type="text"
+                    icon="md-download"
+                    title="Download"
+                  ></Button>
+                </a>
+                <Button
+                  class="fileBtnHoverRed"
+                  size="small"
+                  shape="circle"
+                  type="text"
+                  icon="md-close"
+                  title="Remove"
+                  @click="deleteResourceModalShow(row.resourceId)"
+                ></Button>
+              </template>
             </template>
           </Table>
         </div>
@@ -150,42 +165,49 @@
                       :src="dataUrl"
                       height="72px"
                       width="72px"
+                      title="Data"
                     />
                     <img
                       v-else-if="item.type == 'model'"
                       :src="modelUrl"
                       height="72px"
                       width="72px"
+                      title="Model"
                     />
                     <img
                       v-else-if="item.type == 'paper'"
                       :src="paperUrl"
                       height="72px"
                       width="72px"
+                      title="Paper"
                     />
                     <img
                       v-else-if="item.type == 'document'"
-                     :src="documentUrl"
+                      :src="documentUrl"
                       height="72px"
                       width="72px"
+                      title="Document"
                     />
                     <img
                       v-else-if="item.type == 'image'"
-                     :src="imageUrl"
+                      :src="imageUrl"
                       height="72px"
                       width="72px"
+                      title="Image"
                     />
                     <img
                       v-else-if="item.type == 'video'"
                       :src="videoUrl"
                       height="72px"
                       width="72px"
+                      title="Video"
                     />
                     <img
                       v-else-if="item.type == 'others'"
                       :src="otherUrl"
                       height="72px"
                       width="72px"
+                      title="Others"
                     />
                   </template>
                   <template v-else>
@@ -206,17 +228,28 @@
                       size="small"
                       title="Check"
                       icon="md-eye"
-                      style="margin: 10px 30px 0 0;"
+                      style="margin: 10px 20px 0 0;"
                       @click="checkData(item)"
                     ></Button>
-                    <Button
-                      v-if="permissionIdentity('workspace_resource', item)"
-                      size="small"
-                      title="Delete"
-                      icon="md-close"
-                      style="margin-top: 10px;"
-                      @click="deleteResourceModalShow(item.resourceId)"
-                    ></Button>
+                    <template v-if="permissionIdentity('workspace_resource', item)">
+                      <a :href="item.pathURL" :download="item.name">
+                        <Button
+                          v-if="permissionIdentity('workspace_resource', item)"
+                          size="small"
+                          title="Download"
+                          icon="md-download"
+                          style="margin: 10px 20px 0 0;"
+                        ></Button>
+                      </a>
+                      <Button
+                        v-if="permissionIdentity('workspace_resource', item)"
+                        size="small"
+                        title="Delete"
+                        icon="md-close"
+                        style="margin-top: 10px;"
+                        @click="deleteResourceModalShow(item.resourceId)"
+                      ></Button>
+                    </template>
                   </div>
                 </div>
               </Card>
@@ -402,7 +435,7 @@ export default {
       imageUrl: require("@/assets/images/image.png"),
       videoUrl: require("@/assets/images/video.png"),
       otherUrl: require("@/assets/images/otherfile.png"),
-      // 
+      //
       showType: "resources",
       checkDataModal: false,
       tableColName: [
@@ -434,7 +467,7 @@ export default {
         {
           title: "Action",
           slot: "action",
-          width: 90,
+          width: 120,
           align: "center"
         }
       ],

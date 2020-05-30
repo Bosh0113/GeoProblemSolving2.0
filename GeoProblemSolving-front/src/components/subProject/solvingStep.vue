@@ -232,6 +232,9 @@
         <label style="margin-left:20px">Activity type:</label>
         <Input v-model="showActivityInfo.type" style="width:300px;margin-left:17px" readonly />
       </div>
+      <div style="margin-top:20px">
+        <div style="margin-left:20px;color:grey" v-if="!showActivityInfo.activeStatus"><h3>This workspace is inactive.</h3><h3>You can check this workspace, but can not use it.</h3></div>        
+      </div>
       <div slot="footer">
         <Button
           type="primary"
@@ -794,6 +797,7 @@ export default {
             x: this.processStructure[i].x,
             y: this.processStructure[i].y,
             category: this.processStructure[i].category,
+            activeStatus: this.processStructure[i].activeStatus,
             symbolSize: 45
           };
           if (this.processStructure[i].activeStatus) {
@@ -869,7 +873,8 @@ export default {
           let activity = {
             stepID: params.data.stepId,
             name: params.data.name,
-            type: stepType
+            type: stepType,
+            activeStatus: params.data.activeStatus
           };
           _this.showActivityInfo = activity;
         }
