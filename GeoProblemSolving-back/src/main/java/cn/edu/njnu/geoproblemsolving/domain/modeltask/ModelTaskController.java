@@ -1,17 +1,12 @@
-package cn.edu.njnu.geoproblemsolving.Controller;
+package cn.edu.njnu.geoproblemsolving.domain.modeltask;
 
 import cn.edu.njnu.geoproblemsolving.Entity.ModelTools.CModel.support.JsonResult;
-import cn.edu.njnu.geoproblemsolving.Service.TaskService;
 import cn.edu.njnu.geoproblemsolving.Utils.ResultUtils;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.ServletException;
@@ -20,24 +15,21 @@ import javax.servlet.http.Part;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping(value = "/task")
-public class TaskRestController {
+public class ModelTaskController {
     @Autowired
-    TaskService taskService;
+    ModelTaskService modelTaskService;
 
     @RequestMapping(value = "/getModelBehavior/{doi}",method = RequestMethod.GET)
     public Object readProject(@PathVariable("doi") String doi) {
-        return taskService.getComputeModel(doi);
+        return modelTaskService.getComputeModel(doi);
     }
 
     @RequestMapping(value = "/createTask/{pid}/{userId}", method = RequestMethod.GET)
     JsonResult createTask(@PathVariable("pid") String pid,@PathVariable("userId") String userId){
-        return ResultUtils.success(taskService.createTask(pid,userId));
+        return ResultUtils.success(modelTaskService.createTask(pid,userId));
     }
 
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
@@ -54,7 +46,7 @@ public class TaskRestController {
         FileUtils.copyInputStreamToFile(multiRequest.getPart("file").getInputStream(),file);
         String ip = multiRequest.getParameter("ip");//获得ip&port
         String port = multiRequest.getParameter("port");
-        String url = taskService.upload(file);
+        String url = modelTaskService.upload(file);
         return ResultUtils.success(url);
     }
 
@@ -62,18 +54,18 @@ public class TaskRestController {
     public Object uploadFile(HttpServletRequest request) throws IOException, ServletException {
         MultipartHttpServletRequest request1 = (MultipartHttpServletRequest) request;
         Collection<Part> files = request1.getParts();
-        return  ResultUtils.success(taskService.uploadFileForm(files));
+        return  ResultUtils.success(modelTaskService.uploadFileForm(files));
     }
 
 
     @RequestMapping(value = "/invoke", method = RequestMethod.POST)
     JsonResult invoke(@RequestBody JSONObject obj){
-        return ResultUtils.success(taskService.invoke(obj));
+        return ResultUtils.success(modelTaskService.invoke(obj));
     }
 
     @RequestMapping(value = "/getRecord", method = RequestMethod.POST)
     JsonResult getResult(@RequestBody JSONObject data) {
-        return ResultUtils.success(taskService.getRecord(data));
+        return ResultUtils.success(modelTaskService.getRecord(data));
     }
 
 }

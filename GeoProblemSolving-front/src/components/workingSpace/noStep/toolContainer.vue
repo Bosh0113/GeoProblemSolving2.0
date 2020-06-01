@@ -30,7 +30,7 @@
       <div slot="extra" v-if="permissionIdentity('workspace_tool')">
         <manage-tools
           :step-info="stepInfo"
-          @updateStepTools="stepToolListChanged"
+          @updatesteptools="stepToolListChanged"
           :key="toolModal"
           title="Manage toolsets and tools"
           style="margin-top:-10px"
@@ -270,12 +270,18 @@ export default {
         this.stepInfo.toolList != null &&
         this.stepInfo.toolList != undefined
       ) {
-        this.getToolInfos(this.stepInfo.toolList);
-      }
-      if (
+        if (this.stepInfo.toolList.length == 0) {
+          this.$set(this, "toolList", []);
+        } else {
+          this.getToolInfos(this.stepInfo.toolList);
+        }
+      } else if (
         this.stepInfo.toolsetList != null &&
         this.stepInfo.toolsetList != undefined
       ) {
+        if (this.stepInfo.toolsetList.length == 0) {
+          this.$set(this, "toolsetList", []);
+        }
         this.getToolsetInfos(this.stepInfo.toolsetList);
       }
     },
@@ -287,7 +293,6 @@ export default {
         let data = await get(
           `/GeoProblemSolving/tool/inquiry?key=tid&value=${toolIds[i]}`
         );
-        console.log(data);
         ToolInfos.push(data[0]);
         if (--flagCount < 1) {
           var sortTools = [];
@@ -349,6 +354,7 @@ export default {
       this.stepInfo.toolList = tools;
       this.stepInfo.toolsetList = toolsets;
       this.toolModal++;
+
       this.getAllTools(tools, toolsets);
     },
     showTools(toolsetInfo) {

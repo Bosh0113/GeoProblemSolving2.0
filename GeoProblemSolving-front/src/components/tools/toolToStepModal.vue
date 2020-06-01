@@ -842,7 +842,7 @@ export default {
             // this.$Notice.error({ desc: "There is no existing tool" });
           } else {
             //此处要更新父组件的列表
-            this.$emit("updateStepTools", newStepTools, newStepToolsets);
+            this.$emit("updatesteptools", newStepTools, newStepToolsets);
             this.stepToolModal = false;
           }
         })

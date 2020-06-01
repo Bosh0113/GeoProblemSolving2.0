@@ -30,7 +30,7 @@
       <div slot="extra" v-if="permissionIdentity('workspace_tool')">
         <manage-tools
           :step-info="stepInfo"
-          @updateStepTools="stepToolListChanged"
+          @updatesteptools="stepToolListChanged"
           :key="toolModal"
           title="Manage toolsets and tools"
           style="margin-top:-10px"

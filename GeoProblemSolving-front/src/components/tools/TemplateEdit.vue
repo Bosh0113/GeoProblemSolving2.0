@@ -218,7 +218,7 @@
   </div>
 </template>
 <script>
-import tinymce from "./../tinymce";
+import tinymce from "./../common/tinymce";
 import Avatar from "vue-avatar";
 export default {
   components: {

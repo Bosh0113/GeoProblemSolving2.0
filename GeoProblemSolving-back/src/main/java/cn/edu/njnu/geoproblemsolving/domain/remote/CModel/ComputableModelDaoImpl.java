@@ -1,4 +1,4 @@
-package cn.edu.njnu.geoproblemsolving.Dao.CModel;
+package cn.edu.njnu.geoproblemsolving.domain.remote.CModel;
 
 import cn.edu.njnu.geoproblemsolving.Entity.ModelTools.CModel.ComputableModelEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.ModelTools.ModelItem.ModelItemEntity;

@@ -1,4 +1,4 @@
-package cn.edu.njnu.geoproblemsolving.Dao.CModel;
+package cn.edu.njnu.geoproblemsolving.domain.remote.CModel;
 
 import com.alibaba.fastjson.JSONObject;
 

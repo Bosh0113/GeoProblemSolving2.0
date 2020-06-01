@@ -217,7 +217,7 @@
   </div>
 </template>
 <script>
-import tinymce from "./../tinymce";
+import tinymce from "./../common/tinymce";
 import Avatar from "vue-avatar";
 import { post } from "../../axios";
 export default {
@@ -230,6 +230,7 @@ export default {
       type: Number
     }
   },
+  
   data() {
     return {
       toolInfo: {

@@ -1,4 +1,4 @@
-package cn.edu.njnu.geoproblemsolving.Service.Remote;
+package cn.edu.njnu.geoproblemsolving.domain.remote;
 
 import cn.edu.njnu.geoproblemsolving.Enums.ResultEnum;
 import cn.edu.njnu.geoproblemsolving.Exception.MyException;

@@ -1,10 +1,9 @@
-package cn.edu.njnu.geoproblemsolving.Controller.Remote;
+package cn.edu.njnu.geoproblemsolving.domain.remote;
 
-import cn.edu.njnu.geoproblemsolving.Service.Remote.DataItemService;
+import cn.edu.njnu.geoproblemsolving.domain.remote.DataItemService;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;

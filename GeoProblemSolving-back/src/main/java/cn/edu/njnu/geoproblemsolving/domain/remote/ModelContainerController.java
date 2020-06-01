@@ -1,7 +1,6 @@
-package cn.edu.njnu.geoproblemsolving.Controller.Remote;
+package cn.edu.njnu.geoproblemsolving.domain.remote;
 
 import cn.edu.njnu.geoproblemsolving.Entity.ModelTools.CModel.support.JsonResult;
-import cn.edu.njnu.geoproblemsolving.Service.Remote.ModelItemService;
 import cn.edu.njnu.geoproblemsolving.Utils.ResultUtils;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
