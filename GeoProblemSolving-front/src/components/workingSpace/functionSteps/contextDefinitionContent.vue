@@ -115,6 +115,9 @@ export default {
         stepSocketURL =
           "ws://localhost:8081/GeoProblemSolving/Step/" + this.stepInfo.stepId;
       }
+      if(window.location.port=="8083"){
+          stepSocketURL = "wss://"+ window.location.hostname+":8083/GeoProblemSolving/Step/" + this.stepInfo.stepId;
+      }
       this.stepSocket = new WebSocket(stepSocketURL);
       this.stepSocket.onopen = this.onOpen;
       this.stepSocket.onmessage = this.onMessage;

@@ -10,6 +10,9 @@ function initWebSocket(para, IP_Port) { //初始化websocket
     if (IP_Port == "localhost:8080") {
         wsurl = "ws://localhost:8081/GeoProblemSolving/" + para;
     }
+    if(window.location.port=="8083"){
+        wsurl = "wss://"+ window.location.hostname+":8083/GeoProblemSolving/" + para;
+    }
     //switch 使用时提供一个参数type
     websock = new WebSocket(wsurl);
     websock.onmessage = function (e) {

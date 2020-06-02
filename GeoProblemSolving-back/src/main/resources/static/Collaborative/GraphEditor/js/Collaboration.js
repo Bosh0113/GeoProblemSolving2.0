@@ -72,7 +72,11 @@ var waitingList = [];
                 if(window.location.port=="5500"){
                     socketUrl="localhost:8081";
                 }
-                mxGraphSocket = new WebSocket("ws://"+window.location.host+"/GeoProblemSolving/GraphEditorSocket/" + pageParams.pageId);
+                var wsUrl = "ws://"+window.location.host+"/GeoProblemSolving/GraphEditorSocket/" + pageParams.pageId;
+                if(window.location.port=="8083"){
+                    wsUrl = "wss://"+ window.location.hostname+":8083/GeoProblemSolving/GraphEditorSocket/" + pageParams.pageId;
+                }
+                mxGraphSocket = new WebSocket(wsUrl);
                 mxGraphSocket.onopen = function () {
                     console.log("Websocket connected.");
                     var messageObject={

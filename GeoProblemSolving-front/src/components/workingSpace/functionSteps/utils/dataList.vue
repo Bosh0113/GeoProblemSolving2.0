@@ -257,8 +257,8 @@
         </TabPane>
       </Tabs>
       <br />
-      <Button style="margin-right:20px" @click="dataPreview(selectData)">Preview</Button>
-      <Button style="margin-right:20px" @click="dataVisualize">Visualization</Button>
+      <!-- <Button style="margin-right:20px" @click="dataPreview(selectData)">Preview</Button>
+      <Button style="margin-right:20px" @click="dataVisualize">Visualization</Button> -->
     </Modal>
     <Modal v-model="dataUploadModal" title="Upload data" width="600">
       <Form

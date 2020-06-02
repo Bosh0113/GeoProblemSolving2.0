@@ -414,6 +414,9 @@
                 if (window.location.host == "localhost:8080") {
                     excelSocketURL = "ws://localhost:8081/GeoProblemSolving/ExcelTool/" + roomId;
                 }
+                if(window.location.port=="8083"){
+                    excelSocketURL = "wss://"+ window.location.hostname+":8083/GeoProblemSolving/ExcelTool/" + roomId;
+                }
                 this.excelSocket = new WebSocket(excelSocketURL);
                 this.excelSocket.onopen = this.onOpen;
                 this.excelSocket.onmessage = this.onMessage;
