@@ -45,4 +45,10 @@ public class UpdateDBController {
         UpdateDBDao updateDBDao = new UpdateDBDao(mongoTemplate);
         return updateDBDao.md5Password();
     }
+
+    @RequestMapping(value = "/updatePermission", method = RequestMethod.GET)
+    public String updatePermission(){
+        UpdateDBDao updateDBDao = new UpdateDBDao(mongoTemplate);
+        return updateDBDao.setPermission();
+    }
 }
