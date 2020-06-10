@@ -85,6 +85,15 @@ var waitingList = [];
                         userName:pageParams.userName
                     };
                     mxGraphSocket.send(JSON.stringify(messageObject));
+
+                    window.setInterval(function(){
+                        if(mxGraphSocket!=null){
+                            var messageObject={
+                                type:"Ping",
+                            };
+                            mxGraphSocket.send(JSON.stringify(messageObject));
+                        }
+                    },20000);
                 }
                 mxGraphSocket.onmessage = function (ev) {
                     var messageObject = JSON.parse(ev.data);

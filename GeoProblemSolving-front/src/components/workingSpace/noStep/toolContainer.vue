@@ -166,6 +166,16 @@
     >
       <h3>Note: Jupyter notebooks will be accessed by all members in this project.</h3>
     </Modal>
+    <Modal
+      v-model="openToolModal"
+      title="Open tool"
+    >
+      <h3>How would you like to open the tool?</h3>
+      <div slot="footer" style="text-align:center">
+        <Button @click="openToolInWindow" type="primary" style="margin:0 15px">This window</Button>
+        <Button @click="openToolNewWindow" style="margin:0 15px">New window</Button>
+      </div>
+    </Modal>
   </div>
 </template>
 <script>
@@ -198,7 +208,9 @@ export default {
       showToolsetToolsModal: false,
       panelList: [],
       scopeType: "subproject",
-      jupyterModal: false
+      jupyterModal: false,
+      selectedTool:{},
+      openToolModal:false
     };
   },
   mounted() {
@@ -382,60 +394,94 @@ export default {
     },
     useTool(toolInfo) {
       if (this.userRole != "Visitor" && this.userRole != "Token") {
-        // 记录信息
-        let toolRecords = {
-          type: "tools",
-          time: new Date().Format("yyyy-MM-dd HH:mm:ss"),
-          who: this.userInfo.userName,
-          content: "used a tool",
-          toolType: toolInfo.toolName
-        };
-        this.$emit("toolBehavior", toolRecords);
-
-        if (toolInfo.toolName == "Jupyter notebook") {
-          this.jupyterModal = true;
-          return;
-        }
-
-        var toolURL =
-          '<iframe src="' +
-          toolInfo.toolUrl +
-          "?userName=" +
-          this.userInfo.userName +
-          "&userID=" +
-          this.userInfo.userId +
-          "&groupID=" +
-          this.stepInfo.stepId +
-          '" style="width: 100%;height:100%;" frameborder="0"></iframe>';
-
-        var demoPanelTimer = null;
-        if (this.scopeType == "project") {
-          parent.vm.showToolPanel(toolURL, toolInfo.toolName);
-        } else {
-          var panel = parent.jsPanel.create({
-            theme: "success",
-            headerTitle: toolInfo.toolName,
-            footerToolbar: '<p style="height:10px"></p>',
-            contentSize: "800 400",
-            content: toolURL,
-            disableOnMaximized: true,
-            dragit: {
-              containment: 5
-            },
-            closeOnEscape: true,
-            onclosed: function(panel, status, closedByUser) {
-              window.clearTimeout(demoPanelTimer);
-            }
-          });
-          $(".jsPanel-content").css("font-size", "0");
-          this.panelList.push(panel);
-          this.$emit("toolPanel", panel);
-        }
+        this.selectedTool = toolInfo;
+        this.openToolModal = true;
       } else {
         this.$Notice.info({
           desc: "Please login before using toolsets and join this project."
         });
       }
+    },
+    openToolInWindow(){
+      var toolInfo = this.selectedTool;
+      this.openToolModal = false;
+      // 记录信息
+      let toolRecords = {
+        type: "tools",
+        time: new Date().Format("yyyy-MM-dd HH:mm:ss"),
+        who: this.userInfo.userName,
+        content: "used a tool",
+        toolType: toolInfo.toolName
+      };
+      this.$emit("toolBehavior", toolRecords);
+
+      if (toolInfo.toolName == "Jupyter notebook") {
+        this.jupyterModal = true;
+        return;
+      }
+
+      var toolURL =
+        '<iframe src="' +
+        toolInfo.toolUrl +
+        "?userName=" +
+        this.userInfo.userName +
+        "&userID=" +
+        this.userInfo.userId +
+        "&groupID=" +
+        this.stepInfo.stepId +
+        '" style="width: 100%;height:100%;" frameborder="0"></iframe>';
+
+      var demoPanelTimer = null;
+      if (this.scopeType == "project") {
+        parent.vm.showToolPanel(toolURL, toolInfo.toolName);
+      } else {
+        var panel = parent.jsPanel.create({
+          theme: "success",
+          headerTitle: toolInfo.toolName,
+          footerToolbar: '<p style="height:10px"></p>',
+          contentSize: "800 400",
+          content: toolURL,
+          disableOnMaximized: true,
+          dragit: {
+            containment: 5
+          },
+          closeOnEscape: true,
+          onclosed: function(panel, status, closedByUser) {
+            window.clearTimeout(demoPanelTimer);
+          }
+        });
+        $(".jsPanel-content").css("font-size", "0");
+        this.panelList.push(panel);
+        this.$emit("toolPanel", panel);
+      }
+    },
+    openToolNewWindow(){
+      var toolInfo = this.selectedTool;
+      this.openToolModal = false;
+      // 记录信息
+      let toolRecords = {
+        type: "tools",
+        time: new Date().Format("yyyy-MM-dd HH:mm:ss"),
+        who: this.userInfo.userName,
+        content: "used a tool",
+        toolType: toolInfo.toolName
+      };
+      this.$emit("toolBehavior", toolRecords);
+
+      if (toolInfo.toolName == "Jupyter notebook") {
+        this.jupyterModal = true;
+        return;
+      }
+
+      var toolURL =
+        toolInfo.toolUrl +
+        "?userName=" +
+        this.userInfo.userName +
+        "&userID=" +
+        this.userInfo.userId +
+        "&groupID=" +
+        this.stepInfo.stepId;
+        window.open(toolURL);
     },
     checkJupyterUser() {
       this.axios

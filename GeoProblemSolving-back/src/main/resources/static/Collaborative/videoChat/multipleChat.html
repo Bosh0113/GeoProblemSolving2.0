@@ -196,6 +196,12 @@
             onOpen(){
                 console.log("Socket连接成功！");
                 this.sendMessage("connect",{});
+                var that = this;
+                window.setInterval(()=>{
+                    if(that.videoChatSocket!=null){
+                        that.sendMessage("ping", {});
+                    }
+                },20000);
             },
             async onMessage(evt){
                 var messageObject = JSON.parse(evt.data);
