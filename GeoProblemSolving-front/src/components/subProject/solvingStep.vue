@@ -969,6 +969,7 @@ export default {
             }
           }
           // update scopeInfo/selectedActivities/graph
+          this.selectedPreActivities = [];
           this.selectedActivities = [];
           this.scopeInfo.solvingProcess = JSON.stringify(this.processStructure);
           this.getProcessSteps();
@@ -980,6 +981,9 @@ export default {
       }
     },
     addNewStep() {
+      // 防止Link与add相互干扰
+      this.selectedPreActivities = [];
+      // add
       // 选择父节点检测
       if (
         this.processStructure.length != 0 &&
@@ -1481,6 +1485,9 @@ export default {
       }
     },
     removeStep() {
+      // 防止Link与remove相互干扰
+      this.selectedPreActivities = [];
+      // remove
       if (this.selectedActivities.length == 1) {
         this.delModal = true;
       } else if (this.selectedActivities.length > 1) {
