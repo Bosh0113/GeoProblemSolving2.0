@@ -89,6 +89,7 @@
                     <Option value="materials">Related materials</Option>
                   </Select>
                   <Button
+                    v-if="userRole != 'Visitor'"
                     shape="circle"
                     icon="md-cloud-upload"
                     @click="dataUploadModalShow"

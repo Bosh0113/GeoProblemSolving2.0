@@ -77,20 +77,9 @@
           <Divider type="vertical" />
           <strong style="font-size:1rem;">{{panelTitle}}</strong>
         </div>
-        <!-- <Col span="16" style="margin-left:20px;color: #2d8cf099;"> -->
-        <!-- <strong style="font-size:1.5rem; color: #2d8cf099;position:absolute;left:48%;">{{panelTitle}}</strong> -->
         <div>
           <span class="project_title">{{subProjectInfo.title}}</span>
         </div>
-
-        <!-- </Col> -->
-        <!-- <Button
-          type="info"
-          icon="md-globe"
-          style="float:right;margin:3px 30px 0 0"
-          title="Go to work"
-          @click="gotoWorkingspace"
-        >Working space</Button>-->
       </div>
       <router-view
         :subProjectInfo="subProjectInfo"
@@ -202,31 +191,23 @@ export default {
       }
     },
     getProjectInfo() {
-      let projectInfo = this.$store.getters.project;
-      if (
-        JSON.stringify(projectInfo) != "{}" &&
-        projectInfo.projectId == this.subProjectInfo.projectId
-      ) {
-        this.projectInfo = projectInfo;
-      } else {
-        $.ajax({
-          url:
-            "/GeoProblemSolving/project/inquiry" +
-            "?key=projectId" +
-            "&value=" +
-            this.subProjectInfo.projectId,
-          type: "GET",
-          async: false,
-          success: data => {
-            if (data != "None" && data != "Fail") {
-              this.projectInfo = data[0];
-              this.$store.commit("setProjectInfo", data[0]);
-            } else {
-              console.log(data);
-            }
+      $.ajax({
+        url:
+          "/GeoProblemSolving/project/inquiry" +
+          "?key=projectId" +
+          "&value=" +
+          this.subProjectInfo.projectId,
+        type: "GET",
+        async: false,
+        success: data => {
+          if (data != "None" && data != "Fail") {
+            this.projectInfo = data[0];
+            this.$store.commit("setProjectInfo", data[0]);
+          } else {
+            console.log(data);
           }
-        });
-      }
+        }
+      });
     },
     getSubprojectInfo() {
       let subProjectId = this.$route.params.id;
@@ -310,69 +291,6 @@ export default {
         this.$router.replace({ name: "resource" });
       } else if (name == "task") {
         this.$router.replace({ name: "task" });
-      }
-    },
-    gotoWorkingspace() {
-      this.processStructure = JSON.parse(this.subProjectInfo.solvingProcess);
-
-      if (this.processStructure.length > 0) {
-        let activeStep = undefined;
-        for (let i = 0; i < this.processStructure.length; i++) {
-          if (this.processStructure[i].activeStatus) {
-            activeStep = this.processStructure[i];
-          }
-        }
-
-        if (activeStep === undefined) {
-          activeStep = this.processStructure[0];
-        }
-
-        let stepId = activeStep.stepID;
-        if (activeStep.category == 0) {
-          this.$router.push({
-            name: "contextDefinition",
-            params: { id: stepId }
-          });
-        } else if (activeStep.category == 1) {
-          this.$router.push({
-            name: "dataProcessing",
-            params: { id: stepId }
-          });
-        } else if (activeStep.category == 2) {
-          this.$router.push({
-            name: "visualization",
-            params: { id: stepId }
-          });
-        } else if (activeStep.category == 3) {
-          this.$router.push({
-            name: "modelBuild",
-            params: { id: stepId }
-          });
-        } else if (activeStep.category == 4) {
-          this.$router.push({
-            name: "modelEvaluation",
-            params: { id: stepId }
-          });
-        } else if (activeStep.category == 5) {
-          this.$router.push({
-            name: "simulation",
-            params: { id: stepId }
-          });
-        } else if (activeStep.category == 6) {
-          this.$router.push({
-            name: "analysis",
-            params: { id: stepId }
-          });
-        } else if (activeStep.category == 7) {
-          this.$router.push({
-            name: "decisionMaking",
-            params: { id: stepId }
-          });
-        }
-      } else {
-        this.$Notice.info({
-          desc: "The working space have not be initialized!"
-        });
       }
     },
     changeSubProjectInfo(newInfo) {

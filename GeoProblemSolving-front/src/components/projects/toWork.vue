@@ -66,36 +66,27 @@ export default {
       }
     },
     getProjectInfo() {
-      try {
-        this.projectInfo = JSON.parse(
-          this.decrypto(sessionStorage.getItem("projectInfo"))
-        );
-      } catch (err) {}
-      if (JSON.stringify(this.projectInfo) == "{}" || this.projectInfo == undefined) {
-        $.ajax({
-          url:
-            "/GeoProblemSolving/project/inquiry" +
-            "?key=projectId" +
-            "&value=" +
-            this.projectId,
-          type: "GET",
-          async: false,
-          success: data => {
-            if (data == "Offline") {
-              parent.location.href = "/GeoProblemSolving/login";
-            }
-            if (data != "None" && data != "Fail") {
-              this.projectInfo = data[0];
-              this.identifyUserRole();
-              this.$store.commit("setProjectInfo", data[0]);
-            } else {
-              console.log(data);
-            }
+      $.ajax({
+        url:
+          "/GeoProblemSolving/project/inquiry" +
+          "?key=projectId" +
+          "&value=" +
+          this.projectId,
+        type: "GET",
+        async: false,
+        success: data => {
+          if (data == "Offline") {
+            parent.location.href = "/GeoProblemSolving/login";
           }
-        });
-      } else {
-        this.identifyUserRole();
-      }
+          if (data != "None" && data != "Fail") {
+            this.projectInfo = data[0];
+            this.identifyUserRole();
+            this.$store.commit("setProjectInfo", data[0]);
+          } else {
+            console.log(data);
+          }
+        }
+      });
     },
     identifyUserRole() {
       //Manager|Member|Visitor
@@ -117,18 +108,6 @@ export default {
     changeProjectInfo(newProjectInfo) {
       this.projectInfo = newProjectInfo;
       parent.vm.projectInfo = newProjectInfo;
-    },
-    decrypto(context) {
-      var CryptoJS = require("crypto-js");
-      var key = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
-      var iv = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
-      var decrypt = CryptoJS.AES.decrypt(context, key, {
-        iv: iv,
-        mode: CryptoJS.mode.CBC,
-        padding: CryptoJS.pad.Pkcs7
-      });
-      var decryptedStr = decrypt.toString(CryptoJS.enc.Utf8);
-      return decryptedStr.toString();
     }
   }
 };
