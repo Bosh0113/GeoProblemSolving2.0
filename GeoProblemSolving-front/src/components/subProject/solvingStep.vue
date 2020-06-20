@@ -237,30 +237,6 @@
         <Button type="primary" @click="createStep('formValidate1')">Submit</Button>
       </div>
     </Modal>
-    <Modal
-      width="800px"
-      v-model="inheritResModal"
-      title="Get resources from previous activities"
-      :styles="{top: '20px'}"
-      @on-ok="createActivityModal = true"
-      ok-text="Next"
-      cancel-text="Cancel"
-    >
-      <div style="margin-left:75px">
-        <div style="font-size:14px">Select the needed data:</div>
-        <Transfer
-          :data="existingResources"
-          :target-keys="targetKeys"
-          :list-style="listStyle"
-          :render-format="resourceRender"
-          :titles="['The previous activities', 'The new activity']"
-          filter-placeholder="Enter key words..."
-          filterable
-          :filter-method="filterMethod"
-          @on-change="handleChange"
-        ></Transfer>
-      </div>
-    </Modal>
   </Row>
 </template>
 <script>
@@ -296,7 +272,6 @@ export default {
       },
       contentHeight: "",
       processStructure: [],
-
       workspaceName: "",
       typeList: [
         "Context definition & resource collection",
@@ -317,14 +292,9 @@ export default {
       // 模态框
       delModal: false,
       createActivityModal: false,
-      inheritResModal: false,
       // 双击展示活动信息
       activityInfoModal: false,
       showActivityInfo: {},
-      //资源继承
-      existingResources: [],
-      targetKeys: [],
-      listStyle: { width: "280px", height: "375px" },
       // 工具
       personalTools: [],
       publicTools: [],
@@ -996,84 +966,8 @@ export default {
         return;
       }
 
-      // 获取可继承的资源
-      this.getInheritResource();
       // 创建步骤模态框
-      if (this.processStructure.length > 0) {
-        this.inheritResModal = true;
-      } else {
-        this.createActivityModal = true;
-      }
-    },
-    getInheritResource() {
-      this.existingResources = this.getMockData();
-    },
-    getMockData() {
-      let mockData = [];
-      let selectedRes = [];
-
-      // 前驱步骤的资源
-      for (var i = 0; i < this.selectedActivities.length; i++) {
-        let selectedStepId = this.selectedActivities[i].stepId;
-        let selectedStepName = this.selectedActivities[i].name;
-        let getResUrl =
-          "/GeoProblemSolving/folder/findByFileType?" +
-          "scopeId=" +
-          selectedStepId +
-          "&type=all";
-
-        $.ajax({
-          url: getResUrl,
-          type: "GET",
-          async: false,
-          success: function(data) {
-            if (data !== "Fail") {
-              selectedRes = data;
-              for (var j = 0; j < selectedRes.length; j++) {
-                mockData.push({
-                  key: mockData.length.toString(),
-                  name: selectedRes[j].name,
-                  type: selectedRes[j].type,
-                  resourceId: selectedRes[j].resourceId,
-                  source: selectedStepName
-                });
-              }
-            } else {
-              selectedRes = [];
-            }
-          },
-          error: function(err) {
-            selectedRes = [];
-            console.log("err!");
-          }
-        });
-      }
-      return mockData;
-    },
-    getTargetKeys() {
-      let mockData = [];
-      if (this.existingResources.length > 0) {
-        for (var i = 0; i < this.targetKeys.length; i++) {
-          mockData.push({
-            key: this.targetKeys[i],
-            name: this.existingResources[this.targetKeys[i]].name,
-            type: this.existingResources[this.targetKeys[i]].type,
-            resourceId: this.existingResources[this.targetKeys[i]].resourceId,
-            source: this.existingResources[this.targetKeys[i]].source
-          });
-        }
-      }
-      return mockData;
-    },
-    handleChange(newTargetKeys) {
-      this.targetKeys = newTargetKeys;
-    },
-    filterMethod(data, query) {
-      return data.type.indexOf(query) > -1;
-    },
-    resourceRender(item) {
-      // return item.type + " - " + item.name;
-      return `<span title="${item.type} - ${item.source}">${item.name}</span>`;
+      this.createActivityModal = true;
     },
     createStep(name) {
       this.$refs[name].validate(valid => {
@@ -1128,9 +1022,6 @@ export default {
             this1.$Message.info("Fail");
           } else {
             this.createStepGraph(res.data);
-
-            // 更新新Step的资源
-            this.copyResource(res.data);
           }
         })
         .catch(err => {
@@ -1447,42 +1338,6 @@ export default {
         }
       }
       return resultList;
-    },
-    // 数据继承
-    copyResource(stepId) {
-      let selectResource = [];
-      selectResource = this.getTargetKeys();
-      if (selectResource.length > 0) {
-        // 继承资源的数据id的集合
-        let addFileList = [];
-        for (var i = 0; i < selectResource.length; i++) {
-          addFileList.push(selectResource[i].resourceId);
-        }
-        let addFileListStr = addFileList.toString();
-
-        this.axios
-          .get(
-            "/GeoProblemSolving/folder/shareToFolder" +
-              "?addFileList=" +
-              addFileListStr +
-              "&folderId=" +
-              stepId
-          )
-          .then(res => {
-            this.shareModal = false;
-            if (res.data == "Offline") {
-              this.$store.commit("userLogout");
-              this.$router.push({ name: "Login" });
-            } else if (res.data == "Fail") {
-              this.$Message.error(
-                "Failed to get resources from previous activities."
-              );
-            }
-          })
-          .catch(err => {
-            // console.log(err.data);
-          });
-      }
     },
     removeStep() {
       // 防止Link与remove相互干扰

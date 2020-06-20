@@ -75,6 +75,7 @@
           type="md-list"
           size="24"
           @click="dataListStyle = false"
+          title="Resources list style"
           style="margin-right:20px;margin-top:-10px; cursor: pointer"
         />
         <Icon
@@ -82,6 +83,7 @@
           type="md-apps"
           size="24"
           @click="dataListStyle = true"
+          title="Resources list style"
           style="margin-right:20px;margin-top:-10px; cursor: pointer"
         />
         <Select
@@ -95,6 +97,14 @@
           <Option value="materials">Related materials</Option>
           <Option value="toolData">Tool-generated results</Option>
         </Select>
+        <Button
+          v-if="userRole != 'Visitor'"
+          shape="circle"
+          icon="md-shuffle"
+          @click="getPreviousRes()"
+          style="margin-top:-10px;margin-right:20px"
+          title="Get resources from the previous activities"
+        ></Button>
         <Button
           v-if="userRole != 'Visitor'"
           shape="circle"
@@ -258,7 +268,13 @@
         </div>
       </div>
     </Card>
-    <Modal v-model="checkDataModal" title="Data Information" width="600">
+    <Modal
+      v-model="checkDataModal"
+      title="Data Information"
+      width="600"
+      ok-text="Ok"
+      cancel-text="Cancel"
+    >
       <Tabs>
         <TabPane label="Information" name="metadata" icon="md-home">
           <div style>
@@ -284,14 +300,38 @@
             </div>
           </div>
         </TabPane>
-        <TabPane label="UDX Schema" name="udx" icon="md-browsers">
+        <!-- <TabPane label="UDX Schema" name="udx" icon="md-browsers">
           <pre class="brush: html"></pre>
           <template>...</template>
-        </TabPane>
+        </TabPane>-->
       </Tabs>
       <br />
-      <Button style="margin-right:20px" @click="dataPreview(selectData)">Preview</Button>
-      <Button style="margin-right:20px" @click="dataVisualize">Visualization</Button>
+      <!-- <Button style="margin-right:20px" @click="dataPreview(selectData)">Preview</Button>
+      <Button style="margin-right:20px" @click="dataVisualize">Visualization</Button>-->
+    </Modal>
+    <Modal
+      width="800px"
+      v-model="inheritResModal"
+      title="Get resources from previous activities"
+      :styles="{top: '20px'}"
+      @on-ok="saveResources()"
+      ok-text="Save"
+      cancel-text="Cancel"
+    >
+      <div style="margin-left:75px">
+        <div style="font-size:14px">Select the needed data:</div>
+        <Transfer
+          :data="existingResources"
+          :target-keys="targetKeys"
+          :list-style="listStyle"
+          :render-format="resourceRender"
+          :titles="['The previous activities', 'The new activity']"
+          filter-placeholder="Enter key words..."
+          filterable
+          :filter-method="filterMethod"
+          @on-change="handleChange"
+        ></Transfer>
+      </div>
     </Modal>
     <Modal v-model="dataUploadModal" title="Upload data" width="600">
       <Form
@@ -388,6 +428,13 @@ export default {
       },
       userInfo: this.$store.getters.userInfo,
       resouceModel: "resources",
+      //资源继承
+      preActivities: [],
+      existingResources: [],
+      targetKeys: [],
+      inheritResModal: false,
+      listStyle: { width: "280px", height: "375px" },
+      // 上传资源
       dataUploadModal: false,
       uploadDataInfo: {
         privacy: "private",
@@ -531,11 +578,21 @@ export default {
         this.projectInfo.permissionManager != undefined &&
         operation === "workspace_resource"
       ) {
-        if (
-          this.userRole == "PManager" &&
-          this.projectInfo.permissionManager.workspace_resource.project_manager
-        ) {
-          return true;
+        if (this.userRole == "PManager") {
+          if (
+            this.projectInfo.permissionManager.workspace_resource
+              .project_manager === "Yes"
+          ) {
+            return true;
+          } else if (
+            this.projectInfo.permissionManager.workspace_resource
+              .project_manager === "Yes, partly" &&
+            resource.uploaderId === this.userInfo.userId
+          ) {
+            return true;
+          } else {
+            return false;
+          }
         } else if (
           this.userRole == "Manager" &&
           this.projectInfo.permissionManager.workspace_resource
@@ -554,7 +611,11 @@ export default {
             resource.uploaderId === this.userInfo.userId
           ) {
             return true;
+          } else {
+            return false;
           }
+        } else {
+          return false;
         }
       }
     },
@@ -993,6 +1054,164 @@ export default {
         });
         return false;
       }
+    },
+    getPreviousRes() {
+      // 获取可继承的资源
+      this.getPreActivities();
+      this.inheritResModal = true;
+    },
+    getPreActivities() {
+      this.preActivities = [];
+      let processStructure = [];
+
+      // get solving process
+      if (
+        this.projectInfo.solvingProcess == null ||
+        this.projectInfo.solvingProcess == undefined ||
+        JSON.parse(this.projectInfo.solvingProcess).length == 0
+      ) {
+        if (this.stepInfo.subProjectId != "") {
+          $.ajax({
+            url:
+              "/GeoProblemSolving/subProject/inquiry" +
+              "?key=subProjectId" +
+              "&value=" +
+              this.stepInfo.subProjectId,
+            type: "GET",
+            async: false,
+            success: data => {
+              if (data == "Offline") {
+                this.$store.commit("userLogout");
+                this.$router.push({ name: "Login" });
+              } else if (data != "None" && data != "Fail") {
+                let subprojectInfo = data[0];
+                processStructure = JSON.parse(subprojectInfo.solvingProcess);
+              } else {
+                console.log(data);
+              }
+            },
+            error: function(err) {
+              console.log("Get manager name fail.");
+            }
+          });
+        }
+      } else {
+        processStructure = JSON.parse(this.projectInfo.solvingProcess);
+      }
+
+      for (var i = 0; i < processStructure.length; i++) {
+        if (processStructure[i].stepID == this.stepInfo.stepId) {
+          let last = processStructure[i].last;
+          if (last.length > 0) {
+            for (var j = 0; j < last.length; j++) {
+              this.preActivities.push(processStructure[last[j].id]);
+            }
+            this.getInheritResource();
+          }
+        }
+      }
+    },
+    getInheritResource() {
+      this.existingResources = this.getMockData();
+    },
+    getMockData() {
+      let mockData = [];
+      let selectedRes = [];
+
+      // 前驱步骤的资源
+      for (var i = 0; i < this.preActivities.length; i++) {
+        let selectedStepId = this.preActivities[i].stepID;
+        let selectedStepName = this.preActivities[i].name;
+        let getResUrl =
+          "/GeoProblemSolving/folder/findByFileType?" +
+          "scopeId=" +
+          selectedStepId +
+          "&type=all";
+
+        $.ajax({
+          url: getResUrl,
+          type: "GET",
+          async: false,
+          success: function(data) {
+            if (data !== "Fail") {
+              selectedRes = data;
+              for (var j = 0; j < selectedRes.length; j++) {
+                mockData.push({
+                  key: mockData.length.toString(),
+                  name: selectedRes[j].name,
+                  type: selectedRes[j].type,
+                  resourceId: selectedRes[j].resourceId,
+                  source: selectedStepName
+                });
+              }
+            } else {
+              selectedRes = [];
+            }
+          },
+          error: function(err) {
+            selectedRes = [];
+            console.log("err!");
+          }
+        });
+      }
+      return mockData;
+    },
+    getTargetKeys() {
+      let mockData = [];
+      if (this.existingResources.length > 0) {
+        for (var i = 0; i < this.targetKeys.length; i++) {
+          mockData.push({
+            key: this.targetKeys[i],
+            name: this.existingResources[this.targetKeys[i]].name,
+            type: this.existingResources[this.targetKeys[i]].type,
+            resourceId: this.existingResources[this.targetKeys[i]].resourceId,
+            source: this.existingResources[this.targetKeys[i]].source
+          });
+        }
+      }
+      return mockData;
+    },
+    handleChange(newTargetKeys) {
+      this.targetKeys = newTargetKeys;
+    },
+    resourceRender(item) {
+      // return item.type + " - " + item.name;
+      return `<span title="${item.type} - ${item.source}">${item.name}</span>`;
+    },
+    filterMethod(data, query) {
+      return data.type.indexOf(query) > -1;
+    },
+    saveResources() {
+      let selectResource = this.getTargetKeys();
+      let addFileList = [];
+      for (var i = 0; i < selectResource.length; i++) {
+        addFileList.push(selectResource[i].resourceId);
+      }
+      let addFileListStr = addFileList.toString();
+
+      this.axios
+        .get(
+          "/GeoProblemSolving/folder/shareToFolder" +
+            "?addFileList=" +
+            addFileListStr +
+            "&folderId=" +
+            this.stepInfo.stepId
+        )
+        .then(res => {
+          if (res.data == "Offline") {
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
+          } else if (res.data == "Fail") {
+            this.$Message.error(
+              "Failed to get resources from previous activities."
+            );
+          } else {
+            this.getResList();
+          }
+        })
+        .catch(err => {
+          // console.log(err.data);
+        });
     },
     dataVisualize() {}
   }

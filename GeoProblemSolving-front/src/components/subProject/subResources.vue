@@ -30,7 +30,9 @@ export default {
     };
   },
   beforeDestroy() {
-    this.panel.close();
+    if (this.panel != null) {
+      this.panel.close();
+    }
   },
   mounted() {},
   methods: {

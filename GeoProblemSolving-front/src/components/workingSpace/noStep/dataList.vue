@@ -515,11 +515,21 @@ export default {
         this.projectInfo.permissionManager != undefined &&
         operation === "workspace_resource"
       ) {
-        if (
-          this.userRole == "PManager" &&
-          this.projectInfo.permissionManager.workspace_resource.project_manager
-        ) {
-          return true;
+        if (this.userRole == "PManager") {
+          if (
+            this.projectInfo.permissionManager.workspace_resource
+              .project_manager === "Yes"
+          ) {
+            return true;
+          } else if (
+            this.projectInfo.permissionManager.workspace_resource
+              .project_manager === "Yes, partly" &&
+            resource.uploaderId === this.userInfo.userId
+          ) {
+            return true;
+          } else {
+            return false;
+          }
         } else if (
           this.userRole == "Manager" &&
           this.projectInfo.permissionManager.workspace_resource
@@ -538,7 +548,11 @@ export default {
             resource.uploaderId === this.userInfo.userId
           ) {
             return true;
+          } else {
+            return false;
           }
+        } else {
+          return false;
         }
       }
     },
