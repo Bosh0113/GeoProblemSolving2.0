@@ -2,7 +2,7 @@
 </style>
 <template>
   <span class="stepChange">
-    <Button @click="getProcessSteps()" style="margin-left:20px;" size="small">Switch step</Button>
+    <Button @click="getProcessSteps()" style="margin-left:20px;" size="small">Switch activity</Button>
     <Modal
       width="800"
       v-model="stepChanged"
@@ -240,21 +240,21 @@ export default {
           }
           case 2: {
             this.$router.push({
-              name: "modelProcessP",
+              name: "visualizationP",
               params: { stepId: stepId }
             });
             break;
           }
           case 3: {
             this.$router.push({
-              name: "modelEvaluationP",
+              name: "modelBuildP",
               params: { stepId: stepId }
             });
             break;
           }
           case 4: {
             this.$router.push({
-              name: "analysisP",
+              name: "modelEvaluationP",
               params: { stepId: stepId }
             });
             break;
@@ -268,7 +268,7 @@ export default {
           }
           case 6: {
             this.$router.push({
-              name: "visualizationP",
+              name: "analysisP",
               params: { stepId: stepId }
             });
             break;

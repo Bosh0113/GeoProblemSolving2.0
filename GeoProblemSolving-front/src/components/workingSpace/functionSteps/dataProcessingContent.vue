@@ -7,7 +7,7 @@
         Resource list
         <data-list slot="content" :stepInfo="stepInfo" :userRole="userRole" :projectInfo="projectInfo" @dataBehavior="listenDatalist"></data-list>
       </Panel>
-      <Panel name="tool" v-show="stepInfo.activeStatus">
+      <Panel name="tool">
         Toolbox
         <tool-container slot="content" :stepInfo="stepInfo" :userRole="userRole" :projectInfo="projectInfo" @toolBehavior="listenToolbox" @toolPanel="listenToolPanel"></tool-container>
       </Panel>

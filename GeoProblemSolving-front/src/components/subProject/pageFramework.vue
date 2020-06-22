@@ -44,6 +44,7 @@
         <div style="padding:15px;">
           <h2 style="display:inline-block">Title:</h2>
           <Button
+            v-if="userRole != 'Visitor'"
             style="float:right;"
             class="btnHoverBlue"
             icon="ios-create"
@@ -272,39 +273,34 @@ export default {
       }
     },
     getProjectInfo() {
-      let projectInfo = this.$store.getters.project;
-      if (
-        JSON.stringify(projectInfo) != "{}" &&
-        projectInfo.projectId == this.subProjectInfo.projectId
-      ) {
-        this.projectInfo = projectInfo;
-      } else {
-        $.ajax({
-          url:
-            "/GeoProblemSolving/project/inquiry" +
-            "?key=projectId" +
-            "&value=" +
-            this.subProjectInfo.projectId,
-          type: "GET",
-          async: false,
-          success: data => {
-            if (data == "Offline") {
-              this.$store.commit("userLogout");
-              this.$router.push({ name: "Login" });
-            } else if (data != "None" && data != "Fail") {
-              this.projectInfo = data[0];
-              this.$store.commit("setProjectInfo", data[0]);
-            } else {
-              console.log(data);
-            }
+      $.ajax({
+        url:
+          "/GeoProblemSolving/project/inquiry" +
+          "?key=projectId" +
+          "&value=" +
+          this.subProjectInfo.projectId,
+        type: "GET",
+        async: false,
+        success: data => {
+          if (data == "Offline") {
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
+          } else if (data != "None" && data != "Fail") {
+            this.projectInfo = data[0];
+            this.$store.commit("setProjectInfo", data[0]);
+          } else {
+            console.log(data);
           }
-        });
-      }
+        }
+      });
     },
     getParticipants() {
       let members = this.subProjectInfo.members;
       let membersList = members;
-      if(members.length<1||members[0].userId!=this.subProjectInfo["managerId"]){
+      if (
+        members.length < 1 ||
+        members[0].userId != this.subProjectInfo["managerId"]
+      ) {
         let manager = [
           {
             userId: this.subProjectInfo["managerId"],

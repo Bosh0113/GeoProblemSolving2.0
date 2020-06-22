@@ -1462,9 +1462,9 @@
                             visitor: null
                         },
                         workspace_resource: {
-                            project_manager: true,
+                            project_manager: "Yes",
                             subproject_manager: true,
-                            member: true,
+                            member: "Yes, partly",
                             visitor: null
                         },
                         workspace_tool: {
@@ -1718,7 +1718,7 @@
                             visitor: null
                         },
                         workspace_resource: {
-                            project_manager: true,
+                            project_manager: "Yes, partly",
                             subproject_manager: true,
                             member: "Yes, partly",
                             visitor: null
@@ -2265,7 +2265,7 @@
                                 window.location.href = "/GeoProblemSolving/login"
                             } else if (res.data != "Fail") {
                                 // sessionStorage.setItem("projectInfo", JSON.stringify(res.data));
-                                sessionStorage.setItem("projectInfo", this.encrypto(res.data));
+                                // sessionStorage.setItem("projectInfo", this.encrypto(res.data));
                                 this.projectInfo = res.data;
                             } else {
                                 this.$Message.error("Set type failed.");
@@ -2705,22 +2705,22 @@
                     $(".jsPanel").css("position", "fixed");
                     this.workPanels.push(panel);
                 },
-                encrypto(context) {
-                    var key = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
-                    var iv = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
-                    var encrypted = "";
-                    if (typeof context == "string") {
-                    } else if (typeof context == "object") {
-                        context = JSON.stringify(context);
-                    }
-                    var srcs = CryptoJS.enc.Utf8.parse(context);
-                    encrypted = CryptoJS.AES.encrypt(srcs, key, {
-                        iv: iv,
-                        mode: CryptoJS.mode.CBC,
-                        padding: CryptoJS.pad.Pkcs7
-                    });
-                    return encrypted.toString();
-                },
+                // encrypto(context) {
+                //     var key = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
+                //     var iv = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
+                //     var encrypted = "";
+                //     if (typeof context == "string") {
+                //     } else if (typeof context == "object") {
+                //         context = JSON.stringify(context);
+                //     }
+                //     var srcs = CryptoJS.enc.Utf8.parse(context);
+                //     encrypted = CryptoJS.AES.encrypt(srcs, key, {
+                //         iv: iv,
+                //         mode: CryptoJS.mode.CBC,
+                //         padding: CryptoJS.pad.Pkcs7
+                //     });
+                //     return encrypted.toString();
+                // },
             }
         }
     );

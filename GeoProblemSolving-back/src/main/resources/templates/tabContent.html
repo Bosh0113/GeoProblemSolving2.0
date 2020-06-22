@@ -226,7 +226,7 @@
                 projectInfoModalShow(projectInfo) {
                     if (projectInfo.isMember || projectInfo.isManager) {
                         // window.sessionStorage.setItem("projectInfo",JSON.stringify(projectInfo));
-                        window.sessionStorage.setItem("projectInfo", this.encrypto(projectInfo));
+                        // window.sessionStorage.setItem("projectInfo", this.encrypto(projectInfo));
                         window.location.href="/GeoProblemSolving/projectDetail/"+projectInfo.projectId;
                     } else {
                         this.selectedProjectInfo = Object.assign({}, projectInfo);
@@ -413,26 +413,26 @@
                 enterProject(projectInfo) {
                     // window.sessionStorage.setItem("projectInfo",JSON.stringify(projectInfo));
                     if(this.applyProjectInfo.permissionManager == undefined || this.applyProjectInfo.permissionManager.observe.visitor != "No") {
-                        window.sessionStorage.setItem("projectInfo", this.encrypto(projectInfo));
+                        // window.sessionStorage.setItem("projectInfo", this.encrypto(projectInfo));
                         window.location.href="/GeoProblemSolving/projectDetail/"+projectInfo.projectId;
                     }
                 },
-                encrypto(context) {
-                    var key = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
-                    var iv = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
-                    var encrypted = "";
-                    if (typeof context == "string") {
-                    } else if (typeof context == "object") {
-                        context = JSON.stringify(context);
-                    }
-                    var srcs = CryptoJS.enc.Utf8.parse(context);
-                    encrypted = CryptoJS.AES.encrypt(srcs, key, {
-                        iv: iv,
-                        mode: CryptoJS.mode.CBC,
-                        padding: CryptoJS.pad.Pkcs7
-                    });
-                    return encrypted.toString();
-                }
+                // encrypto(context) {
+                //     var key = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
+                //     var iv = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
+                //     var encrypted = "";
+                //     if (typeof context == "string") {
+                //     } else if (typeof context == "object") {
+                //         context = JSON.stringify(context);
+                //     }
+                //     var srcs = CryptoJS.enc.Utf8.parse(context);
+                //     encrypted = CryptoJS.AES.encrypt(srcs, key, {
+                //         iv: iv,
+                //         mode: CryptoJS.mode.CBC,
+                //         padding: CryptoJS.pad.Pkcs7
+                //     });
+                //     return encrypted.toString();
+                // }
             }
         });
 

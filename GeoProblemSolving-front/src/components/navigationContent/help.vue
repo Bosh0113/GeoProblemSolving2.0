@@ -35,10 +35,10 @@ export default {
         "Personal projects",
         "Notifications center",
         "Project detail page",
-        "Project's resources",
-        "Project's subprojects",
-        "Subproject's detail page",
-        "Subproject's tasks"
+        "Project resources",
+        "Project subprojects",
+        "Subproject detail page",
+        "Subproject tasks"
       ]
     };
   },
