@@ -186,40 +186,42 @@ public class ProjectDaoImpl implements IProjectDao {
             ProjectEntity projectEntity = mongoTemplate.findOne(query, ProjectEntity.class);
             try {
                 String newTitle = request.getParameter("title");
+                if(newTitle!=null){
 
-                Query queryManager = Query.query(Criteria.where("userId").is(projectEntity.getManagerId()));
-                UserEntity manager = mongoTemplate.findOne(queryManager,UserEntity.class);
-                JSONArray manageProjects = manager.getManageProjects();
-                for (int i=0;i<manageProjects.size();i++){
-                    JSONObject manageProject = manageProjects.getJSONObject(i);
-                    if(manageProject.getString("projectId").equals(projectId)){
-                        manageProject.put("title",newTitle);
-                        manageProjects.remove(i);
-                        manageProjects.add(i,manageProject);
-                        Update updateUser = new Update();
-                        updateUser.set("manageProjects",manageProjects);
-                        mongoTemplate.updateFirst(queryManager,updateUser,UserEntity.class);
-                        break;
-                    }
-                }
-
-                JSONArray members = projectEntity.getMembers();
-                for (int i=0;i<members.size();i++){
-                    JSONObject member = members.getJSONObject(i);
-                    String memberId = member.getString("userId");
-                    Query queryUser = Query.query(Criteria.where("userId").is(memberId));
-                    UserEntity memberObject = mongoTemplate.findOne(queryUser,UserEntity.class);
-                    JSONArray joinedProjects = memberObject.getJoinedProjects();
-                    for (int j=0;j<joinedProjects.size();j++){
-                        JSONObject joinedProject = joinedProjects.getJSONObject(j);
-                        if (joinedProject.getString("projectId").equals(projectId)){
-                            joinedProject.put("title",newTitle);
-                            joinedProjects.remove(j);
-                            joinedProjects.add(j,joinedProject);
+                    Query queryManager = Query.query(Criteria.where("userId").is(projectEntity.getManagerId()));
+                    UserEntity manager = mongoTemplate.findOne(queryManager,UserEntity.class);
+                    JSONArray manageProjects = manager.getManageProjects();
+                    for (int i=0;i<manageProjects.size();i++){
+                        JSONObject manageProject = manageProjects.getJSONObject(i);
+                        if(manageProject.getString("projectId").equals(projectId)){
+                            manageProject.put("title",newTitle);
+                            manageProjects.remove(i);
+                            manageProjects.add(i,manageProject);
                             Update updateUser = new Update();
-                            updateUser.set("joinedProjects",joinedProjects);
-                            mongoTemplate.updateFirst(queryUser,updateUser,UserEntity.class);
+                            updateUser.set("manageProjects",manageProjects);
+                            mongoTemplate.updateFirst(queryManager,updateUser,UserEntity.class);
                             break;
+                        }
+                    }
+
+                    JSONArray members = projectEntity.getMembers();
+                    for (int i=0;i<members.size();i++){
+                        JSONObject member = members.getJSONObject(i);
+                        String memberId = member.getString("userId");
+                        Query queryUser = Query.query(Criteria.where("userId").is(memberId));
+                        UserEntity memberObject = mongoTemplate.findOne(queryUser,UserEntity.class);
+                        JSONArray joinedProjects = memberObject.getJoinedProjects();
+                        for (int j=0;j<joinedProjects.size();j++){
+                            JSONObject joinedProject = joinedProjects.getJSONObject(j);
+                            if (joinedProject.getString("projectId").equals(projectId)){
+                                joinedProject.put("title",newTitle);
+                                joinedProjects.remove(j);
+                                joinedProjects.add(j,joinedProject);
+                                Update updateUser = new Update();
+                                updateUser.set("joinedProjects",joinedProjects);
+                                mongoTemplate.updateFirst(queryUser,updateUser,UserEntity.class);
+                                break;
+                            }
                         }
                     }
                 }
