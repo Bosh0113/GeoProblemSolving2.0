@@ -1,8 +1,8 @@
 package cn.edu.njnu.geoproblemsolving.Dto;
 
-import cn.edu.njnu.geoproblemsolving.Entity.ModelTools.CModel.support.BaseEntity;
 import cn.edu.njnu.geoproblemsolving.Exception.MyException;
 import cn.edu.njnu.geoproblemsolving.Utils.CopyUtils;
+import cn.edu.njnu.geoproblemsolving.domain.support.BaseEntity;
 import cn.hutool.core.util.ReflectUtil;
 
 import java.lang.annotation.Annotation;
@@ -15,9 +15,8 @@ import java.lang.reflect.Method;
  * @Version 1.0.0
  */
 public interface ToDomainConverter<DOMAIN> {
-    String BEFORE_UPDATE="cn.edu.njnu.geoproblemsolving.Entity.ModelTools.CModel.support.BeforeUpdate";
-    String BEFORE_INSERT="cn.edu.njnu.geoproblemsolving.Entity.ModelTools.CModel.support.BeforeInsert";
-
+    String BEFORE_UPDATE="cn.edu.njnu.geoproblemsolving.domain.support.BeforeUpdate";
+    String BEFORE_INSERT="cn.edu.njnu.geoproblemsolving.domain.support.BeforeInsert";
     /**
      * 调用的情形为：将DTO转化为Domain，再将Domain插入到数据库中
      * @param domain

@@ -1,6 +1,6 @@
 package cn.edu.njnu.geoproblemsolving.Entity.ModelTools.CModel;
 
-import cn.edu.njnu.geoproblemsolving.Entity.ModelTools.CModel.support.TaskData;
+import cn.edu.njnu.geoproblemsolving.domain.support.TaskData;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.data.annotation.Id;

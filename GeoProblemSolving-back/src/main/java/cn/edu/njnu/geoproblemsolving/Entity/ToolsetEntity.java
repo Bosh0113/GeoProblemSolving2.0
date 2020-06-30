@@ -1,7 +1,6 @@
 package cn.edu.njnu.geoproblemsolving.Entity;
 
-import cn.edu.njnu.geoproblemsolving.domain.tool.ToolEntity;
-import com.alibaba.fastjson.JSONArray;
+import cn.edu.njnu.geoproblemsolving.domain.tool.Tool;
 import lombok.Data;
 import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.ArrayList;
@@ -11,7 +10,7 @@ import java.util.ArrayList;
 public class ToolsetEntity {
     private String tsId;
     private String toolsetName;
-    private ArrayList<ToolEntity> toolList; // 创建的时候不添加toolList，在toolCollection页面添加，或者创建tool 选择 toolset时，自动添加
+    private ArrayList<Tool> toolList; // 创建的时候不添加toolList，在toolCollection页面添加，或者创建tool 选择 toolset时，自动添加
     private ArrayList<String> categoryTag;
     private ArrayList<String> recomStep; // step类型 or general
     private String description;
@@ -36,7 +35,7 @@ public class ToolsetEntity {
         return toolsetName;
     }
 
-    public void setToolList(ArrayList<ToolEntity> toolList) {
+    public void setToolList(ArrayList<Tool> toolList) {
         this.toolList = toolList;
     }
 
@@ -72,7 +71,7 @@ public class ToolsetEntity {
         this.toolsetName = toolsetName;
     }
 
-    public ArrayList<ToolEntity> getToolList() {
+    public ArrayList<Tool> getToolList() {
         return toolList;
     }
 

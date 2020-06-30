@@ -2,8 +2,8 @@ package cn.edu.njnu.geoproblemsolving.domain.tool;
 
 import cn.edu.njnu.geoproblemsolving.Enums.ResultEnum;
 import cn.edu.njnu.geoproblemsolving.Exception.MyException;
-import cn.edu.njnu.geoproblemsolving.domain.tool.dto.AddToolEntityDTO;
-import cn.edu.njnu.geoproblemsolving.domain.tool.dto.UpdateToolEntityDTO;
+import cn.edu.njnu.geoproblemsolving.domain.tool.dto.AddToolDTO;
+import cn.edu.njnu.geoproblemsolving.domain.tool.dto.UpdateToolDTO;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -37,38 +37,38 @@ public class ToolService  {
     @Autowired
     private MongoTemplate mongoTemplate;
 
-    public ToolEntity createTool(AddToolEntityDTO add) {
+    public Tool createTool(AddToolDTO add) {
         toolRepository.findFirstByToolName(add.getToolName()).ifPresent((el)->{
             throw new MyException(ResultEnum.EXISTS_OBJECT);
         });
-        ToolEntity toolEntity = new ToolEntity();
+        Tool tool = new Tool();
         String tid = UUID.randomUUID().toString();
         add.setTid(tid);
-        add.convertTo(toolEntity);
-        return toolRepository.insert(toolEntity);
+        add.convertTo(tool);
+        return toolRepository.insert(tool);
     }
 
     public void deleteByTid(String tid) {
         toolRepository.deleteById(tid);
     }
 
-    public List<ToolEntity> findAllByProvider(String provider) {
+    public List<Tool> findAllByProvider(String provider) {
         return toolRepository.findAllByProvider(provider);
     }
 
-    public Object updateTool(String tid,UpdateToolEntityDTO update) {
-        ToolEntity toolEntity = toolRepository.findFirstByTid(tid).orElseThrow(MyException::noObject);
-        update.updateTo(toolEntity);
-        return toolRepository.save(toolEntity);
+    public Object updateTool(String tid, UpdateToolDTO update) {
+        Tool tool = toolRepository.findFirstByTid(tid).orElseThrow(MyException::noObject);
+        update.updateTo(tool);
+        return toolRepository.save(tool);
     }
 
-    public List<ToolEntity> readTool(String key, String value) {
+    public List<Tool> readTool(String key, String value) {
         Query query = Query.query(Criteria.where(key).is(value));
-        if (mongoTemplate.find(query, ToolEntity.class).isEmpty()) {
+        if (mongoTemplate.find(query, Tool.class).isEmpty()) {
             return Collections.emptyList();
         } else {
-            List<ToolEntity> ToolEntities = mongoTemplate.find(query, ToolEntity.class);
-            return ToolEntities;
+            List<Tool> tools = mongoTemplate.find(query, Tool.class);
+            return tools;
         }
     }
 

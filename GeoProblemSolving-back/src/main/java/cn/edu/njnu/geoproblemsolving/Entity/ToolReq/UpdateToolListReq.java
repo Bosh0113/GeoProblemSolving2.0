@@ -1,19 +1,19 @@
 package cn.edu.njnu.geoproblemsolving.Entity.ToolReq;
 
 
-import cn.edu.njnu.geoproblemsolving.domain.tool.ToolEntity;
+import cn.edu.njnu.geoproblemsolving.domain.tool.Tool;
 
 import java.util.ArrayList;
 
 public class UpdateToolListReq {
-    private ArrayList<ToolEntity> newToolList;
+    private ArrayList<Tool> newToolList;
     private String tsId;
 
     public void setTsId(String tsId) {
         this.tsId = tsId;
     }
 
-    public ArrayList<ToolEntity> getNewToolList() {
+    public ArrayList<Tool> getNewToolList() {
         return newToolList;
     }
 
@@ -21,7 +21,7 @@ public class UpdateToolListReq {
         return tsId;
     }
 
-    public void setNewToolList(ArrayList<ToolEntity> newToolList) {
+    public void setNewToolList(ArrayList<Tool> newToolList) {
         this.newToolList = newToolList;
     }
 }

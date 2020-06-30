@@ -1,6 +1,6 @@
 package cn.edu.njnu.geoproblemsolving.domain.modeltask;
 
-import cn.edu.njnu.geoproblemsolving.Entity.ModelTools.CModel.support.JsonResult;
+import cn.edu.njnu.geoproblemsolving.domain.support.JsonResult;
 import cn.edu.njnu.geoproblemsolving.Utils.ResultUtils;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.io.FileUtils;

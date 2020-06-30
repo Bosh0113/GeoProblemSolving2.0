@@ -3,7 +3,7 @@ package cn.edu.njnu.geoproblemsolving.Dao.Tool_related;
 import cn.edu.njnu.geoproblemsolving.Dao.Method.CommonMethod;
 import cn.edu.njnu.geoproblemsolving.Entity.ToolReq.UpdateToolListReq;
 import cn.edu.njnu.geoproblemsolving.Entity.ToolsetEntity;
-import cn.edu.njnu.geoproblemsolving.domain.tool.ToolEntity;
+import cn.edu.njnu.geoproblemsolving.domain.tool.Tool;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -104,7 +104,7 @@ public class ToolsetDaoImpl implements IToolsetDao {
     public String updateToolList(UpdateToolListReq updateToolListReq){
         try {
             Query query = new Query(Criteria.where("tsId").is(updateToolListReq.getTsId()));
-            ArrayList<ToolEntity> toolList = updateToolListReq.getNewToolList();
+            ArrayList<Tool> toolList = updateToolListReq.getNewToolList();
             Update update = new Update();
             update.set("toolList",toolList);
             mongoTemplate.updateFirst(query,update,ToolsetEntity.class);
@@ -190,12 +190,12 @@ public class ToolsetDaoImpl implements IToolsetDao {
     }
 
     @Override
-    public String addToolToToolset(ToolEntity newTool,String[] tsIds){
+    public String addToolToToolset(Tool newTool, String[] tsIds){
         try {
             for(String tsId:tsIds){
                 Query query = new Query(Criteria.where("tsId").is(tsId));
                 ToolsetEntity toolset = mongoTemplate.findOne(query,ToolsetEntity.class);
-                ArrayList<ToolEntity> tools = toolset.getToolList();
+                ArrayList<Tool> tools = toolset.getToolList();
                 tools.add(newTool);
                 Update update = new Update();
                 update.set("toolList",tools);

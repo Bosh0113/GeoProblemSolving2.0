@@ -1,6 +1,6 @@
 package cn.edu.njnu.geoproblemsolving.Entity.ModelTools.CModel;
 
-import cn.edu.njnu.geoproblemsolving.Entity.ModelTools.CModel.support.AuthorInfo;
+import cn.edu.njnu.geoproblemsolving.domain.support.AuthorInfo;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;

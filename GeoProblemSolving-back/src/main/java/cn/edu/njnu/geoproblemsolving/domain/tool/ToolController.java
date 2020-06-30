@@ -1,9 +1,9 @@
 package cn.edu.njnu.geoproblemsolving.domain.tool;
 
-import cn.edu.njnu.geoproblemsolving.Entity.ModelTools.CModel.support.JsonResult;
+import cn.edu.njnu.geoproblemsolving.domain.support.JsonResult;
 import cn.edu.njnu.geoproblemsolving.Utils.ResultUtils;
-import cn.edu.njnu.geoproblemsolving.domain.tool.dto.AddToolEntityDTO;
-import cn.edu.njnu.geoproblemsolving.domain.tool.dto.UpdateToolEntityDTO;
+import cn.edu.njnu.geoproblemsolving.domain.tool.dto.AddToolDTO;
+import cn.edu.njnu.geoproblemsolving.domain.tool.dto.UpdateToolDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +22,7 @@ public class ToolController {
     MongoTemplate mongoTemplate;
 
     @RequestMapping(value = "/create", produces = {"application/json;charset=UTF-8"},method = RequestMethod.POST)
-    public JsonResult createTool(@RequestBody AddToolEntityDTO add){
+    public JsonResult createTool(@RequestBody AddToolDTO add){
       return ResultUtils.success(toolService.createTool(add));
     }
 
@@ -34,7 +34,7 @@ public class ToolController {
     }
 
     @RequestMapping(value = "/update/{tid}", produces = {"application/json;charset=UTF-8"},method = RequestMethod.POST)
-    public JsonResult updateTool(@PathVariable("tid") String tid,@RequestBody UpdateToolEntityDTO updateToolEntityDTO){
+    public JsonResult updateTool(@PathVariable("tid") String tid,@RequestBody UpdateToolDTO updateToolEntityDTO){
         return ResultUtils.success(toolService.updateTool(tid,updateToolEntityDTO));
     }
 
@@ -42,7 +42,6 @@ public class ToolController {
     public JsonResult uploadPicture(HttpServletRequest request) {
         return ResultUtils.success(toolService.uploadPicture(request));
     }
-
 
     @RequestMapping(value = "/inquiry", method = RequestMethod.GET)
     public Object readTool(@RequestParam("key") String key,@RequestParam("value") String value){

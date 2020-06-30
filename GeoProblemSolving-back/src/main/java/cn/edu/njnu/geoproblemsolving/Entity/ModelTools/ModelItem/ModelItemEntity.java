@@ -1,7 +1,7 @@
 package cn.edu.njnu.geoproblemsolving.Entity.ModelTools.ModelItem;
 
 
-import cn.edu.njnu.geoproblemsolving.Entity.ModelTools.CModel.support.BaseEntity;
+import cn.edu.njnu.geoproblemsolving.domain.support.BaseEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.ModelTools.ModelItem.Support.State;
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -1,6 +1,6 @@
 package cn.edu.njnu.geoproblemsolving.Exception;
 
-import cn.edu.njnu.geoproblemsolving.Entity.ModelTools.CModel.support.JsonResult;
+import cn.edu.njnu.geoproblemsolving.domain.support.JsonResult;
 import cn.edu.njnu.geoproblemsolving.Utils.ResultUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

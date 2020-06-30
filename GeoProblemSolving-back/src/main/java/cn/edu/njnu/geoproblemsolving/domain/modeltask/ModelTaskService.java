@@ -32,17 +32,11 @@ public class ModelTaskService {
 //    @Autowired
 //    ModelItemDao modelItemDao;
 
-    @Value("${managerServerIpAndPort}")
-    private String managerServer;
+//    @Value("${managerServerIpAndPort}")
+//    private String managerServer;
 
     @Value("${managerServerIpAndPort}")
     private String managerServerIpAndPort;
-
-    @Value("${openGMSIpAndPort}")
-    private String openGMSIpAndPort;
-
-    @Value("${resourcePath}")
-    private String resourcePath;
 
     @Resource
     private MongoTemplate mongoTemplate;
@@ -174,7 +168,7 @@ public class ModelTaskService {
 
         form.add("serverNode", "china");
         form.add("userId", "2");
-        form.add("name", "zzyTest");
+        form.add("name", "");
         form.add("origination","GeoProblemSolving");
 
         String urlStr = "http://111.229.14.128:8899/data";

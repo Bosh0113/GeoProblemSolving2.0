@@ -5,7 +5,7 @@ import cn.edu.njnu.geoproblemsolving.Entity.Folder.FolderEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.StepEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.SubProjectEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.ToolsetEntity;
-import cn.edu.njnu.geoproblemsolving.domain.tool.ToolEntity;
+import cn.edu.njnu.geoproblemsolving.domain.tool.Tool;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,9 +64,9 @@ public class StepDaoImpl implements IStepDao {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         step.setCreateTime(dateFormat.format(date));
         Query queryPublic = new Query(Criteria.where("privacy").is("Public"));
-        List<ToolEntity> toolEntities = mongoTemplate.find(queryPublic, ToolEntity.class);
+        List<Tool> toolEntities = mongoTemplate.find(queryPublic, Tool.class);
         ArrayList<String> toolStrs = new ArrayList<>();
-        for (ToolEntity toolEntity:toolEntities){
+        for (Tool toolEntity:toolEntities){
             toolStrs.add(toolEntity.getTid());
         }
         step.setToolList(toolStrs);

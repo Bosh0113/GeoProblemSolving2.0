@@ -72,7 +72,8 @@ const routes = [{
   ]
 },
 { path: '/projectTypeContent/:projectId', name: 'projectTypeContent', component: resolve => (require(["@/components/projects/toWork"], resolve)) },
-{ path: '/chat', name: 'chatUtil', component: resolve => (require(["@/components/utils/chatroom"], resolve)) },
+{ path: '/chat', name: 'chatUtil', component: resolve => (require(["@/components/utils/chatroom/chatroom"], resolve)) },
+{ path: '/test', name: 'chatUtil', component: resolve => (require(["@/components/utils/chatroom/components/ts"], resolve)) },
 { path: '/draw', name: 'drawUtil', component: resolve => (require(["@/components/utils/drawBoard"], resolve)) },
 { path: '/map', name: 'mapTool', component: resolve => (require(["@/components/utils/mapTool"], resolve)) },
 { path: '/lineChart', name: 'lineChart', component: resolve => (require(["@/components/utils/charts/lineChart"], resolve)) },
@@ -91,7 +92,7 @@ const routes = [{
 { path: '/abseir', name: 'abSeir', component: resolve => (require(["@/components/utils/ABM-SEIR"], resolve)) },
 { path: '/tinymce', name: 'tinymce', component: resolve => (require(["@/components/utils/singleUtils/tinymce"], resolve)) },
 { path: '/modelItem/:doi', name: 'Model', component: resolve => (require(["@/components/model/Model"], resolve)) },
-{ path: '/toolShow', name: 'toolTemplate', component: resolve => (require(["@/components/tools/toolPreview"], resolve)) },
+{ path: '/toolShow', name: 'toolTemplate', component: resolve => (require(["@/components/common/tools/toolPreview"], resolve)) },
 ]
 
 export default new Router({

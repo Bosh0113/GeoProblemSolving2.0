@@ -106,7 +106,6 @@ export default {
 
   created() {
     this.getAllRecords();
-    console.log(window.location.href);
   },
 
   components: {

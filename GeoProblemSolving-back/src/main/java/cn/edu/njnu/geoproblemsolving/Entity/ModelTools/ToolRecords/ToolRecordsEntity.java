@@ -1,14 +1,8 @@
 package cn.edu.njnu.geoproblemsolving.Entity.ModelTools.ToolRecords;
 
-import cn.edu.njnu.geoproblemsolving.Entity.ModelTools.CModel.support.TaskData;
-import cn.edu.njnu.geoproblemsolving.Entity.ModelTools.ModelItem.ModelItemEntity;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.web.bind.annotation.RequestBody;
-
-import java.util.Date;
-import java.util.List;
 
 /**
  * @ClassName ToolRecordsEntity

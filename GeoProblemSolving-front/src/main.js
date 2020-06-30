@@ -15,10 +15,7 @@ import store from './store/store.js'
 //引入index.js文件夹
 // import './mock/index'
 import * as socketApi from './api/socket'
-// import VCharts from 'v-charts';
 
-//set globe CSS
-// import './assets/css/style.css'
 
 
 import ElementUI from "element-ui";

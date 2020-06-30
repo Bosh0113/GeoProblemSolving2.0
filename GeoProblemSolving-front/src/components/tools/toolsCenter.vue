@@ -132,14 +132,15 @@
   background-color: rgba(247, 241, 241, 0.938);
   padding: 3% 10% 0 10%;
   overflow-y: scroll;
-
   /* overflow-x:hidden; */
 }
+
 .maskBtn {
   position: absolute;
   z-index: 2;
   right: 10%;
 }
+
 .maskBtn:hover {
   cursor: pointer;
 }
@@ -187,10 +188,7 @@
                 v-if="showMenuItem=='personalTools'"
               >Personal tools</h1>
               <div slot="extra">
-                <Select
-                  v-model="typeSelected"
-                  style="width:160px"
-                >
+                <Select v-model="typeSelected" style="width:160px">
                   <Option v-for="item in typeOptions" :key="item.index" :value="item">{{ item }}</Option>
                 </Select>
                 <Button
@@ -209,68 +207,15 @@
               >
                 <vue-scroll :ops="ops">
                   <Row>
-                    <Col span="8" v-for="tool in publicToolShow" :key="tool.index">
+                    <Col span="8" v-for="tool in filterPublicTools" :key="tool.index">
                       <div style="margin:0 5px 15px 5px">
-                        <Card style="background-color: ghostwhite;">
-                          <p
-                            slot="title"
-                            class="ellipsis"
-                            style="width:75%;display:inline-block;"
-                            :title="tool.toolName"
-                          >{{tool.toolName}}</p>
-                          <div slot="extra">
-                            <Button
-                              icon="md-eye"
-                              shape="circle"
-                              class="btnHoverGray"
-                              title="Details"
-                              size="small"
-                              @click="showTool(tool)"
-                            ></Button>
-                            <Button
-                              icon="md-share-alt"
-                              shape="circle"
-                              type="success"
-                              title="Add to toolset"
-                              size="small"
-                              @click="addToToolsetShow(tool)"
-                              v-if="userInfo.userState"
-                            ></Button>
-                          </div>
-                          <div>
-                            <div style="display: inline-block;algin:left;">
-                              <img
-                                :src="tool.toolImg"
-                                v-if="tool.toolImg!=''"
-                                style="height:100%;max-height:50px;"
-                              />
-                              <avatar
-                                :username="tool.toolName"
-                                :size="50"
-                                style="margin-bottom:6px"
-                                v-else
-                              ></avatar>
-                            </div>
-                            <div
-                              style="display: inline-block;vertical-align: top;width: 70%;"
-                              class="ellipsis"
-                            >
-                              <strong :title="tool.toolName">{{tool.toolName}}</strong>
-                              <br />
-                              <span :title="tool.categoryTag.join('|')">
-                                <i>{{tool.categoryTag.join('|')}}</i>
-                              </span>
-                            </div>
-                            <div
-                              style="width:100%;height: 65px;border: 0.5px dashed #8080804d;padding: 1px 3px;"
-                            >
-                              <p
-                                class="toolDescription"
-                                :title="tool.description"
-                              >{{tool.description}}</p>
-                            </div>
-                          </div>
-                        </Card>
+                        <public-tools-card
+                          :item="tool"
+                          @showtool="showTool"
+                          @edittool="editToolShow"
+                          @removetool="removeToolShow"
+                          @addtotoolset="addToToolsetShow"
+                        ></public-tools-card>
                       </div>
                     </Col>
                   </Row>
@@ -282,86 +227,17 @@
                 :style="{height: contentHeight-187+'px'}"
                 class="toolList"
               >
-                <!-- 修---------------------------------------------------------------------------------------------改 -->
                 <vue-scroll :ops="ops">
                   <Row>
                     <Col span="8" v-for="tool in filterPersonalTools" :key="tool.index">
                       <div style="margin:0 5px 15px 5px">
-                        <Card style="background-color: #faebd75c">
-                          <p
-                            slot="title"
-                            class="ellipsis"
-                            style="width:50%;display:inline-block;"
-                            :title="tool.toolName"
-                          >{{tool.toolName}}</p>
-                          <div slot="extra">
-                            <Button
-                              icon="md-eye"
-                              shape="circle"
-                              class="btnHoverGray"
-                              title="Preview"
-                              size="small"
-                              @click="showTool(tool)"
-                            ></Button>
-                            <Button
-                              icon="ios-create"
-                              shape="circle"
-                              class="btnHoverBlue"
-                              title="Edit"
-                              size="small"
-                              @click="editToolShow(tool)"
-                            ></Button>
-                            <Button
-                              icon="md-close"
-                              shape="circle"
-                              class="btnHoverRed"
-                              title="Delete"
-                              size="small"
-                              @click="removeToolShow(tool)"
-                            ></Button>
-                            <Button
-                              icon="md-share-alt"
-                              shape="circle"
-                              type="success"
-                              title="Add to toolset"
-                              size="small"
-                              @click="addToToolsetShow(tool)"
-                            ></Button>
-                          </div>
-                          <div>
-                            <div style="display: inline-block;algin:left;">
-                              <img
-                                :src="tool.toolImg"
-                                v-if="tool.toolImg!=''"
-                                style="height:100%;max-height:50px;"
-                              />
-                              <avatar
-                                :username="tool.toolName"
-                                :size="50"
-                                style="margin-bottom:6px"
-                                v-else
-                              ></avatar>
-                            </div>
-                            <div
-                              style="display: inline-block;vertical-align: top;width: 70%;"
-                              class="ellipsis"
-                            >
-                              <strong :title="tool.toolName">{{tool.toolName}}</strong>
-                              <br />
-                              <span :title="tool.categoryTag.join('|')">
-                                <i>{{tool.categoryTag.join('|')}}</i>
-                              </span>
-                            </div>
-                            <div
-                              style="width:100%;height: 65px;border: 0.5px dashed #8080804d;padding: 1px 3px;"
-                            >
-                              <p
-                                class="toolDescription"
-                                :title="tool.description"
-                              >{{tool.description}}</p>
-                            </div>
-                          </div>
-                        </Card>
+                        <personal-tools-card
+                          :item="tool"
+                          @showtool="showTool"
+                          @edittool="editToolShow"
+                          @removetool="removeToolShow"
+                          @addtotoolset="addToToolsetShow"
+                        ></personal-tools-card>
                       </div>
                     </Col>
                   </Row>
@@ -869,14 +745,18 @@ import draggable from "vuedraggable";
 import TemplateGeneral from "./TemplateGeneral";
 import TemplateEdit from "./TemplateEdit";
 import { get, del, post, put } from "../../axios";
-import ToolPreview from "./toolPreview";
+import ToolPreview from "@/components/common/tools/toolPreview";
+import PersonalToolsCard from "./../common/card/personalToolsCard";
+import PublicToolsCard from "./../common/card/personalToolsCard";
 export default {
   components: {
     draggable,
     Avatar,
     TemplateGeneral,
     TemplateEdit,
-    ToolPreview
+    ToolPreview,
+    PersonalToolsCard,
+    PublicToolsCard
   },
 
   mounted() {
@@ -1484,7 +1364,6 @@ export default {
           break;
         }
       }
-      // this.filterShowListByType();
       this.$Notice.info({
         desc: "The tool(" + removedTool.toolName + ") has been removed."
       });
@@ -1594,12 +1473,10 @@ export default {
           console.log(err.data);
         });
     },
-
     toolsetInfoShow(toolset) {
       this.selectedToolset = toolset;
       this.toolsetInfoModal = true;
     },
-
     editToolsetShow(toolset) {
       this.inputToolsetTag = "";
       this.selectedToolset = JSON.parse(JSON.stringify(toolset));
