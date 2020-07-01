@@ -125,29 +125,13 @@ public class ActivityServiceImpl implements ActivityService {
             String pid = protocolRepository.save(protocol).getPid();
 
             // Save the next activity
-            JSONObject lastInfo = new JSONObject();
-            lastInfo.put("aid", aid);
-            lastInfo.put("protocolId", pid);
-            JSONArray lastActivities = activity.getLast();
-            lastActivities.add(lastInfo);
-            activity.setLast(lastActivities);
-
-            Activity next = activityRepository.save(activity);
+            Activity next = activityRepository.save(saveNextActivityInfo(aid, pid, activity));
             String nextId = next.getAid();
 
             // Update the current activity
             Activity current = findByAid(aid);
             if(current == null) return null;
-
-            JSONObject nextInfo = new JSONObject();
-            nextInfo.put("aid", nextId);
-            nextInfo.put("protocolId", pid);
-
-            JSONArray nextActivities = current.getNext();
-            nextActivities.add(nextInfo);
-            current.setNext(nextActivities);
-
-            activityRepository.save(current);
+            activityRepository.save(saveLastActivityInfo(nextId, pid, current));
 
             return next;
         }
@@ -165,29 +149,13 @@ public class ActivityServiceImpl implements ActivityService {
             String pid = protocolRepository.save(protocol).getPid();
 
             // Save the last activity
-            JSONObject nextInfo = new JSONObject();
-            nextInfo.put("aid", aid);
-            nextInfo.put("protocolId", pid);
-            JSONArray nextActivities = activity.getNext();
-            nextActivities.add(nextInfo);
-            activity.setNext(nextActivities);
-
-            Activity last = activityRepository.save(activity);
+            Activity last = activityRepository.save(saveLastActivityInfo(aid, pid, activity));
             String lastId = last.getAid();
 
             // Update the current activity
             Activity current = findByAid(aid);
             if(current == null) return null;
-
-            JSONObject lastInfo = new JSONObject();
-            lastInfo.put("aid", lastId);
-            lastInfo.put("protocolId", pid);
-
-            JSONArray lastActivities = current.getLast();
-            lastActivities.add(lastInfo);
-            current.setLast(lastActivities);
-
-            activityRepository.save(current);
+            activityRepository.save(saveNextActivityInfo(lastId, pid, current));
 
             return last;
         }
@@ -204,32 +172,14 @@ public class ActivityServiceImpl implements ActivityService {
             String pid = protocolRepository.save(protocol).getPid();
 
             // Save the last activity
-            JSONObject nextInfo = new JSONObject();
-            nextInfo.put("aid", aid2);
-            nextInfo.put("protocolId", pid);
-
             Activity activity1 = findByAid(aid1);
             if(activity1 == null) return null;
-
-            JSONArray nextActivities = activity1.getNext();
-            nextActivities.add(nextInfo);
-            activity1.setNext(nextActivities);
-
-            activityRepository.save(activity1);
+            activityRepository.save(saveLastActivityInfo(aid2, pid, activity1));
 
             // Update the next activity
-            JSONObject lastInfo = new JSONObject();
-            lastInfo.put("aid", aid1);
-            lastInfo.put("protocolId", pid);
-
             Activity activity2 = findByAid(aid2);
             if(activity2 == null) return null;
-
-            JSONArray lastActivities = activity2.getLast();
-            lastActivities.add(lastInfo);
-            activity2.setLast(lastActivities);
-
-            activityRepository.save(activity2);
+            activityRepository.save(saveNextActivityInfo(aid1, pid, activity2));
 
             return "Success";
         }
@@ -278,4 +228,27 @@ public class ActivityServiceImpl implements ActivityService {
         }
     }
 
+    private Activity saveLastActivityInfo(String aid, String pid, Activity activity){
+        JSONObject nextInfo = new JSONObject();
+        nextInfo.put("aid", aid);
+        nextInfo.put("protocolId", pid);
+
+        JSONArray nextActivities = activity.getNext();
+        nextActivities.add(nextInfo);
+        activity.setNext(nextActivities);
+
+        return activity;
+    }
+
+    private Activity saveNextActivityInfo(String aid, String pid, Activity activity){
+        JSONObject lastInfo = new JSONObject();
+        lastInfo.put("aid", aid);
+        lastInfo.put("protocolId", pid);
+
+        JSONArray lastActivities = activity.getLast();
+        lastActivities.add(lastInfo);
+        activity.setLast(lastActivities);
+
+        return activity;
+    }
 }
