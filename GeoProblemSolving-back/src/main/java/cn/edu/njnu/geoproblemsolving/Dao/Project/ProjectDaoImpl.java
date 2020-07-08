@@ -10,7 +10,6 @@ import cn.edu.njnu.geoproblemsolving.Entity.ProjectEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.SubProjectEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.UserEntity;
 import cn.edu.njnu.geoproblemsolving.View.StaticPagesBuilder;
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
@@ -178,8 +177,9 @@ public class ProjectDaoImpl implements IProjectDao {
             Query query = new Query(Criteria.where("projectId").is(projectId));
             CommonMethod method = new CommonMethod();
             Update update = method.setUpdate(request);
-            if(request.getParameter("permissionManager") != null){
-                update.set("permissionManager", JSONObject.parse(request.getParameter("permissionManager")));
+            String strPermission = request.getParameter("permissionManager");
+            if(strPermission != null){
+                update.set("permissionManager", JSONObject.parse(strPermission));
             }
             mongoTemplate.updateFirst(query, update, ProjectEntity.class);
             ProjectEntity projectEntity = mongoTemplate.findOne(query, ProjectEntity.class);

@@ -354,9 +354,9 @@ export default {
           visitor: null
         },
         workspace_resource: {
-          project_manager: true,
+          project_manager: "Yes",
           subproject_manager: true,
-          member: true,
+          member: "Yes, partly",
           visitor: null
         },
         workspace_tool: {
@@ -610,7 +610,7 @@ export default {
           visitor: null
         },
         workspace_resource: {
-          project_manager: true,
+          project_manager: "Yes, partly",
           subproject_manager: true,
           member: "Yes, partly",
           visitor: null

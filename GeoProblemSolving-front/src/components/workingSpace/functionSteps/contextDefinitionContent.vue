@@ -22,7 +22,7 @@
           @dataBehavior="listenDatalist"
         ></data-list>
       </Panel>
-      <Panel name="tool" v-show="stepInfo.activeStatus">
+      <Panel name="tool">
         Toolbox
         <tool-container
           slot="content"

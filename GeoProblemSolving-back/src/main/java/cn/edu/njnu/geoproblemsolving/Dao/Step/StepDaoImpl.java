@@ -132,9 +132,24 @@ public class StepDaoImpl implements IStepDao {
             if(request.getParameter("name")!=null&&!stepEntity.getName().equals(request.getParameter("name"))){
                 String newName = request.getParameter("name");
                 String subProjectId = stepEntity.getSubProjectId();
-                Query querySubProject = new Query(Criteria.where("subProjectId").is(subProjectId));
-                SubProjectEntity subProjectEntity = mongoTemplate.findOne(querySubProject,SubProjectEntity.class);
-                String solvingProcess = subProjectEntity.getSolvingProcess();
+                String projectId = stepEntity.getProjectId();
+                String solvingProcess = "";
+                Query query2 = new Query();
+                String level = "";
+                // project 下的 step
+                if(subProjectId.equals("") && !projectId.equals("")){
+                    level = "project";
+                    query2 = new Query(Criteria.where("projectId").is(projectId));
+                    ProjectEntity projectEntity = mongoTemplate.findOne(query2,ProjectEntity.class);
+                    solvingProcess = projectEntity.getSolvingProcess();
+                }
+                // subproject 下的 step
+                else if(!subProjectId.equals("") && projectId.equals("")){
+                    level = "subproject";
+                    query2 = new Query(Criteria.where("subProjectId").is(subProjectId));
+                    SubProjectEntity subProjectEntity = mongoTemplate.findOne(query2,SubProjectEntity.class);
+                    solvingProcess = subProjectEntity.getSolvingProcess();
+                }
                 JSONArray processEntities = JSONArray.parseArray(solvingProcess);
                 int nodeId = 0;
                 for(int i=0;i<processEntities.size();i++){
@@ -169,9 +184,17 @@ public class StepDaoImpl implements IStepDao {
                     processEntities.set(i,processEntity);
                 }
                 solvingProcess = processEntities.toString();
-                Update updateSubProject = new Update();
-                updateSubProject.set("solvingProcess",solvingProcess);
-                mongoTemplate.updateFirst(querySubProject,updateSubProject,SubProjectEntity.class);
+
+                if(level.equals("project")){
+                    Update updateProject = new Update();
+                    updateProject.set("solvingProcess",solvingProcess);
+                    mongoTemplate.updateFirst(query2,updateProject,ProjectEntity.class);
+                }
+                else if(level.equals("subproject")) {
+                    Update updateSubProject = new Update();
+                    updateSubProject.set("solvingProcess", solvingProcess);
+                    mongoTemplate.updateFirst(query2, updateSubProject, SubProjectEntity.class);
+                }
             }
 
             mongoTemplate.updateFirst(query, update, StepEntity.class);

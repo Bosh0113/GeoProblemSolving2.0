@@ -29,7 +29,7 @@
                   type="default"
                   size="small"
                   icon="md-globe"
-                  title="Enter the workspace"
+                  title="Please click and select one node (activity)"
                   style="float:right;margin-left:10px;cursor:default"
                 >Workspace</Button>
               </template>
@@ -74,26 +74,26 @@
                   type="default"
                   size="small"
                   icon="md-remove"
-                  title="Remove the activity"
+                  title="Please click and select one node (activity)"
                   style="float:right;margin-left:10px; cursor:default"
                 >Remove</Button>
                 <Button
-                  v-if="activeBtn"
+                  v-if="linkBtn"
                   type="success"
                   size="small"
-                  @click="activateStep()"
-                  icon="md-bulb"
+                  @click="linkActivities()"
+                  icon="md-link"
                   title="Active the activity"
                   style="float:right;margin-left:10px;"
-                >Active</Button>
+                >Link</Button>
                 <Button
                   v-else
                   type="default"
                   size="small"
-                  icon="md-bulb"
-                  title="Active the activity"
+                  icon="md-link"
+                  title="Please select at least one node (activity)"
                   style="float:right;margin-left:10px; cursor:default"
-                >Active</Button>
+                >Link</Button>
                 <Button
                   v-if="addBtn"
                   type="info"
@@ -158,39 +158,6 @@
       </div>
     </Col>
     <Modal
-      v-model="slctActivateModal"
-      title="Select an active activity"
-      @on-ok="selectAActivity('activate')"
-      ok-text="OK"
-      cancel-text="Cancel"
-    >
-      <div
-        style="font-size:14px;"
-      >There are {{activeStepInfo.length}} active activities. Please choose the needed activities and activate the next activity.</div>
-      <CheckboxGroup v-model="aActivitiesName" style="margin-top:10px">
-        <Checkbox v-for="item in activeStepInfo" :key="item.index" :label="item.name"></Checkbox>
-      </CheckboxGroup>
-    </Modal>
-    <Modal
-      v-model="gotoworkModal"
-      title="Select an active activity"
-      @on-ok="selectAActivity('workspace')"
-      ok-text="OK"
-      cancel-text="Cancel"
-    >
-      <div
-        style="font-size:14px;"
-      >There are {{activeStepInfo.length}} active activities. Please choose an activity and go to the worksapce.</div>
-      <RadioGroup v-model="workspaceName">
-        <Radio
-          style="margin-top:10px"
-          v-for="item in activeStepInfo"
-          :key="item.index"
-          :label="item.name"
-        ></Radio>
-      </RadioGroup>
-    </Modal>
-    <Modal
       v-model="delModal"
       title="Delete this process"
       @on-ok="delStepGraph"
@@ -241,17 +208,17 @@
     </Modal>
     <Modal
       width="800px"
-      v-model="createStepModal"
+      v-model="createActivityModal"
       title="Create a new step"
       :styles="{top: '20px'}"
     >
       <div style="height:380px;width:640px;margin-left:50px">
         <Form ref="formValidate1" :model="formValidate1" :rules="ruleValidate1" :label-width="120">
           <FormItem label="Name:" prop="stepTitle">
-            <Input v-model="formValidate1.stepTitle" placeholder="Enter step name" />
+            <Input v-model="formValidate1.stepTitle" placeholder="Enter activity name" />
           </FormItem>
-          <FormItem label="Step type:" prop="stepType" style="margin-top:40px">
-            <Select v-model="formValidate1.stepType" placeholder="Select step type">
+          <FormItem label="Step type:" prop="activityType" style="margin-top:40px">
+            <Select v-model="formValidate1.activityType" placeholder="Select step type">
               <Option v-for="item in typeList" :key="item.index" :value="item">{{ item }}</Option>
             </Select>
           </FormItem>
@@ -266,32 +233,8 @@
         </Form>
       </div>
       <div slot="footer">
-        <Button @click="createStepModal=false">Cancel</Button>
+        <Button @click="createActivityModal=false">Cancel</Button>
         <Button type="primary" @click="createStep('formValidate1')">Submit</Button>
-      </div>
-    </Modal>
-    <Modal
-      width="800px"
-      v-model="inheritResModal"
-      title="Get resources from previous activities"
-      :styles="{top: '20px'}"
-      @on-ok="createStepModal = true"
-      ok-text="Next"
-      cancel-text="Cancel"
-    >
-      <div style="margin-left:75px">
-        <div style="font-size:14px">Select the needed data:</div>
-        <Transfer
-          :data="existingResources"
-          :target-keys="targetKeys"
-          :list-style="listStyle"
-          :render-format="resourceRender"
-          :titles="['The previous activities', 'The new activity']"
-          filter-placeholder="Enter key words..."
-          filterable
-          :filter-method="filterMethod"
-          @on-change="handleChange"
-        ></Transfer>
       </div>
     </Modal>
   </Row>
@@ -307,35 +250,28 @@ export default {
           background: "lightgrey"
         }
       },
-      formValidate0: {
-        stepTitle: "",
-        stepType: ""
-      },
       //button
       addBtn: false,
-      activeBtn: false,
+      linkBtn: false,
       removeBtn: false,
       workspaceBtn: false,
       nodePositionBtn: false,
       // 添加/编辑step
       formValidate1: {
         stepTitle: "",
-        stepType: "",
+        activityType: "",
         result: ""
       },
       ruleValidate1: {
         stepTitle: [
           { required: true, message: "Please enter name...", trigger: "blur" }
         ],
-        stepType: [
+        activityType: [
           { required: true, message: "Please select type...", trigger: "blur" }
         ]
       },
       contentHeight: "",
       processStructure: [],
-      activeStepInfo: [],
-      slctActiveStepInfo: [],
-      aActivitiesName: [],
       workspaceName: "",
       typeList: [
         "Context definition & resource collection",
@@ -349,29 +285,24 @@ export default {
       ],
       // 步骤逻辑图
       stepChart: null,
-      // 选择的步骤
-      selectedStep: [],
+      // 选择的活动
+      selectedActivities: [],
+      // 关联活动
+      selectedPreActivities: [],
+      // 模态框
       delModal: false,
-      // 创建步骤
-      createStepModal: false,
-      inheritResModal: false,
-      slctActivateModal: false,
-      gotoworkModal: false,
+      createActivityModal: false,
       // 双击展示活动信息
       activityInfoModal: false,
       showActivityInfo: {},
-      //资源继承
-      existingResources: [],
-      targetKeys: [],
-      listStyle: { width: "280px", height: "375px" },
       // 工具
       personalTools: [],
       publicTools: [],
       personalToolsets: [],
       publicToolsets: [],
-      selectStepTools: [],
-      selectStepToolsets: [],
-      // step 结构信息
+      selectActivityTools: [],
+      selectActivityToolsets: [],
+      // activity 结构信息
       procedureDrag: true,
       nodeData: [],
       scopeType: "",
@@ -405,7 +336,7 @@ export default {
     this.showSteps();
     this.getAllTools();
     this.getAllToolsets();
-    this.btnFunction();
+    this.btnEnable();
   },
   beforeRouteLeave(to, from, next) {
     next();
@@ -457,7 +388,15 @@ export default {
         } else if (
           role == "Manager" &&
           project.permissionManager.project_workspace_type_manage
-            .subproject_manager
+            .subproject_manager &&
+          this.scopeType == "subproject"
+        ) {
+          return true;
+        } else if (
+          role == "Manager" &&
+          project.permissionManager.project_workspace_type_manage
+            .project_manager &&
+          this.scopeType == "project"
         ) {
           return true;
         } else if (
@@ -528,54 +467,39 @@ export default {
     },
     updateStepchart() {
       // 重新渲染
-      this.selectedStep = [];
+      this.selectedActivities = [];
       this.stepChart.dispose();
       this.stepChart = null;
       this.showSteps();
-      this.btnFunction();
+      this.btnEnable();
     },
-    btnFunction() {
+    btnEnable() {
       if (
         this.processStructure.length <= 0 ||
         this.processStructure.length == undefined
       ) {
         this.addBtn = true;
-        this.activeBtn = false;
+        this.linkBtn = false;
         this.removeBtn = false;
         this.workspaceBtn = false;
         this.nodePositionBtn = false;
       } else {
-        this.workspaceBtn = true;
         this.nodePositionBtn = true;
-        if (this.selectedStep.length == 0) {
+        if (this.selectedActivities.length == 0) {
           this.addBtn = false;
-          this.activeBtn = false;
+          this.linkBtn = false;
           this.removeBtn = false;
-        } else {
+          this.workspaceBtn = false;
+        } else if (this.selectedActivities.length == 1) {
           this.addBtn = true;
           this.removeBtn = true;
-          if (this.activeStepInfo.length == 0) {
-            this.activeBtn = true;
-          } else {
-            let count = 0;
-            for (var i = 0; i < this.selectedStep.length; i++) {
-              for (var j = 0; j < this.activeStepInfo.length; j++) {
-                if (
-                  this.selectedStep[i].stepId == this.activeStepInfo[j].stepID
-                ) {
-                  count++;
-                }
-              }
-            }
-            if (
-              count <= this.activeStepInfo.length &&
-              this.selectedStep.length - count == 1
-            ) {
-              this.activeBtn = true;
-            } else {
-              this.activeBtn = false;
-            }
-          }
+          this.linkBtn = true;
+          this.workspaceBtn = true;
+        } else if (this.selectedActivities.length > 1) {
+          this.addBtn = true;
+          this.removeBtn = false;
+          this.linkBtn = true;
+          this.workspaceBtn = false;
         }
       }
     },
@@ -642,7 +566,7 @@ export default {
           }
           case 3: {
             parent.location.href =
-              "/GeoProblemSolving/modelBuildP/" + stepId + "/modelBuild";
+              "/GeoProblemSolving/workspaceP/" + stepId + "/modelBuild";
             break;
           }
           case 4: {
@@ -679,17 +603,10 @@ export default {
         } catch (err) {
           return;
         }
-        // get active activities information
-        this.activeStepInfo = [];
-        for (var i = 0; i < this.processStructure.length; i++) {
-          if (this.processStructure[i].activeStatus) {
-            this.activeStepInfo.push(this.processStructure[i]);
-          }
-        }
       }
     },
     showSteps() {
-      this.selectedStep = [];
+      this.selectedActivities = [];
       let option = {
         animationDurationUpdate: 500,
         animationEasingUpdate: "quinticInOut",
@@ -796,17 +713,7 @@ export default {
             category: this.processStructure[i].category,
             symbolSize: 45
           };
-          if (this.processStructure[i].activeStatus) {
-            datum.symbolSize = 60;
-            this.nodeData.push(datum);
-            this.selectedStep.push({
-              stepId: this.processStructure[i].stepID,
-              id: this.processStructure[i].id,
-              name: this.processStructure[i].name
-            });
-          } else {
-            this.nodeData.push(datum);
-          }
+          this.nodeData.push(datum);
 
           //get links
           for (var j = 0; j < this.processStructure[i].next.length; j++) {
@@ -832,16 +739,13 @@ export default {
         if (_this.procedureDrag) {
           if (option.series[0].data[params.data.index].symbolSize == 45) {
             option.series[0].data[params.data.index].symbolSize = 60;
-            _this.formValidate0.stepTitle = params.data.name;
-            _this.formValidate0.stepType = _this.getStepType(
-              params.data.category
-            );
 
             // record the selected step nodes
-            _this.selectedStep.push({
+            _this.selectedActivities.push({
               stepId: params.data.stepId,
               id: params.data.index,
-              name: params.data.name
+              name: params.data.name,
+              category: params.data.category
             });
           } else if (
             option.series[0].data[params.data.index].symbolSize == 60
@@ -849,15 +753,15 @@ export default {
             option.series[0].data[params.data.index].symbolSize = 45;
 
             // remove these not selected step nodes
-            for (var i = 0; i < _this.selectedStep.length; i++) {
-              if (_this.selectedStep[i].stepId == params.data.stepId) {
-                _this.selectedStep.splice(i, 1);
+            for (var i = 0; i < _this.selectedActivities.length; i++) {
+              if (_this.selectedActivities[i].stepId == params.data.stepId) {
+                _this.selectedActivities.splice(i, 1);
                 break;
               }
             }
           }
           _this.stepChart.setOption(option);
-          _this.btnFunction();
+          _this.btnEnable();
         }
       });
       // 双击切换当前步骤
@@ -865,11 +769,11 @@ export default {
         if (_this.procedureDrag) {
           // _this.enterStep(params.data.category, params.data.stepId);
           _this.activityInfoModal = true;
-          let stepType = _this.getStepType(params.data.category);
+          let activityType = _this.getStepType(params.data.category);
           let activity = {
             stepID: params.data.stepId,
             name: params.data.name,
-            type: stepType
+            type: activityType
           };
           _this.showActivityInfo = activity;
         }
@@ -983,95 +887,78 @@ export default {
       }
       return category;
     },
-    activateStep(activities) {
-      // 多个激活的活动
-      this.slctActiveStepInfo = [];
-      if (this.activeStepInfo.length > 1) {
-        if (activities == undefined || activities.length == 0) {
-          this.slctActivateModal = true;
-          return;
-        } else if (activities.length > 0) {
-          for (var i = 0; i < activities.length; i++) {
-            for (var j = 0; j < this.activeStepInfo.length; j++) {
-              if (activities[i] == this.activeStepInfo[j].name) {
-                this.slctActiveStepInfo.push(this.activeStepInfo[j]);
-              }
-            }
-          }
-        }
-      } else if (this.activeStepInfo.length == 1) {
-        this.slctActiveStepInfo.push(this.activeStepInfo[0]);
-      }
-
-      // 新激活的活动
-      var nextnode = {};
-      var activityChangeList = [];
-      for (var i = 0; i < this.selectedStep.length; i++) {
-        for (var j = 0; j < this.processStructure.length; j++) {
-          if (this.processStructure[j].stepID == this.selectedStep[i].stepId) {
-            if (!this.processStructure[j].activeStatus) {
-              this.processStructure[j].activeStatus = true;
-              activityChangeList.push({
-                stepId: this.processStructure[j].stepID,
-                activeStatus: this.processStructure[j].activeStatus
-              });
-
+    linkActivities(activities) {
+      // 如果没有选择需要连接的节点
+      if (this.selectedActivities.length == 0) {
+        this.$Notice.info({
+          desc: "Please select at least one node!"
+        });
+        return;
+      } else {
+        if (this.selectedPreActivities.length <= 0) {
+          // The pre-activities have been selected
+          this.selectedPreActivities = Object.assign(this.selectedActivities);
+          this.selectedActivities = [];
+          this.$Notice.info({
+            desc:
+              'Please select the next activities to link, and click the "Link" button again!'
+          });
+        } else {
+          // The next-activities have been selected
+          for (var i = 0; i < this.selectedPreActivities.length; i++) {
+            for (var j = 0; j < this.selectedActivities.length; j++) {
               // 前后继承关系
-              for (var k = 0; k < this.slctActiveStepInfo.length; k++) {
-                let lastnode = {
-                  name: this.slctActiveStepInfo[k].name,
-                  id: this.slctActiveStepInfo[k].id
-                };
-                if (!this.processStructure[j].last.contains[lastnode]) {
-                  this.processStructure[j].last.push(lastnode);
+              let lastnode = {
+                name: this.selectedPreActivities[i].name,
+                id: this.selectedPreActivities[i].id
+              };
+              let nextnode = {
+                name: this.selectedActivities[j].name,
+                id: this.selectedActivities[j].id
+              };
+
+              for (var k = 0; k < this.processStructure.length; k++) {
+                if (
+                  this.processStructure[k].stepID ==
+                  this.selectedActivities[j].stepId
+                ) {
+                  if (!this.processStructure[k].last.contains(lastnode)) {
+                    this.processStructure[k].last.push(lastnode);
+                  }
+                }
+
+                if (
+                  this.processStructure[k].stepID ==
+                  this.selectedPreActivities[i].stepId
+                ) {
+                  if (!this.processStructure[k].next.contains(nextnode)) {
+                    this.processStructure[k].next.push(nextnode);
+                  }
                 }
               }
-
-              nextnode = {
-                name: this.selectedStep[i].name,
-                id: this.selectedStep[i].id
-              };
             }
-            break;
           }
+          // update scopeInfo/selectedActivities/graph
+          this.selectedPreActivities = [];
+          this.selectedActivities = [];
+          this.scopeInfo.solvingProcess = JSON.stringify(this.processStructure);
+          this.getProcessSteps();
+          // 重新渲染
+          this.updateStepchart();
+          // 更新Step
+          this.updateSteps();
         }
       }
-
-      // 使处于非激活状态的活动
-      for (var i = 0; i < this.slctActiveStepInfo.length; i++) {
-        for (var j = 0; j < this.processStructure.length; j++) {
-          if (
-            this.slctActiveStepInfo[i].stepID == this.processStructure[j].stepID
-          ) {
-            if (!this.processStructure[j].next.contains[nextnode]) {
-              this.processStructure[j].next.push(nextnode);
-            }
-
-            this.processStructure[j].activeStatus = false;
-            activityChangeList.push({
-              stepId: this.processStructure[j].stepID,
-              activeStatus: this.processStructure[j].activeStatus
-            });
-
-            break;
-          }
-        }
-      }
-      // update scopeInfo/activeStepInfo/selectedStep/graph
-      this.slctActiveStepInfo = [];
-      this.scopeInfo.solvingProcess = JSON.stringify(this.processStructure);
-      this.getProcessSteps();
-      // 重新渲染
-      this.updateStepchart();
-      // 更新Step
-      this.updateSteps();
-      this.updateStepContent(activityChangeList);
     },
     addNewStep() {
+      // 防止Link与add相互干扰
+      this.selectedPreActivities = [];
+      // add
       // 选择父节点检测
       if (
         this.processStructure.length != 0 &&
-        (this.selectedStep.length == undefined || this.selectedStep.length == 0)
+        (this.selectedActivities.length == undefined ||
+          this.selectedActivities.length == 0)
       ) {
         this.$Notice.info({
           desc: "Please select at least one node in advance!"
@@ -1079,89 +966,13 @@ export default {
         return;
       }
 
-      // 获取可继承的资源
-      this.getInheritResource();
       // 创建步骤模态框
-      if (this.processStructure.length > 0) {
-        this.inheritResModal = true;
-      } else {
-        this.createStepModal = true;
-      }
-    },
-    getInheritResource() {
-      this.existingResources = this.getMockData();
-    },
-    getMockData() {
-      let mockData = [];
-      let selectedRes = [];
-
-      // 前驱步骤的资源
-      for (var i = 0; i < this.selectedStep.length; i++) {
-        let selectedStepId = this.selectedStep[i].stepId;
-        let selectedStepName = this.selectedStep[i].name;
-        let getResUrl =
-          "/GeoProblemSolving/folder/findByFileType?" +
-          "scopeId=" +
-          selectedStepId +
-          "&type=all";
-
-        $.ajax({
-          url: getResUrl,
-          type: "GET",
-          async: false,
-          success: function(data) {
-            if (data !== "Fail") {
-              selectedRes = data;
-              for (var j = 0; j < selectedRes.length; j++) {
-                mockData.push({
-                  key: mockData.length.toString(),
-                  name: selectedRes[j].name,
-                  type: selectedRes[j].type,
-                  resourceId: selectedRes[j].resourceId,
-                  source: selectedStepName
-                });
-              }
-            } else {
-              selectedRes = [];
-            }
-          },
-          error: function(err) {
-            selectedRes = [];
-            console.log("err!");
-          }
-        });
-      }
-      return mockData;
-    },
-    getTargetKeys() {
-      let mockData = [];
-      if (this.existingResources.length > 0) {
-        for (var i = 0; i < this.targetKeys.length; i++) {
-          mockData.push({
-            key: this.targetKeys[i],
-            name: this.existingResources[this.targetKeys[i]].name,
-            type: this.existingResources[this.targetKeys[i]].type,
-            resourceId: this.existingResources[this.targetKeys[i]].resourceId,
-            source: this.existingResources[this.targetKeys[i]].source
-          });
-        }
-      }
-      return mockData;
-    },
-    handleChange(newTargetKeys) {
-      this.targetKeys = newTargetKeys;
-    },
-    filterMethod(data, query) {
-      return data.type.indexOf(query) > -1;
-    },
-    resourceRender(item) {
-      // return item.type + " - " + item.name;
-      return `<span title="${item.type} - ${item.source}">${item.name}</span>`;
+      this.createActivityModal = true;
     },
     createStep(name) {
       this.$refs[name].validate(valid => {
         if (valid) {
-          this.createStepModal = false;
+          this.createActivityModal = false;
           // 重复命名检测
           for (var i = 0; i < this.processStructure.length; i++) {
             if (this.formValidate1.stepTitle == this.processStructure[i].name) {
@@ -1178,11 +989,11 @@ export default {
     },
     createStepContent() {
       // 新步骤的拓展工具、基本信息、资源（数据）
-      this.filterShowListByType(this.formValidate1.stepType);
+      this.filterShowListByType(this.formValidate1.activityType);
 
       let Step = {};
       Step["name"] = this.formValidate1.stepTitle;
-      Step["type"] = this.formValidate1.stepType;
+      Step["type"] = this.formValidate1.activityType;
       Step["description"] = this.formValidate1.result;
       if (this.scopeType == "project") {
         Step["projectId"] = this.scopeId;
@@ -1192,8 +1003,8 @@ export default {
         Step["subProjectId"] = this.scopeId;
       }
       Step["creator"] = this.$store.getters.userId;
-      Step["toolList"] = this.selectStepTools;
-      Step["toolsetList"] = this.selectStepToolsets;
+      Step["toolList"] = this.selectActivityTools;
+      Step["toolsetList"] = this.selectActivityToolsets;
       Step["activeStatus"] = true;
       Step["content"] = {};
 
@@ -1211,9 +1022,6 @@ export default {
             this1.$Message.info("Fail");
           } else {
             this.createStepGraph(res.data);
-
-            // 更新新Step的资源
-            this.copyResource(res.data);
           }
         })
         .catch(err => {
@@ -1224,7 +1032,7 @@ export default {
       if (this.processStructure.length == 0) {
         // 新步骤的类别
         let nodeCategory = 0;
-        nodeCategory = this.getStepCategroy(this.formValidate1.stepType);
+        nodeCategory = this.getStepCategroy(this.formValidate1.activityType);
         // create step node
         let newStepNode = {
           id: 0,
@@ -1248,48 +1056,42 @@ export default {
         this.updateStepchart();
         // 存储Step
         this.updateSteps();
-      } else if (this.selectedStep.length > 0) {
+      } else if (this.selectedActivities.length > 0) {
         //  计算新增节点的属性信息
         let lastNode = [];
         let nodeLevel = 0;
         let nodeY = 0;
         let nodeCategory = 0;
-        var activityChangeList = [];
+        // var activityChangeList = [];
 
-        for (var i = 0; i < this.selectedStep.length; i++) {
+        for (var i = 0; i < this.selectedActivities.length; i++) {
           lastNode.push({
-            name: this.selectedStep[i].name,
-            id: this.selectedStep[i].id
+            name: this.selectedActivities[i].name,
+            id: this.selectedActivities[i].id
           });
           if (
-            this.processStructure[this.selectedStep[i].id].level >= nodeLevel
+            this.processStructure[this.selectedActivities[i].id].level >=
+            nodeLevel
           ) {
             nodeLevel =
-              this.processStructure[this.selectedStep[i].id].level + 1;
+              this.processStructure[this.selectedActivities[i].id].level + 1;
           }
           // modify original step node
-          this.processStructure[this.selectedStep[i].id].next.push({
+          this.processStructure[this.selectedActivities[i].id].next.push({
             name: this.formValidate1.stepTitle,
             id: this.processStructure.length
           });
-          this.processStructure[this.selectedStep[i].id].end = false;
+          this.processStructure[this.selectedActivities[i].id].end = false;
           // calculate y
           if (this.processStructure[i].last == []) {
             nodeY = 200;
           } else {
             let sumY = 0;
-            for (var j = 0; j < this.selectedStep.length; j++) {
-              sumY += this.processStructure[this.selectedStep[j].id].y;
+            for (var j = 0; j < this.selectedActivities.length; j++) {
+              sumY += this.processStructure[this.selectedActivities[j].id].y;
             }
-            nodeY = sumY / this.selectedStep.length;
+            nodeY = sumY / this.selectedActivities.length;
           }
-          //inactivate selected step
-          this.processStructure[this.selectedStep[i].id].activeStatus = false;
-          activityChangeList.push({
-            stepId: this.processStructure[this.selectedStep[i].id].stepID,
-            activeStatus: this.processStructure[this.selectedStep[i].id]
-              .activeStatus
-          });
         }
         let isOverlap = false;
         // 统计每层的节点数
@@ -1307,7 +1109,7 @@ export default {
           }
         }
         // 新步骤的类别
-        nodeCategory = this.getStepCategroy(this.formValidate1.stepType);
+        nodeCategory = this.getStepCategroy(this.formValidate1.activityType);
         // create step node
         let newStepNode = {
           id: this.processStructure.length,
@@ -1350,7 +1152,6 @@ export default {
         this.updateStepchart();
         // 更新Step
         this.updateSteps();
-        this.updateStepContent(activityChangeList);
       } else {
         this.$Notice.info({
           desc: "Select at least one step as source(s), please!"
@@ -1475,14 +1276,17 @@ export default {
       this.getPublicToolsets();
       this.getPersonalToolsets();
     },
-    filterShowListByType(stepType) {
+    filterShowListByType(activityType) {
       var toolList = this.filterDuplicateTools();
-      this.selectStepTools = this.getFilterToolResult(toolList, stepType);
+      this.selectActivityTools = this.getFilterToolResult(
+        toolList,
+        activityType
+      );
 
       var toolsetList = this.filterDuplicateToolsets();
-      this.selectStepToolsets = this.getFilterToolsetResult(
+      this.selectActivityToolsets = this.getFilterToolsetResult(
         toolsetList,
-        stepType
+        activityType
       );
     },
     filterDuplicateTools() {
@@ -1507,7 +1311,7 @@ export default {
       }
       return toolsets;
     },
-    getFilterToolResult(foreList, stepType) {
+    getFilterToolResult(foreList, activityType) {
       let resultList = [];
       for (var i = 0; i < foreList.length; i++) {
         var stepTypes = foreList[i].recomStep;
@@ -1520,12 +1324,12 @@ export default {
       }
       return resultList;
     },
-    getFilterToolsetResult(foreList, stepType) {
+    getFilterToolsetResult(foreList, activityType) {
       let resultList = [];
       for (var i = 0; i < foreList.length; i++) {
         var stepTypes = foreList[i].recomStep;
         for (var j = 0; j < stepTypes.length; j++) {
-          if (stepTypes[j] == stepType || stepTypes[j] == "General step") {
+          if (stepTypes[j] == activityType || stepTypes[j] == "General step") {
             resultList.push(foreList[i].tsId);
             break;
           }
@@ -1533,46 +1337,13 @@ export default {
       }
       return resultList;
     },
-    // 数据继承
-    copyResource(stepId) {
-      let selectResource = [];
-      selectResource = this.getTargetKeys();
-      if (selectResource.length > 0) {
-        // 继承资源的数据id的集合
-        let addFileList = [];
-        for (var i = 0; i < selectResource.length; i++) {
-          addFileList.push(selectResource[i].resourceId);
-        }
-        let addFileListStr = addFileList.toString();
-
-        this.axios
-          .get(
-            "/GeoProblemSolving/folder/shareToFolder" +
-              "?addFileList=" +
-              addFileListStr +
-              "&folderId=" +
-              stepId
-          )
-          .then(res => {
-            this.shareModal = false;
-            if (res.data == "Offline") {
-              this.$store.commit("userLogout");
-              this.$router.push({ name: "Login" });
-            } else if (res.data == "Fail") {
-              this.$Message.error(
-                "Failed to get resources from previous activities."
-              );
-            }
-          })
-          .catch(err => {
-            // console.log(err.data);
-          });
-      }
-    },
     removeStep() {
-      if (this.selectedStep.length == 1) {
+      // 防止Link与remove相互干扰
+      this.selectedPreActivities = [];
+      // remove
+      if (this.selectedActivities.length == 1) {
         this.delModal = true;
-      } else if (this.selectedStep.length > 1) {
+      } else if (this.selectedActivities.length > 1) {
         this.$Notice.info({
           desc: "Steps should be deleted one by one! "
         });
@@ -1599,7 +1370,7 @@ export default {
     },
     delStepGraph() {
       if (this.$store.getters.userInfo.userId == this.scopeInfo.managerId) {
-        let currentIndex = this.selectedStep[0].id;
+        let currentIndex = this.selectedActivities[0].id;
 
         if (this.processStructure[currentIndex].end) {
           let selectedStepId = this.processStructure[currentIndex].stepID;
@@ -1623,7 +1394,7 @@ export default {
                 ) {
                   if (
                     this.processStructure[lastIndex].next[j].name ===
-                    this.selectedStep[0].name
+                    this.selectedActivities[0].name
                   ) {
                     this.processStructure[lastIndex].next.splice(j, 1);
                   }
@@ -1680,7 +1451,7 @@ export default {
           this.$Notice.info({
             desc:
               "The selected step " +
-              this.selectedStep[0].name +
+              this.selectedActivities[0].name +
               " can not be removed. Because it has the next activities."
           });
         }
@@ -1713,7 +1484,7 @@ export default {
               parent.vm.projectInfo = res.data;
               // 如果是项目下的步骤，需要更新sessionStorage
               // sessionStorage.setItem("projectInfo", JSON.stringify(res.data));
-              sessionStorage.setItem("projectInfo", this.encrypto(res.data));
+              // sessionStorage.setItem("projectInfo", this.encrypto(res.data));
               this.$Notice.info({
                 desc: "Project update successfully!"
               });
@@ -1730,32 +1501,6 @@ export default {
         .catch(err => {
           console.log(err.data);
         });
-    },
-    updateStepContent(activityChangeList) {
-      for (var i = 0; i < activityChangeList.length; i++) {
-        let obj = new URLSearchParams();
-        obj.append("activeStatus", activityChangeList[i].activeStatus);
-        obj.append("stepId", activityChangeList[i].stepId);
-        this.axios
-          .post("/GeoProblemSolving/step/update", obj)
-          .then(res => {
-            if (res.data == "Offline") {
-              this.$store.commit("userLogout");
-              this.$router.push({
-                name: "Login"
-              });
-            } else if (res.data != "Fail") {
-              // this.$Notice.info({
-              //   desc: "Update successfully!"
-              // });
-            } else {
-              // this.$Message.error("Update step failed.");
-            }
-          })
-          .catch(err => {
-            console.log(err.data);
-          });
-      }
     },
     resetSubProjectTypeModalShow() {
       if (this.processStructure.length > 0) {
@@ -1816,41 +1561,18 @@ export default {
         });
     },
     gotoCurrentWorkspace() {
-      if (this.activeStepInfo.length == 1) {
+      if (this.selectedActivities.length == 1) {
         this.enterStep(
-          this.activeStepInfo[0].category,
-          this.activeStepInfo[0].stepID
+          this.selectedActivities[0].category,
+          this.selectedActivities[0].stepId
         );
-      } else if (this.activeStepInfo.length > 1) {
-        this.slctActiveStepInfo = [];
-        this.gotoworkModal = true;
-        return;
       } else {
-        this.enterStep(
-          this.processStructure[0].category,
-          this.processStructure[0].stepID
-        );
+        this.$Notice.info({ desc: "Please select only one node!" });
       }
     },
     gotoThisWorkspace(type, stepID) {
       let category = this.getStepCategroy(type);
       this.enterStep(category, stepID);
-    },
-    selectAActivity(value) {
-      if (value == "workspace") {
-        for (var i = 0; i < this.activeStepInfo.length; i++) {
-          if (this.workspaceName == this.activeStepInfo[i].name) {
-            this.enterStep(
-              this.activeStepInfo[i].category,
-              this.activeStepInfo[i].stepID
-            );
-            this.workspaceName = "";
-          }
-        }
-      } else if (value == "activate") {
-        this.activateStep(this.aActivitiesName);
-        this.aActivitiesName = [];
-      }
     },
     encrypto(context) {
       var CryptoJS = require("crypto-js");

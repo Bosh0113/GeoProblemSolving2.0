@@ -1464,7 +1464,7 @@ export default {
     //点击跳转到指定项目的函数
     goSingleProject(projectInfo) {
       // sessionStorage.setItem("projectInfo", JSON.stringify(projectInfo));
-      sessionStorage.setItem("projectInfo", this.encrypto(projectInfo));
+      // sessionStorage.setItem("projectInfo", this.encrypto(projectInfo));
       window.location.href =
         "/GeoProblemSolving/projectDetail/" + projectInfo.projectId;
     },
@@ -1737,23 +1737,23 @@ export default {
         }
       });
     },
-    encrypto(context) {
-      var CryptoJS = require("crypto-js");
-      var key = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
-      var iv = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
-      var encrypted = "";
-      if (typeof context == "string") {
-      } else if (typeof context == "object") {
-        context = JSON.stringify(context);
-      }
-      var srcs = CryptoJS.enc.Utf8.parse(context);
-      encrypted = CryptoJS.AES.encrypt(srcs, key, {
-        iv: iv,
-        mode: CryptoJS.mode.CBC,
-        padding: CryptoJS.pad.Pkcs7
-      });
-      return encrypted.toString();
-    },
+    // encrypto(context) {
+    //   var CryptoJS = require("crypto-js");
+    //   var key = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
+    //   var iv = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
+    //   var encrypted = "";
+    //   if (typeof context == "string") {
+    //   } else if (typeof context == "object") {
+    //     context = JSON.stringify(context);
+    //   }
+    //   var srcs = CryptoJS.enc.Utf8.parse(context);
+    //   encrypted = CryptoJS.AES.encrypt(srcs, key, {
+    //     iv: iv,
+    //     mode: CryptoJS.mode.CBC,
+    //     padding: CryptoJS.pad.Pkcs7
+    //   });
+    //   return encrypted.toString();
+    // },
   }
 };
 </script>

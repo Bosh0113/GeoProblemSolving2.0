@@ -23,11 +23,18 @@
   <div>
     <div style="position:relative;padding:10px 10px 0 10px; margin-top:10px">
       <Breadcrumb style="display: inline-block" separator=">">
-        <BreadcrumbItem><a @click="toProjectDetailPage">Project</a></BreadcrumbItem>
+        <BreadcrumbItem>
+          <a @click="toProjectDetailPage">Project</a>
+        </BreadcrumbItem>
         <BreadcrumbItem>Workspace</BreadcrumbItem>
       </Breadcrumb>
       <h1 id="stepType">{{stepInfo.type}}</h1>
-      <step-change style="float:right" :step-info="stepInfo" :solving-process="projectInfo.solvingProcess" scope="project"></step-change>
+      <step-change
+        style="float:right"
+        :step-info="stepInfo"
+        :solving-process="projectInfo.solvingProcess"
+        scope="project"
+      ></step-change>
     </div>
     <Divider style="margin:10px 0 3px 0" />
     <div style="display:flex;background-color: #f8f8f9;padding:5px;">
@@ -39,6 +46,7 @@
         <div style="padding:15px;">
           <h2 style="display:inline-block">Title:</h2>
           <Button
+            v-if="userRole != 'Visitor'"
             style="float:right;"
             class="btnHoverBlue"
             icon="ios-create"
@@ -130,7 +138,7 @@ export default {
   },
   data() {
     return {
-      userInfo:JSON.parse(sessionStorage.getItem("userInfo")),
+      userInfo: JSON.parse(sessionStorage.getItem("userInfo")),
       contentHeight: 560,
       split: "400px",
       toProjectPage: "",
@@ -161,7 +169,7 @@ export default {
       },
       // onlineParticipants.vue
       onlineParticipants: [],
-      offlineParticipants: [],
+      offlineParticipants: []
     };
   },
   watch: {
@@ -190,13 +198,13 @@ export default {
       if (
         this.projectInfo.permissionManager != undefined &&
         this.userRole == "Visitor" &&
-        (visitorPermission == "All")
+        visitorPermission == "All"
       ) {
         return true;
       }
     },
-    toProjectDetailPage(){
-      window.location.href=this.toProjectPage;
+    toProjectDetailPage() {
+      window.location.href = this.toProjectPage;
     },
     getStepInfo() {
       if (
@@ -235,40 +243,35 @@ export default {
       }
     },
     getProjectInfo() {
-      let projectInfo = this.$store.getters.project;
-      if (
-        JSON.stringify(projectInfo) != "{}" &&
-        projectInfo.projectId == this.stepInfo.projectId
-      ) {
-        this.projectInfo = projectInfo;
-      } else {
-        var that = this;
-        $.ajax({
-          url:
-            "/GeoProblemSolving/project/inquiry" +
-            "?key=projectId" +
-            "&value=" +
-            this.stepInfo.projectId,
-          type: "GET",
-          async: false,
-          success: data => {
-            if (data == "Offline") {
-              that.$store.commit("userLogout");
-              that.$router.push({ name: "Login" });
-            } else if (data != "None" && data != "Fail") {
-              that.projectInfo = data[0];
-              that.$store.commit("setProjectInfo", data[0]);
-            } else {
-              console.log(data);
-            }
+      var that = this;
+      $.ajax({
+        url:
+          "/GeoProblemSolving/project/inquiry" +
+          "?key=projectId" +
+          "&value=" +
+          this.stepInfo.projectId,
+        type: "GET",
+        async: false,
+        success: data => {
+          if (data == "Offline") {
+            that.$store.commit("userLogout");
+            that.$router.push({ name: "Login" });
+          } else if (data != "None" && data != "Fail") {
+            that.projectInfo = data[0];
+            that.$store.commit("setProjectInfo", data[0]);
+          } else {
+            console.log(data);
           }
-        });
-      }
+        }
+      });
     },
     getParticipants() {
       let members = this.projectInfo.members;
       let membersList = members;
-      if(members.length<1||members[0].userId!=this.projectInfo["managerId"]){
+      if (
+        members.length < 1 ||
+        members[0].userId != this.projectInfo["managerId"]
+      ) {
         let manager = [
           {
             userId: this.projectInfo["managerId"],
@@ -302,13 +305,9 @@ export default {
       if (this.userInfo.userState) {
         if (this.projectInfo.managerId === this.userInfo.userId) {
           this.userRole = "Manager";
-        }
-        else {
+        } else {
           for (let i = 0; i < this.projectInfo.members.length; i++) {
-            if (
-              this.projectInfo.members[i].userId ===
-              this.userInfo.userId
-            ) {
+            if (this.projectInfo.members[i].userId === this.userInfo.userId) {
               this.userRole = "Member";
               break;
             }
@@ -369,7 +368,7 @@ export default {
             this.offlineParticipants.push(this.participants[i]);
           }
         }
-      } else if(message.content == "notice") {
+      } else if (message.content == "notice") {
         if (message.msg.behavior == "off") {
           // offline
           for (let i = 0; i < this.onlineParticipants.length; i++) {
@@ -389,7 +388,7 @@ export default {
         }
       }
     },
-    participantsChange: function (msg) {
+    participantsChange: function(msg) {
       this.judgeonlineParticipant(msg);
     }
   }

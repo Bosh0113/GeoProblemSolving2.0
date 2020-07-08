@@ -13,7 +13,7 @@
       <div style="margin: 0 20px">
         <div style="margin-bottom:20px">
           <span style="font-size:12px;font-weight:bold">Problem boundary</span>
-          <div v-show="stepInfo.activeStatus" v-if="permissionIdentity('workspace_edit')">
+          <div v-if="permissionIdentity('workspace_edit')">
             <Icon
               v-if="!edit1"
               type="ios-create"
@@ -45,7 +45,7 @@
         </div>
         <div style="margin-bottom:20px">
           <span style="font-size:12px;font-weight:bold">Spatiotemporal scale</span>
-          <div v-show="stepInfo.activeStatus" v-if="permissionIdentity('workspace_edit')">
+          <div v-if="permissionIdentity('workspace_edit')">
             <Icon
               v-if="!edit2"
               type="ios-create"
@@ -77,7 +77,7 @@
         </div>
         <div style="margin-bottom:20px">
           <span style="font-size:12px;font-weight:bold">Main methods</span>
-          <div v-show="stepInfo.activeStatus" v-if="permissionIdentity('workspace_edit')">
+          <div v-if="permissionIdentity('workspace_edit')">
             <Icon
               v-if="!edit3"
               type="ios-create"
@@ -109,7 +109,7 @@
         </div>
         <div style="margin-bottom:20px">
           <span style="font-size:12px;font-weight:bold">Goals and purposes</span>
-          <div v-show="stepInfo.activeStatus" v-if="permissionIdentity('workspace_edit')">
+          <div v-if="permissionIdentity('workspace_edit')">
             <Icon
               v-if="!edit4"
               type="ios-create"
@@ -141,7 +141,7 @@
         </div>
         <div style="margin-bottom:20px">
           <span style="font-size:12px;font-weight:bold">Difficulties or limitations</span>
-          <div v-show="stepInfo.activeStatus" v-if="permissionIdentity('workspace_edit')">
+          <div v-if="permissionIdentity('workspace_edit')">
             <Icon
               v-if="!edit5"
               type="ios-create"
@@ -177,7 +177,7 @@
         </div>
         <div style="margin-bottom:20px">
           <span style="font-size:12px;font-weight:bold">Supplementary information</span>
-          <div v-show="stepInfo.activeStatus" v-if="permissionIdentity('workspace_edit')">
+          <div v-if="permissionIdentity('workspace_edit')">
             <Icon
               v-if="!edit6"
               type="ios-create"
