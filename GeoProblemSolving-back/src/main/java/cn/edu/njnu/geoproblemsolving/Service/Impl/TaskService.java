@@ -1,4 +1,4 @@
-package cn.edu.njnu.geoproblemsolving.Service;
+package cn.edu.njnu.geoproblemsolving.Service.Impl;
 
 import cn.edu.njnu.geoproblemsolving.Dao.CModel.ModelItemDao;
 import cn.edu.njnu.geoproblemsolving.Dao.CModel.ModelItemDaoImpl;
