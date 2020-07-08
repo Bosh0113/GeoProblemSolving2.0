@@ -312,6 +312,9 @@
                         this.noticeSocket = null;
                     }
                     var noticeSocketURL = "ws://" + window.location.host + "/GeoProblemSolving/NoticeSocket";
+                    if(window.location.port=="8083"){
+                        noticeSocketURL = "wss://"+ window.location.hostname+":8083/GeoProblemSolving/NoticeSocket";
+                    }
                     if(window.location.host == "localhost:8080"){
                         noticeSocketURL = "ws://localhost:8081/GeoProblemSolving/NoticeSocket";
                     }

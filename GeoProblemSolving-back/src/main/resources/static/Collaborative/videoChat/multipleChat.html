@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html>
+<head >
+    <title>Multiple video chat</title>
+    <meta http-equiv="Content-Type" content=" charset=UTF-8" />
+    <meta name="description" content="Participatory|GeoProblem Solving|GIS">
+    <meta name="keywords" content="Participatory|GeoProblem Solving|GIS">
+    <meta name="author" content="OpenGMS">
+    <script src="js/jquery.min.js"></script>
+    <script src="js/vue.min.js"></script>
+    <link href="css/iview.css" rel="stylesheet">
+    <script src="js/iview.min.js"></script>
+    <script src="js/vue-avatar.min.js"></script>
+    <script src="js/axios.min.js"></script>
+    <!-- import vuescroll -->
+    <script src="js/vuescroll.js"></script>
+    <link rel="stylesheet" href="css/vuescroll.css" type="text/css" />
+    <!-- CDNJS :: Sortable -->
+    <script src="js/Sortable.min.js"></script>
+    <!-- CDNJS :: Vue.Draggable -->
+    <script src="js/vuedraggable.umd.min.js"></script>
+    <style >
+        /* video::-webkit-media-controls{
+            display:none !important;
+        } */
+        .fileBtnHoverGreen:hover {
+            background-color: #19be6b;
+            color: white;
+        }
+        .fileBtnHoverGray:hover {
+            background-color: #808695;
+            color: white;
+        }
+    </style>
+
+</head>
+
+<body>
+<div id="vueBody" v-cloak style="min-width: 800px;height:calc(100vh);">
+    <Card dis-hover style="height:100%" id="chatCard">
+        <div slot="title">
+            <h3>
+                <Icon type="ios-videocam" ></Icon>
+                Multi-video chat
+            </h3>
+        </div>
+        <div slot="extra">
+            <div style="margin-top:-8px">
+                <i-button @click="applyToJoin" :disabled="applyDisabled" class="fileBtnHoverGreen">Join chat</i-button>
+                <i-button @click="quitFromChat" :disabled="!applyDisabled" class="fileBtnHoverGray">Quit chat</i-button>
+            </div>
+        </div>
+        <div style="height:calc(100vh-50px);">
+            <div>
+                <h4 style="display: inline-block;margin-right: 15px">Online:</h4>
+                <avatar
+                    v-for="member in participants"
+                    :key="member.index"
+                    :username="member.userName"
+                    :size="25"
+                    :title="member.userName"
+                    style="display:inline-block;margin-right: 5px"
+                ></avatar>
+            </div>
+            <Divider style="margin: 8px 0;" :dashed="true"></Divider>
+            <div>
+                <h4 style="display: inline-block;margin-right: 5px">Chating:</h4>
+                <avatar
+                    v-for="chatUser in chatingUsers"
+                    :key="chatUser.index"
+                    :username="chatUser.userName"
+                    :size="25"
+                    :title="chatUser.userName"
+                    style="display:inline-block;margin-right: 5px"
+                ></avatar>
+            </div>
+            <Divider style="margin: 1px 0;">
+                <h4>
+                    Video list
+                </h4>
+            </Divider>
+            <div v-show="localVideoShow">
+                <Row>
+                    <draggable>
+                        <i-col span="8" style="padding: 5px;">
+                            <div style="border: 1px solid #dcdee2;width: 100%;height: 100%;padding: 5px">
+                                <div style="height: 80%;width: 100%;">
+                                    <video id="localVideo" autoplay="autoplay" src="" controls="controls" style="width:100%;height:100%">
+                                        local video
+                                    </video>
+                                </div>
+                                <div style="height:20%;text-align: center">
+                                    <Tag size="medium" color="green">You</Tag>
+                                </div>
+                            </div>
+                        </i-col>
+                        <i-col span="8" style="padding: 5px;" v-for="chatVideo in participants" :key="chatVideo.index" v-show="videoDisabled(chatVideo.userId)">
+                            <div style="border: 1px solid #dcdee2;width: 100%;height: 100%;padding: 5px">
+                                <div style="height: 80%;width: 100%;">
+                                    <video :id="chatVideo.userId" autoplay="autoplay" src="" controls="controls" style="width:100%;height:100%">
+                                        remote videos
+                                    </video>
+                                </div>
+                                <div style="height:20%;text-align: center">
+                                    <Tag size="medium" color="geekblue">{{chatVideo.userName}}</Tag>
+                                </div>
+                            </div>
+                        </i-col>
+                    </draggable>
+                </Row>
+            </div>
+        </div>
+    </Card>
+</div>
+
+<script>
+    const configuration = {"iceServers": [
+        {"url": "stun:stun.l.google.com:19302"},
+        // TURN 一般需要自己去定义
+        {
+            'url': 'turn:223.2.40.150:3478?transport=udp',
+            'credential': 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
+            'username': '28224511:1379330808'
+        }
+    ]};
+    var constraints = { audio: false, video: true };
+    var vueEl = new Vue({
+        el: '#vueBody',
+        components: {
+            'avatar': VueAvatar.Avatar
+        },
+        data:{
+            pageParams:{},
+            videoChatSocket: null,
+            participants:[],
+            chatingUsers:[],
+            applyDisabled:false,
+            localVideoShow:false,
+            chatVideos:[],
+            peerConnection:[],
+            localStream:null,
+            remoteStream:[]
+        },
+        created(){
+            this.getPageInfo();
+        },
+        mounted(){
+            $('#chatCard .ivu-card-body').css('padding','5px');
+            this.initWebSocket();
+        },
+        methods: {
+            videoDisabled(userId){
+                for(var i=0;i<this.chatVideos.length;i++){
+                    if(userId==this.chatVideos[i].userId){
+                        return true;
+                    }
+                }
+                return false;
+            },
+            getPageInfo(){
+                var href = window.location.href;
+                var url = href.split("&");
+
+                for (var i = 0; i < url.length; i++) {
+                    if (/groupID/.test(url[i])) {
+                        this.pageParams.pageId = url[i].match(/groupID=(\S*)/)[1];
+                        continue;
+                    }
+
+                    if (/userID/.test(url[i])) {
+                        this.pageParams.userId = url[i].match(/userID=(\S*)/)[1];
+                        continue;
+                    }
+
+                    if (/userName/.test(url[i])) {
+                        this.pageParams.userName = url[i].match(/userName=(\S*)/)[1];
+                        continue;
+                    }
+                }
+            },
+            initWebSocket(){
+                if(this.videoChatSocket!=null){
+                    this.videoChatSocket = null;
+                }
+                var websocketURL = window.location.hostname;
+                if(window.location.port=="5500"){
+                    websocketURL="localhost";
+                }
+                var socketUrl = "wss://"+ websocketURL +":8083/GeoProblemSolving/VideoChatSignalSocket/"+this.pageParams.pageId;
+                this.videoChatSocket = new WebSocket(socketUrl);
+                this.videoChatSocket.onopen = this.onOpen;
+                this.videoChatSocket.onmessage = this.onMessage;
+                this.videoChatSocket.onclose = this.onClose;
+                this.videoChatSocket.onerror = this.onError;
+            },
+            onOpen(){
+                console.log("Socket连接成功！");
+                this.sendMessage("connect",{});
+                var that = this;
+                window.setInterval(()=>{
+                    if(that.videoChatSocket!=null){
+                        that.sendMessage("ping", {});
+                    }
+                },20000);
+            },
+            async onMessage(evt){
+                var messageObject = JSON.parse(evt.data);
+                switch(messageObject.type){
+                    case "members":{
+                        this.participants = messageObject.memberList;
+                        this.chatingUsers = messageObject.chatList;
+                        break;
+                    }
+                    case "apply":{
+                        console.log("Someone apply to chat with you.");
+                        //增加视频窗口
+                        var newVideo = {
+                            userId:messageObject.userInfo.userId,
+                            userName:messageObject.userInfo.userName,
+                            videoUid:messageObject.content.videoUid
+                        }
+                        this.chatVideos.push(newVideo);
+                        //设置请求者远程视频
+                        this.initiate(messageObject.userInfo.userId);
+                        this.applySetRemoteConfig(messageObject);
+                        break;
+                    }
+                    case "candidate":{
+                        console.log("[接收candidate]: " + messageObject.content.candidate);
+                        var userId = messageObject.userInfo.userId;
+                        if (messageObject.content.candidate != null) {
+                            await this.peerConnection[userId].addIceCandidate(await new RTCIceCandidate(messageObject.content.candidate));
+                        }
+                        break;
+                    }
+                    case "reply":{
+                        console.log("Someone reply you.");
+                        //增加视频窗口
+                        var newVideo = {
+                            userId:messageObject.userInfo.userId,
+                            userName:messageObject.userInfo.userName,
+                            videoUid:messageObject.content.videoUid
+                        }
+                        this.chatVideos.push(newVideo);
+                        //设置接收者远程视频
+                        this.replySetRemoteConfig(messageObject);
+                        break;
+                    }
+                    case "quit":{
+                        var quitUserId = messageObject.userInfo.userId;
+                        this.peerConnection[quitUserId]=null;
+                        for(var i=0;i<this.chatVideos.length;i++){
+                            if(this.chatVideos[i].userId==quitUserId){
+                                this.chatVideos.splice(i,1);
+                                break;
+                            }
+                        }
+                    }
+                }
+            },
+            onClose(){
+                this.closeConnection();
+                console.log("Socket连接断开！");
+            },
+            onError(){
+                this.closeConnection();
+                console.log("Socket连接错误！");
+            },
+            sendMessage(type, content){
+                var userId = this.pageParams.userId;
+                var userName = this.pageParams.userName;
+                var message ={
+                    type: type,
+                    userInfo:{
+                        userId: userId,
+                        userName: userName
+                    },
+                    content: content
+                }
+                this.videoChatSocket.send(JSON.stringify(message));
+            },
+            applyToJoin(){
+                for(var i=0;i<this.chatingUsers.length;i++){
+                    if(this.pageParams.userId!=this.chatingUsers[i].userId){
+                        this.initiate(this.chatingUsers[i].userId);
+                    }
+                }
+                //设置本地视频窗口
+                this.setLocalConfig();
+            },
+            quitFromChat(){
+                this.sendMessage("quit", {});
+                this.closeConnection();
+                this.chatVideos=[];
+                this.applyDisabled = false;
+                this.localVideoShow = false;
+            },
+            initiate(userId){
+                // 判断是否有 navigator.mediaDevices，没有赋成空对象
+                if (navigator.mediaDevices === undefined) {
+                    navigator.mediaDevices = {};
+                }
+
+                navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+                this.peerConnection[userId] = new RTCPeerConnection(configuration);
+
+                this.peerConnection[userId].onicecandidate = ({candidate}) =>
+                {
+                    console.log("[发送的candidate] " + JSON.stringify({"type":"candidate","value":candidate}))
+                    var content = {
+                        candidateTo: userId,
+                        candidate: candidate
+                    }
+                    this.sendMessage("candidate",content);
+                };
+
+                this.peerConnection[userId].oniceconnectionstatechange = (event)=> {
+                    if (this.peerConnection[userId].iceConnectionState === "failed" ||
+                    this.peerConnection[userId].iceConnectionState === "disconnected" ||
+                    this.peerConnection[userId].iceConnectionState === "closed") {
+                        console.error(event);
+                        console.error("Connection interruption please refresh");
+                    }
+                };
+
+            },
+            async setLocalConfig(){
+                try {
+                    var localView = document.getElementById('localVideo');
+                    // get local stream, show it in self-view and add it to be sent
+                    this.localStream = await navigator.mediaDevices.getUserMedia(constraints);
+                    var that = this;
+                    this.localStream.getTracks().forEach((track) =>{
+                        for(var i=0;i<this.chatingUsers.length;i++){
+                            if(this.pageParams.userId!=this.chatingUsers[i].userId){
+                                this.peerConnection[this.chatingUsers[i].userId].addTrack(track, that.localStream);
+                            }
+                        }
+                    });
+                    if ('srcObject' in localView) { // 判断是否支持 srcObject 属性
+                        localView.srcObject = this.localStream;
+                    } else {
+                        localView.src = window.URL.createObjectURL(this.localStream);
+                    }
+                } catch (err) {
+                    alert("系统未检测到摄像头!");
+                    console.error(err);
+                }
+                if(this.chatingUsers.length<1){
+                    this.sendMessage("initiate", {});
+                }
+                for(var i=0;i<this.chatingUsers.length;i++){
+                    if(this.pageParams.userId!=this.chatingUsers[i].userId){
+                        var userId = this.chatingUsers[i].userId;
+                        await this.peerConnection[userId].createOffer().then( offer => {
+                            return this.peerConnection[userId].setLocalDescription(new RTCSessionDescription(offer));
+                        });
+                        var content = {
+                            applyTo: userId,
+                            videoUid:this.peerConnection[userId].localDescription
+                        }
+                        this.sendMessage("apply", content);
+                    }
+                }
+                this.applyDisabled = true;
+                this.localVideoShow = true;
+            },
+            setRemoteVideo(videoId){
+                var remoteView = document.getElementById(videoId);
+                this.peerConnection[videoId].ontrack = (event) => {
+                    // don't set srcObject again if it is already set.
+                    this.remoteStream[videoId] = event.streams[0];
+                    if ('srcObject' in  remoteView)
+                    {
+                        remoteView.srcObject = this.remoteStream[videoId];
+                    }
+                    else {
+                        remoteView.src = window.URL.createObjectURL(this.remoteStream[videoId]);
+                    }
+                    remoteView.play();
+                };
+            },
+            async applySetRemoteConfig(messageObject){
+                var userId = messageObject.userInfo.userId;
+                this.setRemoteVideo(userId);
+                if (messageObject.content.videoUid != null ){
+                    await this.peerConnection[userId].setRemoteDescription(messageObject.content.videoUid);
+                }
+                try {
+                    var localView = document.getElementById('localVideo');
+                    // get local stream, show it in self-view and add it to be sent
+                    this.localStream = await navigator.mediaDevices.getUserMedia(constraints);
+                    if ('srcObject' in localView) { // 判断是否支持 srcObject 属性
+                        localView.srcObject = this.localStream;
+                    } else {
+                        localView.src = window.URL.createObjectURL(this.localStream);
+                    }
+                    var that = this;
+                    await this.localStream.getTracks().forEach((track) => that.peerConnection[userId].addTrack(track, that.localStream));
+                } catch (err) {
+                    alert("系统未检测到摄像头!");
+                    console.error(err);
+                }
+                await this.peerConnection[userId].createAnswer().then((answer)=> {
+                    that.peerConnection[userId].setLocalDescription(new RTCSessionDescription(answer))
+                });
+                //构建reply消息
+                var applyerId = userId;
+                var content = {
+                    replyTo: applyerId,
+                    videoUid:this.peerConnection[userId].localDescription
+                }
+                this.sendMessage("reply", content);
+                var remoteView = document.getElementById(userId);
+                remoteView.onloadedmetadata = function(){
+                    remoteView.play();
+                }
+            },
+            async replySetRemoteConfig(messageObject){
+                this.setRemoteVideo(messageObject.userInfo.userId);
+                if (messageObject.content.videoUid != null ){
+                    await this.peerConnection[messageObject.userInfo.userId].setRemoteDescription(messageObject.content.videoUid);
+                }
+            },
+            closeConnection() {
+                var that = this;
+                for(var i=0;i<this.chatingUsers.length;i++){
+                    var userId = this.chatingUsers[i].userId;
+                    if(this.pageParams.userId!=userId){
+                        if(that.remoteStream[userId]!=null){
+                            const tracks = this.localStream.getTracks().concat(that.remoteStream[userId].getTracks());
+                            tracks.forEach((track) => {
+                                track.stop();
+                            });
+                        }
+                        this.peerConnection[userId].close();
+                    }
+                }
+            }
+        }
+    })
+</script>
+</body>

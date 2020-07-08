@@ -65,6 +65,24 @@ Toolbar.prototype.init = function()
 		this.addDropDownArrow(formatMenu, 'geSprite-formatpanel', 38, 50, -4, -3, 36, -8);
 		this.addSeparator();
 	}
+	//ReadTask
+	if (sw >= 320)
+	{
+		var elts = this.addItems(['OpenTask']);
+		elts[0].setAttribute('title', 'Load Task');
+	}
+	//SaveTask
+    if (sw >= 320)
+    {
+        var elts = this.addItems(['SaveTask']);
+        elts[0].setAttribute('title', 'Save Task');
+	}
+	//UpdateTask
+    if (sw >= 320)
+    {
+        var elts = this.addItems(['UpdateTask']);
+        elts[0].setAttribute('title', 'Update Task');
+    }
 	
 	var viewMenu = this.addMenu('', mxResources.get('zoom') + ' (Alt+Mousewheel)', true, 'viewZoom', null, true);
 	viewMenu.showDisabled = true;

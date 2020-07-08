@@ -388,6 +388,9 @@ export default {
       if (this.$store.state.IP_Port == "localhost:8080") {
         noticeSocketURL = "ws://localhost:8081/GeoProblemSolving/NoticeSocket";
       }
+      if(window.location.port=="8083"){
+          noticeSocketURL = "wss://"+ window.location.hostname+":8083/GeoProblemSolving/NoticeSocket";
+      }
       this.noticeSocket = new WebSocket(noticeSocketURL);
       this.noticeSocket.onopen = this.onOpen;
       this.noticeSocket.onmessage = this.onMessage;

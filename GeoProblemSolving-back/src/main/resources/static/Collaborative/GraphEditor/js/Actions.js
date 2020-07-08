@@ -220,6 +220,24 @@ Actions.prototype.init = function()
 		}
 	};
 	
+	//ReadTask
+    this.addAction('OpenTask', function()
+    {
+		window.openTaskVM.showModal();
+	}, null, null, '').isEnabled = isGraphEnabled;
+
+	//SaveTask
+    this.addAction('SaveTask', function()
+    {
+		window.saveTaskVM.showModal();
+    }, null, null, '').isEnabled = isGraphEnabled;
+
+	//RefreshTask
+    this.addAction('UpdateTask', function()
+    {
+		window.updateTaskVM.showModal();
+	}, null, null, '').isEnabled = isGraphEnabled;
+
 	this.addAction('delete', function(evt)
 	{
 		deleteCells(evt != null && mxEvent.isShiftDown(evt));
