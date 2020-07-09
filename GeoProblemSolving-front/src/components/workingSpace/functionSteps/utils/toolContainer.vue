@@ -166,17 +166,17 @@
     >
       <h3>Note: Jupyter notebooks will be accessed by all members in this project.</h3>
     </Modal>
-    <Modal
+    <!-- <Modal
       v-model="openToolModal"
       title="Open tool"
     >
       <h2>How would you like to open this tool?</h2>
-      <small style="color:#ff9900">*Some tools are not supported to be used in window.</small>
+      <small style="color:#ff9900">*Some tools should be accessed in a new tab.</small>
       <div slot="footer" style="text-align:center">
-        <Button @click="openToolInWindow" type="primary" style="margin:0 15px">This window</Button>
-        <Button @click="openToolNewWindow" style="margin:0 15px">New window</Button>
+        <Button @click="openToolInWindow" type="primary" style="margin:0 15px">This tab</Button>
+        <Button @click="openToolNewWindow" style="margin:0 15px">New tab</Button>
       </div>
-    </Modal>
+    </Modal> -->
   </div>
 </template>
 <script>
@@ -209,7 +209,7 @@ export default {
       panelList: [],
       jupyterModal: false,
       selectedTool:{},
-      openToolModal:false
+      // openToolModal:false
     };
   },
   mounted() {
@@ -390,11 +390,18 @@ export default {
     },
     useTool(toolInfo) {
       this.selectedTool = toolInfo;
-      this.openToolModal = true;
+      // this.openToolModal = true;
+      var toolUrl = toolInfo.toolUrl;
+      if(toolUrl.indexOf("multipleChat")!==-1||toolUrl.indexOf("p2pChat")!==-1||toolUrl.indexOf("limesurvey")!==-1){
+        this.openToolNewWindow();
+      }
+      else{
+        this.openToolInWindow();
+      }
     },
     openToolInWindow(){
       var toolInfo = this.selectedTool;
-      this.openToolModal = false;
+      // this.openToolModal = false;
       // 记录信息
       let toolRecords = {
         type: "tools",
@@ -445,7 +452,7 @@ export default {
     },
     openToolNewWindow(){
       var toolInfo = this.selectedTool;
-      this.openToolModal = false;
+      // this.openToolModal = false;
       // 记录信息
       let toolRecords = {
         type: "tools",
