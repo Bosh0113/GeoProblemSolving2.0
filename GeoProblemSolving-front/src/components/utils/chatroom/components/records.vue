@@ -1,6 +1,12 @@
 <!-- records -->
 <template>
   <div class>
+    <Row style="margin-left: 20px;">
+      <Button type="info" ghost @click="getAll" class="btn">All</Button>
+      <Button type="info" ghost @click="getPictures" class="btn">Pictures</Button>
+      <Button type="info" ghost @click="getTools" class="btn">Tools</Button>
+    </Row>
+
     <Row>
       <DatePicker
         type="date"
@@ -13,10 +19,16 @@
     </Row>
     <!-- 搜索框 -->
     <Row class="search_msg">
-      <Input search placeholder="Enter something..." enter-button @on-search="queryContentLike" />
+      <Input
+        search
+        placeholder="Enter something..."
+        enter-button
+        @on-search="queryContentLike"
+        class="searchKey"
+      />
     </Row>
     <!-- 聊天记录列表 -->
-    <Row class="record_list">
+    <Row class="record_list" v-show="queryType == 'all'">
       <vue-scroll :ops="ops" :style="{height:panelHeight - 200 +'px'}">
         <div class="box" v-infinite-scroll="load" infinite-scroll-disabled="disabled">
           <div v-for="(list,index) in currentPageData" :key="index" class="record">
@@ -29,7 +41,17 @@
                 <div class="create_time">{{list.createTime}}</div>
               </Row>
               <Row>
-                <div style class="content">{{list.content}}</div>
+                <template v-if="list.type === 'message_pic'" class="picOuter">
+                  <img :src="list.content" class="send_pic" />
+                </template>
+                <template v-else-if="list.type === 'message_tool'">
+                  <simple-public-card
+                    :toolFrom="JSON.parse(list.content)"
+                    :isOpenTool="isOpenTool"
+                    class="toolOuter"
+                  ></simple-public-card>
+                </template>
+                <template v-else class="content">{{list.content}}</template>
               </Row>
             </Row>
           </div>
@@ -38,6 +60,38 @@
           </p>
           <p v-if="noMore" class="no_records">No More Reocrds</p>
         </div>
+      </vue-scroll>
+    </Row>
+    <Row class="record_list" v-show="queryType != 'all'">
+      <vue-scroll :ops="ops" :style="{height:panelHeight - 200 +'px'}">
+        <div v-for="(list,index) in msg_guodu" :key="index" class="record">
+          <Row style="margin-bottom:2.5px">
+            <Row>
+              <div class="message_from">
+                <div class="src" v-if="list.srcUserId == srcId">{{list.srcUserName}}</div>
+                <div class="target" v-else>{{list.srcUserName}}</div>
+              </div>
+              <div class="create_time">{{list.createTime}}</div>
+            </Row>
+            <Row>
+              <template v-if="list.type === 'message_pic'" class="picOuter">
+                <img :src="list.content" class="send_pic" />
+              </template>
+              <template v-else-if="list.type === 'message_tool'">
+                <simple-public-card
+                  :toolFrom="JSON.parse(list.content)"
+                  :isOpenTool="isOpenTool"
+                  class="toolOuter"
+                ></simple-public-card>
+              </template>
+              <template v-else class="content">{{list.content}}</template>
+            </Row>
+          </Row>
+        </div>
+        <p v-if="loading" class="loading_icon">
+          <Icon class="el-icon-loading" :size="30" />
+        </p>
+        <p v-if="noMore" class="no_records">No More Reocrds</p>
       </vue-scroll>
     </Row>
     <!-- 分页 -->
@@ -56,6 +110,7 @@
 
 <script>
 import { get, del, post, put } from "@/axios";
+import simplePublicCard from "@/components/common/card/simplePublicToolsCard";
 export default {
   props: {
     showTab: {
@@ -68,6 +123,8 @@ export default {
       type: String
     }
   },
+  components: { simplePublicCard },
+
   data() {
     return {
       query_date: "",
@@ -78,6 +135,7 @@ export default {
       currentPage: 1, //当前页数 ，默认为1
       pageSize: 15, // 每页显示数量
       currentPageData: [], //当前页显示内容
+      msg_guodu: [],
       roomId: this.groupId,
       srcId: this.userId,
       ops: {
@@ -102,7 +160,11 @@ export default {
       msgR_next: [],
 
       //height
-      panelHeight: 0
+      panelHeight: 0,
+      queryType: "all",
+
+      isOpenTool: true,
+      msgType: "All"
     };
   },
   computed: {
@@ -113,17 +175,33 @@ export default {
       return this.loading || this.noMore;
     }
   },
-  watch: {},
+  watch: {
+    msgType: {
+      handler(val) {
+        this.queryType = "all";
+        this.currentPage = 1;
+        this.currentPageData = [];
+        if (val == "All") {
+          this.loadMessageRecords();
+        } else {
+          this.loadMessageRecordsByType();
+        }
+      },
+      deep: true
+    }
+  },
   methods: {
-    //日期选择器
-    async queryTimeLike(seledate) {
-      this.currentPageData = [];
-      let data = await get(
-        `/GeoProblemSolving/message/timeLike/${this.roomId}/${seledate}`
-      );
-      this.currentPageData.push(...data);
+    getAll() {
+      this.msgType = "All";
     },
 
+    getPictures() {
+      this.msgType = "message_pic";
+    },
+
+    getTools() {
+      this.msgType = "message_tool";
+    },
     //查找total currentPage
     async getTotalCount() {
       let data = await get(`/GeoProblemSolving/message/totalCount`);
@@ -136,22 +214,35 @@ export default {
         this.$Message.warning("This is no record here!");
       }
     },
-
     //inifte scroll
-
     load() {
       this.loading = true;
       setTimeout(() => {
         this.currentPage += 1; //页数+1
-        this.loadMessageRecords(); //调用接口，此时页数+1，查询下一页数据
+        if (this.queryType == "all") {
+          this.loadMessageRecords(); //调用接口，此时页数+1，查询下一页数据
+        } else if (this.queryType == "date") {
+          this.queryContentLike();
+        } else if (this.queryType == "content") {
+          this.queryTimeLike();
+        }
+
         this.loading = false;
       }, 2000);
     },
 
     //按页码查询
     async loadMessageRecords() {
+      this.queryType = "all";
       let data = await get(
         `/GeoProblemSolving/message/inquiryByPage/${this.roomId}/${this.currentPage}/${this.pageSize}`
+      );
+      this.currentPageData.push(...data);
+    },
+
+    async loadMessageRecordsByType() {
+      let data = await get(
+        `/GeoProblemSolving/message/inquiryByType/${this.roomId}/${this.msgType}`
       );
       this.currentPageData.push(...data);
     },
@@ -162,11 +253,34 @@ export default {
     //   this.loadMessageRecords();
     // },
     async queryContentLike(val) {
-      let { data } = await get(
-        `/GeoProblemSolving/message/contentLike/${this.roomId}/${val}`
+      this.queryType = "content";
+      this.msg_guodu = [];
+      this.currentPageData = [];
+      let data = await get(
+        `/GeoProblemSolving/message/contentLike/${this.roomId}/${val}/${this.currentPage}/${this.pageSize}`
       );
-      this.currentPageData = data;
+      this.msg_guodu.push(...data);
     },
+
+    //日期选择器
+    async queryTimeLike(seledate) {
+      this.msg_guodu = [];
+      if (seledate == "") {
+        this.queryType = "all";
+        this.currentPage = 1;
+        this.loadMessageRecords();
+      } else {
+        this.queryType = "date";
+        this.currentPageData = [];
+        let data = await get(
+          `/GeoProblemSolving/message/timeLike/${this.roomId}/${seledate}/${this.currentPage}/${this.pageSize}`
+        );
+        this.msg_guodu.push(...data);
+      }
+    },
+
+    timeClear() {},
+
     initSize() {
       this.panelHeight = window.innerHeight;
       console.log(this.panelHeight);
@@ -201,6 +315,7 @@ export default {
   padding: 10px;
   /* background-color: lightblue; */
   width: 90%;
+  z-index: 0;
   // margin-left: 2.5%;
 }
 
@@ -259,5 +374,25 @@ export default {
   font-style: italic;
   font-weight: 600;
   margin: 10px 0;
+}
+.searchKey {
+  width: 280px;
+  margin-left: 12px;
+}
+.picOuter {
+  max-height: 300px;
+  max-width: 400px;
+}
+.send_pic {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+}
+.toolOuter {
+  width: 120px;
+}
+.btn {
+  line-height: 15px;
 }
 </style>

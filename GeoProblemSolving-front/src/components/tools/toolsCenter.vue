@@ -1078,12 +1078,14 @@ export default {
           console.log(err);
         });
     },
+    
     async getPublicTools() {
       let data = await get(
         "/GeoProblemSolving/tool/inquiry/?key=privacy&value=Public"
       );
       this.$set(this, "publicTools", data);
     },
+
     async getPersonalTools() {
       let data = await get(
         `/GeoProblemSolving/tool/findByProvider/${this.userInfo.userId}`

@@ -171,6 +171,15 @@
                   </div>
 
                   <div class="send_tool">
+                    <Icon
+                      type="md-water"
+                      size="35"
+                      class="send_icon"
+                      @click.native="showConcepts()"
+                    />
+                  </div>
+
+                  <div class="send_tool">
                     <Icon type="md-send" @click.native="send" size="35" class="send_icon" />
                   </div>
                 </Col>
@@ -217,9 +226,15 @@
               :panelHeight="panelHeight"
             ></records>
           </TabPane>
-          <!-- <TabPane label="Concepts">
+        </Tabs>
+        <!-- 日期选择器 -->
+      </div>
+
+      <div class="extendedPanel" v-show="extendedConceptsShow">
+        <Tabs type="card">
+          <TabPane label="Concepts">
             <concepts :msgConcepts="msgConcepts"></concepts>
-          </TabPane>-->
+          </TabPane>
           <TabPane label="ConceptMap">
             <conceptMap :msgConceptMap="msgConceptMap" :panelHeight="panelHeight"></conceptMap>
           </TabPane>
@@ -227,7 +242,7 @@
         <!-- 日期选择器 -->
       </div>
 
-      <Modal v-model="toolModalShow" width="800">
+      <Modal v-model="toolModalShow" width="800" footer-hide>
         <tool-modal :userId="userId" @selectedTools="sendTools" footer-hide></tool-modal>
       </Modal>
     </div>
@@ -280,6 +295,7 @@ export default {
   data() {
     return {
       extendedPanelShow: false,
+      extendedConceptsShow: false,
       message: "",
       msglist: [],
       send_msg: [],
@@ -294,6 +310,8 @@ export default {
       member: [],
       //工具对话框
       toolModalShow: false,
+      //语义概念库
+      toolConceptsShow: false,
       //user infomation
       userId: this.$store.getters.userId,
       userName: this.$store.getters.userName,
@@ -453,6 +471,7 @@ export default {
       } else if (chatMsg.type === "concepts") {
         this.msgConcepts = chatMsg.frequency;
         this.msgConceptMap = chatMsg.conceptMap;
+        this.extendedConceptsShow = true;
       } else if (chatMsg.type == undefined && chatMsg.length > 0) {
         for (let i = 0; i < chatMsg.length; i++) {
           if (chatMsg[i].content != "") {
@@ -515,6 +534,9 @@ export default {
     showRecords() {
       this.extendedPanelShow = !this.extendedPanelShow;
       this.showTabs = true;
+    },
+    showConcepts() {
+      this.extendedConceptsShow = !this.extendedConceptsShow;
     },
 
     //notice

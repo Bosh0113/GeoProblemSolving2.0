@@ -53,7 +53,7 @@ export default {
 </script>
 <style lang='scss' scoped>
 .panel-body {
-  width: 300px;
+  width: 400px;
   height: 500px;
 }
 </style>

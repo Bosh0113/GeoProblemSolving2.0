@@ -1,9 +1,9 @@
 package cn.edu.njnu.geoproblemsolving.Socket;
 
 import cn.edu.njnu.geoproblemsolving.Config.MyEndPointConfigure;
-import cn.edu.njnu.geoproblemsolving.domain.chatmessage.MessageRecordsService;
-import cn.edu.njnu.geoproblemsolving.domain.chatmessage.dto.AddMessageRecordsDTO;
-import cn.edu.njnu.geoproblemsolving.domain.hydrologicalconcept.AnsjSegService;
+import cn.edu.njnu.geoproblemsolving.domain.chatroom.chatmessage.MessageRecordsService;
+import cn.edu.njnu.geoproblemsolving.domain.chatroom.chatmessage.dto.AddMessageRecordsDTO;
+import cn.edu.njnu.geoproblemsolving.domain.chatroom.hydrologicalconcept.AnsjSegService;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -160,16 +160,17 @@ public class ChatServerSocket {
         String srcUserId = messageObject.getString("srcUserId");
         String targetUserId = messageObject.getString("targetUserId");
         String content = messageObject.getString("content");
-        //词云
+
         String result = ansjSegService.processInfo(content);
         String relateConceptSet = ansjSegService.elasticSearch(result);
+
 
         //群聊
         if (srcUserId.equals(targetUserId)) {
             for (Map.Entry<String, Session> server : rooms.get(roomId).entrySet()) {
                 if (!srcUserId.equals(server.getKey())) {
-                server.getValue().getBasicRemote().sendText(message);
-                }server.getValue().getBasicRemote().sendText(message);
+                    server.getValue().getBasicRemote().sendText(message);
+                }
                 server.getValue().getBasicRemote().sendText(relateConceptSet);
 
             }
