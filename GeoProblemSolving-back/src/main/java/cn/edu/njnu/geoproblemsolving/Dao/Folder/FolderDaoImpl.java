@@ -2,11 +2,11 @@ package cn.edu.njnu.geoproblemsolving.Dao.Folder;
 
 import cn.edu.njnu.geoproblemsolving.Dao.Method.FileCopyThread;
 import cn.edu.njnu.geoproblemsolving.Dao.Resource.ResourceDaoImpl;
-import cn.edu.njnu.geoproblemsolving.Entity.Folder.FolderEntity;
-import cn.edu.njnu.geoproblemsolving.Entity.Folder.FolderItem;
-import cn.edu.njnu.geoproblemsolving.Entity.Folder.UploadResult;
-import cn.edu.njnu.geoproblemsolving.Entity.ResourceEntity;
-import cn.edu.njnu.geoproblemsolving.Entity.UserEntity;
+import cn.edu.njnu.geoproblemsolving.Entity.Resources.FolderEntity;
+import cn.edu.njnu.geoproblemsolving.Entity.Resources.FolderItem;
+import cn.edu.njnu.geoproblemsolving.Entity.Resources.UploadResult;
+import cn.edu.njnu.geoproblemsolving.Entity.Resources.ResourceEntity;
+import cn.edu.njnu.geoproblemsolving.Entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -35,7 +35,7 @@ public class FolderDaoImpl implements IFolderDao {
     }
 
     @Override
-    public Object newFolder(String folderName, String parentId, String scopeId) {
+    public Object createFolder(String folderName, String parentId, String scopeId) {
         try {
             // decode
             parentId = decode(parentId);
@@ -287,8 +287,8 @@ public class FolderDaoImpl implements IFolderDao {
                 resourceFile.setName(name);
                 resourceFile.setDescription(description);
                 Query queryUser = new Query(Criteria.where("userId").is(userId));
-                UserEntity userEntity = mongoTemplate.findOne(queryUser, UserEntity.class);
-                resourceFile.setUploaderName(userEntity.getUserName());
+                User user = mongoTemplate.findOne(queryUser, User.class);
+                resourceFile.setUploaderName(user.getName());
                 Date date = new Date();
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
                 String uploadTime = dateFormat.format(date);

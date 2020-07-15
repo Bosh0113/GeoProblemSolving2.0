@@ -1,16 +1,12 @@
 package cn.edu.njnu.geoproblemsolving.Service;
 
 import cn.edu.njnu.geoproblemsolving.Entity.Activities.Activity;
-import cn.edu.njnu.geoproblemsolving.Entity.Activities.Enums.ActivityPrivacy;
+import cn.edu.njnu.geoproblemsolving.Enums.ProjectPrivacy;
 import cn.edu.njnu.geoproblemsolving.Entity.Activities.LinkProtocol;
 
 import java.util.List;
 
 public interface ActivityService {
-
-    public List<Activity> findByLevel(Integer level);
-
-    public List<Activity> findByPrivacy(ActivityPrivacy privacy);
 
     public List<Activity> findChildren(String aid);
 

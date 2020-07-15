@@ -1,6 +1,4 @@
-package cn.edu.njnu.geoproblemsolving.Entity.Folder;
-
-import cn.edu.njnu.geoproblemsolving.Entity.ResourceEntity;
+package cn.edu.njnu.geoproblemsolving.Entity.Resources;
 
 import java.util.ArrayList;
 

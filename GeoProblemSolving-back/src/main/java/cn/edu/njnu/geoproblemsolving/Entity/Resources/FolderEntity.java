@@ -1,6 +1,5 @@
-package cn.edu.njnu.geoproblemsolving.Entity.Folder;
+package cn.edu.njnu.geoproblemsolving.Entity.Resources;
 
-import cn.edu.njnu.geoproblemsolving.Entity.ResourceEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.ArrayList;

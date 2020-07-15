@@ -1,10 +1,10 @@
 package cn.edu.njnu.geoproblemsolving.Dao.SubProject;
 
 import cn.edu.njnu.geoproblemsolving.Dao.Method.CommonMethod;
-import cn.edu.njnu.geoproblemsolving.Entity.Folder.FolderEntity;
+import cn.edu.njnu.geoproblemsolving.Entity.Resources.FolderEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.ProjectEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.SubProjectEntity;
-import cn.edu.njnu.geoproblemsolving.Entity.UserEntity;
+import cn.edu.njnu.geoproblemsolving.Entity.User;
 import com.alibaba.fastjson.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -41,7 +41,7 @@ public class SubProjectDaoImpl implements ISubProjectDao {
             subProject.setCreateTime(dateFormat.format(data));
 
             Query queryUser = Query.query(Criteria.where("userId").is(subProject.getManagerId()));
-            UserEntity managerInfo = mongoTemplate.findOne(queryUser, UserEntity.class);
+            User managerInfo = mongoTemplate.findOne(queryUser, User.class);
             subProject.setManagerName(managerInfo.getUserName());
             mongoTemplate.save(subProject);
 
@@ -116,8 +116,8 @@ public class SubProjectDaoImpl implements ISubProjectDao {
                 JSONArray members = subProject.getMembers();
                 CommonMethod method = new CommonMethod();
                 Query queryUser=Query.query(Criteria.where("userId").is(userId));
-                UserEntity userEntity=mongoTemplate.findOne(queryUser,UserEntity.class);
-                Object result = method.joinGroup(members, managerId, userId,userEntity.getUserName());
+                User user =mongoTemplate.findOne(queryUser, User.class);
+                Object result = method.joinGroup(members, managerId, userId, user.getUserName());
                 if (result.equals("Exist")) {
                     return "Exist";
                 } else {
@@ -168,7 +168,7 @@ public class SubProjectDaoImpl implements ISubProjectDao {
             JSONArray newMembers = method.quitGroup(members, userId, "userId");
             JSONArray newMembers1 = (JSONArray) method.joinGroup(newMembers, userId, foreManagerId,foreManagerName);
             Query queryUser =Query.query(Criteria.where("userId").is(userId));
-            UserEntity newManager=mongoTemplate.findOne(queryUser,UserEntity.class);
+            User newManager=mongoTemplate.findOne(queryUser, User.class);
             Update update = new Update();
             update.set("members", newMembers1);
             update.set("managerId", newManager.getUserId());

@@ -1,4 +1,4 @@
-package cn.edu.njnu.geoproblemsolving.Entity.Folder;
+package cn.edu.njnu.geoproblemsolving.Entity.Resources;
 
 public class FolderItem {
 

@@ -1,7 +1,8 @@
 package cn.edu.njnu.geoproblemsolving.Dao.Step;
 
 import cn.edu.njnu.geoproblemsolving.Dao.Method.CommonMethod;
-import cn.edu.njnu.geoproblemsolving.Entity.Folder.FolderEntity;
+import cn.edu.njnu.geoproblemsolving.Entity.Resources.FolderEntity;
+import cn.edu.njnu.geoproblemsolving.Entity.ProjectEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.StepEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.SubProjectEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.ToolsetEntity;

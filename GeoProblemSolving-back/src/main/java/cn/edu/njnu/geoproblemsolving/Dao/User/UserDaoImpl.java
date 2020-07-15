@@ -4,9 +4,9 @@ package cn.edu.njnu.geoproblemsolving.Dao.User;
 //import cn.edu.njnu.geoproblemsolving.Dao.Method.AESUtils;
 import cn.edu.njnu.geoproblemsolving.Dao.Method.CommonMethod;
 import cn.edu.njnu.geoproblemsolving.Entity.ProjectEntity;
-import cn.edu.njnu.geoproblemsolving.Entity.ResourceEntity;
+import cn.edu.njnu.geoproblemsolving.Entity.Resources.ResourceEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.SubProjectEntity;
-import cn.edu.njnu.geoproblemsolving.Entity.UserEntity;
+import cn.edu.njnu.geoproblemsolving.Entity.User;
 import cn.edu.njnu.geoproblemsolving.View.StaticPagesBuilder;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -32,9 +32,9 @@ public class UserDaoImpl implements IUserDao {
     }
 
     @Override
-    public String saveUser(UserEntity user) {
+    public String saveUser(User user) {
         Query queryEmail = Query.query(Criteria.where("email").is(user.getEmail()));
-        if (!mongoTemplate.find(queryEmail, UserEntity.class).isEmpty()) {
+        if (!mongoTemplate.find(queryEmail, User.class).isEmpty()) {
             return "Email";
 //        } else if (!mongoTemplate.find(queryPhone, UserEntity.class).isEmpty()) {
 //            return "MobilePhone";mongodb
@@ -47,10 +47,10 @@ public class UserDaoImpl implements IUserDao {
     @Override
     public Object readUser(String key, String value) {
         Query query = Query.query(Criteria.where(key).is(value));
-        if (mongoTemplate.find(query, UserEntity.class).isEmpty()) {
+        if (mongoTemplate.find(query, User.class).isEmpty()) {
             return "None";
         } else {
-            UserEntity user = mongoTemplate.findOne(query, UserEntity.class);
+            User user = mongoTemplate.findOne(query, User.class);
 
             user.setPassword("");
             return user;
@@ -71,8 +71,8 @@ public class UserDaoImpl implements IUserDao {
             Query query = new Query(Criteria.where("userId").is(userId));
             CommonMethod method = new CommonMethod();
             Update update = method.setUpdate(request);
-            mongoTemplate.updateFirst(query, update, UserEntity.class);
-            UserEntity newUser = mongoTemplate.findOne(query, UserEntity.class);
+            mongoTemplate.updateFirst(query, update, User.class);
+            User newUser = mongoTemplate.findOne(query, User.class);
             newUser.setPassword("");
             try {
                 String newUserName = request.getParameter("userName");
@@ -93,8 +93,8 @@ public class UserDaoImpl implements IUserDao {
                 Query query = new Query(Criteria.where("email").is(email));
                 Update updatePassword = new Update();
                 updatePassword.set("password", password);
-                mongoTemplate.updateFirst(query, updatePassword, UserEntity.class);
-                return mongoTemplate.findOne(query, UserEntity.class);
+                mongoTemplate.updateFirst(query, updatePassword, User.class);
+                return mongoTemplate.findOne(query, User.class);
             }
         } catch (Exception e) {
             return "Fail";
@@ -108,7 +108,7 @@ public class UserDaoImpl implements IUserDao {
 //            password = aesUtils.decrypt(password);
             if (verifyPassword(email, password)) {
                 Query query = new Query(Criteria.where("email").is(email));
-                UserEntity user = mongoTemplate.findOne(query, UserEntity.class);
+                User user = mongoTemplate.findOne(query, User.class);
                 user.setPassword("");
                 return user;
             } else {
@@ -122,18 +122,18 @@ public class UserDaoImpl implements IUserDao {
     @Override
     public Boolean isRegistered(String email) {
         Query query = new Query(Criteria.where("email").is(email));
-        return !mongoTemplate.find(query, UserEntity.class).isEmpty();
+        return !mongoTemplate.find(query, User.class).isEmpty();
     }
 
     @Override
     public Boolean verifyPassword(String email, String password) {
         Query query = new Query(Criteria.where("email").is(email).and("password").is(password));
-        return !mongoTemplate.find(query, UserEntity.class).isEmpty();
+        return !mongoTemplate.find(query, User.class).isEmpty();
     }
 
-    private void updateAllAboutUserWithUserName(UserEntity userEntity,String newUserName){
-        String userId = userEntity.getUserId();
-        JSONArray joinedProjects = userEntity.getJoinedProjects();
+    private void updateAllAboutUserWithUserName(User user, String newUserName){
+        String userId = user.getUserId();
+        JSONArray joinedProjects = user.getJoinedProjects();
         for (int i=0;i<joinedProjects.size();i++){
             JSONObject joinedProject = joinedProjects.getJSONObject(i);
             String projectId = joinedProject.getString("projectId");
@@ -157,7 +157,7 @@ public class UserDaoImpl implements IUserDao {
             updateAllSubProjectForUserName(projectId,userId,newUserName);
         }
 
-        JSONArray manageProjects = userEntity.getManageProjects();
+        JSONArray manageProjects = user.getManageProjects();
         for (int i=0;i<manageProjects.size();i++){
             JSONObject manageProject = manageProjects.getJSONObject(i);
             String projectId = manageProject.getString("projectId");

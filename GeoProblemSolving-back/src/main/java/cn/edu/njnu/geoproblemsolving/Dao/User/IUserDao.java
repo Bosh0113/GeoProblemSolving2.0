@@ -1,12 +1,12 @@
 package cn.edu.njnu.geoproblemsolving.Dao.User;
 
-import cn.edu.njnu.geoproblemsolving.Entity.UserEntity;
+import cn.edu.njnu.geoproblemsolving.Entity.User;
 
 import javax.servlet.http.HttpServletRequest;
 
 public interface IUserDao {
 
-    String saveUser(UserEntity user);
+    String saveUser(User user);
 
     Object readUser(String key,String value);
 

@@ -9,7 +9,7 @@ import lombok.Getter;
  * Discoverable: apply to join and quit
  * Private: only for Project Level
  */
-public enum ActivityPrivacy {
+public enum ProjectPrivacy {
     Public,
     Discoverable,
     Private

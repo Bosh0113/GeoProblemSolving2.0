@@ -1,5 +1,6 @@
 package cn.edu.njnu.geoproblemsolving.Controller;
 
+import cn.edu.njnu.geoproblemsolving.Dao.Project.ProjectDaoImpl;
 import cn.edu.njnu.geoproblemsolving.Dao.Resource.ResourceDaoImpl;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.web.bind.annotation.*;
@@ -55,5 +56,11 @@ public class ResourceController {
     public void packageZIP(HttpServletRequest request,HttpServletResponse response){
         ResourceDaoImpl resourceDao = new ResourceDaoImpl(mongoTemplate);
         resourceDao.packageToZip(request,response);
+    }
+
+    @RequestMapping(value = "/projectPic", method = RequestMethod.POST)
+    public String uploadPicture(HttpServletRequest request) {
+        ResourceDaoImpl resourceDao = new ResourceDaoImpl(mongoTemplate);
+        return resourceDao.uploadProjectPic(request);
     }
 }

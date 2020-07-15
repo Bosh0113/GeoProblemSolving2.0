@@ -1,4 +1,4 @@
-package cn.edu.njnu.geoproblemsolving.Entity.Activities.Enums;
+package cn.edu.njnu.geoproblemsolving.Enums;
 
 import lombok.Getter;
 
@@ -12,5 +12,4 @@ public enum ActivityType {
 
     Activity_Unit,
     Activity_Group,
-    Activity_Path
 }

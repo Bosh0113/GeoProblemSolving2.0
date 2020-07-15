@@ -1,7 +1,7 @@
 package cn.edu.njnu.geoproblemsolving.Controller;
 
 import cn.edu.njnu.geoproblemsolving.Dao.User.UserDaoImpl;
-import cn.edu.njnu.geoproblemsolving.Entity.UserEntity;
+import cn.edu.njnu.geoproblemsolving.Entity.User;
 import com.alibaba.fastjson.JSONArray;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +20,7 @@ public class UserController {
     private MongoTemplate mongoTemplate;
 
     @RequestMapping(value = "/register", produces = {"application/json;charset=UTF-8"}, method = RequestMethod.POST)
-    public String saveUser(@RequestBody UserEntity user) {
+    public String saveUser(@RequestBody User user) {
         UserDaoImpl userDao = new UserDaoImpl(mongoTemplate);
         String userId = UUID.randomUUID().toString();
         user.setUserId(userId);
@@ -76,7 +76,7 @@ public class UserController {
         try {
             Object object=userDao.login(email,password);
             if(!object.equals("Fail")){
-                UserEntity user=(UserEntity)object;
+                User user=(User)object;
                 HttpSession session=request.getSession();
                 session.setMaxInactiveInterval(30*60);
                 session.setAttribute("userId",user.getUserId());
@@ -105,7 +105,7 @@ public class UserController {
             HttpSession session=request.getSession();
             if (session.getAttribute("userId")!=null){
                 UserDaoImpl userDao=new UserDaoImpl(mongoTemplate);
-                UserEntity userInfo=(UserEntity) userDao.readUser("userId",session.getAttribute("userId").toString());
+                User userInfo=(User) userDao.readUser("userId",session.getAttribute("userId").toString());
                 userInfo.setPassword("");
                 return userInfo;
             }

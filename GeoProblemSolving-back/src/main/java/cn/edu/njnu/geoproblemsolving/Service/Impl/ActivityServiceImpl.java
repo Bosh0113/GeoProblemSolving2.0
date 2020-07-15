@@ -1,9 +1,8 @@
 package cn.edu.njnu.geoproblemsolving.Service.Impl;
 
 import cn.edu.njnu.geoproblemsolving.Entity.Activities.Activity;
-import cn.edu.njnu.geoproblemsolving.Entity.Activities.Enums.ActivityPrivacy;
 import cn.edu.njnu.geoproblemsolving.Entity.Activities.LinkProtocol;
-import cn.edu.njnu.geoproblemsolving.Entity.UserEntity;
+import cn.edu.njnu.geoproblemsolving.Entity.User;
 import cn.edu.njnu.geoproblemsolving.Repository.ActivityRepository;
 import cn.edu.njnu.geoproblemsolving.Repository.ProtocolRepository;
 import cn.edu.njnu.geoproblemsolving.Repository.UserRepository;
@@ -30,18 +29,18 @@ public class ActivityServiceImpl implements ActivityService {
         this.userRepository = userRepository;
     }
 
-
-    @Override
-    public List<Activity> findByLevel(Integer level){
-        return activityRepository.findByLevel(level);
+    private User findByUserId(String userId){
+        Optional optional = userRepository.findById(userId);
+        if(optional.isPresent()){
+            Object user = optional.get();
+            return (User)user;
+        }
+        else {
+            return null;
+        }
     }
 
-    @Override
-    public List<Activity> findByPrivacy(ActivityPrivacy privacy){
-        return activityRepository.findByPrivacy(privacy);
-    }
-
-    private Activity findByAid(String aid){
+    public Activity findActivityById(String aid){
         Optional optional = activityRepository.findById(aid);
         if(optional.isPresent()){
             Object activity = optional.get();
@@ -52,27 +51,16 @@ public class ActivityServiceImpl implements ActivityService {
         }
     }
 
-    private UserEntity findByUserId(String userId){
-        Optional optional = userRepository.findById(userId);
-        if(optional.isPresent()){
-            Object user = optional.get();
-            return (UserEntity)user;
-        }
-        else {
-            return null;
-        }
-    }
-
     @Override
     public List<Activity> findChildren(String aid) {
         List<Activity> activities = new ArrayList();
-        Activity current = findByAid(aid);
+        Activity current = findActivityById(aid);
         if(current == null) return null;
 
         ArrayList<String> children = current.getChildren();
         for(String childId : children){
 
-            Activity child = findByAid(childId);
+            Activity child = findActivityById(childId);
             if(child == null) continue;
             activities.add(child);
         }
@@ -83,14 +71,14 @@ public class ActivityServiceImpl implements ActivityService {
     @Override
     public List<Activity> findLast(String aid){
         List<Activity> activities = new ArrayList();
-        Activity current = findByAid(aid);
+        Activity current = findActivityById(aid);
         if(current == null) return null;
 
         JSONArray lastActivities = current.getLast();
         for(Object last : lastActivities) {
             if (last instanceof JSONObject) {
 
-                Activity lastActivity = findByAid(((JSONObject) last).getString("aid"));
+                Activity lastActivity = findActivityById(((JSONObject) last).getString("aid"));
                 if(lastActivity == null) continue;
                 activities.add(lastActivity);
             }
@@ -101,14 +89,14 @@ public class ActivityServiceImpl implements ActivityService {
     @Override
     public List<Activity> findNext(String aid){
         List<Activity> activities = new ArrayList();
-        Activity current = findByAid(aid);
+        Activity current = findActivityById(aid);
         if(current == null) return null;
 
         JSONArray nextActivities = current.getNext();
         for(Object next : nextActivities){
             if ( next instanceof JSONObject ) {
 
-                Activity nextActivity = findByAid(((JSONObject)next).getString("aid"));
+                Activity nextActivity = findActivityById(((JSONObject)next).getString("aid"));
                 if(nextActivity == null) continue;
                 activities.add(nextActivity);
             }
@@ -123,7 +111,7 @@ public class ActivityServiceImpl implements ActivityService {
         String childId = child.getAid();
 
         // Update the current activity
-        Activity current = findByAid(aid);
+        Activity current = findActivityById(aid);
         if(current == null) return null;
 
         ArrayList<String> children = current.getChildren();
@@ -145,7 +133,7 @@ public class ActivityServiceImpl implements ActivityService {
             String nextId = next.getAid();
 
             // Update the current activity
-            Activity current = findByAid(aid);
+            Activity current = findActivityById(aid);
             if(current == null) return null;
             activityRepository.save(saveLastActivityInfo(nextId, pid, current));
 
@@ -168,7 +156,7 @@ public class ActivityServiceImpl implements ActivityService {
             String lastId = last.getAid();
 
             // Update the current activity
-            Activity current = findByAid(aid);
+            Activity current = findActivityById(aid);
             if(current == null) return null;
             activityRepository.save(saveNextActivityInfo(lastId, pid, current));
 
@@ -187,12 +175,12 @@ public class ActivityServiceImpl implements ActivityService {
             String pid = protocolRepository.save(protocol).getPid();
 
             // Save the last activity
-            Activity activity1 = findByAid(aid1);
+            Activity activity1 = findActivityById(aid1);
             if(activity1 == null) return "Fail: activity does not exist";
             activityRepository.save(saveLastActivityInfo(aid2, pid, activity1));
 
             // Update the next activity
-            Activity activity2 = findByAid(aid2);
+            Activity activity2 = findActivityById(aid2);
             if(activity2 == null) return "Fail: activity does not exist";
             activityRepository.save(saveNextActivityInfo(aid1, pid, activity2));
 
@@ -208,7 +196,7 @@ public class ActivityServiceImpl implements ActivityService {
     public String separateActivities(String lastAid, String nextAid){
         try {
             // Save the last activity
-            Activity activity1 = findByAid(lastAid);
+            Activity activity1 = findActivityById(lastAid);
             if(activity1 == null) return "Fail: activity does not exist";
             JSONArray nextActivities = activity1.getNext();
 
@@ -222,7 +210,7 @@ public class ActivityServiceImpl implements ActivityService {
             activityRepository.save(activity1);
 
             // Save the next activity
-            Activity activity2 = findByAid(nextAid);
+            Activity activity2 = findActivityById(nextAid);
             if(activity2 == null) return "Fail: activity does not exist";
             JSONArray lastActivities = activity2.getLast();
 
@@ -246,15 +234,15 @@ public class ActivityServiceImpl implements ActivityService {
     @Override
     public String joinActivity(String aid, String userId){
         try {
-            UserEntity user = findByUserId(userId);
+            User user = findByUserId(userId);
             if(user == null) return "Fail: user does not exist";
             JSONObject userInfo = new JSONObject();
             userInfo.put("userId", user.getUserId());
-            userInfo.put("name", user.getUserName());
+            userInfo.put("name", user.getName());
             userInfo.put("avatar", user.getAvatar());
             userInfo.put("role", "");
 
-            Activity activity = findByAid(aid);
+            Activity activity = findActivityById(aid);
             if(activity == null) return "Fail: activity does not exist";
             JSONArray members = activity.getMembers();
             members.add(userInfo);
@@ -271,7 +259,7 @@ public class ActivityServiceImpl implements ActivityService {
     @Override
     public String quitActivity(String aid, String userId){
         try {
-            Activity activity = findByAid(aid);
+            Activity activity = findActivityById(aid);
             if(activity == null) return "Fail: activity does not exist";
 
             JSONArray members = activity.getMembers();

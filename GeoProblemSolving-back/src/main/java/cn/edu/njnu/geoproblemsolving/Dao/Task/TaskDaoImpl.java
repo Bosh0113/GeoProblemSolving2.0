@@ -2,7 +2,7 @@ package cn.edu.njnu.geoproblemsolving.Dao.Task;
 
 import cn.edu.njnu.geoproblemsolving.Dao.Method.CommonMethod;
 import cn.edu.njnu.geoproblemsolving.Entity.TaskEntity;
-import cn.edu.njnu.geoproblemsolving.Entity.UserEntity;
+import cn.edu.njnu.geoproblemsolving.Entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -133,7 +133,7 @@ public class TaskDaoImpl implements ITaskDao{
             List<TaskEntity> taskEntityList = mongoTemplate.findAll(TaskEntity.class);
             for (TaskEntity taskEntity:taskEntityList){
                 Query queryCreator = Query.query(Criteria.where("userId").is(taskEntity.getCreatorId()));
-                UserEntity creator = mongoTemplate.findOne(queryCreator,UserEntity.class);
+                User creator = mongoTemplate.findOne(queryCreator, User.class);
                 Update updateTask = new Update();
                 updateTask.set("creatorName",creator.getUserName());
                 updateTask.set("managerName",creator.getUserName());

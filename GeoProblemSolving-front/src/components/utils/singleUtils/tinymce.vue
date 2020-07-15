@@ -198,7 +198,7 @@ export default {
           let formData = new FormData();
           formData.append("picture", file);
           this.axios
-            .post("/GeoProblemSolving/project/picture", formData)
+            .post("/GeoProblemSolving/resource/projectPic", formData)
             .then(res => {
               if (res.data != "Fail") {
                 this.pictureUrl =

@@ -1,7 +1,7 @@
 package cn.edu.njnu.geoproblemsolving.Controller;
 
 import cn.edu.njnu.geoproblemsolving.Entity.Activities.Activity;
-import cn.edu.njnu.geoproblemsolving.Entity.Activities.Enums.ActivityPrivacy;
+import cn.edu.njnu.geoproblemsolving.Enums.ProjectPrivacy;
 import cn.edu.njnu.geoproblemsolving.Entity.Activities.LinkProtocol;
 import cn.edu.njnu.geoproblemsolving.Service.ActivityService;
 import org.slf4j.Logger;
@@ -24,17 +24,17 @@ public class ActivityController {
         this.activityService = activityService;
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/level/{activityLevel}")
-    public List<Activity> getActivitiesByLevel(@PathVariable("activityLevel") Integer level){
-        logger.info("getActivitiesByLevel");
-        return activityService.findByLevel(level);
-    }
-
-    @RequestMapping(method = RequestMethod.GET, value = "/privacy/{activityPrivacy}")
-    public List<Activity> getActivitiesByPrivacy(@PathVariable("activityPrivacy") ActivityPrivacy privacy){
-        logger.info("getActivitiesByPrivacy");
-        return activityService.findByPrivacy(privacy);
-    }
+//    @RequestMapping(method = RequestMethod.GET, value = "/level/{activityLevel}")
+//    public List<Activity> getActivitiesByLevel(@PathVariable("activityLevel") Integer level){
+//        logger.info("getActivitiesByLevel");
+//        return activityService.findByLevel(level);
+//    }
+//
+//    @RequestMapping(method = RequestMethod.GET, value = "/privacy/{activityPrivacy}")
+//    public List<Activity> getActivitiesByPrivacy(@PathVariable("activityPrivacy") ProjectPrivacy privacy){
+//        logger.info("getActivitiesByPrivacy");
+//        return activityService.findByPrivacy(privacy);
+//    }
 
     @RequestMapping(method = RequestMethod.GET, value = "/{aid}/children")
     public List<Activity> getChildren(@PathVariable("aid") String aid){

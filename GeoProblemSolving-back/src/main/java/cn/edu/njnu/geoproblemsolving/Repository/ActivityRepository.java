@@ -1,7 +1,7 @@
 package cn.edu.njnu.geoproblemsolving.Repository;
 
 import cn.edu.njnu.geoproblemsolving.Entity.Activities.Activity;
-import cn.edu.njnu.geoproblemsolving.Entity.Activities.Enums.ActivityPrivacy;
+import cn.edu.njnu.geoproblemsolving.Enums.ProjectPrivacy;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
@@ -12,5 +12,5 @@ public interface ActivityRepository extends MongoRepository<Activity, String> {
 
     public List<Activity> findByLevel(Integer level);
 
-    public List<Activity> findByPrivacy(ActivityPrivacy privacy);
+    public List<Activity> findByPrivacy(ProjectPrivacy privacy);
 }

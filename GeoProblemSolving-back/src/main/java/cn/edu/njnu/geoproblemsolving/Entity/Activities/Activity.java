@@ -1,7 +1,6 @@
 package cn.edu.njnu.geoproblemsolving.Entity.Activities;
 
-import cn.edu.njnu.geoproblemsolving.Entity.Activities.Enums.ActivityPrivacy;
-import cn.edu.njnu.geoproblemsolving.Entity.Activities.Enums.ActivityType;
+import cn.edu.njnu.geoproblemsolving.Enums.ActivityType;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import lombok.Data;
@@ -23,30 +22,23 @@ public class Activity implements Serializable {
     private String name;
 
     /**
-     * Privacy control
-     */
-    private ActivityPrivacy privacy;
-
-    /**
      * Description information
-     * picture: descriptive picture
      */
     private String description;
-    private String tag;
-    private String picture;
+
+    /**
+     * User
+     * creator contains: userId,
+     * members contains: userId, role
+     * role: creator, administrator, decision-maker, researcher, stakeholder, normal member(workers...), visitor(the public)
+     */
+    private String creator;
+    private JSONArray members;
 
     /**
      * The type of activity
      */
     private ActivityType type;
-
-    /**
-     * User
-     * contains: userId, name, avatar, role
-     * role: administrator, decision-maker, researcher, stakeholder, normal member(workers...), visitor(the public)
-     */
-    private JSONObject creator;
-    private JSONArray members;
 
     /**
      * The horizontal relationships:
@@ -63,7 +55,7 @@ public class Activity implements Serializable {
      */
     private String parent;
     private ArrayList<String> children;
-    private JSONObject solvingProcess;
+    private JSONObject pathway;
 
     /**
      * Level (0~3)
@@ -79,11 +71,9 @@ public class Activity implements Serializable {
     private ArrayList<String> toolsetList;
 
     /**
-     * Others
-     * supplement:introduction(level 0), background, limitation, methodology
+     * Time
      */
-    private String createTime;
+    private String createdTime;
     private String activeTime;
-    private JSONObject supplement;
 }
 

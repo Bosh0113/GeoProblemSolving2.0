@@ -1,4 +1,4 @@
-package cn.edu.njnu.geoproblemsolving.Entity;
+package cn.edu.njnu.geoproblemsolving.Entity.Resources;
 
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.data.mongodb.core.mapping.Document;
