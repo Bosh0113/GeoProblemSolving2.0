@@ -24,17 +24,12 @@ public class ActivityController {
         this.activityService = activityService;
     }
 
-//    @RequestMapping(method = RequestMethod.GET, value = "/level/{activityLevel}")
-//    public List<Activity> getActivitiesByLevel(@PathVariable("activityLevel") Integer level){
-//        logger.info("getActivitiesByLevel");
-//        return activityService.findByLevel(level);
-//    }
-//
-//    @RequestMapping(method = RequestMethod.GET, value = "/privacy/{activityPrivacy}")
-//    public List<Activity> getActivitiesByPrivacy(@PathVariable("activityPrivacy") ProjectPrivacy privacy){
-//        logger.info("getActivitiesByPrivacy");
-//        return activityService.findByPrivacy(privacy);
-//    }
+
+    @RequestMapping(method = RequestMethod.POST)
+    public Object createActivity(@RequestBody Activity activity){
+        logger.info("createActivity");
+        return activityService.createActivity(activity);
+    }
 
     @RequestMapping(method = RequestMethod.GET, value = "/{aid}/children")
     public List<Activity> getChildren(@PathVariable("aid") String aid){

@@ -1,19 +1,29 @@
 package cn.edu.njnu.geoproblemsolving.Service.Impl;
 
+import cn.edu.njnu.geoproblemsolving.Controller.FolderController;
+import cn.edu.njnu.geoproblemsolving.Dao.Folder.FolderDaoImpl;
 import cn.edu.njnu.geoproblemsolving.Entity.Activities.Activity;
 import cn.edu.njnu.geoproblemsolving.Entity.Activities.LinkProtocol;
+import cn.edu.njnu.geoproblemsolving.Entity.Activities.Project;
+import cn.edu.njnu.geoproblemsolving.Entity.Activities.Subproject;
+import cn.edu.njnu.geoproblemsolving.Repository.SubprojectRepository;
+import cn.edu.njnu.geoproblemsolving.domain.tool.ToolsetEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.User;
 import cn.edu.njnu.geoproblemsolving.Repository.ActivityRepository;
 import cn.edu.njnu.geoproblemsolving.Repository.ProtocolRepository;
 import cn.edu.njnu.geoproblemsolving.Repository.UserRepository;
 import cn.edu.njnu.geoproblemsolving.Service.ActivityService;
+import cn.edu.njnu.geoproblemsolving.domain.tool.ToolEntity;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.stream.IntStream;
 
 @Service
@@ -22,11 +32,22 @@ public class ActivityServiceImpl implements ActivityService {
     private final ActivityRepository activityRepository;
     private final ProtocolRepository protocolRepository;
     private final UserRepository userRepository;
+    private final MongoTemplate mongoTemplate;
+    private final FolderDaoImpl folderDao;
+    private final SubprojectRepository subprojectRepository;
 
-    public ActivityServiceImpl(ActivityRepository activityRepository, ProtocolRepository protocolRepository, UserRepository userRepository) {
+    public ActivityServiceImpl(ActivityRepository activityRepository,
+                               ProtocolRepository protocolRepository,
+                               UserRepository userRepository,
+                               SubprojectRepository subprojectRepository,
+                               MongoTemplate mongoTemplate,
+                               FolderDaoImpl folderDao) {
         this.activityRepository = activityRepository;
         this.protocolRepository = protocolRepository;
         this.userRepository = userRepository;
+        this.mongoTemplate = mongoTemplate;
+        this.folderDao = folderDao;
+        this.subprojectRepository = subprojectRepository;
     }
 
     private User findByUserId(String userId){
@@ -48,6 +69,69 @@ public class ActivityServiceImpl implements ActivityService {
         }
         else {
             return null;
+        }
+    }
+
+    @Override
+    public Object createActivity(Activity activity){
+        try{
+            // aid
+            String aid = UUID.randomUUID().toString();
+            activity.setAid(aid);
+
+            // created time
+            Date date = new Date();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            activity.setCreatedTime(dateFormat.format(date));
+
+            // update project info
+            String subprojectId = activity.getParent();
+            Subproject subproject = subprojectRepository.findById(subprojectId).get();
+            if(subproject == null) return "Fail: subproject does not exist";
+            ArrayList<String> children = subproject.getChildren();
+            children.add(subprojectId);
+            subproject.setChildren(children);
+            subprojectRepository.save(subproject);
+
+            // members
+            String creatorId = activity.getCreator();
+            JSONObject creator = new JSONObject();
+            JSONObject member = new JSONObject();
+            JSONArray members = new JSONArray();
+
+            creator.put("userId", creatorId);
+            creator.put("role", "creator");
+            members.add(creator);
+            creator.put("userId", subproject.getCreator());
+            creator.put("role", "administrator");
+            members.add(member);
+            activity.setMembers(members);
+
+            // tools and toolsets
+            Query queryPublic = new Query(Criteria.where("privacy").is("Public"));
+            List<ToolEntity> toolEntities = mongoTemplate.find(queryPublic, ToolEntity.class);
+            ArrayList<String> tools = new ArrayList<>();
+            for (ToolEntity toolEntity:toolEntities){
+                tools.add(toolEntity.getTid());
+            }
+            activity.setToolList(tools);
+
+            List<ToolsetEntity> toolsetEntities = mongoTemplate.find(queryPublic,ToolsetEntity.class);
+            ArrayList<String> toolsets = new ArrayList<>();
+            for (ToolsetEntity toolsetEntity: toolsetEntities){
+                toolsets.add(toolsetEntity.getTsid());
+            }
+            activity.setToolsetList(toolsets);
+
+            //folder
+            folderDao.createFolder(activity.getName(), "", aid);
+
+            activityRepository.save(activity);
+
+            return activity;
+        }
+        catch (Exception ex){
+            return "Fail: Exception";
         }
     }
 

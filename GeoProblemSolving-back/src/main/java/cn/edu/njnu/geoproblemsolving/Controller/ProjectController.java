@@ -1,6 +1,5 @@
 package cn.edu.njnu.geoproblemsolving.Controller;
 
-import cn.edu.njnu.geoproblemsolving.Dao.Project.ProjectDaoImpl;
 import cn.edu.njnu.geoproblemsolving.Entity.EmailEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.Activities.Project;
 import cn.edu.njnu.geoproblemsolving.Service.ProjectService;
@@ -159,7 +158,7 @@ public class ProjectController {
      * @throws IOException
      */
     @RequestMapping(value = "/{aid}/user", method = RequestMethod.PUT)
-    public Object changeManager(@PathVariable("aid") String aid, @RequestParam("userId") String userId, @RequestParam("role") String role) throws IOException {
+    public Object changeUserRole(@PathVariable("aid") String aid, @RequestParam("userId") String userId, @RequestParam("role") String role) throws IOException {
         Object result = projectService.updateMemberRole(aid, userId, role);
 
         if(result instanceof Project) {

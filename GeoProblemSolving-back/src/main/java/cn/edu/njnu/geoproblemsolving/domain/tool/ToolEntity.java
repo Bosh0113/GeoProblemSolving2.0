@@ -25,7 +25,6 @@ import java.util.ArrayList;
 @AllArgsConstructor
 public class ToolEntity extends BaseEntity {
     @Id
-    private String id;
     private String tid;
     private String toolName;
     private String toolUrl;//stateId, oid,mdlId,模型条目？

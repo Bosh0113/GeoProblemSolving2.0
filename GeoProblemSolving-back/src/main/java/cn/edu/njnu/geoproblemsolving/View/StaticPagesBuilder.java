@@ -1,6 +1,5 @@
 package cn.edu.njnu.geoproblemsolving.View;
 
-import cn.edu.njnu.geoproblemsolving.Dao.Project.ProjectDaoImpl;
 import cn.edu.njnu.geoproblemsolving.Entity.Activities.Project;
 import cn.edu.njnu.geoproblemsolving.Repository.ProjectRepository;
 import com.alibaba.fastjson.JSONArray;

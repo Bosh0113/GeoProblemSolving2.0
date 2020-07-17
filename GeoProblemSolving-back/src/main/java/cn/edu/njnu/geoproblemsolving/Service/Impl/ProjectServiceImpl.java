@@ -61,7 +61,10 @@ public class ProjectServiceImpl implements ProjectService {
                 projects = projectRepository.findProjectsByPrivacyIsNotAndCategoryEqualsOrTagContainingOrNameLikeOrDescriptionLike("Private", category, tag, keyword, keyword, pageRequest).getContent();
             }
 
-            return projects;
+            if (projects.isEmpty())
+                return "None";
+            else
+                return projects;
 
         } catch (Exception ex) {
             return "Fail: Exception";
@@ -91,6 +94,10 @@ public class ProjectServiceImpl implements ProjectService {
             creator.put("role", "creator");
             members.add(creator);
             project.setMembers(members);
+
+            // children
+            ArrayList<String> children = new ArrayList<>();
+            project.setChildren(children);
 
             projectRepository.save(project);
 
@@ -286,7 +293,7 @@ public class ProjectServiceImpl implements ProjectService {
             if (!optional.isPresent()) return "Fail: project does not exist";
             Project project = (Project) optional.get();
 
-            // remove the user from the project?
+            // remove the user from the project
             JSONArray members = project.getMembers();
             for (Object member : members) {
                 if (member instanceof JSONObject) {

@@ -8,6 +8,8 @@ import java.util.List;
 
 public interface ActivityService {
 
+    public Object createActivity(Activity activity);
+
     public List<Activity> findChildren(String aid);
 
     public List<Activity> findLast(String aid);

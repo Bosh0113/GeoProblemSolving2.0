@@ -135,8 +135,8 @@ public class TaskDaoImpl implements ITaskDao{
                 Query queryCreator = Query.query(Criteria.where("userId").is(taskEntity.getCreatorId()));
                 User creator = mongoTemplate.findOne(queryCreator, User.class);
                 Update updateTask = new Update();
-                updateTask.set("creatorName",creator.getUserName());
-                updateTask.set("managerName",creator.getUserName());
+                updateTask.set("creatorName",creator.getName());
+                updateTask.set("managerName",creator.getName());
                 Query queryTask = Query.query(Criteria.where("taskId").is(taskEntity.getTaskId()));
                 mongoTemplate.updateFirst(queryTask,updateTask,TaskEntity.class);
             }

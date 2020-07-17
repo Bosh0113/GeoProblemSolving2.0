@@ -2,6 +2,7 @@ package cn.edu.njnu.geoproblemsolving.Entity.Activities;
 
 import cn.edu.njnu.geoproblemsolving.Enums.ProjectCategory;
 import cn.edu.njnu.geoproblemsolving.Enums.ProjectPrivacy;
+import com.alibaba.fastjson.JSONArray;
 import lombok.Data;
 import org.springframework.data.mongodb.core.mapping.Document;
 

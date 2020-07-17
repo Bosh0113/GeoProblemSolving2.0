@@ -1,61 +1,83 @@
 package cn.edu.njnu.geoproblemsolving.Controller;
 
-import cn.edu.njnu.geoproblemsolving.Dao.SubProject.SubProjectDaoImpl;
-import cn.edu.njnu.geoproblemsolving.Entity.SubProjectEntity;
-import org.springframework.data.mongodb.core.MongoTemplate;
+import cn.edu.njnu.geoproblemsolving.Entity.Activities.Subproject;
+import cn.edu.njnu.geoproblemsolving.Service.SubprojectService;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 
 @CrossOrigin(origins = "*",allowCredentials = "true")
 @RestController
-@RequestMapping("/subProject")
+@RequestMapping("/subproject")
 public class SubProjectController {
 
-    @Resource
-    private MongoTemplate mongoTemplate;
+    private final SubprojectService subprojectService;
 
-    @RequestMapping(value = "/create", produces = {"application/json;charset=UTF-8"},method = RequestMethod.POST)
-    public Object createSubProject(@RequestBody SubProjectEntity subProject){
-        SubProjectDaoImpl subProjectDao=new SubProjectDaoImpl(mongoTemplate);
-        return subProjectDao.createSubProject(subProject);
+    public SubProjectController(SubprojectService subprojectService) {
+        this.subprojectService = subprojectService;
     }
 
-    @RequestMapping(value = "/inquiry", method = RequestMethod.GET)
-    public Object readSubProject(@RequestParam("key") String key,@RequestParam("value") String value){
-        SubProjectDaoImpl subProjectDao=new SubProjectDaoImpl(mongoTemplate);
-        return subProjectDao.readSubProject(key,value);
+    /**
+     * create subproject
+     * @param subproject
+     * @return
+     */
+    @RequestMapping(produces = {"application/json;charset=UTF-8"},method = RequestMethod.POST)
+    public Object createSubproject(@RequestBody Subproject subproject){
+        return subprojectService.createSubproject(subproject);
     }
 
-    @RequestMapping(value = "/delete", method = RequestMethod.GET)
-    public String deleteSubProject(@RequestParam("subProjectId") String subProjectId){
-        SubProjectDaoImpl subProjectDao=new SubProjectDaoImpl(mongoTemplate);
-        return subProjectDao.deleteSubProject("subProjectId",subProjectId);
+    /**
+     * inquiry subproject
+     * @param projectId
+     * @return
+     */
+    @RequestMapping(value = "/project", method = RequestMethod.GET)
+    public Object readSubproject(@RequestParam("projectId") String projectId){
+        return subprojectService.inquirySubprojects(projectId);
     }
 
-    @RequestMapping(value = "/update", produces = {"application/json;charset=UTF-8"}, method = RequestMethod.POST)
-    public Object updateSubProject(HttpServletRequest request){
-        SubProjectDaoImpl subProjectDao=new SubProjectDaoImpl(mongoTemplate);
-        return subProjectDao.updateSubProject(request);
+    /**
+     * get participants of one subproject
+     * @param aid
+     * @return
+     */
+    @RequestMapping(value = "/{aid}/user", method = RequestMethod.GET)
+    public Object getSubprojectParticipants(@PathVariable("aid") String aid){
+        return subprojectService.findParticipants(aid);
     }
 
-    @RequestMapping(value = "/join", method = RequestMethod.GET)
-    public Object joinSubProject(@RequestParam("subProjectId") String subProjectId,@RequestParam("userId") String userId){
-        SubProjectDaoImpl subProjectDao=new SubProjectDaoImpl(mongoTemplate);
-        return subProjectDao.joinSubProject(subProjectId,userId);
+    /**
+     * join a subproject
+     * @param aid
+     * @param userId
+     * @return
+     */
+    @RequestMapping(value = "/{aid}/user", method = RequestMethod.POST)
+    public Object joinSubproject(@PathVariable("aid") String aid, @RequestParam("userId") String userId){
+        return subprojectService.joinSubproject(aid, userId);
     }
 
-    @RequestMapping(value = "/quit", method = RequestMethod.GET)
-    public String quitSubProject(@RequestParam("subProjectId") String subProjectId,@RequestParam("userId") String userId){
-        SubProjectDaoImpl subProjectDao=new SubProjectDaoImpl(mongoTemplate);
-        return subProjectDao.quitSubProject(subProjectId,userId);
+    /**
+     * change the role of member
+     * @param aid
+     * @param userId
+     * @param role
+     * @return
+     */
+    @RequestMapping(value = "/{aid}/user", method = RequestMethod.PUT)
+    public Object changeUserRole(@PathVariable("aid") String aid, @RequestParam("userId") String userId, @RequestParam("role") String role){
+        return subprojectService.updateMemberRole(aid, userId, role);
     }
 
-    @RequestMapping(value = "/manager", method = RequestMethod.GET)
-    public Object changeManager(@RequestParam("subProjectId") String subProjectId,@RequestParam("userId") String userId){
-        SubProjectDaoImpl subProjectDao=new SubProjectDaoImpl(mongoTemplate);
-        return subProjectDao.changeManager(subProjectId,userId);
+    /**
+     * Exit a subproject
+     * @param aid
+     * @param userId
+     * @return
+     */
+    @RequestMapping(value = "/{aid}/user", method = RequestMethod.DELETE)
+    public String quitSubproject(@PathVariable("aid") String aid, @RequestParam("userId") String userId){
+        return subprojectService.quitSubproject(aid, userId);
     }
 
 }

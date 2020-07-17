@@ -1,9 +1,7 @@
-package cn.edu.njnu.geoproblemsolving.Dao.Tool_related;
+package cn.edu.njnu.geoproblemsolving.domain.tool;
 
 import cn.edu.njnu.geoproblemsolving.Dao.Method.CommonMethod;
 import cn.edu.njnu.geoproblemsolving.Entity.ToolReq.UpdateToolListReq;
-import cn.edu.njnu.geoproblemsolving.Entity.ToolsetEntity;
-import cn.edu.njnu.geoproblemsolving.domain.tool.ToolEntity;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -41,7 +39,7 @@ public class ToolsetDaoImpl implements IToolsetDao {
         if (mongoTemplate.find(query, ToolsetEntity.class).isEmpty()) {
 
             String tsId = UUID.randomUUID().toString();
-            toolset.setTsId(tsId);
+            toolset.setTsid(tsId);
             Date date = new Date();
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
             toolset.setCreateTime(dateFormat.format(date));
@@ -178,7 +176,7 @@ public class ToolsetDaoImpl implements IToolsetDao {
     // 有待测试---------------------------------------------------------
     public String updateToolsetbyToolset(ToolsetEntity toolset) {
         try {
-            Query query = new Query(Criteria.where("tsId").is(toolset.getTsId()));
+            Query query = new Query(Criteria.where("tsId").is(toolset.getTsid()));
             CommonMethod method = new CommonMethod();
             Update update = new Update();
             update.set("toolList",toolset.getToolList());
