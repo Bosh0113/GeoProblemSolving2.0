@@ -107,7 +107,7 @@
     <template th:fragment="commonHeader-html" id="navigation">
         <div style="position: fixed;z-index: 99;">
             <header style="position:inherit;min-width: -webkit-fill-available;">
-                <img :src='window.location.origin+"/PExploration/Images/OGMS_PE.png"' id="logo" class="pic" @click="goHome" style="cursor:pointer;">
+                <img :src='window.location.origin+"/PExploration/Images/OGMS_PE.png"' id="logo" class="pic" @click="goHome" style="cursor:pointer;width: auto;">
                 <div v-if="useMenuCSS">
                     <div class="navPart">
                         <i-menu class="header" mode="horizontal" theme="dark" @on-select="turnContent" :style="`z-index:0;background:headerBgColor`" width="auto"

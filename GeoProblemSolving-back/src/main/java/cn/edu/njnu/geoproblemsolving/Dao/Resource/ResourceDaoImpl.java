@@ -352,7 +352,7 @@ public class ResourceDaoImpl implements IResourceDao {
         String[] fileURLs = fileURLsStr.split(",");
         List files = new ArrayList();
         for (String fileURL : fileURLs) {
-            String regexGetUrl = "/GeoProblemSolving/([\\S]*)";
+            String regexGetUrl = "/PExploration/([\\S]*)";
             Pattern regexPattern = Pattern.compile(regexGetUrl);
             Matcher matcher = regexPattern.matcher(fileURL);
             if (matcher.find()) {
@@ -472,7 +472,7 @@ public class ResourceDaoImpl implements IResourceDao {
             return "ERROR";
         }
 
-        String pathURL = "/GeoProblemSolving/resource/" + folderName + "/" + newFileTitle;
+        String pathURL = "/PExploration/resource/" + folderName + "/" + newFileTitle;
 
         return pathURL;
     }

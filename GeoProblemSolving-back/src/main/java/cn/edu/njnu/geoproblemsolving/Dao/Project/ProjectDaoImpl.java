@@ -478,7 +478,7 @@ public class ProjectDaoImpl implements IProjectDao {
 
                     String reqPath = request.getRequestURL().toString();
                     pathURL = reqPath.replaceAll("localhost", ip) + "/" + newFileTitle;
-                    String regexGetUrl = "(/GeoProblemSolving[\\S]*)";
+                    String regexGetUrl = "(/PExploration[\\S]*)";
                     Pattern regexPattern = Pattern.compile(regexGetUrl);
                     Matcher matcher = regexPattern.matcher(pathURL);
                     if (matcher.find()) {

@@ -242,7 +242,7 @@ public class FolderDaoImpl implements IFolderDao {
             Query queryFile = new Query(Criteria.where("resourceId").is(resourceId));
             ResourceEntity resourceFile = mongoTemplate.findOne(queryFile, ResourceEntity.class);
             String fileUrl = resourceFile.getPathURL();
-            String regex = "GeoProblemSolving(\\S*)";
+            String regex = "PExploration(\\S*)";
             Pattern pattern = Pattern.compile(regex);
             Matcher matcher = pattern.matcher(fileUrl);
             String filePath = "";
@@ -278,7 +278,7 @@ public class FolderDaoImpl implements IFolderDao {
                 Thread thread = new Thread(fileCopyThread);
                 thread.start();
 
-                String newFileUrl = "/GeoProblemSolving/resource/" + userId + "/" + newFileName;
+                String newFileUrl = "/PExploration/resource/" + userId + "/" + newFileName;
                 resourceFile.setResourceId(UUID.randomUUID().toString());
                 resourceFile.setUploaderId(userId);
                 resourceFile.setPathURL(newFileUrl);

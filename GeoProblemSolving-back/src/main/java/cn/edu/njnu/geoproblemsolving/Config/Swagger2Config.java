@@ -29,7 +29,7 @@ public class Swagger2Config {
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
                 //页面标题
-                .title("GeoProblemSolving API文档")
+                .title("PExploration API文档")
                 //创建人
                 .contact(new Contact("Beichen Zhang", "http://www.baidu.com", ""))
                 //版本号
