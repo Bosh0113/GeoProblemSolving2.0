@@ -2,7 +2,7 @@
 <style scoped>
 #logo {
   position: absolute;
-  width: 129px;
+  /* width: 129px; */
   height: 40px;
   z-index: 1;
   margin-top: 5px;
@@ -85,11 +85,11 @@ footer {
     <div style="position: fixed;z-index: 99;">
       <header style="position:inherit;min-width: -webkit-fill-available;">
         <img
-          src="@/assets/images/OGMS.png"
+          src="@/assets/images/OGMS_PE.png"
           id="logo"
           class="pic"
           @click="goHome"
-          style="cursor:pointer;margin-left:5%"
+          style="cursor:pointer;"
         />
         <div v-if="useMenuCSS">
           <div class="navPart">
