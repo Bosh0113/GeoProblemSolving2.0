@@ -106,13 +106,13 @@ export default {
         this.stepSocket = null;
       }
       var stepSocketURL =
-        "ws://" +
+        "wss://" +
         this.$store.state.IP_Port +
         "/PExploration/Step/" +
         this.stepInfo.stepId;
       if (this.$store.state.IP_Port == "localhost:8080") {
         stepSocketURL =
-          "ws://localhost:8081/PExploration/Step/" + this.stepInfo.stepId;
+          "wss://localhost:8081/PExploration/Step/" + this.stepInfo.stepId;
       }
       if(window.location.port=="8083"){
           stepSocketURL = "wss://"+ window.location.hostname+":8083/PExploration/Step/" + this.stepInfo.stepId;

@@ -72,7 +72,7 @@ var waitingList = [];
                 if(window.location.port=="5500"){
                     socketUrl="localhost:8081";
                 }
-                var wsUrl = "ws://"+window.location.host+"/PExploration/GraphEditorSocket/" + pageParams.pageId;
+                var wsUrl = "wss://"+window.location.host+"/PExploration/GraphEditorSocket/" + pageParams.pageId;
                 if(window.location.port=="8083"){
                     wsUrl = "wss://"+ window.location.hostname+":8083/PExploration/GraphEditorSocket/" + pageParams.pageId;
                 }

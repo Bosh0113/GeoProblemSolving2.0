@@ -69,15 +69,15 @@ var userName=userInfo.userName;
             if (url.search(reg) != -1) {
                 localStorage.setItem("historyURL", url);
                 let groupID = url.match(reg)[1];
-                var wsUrl = "ws://"+window.location.host+"/PExploration/ConceptualModel/" + groupID;
+                var wsUrl = "wss://"+window.location.host+"/PExploration/ConceptualModel/" + groupID;
                 if(window.location.port=="8083"){
                     wsUrl = "wss://"+ window.location.hostname+":8083/PExploration/ConceptualModel/" + groupID;
                 }
                 wsMxgraph = new WebSocket(wsUrl);
-                // wsMxgraph = new WebSocket("ws://localhost:8081/PExploration/ConceptualModel/" + groupID);
-                // wsMxgraph = new WebSocket("ws://172.21.212.72:8082/PExploration/ConceptualModel/" + groupID);
-                // wsMxgraph = new WebSocket("ws://94.191.49.160:8080/PExploration/ConceptualModel/" + groupID);
-                // wsMxgraph = new WebSocket("ws://172.21.213.185:8080/PExploration/ConceptualModel/" + groupID);
+                // wsMxgraph = new WebSocket("wss://localhost:8081/PExploration/ConceptualModel/" + groupID);
+                // wsMxgraph = new WebSocket("wss://172.21.212.72:8082/PExploration/ConceptualModel/" + groupID);
+                // wsMxgraph = new WebSocket("wss://94.191.49.160:8080/PExploration/ConceptualModel/" + groupID);
+                // wsMxgraph = new WebSocket("wss://172.21.213.185:8080/PExploration/ConceptualModel/" + groupID);
             }
         }
         else {

@@ -452,9 +452,9 @@
                 }
 
                 let roomId = this.projectInfo.projectId + "task";
-                var projectSocketURL = "ws://" + window.location.host + "/PExploration/Module/" + roomId;
+                var projectSocketURL = "wss://" + window.location.host + "/PExploration/Module/" + roomId;
                 if (window.location.host == "localhost:8080") {
-                    projectSocketURL = "ws://localhost:8081/PExploration/Module/" + roomId;
+                    projectSocketURL = "wss://localhost:8081/PExploration/Module/" + roomId;
                 }
                 this.projectSocket = new WebSocket(projectSocketURL);
                 this.projectSocket.onopen = this.onOpen;

@@ -410,9 +410,9 @@
                 }
 
                 var roomId = this.pageParams.pageId;
-                var excelSocketURL = "ws://" + window.location.host + "/PExploration/ExcelTool/" + roomId;
+                var excelSocketURL = "wss://" + window.location.host + "/PExploration/ExcelTool/" + roomId;
                 if (window.location.host == "localhost:8080") {
-                    excelSocketURL = "ws://localhost:8081/PExploration/ExcelTool/" + roomId;
+                    excelSocketURL = "wss://localhost:8081/PExploration/ExcelTool/" + roomId;
                 }
                 if(window.location.port=="8083"){
                     excelSocketURL = "wss://"+ window.location.hostname+":8083/PExploration/ExcelTool/" + roomId;

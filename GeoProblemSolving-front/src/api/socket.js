@@ -6,9 +6,9 @@ var websockLinked = false;
 
 function initWebSocket(para, IP_Port) { //初始化websocket
 
-    var wsurl = "ws://" + IP_Port + "/PExploration/" + para;
+    var wsurl = "wss://" + IP_Port + "/PExploration/" + para;
     if (IP_Port == "localhost:8080") {
-        wsurl = "ws://localhost:8081/PExploration/" + para;
+        wsurl = "wss://localhost:8081/PExploration/" + para;
     }
     if(window.location.port=="8083"){
         wsurl = "wss://"+ window.location.hostname+":8083/PExploration/" + para;

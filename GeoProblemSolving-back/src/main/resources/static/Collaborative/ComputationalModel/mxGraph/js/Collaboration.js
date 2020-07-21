@@ -85,11 +85,11 @@ var userName = userInfo.userName;
             if (url.search(reg) != -1) {
                 localStorage.setItem("historyURL", url);
                 let groupID = url.match(reg)[1];
-                wsMxgraph = new WebSocket("ws://"+window.location.host+"/PExploration/ComputationalModel/" + groupID);
-                // wsMxgraph = new WebSocket("ws://172.21.212.72:8082/PExploration/ComputationalModel/" + groupID);
-                // wsMxgraph = new WebSocket("ws://172.21.213.185:8080/PExploration/ComputationalModel/" + groupID);
-                // wsMxgraph = new WebSocket("ws://94.191.49.160:8080/PExploration/ComputationalModel/" + groupID);
-                // wsMxgraph = new WebSocket("ws://localhost:8081/PExploration/ComputationalModel/" + groupID);
+                wsMxgraph = new WebSocket("wss://"+window.location.host+"/PExploration/ComputationalModel/" + groupID);
+                // wsMxgraph = new WebSocket("wss://172.21.212.72:8082/PExploration/ComputationalModel/" + groupID);
+                // wsMxgraph = new WebSocket("wss://172.21.213.185:8080/PExploration/ComputationalModel/" + groupID);
+                // wsMxgraph = new WebSocket("wss://94.191.49.160:8080/PExploration/ComputationalModel/" + groupID);
+                // wsMxgraph = new WebSocket("wss://localhost:8081/PExploration/ComputationalModel/" + groupID);
             }
         }
         else {

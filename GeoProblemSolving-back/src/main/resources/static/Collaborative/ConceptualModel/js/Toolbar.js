@@ -220,8 +220,8 @@ Toolbar.prototype.init = function()
     //
     // var wsMxgraph = null;
     // if (WebSocket) {
-    //     wsMxgraph = new WebSocket("ws://localhost:8081/TeamModeling/MxGraph");
-    //     // wsMxgraph = new WebSocket("ws:223.2.43.220:8081/TeamModeling/MxGraph");
+    //     wsMxgraph = new WebSocket("wss://localhost:8081/TeamModeling/MxGraph");
+    //     // wsMxgraph = new WebSocket("wss:223.2.43.220:8081/TeamModeling/MxGraph");
     // }
     // else {
     //     alert("浏览器不支持websocket！");

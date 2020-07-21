@@ -311,12 +311,12 @@
                     if (this.noticeSocket != null) {
                         this.noticeSocket = null;
                     }
-                    var noticeSocketURL = "ws://" + window.location.host + "/PExploration/NoticeSocket";
+                    var noticeSocketURL = "wss://" + window.location.host + "/PExploration/NoticeSocket";
                     if(window.location.port=="8083"){
                         noticeSocketURL = "wss://"+ window.location.hostname+":8083/PExploration/NoticeSocket";
                     }
                     if(window.location.host == "localhost:8080"){
-                        noticeSocketURL = "ws://localhost:8081/PExploration/NoticeSocket";
+                        noticeSocketURL = "wss://localhost:8081/PExploration/NoticeSocket";
                     }
                     this.noticeSocket = new WebSocket(noticeSocketURL);
                     this.noticeSocket.onopen = this.onOpen;

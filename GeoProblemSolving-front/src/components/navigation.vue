@@ -384,9 +384,9 @@ export default {
         this.noticeSocket = null;
       }
       var noticeSocketURL =
-        "ws://" + this.$store.state.IP_Port + "/PExploration/NoticeSocket";
+        "wss://" + this.$store.state.IP_Port + "/PExploration/NoticeSocket";
       if (this.$store.state.IP_Port == "localhost:8080") {
-        noticeSocketURL = "ws://localhost:8081/PExploration/NoticeSocket";
+        noticeSocketURL = "wss://localhost:8081/PExploration/NoticeSocket";
       }
       if(window.location.port=="8083"){
           noticeSocketURL = "wss://"+ window.location.hostname+":8083/PExploration/NoticeSocket";

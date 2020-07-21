@@ -1243,13 +1243,13 @@ export default {
         this.abseirSocket = null;
       }
       var abseirSocketURL =
-        "ws://" +
+        "wss://" +
         this.$store.state.IP_Port +
         "/PExploration/Abseir/" +
         this.pageParams.pageId;
       if (this.$store.state.IP_Port == "localhost:8080") {
         abseirSocketURL =
-          "ws://localhost:8081/PExploration/Abseir/" +
+          "wss://localhost:8081/PExploration/Abseir/" +
           this.pageParams.pageId;
       }
       if(window.location.port=="8083"){
