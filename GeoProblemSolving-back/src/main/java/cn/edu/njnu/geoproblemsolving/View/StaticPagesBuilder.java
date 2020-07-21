@@ -65,7 +65,7 @@ public class StaticPagesBuilder {
         templateEngine.setTemplateResolver(resolver);
 
         ProjectDaoImpl projectDao = new ProjectDaoImpl(mongoTemplate);
-        JSONObject result = (JSONObject)projectDao.inquiryByPage("All", "", 1, 18, "","");
+        JSONObject result = (JSONObject)projectDao.inquiryByPage("Investigational", "", 1, 18, "","");
 
         Context context = new Context();
         context.setVariable("projectsInfo", result);
