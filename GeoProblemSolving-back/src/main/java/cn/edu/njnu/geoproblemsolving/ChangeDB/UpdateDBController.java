@@ -51,4 +51,10 @@ public class UpdateDBController {
         UpdateDBDao updateDBDao = new UpdateDBDao(mongoTemplate);
         return updateDBDao.setPermission();
     }
+
+    @RequestMapping(value = "/changeBaseUrl", method = RequestMethod.GET)
+    public String changeBaseUrl(){
+        UpdateDBDao updateDBDao = new UpdateDBDao(mongoTemplate);
+        return updateDBDao.changeBaseUrl();
+    }
 }

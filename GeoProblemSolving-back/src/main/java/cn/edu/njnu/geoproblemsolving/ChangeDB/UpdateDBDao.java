@@ -5,6 +5,7 @@ import cn.edu.njnu.geoproblemsolving.Entity.*;
 import cn.edu.njnu.geoproblemsolving.Entity.Folder.FolderEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.Folder.FolderItem;
 import com.alibaba.fastjson.JSONObject;
+import javafx.scene.shape.Circle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -297,6 +298,66 @@ public class UpdateDBDao {
                     mongoTemplate.updateFirst(query,update,ProjectEntity.class);
                 }
             }
+            return "Success";
+        }catch (Exception e){
+            return "Fail";
+        }
+    }
+
+
+    public String changeBaseUrl(){
+        try{
+            Query queryProjectWithPicture = new Query(Criteria.where("picture").ne(""));
+            List<ProjectEntity> projectEntities = mongoTemplate.find(queryProjectWithPicture,ProjectEntity.class);
+            for (ProjectEntity projectEntity:projectEntities){
+                Query query = new Query(Criteria.where("projectId").is(projectEntity.getProjectId()));
+                Update update = new Update();
+                update.set("picture",projectEntity.getPicture().replaceAll("GeoProblemSolving","PExploration"));
+                mongoTemplate.updateFirst(query,update,ProjectEntity.class);
+            }
+
+            List<ResourceEntity> resourceEntities = mongoTemplate.findAll(ResourceEntity.class);
+            for(ResourceEntity resourceEntity: resourceEntities){
+                Query query = new Query(Criteria.where("resourceId").is(resourceEntity.getResourceId()));
+                Update update = new Update();
+                update.set("pathURL",resourceEntity.getPathURL().replaceAll("GeoProblemSolving","PExploration"));
+                mongoTemplate.updateFirst(query,update,ResourceEntity.class);
+            }
+
+            List<FolderEntity> folderEntities = mongoTemplate.findAll(FolderEntity.class);
+            for(FolderEntity folderEntity:folderEntities){
+                Query query = new Query(Criteria.where("folderId").is(folderEntity.getFolderId()));
+                List<ResourceEntity> resourceEntities1 = folderEntity.getFiles();
+                List<ResourceEntity> resourceEntities2 = new ArrayList<>();
+                for(ResourceEntity resourceEntity:resourceEntities1){
+                    String oldURL = resourceEntity.getPathURL();
+                    String newURL = oldURL.replaceAll("GeoProblemSolving","PExploration");
+                    resourceEntity.setPathURL(newURL);
+                    resourceEntities2.add(resourceEntity);
+                }
+                Update update = new Update();
+                update.set("files",resourceEntities2);
+                mongoTemplate.updateFirst(query,update,FolderEntity.class);
+            }
+
+            Query queryToolWithImg = new Query(Criteria.where("toolImg").ne(""));
+            List<ToolEntity> toolEntities = mongoTemplate.find(queryToolWithImg, ToolEntity.class);
+            for(ToolEntity toolEntity:toolEntities){
+                Query query = new Query(Criteria.where("tId").is(toolEntity.getTId()));
+                Update update = new Update();
+                update.set("toolImg",toolEntity.getToolImg().replaceAll("GeoProblemSolving","PExploration"));
+                mongoTemplate.updateFirst(query,update,ToolEntity.class);
+            }
+
+            Query queryToolsetWithImg = new Query(Criteria.where("toolsetImg").ne(""));
+            List<ToolsetEntity> toolsetEntities = mongoTemplate.find(queryToolsetWithImg, ToolsetEntity.class);
+            for(ToolsetEntity toolsetEntity:toolsetEntities){
+                Query query = new Query(Criteria.where("tsId").is(toolsetEntity.getTsId()));
+                Update update = new Update();
+                update.set("toolsetImg",toolsetEntity.getToolsetImg().replaceAll("GeoProblemSolving","PExploration"));
+                mongoTemplate.updateFirst(query,update,ToolsetEntity.class);
+            }
+
             return "Success";
         }catch (Exception e){
             return "Fail";
