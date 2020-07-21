@@ -193,7 +193,7 @@ export default {
     getProjectInfo() {
       $.ajax({
         url:
-          "/GeoProblemSolving/project/inquiry" +
+          "/PExploration/project/inquiry" +
           "?key=projectId" +
           "&value=" +
           this.subProjectInfo.projectId,
@@ -223,7 +223,7 @@ export default {
         let that = this;
         $.ajax({
           url:
-            "/GeoProblemSolving/subProject/inquiry" +
+            "/PExploration/subProject/inquiry" +
             "?key=subProjectId" +
             "&value=" +
             subProjectId,
@@ -280,7 +280,7 @@ export default {
     changeContent(name) {
       if (name == "back") {
         window.location.href =
-          "/GeoProblemSolving/projectDetail/" + this.subProjectInfo.projectId;
+          "/PExploration/projectDetail/" + this.subProjectInfo.projectId;
       } else if (name == "overview") {
         this.$router.replace({ name: "overview" });
       } else if (name == "process") {

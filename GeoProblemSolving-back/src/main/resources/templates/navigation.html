@@ -107,7 +107,7 @@
     <template th:fragment="commonHeader-html" id="navigation">
         <div style="position: fixed;z-index: 99;">
             <header style="position:inherit;min-width: -webkit-fill-available;">
-                <img :src='window.location.origin+"/GeoProblemSolving/Images/OGMS.png"' id="logo" class="pic" @click="goHome" style="cursor:pointer;margin-left:5%">
+                <img :src='window.location.origin+"/PExploration/Images/OGMS.png"' id="logo" class="pic" @click="goHome" style="cursor:pointer;margin-left:5%">
                 <div v-if="useMenuCSS">
                     <div class="navPart">
                         <i-menu class="header" mode="horizontal" theme="dark" @on-select="turnContent" :style="`z-index:0;background:headerBgColor`" width="auto"
@@ -168,15 +168,15 @@
                         <i-button icon="md-menu" style="color: white;background-color: #808695"></i-button>
                         <Dropdown-menu slot="list">
                           <Cell-group style="width:200px">
-                            <Cell @click.native="turnToURL('/GeoProblemSolving/home')" class="menuItemCell">Home</Cell>
-                            <Cell @click.native="turnToURL('/GeoProblemSolving/projectList')" class="menuItemCell">Projects</Cell>
-                            <Cell @click.native="turnToURL('/GeoProblemSolving/publicResource')" class="menuItemCell">Resources</Cell>
-                            <Cell @click.native="turnToURL('/GeoProblemSolving/toolsCenter')" class="menuItemCell">Tools</Cell>
-                            <Cell @click.native="turnToURL('/GeoProblemSolving/help')" class="menuItemCell">Help</Cell>
+                            <Cell @click.native="turnToURL('/PExploration/home')" class="menuItemCell">Home</Cell>
+                            <Cell @click.native="turnToURL('/PExploration/projectList')" class="menuItemCell">Projects</Cell>
+                            <Cell @click.native="turnToURL('/PExploration/publicResource')" class="menuItemCell">Resources</Cell>
+                            <Cell @click.native="turnToURL('/PExploration/toolsCenter')" class="menuItemCell">Tools</Cell>
+                            <Cell @click.native="turnToURL('/PExploration/help')" class="menuItemCell">Help</Cell>
                             <Divider style="margin: 5px 0"></Divider>
-                            <Cell v-show="!userInfoNav.userState" @click.native="turnToURL('/GeoProblemSolving/login')" class="menuItemCell">Login</Cell>
-                            <Cell v-show="!userInfoNav.userState" @click.native="turnToURL('/GeoProblemSolving/register')" class="menuItemCell">Sign up</Cell>
-                            <Cell  v-show="userInfoNav.userState" @click.native="turnToURL('/GeoProblemSolving/notifications')" class="menuItemCell">Notification</Cell>
+                            <Cell v-show="!userInfoNav.userState" @click.native="turnToURL('/PExploration/login')" class="menuItemCell">Login</Cell>
+                            <Cell v-show="!userInfoNav.userState" @click.native="turnToURL('/PExploration/register')" class="menuItemCell">Sign up</Cell>
+                            <Cell  v-show="userInfoNav.userState" @click.native="turnToURL('/PExploration/notifications')" class="menuItemCell">Notification</Cell>
                             <Cell  v-show="userInfoNav.userState" @click.native="toPersonalPage" class="menuItemCell">Personal Page</Cell>
                             <Cell  v-show="userInfoNav.userState" @click.native="logout" class="menuItemCell">Log out</Cell>
                           </Cell-group>
@@ -249,37 +249,37 @@
                 },
                 turnContent(name) {
                     if (name === "home") {
-                        window.location.href = "/GeoProblemSolving/home"
+                        window.location.href = "/PExploration/home"
                     } else if (name == "projects") {
-                        window.location.href = "/GeoProblemSolving/projectList"
+                        window.location.href = "/PExploration/projectList"
                     } else if (name == "resources") {
-                        window.location.href = "/GeoProblemSolving/publicResource"
+                        window.location.href = "/PExploration/publicResource"
                     } else if (name == "toolsCenter") {
-                        window.location.href = "/GeoProblemSolving/toolsCenter"
+                        window.location.href = "/PExploration/toolsCenter"
                     } else if (name == "community") {
-                        window.location.href = "/GeoProblemSolving/community"
+                        window.location.href = "/PExploration/community"
                     } else if (name == "help") {
-                        window.location.href = "/GeoProblemSolving/help"
+                        window.location.href = "/PExploration/help"
                     }
                 },
                 goHome() {
-                    window.location.href = "/GeoProblemSolving/home"
+                    window.location.href = "/PExploration/home"
                 },
                 unlogin(name) {
                     if (name === "login") {
-                        window.location.href = "/GeoProblemSolving/login"
+                        window.location.href = "/PExploration/login"
                     } else if (name == "register") {
-                        window.location.href = "/GeoProblemSolving/register"
+                        window.location.href = "/PExploration/register"
                     }
                 },
                 logged(name) {
                     if (name === "notification") {
-                        window.location.href = "/GeoProblemSolving/notifications"
+                        window.location.href = "/PExploration/notifications"
                     } else if (name === "personal") {
                     }
                 },
                 toPersonalPage() {
-                    window.location.href = "/GeoProblemSolving/personalPage"
+                    window.location.href = "/PExploration/personalPage"
                 },
                 // 获取到通知的数量
                 getUnreadNoticeCount() {
@@ -287,7 +287,7 @@
                     //get请求发送的是用户id
                     axios
                         .get(
-                            "/GeoProblemSolving/notice/inquiry" +
+                            "/PExploration/notice/inquiry" +
                             "?key=recipientId" +
                             "&value=" +
                             this.userInfoNav.userId
@@ -311,12 +311,12 @@
                     if (this.noticeSocket != null) {
                         this.noticeSocket = null;
                     }
-                    var noticeSocketURL = "ws://" + window.location.host + "/GeoProblemSolving/NoticeSocket";
+                    var noticeSocketURL = "ws://" + window.location.host + "/PExploration/NoticeSocket";
                     if(window.location.port=="8083"){
-                        noticeSocketURL = "wss://"+ window.location.hostname+":8083/GeoProblemSolving/NoticeSocket";
+                        noticeSocketURL = "wss://"+ window.location.hostname+":8083/PExploration/NoticeSocket";
                     }
                     if(window.location.host == "localhost:8080"){
-                        noticeSocketURL = "ws://localhost:8081/GeoProblemSolving/NoticeSocket";
+                        noticeSocketURL = "ws://localhost:8081/PExploration/NoticeSocket";
                     }
                     this.noticeSocket = new WebSocket(noticeSocketURL);
                     this.noticeSocket.onopen = this.onOpen;
@@ -371,12 +371,12 @@
                 },
                 logout(page) {
                     axios
-                        .get("/GeoProblemSolving/user/logout")
+                        .get("/PExploration/user/logout")
                         .then(res => {
                             this.userInfoNav = { userName: "" };
                             sessionStorage.removeItem("userInfo");
                             this.noticeSocket.close();
-                            window.location.href = "/GeoProblemSolving/" + page;
+                            window.location.href = "/PExploration/" + page;
                         })
                         .catch(err => {
                             confirm("logout fail!");

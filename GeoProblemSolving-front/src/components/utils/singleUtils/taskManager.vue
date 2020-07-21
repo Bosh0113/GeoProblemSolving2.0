@@ -697,7 +697,7 @@ export default {
           taskForm["state"] = "todo";
           taskForm["order"] = this.taskTodo.length;
           this.axios
-            .post("/GeoProblemSolving/task/save", taskForm)
+            .post("/PExploration/task/save", taskForm)
             .then(res => {
               if (res.data == "Offline") {
                 this.$store.commit("userLogout");
@@ -721,7 +721,7 @@ export default {
       taskForm.append("taskId", task.taskId);
       taskForm.append("importance", task.importance);
       this.axios
-        .post("/GeoProblemSolving/task/update", taskForm)
+        .post("/PExploration/task/update", taskForm)
         .then(res => {
           if (res.data == "Offline") {
             this.$store.commit("userLogout");
@@ -740,7 +740,7 @@ export default {
     editOneTask(index, taskList) {
       this.axios
         .get(
-          "/GeoProblemSolving/task/inquiry?" +
+          "/PExploration/task/inquiry?" +
             "key=taskId" +
             "&value=" +
             taskList[index]["taskId"]
@@ -764,7 +764,7 @@ export default {
     showTask(index, taskList) {
       this.axios
         .get(
-          "/GeoProblemSolving/task/inquiry?" +
+          "/PExploration/task/inquiry?" +
             "key=taskId" +
             "&value=" +
             taskList[index]["taskId"]
@@ -832,7 +832,7 @@ export default {
           let importance = this.formValidate.importanceCheck ? 1 : 0;
           taskForm.append("importance", importance);
           this.axios
-            .post("/GeoProblemSolving/task/update", taskForm)
+            .post("/PExploration/task/update", taskForm)
             .then(res => {
               if (res.data == "Offline") {
                 this.$store.commit("userLogout");
@@ -861,7 +861,7 @@ export default {
     inquiryTodoTask() {
       this.axios
         .get(
-          "/GeoProblemSolving/task/inquiryTodo?" +
+          "/PExploration/task/inquiryTodo?" +
             "subProjectId=" +
             this.pageParams.pageId
         )
@@ -881,7 +881,7 @@ export default {
     inquiryDoingTask() {
       this.axios
         .get(
-          "/GeoProblemSolving/task/inquiryDoing?" +
+          "/PExploration/task/inquiryDoing?" +
             "subProjectId=" +
             this.pageParams.pageId
         )
@@ -901,7 +901,7 @@ export default {
     inquiryDoneTask() {
       this.axios
         .get(
-          "/GeoProblemSolving/task/inquiryDone?" +
+          "/PExploration/task/inquiryDone?" +
             "subProjectId=" +
             this.pageParams.pageId
         )
@@ -949,7 +949,7 @@ export default {
               taskUpdateObj.append("state", type);
               taskUpdateObj.append("managerName", thisUserName);
               this.axios
-                .post("/GeoProblemSolving/task/update", taskUpdateObj)
+                .post("/PExploration/task/update", taskUpdateObj)
                 .then(res => {
                   count--;
                   if (res.data == "Offline") {
@@ -969,7 +969,7 @@ export default {
               taskUpdateObj.append("order", i);
               taskUpdateObj.append("state", type);
               this.axios
-                .post("/GeoProblemSolving/task/update", taskUpdateObj)
+                .post("/PExploration/task/update", taskUpdateObj)
                 .then(res => {
                   count--;
                   if (res.data == "Offline") {
@@ -994,7 +994,7 @@ export default {
     taskRemove() {
       this.axios
         .get(
-          "/GeoProblemSolving/task/delete" +
+          "/PExploration/task/delete" +
             "?taskId=" +
             this.taskList[this.selectTaskIndex]["taskId"]
         )

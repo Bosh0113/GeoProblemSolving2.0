@@ -214,7 +214,7 @@ export default {
       ) {
         $.ajax({
           url:
-            "/GeoProblemSolving/step/inquiry/" +
+            "/PExploration/step/inquiry/" +
             "?key=stepId" +
             "&value=" +
             this.$route.params.stepId,
@@ -248,7 +248,7 @@ export default {
       } else {
         $.ajax({
           url:
-            "/GeoProblemSolving/subProject/inquiry" +
+            "/PExploration/subProject/inquiry" +
             "?key=subProjectId" +
             "&value=" +
             this.stepInfo.subProjectId,
@@ -275,7 +275,7 @@ export default {
     getProjectInfo() {
       $.ajax({
         url:
-          "/GeoProblemSolving/project/inquiry" +
+          "/PExploration/project/inquiry" +
           "?key=projectId" +
           "&value=" +
           this.subProjectInfo.projectId,
@@ -315,7 +315,7 @@ export default {
       for (var i = 0; i < membersList.length; i++) {
         $.ajax({
           url:
-            "/GeoProblemSolving/user/inquiry" +
+            "/PExploration/user/inquiry" +
             "?key=" +
             "userId" +
             "&value=" +
@@ -372,7 +372,7 @@ export default {
           obj.append("stepId", this.stepInfo.stepId);
 
           this.axios
-            .post("/GeoProblemSolving/step/update", obj)
+            .post("/PExploration/step/update", obj)
             .then(res => {
               if (res.data == "Offline") {
                 this.$store.commit("userLogout");

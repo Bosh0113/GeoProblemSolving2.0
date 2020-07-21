@@ -1270,7 +1270,7 @@ export default {
     getPersonalToolsets() {
       this.axios
         .get(
-          "/GeoProblemSolving/toolset/inquiryAll" +
+          "/PExploration/toolset/inquiryAll" +
             "?provider=" +
             this.userInfo.userId
         )
@@ -1294,7 +1294,7 @@ export default {
     getPublicToolsets() {
       this.axios
         .get(
-          "/GeoProblemSolving/toolset/inquiry" +
+          "/PExploration/toolset/inquiry" +
             "?key=" +
             "privacy" +
             "&value=" +
@@ -1320,7 +1320,7 @@ export default {
     getPublicTools() {
       this.axios
         .get(
-          "/GeoProblemSolving/tool/inquiry" +
+          "/PExploration/tool/inquiry" +
             "?key=" +
             "privacy" +
             "&value=" +
@@ -1346,7 +1346,7 @@ export default {
     getPersonalTools() {
       this.axios
         .get(
-          "/GeoProblemSolving/tool/inquiryAll" +
+          "/PExploration/tool/inquiryAll" +
             "?provider=" +
             this.userInfo.userId
         )
@@ -1408,7 +1408,7 @@ export default {
           createToolForm["privacy"] = this.toolInfo.privacy;
 
           this.axios
-            .post("/GeoProblemSolving/tool/create", createToolForm)
+            .post("/PExploration/tool/create", createToolForm)
             .then(res => {
               if (res.data == "Offline") {
                 this.$store.commit("userLogout");
@@ -1486,7 +1486,7 @@ export default {
           let formData = new FormData();
           formData.append("toolImg", file);
           this.axios
-            .post("/GeoProblemSolving/tool/picture", formData)
+            .post("/PExploration/tool/picture", formData)
             .then(res => {
               if (res.data != "Fail") {
                 this.toolInfo.toolImg = res.data;
@@ -1537,7 +1537,7 @@ export default {
           createToolsetForm["privacy"] = this.toolsetInfo.privacy;
 
           this.axios
-            .post("/GeoProblemSolving/toolset/create", createToolsetForm)
+            .post("/PExploration/toolset/create", createToolsetForm)
             .then(res => {
               if (res.data == "Offline") {
                 this.$store.commit("userLogout");
@@ -1575,7 +1575,7 @@ export default {
           let formData = new FormData();
           formData.append("toolsetImg", file);
           this.axios
-            .post("/GeoProblemSolving/toolset/picture", formData)
+            .post("/PExploration/toolset/picture", formData)
             .then(res => {
               if (res.data != "Fail") {
                 this.toolsetInfo.toolsetImg = res.data;
@@ -1666,7 +1666,7 @@ export default {
           editToolForm.append("privacy", this.selectedTool.privacy);
 
           this.axios
-            .post("/GeoProblemSolving/tool/update", editToolForm)
+            .post("/PExploration/tool/update", editToolForm)
             .then(res => {
               if (res.data == "Offline") {
                 this.$store.commit("userLogout");
@@ -1705,7 +1705,7 @@ export default {
     },
     removeTool() {
       this.axios
-        .get("/GeoProblemSolving/tool/delete" + "?tId=" + this.selectedTool.tId)
+        .get("/PExploration/tool/delete" + "?tId=" + this.selectedTool.tId)
         .then(res => {
           if (res.data == "Offline") {
             this.$store.commit("userLogout");
@@ -1744,7 +1744,7 @@ export default {
     removeToolset() {
       this.axios
         .get(
-          "/GeoProblemSolving/toolset/delete" +
+          "/PExploration/toolset/delete" +
             "?tsId=" +
             this.selectedToolset.tsId
         )
@@ -1818,7 +1818,7 @@ export default {
       postInfo["newTool"] = this.selectedTool;
       postInfo["tsIds"] = addToToolsetIds;
       this.axios
-        .post("/GeoProblemSolving/toolset/addTool", postInfo)
+        .post("/PExploration/toolset/addTool", postInfo)
         .then(res => {
           if (res.data == "Offline") {
             this.$store.commit("userLogout");
@@ -1873,7 +1873,7 @@ export default {
           editToolsetForm.append("privacy", this.selectedToolset.privacy);
 
           this.axios
-            .post("/GeoProblemSolving/toolset/update", editToolsetForm)
+            .post("/PExploration/toolset/update", editToolsetForm)
             .then(res => {
               if (res.data == "Offline") {
                 this.$store.commit("userLogout");
@@ -1901,7 +1901,7 @@ export default {
           updateReq["tsId"] = this.selectedToolset.tsId;
 
           this.axios
-            .post("/GeoProblemSolving/toolset/updateTools", updateReq)
+            .post("/PExploration/toolset/updateTools", updateReq)
             .then(res => {
               if (res.data == "Offline") {
                 this.$store.commit("userLogout");

@@ -551,42 +551,42 @@ export default {
         switch (type) {
           case 0: {
             parent.location.href =
-              "/GeoProblemSolving/workspaceP/" + stepId + "/contextDefinition";
+              "/PExploration/workspaceP/" + stepId + "/contextDefinition";
             break;
           }
           case 1: {
             parent.location.href =
-              "/GeoProblemSolving/workspaceP/" + stepId + "/dataProcessing";
+              "/PExploration/workspaceP/" + stepId + "/dataProcessing";
             break;
           }
           case 2: {
             parent.location.href =
-              "/GeoProblemSolving/workspaceP/" + stepId + "/visualization";
+              "/PExploration/workspaceP/" + stepId + "/visualization";
             break;
           }
           case 3: {
             parent.location.href =
-              "/GeoProblemSolving/workspaceP/" + stepId + "/modelBuild";
+              "/PExploration/workspaceP/" + stepId + "/modelBuild";
             break;
           }
           case 4: {
             parent.location.href =
-              "/GeoProblemSolving/workspaceP/" + stepId + "/modelEvaluation";
+              "/PExploration/workspaceP/" + stepId + "/modelEvaluation";
             break;
           }
           case 5: {
             parent.location.href =
-              "/GeoProblemSolving/workspaceP/" + stepId + "/simulation";
+              "/PExploration/workspaceP/" + stepId + "/simulation";
             break;
           }
           case 6: {
             parent.location.href =
-              "/GeoProblemSolving/workspaceP/" + stepId + "/analysis";
+              "/PExploration/workspaceP/" + stepId + "/analysis";
             break;
           }
           case 7: {
             parent.location.href =
-              "/GeoProblemSolving/workspaceP/" + stepId + "/decisionMaking";
+              "/PExploration/workspaceP/" + stepId + "/decisionMaking";
             break;
           }
         }
@@ -1009,14 +1009,14 @@ export default {
       Step["content"] = {};
 
       this.axios
-        .post("/GeoProblemSolving/step/create", Step)
+        .post("/PExploration/step/create", Step)
         .then(res => {
           if (res.data == "Offline") {
             if (this.scopeType == "subproject") {
               this.$store.commit("userLogout");
               this.$router.push({ name: "Login" });
             } else {
-              parent.location.href = "/GeoProblemSolving/login";
+              parent.location.href = "/PExploration/login";
             }
           } else if (res.data === "Fail") {
             this1.$Message.info("Fail");
@@ -1161,7 +1161,7 @@ export default {
     getPublicTools() {
       this.axios
         .get(
-          "/GeoProblemSolving/tool/inquiry" +
+          "/PExploration/tool/inquiry" +
             "?key=" +
             "privacy" +
             "&value=" +
@@ -1173,7 +1173,7 @@ export default {
               this.$store.commit("userLogout");
               this.$router.push({ name: "Login" });
             } else {
-              parent.location.href = "/GeoProblemSolving/login";
+              parent.location.href = "/PExploration/login";
             }
           } else if (res.data === "Fail") {
             // this.$Notice.error({ desc: "Loading tools fail." });
@@ -1190,7 +1190,7 @@ export default {
     getPersonalTools() {
       this.axios
         .get(
-          "/GeoProblemSolving/tool/inquiryAll" +
+          "/PExploration/tool/inquiryAll" +
             "?provider=" +
             this.$store.getters.userInfo.userId
         )
@@ -1200,7 +1200,7 @@ export default {
               this.$store.commit("userLogout");
               this.$router.push({ name: "Login" });
             } else {
-              parent.location.href = "/GeoProblemSolving/login";
+              parent.location.href = "/PExploration/login";
             }
           } else if (res.data === "Fail") {
             // this.$Notice.error({ desc: "Loading tool fail." });
@@ -1221,7 +1221,7 @@ export default {
     getPublicToolsets() {
       this.axios
         .get(
-          "/GeoProblemSolving/toolset/inquiry" +
+          "/PExploration/toolset/inquiry" +
             "?key=" +
             "privacy" +
             "&value=" +
@@ -1233,7 +1233,7 @@ export default {
               this.$store.commit("userLogout");
               this.$router.push({ name: "Login" });
             } else {
-              parent.location.href = "/GeoProblemSolving/login";
+              parent.location.href = "/PExploration/login";
             }
           } else if (res.data === "Fail") {
             // this.$Notice.error({ desc: "Loading toolsets fail." });
@@ -1250,7 +1250,7 @@ export default {
     getPersonalToolsets() {
       this.axios
         .get(
-          "/GeoProblemSolving/toolset/inquiryAll" +
+          "/PExploration/toolset/inquiryAll" +
             "?provider=" +
             this.$store.getters.userInfo.userId
         )
@@ -1260,7 +1260,7 @@ export default {
               this.$store.commit("userLogout");
               this.$router.push({ name: "Login" });
             } else {
-              parent.location.href = "/GeoProblemSolving/login";
+              parent.location.href = "/PExploration/login";
             }
           } else if (res.data === "Fail") {
             // this.$Notice.error({ desc: "Loading toolsets fail." });
@@ -1358,7 +1358,7 @@ export default {
     delStepContent(stepId) {
       // 删除step
       this.axios
-        .get("/GeoProblemSolving/step/delete" + "?stepId=" + stepId)
+        .get("/PExploration/step/delete" + "?stepId=" + stepId)
         .then(res => {
           if (res.data === "Success") {
             this.$Notice.info({
@@ -1465,10 +1465,10 @@ export default {
       var updateurl = "";
       if (this.scopeType == "project") {
         obj.append("projectId", this.scopeId);
-        updateurl = "/GeoProblemSolving/project/update";
+        updateurl = "/PExploration/project/update";
       } else if (this.scopeType == "subproject") {
         obj.append("subProjectId", this.scopeId);
-        updateurl = "/GeoProblemSolving/subProject/update";
+        updateurl = "/PExploration/subProject/update";
       }
       this.axios
         .post(updateurl, obj)
@@ -1478,7 +1478,7 @@ export default {
               this.$store.commit("userLogout");
               this.$router.push({ name: "Login" });
             } else {
-              parent.location.href = "/GeoProblemSolving/login";
+              parent.location.href = "/PExploration/login";
             }
           } else if (res.data != "Fail") {
             if (this.scopeType == "project") {
@@ -1524,11 +1524,11 @@ export default {
       obj.append("type", "");
       obj.append("stepId", "");
       this.axios
-        .post("/GeoProblemSolving/subProject/update", obj)
+        .post("/PExploration/subProject/update", obj)
         .then(res => {
           this.resetProjectTypeModel = false;
           if (res.data == "Offline") {
-            parent.location.href = "/GeoProblemSolving/login";
+            parent.location.href = "/PExploration/login";
           } else if (res.data != "Fail") {
             this.$store.commit("setSubProjectInfo", res.data);
             this.$emit("changeSubProjectInfo", res.data);
@@ -1546,11 +1546,11 @@ export default {
       obj.append("type", "");
       obj.append("stepId", "");
       this.axios
-        .post("/GeoProblemSolving/project/update", obj)
+        .post("/PExploration/project/update", obj)
         .then(res => {
           this.resetProjectTypeModel = false;
           if (res.data == "Offline") {
-            parent.location.href = "/GeoProblemSolving/login";
+            parent.location.href = "/PExploration/login";
           } else if (res.data != "Fail") {
             this.$store.commit("setProjectInfo", res.data);
             this.$emit("changeProjectInfo", res.data);

@@ -452,9 +452,9 @@
                 }
 
                 let roomId = this.projectInfo.projectId + "task";
-                var projectSocketURL = "ws://" + window.location.host + "/GeoProblemSolving/Module/" + roomId;
+                var projectSocketURL = "ws://" + window.location.host + "/PExploration/Module/" + roomId;
                 if (window.location.host == "localhost:8080") {
-                    projectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + roomId;
+                    projectSocketURL = "ws://localhost:8081/PExploration/Module/" + roomId;
                 }
                 this.projectSocket = new WebSocket(projectSocketURL);
                 this.projectSocket.onopen = this.onOpen;
@@ -544,7 +544,7 @@
                         taskForm["state"] = "todo";
                         taskForm["order"] = this.taskTodo.length;
                         axios
-                            .post("/GeoProblemSolving/task/save", taskForm)
+                            .post("/PExploration/task/save", taskForm)
                             .then(res => {
                                 if (res.data == "Offline") {
                                     confirm("You are offline, please login again.");
@@ -574,7 +574,7 @@
                 taskForm.append("taskId", task.taskId);
                 taskForm.append("importance", task.importance);
                 axios
-                    .post("/GeoProblemSolving/task/update", taskForm)
+                    .post("/PExploration/task/update", taskForm)
                     .then(res => {
                         if (res.data == "Offline") {
                             confirm("You are offline, please login again.");
@@ -597,7 +597,7 @@
             editOneTask(index, taskList) {
                 axios
                     .get(
-                        "/GeoProblemSolving/task/inquiry?" +
+                        "/PExploration/task/inquiry?" +
                         "key=taskId" +
                         "&value=" +
                         taskList[index]["taskId"]
@@ -621,7 +621,7 @@
             showTask(index, taskList) {
                 axios
                     .get(
-                        "/GeoProblemSolving/task/inquiry?" +
+                        "/PExploration/task/inquiry?" +
                         "key=taskId" +
                         "&value=" +
                         taskList[index]["taskId"]
@@ -689,7 +689,7 @@
                         let importance = this.formValidate.importanceCheck ? 1 : 0;
                         taskForm.append("importance", importance);
                         axios
-                            .post("/GeoProblemSolving/task/update", taskForm)
+                            .post("/PExploration/task/update", taskForm)
                             .then(res => {
                                 if (res.data == "Offline") {
                                     confirm("You are offline, please login again.");
@@ -723,7 +723,7 @@
             inquiryTodoTask() {
                 axios
                     .get(
-                        "/GeoProblemSolving/task/inquiryTodo?" +
+                        "/PExploration/task/inquiryTodo?" +
                         "subProjectId=" +
                         this.projectInfo.projectId
                     )
@@ -744,7 +744,7 @@
             inquiryDoingTask() {
                 axios
                     .get(
-                        "/GeoProblemSolving/task/inquiryDoing?" +
+                        "/PExploration/task/inquiryDoing?" +
                         "subProjectId=" +
                         this.projectInfo.projectId
                     )
@@ -765,7 +765,7 @@
             inquiryDoneTask() {
                 axios
                     .get(
-                        "/GeoProblemSolving/task/inquiryDone?" +
+                        "/PExploration/task/inquiryDone?" +
                         "subProjectId=" +
                         this.projectInfo.projectId
                     )
@@ -814,7 +814,7 @@
                                 taskUpdateObj.append("state", type);
                                 taskUpdateObj.append("managerName", thisUserName);
                                 axios
-                                    .post("/GeoProblemSolving/task/update", taskUpdateObj)
+                                    .post("/PExploration/task/update", taskUpdateObj)
                                     .then(res => {
                                         count--;
                                         if (res.data == "Offline") {
@@ -836,7 +836,7 @@
                                 taskUpdateObj.append("order", i);
                                 taskUpdateObj.append("state", type);
                                 axios
-                                    .post("/GeoProblemSolving/task/update", taskUpdateObj)
+                                    .post("/PExploration/task/update", taskUpdateObj)
                                     .then(res => {
                                         count--;
                                         if (res.data == "Offline") {
@@ -872,7 +872,7 @@
             taskRemove() {
                 axios
                     .get(
-                        "/GeoProblemSolving/task/delete" +
+                        "/PExploration/task/delete" +
                         "?taskId=" +
                         this.taskList[this.selectTaskIndex]["taskId"]
                     )

@@ -53,7 +53,7 @@ function uploadFun() {
 
     $.ajax({
         type: "POST",
-        url: "/GeoProblemSolving/resource/upload",
+        url: "/PExploration/resource/upload",
         data: formData,
         cache: false,        //不设置缓存
         processData: false,  // 不处理数据
@@ -135,7 +135,7 @@ function loadTDSmodel(fileName, files) {
             textureName = files[i];
         }
     }
-    var filePath = "/GeoProblemSolving/resource/upload/" + fileName;
+    var filePath = "/PExploration/resource/upload/" + fileName;
 
     if(modelName !== "") {
         var texture;
@@ -168,7 +168,7 @@ function loadSTLmodel(fileName, files) {
             modelName = files[i];
         }
     }
-    var filePath = "/GeoProblemSolving/resource/upload/" + fileName;
+    var filePath = "/PExploration/resource/upload/" + fileName;
 
     if(modelName !== "") {
         var loader = new THREE.STLLoader();
@@ -195,7 +195,7 @@ function loadOBJmodel(fileName, files) {
             mtlName = files[i];
         }
     }
-    var filePath = "/GeoProblemSolving/resource/operateZip?key=" + fileName+"&value=";
+    var filePath = "/PExploration/resource/operateZip?key=" + fileName+"&value=";
 
     if(modelName !== "") {
         if (mtlName !== "") {
@@ -243,7 +243,7 @@ function loadJSONmodel(fileName, files) {
             modelName = files[i];
         }
     }
-    var filePath = "/GeoProblemSolving/resource/upload/" + fileName;
+    var filePath = "/PExploration/resource/upload/" + fileName;
 
     if(modelName !== "") {
         var loader = new THREE.JSONLoader();
@@ -266,7 +266,7 @@ function loadXmodel(fileName, files) {
             modelName = files[i];
         }
     }
-    var filePath = "/GeoProblemSolving/resource/upload/" + fileName;
+    var filePath = "/PExploration/resource/upload/" + fileName;
 
     var manager = new THREE.LoadingManager();
     var Texloader = new THREE.TextureLoader();

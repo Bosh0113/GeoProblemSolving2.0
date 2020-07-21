@@ -156,9 +156,9 @@
 				showModal(){
 					this.taskList = [];
 					//发送请求
-					var url = "/GeoProblemSolving/graphEditor/inquiry";
+					var url = "/PExploration/graphEditor/inquiry";
 					if(window.location.port == "5500"){
-						url = "http://localhost:8081/GeoProblemSolving/graphEditor/inquiry";
+						url = "http://localhost:8081/PExploration/graphEditor/inquiry";
 					}
                     axios
 					.get(url+
@@ -179,9 +179,9 @@
 				},
 				deleteTask(taskId){
 					//发送请求
-					var url = "/GeoProblemSolving/graphEditor/delete";
+					var url = "/PExploration/graphEditor/delete";
 					if(window.location.port == "5500"){
-						url = "http://localhost:8081/GeoProblemSolving/graphEditor/delete";
+						url = "http://localhost:8081/PExploration/graphEditor/delete";
 					}
                     axios
 					.get(url+
@@ -266,9 +266,9 @@
 						graphXML:getGraphXML()
 					}
 					//发送请求
-					var url = "/GeoProblemSolving/graphEditor/save";
+					var url = "/PExploration/graphEditor/save";
 					if(window.location.port == "5500"){
-						url = "http://localhost:8081/GeoProblemSolving/graphEditor/save";
+						url = "http://localhost:8081/PExploration/graphEditor/save";
 					}
                     axios
                         .post(url,taskInfoData)
@@ -332,9 +332,9 @@
 					taskInfoData.append("description", this.taskInfo.description);
 					taskInfoData.append("graphXML", getGraphXML());
 					//发送请求
-					var url = "/GeoProblemSolving/graphEditor/update";
+					var url = "/PExploration/graphEditor/update";
 					if(window.location.port == "5500"){
-						url = "http://localhost:8081/GeoProblemSolving/graphEditor/update";
+						url = "http://localhost:8081/PExploration/graphEditor/update";
 					}
                     axios
                         .post(url,taskInfoData)

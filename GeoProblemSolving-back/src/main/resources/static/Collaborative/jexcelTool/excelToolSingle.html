@@ -209,7 +209,7 @@
                 if (this.userInfo == {}) {
                     this.axios
                         .get(
-                            "/GeoProblemSolving/user/inquiry" +
+                            "/PExploration/user/inquiry" +
                             "?key=" +
                             "userId" +
                             "&value=" +
@@ -280,7 +280,7 @@
                 var inThis = this;
                 $.ajax({
                     type: "POST",
-                    url: "/GeoProblemSolving/folder/uploadToFolder",
+                    url: "/PExploration/folder/uploadToFolder",
                     data: formData,
                     cache: false,        //不设置缓存
                     processData: false,  // 不处理数据

@@ -687,7 +687,7 @@ export default {
     },
     changeFolder(folderId, type) {
       this.axios
-        .get("/GeoProblemSolving/folder/inquiry" + "?folderId=" + folderId)
+        .get("/PExploration/folder/inquiry" + "?folderId=" + folderId)
         .then(res => {
           if (res.data == "Offline") {
             this.$store.commit("userLogout");
@@ -748,7 +748,7 @@ export default {
           var newFolderName = this.newValidate.setName;
           this.axios
             .post(
-              "/GeoProblemSolving/folder/new" +
+              "/PExploration/folder/new" +
                 "?folderName=" +
                 newFolderName +
                 "&parentId=" +
@@ -779,7 +779,7 @@ export default {
         var parentId = this.currentFolder.folderId;
         this.axios
           .get(
-            "/GeoProblemSolving/folder/removeFolder" +
+            "/PExploration/folder/removeFolder" +
               "?folderId=" +
               folderId +
               "&parentId=" +
@@ -818,7 +818,7 @@ export default {
           var newName = this.renameValidate.newName;
           this.axios
             .get(
-              "/GeoProblemSolving/folder/renameFolder" +
+              "/PExploration/folder/renameFolder" +
                 "?newName=" +
                 newName +
                 "&folderId=" +
@@ -904,7 +904,7 @@ export default {
             formData.append("folderId", this.currentFolder.folderId);
             this.progressModalShow = true;
             this.axios({
-              url: "/GeoProblemSolving/folder/uploadToFolder",
+              url: "/PExploration/folder/uploadToFolder",
               method: "post",
               onUploadProgress: progressEvent => {
                 this.uploadProgress =
@@ -1061,7 +1061,7 @@ export default {
         var fileId = fileInfo.resourceId;
         this.axios
           .get(
-            "/GeoProblemSolving/folder/removeFile" +
+            "/PExploration/folder/removeFile" +
               "?folderId=" +
               folderId +
               "&fileId=" +
@@ -1129,7 +1129,7 @@ export default {
         this.axios({
           method: "post",
           url:
-            "/GeoProblemSolving/resource/packageZIP?fileURLs=" + choosefileUrls,
+            "/PExploration/resource/packageZIP?fileURLs=" + choosefileUrls,
           responseType: "blob"
         })
           .then(res => {
@@ -1149,7 +1149,7 @@ export default {
     shareModalShow() {
       this.axios
         .get(
-          "/GeoProblemSolving/resource/inquiry" +
+          "/PExploration/resource/inquiry" +
             "?key=uploaderId" +
             "&value=" +
             this.$store.getters.userId
@@ -1177,7 +1177,7 @@ export default {
       var addFileListStr = addFileList.toString();
       this.axios
         .get(
-          "/GeoProblemSolving/folder/shareToFolder" +
+          "/PExploration/folder/shareToFolder" +
             "?addFileList=" +
             addFileListStr +
             "&folderId=" +
@@ -1226,7 +1226,7 @@ export default {
           var fileId = this.renameForeInfo.resourceId;
           this.axios
             .get(
-              "/GeoProblemSolving/folder/editFile" +
+              "/PExploration/folder/editFile" +
                 "?fileId=" +
                 fileId +
                 "&folderId=" +
@@ -1283,7 +1283,7 @@ export default {
       this.$Spin.show();
       this.axios
         .get(
-          "/GeoProblemSolving/folder/copyToCenter" +
+          "/PExploration/folder/copyToCenter" +
             "?resourceId=" +
             this.selectedFile.resourceId +
             "&userId=" +

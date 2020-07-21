@@ -90,14 +90,14 @@ h1 {
     <div>
       <Form ref="formInline" :model="formInline" :rules="newProjectRule" class="projectForm">
         <!-- 选择类别 -->
-        <FormItem prop="category" label="Category" :label-width="100">
+        <!-- <FormItem prop="category" label="Category" :label-width="100">
           <RadioGroup v-model="formInline.category" style="width:80%">
             <Radio label="Investigational">Investigational project</Radio>
             <Radio label="Intercomparable">Intercomparable project</Radio>
             <Radio label="Reproducible">Reproducible project</Radio>
             <Radio label="Educational">Educational project</Radio>
           </RadioGroup>
-        </FormItem>
+        </FormItem> -->
         <FormItem prop="title" label="Name" :label-width="100">
           <Input
             v-model="formInline.title"
@@ -215,7 +215,7 @@ export default {
   beforeRouteEnter: (to, from, next) => {
     next(vm => {
       $.ajax({
-        url: "/GeoProblemSolving/user/state",
+        url: "/PExploration/user/state",
         type: "POST",
         async: false,
         success: function(data) {
@@ -236,7 +236,7 @@ export default {
       clickForbidden: false,
       formInline: {
         title: "",
-        category: "",
+        category: "Investigational",
         introduction: "",
         privacy: "Public",
         description: "",
@@ -637,13 +637,13 @@ export default {
             max: 60
           }
         ],
-        category: [
-          {
-            required: true,
-            message: "Please select category",
-            trigger: "change"
-          }
-        ],
+        // category: [
+        //   {
+        //     required: true,
+        //     message: "Please select category",
+        //     trigger: "change"
+        //   }
+        // ],
         privacy: [
           {
             required: true,
@@ -721,7 +721,7 @@ export default {
           createProjectForm["permissionManager"] = permission;
 
           this.axios
-            .post("/GeoProblemSolving/project/create", createProjectForm)
+            .post("/PExploration/project/create", createProjectForm)
             .then(res => {
               if (res.data == "Offline") {
                 this.$store.commit("userLogout");
@@ -754,12 +754,12 @@ export default {
       form["eventType"] = "project";
       form["userId"] = this.$store.getters.userId;
       this.axios
-        .post("/GeoProblemSolving/history/save", form)
+        .post("/PExploration/history/save", form)
         .then(res => {
           if (res.data === "Success") {
             this.$store.commit("setProjectInfo", this.createProjectInfo);
             window.location.href =
-              "/GeoProblemSolving/projectDetail/" +
+              "/PExploration/projectDetail/" +
               this.createProjectInfo.projectId;
           } else {
             confirm("Created project fail.");
@@ -794,7 +794,7 @@ export default {
           let formData = new FormData();
           formData.append("picture", file);
           this.axios
-            .post("/GeoProblemSolving/project/picture", formData)
+            .post("/PExploration/project/picture", formData)
             .then(res => {
               if (res.data != "Fail") {
                 this.pictureUrl = res.data;

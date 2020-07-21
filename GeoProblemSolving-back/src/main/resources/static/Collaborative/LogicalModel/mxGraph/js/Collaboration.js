@@ -89,15 +89,15 @@ var userName=userInfo.userName;
             if (url.search(reg) != -1) {
                 localStorage.setItem("historyURL", url);
                 let groupID = url.match(reg)[1];
-                var  wsUrl = "ws://"+window.location.host+"/GeoProblemSolving/LogicalModel/" + groupID;
+                var  wsUrl = "ws://"+window.location.host+"/PExploration/LogicalModel/" + groupID;
                 if(window.location.port=="8083"){
-                    wsUrl = "wss://"+ window.location.hostname+":8083/GeoProblemSolving/LogicalModel/" + groupID;
+                    wsUrl = "wss://"+ window.location.hostname+":8083/PExploration/LogicalModel/" + groupID;
                 }
                 wsMxgraph = new WebSocket(wsUrl);
-                // wsMxgraph = new WebSocket("ws://localhost:8081/GeoProblemSolving/LogicalModel/" + groupID);
-                // wsMxgraph = new WebSocket("ws://172.21.212.72:8082/GeoProblemSolving/LogicalModel/" + groupID);
-                // wsMxgraph = new WebSocket("ws://94.191.49.160:8080/GeoProblemSolving/LogicalModel/" + groupID);
-                // wsMxgraph = new WebSocket("ws://172.21.213.185:8080/GeoProblemSolving/LogicalModel/" + groupID);
+                // wsMxgraph = new WebSocket("ws://localhost:8081/PExploration/LogicalModel/" + groupID);
+                // wsMxgraph = new WebSocket("ws://172.21.212.72:8082/PExploration/LogicalModel/" + groupID);
+                // wsMxgraph = new WebSocket("ws://94.191.49.160:8080/PExploration/LogicalModel/" + groupID);
+                // wsMxgraph = new WebSocket("ws://172.21.213.185:8080/PExploration/LogicalModel/" + groupID);
             }
         }
         else {

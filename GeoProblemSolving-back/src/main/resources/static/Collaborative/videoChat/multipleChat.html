@@ -186,7 +186,7 @@
                 if(window.location.port=="5500"){
                     websocketURL="localhost";
                 }
-                var socketUrl = "wss://"+ websocketURL +":8083/GeoProblemSolving/VideoChatSignalSocket/"+this.pageParams.pageId;
+                var socketUrl = "wss://"+ websocketURL +":8083/PExploration/VideoChatSignalSocket/"+this.pageParams.pageId;
                 this.videoChatSocket = new WebSocket(socketUrl);
                 this.videoChatSocket.onopen = this.onOpen;
                 this.videoChatSocket.onmessage = this.onMessage;

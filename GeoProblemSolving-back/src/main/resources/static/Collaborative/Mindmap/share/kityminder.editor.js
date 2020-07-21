@@ -2409,7 +2409,7 @@ angular.module('kityminderEditor')
                         url = "http://"+RouteInfo.getIPPort()+"/personalPage";
                     }
                     else {
-                        url = "http://"+RouteInfo.getIPPort()+"/GeoProblemSolving/memberPage/"+userId;
+                        url = "http://"+RouteInfo.getIPPort()+"/PExploration/memberPage/"+userId;
                     }
                     window.location.href = url;
                 }
@@ -2489,7 +2489,7 @@ angular.module('kityminderEditor')
                         var folderId = info.pageId;
                         try {
                             $.ajax({
-                                url: 'http://' + RouteInfo.getIPPort() + '/GeoProblemSolving/folder/inquiry?folderId=' + folderId,
+                                url: 'http://' + RouteInfo.getIPPort() + '/PExploration/folder/inquiry?folderId=' + folderId,
                                 type: "GET",
                                 async: false,
                                 success: function (data) {
@@ -2604,7 +2604,7 @@ angular.module('kityminderEditor')
 
                             var folderId = info.pageId;
                             $.ajax({
-                                url: 'http://' + RouteInfo.getIPPort() + '/GeoProblemSolving/folder/removeFile?fileId=' + map.resourceId + '&folderId=' + folderId,
+                                url: 'http://' + RouteInfo.getIPPort() + '/PExploration/folder/removeFile?fileId=' + map.resourceId + '&folderId=' + folderId,
                                 type: "GET",
                                 async: false,
                                 success: function (data) {
@@ -2692,7 +2692,7 @@ angular.module('kityminderEditor')
                                         var fileBlob = new File([blob], filename);
 
                                         // 工具信息
-                                        var toolInfo = {toolName:"Mind map", toolUrl:"/GeoProblemSolving/Collaborative/Mindmap/index.html"};
+                                        var toolInfo = {toolName:"Mind map", toolUrl:"/PExploration/Collaborative/Mindmap/index.html"};
 
                                         var formData = new FormData();
                                         formData.append("resourceId", mindmapInfo.resourceId);
@@ -2704,7 +2704,7 @@ angular.module('kityminderEditor')
 
                                         try {
                                             $.ajax({
-                                                url: 'http://' + RouteInfo.getIPPort() + '/GeoProblemSolving/folder/uploadToFolder',
+                                                url: 'http://' + RouteInfo.getIPPort() + '/PExploration/folder/uploadToFolder',
                                                 type: "POST",
                                                 data: formData,
                                                 processData: false,
@@ -2791,7 +2791,7 @@ angular.module('kityminderEditor')
                                         var fileBlob = new File([blob], filename);
 
                                         // 工具信息
-                                        var toolInfo = {toolName:"Mind map", toolUrl:"/GeoProblemSolving/Collaborative/Mindmap/index.html"};
+                                        var toolInfo = {toolName:"Mind map", toolUrl:"/PExploration/Collaborative/Mindmap/index.html"};
 
                                         var formData = new FormData();
                                         formData.append("file", fileBlob);
@@ -2805,7 +2805,7 @@ angular.module('kityminderEditor')
 
                                         try {
                                             $.ajax({
-                                                url: 'http://' + RouteInfo.getIPPort() + '/GeoProblemSolving/folder/uploadToFolder',
+                                                url: 'http://' + RouteInfo.getIPPort() + '/PExploration/folder/uploadToFolder',
                                                 type: "POST",
                                                 data: formData,
                                                 processData: false,
@@ -3144,7 +3144,7 @@ angular.module('kityminderEditor')
 							// 	var map = {};
 							// 	try {
 							// 		$.ajax({
-							// 			url: 'http://' + RouteInfo.getIPPort() + '/GeoProblemSolving/resource/inquiry?key=resourceId&value=' + resourceId,
+							// 			url: 'http://' + RouteInfo.getIPPort() + '/PExploration/resource/inquiry?key=resourceId&value=' + resourceId,
 							// 			type: "GET",
 							// 			async: false,
 							// 			success: function (data) {
@@ -3168,7 +3168,7 @@ angular.module('kityminderEditor')
 								var map = {};
 								try {
 									$.ajax({
-										url: 'http://' + RouteInfo.getIPPort() + '/GeoProblemSolving/folder/inquiry?folderId=' + info.pageId,
+										url: 'http://' + RouteInfo.getIPPort() + '/PExploration/folder/inquiry?folderId=' + info.pageId,
 										type: "GET",
 										async: false,
 										success: function (data) {

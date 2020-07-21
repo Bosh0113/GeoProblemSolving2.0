@@ -4,31 +4,31 @@
     <meta http-equiv="pragma" content="no-cache">
     <meta http-equiv="cache-control" content="no-cache">
     <meta http-equiv="expires" content="0">
-    <link rel="shortcut icon" href="/GeoProblemSolving/static/favicon.ico">
+    <link rel="shortcut icon" href="/PExploration/static/favicon.ico">
     <title th:text="${projectInfo.title}+' | Geo-ProblemSolving'"></title>
     <meta http-equiv="Content-Type" content=" charset=UTF-8"/>
     <meta name="description" th:attr="content=${projectInfo.description}">
     <meta name="keywords" th:attr="content=${projectInfo.tag}">
     <meta name="author" content="OpenGMS">
-    <script src="/GeoProblemSolving/js/jquery.js"></script>
-    <script src="/GeoProblemSolving/js/vue.min.js"></script>
-    <script src="/GeoProblemSolving/js/crypto-js.js"></script>
-    <link href="/GeoProblemSolving/css/iview.css" rel="stylesheet">
-    <script src="/GeoProblemSolving/js/iview.js"></script>
-    <script src="/GeoProblemSolving/js/vue-avatar.min.js"></script>
-    <script src="/GeoProblemSolving/js/axios.min.js"></script>
-    <link href="/GeoProblemSolving/css/vuescroll.css" rel="stylesheet">
-    <script src="/GeoProblemSolving/js/vuescroll.js"></script>
-    <script src="/GeoProblemSolving/js/Sortable.min.js"></script>
-    <script src="/GeoProblemSolving/js/vuedraggable.umd.min.js"></script>
-    <link href="/GeoProblemSolving/jspanel/jspanel.css" rel="stylesheet">
-    <script src="/GeoProblemSolving/jspanel/jspanel.js"></script>
-    <script src="/GeoProblemSolving/jspanel/extensions/modal/jspanel.modal.js"></script>
-    <script src="/GeoProblemSolving/jspanel/extensions/tooltip/jspanel.tooltip.js"></script>
-    <script src="/GeoProblemSolving/jspanel/extensions/hint/jspanel.hint.js"></script>
-    <script src="/GeoProblemSolving/jspanel/extensions/layout/jspanel.layout.js"></script>
-    <script src="/GeoProblemSolving/jspanel/extensions/contextmenu/jspanel.contextmenu.js"></script>
-    <script src="/GeoProblemSolving/jspanel/extensions/dock/jspanel.dock.js"></script>
+    <script src="/PExploration/js/jquery.js"></script>
+    <script src="/PExploration/js/vue.min.js"></script>
+    <script src="/PExploration/js/crypto-js.js"></script>
+    <link href="/PExploration/css/iview.css" rel="stylesheet">
+    <script src="/PExploration/js/iview.js"></script>
+    <script src="/PExploration/js/vue-avatar.min.js"></script>
+    <script src="/PExploration/js/axios.min.js"></script>
+    <link href="/PExploration/css/vuescroll.css" rel="stylesheet">
+    <script src="/PExploration/js/vuescroll.js"></script>
+    <script src="/PExploration/js/Sortable.min.js"></script>
+    <script src="/PExploration/js/vuedraggable.umd.min.js"></script>
+    <link href="/PExploration/jspanel/jspanel.css" rel="stylesheet">
+    <script src="/PExploration/jspanel/jspanel.js"></script>
+    <script src="/PExploration/jspanel/extensions/modal/jspanel.modal.js"></script>
+    <script src="/PExploration/jspanel/extensions/tooltip/jspanel.tooltip.js"></script>
+    <script src="/PExploration/jspanel/extensions/hint/jspanel.hint.js"></script>
+    <script src="/PExploration/jspanel/extensions/layout/jspanel.layout.js"></script>
+    <script src="/PExploration/jspanel/extensions/contextmenu/jspanel.contextmenu.js"></script>
+    <script src="/PExploration/jspanel/extensions/dock/jspanel.dock.js"></script>
     <script th:replace="navigation::commonHeader-css"></script>
     <script th:replace="navigation::commonHeader-html"></script>
     <script th:replace="navigation::commonHeader-js"></script>
@@ -316,7 +316,7 @@
                                             >Introduction
                                             </div>
                                             <div style="text-align:center; width:40%; float:left">
-                                                <img src="/GeoProblemSolving/Images/info.png"/>
+                                                <img src="/PExploration/Images/info.png"/>
                                             </div>
                                             <div style="width:60%; float:left; min-height: 90px">
                                                 <ul>
@@ -341,7 +341,7 @@
                                             >Task assignment
                                             </div>
                                             <div style="text-align:center; width:40%; float:left">
-                                                <img src="/GeoProblemSolving/Images/tasks.png"/>
+                                                <img src="/PExploration/Images/tasks.png"/>
                                             </div>
                                             <div style="width:60%; float:left; min-height: 90px">
                                                 <ul>
@@ -366,7 +366,7 @@
                                             >Workspace
                                             </div>
                                             <div style="text-align:center; width:40%; float:left">
-                                                <img src="/GeoProblemSolving/Images/steps.jpg"/>
+                                                <img src="/PExploration/Images/steps.jpg"/>
                                             </div>
                                             <div style="width:60%; float:left; min-height: 90px">
                                                 <ul>
@@ -390,7 +390,7 @@
                                             >Resources
                                             </div>
                                             <div style="text-align:center; width:40%; float:left">
-                                                <img src="/GeoProblemSolving/Images/data.png"/>
+                                                <img src="/PExploration/Images/data.png"/>
                                             </div>
                                             <div style="width:60%; float:left; min-height: 90px">
                                                 <ul>
@@ -1113,7 +1113,7 @@
                 this.tokenStr = this.getURLParameter("token");
                 if (this.tokenStr != null) {
                     $.ajax({
-                        url: "/GeoProblemSolving/token/checkShareToken" + "?shareToken=" + this.tokenStr,
+                        url: "/PExploration/token/checkShareToken" + "?shareToken=" + this.tokenStr,
                         type: "GET",
                         async: false,
                         success: data => {
@@ -1128,7 +1128,7 @@
 
                 }
                 $.ajax({
-                    url: "/GeoProblemSolving/user/state",
+                    url: "/PExploration/user/state",
                     type: "POST",
                     async: false,
                     success: data => {
@@ -1138,7 +1138,7 @@
                         } else {
                             console.log("Not logged in");
                             if (this.taskRole != "Token") {
-                                window.location.href = '/GeoProblemSolving/login';
+                                window.location.href = '/PExploration/login';
                             }
                         }
                     },
@@ -1148,7 +1148,7 @@
                 });
                 this.userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
                 // if (this.userInfo == null || !this.userInfo.userState) {
-                //     window.location.href = '/GeoProblemSolving/login';
+                //     window.location.href = '/PExploration/login';
                 // }
                 if (window.location.host == "localhost:8080") {
                     this.ipPort = 'http://localhost:8080';
@@ -1164,7 +1164,7 @@
             },
             data() {
                 return {
-                    ipPort: "/GeoProblemSolving",
+                    ipPort: "/PExploration",
                     tokenStr: '',
                     userInfo: {
                         userState: false,
@@ -1262,7 +1262,7 @@
                     "<br>Please copy the url and access it to join us: <br>" +
                     "http://" +
                     window.location.host +
-                    "/GeoProblemSolving/join/" +
+                    "/PExploration/join/" +
                     projectInfo.projectId +
                     "/",
                     prompt: [],
@@ -1773,7 +1773,7 @@
                     if (this.projectInfo == {} || this.projectInfo == undefined) {
                         $.ajax({
                             url:
-                            "/GeoProblemSolving/project/inquiry" +
+                            "/PExploration/project/inquiry" +
                             "?key=projectId" +
                             "&value=" +
                             this.projectId,
@@ -1781,7 +1781,7 @@
                             async: false,
                             success: data => {
                                 if (data == "Offline") {
-                                    parent.location.href = "/GeoProblemSolving/login"
+                                    parent.location.href = "/PExploration/login"
                                 }
                                 if (data != "None" && data != "Fail") {
                                     this.projectInfo = data[0];
@@ -1796,19 +1796,19 @@
                     if (this.taskRole != "Token") {
                         if (this.projectInfo.privacy == "Public") {
                             if (!this.userInfo.userState) {
-                                window.location.href = "/GeoProblemSolving/projectList";
+                                window.location.href = "/PExploration/projectList";
                             }
                         } else if (this.projectInfo.privacy == "Discoverable") {
                             let isManager = this.managerIdentity(this.projectInfo.managerId);
                             let isMember = this.memberIdentity(this.projectInfo.members);
                             if (!this.userInfo.userState || !(isManager || isMember)) {
-                                window.location.href = "/GeoProblemSolving/projectList";
+                                window.location.href = "/PExploration/projectList";
                             }
                         } else if (this.projectInfo.privacy == "Private") {
                             let isManager = this.managerIdentity(this.projectInfo.managerId);
                             let isMember = this.memberIdentity(this.projectInfo.members);
                             if (!this.userInfo.userState || !(isManager || isMember)) {
-                                window.location.href = "/GeoProblemSolving/projectList";
+                                window.location.href = "/PExploration/projectList";
                             }
                         }
                     }
@@ -1862,7 +1862,7 @@
                     if (this.tokenStr != null) {
                         tokenParam = "&token=" + this.tokenStr;
                     }
-                    window.history.replaceState(null, null, '/GeoProblemSolving/projectDetail/' + projectId + "?content=" + name + tokenParam);
+                    window.history.replaceState(null, null, '/PExploration/projectDetail/' + projectId + "?content=" + name + tokenParam);
                 },
                 gotoIntroduction() {
                     this.changeMenuItem("projectDetail");
@@ -1890,7 +1890,7 @@
                     if (this.projectInfo.type == "type0") {
                         axios
                             .get(
-                                "/GeoProblemSolving/subProject/inquiry" + "?key=projectId" + "&value=" + this.projectInfo.projectId
+                                "/PExploration/subProject/inquiry" + "?key=projectId" + "&value=" + this.projectInfo.projectId
                             )
                             .then(res => {
                                 if (res.data == "Offline") {
@@ -2021,7 +2021,7 @@
                             let formData = new FormData();
                             formData.append("picture", file);
                             axios
-                                .post("/GeoProblemSolving/project/picture", formData)
+                                .post("/PExploration/project/picture", formData)
                                 .then(res => {
                                     if (res.data != "Fail") {
                                         this.pictureUrl = res.data;
@@ -2074,7 +2074,7 @@
                             form.append("picture", this.pictureUrl);
                             form.append("permissionManager", JSON.stringify(permission));
                             axios
-                                .post("/GeoProblemSolving/project/update ", form)
+                                .post("/PExploration/project/update ", form)
                                 .then(res => {
                                     if (res.data == "Offline") {
                                         this.$refs.navigationEl.logout("login");
@@ -2104,7 +2104,7 @@
                 deleteProject() {
                     axios
                         .get(
-                            "/GeoProblemSolving/project/delete?" +
+                            "/PExploration/project/delete?" +
                             "projectId=" +
                             this.projectInfo.projectId
                         )
@@ -2122,7 +2122,7 @@
                                     title: "Success",
                                     desc: "Delete project successfully."
                                 });
-                                window.location.href = '/GeoProblemSolving/projectList';
+                                window.location.href = '/PExploration/projectList';
                             }
                         })
                         .catch(err => {
@@ -2144,7 +2144,7 @@
                             emailFormBody["mailContent"] =
                                 this.emailInfo.emailContent + this.emailAddStr;
                             axios
-                                .post("/GeoProblemSolving/email/invite", emailFormBody)
+                                .post("/PExploration/email/invite", emailFormBody)
                                 .then(res => {
                                     if (res.data == "Success") {
                                         this.$Notice.success({
@@ -2202,7 +2202,7 @@
                 removeMember() {
                     axios
                         .get(
-                            "/GeoProblemSolving/project/quit" +
+                            "/PExploration/project/quit" +
                             "?projectId=" +
                             this.projectInfo.projectId +
                             "&userId=" +
@@ -2236,14 +2236,14 @@
                 },
                 goPersonalPage(userId) {
                     if (userId == this.userInfo.userId) {
-                        window.location.href = "/GeoProblemSolving/personalPage";
+                        window.location.href = "/PExploration/personalPage";
                     }
                     else {
-                        window.location.href = "/GeoProblemSolving/memberPage/" + userId;
+                        window.location.href = "/PExploration/memberPage/" + userId;
                     }
                 },
                 modifyPermission(){
-                    window.location.href = "/GeoProblemSolving/project/" + this.projectInfo.projectId + "/permission";
+                    window.location.href = "/PExploration/project/" + this.projectInfo.projectId + "/permission";
                 },
                 resetProjectTypeModalShow() {
                     if (this.subProjectList.length > 0) {
@@ -2258,11 +2258,11 @@
                     obj.append("type", "");
                     obj.append("stepId", "");
                     axios
-                        .post("/GeoProblemSolving/project/update", obj)
+                        .post("/PExploration/project/update", obj)
                         .then(res => {
                             this.resetProjectTypeModel = false;
                             if (res.data == "Offline") {
-                                window.location.href = "/GeoProblemSolving/login"
+                                window.location.href = "/PExploration/login"
                             } else if (res.data != "Fail") {
                                 // sessionStorage.setItem("projectInfo", JSON.stringify(res.data));
                                 // sessionStorage.setItem("projectInfo", this.encrypto(res.data));
@@ -2294,7 +2294,7 @@
                             SubProject["type"] = "";
                             SubProject["stepId"] = "";
                             axios
-                                .post("/GeoProblemSolving/subProject/create", SubProject)
+                                .post("/PExploration/subProject/create", SubProject)
                                 .then(res => {
                                     if (res.data == "Offline") {
                                         this.$refs.navigationEl.logout("login");
@@ -2329,7 +2329,7 @@
                 handOverAuthority() {
                     axios
                         .get(
-                            "/GeoProblemSolving/subProject/manager?" +
+                            "/PExploration/subProject/manager?" +
                             "subProjectId=" +
                             this.subProjectList[this.selectSubProjectIndex].subProjectId +
                             "&userId=" +
@@ -2353,7 +2353,7 @@
                                     "."
                                 };
                                 axios
-                                    .post("/GeoProblemSolving/notice/save", replyNotice)
+                                    .post("/PExploration/notice/save", replyNotice)
                                     .then(result => {
                                         if (result.data == "Success") {
                                             this.sendNotice(this.newManagerId);
@@ -2397,7 +2397,7 @@
                                 this.editSubProjectForm.subProjectDescriptionEdit
                             );
                             axios
-                                .post("/GeoProblemSolving/subProject/update", obj)
+                                .post("/PExploration/subProject/update", obj)
                                 .then(res => {
                                     if (res.data == "Offline") {
                                         this.$refs.navigationEl.logout("login");
@@ -2423,7 +2423,7 @@
                     var deletedSubProjectId = this.subProjectList[this.selectSubProjectIndex].subProjectId;
                     axios
                         .get(
-                            "/GeoProblemSolving/subProject/delete?" +
+                            "/PExploration/subProject/delete?" +
                             "subProjectId=" +
                             deletedSubProjectId
                         )
@@ -2450,14 +2450,14 @@
                 },
                 joinSubProject(index) {
                     let subProject = this.subProjectList[index];
-                    this.axios.get("/GeoProblemSolving/subProject/join?subProjectId=" + subProject.subProjectId + '&userId=' + this.userInfo.userId)
+                    this.axios.get("/PExploration/subProject/join?subProjectId=" + subProject.subProjectId + '&userId=' + this.userInfo.userId)
                         .then(res => {
                             if (res.data !== "Fail" && res.data !== "None") {
                                 this.$Notice.success({
                                     title: 'Success notice',
                                     desc: 'Now you are a member of this subproject.',
                                 });
-                                window.location.href = "/GeoProblemSolving/project/" + subProject.subProjectId + "/subproject";
+                                window.location.href = "/PExploration/project/" + subProject.subProjectId + "/subproject";
                             }
                         })
                         .catch(err => {
@@ -2492,7 +2492,7 @@
                                 approve: "unknow"
                             };
                             axios
-                                .post("/GeoProblemSolving/notice/save", joinSubPForm)
+                                .post("/PExploration/notice/save", joinSubPForm)
                                 .then(res => {
                                     this.$Message.info("Apply Successfully");
                                     this.sendNotice(subProject.managerId);
@@ -2515,10 +2515,10 @@
                                 "The url is " +
                                 "http://" +
                                 window.location.host +
-                                "/GeoProblemSolving/home";
+                                "/PExploration/home";
 
                             axios
-                                .post("/GeoProblemSolving/project/applyByMail", joinSubProjectEmail)
+                                .post("/PExploration/project/applyByMail", joinSubProjectEmail)
                                 .then(res => {
                                     if (res.data == "Success") {
                                         this.$Notice.success({
@@ -2543,10 +2543,10 @@
                     if(this.projectInfo.permissionManager != undefined
                         && (this.projectInfo.permissionManager.observe.visitor == "All"
                             || this.projectInfo.permissionManager.observe.visitor == "At subproject level")){
-                        window.location.href = "/GeoProblemSolving/project/" + subProject.subProjectId + "/subproject/info";
+                        window.location.href = "/PExploration/project/" + subProject.subProjectId + "/subproject/info";
                     } else {
                         if (this.managerIdentity(subProject.managerId) || this.memberIdentity(subProject.members)) {
-                            window.location.href = "/GeoProblemSolving/project/" + subProject.subProjectId + "/subproject/info";
+                            window.location.href = "/PExploration/project/" + subProject.subProjectId + "/subproject/info";
                         } else {
                             this.$Message.warning({
                                 render: h => {
@@ -2560,7 +2560,7 @@
                     }
                 },
                 goResourceCenter() {
-                    window.location.href = "/GeoProblemSolving/resourceCenter";
+                    window.location.href = "/PExploration/resourceCenter";
                 },
                 joinApplyModalShow() {
                     if (this.userInfo.userState) {
@@ -2570,12 +2570,12 @@
 
                             // join the project directly
                             axios
-                                .get("/GeoProblemSolving/project/join?"+"projectId="+  this.applyProjectInfo.projectId+"&userId=" +this.userInfo.userId)
+                                .get("/PExploration/project/join?"+"projectId="+  this.applyProjectInfo.projectId+"&userId=" +this.userInfo.userId)
                                 .then(res => {
                                     if (res.data === "Success") {
                                         this.$Message.info("Join the project successfuly");
 
-                                        window.location.href="/GeoProblemSolving/projectDetail/" + this.applyProjectInfo.projectId;
+                                        window.location.href="/PExploration/projectDetail/" + this.applyProjectInfo.projectId;
                                     } else if (res.data === "Fail") {
                                         this.$Message.info("Fail to join in this project");
                                     }
@@ -2630,7 +2630,7 @@
                                     approve: "unknow"
                                 };
                                 axios
-                                    .post("/GeoProblemSolving/notice/save", joinForm)
+                                    .post("/PExploration/notice/save", joinForm)
                                     .then(res => {
                                         if (res.data == "Success") {
                                             this.$Notice.open({
@@ -2659,10 +2659,10 @@
                                     "You can click this url and enter the site to process this application: " +
                                     "http://" +
                                     window.location.host +
-                                    "/GeoProblemSolving/home"
+                                    "/PExploration/home"
                                 };
                                 axios
-                                    .post("/GeoProblemSolving/project/applyByMail", emailObject)
+                                    .post("/PExploration/project/applyByMail", emailObject)
                                     .then(res => {
                                         if (res.data == "Success") {
                                             console.log("Email Success.");

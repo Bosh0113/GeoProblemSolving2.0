@@ -6,7 +6,7 @@
 <script>
 export default {
     created(){
-        window.location.replace("/GeoProblemSolving/home");
+        window.location.replace("/PExploration/home");
     }
 }
 </script>

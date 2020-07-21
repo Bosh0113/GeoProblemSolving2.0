@@ -184,15 +184,15 @@ footer {
             <Button icon="md-menu" style="color: white;background-color: #808695"></Button>
             <DropdownMenu slot="list">
               <CellGroup style="width:200px">
-                <Cell @click.native="turnToURL('/GeoProblemSolving/home')" class="menuItemCell">Home</Cell>
-                <Cell @click.native="turnToURL('/GeoProblemSolving/projectList')" class="menuItemCell">Projects</Cell>
-                <Cell @click.native="turnToURL('/GeoProblemSolving/publicResource')" class="menuItemCell">Resources</Cell>
-                <Cell @click.native="turnToURL('/GeoProblemSolving/toolsCenter')" class="menuItemCell">Tools</Cell>
-                <Cell @click.native="turnToURL('/GeoProblemSolving/help')" class="menuItemCell">Help</Cell>
+                <Cell @click.native="turnToURL('/PExploration/home')" class="menuItemCell">Home</Cell>
+                <Cell @click.native="turnToURL('/PExploration/projectList')" class="menuItemCell">Projects</Cell>
+                <Cell @click.native="turnToURL('/PExploration/publicResource')" class="menuItemCell">Resources</Cell>
+                <Cell @click.native="turnToURL('/PExploration/toolsCenter')" class="menuItemCell">Tools</Cell>
+                <Cell @click.native="turnToURL('/PExploration/help')" class="menuItemCell">Help</Cell>
                 <Divider style="margin: 5px 0"/>
-                <Cell v-show="!userState" @click.native="turnToURL('/GeoProblemSolving/login')" class="menuItemCell">Login</Cell>
-                <Cell v-show="!userState" @click.native="turnToURL('/GeoProblemSolving/register')" class="menuItemCell">Sign up</Cell>
-                <Cell  v-show="userState" @click.native="turnToURL('/GeoProblemSolving/notifications')" class="menuItemCell">Notification</Cell>
+                <Cell v-show="!userState" @click.native="turnToURL('/PExploration/login')" class="menuItemCell">Login</Cell>
+                <Cell v-show="!userState" @click.native="turnToURL('/PExploration/register')" class="menuItemCell">Sign up</Cell>
+                <Cell  v-show="userState" @click.native="turnToURL('/PExploration/notifications')" class="menuItemCell">Notification</Cell>
                 <Cell  v-show="userState" @click.native="toPersonalPage" class="menuItemCell">Personal Page</Cell>
                 <Cell  v-show="userState" @click.native="logout" class="menuItemCell">Log out</Cell>
               </CellGroup>
@@ -321,9 +321,9 @@ export default {
     },
     turnContent(name) {
       if (name === "home") {
-        window.location.href = "/GeoProblemSolving/home";
+        window.location.href = "/PExploration/home";
       } else if (name == "projects") {
-        window.location.href = "/GeoProblemSolving/projectList";
+        window.location.href = "/PExploration/projectList";
       } else if (name == "resources") {
         this.$router.replace({ name: "PublicResource" });
       } else if (name == "toolsCenter") {
@@ -335,7 +335,7 @@ export default {
       }
     },
     goHome() {
-      window.location.href = "/GeoProblemSolving/home";
+      window.location.href = "/PExploration/home";
     },
     unlogin(name) {
       if (name === "login") {
@@ -359,7 +359,7 @@ export default {
       //get请求发送的是用户id
       this.axios
         .get(
-          "/GeoProblemSolving/notice/inquiry" +
+          "/PExploration/notice/inquiry" +
             "?key=recipientId" +
             "&value=" +
             this.$store.getters.userId
@@ -384,12 +384,12 @@ export default {
         this.noticeSocket = null;
       }
       var noticeSocketURL =
-        "ws://" + this.$store.state.IP_Port + "/GeoProblemSolving/NoticeSocket";
+        "ws://" + this.$store.state.IP_Port + "/PExploration/NoticeSocket";
       if (this.$store.state.IP_Port == "localhost:8080") {
-        noticeSocketURL = "ws://localhost:8081/GeoProblemSolving/NoticeSocket";
+        noticeSocketURL = "ws://localhost:8081/PExploration/NoticeSocket";
       }
       if(window.location.port=="8083"){
-          noticeSocketURL = "wss://"+ window.location.hostname+":8083/GeoProblemSolving/NoticeSocket";
+          noticeSocketURL = "wss://"+ window.location.hostname+":8083/PExploration/NoticeSocket";
       }
       this.noticeSocket = new WebSocket(noticeSocketURL);
       this.noticeSocket.onopen = this.onOpen;
@@ -444,11 +444,11 @@ export default {
     },
     logout() {
       this.axios
-        .get("/GeoProblemSolving/user/logout")
+        .get("/PExploration/user/logout")
         .then(res => {
           this.$store.commit("userLogout");
           this.noticeSocket.close();
-          window.location.href = "/GeoProblemSolving/home";
+          window.location.href = "/PExploration/home";
         })
         .catch(err => {
           confirm("logout fail!");

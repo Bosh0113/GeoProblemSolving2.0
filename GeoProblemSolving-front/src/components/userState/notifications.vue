@@ -217,7 +217,7 @@ export default {
     loadNotifications() {
       this.axios
         .get(
-          "/GeoProblemSolving/notice/inquiry?" +
+          "/PExploration/notice/inquiry?" +
             "key=recipientId" +
             "&value=" +
             this.$store.getters.userId
@@ -269,7 +269,7 @@ export default {
     },
     deleteNotice(notice) {
       this.axios
-        .get("/GeoProblemSolving/notice/delete" + "?noticeId=" + notice.noticeId)
+        .get("/PExploration/notice/delete" + "?noticeId=" + notice.noticeId)
         .then(res => {
           if(res.data == "Offline"){
             this.$store.commit("userLogout");
@@ -298,7 +298,7 @@ export default {
       var unreadCount = unreadList.length;
       for(var i=0;i<unreadList.length;i++){
         this.axios
-        .get("/GeoProblemSolving/notice/read" + "?noticeId=" + unreadList[i].noticeId)
+        .get("/PExploration/notice/read" + "?noticeId=" + unreadList[i].noticeId)
         .then(res => {
           if(res.data == "Offline"){
             this.$store.commit("userLogout");
@@ -321,7 +321,7 @@ export default {
     },
     readNotice(noticeId) {
       this.axios
-        .get("/GeoProblemSolving/notice/read" + "?noticeId=" + noticeId)
+        .get("/PExploration/notice/read" + "?noticeId=" + noticeId)
         .then(res => {
           if(res.data == "Offline"){
             this.$store.commit("userLogout");
@@ -342,7 +342,7 @@ export default {
     gotoWork(noticeId,subProjectId){
       //路由跳转好像和回调的关系有点问题，这样在回调之前就已经跳转了，回调的内容好像没啥用
       this.axios
-        .get("/GeoProblemSolving/notice/read" + "?noticeId=" + noticeId)
+        .get("/PExploration/notice/read" + "?noticeId=" + noticeId)
         .then(res => {
           if(res.data == "Offline"){
             this.$store.commit("userLogout");
@@ -367,7 +367,7 @@ export default {
       updateApply.append("content.approve", "false");
       updateApply.append("state", "read");
       this.axios
-        .post("/GeoProblemSolving/notice/update", updateApply)
+        .post("/PExploration/notice/update", updateApply)
         .then(res => {
           if(res.data == "Offline"){
             this.$store.commit("userLogout");
@@ -387,7 +387,7 @@ export default {
                 " ."
             };
             this.axios
-              .post("/GeoProblemSolving/notice/save", replyNotice)
+              .post("/PExploration/notice/save", replyNotice)
               .then(result => {
                 if (result.data == "Success") {
                   this.$emit("sendNotice", apply.content.userId);
@@ -412,7 +412,7 @@ export default {
       updateApply.append("content.approve", "true");
       updateApply.append("state", "read");
       this.axios
-        .post("/GeoProblemSolving/notice/update", updateApply)
+        .post("/PExploration/notice/update", updateApply)
         .then(res => {
           if(res.data == "Offline"){
             this.$store.commit("userLogout");
@@ -424,7 +424,7 @@ export default {
             //update project members
             this.axios
               .get(
-                "/GeoProblemSolving/"+apply.content.scope+"/join?" +
+                "/PExploration/"+apply.content.scope+"/join?" +
                   apply.content.scope+"Id=" +
                   apply.content.projectId +
                   "&userId=" +
@@ -454,7 +454,7 @@ export default {
                 " ."
             };
             this.axios
-              .post("/GeoProblemSolving/notice/save", replyNotice)
+              .post("/PExploration/notice/save", replyNotice)
               .then(result => {
                 if (result.data == "Success") {
                   this.$emit("sendNotice", apply.content.userId);
@@ -462,7 +462,7 @@ export default {
                   resultEmailBody["recipient"] = apply.content.userEmail;
                   resultEmailBody["mailTitle"] = "Join project result";
                   resultEmailBody["mailContent"] = "Hello, "+ apply.content.userName + ", Congratulations for joining the "+apply.content.scope+": " + apply.content.projectTitle + " .";
-                  this.axios.post("/GeoProblemSolving/email/send", resultEmailBody)
+                  this.axios.post("/PExploration/email/send", resultEmailBody)
                   .then(res=>{
                     if (res.data == "Success") {
                         this.$Notice.success({

@@ -395,7 +395,7 @@ export default {
       if (this.userInfo == {}) {
         this.axios
           .get(
-            "/GeoProblemSolving/user/inquiry" +
+            "/PExploration/user/inquiry" +
               "?key=" +
               "userId" +
               "&value=" +
@@ -491,7 +491,7 @@ export default {
       this.dataResList = [];
       this.axios
         .get(
-          "/GeoProblemSolving/folder/inquiry?folderId=" + this.pageParams.pageId
+          "/PExploration/folder/inquiry?folderId=" + this.pageParams.pageId
         )
         .then(res => {
           // 写渲染函数，取到所有资源
@@ -1208,7 +1208,7 @@ export default {
           resultForm.append("folderId", this.pageParams.pageId);
 
           this.axios
-            .post("/GeoProblemSolving/folder/uploadToFolder", resultForm)
+            .post("/PExploration/folder/uploadToFolder", resultForm)
             .then(res => {
               if (
                 res.data.sizeOver.length > 0 ||
@@ -1245,15 +1245,15 @@ export default {
       var abseirSocketURL =
         "ws://" +
         this.$store.state.IP_Port +
-        "/GeoProblemSolving/Abseir/" +
+        "/PExploration/Abseir/" +
         this.pageParams.pageId;
       if (this.$store.state.IP_Port == "localhost:8080") {
         abseirSocketURL =
-          "ws://localhost:8081/GeoProblemSolving/Abseir/" +
+          "ws://localhost:8081/PExploration/Abseir/" +
           this.pageParams.pageId;
       }
       if(window.location.port=="8083"){
-          abseirSocketURL = "wss://"+ window.location.hostname+":8083/GeoProblemSolving/Abseir" +
+          abseirSocketURL = "wss://"+ window.location.hostname+":8083/PExploration/Abseir" +
           this.pageParams.pageId;
       }
       this.abseirSocket = new WebSocket(abseirSocketURL);

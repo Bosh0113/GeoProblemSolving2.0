@@ -237,7 +237,7 @@ export default {
     },
     readResource() {
       this.allResourceList = [];
-      this.axios.get("/GeoProblemSolving/resource/allPublic").then(res => {
+      this.axios.get("/PExploration/resource/allPublic").then(res => {
         if (res.data != "None") {
           var tempResourceList = res.data;
           tempResourceList.reverse();

@@ -81,7 +81,7 @@ export default {
     getStepInfo() {
       this.axios
         .get(
-          "/GeoProblemSolving/step/inquiry?key=stepId&value=" +
+          "/PExploration/step/inquiry?key=stepId&value=" +
             this.subProjectInfo.stepId
         )
         .then(res => {
@@ -103,11 +103,11 @@ export default {
       obj.append("type", "");
       obj.append("stepId", "");
       this.axios
-        .post("/GeoProblemSolving/subProject/update", obj)
+        .post("/PExploration/subProject/update", obj)
         .then(res => {
           this.resetProjectTypeModel = false;
           if (res.data == "Offline") {
-            parent.location.href = "/GeoProblemSolving/login";
+            parent.location.href = "/PExploration/login";
           } else if (res.data != "Fail") {
             this.$store.commit("setSubProjectInfo", res.data);
             this.$emit("changeSubProjectInfo", res.data);

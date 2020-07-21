@@ -220,7 +220,7 @@ export default {
       if (this.userInfo == {}) {
         this.axios
           .get(
-            "/GeoProblemSolving/user/inquiry" +
+            "/PExploration/user/inquiry" +
               "?key=" +
               "userId" +
               "&value=" +
@@ -455,7 +455,7 @@ export default {
             formData.append("privacy", "private");
             formData.append("folderId", this.pageParams.pageId);
             this.axios
-              .post("/GeoProblemSolving/folder/uploadToFolder", formData)
+              .post("/PExploration/folder/uploadToFolder", formData)
               .then(res => {
                 if (
                   res.data.sizeOver.length > 0 ||
@@ -478,7 +478,7 @@ export default {
                   let dataItem = {
                     name: filename,
                     description: "map tool data",
-                    pathURL: "/GeoProblemSolving/resource/upload/" + dataName
+                    pathURL: "/PExploration/resource/upload/" + dataName
                   };
                   this.resources.push(dataItem);
 
@@ -487,7 +487,7 @@ export default {
                     type: "resourcesSave",
                     name: filename,
                     description: "map tool data",
-                    pathURL: "/GeoProblemSolving/resource/upload/" + dataName
+                    pathURL: "/PExploration/resource/upload/" + dataName
                   };
                   this.socketApi.sendSock(
                     this.send_content,
@@ -530,7 +530,7 @@ export default {
       formData.append("privacy", "private");
       formData.append("folderId", this.pageParams.pageId);
       this.axios
-        .post("/GeoProblemSolving/folder/uploadToFolder", formData)
+        .post("/PExploration/folder/uploadToFolder", formData)
         .then(res => {
           if (
             res.data.sizeOver.length > 0 ||
@@ -543,12 +543,12 @@ export default {
             this.uploadDataName = file.name;
 
             let dataName = res.data.uploaded[0].name;
-            this.dataUrl = "/GeoProblemSolving/resource/upload/" + dataName;
+            this.dataUrl = "/PExploration/resource/upload/" + dataName;
 
             let dataItem = {
               name: dataName,
               description: "map tool data",
-              pathURL: "/GeoProblemSolving/resource/upload/" + dataName
+              pathURL: "/PExploration/resource/upload/" + dataName
             };
             this.resources.push(dataItem);
 
@@ -557,7 +557,7 @@ export default {
               type: "resourcesUpdate",
               name: dataName,
               description: "map tool data",
-              pathURL: "/GeoProblemSolving/resource/upload/" + dataName
+              pathURL: "/PExploration/resource/upload/" + dataName
             };
             this.socketApi.sendSock(this.send_content, this.getSocketConnect);
           }
@@ -893,7 +893,7 @@ export default {
         for (let i = 0; i < this.olParticipants.length; i++) {
           this.axios
             .get(
-              "/GeoProblemSolving/user/inquiry" +
+              "/PExploration/user/inquiry" +
                 "?key=" +
                 "userId" +
                 "&value=" +
@@ -925,7 +925,7 @@ export default {
           var that = this;
           this.axios
             .get(
-              "/GeoProblemSolving/user/inquiry" +
+              "/PExploration/user/inquiry" +
                 "?key=" +
                 "userId" +
                 "&value=" +
@@ -983,7 +983,7 @@ export default {
       this.resources = [];
       this.axios
         .get(
-          "/GeoProblemSolving/folder/inquiry?folderId=" + this.pageParams.pageId
+          "/PExploration/folder/inquiry?folderId=" + this.pageParams.pageId
         )
         .then(res => {
           // 写渲染函数，取到所有资源

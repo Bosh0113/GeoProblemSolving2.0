@@ -292,7 +292,7 @@ export default {
     getContext() {
       this.axios
         .get(
-          "/GeoProblemSolving/step/inquiry/" +
+          "/PExploration/step/inquiry/" +
             "?key=stepId" +
             "&value=" +
             this.stepInfo.stepId
@@ -327,7 +327,7 @@ export default {
       contextDefinition.append("stepId", this.stepInfo.stepId);
 
       this.axios
-        .post("/GeoProblemSolving/step/update", contextDefinition)
+        .post("/PExploration/step/update", contextDefinition)
         .then(res => {
           if (res.data == "Offline") {
             this.$store.commit("userLogout");

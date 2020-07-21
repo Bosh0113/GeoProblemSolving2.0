@@ -340,7 +340,7 @@ export default {
     readHistoricalRecords() {
       this.axios
         .get(
-          "/GeoProblemSolving/history/inquiry?" +
+          "/PExploration/history/inquiry?" +
             "eventType=step" +
             "&key=scopeId" +
             "&value=" +

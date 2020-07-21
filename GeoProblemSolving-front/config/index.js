@@ -11,11 +11,11 @@ module.exports = {
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     proxyTable: {
-      '/GeoProblemSolving': {
+      '/PExploration': {
         target: 'http://localhost:8081',       
         changeOrigin: true,
         pathRewrite: {
-          '^/GeoProblemSolving': '/GeoProblemSolving'
+          '^/PExploration': '/PExploration'
         }
       }
     },
@@ -50,8 +50,8 @@ module.exports = {
 
     // Paths
     assetsRoot: path.resolve(__dirname, '../dist'),
-    assetsSubDirectory: 'GeoProblemSolving/static',
-    assetsPublicPath: '/GeoProblemSolving/',
+    assetsSubDirectory: 'PExploration/static',
+    assetsPublicPath: '/PExploration/',
 
     /**
      * Source Maps

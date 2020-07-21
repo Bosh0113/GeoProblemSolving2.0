@@ -558,7 +558,7 @@
                 changeFolder(folderId, type) {
                     axios
                         .get(
-                            "/GeoProblemSolving/folder/inquiry" +
+                            "/PExploration/folder/inquiry" +
                             "?folderId=" +
                             folderId
                         )
@@ -621,7 +621,7 @@
                             var newFolderName = this.newValidate.setName;
                             axios
                                 .post(
-                                    "/GeoProblemSolving/folder/new" +
+                                    "/PExploration/folder/new" +
                                     "?folderName=" +
                                     newFolderName +
                                     "&parentId=" +
@@ -651,7 +651,7 @@
                         var parentId = this.currentFolder.folderId;
                         axios
                             .get(
-                                "/GeoProblemSolving/folder/removeFolder" +
+                                "/PExploration/folder/removeFolder" +
                                 "?folderId=" +
                                 folderId +
                                 "&parentId=" +
@@ -689,7 +689,7 @@
                             var newName = this.renameValidate.newName;
                             axios
                                 .get(
-                                    "/GeoProblemSolving/folder/renameFolder" +
+                                    "/PExploration/folder/renameFolder" +
                                     "?newName=" +
                                     newName +
                                     "&folderId=" +
@@ -774,7 +774,7 @@
                                 formData.append("folderId", this.currentFolder.folderId);
                                 this.progressModalShow = true;
                                 axios({
-                                    url: "/GeoProblemSolving/folder/uploadToFolder",
+                                    url: "/PExploration/folder/uploadToFolder",
                                     method: "post",
                                     onUploadProgress: progressEvent => {
                                         this.uploadProgress =
@@ -832,7 +832,7 @@
                         var fileId = fileInfo.resourceId;
                         axios
                             .get(
-                                "/GeoProblemSolving/folder/removeFile" +
+                                "/PExploration/folder/removeFile" +
                                 "?folderId=" +
                                 folderId +
                                 "&fileId=" +
@@ -899,7 +899,7 @@
                         axios({
                             method: "post",
                             url:
-                                "/GeoProblemSolving/resource/packageZIP?fileURLs=" + choosefileUrls,
+                                "/PExploration/resource/packageZIP?fileURLs=" + choosefileUrls,
                             responseType: "blob"
                         })
                             .then(res => {
@@ -919,7 +919,7 @@
                 shareModalShow() {
                     axios
                         .get(
-                            "/GeoProblemSolving/resource/inquiry" +
+                            "/PExploration/resource/inquiry" +
                             "?key=uploaderId" +
                             "&value=" +
                             this.userInfo.userId
@@ -946,7 +946,7 @@
                     var addFileListStr = addFileList.toString();
                     axios
                         .get(
-                            "/GeoProblemSolving/folder/shareToFolder" +
+                            "/PExploration/folder/shareToFolder" +
                             "?addFileList=" +
                             addFileListStr +
                             "&folderId=" +
@@ -994,7 +994,7 @@
                         var fileId = this.renameForeInfo.resourceId;
                         axios
                             .get(
-                            "/GeoProblemSolving/folder/editFile" +
+                            "/PExploration/folder/editFile" +
                                 "?fileId=" +
                                 fileId +
                                 "&folderId=" +
@@ -1050,7 +1050,7 @@
                     this.$Spin.show();
                     axios
                     .get(
-                        "/GeoProblemSolving/folder/copyToCenter"+
+                        "/PExploration/folder/copyToCenter"+
                         "?resourceId="+this.selectedFile.resourceId+
                         "&userId="+this.userInfo.userId+
                         "&privacy="+this.copyFilePrivacy+

@@ -219,7 +219,7 @@ export default {
       urlAddress:
         "http://" +
         this.$store.state.IP_Port +
-        "/GeoProblemSolving/resetPassword/",
+        "/PExploration/resetPassword/",
       resetModalSHow: false
     };
   },
@@ -254,7 +254,7 @@ export default {
           var passwordAESURI = md5(this.loginForm.password);
           this.axios
             .get(
-              "/GeoProblemSolving/user/login" +
+              "/PExploration/user/login" +
                 "?email=" +
                 email +
                 "&password=" +
@@ -280,13 +280,13 @@ export default {
       });
     },
     goBack() {
-      window.location.href = "/GeoProblemSolving/home";
+      window.location.href = "/PExploration/home";
     },
     register() {
       this.$router.push({ name: "Register" });
     },
     goHome() {
-      window.location.href = "/GeoProblemSolving/home";
+      window.location.href = "/PExploration/home";
     },
     getlocalStorage() {
       this.loginForm.user = localStorage.getItem("user");
@@ -338,7 +338,7 @@ export default {
         this.loginForm.user +
         " to change your password, thanks.";
       this.axios
-        .post("/GeoProblemSolving/email/send", emailFormBody)
+        .post("/PExploration/email/send", emailFormBody)
         .then(res => {
           if (res.data == "Success") {
             this.$Notice.success({

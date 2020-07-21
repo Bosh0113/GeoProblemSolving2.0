@@ -49,7 +49,7 @@ export default {
     getUserInfo() {
       if (this.userInfo == {} || this.userInfo == undefined) {
         $.ajax({
-          url: "/GeoProblemSolving/user/state",
+          url: "/PExploration/user/state",
           type: "POST",
           async: false,
           success: data => {
@@ -68,7 +68,7 @@ export default {
     getProjectInfo() {
       $.ajax({
         url:
-          "/GeoProblemSolving/project/inquiry" +
+          "/PExploration/project/inquiry" +
           "?key=projectId" +
           "&value=" +
           this.projectId,
@@ -76,7 +76,7 @@ export default {
         async: false,
         success: data => {
           if (data == "Offline") {
-            parent.location.href = "/GeoProblemSolving/login";
+            parent.location.href = "/PExploration/login";
           }
           if (data != "None" && data != "Fail") {
             this.projectInfo = data[0];

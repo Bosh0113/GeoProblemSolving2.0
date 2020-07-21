@@ -569,7 +569,7 @@ export default {
 
       this.axios
         .get(
-          "/GeoProblemSolving/user/inquiry" +
+          "/PExploration/user/inquiry" +
             "?key=" +
             "userId" +
             "&value=" +
@@ -583,7 +583,7 @@ export default {
             for (let i = 1; i < membersList.length; i++) {
               this.axios
                 .get(
-                  "/GeoProblemSolving/user/inquiry" +
+                  "/PExploration/user/inquiry" +
                     "?key=" +
                     "userId" +
                     "&value=" +
@@ -636,7 +636,7 @@ export default {
       for (let i = 0; i < this.inviteList.length; i++) {
         $.ajax({
           url:
-            "/GeoProblemSolving/subProject/join" +
+            "/PExploration/subProject/join" +
             "?subProjectId=" +
             this.$route.params.id +
             "&userId=" +
@@ -653,7 +653,7 @@ export default {
             } else {
               that.axios
                 .get(
-                  "/GeoProblemSolving/user/inquiry" +
+                  "/PExploration/user/inquiry" +
                     "?key=" +
                     "userId" +
                     "&value=" +
@@ -690,7 +690,7 @@ export default {
                   " , and now you are a member in this subproject."
               };
               this.axios
-                .post("/GeoProblemSolving/notice/save", replyNotice)
+                .post("/PExploration/notice/save", replyNotice)
                 .then(result => {
                   if (result.data == "Success") {
                     this.$emit("sendNotice", this.inviteList[i]); // 改apply.content.userId
@@ -710,7 +710,7 @@ export default {
     quitSubProject() {
       this.axios
         .get(
-          "/GeoProblemSolving/subProject/quit" +
+          "/PExploration/subProject/quit" +
             "?subProjectId=" +
             this.$route.params.id +
             "&userId=" +
@@ -734,7 +734,7 @@ export default {
               approve: "unknow"
             };
             this.axios
-              .post("/GeoProblemSolving/notice/save", quitNotice)
+              .post("/PExploration/notice/save", quitNotice)
               .then(res => {
                 if (res.data == "Success") {
                   this.$emit("sendNotice", this.subProjectInfo.managerId);
@@ -783,7 +783,7 @@ export default {
       // 获取到userId
       this.axios
         .get(
-          "/GeoProblemSolving/subProject/quit" +
+          "/PExploration/subProject/quit" +
             "?subProjectId=" +
             this.$route.params.id +
             "&userId=" +
@@ -816,7 +816,7 @@ export default {
                 "."
             };
             this.axios
-              .post("/GeoProblemSolving/notice/save", removeNotice)
+              .post("/PExploration/notice/save", removeNotice)
               .then(res => {
                 if (res.data == "Success") {
                   this.$emit("sendNotice", uid);
@@ -841,7 +841,7 @@ export default {
           obj.append("subProjectId", this.subProjectInfo.subProjectId);
           obj.append("title", this.title);
           this.axios
-            .post("/GeoProblemSolving/subProject/update", obj)
+            .post("/PExploration/subProject/update", obj)
             .then(res => {
               if (res.data == "Offline") {
                 this.$store.commit("userLogout");
@@ -872,7 +872,7 @@ export default {
           obj.append("subProjectId", this.subProjectInfo.subProjectId);
           obj.append("description", this.description);
           this.axios
-            .post("/GeoProblemSolving/subProject/update", obj)
+            .post("/PExploration/subProject/update", obj)
             .then(res => {
               if (res.data == "Offline") {
                 this.$store.commit("userLogout");
@@ -903,7 +903,7 @@ export default {
           obj.append("subProjectId", this.subProjectInfo.subProjectId);
           obj.append("background", this.background);
           this.axios
-            .post("/GeoProblemSolving/subProject/update", obj)
+            .post("/PExploration/subProject/update", obj)
             .then(res => {
               if (res.data == "Offline") {
                 this.$store.commit("userLogout");
@@ -934,7 +934,7 @@ export default {
           obj.append("subProjectId", this.subProjectInfo.subProjectId);
           obj.append("limitation", this.limitation);
           this.axios
-            .post("/GeoProblemSolving/subProject/update", obj)
+            .post("/PExploration/subProject/update", obj)
             .then(res => {
               if (res.data == "Offline") {
                 this.$store.commit("userLogout");

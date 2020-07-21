@@ -224,7 +224,7 @@ export default {
     getUserResource() {
       this.axios
         .get(
-          "/GeoProblemSolving/resource/inquiry" +
+          "/PExploration/resource/inquiry" +
             "?key=uploaderId" +
             "&value=" +
             this.$store.getters.userId
@@ -267,7 +267,7 @@ export default {
           editFormData.append("description", this.editFileValidate.description);
           editFormData.append("privacy", this.editFileValidate.privacy);
           this.axios({
-            url: "/GeoProblemSolving/resource/update",
+            url: "/PExploration/resource/update",
             method: "post",
             data: editFormData
           })
@@ -308,7 +308,7 @@ export default {
       if (this.deleteResourceId != "") {
         this.axios
           .get(
-            "/GeoProblemSolving/resource/delete?" +
+            "/PExploration/resource/delete?" +
               "resourceId=" +
               this.deleteResourceId
           )
@@ -338,7 +338,7 @@ export default {
         var filesUrlStr = this.filesToPackage.toString();
         this.axios({
           method: "post",
-          url: "/GeoProblemSolving/resource/packageZIP?fileURLs=" + filesUrlStr,
+          url: "/PExploration/resource/packageZIP?fileURLs=" + filesUrlStr,
           responseType: "blob"
         })
           .then(res => {

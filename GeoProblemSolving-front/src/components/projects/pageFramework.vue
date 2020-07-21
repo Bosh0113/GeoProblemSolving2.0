@@ -215,7 +215,7 @@ export default {
         var that = this;
         $.ajax({
           url:
-            "/GeoProblemSolving/step/inquiry/" +
+            "/PExploration/step/inquiry/" +
             "?key=stepId" +
             "&value=" +
             that.$route.params.stepId,
@@ -228,7 +228,7 @@ export default {
             } else if (data != "None" && data != "Fail") {
               that.stepInfo = data[0];
               that.toProjectPage =
-                "/GeoProblemSolving/projectDetail/" + data[0].projectId;
+                "/PExploration/projectDetail/" + data[0].projectId;
             } else {
               that.$Notice.info({
                 desc: "Get step description failed!"
@@ -246,7 +246,7 @@ export default {
       var that = this;
       $.ajax({
         url:
-          "/GeoProblemSolving/project/inquiry" +
+          "/PExploration/project/inquiry" +
           "?key=projectId" +
           "&value=" +
           this.stepInfo.projectId,
@@ -286,7 +286,7 @@ export default {
       for (var i = 0; i < membersList.length; i++) {
         $.ajax({
           url:
-            "/GeoProblemSolving/user/inquiry" +
+            "/PExploration/user/inquiry" +
             "?key=" +
             "userId" +
             "&value=" +
@@ -331,7 +331,7 @@ export default {
           obj.append("stepId", this.stepInfo.stepId);
 
           this.axios
-            .post("/GeoProblemSolving/step/update", obj)
+            .post("/PExploration/step/update", obj)
             .then(res => {
               if (res.data == "Offline") {
                 this.$store.commit("userLogout");

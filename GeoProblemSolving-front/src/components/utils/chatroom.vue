@@ -710,7 +710,7 @@ export default {
     async getGroupId() {
       let groupId = this.$route.query.groupID;     
       let data = await this.axios.get(
-        `/GeoProblemSolving/step/inquiry?key=stepId&value=${groupId}`
+        `/PExploration/step/inquiry?key=stepId&value=${groupId}`
       );
      
       let subProjectId = data.data[0].subProjectId;
@@ -729,7 +729,7 @@ export default {
       if (scopeId != undefined && scopeId != "") {
         if (scopeType == "subproject") {
           let data = await this.axios.get(
-            `/GeoProblemSolving/subProject/inquiry?key=subProjectId&value=${scopeId}`
+            `/PExploration/subProject/inquiry?key=subProjectId&value=${scopeId}`
           );
           if (data.data == "Offline") {
             this.$store.commit("userLogout");
@@ -752,7 +752,7 @@ export default {
           }
         } else if (scopeType == "project") {
           let data = await this.axios.get(
-            `/GeoProblemSolving/project/inquiry?key=projectId&value=${scopeId}`
+            `/PExploration/project/inquiry?key=projectId&value=${scopeId}`
           );
           if (data.data == "Offline") {
             this.$store.commit("userLogout");
@@ -787,7 +787,7 @@ export default {
       for (let i = 0; i < membersList.length; i++) {
         let userId = membersList[i].userId;
         let data = await this.axios.get(
-          `/GeoProblemSolving/user/inquiry?key=userId&value=${userId}`
+          `/PExploration/user/inquiry?key=userId&value=${userId}`
         );
         participantsTemp.push(data.data);
       }
@@ -1008,7 +1008,7 @@ export default {
       if (this.searchPanelShow === true) {
         this.axios
           .get(
-            "/GeoProblemSolving/message/inquiry" +
+            "/PExploration/message/inquiry" +
               "?type=message" +
               "&key=roomId" +
               "&value=" +

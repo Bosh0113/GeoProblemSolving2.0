@@ -442,7 +442,7 @@ export default {
           var passwordAES = md5(this.registerForm.password);
           var email = this.registerForm.email;
           this.axios
-            .post("/GeoProblemSolving/user/register", userJson)
+            .post("/PExploration/user/register", userJson)
             .then(res => {
               if (res.data == "Email") {
                 this.$Message.success("Email has been used!");
@@ -453,7 +453,7 @@ export default {
 
                 this.axios
                   .get(
-                    "/GeoProblemSolving/user/login" +
+                    "/PExploration/user/login" +
                       "?email=" +
                       email +
                       "&password=" +
@@ -472,7 +472,7 @@ export default {
                         "Welcome to join in Geo-Future Lab. In this platform, you can deal with geo-problems with your colleagues collaboratively.";
                       this.axios
                         .post(
-                          "/GeoProblemSolving/email/send",
+                          "/PExploration/email/send",
                           registerEmailBody
                         )
                         .then(res => {
@@ -529,7 +529,7 @@ export default {
     },
     //点击图标片跳转到主页
     goHome() {
-      window.location.href = "/GeoProblemSolving/home";
+      window.location.href = "/PExploration/home";
     },
     //输入密码时
     changeType() {

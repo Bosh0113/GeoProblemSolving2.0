@@ -115,7 +115,7 @@ export default {
   methods: {
     resetPwd() {
       this.axios
-        .get("/GeoProblemSolving/user/newPassword?email="+this.formValidate.email+"&password="+md5(this.formValidate.newPassword))
+        .get("/PExploration/user/newPassword?email="+this.formValidate.email+"&password="+md5(this.formValidate.newPassword))
         .then(res => {
           if (res.data !== "Fail") {
             this.$Notice.success({

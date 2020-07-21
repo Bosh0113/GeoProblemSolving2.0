@@ -570,7 +570,7 @@ export default {
       if (this.stepInfo.stepId != "" && this.stepInfo.stepId != undefined) {
         $.ajax({
           url:
-            "/GeoProblemSolving/folder/inquiry" +
+            "/PExploration/folder/inquiry" +
             "?folderId=" +
             this.stepInfo.stepId,
           type: "GET",
@@ -683,7 +683,7 @@ export default {
               this.stepInfo.stepId != undefined
             ) {
               this.axios({
-                url: "/GeoProblemSolving/folder/uploadToFolder",
+                url: "/PExploration/folder/uploadToFolder",
                 method: "post",
                 onUploadProgress: progressEvent => {
                   this.uploadProgress =
@@ -779,7 +779,7 @@ export default {
       if (this.deleteResourceId != "") {
         this.axios
           .get(
-            "/GeoProblemSolving/folder/removeFile?" +
+            "/PExploration/folder/removeFile?" +
               "fileId=" +
               this.deleteResourceId +
               "&folderId=" +
@@ -1017,13 +1017,13 @@ export default {
           resourceId: this.selectData.resourceId
         };
         this.axios
-          .post("/GeoProblemSolving/token/getShareToken?duration=0", info)
+          .post("/PExploration/token/getShareToken?duration=0", info)
           .then(res => {
             this.sharedToken = res.data;
             this.sharedUrl =
               "http://" +
               this.$store.state.IP_Port +
-              "/GeoProblemSolving/share?tool=mindmap&token=" +
+              "/PExploration/share?tool=mindmap&token=" +
               this.sharedToken;
           })
           .catch(err => {});
@@ -1064,7 +1064,7 @@ export default {
       emailFormBody["mailContent"] =
         "Open the address:( " + url + " ), and check the latest work.";
       axios
-        .post("/GeoProblemSolving/email/send", emailFormBody)
+        .post("/PExploration/email/send", emailFormBody)
         .then(res => {
           if (res.data == "Success") {
             this.$Notice.success({

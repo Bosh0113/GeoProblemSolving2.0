@@ -158,7 +158,7 @@ export default {
       if (this.userInfo == {}) {
         this.axios
           .get(
-            "/GeoProblemSolving/user/inquiry" +
+            "/PExploration/user/inquiry" +
               "?key=" +
               "userId" +
               "&value=" +
@@ -183,7 +183,7 @@ export default {
 
       this.axios
         .get(
-          "/GeoProblemSolving/folder/inquiry?folderId=" + this.pageParams.pageId
+          "/PExploration/folder/inquiry?folderId=" + this.pageParams.pageId
         )
         .then(res => {
           // 写渲染函数，取到所有资源
@@ -237,7 +237,7 @@ export default {
       formData.append("privacy", "private");
       formData.append("folderId", this.pageParams.pageId);
       this.axios
-        .post("/GeoProblemSolving/folder/uploadToFolder", formData)
+        .post("/PExploration/folder/uploadToFolder", formData)
         .then(res => {
           if (
             res.data.sizeOver.length > 0 ||
@@ -247,12 +247,12 @@ export default {
               console.log(res.data);
             } else if (res.data.uploaded.length > 0) {
             let fileName = res.data.uploaded[0].name;
-            this.fileURL = "/GeoProblemSolving/resource/upload/" + fileName;
+            this.fileURL = "/PExploration/resource/upload/" + fileName;
 
             let fileItem = {
               name: file.name,
               description: "file preview tool",
-              pathURL: "/GeoProblemSolving/resource/upload/" + fileName
+              pathURL: "/PExploration/resource/upload/" + fileName
             };
             if (this.isPaper) {
               this.paperList.push(fileItem);

@@ -48,7 +48,7 @@ export default new Vuex.Store({
         getUserInfo: state => {
             if (!state.userInfo.userState) {
                 $.ajax({
-                    url: "/GeoProblemSolving/user/state",
+                    url: "/PExploration/user/state",
                     type: "POST",
                     async: false,
                     success: function (data) {

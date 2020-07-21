@@ -192,10 +192,10 @@
 
         function startWebsocket(roomId) {
 
-            var wsUrl = "ws://" + RouteInfo.getIPPort() + "/GeoProblemSolving/Mindmap/" + roomId;
-            // var wsUrl = "ws://localhost:8081/GeoProblemSolving/Mindmap/" + roomId;
+            var wsUrl = "ws://" + RouteInfo.getIPPort() + "/PExploration/Mindmap/" + roomId;
+            // var wsUrl = "ws://localhost:8081/PExploration/Mindmap/" + roomId;
             if(window.location.port=="8083"){
-                wsUrl = "wss://"+ window.location.hostname+":8083/GeoProblemSolving/Mindmap/" + roomId;
+                wsUrl = "wss://"+ window.location.hostname+":8083/PExploration/Mindmap/" + roomId;
             }
             dataStream = $websocket(wsUrl);
 

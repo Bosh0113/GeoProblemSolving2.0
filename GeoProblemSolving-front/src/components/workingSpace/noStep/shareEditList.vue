@@ -78,7 +78,7 @@ export default {
       if (this.stepInfo.stepId != "" && this.stepInfo.stepId != undefined) {
         $.ajax({
           url:
-            "/GeoProblemSolving/folder/inquiry" +
+            "/PExploration/folder/inquiry" +
             "?folderId=" +
             this.stepInfo.stepId,
           type: "GET",
@@ -122,7 +122,7 @@ export default {
       }
       if (this.userRole != "Visitor" && this.userRole != "Token") {
         toolURL =
-          '<iframe src="/GeoProblemSolving/Collaborative/Mindmap/version/mindmap.html?userName=' +
+          '<iframe src="/PExploration/Collaborative/Mindmap/version/mindmap.html?userName=' +
           this.userInfo.userName +
           "&userID=" +
           this.userInfo.userId +
@@ -133,7 +133,7 @@ export default {
           '" style="width: 100%;height:100%;" frameborder="0"></iframe>';
       } else {
         toolURL =
-          '<iframe src="/GeoProblemSolving/Collaborative/Mindmap/share/mindmap.html?userName=&userID=&groupID=' +
+          '<iframe src="/PExploration/Collaborative/Mindmap/share/mindmap.html?userName=&userID=&groupID=' +
           this.stepInfo.stepId +
           "&resourceID=" +
           item.resourceId +

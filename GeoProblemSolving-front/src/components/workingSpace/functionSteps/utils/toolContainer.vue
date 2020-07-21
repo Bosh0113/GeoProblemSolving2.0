@@ -286,7 +286,7 @@ export default {
       for (var i = 0; i < toolsCount; i++) {
         this.axios
           .get(
-            "/GeoProblemSolving/tool/inquiry" +
+            "/PExploration/tool/inquiry" +
               "?key=" +
               "tId" +
               "&value=" +
@@ -328,7 +328,7 @@ export default {
       for (var i = 0; i < toolsetsCount; i++) {
         this.axios
           .get(
-            "/GeoProblemSolving/toolset/inquiry" +
+            "/PExploration/toolset/inquiry" +
               "?key=" +
               "tsId" +
               "&value=" +
@@ -380,7 +380,7 @@ export default {
       form["eventType"] = "step";
       form["userId"] = this.$store.getters.userId;
       this.axios
-        .post("/GeoProblemSolving/history/save", form)
+        .post("/PExploration/history/save", form)
         .then(res => {
           console.log(res.data);
         })
@@ -481,7 +481,7 @@ export default {
     checkJupyterUser() {
       this.axios
         .get(
-          "/GeoProblemSolving/jupyter/inquiry?projectId=" +
+          "/PExploration/jupyter/inquiry?projectId=" +
             this.projectInfo.projectId
         )
         .then(res => {
@@ -564,7 +564,7 @@ export default {
         jupyterUserId: name_jupyterhub 
       };
       this.axios
-        .post("/GeoProblemSolving/jupyter/create", data)
+        .post("/PExploration/jupyter/create", data)
         .then(res => {
           if (res.data == "Success") {
             this.$Notice.info({desc: "Create Jupyter notebook successfully. It can be used now."});

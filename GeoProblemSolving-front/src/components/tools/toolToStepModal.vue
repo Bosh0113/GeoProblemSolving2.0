@@ -501,7 +501,7 @@ export default {
     getPublicToolsets() {
       this.axios
         .get(
-          "/GeoProblemSolving/toolset/inquiry" +
+          "/PExploration/toolset/inquiry" +
             "?key=" +
             "privacy" +
             "&value=" +
@@ -526,7 +526,7 @@ export default {
     getPersonalToolsets() {
       this.axios
         .get(
-          "/GeoProblemSolving/toolset/inquiryAll" +
+          "/PExploration/toolset/inquiryAll" +
             "?provider=" +
             this.userInfo.userId
         )
@@ -560,7 +560,7 @@ export default {
       for (var i = 0; i < toolsetsCount; i++) {
         this.axios
           .get(
-            "/GeoProblemSolving/toolset/inquiry" +
+            "/PExploration/toolset/inquiry" +
               "?key=" +
               "tsId" +
               "&value=" +
@@ -600,7 +600,7 @@ export default {
     getPublicTools() {
       this.axios
         .get(
-          "/GeoProblemSolving/tool/inquiry" +
+          "/PExploration/tool/inquiry" +
             "?key=" +
             "privacy" +
             "&value=" +
@@ -627,7 +627,7 @@ export default {
     getPersonalTools() {
       this.axios
         .get(
-          "/GeoProblemSolving/tool/inquiryAll" +
+          "/PExploration/tool/inquiryAll" +
             "?provider=" +
             this.userInfo.userId
         )
@@ -661,7 +661,7 @@ export default {
       for (var i = 0; i < toolsCount; i++) {
         this.axios
           .get(
-            "/GeoProblemSolving/tool/inquiry" +
+            "/PExploration/tool/inquiry" +
               "?key=" +
               "tId" +
               "&value=" +
@@ -701,7 +701,7 @@ export default {
     changeMenuItem(name) {
       if(name=="diyTools"){
         this.stepToolModal = false;
-        top.location.href="/GeoProblemSolving/toolsCenter";
+        top.location.href="/PExploration/toolsCenter";
       }
       this.showMenuItem = name;
     },
@@ -879,7 +879,7 @@ export default {
       obj.append("toolsetList", newStepToolsets);
       obj.append("toolList", newStepTools);
       this.axios
-        .post("/GeoProblemSolving/step/update", obj)
+        .post("/PExploration/step/update", obj)
         .then(res => {
           if (res.data == "Offline") {
             this.$store.commit("userLogout");
@@ -900,7 +900,7 @@ export default {
     },
     showTool(toolInfo) {
       // this.axios
-      //   .post("/GeoProblemSolving/user/state")
+      //   .post("/PExploration/user/state")
       //   .then(res => {
       //     if (!res.data) {
       //       this.$store.commit("userLogout");

@@ -437,7 +437,7 @@ export default {
       if (this.userInfo == {}) {
         this.axios
           .get(
-            "/GeoProblemSolving/user/inquiry" +
+            "/PExploration/user/inquiry" +
               "?key=" +
               "userId" +
               "&value=" +
@@ -587,7 +587,7 @@ export default {
           imageForm.append("thumbnail", thumbnailBlobFile);
 
           this.axios
-            .post("/GeoProblemSolving/folder/uploadToFolder", imageForm)
+            .post("/PExploration/folder/uploadToFolder", imageForm)
             .then(res => {
               if (
                 res.data.sizeOver.length > 0 ||
@@ -606,7 +606,7 @@ export default {
                 let dataItem = {
                   name: filename,
                   description: "drawing tool data",
-                  pathURL: "/GeoProblemSolving/resource/upload/" + dataName
+                  pathURL: "/PExploration/resource/upload/" + dataName
                 };
                 that.resources.push(dataItem);
 
@@ -615,7 +615,7 @@ export default {
                   type: "imageSave",
                   name: filename,
                   description: "drawing tool data",
-                  pathURL: "/GeoProblemSolving/resource/upload/" + dataName
+                  pathURL: "/PExploration/resource/upload/" + dataName
                 };
                 that.socketApi.sendSock(
                   that.send_content,
@@ -1216,7 +1216,7 @@ export default {
         for (let i = 0; i < this.olParticipants.length; i++) {
           this.axios
             .get(
-              "/GeoProblemSolving/user/inquiry" +
+              "/PExploration/user/inquiry" +
                 "?key=" +
                 "userId" +
                 "&value=" +
@@ -1248,7 +1248,7 @@ export default {
           var that = this;
           this.axios
             .get(
-              "/GeoProblemSolving/user/inquiry" +
+              "/PExploration/user/inquiry" +
                 "?key=" +
                 "userId" +
                 "&value=" +
@@ -1288,7 +1288,7 @@ export default {
 
       this.axios
         .get(
-          "/GeoProblemSolving/folder/inquiry?folderId=" + this.pageParams.pageId
+          "/PExploration/folder/inquiry?folderId=" + this.pageParams.pageId
         )
         .then(res => {
           // 写渲染函数，取到所有资源

@@ -152,12 +152,12 @@ export default {
     getStepInfo() {
       this.axios
         .get(
-          "/GeoProblemSolving/step/inquiry?key=stepId&value=" +
+          "/PExploration/step/inquiry?key=stepId&value=" +
             this.projectInfo.stepId
         )
         .then(res => {
           if (res.data == "Offline") {
-            parent.location.href = "/GeoProblemSolving/login";
+            parent.location.href = "/PExploration/login";
           } else if (res.data != "None" && res.data != "Fail") {
             this.$set(this, "stepInfo", res.data[0]);
             this.getParticipants();
@@ -174,11 +174,11 @@ export default {
       obj.append("type", "");
       obj.append("stepId", "");
       this.axios
-        .post("/GeoProblemSolving/project/update", obj)
+        .post("/PExploration/project/update", obj)
         .then(res => {
           this.resetProjectTypeModel = false;
           if (res.data == "Offline") {
-            parent.location.href = "/GeoProblemSolving/login";
+            parent.location.href = "/PExploration/login";
           } else if (res.data != "Fail") {
             this.$store.commit("setProjectInfo", res.data);
             this.$emit("changeProjectInfo", res.data);
@@ -208,7 +208,7 @@ export default {
       for (var i = 0; i < membersList.length; i++) {
         $.ajax({
           url:
-            "/GeoProblemSolving/user/inquiry" +
+            "/PExploration/user/inquiry" +
             "?key=" +
             "userId" +
             "&value=" +
@@ -303,7 +303,7 @@ export default {
         groupId: this.stepInfo.stepId
       }
       this.axios
-        .post("/GeoProblemSolving/token/getShareToken?duration=0",info)
+        .post("/PExploration/token/getShareToken?duration=0",info)
         .then(res => {
           this.sharedToken = res.data;
           this.sharedUrl = top.location.href + "&token=" + this.sharedToken;
@@ -343,7 +343,7 @@ export default {
       emailFormBody["mailContent"] =
         "Open the address:( " + url + " ), and check the latest work.";
       axios
-        .post("/GeoProblemSolving/email/send", emailFormBody)
+        .post("/PExploration/email/send", emailFormBody)
         .then(res => {
           if (res.data == "Success") {
             this.$Notice.success({

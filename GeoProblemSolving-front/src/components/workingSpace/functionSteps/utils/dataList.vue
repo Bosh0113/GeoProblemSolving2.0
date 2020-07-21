@@ -624,7 +624,7 @@ export default {
       if (this.stepInfo.stepId != "" && this.stepInfo.stepId != undefined) {
         $.ajax({
           url:
-            "/GeoProblemSolving/folder/inquiry" +
+            "/PExploration/folder/inquiry" +
             "?folderId=" +
             this.stepInfo.stepId,
           type: "GET",
@@ -736,7 +736,7 @@ export default {
               this.stepInfo.stepId != undefined
             ) {
               this.axios({
-                url: "/GeoProblemSolving/folder/uploadToFolder",
+                url: "/PExploration/folder/uploadToFolder",
                 method: "post",
                 onUploadProgress: progressEvent => {
                   this.uploadProgress =
@@ -830,7 +830,7 @@ export default {
       if (this.deleteResourceId != "") {
         this.axios
           .get(
-            "/GeoProblemSolving/folder/removeFile?" +
+            "/PExploration/folder/removeFile?" +
               "fileId=" +
               this.deleteResourceId +
               "&folderId=" +
@@ -916,7 +916,7 @@ export default {
       form["eventType"] = "step";
       form["userId"] = this.$store.getters.userId;
       this.axios
-        .post("/GeoProblemSolving/history/save", form)
+        .post("/PExploration/history/save", form)
         .then(res => {
           console.log(res.data);
         })
@@ -1073,7 +1073,7 @@ export default {
         if (this.stepInfo.subProjectId != "") {
           $.ajax({
             url:
-              "/GeoProblemSolving/subProject/inquiry" +
+              "/PExploration/subProject/inquiry" +
               "?key=subProjectId" +
               "&value=" +
               this.stepInfo.subProjectId,
@@ -1123,7 +1123,7 @@ export default {
         let selectedStepId = this.preActivities[i].stepID;
         let selectedStepName = this.preActivities[i].name;
         let getResUrl =
-          "/GeoProblemSolving/folder/findByFileType?" +
+          "/PExploration/folder/findByFileType?" +
           "scopeId=" +
           selectedStepId +
           "&type=all";
@@ -1191,7 +1191,7 @@ export default {
 
       this.axios
         .get(
-          "/GeoProblemSolving/folder/shareToFolder" +
+          "/PExploration/folder/shareToFolder" +
             "?addFileList=" +
             addFileListStr +
             "&folderId=" +

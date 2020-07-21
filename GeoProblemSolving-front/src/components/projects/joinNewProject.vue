@@ -82,7 +82,7 @@ export default {
   },
   methods:{
       getProjectName(){
-        this.axios.get("/GeoProblemSolving/project/inquiry?key=projectId&&value=" + this.$route.params.id)
+        this.axios.get("/PExploration/project/inquiry?key=projectId&&value=" + this.$route.params.id)
         .then(res=> {
           if(res.data!="None"){
             this.projectInfo = res.data;
@@ -96,7 +96,7 @@ export default {
       judgeMailRegiste(){
         this.axios
         .get(
-          "/GeoProblemSolving/user/isRegistered?" +
+          "/PExploration/user/isRegistered?" +
             "email=" +
             this.email
         )
@@ -123,7 +123,7 @@ export default {
       var passwordMD5 = md5(this.password);
       this.axios
         .get(
-          "/GeoProblemSolving/project/joinByMail" +
+          "/PExploration/project/joinByMail" +
             "?projectId="+
             this.projectId+
             "&email=" +
@@ -154,7 +154,7 @@ export default {
     autoLogin(email,passsword,projectId){
       this.axios
         .get(
-          "/GeoProblemSolving/user/login" +
+          "/PExploration/user/login" +
             "?email=" +
             email +
             "&password=" +
@@ -167,7 +167,7 @@ export default {
             this.$Message.error("Invalid account or password.");
           } else {
             this.$store.commit("userLogin", res.data);
-            window.location.href="/GeoProblemSolving/projectDetail/"+projectId;
+            window.location.href="/PExploration/projectDetail/"+projectId;
           }
         });
     }

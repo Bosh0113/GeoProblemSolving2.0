@@ -469,7 +469,7 @@ export default {
     getUserProfile() {
       this.axios
         .get(
-          "/GeoProblemSolving/user/inquiry" +
+          "/PExploration/user/inquiry" +
             "?key=userId" +
             "&value=" +
             this.$route.params.id
@@ -490,7 +490,7 @@ export default {
     readPersonalEvent() {
       this.axios
         .get(
-          "/GeoProblemSolving/history/inquiry?" +
+          "/PExploration/history/inquiry?" +
             "eventType=project" +
             "&key=userId" +
             "&value=" +
@@ -511,7 +511,7 @@ export default {
     getManagerProjectList() {
       this.axios
         .get(
-          "/GeoProblemSolving/project/inquiry" +
+          "/PExploration/project/inquiry" +
             "?key=managerId" +
             "&value=" +
             this.$route.params.id
@@ -531,7 +531,7 @@ export default {
       for (let i = 0; i < projectIds.length; i++) {
         this.axios
           .get(
-            "/GeoProblemSolving/project/inquiry" +
+            "/PExploration/project/inquiry" +
               "?key=projectId" +
               "&value=" +
               projectIds[i].projectId

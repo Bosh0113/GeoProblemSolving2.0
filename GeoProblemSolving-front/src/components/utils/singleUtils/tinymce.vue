@@ -123,7 +123,7 @@ export default {
       if (this.userInfo == {}) {
         this.axios
           .get(
-            "/GeoProblemSolving/user/inquiry" +
+            "/PExploration/user/inquiry" +
               "?key=" +
               "userId" +
               "&value=" +
@@ -163,7 +163,7 @@ export default {
         "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
       };
       this.axios
-        .post("/GeoProblemSolving/folder/uploadToFolder", formData)
+        .post("/PExploration/folder/uploadToFolder", formData)
         .then(res => {
           if (
             res.data.sizeOver.length > 0 ||
@@ -198,7 +198,7 @@ export default {
           let formData = new FormData();
           formData.append("picture", file);
           this.axios
-            .post("/GeoProblemSolving/project/picture", formData)
+            .post("/PExploration/project/picture", formData)
             .then(res => {
               if (res.data != "Fail") {
                 this.pictureUrl =

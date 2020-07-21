@@ -1162,7 +1162,7 @@ export default {
         for (let i = 0; i < projectIds.length; i++) {
           this.axios
             .get(
-              "/GeoProblemSolving/project/inquiry" +
+              "/PExploration/project/inquiry" +
                 "?key=projectId" +
                 "&value=" +
                 projectIds[i].projectId
@@ -1203,7 +1203,7 @@ export default {
     getManagerProjectList() {
       this.axios
         .get(
-          "/GeoProblemSolving/project/inquiry" +
+          "/PExploration/project/inquiry" +
             "?key=managerId" +
             "&value=" +
             this.userDetail.userId
@@ -1225,12 +1225,12 @@ export default {
     logOutAccount() {
       this.axios
         .get(
-          "/GeoProblemSolving/user/remove?" +
+          "/PExploration/user/remove?" +
             "userId=" +
             this.$store.getters.userId
         )
         .then(res => {
-          window.location.href = "/GeoProblemSolving/home";
+          window.location.href = "/PExploration/home";
         })
         .catch(err => {
           console.log(err.data);
@@ -1245,7 +1245,7 @@ export default {
       let quitProjectId = this.currentProject.projectId;
       this.axios
         .get(
-          "/GeoProblemSolving/project/quit" +
+          "/PExploration/project/quit" +
             "?projectId=" +
             quitProjectId +
             "&userId=" +
@@ -1272,7 +1272,7 @@ export default {
                 "!"
             };
             this.axios
-              .post("/GeoProblemSolving/notice/save", notice)
+              .post("/PExploration/notice/save", notice)
               .then(res => {
                 if (res.data == "Success") {
                   this.$emit("sendNotice", recipientId);
@@ -1306,7 +1306,7 @@ export default {
     authorize() {
       this.axios
         .get(
-          "/GeoProblemSolving/project/manager?" +
+          "/PExploration/project/manager?" +
             "projectId=" +
             this.currentProject.projectId +
             "&newManagerId=" +
@@ -1332,7 +1332,7 @@ export default {
                 " !"
             };
             this.axios
-              .post("/GeoProblemSolving/notice/save", notice)
+              .post("/PExploration/notice/save", notice)
               .then(res => {
                 if (res.data == "Success") {
                   this.$emit("sendNotice", recipientId);
@@ -1364,7 +1364,7 @@ export default {
       if (this.deleteProjectId != "") {
         this.axios
           .get(
-            "/GeoProblemSolving/project/delete?" +
+            "/PExploration/project/delete?" +
               "projectId=" +
               this.deleteProjectId
           )
@@ -1436,7 +1436,7 @@ export default {
             changedProfile.append(item, data[item]);
           }
           this.axios
-            .post("/GeoProblemSolving/user/update", changedProfile)
+            .post("/PExploration/user/update", changedProfile)
             .then(res => {
               if (res.data !== "Fail") {
                 // this.drawerClose = true;
@@ -1466,12 +1466,12 @@ export default {
       // sessionStorage.setItem("projectInfo", JSON.stringify(projectInfo));
       // sessionStorage.setItem("projectInfo", this.encrypto(projectInfo));
       window.location.href =
-        "/GeoProblemSolving/projectDetail/" + projectInfo.projectId;
+        "/PExploration/projectDetail/" + projectInfo.projectId;
     },
     readPersonalEvent() {
       this.axios
         .get(
-          "/GeoProblemSolving/history/inquiry?" +
+          "/PExploration/history/inquiry?" +
             "eventType=project" +
             "&key=userId" +
             "&value=" +
@@ -1492,7 +1492,7 @@ export default {
     getUserResource() {
       this.axios
         .get(
-          "/GeoProblemSolving/resource/inquiry" +
+          "/PExploration/resource/inquiry" +
             "?key=uploaderId" +
             "&value=" +
             this.$store.getters.userId
@@ -1519,7 +1519,7 @@ export default {
       if (this.deleteResourceId != "") {
         this.axios
           .get(
-            "/GeoProblemSolving/resource/delete?" +
+            "/PExploration/resource/delete?" +
               "resourceId=" +
               this.deleteResourceId
           )
@@ -1571,7 +1571,7 @@ export default {
           editFormData.append("description", this.editFileValidate.description);
           editFormData.append("privacy", this.editFileValidate.privacy);
           this.axios({
-            url: "/GeoProblemSolving/resource/update",
+            url: "/PExploration/resource/update",
             method: "post",
             data: editFormData
           })
@@ -1607,7 +1607,7 @@ export default {
         var filesUrlStr = this.filesToPackage.toString();
         this.axios({
           method: "post",
-          url: "/GeoProblemSolving/resource/packageZIP?fileURLs=" + filesUrlStr,
+          url: "/PExploration/resource/packageZIP?fileURLs=" + filesUrlStr,
           responseType: "blob"
         })
           .then(res => {
@@ -1635,7 +1635,7 @@ export default {
       a.remove();
     },
     goResourceCenter() {
-      window.location.href = "/GeoProblemSolving/resourceCenter";
+      window.location.href = "/PExploration/resourceCenter";
     },
     uploadModalShow() {
       this.uploadValidate = {
@@ -1688,7 +1688,7 @@ export default {
             formData.append("privacy", this.uploadValidate.privacy);
             this.progressModalShow = true;
             this.axios({
-              url: "/GeoProblemSolving/resource/upload",
+              url: "/PExploration/resource/upload",
               method: "post",
               onUploadProgress: progressEvent => {
                 this.uploadProgress =

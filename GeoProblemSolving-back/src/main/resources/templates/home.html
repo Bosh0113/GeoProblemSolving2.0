@@ -5,19 +5,19 @@
     <meta http-equiv="cache-control" content="no-cache">
     <meta http-equiv="expires" content="0">
     <title>Geo-Problem Solving</title>
-    <link rel="shortcut icon" href="/GeoProblemSolving/static/favicon.ico">
+    <link rel="shortcut icon" href="/PExploration/static/favicon.ico">
     <meta http-equiv="Content-Type" content=" charset=UTF-8" />
     <meta name="description" content="Participatory|GeoProblem Solving|GIS">
     <meta name="keywords" content="Participatory|GeoProblem Solving|GIS">
     <meta name="author" content="OpenGMS">
-    <script src="/GeoProblemSolving/js/vue.min.js"></script>
-    <script src="/GeoProblemSolving/js/jquery.js"></script>
-    <script src="/GeoProblemSolving/js/ionicons/ionicons.js"></script>
-    <link href="/GeoProblemSolving/js/ionicons/css/ionicons.min.css" rel="stylesheet">
-    <link href="/GeoProblemSolving/css/iview.css" rel="stylesheet">
-    <script src="/GeoProblemSolving/js/iview.js"></script>
-    <script src="/GeoProblemSolving/js/vue-avatar.min.js"></script>
-    <script src="/GeoProblemSolving/js/axios.min.js"></script>
+    <script src="/PExploration/js/vue.min.js"></script>
+    <script src="/PExploration/js/jquery.js"></script>
+    <script src="/PExploration/js/ionicons/ionicons.js"></script>
+    <link href="/PExploration/js/ionicons/css/ionicons.min.css" rel="stylesheet">
+    <link href="/PExploration/css/iview.css" rel="stylesheet">
+    <script src="/PExploration/js/iview.js"></script>
+    <script src="/PExploration/js/vue-avatar.min.js"></script>
+    <script src="/PExploration/js/axios.min.js"></script>
 
     <style >
         .home-screen {
@@ -433,7 +433,7 @@
             };
             sessionStorage.setItem('userInfo', JSON.stringify(userInfo));
             $.ajax({
-                url: "/GeoProblemSolving/user/state",
+                url: "/PExploration/user/state",
                 type: "POST",
                 async: false,
                 success: data=> {
@@ -460,22 +460,22 @@
         methods: {
             start() {
                 if (this.userInfo.userState) {
-                    window.location.href = "/GeoProblemSolving/projectList"
+                    window.location.href = "/PExploration/projectList"
                 } else {
-                    window.location.href = "/GeoProblemSolving/login"
+                    window.location.href = "/PExploration/login"
                 }
             },
             toRegister(){
-                window.location.href = "/GeoProblemSolving/register"
+                window.location.href = "/PExploration/register"
             },
             toCreate(){
-                window.location.href = "/GeoProblemSolving/newProject"
+                window.location.href = "/PExploration/newProject"
             },
             toTeam(){
-                window.location.href = "/GeoProblemSolving/projectList"
+                window.location.href = "/PExploration/projectList"
             },
             toDemo(){
-                window.location.href = "/GeoProblemSolving/projectList"
+                window.location.href = "/PExploration/projectList"
             }
         }
     })

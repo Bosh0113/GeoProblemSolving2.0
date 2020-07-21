@@ -781,7 +781,7 @@ export default {
       } else {
         $.ajax({
           url:
-            "/GeoProblemSolving/project/inquiry" +
+            "/PExploration/project/inquiry" +
             "?key=projectId" +
             "&value=" +
             this.projectId,
@@ -1395,11 +1395,11 @@ export default {
       obj.append("projectId", this.projectId);
       obj.append("permissionManager", JSON.stringify(this.permission));
       this.axios
-        .post("/GeoProblemSolving/project/update", obj)
+        .post("/PExploration/project/update", obj)
         .then(res => {
           this.resetProjectTypeModel = false;
           if (res.data == "Offline") {
-            parent.location.href = "/GeoProblemSolving/login";
+            parent.location.href = "/PExploration/login";
           } else if (res.data != "Fail") {
             this.$store.commit("setProjectInfo", res.data);
             this.$Notice.info({

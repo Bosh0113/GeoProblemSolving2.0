@@ -99,7 +99,7 @@ export default {
             Step["toolsetList"] = [];
             Step["content"] = {};
             this.axios
-            .post("/GeoProblemSolving/step/createForType", Step)
+            .post("/PExploration/step/createForType", Step)
             .then(res => {
             if (res.data == "Offline") {
                 this.$store.commit("userLogout");
@@ -113,7 +113,7 @@ export default {
                 obj.append("type", this.selectType);
                 obj.append("stepId", stepId);
                 this.axios
-                    .post("/GeoProblemSolving/subProject/update", obj)
+                    .post("/PExploration/subProject/update", obj)
                     .then(res => {
                         this.selectTypeModal = false;
                         if (res.data == "Offline") {

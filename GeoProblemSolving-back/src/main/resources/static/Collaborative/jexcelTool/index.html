@@ -245,7 +245,7 @@
                 if (this.userInfo == null || JSON.stringify(this.userInfo) == "{}") {
                     $.ajax({
                         type: "GET",
-                        url: "/GeoProblemSolving/user/inquiry" +
+                        url: "/PExploration/user/inquiry" +
                         "?key=" +
                         "userId" +
                         "&value=" +
@@ -274,7 +274,7 @@
                 this.fileList = [];
                 $.ajax({
                     type: "GET",
-                    url: "/GeoProblemSolving/folder/inquiry?folderId=" + this.pageParams.pageId,
+                    url: "/PExploration/folder/inquiry?folderId=" + this.pageParams.pageId,
                     cache: false,        //不设置缓存
                     processData: false,  // 不处理数据
                     contentType: false,  // 不设置内容类型
@@ -336,7 +336,7 @@
 
                 $.ajax({
                     type: "POST",
-                    url: "/GeoProblemSolving/folder/uploadToFolder",
+                    url: "/PExploration/folder/uploadToFolder",
                     data: resultForm,
                     cache: false,        //不设置缓存
                     processData: false,  // 不处理数据
@@ -410,12 +410,12 @@
                 }
 
                 var roomId = this.pageParams.pageId;
-                var excelSocketURL = "ws://" + window.location.host + "/GeoProblemSolving/ExcelTool/" + roomId;
+                var excelSocketURL = "ws://" + window.location.host + "/PExploration/ExcelTool/" + roomId;
                 if (window.location.host == "localhost:8080") {
-                    excelSocketURL = "ws://localhost:8081/GeoProblemSolving/ExcelTool/" + roomId;
+                    excelSocketURL = "ws://localhost:8081/PExploration/ExcelTool/" + roomId;
                 }
                 if(window.location.port=="8083"){
-                    excelSocketURL = "wss://"+ window.location.hostname+":8083/GeoProblemSolving/ExcelTool/" + roomId;
+                    excelSocketURL = "wss://"+ window.location.hostname+":8083/PExploration/ExcelTool/" + roomId;
                 }
                 this.excelSocket = new WebSocket(excelSocketURL);
                 this.excelSocket.onopen = this.onOpen;

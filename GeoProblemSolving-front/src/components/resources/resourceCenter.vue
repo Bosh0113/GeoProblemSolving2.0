@@ -314,7 +314,7 @@ export default {
       this.stepDisable = true;
       this.axios
         .get(
-          "/GeoProblemSolving/subProject/inquiry" +
+          "/PExploration/subProject/inquiry" +
             "?key=" +
             "projectId" +
             "&value=" +
@@ -368,7 +368,7 @@ export default {
       var that = this;
       $.ajax({
         url:
-          "/GeoProblemSolving/project/inquiry" +
+          "/PExploration/project/inquiry" +
           "?key=projectId" +
           "&value=" +
           projectId,
@@ -477,7 +477,7 @@ export default {
     getResourceShowList() {
       this.axios
         .get(
-          "/GeoProblemSolving/folder/findByFileType" +
+          "/PExploration/folder/findByFileType" +
             "?scopeId=" +
             this.scopeId +
             "&type=" +
@@ -511,7 +511,7 @@ export default {
         var filesUrlStr = this.filesToPackage.toString();
         this.axios({
           method: "post",
-          url: "/GeoProblemSolving/resource/packageZIP?fileURLs=" + filesUrlStr,
+          url: "/PExploration/resource/packageZIP?fileURLs=" + filesUrlStr,
           responseType: "blob"
         })
           .then(res => {

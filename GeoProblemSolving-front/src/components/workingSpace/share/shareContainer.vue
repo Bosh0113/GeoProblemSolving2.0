@@ -23,7 +23,7 @@ export default {
     verifyToken() {
       let tokenStr = this.$route.query.token;
       this.axios
-        .get("/GeoProblemSolving/token/checkShareToken?shareToken=" + tokenStr)
+        .get("/PExploration/token/checkShareToken?shareToken=" + tokenStr)
         .then(res => {
           if (Object.prototype.toString.call(res.data)=="[object Object]") {
             let groupId = res.data.groupId;
@@ -46,7 +46,7 @@ export default {
         userInfo.userName != ""
       ) {
         this.pageUrl =
-          "/GeoProblemSolving/Collaborative/Mindmap/version/mindmap.html?userName=" +
+          "/PExploration/Collaborative/Mindmap/version/mindmap.html?userName=" +
           userInfo.userName +
           "&userID=" +
           userInfo.userId +
@@ -56,7 +56,7 @@ export default {
           resourceId;
       } else {
         this.pageUrl =
-          "/GeoProblemSolving/Collaborative/Mindmap/share/mindmap.html?userName=&userID=&groupID=" +
+          "/PExploration/Collaborative/Mindmap/share/mindmap.html?userName=&userID=&groupID=" +
           groupId +
           "&resourceID=" +
           resourceId;

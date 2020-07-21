@@ -127,10 +127,10 @@ export default {
             Step["toolsetList"] = [];
             Step["content"] = {};
             this.axios
-            .post("/GeoProblemSolving/step/createForType", Step)
+            .post("/PExploration/step/createForType", Step)
             .then(res => {
             if (res.data == "Offline") {
-                parent.location.href="/GeoProblemSolving/login"
+                parent.location.href="/PExploration/login"
             } else if (res.data === "Fail") {
                 this1.$Message.info("Fail");
             } else {
@@ -140,11 +140,11 @@ export default {
                 obj.append("type", this.selectType);
                 obj.append("stepId", stepId);
                 this.axios
-                    .post("/GeoProblemSolving/project/update", obj)
+                    .post("/PExploration/project/update", obj)
                     .then(res => {
                         this.selectTypeModal = false;
                         if (res.data == "Offline") {
-                            parent.location.href="/GeoProblemSolving/login"
+                            parent.location.href="/PExploration/login"
                         } else if (res.data != "Fail") {
                             this.$store.commit("setProjectInfo", res.data);
                             this.$emit("changeProjectInfo", res.data);

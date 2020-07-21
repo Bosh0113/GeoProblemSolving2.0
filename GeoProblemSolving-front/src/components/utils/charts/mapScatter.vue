@@ -135,7 +135,7 @@ export default {
       if (this.userInfo == {}) {
         this.axios
           .get(
-            "/GeoProblemSolving/user/inquiry" +
+            "/PExploration/user/inquiry" +
               "?key=" +
               "userId" +
               "&value=" +
@@ -566,7 +566,7 @@ export default {
       this.resources = [];
       this.axios
         .get(
-          "/GeoProblemSolving/folder/inquiry?folderId=" + this.pageParams.pageId
+          "/PExploration/folder/inquiry?folderId=" + this.pageParams.pageId
         )
         .then(res => {
           // 写渲染函数，取到所有资源
@@ -626,7 +626,7 @@ export default {
         for (let i = 0; i < this.olParticipants.length; i++) {
           this.axios
             .get(
-              "/GeoProblemSolving/user/inquiry" +
+              "/PExploration/user/inquiry" +
                 "?key=" +
                 "userId" +
                 "&value=" +
@@ -658,7 +658,7 @@ export default {
           var that = this;
           this.axios
             .get(
-              "/GeoProblemSolving/user/inquiry" +
+              "/PExploration/user/inquiry" +
                 "?key=" +
                 "userId" +
                 "&value=" +

@@ -299,7 +299,7 @@ export default {
       for (var i = 0; i < toolsCount; i++) {
         this.axios
           .get(
-            "/GeoProblemSolving/tool/inquiry" +
+            "/PExploration/tool/inquiry" +
               "?key=" +
               "tId" +
               "&value=" +
@@ -341,7 +341,7 @@ export default {
       for (var i = 0; i < toolsetsCount; i++) {
         this.axios
           .get(
-            "/GeoProblemSolving/toolset/inquiry" +
+            "/PExploration/toolset/inquiry" +
               "?key=" +
               "tsId" +
               "&value=" +
@@ -486,7 +486,7 @@ export default {
     checkJupyterUser() {
       this.axios
         .get(
-          "/GeoProblemSolving/jupyter/inquiry?projectId=" +
+          "/PExploration/jupyter/inquiry?projectId=" +
             this.projectInfo.projectId
         )
         .then(res => {
@@ -569,7 +569,7 @@ export default {
         jupyterUserId: name_jupyterhub
       };
       this.axios
-        .post("/GeoProblemSolving/jupyter/create", data)
+        .post("/PExploration/jupyter/create", data)
         .then(res => {
           if (res.data == "Success") {
             this.$Notice.info({

@@ -161,7 +161,7 @@
     </dependencies>
 
     <build>
-        <finalName>GeoProblemSolving</finalName>
+        <finalName>PExploration</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

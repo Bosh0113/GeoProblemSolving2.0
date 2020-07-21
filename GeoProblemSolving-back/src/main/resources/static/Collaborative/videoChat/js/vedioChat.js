@@ -61,7 +61,7 @@ $(document).ready(function () {
     var ws;
     if(WebSocket)
     {
-        ws = new WebSocket("wss://"+ window.location.hostname +":8083/GeoProblemSolving/VideoChatServer/"+thisRoomId);
+        ws = new WebSocket("wss://"+ window.location.hostname +":8083/PExploration/VideoChatServer/"+thisRoomId);
 
     }
 
@@ -439,7 +439,7 @@ $(document).ready(function () {
         var membersCount = members.length;
           for (var i = 0; i < members.length; i++) {
                   $.ajax({
-                      url:"/GeoProblemSolving/user/inquiry" +
+                      url:"/PExploration/user/inquiry" +
                       "?key=" +
                       "userId" +
                       "&value=" +
@@ -477,7 +477,7 @@ $(document).ready(function () {
   
               // 人员渲染
               $.ajax({
-                  url:"/GeoProblemSolving/user/inquiry" +
+                  url:"/PExploration/user/inquiry" +
                   "?key=" +
                   "userId" +
                   "&value=" +

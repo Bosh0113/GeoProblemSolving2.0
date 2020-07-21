@@ -176,7 +176,7 @@ export default {
   methods: {
     start() {
       if (this.$store.getters.userState) {
-        window.location.href="/GeoProblemSolving/projectList";
+        window.location.href="/PExploration/projectList";
       } else {
         this.$router.push({ name: "Login" });
       }
