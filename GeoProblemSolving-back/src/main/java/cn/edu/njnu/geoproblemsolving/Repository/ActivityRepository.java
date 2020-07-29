@@ -9,8 +9,4 @@ import java.util.List;
 
 @RepositoryRestResource(path = "activity")
 public interface ActivityRepository extends MongoRepository<Activity, String> {
-
-    public List<Activity> findByLevel(Integer level);
-
-    public List<Activity> findByPrivacy(ProjectPrivacy privacy);
 }

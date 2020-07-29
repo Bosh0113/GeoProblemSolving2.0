@@ -1,5 +1,4 @@
 <style scoped>
-/* 注意css在哪里生效,需要全局使用就全局定义，仅在某个局部定义就在某个div或者元素下定义，在其子元素生效 */
 .layout {
   background-color: #ffffff;
   --headerHeight: 60px;

@@ -16,7 +16,7 @@ import cn.edu.njnu.geoproblemsolving.Service.ActivityService;
 import cn.edu.njnu.geoproblemsolving.domain.tool.ToolEntity;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -36,6 +36,7 @@ public class ActivityServiceImpl implements ActivityService {
     private final FolderDaoImpl folderDao;
     private final SubprojectRepository subprojectRepository;
 
+    @Autowired
     public ActivityServiceImpl(ActivityRepository activityRepository,
                                ProtocolRepository protocolRepository,
                                UserRepository userRepository,

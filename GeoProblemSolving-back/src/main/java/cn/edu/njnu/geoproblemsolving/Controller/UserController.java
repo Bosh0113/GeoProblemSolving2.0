@@ -48,7 +48,7 @@ public class UserController {
                 return user;
             }
             else {
-                return false;
+                return "Fail";
             }
         }catch (Exception e){
             return "Fail";
