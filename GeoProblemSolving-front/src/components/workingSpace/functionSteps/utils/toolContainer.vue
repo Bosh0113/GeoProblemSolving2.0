@@ -392,7 +392,10 @@ export default {
       this.selectedTool = toolInfo;
       // this.openToolModal = true;
       var toolUrl = toolInfo.toolUrl;
-      if(toolUrl.indexOf("multipleChat")!==-1||toolUrl.indexOf("p2pChat")!==-1||toolUrl.indexOf("limesurvey")!==-1){
+      // if(toolUrl.indexOf("multipleChat")!==-1||toolUrl.indexOf("p2pChat")!==-1||toolUrl.indexOf("limesurvey")!==-1){
+      //   this.openToolNewWindow();
+      // }
+      if(toolUrl.indexOf("http")!==-1){
         this.openToolNewWindow();
       }
       else{
