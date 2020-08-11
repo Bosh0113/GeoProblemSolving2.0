@@ -253,13 +253,13 @@ public class UpdateDBDao {
 
     public String md5Password(){
         try{
-            List<User> userEntities = mongoTemplate.findAll(User.class);
-            for(User user :userEntities){
+            List<UserEntity> userEntities = mongoTemplate.findAll(UserEntity.class);
+            for(UserEntity user :userEntities){
                 String passWordMD5 = DigestUtils.md5DigestAsHex(user.getPassword().getBytes());
                 Query query = new Query(Criteria.where("userId").is(user.getUserId()));
                 Update update = new Update();
                 update.set("password",passWordMD5);
-                mongoTemplate.updateFirst(query,update, User.class);
+                mongoTemplate.updateFirst(query,update, UserEntity.class);
             }
             return "Success";
         }catch (Exception e){

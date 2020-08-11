@@ -1,4 +1,4 @@
-package cn.edu.njnu.geoproblemsolving.domain.activity.repository.tool;
+package cn.edu.njnu.geoproblemsolving.domain.tool;
 
 import cn.edu.njnu.geoproblemsolving.Dao.Method.CommonMethod;
 import cn.edu.njnu.geoproblemsolving.Entity.ToolReq.UpdateToolListReq;

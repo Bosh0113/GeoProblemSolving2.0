@@ -1,4 +1,4 @@
-package cn.edu.njnu.geoproblemsolving.Controller;
+package cn.edu.njnu.geoproblemsolving.domain.activity.controller;
 
 import cn.edu.njnu.geoproblemsolving.Entity.EmailEntity;
 import cn.edu.njnu.geoproblemsolving.domain.activity.Project;

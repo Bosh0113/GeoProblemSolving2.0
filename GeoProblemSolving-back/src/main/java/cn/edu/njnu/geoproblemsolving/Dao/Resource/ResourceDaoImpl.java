@@ -3,7 +3,7 @@ package cn.edu.njnu.geoproblemsolving.Dao.Resource;
 import cn.edu.njnu.geoproblemsolving.Dao.Method.CommonMethod;
 import cn.edu.njnu.geoproblemsolving.Entity.Resources.UploadResult;
 import cn.edu.njnu.geoproblemsolving.Entity.Resources.ResourceEntity;
-import cn.edu.njnu.geoproblemsolving.Entity.User;
+import cn.edu.njnu.geoproblemsolving.Entity.UserEntity;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -124,7 +124,7 @@ public class ResourceDaoImpl implements IResourceDao {
                             resourceEntity.setResourceId(resourceId);
 
                             Query queryUser = Query.query(Criteria.where("userId").is(request.getParameter("uploaderId")));
-                            User uploader = mongoTemplate.findOne(queryUser, User.class);
+                            UserEntity uploader = mongoTemplate.findOne(queryUser, UserEntity.class);
 
                             resourceEntity.setName(fileNames);
                             resourceEntity.setDescription(request.getParameter("description"));
@@ -134,7 +134,7 @@ public class ResourceDaoImpl implements IResourceDao {
                             resourceEntity.setFileSize(fileSize);
                             resourceEntity.setPathURL(pathURL);
                             resourceEntity.setUploaderId(uploader.getUserId());
-                            resourceEntity.setUploaderName(uploader.getName());
+                            resourceEntity.setUploaderName(uploader.getUserName());
                             resourceEntity.setUploadTime(uploadTime);
                             resourceEntity.setEditToolInfo(request.getParameter("editToolInfo"));
                             mongoTemplate.save(resourceEntity);
@@ -258,7 +258,7 @@ public class ResourceDaoImpl implements IResourceDao {
                                 }
 
                                 Query queryUser = Query.query(Criteria.where("userId").is(request.getParameter("uploaderId")));
-                                User uploader = mongoTemplate.findOne(queryUser, User.class);
+                                UserEntity uploader = mongoTemplate.findOne(queryUser, UserEntity.class);
 
                                 Date date = new Date();
                                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
@@ -268,7 +268,7 @@ public class ResourceDaoImpl implements IResourceDao {
                                 update.set("fileSize", fileSize);
                                 update.set("pathURL", pathURL);
                                 update.set("uploaderId", uploader.getUserId());
-                                update.set("uploaderName", uploader.getName());
+                                update.set("uploaderName", uploader.getUserName());
                                 update.set("uploadTime", uploadTime);
                                 update.set("thumbnail", thumbnailPath);
                                 update.set("editToolInfo", request.getParameter("editToolInfo"));

@@ -1,4 +1,4 @@
-package cn.edu.njnu.geoproblemsolving.Entity.Activities;
+package cn.edu.njnu.geoproblemsolving.domain.activity;
 
 import lombok.Data;
 

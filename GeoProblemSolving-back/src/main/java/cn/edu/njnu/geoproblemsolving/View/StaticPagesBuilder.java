@@ -1,9 +1,6 @@
 package cn.edu.njnu.geoproblemsolving.View;
 
-import cn.edu.njnu.geoproblemsolving.Entity.Activities.Project;
-import cn.edu.njnu.geoproblemsolving.Repository.ProjectRepository;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import cn.edu.njnu.geoproblemsolving.domain.activity.Project;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;

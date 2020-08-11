@@ -1,4 +1,4 @@
-package cn.edu.njnu.geoproblemsolving.Controller;
+package cn.edu.njnu.geoproblemsolving.domain.activity.controller;
 
 import cn.edu.njnu.geoproblemsolving.domain.activity.Activity;
 import cn.edu.njnu.geoproblemsolving.domain.activity.LinkProtocol;

@@ -1,4 +1,4 @@
-package cn.edu.njnu.geoproblemsolving.domain.activity.repository.tool;
+package cn.edu.njnu.geoproblemsolving.domain.tool;
 
 import cn.edu.njnu.geoproblemsolving.Entity.ModelTools.CModel.support.BaseEntity;
 import com.alibaba.fastjson.JSONObject;

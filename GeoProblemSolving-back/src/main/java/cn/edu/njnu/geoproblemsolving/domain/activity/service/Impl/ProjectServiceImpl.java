@@ -1,13 +1,13 @@
-package cn.edu.njnu.geoproblemsolving.Service.Impl;
+package cn.edu.njnu.geoproblemsolving.domain.activity.service.Impl;
 
 import cn.edu.njnu.geoproblemsolving.Dao.Email.EmailDaoImpl;
 import cn.edu.njnu.geoproblemsolving.Dao.Folder.FolderDaoImpl;
 import cn.edu.njnu.geoproblemsolving.domain.activity.Project;
 import cn.edu.njnu.geoproblemsolving.Entity.EmailEntity;
-import cn.edu.njnu.geoproblemsolving.Entity.User;
+import cn.edu.njnu.geoproblemsolving.domain.user.User;
 import cn.edu.njnu.geoproblemsolving.domain.activity.repository.ProjectRepository;
+import cn.edu.njnu.geoproblemsolving.domain.activity.service.ProjectService;
 import cn.edu.njnu.geoproblemsolving.domain.user.repository.UserRepository;
-import cn.edu.njnu.geoproblemsolving.Service.ProjectService;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.data.domain.PageRequest;

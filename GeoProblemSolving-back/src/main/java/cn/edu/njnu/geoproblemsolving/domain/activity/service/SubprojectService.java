@@ -1,4 +1,4 @@
-package cn.edu.njnu.geoproblemsolving.Service;
+package cn.edu.njnu.geoproblemsolving.domain.activity.service;
 
 
 import cn.edu.njnu.geoproblemsolving.domain.activity.Subproject;

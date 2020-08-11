@@ -1,4 +1,4 @@
-package cn.edu.njnu.geoproblemsolving.Repository;
+package cn.edu.njnu.geoproblemsolving.domain.activity.repository;
 
 import cn.edu.njnu.geoproblemsolving.domain.activity.LinkProtocol;
 import org.springframework.data.mongodb.repository.MongoRepository;

@@ -1,7 +1,7 @@
-package cn.edu.njnu.geoproblemsolving.Entity.Activities;
+package cn.edu.njnu.geoproblemsolving.domain.activity;
 
-import cn.edu.njnu.geoproblemsolving.Enums.ProtocolType;
-import cn.edu.njnu.geoproblemsolving.Enums.RoleProtocol;
+import cn.edu.njnu.geoproblemsolving.domain.activity.enums.ProtocolType;
+import cn.edu.njnu.geoproblemsolving.domain.user.enums.RoleProtocol;
 import com.alibaba.fastjson.JSONObject;
 import lombok.Data;
 import org.springframework.data.annotation.Id;

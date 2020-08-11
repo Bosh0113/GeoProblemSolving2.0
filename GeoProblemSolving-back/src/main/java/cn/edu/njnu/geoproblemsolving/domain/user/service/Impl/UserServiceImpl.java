@@ -1,9 +1,9 @@
-package cn.edu.njnu.geoproblemsolving.Service.Impl;
+package cn.edu.njnu.geoproblemsolving.domain.user.service.Impl;
 
 import cn.edu.njnu.geoproblemsolving.Entity.Resources.ResourceEntity;
-import cn.edu.njnu.geoproblemsolving.Entity.User;
+import cn.edu.njnu.geoproblemsolving.domain.user.User;
 import cn.edu.njnu.geoproblemsolving.domain.user.repository.UserRepository;
-import cn.edu.njnu.geoproblemsolving.Service.UserService;
+import cn.edu.njnu.geoproblemsolving.domain.user.service.UserService;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
