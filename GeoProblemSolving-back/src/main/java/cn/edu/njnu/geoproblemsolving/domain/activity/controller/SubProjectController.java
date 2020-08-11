@@ -1,7 +1,7 @@
 package cn.edu.njnu.geoproblemsolving.Controller;
 
-import cn.edu.njnu.geoproblemsolving.Entity.Activities.Subproject;
-import cn.edu.njnu.geoproblemsolving.Service.SubprojectService;
+import cn.edu.njnu.geoproblemsolving.domain.activity.Subproject;
+import cn.edu.njnu.geoproblemsolving.domain.activity.service.SubprojectService;
 import org.springframework.web.bind.annotation.*;
 
 

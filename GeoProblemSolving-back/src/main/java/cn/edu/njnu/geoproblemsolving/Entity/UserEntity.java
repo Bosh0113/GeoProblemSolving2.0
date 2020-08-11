@@ -1,12 +1,10 @@
 package cn.edu.njnu.geoproblemsolving.Entity;
 
-import cn.edu.njnu.geoproblemsolving.Enums.UserTitle;
-import com.alibaba.fastjson.JSONArray;
+import cn.edu.njnu.geoproblemsolving.domain.user.enums.UserTitle;
 import lombok.Data;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.ArrayList;
-import java.util.List;
 
 @Data
 @Document(collection = "User")

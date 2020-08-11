@@ -1,17 +1,14 @@
 package cn.edu.njnu.geoproblemsolving.Controller;
 
 import cn.edu.njnu.geoproblemsolving.Entity.EmailEntity;
-import cn.edu.njnu.geoproblemsolving.Entity.Activities.Project;
-import cn.edu.njnu.geoproblemsolving.Service.ProjectService;
+import cn.edu.njnu.geoproblemsolving.domain.activity.Project;
+import cn.edu.njnu.geoproblemsolving.domain.activity.service.ProjectService;
 import cn.edu.njnu.geoproblemsolving.View.StaticPagesBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
 @CrossOrigin(origins = "*", allowCredentials = "true")

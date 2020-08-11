@@ -1,17 +1,15 @@
 package cn.edu.njnu.geoproblemsolving.Service.Impl;
 
-import cn.edu.njnu.geoproblemsolving.Controller.FolderController;
 import cn.edu.njnu.geoproblemsolving.Dao.Folder.FolderDaoImpl;
-import cn.edu.njnu.geoproblemsolving.Entity.Activities.Activity;
-import cn.edu.njnu.geoproblemsolving.Entity.Activities.LinkProtocol;
-import cn.edu.njnu.geoproblemsolving.Entity.Activities.Project;
-import cn.edu.njnu.geoproblemsolving.Entity.Activities.Subproject;
-import cn.edu.njnu.geoproblemsolving.Repository.SubprojectRepository;
+import cn.edu.njnu.geoproblemsolving.domain.activity.Activity;
+import cn.edu.njnu.geoproblemsolving.domain.activity.LinkProtocol;
+import cn.edu.njnu.geoproblemsolving.domain.activity.Subproject;
+import cn.edu.njnu.geoproblemsolving.domain.activity.repository.SubprojectRepository;
 import cn.edu.njnu.geoproblemsolving.domain.tool.ToolsetEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.User;
-import cn.edu.njnu.geoproblemsolving.Repository.ActivityRepository;
-import cn.edu.njnu.geoproblemsolving.Repository.ProtocolRepository;
-import cn.edu.njnu.geoproblemsolving.Repository.UserRepository;
+import cn.edu.njnu.geoproblemsolving.domain.activity.repository.ActivityRepository;
+import cn.edu.njnu.geoproblemsolving.domain.activity.repository.ProtocolRepository;
+import cn.edu.njnu.geoproblemsolving.domain.user.repository.UserRepository;
 import cn.edu.njnu.geoproblemsolving.Service.ActivityService;
 import cn.edu.njnu.geoproblemsolving.domain.tool.ToolEntity;
 import com.alibaba.fastjson.JSONArray;

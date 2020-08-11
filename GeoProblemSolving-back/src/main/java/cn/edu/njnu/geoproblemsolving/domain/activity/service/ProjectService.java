@@ -1,6 +1,6 @@
 package cn.edu.njnu.geoproblemsolving.Service;
 
-import cn.edu.njnu.geoproblemsolving.Entity.Activities.Project;
+import cn.edu.njnu.geoproblemsolving.domain.activity.Project;
 import cn.edu.njnu.geoproblemsolving.Entity.EmailEntity;
 
 import java.util.List;

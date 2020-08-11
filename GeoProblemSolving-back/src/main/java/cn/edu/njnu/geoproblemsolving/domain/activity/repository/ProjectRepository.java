@@ -1,6 +1,6 @@
-package cn.edu.njnu.geoproblemsolving.Repository;
+package cn.edu.njnu.geoproblemsolving.domain.activity.repository;
 
-import cn.edu.njnu.geoproblemsolving.Entity.Activities.Project;
+import cn.edu.njnu.geoproblemsolving.domain.activity.Project;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;

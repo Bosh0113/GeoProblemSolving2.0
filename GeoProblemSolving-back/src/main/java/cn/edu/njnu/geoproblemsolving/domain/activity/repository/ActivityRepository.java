@@ -1,11 +1,8 @@
-package cn.edu.njnu.geoproblemsolving.Repository;
+package cn.edu.njnu.geoproblemsolving.domain.activity.repository;
 
-import cn.edu.njnu.geoproblemsolving.Entity.Activities.Activity;
-import cn.edu.njnu.geoproblemsolving.Enums.ProjectPrivacy;
+import cn.edu.njnu.geoproblemsolving.domain.activity.Activity;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
-
-import java.util.List;
 
 @RepositoryRestResource(path = "activity")
 public interface ActivityRepository extends MongoRepository<Activity, String> {

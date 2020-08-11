@@ -1,4 +1,4 @@
-package cn.edu.njnu.geoproblemsolving.Enums;
+package cn.edu.njnu.geoproblemsolving.domain.tool;
 
 /**
  * @EnumName ResultEnum

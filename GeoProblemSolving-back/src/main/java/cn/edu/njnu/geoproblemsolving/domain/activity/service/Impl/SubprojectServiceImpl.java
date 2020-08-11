@@ -1,12 +1,12 @@
 package cn.edu.njnu.geoproblemsolving.Service.Impl;
 
 import cn.edu.njnu.geoproblemsolving.Dao.Folder.FolderDaoImpl;
-import cn.edu.njnu.geoproblemsolving.Entity.Activities.Project;
-import cn.edu.njnu.geoproblemsolving.Entity.Activities.Subproject;
+import cn.edu.njnu.geoproblemsolving.domain.activity.Project;
+import cn.edu.njnu.geoproblemsolving.domain.activity.Subproject;
 import cn.edu.njnu.geoproblemsolving.Entity.User;
-import cn.edu.njnu.geoproblemsolving.Repository.ProjectRepository;
-import cn.edu.njnu.geoproblemsolving.Repository.SubprojectRepository;
-import cn.edu.njnu.geoproblemsolving.Repository.UserRepository;
+import cn.edu.njnu.geoproblemsolving.domain.activity.repository.ProjectRepository;
+import cn.edu.njnu.geoproblemsolving.domain.activity.repository.SubprojectRepository;
+import cn.edu.njnu.geoproblemsolving.domain.user.repository.UserRepository;
 import cn.edu.njnu.geoproblemsolving.Service.SubprojectService;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;

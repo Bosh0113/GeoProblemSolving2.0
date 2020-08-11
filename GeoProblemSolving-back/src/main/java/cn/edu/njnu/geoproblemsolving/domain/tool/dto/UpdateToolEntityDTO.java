@@ -1,7 +1,7 @@
-package cn.edu.njnu.geoproblemsolving.domain.tool.dto;
+package cn.edu.njnu.geoproblemsolving.domain.activity.repository.tool.dto;
 
 import cn.edu.njnu.geoproblemsolving.Dto.ToDomainConverter;
-import cn.edu.njnu.geoproblemsolving.domain.tool.ToolEntity;
+import cn.edu.njnu.geoproblemsolving.domain.activity.repository.tool.ToolEntity;
 import com.alibaba.fastjson.JSONObject;
 import lombok.Data;
 

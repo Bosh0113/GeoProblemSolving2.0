@@ -1,8 +1,7 @@
 package cn.edu.njnu.geoproblemsolving.Service;
 
-import cn.edu.njnu.geoproblemsolving.Entity.Activities.Activity;
-import cn.edu.njnu.geoproblemsolving.Enums.ProjectPrivacy;
-import cn.edu.njnu.geoproblemsolving.Entity.Activities.LinkProtocol;
+import cn.edu.njnu.geoproblemsolving.domain.activity.Activity;
+import cn.edu.njnu.geoproblemsolving.domain.activity.LinkProtocol;
 
 import java.util.List;
 
