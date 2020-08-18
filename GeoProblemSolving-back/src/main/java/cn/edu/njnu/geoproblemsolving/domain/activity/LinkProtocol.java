@@ -36,7 +36,7 @@ public class LinkProtocol implements Serializable {
     /**
      * Participants
      * type of user engagement
-     * the type of accept roles: administrator, decision-maker, researcher, stakeholder, normal member(workers...), visitor(the public)
+     * the type of accept roles: manager, decision-maker, researcher, stakeholder, normal member(workers...), visitor(the public)
      */
     private RoleProtocol roles;
     private ArrayList<String> acceptRoles;

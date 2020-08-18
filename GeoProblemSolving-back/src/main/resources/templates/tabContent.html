@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head >
+<head>
     <title>Demo</title>
-    <meta http-equiv="Content-Type" content=" charset=UTF-8" />
+    <meta http-equiv="Content-Type" content=" charset=UTF-8"/>
     <link href="https://unpkg.com/ionicons@4.5.10-1/dist/css/ionicons.min.css" rel="stylesheet">
     <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdn.bootcss.com/vue/2.6.10/vue.min.js"></script>
@@ -16,6 +16,7 @@
             width: 100%;
             height: auto;
         }
+
         .projectTitle {
             height: 16px;
             line-height: 15px;
@@ -27,22 +28,27 @@
             text-overflow: ellipsis;
             white-space: nowrap;
         }
-        .cardicon{
-            height:15px;
-            align-items:center;
-            display:flex;
-            justify-content:flex-start;
-            margin-top:10px
+
+        .cardicon {
+            height: 15px;
+            align-items: center;
+            display: flex;
+            justify-content: flex-start;
+            margin-top: 10px
         }
+
         /*Modal*/
 
-        .ivu-modal-header{
-            padding: 15px 20px  0px 20px;
-            border-bottom: 0px solid #e9eaec; //下划线
+        .ivu-modal-header {
+            padding: 15px 20px 0px 20px;
+            border-bottom: 0px solid #e9eaec;
+        / / 下划线
         }
-        .ivu-modal-header-inner{
+
+        .ivu-modal-header-inner {
             font-size: 16px;
         }
+
         /*.ivu-modal-body{*/
         /*    width: auto;*/
         /*}*/
@@ -62,55 +68,61 @@
 
 </head>
 <body>
-    <template id="tabContent" th:fragment="tab-card">
-        <div>
-        <div v-if="projectList.length > 0">
-            <div class="projectCard" v-for="(item,index) in projectList" :key="item.index"  style="width:95%;margin-right:5%"  >
+<template id="tabContent" th:fragment="tab-card">
+    <div>
+        <div v-if="v-if="projectList!=undefined && projectList.length > 0"">
+            <div class="projectCard" v-for="(item,index) in projectList" :key="item.index"
+                 style="width:95%;margin-right:5%">
                 <i-col :xs="{ span: 5, offset: 1 }"
                        :md="{ span:5, offset: 1 }"
                        :lg="{ span: 3, offset: 1}">
                     <div @click="projectInfoModalShow(item)" style="cursor:pointer">
                         <Card style="height:auto;margin:15px -15px">
                             <!-- title-->
-                            <span slot="title" class="projectTitle" :title="item.title">{{item.title}}</span>
+                            <span slot="title" class="projectTitle" :title="item.name">{{item.name}}</span>
 
                             <!-- 右上角的button-->
                             <div class="operate" slot="extra" style="display:flex;align-items:center">
-                                <Icon type="md-eye" :size="20" title="Public project"  v-show="!(item.isManager||item.isMember) && (item.privacy=='Public')" ></Icon>
-                                <Icon type="md-lock" :size="20" title="Discoverable project"  v-show="!(item.isManager||item.isMember) && (item.privacy=='Discoverable')" ></Icon>
+                                <Icon type="md-eye" :size="20" title="Public project"
+                                      v-show="!(item.isManager||item.isMember) && (item.privacy=='Public')"></Icon>
+                                <Icon type="md-lock" :size="20" title="Discoverable project"
+                                      v-show="!(item.isManager||item.isMember) && (item.privacy=='Discoverable')"></Icon>
                                 <br/>
-                                <Icon type="md-person" :size="20" title="Managed or joined project" v-show="item.isMember||item.isManager" :id="item.projectId" ></Icon>
+                                <Icon type="md-person" :size="20" title="Managed or joined project"
+                                      v-show="item.isMember||item.isManager" :id="item.aid"></Icon>
                             </div>
                             <!--  description-->
                             <div style="display:flex;align-items:center;height:20px">
                                 <strong style="text-align: center">Description</strong>
-                                <p style="padding: 0 10px;word-break:break-word;overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 400px;" :title="item.description" >
+                                <p style="padding: 0 10px;word-break:break-word;overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 400px;"
+                                   :title="item.description">
                                     {{item.description}}
                                 </p>
                             </div>
                             <!-- avatar-->
                             <div style="height:200px;display:flex;justify-content:center;margin-top:10px">
-                                <img :src="item.picture" v-if="item.picture!=''&&item.picture!='undefined'" />
-                                <avatar :username="item.title" :size="200"  :title="item.title" :rounded="false"  v-else >  </avatar>
+                                <img :src="item.picture" v-if="item.picture!=''&&item.picture!='undefined'"/>
+                                <avatar :username="item.name" :size="200" :title="item.name" :rounded="false"
+                                        v-else></avatar>
                             </div>
                             <!--managername -->
-                            <div  class="cardicon"  >
-                                <Icon type="md-body" :size="15" Manager></Icon>
-                                <span style="height:20px;margin-left:5%">
-                                <strong>{{item.managerName}}</strong>
-                            </span>
-                            </div>
+                            <!--                            <div  class="cardicon"  >-->
+                            <!--                                <Icon type="md-body" :size="15" Manager></Icon>-->
+                            <!--                                <span style="height:20px;margin-left:5%">-->
+                            <!--                                <strong>{{item.managerName}}</strong>-->
+                            <!--                            </span>-->
+                            <!--                            </div>-->
                             <!--time-->
-                            <div class="cardicon" >
+                            <div class="cardicon">
                                 <Icon type="md-clock" :size="15" Time></Icon>
                                 <span style="height:20px;margin-left:5%">
-                                <strong>{{item.createTime.split(' ')[0]}}</strong>
+                                <strong>{{item.createdTime.split(' ')[0]}}</strong>
                             </span>
                             </div>
                             <!--tag -->
-                            <div class="cardicon" >
+                            <div class="cardicon">
                                 <Icon type="md-pricetags" :size="15" Tags></Icon>
-                                <strong style=" margin-left:5%; display: inline-block; overflow: hidden;  white-space: nowrap; text-overflow: ellipsis;" >
+                                <strong style=" margin-left:5%; display: inline-block; overflow: hidden;  white-space: nowrap; text-overflow: ellipsis;">
                                     {{item.tag}}
                                 </strong>
                             </div>
@@ -123,28 +135,28 @@
             <i-col span="22" offset="1">
                 <Card :bordered="false" style="min-height: 350px; margin-top: 3%">
                     <div style="display:flex;justify-content:center">
-                        <Icon type="md-alert" size="40" color="gray" ></Icon>
+                        <Icon type="md-alert" size="40" color="gray"></Icon>
                     </div>
-                    <br />
+                    <br/>
                     <div style="display:flex;justify-content:center;">
                         <h2 style="text-align:center;width:50%">No more projects in this category.</h2>
                     </div>
-                    <br />
+                    <br/>
                     <div style="display:flex;justify-content:center">
                         <h4 style="text-align:center;width:50%;color:lightblue">
                             You can click the button right top to add a new project.
-                            <br />Enriching your description of the project and attracting more people to join in.
+                            <br/>Enriching your description of the project and attracting more people to join in.
                         </h4>
                     </div>
                 </Card>
             </i-col>
         </div>
 
-        <Modal v-model="projectInfoModal" title="Project information"  width="800px" class="projectInfoModal">
-            <i-table stripe border :columns="columns" :data="projectInfoShow" :show-header="false"  ></i-table>
+        <Modal v-model="projectInfoModal" title="Project information" width="800px" class="projectInfoModal">
+            <i-table stripe border :columns="columns" :data="projectDetailInfo" :show-header="false"></i-table>
             <div slot="footer">
-                <Alert  show-icon  style="float: left;width: fit-content;display: inline-block;"  v-show="!UserState">
-                    If you want to participate in the project, please login.
+                <Alert show-icon style="float: left;width: fit-content;display: inline-block;" v-show="!UserState">
+                    If you want to join the project, please log in first.
                 </Alert>
                 <i-button v-show="!UserState" type="success" @click="login">Log in</i-button>
                 <i-button
@@ -152,13 +164,15 @@
                         type="success"
                         title="Enter the project and check it"
                         @click="enterProject(selectedProjectInfo)"
-                >Enter</i-button>
+                >Enter
+                </i-button>
                 <i-button
                         type="success"
                         @click="joinApplyModalShow(selectedProjectInfo)"
                         v-show="!selectedProjectInfo.isMember&&!selectedProjectInfo.isManager&&UserState"
                         title="Apply to join the project"
-                >Apply</i-button>
+                >Apply
+                </i-button>
             </div>
         </Modal>
 
@@ -178,268 +192,281 @@
                 <i-button type="success" @click="joinApply('applyValidate')">Apply</i-button>
             </div>
         </Modal>
-        </div>
-    </template>
+    </div>
+</template>
 
 
-    <script th:fragment="tab-component" th:inline="javascript">
+<script th:fragment="tab-component" th:inline="javascript">
 
-        Vue.component('tab-content',{
-            template:'#tabContent',
-            props: ["projectList"],
-            components:{
-                'avatar':VueAvatar.Avatar
-            },
-            data(){
-                return{
-                    selectedProjectInfo: {},
-                    projectInfoModal: false,//modal模态框
-                    columns: [
-                        { title: "Key", key: "key", width: "148px" },
-                        { title: "Value", key: "value" , width: "618px"}
-                    ],
-                    projectInfoShow: [],
-                    //加入项目
-                    applyProjectInfo: {},
-                    applyValidate: {
-                        reason: ""
-                    },
-                    applyRuleValidate: {
-                        reason: [
-                            { required: true, message: "Please enter the reason for application", trigger: "blur" },
-                            { type: "string", min: 5, message: "The reason no less than 10 characters", trigger: "blur" }
-                        ]
-                    },
-                    applyJoinModal: false,
-                    // 记录已经申请的情况
-                    haveApplied: false,
-                    UserState:false,
-                    userInfo:[],
+    Vue.component('tab-content', {
+        template: '#tabContent',
+        props: ["projectList"],
+        components: {
+            'avatar': VueAvatar.Avatar
+        },
+        data() {
+            return {
+                selectedProjectInfo: {},
+                projectInfoModal: false,//modal模态框
+                columns: [
+                    {title: "Key", key: "key", width: "148px"},
+                    {title: "Value", key: "value", width: "618px"}
+                ],
+                projectDetailInfo: [],
+                //加入项目
+                applyProjectInfo: {},
+                applyValidate: {
+                    reason: ""
+                },
+                applyRuleValidate: {
+                    reason: [
+                        {required: true, message: "Please enter the reason for application", trigger: "blur"},
+                        {type: "string", min: 5, message: "The reason no less than 10 characters", trigger: "blur"}
+                    ]
+                },
+                applyJoinModal: false,
+                // 记录已经申请的情况
+                haveApplied: false,
+                UserState: false,
+                userInfo: [],
+            }
+        },
+        mounted() {
+            this.userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
+            this.UserState = this.userInfo.userState;
+        },
+
+        methods: {
+            projectInfoModalShow(projectInfo) {
+                if (projectInfo.isMember || projectInfo.isManager) {
+                    window.location.href = "/GeoProblemSolving/projectDetail/" + projectInfo.aid;
+                } else {
+                    this.selectedProjectInfo = Object.assign({}, projectInfo);
+
+                    this.projectDetailInfo = [
+                        {
+                            key: "Category",
+                            value: projectInfo.category
+                        },
+                        {
+                            key: "Name",
+                            value: projectInfo.name
+                        },
+                        {
+                            key: "Description",
+                            value: projectInfo.description
+                        },
+                        {
+                            key: "Tag",
+                            value: projectInfo.tag
+                        },
+                        {
+                            key: "Creator",
+                            value: ""
+                        },
+                        {
+                            key: "Members",
+                            value: ""
+                        },
+                        {
+                            key: "Created time",
+                            value: projectInfo.createdTime
+                        },
+                        {
+                            key: "Last active time",
+                            value: projectInfo.activeTime
+                        }
+                    ];
+
+                    axios
+                        .get("/GeoProblemSolving/project/" + projectInfo.aid + "/user?userId=" + this.userInfo.userId)
+                        .then(res => {
+                            if (res.data === "Fail") {
+                                this.$Message.info("Fail to get the information of the project");
+                                this.projectInfoModal = true;
+                            } else {
+                                var participants = res.data;
+
+                                //creator
+                                if (participants.creator != null) {
+                                    this.projectDetailInfo[4].value = participants.creator.name;
+                                } else {
+                                    this.$Message.info("Fail to get the information of the creator");
+                                }
+                                // members
+                                var membersName = "";
+                                for (var i = 0; i < participants.members.length; i++) {
+                                    if (i == 0) {
+                                        membersName = participants.members[i].name;
+                                    } else {
+                                        membersName = membersName + "," + participants.members[i].name;
+                                    }
+                                }
+                                this.projectDetailInfo[5].value = membersName;
+
+                                this.projectInfoModal = true;
+                            }
+                        })
+                        .catch(err => {
+                            console.log(err.data);
+                        });
                 }
             },
-            mounted(){
-                this.userInfo=JSON.parse(sessionStorage.getItem("userInfo"));
-                this.UserState= this.userInfo.userState;
-            },
+            joinApplyModalShow(applyProjectInfo) {
+                if (this.UserState) {
+                    this.applyProjectInfo = Object.assign([], applyProjectInfo);
+                    this.applyValidate.reason = "";
+                    if (this.applyProjectInfo.privacy == "Public") {
+                        if (this.applyProjectInfo.permissionManager != undefined && this.applyProjectInfo.permissionManager.auto_join.visitor) {
 
-            methods:{
-                projectInfoModalShow(projectInfo) {
-                    if (projectInfo.isMember || projectInfo.isManager) {
-                        // window.sessionStorage.setItem("projectInfo",JSON.stringify(projectInfo));
-                        // window.sessionStorage.setItem("projectInfo", this.encrypto(projectInfo));
-                        window.location.href="/GeoProblemSolving/projectDetail/"+projectInfo.projectId;
-                    } else {
-                        this.selectedProjectInfo = Object.assign({}, projectInfo);
-                        var category = "";
-                        if (projectInfo.category != "Human" &&  projectInfo.category != "GISRS"){category = projectInfo.category;}
-                        else if (projectInfo.category == "Human"){category = "Human-Activity";}
-                        else if (projectInfo.category == "GISRS"){category = "GIS & RS";}
+                            // join the project directly
+                            axios
+                                .get("/GeoProblemSolving/project/join?" + "projectId=" + this.applyProjectInfo.projectId + "&userId=" + this.userInfo.userId)
+                                .then(res => {
+                                    if (res.data === "Success") {
+                                        this.$Message.info("Join the project successfuly");
 
-                        var membersName = "";
-                        var members = projectInfo.members;
-                        for (var i = 0; i < members.length; i++) {
-                            if (i == 0) {
-                                membersName = members[i].userName;
-                            } else {
-                                membersName = membersName + "," + members[i].userName;
-                            }
+                                        window.location.href = "/GeoProblemSolving/projectDetail/" + this.applyProjectInfo.projectId;
+                                    } else if (res.data === "Fail") {
+                                        this.$Message.info("Fail to join in this project");
+                                    }
+                                })
+                                .catch(err => {
+                                    console.log(err.data);
+                                });
+                        } else {
+                            this.applyJoinModal = true;
                         }
-                        this.projectInfoShow = [
-                            {
-                                key: "Category",
-                                value: category
-                            },
-                            {
-                                key: "Title",
-                                value: projectInfo.title
-                            },
-                            {
-                                key: "Description",
-                                value: projectInfo.description
-                            },
-                            {
-                                key: "Introduction",
-                                value: projectInfo.introduction
-                            },
-                            {
-                                key: "Tag",
-                                value: projectInfo.tag
-                            },
-                            {
-                                key: "Manager",
-                                value: projectInfo.managerName
-                            },
-                            {
-                                key: "Members",
-                                value: membersName
-                            },
-                            {
-                                key: "Created Time",
-                                value: projectInfo.createTime
-                            }
-                        ];
-
-                        this.projectInfoModal = true;
+                    } else if (this.applyProjectInfo.privacy == "Discoverable") {
+                        this.applyJoinModal = true;
                     }
-                },
-                joinApplyModalShow(applyProjectInfo) {
-                    if (this.UserState) {
-                        this.applyProjectInfo = Object.assign([], applyProjectInfo);
-                        this.applyValidate.reason = "";
-                        if (this.applyProjectInfo.privacy == "Public") {
-                            if(this.applyProjectInfo.permissionManager != undefined && this.applyProjectInfo.permissionManager.auto_join.visitor) {
-
-                                // join the project directly
+                } else {
+                    window.location.href = "/GeoProblemSolving/login";
+                }
+            },
+            joinApply(name) {
+                this.$refs[name].validate(valid => {
+                    if (valid) {
+                        this.applyJoinModal = false;
+                        var data = this.applyProjectInfo;
+                        if (
+                            this.haveApplied == true &&
+                            data.projectId == sessionStorage.getItem("applyId")
+                        ) {
+                            this.$Notice.warning({
+                                title: "repeat apply warning",
+                                desc: "You have applied successfully, no need to click again!"
+                            });
+                        } else {
+                            if (this.UserState) {
+                                let userDetail = this.userInfo;
+                                let joinForm = {};
+                                sessionStorage.setItem("applyId", data.projectId);
+                                joinForm["recipientId"] = data.managerId;
+                                joinForm["type"] = "apply";
+                                joinForm["content"] = {
+                                    userEmail: userDetail.email,
+                                    userName: this.userInfo.userName,
+                                    userId: this.userInfo.userId,
+                                    title: "Group application",
+                                    description:
+                                        "User " +
+                                        this.userInfo.userName +
+                                        " apply to join your project: " +
+                                        data.title +
+                                        " ." +
+                                        " The reason for application is: " +
+                                        this.applyValidate.reason,
+                                    projectId: data.projectId,
+                                    projectTitle: data.title,
+                                    scope: "project",
+                                    approve: "unknow"
+                                };
                                 axios
-                                    .get("/GeoProblemSolving/project/join?"+"projectId="+  this.applyProjectInfo.projectId+"&userId=" +this.userInfo.userId)
+                                    .post("/GeoProblemSolving/notice/save", joinForm)
                                     .then(res => {
-                                        if (res.data === "Success") {
-                                            this.$Message.info("Join the project successfuly");
-
-                                            window.location.href="/GeoProblemSolving/projectDetail/" + this.applyProjectInfo.projectId;
-                                        } else if (res.data === "Fail") {
-                                            this.$Message.info("Fail to join in this project");
+                                        if (res.data == "Success") {
+                                            this.$Notice.open({
+                                                title: "Apply Successfully",
+                                                desc:
+                                                    "The project's manager will process your apply in time,you can get a notification later to tell you the result."
+                                            });
+                                            this.$emit("sendNotice", data.managerId);
+                                            this.haveApplied = true;
+                                        } else {
+                                            this.$Notice.open({
+                                                desc: "Apply failed"
+                                            });
                                         }
                                     })
                                     .catch(err => {
-                                        console.log(err.data);
+                                        console.log("申请失败的原因是：" + err.data);
                                     });
+
+                                let emailObject = {
+                                    recipient: joinForm.recipientId,
+                                    mailTitle: "Group application",
+                                    mailContent:
+                                        joinForm.content.description +
+                                        "<br>" +
+                                        "You can click this url and enter the site to process this application: " +
+                                        "http://" +
+                                        window.location.host +
+                                        "/GeoProblemSolving/home"
+                                };
+                                axios
+                                    .post("/GeoProblemSolving/project/applyByMail", emailObject)
+                                    .then(res => {
+                                        if (res.data == "Success") {
+                                            console.log("Email Success.");
+                                        } else {
+                                            console.log("Email fail.");
+                                        }
+                                    })
+                                    .catch(err => {
+                                        console.log("Email fail.");
+                                    });
+                            } else {
+                                this.$Message.error("you must have an account before you apply");
+                                window.location.href = "/GeoProblemSolving/login"
                             }
-                            else {
-                                this.applyJoinModal = true;
-                            }
-                        } else if (this.applyProjectInfo.privacy == "Discoverable") {
-                            this.applyJoinModal = true;
                         }
                     } else {
-                        window.location.href = "/GeoProblemSolving/login";
+                        this.$Message.error("Fail!");
                     }
-                },
-                joinApply(name) {
-                    this.$refs[name].validate(valid => {
-                        if (valid) {
-                            this.applyJoinModal = false;
-                            var data = this.applyProjectInfo;
-                            if (
-                                this.haveApplied == true &&
-                                data.projectId == sessionStorage.getItem("applyId")
-                            ) {
-                                this.$Notice.warning({
-                                    title: "repeat apply warning",
-                                    desc: "You have applied successfully, no need to click again!"
-                                });
-                            } else {
-                                if (this.UserState) {
-                                    let userDetail = this.userInfo;
-                                    let joinForm = {};
-                                    sessionStorage.setItem("applyId", data.projectId);
-                                    joinForm["recipientId"] = data.managerId;
-                                    joinForm["type"] = "apply";
-                                    joinForm["content"] = {
-                                        userEmail: userDetail.email,
-                                        userName:this.userInfo.userName,
-                                        userId: this.userInfo.userId,
-                                        title: "Group application",
-                                        description:
-                                            "User " +
-                                            this.userInfo.userName +
-                                            " apply to join your project: " +
-                                            data.title +
-                                            " ." +
-                                            " The reason for application is: " +
-                                            this.applyValidate.reason,
-                                        projectId: data.projectId,
-                                        projectTitle: data.title,
-                                        scope: "project",
-                                        approve: "unknow"
-                                    };
-                                    axios
-                                        .post("/GeoProblemSolving/notice/save", joinForm)
-                                        .then(res => {
-                                            if (res.data == "Success") {
-                                                this.$Notice.open({
-                                                    title: "Apply Successfully",
-                                                    desc:
-                                                        "The project's manager will process your apply in time,you can get a notification later to tell you the result."
-                                                });
-                                                this.$emit("sendNotice", data.managerId);
-                                                this.haveApplied = true;
-                                            } else {
-                                                this.$Notice.open({
-                                                    desc: "Apply failed"
-                                                });
-                                            }
-                                        })
-                                        .catch(err => {
-                                            console.log("申请失败的原因是：" + err.data);
-                                        });
-
-                                    let emailObject = {
-                                        recipient: joinForm.recipientId,
-                                        mailTitle: "Group application",
-                                        mailContent:
-                                            joinForm.content.description +
-                                            "<br>" +
-                                            "You can click this url and enter the site to process this application: " +
-                                            "http://" +
-                                            window.location.host +
-                                            "/GeoProblemSolving/home"
-                                    };
-                                    axios
-                                        .post("/GeoProblemSolving/project/applyByMail", emailObject)
-                                        .then(res => {
-                                            if (res.data == "Success") {
-                                                console.log("Email Success.");
-                                            } else {
-                                                console.log("Email fail.");
-                                            }
-                                        })
-                                        .catch(err => {
-                                            console.log("Email fail.");
-                                        });
-                                } else {
-                                    this.$Message.error("you must have an account before you apply");
-                                    window.location.href="/GeoProblemSolving/login"
-                                }
-                            }
-                        } else {
-                            this.$Message.error("Fail!");
-                        }
-                    });
-                },
-                login() {
-                    window.location.href="/GeoProblemSolving/login"
-                },
-                enterProject(projectInfo) {
-                    // window.sessionStorage.setItem("projectInfo",JSON.stringify(projectInfo));
-                    if(this.applyProjectInfo.permissionManager == undefined || this.applyProjectInfo.permissionManager.observe.visitor != "No") {
-                        // window.sessionStorage.setItem("projectInfo", this.encrypto(projectInfo));
-                        window.location.href="/GeoProblemSolving/projectDetail/"+projectInfo.projectId;
-                    }
-                },
-                // encrypto(context) {
-                //     var key = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
-                //     var iv = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
-                //     var encrypted = "";
-                //     if (typeof context == "string") {
-                //     } else if (typeof context == "object") {
-                //         context = JSON.stringify(context);
-                //     }
-                //     var srcs = CryptoJS.enc.Utf8.parse(context);
-                //     encrypted = CryptoJS.AES.encrypt(srcs, key, {
-                //         iv: iv,
-                //         mode: CryptoJS.mode.CBC,
-                //         padding: CryptoJS.pad.Pkcs7
-                //     });
-                //     return encrypted.toString();
-                // }
-            }
-        });
+                });
+            },
+            login() {
+                window.location.href = "/GeoProblemSolving/login"
+            },
+            enterProject(projectInfo) {
+                // window.sessionStorage.setItem("projectInfo",JSON.stringify(projectInfo));
+                if (this.applyProjectInfo.permission == "" || this.applyProjectInfo.permission == undefined || JSON.parse(this.applyProjectInfo.permission).observe.visitor != "No") {
+                    // window.sessionStorage.setItem("projectInfo", this.encrypto(projectInfo));
+                    window.location.href = "/GeoProblemSolving/projectDetail/" + projectInfo.aid;
+                }
+            },
+            // encrypto(context) {
+            //     var key = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
+            //     var iv = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
+            //     var encrypted = "";
+            //     if (typeof context == "string") {
+            //     } else if (typeof context == "object") {
+            //         context = JSON.stringify(context);
+            //     }
+            //     var srcs = CryptoJS.enc.Utf8.parse(context);
+            //     encrypted = CryptoJS.AES.encrypt(srcs, key, {
+            //         iv: iv,
+            //         mode: CryptoJS.mode.CBC,
+            //         padding: CryptoJS.pad.Pkcs7
+            //     });
+            //     return encrypted.toString();
+            // }
+        }
+    });
 
 
-
-
-    </script>
+</script>
 
 </body>
 </html>

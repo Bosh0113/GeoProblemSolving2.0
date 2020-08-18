@@ -102,4 +102,13 @@
 //        System.out.println("User logout. UserName: "+session.getAttribute("userName"));
 //        session.invalidate();
 //    }
+//
+//    /**
+//     * Inquiry user's joined or created projects
+//     * @return
+//     */
+//    @RequestMapping(value = "/projects", method = RequestMethod.GET)
+//    public Object quitInvolvedProjects(){
+//
+//    }
 //}

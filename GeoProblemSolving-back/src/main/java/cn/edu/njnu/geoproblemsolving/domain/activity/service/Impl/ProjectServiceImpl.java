@@ -11,6 +11,7 @@ import cn.edu.njnu.geoproblemsolving.domain.user.repository.UserRepository;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -41,22 +42,43 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<Project> findProjectsByPage(int page, int size) {
-        PageRequest pageRequest = PageRequest.of(page, size);
-        return projectRepository.findAll(pageRequest).getContent();
+    public Project findProject(String aid){
+        Optional optional =  projectRepository.findById(aid);
+
+        if (optional.isPresent()) {
+            Object project = optional.get();
+            return (Project) project;
+        } else {
+            return null;
+        }
     }
 
     @Override
-    public Object inquiryByConditions(String category, String tag, String keyword, int page, int size) {
+    public List<Project> findProjectsByPage(int page, int size) {
+        Pageable pageable = PageRequest.of(page-1, size);
+        return projectRepository.findAll(pageable).getContent();
+    }
+
+    @Override
+    public Object inquiryByConditions(String category, String tag, String keyword, String userId, int page, int size) {
         try {
             Sort sort = new Sort(Sort.Direction.DESC, "createdTime");
-            PageRequest pageRequest = PageRequest.of(page, size, sort);
+            Pageable pageable = PageRequest.of(page-1, size, sort);
 
             List<Project> projects = new ArrayList<>();
-            if (category.equals("All")) {
-                projects = projectRepository.findProjectsByPrivacyIsNotOrTagContainingOrNameLikeOrDescriptionLike("Private", tag, keyword, keyword, pageRequest).getContent();
-            } else {
-                projects = projectRepository.findProjectsByPrivacyIsNotAndCategoryEqualsOrTagContainingOrNameLikeOrDescriptionLike("Private", category, tag, keyword, keyword, pageRequest).getContent();
+            if(userId.equals("")){
+                if (category.equals("All")) {
+                    projects = projectRepository.findProjectsByPrivacyIsNotOrTagContainingOrNameLikeOrDescriptionLike("Private", tag, keyword, keyword, pageable).getContent();
+                } else {
+                    projects = projectRepository.findProjectsByPrivacyIsNotAndCategoryEqualsOrTagContainingOrNameLikeOrDescriptionLike("Private", category, tag, keyword, keyword, pageable).getContent();
+                }
+            }
+            else {
+                if (category.equals("All")) {
+                    projects = projectRepository.findProjectsByPrivacyIsAndCreatorIsOrPrivacyIsNotOrTagContainingOrNameLikeOrDescriptionLike("Private", userId,"Private", tag, keyword, keyword, pageable).getContent();
+                } else {
+                    projects = projectRepository.findProjectsByPrivacyIsAndCreatorIsOrPrivacyIsNotAndCategoryEqualsOrTagContainingOrNameLikeOrDescriptionLike("Private", userId, "Private", category, tag, keyword, keyword, pageable).getContent();
+                }
             }
 
             if (projects.isEmpty())
@@ -75,10 +97,11 @@ public class ProjectServiceImpl implements ProjectService {
             /**
              * Save project info
              */
-            // Created time
+            // Created time and active time
             Date date = new Date();
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
             project.setCreatedTime(dateFormat.format(date));
+            project.setActiveTime(dateFormat.format(date));
 
             // Aid
             String projectId = UUID.randomUUID().toString();
@@ -88,33 +111,35 @@ public class ProjectServiceImpl implements ProjectService {
             String creatorId = project.getCreator();
             JSONArray members = new JSONArray();
             JSONObject creator = new JSONObject();
+
             creator.put("userId", creatorId);
-            creator.put("role", "creator");
+            creator.put("role", "manager");
             members.add(creator);
+
             project.setMembers(members);
 
             // children
             ArrayList<String> children = new ArrayList<>();
             project.setChildren(children);
 
-            projectRepository.save(project);
 
             /**
              * Update user info
              */
             // Update user information
             User user = findByUserId(creator.getString("userId"));
-            if (user == null) return "Fail: user does not exist";
+            if (user == null) return "Fail";
 
             ArrayList<String> managedProjects = new ArrayList<>();
             managedProjects.add(projectId);
             user.setManageProjects(managedProjects);
-            userRepository.save(user);
-
             /**
              * Resource folder
              */
             folderDao.createFolder(project.getName(), "", projectId);
+
+            projectRepository.save(project);
+            userRepository.save(user);
 
             return project;
         } catch (Exception ex) {
@@ -175,7 +200,7 @@ public class ProjectServiceImpl implements ProjectService {
     public Object findParticipants(String aid) {
         try {
             Optional optional = projectRepository.findById(aid);
-            if (!optional.isPresent()) return "Fail: project does not exist";
+            if (!optional.isPresent()) return "Fail";
             Project project = (Project) optional.get();
 
             JSONObject participants = new JSONObject();
@@ -199,7 +224,7 @@ public class ProjectServiceImpl implements ProjectService {
 
             return participants;
         } catch (Exception ex) {
-            return "Fail: Exception";
+            return "Fail";
         }
     }
 
@@ -229,7 +254,6 @@ public class ProjectServiceImpl implements ProjectService {
             newUser.put("role", "");
             members.add(newUser);
             project.setMembers(members);
-            projectRepository.save(project);
 
             // update user info
             // if user exist in project?
@@ -241,6 +265,9 @@ public class ProjectServiceImpl implements ProjectService {
 
             joinedProjects.add(aid);
             user.setManageProjects(joinedProjects);
+
+            //save
+            projectRepository.save(project);
             userRepository.save(user);
 
             return project;
@@ -301,7 +328,6 @@ public class ProjectServiceImpl implements ProjectService {
                 }
             }
             project.setMembers(members);
-            projectRepository.save(project);
 
             // update user info
             ArrayList<String> joinedProjects = user.getJoinedProjects();
@@ -310,6 +336,9 @@ public class ProjectServiceImpl implements ProjectService {
                     joinedProjects.remove(projectId);
             }
             user.setJoinedProjects(joinedProjects);
+
+            //save
+            projectRepository.save(project);
             userRepository.save(user);
 
             return "Success";
@@ -351,7 +380,7 @@ public class ProjectServiceImpl implements ProjectService {
             JSONArray members = project.getMembers();
             for (Object member : members)
                 if (member instanceof JSONObject) {
-                    if (((JSONObject) member).get("role").equals("administrator")) {
+                    if (((JSONObject) member).get("role").equals("manager")) {
                         String userId = ((JSONObject) member).getString("userId");
 
                         User user = findByUserId(userId);

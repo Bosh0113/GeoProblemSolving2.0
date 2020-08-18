@@ -15,11 +15,6 @@ public class Project extends Activity{
     private ProjectPrivacy privacy;
 
     /**
-     * Permission Manager
-     */
-    private String permission;
-
-    /**
      * tag
      * picture: descriptive picture
      */

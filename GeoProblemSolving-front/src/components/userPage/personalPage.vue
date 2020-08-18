@@ -1162,9 +1162,7 @@ export default {
         for (let i = 0; i < projectIds.length; i++) {
           this.axios
             .get(
-              "/GeoProblemSolving/project/inquiry" +
-                "?key=projectId" +
-                "&value=" +
+              "/GeoProblemSolving/project/" +
                 projectIds[i].projectId
             )
             .then(res => {
@@ -1203,7 +1201,7 @@ export default {
     getManagerProjectList() {
       this.axios
         .get(
-          "/GeoProblemSolving/project/inquiry" +
+          "/GeoProblemSolving/user" +
             "?key=managerId" +
             "&value=" +
             this.userDetail.userId
@@ -1245,10 +1243,8 @@ export default {
       let quitProjectId = this.currentProject.projectId;
       this.axios
         .get(
-          "/GeoProblemSolving/project/quit" +
-            "?projectId=" +
-            quitProjectId +
-            "&userId=" +
+          "/GeoProblemSolving/project/" + quitProjectId + "/user" +
+            "?userId=" +
             this.$store.getters.userId
         )
         .then(res => {
@@ -1306,11 +1302,9 @@ export default {
     authorize() {
       this.axios
         .get(
-          "/GeoProblemSolving/project/manager?" +
-            "projectId=" +
-            this.currentProject.projectId +
-            "&newManagerId=" +
-            this.selectManagerId
+          "/GeoProblemSolving/project/" + this.currentProject.projectId + "/user" +            
+            "?userId=" + this.selectManagerId + 
+            "&role=manager"
         )
         .then(res => {
           if (res.data == "Offline") {
@@ -1363,10 +1357,9 @@ export default {
     deleteProject() {
       if (this.deleteProjectId != "") {
         this.axios
-          .get(
-            "/GeoProblemSolving/project/delete?" +
-              "projectId=" +
-              this.deleteProjectId
+          .delete(
+            "/GeoProblemSolving/project?" +
+              "aid=" + this.deleteProjectId
           )
           .then(res => {
             if (res.data == "Offline") {

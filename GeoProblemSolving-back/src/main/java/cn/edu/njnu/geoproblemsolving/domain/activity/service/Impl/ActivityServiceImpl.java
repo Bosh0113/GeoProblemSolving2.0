@@ -90,20 +90,16 @@ public class ActivityServiceImpl implements ActivityService {
             ArrayList<String> children = subproject.getChildren();
             children.add(subprojectId);
             subproject.setChildren(children);
-            subprojectRepository.save(subproject);
 
             // members
             String creatorId = activity.getCreator();
             JSONObject creator = new JSONObject();
-            JSONObject member = new JSONObject();
             JSONArray members = new JSONArray();
 
             creator.put("userId", creatorId);
-            creator.put("role", "creator");
+            creator.put("role", "manager");
             members.add(creator);
-            creator.put("userId", subproject.getCreator());
-            creator.put("role", "administrator");
-            members.add(member);
+
             activity.setMembers(members);
 
             // tools and toolsets
@@ -125,6 +121,8 @@ public class ActivityServiceImpl implements ActivityService {
             //folder
             folderDao.createFolder(activity.getName(), "", aid);
 
+            //save
+            subprojectRepository.save(subproject);
             activityRepository.save(activity);
 
             return activity;
@@ -189,17 +187,20 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Override
     public Activity createChild(String aid, Activity activity){
+        // confirm aid
+        Activity current = findActivityById(aid);
+        if(current == null) return null;
+
         // Save the child activity
         Activity child = activityRepository.save(activity);
         String childId = child.getAid();
 
         // Update the current activity
-        Activity current = findActivityById(aid);
-        if(current == null) return null;
-
         ArrayList<String> children = current.getChildren();
         children.add(childId);
         current.setChildren(children);
+
+        //save
         activityRepository.save(current);
 
         return child;
@@ -208,6 +209,10 @@ public class ActivityServiceImpl implements ActivityService {
     @Override
     public Activity createNext(String aid, Activity activity, LinkProtocol protocol){
         try {
+            // Confirm aid
+            Activity current = findActivityById(aid);
+            if(current == null) return null;
+
             // Save the protocol
             String pid = protocolRepository.save(protocol).getPid();
 
@@ -216,8 +221,6 @@ public class ActivityServiceImpl implements ActivityService {
             String nextId = next.getAid();
 
             // Update the current activity
-            Activity current = findActivityById(aid);
-            if(current == null) return null;
             activityRepository.save(saveLastActivityInfo(nextId, pid, current));
 
             return next;
@@ -231,6 +234,10 @@ public class ActivityServiceImpl implements ActivityService {
     @Override
     public Activity createLast(String aid, Activity activity, LinkProtocol protocol){
         try {
+            // Confirm aid
+            Activity current = findActivityById(aid);
+            if(current == null) return null;
+
             // Save the protocol
             String pid = protocolRepository.save(protocol).getPid();
 
@@ -239,8 +246,6 @@ public class ActivityServiceImpl implements ActivityService {
             String lastId = last.getAid();
 
             // Update the current activity
-            Activity current = findActivityById(aid);
-            if(current == null) return null;
             activityRepository.save(saveNextActivityInfo(lastId, pid, current));
 
             return last;
@@ -254,17 +259,19 @@ public class ActivityServiceImpl implements ActivityService {
     @Override
     public String linkActivities(String aid1, String aid2, LinkProtocol protocol){
         try {
+            // Confirm aid
+            Activity activity1 = findActivityById(aid1);
+            if(activity1 == null) return "Fail: activity does not exist";
+            Activity activity2 = findActivityById(aid2);
+            if(activity2 == null) return "Fail: activity does not exist";
+
             // Save the protocol
             String pid = protocolRepository.save(protocol).getPid();
 
             // Save the last activity
-            Activity activity1 = findActivityById(aid1);
-            if(activity1 == null) return "Fail: activity does not exist";
             activityRepository.save(saveLastActivityInfo(aid2, pid, activity1));
 
             // Update the next activity
-            Activity activity2 = findActivityById(aid2);
-            if(activity2 == null) return "Fail: activity does not exist";
             activityRepository.save(saveNextActivityInfo(aid1, pid, activity2));
 
             return "Success";
@@ -278,9 +285,13 @@ public class ActivityServiceImpl implements ActivityService {
     @Override
     public String separateActivities(String lastAid, String nextAid){
         try {
-            // Save the last activity
+            // Confirm aid
             Activity activity1 = findActivityById(lastAid);
             if(activity1 == null) return "Fail: activity does not exist";
+            Activity activity2 = findActivityById(nextAid);
+            if(activity2 == null) return "Fail: activity does not exist";
+
+            // Save the last activity
             JSONArray nextActivities = activity1.getNext();
 
             IntStream.range(0, nextActivities.size()).forEach(i -> {
@@ -293,8 +304,6 @@ public class ActivityServiceImpl implements ActivityService {
             activityRepository.save(activity1);
 
             // Save the next activity
-            Activity activity2 = findActivityById(nextAid);
-            if(activity2 == null) return "Fail: activity does not exist";
             JSONArray lastActivities = activity2.getLast();
 
             IntStream.range(0, lastActivities.size()).forEach(i -> {

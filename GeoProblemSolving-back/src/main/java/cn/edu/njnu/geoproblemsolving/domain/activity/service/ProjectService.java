@@ -8,6 +8,8 @@ import java.util.List;
 public interface ProjectService {
     public Object createProject(Project project);
 
+    public Project findProject(String aid);
+
     public List<Project> findProjectsByPage(int page, int size);
 
     public String deleteProject(String aid);
@@ -26,5 +28,5 @@ public interface ProjectService {
 
     public String applyJoinProject(String aid, EmailEntity emailEntity);
 
-    public Object inquiryByConditions(String category, String tag, String keyword, int page, int size);
+    public Object inquiryByConditions(String category, String tag, String keyword, String userId, int page, int size);
 }

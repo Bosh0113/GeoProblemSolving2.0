@@ -98,16 +98,17 @@ h1 {
             <Radio label="Educational">Educational project</Radio>
           </RadioGroup>
         </FormItem>
-        <FormItem prop="title" label="Name" :label-width="100">
+        <FormItem prop="name" label="Name" :label-width="100">
           <Input
-            v-model="formInline.title"
+            v-model="formInline.name"
             placeholder="Enter name of the project(less than 60 characters)..."
           />
         </FormItem>
         <FormItem prop="description" label="Description" :label-width="100">
           <Input
             v-model="formInline.description"
-            placeholder="Enter a brief introduction (less than 180 characters)..."
+            type="textarea"
+            placeholder="Enter a description about this project..."
           />
         </FormItem>
         <FormItem prop="privacy" label="Privacy" :label-width="100">
@@ -186,16 +187,6 @@ h1 {
             </Modal>
           </div>
         </FormItem>
-        <FormItem prop="introduction" label="Introduction" :label-width="100">
-          <div class="inline_style">
-            <Input
-              v-model="formInline.introduction"
-              type="textarea"
-              placeholder="Enter detailed introduction about this project..."
-              style="height:100%;width:100%"
-            />
-          </div>
-        </FormItem>
         <FormItem>
           <div class="inline_style">
             <Button
@@ -211,22 +202,23 @@ h1 {
   </div>
 </template>
 <script>
+import * as userRole from "./../../api/userRole.js";
 export default {
   beforeRouteEnter: (to, from, next) => {
-    next(vm => {
+    next((vm) => {
       $.ajax({
         url: "/GeoProblemSolving/user/state",
         type: "POST",
         async: false,
-        success: function(data) {
+        success: function (data) {
           if (!data) {
             vm.$store.commit("userLogout");
             vm.$router.push({ name: "Login" });
           }
         },
-        error: function(err) {
+        error: function (err) {
           console.log("Get user state fail.");
-        }
+        },
       });
     });
   },
@@ -235,428 +227,35 @@ export default {
       // 控制按钮禁用的
       clickForbidden: false,
       formInline: {
-        title: "",
+        name: "",
         category: "",
-        introduction: "",
         privacy: "Public",
         description: "",
         //tag列表
-        tagList: []
-      },
-      // 权限的具体功能
-      defaultPublic: {
-        observe: {
-          project_manager: null,
-          subproject_manager: null,
-          member: null,
-          visitor: "All"
-        },
-        auto_join: {
-          project_manager: null,
-          subproject_manager: null,
-          member: null,
-          visitor: true
-        },
-        project_edit_info: {
-          project_manager: true,
-          subproject_manager: null,
-          member: false,
-          visitor: null
-        },
-        project_invite_member: {
-          project_manager: true,
-          subproject_manager: null,
-          member: true,
-          visitor: null
-        },
-        project_remove_member: {
-          project_manager: true,
-          subproject_manager: null,
-          member: false,
-          visitor: null
-        },
-        project_task_create: {
-          project_manager: true,
-          subproject_manager: null,
-          member: true,
-          visitor: null
-        },
-        project_task_manage: {
-          project_manager: true,
-          subproject_manager: null,
-          member: "Yes, partly",
-          visitor: null
-        },
-        project_resource_manage: {
-          project_manager: true,
-          subproject_manager: null,
-          member: "Yes, partly",
-          visitor: null
-        },
-        project_workspace_type_manage: {
-          project_manager: true,
-          subproject_manager: null,
-          member: false,
-          visitor: null
-        },
-        subprojects_manage: {
-          project_manager: true,
-          subproject_manager: null,
-          member: "Yes, partly",
-          visitor: null
-        },
-        subproject_edit_info: {
-          project_manager: true,
-          subproject_manager: true,
-          member: false,
-          visitor: null
-        },
-        subproject_invite_member: {
-          project_manager: true,
-          subproject_manager: true,
-          member: true,
-          visitor: null
-        },
-        subproject_remove_member: {
-          project_manager: true,
-          subproject_manager: true,
-          member: false,
-          visitor: null
-        },
-        subproject_task_create: {
-          project_manager: true,
-          subproject_manager: true,
-          member: true,
-          visitor: null
-        },
-        subproject_task_manage: {
-          project_manager: true,
-          subproject_manager: true,
-          member: "Yes, partly",
-          visitor: null
-        },
-        subproject_resource_manage: {
-          project_manager: "Yes, partly",
-          subproject_manager: true,
-          member: "Yes, partly",
-          visitor: null
-        },
-        subproject_workspace_type_manage: {
-          project_manager: true,
-          subproject_manager: true,
-          member: false,
-          visitor: null
-        },
-        activity_manage: {
-          project_manager: true,
-          subproject_manager: true,
-          member: true,
-          visitor: null
-        },
-        workspace_resource: {
-          project_manager: "Yes",
-          subproject_manager: true,
-          member: "Yes, partly",
-          visitor: null
-        },
-        workspace_tool: {
-          project_manager: true,
-          subproject_manager: true,
-          member: true,
-          visitor: null
-        },
-        workspace_edit: {
-          project_manager: true,
-          subproject_manager: true,
-          member: true,
-          visitor: null
-        }
-      },
-      defaultPrivate: {
-        observe: {
-          project_manager: null,
-          subproject_manager: null,
-          member: null,
-          visitor: "No"
-        },
-        auto_join: {
-          project_manager: null,
-          subproject_manager: null,
-          member: null,
-          visitor: null
-        },
-        project_edit_info: {
-          project_manager: true,
-          subproject_manager: null,
-          member: false,
-          visitor: null
-        },
-        project_invite_member: {
-          project_manager: true,
-          subproject_manager: null,
-          member: false,
-          visitor: null
-        },
-        project_remove_member: {
-          project_manager: true,
-          subproject_manager: null,
-          member: false,
-          visitor: null
-        },
-        project_task_create: {
-          project_manager: true,
-          subproject_manager: null,
-          member: true,
-          visitor: null
-        },
-        project_task_manage: {
-          project_manager: true,
-          subproject_manager: null,
-          member: "Yes, partly",
-          visitor: null
-        },
-        project_resource_manage: {
-          project_manager: true,
-          subproject_manager: null,
-          member: "Yes, partly",
-          visitor: null
-        },
-        project_workspace_type_manage: {
-          project_manager: true,
-          subproject_manager: null,
-          member: false,
-          visitor: null
-        },
-        subprojects_manage: {
-          project_manager: true,
-          subproject_manager: null,
-          member: "Yes, partly",
-          visitor: null
-        },
-        subproject_edit_info: {
-          project_manager: false,
-          subproject_manager: true,
-          member: false,
-          visitor: null
-        },
-        subproject_invite_member: {
-          project_manager: false,
-          subproject_manager: true,
-          member: false,
-          visitor: null
-        },
-        subproject_remove_member: {
-          project_manager: false,
-          subproject_manager: true,
-          member: false,
-          visitor: null
-        },
-        subproject_task_create: {
-          project_manager: true,
-          subproject_manager: true,
-          member: true,
-          visitor: null
-        },
-        subproject_task_manage: {
-          project_manager: false,
-          subproject_manager: true,
-          member: "Yes, partly",
-          visitor: null
-        },
-        subproject_resource_manage: {
-          project_manager: "Yes, partly",
-          subproject_manager: true,
-          member: "Yes, partly",
-          visitor: null
-        },
-        subproject_workspace_type_manage: {
-          project_manager: true,
-          subproject_manager: true,
-          member: false,
-          visitor: null
-        },
-        activity_manage: {
-          project_manager: false,
-          subproject_manager: true,
-          member: false,
-          visitor: null
-        },
-        workspace_resource: {
-          project_manager: "Yes, partly",
-          subproject_manager: true,
-          member: "Yes, partly",
-          visitor: null
-        },
-        workspace_tool: {
-          project_manager: true,
-          subproject_manager: true,
-          member: true,
-          visitor: null
-        },
-        workspace_edit: {
-          project_manager: false,
-          subproject_manager: true,
-          member: false,
-          visitor: null
-        }
-      },
-      defaultDiscoverable: {
-        observe: {
-          project_manager: null,
-          subproject_manager: null,
-          member: null,
-          visitor: "No"
-        },
-        auto_join: {
-          project_manager: null,
-          subproject_manager: null,
-          member: null,
-          visitor: null
-        },
-        project_edit_info: {
-          project_manager: true,
-          subproject_manager: null,
-          member: false,
-          visitor: null
-        },
-        project_invite_member: {
-          project_manager: true,
-          subproject_manager: null,
-          member: false,
-          visitor: null
-        },
-        project_remove_member: {
-          project_manager: true,
-          subproject_manager: null,
-          member: false,
-          visitor: null
-        },
-        project_task_create: {
-          project_manager: true,
-          subproject_manager: null,
-          member: true,
-          visitor: null
-        },
-        project_task_manage: {
-          project_manager: true,
-          subproject_manager: null,
-          member: "Yes, partly",
-          visitor: null
-        },
-        project_resource_manage: {
-          project_manager: true,
-          subproject_manager: null,
-          member: "Yes, partly",
-          visitor: null
-        },
-        project_workspace_type_manage: {
-          project_manager: true,
-          subproject_manager: null,
-          member: false,
-          visitor: null
-        },
-        subprojects_manage: {
-          project_manager: true,
-          subproject_manager: null,
-          member: "Yes, partly",
-          visitor: null
-        },
-        subproject_edit_info: {
-          project_manager: false,
-          subproject_manager: true,
-          member: false,
-          visitor: null
-        },
-        subproject_invite_member: {
-          project_manager: false,
-          subproject_manager: true,
-          member: false,
-          visitor: null
-        },
-        subproject_remove_member: {
-          project_manager: false,
-          subproject_manager: true,
-          member: false,
-          visitor: null
-        },
-        subproject_task_create: {
-          project_manager: true,
-          subproject_manager: true,
-          member: true,
-          visitor: null
-        },
-        subproject_task_manage: {
-          project_manager: "Yes, partly",
-          subproject_manager: true,
-          member: "Yes, partly",
-          visitor: null
-        },
-        subproject_resource_manage: {
-          project_manager: "Yes, partly",
-          subproject_manager: true,
-          member: "Yes, partly",
-          visitor: null
-        },
-        subproject_workspace_type_manage: {
-          project_manager: false,
-          subproject_manager: true,
-          member: false,
-          visitor: null
-        },
-        activity_manage: {
-          project_manager: false,
-          subproject_manager: true,
-          member: false,
-          visitor: null
-        },
-        workspace_resource: {
-          project_manager: "Yes, partly",
-          subproject_manager: true,
-          member: "Yes, partly",
-          visitor: null
-        },
-        workspace_tool: {
-          project_manager: true,
-          subproject_manager: true,
-          member: true,
-          visitor: null
-        },
-        workspace_edit: {
-          project_manager: false,
-          subproject_manager: true,
-          member: false,
-          visitor: null
-        }
+        tagList: [],
       },
       newProjectRule: {
-        title: [
+        name: [
           {
             required: true,
-            message: "The title cannot be empty and no more than 60 characters",
+            message: "The name cannot be empty and no more than 60 characters",
             trigger: "blur",
-            max: 60
-          }
+            max: 60,
+          },
         ],
         category: [
           {
             required: true,
             message: "Please select category",
-            trigger: "change"
-          }
+            trigger: "change",
+          },
         ],
         privacy: [
           {
             required: true,
             message: "Please select privacy",
-            trigger: "change"
-          }
-        ],
-        introduction: [
-          {
-            required: false,
-            message: "give a detailed introduction about this project",
-            trigger: "blur"
-          }
+            trigger: "change",
+          },
         ],
         description: [
           {
@@ -664,9 +263,9 @@ export default {
             message:
               "The description cannot be empty and no more than 360 characters",
             trigger: "blur",
-            max: 360
-          }
-        ]
+            max: 360,
+          },
+        ],
       },
       //用来存储输入的单个标签变量
       inputTag: "",
@@ -674,7 +273,7 @@ export default {
       //表示图片
       img: "",
       pictureUrl: "",
-      createProjectInfo: {}
+      createProjectInfo: {},
     };
   },
   created() {
@@ -683,7 +282,7 @@ export default {
       this.$router.push({ name: "Login" });
     }
 
-    Array.prototype.contains = function(obj) {
+    Array.prototype.contains = function (obj) {
       var i = this.length;
       while (i--) {
         if (this[i] != undefined && this[i] === obj) {
@@ -695,45 +294,38 @@ export default {
   },
   methods: {
     createProject(name) {
-      let permission;
-      if (this.formInline.privacy == "Public") {
-        permission = this.defaultPublic;
-      } else if (this.formInline.privacy == "Discoverable") {
-        permission = this.defaultDiscoverable;
-      } else if (this.formInline.privacy == "Private") {
-        permission = this.defaultPrivate;
-      }
+      let permission = userRole.getDefault();
 
-      this.$refs[name].validate(valid => {
+      this.$refs[name].validate((valid) => {
         if (valid) {
           this.clickForbidden = true;
-          let createProjectForm = {};
-          createProjectForm["category"] = this.formInline.category;
-          createProjectForm["title"] = this.formInline.title;
-          createProjectForm["tag"] = this.formInline.tagList.toString();
-          createProjectForm["privacy"] = this.formInline.privacy;
-          createProjectForm["picture"] = this.pictureUrl;
-          createProjectForm["introduction"] = this.formInline.introduction;
-          createProjectForm["description"] = this.formInline.description;
-          createProjectForm["managerId"] = this.$store.getters.userId;
-          createProjectForm["type"] = "";
-          createProjectForm["stepId"] = "";
-          createProjectForm["permissionManager"] = permission;
+          let createProjectForm = {
+            category: this.formInline.category,
+            name: this.formInline.name,
+            tag: this.formInline.tagList.toString(),
+            privacy: this.formInline.privacy,
+            picture: this.pictureUrl,
+            description: this.formInline.description,
+            // creator: "5d1c51e5020a3e3ad80b717e",
+            creator: this.$store.getters.userId,
+            permission: JSON.stringify(permission),
+            level: 0
+          };
 
           this.axios
-            .post("/GeoProblemSolving/project/create", createProjectForm)
-            .then(res => {
+            .post("/GeoProblemSolving/project", createProjectForm)
+            .then((res) => {
               if (res.data == "Offline") {
                 this.$store.commit("userLogout");
                 this.$router.push({ name: "Login" });
               } else if (res.data === "Fail") {
-                this.$Message.error("Create project fail.");
+                this.$Message.error(res.data);
               } else {
                 this.createProjectInfo = res.data;
                 this.addHistoryEvent(this.createProjectInfo.projectId);
               }
             })
-            .catch(err => {
+            .catch((err) => {
               console.log(err);
             });
         } else {
@@ -748,14 +340,14 @@ export default {
         " created a " +
         this.formInline.category +
         " project named " +
-        this.formInline.title;
+        this.formInline.name;
       form["description"] = description;
       form["scopeId"] = scopeId;
       form["eventType"] = "project";
       form["userId"] = this.$store.getters.userId;
       this.axios
         .post("/GeoProblemSolving/history/save", form)
-        .then(res => {
+        .then((res) => {
           if (res.data === "Success") {
             this.$store.commit("setProjectInfo", this.createProjectInfo);
             window.location.href =
@@ -765,7 +357,7 @@ export default {
             confirm("Created project fail.");
           }
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err.data);
         });
     },
@@ -789,13 +381,13 @@ export default {
       } else {
         var reader = new FileReader();
         reader.readAsDataURL(file);
-        reader.onload = e => {
+        reader.onload = (e) => {
           // 读取到的图片base64 数据编码 将此编码字符串传给后台即可
           let formData = new FormData();
           formData.append("picture", file);
           this.axios
             .post("/GeoProblemSolving/resource/projectPic", formData)
-            .then(res => {
+            .then((res) => {
               if (res.data != "Fail") {
                 this.pictureUrl = res.data;
                 this.img = e.target.result;
@@ -814,7 +406,7 @@ export default {
     handleRemove() {
       this.img = "";
       this.pictureUrl = "";
-    }
-  }
+    },
+  },
 };
 </script>

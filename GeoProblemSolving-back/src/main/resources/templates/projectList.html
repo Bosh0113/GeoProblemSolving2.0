@@ -289,8 +289,8 @@
                 }
                 else {
                     this.userState = false;
-                    this.judgeMember(projectsInfo.projectList);
-                    this.tabPageData = Object.assign([], projectsInfo.projectList);
+                    this.judgeMember(projectsInfo);
+                    this.tabPageData = Object.assign([], projectsInfo);
                     this.freshEle++;
                 }
                 window.onresize = () => {
@@ -370,13 +370,6 @@
                     this.showPageList();
                 },
                 showPageList() {
-                    // if (this.currentTab == "All" && this.currentPage == 1 && !this.userState) {
-                    //     this.judgeMember(projectsInfo.projectList);
-                    //     this.tabPageData = Object.assign([], this.currentProjectList);
-                    //     this.freshEle++;
-                    //     this.totalCount = projectsInfo.count;
-                    // }
-                    // else {
                         let userId = "";
                         let joinedProjects = [];
                         if (this.userState) {
@@ -387,14 +380,13 @@
                         }
                         // this.$Spin.show();
                         axios
-                            .get("/GeoProblemSolving/project/inquiryByPage" +
+                            .get("/GeoProblemSolving/project" +
                                 "?category=" + this.currentTab +
                                 "&tag=" + this.selectTag +
                                 "&page=" + this.currentPage +
-                                "&pageSize=" + this.pageSize +
                                 "&userId=" + userId +
-                                "&searchConfig=" + this.searchText +
-                                "&joinedProjects=" + joinedProjects)
+                                "&pageSize=" + this.pageSize +
+                                "&keyword=" + this.searchText )
                             .then(res => {
                                 // this.$Spin.hide();
                                 if (res.data != "Fail") {
@@ -402,7 +394,7 @@
                                         this.currentProjectList = [];
                                     }
                                     else {
-                                        this.judgeMember(res.data.projectList);
+                                        this.judgeMember(res.data);
                                     }
                                     this.tabPageData = Object.assign([], this.currentProjectList);
                                     this.totalCount = res.data.count;
@@ -418,30 +410,23 @@
                     // }
                 },
 
-                judgeMember(list) {
-                    let projectList = list;
+                judgeMember(projectList) {
                     //判断登录状态
                     if (this.userState == true) {
                         if (projectList.length != 0) {
                             for (var i = 0; i < projectList.length; i++) {
-                                let managerId = projectList[i].managerId;
                                 let members = projectList[i].members;
-                                if (managerId == this.userInfo.userId) {
-                                    projectList[i]["isManager"] = true;
-                                } else {
-                                    projectList[i]["isManager"] = false;
-                                }
-                                if (members.length != 0) {
                                     for (var j = 0; j < members.length; j++) {
-                                        if (members[j].userId == this.userInfo.userId) {
-                                            projectList[i]["isMember"] = true;
-                                            break;
-                                        } else {
-                                            projectList[i]["isMember"] = false;
-                                        }
+                                    if (members[j].userId == this.userInfo.userId) {
+                                        projectList[i]["isMember"] = true;
+                                        if(members[j].role == "manager")
+                                            projectList[i]["isManager"] = true;
+                                        else
+                                            projectList[i]["isManager"] = false;
+                                        break;
+                                    } else {
+                                        projectList[i]["isMember"] = false;
                                     }
-                                } else {
-                                    projectList[i]["isMember"] = false;
                                 }
                             }
                             this.currentProjectList = Object.assign([], projectList);
@@ -453,8 +438,6 @@
                     else {
                         if (projectList.length != 0) {
                             for (var i = 0; i < projectList.length; i++) {
-                                let managerId = projectList[i].managerId;
-                                let members = projectList[i].members;
                                 projectList[i]["isManager"] = false;
                                 projectList[i]["isMember"] = false;
                             }

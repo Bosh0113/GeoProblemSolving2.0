@@ -30,7 +30,7 @@ public class Activity implements Serializable {
      * User
      * creator contains: userId,
      * members contains: userId, role
-     * role: creator, administrator, decision-maker, researcher, stakeholder, normal member(workers...), visitor(the public)
+     * role: manager // researcher, expert(e.g. engineer), core-member(students, workers...) // decision-maker, stakeholder, consultant // visitor(the public)
      */
     private String creator;
     private JSONArray members;
@@ -56,6 +56,11 @@ public class Activity implements Serializable {
     private String parent;
     private ArrayList<String> children;
     private JSONObject pathway;
+
+    /**
+     * Permission Manager
+     */
+    private String permission;
 
     /**
      * Level (0~3)

@@ -53,7 +53,6 @@ public class SubprojectServiceImpl implements SubprojectService {
             ArrayList<String> children = project.getChildren();
             children.add(subprojectId);
             project.setChildren(children);
-            projectRepository.save(project);
 
             // Created time
             subproject.setCreatedTime(dateFormat.format(data));
@@ -64,17 +63,16 @@ public class SubprojectServiceImpl implements SubprojectService {
             // members
             String creatorId = project.getCreator();
             JSONObject creator = new JSONObject();
-            JSONObject member = new JSONObject();
             JSONArray members = new JSONArray();
 
             creator.put("userId", creatorId);
-            creator.put("role", "creator");
+            creator.put("role", "manager");
             members.add(creator);
-            creator.put("userId", project.getCreator());
-            creator.put("role", "administrator");
-            members.add(member);
 
             subproject.setMembers(members);
+
+            // Save
+            projectRepository.save(project);
             subprojectRepository.save(subproject);
 
             // folder

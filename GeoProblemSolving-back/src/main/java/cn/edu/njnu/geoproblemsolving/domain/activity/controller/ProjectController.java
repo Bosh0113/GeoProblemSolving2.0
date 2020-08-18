@@ -40,9 +40,10 @@ public class ProjectController {
     public Object inquiryByPage(@RequestParam("category") String category,
                                 @RequestParam("tag") String tag,
                                 @RequestParam("keyword") String keyword,
+                                @RequestParam("userId") String userId,
                                 @RequestParam("page") int page,
                                 @RequestParam("pageSize") int pageSize){
-        Object result = projectService.inquiryByConditions(category, tag, keyword, page , pageSize);
+        Object result = projectService.inquiryByConditions(category, tag, keyword, userId, page, pageSize);
         return result;
     }
 
@@ -60,7 +61,7 @@ public class ProjectController {
         // Thymeleaf
         if(result instanceof Project){
             staticPagesBuilder.projectDetailPageBuilder((Project) result);
-            staticPagesBuilder.projectListPageBuilder(projectService.findProjectsByPage(0,18));
+            staticPagesBuilder.projectListPageBuilder(projectService.findProjectsByPage(1,18));
         }
 
         return result;
@@ -78,7 +79,7 @@ public class ProjectController {
         // Thymeleaf
         if(result.equals("Success")) {
             staticPagesBuilder.projectDetailPageBuilder((Project) result);
-            staticPagesBuilder.projectListPageBuilder(projectService.findProjectsByPage(0, 18));
+            staticPagesBuilder.projectListPageBuilder(projectService.findProjectsByPage(1, 18));
         }
         return result;
     }
@@ -94,7 +95,7 @@ public class ProjectController {
         // Thymeleaf
         if(result.equals("Success")) {
             staticPagesBuilder.projectDetailPageRemove(aid);
-            staticPagesBuilder.projectListPageBuilder(projectService.findProjectsByPage(0, 18));
+            staticPagesBuilder.projectListPageBuilder(projectService.findProjectsByPage(1, 18));
         }
         return result;
     }
