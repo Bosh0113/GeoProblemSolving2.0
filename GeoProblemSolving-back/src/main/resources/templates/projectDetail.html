@@ -10,7 +10,6 @@
     <meta name="description" th:attr="content=${projectInfo.description}">
     <meta name="keywords" th:attr="content=${projectInfo.tag}">
     <meta name="author" content="OpenGMS">
-    <script src="/GeoProblemSolving/customize/userRole.js"></script>
     <script src="/GeoProblemSolving/js/jquery.js"></script>
     <script src="/GeoProblemSolving/js/vue.min.js"></script>
     <script src="/GeoProblemSolving/js/crypto-js.js"></script>
@@ -235,23 +234,23 @@
             color: white;
         }
 
-        .project_title{
-            font-size:1.5rem;
+        .project_title {
+            font-size: 1.5rem;
             color: rgba(214, 109, 0, 0.82);
-            display:contents;
-            overflow:hidden;
-            text-overflow:ellipsis;
-            white-space:nowrap;
+            display: contents;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
-        @media screen and (min-width:1300px){
-            .title_mw{
+        @media screen and (min-width: 1300px) {
+            .title_mw {
                 max-width: 600px;
             }
         }
 
-        @media screen and (max-width: 1299px){
-            .title_mw{
+        @media screen and (max-width: 1299px) {
+            .title_mw {
                 max-width: 350px;
             }
         }
@@ -436,13 +435,15 @@
                             </div>
                             <div slot="extra">
                                 <div>
-                                    <Poptip trigger="hover" content="Edit project information" placement="left" v-if="permissionIdentity('edit_info')">
+                                    <Poptip trigger="hover" content="Edit project information" placement="left"
+                                            v-if="permissionIdentity('edit_info')">
                                         <i-button style="margin: 0 5px;" class="changeEditColor"
                                                   @click="editModelShow()">
                                             <Icon type="ios-create" :size="20"></Icon>
                                         </i-button>
                                     </Poptip>
-                                    <Poptip trigger="hover" content="Remove project" placement="left" v-if="userRole == 'manager'">
+                                    <Poptip trigger="hover" content="Remove project" placement="left"
+                                            v-if="userRole == 'manager'">
                                         <i-button style="margin: 0 5px;" class="changeRemoveColor"
                                                   @click="deleteProjectShow()">
                                             <Icon type="md-close" :size="20"></Icon>
@@ -483,9 +484,12 @@
                                                                 </p>
                                                                 <p><strong>Privacy: </strong><span id="projectPrivacy"
                                                                                                    th:text="${projectInfo.privacy}">Project privacy</span>
-                                                                    <span style="margin-left: 10px; cursor: pointer" title="Modify the permission of participants"
-                                                                          v-if="userRole == 'manager'" @click="modifyPermission">
-                                                                       <Icon type="md-cog" size="16" color="grey"></Icon>
+                                                                    <span style="margin-left: 10px; cursor: pointer"
+                                                                          title="Modify the permission of participants"
+                                                                          v-if="userRole == 'manager'"
+                                                                          @click="modifyPermission">
+                                                                       <Icon type="md-cog" size="16"
+                                                                             color="grey"></Icon>
                                                                     </span>
                                                                 </p>
                                                                 <p><strong>Category: </strong><span id="projectCategory"
@@ -497,9 +501,9 @@
                                                                                                th:text="${projectInfo.tag}"
                                                                                                th:attr="title=${projectInfo.tag}">Project tag</span>
                                                                 </p>
-<!--                                                                <p><strong>Manager: </strong>-->
-<!--                                                                    {{projectInfo.managerName}}-->
-<!--                                                                </p>-->
+                                                                <!--                                                                <p><strong>Manager: </strong>-->
+                                                                <!--                                                                    {{projectInfo.managerName}}-->
+                                                                <!--                                                                </p>-->
                                                                 <p><strong>Create time: </strong>
                                                                     {{projectInfo.createdTime}}</p>
                                                             </div>
@@ -529,17 +533,17 @@
                                                         </vue-scroll>
                                                     </div>
                                                 </div>
-<!--                                                <div style="flex: 1;min-height: 130px;padding: 5px;border: #e8eaec 0.1px dashed;margin-top: 10px;">-->
-<!--                                                    <h3>Introduction:</h3>-->
-<!--                                                    <div class="projectIntroductionContent">-->
-<!--                                                        <vue-scroll :ops="scrollOps">-->
-<!--                                                            <div id="projectIntroduction" style="white-space: pre-line;"-->
-<!--                                                                 th:text="${projectInfo.introduction}">-->
-<!--                                                                Project introduction-->
-<!--                                                            </div>-->
-<!--                                                        </vue-scroll>-->
-<!--                                                    </div>-->
-<!--                                                </div>-->
+                                                <!--                                                <div style="flex: 1;min-height: 130px;padding: 5px;border: #e8eaec 0.1px dashed;margin-top: 10px;">-->
+                                                <!--                                                    <h3>Introduction:</h3>-->
+                                                <!--                                                    <div class="projectIntroductionContent">-->
+                                                <!--                                                        <vue-scroll :ops="scrollOps">-->
+                                                <!--                                                            <div id="projectIntroduction" style="white-space: pre-line;"-->
+                                                <!--                                                                 th:text="${projectInfo.introduction}">-->
+                                                <!--                                                                Project introduction-->
+                                                <!--                                                            </div>-->
+                                                <!--                                                        </vue-scroll>-->
+                                                <!--                                                    </div>-->
+                                                <!--                                                </div>-->
                                             </div>
                                         </div>
                                     </i-col>
@@ -551,14 +555,16 @@
                                                 </div>
                                                 <div slot="extra">
                                                     <div>
-                                                        <Poptip trigger="hover" content="Invite members" v-if="permissionIdentity('invite_member')"
+                                                        <Poptip trigger="hover" content="Invite members"
+                                                                v-if="permissionIdentity('invite_member')"
                                                                 placement="bottom">
                                                             <i-button class="changeInviteColor"
                                                                       @click="inviteModalShow()">
                                                                 <Icon type="md-person-add" :size="20"></Icon>
                                                             </i-button>
                                                         </Poptip>
-                                                        <Poptip trigger="hover" content="Remove members" v-if="permissionIdentity('manage_member')"
+                                                        <Poptip trigger="hover" content="Remove members"
+                                                                v-if="permissionIdentity('manage_member')"
                                                                 placement="left">
                                                             <i-button style="margin-left:5px;"
                                                                       class="changeRemoveColor"
@@ -568,24 +574,24 @@
                                                         </Poptip>
                                                     </div>
                                                 </div>
-<!--                                                <div :style="{height: membersContentCSS}" style="overflow-y:auto;">-->
-<!--                                                    <vue-scroll :ops="scrollOps">-->
-<!--                                                        <Card style="background-color: #dcdee2;border-color: #c5c8ce;cursor: pointer;"-->
-<!--                                                              @click.native=goPersonalPage(projectInfo.managerId)>-->
-<!--                                                            <div title="Manager">-->
-<!--                                                                <h2 style="color: white" class="overEllipsis">-->
-<!--                                                                    {{projectInfo.managerName}}</h2>-->
-<!--                                                            </div>-->
-<!--                                                        </Card>-->
-<!--                                                        <Card v-for="member in projectInfo.members"-->
-<!--                                                              style="margin-top: 5px;cursor: pointer;"-->
-<!--                                                              @click.native=goPersonalPage(member.userId)>-->
-<!--                                                            <div title="Member">-->
-<!--                                                                <h2 class="overEllipsis">{{member.userName}}</h2>-->
-<!--                                                            </div>-->
-<!--                                                        </Card>-->
-<!--                                                    </vue-scroll>-->
-<!--                                                </div>-->
+                                                <!--                                                <div :style="{height: membersContentCSS}" style="overflow-y:auto;">-->
+                                                <!--                                                    <vue-scroll :ops="scrollOps">-->
+                                                <!--                                                        <Card style="background-color: #dcdee2;border-color: #c5c8ce;cursor: pointer;"-->
+                                                <!--                                                              @click.native=goPersonalPage(projectInfo.managerId)>-->
+                                                <!--                                                            <div title="Manager">-->
+                                                <!--                                                                <h2 style="color: white" class="overEllipsis">-->
+                                                <!--                                                                    {{projectInfo.managerName}}</h2>-->
+                                                <!--                                                            </div>-->
+                                                <!--                                                        </Card>-->
+                                                <!--                                                        <Card v-for="member in projectInfo.members"-->
+                                                <!--                                                              style="margin-top: 5px;cursor: pointer;"-->
+                                                <!--                                                              @click.native=goPersonalPage(member.userId)>-->
+                                                <!--                                                            <div title="Member">-->
+                                                <!--                                                                <h2 class="overEllipsis">{{member.userName}}</h2>-->
+                                                <!--                                                            </div>-->
+                                                <!--                                                        </Card>-->
+                                                <!--                                                    </vue-scroll>-->
+                                                <!--                                                </div>-->
                                             </Card>
                                         </div>
                                     </i-col>
@@ -598,17 +604,17 @@
                     <div style="background:#eee;padding: 10px;height: inherit;min-height: fit-content;">
                         <Card v-if="projectInfo.type=='Activity_Unit'" :bordered="false" dis-hover
                               style="height: -webkit-fill-available;min-height: fit-content;">
-                              <div slot="title">
-<!--                                <h1 class="projectMenuItemTitle">Subprojects</h1>-->
-                                  <div style="margin-left:20px;top: 15px; position:absolute;left:50px;">
-                                      <strong style="font-size:1.5rem;">Project</strong>
-                                      <Divider type="vertical"></Divider>
-                                      <strong style="font-size:1rem;">Subprojects</strong>
-                                  </div>
-                                  <div style="display:flex;align-items:center;justify-content:center;">
-                                      <span class="project_title title_mw">{{projectInfo.name}}</span>
-                                  </div>
-                              </div>
+                            <div slot="title">
+                                <!--                                <h1 class="projectMenuItemTitle">Subprojects</h1>-->
+                                <div style="margin-left:20px;top: 15px; position:absolute;left:50px;">
+                                    <strong style="font-size:1.5rem;">Project</strong>
+                                    <Divider type="vertical"></Divider>
+                                    <strong style="font-size:1rem;">Subprojects</strong>
+                                </div>
+                                <div style="display:flex;align-items:center;justify-content:center;">
+                                    <span class="project_title title_mw">{{projectInfo.name}}</span>
+                                </div>
+                            </div>
                             <div slot="extra" v-if="userRole!='visitor'">
                                 <Poptip trigger="hover" content="Create subproject" placement="left">
                                     <i-button style="margin: 0 5px;" class="changeInviteColor"
@@ -617,87 +623,87 @@
                                     </i-button>
                                 </Poptip>
                             </div>
-<!--                            <div :style="{height:subProjectsCSS}">-->
-<!--                                <vue-scroll :ops="scrollOps">-->
-<!--                                    <div v-if="!subProjectList.length" style="text-align:center">-->
-<!--                                        <div style="color:lightgray;font-size:4em; font-weight:bold">No subprojects-->
-<!--                                            have been created.-->
-<!--                                        </div>-->
-<!--                                    </div>-->
-<!--                                    <div>-->
-<!--                                        <div v-for="(subProject,index) in subProjectList"-->
-<!--                                             style="width: 25%;display: inline-block;padding: 5px;">-->
-<!--                                            <Card style="height: 300px;" class="subProjectCard">-->
-<!--                                                <div slot="title" style="cursor: pointer;"-->
-<!--                                                     @click="goSubProjectPage(subProject)">-->
-<!--                                                    <strong style="width: 160px;display: inline-block;"-->
-<!--                                                            class="overEllipsis"-->
-<!--                                                            :title="subProject.name">-->
-<!--                                                        {{subProject.name}}-->
-<!--                                                    </strong>-->
-<!--                                                </div>-->
-<!--                                                <template v-if="userRole!='visitor'">-->
-<!--                                                    <div slot="extra" v-if="permissionIdentity('manage_child_activity', subProject)">-->
-<!--                                                        <Poptip trigger="hover" content="Change manager" placement="bottom">-->
-<!--                                                            <i-button class="changeInviteColor" icon="ios-people"-->
-<!--                                                                      size="small"-->
-<!--                                                                      shape="circle"-->
-<!--                                                                      @click="handOverModalShow(index)"></i-button>-->
-<!--                                                        </Poptip>-->
-<!--                                                        <Poptip trigger="hover" content="Edit information"-->
-<!--                                                                placement="bottom">-->
-<!--                                                            <i-button class="changeEditColor" icon="ios-create" size="small"-->
-<!--                                                                      shape="circle"-->
-<!--                                                                      @click="editSubProjectModalShow(index)"></i-button>-->
-<!--                                                        </Poptip>-->
-<!--                                                        <Poptip trigger="hover" content="Remove subproject"-->
-<!--                                                                placement="bottom">-->
-<!--                                                            <i-button class="changeRemoveColor" icon="md-close" size="small"-->
-<!--                                                                      shape="circle"-->
-<!--                                                                      @click="deleteSubProjectModalShow(index)"></i-button>-->
-<!--                                                        </Poptip>-->
-<!--                                                    </div>-->
-<!--                                                    <div slot="extra" v-else-if="memberIdentity(subProject.members)">-->
-<!--                                                        <Icon type="ios-person" :size="20"></Icon>-->
-<!--                                                    </div>-->
-<!--                                                    <div slot="extra" v-else>-->
-<!--                                                        <Poptip trigger="hover" content="Apply to Join"-->
-<!--                                                                placement="left">-->
-<!--                                                            <i-button class="changeInviteColor" icon="md-add"-->
-<!--                                                                      size="small"-->
-<!--                                                                      shape="circle"-->
-<!--                                                                      @click="applyJoinSubProjectModalShow(index)"></i-button>-->
-<!--                                                        </Poptip>-->
-<!--                                                    </div>-->
-<!--                                                </template>-->
-<!--                                                <div class="subProjectDes" :title="subProject.description"-->
-<!--                                                     style="cursor: pointer;" @click="goSubProjectPage(subProject)" >-->
-<!--                                                    {{subProject.description}}-->
-<!--                                                </div>-->
-<!--                                                <div style="height: 75px;padding: 5px;">-->
-<!--                                                    <p class="subProjectExtraP">-->
-<!--                                                        <strong style="display: inline-block">Manager: </strong>-->
-<!--                                                        <span class="subProjectExtraSpan">{{subProject.managerName}}</span>-->
-<!--                                                    </p>-->
-<!--                                                    <p class="subProjectExtraP">-->
-<!--                                                        <strong style="display: inline-block">Members: </strong>-->
-<!--                                                        <span class="subProjectExtraSpan">{{memberListStr(subProject.members)}}</span>-->
-<!--                                                    </p>-->
-<!--                                                    <p class="subProjectExtraP">-->
-<!--                                                        <strong style="display: inline-block">Create time: </strong>-->
-<!--                                                        <span class="subProjectExtraSpan">{{subProject.createTime}}</span>-->
-<!--                                                    </p>-->
-<!--                                                </div>-->
-<!--                                            </Card>-->
-<!--                                        </div>-->
-<!--                                    </div>-->
-<!--                                    <div style="margin:5px 0 5px 80px;text-align:center">-->
-<!--                                        <i-button class="btnHoverRed" @click="resetProjectTypeModalShow()" v-if="permissionIdentity('manage_workspace_type')">Reset-->
-<!--                                            workspace type-->
-<!--                                        </i-button>-->
-<!--                                    </div>-->
-<!--                                </vue-scroll>-->
-<!--                            </div>-->
+                            <!--                            <div :style="{height:subProjectsCSS}">-->
+                            <!--                                <vue-scroll :ops="scrollOps">-->
+                            <!--                                    <div v-if="!subProjectList.length" style="text-align:center">-->
+                            <!--                                        <div style="color:lightgray;font-size:4em; font-weight:bold">No subprojects-->
+                            <!--                                            have been created.-->
+                            <!--                                        </div>-->
+                            <!--                                    </div>-->
+                            <!--                                    <div>-->
+                            <!--                                        <div v-for="(subProject,index) in subProjectList"-->
+                            <!--                                             style="width: 25%;display: inline-block;padding: 5px;">-->
+                            <!--                                            <Card style="height: 300px;" class="subProjectCard">-->
+                            <!--                                                <div slot="title" style="cursor: pointer;"-->
+                            <!--                                                     @click="goSubProjectPage(subProject)">-->
+                            <!--                                                    <strong style="width: 160px;display: inline-block;"-->
+                            <!--                                                            class="overEllipsis"-->
+                            <!--                                                            :title="subProject.name">-->
+                            <!--                                                        {{subProject.name}}-->
+                            <!--                                                    </strong>-->
+                            <!--                                                </div>-->
+                            <!--                                                <template v-if="userRole!='visitor'">-->
+                            <!--                                                    <div slot="extra" v-if="permissionIdentity('manage_child_activity', subProject)">-->
+                            <!--                                                        <Poptip trigger="hover" content="Change manager" placement="bottom">-->
+                            <!--                                                            <i-button class="changeInviteColor" icon="ios-people"-->
+                            <!--                                                                      size="small"-->
+                            <!--                                                                      shape="circle"-->
+                            <!--                                                                      @click="handOverModalShow(index)"></i-button>-->
+                            <!--                                                        </Poptip>-->
+                            <!--                                                        <Poptip trigger="hover" content="Edit information"-->
+                            <!--                                                                placement="bottom">-->
+                            <!--                                                            <i-button class="changeEditColor" icon="ios-create" size="small"-->
+                            <!--                                                                      shape="circle"-->
+                            <!--                                                                      @click="editSubProjectModalShow(index)"></i-button>-->
+                            <!--                                                        </Poptip>-->
+                            <!--                                                        <Poptip trigger="hover" content="Remove subproject"-->
+                            <!--                                                                placement="bottom">-->
+                            <!--                                                            <i-button class="changeRemoveColor" icon="md-close" size="small"-->
+                            <!--                                                                      shape="circle"-->
+                            <!--                                                                      @click="deleteSubProjectModalShow(index)"></i-button>-->
+                            <!--                                                        </Poptip>-->
+                            <!--                                                    </div>-->
+                            <!--                                                    <div slot="extra" v-else-if="memberIdentity(subProject.members)">-->
+                            <!--                                                        <Icon type="ios-person" :size="20"></Icon>-->
+                            <!--                                                    </div>-->
+                            <!--                                                    <div slot="extra" v-else>-->
+                            <!--                                                        <Poptip trigger="hover" content="Apply to Join"-->
+                            <!--                                                                placement="left">-->
+                            <!--                                                            <i-button class="changeInviteColor" icon="md-add"-->
+                            <!--                                                                      size="small"-->
+                            <!--                                                                      shape="circle"-->
+                            <!--                                                                      @click="applyJoinSubProjectModalShow(index)"></i-button>-->
+                            <!--                                                        </Poptip>-->
+                            <!--                                                    </div>-->
+                            <!--                                                </template>-->
+                            <!--                                                <div class="subProjectDes" :title="subProject.description"-->
+                            <!--                                                     style="cursor: pointer;" @click="goSubProjectPage(subProject)" >-->
+                            <!--                                                    {{subProject.description}}-->
+                            <!--                                                </div>-->
+                            <!--                                                <div style="height: 75px;padding: 5px;">-->
+                            <!--                                                    <p class="subProjectExtraP">-->
+                            <!--                                                        <strong style="display: inline-block">Manager: </strong>-->
+                            <!--                                                        <span class="subProjectExtraSpan">{{subProject.managerName}}</span>-->
+                            <!--                                                    </p>-->
+                            <!--                                                    <p class="subProjectExtraP">-->
+                            <!--                                                        <strong style="display: inline-block">Members: </strong>-->
+                            <!--                                                        <span class="subProjectExtraSpan">{{memberListStr(subProject.members)}}</span>-->
+                            <!--                                                    </p>-->
+                            <!--                                                    <p class="subProjectExtraP">-->
+                            <!--                                                        <strong style="display: inline-block">Create time: </strong>-->
+                            <!--                                                        <span class="subProjectExtraSpan">{{subProject.createTime}}</span>-->
+                            <!--                                                    </p>-->
+                            <!--                                                </div>-->
+                            <!--                                            </Card>-->
+                            <!--                                        </div>-->
+                            <!--                                    </div>-->
+                            <!--                                    <div style="margin:5px 0 5px 80px;text-align:center">-->
+                            <!--                                        <i-button class="btnHoverRed" @click="resetProjectTypeModalShow()" v-if="permissionIdentity('manage_workspace_type')">Reset-->
+                            <!--                                            workspace type-->
+                            <!--                                        </i-button>-->
+                            <!--                                    </div>-->
+                            <!--                                </vue-scroll>-->
+                            <!--                            </div>-->
                         </Card>
                         <div v-else style="width: -webkit-fill-available;height: -webkit-fill-available;">
                             <iframe style="width: -webkit-fill-available;height: -webkit-fill-available;border-width:0"
@@ -1093,7 +1099,9 @@
 <script th:inline="javascript">
     var projectInfo = [[${projectInfo}]];
 </script>
-<script>
+<script type="module">
+    import * as userRoleJS from "/GeoProblemSolving/customize/userRole.js";
+
     var vm = new Vue(
         {
             el: "#projectDetailPage",
@@ -1162,7 +1170,7 @@
             },
             data() {
                 return {
-                    userRole:"visitor",
+                    userRole: "visitor",
                     ipPort: "/GeoProblemSolving",
                     tokenStr: '',
                     userInfo: {
@@ -1185,7 +1193,6 @@
                     editProjectModal: false,
                     projectEditForm: {
                         description: "",
-                        introduction: "",
                         name: "",
                         privacy: "",
                         editTags: ""
@@ -1258,12 +1265,12 @@
                         ]
                     },
                     emailAddStr:
-                    "<br>Please copy the url and access it to join us: <br>" +
-                    "http://" +
-                    window.location.host +
-                    "/GeoProblemSolving/join/" +
-                    projectInfo.aid +
-                    "/",
+                        "<br>Please copy the url and access it to join us: <br>" +
+                        "http://" +
+                        window.location.host +
+                        "/GeoProblemSolving/join/" +
+                        projectInfo.aid +
+                        "/",
                     prompt: [],
                     deleteMemberModel: false,
                     removeMemberName: "",
@@ -1349,391 +1356,6 @@
                     resetProjectTypeModel: false,
                     joinProjectNotice: false,
                     workPanels: [],
-                    // 权限的具体功能
-                    defaultPublic: {
-                        observe: {
-                            project_manager: null,
-                            subproject_manager: null,
-                            member: null,
-                            visitor: "All"
-                        },
-                        auto_join: {
-                            project_manager: null,
-                            subproject_manager: null,
-                            member: null,
-                            visitor: true
-                        },
-                        project_edit_info: {
-                            project_manager: true,
-                            subproject_manager: null,
-                            member: false,
-                            visitor: null
-                        },
-                        project_invite_member: {
-                            project_manager: true,
-                            subproject_manager: null,
-                            member: true,
-                            visitor: null
-                        },
-                        project_remove_member: {
-                            project_manager: true,
-                            subproject_manager: null,
-                            member: false,
-                            visitor: null
-                        },
-                        project_task_create: {
-                            project_manager: true,
-                            subproject_manager: null,
-                            member: true,
-                            visitor: null
-                        },
-                        project_task_manage: {
-                            project_manager: true,
-                            subproject_manager: null,
-                            member: "Yes, partly",
-                            visitor: null
-                        },
-                        project_resource_manage: {
-                            project_manager: true,
-                            subproject_manager: null,
-                            member: "Yes, partly",
-                            visitor: null
-                        },
-                        project_workspace_type_manage: {
-                            project_manager: true,
-                            subproject_manager: null,
-                            member: false,
-                            visitor: null
-                        },
-                        subprojects_manage: {
-                            project_manager: true,
-                            subproject_manager: null,
-                            member: "Yes, partly",
-                            visitor: null
-                        },
-                        subproject_edit_info: {
-                            project_manager: true,
-                            subproject_manager: true,
-                            member: false,
-                            visitor: null
-                        },
-                        subproject_invite_member: {
-                            project_manager: true,
-                            subproject_manager: true,
-                            member: true,
-                            visitor: null
-                        },
-                        subproject_remove_member: {
-                            project_manager: true,
-                            subproject_manager: true,
-                            member: false,
-                            visitor: null
-                        },
-                        subproject_task_create: {
-                            project_manager: true,
-                            subproject_manager: true,
-                            member: true,
-                            visitor: null
-                        },
-                        subproject_task_manage: {
-                            project_manager: true,
-                            subproject_manager: true,
-                            member: "Yes, partly",
-                            visitor: null
-                        },
-                        subproject_resource_manage: {
-                            project_manager: "Yes, partly",
-                            subproject_manager: true,
-                            member: "Yes, partly",
-                            visitor: null
-                        },
-                        subproject_workspace_type_manage: {
-                            project_manager: true,
-                            subproject_manager: true,
-                            member: false,
-                            visitor: null
-                        },
-                        activity_manage: {
-                            project_manager: true,
-                            subproject_manager: true,
-                            member: true,
-                            visitor: null
-                        },
-                        workspace_resource: {
-                            project_manager: "Yes",
-                            subproject_manager: true,
-                            member: "Yes, partly",
-                            visitor: null
-                        },
-                        workspace_tool: {
-                            project_manager: true,
-                            subproject_manager: true,
-                            member: true,
-                            visitor: null
-                        },
-                        workspace_edit: {
-                            project_manager: true,
-                            subproject_manager: true,
-                            member: true,
-                            visitor: null
-                        }
-                    },
-                    defaultPrivate: {
-                        observe: {
-                            project_manager: null,
-                            subproject_manager: null,
-                            member: null,
-                            visitor: "No"
-                        },
-                        auto_join: {
-                            project_manager: null,
-                            subproject_manager: null,
-                            member: null,
-                            visitor: null
-                        },
-                        project_edit_info: {
-                            project_manager: true,
-                            subproject_manager: null,
-                            member: false,
-                            visitor: null
-                        },
-                        project_invite_member: {
-                            project_manager: true,
-                            subproject_manager: null,
-                            member: false,
-                            visitor: null
-                        },
-                        project_remove_member: {
-                            project_manager: true,
-                            subproject_manager: null,
-                            member: false,
-                            visitor: null
-                        },
-                        project_task_create: {
-                            project_manager: true,
-                            subproject_manager: null,
-                            member: true,
-                            visitor: null
-                        },
-                        project_task_manage: {
-                            project_manager: true,
-                            subproject_manager: null,
-                            member: "Yes, partly",
-                            visitor: null
-                        },
-                        project_resource_manage: {
-                            project_manager: true,
-                            subproject_manager: null,
-                            member: "Yes, partly",
-                            visitor: null
-                        },
-                        project_workspace_type_manage: {
-                            project_manager: true,
-                            subproject_manager: null,
-                            member: false,
-                            visitor: null
-                        },
-                        subprojects_manage: {
-                            project_manager: true,
-                            subproject_manager: null,
-                            member: "Yes, partly",
-                            visitor: null
-                        },
-                        subproject_edit_info: {
-                            project_manager: false,
-                            subproject_manager: true,
-                            member: false,
-                            visitor: null
-                        },
-                        subproject_invite_member: {
-                            project_manager: false,
-                            subproject_manager: true,
-                            member: false,
-                            visitor: null
-                        },
-                        subproject_remove_member: {
-                            project_manager: false,
-                            subproject_manager: true,
-                            member: false,
-                            visitor: null
-                        },
-                        subproject_task_create: {
-                            project_manager: true,
-                            subproject_manager: true,
-                            member: true,
-                            visitor: null
-                        },
-                        subproject_task_manage: {
-                            project_manager: false,
-                            subproject_manager: true,
-                            member: "Yes, partly",
-                            visitor: null
-                        },
-                        subproject_resource_manage: {
-                            project_manager: "Yes, partly",
-                            subproject_manager: true,
-                            member: "Yes, partly",
-                            visitor: null
-                        },
-                        subproject_workspace_type_manage: {
-                            project_manager: true,
-                            subproject_manager: true,
-                            member: false,
-                            visitor: null
-                        },
-                        activity_manage: {
-                            project_manager: false,
-                            subproject_manager: true,
-                            member: false,
-                            visitor: null
-                        },
-                        workspace_resource: {
-                            project_manager: "Yes, partly",
-                            subproject_manager: true,
-                            member: "Yes, partly",
-                            visitor: null
-                        },
-                        workspace_tool: {
-                            project_manager: true,
-                            subproject_manager: true,
-                            member: true,
-                            visitor: null
-                        },
-                        workspace_edit: {
-                            project_manager: false,
-                            subproject_manager: true,
-                            member: false,
-                            visitor: null
-                        }
-                    },
-                    defaultDiscoverable: {
-                        observe: {
-                            project_manager: null,
-                            subproject_manager: null,
-                            member: null,
-                            visitor: "No"
-                        },
-                        auto_join: {
-                            project_manager: null,
-                            subproject_manager: null,
-                            member: null,
-                            visitor: null
-                        },
-                        project_edit_info: {
-                            project_manager: true,
-                            subproject_manager: null,
-                            member: false,
-                            visitor: null
-                        },
-                        project_invite_member: {
-                            project_manager: true,
-                            subproject_manager: null,
-                            member: false,
-                            visitor: null
-                        },
-                        project_remove_member: {
-                            project_manager: true,
-                            subproject_manager: null,
-                            member: false,
-                            visitor: null
-                        },
-                        project_task_create: {
-                            project_manager: true,
-                            subproject_manager: null,
-                            member: true,
-                            visitor: null
-                        },
-                        project_task_manage: {
-                            project_manager: true,
-                            subproject_manager: null,
-                            member: "Yes, partly",
-                            visitor: null
-                        },
-                        project_resource_manage: {
-                            project_manager: true,
-                            subproject_manager: null,
-                            member: "Yes, partly",
-                            visitor: null
-                        },
-                        project_workspace_type_manage: {
-                            project_manager: true,
-                            subproject_manager: null,
-                            member: false,
-                            visitor: null
-                        },
-                        subprojects_manage: {
-                            project_manager: true,
-                            subproject_manager: null,
-                            member: "Yes, partly",
-                            visitor: null
-                        },
-                        subproject_edit_info: {
-                            project_manager: false,
-                            subproject_manager: true,
-                            member: false,
-                            visitor: null
-                        },
-                        subproject_invite_member: {
-                            project_manager: false,
-                            subproject_manager: true,
-                            member: false,
-                            visitor: null
-                        },
-                        subproject_remove_member: {
-                            project_manager: false,
-                            subproject_manager: true,
-                            member: false,
-                            visitor: null
-                        },
-                        subproject_task_create: {
-                            project_manager: true,
-                            subproject_manager: true,
-                            member: true,
-                            visitor: null
-                        },
-                        subproject_task_manage: {
-                            project_manager: "Yes, partly",
-                            subproject_manager: true,
-                            member: "Yes, partly",
-                            visitor: null
-                        },
-                        subproject_resource_manage: {
-                            project_manager: "Yes, partly",
-                            subproject_manager: true,
-                            member: "Yes, partly",
-                            visitor: null
-                        },
-                        subproject_workspace_type_manage: {
-                            project_manager: false,
-                            subproject_manager: true,
-                            member: false,
-                            visitor: null
-                        },
-                        activity_manage: {
-                            project_manager: false,
-                            subproject_manager: true,
-                            member: false,
-                            visitor: null
-                        },
-                        workspace_resource: {
-                            project_manager: "Yes, partly",
-                            subproject_manager: true,
-                            member: "Yes, partly",
-                            visitor: null
-                        },
-                        workspace_tool: {
-                            project_manager: true,
-                            subproject_manager: true,
-                            member: true,
-                            visitor: null
-                        },
-                        workspace_edit: {
-                            project_manager: false,
-                            subproject_manager: true,
-                            member: false,
-                            visitor: null
-                        }
-                    }
                 }
             },
             watch: {
@@ -1750,6 +1372,9 @@
                 }
             },
             methods: {
+                permissionIdentity(operation) {
+                    return userRoleJS.permissionIdentity(this.projectInfo.permission, this.userRole, operation);
+                },
                 changeMenuByUrl() {
                     var content = this.getURLParameter("content");
                     if (content != null) {
@@ -1771,10 +1396,8 @@
                     if (this.projectInfo == {} || this.projectInfo == undefined) {
                         $.ajax({
                             url:
-                            "/GeoProblemSolving/project/inquiry" +
-                            "?key=projectId" +
-                            "&value=" +
-                            this.projectId,
+                                "/GeoProblemSolving/project/" +
+                                this.projectId,
                             type: "GET",
                             async: false,
                             success: data => {
@@ -1808,9 +1431,9 @@
                     }
                 },
                 roleIdentity() {
-                    let role = roleIdentify(this.projectInfo.members, this.userInfo.userId);
+                    let role = userRoleJS.roleIdentify(this.projectInfo.members, this.userInfo.userId);
 
-                    if(role == "visitor"){
+                    if (role == "visitor") {
                         if (this.userRole != 'Token') {
                             this.userRole = role;
                         }
@@ -1862,16 +1485,14 @@
                 gotoResource() {
                     if (this.userRole == "visitor") {
                         this.joinProjectNotice = true;
-                    }
-                    else {
+                    } else {
                         this.changeMenuItem("resources");
                     }
                 },
                 gotoWorking() {
                     if (this.userRole == "visitor") {
                         this.joinProjectNotice = true;
-                    }
-                    else {
+                    } else {
                         this.changeMenuItem("subProjects");
                     }
                 },
@@ -1903,8 +1524,7 @@
                     for (let i = 0; i < members.length; i++) {
                         if (i == 0) {
                             membersStr += members[i].userName;
-                        }
-                        else {
+                        } else {
                             membersStr += ',' + members[i].userName;
                         }
                     }
@@ -1914,7 +1534,6 @@
                     this.editProjectModal = true;
                     let editProjectInfo = this.projectInfo;
                     this.projectEditForm.name = editProjectInfo.name;
-                    this.projectEditForm.introduction = editProjectInfo.introduction;
                     this.projectEditForm.description = editProjectInfo.description;
                     this.projectEditForm.category = editProjectInfo.category;
                     this.projectEditForm.privacy = editProjectInfo.privacy;
@@ -1979,7 +1598,7 @@
                     this.$refs[form].validate(valid => {
                         if (valid) {
                             let form = {
-                                aid:this.projectInfo.aid,
+                                aid: this.projectInfo.aid,
                                 name: this.projectEditForm.name,
                                 category: this.projectEditForm.category,
                                 description: this.projectEditForm.description,
@@ -2151,12 +1770,11 @@
                 goPersonalPage(userId) {
                     if (userId == this.userInfo.userId) {
                         window.location.href = "/GeoProblemSolving/personalPage";
-                    }
-                    else {
+                    } else {
                         window.location.href = "/GeoProblemSolving/memberPage/" + userId;
                     }
                 },
-                modifyPermission(){
+                modifyPermission() {
                     window.location.href = "/GeoProblemSolving/project/" + this.projectInfo.aid + "/permission";
                 },
                 resetProjectTypeModalShow() {
@@ -2262,9 +1880,9 @@
                                 replyNotice["content"] = {
                                     title: "Subproject manager",
                                     description:
-                                    "You have already become the manager of subproject: " +
-                                    this.subProjectList[this.selectSubProjectIndex].title +
-                                    "."
+                                        "You have already become the manager of subproject: " +
+                                        this.subProjectList[this.selectSubProjectIndex].title +
+                                        "."
                                 };
                                 axios
                                     .post("/GeoProblemSolving/notice/save", replyNotice)
@@ -2379,79 +1997,79 @@
                         })
                 },
                 applyJoin(form) {
-                    this.$refs[form].validate(valid => {
-                        if (valid) {
-                            this.applyJoinSubProjectModal = false;
-                            var subProject = this.subProjectList[this.selectSubProjectIndex];
-                            let joinSubPForm = {};
-                            joinSubPForm["recipientId"] = subProject.managerId;
-                            joinSubPForm["type"] = "apply";
-                            let userDetail = this.userInfo;
-                            joinSubPForm["content"] = {
-                                userEmail: userDetail.email,
-                                userName: userDetail.userName,
-                                userId: userDetail.userId,
-                                title: "Group application",
-                                description:
-                                "User " +
-                                userDetail.userName +
-                                " apply to join in your subproject: " +
-                                subProject.name +
-                                " of project: " +
-                                this.projectInfo.name +
-                                " .",
-                                projectId: subProject.aid,
-                                projectTitle: subProject.title,
-                                scope: "subProject",
-                                approve: "unknow"
-                            };
-                            axios
-                                .post("/GeoProblemSolving/notice/save", joinSubPForm)
-                                .then(res => {
-                                    this.$Message.info("Apply Successfully");
-                                    this.sendNotice(subProject.managerId);
-                                })
-                                .catch(err => {
-                                    console.log("申请失败的原因是：" + err.data);
-                                });
-                            let joinSubProjectEmail = {};
-                            joinSubProjectEmail["recipient"] = subProject.managerId;
-                            joinSubProjectEmail["mailTitle"] = "Join sub project application";
-                            joinSubProjectEmail["mailContent"] =
-                                "User " +
-                                userDetail.userName +
-                                " apply to join in your subproject: " +
-                                subProject.title +
-                                " of project: " +
-                                this.projectInfo.name +
-                                " ." +
-                                " And you can access the subproject from this platform. " +
-                                "The url is " +
-                                "http://" +
-                                window.location.host +
-                                "/GeoProblemSolving/home";
-
-                            axios
-                                .post("/GeoProblemSolving/project/applyByMail", joinSubProjectEmail)
-                                .then(res => {
-                                    if (res.data == "Success") {
-                                        this.$Notice.success({
-                                            title: "Email send title",
-                                            desc:
-                                                "The join email has been sent,if he/she doesn't online,the email will remind the mamnager in time."
-                                        });
-                                    } else {
-                                        this.$Notice.error({
-                                            title: "Email send fail",
-                                            desc: "The invitation isn't be sent successfully."
-                                        });
-                                    }
-                                })
-                                .catch(err => {
-                                    console.log(err.data);
-                                });
-                        }
-                    });
+                    // this.$refs[form].validate(valid => {
+                    //     if (valid) {
+                    //         this.applyJoinSubProjectModal = false;
+                    //         var subProject = this.subProjectList[this.selectSubProjectIndex];
+                    //         let joinSubPForm = {};
+                    //         joinSubPForm["recipientId"] = subProject.managerId;
+                    //         joinSubPForm["type"] = "apply";
+                    //         let userDetail = this.userInfo;
+                    //         joinSubPForm["content"] = {
+                    //             userEmail: userDetail.email,
+                    //             userName: userDetail.userName,
+                    //             userId: userDetail.userId,
+                    //             title: "Group application",
+                    //             description:
+                    //             "User " +
+                    //             userDetail.userName +
+                    //             " apply to join in your subproject: " +
+                    //             subProject.name +
+                    //             " of project: " +
+                    //             this.projectInfo.name +
+                    //             " .",
+                    //             projectId: subProject.aid,
+                    //             projectTitle: subProject.name,
+                    //             scope: "subProject",
+                    //             approve: "unknow"
+                    //         };
+                    //         axios
+                    //             .post("/GeoProblemSolving/notice/save", joinSubPForm)
+                    //             .then(res => {
+                    //                 this.$Message.info("Apply Successfully");
+                    //                 this.sendNotice(subProject.managerId);
+                    //             })
+                    //             .catch(err => {
+                    //                 console.log("申请失败的原因是：" + err.data);
+                    //             });
+                    //         let joinSubProjectEmail = {};
+                    //         joinSubProjectEmail["recipient"] = subProject.managerId;
+                    //         joinSubProjectEmail["mailTitle"] = "Join sub project application";
+                    //         joinSubProjectEmail["mailContent"] =
+                    //             "User " +
+                    //             userDetail.userName +
+                    //             " apply to join in your subproject: " +
+                    //             subProject.title +
+                    //             " of project: " +
+                    //             this.projectInfo.name +
+                    //             " ." +
+                    //             " And you can access the subproject from this platform. " +
+                    //             "The url is " +
+                    //             "http://" +
+                    //             window.location.host +
+                    //             "/GeoProblemSolving/home";
+                    //
+                    //         axios
+                    //             .post("/GeoProblemSolving/project/applyByMail", joinSubProjectEmail)
+                    //             .then(res => {
+                    //                 if (res.data == "Success") {
+                    //                     this.$Notice.success({
+                    //                         title: "Email send title",
+                    //                         desc:
+                    //                             "The join email has been sent,if he/she doesn't online,the email will remind the mamnager in time."
+                    //                     });
+                    //                 } else {
+                    //                     this.$Notice.error({
+                    //                         title: "Email send fail",
+                    //                         desc: "The invitation isn't be sent successfully."
+                    //                     });
+                    //                 }
+                    //             })
+                    //             .catch(err => {
+                    //                 console.log(err.data);
+                    //             });
+                    //     }
+                    // });
                 },
                 goSubProjectPage(subProject) {
                     // if(this.projectInfo.permission != undefined
@@ -2479,16 +2097,16 @@
                     if (this.userInfo.userState) {
                         this.applyProjectInfo = Object.assign([], this.projectInfo);
 
-                        if( this.applyProjectInfo.permission != undefined && this.applyProjectInfo.permission.auto_join.visitor) {
+                        if (this.applyProjectInfo.permission != undefined && this.applyProjectInfo.permission.auto_join.visitor) {
 
                             // join the project directly
                             axios
-                                .get("/GeoProblemSolving/project/join?"+"projectId="+  this.applyProjectInfo.projectId+"&userId=" +this.userInfo.userId)
+                                .get("/GeoProblemSolving/project/join?" + "projectId=" + this.applyProjectInfo.projectId + "&userId=" + this.userInfo.userId)
                                 .then(res => {
                                     if (res.data === "Success") {
                                         this.$Message.info("Join the project successfuly");
 
-                                        window.location.href="/GeoProblemSolving/projectDetail/" + this.applyProjectInfo.projectId;
+                                        window.location.href = "/GeoProblemSolving/projectDetail/" + this.applyProjectInfo.projectId;
                                     } else if (res.data === "Fail") {
                                         this.$Message.info("Fail to join in this project");
                                     }
@@ -2496,8 +2114,7 @@
                                 .catch(err => {
                                     console.log(err.data);
                                 });
-                        }
-                        else {
+                        } else {
                             this.applyValidate.reason = "";
                             this.applyJoinModal = true;
                         }
@@ -2530,13 +2147,13 @@
                                     userId: this.userInfo.userId,
                                     title: "Group application",
                                     description:
-                                    "User " +
-                                    this.userInfo.userName +
-                                    " apply to join your project: " +
-                                    data.title +
-                                    " ." +
-                                    " The reason for application is: " +
-                                    this.applyValidate.reason,
+                                        "User " +
+                                        this.userInfo.userName +
+                                        " apply to join your project: " +
+                                        data.title +
+                                        " ." +
+                                        " The reason for application is: " +
+                                        this.applyValidate.reason,
                                     projectId: data.projectId,
                                     projectTitle: data.title,
                                     scope: "project",
@@ -2567,12 +2184,12 @@
                                     recipient: joinForm.recipientId,
                                     mailTitle: "Group application",
                                     mailContent:
-                                    joinForm.content.description +
-                                    "<br>" +
-                                    "You can click this url and enter the site to process this application: " +
-                                    "http://" +
-                                    window.location.host +
-                                    "/GeoProblemSolving/home"
+                                        joinForm.content.description +
+                                        "<br>" +
+                                        "You can click this url and enter the site to process this application: " +
+                                        "http://" +
+                                        window.location.host +
+                                        "/GeoProblemSolving/home"
                                 };
                                 axios
                                     .post("/GeoProblemSolving/project/applyByMail", emailObject)
@@ -2618,22 +2235,6 @@
                     $(".jsPanel").css("position", "fixed");
                     this.workPanels.push(panel);
                 },
-                // encrypto(context) {
-                //     var key = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
-                //     var iv = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
-                //     var encrypted = "";
-                //     if (typeof context == "string") {
-                //     } else if (typeof context == "object") {
-                //         context = JSON.stringify(context);
-                //     }
-                //     var srcs = CryptoJS.enc.Utf8.parse(context);
-                //     encrypted = CryptoJS.AES.encrypt(srcs, key, {
-                //         iv: iv,
-                //         mode: CryptoJS.mode.CBC,
-                //         padding: CryptoJS.pad.Pkcs7
-                //     });
-                //     return encrypted.toString();
-                // },
             }
         }
     );

@@ -2,94 +2,93 @@
  * User roles and permissions
  */
 
-var permission = {};
 var defaultPermission = {
     observe: {
-        "leader": null,
+        "manager": null,
         "coreteam": null,
         "widerteam": null,
         "visitor": "No"
     },
     auto_join: {
-        "leader": null,
+        "manager": null,
         "coreteam": null,
         "widerteam": null,
         "visitor": "No"
     },
     edit_info: {
-        "leader": true,
+        "manager": true,
         "coreteam": true,
         "widerteam": false,
         "visitor": null
     },
     invite_member: {
-        "leader": true,
+        "manager": true,
         "coreteam": true,
         "widerteam": true,
         "visitor": null
     },
     manage_member: {
-        "leader": true,
+        "manager": true,
         "coreteam": false,
         "widerteam": false,
         "visitor": null
     },
     create_task: {
-        "leader": true,
+        "manager": true,
         "coreteam": false,
         "widerteam": false,
         "visitor": null
     },
     manage_task: {
-        "leader": true,
+        "manager": true,
         "coreteam": false,
         "widerteam": false,
         "visitor": null
     },
     upload_resource: {
-        "leader": true,
+        "manager": true,
         "coreteam": true,
         "widerteam": true,
         "visitor": null
     },
     use_resource: {
-        "leader": true,
+        "manager": true,
         "coreteam": true,
         "widerteam": true,
         "visitor": null
     },
     manage_resource: {
-        "leader": true,
+        "manager": true,
         "coreteam": false,
         "widerteam": false,
         "visitor": null
     },
     manage_workspace_type: {
-        "leader": true,
+        "manager": true,
         "coreteam": false,
         "widerteam": false,
         "visitor": null
     },
     import_tool: {
-        "leader": true,
+        "manager": true,
         "coreteam": true,
         "widerteam": false,
         "visitor": null
     },
     use_tool: {
-        "leader": true,
+        "manager": true,
         "coreteam": true,
         "widerteam": true,
         "visitor": null
     },
     manage_tool: {
-        "leader": true,
+        "manager": true,
         "coreteam": false,
         "widerteam": false,
         "visitor": null
     },
     manage_child_activity: {
-        "leader": true,
+        "manager": true,
         "coreteam": false,
         "widerteam": false,
         "visitor": null
@@ -114,7 +113,7 @@ function roleLevelIdentify(role) {
     switch (role) {
         case "manager":
         case "creator": {
-            roleLevel = "leader";
+            roleLevel = "manager";
         };
         case "researcher":
         case "expert":
@@ -135,179 +134,182 @@ function roleLevelIdentify(role) {
 
 // Get default permission
 function getDefault() {
-    permission = defaultPermission;
+    var permission = defaultPermission;
     return permission;
 }
 
-// Set current permission
-function setPermission(currentPermission) {
-    permission = currentPermission;
-}
-
 // Permission: from Json to Array
-function permissionJson2Array() {
-    if (permission == {})
+function permissionJson2Array(currentPermission) {
+
+    var permission = {};
+    if (currentPermission == undefined || currentPermission == {})
         permission = defaultPermission;
+    else
+        permission = currentPermission;
 
     var permissionArray = [];
     if (permission.observe != undefined) {
         var row = {
             operation: "Learn more about the activity",
-            leader: permission.observe.leader,
+            manager: permission.observe.manager,
             coreteam: permission.observe.coreteam,
             widerteam: permission.observe.widerteam,
             visitor: permission.observe.visitor
         };
-        permissionList.push(row);
+        permissionArray.push(row);
     }
-    if (
-        permission.auto_join != undefined &&
-        privacy == "Public"
-    ) {
+    if (permission.auto_join != undefined) {
         var row = {
             operation: "Join the activity automatically",
-            leader: permission.auto_join.leader,
+            manager: permission.auto_join.manager,
             coreteam: permission.auto_join.coreteam,
             widerteam: permission.auto_join.widerteam,
             visitor: permission.auto_join.visitor
         };
-        permissionList.push(row);
+        permissionArray.push(row);
     }
     if (permission.edit_info != undefined) {
         var row = {
             operation: "Edit the information of the activity",
-            leader: permission.edit_info.leader,
+            manager: permission.edit_info.manager,
             coreteam: permission.edit_info.coreteam,
             widerteam: permission.edit_info.widerteam,
             visitor: permission.edit_info.visitor
         };
-        permissionList.push(row);
+        permissionArray.push(row);
     }
     if (permission.invite_member != undefined) {
         var row = {
-            operation: "Invite someone to join the activity",
-            leader: permission.invite_member.leader,
+            operation: "Invite other person to join the activity",
+            manager: permission.invite_member.manager,
             coreteam: permission.invite_member.coreteam,
             widerteam: permission.invite_member.widerteam,
             visitor: permission.invite_member.visitor
         };
-        permissionList.push(row);
+        permissionArray.push(row);
     }
     if (permission.manage_member != undefined) {
         var row = {
-            operation: "manage members",
-            leader: permission.manage_member.leader,
+            operation: "Manage members",
+            manager: permission.manage_member.manager,
             coreteam: permission.manage_member.coreteam,
             widerteam: permission.manage_member.widerteam,
             visitor: permission.manage_member.visitor
         };
-        permissionList.push(row);
+        permissionArray.push(row);
     }
     if (permission.create_task != undefined) {
         var row = {
             operation: "Create activity tasks",
-            leader: permission.create_task.leader,
+            manager: permission.create_task.manager,
             coreteam: permission.create_task.coreteam,
             widerteam: permission.create_task.widerteam,
             visitor: permission.create_task.visitor
         };
-        permissionList.push(row);
+        permissionArray.push(row);
     }
     if (permission.manage_task != undefined) {
         var row = {
             operation: "Manage activity tasks",
-            leader: permission.manage_task.leader,
+            manager: permission.manage_task.manager,
             coreteam: permission.manage_task.coreteam,
             widerteam: permission.manage_task.widerteam,
             visitor: permission.manage_task.visitor
         };
-        permissionList.push(row);
+        permissionArray.push(row);
     }
     if (permission.upload_resource != undefined) {
         var row = {
             operation: "Upload resources",
-            leader: permission.upload_resource.leader,
+            manager: permission.upload_resource.manager,
             coreteam: permission.upload_resource.coreteam,
             widerteam: permission.upload_resource.widerteam,
             visitor: permission.upload_resource.visitor
         };
-        permissionList.push(row);
+        permissionArray.push(row);
     }
     if (permission.use_resource != undefined) {
         var row = {
             operation: "Use resources",
-            leader: permission.use_resource.leader,
+            manager: permission.use_resource.manager,
             coreteam: permission.use_resource.coreteam,
             widerteam: permission.use_resource.widerteam,
             visitor: permission.use_resource.visitor
         };
-        permissionList.push(row);
+        permissionArray.push(row);
     }
     if (permission.manage_resource != undefined) {
         var row = {
             operation: "Manage resources",
-            leader: permission.manage_resource.leader,
+            manager: permission.manage_resource.manager,
             coreteam: permission.manage_resource.coreteam,
             widerteam: permission.manage_resource.widerteam,
             visitor: permission.manage_resource.visitor
         };
-        permissionList.push(row);
+        permissionArray.push(row);
     }
     if (permission.manage_workspace_type != undefined) {
         var row = {
             operation: "Switch the type of workspace",
-            leader: permission.manage_workspace_type.leader,
+            manager: permission.manage_workspace_type.manager,
             coreteam: permission.manage_workspace_type.coreteam,
             widerteam: permission.manage_workspace_type.widerteam,
             visitor: permission.manage_workspace_type.visitor
         };
-        permissionList.push(row);
+        permissionArray.push(row);
     }
     if (permission.import_tool != undefined) {
         var row = {
             operation: "Import tools or toolsets",
-            leader: permission.import_tool.leader,
+            manager: permission.import_tool.manager,
             coreteam: permission.import_tool.coreteam,
             widerteam: permission.import_tool.widerteam,
             visitor: permission.import_tool.visitor
         };
-        permissionList.push(row);
+        permissionArray.push(row);
     }
     if (permission.use_tool != undefined) {
         var row = {
             operation: "Use tools or toolsets",
-            leader: permission.use_tool.leader,
+            manager: permission.use_tool.manager,
             coreteam: permission.use_tool.coreteam,
             widerteam: permission.use_tool.widerteam,
             visitor: permission.use_tool.visitor
         };
-        permissionList.push(row);
+        permissionArray.push(row);
     }
     if (permission.manage_tool != undefined) {
         var row = {
             operation: "Manage tools or toolsets",
-            leader: permission.manage_tool.leader,
+            manager: permission.manage_tool.manager,
             coreteam: permission.manage_tool.coreteam,
             widerteam: permission.manage_tool.widerteam,
             visitor: permission.manage_tool.visitor
         };
-        permissionList.push(row);
+        permissionArray.push(row);
     }
     if (permission.manage_child_activity != undefined) {
         var row = {
             operation: "Manage child activity",
-            leader: permission.manage_child_activity.leader,
+            manager: permission.manage_child_activity.manager,
             coreteam: permission.manage_child_activity.coreteam,
             widerteam: permission.manage_child_activity.widerteam,
             visitor: permission.manage_child_activity.visitor
         };
-        permissionList.push(row);
+        permissionArray.push(row);
     }
     return permissionArray;
 }
 
+/**
+ * 判断权限
+ * @param {*} currentPermission
+ * @param {*} role
+ * @param {*} operation
+ */
 function permissionIdentity(currentPermission, role, operation) {
 
+    var permission = {};
     if (currentPermission == undefined || currentPermission == {}) {
         return false;
     }
@@ -318,8 +320,8 @@ function permissionIdentity(currentPermission, role, operation) {
     var roleLevel = roleLevelIdentify(role);
 
     if (operation === "edit_info") {
-        if (roleLevel == "leader") {
-            return permission.edit_info.leader;
+        if (roleLevel == "manager") {
+            return permission.edit_info.manager;
         } else if (roleLevel == "coreteam") {
             return permission.edit_info.coreteam;
         } else if (roleLevel == "widerteam") {
@@ -329,8 +331,8 @@ function permissionIdentity(currentPermission, role, operation) {
         }
     }
     else if (operation === "invite_member") {
-        if (roleLevel == "leader") {
-            return permission.invite_member.leader;
+        if (roleLevel == "manager") {
+            return permission.invite_member.manager;
         } else if (roleLevel == "coreteam") {
             return permission.invite_member.coreteam;
         } else if (roleLevel == "widerteam") {
@@ -340,8 +342,8 @@ function permissionIdentity(currentPermission, role, operation) {
         }
     }
     else if (operation === "manage_member") {
-        if (roleLevel == "leader") {
-            return permission.manage_member.leader;
+        if (roleLevel == "manager") {
+            return permission.manage_member.manager;
         } else if (roleLevel == "coreteam") {
             return permission.manage_member.coreteam;
         } else if (roleLevel == "widerteam") {
@@ -351,8 +353,8 @@ function permissionIdentity(currentPermission, role, operation) {
         }
     }
     else if (operation === "create_task") {
-        if (roleLevel == "leader") {
-            return permission.create_task.leader;
+        if (roleLevel == "manager") {
+            return permission.create_task.manager;
         } else if (roleLevel == "coreteam") {
             return permission.create_task.coreteam;
         } else if (roleLevel == "widerteam") {
@@ -362,8 +364,8 @@ function permissionIdentity(currentPermission, role, operation) {
         }
     }
     else if (operation === "manage_task") {
-        if (roleLevel == "leader") {
-            return permission.manage_task.leader;
+        if (roleLevel == "manager") {
+            return permission.manage_task.manager;
         } else if (roleLevel == "coreteam") {
             return permission.manage_task.coreteam;
         } else if (roleLevel == "widerteam") {
@@ -373,8 +375,8 @@ function permissionIdentity(currentPermission, role, operation) {
         }
     }
     else if (operation === "upload_resource") {
-        if (roleLevel == "leader") {
-            return permission.upload_resource.leader;
+        if (roleLevel == "manager") {
+            return permission.upload_resource.manager;
         } else if (roleLevel == "coreteam") {
             return permission.upload_resource.coreteam;
         } else if (roleLevel == "widerteam") {
@@ -384,8 +386,8 @@ function permissionIdentity(currentPermission, role, operation) {
         }
     }
     else if (operation === "use_resource") {
-        if (roleLevel == "leader") {
-            return permission.use_resource.leader;
+        if (roleLevel == "manager") {
+            return permission.use_resource.manager;
         } else if (roleLevel == "coreteam") {
             return permission.use_resource.coreteam;
         } else if (roleLevel == "widerteam") {
@@ -395,8 +397,8 @@ function permissionIdentity(currentPermission, role, operation) {
         }
     }
     else if (operation === "manage_resource") {
-        if (roleLevel == "leader") {
-            return permission.manage_resource.leader;
+        if (roleLevel == "manager") {
+            return permission.manage_resource.manager;
         } else if (roleLevel == "coreteam") {
             return permission.manage_resource.coreteam;
         } else if (roleLevel == "widerteam") {
@@ -406,8 +408,8 @@ function permissionIdentity(currentPermission, role, operation) {
         }
     }
     else if (operation === "manage_workspace_type") {
-        if (roleLevel == "leader") {
-            return permission.manage_workspace_type.leader;
+        if (roleLevel == "manager") {
+            return permission.manage_workspace_type.manager;
         } else if (roleLevel == "coreteam") {
             return permission.manage_workspace_type.coreteam;
         } else if (roleLevel == "widerteam") {
@@ -417,8 +419,8 @@ function permissionIdentity(currentPermission, role, operation) {
         }
     }
     else if (operation === "import_tool") {
-        if (roleLevel == "leader") {
-            return permission.import_tool.leader;
+        if (roleLevel == "manager") {
+            return permission.import_tool.manager;
         } else if (roleLevel == "coreteam") {
             return permission.import_tool.coreteam;
         } else if (roleLevel == "widerteam") {
@@ -428,8 +430,8 @@ function permissionIdentity(currentPermission, role, operation) {
         }
     }
     else if (operation === "use_tool") {
-        if (roleLevel == "leader") {
-            return permission.edit_info.leader;
+        if (roleLevel == "manager") {
+            return permission.edit_info.manager;
         } else if (roleLevel == "coreteam") {
             return permission.edit_info.coreteam;
         } else if (roleLevel == "widerteam") {
@@ -439,8 +441,8 @@ function permissionIdentity(currentPermission, role, operation) {
         }
     }
     else if (operation === "manage_tool") {
-        if (roleLevel == "leader") {
-            return permission.manage_tool.leader;
+        if (roleLevel == "manager") {
+            return permission.manage_tool.manager;
         } else if (roleLevel == "coreteam") {
             return permission.manage_tool.coreteam;
         } else if (roleLevel == "widerteam") {
@@ -450,8 +452,8 @@ function permissionIdentity(currentPermission, role, operation) {
         }
     }
     else if (operation === "manage_child_activity") {
-        if (roleLevel == "leader") {
-            return permission.manage_child_activity.leader;
+        if (roleLevel == "manager") {
+            return permission.manage_child_activity.manager;
         } else if (roleLevel == "coreteam") {
             return permission.manage_child_activity.coreteam;
         } else if (roleLevel == "widerteam") {
@@ -463,4 +465,4 @@ function permissionIdentity(currentPermission, role, operation) {
 }
 
 
-export { roleIdentify, getDefault, setPermission, permissionJson2Array, permissionIdentity }
+export { roleIdentify, getDefault, permissionJson2Array, permissionIdentity }

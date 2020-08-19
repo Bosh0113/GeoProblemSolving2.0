@@ -70,7 +70,7 @@
 <body>
 <template id="tabContent" th:fragment="tab-card">
     <div>
-        <div v-if="v-if="projectList!=undefined && projectList.length > 0"">
+        <div v-if="projectList!=undefined && projectList.length > 0">
             <div class="projectCard" v-for="(item,index) in projectList" :key="item.index"
                  style="width:95%;margin-right:5%">
                 <i-col :xs="{ span: 5, offset: 1 }"
@@ -317,7 +317,7 @@
                     this.applyProjectInfo = Object.assign([], applyProjectInfo);
                     this.applyValidate.reason = "";
                     if (this.applyProjectInfo.privacy == "Public") {
-                        if (this.applyProjectInfo.permissionManager != undefined && this.applyProjectInfo.permissionManager.auto_join.visitor) {
+                        if (this.applyProjectInfo.permission != undefined && this.applyProjectInfo.permission.auto_join.visitor) {
 
                             // join the project directly
                             axios
