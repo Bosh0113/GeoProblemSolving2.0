@@ -321,6 +321,9 @@ public class UpdateDBDao {
                 Query query = new Query(Criteria.where("resourceId").is(resourceEntity.getResourceId()));
                 Update update = new Update();
                 update.set("pathURL",resourceEntity.getPathURL().replaceAll("GeoProblemSolving","PExploration"));
+                try {
+                    update.set("thumbnail",resourceEntity.getThumbnail().replaceAll("GeoProblemSolving","PExploration"));
+                }catch (Exception ignored){}
                 mongoTemplate.updateFirst(query,update,ResourceEntity.class);
             }
 
@@ -333,6 +336,11 @@ public class UpdateDBDao {
                     String oldURL = resourceEntity.getPathURL();
                     String newURL = oldURL.replaceAll("GeoProblemSolving","PExploration");
                     resourceEntity.setPathURL(newURL);
+                    try {
+                        String oldThumbnail = resourceEntity.getThumbnail();
+                        String newThumbnail = oldThumbnail.replaceAll("GeoProblemSolving","PExploration");
+                        resourceEntity.setThumbnail(newThumbnail);
+                    }catch (Exception ignored){}
                     resourceEntities2.add(resourceEntity);
                 }
                 Update update = new Update();
