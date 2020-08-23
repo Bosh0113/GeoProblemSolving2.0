@@ -1,4 +1,4 @@
-package cn.edu.njnu.geoproblemsolving.Utils;
+package cn.edu.njnu.geoproblemsolving.utils;
 
 import cn.edu.njnu.geoproblemsolving.Entity.ModelTools.CModel.support.JsonResult;
 import cn.edu.njnu.geoproblemsolving.Enums.ResultEnum;

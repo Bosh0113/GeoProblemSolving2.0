@@ -1,7 +1,7 @@
 package cn.edu.njnu.geoproblemsolving.Exception;
 
 import cn.edu.njnu.geoproblemsolving.Entity.ModelTools.CModel.support.JsonResult;
-import cn.edu.njnu.geoproblemsolving.Utils.ResultUtils;
+import cn.edu.njnu.geoproblemsolving.common.utils.ResultUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
