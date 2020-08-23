@@ -1,4 +1,4 @@
-package cn.edu.njnu.geoproblemsolving.utils;
+package cn.edu.njnu.geoproblemsolving.common.utils;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;

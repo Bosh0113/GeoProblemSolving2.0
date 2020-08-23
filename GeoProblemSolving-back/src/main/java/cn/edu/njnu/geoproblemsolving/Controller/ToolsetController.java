@@ -1,10 +1,10 @@
 package cn.edu.njnu.geoproblemsolving.Controller;
 
-import cn.edu.njnu.geoproblemsolving.domain.tool.ToolsetDaoImpl;
+import cn.edu.njnu.geoproblemsolving.business.tool.ToolsetDaoImpl;
 
 import cn.edu.njnu.geoproblemsolving.Entity.ToolReq.AddToolReq;
 import cn.edu.njnu.geoproblemsolving.Entity.ToolReq.UpdateToolListReq;
-import cn.edu.njnu.geoproblemsolving.domain.tool.ToolsetEntity;
+import cn.edu.njnu.geoproblemsolving.business.tool.ToolsetEntity;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.web.bind.annotation.*;
 

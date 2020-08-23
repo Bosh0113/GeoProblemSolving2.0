@@ -504,7 +504,7 @@
                     this.projectSocket = null;
                 }
 
-                let roomId = this.projectInfo.projectId + "task";
+                let roomId = this.projectInfo.aid + "task";
                 var projectSocketURL = "ws://" + window.location.host + "/GeoProblemSolving/Module/" + roomId;
                 if (window.location.host == "localhost:8080") {
                     projectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + roomId;
@@ -594,7 +594,7 @@
                         taskForm["creatorName"] = this.userInfo.userName;
                         taskForm["managerName"] = this.userInfo.userName;
                         taskForm["importance"] = this.formValidate.importanceCheck ? 1 : 0;
-                        taskForm["subProjectId"] = this.projectInfo.projectId;  //此处subProjectId是由于后台当初设计只考虑设在子项目，此处当作scopeId使用即可。
+                        taskForm["subProjectId"] = this.projectInfo.aid;  //此处subProjectId是由于后台当初设计只考虑设在子项目，此处当作scopeId使用即可。
                         taskForm["state"] = "todo";
                         taskForm["order"] = this.taskTodo.length;
                         axios
@@ -780,7 +780,7 @@
                     .get(
                         "/GeoProblemSolving/task/inquiryTodo?" +
                         "subProjectId=" +
-                        this.projectInfo.projectId
+                        this.projectInfo.aid
                     )
                     .then(res => {
                         // this.todoLoading=false;
@@ -801,7 +801,7 @@
                     .get(
                         "/GeoProblemSolving/task/inquiryDoing?" +
                         "subProjectId=" +
-                        this.projectInfo.projectId
+                        this.projectInfo.aid
                     )
                     .then(res => {
                         // this.doingLoading=false;
@@ -822,7 +822,7 @@
                     .get(
                         "/GeoProblemSolving/task/inquiryDone?" +
                         "subProjectId=" +
-                        this.projectInfo.projectId
+                        this.projectInfo.aid
                     )
                     .then(res => {
                         // this.doneLoading=false;
@@ -964,7 +964,7 @@
                 }
             },
             permissionIdentity(operation) {
-                return userRoleJS.permissionIdentity(this.projectInfo.permission, this.userRole, operation);
+                return userRoleJS.permissionIdentity(JSON.parse(this.projectInfo.permission), this.userRole, operation);
             },
             taskItemDraggable() {
                 if (this.userRole == 'Manager' || this.userRole == 'PManager' || this.userRole == 'Member') {

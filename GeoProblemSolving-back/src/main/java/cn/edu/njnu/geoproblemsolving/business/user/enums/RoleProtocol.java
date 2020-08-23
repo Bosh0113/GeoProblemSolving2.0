@@ -1,4 +1,4 @@
-package cn.edu.njnu.geoproblemsolving.domain.user.enums;
+package cn.edu.njnu.geoproblemsolving.business.user.enums;
 
 import lombok.Getter;
 

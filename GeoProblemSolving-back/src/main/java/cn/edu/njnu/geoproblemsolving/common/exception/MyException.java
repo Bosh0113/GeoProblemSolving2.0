@@ -1,7 +1,7 @@
-package cn.edu.njnu.geoproblemsolving.Exception;
+package cn.edu.njnu.geoproblemsolving.common.exception;
 
 
-import cn.edu.njnu.geoproblemsolving.Enums.ResultEnum;
+import cn.edu.njnu.geoproblemsolving.common.enums.ResultEnum;
 
 /**
  * @ClassName MyException

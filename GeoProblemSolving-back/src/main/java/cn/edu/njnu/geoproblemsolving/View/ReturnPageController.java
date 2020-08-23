@@ -1,16 +1,15 @@
 package cn.edu.njnu.geoproblemsolving.View;
 
-import cn.edu.njnu.geoproblemsolving.domain.activity.Project;
-import cn.edu.njnu.geoproblemsolving.domain.activity.service.ProjectService;
+import cn.edu.njnu.geoproblemsolving.Entity.ModelTools.CModel.support.JsonResult;
+import cn.edu.njnu.geoproblemsolving.business.activity.entity.Project;
+import cn.edu.njnu.geoproblemsolving.business.activity.service.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
 
@@ -32,9 +31,9 @@ public class ReturnPageController {
         String servicePath = getServicePath();
         File file = new File(servicePath+"/staticPage/project/"+aid+".html");
         if(!file.exists()){//不存在静态文件则生成
-            Project project = projectService.findProject(aid);
-            if(project != null) {
-                staticPagesBuilder.projectDetailPageBuilder(project);
+            JsonResult project = projectService.findProject(aid);
+            if(project.getCode() == 0) {
+                staticPagesBuilder.projectDetailPageBuilder((Project) project.getData());
             }
         }
         return "/staticPage/project/"+aid+".html";

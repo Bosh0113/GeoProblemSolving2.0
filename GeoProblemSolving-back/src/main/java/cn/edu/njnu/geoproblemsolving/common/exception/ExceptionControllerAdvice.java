@@ -1,4 +1,4 @@
-package cn.edu.njnu.geoproblemsolving.Exception;
+package cn.edu.njnu.geoproblemsolving.common.exception;
 
 import cn.edu.njnu.geoproblemsolving.Entity.ModelTools.CModel.support.JsonResult;
 import cn.edu.njnu.geoproblemsolving.common.utils.ResultUtils;

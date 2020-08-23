@@ -1,6 +1,6 @@
-package cn.edu.njnu.geoproblemsolving.domain.user;
+package cn.edu.njnu.geoproblemsolving.business.user.entity;
 
-import cn.edu.njnu.geoproblemsolving.domain.user.enums.UserTitle;
+import cn.edu.njnu.geoproblemsolving.business.user.enums.UserTitle;
 import lombok.Data;
 import org.springframework.data.mongodb.core.mapping.Document;
 

@@ -1,9 +1,9 @@
-package cn.edu.njnu.geoproblemsolving.domain.tool;
+package cn.edu.njnu.geoproblemsolving.business.tool;
 
-import cn.edu.njnu.geoproblemsolving.Enums.ResultEnum;
-import cn.edu.njnu.geoproblemsolving.Exception.MyException;
-import cn.edu.njnu.geoproblemsolving.domain.tool.dto.AddToolEntityDTO;
-import cn.edu.njnu.geoproblemsolving.domain.tool.dto.UpdateToolEntityDTO;
+import cn.edu.njnu.geoproblemsolving.common.enums.ResultEnum;
+import cn.edu.njnu.geoproblemsolving.common.exception.MyException;
+import cn.edu.njnu.geoproblemsolving.business.tool.dto.AddToolEntityDTO;
+import cn.edu.njnu.geoproblemsolving.business.tool.dto.UpdateToolEntityDTO;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;

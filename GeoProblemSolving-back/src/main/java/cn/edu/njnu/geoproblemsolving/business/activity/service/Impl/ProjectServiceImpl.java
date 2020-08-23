@@ -1,13 +1,15 @@
-package cn.edu.njnu.geoproblemsolving.domain.activity.service.Impl;
+package cn.edu.njnu.geoproblemsolving.business.activity.service.Impl;
 
 import cn.edu.njnu.geoproblemsolving.Dao.Email.EmailDaoImpl;
 import cn.edu.njnu.geoproblemsolving.Dao.Folder.FolderDaoImpl;
-import cn.edu.njnu.geoproblemsolving.domain.activity.Project;
+import cn.edu.njnu.geoproblemsolving.Entity.ModelTools.CModel.support.JsonResult;
+import cn.edu.njnu.geoproblemsolving.business.activity.entity.Project;
 import cn.edu.njnu.geoproblemsolving.Entity.EmailEntity;
-import cn.edu.njnu.geoproblemsolving.domain.user.User;
-import cn.edu.njnu.geoproblemsolving.domain.activity.repository.ProjectRepository;
-import cn.edu.njnu.geoproblemsolving.domain.activity.service.ProjectService;
-import cn.edu.njnu.geoproblemsolving.domain.user.repository.UserRepository;
+import cn.edu.njnu.geoproblemsolving.business.user.entity.User;
+import cn.edu.njnu.geoproblemsolving.business.activity.repository.ProjectRepository;
+import cn.edu.njnu.geoproblemsolving.business.activity.service.ProjectService;
+import cn.edu.njnu.geoproblemsolving.business.user.repository.UserRepository;
+import cn.edu.njnu.geoproblemsolving.common.utils.ResultUtils;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.data.domain.PageRequest;
@@ -42,14 +44,14 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Project findProject(String aid){
+    public JsonResult findProject(String aid){
         Optional optional =  projectRepository.findById(aid);
 
         if (optional.isPresent()) {
             Object project = optional.get();
-            return (Project) project;
+            return ResultUtils.success(project);
         } else {
-            return null;
+            return ResultUtils.error(-1,"None");
         }
     }
 
@@ -60,39 +62,57 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Object inquiryByConditions(String category, String tag, String keyword, String userId, int page, int size) {
+    public JsonResult inquiryByConditions(String category, String tag, String keyword, String userId, int page, int size) {
         try {
             Sort sort = new Sort(Sort.Direction.DESC, "createdTime");
             Pageable pageable = PageRequest.of(page-1, size, sort);
 
             List<Project> projects = new ArrayList<>();
-            if(userId.equals("")){
-                if (category.equals("All")) {
-                    projects = projectRepository.findProjectsByPrivacyIsNotOrTagContainingOrNameLikeOrDescriptionLike("Private", tag, keyword, keyword, pageable).getContent();
-                } else {
-                    projects = projectRepository.findProjectsByPrivacyIsNotAndCategoryEqualsOrTagContainingOrNameLikeOrDescriptionLike("Private", category, tag, keyword, keyword, pageable).getContent();
+            if(!keyword.equals("")){
+                if(userId.equals("")){
+                    if (category.equals("All")) {
+                        projects = projectRepository.findProjectsByPrivacyIsNot("Private", pageable).getContent();
+                    } else {
+                        if(tag.equals("")){
+                            projects = projectRepository.findProjectsByPrivacyIsNotAndCategoryEquals("Private", category, pageable).getContent();
+                        } else {
+                            projects = projectRepository.findProjectsByPrivacyIsNotAndCategoryEqualsAndTagContaining("Private", category, tag, pageable).getContent();
+                        }
+                    }
+                }
+                else {
+                    if (category.equals("All")) {
+                        projects = projectRepository.findProjectsByPrivacyIsAndCreatorIsOrPrivacyIsNot("Private", userId,"Private", pageable).getContent();
+                    } else {
+                        if(tag.equals("")){
+                            projects = projectRepository.findProjectsByPrivacyIsAndCreatorIsOrPrivacyIsNotAndCategoryEquals("Private", userId, "Private", category, pageable).getContent();
+                        } else {
+                            projects = projectRepository.findProjectsByPrivacyIsAndCreatorIsOrPrivacyIsNotAndCategoryEqualsAndTagContaining("Private", userId, "Private", category, tag, pageable).getContent();
+                        }
+                    }
+                }
+            } else {
+                if(userId.equals("")){
+                    projects = projectRepository.findProjectsByNameLikeOrDescriptionLikeAndPrivacyIsNot(keyword, keyword, "Private", pageable).getContent();
+                }
+                else {
+                    projects = projectRepository.findProjectsByNameLikeOrDescriptionLikeAndPrivacyIsAndCreatorIsOrPrivacyIsNot(keyword, keyword, "Private", userId,"Private", pageable).getContent();
                 }
             }
-            else {
-                if (category.equals("All")) {
-                    projects = projectRepository.findProjectsByPrivacyIsAndCreatorIsOrPrivacyIsNotOrTagContainingOrNameLikeOrDescriptionLike("Private", userId,"Private", tag, keyword, keyword, pageable).getContent();
-                } else {
-                    projects = projectRepository.findProjectsByPrivacyIsAndCreatorIsOrPrivacyIsNotAndCategoryEqualsOrTagContainingOrNameLikeOrDescriptionLike("Private", userId, "Private", category, tag, keyword, keyword, pageable).getContent();
-                }
-            }
+
 
             if (projects.isEmpty())
-                return "None";
+                return ResultUtils.error(-1,"None");
             else
-                return projects;
+                return ResultUtils.success(projects);
 
         } catch (Exception ex) {
-            return "Fail: Exception";
+            return ResultUtils.error(-2,"Fail: Exception");
         }
     }
 
     @Override
-    public Object createProject(Project project) {
+    public JsonResult createProject(Project project) {
         try {
             /**
              * Save project info
@@ -128,7 +148,7 @@ public class ProjectServiceImpl implements ProjectService {
              */
             // Update user information
             User user = findByUserId(creator.getString("userId"));
-            if (user == null) return "Fail";
+            if (user == null) return ResultUtils.error(-1,"Fail: user does not exist");
 
             ArrayList<String> managedProjects = new ArrayList<>();
             managedProjects.add(projectId);
@@ -141,33 +161,34 @@ public class ProjectServiceImpl implements ProjectService {
             projectRepository.save(project);
             userRepository.save(user);
 
-            return project;
+            return ResultUtils.success(project);
         } catch (Exception ex) {
-            return "Fail: Exception";
+            return ResultUtils.error(-2,"Fail: Exception");
         }
     }
 
-    public Object updateProject(Project project) {
+    public JsonResult updateProject(Project project) {
         try {
             String aid = project.getAid();
             if (aid.isEmpty()) {
-                return "Fail: no aid";
+                return ResultUtils.error(-1,"Fail: no aid");
             } else if (!projectRepository.existsById(aid)) {
-                return "Fail: no this project";
+                return ResultUtils.error(-1,"Fail: no this project");
             }
             projectRepository.save(project);
-            return project;
+
+            return ResultUtils.success(project);
         } catch (Exception ex) {
-            return "Fail: exception";
+            return ResultUtils.error(-2,"Fail: Exception");
         }
     }
 
     @Override
-    public String deleteProject(String aid) {
+    public JsonResult deleteProject(String aid) {
         try {
             // Update user information
             Optional optional = projectRepository.findById(aid);
-            if (!optional.isPresent()) return "Fail: does not exist";
+            if (!optional.isPresent()) return ResultUtils.error(-1,"Fail: does not exist");
             Project project = (Project) optional.get();
 
             // joined project
@@ -182,7 +203,7 @@ public class ProjectServiceImpl implements ProjectService {
             // created project
             String userId = project.getCreator();
             User user = findByUserId(userId);
-            if (user == null) return "Fail: user does not exist";
+            if (user == null) return ResultUtils.error(-1,"Fail: user does not exist");
             ArrayList<String> projectIds = user.getManageProjects();
             projectIds.removeIf(projectId -> projectId.equals(aid));
             user.setManageProjects(projectIds);
@@ -191,16 +212,17 @@ public class ProjectServiceImpl implements ProjectService {
             // delete project
             projectRepository.deleteById(aid);
 
-            return "Success";
+            return ResultUtils.success("Success");
+
         } catch (Exception ex) {
-            return "Fail";
+            return ResultUtils.error(-2,"Fail: Exception");
         }
     }
 
-    public Object findParticipants(String aid) {
+    public JsonResult findParticipants(String aid) {
         try {
             Optional optional = projectRepository.findById(aid);
-            if (!optional.isPresent()) return "Fail";
+            if (!optional.isPresent()) return ResultUtils.error(-1,"Fail: project does not exist");
             Project project = (Project) optional.get();
 
             JSONObject participants = new JSONObject();
@@ -222,20 +244,20 @@ public class ProjectServiceImpl implements ProjectService {
             }
             participants.put("members", memberinfos);
 
-            return participants;
+            return ResultUtils.success(participants);
         } catch (Exception ex) {
-            return "Fail";
+            return ResultUtils.error(-2,"Fail: Exception");
         }
     }
 
     @Override
-    public Object joinProject(String aid, String userId) {
+    public JsonResult joinProject(String aid, String userId) {
         try {
             User user = findByUserId(userId);
-            if (user == null) return "Fail: user does not exist";
+            if (user == null) return ResultUtils.error(-1,"Fail: user does not exist");
 
             Optional optional = projectRepository.findById(aid);
-            if (!optional.isPresent()) return "Fail: project does not exist";
+            if (!optional.isPresent()) return ResultUtils.error(-1,"Fail: project does not exist");
             Project project = (Project) optional.get();
 
             // add user info to project
@@ -244,7 +266,7 @@ public class ProjectServiceImpl implements ProjectService {
             for (Object member : members) {
                 if (member instanceof JSONObject) {
                     if (((JSONObject) member).get("userId").equals(userId)) {
-                        return "Exist";
+                        return ResultUtils.error(-3,"Fail: member already exists in the project");
                     }
                 }
             }
@@ -260,7 +282,7 @@ public class ProjectServiceImpl implements ProjectService {
             ArrayList<String> joinedProjects = user.getJoinedProjects();
             for (String projectId : joinedProjects) {
                 if (projectId.equals(aid))
-                    return "Exist";
+                    return ResultUtils.error(-3,"Fail: project already exists in personal joined projects");
             }
 
             joinedProjects.add(aid);
@@ -270,20 +292,20 @@ public class ProjectServiceImpl implements ProjectService {
             projectRepository.save(project);
             userRepository.save(user);
 
-            return project;
+            return ResultUtils.success(project);
         } catch (Exception ex) {
-            return "Fail";
+            return ResultUtils.error(-2,"Fail: Exception");
         }
     }
 
-    public Object updateMemberRole(String aid, String userId, String role) {
+    public JsonResult updateMemberRole(String aid, String userId, String role) {
         try {
             // check
             User user = findByUserId(userId);
-            if (user == null) return "Fail: user does not exist";
+            if (user == null) return ResultUtils.error(-1,"Fail: user does not exist");
 
             Optional optional = projectRepository.findById(aid);
-            if (!optional.isPresent()) return "Fail: project does not exist";
+            if (!optional.isPresent()) return ResultUtils.error(-1,"Fail: project does not exist");
             Project project = (Project) optional.get();
 
             // Update roles
@@ -301,21 +323,21 @@ public class ProjectServiceImpl implements ProjectService {
             project.setMembers(members);
             projectRepository.save(project);
 
-            return project;
+            return ResultUtils.success(project);
         } catch (Exception ex) {
-            return "Fail: Exception";
+            return ResultUtils.error(-2,"Fail: Exception");
         }
     }
 
     @Override
-    public Object quitProject(String aid, String userId) {
+    public JsonResult quitProject(String aid, String userId) {
         try {
             // check
             User user = findByUserId(userId);
-            if (user == null) return "Fail: user does not exist";
+            if (user == null) return ResultUtils.error(-1,"Fail: user does not exist");
 
             Optional optional = projectRepository.findById(aid);
-            if (!optional.isPresent()) return "Fail: project does not exist";
+            if (!optional.isPresent()) return ResultUtils.error(-1,"Fail: project does not exist");
             Project project = (Project) optional.get();
 
             // remove the user from the project
@@ -341,13 +363,13 @@ public class ProjectServiceImpl implements ProjectService {
             projectRepository.save(project);
             userRepository.save(user);
 
-            return "Success";
+            return ResultUtils.success("Success");
         } catch (Exception ex) {
-            return "Fail";
+            return ResultUtils.error(-2,"Fail: Exception");
         }
     }
 
-    public Object invitedParticipants(String aid, String email, String password) {
+    public JsonResult invitedParticipants(String aid, String email, String password) {
         try {
             User user = userRepository.findByEmail(email);
             if (user == null) {
@@ -361,19 +383,19 @@ public class ProjectServiceImpl implements ProjectService {
                 if (user.getPassword().equals(password)) {
                     return joinProject(aid, user.getUserId());
                 } else {
-                    return "Fail: Wrong password";
+                    return ResultUtils.error(-2,"Fail: Wrong password");
                 }
             }
         } catch (Exception ex) {
-            return "Fail: Exception";
+            return ResultUtils.error(-2,"Fail: Exception");
         }
     }
 
-    public String applyJoinProject(String aid, EmailEntity emailEntity) {
+    public JsonResult applyJoinProject(String aid, EmailEntity emailEntity) {
         try {
             // check
             Optional optional = projectRepository.findById(aid);
-            if (!optional.isPresent()) return "Fail: project does not exist";
+            if (!optional.isPresent()) return ResultUtils.error(-1,"Fail: project does not exist");
             Project project = (Project) optional.get();
 
             String addresses = "";
@@ -384,7 +406,7 @@ public class ProjectServiceImpl implements ProjectService {
                         String userId = ((JSONObject) member).getString("userId");
 
                         User user = findByUserId(userId);
-                        if (user == null) return "Fail: user does not exist";
+                        if (user == null) return ResultUtils.error(-1,"Fail: user does not exist");
                         addresses += user.getEmail();
                         addresses += ",";
                     }
@@ -394,9 +416,9 @@ public class ProjectServiceImpl implements ProjectService {
             EmailDaoImpl emailDao = new EmailDaoImpl();
             emailDao.sendEmail(emailEntity);
 
-            return "Success";
+            return ResultUtils.success("Success");
         } catch (Exception ex) {
-            return "Fail: Exception";
+            return ResultUtils.error(-2,"Fail: Exception");
         }
     }
 }

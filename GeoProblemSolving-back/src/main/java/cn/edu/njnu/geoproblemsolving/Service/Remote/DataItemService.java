@@ -1,7 +1,7 @@
 package cn.edu.njnu.geoproblemsolving.Service.Remote;
 
-import cn.edu.njnu.geoproblemsolving.Enums.ResultEnum;
-import cn.edu.njnu.geoproblemsolving.Exception.MyException;
+import cn.edu.njnu.geoproblemsolving.common.enums.ResultEnum;
+import cn.edu.njnu.geoproblemsolving.common.exception.MyException;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;

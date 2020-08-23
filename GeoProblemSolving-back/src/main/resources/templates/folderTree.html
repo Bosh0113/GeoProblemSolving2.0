@@ -391,7 +391,7 @@
         props: ["role", "projectInfo"],
         mounted() {
             this.resizeContent();
-            this.enterFolder(this.projectInfo.projectId);
+            this.enterFolder(this.projectInfo.aid);
             this.userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
         },
         data() {
@@ -554,7 +554,7 @@
                 }
             },
             permissionIdentity(operation) {
-                return userRoleJS.permissionIdentity(this.projectInfo.permission, this.userRole, operation);
+                return userRoleJS.permissionIdentity(JSON.parse(this.projectInfo.permission), this.userRole, operation);
             },
             enterFolder(currentFolderId) {
                 this.chooseFilesArray = [];
@@ -644,7 +644,7 @@
                                 "&parentId=" +
                                 parentId +
                                 "&scopeId=" +
-                                this.projectInfo.projectId
+                                this.projectInfo.aid
                             )
                             .then(res => {
                                 if (res.data == "Offline") {

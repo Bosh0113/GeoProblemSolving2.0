@@ -1,7 +1,7 @@
 package cn.edu.njnu.geoproblemsolving.Entity.ToolReq;
 
 
-import cn.edu.njnu.geoproblemsolving.domain.tool.ToolEntity;
+import cn.edu.njnu.geoproblemsolving.business.tool.ToolEntity;
 
 public class AddToolReq {
     private ToolEntity newTool;

@@ -1,6 +1,6 @@
 package cn.edu.njnu.geoproblemsolving.View;
 
-import cn.edu.njnu.geoproblemsolving.domain.activity.Project;
+import cn.edu.njnu.geoproblemsolving.business.activity.entity.Project;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;

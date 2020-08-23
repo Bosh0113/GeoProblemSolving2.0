@@ -1,9 +1,9 @@
-package cn.edu.njnu.geoproblemsolving.domain.tool;
+package cn.edu.njnu.geoproblemsolving.business.tool;
 
 import cn.edu.njnu.geoproblemsolving.Entity.ModelTools.CModel.support.JsonResult;
-import cn.edu.njnu.geoproblemsolving.Utils.ResultUtils;
-import cn.edu.njnu.geoproblemsolving.domain.tool.dto.AddToolEntityDTO;
-import cn.edu.njnu.geoproblemsolving.domain.tool.dto.UpdateToolEntityDTO;
+import cn.edu.njnu.geoproblemsolving.common.utils.ResultUtils;
+import cn.edu.njnu.geoproblemsolving.business.tool.dto.AddToolEntityDTO;
+import cn.edu.njnu.geoproblemsolving.business.tool.dto.UpdateToolEntityDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.web.bind.annotation.*;

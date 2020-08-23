@@ -1,6 +1,6 @@
-package cn.edu.njnu.geoproblemsolving.domain.user.repository;
+package cn.edu.njnu.geoproblemsolving.business.user.repository;
 
-import cn.edu.njnu.geoproblemsolving.domain.user.User;
+import cn.edu.njnu.geoproblemsolving.business.user.entity.User;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 

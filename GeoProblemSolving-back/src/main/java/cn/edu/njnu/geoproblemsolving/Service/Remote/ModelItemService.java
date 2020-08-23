@@ -2,8 +2,8 @@ package cn.edu.njnu.geoproblemsolving.Service.Remote;
 
 import cn.edu.njnu.geoproblemsolving.Dao.CModel.ToolRecordDaoImpl;
 import cn.edu.njnu.geoproblemsolving.Entity.ModelTools.ToolRecords.ToolRecordsEntity;
-import cn.edu.njnu.geoproblemsolving.Enums.ResultEnum;
-import cn.edu.njnu.geoproblemsolving.Exception.MyException;
+import cn.edu.njnu.geoproblemsolving.common.enums.ResultEnum;
+import cn.edu.njnu.geoproblemsolving.common.exception.MyException;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Value;

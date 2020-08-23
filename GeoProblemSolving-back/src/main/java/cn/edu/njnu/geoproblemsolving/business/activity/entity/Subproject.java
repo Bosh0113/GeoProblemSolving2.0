@@ -1,6 +1,6 @@
-package cn.edu.njnu.geoproblemsolving.domain.activity;
+package cn.edu.njnu.geoproblemsolving.business.activity.entity;
 
-import cn.edu.njnu.geoproblemsolving.domain.activity.enums.SubprojectPrivacy;
+import cn.edu.njnu.geoproblemsolving.business.activity.enums.SubprojectPrivacy;
 import lombok.Data;
 import org.springframework.data.mongodb.core.mapping.Document;
 

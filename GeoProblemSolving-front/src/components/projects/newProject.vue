@@ -318,10 +318,10 @@ export default {
               if (res.data == "Offline") {
                 this.$store.commit("userLogout");
                 this.$router.push({ name: "Login" });
-              } else if (res.data === "Fail") {
-                this.$Message.error(res.data);
+              } else if (res.data.code != 0) {
+                this.$Message.error(res.data.msg);
               } else {
-                this.createProjectInfo = res.data;
+                this.createProjectInfo = res.data.data;
                 this.addHistoryEvent(this.createProjectInfo.projectId);
               }
             })

@@ -1,6 +1,6 @@
-package cn.edu.njnu.geoproblemsolving.domain.user.service;
+package cn.edu.njnu.geoproblemsolving.business.user.service;
 
-import cn.edu.njnu.geoproblemsolving.domain.user.User;
+import cn.edu.njnu.geoproblemsolving.business.user.entity.User;
 
 public interface UserService {
 

@@ -1,7 +1,7 @@
-package cn.edu.njnu.geoproblemsolving.utils;
+package cn.edu.njnu.geoproblemsolving.common.utils;
 
 import cn.edu.njnu.geoproblemsolving.Entity.ModelTools.CModel.support.JsonResult;
-import cn.edu.njnu.geoproblemsolving.Enums.ResultEnum;
+import cn.edu.njnu.geoproblemsolving.common.enums.ResultEnum;
 
 /**
  * @ClassName ResultUtils

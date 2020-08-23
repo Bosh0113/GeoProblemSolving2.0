@@ -1,7 +1,7 @@
-package cn.edu.njnu.geoproblemsolving.domain.activity.service;
+package cn.edu.njnu.geoproblemsolving.business.activity.service;
 
-import cn.edu.njnu.geoproblemsolving.domain.activity.Activity;
-import cn.edu.njnu.geoproblemsolving.domain.activity.LinkProtocol;
+import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
+import cn.edu.njnu.geoproblemsolving.business.activity.entity.LinkProtocol;
 
 import java.util.List;
 

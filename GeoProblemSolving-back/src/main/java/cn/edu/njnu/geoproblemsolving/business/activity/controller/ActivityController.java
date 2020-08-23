@@ -1,8 +1,8 @@
-package cn.edu.njnu.geoproblemsolving.domain.activity.controller;
+package cn.edu.njnu.geoproblemsolving.business.activity.controller;
 
-import cn.edu.njnu.geoproblemsolving.domain.activity.Activity;
-import cn.edu.njnu.geoproblemsolving.domain.activity.LinkProtocol;
-import cn.edu.njnu.geoproblemsolving.domain.activity.service.ActivityService;
+import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
+import cn.edu.njnu.geoproblemsolving.business.activity.entity.LinkProtocol;
+import cn.edu.njnu.geoproblemsolving.business.activity.service.ActivityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

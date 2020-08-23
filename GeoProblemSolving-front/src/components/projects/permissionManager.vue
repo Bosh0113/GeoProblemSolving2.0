@@ -655,13 +655,13 @@ export default {
           this.resetProjectTypeModel = false;
           if (res.data == "Offline") {
             parent.location.href = "/GeoProblemSolving/login";
-          } else if (res.data != "Fail") {
-            this.$store.commit("setProjectInfo", res.data);
+          } else if (res.data.code == 0) {
+            this.$store.commit("setProjectInfo", res.data.data);
             this.$Notice.info({
               desc: "Update permission successfully. "
             });
           } else {
-            this.$Message.error("Failed to save permission.");
+            this.$Message.error(res.data.msg);
           }
         })
         .catch(err => {

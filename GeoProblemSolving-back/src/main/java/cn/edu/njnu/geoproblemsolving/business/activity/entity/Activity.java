@@ -1,6 +1,6 @@
-package cn.edu.njnu.geoproblemsolving.domain.activity;
+package cn.edu.njnu.geoproblemsolving.business.activity.entity;
 
-import cn.edu.njnu.geoproblemsolving.domain.activity.enums.ActivityType;
+import cn.edu.njnu.geoproblemsolving.business.activity.enums.ActivityType;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import lombok.Data;

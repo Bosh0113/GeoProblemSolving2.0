@@ -1,13 +1,13 @@
-package cn.edu.njnu.geoproblemsolving.domain.activity.service.Impl;
+package cn.edu.njnu.geoproblemsolving.business.activity.service.Impl;
 
 import cn.edu.njnu.geoproblemsolving.Dao.Folder.FolderDaoImpl;
-import cn.edu.njnu.geoproblemsolving.domain.activity.Project;
-import cn.edu.njnu.geoproblemsolving.domain.activity.Subproject;
-import cn.edu.njnu.geoproblemsolving.domain.user.User;
-import cn.edu.njnu.geoproblemsolving.domain.activity.repository.ProjectRepository;
-import cn.edu.njnu.geoproblemsolving.domain.activity.repository.SubprojectRepository;
-import cn.edu.njnu.geoproblemsolving.domain.activity.service.SubprojectService;
-import cn.edu.njnu.geoproblemsolving.domain.user.repository.UserRepository;
+import cn.edu.njnu.geoproblemsolving.business.activity.entity.Project;
+import cn.edu.njnu.geoproblemsolving.business.activity.entity.Subproject;
+import cn.edu.njnu.geoproblemsolving.business.user.entity.User;
+import cn.edu.njnu.geoproblemsolving.business.activity.repository.ProjectRepository;
+import cn.edu.njnu.geoproblemsolving.business.activity.repository.SubprojectRepository;
+import cn.edu.njnu.geoproblemsolving.business.activity.service.SubprojectService;
+import cn.edu.njnu.geoproblemsolving.business.user.repository.UserRepository;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.stereotype.Service;

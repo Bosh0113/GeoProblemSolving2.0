@@ -1,7 +1,7 @@
-package cn.edu.njnu.geoproblemsolving.domain.activity.service;
+package cn.edu.njnu.geoproblemsolving.business.activity.service;
 
 
-import cn.edu.njnu.geoproblemsolving.domain.activity.Subproject;
+import cn.edu.njnu.geoproblemsolving.business.activity.entity.Subproject;
 
 public interface SubprojectService{
     public Object createSubproject(Subproject subproject);

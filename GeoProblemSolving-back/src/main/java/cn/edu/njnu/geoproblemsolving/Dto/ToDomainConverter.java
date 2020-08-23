@@ -1,8 +1,8 @@
 package cn.edu.njnu.geoproblemsolving.Dto;
 
 import cn.edu.njnu.geoproblemsolving.Entity.ModelTools.CModel.support.BaseEntity;
-import cn.edu.njnu.geoproblemsolving.Exception.MyException;
-import cn.edu.njnu.geoproblemsolving.Utils.CopyUtils;
+import cn.edu.njnu.geoproblemsolving.common.exception.MyException;
+import cn.edu.njnu.geoproblemsolving.common.utils.CopyUtils;
 import cn.hutool.core.util.ReflectUtil;
 
 import java.lang.annotation.Annotation;

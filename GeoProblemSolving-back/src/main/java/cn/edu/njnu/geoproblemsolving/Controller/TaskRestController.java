@@ -2,7 +2,7 @@ package cn.edu.njnu.geoproblemsolving.Controller;
 
 import cn.edu.njnu.geoproblemsolving.Entity.ModelTools.CModel.support.JsonResult;
 import cn.edu.njnu.geoproblemsolving.Service.Impl.TaskService;
-import cn.edu.njnu.geoproblemsolving.Utils.ResultUtils;
+import cn.edu.njnu.geoproblemsolving.common.utils.ResultUtils;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;

@@ -1373,7 +1373,7 @@
             },
             methods: {
                 permissionIdentity(operation) {
-                    return userRoleJS.permissionIdentity(this.projectInfo.permission, this.userRole, operation);
+                    return userRoleJS.permissionIdentity(JSON.parse(this.projectInfo.permission), this.userRole, operation);
                 },
                 changeMenuByUrl() {
                     var content = this.getURLParameter("content");
@@ -1612,8 +1612,8 @@
                                 .then(res => {
                                     if (res.data == "Offline") {
                                         this.$refs.navigationEl.logout("login");
-                                    } else if (res.data != "Fail") {
-                                        var newProjectInfo = res.data;
+                                    } else if (res.data.code == 0) {
+                                        var newProjectInfo = res.data.data;
                                         this.editProjectModal = false;
                                         this.projectInfo = newProjectInfo;
                                         $('#projectTitle').html(newProjectInfo.name);
@@ -1621,6 +1621,8 @@
                                         $('#projectPrivacy').html(newProjectInfo.privacy);
                                         $('#projectCategory').html(newProjectInfo.category);
                                         $('#projectTag').html(newProjectInfo.tag);
+                                    } else {
+                                        this.$Message.error(res.data.msg);
                                     }
                                 })
                                 .catch(err => {
@@ -1785,22 +1787,19 @@
                     }
                 },
                 resetProjectType() {
-                    let obj = {
-                        aid: this.projectInfo.aid,
-                        type: "",
-                    };
+                    this.projectInfo.type = "";
                     axios
-                        .put("/GeoProblemSolving/project", obj)
+                        .put("/GeoProblemSolving/project", this.projectInfo)
                         .then(res => {
                             this.resetProjectTypeModel = false;
                             if (res.data == "Offline") {
                                 window.location.href = "/GeoProblemSolving/login"
-                            } else if (res.data != "Fail") {
+                            } else if (res.data.code == 0) {
                                 // sessionStorage.setItem("projectInfo", JSON.stringify(res.data));
                                 // sessionStorage.setItem("projectInfo", this.encrypto(res.data));
-                                this.projectInfo = res.data;
+                                this.projectInfo = res.data.data;
                             } else {
-                                this.$Message.error("Set type failed.");
+                                this.$Message.error(res.data.msg);
                             }
                         })
                         .catch(err => {

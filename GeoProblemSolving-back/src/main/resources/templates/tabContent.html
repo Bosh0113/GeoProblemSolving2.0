@@ -281,11 +281,8 @@
                     axios
                         .get("/GeoProblemSolving/project/" + projectInfo.aid + "/user?userId=" + this.userInfo.userId)
                         .then(res => {
-                            if (res.data === "Fail") {
-                                this.$Message.info("Fail to get the information of the project");
-                                this.projectInfoModal = true;
-                            } else {
-                                var participants = res.data;
+                            if (res.data.code === 0) {
+                                var participants = res.data.data;
 
                                 //creator
                                 if (participants.creator != null) {
@@ -304,6 +301,9 @@
                                 }
                                 this.projectDetailInfo[5].value = membersName;
 
+                                this.projectInfoModal = true;
+                            } else {
+                                this.$Message.info(res.data.msg);
                                 this.projectInfoModal = true;
                             }
                         })
