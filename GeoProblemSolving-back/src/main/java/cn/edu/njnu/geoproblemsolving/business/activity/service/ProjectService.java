@@ -19,6 +19,8 @@ public interface ProjectService {
 
     public JsonResult findParticipants(String aid);
 
+    public JsonResult findAllActivities(String aid);
+
     public JsonResult joinProject(String aid, String userId);
 
     public JsonResult updateMemberRole(String aid, String userId, String role);

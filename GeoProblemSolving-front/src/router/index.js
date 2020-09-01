@@ -62,7 +62,8 @@ const routes = [
       { path: 'share', name: 'shareContainer', component: resolve => (require(["@/components/workingSpace/share/shareContainer"], resolve)) }, //share
     ]
   },
-  { path: '/projectTypeContent/:projectId', name: 'projectTypeContent', component: resolve => (require(["@/components/projects/toWork"], resolve)) },
+  { path: '/activity/:level/:projectId', name: 'workspaceContent', component: resolve => (require(["@/components/workingSpace/workspaceFrame.vue"], resolve)) },
+  // { path: '/projectTypeContent/:projectId', name: 'projectTypeContent', component: resolve => (require(["@/components/projects/toWork"], resolve)) },
   { path: '/chat', name: 'chatUtil', component: resolve => (require(["@/components/utils/chatroom"], resolve)) },
   { path: '/draw', name: 'drawUtil', component: resolve => (require(["@/components/utils/drawBoard"], resolve)) },
   { path: '/map', name: 'mapTool', component: resolve => (require(["@/components/utils/mapTool"], resolve)) },

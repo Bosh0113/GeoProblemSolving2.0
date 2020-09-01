@@ -322,7 +322,7 @@ export default {
                 this.$Message.error(res.data.msg);
               } else {
                 this.createProjectInfo = res.data.data;
-                this.addHistoryEvent(this.createProjectInfo.projectId);
+                this.addHistoryEvent(this.createProjectInfo.aid);
               }
             })
             .catch((err) => {
@@ -351,8 +351,7 @@ export default {
           if (res.data === "Success") {
             this.$store.commit("setProjectInfo", this.createProjectInfo);
             window.location.href =
-              "/GeoProblemSolving/projectDetail/" +
-              this.createProjectInfo.projectId;
+              "/GeoProblemSolving/projectDetail/" + scopeId;
           } else {
             confirm("Created project fail.");
           }

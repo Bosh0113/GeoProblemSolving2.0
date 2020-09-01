@@ -1,8 +1,10 @@
 package cn.edu.njnu.geoproblemsolving.business.activity.service.Impl;
 
 import cn.edu.njnu.geoproblemsolving.Dao.Folder.FolderDaoImpl;
+import cn.edu.njnu.geoproblemsolving.Entity.ModelTools.CModel.support.JsonResult;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.LinkProtocol;
+import cn.edu.njnu.geoproblemsolving.business.activity.entity.Project;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Subproject;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.SubprojectRepository;
 import cn.edu.njnu.geoproblemsolving.business.activity.service.ActivityService;
@@ -12,6 +14,7 @@ import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityReposi
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ProtocolRepository;
 import cn.edu.njnu.geoproblemsolving.business.user.repository.UserRepository;
 import cn.edu.njnu.geoproblemsolving.business.tool.ToolEntity;
+import cn.edu.njnu.geoproblemsolving.common.utils.ResultUtils;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -133,20 +136,26 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
-    public List<Activity> findChildren(String aid) {
-        List<Activity> activities = new ArrayList();
-        Activity current = findActivityById(aid);
-        if(current == null) return null;
+    public JsonResult findChildren(String aid) {
+        try {
+            // confirm
+            Optional optional = activityRepository.findById(aid);
+            if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: project does not exist");
+            Activity activity = (Activity) optional.get();
 
-        ArrayList<String> children = current.getChildren();
-        for(String childId : children){
+            JSONArray activities = new JSONArray();
+            for (String childId : activity.getChildren()) {
+                optional = activityRepository.findById(childId);
+                if (optional.isPresent()) {
+                    Activity childActivity = (Activity) optional.get();
+                    activities.add(childActivity);
+                }
+            }
 
-            Activity child = findActivityById(childId);
-            if(child == null) continue;
-            activities.add(child);
+            return ResultUtils.success(activities);
+        } catch (Exception ex) {
+            return ResultUtils.error(-2, "Fail: Exception");
         }
-
-        return activities;
     }
 
     @Override

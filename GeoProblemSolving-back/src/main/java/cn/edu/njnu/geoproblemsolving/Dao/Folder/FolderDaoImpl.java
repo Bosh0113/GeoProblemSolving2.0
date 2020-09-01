@@ -37,25 +37,36 @@ public class FolderDaoImpl implements IFolderDao {
     @Override
     public Object createFolder(String folderName, String parentId, String scopeId) {
         try {
-            // decode
-            parentId = decode(parentId);
             FolderItem newFolderInfo = new FolderItem();
-            newFolderInfo.setName(folderName);
-            newFolderInfo.setUid(UUID.randomUUID().toString());
+            String folderId = "";
 
-            Query queryParent = new Query(Criteria.where("folderId").is(parentId));
-            FolderEntity parentFolder = mongoTemplate.findOne(queryParent, FolderEntity.class);
-            ArrayList<FolderItem> folderItems = parentFolder.getFolders();
-            folderItems.add(newFolderInfo);
-            Update updateParent = new Update();
-            updateParent.set("folders", folderItems);
-            mongoTemplate.updateFirst(queryParent, updateParent, FolderEntity.class);
+            if(parentId.equals("")) {
+                // 没有上级活动
+                folderId = scopeId;
+            }
+            else {
+                // 有上级活动
+                // decode
+                parentId = decode(parentId);
+
+                newFolderInfo.setName(folderName);
+                folderId = UUID.randomUUID().toString();
+                newFolderInfo.setUid(folderId);
+
+                Query queryParent = new Query(Criteria.where("folderId").is(parentId));
+                FolderEntity parentFolder = mongoTemplate.findOne(queryParent, FolderEntity.class);
+                ArrayList<FolderItem> folderItems = parentFolder.getFolders();
+                folderItems.add(newFolderInfo);
+                Update updateParent = new Update();
+                updateParent.set("folders", folderItems);
+                mongoTemplate.updateFirst(queryParent, updateParent, FolderEntity.class);
+            }
 
             FolderEntity newFolder = new FolderEntity();
             newFolder.setScopeId(scopeId);
             newFolder.setFiles(new ArrayList<>());
             newFolder.setFolders(new ArrayList<>());
-            newFolder.setFolderId(newFolderInfo.getUid());
+            newFolder.setFolderId(folderId);
             newFolder.setParentId(parentId);
             newFolder.setFolderName(folderName);
             mongoTemplate.save(newFolder);

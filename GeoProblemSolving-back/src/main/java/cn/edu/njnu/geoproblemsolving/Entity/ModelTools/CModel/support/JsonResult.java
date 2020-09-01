@@ -1,10 +1,13 @@
 package cn.edu.njnu.geoproblemsolving.Entity.ModelTools.CModel.support;
 
+import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 /**
  * @ClassName JsonResult
@@ -17,7 +20,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @ApiModel (value = "请求结果响应体")
-public class JsonResult<T> {
+public class JsonResult<T> implements List<Activity> {
     @ApiModelProperty (value = "响应状态回执码")
     private Integer code;
 

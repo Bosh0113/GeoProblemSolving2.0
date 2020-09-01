@@ -102,6 +102,17 @@ public class ProjectController {
     }
 
     /**
+     * Get children of project
+     * @param aid
+     * @return
+     */
+    @RequestMapping(value = "/{aid}/children", method = RequestMethod.GET)
+    public JsonResult getAllActivities(@PathVariable("aid") String aid){
+        JsonResult result = projectService.findAllActivities(aid);
+        return result;
+    }
+
+    /**
      * Inquiry the creator and members of one project
      * @param aid
      * @return

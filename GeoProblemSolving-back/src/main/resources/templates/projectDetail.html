@@ -274,7 +274,7 @@
                     <menu-item name="tasks" class="projectMenuItem">
                         <Icon type="md-calendar" title="Tasks" size="35"></Icon>
                     </menu-item>
-                    <menu-item name="subProjects" class="projectMenuItem">
+                    <menu-item name="workspace" class="projectMenuItem">
                         <Icon type="md-git-branch" title="Workspace" size="35"></Icon>
                     </menu-item>
                     <menu-item name="resources" class="projectMenuItem">
@@ -600,114 +600,11 @@
                         </Card>
                     </div>
                 </div>
-                <div v-show="activeMenu=='subProjects'" style="height: inherit;min-height: fit-content;">
+                <div v-show="activeMenu=='workspace'" style="height: inherit;min-height: fit-content;">
                     <div style="background:#eee;padding: 10px;height: inherit;min-height: fit-content;">
-                        <Card v-if="projectInfo.type=='Activity_Unit'" :bordered="false" dis-hover
-                              style="height: -webkit-fill-available;min-height: fit-content;">
-                            <div slot="title">
-                                <!--                                <h1 class="projectMenuItemTitle">Subprojects</h1>-->
-                                <div style="margin-left:20px;top: 15px; position:absolute;left:50px;">
-                                    <strong style="font-size:1.5rem;">Project</strong>
-                                    <Divider type="vertical"></Divider>
-                                    <strong style="font-size:1rem;">Subprojects</strong>
-                                </div>
-                                <div style="display:flex;align-items:center;justify-content:center;">
-                                    <span class="project_title title_mw">{{projectInfo.name}}</span>
-                                </div>
-                            </div>
-                            <div slot="extra" v-if="userRole!='visitor'">
-                                <Poptip trigger="hover" content="Create subproject" placement="left">
-                                    <i-button style="margin: 0 5px;" class="changeInviteColor"
-                                              @click="showSubProjectCreateModel">
-                                        <Icon type="md-add-circle" :size="20"></Icon>
-                                    </i-button>
-                                </Poptip>
-                            </div>
-                            <!--                            <div :style="{height:subProjectsCSS}">-->
-                            <!--                                <vue-scroll :ops="scrollOps">-->
-                            <!--                                    <div v-if="!subProjectList.length" style="text-align:center">-->
-                            <!--                                        <div style="color:lightgray;font-size:4em; font-weight:bold">No subprojects-->
-                            <!--                                            have been created.-->
-                            <!--                                        </div>-->
-                            <!--                                    </div>-->
-                            <!--                                    <div>-->
-                            <!--                                        <div v-for="(subProject,index) in subProjectList"-->
-                            <!--                                             style="width: 25%;display: inline-block;padding: 5px;">-->
-                            <!--                                            <Card style="height: 300px;" class="subProjectCard">-->
-                            <!--                                                <div slot="title" style="cursor: pointer;"-->
-                            <!--                                                     @click="goSubProjectPage(subProject)">-->
-                            <!--                                                    <strong style="width: 160px;display: inline-block;"-->
-                            <!--                                                            class="overEllipsis"-->
-                            <!--                                                            :title="subProject.name">-->
-                            <!--                                                        {{subProject.name}}-->
-                            <!--                                                    </strong>-->
-                            <!--                                                </div>-->
-                            <!--                                                <template v-if="userRole!='visitor'">-->
-                            <!--                                                    <div slot="extra" v-if="permissionIdentity('manage_child_activity', subProject)">-->
-                            <!--                                                        <Poptip trigger="hover" content="Change manager" placement="bottom">-->
-                            <!--                                                            <i-button class="changeInviteColor" icon="ios-people"-->
-                            <!--                                                                      size="small"-->
-                            <!--                                                                      shape="circle"-->
-                            <!--                                                                      @click="handOverModalShow(index)"></i-button>-->
-                            <!--                                                        </Poptip>-->
-                            <!--                                                        <Poptip trigger="hover" content="Edit information"-->
-                            <!--                                                                placement="bottom">-->
-                            <!--                                                            <i-button class="changeEditColor" icon="ios-create" size="small"-->
-                            <!--                                                                      shape="circle"-->
-                            <!--                                                                      @click="editSubProjectModalShow(index)"></i-button>-->
-                            <!--                                                        </Poptip>-->
-                            <!--                                                        <Poptip trigger="hover" content="Remove subproject"-->
-                            <!--                                                                placement="bottom">-->
-                            <!--                                                            <i-button class="changeRemoveColor" icon="md-close" size="small"-->
-                            <!--                                                                      shape="circle"-->
-                            <!--                                                                      @click="deleteSubProjectModalShow(index)"></i-button>-->
-                            <!--                                                        </Poptip>-->
-                            <!--                                                    </div>-->
-                            <!--                                                    <div slot="extra" v-else-if="memberIdentity(subProject.members)">-->
-                            <!--                                                        <Icon type="ios-person" :size="20"></Icon>-->
-                            <!--                                                    </div>-->
-                            <!--                                                    <div slot="extra" v-else>-->
-                            <!--                                                        <Poptip trigger="hover" content="Apply to Join"-->
-                            <!--                                                                placement="left">-->
-                            <!--                                                            <i-button class="changeInviteColor" icon="md-add"-->
-                            <!--                                                                      size="small"-->
-                            <!--                                                                      shape="circle"-->
-                            <!--                                                                      @click="applyJoinSubProjectModalShow(index)"></i-button>-->
-                            <!--                                                        </Poptip>-->
-                            <!--                                                    </div>-->
-                            <!--                                                </template>-->
-                            <!--                                                <div class="subProjectDes" :title="subProject.description"-->
-                            <!--                                                     style="cursor: pointer;" @click="goSubProjectPage(subProject)" >-->
-                            <!--                                                    {{subProject.description}}-->
-                            <!--                                                </div>-->
-                            <!--                                                <div style="height: 75px;padding: 5px;">-->
-                            <!--                                                    <p class="subProjectExtraP">-->
-                            <!--                                                        <strong style="display: inline-block">Manager: </strong>-->
-                            <!--                                                        <span class="subProjectExtraSpan">{{subProject.managerName}}</span>-->
-                            <!--                                                    </p>-->
-                            <!--                                                    <p class="subProjectExtraP">-->
-                            <!--                                                        <strong style="display: inline-block">Members: </strong>-->
-                            <!--                                                        <span class="subProjectExtraSpan">{{memberListStr(subProject.members)}}</span>-->
-                            <!--                                                    </p>-->
-                            <!--                                                    <p class="subProjectExtraP">-->
-                            <!--                                                        <strong style="display: inline-block">Create time: </strong>-->
-                            <!--                                                        <span class="subProjectExtraSpan">{{subProject.createTime}}</span>-->
-                            <!--                                                    </p>-->
-                            <!--                                                </div>-->
-                            <!--                                            </Card>-->
-                            <!--                                        </div>-->
-                            <!--                                    </div>-->
-                            <!--                                    <div style="margin:5px 0 5px 80px;text-align:center">-->
-                            <!--                                        <i-button class="btnHoverRed" @click="resetProjectTypeModalShow()" v-if="permissionIdentity('manage_workspace_type')">Reset-->
-                            <!--                                            workspace type-->
-                            <!--                                        </i-button>-->
-                            <!--                                    </div>-->
-                            <!--                                </vue-scroll>-->
-                            <!--                            </div>-->
-                        </Card>
-                        <div v-else style="width: -webkit-fill-available;height: -webkit-fill-available;">
+                        <div style="width: -webkit-fill-available;height: -webkit-fill-available;">
                             <iframe style="width: -webkit-fill-available;height: -webkit-fill-available;border-width:0"
-                                    :src="ipPort+'/projectTypeContent/' + projectInfo.aid"></iframe>
+                                    :src="ipPort+'/activity/' + projectInfo.level +'/'+ projectInfo.aid"></iframe>
                         </div>
                     </div>
                 </div>
@@ -733,7 +630,7 @@
                                     </i-button>
                                 </Tooltip>
                             </div>
-                            <div :style="{height:subProjectsCSS}">
+                            <div :style="{height:workspaceCSS}">
                                 <child-folder
                                         :role="userRole"
                                         :project-info="projectInfo"
@@ -1161,7 +1058,6 @@
                 }
             },
             mounted() {
-                this.getProjectInfo();
                 this.userEnter();
                 this.resizeContent();
                 this.getAllSubProjects();
@@ -1183,7 +1079,7 @@
                     activeMenu: "projectOverview",
                     contentPageCSS: '',
                     membersContentCSS: '',
-                    subProjectsCSS: '',
+                    workspaceCSS: '',
                     scrollOps: {
                         bar: {
                             background: "#808695"
@@ -1360,7 +1256,7 @@
             },
             watch: {
                 activeMenu(val) {
-                    if (val == "subProjects" && this.projectInfo.type != "" && this.projectInfo.type != "Activity_Unit") {
+                    if (val == "workspace" && this.projectInfo.type != "" && this.projectInfo.type != "Activity_Unit") {
                         this.workPanels.forEach(function (e) {
                             e.normalize();
                         });
@@ -1378,7 +1274,7 @@
                 changeMenuByUrl() {
                     var content = this.getURLParameter("content");
                     if (content != null) {
-                        var array = ["projectOverview", "projectDetail", "tasks", "subProjects", "resources"];
+                        var array = ["projectOverview", "projectDetail", "tasks", "workspace", "resources"];
                         if (array.includes(content)) {
                             this.activeMenu = content;
                         }
@@ -1391,27 +1287,6 @@
                         return unescape(r[2]);
                     }
                     return null;
-                },
-                getProjectInfo() {
-                    if (this.projectInfo == {} || this.projectInfo == undefined) {
-                        $.ajax({
-                            url:
-                                "/GeoProblemSolving/project/" +
-                                this.projectId,
-                            type: "GET",
-                            async: false,
-                            success: data => {
-                                if (data == "Offline") {
-                                    parent.location.href = "/GeoProblemSolving/login"
-                                }
-                                if (data != "None" && data != "Fail") {
-                                    this.projectInfo = data[0];
-                                } else {
-                                    console.log(data);
-                                }
-                            }
-                        });
-                    }
                 },
                 userEnter() {
                     if (this.userRole != "Token") {
@@ -1445,11 +1320,11 @@
                     if (window.innerHeight > 735) {
                         this.membersContentCSS = window.innerHeight - 330 + 'px';
                         this.contentPageCSS = window.innerHeight - 130 + 'px';
-                        this.subProjectsCSS = window.innerHeight - 240 + 'px';
+                        this.workspaceCSS = window.innerHeight - 240 + 'px';
                     } else {
                         this.membersContentCSS = '407px';
                         this.contentPageCSS = 'fit-content';
-                        this.subProjectsCSS = '495px';
+                        this.workspaceCSS = '495px';
                     }
                     window.onresize = () => {
                         return (() => {
@@ -1493,7 +1368,7 @@
                     if (this.userRole == "visitor") {
                         this.joinProjectNotice = true;
                     } else {
-                        this.changeMenuItem("subProjects");
+                        this.changeMenuItem("workspace");
                     }
                 },
                 gotoTaskassignment() {
@@ -2096,18 +1971,16 @@
                     if (this.userInfo.userState) {
                         this.applyProjectInfo = Object.assign([], this.projectInfo);
 
+                        // join the project directly
                         if (this.applyProjectInfo.permission != undefined && this.applyProjectInfo.permission.auto_join.visitor) {
-
-                            // join the project directly
                             axios
-                                .get("/GeoProblemSolving/project/join?" + "projectId=" + this.applyProjectInfo.projectId + "&userId=" + this.userInfo.userId)
+                                .get("/GeoProblemSolving/project/"+ this.applyProjectInfo.aid +"/user?" + "userId=" + this.userInfo.userId)
                                 .then(res => {
-                                    if (res.data === "Success") {
-                                        this.$Message.info("Join the project successfuly");
-
-                                        window.location.href = "/GeoProblemSolving/projectDetail/" + this.applyProjectInfo.projectId;
-                                    } else if (res.data === "Fail") {
-                                        this.$Message.info("Fail to join in this project");
+                                    if (res.data.code == 0) {
+                                        this.$Message.info("Join this project successfully");
+                                        window.location.href = "/GeoProblemSolving/projectDetail/" + this.applyProjectInfo.aid;
+                                    } else {
+                                        this.$Message.info(res.data.msg);
                                     }
                                 })
                                 .catch(err => {
@@ -2125,82 +1998,78 @@
                     this.$refs[name].validate(valid => {
                         if (valid) {
                             this.applyJoinModal = false;
-                            var data = this.applyProjectInfo;
                             if (
                                 this.haveApplied == true &&
-                                data.projectId == sessionStorage.getItem("applyId")
+                                this.applyProjectInfo.aid == sessionStorage.getItem("applyId")
                             ) {
-                                this.$Notice.warning({
-                                    title: "repeat apply warning",
-                                    desc: "You have applied successfully, no need to click again!"
-                                });
+                                return;
                             } else {
+                                let description = "User " +
+                                    userDetail.userName +
+                                    " apply to join your project: " +
+                                    this.applyProjectInfo.name +
+                                    " ." +
+                                    " The reason for application is: " +
+                                    this.applyValidate.reason;
                                 let userDetail = this.userInfo;
-                                let joinForm = {};
-                                sessionStorage.setItem("applyId", data.projectId);
-                                joinForm["recipientId"] = data.managerId;
-                                joinForm["type"] = "apply";
-                                joinForm["content"] = {
-                                    userEmail: userDetail.email,
-                                    userName: this.userInfo.userName,
-                                    userId: this.userInfo.userId,
-                                    title: "Group application",
-                                    description:
-                                        "User " +
-                                        this.userInfo.userName +
-                                        " apply to join your project: " +
-                                        data.title +
-                                        " ." +
-                                        " The reason for application is: " +
-                                        this.applyValidate.reason,
-                                    projectId: data.projectId,
-                                    projectTitle: data.title,
-                                    scope: "project",
-                                    approve: "unknow"
-                                };
-                                axios
-                                    .post("/GeoProblemSolving/notice/save", joinForm)
-                                    .then(res => {
-                                        if (res.data == "Success") {
-                                            this.$Notice.open({
-                                                title: "Apply Successfully",
-                                                desc:
-                                                    "The project's manager will process your apply in time,you can get a notification later to tell you the result."
+                                for(var i = 0; i< this.applyProjectInfo.members.length; i++){
+                                    if( this.applyProjectInfo.members[i].role == "manager"){
+                                        let managerId = this.applyProjectInfo.members[i].userId;
+                                        let joinForm = {};
+                                        joinForm["recipientId"] = managerId;
+                                        joinForm["type"] = "apply";
+                                        joinForm["content"] = {
+                                            userEmail: userDetail.email,
+                                            userName: userDetail.userName,
+                                            userId: userDetail.userId,
+                                            title: "Group application",
+                                            description: description,
+                                            projectId: this.applyProjectInfo.aid,
+                                            projectTitle: this.applyProjectInfo.name,
+                                            scope: "project",
+                                            approve: "unknow"
+                                        };
+
+                                        axios
+                                            .post("/GeoProblemSolving/notice/save", joinForm)
+                                            .then(res => {
+                                                if (res.data == "Success") {
+                                                    this.$Notice.open({
+                                                        title: "Apply Successfully",
+                                                        desc:
+                                                            "The application has been sent to managers of the project."
+                                                    });
+                                                    this.$emit("sendNotice", managerId);
+                                                    this.haveApplied = true;
+                                                } else {
+                                                    this.$Notice.open({
+                                                        desc: "Apply failed."
+                                                    });
+                                                }
+                                            })
+                                            .catch(err => {
+                                                console.log("申请失败的原因是：" + err.data);
                                             });
-                                            this.$emit("sendNotice", data.managerId);
-                                            this.haveApplied = true;
-                                        } else {
-                                            this.$Notice.open({
-                                                desc: "Apply failed"
-                                            });
-                                        }
-                                    })
-                                    .catch(err => {
-                                        console.log("申请失败的原因是：" + err.data);
-                                    });
+                                    }
+                                }
+                                sessionStorage.setItem("applyId", this.applyProjectInfo.aid);
 
                                 let emailObject = {
-                                    recipient: joinForm.recipientId,
-                                    mailTitle: "Group application",
+                                    mailTitle: "Project application",
                                     mailContent:
-                                        joinForm.content.description +
-                                        "<br>" +
+                                        description + "<br>" +
                                         "You can click this url and enter the site to process this application: " +
-                                        "http://" +
-                                        window.location.host +
-                                        "/GeoProblemSolving/home"
+                                        "http://" + window.location.host + "/GeoProblemSolving/home"
                                 };
                                 axios
-                                    .post("/GeoProblemSolving/project/applyByMail", emailObject)
+                                    .post("/GeoProblemSolving/project/"+ this.applyProjectInfo.aid +"/apply", emailObject)
                                     .then(res => {
-                                        if (res.data == "Success") {
-                                            console.log("Email Success.");
-                                        } else {
-                                            console.log("Email fail.");
+                                        if (res.data.code !== 0) {
+                                            console.log(res.data.msg);
                                         }
                                     })
                                     .catch(err => {
-                                        console.log("Email fail.");
+                                        console.log(err.data);
                                     });
                             }
                         } else {
