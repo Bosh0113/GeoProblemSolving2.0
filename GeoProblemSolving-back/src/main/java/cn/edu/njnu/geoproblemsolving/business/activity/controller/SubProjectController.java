@@ -1,5 +1,6 @@
 package cn.edu.njnu.geoproblemsolving.business.activity.controller;
 
+import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Subproject;
 import cn.edu.njnu.geoproblemsolving.business.activity.service.SubprojectService;
 import org.springframework.web.bind.annotation.*;
@@ -22,18 +23,38 @@ public class SubProjectController {
      * @return
      */
     @RequestMapping(produces = {"application/json;charset=UTF-8"},method = RequestMethod.POST)
-    public Object createSubproject(@RequestBody Subproject subproject){
+    public JsonResult createSubproject(@RequestBody Subproject subproject){
         return subprojectService.createSubproject(subproject);
     }
 
     /**
      * inquiry subproject
-     * @param projectId
+     * @param aid
      * @return
      */
-    @RequestMapping(value = "/project", method = RequestMethod.GET)
-    public Object readSubproject(@RequestParam("projectId") String projectId){
-        return subprojectService.inquirySubprojects(projectId);
+    @RequestMapping(method = RequestMethod.GET)
+    public JsonResult readSubproject(@RequestParam("aid") String aid){
+        return subprojectService.inquirySubproject(aid);
+    }
+
+    /**
+     * update subproject
+     * @param subproject
+     * @return
+     */
+    @RequestMapping(method = RequestMethod.PUT)
+    public JsonResult updateSubproject(@RequestBody Subproject subproject){
+        return subprojectService.updateSubproject(subproject);
+    }
+
+    /**
+     * delete subproject
+     * @param aid
+     * @return
+     */
+    @RequestMapping(method = RequestMethod.DELETE)
+    public JsonResult deleteSubproject(@RequestParam("aid") String aid){
+        return subprojectService.deleteSubproject(aid);
     }
 
     /**
@@ -42,7 +63,7 @@ public class SubProjectController {
      * @return
      */
     @RequestMapping(value = "/{aid}/user", method = RequestMethod.GET)
-    public Object getSubprojectParticipants(@PathVariable("aid") String aid){
+    public JsonResult getSubprojectParticipants(@PathVariable("aid") String aid){
         return subprojectService.findParticipants(aid);
     }
 
@@ -53,7 +74,7 @@ public class SubProjectController {
      * @return
      */
     @RequestMapping(value = "/{aid}/user", method = RequestMethod.POST)
-    public Object joinSubproject(@PathVariable("aid") String aid, @RequestParam("userId") String userId){
+    public JsonResult joinSubproject(@PathVariable("aid") String aid, @RequestParam("userId") String userId){
         return subprojectService.joinSubproject(aid, userId);
     }
 
@@ -65,7 +86,7 @@ public class SubProjectController {
      * @return
      */
     @RequestMapping(value = "/{aid}/user", method = RequestMethod.PUT)
-    public Object changeUserRole(@PathVariable("aid") String aid, @RequestParam("userId") String userId, @RequestParam("role") String role){
+    public JsonResult changeUserRole(@PathVariable("aid") String aid, @RequestParam("userId") String userId, @RequestParam("role") String role){
         return subprojectService.updateMemberRole(aid, userId, role);
     }
 
@@ -76,7 +97,7 @@ public class SubProjectController {
      * @return
      */
     @RequestMapping(value = "/{aid}/user", method = RequestMethod.DELETE)
-    public String quitSubproject(@PathVariable("aid") String aid, @RequestParam("userId") String userId){
+    public JsonResult quitSubproject(@PathVariable("aid") String aid, @RequestParam("userId") String userId){
         return subprojectService.quitSubproject(aid, userId);
     }
 

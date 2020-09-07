@@ -311,8 +311,7 @@
         </Modal>
     </div>
 </template>
-<script th:fragment="task-js" type="module">
-    import * as userRoleJS from "/GeoProblemSolving/customize/userRole.js";
+<script th:fragment="task-js">
 
     Vue.component('child-task', {
         template: '#taskComponent',
@@ -964,7 +963,7 @@
                 }
             },
             permissionIdentity(operation) {
-                return userRoleJS.permissionIdentity(JSON.parse(this.projectInfo.permission), this.userRole, operation);
+                return permissionIdentity(JSON.parse(this.projectInfo.permission), this.userRole, operation);
             },
             taskItemDraggable() {
                 if (this.userRole == 'Manager' || this.userRole == 'PManager' || this.userRole == 'Member') {

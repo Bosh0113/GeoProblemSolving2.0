@@ -1,6 +1,6 @@
 package cn.edu.njnu.geoproblemsolving.business.tool;
 
-import cn.edu.njnu.geoproblemsolving.Entity.ModelTools.CModel.support.JsonResult;
+import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import cn.edu.njnu.geoproblemsolving.common.utils.ResultUtils;
 import cn.edu.njnu.geoproblemsolving.business.tool.dto.AddToolEntityDTO;
 import cn.edu.njnu.geoproblemsolving.business.tool.dto.UpdateToolEntityDTO;

@@ -29,6 +29,7 @@
     <script src="/GeoProblemSolving/jspanel/extensions/layout/jspanel.layout.js"></script>
     <script src="/GeoProblemSolving/jspanel/extensions/contextmenu/jspanel.contextmenu.js"></script>
     <script src="/GeoProblemSolving/jspanel/extensions/dock/jspanel.dock.js"></script>
+    <script src="/GeoProblemSolving/customize/userRole.js"></script>
     <script th:replace="navigation::commonHeader-css"></script>
     <script th:replace="navigation::commonHeader-html"></script>
     <script th:replace="navigation::commonHeader-js"></script>
@@ -996,8 +997,7 @@
 <script th:inline="javascript">
     var projectInfo = [[${projectInfo}]];
 </script>
-<script type="module">
-    import * as userRoleJS from "/GeoProblemSolving/customize/userRole.js";
+<script>
 
     var vm = new Vue(
         {
@@ -1269,7 +1269,7 @@
             },
             methods: {
                 permissionIdentity(operation) {
-                    return userRoleJS.permissionIdentity(JSON.parse(this.projectInfo.permission), this.userRole, operation);
+                    return permissionIdentity(JSON.parse(this.projectInfo.permission), this.userRole, operation);
                 },
                 changeMenuByUrl() {
                     var content = this.getURLParameter("content");
@@ -1290,23 +1290,18 @@
                 },
                 userEnter() {
                     if (this.userRole != "Token") {
-                        if (this.projectInfo.privacy == "Public") {
-                            if (!this.userInfo.userState) {
-                                window.location.href = "/GeoProblemSolving/projectList";
-                            }
-                        } else if (this.projectInfo.privacy == "Discoverable") {
-                            if (!this.userInfo.userState || this.userRole == "visitor") {
-                                window.location.href = "/GeoProblemSolving/projectList";
-                            }
-                        } else if (this.projectInfo.privacy == "Private") {
-                            if (!this.userInfo.userState || this.userRole == "visitor") {
-                                window.location.href = "/GeoProblemSolving/projectList";
+                        if (!this.userInfo.userState) {
+                            window.location.href = "/GeoProblemSolving/login";
+                        } else{
+                            if (this.projectInfo.privacy != "Public" && this.userRole == "visitor") {
+                                    window.location.href = "/GeoProblemSolving/projectList";
                             }
                         }
+
                     }
                 },
                 roleIdentity() {
-                    let role = userRoleJS.roleIdentify(this.projectInfo.members, this.userInfo.userId);
+                    let role = roleIdentify(this.projectInfo.members, this.userInfo.userId);
 
                     if (role == "visitor") {
                         if (this.userRole != 'Token') {
@@ -1974,7 +1969,7 @@
                         // join the project directly
                         if (this.applyProjectInfo.permission != undefined && this.applyProjectInfo.permission.auto_join.visitor) {
                             axios
-                                .get("/GeoProblemSolving/project/"+ this.applyProjectInfo.aid +"/user?" + "userId=" + this.userInfo.userId)
+                                .get("/GeoProblemSolving/project/" + this.applyProjectInfo.aid + "/user?" + "userId=" + this.userInfo.userId)
                                 .then(res => {
                                     if (res.data.code == 0) {
                                         this.$Message.info("Join this project successfully");
@@ -2012,8 +2007,8 @@
                                     " The reason for application is: " +
                                     this.applyValidate.reason;
                                 let userDetail = this.userInfo;
-                                for(var i = 0; i< this.applyProjectInfo.members.length; i++){
-                                    if( this.applyProjectInfo.members[i].role == "manager"){
+                                for (var i = 0; i < this.applyProjectInfo.members.length; i++) {
+                                    if (this.applyProjectInfo.members[i].role == "manager") {
                                         let managerId = this.applyProjectInfo.members[i].userId;
                                         let joinForm = {};
                                         joinForm["recipientId"] = managerId;
@@ -2062,7 +2057,7 @@
                                         "http://" + window.location.host + "/GeoProblemSolving/home"
                                 };
                                 axios
-                                    .post("/GeoProblemSolving/project/"+ this.applyProjectInfo.aid +"/apply", emailObject)
+                                    .post("/GeoProblemSolving/project/" + this.applyProjectInfo.aid + "/application", emailObject)
                                     .then(res => {
                                         if (res.data.code !== 0) {
                                             console.log(res.data.msg);

@@ -383,8 +383,7 @@
         </Modal>
     </div>
 </template>
-<script th:fragment="common-js" type="module">
-    import * as userRoleJS from "/GeoProblemSolving/customize/userRole.js";
+<script th:fragment="common-js">
 
     Vue.component('child-folder', {
         template: '#folderTreeComponent',
@@ -554,7 +553,7 @@
                 }
             },
             permissionIdentity(operation) {
-                return userRoleJS.permissionIdentity(JSON.parse(this.projectInfo.permission), this.userRole, operation);
+                return permissionIdentity(JSON.parse(this.projectInfo.permission), this.userRole, operation);
             },
             enterFolder(currentFolderId) {
                 this.chooseFilesArray = [];

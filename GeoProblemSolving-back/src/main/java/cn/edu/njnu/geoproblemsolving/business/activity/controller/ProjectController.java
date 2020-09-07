@@ -1,7 +1,7 @@
 package cn.edu.njnu.geoproblemsolving.business.activity.controller;
 
 import cn.edu.njnu.geoproblemsolving.Entity.EmailEntity;
-import cn.edu.njnu.geoproblemsolving.Entity.ModelTools.CModel.support.JsonResult;
+import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Project;
 import cn.edu.njnu.geoproblemsolving.business.activity.service.ProjectService;
 import cn.edu.njnu.geoproblemsolving.View.StaticPagesBuilder;
@@ -185,7 +185,7 @@ public class ProjectController {
      * @return
      * @throws IOException
      */
-    @RequestMapping(value = "/{aid}/invited", method = RequestMethod.POST)
+    @RequestMapping(value = "/{aid}/invitation", method = RequestMethod.POST)
     public JsonResult joinByMail(@PathVariable("aid") String aid, @RequestParam("email") String email, @RequestParam("password") String password) throws IOException {
         JsonResult result = projectService.invitedParticipants(aid, email, password);
 
@@ -202,7 +202,7 @@ public class ProjectController {
      * @param emailEntity
      * @return
      */
-    @RequestMapping(value = "/{aid}/apply", produces = {"application/json;charset=UTF-8"}, method = RequestMethod.POST)
+    @RequestMapping(value = "/{aid}/application", produces = {"application/json;charset=UTF-8"}, method = RequestMethod.POST)
     public JsonResult sendEmail(@PathVariable("aid") String aid, @RequestBody EmailEntity emailEntity) {
         return projectService.applyJoinProject(aid, emailEntity);
     }

@@ -2,11 +2,10 @@ package cn.edu.njnu.geoproblemsolving.business.activity.service.Impl;
 
 import cn.edu.njnu.geoproblemsolving.Dao.Email.EmailDaoImpl;
 import cn.edu.njnu.geoproblemsolving.Dao.Folder.FolderDaoImpl;
-import cn.edu.njnu.geoproblemsolving.Entity.ModelTools.CModel.support.JsonResult;
+import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Project;
 import cn.edu.njnu.geoproblemsolving.Entity.EmailEntity;
-import cn.edu.njnu.geoproblemsolving.business.activity.entity.Subproject;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityRepository;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.SubprojectRepository;
 import cn.edu.njnu.geoproblemsolving.business.user.entity.User;
@@ -315,9 +314,9 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public JsonResult joinProject(String aid, String userId) {
         try {
+            // confirm
             User user = findByUserId(userId);
             if (user == null) return ResultUtils.error(-1, "Fail: user does not exist");
-
             Optional optional = projectRepository.findById(aid);
             if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: project does not exist");
             Project project = (Project) optional.get();

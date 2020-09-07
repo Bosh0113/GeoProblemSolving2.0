@@ -1,32 +1,30 @@
 package cn.edu.njnu.geoproblemsolving.business.activity.service;
 
-import cn.edu.njnu.geoproblemsolving.Entity.ModelTools.CModel.support.JsonResult;
+import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.LinkProtocol;
 
-import java.util.List;
-
 public interface ActivityService {
 
-    public Object createActivity(Activity activity);
+    public JsonResult createActivity(Activity activity);
 
     public JsonResult findChildren(String aid);
 
-    public List<Activity> findLast(String aid);
+    public JsonResult findLast(String aid);
 
-    public List<Activity> findNext(String aid);
+    public JsonResult findNext(String aid);
 
-    public Activity createChild(String aid, Activity activity);
+    public JsonResult createChild(String aid, String childId);
 
-    public Activity createNext(String aid, Activity activity, LinkProtocol protocol);
+    public JsonResult createNext(String aid, String nextId, LinkProtocol protocol);
 
-    public Activity createLast(String aid, Activity activity, LinkProtocol protocol);
+    public JsonResult createLast(String aid, String lastId, LinkProtocol protocol);
 
-    public String linkActivities(String aid1, String aid2, LinkProtocol protocol);
+    public JsonResult linkActivities(String aid1, String aid2, LinkProtocol protocol);
 
-    public String separateActivities(String aid1, String aid2);
+    public JsonResult separateActivities(String aid1, String aid2);
 
-    public String joinActivity(String aid, String userId);
+    public JsonResult joinActivity(String aid, String userId);
 
-    public String quitActivity(String aid, String userId);
+    public JsonResult quitActivity(String aid, String userId);
 }

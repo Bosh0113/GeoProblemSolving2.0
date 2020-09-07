@@ -464,5 +464,3 @@ function permissionIdentity(currentPermission, role, operation) {
     }
 }
 
-
-export { roleIdentify, getDefault, permissionJson2Array, permissionIdentity }

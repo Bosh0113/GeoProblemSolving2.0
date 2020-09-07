@@ -10,6 +10,7 @@ import lombok.Getter;
 @Getter
 public enum ActivityType {
 
+    Activity_Default,
     Activity_Unit,
     Activity_Group,
 }

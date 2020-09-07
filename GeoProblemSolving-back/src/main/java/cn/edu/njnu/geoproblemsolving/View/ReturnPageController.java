@@ -1,6 +1,6 @@
 package cn.edu.njnu.geoproblemsolving.View;
 
-import cn.edu.njnu.geoproblemsolving.Entity.ModelTools.CModel.support.JsonResult;
+import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Project;
 import cn.edu.njnu.geoproblemsolving.business.activity.service.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;

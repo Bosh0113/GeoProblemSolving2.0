@@ -1,6 +1,7 @@
 package cn.edu.njnu.geoproblemsolving.business.activity.service.Impl;
 
 import cn.edu.njnu.geoproblemsolving.Dao.Folder.FolderDaoImpl;
+import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Project;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Subproject;
 import cn.edu.njnu.geoproblemsolving.business.user.entity.User;
@@ -8,6 +9,7 @@ import cn.edu.njnu.geoproblemsolving.business.activity.repository.ProjectReposit
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.SubprojectRepository;
 import cn.edu.njnu.geoproblemsolving.business.activity.service.SubprojectService;
 import cn.edu.njnu.geoproblemsolving.business.user.repository.UserRepository;
+import cn.edu.njnu.geoproblemsolving.common.utils.ResultUtils;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.stereotype.Service;
@@ -40,7 +42,8 @@ public class SubprojectServiceImpl implements SubprojectService {
         }
     }
 
-    public Object createSubproject(Subproject subproject){
+    @Override
+    public JsonResult createSubproject(Subproject subproject) {
         try {
             Date data = new Date();
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
@@ -49,13 +52,14 @@ public class SubprojectServiceImpl implements SubprojectService {
             // update project info
             String projectId = subproject.getParent();
             Project project = projectRepository.findById(projectId).get();
-            if(project == null) return "Fail: project does not exist";
+            if (project == null) return ResultUtils.error(-1, "Fail: project does not exist.");
             ArrayList<String> children = project.getChildren();
             children.add(subprojectId);
             project.setChildren(children);
 
             // Created time
             subproject.setCreatedTime(dateFormat.format(data));
+            subproject.setActiveTime(dateFormat.format(data));
 
             // Aid
             subproject.setAid(subprojectId);
@@ -71,37 +75,63 @@ public class SubprojectServiceImpl implements SubprojectService {
 
             subproject.setMembers(members);
 
-            // Save
-            projectRepository.save(project);
-            subprojectRepository.save(subproject);
-
             // folder
             folderDao.createFolder(subproject.getName(), "", subprojectId);
 
-            return subproject;
-        }
-        catch (Exception ex){
-            return "Fail: Exception";
+            // Save
+            subprojectRepository.save(subproject);
+            projectRepository.save(project);
+
+            return ResultUtils.success(subproject);
+        } catch (Exception ex) {
+            return ResultUtils.error(-2, "Fail: Exception");
         }
     }
 
-    public Object inquirySubprojects(String projectId){
+    @Override
+    public JsonResult inquirySubproject(String aid) {
         try {
-            List<Subproject> result =  subprojectRepository.findByParent(projectId);
-            if(result.isEmpty())
-                return "None";
+            Optional result = subprojectRepository.findById(aid);
+            if (result.isPresent())
+                return ResultUtils.success(result.get());
             else
-                return result;
-        }
-        catch (Exception ex){
-            return "Fail: Exception";
+                return ResultUtils.error(-1, "Fail: subproject does not exist.");
+        } catch (Exception ex) {
+            return ResultUtils.error(-2, "Fail: Exception");
         }
     }
 
-    public Object findParticipants(String aid){
+    @Override
+    public JsonResult updateSubproject(Subproject subproject) {
+        try {
+            // confirm
+            Optional result = subprojectRepository.findById(subproject.getAid());
+            if (!result.isPresent()) return ResultUtils.error(-1, "Fail: subproject does not exist.");
+
+            return ResultUtils.success(subprojectRepository.save(subproject));
+        } catch (Exception ex) {
+            return ResultUtils.error(-2, "Fail: Exception");
+        }
+    }
+
+    @Override
+    public JsonResult deleteSubproject(String aid) {
+        try {
+            Optional result = subprojectRepository.findById(aid);
+            if (! result.isPresent())  return ResultUtils.error(-1, "Fail: subproject does not exist.");
+
+            subprojectRepository.deleteById(aid);
+            return ResultUtils.success("Success");
+        } catch (Exception ex) {
+            return ResultUtils.error(-2, "Fail: Exception");
+        }
+    }
+
+    @Override
+    public JsonResult findParticipants(String aid) {
         try {
             Optional optional = subprojectRepository.findById(aid);
-            if (!optional.isPresent()) return "Fail: subproject does not exist";
+            if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: subproject does not exist.");
             Subproject subproject = (Subproject) optional.get();
 
             // creator
@@ -125,26 +155,29 @@ public class SubprojectServiceImpl implements SubprojectService {
             }
             participants.put("members", memberinfos);
 
-            return participants;
-        }
-        catch (Exception ex){
-            return "Fail: Exception";
+            return ResultUtils.success(participants);
+        } catch (Exception ex) {
+            return ResultUtils.error(-2, "Fail: Exception");
         }
     }
 
-    public String joinSubproject(String aid, String userId){
+    @Override
+    public JsonResult joinSubproject(String aid, String userId) {
         try {
+            // confirm
             Optional optional = subprojectRepository.findById(aid);
-            if (!optional.isPresent()) return "Fail: subproject does not exist";
-            Subproject subproject = (Subproject) optional.get();
+            if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: subproject does not exist.");
+            User user = findByUserId(userId);
+            if (user == null) return ResultUtils.error(-1, "Fail: user does not exist.");
 
             // add user info to subproject
             // if user exist in subproject?
+            Subproject subproject = (Subproject) optional.get();
             JSONArray members = subproject.getMembers();
             for (Object member : members) {
                 if (member instanceof JSONObject) {
                     if (((JSONObject) member).get("userId").equals(userId)) {
-                        return "Exist";
+                        return ResultUtils.error(-3, "Fail: member already exists in the subproject");
                     }
                 }
             }
@@ -156,18 +189,18 @@ public class SubprojectServiceImpl implements SubprojectService {
             subproject.setMembers(members);
             subprojectRepository.save(subproject);
 
-            return "Success";
-        }
-        catch (Exception ex){
-            return "Fail: Exception";
+            return ResultUtils.success("Success");
+        } catch (Exception ex) {
+            return ResultUtils.error(-2, "Fail: Exception");
         }
     }
 
-    public String updateMemberRole(String aid, String userId, String role){
+    @Override
+    public JsonResult updateMemberRole(String aid, String userId, String role) {
         try {
             // check
             Optional optional = subprojectRepository.findById(aid);
-            if (!optional.isPresent()) return "Fail: subproject does not exist";
+            if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: subproject does not exist.");
             Subproject subproject = (Subproject) optional.get();
 
             // Update roles
@@ -185,18 +218,18 @@ public class SubprojectServiceImpl implements SubprojectService {
             subproject.setMembers(members);
             subprojectRepository.save(subproject);
 
-            return "Success";
-        }
-        catch (Exception ex){
-            return "Fail: Exception";
+            return ResultUtils.success("Success");
+        } catch (Exception ex) {
+            return ResultUtils.error(-2, "Fail: Exception");
         }
     }
 
-    public String quitSubproject(String aid, String userId){
+    @Override
+    public JsonResult quitSubproject(String aid, String userId) {
         try {
             // check
             Optional optional = subprojectRepository.findById(aid);
-            if (!optional.isPresent()) return "Fail: subproject does not exist";
+            if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: subproject does not exist.");
             Subproject subproject = (Subproject) optional.get();
 
             // remove the user from the project
@@ -211,10 +244,9 @@ public class SubprojectServiceImpl implements SubprojectService {
             subproject.setMembers(members);
             subprojectRepository.save(subproject);
 
-            return "Success";
-        }
-        catch (Exception ex){
-            return "Fail: Exception";
+            return ResultUtils.success("Success");
+        } catch (Exception ex) {
+            return ResultUtils.error(-2, "Fail: Exception");
         }
     }
 
