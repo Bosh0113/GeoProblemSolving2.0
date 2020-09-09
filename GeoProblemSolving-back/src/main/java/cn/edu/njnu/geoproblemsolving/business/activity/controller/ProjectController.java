@@ -108,7 +108,7 @@ public class ProjectController {
      */
     @RequestMapping(value = "/{aid}/children", method = RequestMethod.GET)
     public JsonResult getAllActivities(@PathVariable("aid") String aid){
-        JsonResult result = projectService.findAllActivities(aid);
+        JsonResult result = projectService.findChildren(aid);
         return result;
     }
 

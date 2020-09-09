@@ -1,18 +1,15 @@
 <template>
   <div style="display: flex;background-color:lightgrey">
-    <Card style="margin: 5px; width: 250px;overflow-y: auto" dis-hover class="activityCard">
+    <Card dis-hover class="activityCard">
       <h3 slot="title">Activity list</h3>
       <div style="padding-right: 15px">
-        <Tree :data="activityTree" :render="renderStyle" @on-toggle-expand="expand"></Tree>
+        <Tree :data="activityTree" :render="renderStyle"></Tree>
       </div>
     </Card>
-    <Card
-      dis-hover
-      style="width: calc(100vw - 260px); height: calc(100vh - 10px); background-color: white; margin: 5px;overflow-x: auto"
-    >
-      <div slot="title">{{slctActivity.name}}</div>
+    <Card dis-hover class="workspaceCard">
+      <h3 slot="title">{{slctActivity.name}}</h3>
       <div slot="extra" v-show="slctActivity.level > 0">
-        <Button
+        <!-- <Button
           icon="md-create"
           size="small"
           style="margin-top:-10px; margin-right: 10px"
@@ -25,8 +22,34 @@
           style="margin-top:-10px"
           @click="activityDeleteModal = true"
           v-show="userInfo.userId === slctActivity.creator"
+        >Delete</Button>-->
+        <Button
+          icon="md-create"
+          size="small"
+          style="margin-top:-10px; margin-right: 10px"
+          @click="activityEditModal = true"
+        >Edit</Button>
+        <Button
+          icon="md-trash"
+          size="small"
+          style="margin-top:-10px"
+          @click="activityDeleteModal = true"
         >Delete</Button>
       </div>
+      <!-- <Spin size="large" fix v-if="spinShow"></Spin> -->
+      <type-choose
+        v-if="contentType==0"
+        :activityInfo="slctActivity"
+        :userInfo="userInfo"
+        @typeChanged="typeChanged"
+      ></type-choose>
+      <!-- <work-space v-else-if="contentType==1" :activityInfo="slctActivity" :userInfo="userInfo"></work-space> -->
+      <activity-manager
+        v-else-if="contentType==2"
+        :activityInfo="slctActivity"
+        :userInfo="userInfo"
+      ></activity-manager>
+      <!-- <activity-show v-else-if="contentType==4" :activityInfo="slctActivity" :userInfo="userInfo"></activity-show> -->
     </Card>
     <Modal
       v-model="activityEditModal"
@@ -36,7 +59,7 @@
       <Form
         ref="activityForm"
         :model="slctActivity"
-        :rules="activityRuleValidate"
+        :rules="activityEditRule"
         :label-width="120"
       >
         <FormItem label="Name" prop="name">
@@ -54,6 +77,12 @@
             type="textarea"
           ></Input>
         </FormItem>
+        <FormItem label="Purpose:" prop="purpose">
+          <Input
+            type="text" readonly
+            v-model="slctActivity.purpose"
+          ></Input>
+          </FormItem>
       </Form>
       <div slot="footer" style="display: inline-block">
         <Button type="primary" @click="editActivity()" style="float:right;">OK</Button>
@@ -78,7 +107,7 @@
       <Form
         ref="activityForm"
         :model="activityForm"
-        :rules="activityRuleValidate"
+        :rules="activityCreateRule"
         :label-width="120"
       >
         <FormItem label="Name" prop="name">
@@ -95,7 +124,12 @@
             :rows="4"
             type="textarea"
           ></Input>
-        </FormItem>
+        </FormItem>        
+        <FormItem label="Purpose:" prop="purpose">
+            <Select v-model="activityForm.purpose" placeholder="Select the purpose of this activity" readonly>
+              <Option v-for="item in purposes" :key="item.index" :value="item">{{item}}</Option>
+            </Select>
+          </FormItem>
       </Form>
       <div slot="footer" style="display: inline-block">
         <Button type="primary" @click="createActivity('activityForm')" style="float:right;">OK</Button>
@@ -106,12 +140,21 @@
 </template>
 <script>
 import * as userRoleJS from "./../../api/userRole.js";
+import typeChoose from "./activity/typeChoose.vue";
+import workSpace from "./activity/workSpace.vue";
+import activityManager from "./activity/activityManager.vue";
+import activityShow from "./activity/activityShow.vue";
 export default {
+  components: {
+    typeChoose,
+    workSpace,
+    activityManager,
+    activityShow,
+  },
   data() {
     return {
-      userRole: JSON.parse(sessionStorage.getItem("userInfo")),
       projectInfo: {},
-      userInfo: {},
+      userInfo: JSON.parse(sessionStorage.getItem("userInfo")),
       activityTree: [
         {
           aid: "111",
@@ -168,7 +211,6 @@ export default {
       slctActivity: {},
       expandNode: {}, // 使用引用传递，记录expand的位置，对activity tree 进行修改
       parentNode: {}, // 记录所创建/选择activity的父节点位置，对activity tree 进行修改
-      // create activity
       createActivityModel: false,
       activityForm: {
         name: "",
@@ -179,7 +221,7 @@ export default {
         permission: JSON.stringify(userRoleJS.getDefault()),
         type: "Activity_Default",
       },
-      activityRuleValidate: {
+      activityCreateRule: {
         name: [
           {
             required: true,
@@ -196,9 +238,47 @@ export default {
             trigger: "blur",
           },
         ],
+        purpose: [
+          {
+            required: true,
+            message: "The purpose should not be empty",
+            trigger: "blur",
+          },
+        ],
+      },
+      activityEditRule: {
+        name: [
+          {
+            required: true,
+            message: "The name should not be empty and more than 60 characters",
+            trigger: "blur",
+            type: "string",
+            max: 60,
+          },
+        ],
+        description: [
+          {
+            required: true,
+            message: "The description should not be empty",
+            trigger: "blur",
+          }
+        ],
       },
       activityEditModal: false,
       activityDeleteModal: false,
+      contentType: -1,
+      purposes: [
+        "Context definition & resource collection",
+        "Data processing",
+        "Data visualization",
+        "Geographic model construction",
+        "Model effectiveness evaluation",
+        "Geographical simulation",
+        "Quantitative and qualitative analysis",
+        "Decision-making for management",
+        "Others"
+      ],
+      // spinShow: false,
     };
   },
   beforeRouteEnter: (to, from, next) => {
@@ -287,7 +367,7 @@ export default {
       this.projectInfo = parent.vm.projectInfo;
       this.initActivityTree();
       this.slctActivity = this.projectInfo;
-      this.userRole = this.roleIdentity(this.projectInfo);
+      this.setContent(this.slctActivity);
     },
     roleIdentity(activity) {
       return userRoleJS.roleIdentify(activity.members, this.userInfo.userId);
@@ -301,88 +381,92 @@ export default {
     },
     initActivityTree() {
       this.activityTree = [];
-      this.axios
-        .get("/GeoProblemSolving/project/" + this.projectInfo.aid + "/children")
-        .then((res) => {
-          if (res.data.code == 0) {
-            let children = res.data.data;
-            // if (
-            //   this.permissionIdentity(
-            //     this.projectInfo.permission,
-            //     this.roleIdentity(this.projectInfo),
-            //     "manage_child_activity"
-            //   )
-            // ) {
-            children.push({
-              aid: "add",
-            }); // create activity node
-            // }
+      if (this.projectInfo.type == "Activity_Group") {
+        this.axios
+          .get(
+            "/GeoProblemSolving/project/" + this.projectInfo.aid + "/children"
+          )
+          .then((res) => {
+            if (res.data.code == 0) {
+              let children = res.data.data;
+              // if (
+              //   this.permissionIdentity(
+              //     this.projectInfo.permission,
+              //     this.roleIdentity(this.projectInfo),
+              //     "manage_child_activity"
+              //   )
+              // ) {
+              children.push({ aid: "add" }); // create activity node
+              // }
 
-            let root = Object.assign({}, this.projectInfo);
-            root["expand"] = true;
-            root["children"] = children;
+              let root = Object.assign({}, this.projectInfo);
+              root["expand"] = true;
+              root["children"] = children;
 
-            this.activityTree.push(root);
-          } else {
-            console.log(res.data.msg);
-          }
-        })
-        .catch((err) => {
-          console.log(err.data);
-        });
+              this.activityTree.push(root);
+            } else {
+              console.log(res.data.msg);
+            }
+          })
+          .catch((err) => {
+            console.log(err.data);
+          });
+      } else {
+        let root = Object.assign({}, this.projectInfo);
+        this.activityTree.push(root);
+      }
+    },
+    typeChanged(type) {
+      if (type == "Activity_Group") {
+        this.slctActivity.children = [{ aid: "add" }];
+      }
+      this.slctActivity.type = type;
+      this.setContent(activity);
     },
     expandActivityTree(activity) {
-      let url = "";
-      if (activity.level == 1) {
-        url =
-          "/GeoProblemSolving/subproject/" + this.projectInfo.aid + "/children";
-      } else if (activity.level > 1) {
-        url =
-          "/GeoProblemSolving/activity/" + this.projectInfo.aid + "/children";
-      }
+      if (activity.type == "Activity_Group") {
+        let url = "";
+        if (activity.level == 1) {
+          url = "/GeoProblemSolving/subproject/" + activity.aid + "/children";
+        } else if (activity.level > 1) {
+          url = "/GeoProblemSolving/activity/" + activity.aid + "/children";
+        }
 
-      this.axios
-        .get(url)
-        .then((res) => {
-          if (res.data.code == 0) {
-            // children
-            let children = res.data.data;
-            if (
-              this.permissionIdentity(
-                activity.permission,
-                this.roleIdentity(activity),
-                "manage_child_activity"
-              )
-            ) {
+        this.axios
+          .get(url)
+          .then((res) => {
+            if (res.data.code == 0) {
+              // children
+              let children = res.data.data;
+              // if (
+              //   this.permissionIdentity(
+              //     activity.permission,
+              //     this.roleIdentity(activity),
+              //     "manage_child_activity"
+              //   )
+              // ) {
               children.push({
                 aid: "add",
               });
-            }
+              // }
 
-            this.expandNode["expand"] = true;
-            this.expandNode["children"] = children;
-          } else {
-            console.log(res.data.msg);
-          }
-        })
-        .catch((err) => {
-          console.log(err.data);
-        });
-    },
-    expand(activity) {
-      if (activity.expand) {
-        if (
-          this.roleIdentity(activity) != "visitor" ||
-          activity.permission.observe == "Yes"
-        ) {
-          this.expandActivityTree(activity);
-          this.expandNode = activity;
-        } else {
-          activity.expand = false;
-        }
+              this.expandNode["expand"] = true;
+              this.expandNode["children"] = children;
+            } else {
+              console.log(res.data.msg);
+            }
+          })
+          .catch((err) => {
+            console.log(err.data);
+          });
       }
     },
     switchActivity(root, node, activity) {
+      // if (
+      //   this.roleIdentity(activity) != "visitor" ||
+      //   activity.permission.observe == "Yes"
+      // ) {
+      //content
       if (activity.level > 0) {
         this.parentNode = root[node.parent].node;
       } else {
@@ -390,20 +474,20 @@ export default {
       }
       this.slctActivity = activity;
       this.setContent(activity);
+      // expand
+      this.expandActivityTree(activity);
+      this.expandNode = activity;
+      // } else {
+      //   this.contentType = 4;
+      // }
     },
     setContent(activity) {
-      if (activity.level == 0) {
-        if (activity.children == undefined || activity.children.lenght == 0) {
-          // leaf
-        } else if (activity.children.lenght > 0) {
-          // not leaf
-        }
-      } else if (activity.level > 0) {
-        if (activity.children == undefined || activity.children.lenght == 0) {
-          // leaf
-        } else if (activity.children.lenght > 0) {
-          // not leaf
-        }
+      if (activity.type == "Activity_Default") {
+        this.contentType = 0;
+      } else if (activity.type == "Activity_Unit") {
+        this.contentType = 1;
+      } else if (activity.type == "Activity_Group") {
+        this.contentType = 2;
       }
     },
     preCreation(root, node) {
@@ -437,6 +521,7 @@ export default {
             }
             this.parentNode.children.push({ aid: "add" });
             this.slctActivity = res.data.data;
+            this.setContent(this.slctActivity);
             // change content
             //...
           } else {
@@ -482,42 +567,58 @@ export default {
       this.activityEditModal = false;
     },
     delActivity() {
-      if (this.userInfo.userId === this.slctActivity.creator) {
-        let url = "";
-        let aid = this.slctActivity.aid;
-        if (this.slctActivity.level == 1) {
-          url = "/GeoProblemSolving/subproject?aid=" + aid;
-        } else if (this.slctActivity.level > 1) {
-          url = "/GeoProblemSolving/activity?aid=" + aid;
-        }
-        this.axios
-          .delete(url)
-          .then((res) => {
-            if (res.data.code == 0) {
-              if (this.parentNode != {}) {
-                this.slctActivity = this.parentNode;
-
-                // delete activity from activity tree
-                let children = this.parentNode.children;
-                children.splice(
-                  children.findIndex((item) => item.aid === aid),
-                  1
-                );
-              }
-            } else {
-              console.log(res.data.msg);
-            }
-          })
-          .catch((err) => {
-            console.log(err);
-          });
+      // if (this.userInfo.userId === this.slctActivity.creator) {
+      let url = "";
+      let aid = this.slctActivity.aid;
+      if (this.slctActivity.level == 1) {
+        url = "/GeoProblemSolving/subproject?aid=" + aid;
+      } else if (this.slctActivity.level > 1) {
+        url = "/GeoProblemSolving/activity?aid=" + aid;
       }
+      this.axios
+        .delete(url)
+        .then((res) => {
+          if (res.data.code == 0) {
+            if (this.parentNode != {}) {
+              this.slctActivity = this.parentNode;
+              this.setContent(this.slctActivity);
+
+              // delete activity from activity tree
+              let children = this.parentNode.children;
+              children.splice(
+                children.findIndex((item) => item.aid === aid),
+                1
+              );
+            }
+          } else {
+            console.log(res.data.msg);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+      // }
     },
   },
 };
 </script>
 <style scoped>
+.activityCard {
+  margin: 5px;
+  width: 250px;
+  overflow-y: auto;
+}
 .activityCard >>> .ivu-card-body {
   padding: 5px 10px;
+}
+.workspaceCard {
+  width: calc(100vw - 260px);
+  height: calc(100vh - 10px);
+  background-color: white;
+  margin: 5px;
+  overflow-x: auto;
+}
+.workspaceCard >>> .ivu-card-body {
+  padding: 0px 10px;
 }
 </style>

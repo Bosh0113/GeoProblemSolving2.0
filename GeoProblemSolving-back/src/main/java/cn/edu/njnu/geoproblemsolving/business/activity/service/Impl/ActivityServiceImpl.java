@@ -1,6 +1,8 @@
 package cn.edu.njnu.geoproblemsolving.business.activity.service.Impl;
 
 import cn.edu.njnu.geoproblemsolving.Dao.Folder.FolderDaoImpl;
+import cn.edu.njnu.geoproblemsolving.business.activity.entity.Project;
+import cn.edu.njnu.geoproblemsolving.business.activity.enums.ActivityType;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.LinkProtocol;
@@ -71,7 +73,7 @@ public class ActivityServiceImpl implements ActivityService {
         }
     }
 
-    private Activity saveLastActivityInfo(String aid, String pid, Activity last){
+    private Activity saveLastActivityInfo(String aid, String pid, Activity last) {
         JSONObject nextInfo = new JSONObject();
         nextInfo.put("aid", aid);
         nextInfo.put("protocolId", pid);
@@ -83,7 +85,7 @@ public class ActivityServiceImpl implements ActivityService {
         return last;
     }
 
-    private Activity saveNextActivityInfo(String aid, String pid, Activity next){
+    private Activity saveNextActivityInfo(String aid, String pid, Activity next) {
         JSONObject lastInfo = new JSONObject();
         lastInfo.put("aid", aid);
         lastInfo.put("protocolId", pid);
@@ -93,6 +95,18 @@ public class ActivityServiceImpl implements ActivityService {
         next.setLast(lastActivities);
 
         return next;
+    }
+
+    @Override
+    public JsonResult findActivity(String aid) {
+        try {
+            Activity activity = findActivityById(aid);
+            if (activity == null) return ResultUtils.error(-1, "Fail: activity does not exist.");
+
+            return ResultUtils.success(activity);
+        } catch (Exception ex) {
+            return ResultUtils.error(-2, "Fail: Exception");
+        }
     }
 
     @Override
@@ -108,14 +122,6 @@ public class ActivityServiceImpl implements ActivityService {
             activity.setCreatedTime(dateFormat.format(date));
             activity.setActiveTime(dateFormat.format(date));
 
-            // update project info
-            String subprojectId = activity.getParent();
-            Subproject subproject = subprojectRepository.findById(subprojectId).get();
-            if (subproject == null) return ResultUtils.error(-1, "Fail: subproject does not exist.");
-            ArrayList<String> children = subproject.getChildren();
-            children.add(subprojectId);
-            subproject.setChildren(children);
-
             // members
             String creatorId = activity.getCreator();
             JSONObject creator = new JSONObject();
@@ -126,6 +132,9 @@ public class ActivityServiceImpl implements ActivityService {
             members.add(creator);
 
             activity.setMembers(members);
+
+            // set type
+            activity.setType(ActivityType.Activity_Default);
 
             // tools and toolsets
             Query queryPublic = new Query(Criteria.where("privacy").is("Public"));
@@ -146,11 +155,81 @@ public class ActivityServiceImpl implements ActivityService {
             //folder
             folderDao.createFolder(activity.getName(), "", aid);
 
+            // update parent activity info
+            if(activity.getLevel() == 2) {
+                String subprojectId = activity.getParent();
+                Optional optional = subprojectRepository.findById(subprojectId);
+                if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: parent activity does not exist.");
+                Subproject parent = (Subproject) optional.get();
+
+                ArrayList<String> children = parent.getChildren();
+                children.add(subprojectId);
+                parent.setChildren(children);
+                subprojectRepository.save(parent);
+            } else {
+                String activityId = activity.getParent();
+                Optional optional = activityRepository.findById(activityId);
+                if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: parent activity does not exist.");
+                Activity parent = (Activity) optional.get();
+
+                ArrayList<String> children = parent.getChildren();
+                children.add(activityId);
+                parent.setChildren(children);
+                activityRepository.save(parent);
+            }
+
             //save
-            subprojectRepository.save(subproject);
             activityRepository.save(activity);
 
             return ResultUtils.success(activity);
+        } catch (Exception ex) {
+            return ResultUtils.error(-2, "Fail: Exception");
+        }
+    }
+
+    @Override
+    public JsonResult updateActivity(Activity activity) {
+        try {
+            // confirm
+            Optional result = activityRepository.findById(activity.getAid());
+            if (!result.isPresent()) return ResultUtils.error(-1, "Fail: activity does not exist.");
+
+            return ResultUtils.success(activityRepository.save(activity));
+        } catch (Exception ex) {
+            return ResultUtils.error(-2, "Fail: Exception");
+        }
+    }
+
+    @Override
+    public JsonResult deleteActivity(String aid) {
+        try {
+            // confirm
+            Optional optional = activityRepository.findById(aid);
+            if (! optional.isPresent())  return ResultUtils.error(-1, "Fail: activity does not exist.");
+            Activity activity = (Activity) optional.get();
+
+            if(activity.getLevel() == 2) {
+                optional = subprojectRepository.findById(activity.getParent());
+                if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: parent activity does not exist.");
+                Subproject parent = (Subproject) optional.get();
+
+                // delete from parent
+                if(parent.getChildren().contains(aid))
+                    parent.getChildren().remove(aid);
+                subprojectRepository.save(parent);
+            } else {
+                optional = activityRepository.findById(activity.getParent());
+                if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: parent activity does not exist.");
+                Activity parent = (Activity) optional.get();
+
+                // delete from parent
+                if(parent.getChildren().contains(aid))
+                    parent.getChildren().remove(aid);
+                activityRepository.save(parent);
+            }
+
+            activityRepository.deleteById(aid);
+            return ResultUtils.success("Success");
         } catch (Exception ex) {
             return ResultUtils.error(-2, "Fail: Exception");
         }
@@ -221,29 +300,6 @@ public class ActivityServiceImpl implements ActivityService {
             return ResultUtils.error(-2, "Fail: Exception");
         }
 
-    }
-
-    @Override
-    public JsonResult createChild(String aid, String childId) {
-        try {
-            // confirm aid
-            Activity current = findActivityById(aid);
-            if (current == null) return ResultUtils.error(-1, "Fail: current activity does not exist.");
-            Activity child = findActivityById(childId);
-            if (child == null) return ResultUtils.error(-1, "Fail: child activity does not exist.");
-
-            // Update the current activity
-            ArrayList<String> children = current.getChildren();
-            children.add(childId);
-            current.setChildren(children);
-
-            //save
-            activityRepository.save(current);
-
-            return ResultUtils.success(child);
-        } catch (Exception ex) {
-            return ResultUtils.error(-2, "Fail: Exception");
-        }
     }
 
     @Override

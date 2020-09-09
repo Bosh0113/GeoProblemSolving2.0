@@ -57,6 +57,12 @@ public class SubProjectController {
         return subprojectService.deleteSubproject(aid);
     }
 
+    @RequestMapping(value = "/{aid}/children", method = RequestMethod.GET)
+    public JsonResult getAllActivities(@PathVariable("aid") String aid){
+        JsonResult result = subprojectService.findChildren(aid);
+        return result;
+    }
+
     /**
      * get participants of one subproject
      * @param aid

@@ -19,7 +19,7 @@ public interface ProjectService {
 
     public JsonResult findParticipants(String aid);
 
-    public JsonResult findAllActivities(String aid);
+    public JsonResult findChildren(String aid);
 
     public JsonResult joinProject(String aid, String userId);
 

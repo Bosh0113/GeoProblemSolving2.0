@@ -14,6 +14,8 @@ public interface SubprojectService{
 
     public JsonResult deleteSubproject(String aid);
 
+    public JsonResult findChildren(String aid);
+
     public JsonResult findParticipants(String aid);
 
     public JsonResult joinSubproject(String aid, String userId);

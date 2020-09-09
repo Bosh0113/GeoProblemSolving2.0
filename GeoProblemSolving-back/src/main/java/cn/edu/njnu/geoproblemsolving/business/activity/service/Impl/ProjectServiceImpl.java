@@ -2,6 +2,8 @@ package cn.edu.njnu.geoproblemsolving.business.activity.service.Impl;
 
 import cn.edu.njnu.geoproblemsolving.Dao.Email.EmailDaoImpl;
 import cn.edu.njnu.geoproblemsolving.Dao.Folder.FolderDaoImpl;
+import cn.edu.njnu.geoproblemsolving.business.activity.entity.Subproject;
+import cn.edu.njnu.geoproblemsolving.business.activity.enums.ActivityType;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Project;
@@ -143,6 +145,9 @@ public class ProjectServiceImpl implements ProjectService {
 
             project.setMembers(members);
 
+            // set type
+            project.setType(ActivityType.Activity_Default);
+
             // children
             ArrayList<String> children = new ArrayList<>();
             project.setChildren(children);
@@ -224,7 +229,8 @@ public class ProjectServiceImpl implements ProjectService {
         }
     }
 
-    public JsonResult findAllActivities(String aid) {
+    @Override
+    public JsonResult findChildren(String aid) {
         try {
             Optional optional = projectRepository.findById(aid);
             if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: project does not exist");
@@ -234,7 +240,7 @@ public class ProjectServiceImpl implements ProjectService {
             for (String childId : project.getChildren()) {
                 optional = subprojectRepository.findById(childId);
                 if (optional.isPresent()) {
-                    Activity childActivity = (Activity) optional.get();
+                    Subproject childActivity = (Subproject) optional.get();
                     children.add(childActivity);
                 }
             }
@@ -245,41 +251,7 @@ public class ProjectServiceImpl implements ProjectService {
         }
     }
 
-    private JSONObject getChildList(Activity activity, Integer level) {
-        JSONObject activityItem = new JSONObject();
-        if (activity.getChildren().size() == 0) {
-            activityItem.put("aid", activity.getAid());
-            activityItem.put("name", activity.getName());
-            activityItem.put("level", activity.getLevel());
-        } else {
-            for (String aid : activity.getChildren()) {
-                Activity childActivity = new Activity();
-                if (level == 1) {
-                    Optional optional = subprojectRepository.findById(aid);
-                    if (optional.isPresent()) {
-                        childActivity = (Activity) optional.get();
-                    } else {
-                        childActivity = null;
-                    }
-                } else if (level > 1) {
-                    Optional optional = activityRepository.findById(aid);
-                    if (optional.isPresent()) {
-                        childActivity = (Activity) optional.get();
-                    } else {
-                        childActivity = null;
-                    }
-                }
-                if (childActivity != null) {
-                    activityItem.put("aid", activity.getAid());
-                    activityItem.put("name", activity.getName());
-                    activityItem.put("level", activity.getLevel());
-                    activityItem.put("children", getChildList(childActivity, level + 1));
-                }
-            }
-        }
-        return activityItem;
-    }
-
+    @Override
     public JsonResult findParticipants(String aid) {
         try {
             Optional optional = projectRepository.findById(aid);
@@ -359,6 +331,7 @@ public class ProjectServiceImpl implements ProjectService {
         }
     }
 
+    @Override
     public JsonResult updateMemberRole(String aid, String userId, String role) {
         try {
             // check
@@ -430,6 +403,7 @@ public class ProjectServiceImpl implements ProjectService {
         }
     }
 
+    @Override
     public JsonResult invitedParticipants(String aid, String email, String password) {
         try {
             User user = userRepository.findByEmail(email);
@@ -452,6 +426,7 @@ public class ProjectServiceImpl implements ProjectService {
         }
     }
 
+    @Override
     public JsonResult applyJoinProject(String aid, EmailEntity emailEntity) {
         try {
             // check

@@ -6,15 +6,19 @@ import cn.edu.njnu.geoproblemsolving.business.activity.entity.LinkProtocol;
 
 public interface ActivityService {
 
+    public JsonResult findActivity(String aid);
+
     public JsonResult createActivity(Activity activity);
+
+    public JsonResult updateActivity(Activity activity);
+
+    public JsonResult deleteActivity(String aid);
 
     public JsonResult findChildren(String aid);
 
     public JsonResult findLast(String aid);
 
     public JsonResult findNext(String aid);
-
-    public JsonResult createChild(String aid, String childId);
 
     public JsonResult createNext(String aid, String nextId, LinkProtocol protocol);
 

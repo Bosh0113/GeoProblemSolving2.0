@@ -25,6 +25,7 @@ public class Activity implements Serializable {
      * Description information
      */
     private String description;
+    private String purpose;
 
     /**
      * User

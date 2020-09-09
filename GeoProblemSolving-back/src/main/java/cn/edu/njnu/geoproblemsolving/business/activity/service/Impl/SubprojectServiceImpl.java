@@ -1,6 +1,9 @@
 package cn.edu.njnu.geoproblemsolving.business.activity.service.Impl;
 
 import cn.edu.njnu.geoproblemsolving.Dao.Folder.FolderDaoImpl;
+import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
+import cn.edu.njnu.geoproblemsolving.business.activity.enums.ActivityType;
+import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityRepository;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Project;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Subproject;
@@ -22,12 +25,14 @@ public class SubprojectServiceImpl implements SubprojectService {
 
     private final SubprojectRepository subprojectRepository;
     private final ProjectRepository projectRepository;
+    private final ActivityRepository activityRepository;
     private final UserRepository userRepository;
     private final FolderDaoImpl folderDao;
 
-    public SubprojectServiceImpl(SubprojectRepository subprojectRepository, ProjectRepository projectRepository, UserRepository userRepository, FolderDaoImpl folderDao) {
+    public SubprojectServiceImpl(SubprojectRepository subprojectRepository, ProjectRepository projectRepository, ActivityRepository activityRepository, UserRepository userRepository, FolderDaoImpl folderDao) {
         this.subprojectRepository = subprojectRepository;
         this.projectRepository = projectRepository;
+        this.activityRepository = activityRepository;
         this.userRepository = userRepository;
         this.folderDao = folderDao;
     }
@@ -75,6 +80,9 @@ public class SubprojectServiceImpl implements SubprojectService {
 
             subproject.setMembers(members);
 
+            // set type
+            subproject.setType(ActivityType.Activity_Default);
+
             // folder
             folderDao.createFolder(subproject.getName(), "", subprojectId);
 
@@ -117,11 +125,42 @@ public class SubprojectServiceImpl implements SubprojectService {
     @Override
     public JsonResult deleteSubproject(String aid) {
         try {
-            Optional result = subprojectRepository.findById(aid);
-            if (! result.isPresent())  return ResultUtils.error(-1, "Fail: subproject does not exist.");
+            Optional optional = subprojectRepository.findById(aid);
+            if (! optional.isPresent())  return ResultUtils.error(-1, "Fail: subproject does not exist.");
+            Subproject subproject = (Subproject) optional.get();
+            optional = projectRepository.findById(subproject.getParent());
+            if (! optional.isPresent())  return ResultUtils.error(-1, "Fail: subproject does not exist.");
+            Project project = (Project) optional.get();
 
+            // delete from parent
+            if(project.getChildren().contains(aid))
+                project.getChildren().remove(aid);
+
+            projectRepository.save(project);
             subprojectRepository.deleteById(aid);
             return ResultUtils.success("Success");
+        } catch (Exception ex) {
+            return ResultUtils.error(-2, "Fail: Exception");
+        }
+    }
+
+    @Override
+    public JsonResult findChildren(String aid) {
+        try {
+            Optional optional = subprojectRepository.findById(aid);
+            if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: subproject does not exist");
+            Subproject subproject = (Subproject) optional.get();
+
+            JSONArray children = new JSONArray();
+            for (String childId : subproject.getChildren()) {
+                optional = activityRepository.findById(childId);
+                if (optional.isPresent()) {
+                    Activity childActivity = (Activity) optional.get();
+                    children.add(childActivity);
+                }
+            }
+
+            return ResultUtils.success(children);
         } catch (Exception ex) {
             return ResultUtils.error(-2, "Fail: Exception");
         }

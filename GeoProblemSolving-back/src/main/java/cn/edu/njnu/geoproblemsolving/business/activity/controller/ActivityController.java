@@ -23,24 +23,61 @@ public class ActivityController {
         this.activityService = activityService;
     }
 
+    /**
+     * Inquiry activity
+     * @param aid
+     * @return
+     */
+    @RequestMapping(method = RequestMethod.GET)
+    public JsonResult inquiryActivity(@RequestParam("aid") String aid) {
+        logger.info("createActivity");
+        return activityService.findActivity(aid);
+    }
 
+    /**
+     * Create activity
+     * @param activity
+     * @return
+     */
     @RequestMapping(method = RequestMethod.POST)
     public JsonResult createActivity(@RequestBody Activity activity) {
         logger.info("createActivity");
         return activityService.createActivity(activity);
     }
 
+    /**
+     * Update activity
+     * @param activity
+     * @return
+     */
+    @RequestMapping(method = RequestMethod.PUT)
+    public JsonResult updateActivity(@RequestBody Activity activity) {
+        logger.info("createActivity");
+        return activityService.updateActivity(activity);
+    }
+
+    /**
+     * Delete activity
+     * @param aid
+     * @return
+     */
+    @RequestMapping(method = RequestMethod.DELETE)
+    public JsonResult deleteActivity(@RequestParam("aid") String aid) {
+        logger.info("createActivity");
+        return activityService.deleteActivity(aid);
+    }
+
+    /**
+     * Get child activities
+     * @param aid
+     * @return
+     */
     @RequestMapping(method = RequestMethod.GET, value = "/{aid}/children")
     public JsonResult getChildren(@PathVariable("aid") String aid) {
         logger.info("getChildren");
         return activityService.findChildren(aid);
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/{aid}/children")
-    public JsonResult createChildActivity(@PathVariable("aid") String aid, @RequestParam("childId") String childId) {
-        logger.info("createChildActivity");
-        return activityService.createChild(aid, childId);
-    }
 
     @RequestMapping(method = RequestMethod.GET, value = "/{aid}/next")
     public JsonResult getNextActivities(@PathVariable("aid") String aid) {
