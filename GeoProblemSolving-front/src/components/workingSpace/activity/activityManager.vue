@@ -18,11 +18,13 @@
       <MenuItem name="Activities">
         <Icon type="ios-analytics" />Activities
       </MenuItem>
-      <MenuItem name="Discussion">
+      <!-- <MenuItem name="Discussion">
         <Icon type="ios-people" />Discussion
-      </MenuItem>
+      </MenuItem> -->
     </Menu>
-    <div v-show="activeMenu=='Introduction'"></div>
+    <div v-show="activeMenu=='Introduction'">
+      <activity-show style="margin-top: 10px" :activityInfo="activityInfo"></activity-show>
+    </div>
     <div v-show="activeMenu=='Resources'">
       <folder-tree
         style="margin-top: 10px"
@@ -40,15 +42,17 @@
   </div>
 </template>
 <script>
+import activityShow from "./activityShow.vue";
 import folderTree from "../../resources/folderTree";
 import taskManager from "./utils/taskManger.vue";
 import processManager from "./utils/processManager.vue";
 export default {
   props: ["activityInfo", "userInfo"],
   components: {
+    activityShow,
     folderTree,
     taskManager,
-    processManager
+    processManager,
   },
   data() {
     return {

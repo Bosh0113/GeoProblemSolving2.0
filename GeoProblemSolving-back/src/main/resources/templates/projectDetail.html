@@ -71,18 +71,9 @@
         }
 
         .projectDescriptionContent {
-            height: 75px;
+            height: calc(100vh - 530px);
             overflow-y: auto;
-            text-indent: 2em;
-            padding: 0 5px;
-            word-break: break-word;
-        }
-
-        .projectIntroductionContent {
-            height: 110px;
-            overflow-y: auto;
-            text-indent: 2em;
-            padding: 0 5px;
+            padding: 10px 5px;
             word-break: break-word;
         }
 
@@ -523,7 +514,7 @@
                                                 </i-col>
                                             </Row>
                                             <div class="flex1" style="margin-top: 10px;">
-                                                <div style="padding: 5px;min-height: 80px;max-height: 100px;border: #e8eaec 0.1px dashed;">
+                                                <div style="flex: 1;padding: 5px;min-height: 100px;border: #e8eaec 0.1px dashed;">
                                                     <h3>Description:</h3>
                                                     <div class="projectDescriptionContent">
                                                         <vue-scroll :ops="scrollOps">
@@ -534,17 +525,6 @@
                                                         </vue-scroll>
                                                     </div>
                                                 </div>
-                                                <!--                                                <div style="flex: 1;min-height: 130px;padding: 5px;border: #e8eaec 0.1px dashed;margin-top: 10px;">-->
-                                                <!--                                                    <h3>Introduction:</h3>-->
-                                                <!--                                                    <div class="projectIntroductionContent">-->
-                                                <!--                                                        <vue-scroll :ops="scrollOps">-->
-                                                <!--                                                            <div id="projectIntroduction" style="white-space: pre-line;"-->
-                                                <!--                                                                 th:text="${projectInfo.introduction}">-->
-                                                <!--                                                                Project introduction-->
-                                                <!--                                                            </div>-->
-                                                <!--                                                        </vue-scroll>-->
-                                                <!--                                                    </div>-->
-                                                <!--                                                </div>-->
                                             </div>
                                         </div>
                                     </i-col>

@@ -49,19 +49,14 @@
         :activityInfo="slctActivity"
         :userInfo="userInfo"
       ></activity-manager>
-      <!-- <activity-show v-else-if="contentType==4" :activityInfo="slctActivity" :userInfo="userInfo"></activity-show> -->
+      <activity-show v-else-if="contentType==4" :activityInfo="slctActivity"></activity-show>
     </Card>
     <Modal
       v-model="activityEditModal"
       title="Edit information of the activity"
       :mask-closable="false"
     >
-      <Form
-        ref="activityForm"
-        :model="slctActivity"
-        :rules="activityEditRule"
-        :label-width="120"
-      >
+      <Form ref="activityForm" :model="slctActivity" :rules="activityEditRule" :label-width="120">
         <FormItem label="Name" prop="name">
           <Input
             type="text"
@@ -78,14 +73,11 @@
           ></Input>
         </FormItem>
         <FormItem label="Purpose:" prop="purpose">
-          <Input
-            type="text" readonly
-            v-model="slctActivity.purpose"
-          ></Input>
-          </FormItem>
+          <Input type="text" readonly v-model="slctActivity.purpose"></Input>
+        </FormItem>
       </Form>
       <div slot="footer" style="display: inline-block">
-        <Button type="primary" @click="editActivity()" style="float:right;">OK</Button>
+        <Button type="primary" @click="editActivity('activityEditRule')" style="float:right;">OK</Button>
         <Button @click="createActivityModel = false" style="float:right;margin-right: 15px;">Cancel</Button>
       </div>
     </Modal>
@@ -104,12 +96,7 @@
       width="800"
       :mask-closable="false"
     >
-      <Form
-        ref="activityForm"
-        :model="activityForm"
-        :rules="activityCreateRule"
-        :label-width="120"
-      >
+      <Form ref="activityForm" :model="activityForm" :rules="activityCreateRule" :label-width="120">
         <FormItem label="Name" prop="name">
           <Input
             type="text"
@@ -124,15 +111,19 @@
             :rows="4"
             type="textarea"
           ></Input>
-        </FormItem>        
+        </FormItem>
         <FormItem label="Purpose:" prop="purpose">
-            <Select v-model="activityForm.purpose" placeholder="Select the purpose of this activity" readonly>
-              <Option v-for="item in purposes" :key="item.index" :value="item">{{item}}</Option>
-            </Select>
-          </FormItem>
+          <Select
+            v-model="activityForm.purpose"
+            placeholder="Select the purpose of this activity"
+            readonly
+          >
+            <Option v-for="item in purposes" :key="item.index" :value="item">{{item}}</Option>
+          </Select>
+        </FormItem>
       </Form>
       <div slot="footer" style="display: inline-block">
-        <Button type="primary" @click="createActivity('activityForm')" style="float:right;">OK</Button>
+        <Button type="primary" @click="createActivity('activityCreateRule')" style="float:right;">OK</Button>
         <Button @click="createActivityModel = false" style="float:right;margin-right: 15px;">Cancel</Button>
       </div>
     </Modal>
@@ -261,7 +252,7 @@ export default {
             required: true,
             message: "The description should not be empty",
             trigger: "blur",
-          }
+          },
         ],
       },
       activityEditModal: false,
@@ -276,7 +267,7 @@ export default {
         "Geographical simulation",
         "Quantitative and qualitative analysis",
         "Decision-making for management",
-        "Others"
+        "Others",
       ],
       // spinShow: false,
     };
@@ -499,39 +490,43 @@ export default {
 
       this.createActivityModel = true;
     },
-    createActivity() {
-      let url = "";
-      if (this.activityForm.level == 1) {
-        // subproject
-        url = "/GeoProblemSolving/subproject";
-      } else if (this.activityForm.level > 1) {
-        // activity
-        url = "/GeoProblemSolving/activity";
-      }
-
-      this.axios
-        .post(url, this.activityForm)
-        .then((res) => {
-          if (res.data.code == 0) {
-            // change activity tree
-            for (let i = 0; i < this.parentNode.children.length; i++) {
-              if (this.parentNode.children[i].aid == "add") {
-                this.parentNode.children[i] = res.data.data;
-              }
-            }
-            this.parentNode.children.push({ aid: "add" });
-            this.slctActivity = res.data.data;
-            this.setContent(this.slctActivity);
-            // change content
-            //...
-          } else {
-            console.log(res.data.msg);
+    createActivity(name) {
+      this.$refs[name].validate((valid) => {
+        if (valid) {
+          let url = "";
+          if (this.activityForm.level == 1) {
+            // subproject
+            url = "/GeoProblemSolving/subproject";
+          } else if (this.activityForm.level > 1) {
+            // activity
+            url = "/GeoProblemSolving/activity";
           }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-      this.createActivityModel = false;
+
+          this.axios
+            .post(url, this.activityForm)
+            .then((res) => {
+              if (res.data.code == 0) {
+                // change activity tree
+                for (let i = 0; i < this.parentNode.children.length; i++) {
+                  if (this.parentNode.children[i].aid == "add") {
+                    this.parentNode.children[i] = res.data.data;
+                  }
+                }
+                this.parentNode.children.push({ aid: "add" });
+                this.slctActivity = res.data.data;
+                this.setContent(this.slctActivity);
+                // change content
+                //...
+              } else {
+                console.log(res.data.msg);
+              }
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+          this.createActivityModel = false;
+        }
+      });
     },
     preEditting(activity) {
       let children = [];
@@ -543,28 +538,32 @@ export default {
       }
       return activity;
     },
-    editActivity() {
-      let url = "";
-      let aid = this.slctActivity.aid;
-      let data = this.preEditting(this.slctActivity);
-      if (this.slctActivity.level == 1) {
-        url = "/GeoProblemSolving/subproject?aid=" + aid;
-      } else if (this.slctActivity.level > 1) {
-        url = "/GeoProblemSolving/activity?aid=" + aid;
-      }
-      this.axios
-        .put(url, data)
-        .then((res) => {
-          if (res.data.code == 0) {
-            this.$Notice.info({ title: "Result", desc: "Success!" });
-          } else {
-            this.$Notice.info({ title: "Result", desc: res.data.msg });
+    editActivity(name) {
+      this.$refs[name].validate((valid) => {
+        if (valid) {
+          let url = "";
+          let aid = this.slctActivity.aid;
+          let data = this.preEditting(this.slctActivity);
+          if (this.slctActivity.level == 1) {
+            url = "/GeoProblemSolving/subproject?aid=" + aid;
+          } else if (this.slctActivity.level > 1) {
+            url = "/GeoProblemSolving/activity?aid=" + aid;
           }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-      this.activityEditModal = false;
+          this.axios
+            .put(url, data)
+            .then((res) => {
+              if (res.data.code == 0) {
+                this.$Notice.info({ title: "Result", desc: "Success!" });
+              } else {
+                this.$Notice.info({ title: "Result", desc: res.data.msg });
+              }
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+          this.activityEditModal = false;
+        }
+      });
     },
     delActivity() {
       // if (this.userInfo.userId === this.slctActivity.creator) {
