@@ -250,7 +250,7 @@ export default {
         "Geographic model construction",
         "Model effectiveness evaluation",
         "Geographical simulation",
-        "Quantitative and qualitative analysis",
+        "Quantitative and qualitative analyses",
         "Decision-making for management"
       ],
       toolInfoRule: {

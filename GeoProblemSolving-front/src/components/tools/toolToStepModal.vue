@@ -434,7 +434,7 @@ export default {
         "Geographic model construction",
         "Model effectiveness evaluation",
         "Geographical simulation",
-        "Quantitative and qualitative analysis",
+        "Quantitative and qualitative analyses",
         "Decision-making for management",
         "Others"
       ],
@@ -741,7 +741,7 @@ export default {
           case "Geographic model construction":
           case "Model effectiveness evaluation":
           case "Geographical simulation":
-          case "Quantitative and qualitative analysis":
+          case "Quantitative and qualitative analyses":
           case "Decision-making for management": {
             var stepTypes = item.recomStep;
             for (var i = 0; i < stepTypes.length; i++) {

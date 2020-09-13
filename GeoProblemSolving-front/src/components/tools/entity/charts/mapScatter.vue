@@ -1,5 +1,5 @@
 <style>
-@import "../../../../static/css/jquery.jexcel.css";
+@import "../../../../../static/css/jquery.jexcel.css";
 </style>
 <template>
   <Row>
@@ -11,15 +11,12 @@
     <div style="width: 300px; padding:30px;margin-left:60px; float:left">
       <h3>Select data:</h3>
       <RadioGroup v-model="SelectAxis">
-        <Radio label="Name" style="padding:20px 0 10px 0"></Radio>
-        <Input v-model="SelectX" style="width:200px" readonly />
+        <Radio label="Place" style="padding:20px 0 10px 0"></Radio>
+        <Input v-model="SelectName" style="width:200px" readonly />
         <Radio label="Value" style="padding:20px 0 10px 0"></Radio>
-        <Input v-model="SelectY" style="width:200px" readonly />
-        <Radio
-          v-model="isRing"
-          @click.native="isRing = !isRing"
-          style="margin-top:20px"
-        >Doughnut chart</Radio>
+        <Input v-model="SelectValue" style="width:200px" readonly />
+        <Radio label="Coordinate" style="padding:20px 0 10px 0"></Radio>
+        <Input v-model="Coords" style="width:200px" readonly />
       </RadioGroup>
       <Button @click="Visualize" style="margin-top:30px">Visualization</Button>
       <Button v-if="visualization" @click="back2Table" style="margin-top:30px">Select data</Button>
@@ -37,12 +34,14 @@
   </Row>
 </template>
 <script>
-import * as socketApi from "./../../../api/socket.js";
-import csv from "../../../../static/js/jquery.csv.min.js";
-import jexcel from "../../../../static/js/jquery.jexcel.js";
+import * as socketApi from "./../../../../api/socket.js";
+import csv from "../../../../../static/js/jquery.csv.min.js";
+import jexcel from "../../../../../static/js/jquery.jexcel.js";
 import XLSX from "xlsx";
 import echarts from "echarts";
 import toolStyle from "../toolStyle";
+import "echarts/extension/bmap/bmap";
+import { MP } from "../../../../../static/js/baidu-map.js";
 export default {
   components: { toolStyle },
   data() {
@@ -56,14 +55,15 @@ export default {
       //data and params
       DataX: [],
       DataY: [],
-      SelectX: "",
-      SelectY: "",
+      DataZ: [],
+      SelectName: "",
+      SelectValue: "",
+      Coords: "",
       SelectAxis: "",
       chartData: [],
       chooseType: "",
       Charts: null,
       chartSettings: {},
-      isRing: false,
       // page info
       pageParams: { pageId: "", userId: "", userName: "" },
       userInfo: {},
@@ -82,6 +82,10 @@ export default {
     this.init();
     this.getResources();
     this.startWebSocket();
+    this.$nextTick(() => {
+      let _this = this;
+      MP("zkBKRbVfjeOMnIZFXtaTcr9b");
+    });
   },
   methods: {
     init() {
@@ -209,16 +213,21 @@ export default {
           (parseInt(endXY[1]) + 1);
       } catch (e) {}
 
-      if (this.SelectAxis == "Name") {
+      if (this.SelectAxis == "Place") {
         this.socket_content["startX"] = startXY;
         this.socket_content["endX"] = endXY;
-        this.SelectX = start + "->" + end;
+        this.SelectName = start + "->" + end;
         this.DataX = this.getData(startXY, endXY);
       } else if (this.SelectAxis == "Value") {
         this.socket_content["startY"] = startXY;
         this.socket_content["endY"] = endXY;
-        this.SelectY = start + "->" + end;
+        this.SelectValue = start + "->" + end;
         this.DataY = this.getData(startXY, endXY);
+      } else if (this.SelectAxis == "Coordinate") {
+        this.socket_content["startY"] = startXY;
+        this.socket_content["endY"] = endXY;
+        this.Coords = start + "->" + end;
+        this.DataZ = this.getData(startXY, endXY);
       }
     },
     getData(start, end) {
@@ -258,43 +267,197 @@ export default {
       this.visualization = false;
     },
     showCharts() {
-      this.visualization = true;
       let dataLength =
         this.DataX[0].length <= this.DataY[0].length
           ? this.DataX[0].length
           : this.DataY[0].length;
+      dataLength =
+        dataLength <= this.DataZ[0].length ? dataLength : this.DataZ[0].length;
+
+      var convertData = function(data) {
+        var res = [];
+        for (var i = 0; i < data.length; i++) {
+          var geoCoord = geoCoordMap[data[i].name];
+          if (geoCoord) {
+            res.push({
+              name: data[i].name,
+              value: geoCoord.concat(data[i].value)
+            });
+          }
+        }
+        return res;
+      };
+
+      var data = [],
+        geoCoordMap = {},
+        maxValue = 0;
+      for (var i = 1; i < dataLength; i++) {
+        if (this.DataY[0][i] > maxValue) {
+          maxValue = this.DataY[0][i];
+        }
+        data.push({
+          name: this.DataX[0][i],
+          value: this.DataY[0][i]
+        });
+        geoCoordMap[this.DataX[0][i].toString()] = [
+          this.DataZ[0][i],
+          this.DataZ[1][i]
+        ];
+      }
+
       var option = {
         tooltip: {
-          trigger: "item",
-          formatter: "{a} <br/>{b}: {c} ({d}%)"
+          trigger: "item"
         },
-        legend: {
-          data: []
+        bmap: {
+          center: [104.114129, 37.550339],
+          zoom: 5,
+          roam: true,
+          coordinateSystem: "bmap",
+          mapStyle: {
+            styleJson: [
+              {
+                featureType: "water",
+                elementType: "all",
+                stylers: {
+                  color: "#d1d1d1"
+                }
+              },
+              {
+                featureType: "land",
+                elementType: "all",
+                stylers: {
+                  color: "#f3f3f3"
+                }
+              },
+              {
+                featureType: "railway",
+                elementType: "all",
+                stylers: {
+                  visibility: "off"
+                }
+              },
+              {
+                featureType: "highway",
+                elementType: "all",
+                stylers: {
+                  color: "#fdfdfd"
+                }
+              },
+              {
+                featureType: "highway",
+                elementType: "labels",
+                stylers: {
+                  visibility: "off"
+                }
+              },
+              {
+                featureType: "arterial",
+                elementType: "geometry",
+                stylers: {
+                  color: "#fefefe"
+                }
+              },
+              {
+                featureType: "arterial",
+                elementType: "geometry.fill",
+                stylers: {
+                  color: "#fefefe"
+                }
+              },
+              {
+                featureType: "poi",
+                elementType: "all",
+                stylers: {
+                  visibility: "off"
+                }
+              },
+              {
+                featureType: "green",
+                elementType: "all",
+                stylers: {
+                  visibility: "off"
+                }
+              },
+              {
+                featureType: "subway",
+                elementType: "all",
+                stylers: {
+                  visibility: "off"
+                }
+              },
+              {
+                featureType: "manmade",
+                elementType: "all",
+                stylers: {
+                  color: "#d1d1d1"
+                }
+              },
+              {
+                featureType: "local",
+                elementType: "all",
+                stylers: {
+                  color: "#d1d1d1"
+                }
+              },
+              {
+                featureType: "arterial",
+                elementType: "labels",
+                stylers: {
+                  visibility: "off"
+                }
+              },
+              {
+                featureType: "boundary",
+                elementType: "all",
+                stylers: {
+                  color: "#fefefe"
+                }
+              },
+              {
+                featureType: "building",
+                elementType: "all",
+                stylers: {
+                  color: "#d1d1d1"
+                }
+              },
+              {
+                featureType: "label",
+                elementType: "labels.text.fill",
+                stylers: {
+                  color: "#999999"
+                }
+              }
+            ]
+          }
         },
         series: [
           {
-            data: [],
-            type: "pie",
-            radius: [this.isRing ? "45%" : "0%", "70%"],
+            name: this.DataY[0][0],
+            type: "scatter",
+            coordinateSystem: "bmap",
+            data: convertData(data),
+            symbolSize: function(val) {
+              console.log(val);
+              return val[2]/maxValue*50;
+            },
             label: {
-              emphasis: {
-                show: true,
-                textStyle: {
-                  fontSize: "30",
-                  fontWeight: "bold"
-                }
+              formatter: "{b}",
+              position: "right",
+              show: false
+            },
+            itemStyle: {
+              color: "blue"
+            },
+            emphasis: {
+              label: {
+                show: true
               }
             }
           }
         ]
       };
-      for (let i = 1; i < dataLength; i++) {
-        option.legend.data.push(this.DataX[0][i]);
-        option.series[0].data.push({
-          value: this.DataY[0][i],
-          name: this.DataX[0][i]
-        });
-      }
+
       if (this.Charts == null) {
         this.Charts = echarts.init(document.getElementById("visualization"));
       }
@@ -309,6 +472,7 @@ export default {
       this.socketApi.sendSock(this.socket_content, this.getSocketConnect);
       // this.socket_content = {};
 
+      this.visualization = true;
       this.showCharts();
     },
     getSocketConnect(data) {
@@ -337,7 +501,7 @@ export default {
                 parseInt(socketData.endX[0]) + "A".charCodeAt()
               ) +
               (parseInt(socketData.endX[1]) + 1);
-            this.SelectX = start + "->" + end;
+            this.SelectName = start + "->" + end;
             this.DataX = this.getData(socketData.startX, socketData.endX);
 
             start =
@@ -350,9 +514,23 @@ export default {
                 parseInt(socketData.endY[0]) + "A".charCodeAt()
               ) +
               (parseInt(socketData.endY[1]) + 1);
-            this.SelectY = start + "->" + end;
+            this.SelectValue = start + "->" + end;
             this.DataY = this.getData(socketData.startY, socketData.endY);
+
+            start =
+              String.fromCharCode(
+                parseInt(socketData.startZ[0]) + "A".charCodeAt()
+              ) +
+              (parseInt(socketData.startZ[1]) + 1);
+            end =
+              String.fromCharCode(
+                parseInt(socketData.endZ[0]) + "A".charCodeAt()
+              ) +
+              (parseInt(socketData.endZ[1]) + 1);
+            this.Coords = start + "->" + end;
+            this.DataZ = this.getData(socketData.startZ, socketData.endZ);
           } catch (e) {}
+          this.visualization = true;
           this.showCharts();
         } else if (socketData.operate === "selectdata") {
           this.dataUrl = socketData.pathURL;
@@ -368,7 +546,7 @@ export default {
 
       let roomId = this.pageParams.pageId;
       this.socketApi.initWebSocket(
-        "ChartsServer/" + "pie" + roomId,
+        "ChartsServer/" + "mapScatter" + roomId,
         this.$store.state.IP_Port
       );
 
@@ -513,6 +691,3 @@ export default {
   }
 };
 </script>
-
-
-

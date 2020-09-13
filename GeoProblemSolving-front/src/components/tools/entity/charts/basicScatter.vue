@@ -1,5 +1,5 @@
 <style>
-@import "../../../../static/css/jquery.jexcel.css";
+@import "../../../../../static/css/jquery.jexcel.css";
 </style>
 <template>
   <Row>
@@ -9,20 +9,12 @@
       v-on:resourceUrl="selecetResource"
     ></toolStyle>
     <div style="width: 300px; padding:30px;margin-left:60px; float:left">
-      <h3>Type of chart:</h3>
-      <Select
-        v-model="chooseType"
-        style="width:200px;padding-top:10px"
-        :placeholder="chartTypePlaceholder"
-      >
-        <Option v-for="item in normalChart" :value="item.value" :key="item.value">{{ item.label }}</Option>
-      </Select>
+      <h3>Select X-axis and Y-axis:</h3>
       <RadioGroup v-model="SelectAxis">
         <Radio label="X-Axis" style="padding:20px 0 10px 0"></Radio>
         <Input v-model="SelectX" style="width:200px" readonly />
         <Radio label="Y-Axis" style="padding:20px 0 10px 0"></Radio>
         <Input v-model="SelectY" style="width:200px" readonly />
-        <Radio v-model="stacked" @click.native="stacked = !stacked" style="margin-top:20px">Stack</Radio>
       </RadioGroup>
       <Button @click="Visualize" style="margin-top:30px">Visualization</Button>
       <Button v-if="visualization" @click="back2Table" style="margin-top:30px">Select data</Button>
@@ -40,9 +32,9 @@
   </Row>
 </template>
 <script>
-import * as socketApi from "./../../../api/socket.js";
-import csv from "../../../../static/js/jquery.csv.min.js";
-import jexcel from "../../../../static/js/jquery.jexcel.js";
+import * as socketApi from "./../../../../api/socket.js";
+import csv from "../../../../../static/js/jquery.csv.min.js";
+import jexcel from "../../../../../static/js/jquery.jexcel.js";
 import XLSX from "xlsx";
 import echarts from "echarts";
 import toolStyle from "../toolStyle";
@@ -56,12 +48,6 @@ export default {
       columnHeader: [],
       excelData: [],
       columnNameList: [],
-      // 选中的参考值
-      normalChart: [
-        { value: "Bar", label: "Simple bar" },
-        { value: "Stacked-bar", label: "Stacked bar" },
-      ],
-      chartTypePlaceholder: "Choose one type of charts",
       //data and params
       DataX: [],
       DataY: [],
@@ -72,7 +58,6 @@ export default {
       chooseType: "",
       Charts: null,
       chartSettings: {},
-      stacked: false,
       // page info
       pageParams: { pageId: "", userId: "", userName: "" },
       userInfo: {},
@@ -272,82 +257,35 @@ export default {
         this.DataX[0].length <= this.DataY[0].length
           ? this.DataX[0].length
           : this.DataY[0].length;
-      if (this.chooseType == "Bar") {
-        var option = {
-          tooltip: {
-            trigger: "axis",
-            axisPointer: {
-              type: "shadow"
-            }
-          },
-          xAxis: {
-            type: "category",
-            name: this.DataX[0][0],
-            data: []
-          },
-          yAxis: {
-            type: "value",
-            name: this.DataY[0][0]
-          },
-          series: [
-            {
-              data: [],
-              type: "bar"
-            }
-          ]
-        };
-        for (let i = 1; i < dataLength; i++) {
-          option.xAxis.data.push(this.DataX[0][i]);
-          option.series[0].data.push(this.DataY[0][i]);
-        }
-        if (this.Charts == null) {
-          this.Charts = echarts.init(document.getElementById("visualization"));
-        }
-        this.Charts.setOption(option);
-      } else if (this.chooseType == "Stacked-bar") {
-        var option = {
-          tooltip: {
-            trigger: "axis",
-            axisPointer: {
-              type: "shadow"
-            }
-          },
-          legend: {
-            data: []
-          },
-          xAxis: {
-            type: "category",
-            name: this.DataX[0][0],
-            data: []
-          },
-          yAxis: {
-            type: "value"
-          },
-          series: []
-        };
-        //X axis
-        for (var i = 1; i < dataLength; i++) {
-          option.xAxis.data.push(this.DataX[0][i]);
-        }
-        //Y axis
-        for (var j = 0; j < this.DataY.length; j++) {
-          let line = {
+
+      var option = {
+        tooltip: {
+          trigger: "item"
+        },
+        xAxis: {
+          name: this.DataX[0][0]
+        },
+        yAxis: {
+          name: this.DataY[0][0]
+        },
+        series: [
+          {
+            symbolSize: 10,
             data: [],
-            type: "bar",
-            name: this.DataY[j][0],
-            stack: this.stacked
-          };
-          option.legend.data.push(this.DataY[j][0]);
-          for (var i = 1; i < dataLength; i++) {
-            line.data.push(this.DataY[j][i]);
+            type: "scatter"
           }
-          option.series.push(line);
-        }
-        if (this.Charts == null) {
-          this.Charts = echarts.init(document.getElementById("visualization"));
-        }
-        this.Charts.setOption(option);
+        ]
+      };
+      for (let i = 1; i < dataLength; i++) {
+        let datum = [];
+        datum.push(this.DataX[0][i]);
+        datum.push(this.DataY[0][i]);
+        option.series[0].data.push(datum);
       }
+      if (this.Charts == null) {
+        this.Charts = echarts.init(document.getElementById("visualization"));
+      }
+      this.Charts.setOption(option);
     },
     Visualize() {
       if (this.DataX.length == 0 || this.DataY.length == 0) {
@@ -417,7 +355,7 @@ export default {
 
       let roomId = this.pageParams.pageId;
       this.socketApi.initWebSocket(
-        "ChartsServer/" + "histogram" + roomId,
+        "ChartsServer/" + "bscatter" + roomId,
         this.$store.state.IP_Port
       );
 

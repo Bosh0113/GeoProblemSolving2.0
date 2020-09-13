@@ -259,8 +259,8 @@
 </template>
 <script>
 import L from "leaflet";
-import A from "../../../static/js/agentmaps.js";
-import imIcon from "../../../static/Images/import.png";
+import A from "../../../../static/js/agentmaps.js";
+import imIcon from "../../../../static/Images/import.png";
 import "leaflet/dist/leaflet.css";
 export default {
   data() {

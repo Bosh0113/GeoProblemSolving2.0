@@ -7,7 +7,7 @@
 }
 
 .content {
-  background-image: url("../../assets/images/c5.jpg");
+  background-image: url("../../../assets/images/c5.jpg");
   background-size: cover;
   display: flex;
   justify-content: center;

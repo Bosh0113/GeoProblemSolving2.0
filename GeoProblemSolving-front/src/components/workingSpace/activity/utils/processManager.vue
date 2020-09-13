@@ -274,7 +274,7 @@ export default {
         "Geographic model construction",
         "Model effectiveness evaluation",
         "Geographical simulation",
-        "Quantitative and qualitative analysis",
+        "Quantitative and qualitative analyses",
         "Decision-making for management"
       ],
       // 步骤逻辑图
@@ -531,7 +531,7 @@ export default {
               icon: "circle"
             },
             {
-              name: "Quantitative and qualitative analysis",
+              name: "Quantitative and qualitative analyses",
               icon: "circle"
             },
             {
@@ -576,7 +576,7 @@ export default {
                 name: "Geographical simulation"
               },
               {
-                name: "Quantitative and qualitative analysis"
+                name: "Quantitative and qualitative analyses"
               },
               {
                 name: "Decision-making for management"
@@ -753,7 +753,7 @@ export default {
       } else if (category == 5) {
         type = "Geographical simulation";
       } else if (category == 6) {
-        type = "Quantitative and qualitative analysis";
+        type = "Quantitative and qualitative analyses";
       } else if (category == 7) {
         type = "Decision-making for management";
       }
@@ -773,7 +773,7 @@ export default {
         category = 4;
       } else if (type == "Geographical simulation") {
         category = 5;
-      } else if (type == "Quantitative and qualitative analysis") {
+      } else if (type == "Quantitative and qualitative analyses") {
         category = 6;
       } else if (type == "Decision-making for management") {
         category = 7;

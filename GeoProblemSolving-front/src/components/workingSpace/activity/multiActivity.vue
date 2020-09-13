@@ -23,7 +23,7 @@
       </MenuItem> -->
     </Menu>
     <div v-show="activeMenu=='Introduction'">
-      <activity-show style="margin-top: 10px" :activityInfo="activityInfo"></activity-show>
+      <activity-show :activityInfo="activityInfo"></activity-show>
     </div>
     <div v-show="activeMenu=='Resources'">
       <folder-tree

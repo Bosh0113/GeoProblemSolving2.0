@@ -1,5 +1,5 @@
 <style>
-@import "../../../../static/css/jquery.jexcel.css";
+@import "../../../../../static/css/jquery.jexcel.css";
 </style>
 <template>
   <Row>
@@ -9,12 +9,16 @@
       v-on:resourceUrl="selecetResource"
     ></toolStyle>
     <div style="width: 300px; padding:30px;margin-left:60px; float:left">
-      <h3>Select X-axis and Y-axis:</h3>
+      <h3>Select data:</h3>
       <RadioGroup v-model="SelectAxis">
-        <Radio label="X-Axis" style="padding:20px 0 10px 0"></Radio>
+        <Radio label="Name" style="padding:20px 0 10px 0"></Radio>
         <Input v-model="SelectX" style="width:200px" readonly />
-        <Radio label="Y-Axis" style="padding:20px 0 10px 0"></Radio>
+        <Radio label="Value" style="padding:20px 0 10px 0"></Radio>
         <Input v-model="SelectY" style="width:200px" readonly />
+      </RadioGroup>
+      <RadioGroup v-model="sort">
+        <Radio label="ascending" style="padding:20px 20px 10px 0"></Radio>
+        <Radio label="descending" style="padding:20px 20px 10px 0"></Radio>
       </RadioGroup>
       <Button @click="Visualize" style="margin-top:30px">Visualization</Button>
       <Button v-if="visualization" @click="back2Table" style="margin-top:30px">Select data</Button>
@@ -32,9 +36,9 @@
   </Row>
 </template>
 <script>
-import * as socketApi from "./../../../api/socket.js";
-import csv from "../../../../static/js/jquery.csv.min.js";
-import jexcel from "../../../../static/js/jquery.jexcel.js";
+import * as socketApi from "./../../../../api/socket.js";
+import csv from "../../../../../static/js/jquery.csv.min.js";
+import jexcel from "../../../../../static/js/jquery.jexcel.js";
 import XLSX from "xlsx";
 import echarts from "echarts";
 import toolStyle from "../toolStyle";
@@ -58,6 +62,7 @@ export default {
       chooseType: "",
       Charts: null,
       chartSettings: {},
+      sort: "descending",
       // page info
       pageParams: { pageId: "", userId: "", userName: "" },
       userInfo: {},
@@ -203,12 +208,12 @@ export default {
           (parseInt(endXY[1]) + 1);
       } catch (e) {}
 
-      if (this.SelectAxis == "X-Axis") {
+      if (this.SelectAxis == "Name") {
         this.socket_content["startX"] = startXY;
         this.socket_content["endX"] = endXY;
         this.SelectX = start + "->" + end;
         this.DataX = this.getData(startXY, endXY);
-      } else if (this.SelectAxis == "Y-Axis") {
+      } else if (this.SelectAxis == "Value") {
         this.socket_content["startY"] = startXY;
         this.socket_content["endY"] = endXY;
         this.SelectY = start + "->" + end;
@@ -257,30 +262,46 @@ export default {
         this.DataX[0].length <= this.DataY[0].length
           ? this.DataX[0].length
           : this.DataY[0].length;
-
       var option = {
         tooltip: {
-          trigger: "item"
+          trigger: "item",
+          formatter: "{a} <br/>{b} : {c}%"
         },
-        xAxis: {
-          name: this.DataX[0][0]
+        toolbox: {
+          feature: {
+            saveAsImage: {}
+          }
         },
-        yAxis: {
-          name: this.DataY[0][0]
+        legend: {
+          data:[]
         },
         series: [
           {
-            symbolSize: 10,
             data: [],
-            type: "scatter"
+            type: "funnel",
+            sort: this.sort,
+            label: {
+              show: true,
+              position: "inside"
+            },
+            itemStyle: {
+              borderColor: "#fff",
+              borderWidth: 1
+            },
+            emphasis: {
+              label: {
+                fontSize: 20
+              }
+            }
           }
         ]
       };
       for (let i = 1; i < dataLength; i++) {
-        let datum = [];
-        datum.push(this.DataX[0][i]);
-        datum.push(this.DataY[0][i]);
-        option.series[0].data.push(datum);
+        option.legend.data.push(this.DataX[0][i]);
+        option.series[0].data.push({
+          value: this.DataY[0][i],
+          name: this.DataX[0][i]
+        });
       }
       if (this.Charts == null) {
         this.Charts = echarts.init(document.getElementById("visualization"));
@@ -355,7 +376,7 @@ export default {
 
       let roomId = this.pageParams.pageId;
       this.socketApi.initWebSocket(
-        "ChartsServer/" + "bscatter" + roomId,
+        "ChartsServer/" + "funnel" + roomId,
         this.$store.state.IP_Port
       );
 

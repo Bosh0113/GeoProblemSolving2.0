@@ -1,6 +1,12 @@
 <template>
   <div style="display: flex;background-color:lightgrey">
     <Card dis-hover class="activityCard">
+      <!-- <Breadcrumb style="display: inline-block" separator=">">
+        <BreadcrumbItem>
+          <a @click="toProjectDetailPage">Project</a>
+        </BreadcrumbItem>
+        <BreadcrumbItem>Workspace</BreadcrumbItem>
+      </Breadcrumb>-->
       <h3 slot="title">Activity list</h3>
       <div style="padding-right: 15px">
         <Tree :data="activityTree" :render="renderStyle"></Tree>
@@ -13,12 +19,14 @@
           icon="md-create"
           size="small"
           style="margin-top:-10px; margin-right: 10px"
+          title="Edit information"
           @click="activityEditModal = true"
           v-show="permissionIdentity(slctActivity.permission, roleIdentity(slctActivity), 'edit_info')"
         >Edit</Button>
         <Button
           icon="md-trash"
           size="small"
+          title="Delete activity"
           style="margin-top:-10px"
           @click="activityDeleteModal = true"
           v-show="userInfo.userId === slctActivity.creator"
@@ -43,12 +51,8 @@
         :userInfo="userInfo"
         @typeChanged="typeChanged"
       ></type-choose>
-      <!-- <work-space v-else-if="contentType==1" :activityInfo="slctActivity" :userInfo="userInfo"></work-space> -->
-      <activity-manager
-        v-else-if="contentType==2"
-        :activityInfo="slctActivity"
-        :userInfo="userInfo"
-      ></activity-manager>
+      <single-activity v-else-if="contentType==1" :activityInfo="slctActivity"></single-activity>
+      <multi-activity v-else-if="contentType==2" :activityInfo="slctActivity" :userInfo="userInfo"></multi-activity>
       <activity-show v-else-if="contentType==4" :activityInfo="slctActivity"></activity-show>
     </Card>
     <Modal
@@ -77,8 +81,8 @@
         </FormItem>
       </Form>
       <div slot="footer" style="display: inline-block">
-        <Button type="primary" @click="editActivity('activityEditRule')" style="float:right;">OK</Button>
-        <Button @click="createActivityModel = false" style="float:right;margin-right: 15px;">Cancel</Button>
+        <Button type="primary" @click="editActivity('activityForm')" style="float:right;">OK</Button>
+        <Button @click="activityEditModal = false" style="float:right;margin-right: 15px;">Cancel</Button>
       </div>
     </Modal>
     <Modal
@@ -112,7 +116,18 @@
             type="textarea"
           ></Input>
         </FormItem>
-        <FormItem label="Purpose:" prop="purpose">
+        <FormItem label="Activity type:" prop="type">
+          <Select
+            v-model="activityForm.type"
+            placeholder="Select the type of this activity"
+            readonly
+          >
+            <Option value="Activity_Default">Select type later</Option>
+            <Option value="Activity_Unit">Single activity</Option>
+            <Option value="Activity_Group">Multi activities</Option>
+          </Select>
+        </FormItem>
+        <FormItem label="Purpose:" prop="purpose" v-show="activityForm.type=='Activity_Unit'">
           <Select
             v-model="activityForm.purpose"
             placeholder="Select the purpose of this activity"
@@ -123,7 +138,7 @@
         </FormItem>
       </Form>
       <div slot="footer" style="display: inline-block">
-        <Button type="primary" @click="createActivity('activityCreateRule')" style="float:right;">OK</Button>
+        <Button type="primary" @click="createActivity('activityForm')" style="float:right;">OK</Button>
         <Button @click="createActivityModel = false" style="float:right;margin-right: 15px;">Cancel</Button>
       </div>
     </Modal>
@@ -132,14 +147,14 @@
 <script>
 import * as userRoleJS from "./../../api/userRole.js";
 import typeChoose from "./activity/typeChoose.vue";
-import workSpace from "./activity/workSpace.vue";
-import activityManager from "./activity/activityManager.vue";
+import singleActivity from "./activity/singleActivity.vue";
+import multiActivity from "./activity/multiActivity.vue";
 import activityShow from "./activity/activityShow.vue";
 export default {
   components: {
     typeChoose,
-    workSpace,
-    activityManager,
+    singleActivity,
+    multiActivity,
     activityShow,
   },
   data() {
@@ -211,6 +226,7 @@ export default {
         level: -1,
         permission: JSON.stringify(userRoleJS.getDefault()),
         type: "Activity_Default",
+        purpose: "Others"
       },
       activityCreateRule: {
         name: [
@@ -265,9 +281,8 @@ export default {
         "Geographic model construction",
         "Model effectiveness evaluation",
         "Geographical simulation",
-        "Quantitative and qualitative analysis",
-        "Decision-making for management",
-        "Others",
+        "Quantitative and qualitative analyses",
+        "Decision-making for management"
       ],
       // spinShow: false,
     };
@@ -380,6 +395,14 @@ export default {
           .then((res) => {
             if (res.data.code == 0) {
               let children = res.data.data;
+
+              // 处理掉异常
+              for (let i = 0; i < children.length; i++) {
+                if (children[i].children != undefined) {
+                  children[i].children = [];
+                }
+              }
+
               // if (
               //   this.permissionIdentity(
               //     this.projectInfo.permission,
@@ -429,6 +452,14 @@ export default {
             if (res.data.code == 0) {
               // children
               let children = res.data.data;
+
+              // 处理掉异常
+              for (let i = 0; i < children.length; i++) {
+                if (children[i].children != undefined) {
+                  children[i].children = [];
+                }
+              }
+
               // if (
               //   this.permissionIdentity(
               //     activity.permission,
@@ -466,8 +497,10 @@ export default {
       this.slctActivity = activity;
       this.setContent(activity);
       // expand
-      this.expandActivityTree(activity);
-      this.expandNode = activity;
+      if (activity.type == "Activity_Group" && activity.children.length == 0) {
+        this.expandActivityTree(activity);
+        this.expandNode = activity;
+      }
       // } else {
       //   this.contentType = 4;
       // }

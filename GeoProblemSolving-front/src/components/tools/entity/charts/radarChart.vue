@@ -1,5 +1,5 @@
 <style>
-@import "../../../../static/css/jquery.jexcel.css";
+@import "../../../../../static/css/jquery.jexcel.css";
 </style>
 <template>
   <Row>
@@ -9,24 +9,14 @@
       v-on:resourceUrl="selecetResource"
     ></toolStyle>
     <div style="width: 300px; padding:30px;margin-left:60px; float:left">
-      <h3>Type of chart:</h3>
-      <Select
-        v-model="chooseType"
-        style="width:200px;padding-top:10px"
-        :placeholder="chartTypePlaceholder"
-      >
-        <Option v-for="item in normalChart" :value="item.value" :key="item.value">{{ item.label }}</Option>
-      </Select>
+      <h3>Select data:</h3>
       <RadioGroup v-model="SelectAxis">
-        <Radio label="X-Axis" style="padding:20px 0 10px 0"></Radio>
-        <Input v-model="SelectX" style="width:200px" readonly />
-        <Radio label="Y-Axis" style="padding:20px 0 10px 0"></Radio>
-        <Input v-model="SelectY" style="width:200px" readonly />
-        <Radio
-          v-model="smoothed"
-          @click.native="smoothed = !smoothed"
-          style="margin-top:20px"
-        >Smooth</Radio>
+        <Radio label="Name" style="padding:20px 0 10px 0"></Radio>
+        <Input v-model="SelectName" style="width:200px" readonly />
+        <Radio label="Value" style="padding:20px 0 10px 0"></Radio>
+        <Input v-model="SelectValue" style="width:200px" readonly />
+        <Radio label="Maximum" style="padding:20px 0 10px 0"></Radio>
+        <Input v-model="SelectMax" style="width:200px" readonly />
       </RadioGroup>
       <Button @click="Visualize" style="margin-top:30px">Visualization</Button>
       <Button v-if="visualization" @click="back2Table" style="margin-top:30px">Select data</Button>
@@ -44,9 +34,9 @@
   </Row>
 </template>
 <script>
-import * as socketApi from "./../../../api/socket.js";
-import csv from "../../../../static/js/jquery.csv.min.js";
-import jexcel from "../../../../static/js/jquery.jexcel.js";
+import * as socketApi from "./../../../../api/socket.js";
+import csv from "../../../../../static/js/jquery.csv.min.js";
+import jexcel from "../../../../../static/js/jquery.jexcel.js";
 import XLSX from "xlsx";
 import echarts from "echarts";
 import toolStyle from "../toolStyle";
@@ -60,23 +50,19 @@ export default {
       columnHeader: [],
       excelData: [],
       columnNameList: [],
-      // 选中的参考值
-      normalChart: [
-        { value: "Line", label: "Individual line" },
-        { value: "Stacked-line", label: "Stacked line" }
-      ],
-      chartTypePlaceholder: "Choose one type of charts",
       //data and params
       DataX: [],
       DataY: [],
-      SelectX: "",
-      SelectY: "",
+      DataZ: [],
+      SelectName: "",
+      SelectValue: "",
+      SelectMax: "",
       SelectAxis: "",
       chartData: [],
       chooseType: "",
       Charts: null,
       chartSettings: {},
-      smoothed: false,
+      isRing: false,
       // page info
       pageParams: { pageId: "", userId: "", userName: "" },
       userInfo: {},
@@ -222,16 +208,21 @@ export default {
           (parseInt(endXY[1]) + 1);
       } catch (e) {}
 
-      if (this.SelectAxis == "X-Axis") {
+      if (this.SelectAxis == "Name") {
         this.socket_content["startX"] = startXY;
         this.socket_content["endX"] = endXY;
-        this.SelectX = start + "->" + end;
+        this.SelectName = start + "->" + end;
         this.DataX = this.getData(startXY, endXY);
-      } else if (this.SelectAxis == "Y-Axis") {
+      } else if (this.SelectAxis == "Value") {
         this.socket_content["startY"] = startXY;
         this.socket_content["endY"] = endXY;
-        this.SelectY = start + "->" + end;
+        this.SelectValue = start + "->" + end;
         this.DataY = this.getData(startXY, endXY);
+      } else if (this.SelectAxis == "Maximum") {
+        this.socket_content["startY"] = startXY;
+        this.socket_content["endY"] = endXY;
+        this.SelectMax = start + "->" + end;
+        this.DataZ = this.getData(startXY, endXY);
       }
     },
     getData(start, end) {
@@ -276,79 +267,50 @@ export default {
         this.DataX[0].length <= this.DataY[0].length
           ? this.DataX[0].length
           : this.DataY[0].length;
-      if (this.chooseType == "Line") {
-        var option = {
-          xAxis: {
-            type: "category",
-            name: this.DataX[0][0],
-            data: []
-          },
-          yAxis: {
-            type: "value",
-            name: this.DataY[0][0]
-          },
-          series: [
-            {
-              data: [],
-              type: "line",
-              smooth: this.smoothed
+      dataLength =
+        dataLength <= this.DataZ[0].length ? dataLength : this.DataZ[0].length;
+      var option = {
+        tooltip: {},
+        legend: {
+          data: []
+        },
+        radar: {
+          // shape: 'circle',
+          name: {
+            textStyle: {
+              color: "#fff",
+              backgroundColor: "#999",
+              borderRadius: 3,
+              padding: [3, 5]
             }
-          ]
-        };
-        for (let i = 1; i < dataLength; i++) {
-          option.xAxis.data.push(this.DataX[0][i]);
-          option.series[0].data.push(this.DataY[0][i]);
-        }
-        if (this.Charts != null) {
-          this.Charts.dispose();
-          this.Charts = null;
-        }
-        this.Charts = echarts.init(document.getElementById("visualization"));
-        this.Charts.setOption(option);
-      } else if (this.chooseType == "Stacked-line") {
-        var option = {
-          tooltip: {
-            trigger: "axis"
           },
-          legend: {
-            data: []
-          },
-          xAxis: {
-            type: "category",
-            name: this.DataX[0][0],
-            data: []
-          },
-          yAxis: {
-            type: "value"
-          },
-          series: []
-        };
-        // X axis
-        for (var i = 1; i < dataLength; i++) {
-          option.xAxis.data.push(this.DataX[0][i]);
-        }
-        // Y axis
-        for (var j = 0; j < this.DataY.length; j++) {
-          let line = {
+          indicator: []
+        },
+        series: [
+          {
             data: [],
-            type: "line",
-            name: this.DataY[j][0],
-            smooth: this.smoothed
-          };
-          option.legend.data.push(this.DataY[j][0]);
-          for (var i = 1; i < dataLength; i++) {
-            line.data.push(this.DataY[j][i]);
+            type: "radar"
           }
-          option.series.push(line);
-        }
-
-        if (this.Charts != null) {
-          this.Charts.dispose();
-          this.Charts = null;
-        }
-        this.Charts = echarts.init(document.getElementById("visualization"));
-        this.Charts.setOption(option);
+        ]
+      };
+      for (var i = 1; i < dataLength; i++) {
+        option.radar.indicator.push({
+          name: this.DataX[0][i],
+          max: this.DataZ[0][i]
+        });
       }
+      for (var i = 0; i < this.DataY.length; i++) {
+        option.legend.data.push(this.DataY[i][0]);
+        let datum = [];
+        for (var j = 1; j < dataLength; j++) {
+          datum.push(this.DataY[i][j]);
+        }
+        option.series[0].data.push({ value: datum, name: this.DataY[i][0] });
+      }
+      if (this.Charts == null) {
+        this.Charts = echarts.init(document.getElementById("visualization"));
+      }
+      this.Charts.setOption(option);
     },
     Visualize() {
       if (this.DataX.length == 0 || this.DataY.length == 0) {
@@ -387,7 +349,7 @@ export default {
                 parseInt(socketData.endX[0]) + "A".charCodeAt()
               ) +
               (parseInt(socketData.endX[1]) + 1);
-            this.SelectX = start + "->" + end;
+            this.SelectName = start + "->" + end;
             this.DataX = this.getData(socketData.startX, socketData.endX);
 
             start =
@@ -400,8 +362,21 @@ export default {
                 parseInt(socketData.endY[0]) + "A".charCodeAt()
               ) +
               (parseInt(socketData.endY[1]) + 1);
-            this.SelectY = start + "->" + end;
+            this.SelectValue = start + "->" + end;
             this.DataY = this.getData(socketData.startY, socketData.endY);
+
+            start =
+              String.fromCharCode(
+                parseInt(socketData.startZ[0]) + "A".charCodeAt()
+              ) +
+              (parseInt(socketData.startZ[1]) + 1);
+            end =
+              String.fromCharCode(
+                parseInt(socketData.endZ[0]) + "A".charCodeAt()
+              ) +
+              (parseInt(socketData.endZ[1]) + 1);
+            this.SelectMax = start + "->" + end;
+            this.DataZ = this.getData(socketData.startZ, socketData.endZ);
           } catch (e) {}
           this.showCharts();
         } else if (socketData.operate === "selectdata") {
@@ -418,7 +393,7 @@ export default {
 
       let roomId = this.pageParams.pageId;
       this.socketApi.initWebSocket(
-        "ChartsServer/" + "line" + roomId,
+        "ChartsServer/" + "radar" + roomId,
         this.$store.state.IP_Port
       );
 

@@ -958,7 +958,7 @@ export default {
         "Geographic model construction",
         "Model effectiveness evaluation",
         "Geographical simulation",
-        "Quantitative and qualitative analysis",
+        "Quantitative and qualitative analyses",
         "Decision-making for management",
         "Others"
       ],
@@ -1000,7 +1000,7 @@ export default {
         "Geographic model construction",
         "Model effectiveness evaluation",
         "Geographical simulation",
-        "Quantitative and qualitative analysis",
+        "Quantitative and qualitative analyses",
         "Decision-making for management"
       ],
       visible: false,

@@ -103,7 +103,7 @@ export default {
               icon: "circle"
             },
             {
-              name: "Quantitative and qualitative analysis",
+              name: "Quantitative and qualitative analyses",
               icon: "circle"
             },
             {
@@ -147,7 +147,7 @@ export default {
                 name: "Geographical simulation"
               },
               {
-                name: "Quantitative and qualitative analysis"
+                name: "Quantitative and qualitative analyses"
               },
               {
                 name: "Decision-making for management"
