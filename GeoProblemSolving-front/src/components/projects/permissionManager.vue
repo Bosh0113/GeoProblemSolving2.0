@@ -650,7 +650,7 @@ export default {
     save2Project() {
       this.projectInfo.permission = JSON.stringify(this.permission);
       this.axios
-        .put("/GeoProblemSolving/project", this.projectInfo)
+        .put("/GeoProblemSolving/project/"+ this.projectInfo.aid, this.projectInfo)
         .then(res => {
           this.resetProjectTypeModel = false;
           if (res.data == "Offline") {

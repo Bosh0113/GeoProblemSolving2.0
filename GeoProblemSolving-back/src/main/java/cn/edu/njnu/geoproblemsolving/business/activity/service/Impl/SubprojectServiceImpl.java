@@ -1,6 +1,7 @@
 package cn.edu.njnu.geoproblemsolving.business.activity.service.Impl;
 
 import cn.edu.njnu.geoproblemsolving.Dao.Folder.FolderDaoImpl;
+import cn.edu.njnu.geoproblemsolving.business.activity.dto.UpdateActivityDTO;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
 import cn.edu.njnu.geoproblemsolving.business.activity.enums.ActivityType;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityRepository;
@@ -81,7 +82,7 @@ public class SubprojectServiceImpl implements SubprojectService {
             subproject.setMembers(members);
 
             // set type
-            subproject.setType(ActivityType.Activity_Default);
+            subproject.setType(subproject.getType());
 
             // folder
             folderDao.createFolder(subproject.getName(), "", subprojectId);
@@ -110,11 +111,14 @@ public class SubprojectServiceImpl implements SubprojectService {
     }
 
     @Override
-    public JsonResult updateSubproject(Subproject subproject) {
+    public JsonResult updateSubproject(String aid, UpdateActivityDTO update) {
         try {
             // confirm
-            Optional result = subprojectRepository.findById(subproject.getAid());
+            Optional result = subprojectRepository.findById(aid);
             if (!result.isPresent()) return ResultUtils.error(-1, "Fail: subproject does not exist.");
+
+            Subproject subproject = (Subproject) result.get();
+            update.updateTo(subproject);
 
             return ResultUtils.success(subprojectRepository.save(subproject));
         } catch (Exception ex) {

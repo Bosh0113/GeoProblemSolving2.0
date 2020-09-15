@@ -46,6 +46,7 @@ import activityShow from "./activityShow.vue";
 import folderTree from "../../resources/folderTree";
 import taskManager from "./utils/taskManger.vue";
 import processManager from "./utils/processManager.vue";
+
 export default {
   props: ["activityInfo", "userInfo"],
   components: {

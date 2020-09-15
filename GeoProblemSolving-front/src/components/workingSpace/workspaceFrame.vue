@@ -50,10 +50,24 @@
         :activityInfo="slctActivity"
         :userInfo="userInfo"
         @typeChanged="typeChanged"
+        :key="slctActivity.aid"
       ></type-choose>
-      <single-activity v-else-if="contentType==1" :activityInfo="slctActivity"></single-activity>
-      <multi-activity v-else-if="contentType==2" :activityInfo="slctActivity" :userInfo="userInfo"></multi-activity>
-      <activity-show v-else-if="contentType==4" :activityInfo="slctActivity"></activity-show>
+      <single-activity
+        v-else-if="contentType==1"
+        :activityInfo="slctActivity"
+        :key="slctActivity.aid"
+      ></single-activity>
+      <multi-activity
+        v-else-if="contentType==2"
+        :activityInfo="slctActivity"
+        :userInfo="userInfo"
+        :key="slctActivity.aid"
+      ></multi-activity>
+      <activity-show
+        v-else-if="contentType==3"
+        :activityInfo="slctActivity"
+        :key="slctActivity.aid"
+      ></activity-show>
     </Card>
     <Modal
       v-model="activityEditModal"
@@ -75,9 +89,6 @@
             :rows="4"
             type="textarea"
           ></Input>
-        </FormItem>
-        <FormItem label="Purpose:" prop="purpose">
-          <Input type="text" readonly v-model="slctActivity.purpose"></Input>
         </FormItem>
       </Form>
       <div slot="footer" style="display: inline-block">
@@ -226,7 +237,7 @@ export default {
         level: -1,
         permission: JSON.stringify(userRoleJS.getDefault()),
         type: "Activity_Default",
-        purpose: "Others"
+        purpose: "Others",
       },
       activityCreateRule: {
         name: [
@@ -282,7 +293,7 @@ export default {
         "Model effectiveness evaluation",
         "Geographical simulation",
         "Quantitative and qualitative analyses",
-        "Decision-making for management"
+        "Decision-making for management",
       ],
       // spinShow: false,
     };
@@ -435,7 +446,7 @@ export default {
         this.slctActivity.children = [{ aid: "add" }];
       }
       this.slctActivity.type = type;
-      this.setContent(activity);
+      this.setContent(this.slctActivity);
     },
     expandActivityTree(activity) {
       if (activity.type == "Activity_Group") {
@@ -502,7 +513,7 @@ export default {
         this.expandNode = activity;
       }
       // } else {
-      //   this.contentType = 4;
+      //   this.contentType = 3;
       // }
     },
     setContent(activity) {
@@ -578,9 +589,9 @@ export default {
           let aid = this.slctActivity.aid;
           let data = this.preEditting(this.slctActivity);
           if (this.slctActivity.level == 1) {
-            url = "/GeoProblemSolving/subproject?aid=" + aid;
+            url = "/GeoProblemSolving/subproject/" + aid;
           } else if (this.slctActivity.level > 1) {
-            url = "/GeoProblemSolving/activity?aid=" + aid;
+            url = "/GeoProblemSolving/activity/" + aid;
           }
           this.axios
             .put(url, data)

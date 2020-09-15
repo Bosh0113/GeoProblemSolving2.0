@@ -124,9 +124,9 @@ export default {
           data.children = [];
       }
       if (this.activityInfo.level == 1) {
-        url = "/GeoProblemSolving/subproject?aid=" + aid;
+        url = "/GeoProblemSolving/subproject/" + aid;
       } else if (this.activityInfo.level > 1) {
-        url = "/GeoProblemSolving/activity?aid=" + aid;
+        url = "/GeoProblemSolving/activity/" + aid;
       }
       this.axios
         .put(url, data)

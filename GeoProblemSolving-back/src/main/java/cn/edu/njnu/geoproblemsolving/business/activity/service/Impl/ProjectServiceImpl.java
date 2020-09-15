@@ -2,6 +2,7 @@ package cn.edu.njnu.geoproblemsolving.business.activity.service.Impl;
 
 import cn.edu.njnu.geoproblemsolving.Dao.Email.EmailDaoImpl;
 import cn.edu.njnu.geoproblemsolving.Dao.Folder.FolderDaoImpl;
+import cn.edu.njnu.geoproblemsolving.business.activity.dto.UpdateActivityDTO;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Subproject;
 import cn.edu.njnu.geoproblemsolving.business.activity.enums.ActivityType;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
@@ -146,7 +147,7 @@ public class ProjectServiceImpl implements ProjectService {
             project.setMembers(members);
 
             // set type
-            project.setType(ActivityType.Activity_Default);
+            project.setType(project.getType());
 
             // children
             ArrayList<String> children = new ArrayList<>();
@@ -177,14 +178,14 @@ public class ProjectServiceImpl implements ProjectService {
         }
     }
 
-    public JsonResult updateProject(Project project) {
+    public JsonResult updateProject(String aid, UpdateActivityDTO update) {
         try {
-            String aid = project.getAid();
-            if (aid.isEmpty()) {
-                return ResultUtils.error(-1, "Fail: no aid");
-            } else if (!projectRepository.existsById(aid)) {
+            Optional optional = projectRepository.findById(aid);
+            if (!optional.isPresent())
                 return ResultUtils.error(-1, "Fail: no this project");
-            }
+
+            Project project = (Project) optional.get();
+            update.updateTo(project);
             projectRepository.save(project);
 
             return ResultUtils.success(project);

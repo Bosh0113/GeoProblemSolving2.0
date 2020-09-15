@@ -22,7 +22,7 @@
                     type="default"
                     class="createTaskBtn"
                     style="margin-top:-8px"
-                    v-if="permissionIdentity('subproject_task_create')"
+                    v-if="permissionIdentity(activityInfo.permission, 'create_task')"
                     @click="createTaskModalShow()"
                   >Add</Button>
                   <vue-scroll :ops="ops" :style="{height:contentHeight-80+'px'}">
@@ -57,14 +57,16 @@
                           </span>
                           <div style="float:right">
                             <Rate
-                              :disabled="!(permissionIdentity('subproject_task_manage', item))"
+                              :disabled="!(permissionIdentity(activityInfo.permission, 'manage_task') || (permissionIdentity(activityInfo.permission, 'create_task') && item.creatorId == userInfo.userId))"
                               v-model="item.importance"
                               :count="1"
                               clearable
                               title="Importance"
                               @on-change="changeImportance(item)"
                             />
-                            <template v-if="permissionIdentity('subproject_task_manage', item)">
+                            <template
+                              v-if="permissionIdentity(activityInfo.permission, 'manage_task') || (permissionIdentity(activityInfo.permission, 'create_task') && item.creatorId == userInfo.userId)"
+                            >
                               <span title="Edit">
                                 <Icon
                                   type="ios-create"
@@ -134,16 +136,18 @@
                               :title="item.taskName"
                             >{{item.taskName}}</strong>
                           </span>
-                          <div style="float:right" v-show="userRole != 'Visitor'">
+                          <div style="float:right" v-show="userRole != 'visitor'">
                             <Rate
-                              :disabled="!(permissionIdentity('subproject_task_manage', item))"
+                              :disabled="!(permissionIdentity(activityInfo.permission, 'manage_task') || (permissionIdentity(activityInfo.permission, 'create_task') && item.creatorId == userInfo.userId))"
                               v-model="item.importance"
                               :count="1"
                               clearable
                               title="Importance"
                               @on-change="changeImportance(item)"
                             />
-                            <template v-if="permissionIdentity('subproject_task_manage', item)">
+                            <template
+                              v-if="permissionIdentity(activityInfo.permission, 'manage_task') || (permissionIdentity(activityInfo.permission, 'create_task') && item.creatorId == userInfo.userId)"
+                            >
                               <span title="Edit">
                                 <Icon
                                   type="ios-create"
@@ -213,16 +217,18 @@
                               :title="item.taskName"
                             >{{item.taskName}}</strong>
                           </span>
-                          <div style="float:right" v-show="userRole != 'Visitor'">
+                          <div style="float:right" v-show="userRole != 'visitor'">
                             <Rate
-                              :disabled="!(permissionIdentity('subproject_task_manage', item))"
+                              :disabled="!(permissionIdentity(activityInfo.permission, 'manage_task') || (permissionIdentity(activityInfo.permission, 'create_task') && item.creatorId == userInfo.userId))"
                               v-model="item.importance"
                               :count="1"
                               clearable
                               title="Importance"
                               @on-change="changeImportance(item)"
                             />
-                            <template v-if="permissionIdentity('subproject_task_manage', item)">
+                            <template
+                              v-if="permissionIdentity(activityInfo.permission, 'manage_task') || (permissionIdentity(activityInfo.permission, 'create_task') && item.creatorId == userInfo.userId)"
+                            >
                               <span title="Edit">
                                 <Icon
                                   type="ios-create"
@@ -440,36 +446,37 @@
 import dayjs from "dayjs";
 import draggable from "vuedraggable";
 import GanttElastic from "gantt-elastic";
+import * as userRoleJS from "./../../../../api/userRole.js";
 export default {
   components: {
     draggable,
     dayjs,
-    ganttElastic: GanttElastic
+    ganttElastic: GanttElastic,
   },
   props: ["activityInfo"], //子项目管理者Manager，项目管理者PManager,成员Member
   data() {
     return {
       userInfo: JSON.parse(sessionStorage.getItem("userInfo")),
-      userRole: "",
+      userRole: "visitor",
       todoLoading: true,
       doingLoading: true,
       doneLoading: true,
       ops: {
         bar: {
-          background: "#808695"
-        }
+          background: "#808695",
+        },
       },
       scrollOps: {
         bar: {
           background: "#808080",
           keepShow: true,
-          size: "8px"
+          size: "8px",
         },
         rail: {
           background: "#d7d7d7",
           opacity: 0.8,
-          size: "10px"
-        }
+          size: "10px",
+        },
       },
       // 后台获取的subproject下的task列表
       taskList: [],
@@ -485,7 +492,7 @@ export default {
         description: "Please input the task description.",
         name: "Please input the task name",
         startTime: "Choose the start time of task",
-        endTime: "Choose the end time of task"
+        endTime: "Choose the end time of task",
       },
       //task相关
       taskInfo: {},
@@ -499,17 +506,17 @@ export default {
         description: "",
         startTime: "",
         endTime: "",
-        importanceCheck: false
+        importanceCheck: false,
       },
       ruleValidate: {
         taskName: [
-          { required: true, message: "Please enter name...", trigger: "blur" }
+          { required: true, message: "Please enter name...", trigger: "blur" },
         ],
         description: [
-          { required: true, message: "Please select type...", trigger: "blur" }
+          { required: true, message: "Please select type...", trigger: "blur" },
         ],
         startTime: [{ required: true, type: "date", trigger: "blur" }],
-        endTime: [{ required: true, type: "date", trigger: "blur" }]
+        endTime: [{ required: true, type: "date", trigger: "blur" }],
       },
       contentHeight: "",
       chartSwitch: false, // 切换至甘特图
@@ -522,67 +529,67 @@ export default {
           start: new Date(),
           end: new Date(),
           progress: 0,
-          type: "task"
-        }
+          type: "task",
+        },
       ],
       ganttOptions: {
         maxRows: 100,
         maxHeight: this.contentHeight - 60,
         row: {
-          height: 24
+          height: 24,
         },
         calendar: {
           hour: {
-            display: false
-          }
+            display: false,
+          },
         },
         chart: {
           progress: {
-            bar: false
+            bar: false,
           },
           expander: {
-            display: true
-          }
+            display: true,
+          },
         },
         taskList: {
           expander: {
-            straight: false
+            straight: false,
           },
           columns: [
             {
               id: 1,
               label: "ID",
               value: "id",
-              width: 40
+              width: 40,
             },
             {
               id: 2,
               label: "Name",
               value: "name",
               width: 200,
-              expander: true
+              expander: true,
             },
             {
               id: 3,
               label: "Assigned to",
               value: "user",
-              width: 100
+              width: 100,
             },
             {
               id: 4,
               label: "Start",
-              value: task => dayjs(task.start).format("YYYY-MM-DD"),
-              width: 90
+              value: (task) => dayjs(task.start).format("YYYY-MM-DD"),
+              width: 90,
             },
             {
               id: 5,
               label: "End",
-              value: task => dayjs(task.end).format("YYYY-MM-DD"),
-              width: 90
-            }
-          ]
-        }
-      }
+              value: (task) => dayjs(task.end).format("YYYY-MM-DD"),
+              width: 90,
+            },
+          ],
+        },
+      },
     };
   },
   created() {
@@ -590,12 +597,13 @@ export default {
   },
   mounted() {
     this.inquiryTask();
+    this.roleIdentity();
     window.addEventListener("resize", this.initSize);
   },
   beforeRouteLeave(to, from, next) {
     next();
   },
-  beforeDestroy: function() {
+  beforeDestroy: function () {
     window.removeEventListener("resize", this.initSize);
   },
   methods: {
@@ -603,8 +611,18 @@ export default {
       this.contentHeight = window.innerHeight - 140;
     },
     cancel() {},
-    permissionIdentity(operation, task) {
-      
+    roleIdentity() {
+      this.userRole = userRoleJS.roleIdentify(
+        this.activityInfo.members,
+        this.userInfo.userId
+      );
+    },
+    permissionIdentity(permission, operation) {
+      return userRoleJS.permissionIdentity(
+        JSON.parse(permission),
+        this.userRole,
+        operation
+      );
     },
     //创建任务
     createTaskModalShow() {
@@ -613,14 +631,14 @@ export default {
         description: "",
         startTime: "",
         endTime: "",
-        state: "todo"
+        state: "todo",
       };
       this.$set(this, "taskInfo", taskDefult);
       this.$set(this, "formValidate", taskDefult);
       this.createTaskModal = true;
     },
     createTask(name) {
-      this.$refs[name].validate(valid => {
+      this.$refs[name].validate((valid) => {
         if (valid) {
           let taskForm = {};
           taskForm["taskName"] = this.formValidate.taskName;
@@ -636,7 +654,7 @@ export default {
           taskForm["order"] = this.taskTodo.length;
           this.axios
             .post("/GeoProblemSolving/task/save", taskForm)
-            .then(res => {
+            .then((res) => {
               if (res.data == "Offline") {
                 this.$store.commit("userLogout");
                 this.$router.push({ name: "Login" });
@@ -645,7 +663,7 @@ export default {
                 this.createTaskModal = false;
               }
             })
-            .catch(err => {});
+            .catch((err) => {});
         } else {
           this.$Message.error("Please enter the necessary information!");
         }
@@ -660,7 +678,7 @@ export default {
       taskForm.append("importance", task.importance);
       this.axios
         .post("/GeoProblemSolving/task/update", taskForm)
-        .then(res => {
+        .then((res) => {
           if (res.data == "Offline") {
             this.$store.commit("userLogout");
             this.$router.push({ name: "Login" });
@@ -670,7 +688,7 @@ export default {
             this.$Message.error("Fail!");
           }
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err.data);
         });
     },
@@ -683,7 +701,7 @@ export default {
             "&value=" +
             taskList[index]["taskId"]
         )
-        .then(res => {
+        .then((res) => {
           if (res.data != "Fail") {
             let taskInfoRes = res.data[0];
             taskInfoRes.startTime = new Date(taskInfoRes.startTime);
@@ -695,7 +713,7 @@ export default {
             this.$Message.error("Fail!");
           }
         })
-        .catch(err => {
+        .catch((err) => {
           this.$Message.error("Fail!");
         });
     },
@@ -707,7 +725,7 @@ export default {
             "&value=" +
             taskList[index]["taskId"]
         )
-        .then(res => {
+        .then((res) => {
           if (res.data != "Fail") {
             let taskInfoRes = res.data[0];
             taskInfoRes.startTime = new Date(taskInfoRes.startTime);
@@ -718,7 +736,7 @@ export default {
             this.$Message.error("Fail!");
           }
         })
-        .catch(err => {
+        .catch((err) => {
           this.$Message.error("Fail!");
         });
     },
@@ -759,7 +777,7 @@ export default {
     },
     //更新某个task
     updateTask(name) {
-      this.$refs[name].validate(valid => {
+      this.$refs[name].validate((valid) => {
         if (valid) {
           let taskForm = new URLSearchParams();
           taskForm.append("taskId", this.formValidate.taskId);
@@ -771,7 +789,7 @@ export default {
           taskForm.append("importance", importance);
           this.axios
             .post("/GeoProblemSolving/task/update", taskForm)
-            .then(res => {
+            .then((res) => {
               if (res.data == "Offline") {
                 this.$store.commit("userLogout");
                 this.$router.push({ name: "Login" });
@@ -782,7 +800,7 @@ export default {
                 this.$Message.error("Fail!");
               }
             })
-            .catch(err => {
+            .catch((err) => {
               console.log(err.data);
             });
         } else {
@@ -797,64 +815,64 @@ export default {
       this.inquiryDoneTask();
     },
     inquiryTodoTask() {
-      // this.axios
-      //   .get(
-      //     "/GeoProblemSolving/task/inquiryTodo?" +
-      //       "aid=" +
-      //       this.activityInfo.aid
-      //   )
-      //   .then(res => {
-      //     this.todoLoading = false;
-      //     if (res.data != "None" && res.data != "Fail") {
-      //       this.$set(this, "taskTodo", res.data);
-      //     } else {
-      //       this.$Message.error("Fail!");
-      //     }
-      //   })
-      //   .catch(err => {
-      //     this.todoLoading = false;
-      //     console.log(err.data);
-      //   });
+      this.axios
+        .get(
+          "/GeoProblemSolving/task/inquiryTodo?" +
+            "aid=" +
+            this.activityInfo.aid
+        )
+        .then((res) => {
+          this.todoLoading = false;
+          if (res.data != "None" && res.data != "Fail") {
+            this.$set(this, "taskTodo", res.data);
+          } else {
+            this.$Message.error("Fail!");
+          }
+        })
+        .catch((err) => {
+          this.todoLoading = false;
+          console.log(err.data);
+        });
     },
     inquiryDoingTask() {
-      // this.axios
-      //   .get(
-      //     "/GeoProblemSolving/task/inquiryDoing?" +
-      //       "aid=" +
-      //       this.activityInfo.aid
-      //   )
-      //   .then(res => {
-      //     this.doingLoading = false;
-      //     if (res.data != "None" && res.data != "Fail") {
-      //       this.$set(this, "taskDoing", res.data);
-      //     } else {
-      //       this.$Message.error("Fail!");
-      //     }
-      //   })
-      //   .catch(err => {
-      //     this.doingLoading = false;
-      //     console.log(err.data);
-      //   });
+      this.axios
+        .get(
+          "/GeoProblemSolving/task/inquiryDoing?" +
+            "aid=" +
+            this.activityInfo.aid
+        )
+        .then((res) => {
+          this.doingLoading = false;
+          if (res.data != "None" && res.data != "Fail") {
+            this.$set(this, "taskDoing", res.data);
+          } else {
+            this.$Message.error("Fail!");
+          }
+        })
+        .catch((err) => {
+          this.doingLoading = false;
+          console.log(err.data);
+        });
     },
     inquiryDoneTask() {
-      // this.axios
-      //   .get(
-      //     "/GeoProblemSolving/task/inquiryDone?" +
-      //       "aid=" +
-      //       this.activityInfo.aid
-      //   )
-      //   .then(res => {
-      //     this.doneLoading = false;
-      //     if (res.data != "None" && res.data != "Fail") {
-      //       this.$set(this, "taskDone", res.data);
-      //     } else {
-      //       this.$Message.error("Fail!");
-      //     }
-      //   })
-      //   .catch(err => {
-      //     this.doneLoading = false;
-      //     console.log(err.data);
-      //   });
+      this.axios
+        .get(
+          "/GeoProblemSolving/task/inquiryDone?" +
+            "aid=" +
+            this.activityInfo.aid
+        )
+        .then((res) => {
+          this.doneLoading = false;
+          if (res.data != "None" && res.data != "Fail") {
+            this.$set(this, "taskDone", res.data);
+          } else {
+            this.$Message.error("Fail!");
+          }
+        })
+        .catch((err) => {
+          this.doneLoading = false;
+          console.log(err.data);
+        });
     },
     setMoveCount() {
       this.MoveCount = 2;
@@ -872,7 +890,7 @@ export default {
       this.taskOrderUpdate(taskList, type);
     },
     taskOrderUpdate(taskList, type) {
-      if (this.userRole != "Visitor") {
+      if (this.userRole != "visitor") {
         let thisUserName = this.$store.getters.userName;
         let stateChangeIndex = 0;
         let count = taskList.length;
@@ -888,7 +906,7 @@ export default {
               taskUpdateObj.append("managerName", thisUserName);
               this.axios
                 .post("/GeoProblemSolving/task/update", taskUpdateObj)
-                .then(res => {
+                .then((res) => {
                   count--;
                   if (res.data == "Offline") {
                     this.$store.commit("userLogout");
@@ -898,7 +916,7 @@ export default {
                     taskList[stateChangeIndex].managerName = thisUserName;
                   }
                 })
-                .catch(err => {
+                .catch((err) => {
                   console.log(err.data);
                 });
             } else {
@@ -908,7 +926,7 @@ export default {
               taskUpdateObj.append("state", type);
               this.axios
                 .post("/GeoProblemSolving/task/update", taskUpdateObj)
-                .then(res => {
+                .then((res) => {
                   count--;
                   if (res.data == "Offline") {
                     this.$store.commit("userLogout");
@@ -916,7 +934,7 @@ export default {
                   } else if (res.data != "Fail") {
                   }
                 })
-                .catch(err => {
+                .catch((err) => {
                   console.log(err.data);
                 });
             }
@@ -936,38 +954,23 @@ export default {
             "?taskId=" +
             this.taskList[this.selectTaskIndex]["taskId"]
         )
-        .then(res => {
+        .then((res) => {
           if (res.data == "Success") {
             this.taskList.splice(this.selectTaskIndex, 1);
           } else {
             this.$Message.error("Fail!");
           }
         })
-        .catch(err => {
+        .catch((err) => {
           this.$Message.error("Fail!");
         });
     },
-    isManager() {
-      if (this.userRole == "Manager" || this.userRole == "PManager") {
-        return true;
-      } else {
-        return false;
-      }
-    },
-    isOwner(task) {
-      if (task.creatorId == this.$store.getters.userId) {
-        return true;
-      } else {
-        return false;
-      }
-    },
     taskItemDraggable() {
-      // if(this.userRole=='Manager'||this.userRole=='PManager'||this.userRole=='Member'){
-      return false;
-      // }
-      // else{
-      //   return true;
-      // }
+      if (this.userRole != "visitor") {
+        return false;
+      } else {
+        return true;
+      }
     },
     initGantt() {
       this.ganttTasks = [];
@@ -982,9 +985,9 @@ export default {
           progress: 100,
           style: {
             base: {
-              fill: "#1EBC61"
-            }
-          }
+              fill: "#1EBC61",
+            },
+          },
         };
         this.ganttTasks.push(gantttask);
       }
@@ -999,9 +1002,9 @@ export default {
           progress: 100,
           style: {
             base: {
-              fill: "#F90"
-            }
-          }
+              fill: "#F90",
+            },
+          },
         };
         this.ganttTasks.push(gantttask);
       }
@@ -1016,9 +1019,9 @@ export default {
           progress: 100,
           style: {
             base: {
-              fill: "#57A3F3"
-            }
-          }
+              fill: "#57A3F3",
+            },
+          },
         };
         this.ganttTasks.push(gantttask);
       }
@@ -1034,8 +1037,8 @@ export default {
       this.chartSwitch = true;
 
       this.initGantt();
-    }
-  }
+    },
+  },
 };
 </script>
 <style scoped>

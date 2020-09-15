@@ -493,93 +493,93 @@ export default {
       userRole: "visitor",
       currentFolder: {
         folders: [],
-        files: []
+        files: [],
       },
       folderNameStack: [],
       newFolderModal: false,
       setFolderName: "",
       newValidate: {
-        setName: ""
+        setName: "",
       },
       newRuleValidate: {
         setName: [
           {
             required: true,
             message: "The name can't be null.",
-            trigger: "blur"
-          }
-        ]
+            trigger: "blur",
+          },
+        ],
       },
       renameForeInfo: {},
       renameFolderModal: false,
       renameValidate: {
-        newName: ""
+        newName: "",
       },
       renameRuleValidate: {
         newName: [
           {
             required: true,
             message: "The name can't be null.",
-            trigger: "blur"
-          }
-        ]
+            trigger: "blur",
+          },
+        ],
       },
       editFileValidate: {
         name: "",
         type: "",
-        description: ""
+        description: "",
       },
       editFileRuleValidate: {
         type: [
           {
             required: true,
             message: "file type cannot be empty",
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         name: [
           {
             required: true,
             message: "file description cannot be empty",
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         description: [
           {
             required: true,
             message: "file description cannot be empty",
-            trigger: "blur"
-          }
-        ]
+            trigger: "blur",
+          },
+        ],
       },
       uploadModal: false,
       uploadValidate: {
         privacy: "private",
         type: "data",
-        description: ""
+        description: "",
       },
       uploadRuleValidate: {
         privacy: [
           {
             required: true,
             message: "file privacy cannot be empty",
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         type: [
           {
             required: true,
             message: "file type cannot be empty",
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         description: [
           {
             required: true,
             message: "file description cannot be empty",
-            trigger: "blur"
-          }
-        ]
+            trigger: "blur",
+          },
+        ],
       },
       toUploadFiles: [],
       fileCountTimer: null,
@@ -591,12 +591,12 @@ export default {
           title: "key",
           key: "key",
           minWidth: 10,
-          width: 110
+          width: 110,
         },
         {
           title: "value",
-          key: "value"
-        }
+          key: "value",
+        },
       ],
       selectedFileData: [],
       panel: null,
@@ -611,13 +611,13 @@ export default {
       selectedFilesToShare: [],
       ops: {
         bar: {
-          background: "#808695"
-        }
+          background: "#808695",
+        },
       },
       contentHeight: 100,
       copyFileModal: false,
       copyFilePrivacy: "private",
-      selectedFile: {}
+      selectedFile: {},
     };
   },
   mounted() {
@@ -626,7 +626,7 @@ export default {
     this.enterFolder(this.activityInfo.aid);
     window.addEventListener("resize", this.initSize);
   },
-  beforeDestroy: function() {
+  beforeDestroy: function () {
     window.removeEventListener("resize", this.initSize);
   },
   methods: {
@@ -665,7 +665,7 @@ export default {
     changeFolder(folderId, type) {
       this.axios
         .get("/GeoProblemSolving/folder/inquiry" + "?folderId=" + folderId)
-        .then(res => {
+        .then((res) => {
           if (res.data == "Offline") {
             this.$store.commit("userLogout");
             this.$router.push({ name: "Login" });
@@ -681,7 +681,7 @@ export default {
             this.$Message.warning("Get folder info fail.");
           }
         })
-        .catch(err => {
+        .catch((err) => {
           this.$Message.warning("Get folder info fail.");
         });
     },
@@ -689,28 +689,28 @@ export default {
       this.selectedFileData = [
         {
           key: "File name",
-          value: file.name
+          value: file.name,
         },
         {
           key: "Description",
-          value: file.description
+          value: file.description,
         },
         {
           key: "Type",
-          value: file.type
+          value: file.type,
         },
         {
           key: "File size",
-          value: file.fileSize
+          value: file.fileSize,
         },
         {
           key: "Uploader",
-          value: file.uploaderName
+          value: file.uploaderName,
         },
         {
           key: "Upload Time",
-          value: file.uploadTime
-        }
+          value: file.uploadTime,
+        },
       ];
       this.fileInfoModal = true;
     },
@@ -719,7 +719,7 @@ export default {
       this.newFolderModal = true;
     },
     addFolder(name) {
-      this.$refs[name].validate(valid => {
+      this.$refs[name].validate((valid) => {
         if (valid) {
           var parentId = this.currentFolder.folderId;
           var newFolderName = this.newValidate.setName;
@@ -733,7 +733,7 @@ export default {
                 "&scopeId=" +
                 this.activityInfo.aid
             )
-            .then(res => {
+            .then((res) => {
               if (res.data == "Offline") {
                 this.$store.commit("userLogout");
                 this.$router.push({ name: "Login" });
@@ -744,7 +744,7 @@ export default {
                 this.$Message.warning("New folder fail.");
               }
             })
-            .catch(err => {
+            .catch((err) => {
               this.$Message.warning("New folder fail.");
             });
         }
@@ -762,7 +762,7 @@ export default {
               "&parentId=" +
               parentId
           )
-          .then(res => {
+          .then((res) => {
             if (res.data == "Offline") {
               this.$store.commit("userLogout");
               this.$router.push({ name: "Login" });
@@ -777,7 +777,7 @@ export default {
               this.$Message.warning("Delete folder fail.");
             }
           })
-          .catch(err => {
+          .catch((err) => {
             this.$Message.warning("Delete folder fail.");
           });
       }
@@ -788,7 +788,7 @@ export default {
       this.renameFolderModal = true;
     },
     renameFolder(name) {
-      this.$refs[name].validate(valid => {
+      this.$refs[name].validate((valid) => {
         if (valid) {
           var parentId = this.currentFolder.folderId;
           var folderId = this.renameForeInfo.uid;
@@ -803,14 +803,14 @@ export default {
                 "&parentId=" +
                 parentId
             )
-            .then(res => {
+            .then((res) => {
               if (res.data == "Offline") {
                 this.$store.commit("userLogout");
                 this.$router.push({ name: "Login" });
               } else if (res.data != "Fail") {
                 var newNameFolder = {
                   uid: folderId,
-                  name: newName
+                  name: newName,
                 };
                 for (var i = 0; i < this.currentFolder.folders.length; i++) {
                   if (this.currentFolder.folders[i].uid == folderId) {
@@ -822,7 +822,7 @@ export default {
                 this.$Message.warning("Rename fail.");
               }
             })
-            .catch(err => {
+            .catch((err) => {
               this.$Message.warning("Rename fail.");
             });
           this.renameFolderModal = false;
@@ -833,7 +833,7 @@ export default {
       this.uploadValidate = {
         privacy: "private",
         type: "data",
-        description: ""
+        description: "",
       };
       this.toUploadFiles = [];
       this.uploadModal = true;
@@ -865,7 +865,7 @@ export default {
       this.toUploadFiles.splice(index, 1);
     },
     folderUpload(name) {
-      this.$refs[name].validate(valid => {
+      this.$refs[name].validate((valid) => {
         if (valid) {
           var uploadFiles = this.toUploadFiles;
           if (uploadFiles.length > 0) {
@@ -883,13 +883,13 @@ export default {
             this.axios({
               url: "/GeoProblemSolving/folder/uploadToFolder",
               method: "post",
-              onUploadProgress: progressEvent => {
+              onUploadProgress: (progressEvent) => {
                 this.uploadProgress =
                   ((progressEvent.loaded / progressEvent.total) * 100) | 0;
               },
-              data: formData
+              data: formData,
             })
-              .then(res => {
+              .then((res) => {
                 if (res.data != "Fail") {
                   var uploadedList = res.data.uploaded;
                   var failedList = res.data.failed;
@@ -900,17 +900,17 @@ export default {
                   if (sizeOverList.length > 0) {
                     this.$Notice.warning({
                       title: "Files too large.",
-                      render: h => {
+                      render: (h) => {
                         return h("span", sizeOverList.join(";"));
-                      }
+                      },
                     });
                   }
                   if (failedList.length > 0) {
                     this.$Notice.error({
                       title: "Upload fail.",
-                      render: h => {
+                      render: (h) => {
                         return h("span", failedList.join(";"));
-                      }
+                      },
                     });
                   }
                 } else {
@@ -919,7 +919,7 @@ export default {
                 this.progressModalShow = false;
                 this.uploadProgress = 0;
               })
-              .catch(err => {
+              .catch((err) => {
                 this.progressModalShow = false;
                 this.$Message.warning("Upload fail.");
                 this.uploadProgress = 0;
@@ -952,7 +952,7 @@ export default {
               ' style="width: 100%;height:100%" frameborder="0"></iframe>';
             this.panel = jsPanel.create({
               headerControls: {
-                smallify: "remove"
+                smallify: "remove",
               },
               theme: "primary",
               footerToolbar: '<p style="height:5px"></p>',
@@ -961,16 +961,16 @@ export default {
               content: toolURL,
               disableOnMaximized: true,
               dragit: {
-                containment: 5
+                containment: 5,
               },
-              closeOnEscape: true
+              closeOnEscape: true,
             });
             $(".jsPanel-content").css("font-size", "0");
             this.$emit("toolPanel", this.panel);
           },
           onCancel: () => {
             return;
-          }
+          },
         });
       } else if (/\.(mp4)$/.test(name.toLowerCase())) {
         if (this.panel != null) {
@@ -983,7 +983,7 @@ export default {
           ' style="width: 100%;height:100%" controls></video>';
         this.panel = jsPanel.create({
           headerControls: {
-            smallify: "remove"
+            smallify: "remove",
           },
           theme: "primary",
           footerToolbar: '<p style="height:10px"></p>',
@@ -992,9 +992,9 @@ export default {
           content: toolURL,
           disableOnMaximized: true,
           dragit: {
-            containment: 5
+            containment: 5,
           },
-          closeOnEscape: true
+          closeOnEscape: true,
         });
         $(".jsPanel-content").css("font-size", "0");
         this.$emit("toolPanel", this.panel);
@@ -1009,7 +1009,7 @@ export default {
           ' style="width: 100%;height:100%" frameborder="0" controls></iframe>';
         this.panel = jsPanel.create({
           headerControls: {
-            smallify: "remove"
+            smallify: "remove",
           },
           theme: "primary",
           footerToolbar: '<p style="height:10px"></p>',
@@ -1018,16 +1018,16 @@ export default {
           content: toolURL,
           disableOnMaximized: true,
           dragit: {
-            containment: 5
+            containment: 5,
           },
-          closeOnEscape: true
+          closeOnEscape: true,
         });
         $(".jsPanel-content").css("font-size", "0");
         this.$emit("toolPanel", this.panel);
       } else {
         this.$Notice.error({
           title: "Open failed",
-          desc: "Sorry. Unsupported file format."
+          desc: "Sorry. Unsupported file format.",
         });
         return false;
       }
@@ -1044,7 +1044,7 @@ export default {
               "&fileId=" +
               fileId
           )
-          .then(res => {
+          .then((res) => {
             if (res.data == "Offline") {
               this.$store.commit("userLogout");
               this.$router.push({ name: "Login" });
@@ -1059,7 +1059,7 @@ export default {
               this.$Message.warning("Delete file fail.");
             }
           })
-          .catch(err => {
+          .catch((err) => {
             this.$Message.warning("Delete file fail.");
           });
       }
@@ -1080,7 +1080,7 @@ export default {
       }
       this.indeterminate = false;
       if (this.checkAll) {
-        this.currentFolder.files.forEach(item => {
+        this.currentFolder.files.forEach((item) => {
           this.chooseFilesArray.push(item["pathURL"]);
         });
       } else {
@@ -1107,9 +1107,9 @@ export default {
           method: "post",
           url:
             "/GeoProblemSolving/resource/packageZIP?fileURLs=" + choosefileUrls,
-          responseType: "blob"
+          responseType: "blob",
         })
-          .then(res => {
+          .then((res) => {
             if (res.status == 200) {
               this.$Spin.hide();
               const blobUrl = window.URL.createObjectURL(res.data);
@@ -1118,7 +1118,7 @@ export default {
               }
             }
           })
-          .catch(err => {});
+          .catch((err) => {});
       } else {
         alert("you don't choose any file!");
       }
@@ -1131,7 +1131,7 @@ export default {
             "&value=" +
             this.$store.getters.userId
         )
-        .then(res => {
+        .then((res) => {
           if (res.data == "Offline") {
             this.$store.commit("userLogout");
             this.$router.push({ name: "Login" });
@@ -1142,7 +1142,7 @@ export default {
             this.userResourceList = [];
           }
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err.data);
         });
     },
@@ -1160,13 +1160,13 @@ export default {
             "&folderId=" +
             this.currentFolder.folderId
         )
-        .then(res => {
+        .then((res) => {
           this.shareModal = false;
           if (res.data == "Offline") {
             this.$store.commit("userLogout");
             this.$router.push({ name: "Login" });
           } else if (res.data != "Fail") {
-            var addFileInfoList = this.userResourceList.filter(file => {
+            var addFileInfoList = this.userResourceList.filter((file) => {
               for (var i = 0; i < addFileList.length; i++) {
                 if (file.resourceId == addFileList[i]) {
                   return true;
@@ -1182,7 +1182,7 @@ export default {
             console.log(res.data);
           }
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err.data);
         });
     },
@@ -1197,7 +1197,7 @@ export default {
       this.editFileModel = true;
     },
     editFileInfo(name) {
-      this.$refs[name].validate(valid => {
+      this.$refs[name].validate((valid) => {
         if (valid) {
           var folderId = this.currentFolder.folderId;
           var fileId = this.renameForeInfo.resourceId;
@@ -1215,7 +1215,7 @@ export default {
                 "&description=" +
                 this.editFileValidate.description
             )
-            .then(res => {
+            .then((res) => {
               this.editFileModel = false;
               if (res.data == "Offline") {
                 this.$store.commit("userLogout");
@@ -1235,7 +1235,7 @@ export default {
                 this.$Message.warning("Rename fail.");
               }
             })
-            .catch(err => {
+            .catch((err) => {
               this.$Message.warning("Rename fail.");
             });
           this.renameFolderModal = false;
@@ -1274,7 +1274,7 @@ export default {
             "&description=" +
             this.selectedFile.description
         )
-        .then(res => {
+        .then((res) => {
           this.$Spin.hide();
           this.copyFileModal = false;
           if (res.data == "Success") {
@@ -1283,10 +1283,10 @@ export default {
             this.$Message.warning(res.data);
           }
         })
-        .catch(err => {
+        .catch((err) => {
           this.$Message.error("Copy file fail.");
         });
-    }
-  }
+    },
+  },
 };
 </script>

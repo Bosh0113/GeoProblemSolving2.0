@@ -427,6 +427,7 @@ export default {
         }
       },
       userInfo: this.$store.getters.userInfo,
+      userRole: "visitor", 
       resouceModel: "resources",
       //资源继承
       preActivities: [],
@@ -529,14 +530,14 @@ export default {
       panel: null
     };
   },
-  props: ["stepInfo", "userRole", "projectInfo"],
+  props: ["activityInfo"],
   watch: {
     checkDataModal(value) {
       if (!value) {
         this.panel.close();
       }
     },
-    stepInfo() {
+    activityInfo() {
       this.getResList();
     }
   },
@@ -573,60 +574,24 @@ export default {
     };
   },
   methods: {
-    permissionIdentity(operation, resource) {
-      if (
-        this.projectInfo.permissionManager != undefined &&
-        operation === "workspace_resource"
-      ) {
-        if (this.userRole == "PManager") {
-          if (
-            this.projectInfo.permissionManager.workspace_resource
-              .project_manager === "Yes"
-          ) {
-            return true;
-          } else if (
-            this.projectInfo.permissionManager.workspace_resource
-              .project_manager === "Yes, partly" &&
-            resource.uploaderId === this.userInfo.userId
-          ) {
-            return true;
-          } else {
-            return false;
-          }
-        } else if (
-          this.userRole == "Manager" &&
-          this.projectInfo.permissionManager.workspace_resource
-            .subproject_manager
-        ) {
-          return true;
-        } else if (this.userRole == "Member") {
-          if (
-            this.projectInfo.permissionManager.workspace_resource.member ===
-            "Yes"
-          ) {
-            return true;
-          } else if (
-            this.projectInfo.permissionManager.workspace_resource.member ===
-              "Yes, partly" &&
-            resource.uploaderId === this.userInfo.userId
-          ) {
-            return true;
-          } else {
-            return false;
-          }
-        } else {
-          return false;
-        }
-      }
+    roleIdentity(activity) {
+      return userRoleJS.roleIdentify(activity.members, this.userInfo.userId);
+    },
+    permissionIdentity(permission, role, operation) {
+      return userRoleJS.permissionIdentity(
+        JSON.parse(permission),
+        role,
+        operation
+      );
     },
     getResList() {
       var list = [];
-      if (this.stepInfo.stepId != "" && this.stepInfo.stepId != undefined) {
+      if (this.activityInfo.stepId != "" && this.activityInfo.stepId != undefined) {
         $.ajax({
           url:
             "/GeoProblemSolving/folder/inquiry" +
             "?folderId=" +
-            this.stepInfo.stepId,
+            this.activityInfo.stepId,
           type: "GET",
           async: false,
           success: data => {
@@ -728,13 +693,13 @@ export default {
             formData.append("type", this.uploadDataInfo.type);
             formData.append("uploaderId", this.userInfo.userId);
             formData.append("privacy", this.uploadDataInfo.privacy);
-            formData.append("folderId", this.stepInfo.stepId);
+            formData.append("folderId", this.activityInfo.stepId);
 
             this.progressModalShow = true;
 
             if (
-              this.stepInfo.stepId != "" ||
-              this.stepInfo.stepId != undefined
+              this.activityInfo.stepId != "" ||
+              this.activityInfo.stepId != undefined
             ) {
               this.axios({
                 url: "/GeoProblemSolving/folder/uploadToFolder",
@@ -800,7 +765,7 @@ export default {
                     };
                     // 保存记录
                     this.$emit("dataBehavior", dataRecords);
-                    this.addHistoryEvent(this.stepInfo.stepId, dataRecords);
+                    this.addHistoryEvent(this.activityInfo.stepId, dataRecords);
                   } else {
                     this.$Message.warning("Upload fail.");
                   }
@@ -835,7 +800,7 @@ export default {
               "fileId=" +
               this.deleteResourceId +
               "&folderId=" +
-              this.stepInfo.stepId
+              this.activityInfo.stepId
           )
           .then(res => {
             if (res.data == "Fail") {
@@ -864,7 +829,7 @@ export default {
                       file: this.fileList[i].name
                     };
                     this.$emit("dataBehavior", dataRecords);
-                    this.addHistoryEvent(this.stepInfo.stepId, dataRecords);
+                    this.addHistoryEvent(this.activityInfo.stepId, dataRecords);
 
                     deleteResType = this.fileList[i].type;
                     this.fileList.splice(i, 1);
@@ -1062,55 +1027,51 @@ export default {
       this.inheritResModal = true;
     },
     getPreActivities() {
-      this.preActivities = [];
-      let processStructure = [];
+      // this.preActivities = [];
+      // let processStructure = [];
 
-      // get solving process
-      if (
-        this.projectInfo.solvingProcess == null ||
-        this.projectInfo.solvingProcess == undefined ||
-        JSON.parse(this.projectInfo.solvingProcess).length == 0
-      ) {
-        if (this.stepInfo.subProjectId != "") {
-          $.ajax({
-            url:
-              "/GeoProblemSolving/subProject/inquiry" +
-              "?key=subProjectId" +
-              "&value=" +
-              this.stepInfo.subProjectId,
-            type: "GET",
-            async: false,
-            success: data => {
-              if (data == "Offline") {
-                this.$store.commit("userLogout");
-                this.$router.push({ name: "Login" });
-              } else if (data != "None" && data != "Fail") {
-                let subprojectInfo = data[0];
-                processStructure = JSON.parse(subprojectInfo.solvingProcess);
-              } else {
-                console.log(data);
-              }
-            },
-            error: function(err) {
-              console.log("Get manager name fail.");
-            }
-          });
-        }
-      } else {
-        processStructure = JSON.parse(this.projectInfo.solvingProcess);
-      }
+      // // get solving process
+      // if (
+      //   this.projectInfo.solvingProcess == null ||
+      //   this.projectInfo.solvingProcess == undefined ||
+      //   JSON.parse(this.projectInfo.solvingProcess).length == 0
+      // ) {
+      //     $.ajax({
+      //       url:
+      //         "/GeoProblemSolving/subProject/inquiry" +
+      //         "?key=aid" +
+      //         "&value=" +
+      //         this.activityInfo.aid,
+      //       type: "GET",
+      //       async: false,
+      //       success: data => {
+      //         if (data == "Offline") {
+      //           this.$store.commit("userLogout");
+      //           this.$router.push({ name: "Login" });
+      //         } else if (data != "None" && data != "Fail") {
+      //           let subprojectInfo = data[0];
+      //           processStructure = JSON.parse(subprojectInfo.solvingProcess);
+      //         } else {
+      //           console.log(data);
+      //         }
+      //       },
+      //       error: function(err) {
+      //         console.log("Get manager name fail.");
+      //       }
+      //     });
+      //   }
 
-      for (var i = 0; i < processStructure.length; i++) {
-        if (processStructure[i].stepID == this.stepInfo.stepId) {
-          let last = processStructure[i].last;
-          if (last.length > 0) {
-            for (var j = 0; j < last.length; j++) {
-              this.preActivities.push(processStructure[last[j].id]);
-            }
-            this.getInheritResource();
-          }
-        }
-      }
+      // for (var i = 0; i < processStructure.length; i++) {
+      //   if (processStructure[i].stepID == this.activityInfo.stepId) {
+      //     let last = processStructure[i].last;
+      //     if (last.length > 0) {
+      //       for (var j = 0; j < last.length; j++) {
+      //         this.preActivities.push(processStructure[last[j].id]);
+      //       }
+      //       this.getInheritResource();
+      //     }
+      //   }
+      // }
     },
     getInheritResource() {
       this.existingResources = this.getMockData();
@@ -1196,7 +1157,7 @@ export default {
             "?addFileList=" +
             addFileListStr +
             "&folderId=" +
-            this.stepInfo.stepId
+            this.activityInfo.stepId
         )
         .then(res => {
           if (res.data == "Offline") {

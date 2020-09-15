@@ -14,7 +14,7 @@ import java.util.ArrayList;
  */
 @Data
 public class UpdateToolEntityDTO  implements ToDomainConverter<ToolEntity> {
-    private String toolUrl;//stateId, oid,mdlId,模型条目？
+    private String toolUrl; //stateId, oid,mdlId,模型条目？
     private JSONObject modelInfo; //stateId, oid,mdlId,模型条目？
     private String description; // 可在多个不同的toolset内，或没有dataset
     private ArrayList<String> recomStep; // step类型 or general

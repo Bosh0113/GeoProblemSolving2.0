@@ -1,5 +1,6 @@
 package cn.edu.njnu.geoproblemsolving.business.activity.service;
 
+import cn.edu.njnu.geoproblemsolving.business.activity.dto.UpdateActivityDTO;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.LinkProtocol;
@@ -10,11 +11,13 @@ public interface ActivityService {
 
     public JsonResult createActivity(Activity activity);
 
-    public JsonResult updateActivity(Activity activity);
+    public JsonResult updateActivity(String aid, UpdateActivityDTO update);
 
     public JsonResult deleteActivity(String aid);
 
     public JsonResult findChildren(String aid);
+
+    public JsonResult findParticipants(String aid);
 
     public JsonResult findLast(String aid);
 

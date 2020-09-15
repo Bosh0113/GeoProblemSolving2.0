@@ -1,5 +1,6 @@
 package cn.edu.njnu.geoproblemsolving.business.activity.controller;
 
+import cn.edu.njnu.geoproblemsolving.business.activity.dto.UpdateActivityDTO;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Subproject;
 import cn.edu.njnu.geoproblemsolving.business.activity.service.SubprojectService;
@@ -42,9 +43,9 @@ public class SubProjectController {
      * @param subproject
      * @return
      */
-    @RequestMapping(method = RequestMethod.PUT)
-    public JsonResult updateSubproject(@RequestBody Subproject subproject){
-        return subprojectService.updateSubproject(subproject);
+    @RequestMapping(method = RequestMethod.PUT, value = "/{aid}")
+    public JsonResult updateSubproject(@PathVariable("aid") String aid, @RequestBody UpdateActivityDTO subproject){
+        return subprojectService.updateSubproject(aid, subproject);
     }
 
     /**

@@ -1,6 +1,7 @@
 package cn.edu.njnu.geoproblemsolving.business.activity.service.Impl;
 
 import cn.edu.njnu.geoproblemsolving.Dao.Folder.FolderDaoImpl;
+import cn.edu.njnu.geoproblemsolving.business.activity.dto.UpdateActivityDTO;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Project;
 import cn.edu.njnu.geoproblemsolving.business.activity.enums.ActivityType;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
@@ -134,7 +135,7 @@ public class ActivityServiceImpl implements ActivityService {
             activity.setMembers(members);
 
             // set type
-            activity.setType(ActivityType.Activity_Default);
+            activity.setType(activity.getType());
 
             // tools and toolsets
             Query queryPublic = new Query(Criteria.where("privacy").is("Public"));
@@ -188,12 +189,14 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
-    public JsonResult updateActivity(Activity activity) {
+    public JsonResult updateActivity(String aid, UpdateActivityDTO update) {
         try {
             // confirm
-            Optional result = activityRepository.findById(activity.getAid());
+            Optional result = activityRepository.findById(aid);
             if (!result.isPresent()) return ResultUtils.error(-1, "Fail: activity does not exist.");
+            Activity activity = (Activity) result.get();
 
+            update.updateTo(activity);
             return ResultUtils.success(activityRepository.save(activity));
         } catch (Exception ex) {
             return ResultUtils.error(-2, "Fail: Exception");
@@ -254,6 +257,41 @@ public class ActivityServiceImpl implements ActivityService {
 
             return ResultUtils.success(activities);
         } catch (Exception ex) {
+            return ResultUtils.error(-2, "Fail: Exception");
+        }
+    }
+
+    @Override
+    public JsonResult findParticipants(String aid){
+        try {
+            Optional optional = activityRepository.findById(aid);
+            if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: subproject does not exist.");
+            Activity activity = (Activity) optional.get();
+
+            // creator
+            JSONObject participants = new JSONObject();
+            User creator = findByUserId(activity.getCreator());
+            participants.put("creator", creator);
+
+            // members
+            JSONArray members = activity.getMembers();
+            JSONArray memberinfos = new JSONArray();
+            for (Object member : members) {
+                if (member instanceof JSONObject) {
+                    User user = findByUserId(((JSONObject) member).getString("userId"));
+                    JSONObject userInfo = (JSONObject) member;
+                    userInfo.put("name", user.getName());
+                    userInfo.put("avatar", user.getAvatar());
+                    userInfo.put("email", user.getEmail());
+                    userInfo.put("title", user.getTitle());
+                    memberinfos.add(userInfo);
+                }
+            }
+            participants.put("members", memberinfos);
+
+            return ResultUtils.success(participants);
+        }
+        catch (Exception ex){
             return ResultUtils.error(-2, "Fail: Exception");
         }
     }

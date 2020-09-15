@@ -3,18 +3,23 @@
   background-color: #808695;
   color: white;
 }
+#steps {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #f8f8f9;
+  height: calc(100vh - 200px);
+  width: calc(100vw - 400px);
+}
 </style>
 <template>
   <Row>
-    <Col span="23" offset="1" style="margin-top:20px">
-      <div :style="{height:contentHeight+'px'}">
+    <Col span="24" style="margin-top:20px">
+      <div>
         <Row type="flex" justify="space-around">
           <template>
-            <div style="width: 80%; height: 25px">
-              <span
-                style="font-weight: bold; font-size:16px"
-              >Procedure of iterative attempts for geo-problem solving</span>
-              <template v-if="permissionIdentity('observe')">
+            <div style="width: 80%; height: 25px; text-align: center;">
+              <span style="font-weight: bold; font-size:16px">Procedure of geo-problem solving</span>
+              <template v-if="permissionIdentity(activityInfo.permission, 'observe')">
                 <Button
                   v-if="workspaceBtn"
                   type="primary"
@@ -33,7 +38,7 @@
                   style="float:right;margin-left:10px;cursor:default"
                 >Workspace</Button>
               </template>
-              <template v-if="permissionIdentity('activity_manage')">
+              <template v-if="permissionIdentity(activityInfo.permission, 'activity_manage')">
                 <Button
                   v-if="nodePositionBtn && procedureDrag"
                   type="warning"
@@ -116,36 +121,12 @@
               </template>
             </div>
           </template>
-          <div
-            style="width:90%;margin-top:20px;padding:15px;background-color:#f8f8f9"
-            :style="{height:contentHeight - 140 + 'px'}"
-            id="steps"
-            v-if="scopeType == 'subproject'"
-          ></div>
-          <div
-            style="width:90%;margin-top:20px;padding:15px;background-color:#f8f8f9"
-            :style="{height:contentHeight+ 40 +'px'}"
-            id="steps"
-            v-else-if="scopeType == 'project'"
-          ></div>
-          <div
-            style="width:100%;text-align:center;margin-top:10px"
-            v-if="scopeType == 'subproject'"
-          >
+          <div id="steps"></div>
+          <div style="width:100%;text-align:center;margin-top:10px">
             <Button
               class="btnHoverGray"
               @click="resetSubProjectTypeModalShow()"
-              v-if="permissionIdentity('subproject_workspace_type_manage')"
-            >Reset workspace type</Button>
-          </div>
-          <div
-            style="width:100%;text-align:center;margin-top:10px"
-            v-else-if="scopeType == 'project'"
-          >
-            <Button
-              class="btnHoverGray"
-              @click="resetProjectTypeModalShow()"
-              v-if="permissionIdentity('project_workspace_type_manage')"
+              v-if="permissionIdentity(activityInfo.permission, 'subproject_workspace_type_manage')"
             >Reset workspace type</Button>
           </div>
         </Row>
@@ -178,29 +159,23 @@
         <Button type="primary" @click="resetProjectTypeNotice=false">OK</Button>
       </div>
     </Modal>
-    <Modal v-model="resetProjectTypeModel" title="Reset workspace type">
-      <h2>Are you sure to reset the workspace type?</h2>
-      <div slot="footer">
-        <Button type="primary" @click="resetProjectType()">OK</Button>
-      </div>
-    </Modal>
     <Modal v-model="activityInfoModal" title="Information of the activity">
       <div>
         <label style="margin-left:20px">Activity name:</label>
         <Input v-model="showActivityInfo.name" style="width: 300px;margin-left:10px" readonly />
       </div>
       <div style="margin-top:20px">
-        <label style="margin-left:20px">Activity type:</label>
-        <Input v-model="showActivityInfo.type" style="width:300px;margin-left:17px" readonly />
+        <label style="margin-left:20px">Activity purpose:</label>
+        <Input v-model="showActivityInfo.purpose" style="width:300px;margin-left:17px" readonly />
       </div>
       <div slot="footer">
         <Button
           type="primary"
-          @click="gotoThisWorkspace(showActivityInfo.type, showActivityInfo.stepID)"
+          @click="gotoThisWorkspace(showActivityInfo.purpose, showActivityInfo.aid)"
         >Go to this workspace</Button>
       </div>
     </Modal>
-    <Modal
+    <!-- <Modal
       width="800px"
       v-model="createActivityModal"
       title="Create a new step"
@@ -208,11 +183,11 @@
     >
       <div style="height:380px;width:640px;margin-left:50px">
         <Form ref="formValidate1" :model="formValidate1" :rules="ruleValidate1" :label-width="120">
-          <FormItem label="Name:" prop="stepTitle">
-            <Input v-model="formValidate1.stepTitle" placeholder="Enter activity name" />
+          <FormItem label="Name:" prop="name">
+            <Input v-model="formValidate1.name" placeholder="Enter activity name" />
           </FormItem>
-          <FormItem label="Step type:" prop="activityType" style="margin-top:40px">
-            <Select v-model="formValidate1.activityType" placeholder="Select step type">
+          <FormItem label="Step purpose:" prop="purpose" style="margin-top:40px">
+            <Select v-model="formValidate1.purpose" placeholder="Select step purpose">
               <Option v-for="item in typeList" :key="item.index" :value="item">{{item}}</Option>
             </Select>
           </FormItem>
@@ -230,20 +205,24 @@
         <Button @click="createActivityModal=false">Cancel</Button>
         <Button type="primary" @click="createStep('formValidate1')">Submit</Button>
       </div>
-    </Modal>
+    </Modal>-->
   </Row>
 </template>
 <script>
 import echarts from "echarts";
+import * as userRoleJS from "./../../../../api/userRole.js";
 export default {
   props: ["activityInfo"],
   data() {
     return {
       scrollOps: {
         bar: {
-          background: "lightgrey"
-        }
+          background: "lightgrey",
+        },
       },
+      // user
+      userInfo: JSON.parse(sessionStorage.getItem("userInfo")),
+      userRole: "visitor",
       //button
       addBtn: false,
       linkBtn: false,
@@ -252,19 +231,22 @@ export default {
       nodePositionBtn: false,
       // 添加/编辑step
       formValidate1: {
-        stepTitle: "",
-        activityType: "",
-        result: ""
+        name: "",
+        purpose: "",
+        result: "",
       },
       ruleValidate1: {
-        stepTitle: [
-          { required: true, message: "Please enter name...", trigger: "blur" }
+        name: [
+          { required: true, message: "Please enter name...", trigger: "blur" },
         ],
-        activityType: [
-          { required: true, message: "Please select type...", trigger: "blur" }
-        ]
+        purpose: [
+          {
+            required: true,
+            message: "Please select purpose...",
+            trigger: "blur",
+          },
+        ],
       },
-      contentHeight: "",
       processStructure: [],
       workspaceName: "",
       typeList: [
@@ -275,7 +257,7 @@ export default {
         "Model effectiveness evaluation",
         "Geographical simulation",
         "Quantitative and qualitative analyses",
-        "Decision-making for management"
+        "Decision-making for management",
       ],
       // 步骤逻辑图
       stepChart: null,
@@ -285,7 +267,6 @@ export default {
       selectedPreActivities: [],
       // 模态框
       delModal: false,
-      createActivityModal: false,
       // 双击展示活动信息
       activityInfoModal: false,
       showActivityInfo: {},
@@ -299,26 +280,24 @@ export default {
       // activity 结构信息
       procedureDrag: true,
       nodeData: [],
-      scopeType: "",
-      scopeId: "",
       resetSubProjectTypeNotice: false,
       resetSubProjectTypeModel: false,
       resetProjectTypeNotice: false,
-      resetProjectTypeModel: false
+      resetProjectTypeModel: false,
     };
   },
   created() {
     this.init();
     this.getProcessSteps();
 
-    Array.prototype.contains = function(obj) {
+    Array.prototype.contains = function (obj) {
       var i = this.length;
       while (i--) {
         if (
           (this[i].tid != undefined && this[i].tid === obj.tid) ||
           (this[i].tsId != undefined && this[i].tsId === obj.tsId) ||
           (this[i].id != undefined && this[i].id === obj.id) ||
-          (this[i].stepId != undefined && this[i].stepId === obj.stepId)
+          (this[i].aid != undefined && this[i].aid === obj.aid)
         ) {
           return true;
         }
@@ -331,32 +310,30 @@ export default {
     this.getAllTools();
     this.getAllToolsets();
     this.btnEnable();
+    this.roleIdentity();
   },
   beforeRouteLeave(to, from, next) {
     next();
   },
-  beforeDestroy: function() {
-    window.removeEventListener("resize", this.initSize);
+  beforeDestroy: function () {
   },
   methods: {
-    initSize() {
-      this.contentHeight = window.innerHeight - 200;
-    },
     //初始化函数，作用是控制侧边栏的高度，设置右边通知栏弹出时候的距顶高度以及延迟的时间
     init() {
-      this.initSize();
-      if (this.activityInfo.aid == undefined) {
-        this.scopeType = "project";
-        this.scopeId = this.activityInfo.aid;
-      } else {
-        this.scopeType = "subproject";
-        this.scopeId = this.activityInfo.aid;
-      }
-      window.addEventListener("resize", this.initSize);
       window.addEventListener("resize", this.updateStepchart);
     },
-    permissionIdentity(operation) {
-      
+    roleIdentity() {
+      this.userRole = userRoleJS.roleIdentify(
+        this.activityInfo.members,
+        this.userInfo.userId
+      );
+    },
+    permissionIdentity(permission, operation) {
+      return userRoleJS.permissionIdentity(
+        JSON.parse(permission),
+        this.userRole,
+        operation
+      );
     },
     updateStepchart() {
       // 重新渲染
@@ -397,106 +374,99 @@ export default {
       }
     },
     // 进入具体的step页面
-    enterStep(type, stepId) {
-      if (this.activityInfo.aid != undefined) {
-        if (type == 0) {
-          this.$router.push({
-            name: "contextDefinition",
-            params: { stepId: stepId }
-          });
-        } else if (type == 1) {
-          this.$router.push({
-            name: "dataProcessing",
-            params: { stepId: stepId }
-          });
-        } else if (type == 2) {
-          this.$router.push({
-            name: "visualization",
-            params: { stepId: stepId }
-          });
-        } else if (type == 3) {
-          this.$router.push({
-            name: "modelBuild",
-            params: { stepId: stepId }
-          });
-        } else if (type == 4) {
-          this.$router.push({
-            name: "modelEvaluation",
-            params: { stepId: stepId }
-          });
-        } else if (type == 5) {
-          this.$router.push({
-            name: "simulation",
-            params: { stepId: stepId }
-          });
-        } else if (type == 6) {
-          this.$router.push({
-            name: "analysis",
-            params: { stepId: stepId }
-          });
-        } else if (type == 7) {
-          this.$router.push({
-            name: "decisionMaking",
-            params: { stepId: stepId }
-          });
-        }
-      } else {
-        switch (type) {
-          case 0: {
-            parent.location.href =
-              "/GeoProblemSolving/workspaceP/" + stepId + "/contextDefinition";
-            break;
-          }
-          case 1: {
-            parent.location.href =
-              "/GeoProblemSolving/workspaceP/" + stepId + "/dataProcessing";
-            break;
-          }
-          case 2: {
-            parent.location.href =
-              "/GeoProblemSolving/workspaceP/" + stepId + "/visualization";
-            break;
-          }
-          case 3: {
-            parent.location.href =
-              "/GeoProblemSolving/workspaceP/" + stepId + "/modelBuild";
-            break;
-          }
-          case 4: {
-            parent.location.href =
-              "/GeoProblemSolving/workspaceP/" + stepId + "/modelEvaluation";
-            break;
-          }
-          case 5: {
-            parent.location.href =
-              "/GeoProblemSolving/workspaceP/" + stepId + "/simulation";
-            break;
-          }
-          case 6: {
-            parent.location.href =
-              "/GeoProblemSolving/workspaceP/" + stepId + "/analysis";
-            break;
-          }
-          case 7: {
-            parent.location.href =
-              "/GeoProblemSolving/workspaceP/" + stepId + "/decisionMaking";
-            break;
-          }
-        }
-      }
+    enterStep(purpose, aid) {
+      // if (this.activityInfo.aid != undefined) {
+      //   if (purpose == 0) {
+      //     this.$router.push({
+      //       name: "contextDefinition",
+      //       params: { aid: aid },
+      //     });
+      //   } else if (purpose == 1) {
+      //     this.$router.push({
+      //       name: "dataProcessing",
+      //       params: { aid: aid },
+      //     });
+      //   } else if (purpose == 2) {
+      //     this.$router.push({
+      //       name: "visualization",
+      //       params: { aid: aid },
+      //     });
+      //   } else if (purpose == 3) {
+      //     this.$router.push({
+      //       name: "modelBuild",
+      //       params: { aid: aid },
+      //     });
+      //   } else if (purpose == 4) {
+      //     this.$router.push({
+      //       name: "modelEvaluation",
+      //       params: { aid: aid },
+      //     });
+      //   } else if (purpose == 5) {
+      //     this.$router.push({
+      //       name: "simulation",
+      //       params: { aid: aid },
+      //     });
+      //   } else if (purpose == 6) {
+      //     this.$router.push({
+      //       name: "analysis",
+      //       params: { aid: aid },
+      //     });
+      //   } else if (purpose == 7) {
+      //     this.$router.push({
+      //       name: "decisionMaking",
+      //       params: { aid: aid },
+      //     });
+      //   }
+      // } else {
+      //   switch (purpose) {
+      //     case 0: {
+      //       parent.location.href =
+      //         "/GeoProblemSolving/workspaceP/" + aid + "/contextDefinition";
+      //       break;
+      //     }
+      //     case 1: {
+      //       parent.location.href =
+      //         "/GeoProblemSolving/workspaceP/" + aid + "/dataProcessing";
+      //       break;
+      //     }
+      //     case 2: {
+      //       parent.location.href =
+      //         "/GeoProblemSolving/workspaceP/" + aid + "/visualization";
+      //       break;
+      //     }
+      //     case 3: {
+      //       parent.location.href =
+      //         "/GeoProblemSolving/workspaceP/" + aid + "/modelBuild";
+      //       break;
+      //     }
+      //     case 4: {
+      //       parent.location.href =
+      //         "/GeoProblemSolving/workspaceP/" + aid + "/modelEvaluation";
+      //       break;
+      //     }
+      //     case 5: {
+      //       parent.location.href =
+      //         "/GeoProblemSolving/workspaceP/" + aid + "/simulation";
+      //       break;
+      //     }
+      //     case 6: {
+      //       parent.location.href =
+      //         "/GeoProblemSolving/workspaceP/" + aid + "/analysis";
+      //       break;
+      //     }
+      //     case 7: {
+      //       parent.location.href =
+      //         "/GeoProblemSolving/workspaceP/" + aid + "/decisionMaking";
+      //       break;
+      //     }
+      //   }
+      // }
     },
     getProcessSteps() {
-      this.processStructure = [];
-      if (
-        this.activityInfo.solvingProcess != undefined &&
-        this.activityInfo.solvingProcess != ""
-      ) {
-        try {
-          this.processStructure = JSON.parse(this.activityInfo.solvingProcess);
-        } catch (err) {
-          return;
-        }
+      if (this.activityInfo.pathway == undefined) {
+        this.activityInfo.pathway = [];
       }
+      this.processStructure = this.activityInfo.pathway;
     },
     showSteps() {
       this.selectedActivities = [];
@@ -508,37 +478,37 @@ export default {
           data: [
             {
               name: "Context definition & resource collection",
-              icon: "circle"
+              icon: "circle",
             },
             {
               name: "Data processing",
-              icon: "circle"
+              icon: "circle",
             },
             {
               name: "Data visualization",
-              icon: "circle"
+              icon: "circle",
             },
             {
               name: "Geographic model construction",
-              icon: "circle"
+              icon: "circle",
             },
             {
               name: "Model effectiveness evaluation",
-              icon: "circle"
+              icon: "circle",
             },
             {
               name: "Geographical simulation",
-              icon: "circle"
+              icon: "circle",
             },
             {
               name: "Quantitative and qualitative analyses",
-              icon: "circle"
+              icon: "circle",
             },
             {
               name: "Decision-making for management",
-              icon: "circle"
-            }
-          ]
+              icon: "circle",
+            },
+          ],
         },
         series: [
           {
@@ -549,8 +519,8 @@ export default {
             roam: this.procedureDrag,
             label: {
               normal: {
-                show: true
-              }
+                show: true,
+              },
             },
             edgeSymbol: ["circle", "arrow"],
             edgeSymbolSize: [4, 10],
@@ -558,40 +528,40 @@ export default {
             data: [],
             categories: [
               {
-                name: "Context definition & resource collection"
+                name: "Context definition & resource collection",
               },
               {
-                name: "Data processing"
+                name: "Data processing",
               },
               {
-                name: "Data visualization"
+                name: "Data visualization",
               },
               {
-                name: "Geographic model construction"
+                name: "Geographic model construction",
               },
               {
-                name: "Model effectiveness evaluation"
+                name: "Model effectiveness evaluation",
               },
               {
-                name: "Geographical simulation"
+                name: "Geographical simulation",
               },
               {
-                name: "Quantitative and qualitative analyses"
+                name: "Quantitative and qualitative analyses",
               },
               {
-                name: "Decision-making for management"
-              }
+                name: "Decision-making for management",
+              },
             ],
             links: [],
             lineStyle: {
               normal: {
                 opacity: 1,
                 width: 5,
-                curveness: 0.1
-              }
-            }
-          }
-        ]
+                curveness: 0.1,
+              },
+            },
+          },
+        ],
       };
       this.nodeData = [];
       if (this.processStructure.length > 0) {
@@ -600,11 +570,11 @@ export default {
           let datum = {
             name: this.processStructure[i].name,
             index: this.processStructure[i].id,
-            stepId: this.processStructure[i].stepID,
+            aid: this.processStructure[i].aid,
             x: this.processStructure[i].x,
             y: this.processStructure[i].y,
             category: this.processStructure[i].category,
-            symbolSize: 45
+            symbolSize: 45,
           };
           this.nodeData.push(datum);
 
@@ -612,7 +582,7 @@ export default {
           for (var j = 0; j < this.processStructure[i].next.length; j++) {
             option.series[0].links.push({
               source: this.processStructure[i].name,
-              target: this.processStructure[i].next[j].name
+              target: this.processStructure[i].next[j].name,
             });
           }
         }
@@ -628,17 +598,17 @@ export default {
 
       let _this = this;
       // 单击选择步骤
-      this.stepChart.on("click", function(params) {
+      this.stepChart.on("click", function (params) {
         if (_this.procedureDrag) {
           if (option.series[0].data[params.data.index].symbolSize == 45) {
             option.series[0].data[params.data.index].symbolSize = 60;
 
             // record the selected step nodes
             _this.selectedActivities.push({
-              stepId: params.data.stepId,
+              aid: params.data.aid,
               id: params.data.index,
               name: params.data.name,
-              category: params.data.category
+              category: params.data.category,
             });
           } else if (
             option.series[0].data[params.data.index].symbolSize == 60
@@ -647,7 +617,7 @@ export default {
 
             // remove these not selected step nodes
             for (var i = 0; i < _this.selectedActivities.length; i++) {
-              if (_this.selectedActivities[i].stepId == params.data.stepId) {
+              if (_this.selectedActivities[i].aid == params.data.aid) {
                 _this.selectedActivities.splice(i, 1);
                 break;
               }
@@ -658,15 +628,15 @@ export default {
         }
       });
       // 双击切换当前步骤
-      this.stepChart.on("dblclick", function(params) {
+      this.stepChart.on("dblclick", function (params) {
         if (_this.procedureDrag) {
-          // _this.enterStep(params.data.category, params.data.stepId);
+          // _this.enterStep(params.data.category, params.data.aid);
           _this.activityInfoModal = true;
-          let activityType = _this.getStepType(params.data.category);
+          let purpose = _this.getStepType(params.data.category);
           let activity = {
-            stepID: params.data.stepId,
+            aid: params.data.aid,
             name: params.data.name,
-            type: activityType
+            purpose: purpose,
           };
           _this.showActivityInfo = activity;
         }
@@ -680,9 +650,9 @@ export default {
         series: [
           {
             id: "procedure",
-            roam: this.procedureDrag
-          }
-        ]
+            roam: this.procedureDrag,
+          },
+        ],
       });
 
       // node的拖拽功能
@@ -690,7 +660,7 @@ export default {
       try {
         this.stepChart.setOption({
           // https://www.echartsjs.com/zh/tutorial.html#小例子：自己实现拖拽
-          graphic: echarts.util.map(_this.nodeData, function(
+          graphic: echarts.util.map(_this.nodeData, function (
             dataItem,
             dataIndex
           ) {
@@ -705,13 +675,13 @@ export default {
             return {
               type: "circle",
               shape: {
-                r: 20
+                r: 20,
               },
               position: nodePosition,
               invisible: true,
               draggable: !_this.procedureDrag,
               z: 100,
-              ondrag: echarts.util.curry(function() {
+              ondrag: echarts.util.curry(function () {
                 let position = _this.stepChart.convertFromPixel(
                   { seriesIndex: 0 },
                   this.position
@@ -722,60 +692,59 @@ export default {
                   series: [
                     {
                       id: "procedure",
-                      data: _this.nodeData
-                    }
-                  ]
+                      data: _this.nodeData,
+                    },
+                  ],
                 });
-              }, dataIndex)
+              }, dataIndex),
             };
-          })
+          }),
         });
       } catch (ex) {
         this.$Nothis.info({
-          desc: "ERROR!"
+          desc: "ERROR!",
         });
         tice;
       }
     },
-    onPointDragging(dataIndex) {},
     getStepType(category) {
-      let type;
+      let purpose;
       if (category == 0) {
-        type = "Context definition & resource collection";
+        purpose = "Context definition & resource collection";
       } else if (category == 1) {
-        type = "Data processing";
+        purpose = "Data processing";
       } else if (category == 2) {
-        type = "Data visualization";
+        purpose = "Data visualization";
       } else if (category == 3) {
-        type = "Geographic model construction";
+        purpose = "Geographic model construction";
       } else if (category == 4) {
-        type = "Model effectiveness evaluation";
+        purpose = "Model effectiveness evaluation";
       } else if (category == 5) {
-        type = "Geographical simulation";
+        purpose = "Geographical simulation";
       } else if (category == 6) {
-        type = "Quantitative and qualitative analyses";
+        purpose = "Quantitative and qualitative analyses";
       } else if (category == 7) {
-        type = "Decision-making for management";
+        purpose = "Decision-making for management";
       }
-      return type;
+      return purpose;
     },
-    getStepCategroy(type) {
+    getStepCategroy(purpose) {
       let category;
-      if (type == "Context definition & resource collection") {
+      if (purpose == "Context definition & resource collection") {
         category = 0;
-      } else if (type == "Data processing") {
+      } else if (purpose == "Data processing") {
         category = 1;
-      } else if (type == "Data visualization") {
+      } else if (purpose == "Data visualization") {
         category = 2;
-      } else if (type == "Geographic model construction") {
+      } else if (purpose == "Geographic model construction") {
         category = 3;
-      } else if (type == "Model effectiveness evaluation") {
+      } else if (purpose == "Model effectiveness evaluation") {
         category = 4;
-      } else if (type == "Geographical simulation") {
+      } else if (purpose == "Geographical simulation") {
         category = 5;
-      } else if (type == "Quantitative and qualitative analyses") {
+      } else if (purpose == "Quantitative and qualitative analyses") {
         category = 6;
-      } else if (type == "Decision-making for management") {
+      } else if (purpose == "Decision-making for management") {
         category = 7;
       }
       return category;
@@ -784,7 +753,7 @@ export default {
       // 如果没有选择需要连接的节点
       if (this.selectedActivities.length == 0) {
         this.$Notice.info({
-          desc: "Please select at least one node!"
+          desc: "Please select at least one node!",
         });
         return;
       } else {
@@ -794,7 +763,7 @@ export default {
           this.selectedActivities = [];
           this.$Notice.info({
             desc:
-              'Please select the next activities to link, and click the "Link" button again!'
+              'Please select the next activities to link, and click the "Link" button again!',
           });
         } else {
           // The next-activities have been selected
@@ -803,17 +772,16 @@ export default {
               // 前后继承关系
               let lastnode = {
                 name: this.selectedPreActivities[i].name,
-                id: this.selectedPreActivities[i].id
+                id: this.selectedPreActivities[i].id,
               };
               let nextnode = {
                 name: this.selectedActivities[j].name,
-                id: this.selectedActivities[j].id
+                id: this.selectedActivities[j].id,
               };
 
               for (var k = 0; k < this.processStructure.length; k++) {
                 if (
-                  this.processStructure[k].stepID ==
-                  this.selectedActivities[j].stepId
+                  this.processStructure[k].aid == this.selectedActivities[j].aid
                 ) {
                   if (!this.processStructure[k].last.contains(lastnode)) {
                     this.processStructure[k].last.push(lastnode);
@@ -821,8 +789,8 @@ export default {
                 }
 
                 if (
-                  this.processStructure[k].stepID ==
-                  this.selectedPreActivities[i].stepId
+                  this.processStructure[k].aid ==
+                  this.selectedPreActivities[i].aid
                 ) {
                   if (!this.processStructure[k].next.contains(nextnode)) {
                     this.processStructure[k].next.push(nextnode);
@@ -834,8 +802,6 @@ export default {
           // update activityInfo/selectedActivities/graph
           this.selectedPreActivities = [];
           this.selectedActivities = [];
-          this.activityInfo.solvingProcess = JSON.stringify(this.processStructure);
-          this.getProcessSteps();
           // 重新渲染
           this.updateStepchart();
           // 更新Step
@@ -843,214 +809,208 @@ export default {
         }
       }
     },
-    addNewStep() {
-      // 防止Link与add相互干扰
-      this.selectedPreActivities = [];
-      // add
-      // 选择父节点检测
-      if (
-        this.processStructure.length != 0 &&
-        (this.selectedActivities.length == undefined ||
-          this.selectedActivities.length == 0)
-      ) {
-        this.$Notice.info({
-          desc: "Please select at least one node in advance!"
-        });
-        return;
-      }
+    // addNewStep() {
+    //   // 防止Link与add相互干扰
+    //   this.selectedPreActivities = [];
+    //   // add
+    //   // 选择父节点检测
+    //   if (
+    //     this.processStructure.length != 0 &&
+    //     (this.selectedActivities.length == undefined ||
+    //       this.selectedActivities.length == 0)
+    //   ) {
+    //     this.$Notice.info({
+    //       desc: "Please select at least one node in advance!",
+    //     });
+    //     return;
+    //   }
 
-      // 创建步骤模态框
-      this.createActivityModal = true;
-    },
-    createStep(name) {
-      this.$refs[name].validate(valid => {
-        if (valid) {
-          this.createActivityModal = false;
-          // 重复命名检测
-          for (var i = 0; i < this.processStructure.length; i++) {
-            if (this.formValidate1.stepTitle == this.processStructure[i].name) {
-              this.$Notice.info({
-                desc: "The name of new step should not be different!"
-              });
-              return;
-            }
-          }
-          this.createStepContent();
-        } else {
-        }
-      });
-    },
-    createStepContent() {
-      // 新步骤的拓展工具、基本信息、资源（数据）
-      this.filterShowListByType(this.formValidate1.activityType);
+    //   // 创建步骤模态框
+    //   this.createActivityModal = true;
+    // },
+    // createStep(name) {
+    //   this.$refs[name].validate((valid) => {
+    //     if (valid) {
+    //       this.createActivityModal = false;
+    //       // 重复命名检测
+    //       for (var i = 0; i < this.processStructure.length; i++) {
+    //         if (this.formValidate1.name == this.processStructure[i].name) {
+    //           this.$Notice.info({
+    //             desc: "The name of new step should not be different!",
+    //           });
+    //           return;
+    //         }
+    //       }
+    //       this.createStepContent();
+    //     } else {
+    //     }
+    //   });
+    // },
+    // createStepContent() {
+    //   // 新步骤的拓展工具、基本信息、资源（数据）
+    //   this.filterShowListByType(this.formValidate1.purpose);
 
-      let Step = {};
-      Step["name"] = this.formValidate1.stepTitle;
-      Step["type"] = this.formValidate1.activityType;
-      Step["description"] = this.formValidate1.result;
-      if (this.scopeType == "project") {
-        Step["aid"] = this.scopeId;
-        Step["aid"] = "";
-      } else {
-        Step["aid"] = "";
-        Step["aid"] = this.scopeId;
-      }
-      Step["creator"] = this.$store.getters.userId;
-      Step["toolList"] = this.selectActivityTools;
-      Step["toolsetList"] = this.selectActivityToolsets;
-      Step["activeStatus"] = true;
-      Step["content"] = {};
+    //   let Step = {};
+    //   Step["name"] = this.formValidate1.name;
+    //   Step["purpose"] = this.formValidate1.purpose;
+    //   Step["description"] = this.formValidate1.result;
+    //   if (this.activityInfo.level == 0) {
+    //     Step["aid"] = this.activityInfo.aid;
+    //     Step["aid"] = "";
+    //   } else {
+    //     Step["aid"] = "";
+    //     Step["aid"] = this.activityInfo.aid;
+    //   }
+    //   Step["creator"] = this.$store.getters.userId;
+    //   Step["toolList"] = this.selectActivityTools;
+    //   Step["toolsetList"] = this.selectActivityToolsets;
+    //   Step["activeStatus"] = true;
+    //   Step["content"] = {};
 
-      this.axios
-        .post("/GeoProblemSolving/step/create", Step)
-        .then(res => {
-          if (res.data == "Offline") {
-            if (this.scopeType == "subproject") {
-              this.$store.commit("userLogout");
-              this.$router.push({ name: "Login" });
-            } else {
-              parent.location.href = "/GeoProblemSolving/login";
-            }
-          } else if (res.data === "Fail") {
-            this1.$Message.info("Fail");
-          } else {
-            this.createStepGraph(res.data);
-          }
-        })
-        .catch(err => {
-          console.log(err.data);
-        });
-    },
-    createStepGraph(id) {
-      if (this.processStructure.length == 0) {
-        // 新步骤的类别
-        let nodeCategory = 0;
-        nodeCategory = this.getStepCategroy(this.formValidate1.activityType);
-        // create step node
-        let newStepNode = {
-          id: 0,
-          stepID: id,
-          name: this.formValidate1.stepTitle,
-          category: nodeCategory,
-          last: [],
-          next: [],
-          x: 600,
-          y: 200,
-          level: 0,
-          end: true,
-          activeStatus: true
-        };
-        this.processStructure.push(newStepNode);
+    //   this.axios
+    //     .post("/GeoProblemSolving/step/create", Step)
+    //     .then((res) => {
+    //       if (res.data == "Offline") {
+    //         if (this.activityInfo.level == 1) {
+    //           this.$store.commit("userLogout");
+    //           this.$router.push({ name: "Login" });
+    //         } else {
+    //           parent.location.href = "/GeoProblemSolving/login";
+    //         }
+    //       } else if (res.data === "Fail") {
+    //         this1.$Message.info("Fail");
+    //       } else {
+    //         this.createStepGraph(res.data);
+    //       }
+    //     })
+    //     .catch((err) => {
+    //       console.log(err.data);
+    //     });
+    // },
+    // createStepGraph(id) {
+    //   if (this.processStructure.length == 0) {
+    //     // 新步骤的类别
+    //     let nodeCategory = 0;
+    //     nodeCategory = this.getStepCategroy(this.formValidate1.purpose);
+    //     // create step node
+    //     let newStepNode = {
+    //       id: 0,
+    //       aid: id,
+    //       name: this.formValidate1.name,
+    //       category: nodeCategory,
+    //       last: [],
+    //       next: [],
+    //       x: 600,
+    //       y: 200,
+    //       level: 0,
+    //       end: true,
+    //       activeStatus: true,
+    //     };
+    //     this.processStructure.push(newStepNode);
 
-        // 更新scopeInfo
-        this.activityInfo.solvingProcess = JSON.stringify(this.processStructure);
-        this.getProcessSteps();
-        // 重新渲染
-        this.updateStepchart();
-        // 存储Step
-        this.updateSteps();
-      } else if (this.selectedActivities.length > 0) {
-        //  计算新增节点的属性信息
-        let lastNode = [];
-        let nodeLevel = 0;
-        let nodeY = 0;
-        let nodeCategory = 0;
-        // var activityChangeList = [];
+    //     // 重新渲染
+    //     this.updateStepchart();
+    //     // 存储Step
+    //     this.updateSteps();
+    //   } else if (this.selectedActivities.length > 0) {
+    //     //  计算新增节点的属性信息
+    //     let lastNode = [];
+    //     let nodeLevel = 0;
+    //     let nodeY = 0;
+    //     let nodeCategory = 0;
+    //     // var activityChangeList = [];
 
-        for (var i = 0; i < this.selectedActivities.length; i++) {
-          lastNode.push({
-            name: this.selectedActivities[i].name,
-            id: this.selectedActivities[i].id
-          });
-          if (
-            this.processStructure[this.selectedActivities[i].id].level >=
-            nodeLevel
-          ) {
-            nodeLevel =
-              this.processStructure[this.selectedActivities[i].id].level + 1;
-          }
-          // modify original step node
-          this.processStructure[this.selectedActivities[i].id].next.push({
-            name: this.formValidate1.stepTitle,
-            id: this.processStructure.length
-          });
-          this.processStructure[this.selectedActivities[i].id].end = false;
-          // calculate y
-          if (this.processStructure[i].last == []) {
-            nodeY = 200;
-          } else {
-            let sumY = 0;
-            for (var j = 0; j < this.selectedActivities.length; j++) {
-              sumY += this.processStructure[this.selectedActivities[j].id].y;
-            }
-            nodeY = sumY / this.selectedActivities.length;
-          }
-        }
-        let isOverlap = false;
-        // 统计每层的节点数
-        let levelNum = [];
-        for (var i = 0; i < this.processStructure.length; i++) {
-          if (this.processStructure[i].level == nodeLevel) {
-            levelNum.push(this.processStructure[i].id);
-          }
-        }
-        // 节点重复检测
-        for (var i = 0; i < levelNum.length; i++) {
-          if (Math.abs(this.processStructure[levelNum[i]].y - nodeY) < 30) {
-            isOverlap = true;
-            break;
-          }
-        }
-        // 新步骤的类别
-        nodeCategory = this.getStepCategroy(this.formValidate1.activityType);
-        // create step node
-        let newStepNode = {
-          id: this.processStructure.length,
-          stepID: id,
-          name: this.formValidate1.stepTitle,
-          category: nodeCategory,
-          last: lastNode,
-          next: [],
-          x: 0,
-          y: nodeY,
-          level: nodeLevel,
-          end: true,
-          activeStatus: true
-        };
-        this.processStructure.push(newStepNode);
-        levelNum.push(newStepNode.id);
-        // 如果重叠，修改y坐标
-        if (isOverlap) {
-          for (var i = 0; i < levelNum.length; i++) {
-            this.processStructure[levelNum[i]].y =
-              (400 / (levelNum.length + 1)) * (i + 1);
-          }
-          isOverlap = false;
-        }
-        // calculate x
-        let maxLevel = 0;
-        for (var i = 0; i < this.processStructure.length; i++) {
-          if (this.processStructure[i].level > maxLevel) {
-            maxLevel = this.processStructure[i].level;
-          }
-        }
-        for (var i = 0; i < this.processStructure.length; i++) {
-          this.processStructure[i].x =
-            (800 / (maxLevel + 1)) * (this.processStructure[i].level + 1);
-        }
-        // 更新scopeInfo
-        this.activityInfo.solvingProcess = JSON.stringify(this.processStructure);
-        this.getProcessSteps();
-        // 重新渲染
-        this.updateStepchart();
-        // 更新Step
-        this.updateSteps();
-      } else {
-        this.$Notice.info({
-          desc: "Select at least one step as source(s), please!"
-        });
-      }
-    },
+    //     for (var i = 0; i < this.selectedActivities.length; i++) {
+    //       lastNode.push({
+    //         name: this.selectedActivities[i].name,
+    //         id: this.selectedActivities[i].id,
+    //       });
+    //       if (
+    //         this.processStructure[this.selectedActivities[i].id].level >=
+    //         nodeLevel
+    //       ) {
+    //         nodeLevel =
+    //           this.processStructure[this.selectedActivities[i].id].level + 1;
+    //       }
+    //       // modify original step node
+    //       this.processStructure[this.selectedActivities[i].id].next.push({
+    //         name: this.formValidate1.name,
+    //         id: this.processStructure.length,
+    //       });
+    //       this.processStructure[this.selectedActivities[i].id].end = false;
+    //       // calculate y
+    //       if (this.processStructure[i].last == []) {
+    //         nodeY = 200;
+    //       } else {
+    //         let sumY = 0;
+    //         for (var j = 0; j < this.selectedActivities.length; j++) {
+    //           sumY += this.processStructure[this.selectedActivities[j].id].y;
+    //         }
+    //         nodeY = sumY / this.selectedActivities.length;
+    //       }
+    //     }
+    //     let isOverlap = false;
+    //     // 统计每层的节点数
+    //     let levelNum = [];
+    //     for (var i = 0; i < this.processStructure.length; i++) {
+    //       if (this.processStructure[i].level == nodeLevel) {
+    //         levelNum.push(this.processStructure[i].id);
+    //       }
+    //     }
+    //     // 节点重复检测
+    //     for (var i = 0; i < levelNum.length; i++) {
+    //       if (Math.abs(this.processStructure[levelNum[i]].y - nodeY) < 30) {
+    //         isOverlap = true;
+    //         break;
+    //       }
+    //     }
+    //     // 新步骤的类别
+    //     nodeCategory = this.getStepCategroy(this.formValidate1.purpose);
+    //     // create step node
+    //     let newStepNode = {
+    //       id: this.processStructure.length,
+    //       aid: id,
+    //       name: this.formValidate1.name,
+    //       category: nodeCategory,
+    //       last: lastNode,
+    //       next: [],
+    //       x: 0,
+    //       y: nodeY,
+    //       level: nodeLevel,
+    //       end: true,
+    //       activeStatus: true,
+    //     };
+    //     this.processStructure.push(newStepNode);
+    //     levelNum.push(newStepNode.id);
+    //     // 如果重叠，修改y坐标
+    //     if (isOverlap) {
+    //       for (var i = 0; i < levelNum.length; i++) {
+    //         this.processStructure[levelNum[i]].y =
+    //           (400 / (levelNum.length + 1)) * (i + 1);
+    //       }
+    //       isOverlap = false;
+    //     }
+    //     // calculate x
+    //     let maxLevel = 0;
+    //     for (var i = 0; i < this.processStructure.length; i++) {
+    //       if (this.processStructure[i].level > maxLevel) {
+    //         maxLevel = this.processStructure[i].level;
+    //       }
+    //     }
+    //     for (var i = 0; i < this.processStructure.length; i++) {
+    //       this.processStructure[i].x =
+    //         (800 / (maxLevel + 1)) * (this.processStructure[i].level + 1);
+    //     }
+    //     // 重新渲染
+    //     this.updateStepchart();
+    //     // 更新Step
+    //     this.updateSteps();
+    //   } else {
+    //     this.$Notice.info({
+    //       desc: "Select at least one step as source(s), please!",
+    //     });
+    //   }
+    // },
     getPublicTools() {
       this.axios
         .get(
@@ -1060,9 +1020,9 @@ export default {
             "&value=" +
             "Public"
         )
-        .then(res => {
+        .then((res) => {
           if (res.data == "Offline") {
-            if (this.scopeType == "subproject") {
+            if (this.activityInfo.level == 1) {
               this.$store.commit("userLogout");
               this.$router.push({ name: "Login" });
             } else {
@@ -1076,7 +1036,7 @@ export default {
             this.$set(this, "publicTools", res.data);
           }
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err);
         });
     },
@@ -1085,9 +1045,9 @@ export default {
         .get(
           `/GeoProblemSolving/tool/findByProvider/${this.$store.getters.userInfo.userId}`
         )
-        .then(res => {
+        .then((res) => {
           if (res.data == "Offline") {
-            if (this.scopeType == "subproject") {
+            if (this.activityInfo.level == 1) {
               this.$store.commit("userLogout");
               this.$router.push({ name: "Login" });
             } else {
@@ -1101,7 +1061,7 @@ export default {
             this.$set(this, "personalTools", res.data);
           }
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err);
         });
     },
@@ -1118,9 +1078,9 @@ export default {
             "&value=" +
             "Public"
         )
-        .then(res => {
+        .then((res) => {
           if (res.data == "Offline") {
-            if (this.scopeType == "subproject") {
+            if (this.activityInfo.level == 1) {
               this.$store.commit("userLogout");
               this.$router.push({ name: "Login" });
             } else {
@@ -1134,7 +1094,7 @@ export default {
             this.$set(this, "publicToolsets", res.data);
           }
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err);
         });
     },
@@ -1145,9 +1105,9 @@ export default {
             "?provider=" +
             this.$store.getters.userInfo.userId
         )
-        .then(res => {
+        .then((res) => {
           if (res.data == "Offline") {
-            if (this.scopeType == "subproject") {
+            if (this.activityInfo.level == 1) {
               this.$store.commit("userLogout");
               this.$router.push({ name: "Login" });
             } else {
@@ -1161,7 +1121,7 @@ export default {
             this.$set(this, "personalToolsets", res.data);
           }
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err);
         });
     },
@@ -1169,17 +1129,14 @@ export default {
       this.getPublicToolsets();
       this.getPersonalToolsets();
     },
-    filterShowListByType(activityType) {
+    filterShowListByType(purpose) {
       var toolList = this.filterDuplicateTools();
-      this.selectActivityTools = this.getFilterToolResult(
-        toolList,
-        activityType
-      );
+      this.selectActivityTools = this.getFilterToolResult(toolList, purpose);
 
       var toolsetList = this.filterDuplicateToolsets();
       this.selectActivityToolsets = this.getFilterToolsetResult(
         toolsetList,
-        activityType
+        purpose
       );
     },
     filterDuplicateTools() {
@@ -1204,7 +1161,7 @@ export default {
       }
       return toolsets;
     },
-    getFilterToolResult(foreList, activityType) {
+    getFilterToolResult(foreList, purpose) {
       let resultList = [];
       for (var i = 0; i < foreList.length; i++) {
         var stepTypes = foreList[i].recomStep;
@@ -1217,12 +1174,12 @@ export default {
       }
       return resultList;
     },
-    getFilterToolsetResult(foreList, activityType) {
+    getFilterToolsetResult(foreList, purpose) {
       let resultList = [];
       for (var i = 0; i < foreList.length; i++) {
         var stepTypes = foreList[i].recomStep;
         for (var j = 0; j < stepTypes.length; j++) {
-          if (stepTypes[j] == activityType || stepTypes[j] == "General step") {
+          if (stepTypes[j] == purpose || stepTypes[j] == "General step") {
             resultList.push(foreList[i].tsId);
             break;
           }
@@ -1238,26 +1195,26 @@ export default {
         this.delModal = true;
       } else if (this.selectedActivities.length > 1) {
         this.$Notice.info({
-          desc: "Steps should be deleted one by one! "
+          desc: "Steps should be deleted one by one! ",
         });
       } else {
         this.$Notice.info({
-          desc: "There is no step selected! "
+          desc: "There is no step selected! ",
         });
       }
     },
-    delStepContent(stepId) {
+    delStepContent(aid) {
       // 删除step
       this.axios
-        .get("/GeoProblemSolving/step/delete" + "?stepId=" + stepId)
-        .then(res => {
+        .get("/GeoProblemSolving/step/delete" + "?aid=" + aid)
+        .then((res) => {
           if (res.data === "Success") {
             this.$Notice.info({
-              desc: "Remove successfully! "
+              desc: "Remove successfully! ",
             });
           }
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err.data);
         });
     },
@@ -1266,7 +1223,7 @@ export default {
         let currentIndex = this.selectedActivities[0].id;
 
         if (this.processStructure[currentIndex].end) {
-          let selectedStepId = this.processStructure[currentIndex].stepID;
+          let selectedStepId = this.processStructure[currentIndex].aid;
           // 删除step节点
           if (currentIndex > 0) {
             // 处理被删除节点的前驱节点
@@ -1332,9 +1289,6 @@ export default {
             this.processStructure.splice(currentIndex, 1);
           }
 
-          // 更新scopeInfo
-          this.activityInfo.solvingProcess = JSON.stringify(this.processStructure);
-          this.getProcessSteps();
           // 重新渲染
           this.updateStepchart();
           this.updateSteps();
@@ -1345,125 +1299,94 @@ export default {
             desc:
               "The selected step " +
               this.selectedActivities[0].name +
-              " can not be removed. Because it has the next activities."
+              " can not be removed. Because it has the next activities.",
           });
         }
       }
     },
     updateSteps() {
-      let obj = new URLSearchParams();
-      obj.append("solvingProcess", JSON.stringify(this.processStructure));
-      var updateurl = "";
-      if (this.scopeType == "project") {
-        obj.append("aid", this.scopeId);
-        updateurl = "/GeoProblemSolving/project/update";
-      } else if (this.scopeType == "subproject") {
-        obj.append("aid", this.scopeId);
-        updateurl = "/GeoProblemSolving/subProject/update";
-      }
-      this.axios
-        .post(updateurl, obj)
-        .then(res => {
-          if (res.data == "Offline") {
-            if (this.scopeType == "subproject") {
-              this.$store.commit("userLogout");
-              this.$router.push({ name: "Login" });
-            } else {
-              parent.location.href = "/GeoProblemSolving/login";
-            }
-          } else if (res.data != "Fail") {
-            if (this.scopeType == "project") {
-              this.$store.commit("setProjectInfo", res.data);
-            //   parent.vm.projectInfo = res.data;
-              this.$Notice.info({
-                desc: "Project update successfully!"
-              });
-            } else if (this.scopeType == "subproject") {
-              this.$store.commit("setSubProjectInfo", res.data);
-              this.$Notice.info({
-                desc: "Subproject update successfully!"
-              });
-            }
-          } else {
-            this.$Message.error("Update subproject failed.");
-          }
-        })
-        .catch(err => {
-          console.log(err.data);
-        });
+      // let obj = new URLSearchParams();
+      // var updateurl = "";
+      // if (this.activityInfo.level == 0) {
+      //   obj.append("aid", this.activityInfo.aid);
+      //   updateurl = "/GeoProblemSolving/project/update";
+      // } else if (this.activityInfo.level == 1) {
+      //   obj.append("aid", this.activityInfo.aid);
+      //   updateurl = "/GeoProblemSolving/subProject/update";
+      // }
+      this.axios;
+      // .post(updateurl, obj)
+      // .then((res) => {
+      //   if (res.data == "Offline") {
+      //     if (this.activityInfo.level == 1) {
+      //       this.$store.commit("userLogout");
+      //       this.$router.push({ name: "Login" });
+      //     } else {
+      //       parent.location.href = "/GeoProblemSolving/login";
+      //     }
+      //   } else if (res.data != "Fail") {
+      //     if (this.activityInfo.level == 0) {
+      //       this.$store.commit("setProjectInfo", res.data);
+      //       //   parent.vm.projectInfo = res.data;
+      //       this.$Notice.info({
+      //         desc: "Project update successfully!",
+      //       });
+      //     } else if (this.activityInfo.level == 1) {
+      //       this.$store.commit("setSubProjectInfo", res.data);
+      //       this.$Notice.info({
+      //         desc: "Subproject update successfully!",
+      //       });
+      //     }
+      //   } else {
+      //     this.$Message.error("Update subproject failed.");
+      //   }
+      // })
+      // .catch((err) => {
+      //   console.log(err.data);
+      // });
     },
     resetSubProjectTypeModalShow() {
-      if (this.processStructure.length > 0) {
-        this.resetSubProjectTypeNotice = true;
-      } else {
-        this.resetSubProjectTypeModel = true;
-      }
-    },
-    resetProjectTypeModalShow() {
-      if (this.processStructure.length > 0) {
-        this.resetProjectTypeNotice = true;
-      } else {
-        this.resetProjectTypeModel = true;
-      }
+      // if (this.processStructure.length > 0) {
+      //   this.resetSubProjectTypeNotice = true;
+      // } else {
+      //   this.resetSubProjectTypeModel = true;
+      // }
     },
     resetSubProjectType() {
-      let obj = new URLSearchParams();
-      obj.append("aid", this.scopeId);
-      obj.append("type", "");
-      obj.append("stepId", "");
-      this.axios
-        .post("/GeoProblemSolving/subProject/update", obj)
-        .then(res => {
-          this.resetProjectTypeModel = false;
-          if (res.data == "Offline") {
-            parent.location.href = "/GeoProblemSolving/login";
-          } else if (res.data != "Fail") {
-            this.$store.commit("setSubProjectInfo", res.data);
-            this.$emit("changeSubProjectInfo", res.data);
-          } else {
-            this.$Message.error("Set type failed.");
-          }
-        })
-        .catch(err => {
-          console.log(err.data);
-        });
-    },
-    resetProjectType() {
-    //   let obj = new URLSearchParams();
-    //   obj.append("aid", this.scopeId);
-    //   obj.append("type", "");
-    //   obj.append("stepId", "");
-    //   this.axios
-    //     .post("/GeoProblemSolving/project/update", obj)
-    //     .then(res => {
-    //       this.resetProjectTypeModel = false;
-    //       if (res.data == "Offline") {
-    //         parent.location.href = "/GeoProblemSolving/login";
-    //       } else if (res.data != "Fail") {
-    //         this.$store.commit("setProjectInfo", res.data);
-    //         this.$emit("changeProjectInfo", res.data);
-    //       } else {
-    //         this.$Message.error("Set type failed.");
-    //       }
-    //     })
-    //     .catch(err => {
-    //       console.log(err.data);
-    //     });
+      // let obj = new URLSearchParams();
+      // obj.append("aid", this.activityInfo.aid);
+      // obj.append("purpose", "");
+      // this.axios
+      //   .post("/GeoProblemSolving/subProject/update", obj)
+      //   .then((res) => {
+      //     this.resetProjectTypeModel = false;
+      //     if (res.data == "Offline") {
+      //       parent.location.href = "/GeoProblemSolving/login";
+      //     } else if (res.data != "Fail") {
+      //       this.$store.commit("setSubProjectInfo", res.data);
+      //       this.$emit("changeSubProjectInfo", res.data);
+      //     } else {
+      //       this.$Message.error("Set purpose failed.");
+      //     }
+      //   })
+      //   .catch((err) => {
+      //     console.log(err.data);
+      //   });
     },
     gotoCurrentWorkspace() {
       if (this.selectedActivities.length == 1) {
         this.enterStep(
           this.selectedActivities[0].category,
-          this.selectedActivities[0].stepId
+          this.selectedActivities[0].aid
         );
       } else {
         this.$Notice.info({ desc: "Please select only one node!" });
       }
     },
-    gotoThisWorkspace(type, stepID) {
-      let category = this.getStepCategroy(type);
-      this.enterStep(category, stepID);
-    }
-  }
+    gotoThisWorkspace(purpose, aid) {
+      let category = this.getStepCategroy(purpose);
+      this.enterStep(category, aid);
+    },
+  },
 };
 </script>

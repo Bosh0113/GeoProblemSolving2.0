@@ -55,11 +55,11 @@ public class TaskDaoImpl implements ITaskDao{
     }
 
     @Override
-    public Object inquiryTodo(String subProjectId){
+    public Object inquiryTodo(String aid){
         try {
             Query query=new Query();
             Criteria criteria=new Criteria();
-            criteria.andOperator(Criteria.where("subProjectId").is(subProjectId),Criteria.where("state").is("todo"));
+            criteria.andOperator(Criteria.where("aid").is(aid),Criteria.where("state").is("todo"));
             query.addCriteria(criteria);
             query.with(new Sort(Sort.Direction.ASC,"order"));
             return mongoTemplate.find(query,TaskEntity.class);
@@ -69,11 +69,11 @@ public class TaskDaoImpl implements ITaskDao{
     }
 
     @Override
-    public Object inquiryDoing(String subProjectId){
+    public Object inquiryDoing(String aid){
         try {
             Query query=new Query();
             Criteria criteria=new Criteria();
-            criteria.andOperator(Criteria.where("subProjectId").is(subProjectId),Criteria.where("state").is("doing"));
+            criteria.andOperator(Criteria.where("aid").is(aid),Criteria.where("state").is("doing"));
             query.addCriteria(criteria);
             query.with(new Sort(Sort.Direction.ASC,"order"));
             return mongoTemplate.find(query,TaskEntity.class);
@@ -83,11 +83,11 @@ public class TaskDaoImpl implements ITaskDao{
     }
 
     @Override
-    public Object inquiryDone(String subProjectId){
+    public Object inquiryDone(String aid){
         try {
             Query query=new Query();
             Criteria criteria=new Criteria();
-            criteria.andOperator(Criteria.where("subProjectId").is(subProjectId),Criteria.where("state").is("done"));
+            criteria.andOperator(Criteria.where("aid").is(aid),Criteria.where("state").is("done"));
             query.addCriteria(criteria);
             query.with(new Sort(Sort.Direction.ASC,"order"));
             return mongoTemplate.find(query,TaskEntity.class);

@@ -1,5 +1,6 @@
 package cn.edu.njnu.geoproblemsolving.business.activity.service;
 
+import cn.edu.njnu.geoproblemsolving.business.activity.dto.UpdateActivityDTO;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Project;
 import cn.edu.njnu.geoproblemsolving.Entity.EmailEntity;
@@ -15,7 +16,7 @@ public interface ProjectService {
 
     public JsonResult deleteProject(String aid);
 
-    public JsonResult updateProject(Project project);
+    public JsonResult updateProject(String aid, UpdateActivityDTO project);
 
     public JsonResult findParticipants(String aid);
 
