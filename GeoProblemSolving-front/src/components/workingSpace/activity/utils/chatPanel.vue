@@ -1,81 +1,17 @@
 <template>
   <Row>
-    <!-- <Col span="24"> -->
-    <div class="chatPanel" :style="{height:panelHeight+'px',width:panelWidth+'px'}">
-      <div class="memberPanel">
-        <div class="participants">
-          <h4>Participants</h4>
-          <div>
-            <Card
-              v-for="(participant,index) in onlineParticipants"
-              :key="'online' +index"
-              style="margin:2.5%"
-              :padding="5"
-            >
-              <div style="display:flex;align-items:center">
-                <div class="memberImg" style="position:relative">
-                  <img
-                    v-if="participant.avatar != '' && participant.avatar!='undefined'"
-                    :src="participant.avatar"
-                    style="width:40px;height:40px"
-                  />
-                  <avatar v-else :username="participant.userName" :size="40" :rounded="false"></avatar>
-                  <div class="onlinecircle"></div>
-                </div>
-                <div class="memberDetail">
-                  <div class="memberName">
-                    <span>{{participant.userName}}</span>
-                  </div>
-                  <div class="memberOrganization">
-                    <span>{{participant.organization}}</span>
-                  </div>
-                </div>
-              </div>
-            </Card>
-          </div>
-          <div>
-            <Card
-              v-for="(participant,index) in offlineParticipants"
-              :key=" 'offline' + index"
-              style="margin:2.5%"
-              :padding="5"
-            >
-              <div style="display:flex;align-items:center">
-                <div class="memberImg" style="position:relative">
-                  <img
-                    v-if="participant.avatar != '' && participant.avatar!='undefined'"
-                    :src="participant.avatar"
-                    style="width:40px;height:40px"
-                  />
-                  <avatar v-else :username="participant.userName" :size="40" :rounded="false"></avatar>
-                  <div class="offlinecircle"></div>
-                </div>
-                <div class="memberDetail">
-                  <div class="memberName">
-                    <span>{{participant.userName}}</span>
-                  </div>
-                  <div class="memberOrganization">
-                    <span>{{participant.organization}}</span>
-                  </div>
-                </div>
-              </div>
-            </Card>
-          </div>
-        </div>
-      </div>
+    <div class="chatPanel">
       <transition name="left">
         <div class="contentPanel">
           <div class="contentHeader">
             <div class="chatObject">
-              <div class="s_name" v-show="selectGroup.selectName!==''">{{selectGroup.selectName}}</div>
+              <div class="panelTitle">Meeting</div>
             </div>
-
-            <div class="chatOperate">
-              <Button type="default" class="recordsButton" @click="showRecords">Records</Button>
+            <div class="chatRecord">
+              <Button type="default" @click="showRecords" size="small">Records</Button>
             </div>
           </div>
-
-          <div class="contentBody" :style="message_panelObj" id="contentBody">
+          <div class="contentBody" id="contentBody">
             <div style="display:flex" v-for="(list,index) in msglist" :key="index">
               <template v-if="list.type === 'notice'">
                 <div class="chat-notice">{{list.content}}</div>
@@ -107,19 +43,14 @@
             </div>
           </div>
           <div class="contentFooter">
-            <div class="message_bar">
-              <div class="u_avater">
-                <avatar class="user_img" username="m e" :size="40" style="margin-top: -4px;"></avatar>
-              </div>
-              <div class="input_panel">
-                <Input
-                  placeholder="Enter message..."
-                  icon="ios-link"
-                  class="message_input"
-                  v-model="message"
-                  @keyup.enter.native="send(message)"
-                />
-              </div>
+            <div>
+              <Input
+                placeholder="Enter message..."
+                icon="ios-link"
+                v-model="message"
+                type="textarea"
+                :autosize="{ minRows: 5, maxRows: 5 }"
+              />
               <div class="send_panel">
                 <Button class="send_message_btn" @click="send(message)">Send</Button>
               </div>
@@ -127,7 +58,6 @@
           </div>
         </div>
       </transition>
-
       <transition name="right">
         <div class="searchPanel" v-show="searchPanelShow">
           <div class="searchHeader">
@@ -149,11 +79,7 @@
             <Input search placeholder="Enter something..." />
           </div>
           <!-- 聊天记录列表 -->
-          <div
-            class="searchmessageList"
-            :style="{height:messageListPanelHeight}"
-            id="searchmessageList"
-          >
+          <div class="searchmessageList" id="searchmessageList">
             <div class="message_record_board">
               <div style="display:flex" v-for="(list,index) in currentPageData" :key="'A'+index">
                 <div class="single_record">
@@ -174,23 +100,19 @@
               simple
               ref="page"
             />
-            <!-- <Button @click="prevPage()"> 上一页 </Button>
-            <span>第{{currentPage}}页/共{{totalPage}}页
-            <Button @click="nextPage()"> 下一页 </Button>-->
           </div>
         </div>
       </transition>
     </div>
-    <!-- </Col> -->
   </Row>
 </template>
 <script>
 import * as socketApi from "./../../../../api/socket.js";
 import Avatar from "vue-avatar";
-
 export default {
+  props: ["activityInfo", "participants"],
   components: {
-    Avatar
+    Avatar,
   },
   data() {
     return {
@@ -200,44 +122,19 @@ export default {
         // grid:1,
         right: "300px",
         borderRight: "0px",
-        searchPanelShow: false
+        searchPanelShow: false,
       },
       message_notice: {
         color: "green",
         right: "0px",
-        borderRight: "0px"
+        borderRight: "0px",
       },
-      // 原有的变量字段     
-      groupInfo: {},
-      participants: [],
-      participantsDetail: [],
-      selectGroup: {
-        selectId: "",
-        selectName: "",
-        selectType: ""
-      },
+      // message
       message: "",
       msglist: [],
       send_msg: [],
       query_date: "",
-      panelHeight: "",
-      panelWidth: "",
-      messageListPanelHeight: "",
       // 下拉框的测试数据
-      itemList: [
-        {
-          value: "Step",
-          label: "Step"
-        },
-        {
-          value: "Subproject",
-          label: "Subproject"
-        },
-        {
-          value: "Project",
-          label: "Project"
-        }
-      ],
       onlineParticipants: [],
       onlineUserIdList: [],
       offlineParticipants: [],
@@ -254,57 +151,23 @@ export default {
       msgindex: 0,
       msgR_prev: [],
       msgR_next: [],
-      groupId: this.$route.query.groupID,
-      scopeId: "",
-      scopeType: ""
     };
   },
-
-  // computed:{
-  //   currentPageDataA(){
-  //     let that= this;
-  //     let currentPageDataA=[];
-  //     for(let i=0 ;i< that.msgRecords.length;i++){
-  //       if(i < that.msgindex){
-  //         currentPageDataA.push (that.msgRecords[j]);
-  //       }
-  //     }
-  //     return currentPageDataA;
-  //   },
-  //    currentPageDataB(){
-  //     let that= this;
-  //     let currentPageDataB=[];
-  //     currentPageDataB.push (that.msgRecords[that.msgindex]);
-  //     return currentPageDataB;
-  //   },
-  //    currentPageDataC(){
-  //     let that= this;
-  //     let currentPageC=[];
-  //     for(let i=0 ;i< that.currentPage.length;i++){
-  //       if(i > that.msgindex){
-  //         currentPageDataC.push (that.msgRecords[i]);
-  //       }
-  //     }
-  //     return currentPageDataC;
-  //   },
-  // },
-
   beforeDestroy() {
     this.socketApi.close();
-    window.removeEventListener("resize", this.initSize);
   },
   beforeRouteEnter: (to, from, next) => {
-    next(vm => {
+    next((vm) => {
       if (!vm.$store.getters.userState || vm.$store.getters.userId == "") {
         vm.$router.push({
-          name: "Login"
+          name: "Login",
         });
       } else {
       }
     });
   },
-  updated: function() {
-    this.$nextTick(function() {
+  updated: function () {
+    this.$nextTick(function () {
       var div = document.getElementById("contentBody");
       var div2 = document.getElementById("searchmessageList");
       div.scrollTop = div.scrollHeight - 60;
@@ -315,13 +178,12 @@ export default {
     $("#app").css("min-width", "0");
     window.addEventListener("blur", this.winBlur); //监听浏览器失焦事件
     window.addEventListener("focus", this.winFocus); //监听浏览器失焦事件
-    window.addEventListener("resize", this.initSize);
 
     this.init();
     this.supportNotify();
 
     //修改时间格式使其统一
-    Date.prototype.Format = function(fmt) {
+    Date.prototype.Format = function (fmt) {
       var o = {
         "M+": this.getMonth() + 1, //月份
         "d+": this.getDate(), //日
@@ -329,7 +191,7 @@ export default {
         "m+": this.getMinutes(), //分
         "s+": this.getSeconds(), //秒
         "q+": Math.floor((this.getMonth() + 3) / 3), //季度
-        "S+": this.getMilliseconds() //毫毛
+        "S+": this.getMilliseconds(), //毫毛
       };
       if (/(y+)/.test(fmt))
         fmt = fmt.replace(
@@ -347,101 +209,10 @@ export default {
       return fmt;
     };
   },
-
   methods: {
-    async init() {
-      this.initSize();
-      await this.getGroupId();
-      await this.getGroupInfo();
+    init() {
+      this.startWebSocket(this.activityInfo.aid);
     },
-
-    async getGroupId() {
-      let groupId = this.$route.query.groupID;     
-      let data = await this.axios.get(
-        `/GeoProblemSolving/step/inquiry?key=stepId&value=${groupId}`
-      );
-     
-      let subProjectId = data.data[0].subProjectId;
-      if (subProjectId == undefined || subProjectId == "") {
-        this.scopeId = data.data[0].projectId;
-        this.scopeType = "project";
-      } else {
-        this.scopeId = subProjectId;
-        this.scopeType = "subproject";
-      }
-    },
-
-    async getGroupInfo() {
-      let scopeId = this.scopeId;
-      let scopeType = this.scopeType;
-      if (scopeId != undefined && scopeId != "") {
-        if (scopeType == "subproject") {
-          let data = await this.axios.get(
-            `/GeoProblemSolving/subProject/inquiry?key=subProjectId&value=${scopeId}`
-          );
-          if (data.data == "Offline") {
-            this.$store.commit("userLogout");
-            this.$router.push({ name: "Login" });
-          } else if (data.data != "None" && data.data != "Fail") {
-            this.$set(this, "groupInfo", data.data[0]);
-            this.selectGroup.selectName = this.groupInfo.title;
-            this.selectGroup.selectId = this.groupInfo.subProjectId;
-
-            let membersList = this.groupInfo.members;
-            let manager = {
-              userId: this.groupInfo.managerId,
-              userName: this.groupInfo.managerName
-            };
-            membersList.unshift(manager); //在List开头加入manager元素
-            this.$set(this, "participants", membersList);
-            await this.getParticipants();
-            // 建立通讯
-            this.startWebSocket(scopeId);
-          }
-        } else if (scopeType == "project") {
-          let data = await this.axios.get(
-            `/GeoProblemSolving/project/inquiry?key=projectId&value=${scopeId}`
-          );
-          if (data.data == "Offline") {
-            this.$store.commit("userLogout");
-            this.$router.push({ name: "Login" });
-          } else if (data.data != "None" && data.data != "Fail") {
-            this.$set(this, "groupInfo", data.data[0]);
-            this.selectGroup.selectName = this.groupInfo.title;
-            this.selectGroup.selectId = this.groupInfo.projectId;
-
-            let membersList = this.groupInfo.members;
-            let manager = {
-              userId: this.groupInfo.managerId,
-              userName: this.groupInfo.managerName
-            };
-            membersList.unshift(manager); //在List开头加入manager元素
-            this.$set(this, "participants", membersList);
-            await this.getParticipants();
-            // 建立通讯
-            this.startWebSocket(scopeId);
-          }
-        }
-      } else {
-        this.$Notice.error({
-          desc: "Failed to get the group id!"
-        });
-      }
-    },
-
-    async getParticipants() {
-      let membersList = this.participants;
-      let participantsTemp = [];
-      for (let i = 0; i < membersList.length; i++) {
-        let userId = membersList[i].userId;
-        let data = await this.axios.get(
-          `/GeoProblemSolving/user/inquiry?key=userId&value=${userId}`
-        );
-        participantsTemp.push(data.data);
-      }
-      this.$set(this, "participants", participantsTemp);
-    },
-
     send(msg) {
       this.message = msg;
       let myDate = new Date().Format("yyyy-MM-dd HH:mm:ss");
@@ -454,7 +225,7 @@ export default {
           from: this.$store.getters.userName,
           fromid: this.$store.getters.userId,
           content: this.message,
-          time: current_time
+          time: current_time,
         };
         if (this.socketApi.getSocketInfo().linked) {
           this.msglist.push(this.send_msg);
@@ -463,14 +234,13 @@ export default {
         } else {
           let chatMsg = {
             type: "notice",
-            content: "You are disconnected with others."
+            content: "You are disconnected with others.",
           };
           this.msglist.push(chatMsg);
         }
       }
       this.message = "";
     },
-
     startWebSocket(id) {
       this.socketApi.initWebSocket(
         "ChatServer/" + id,
@@ -479,11 +249,10 @@ export default {
       this.send_msg = {
         type: "test",
         from: "Test",
-        content: "TestChat"
+        content: "TestChat",
       };
       this.socketApi.sendSock(this.send_msg, this.getSocketConnect);
     },
-
     getSocketConnect(data) {
       var chatMsg = data; //data传回onopen方法里的值
       if (data.type === "members") {
@@ -517,15 +286,6 @@ export default {
         }
       }
     },
-
-    initSize() {
-      $("#app").css("min-width", "0");
-      $("#app").css("min-height", "0");
-      this.panelHeight = window.innerHeight;
-      this.panelWidth = window.innerWidth;
-      this.messageListPanelHeight = this.panelHeight - 144 - 40 + "px";
-    },
-
     //判断在线的用户列表
     judgeonlineParticipant(msg) {
       if (msg == undefined || msg == "") {
@@ -559,7 +319,6 @@ export default {
         }
       }
     },
-
     //notice
     winBlur() {
       this.windowStatus = "blur";
@@ -567,7 +326,6 @@ export default {
     winFocus() {
       this.windowStatus = "focus";
     },
-
     supportNotify() {
       //检查浏览器是否支持
       if (!("Notification" in window)) {
@@ -586,40 +344,38 @@ export default {
         }
       }
     },
-
     sendNotify(msg) {
       if (this.windowStatus === "blur") {
         var notify = new Notification("You have got a new message", {
           tag: msg.fromid + msg.time,
           icon: require("@/assets/images/OGMS2.png"), //通知的缩略图,
           body: "from   " + msg.from, //通知的具体内容
-          renotify: true
+          renotify: true,
         });
 
         //通知显示
-        notify.onshow = function() {
+        notify.onshow = function () {
           //5s自行停止通知
           setTimeout(notify.close.bind(notify), 5000);
         };
 
         //单击通知，跳转到页面
-        notify.onclick = function() {
+        notify.onclick = function () {
           window.focus();
           notify.close();
         };
 
         //报错处理
-        notify.onerror = function() {
+        notify.onerror = function () {
           console.log("error");
         };
 
         //通知关闭
-        notify.onclose = function() {
+        notify.onclose = function () {
           console.log("HTML5桌面消息关闭！！！");
         };
       }
     },
-
     //日期选择器
     find(seledate) {
       let msgtime = "";
@@ -645,7 +401,6 @@ export default {
       this.changeRecordPage(this.msgR_page);
       this.msgindex = "";
     },
-
     //查找所有聊天记录
     showRecords() {
       //聊天记录框
@@ -660,9 +415,9 @@ export default {
               "?type=message" +
               "&key=roomId" +
               "&value=" +
-              this.selectGroup.selectId
+              this.activityInfo.aid
           )
-          .then(res => {
+          .then((res) => {
             if (res.data != "None" && res.data != "Fail") {
               for (let i = 0; i < res.data.length; i++) {
                 let message = JSON.parse(res.data[i].content);
@@ -680,7 +435,6 @@ export default {
           });
       }
     },
-
     //聊天记录分页,没有按日期查找，倒序排列
     changeRecordPage(index) {
       let beforePage = this.currentPage; //翻页之前的页码 判断前后
@@ -694,47 +448,14 @@ export default {
       }
       this.currentPage = index;
       this.$refs.page.currentPage = index; //分页强制固定
-    }
-  }
+    },
+  },
 };
 </script>
 <style scoped>
 .chatPanel {
   display: flex;
   overflow-y: hidden;
-}
-
-/* member部分样式 */
-.memberPanel {
-  width: 200px;
-  background-color: #ffffff;
-  box-shadow: 6px 0px 3px -5px #b9b9b9;
-}
-
-.panelHeader {
-  height: 40px;
-  margin-top: 10px;
-}
-
-.participants {
-  height: auto;
-  margin-top: 10px;
-}
-
-.participants h4,
-.panelHeader h4 {
-  padding: 10px;
-  font-size: 20px;
-  line-height: 20px;
-  text-align: center;
-  color: rgb(0, 0, 0);
-}
-
-.f_list {
-  display: flex;
-  padding-left: 10%;
-  padding-bottom: 15px;
-  color: white;
 }
 
 .name {
@@ -778,7 +499,6 @@ export default {
 
 .search_msg {
   padding: 10px;
-  /* background-color: lightblue; */
   width: 90%;
   margin-left: 2.5%;
 }
@@ -823,18 +543,16 @@ export default {
 }
 
 .contentHeader {
-  /* background-color: lightgray; */
   border-bottom: 1px solid lightgray;
-  height: 60px;
   display: flex;
 }
 
 /* 信息主题列表显示窗口 */
 .contentBody {
-  flex: 1;
   padding: 25px;
   overflow-y: auto;
   background-color: #e7e7e73a;
+  height: calc(100vh - 235px);
 }
 
 .chat-bubble-r {
@@ -847,10 +565,6 @@ export default {
   border-radius: 5px;
   min-width: 20%;
   float: right;
-  /* 这两句让文字从右面开始显示 */
-  /* direction: rtl;
-  unicode-bidi: bidi-override; */
-  /* float:right; */
 }
 
 .chat-bubble-l {
@@ -928,18 +642,16 @@ export default {
 /* 信息主体结束 */
 /* 发送信息部分 */
 .contentFooter {
-  height: 60px;
-  padding: 4px 20px 4px 10px;
+  height: 124px;
+  padding: 4px 5px;
   background-color: lightgray;
 }
 
-.message_bar {
-  display: flex;
-  height: 52px;
-}
-
 .send_panel {
-  display: flex;
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  z-index: 10;
 }
 
 .u_avater {
@@ -954,138 +666,35 @@ export default {
   margin-left: 5px;
 }
 
-.input_panel {
-  width: 85%;
-  margin-right: 4%;
-}
-
-.message_input {
-  height: 40px;
-  margin-top: 10px;
-  /* margin-bottom: 10px; */
-  margin-right: 15px;
-  margin-left: 15px;
-}
-
-.send_panel {
-  display: flex;
-}
-
 .send_message_btn {
   height: 32px;
   margin-top: 10px;
   /* margin-bottom: 10px; */
 }
-
 /* 发送信息部分结束 */
+
 .chatObject {
-  height: 60px;
+  height: 40px;
   padding: 10px;
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 90%;
 }
 
-.s_name {
-  font-size: 20px;
-  text-align: center;
+.panelTitle {
+  font-size: 1.17em;
+  font-weight: bold;
 }
 
-.chatOperate {
+.chatRecord {
   display: flex;
-  justify-content: center;
   align-items: center;
-  width: 10%;
-}
-
-.recordsButton {
-  height: 40px;
-  line-height: 15px;
-  font-size: 15px;
-  padding: 5px 5px 5px 5px;
+  margin-left: auto;
   margin-right: 10px;
-  /* float:right; */
-}
-
-.memberImg {
-  width: 40px;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.memberName {
-  height: 20px;
-  padding: 0px 10px;
-  width: 100%;
-}
-
-.memberDetail {
-  height: 100%;
-  width: 100%;
-  overflow: hidden;
-}
-
-.memberOrganization {
-  height: 20px;
-  padding: 0px 10px;
-  width: 100%;
-}
-
-.memberName span {
-  display: inline-block;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.memberOrganization span {
-  display: inline-block;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  max-width: 50%;
 }
 
 .chat-notice {
   color: darkgreen;
   width: 90%;
   text-align: center;
-}
-
-.offlineparticipantState {
-  background: rgba(255, 255, 255, 0.4);
-}
-
-.onlineparticipantState {
-  background: rgba(18, 158, 71, 0.4);
-}
-
-.onlinecircle {
-  width: 14px;
-  height: 14px;
-  background-color: rgb(93, 243, 79);
-  border: 2px solid rgb(221, 245, 221);
-  border-radius: 50%;
-  -moz-border-radius: 50%;
-  -webkit-border-radius: 50%;
-  position: absolute;
-  bottom: -2px;
-  right: -2px;
-}
-
-.offlinecircle {
-  width: 14px;
-  height: 14px;
-  background-color: rgb(151, 153, 152);
-  border: 2px solid rgb(175, 175, 175);
-  border-radius: 50%;
-  -moz-border-radius: 50%;
-  -webkit-border-radius: 50%;
-  position: absolute;
-  bottom: -2px;
-  right: -2px;
 }
 </style>

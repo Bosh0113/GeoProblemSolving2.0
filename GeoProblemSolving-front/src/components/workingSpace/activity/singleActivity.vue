@@ -50,14 +50,38 @@
       </div>
       <div style="flex:1; border-left: 1px solid #dcdee2; background-color: white;">
         <vue-scroll :ops="scrollOps" style="height:calc(100vh - 70px)">
-          <context-res v-if="activityInfo.purpose=='Context definition & resource collection'" :activityInfo="activityInfo"></context-res>
-          <data-processing v-else-if="activityInfo.purpose=='Data processing'" :activityInfo="activityInfo"></data-processing>
-          <data-visual v-else-if="activityInfo.purpose=='Data visualization'" :activityInfo="activityInfo"></data-visual>
-          <model-build v-else-if="activityInfo.purpose=='Geographic model construction'" :activityInfo="activityInfo"></model-build>
-          <model-evaluation v-else-if="activityInfo.purpose=='Model effectiveness evaluation'" :activityInfo="activityInfo"></model-evaluation>
-          <geo-simulation v-else-if="activityInfo.purpose=='Geographical simulation'" :activityInfo="activityInfo"></geo-simulation>
-          <geo-analysis v-else-if="activityInfo.purpose=='Quantitative and qualitative analyses'" :activityInfo="activityInfo"></geo-analysis>
-          <decision-making v-else-if="activityInfo.purpose=='Decision-making for management'" :activityInfo="activityInfo"></decision-making>
+          <context-res
+            v-if="activityInfo.purpose=='Context definition & resource collection'"
+            :activityInfo="activityInfo" :participants="participants"
+          ></context-res>
+          <data-processing
+            v-else-if="activityInfo.purpose=='Data processing'"
+            :activityInfo="activityInfo" :participants="participants"
+          ></data-processing>
+          <data-visual
+            v-else-if="activityInfo.purpose=='Data visualization'"
+            :activityInfo="activityInfo" :participants="participants"
+          ></data-visual>
+          <model-build
+            v-else-if="activityInfo.purpose=='Geographic model construction'"
+            :activityInfo="activityInfo" :participants="participants"
+          ></model-build>
+          <model-evaluation
+            v-else-if="activityInfo.purpose=='Model effectiveness evaluation'"
+            :activityInfo="activityInfo" :participants="participants"
+          ></model-evaluation>
+          <geo-simulation
+            v-else-if="activityInfo.purpose=='Geographical simulation'"
+            :activityInfo="activityInfo" :participants="participants"
+          ></geo-simulation>
+          <geo-analysis
+            v-else-if="activityInfo.purpose=='Quantitative and qualitative analyses'"
+            :activityInfo="activityInfo" :participants="participants"
+          ></geo-analysis>
+          <decision-making
+            v-else-if="activityInfo.purpose=='Decision-making for management'"
+            :activityInfo="activityInfo" :participants="participants"
+          ></decision-making>
         </vue-scroll>
       </div>
     </div>

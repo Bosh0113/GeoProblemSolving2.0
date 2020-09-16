@@ -52,7 +52,7 @@
 }
 #toolData {
   width: 100%;
-  height: 400px;
+  height: 100;
   border: 1px solid #dcdee2;
 }
 #toolDataHeader {
@@ -62,21 +62,24 @@
   border-bottom: 1px solid #e8eaec;
   background-color: #f8f8f9;
 }
+.resCard {
+    height: calc(100vh - 120px);
+}
+.resCard >>> .ivu-card-head {
+    padding: 6px 16px;
+}
 </style>
 <template>
   <div>
-    <Card dis-hover>
+    <Card class="resCard" dis-hover>
       <div slot="title">
-        <h4>Resources</h4>
-      </div>
-      <div slot="extra">
         <Icon
           v-if="dataListStyle"
           type="md-list"
           size="24"
           @click="dataListStyle = false"
           title="Resources list style"
-          style="margin-right:20px;margin-top:-10px; cursor: pointer"
+          style="margin-right:10px; cursor: pointer"
         />
         <Icon
           v-else
@@ -84,25 +87,14 @@
           size="24"
           @click="dataListStyle = true"
           title="Resources list style"
-          style="margin-right:20px;margin-top:-10px; cursor: pointer"
+          style="margin-right:10px; cursor: pointer"
         />
-        <Select
-          v-model="resouceModel"
-          size="small"
-          @on-change="changeResModel"
-          style="width:150px;margin-right:20px;margin-top:-10px"
-        >
-          <Option value="resources">All resources</Option>
-          <Option value="data">Data</Option>
-          <Option value="materials">Related materials</Option>
-          <Option value="toolData">Tool-generated results</Option>
-        </Select>
         <Button
           v-if="userRole != 'Visitor'"
           shape="circle"
           icon="md-shuffle"
           @click="getPreviousRes()"
-          style="margin-top:-10px;margin-right:20px"
+          style="margin-right:10px"
           title="Get resources from the previous activities"
         ></Button>
         <Button
@@ -110,12 +102,23 @@
           shape="circle"
           icon="md-cloud-upload"
           @click="dataUploadModalShow"
-          style="margin-top:-10px"
           title="Upload resources"
         ></Button>
       </div>
+      <Label>Select:</Label>
+      <Select
+        v-model="resouceModel"
+        size="small"
+        @on-change="changeResModel"
+        style="width:150px;margin:5px 10px"
+      >
+        <Option value="resources">All resources</Option>
+        <Option value="data">Data</Option>
+        <Option value="materials">Other resources</Option>
+        <Option value="toolData">Results</Option>
+      </Select>
       <div style="display: flex; justify-content: space-between;">
-        <div style="width:99%; height:400px" v-if="dataListStyle">
+        <div style="width:99%; height:100" v-if="dataListStyle">
           <Table
             :columns="tableColName"
             :data="fileList"
@@ -137,7 +140,9 @@
                 shape="circle"
                 type="text"
               ></Button>
-              <template v-if="permissionIdentity('workspace_resource', row)">
+              <template
+                v-if="permissionIdentity(activityInfo.permission, 'use_resource') || (permissionIdentity(activityInfo.permission, 'upload_resource') && item.uploaderId == userInfo.userId)"
+              >
                 <a :href="row.pathURL" :download="row.name" title="Download">
                   <Button
                     class="fileBtnHoverBlue"
@@ -165,9 +170,9 @@
           <Card style="width:30%; height:150px; float:left; margin:5px" v-if="fileList.length == 0">
             <div>There is no resource.</div>
           </Card>
-          <vue-scroll :ops="ops" style="height:360px">
+          <vue-scroll :ops="ops" style="height: calc(100vh - 200px)">
             <div v-for="(item,index) in fileList" :key="index">
-              <Card style="width:32%; height:150px; float:left; margin:5px">
+              <Card style="width:150px; height:150px; float:left; margin:5px">
                 <div style="float:left">
                   <template v-if="item.thumbnail == ''||item.thumbnail == undefined">
                     <img
@@ -226,13 +231,12 @@
                 </div>
                 <div style="float:left;margin: 0 10px">
                   <div>
-                    <Label class="toolDataLabel">Name:</Label>
                     <div class="toolDataText" :title="item.name">{{item.name}}</div>
                   </div>
-                  <div>
+                  <!-- <div>
                     <Label class="toolDataLabel">Description:</Label>
                     <div class="toolDataText" :title="item.description">{{item.description}}</div>
-                  </div>
+                  </div> -->
                   <div>
                     <Button
                       size="small"
@@ -241,25 +245,23 @@
                       style="margin: 10px 20px 0 0;"
                       @click="checkData(item)"
                     ></Button>
-                    <template v-if="permissionIdentity('workspace_resource', item)">
-                      <a :href="item.pathURL" :download="item.name">
-                        <Button
-                          v-if="permissionIdentity('workspace_resource', item)"
-                          size="small"
-                          title="Download"
-                          icon="md-download"
-                          style="margin: 10px 20px 0 0;"
-                        ></Button>
-                      </a>
+                    <a :href="item.pathURL" :download="item.name">
                       <Button
-                        v-if="permissionIdentity('workspace_resource', item)"
+                        v-if="permissionIdentity(activityInfo.permission, 'use_resource')"
                         size="small"
-                        title="Delete"
-                        icon="md-close"
-                        style="margin-top: 10px;"
-                        @click="deleteResourceModalShow(item.resourceId)"
+                        title="Download"
+                        icon="md-download"
+                        style="margin: 10px 20px 0 0;"
                       ></Button>
-                    </template>
+                    </a>
+                    <Button
+                      v-if="permissionIdentity(activityInfo.permission, 'manage_resource') || (permissionIdentity(activityInfo.permission, 'upload_resource') && item.uploaderId == userInfo.userId)"
+                      size="small"
+                      title="Delete"
+                      icon="md-close"
+                      style="margin-top: 10px;"
+                      @click="deleteResourceModalShow(item.resourceId)"
+                    ></Button>
                   </div>
                 </div>
               </Card>
@@ -415,19 +417,21 @@
 </template>
 <script>
 import Avatar from "vue-avatar";
+import * as userRoleJS from "./../../../../api/userRole.js";
 export default {
+  props: ["activityInfo"],
   components: {
-    Avatar
+    Avatar,
   },
   data() {
     return {
       ops: {
         bar: {
-          background: "#808695"
-        }
+          background: "#808695",
+        },
       },
       userInfo: this.$store.getters.userInfo,
-      userRole: "visitor", 
+      userRole: "visitor",
       resouceModel: "resources",
       //资源继承
       preActivities: [],
@@ -440,30 +444,30 @@ export default {
       uploadDataInfo: {
         privacy: "private",
         type: "data",
-        description: ""
+        description: "",
       },
       uploadDataRule: {
         privacy: [
           {
             required: true,
             message: "file privacy cannot be empty",
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         type: [
           {
             required: true,
             message: "file type cannot be empty",
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         description: [
           {
             required: true,
             message: "file description cannot be empty",
-            trigger: "blur"
-          }
-        ]
+            trigger: "blur",
+          },
+        ],
       },
       toUploadFiles: [],
       fileCountTimer: null,
@@ -492,32 +496,19 @@ export default {
           key: "name",
           minWidth: 30,
           tooltip: true,
-          sortable: true
-        },
-        {
-          title: "Type",
-          key: "type",
-          width: 90,
-          tooltip: true,
-          sortable: true
-        },
-        {
-          title: "Description",
-          key: "description",
-          tooltip: true
-        },
-        {
-          title: "Uploader",
-          key: "uploaderName",
           sortable: true,
-          width: 120
         },
+        // {
+        //   title: "Description",
+        //   key: "description",
+        //   tooltip: true,
+        // },
         {
           title: "Action",
           slot: "action",
           width: 120,
-          align: "center"
-        }
+          align: "center",
+        },
       ],
       selectData: {},
       // 编辑data描述信息
@@ -527,10 +518,9 @@ export default {
       // 删除资源
       deleteResourceModal: false,
       deleteResourceId: "",
-      panel: null
+      panel: null,
     };
   },
-  props: ["activityInfo"],
   watch: {
     checkDataModal(value) {
       if (!value) {
@@ -539,7 +529,7 @@ export default {
     },
     activityInfo() {
       this.getResList();
-    }
+    },
   },
   created() {},
   mounted() {
@@ -547,7 +537,7 @@ export default {
 
     $(".__view").css("width", "inherit");
 
-    Date.prototype.Format = function(fmt) {
+    Date.prototype.Format = function (fmt) {
       var o = {
         "M+": this.getMonth() + 1, //月份
         "d+": this.getDate(), //日
@@ -555,7 +545,7 @@ export default {
         "m+": this.getMinutes(), //分
         "s+": this.getSeconds(), //秒
         "q+": Math.floor((this.getMonth() + 3) / 3), //季度
-        "S+": this.getMilliseconds() //毫毛
+        "S+": this.getMilliseconds(), //毫毛
       };
       if (/(y+)/.test(fmt))
         fmt = fmt.replace(
@@ -574,27 +564,30 @@ export default {
     };
   },
   methods: {
-    roleIdentity(activity) {
-      return userRoleJS.roleIdentify(activity.members, this.userInfo.userId);
+    roleIdentity() {
+      this.userRole = userRoleJS.roleIdentify(
+        this.activityInfo.members,
+        this.userInfo.userId
+      );
     },
-    permissionIdentity(permission, role, operation) {
+    permissionIdentity(permission, operation) {
       return userRoleJS.permissionIdentity(
         JSON.parse(permission),
-        role,
+        this.userRole,
         operation
       );
     },
     getResList() {
       var list = [];
-      if (this.activityInfo.stepId != "" && this.activityInfo.stepId != undefined) {
+      if (this.activityInfo.aid != "" && this.activityInfo.aid != undefined) {
         $.ajax({
           url:
             "/GeoProblemSolving/folder/inquiry" +
             "?folderId=" +
-            this.activityInfo.stepId,
+            this.activityInfo.aid,
           type: "GET",
           async: false,
-          success: data => {
+          success: (data) => {
             if (data !== "None") {
               list = data.files;
             } else {
@@ -606,19 +599,19 @@ export default {
             this.filterData();
             this.filterToolData();
             this.filterRelatedRes();
-          }
+          },
         });
       }
     },
     filterData() {
-      var filterdata = this.fileList.filter(item => {
+      var filterdata = this.fileList.filter((item) => {
         return item.type === "data";
       });
       this.$set(this, "stepDataList", filterdata);
     },
-    
+
     filterToolData() {
-      var filterdata = this.fileList.filter(item => {
+      var filterdata = this.fileList.filter((item) => {
         if (item.type.indexOf("toolData") != -1) {
           return item;
         }
@@ -626,7 +619,7 @@ export default {
       this.$set(this, "toolDataList", filterdata);
     },
     filterRelatedRes() {
-      var filterdata = this.fileList.filter(item => {
+      var filterdata = this.fileList.filter((item) => {
         return item.type !== "data";
       });
       this.$set(this, "relatedResList", filterdata);
@@ -675,12 +668,12 @@ export default {
       this.uploadDataInfo = {
         privacy: "private",
         type: "data",
-        description: ""
+        description: "",
       };
       this.dataUploadModal = true;
     },
     folderUpload(name) {
-      this.$refs[name].validate(valid => {
+      this.$refs[name].validate((valid) => {
         if (valid) {
           var uploadFiles = this.toUploadFiles;
           if (uploadFiles.length > 0) {
@@ -693,24 +686,24 @@ export default {
             formData.append("type", this.uploadDataInfo.type);
             formData.append("uploaderId", this.userInfo.userId);
             formData.append("privacy", this.uploadDataInfo.privacy);
-            formData.append("folderId", this.activityInfo.stepId);
+            formData.append("folderId", this.activityInfo.aid);
 
             this.progressModalShow = true;
 
             if (
-              this.activityInfo.stepId != "" ||
-              this.activityInfo.stepId != undefined
+              this.activityInfo.aid != "" ||
+              this.activityInfo.aid != undefined
             ) {
               this.axios({
                 url: "/GeoProblemSolving/folder/uploadToFolder",
                 method: "post",
-                onUploadProgress: progressEvent => {
+                onUploadProgress: (progressEvent) => {
                   this.uploadProgress =
                     ((progressEvent.loaded / progressEvent.total) * 100) | 0;
                 },
-                data: formData
+                data: formData,
               })
-                .then(res => {
+                .then((res) => {
                   if (res.data != "Fail") {
                     var uploadedList = res.data.uploaded;
                     var failedList = res.data.failed;
@@ -732,17 +725,17 @@ export default {
                     if (sizeOverList.length > 0) {
                       this.$Notice.warning({
                         title: "Files too large.",
-                        render: h => {
+                        render: (h) => {
                           return h("span", sizeOverList.join(";"));
-                        }
+                        },
                       });
                     }
                     if (failedList.length > 0) {
                       this.$Notice.error({
                         title: "Upload fail.",
-                        render: h => {
+                        render: (h) => {
                           return h("span", failedList.join(";"));
-                        }
+                        },
                       });
                     }
 
@@ -761,25 +754,25 @@ export default {
                       time: new Date().Format("yyyy-MM-dd HH:mm:ss"),
                       who: this.userInfo.userName,
                       content: "upload data",
-                      file: filelist
+                      file: filelist,
                     };
                     // 保存记录
                     this.$emit("dataBehavior", dataRecords);
-                    this.addHistoryEvent(this.activityInfo.stepId, dataRecords);
+                    // this.addHistoryEvent(this.activityInfo.aid, dataRecords);
                   } else {
                     this.$Message.warning("Upload fail.");
                   }
                   this.progressModalShow = false;
                   this.uploadProgress = 0;
                 })
-                .catch(err => {
+                .catch((err) => {
                   this.progressModalShow = false;
                   this.$Message.warning("Upload fail.");
                   this.uploadProgress = 0;
                 });
             } else {
               this.$Notice.info({
-                desc: "upload data failed!"
+                desc: "upload data failed!",
               });
             }
           } else {
@@ -800,19 +793,19 @@ export default {
               "fileId=" +
               this.deleteResourceId +
               "&folderId=" +
-              this.activityInfo.stepId
+              this.activityInfo.aid
           )
-          .then(res => {
+          .then((res) => {
             if (res.data == "Fail") {
               this.$Notice.error({
                 title: "Process result",
-                desc: "Delete fail"
+                desc: "Delete fail",
               });
               // this.$Message.info("Failure");
             } else {
               this.$Notice.success({
                 title: "Process result",
-                desc: "Delete successfully"
+                desc: "Delete successfully",
               });
 
               //从列表中删除
@@ -826,10 +819,10 @@ export default {
                       time: new Date().Format("yyyy-MM-dd HH:mm:ss"),
                       who: this.userInfo.userName,
                       content: "delete data",
-                      file: this.fileList[i].name
+                      file: this.fileList[i].name,
                     };
                     this.$emit("dataBehavior", dataRecords);
-                    this.addHistoryEvent(this.activityInfo.stepId, dataRecords);
+                    // this.addHistoryEvent(this.activityInfo.aid, dataRecords);
 
                     deleteResType = this.fileList[i].type;
                     this.fileList.splice(i, 1);
@@ -870,26 +863,26 @@ export default {
               // }
             }
           })
-          .catch(err => {
+          .catch((err) => {
             console.log(err.data);
           });
       }
     },
-    addHistoryEvent(scopeId, record) {
-      let form = {};
-      form["description"] = JSON.stringify(record);
-      form["scopeId"] = scopeId;
-      form["eventType"] = "step";
-      form["userId"] = this.$store.getters.userId;
-      this.axios
-        .post("/GeoProblemSolving/history/save", form)
-        .then(res => {
-          console.log(res.data);
-        })
-        .catch(err => {
-          console.log(err.data);
-        });
-    },
+    // addHistoryEvent(scopeId, record) {
+    //   let form = {};
+    //   form["description"] = JSON.stringify(record);
+    //   form["scopeId"] = scopeId;
+    //   form["eventType"] = "step";
+    //   form["userId"] = this.$store.getters.userId;
+    //   this.axios
+    //     .post("/GeoProblemSolving/history/save", form)
+    //     .then(res => {
+    //       console.log(res.data);
+    //     })
+    //     .catch(err => {
+    //       console.log(err.data);
+    //     });
+    // },
     checkData(item) {
       this.selectData = item;
       this.checkDataModal = true;
@@ -924,7 +917,7 @@ export default {
             var demoPanelTimer = null;
             this.panel = jsPanel.create({
               headerControls: {
-                smallify: "remove"
+                smallify: "remove",
               },
               theme: "primary",
               footerToolbar: '<p style="height:5px"></p>',
@@ -933,9 +926,9 @@ export default {
               content: toolURL,
               disableOnMaximized: true,
               dragit: {
-                containment: 5
+                containment: 5,
               },
-              closeOnEscape: true
+              closeOnEscape: true,
               // callback: function() {
               //   var that = this;
               //   demoPanelTimer = window.setInterval(function() {
@@ -947,7 +940,7 @@ export default {
           },
           onCancel: () => {
             return;
-          }
+          },
         });
       } else if (/\.(mp4)$/.test(name.toLowerCase())) {
         if (this.panel != null) {
@@ -961,7 +954,7 @@ export default {
         var demoPanelTimer = null;
         this.panel = jsPanel.create({
           headerControls: {
-            smallify: "remove"
+            smallify: "remove",
           },
           theme: "primary",
           footerToolbar: '<p style="height:10px"></p>',
@@ -970,9 +963,9 @@ export default {
           content: toolURL,
           disableOnMaximized: true,
           dragit: {
-            containment: 5
+            containment: 5,
           },
-          closeOnEscape: true
+          closeOnEscape: true,
           // callback: function() {
           //   var that = this;
           //   demoPanelTimer = window.setInterval(function() {
@@ -993,7 +986,7 @@ export default {
         var demoPanelTimer = null;
         this.panel = jsPanel.create({
           headerControls: {
-            smallify: "remove"
+            smallify: "remove",
           },
           theme: "primary",
           footerToolbar: '<p style="height:10px"></p>',
@@ -1002,9 +995,9 @@ export default {
           content: toolURL,
           disableOnMaximized: true,
           dragit: {
-            containment: 5
+            containment: 5,
           },
-          closeOnEscape: true
+          closeOnEscape: true,
           // callback: function() {
           //   var that = this;
           //   demoPanelTimer = window.setInterval(function() {
@@ -1016,7 +1009,7 @@ export default {
       } else {
         this.$Notice.error({
           title: "Open failed",
-          desc: "Sorry. Unsupported file format."
+          desc: "Sorry. Unsupported file format.",
         });
         return false;
       }
@@ -1029,7 +1022,6 @@ export default {
     getPreActivities() {
       // this.preActivities = [];
       // let processStructure = [];
-
       // // get solving process
       // if (
       //   this.projectInfo.solvingProcess == null ||
@@ -1060,9 +1052,8 @@ export default {
       //       }
       //     });
       //   }
-
       // for (var i = 0; i < processStructure.length; i++) {
-      //   if (processStructure[i].stepID == this.activityInfo.stepId) {
+      //   if (processStructure[i].aid == this.activityInfo.aid) {
       //     let last = processStructure[i].last;
       //     if (last.length > 0) {
       //       for (var j = 0; j < last.length; j++) {
@@ -1082,7 +1073,7 @@ export default {
 
       // 前驱步骤的资源
       for (var i = 0; i < this.preActivities.length; i++) {
-        let selectedStepId = this.preActivities[i].stepID;
+        let selectedStepId = this.preActivities[i].aid;
         let selectedStepName = this.preActivities[i].name;
         let getResUrl =
           "/GeoProblemSolving/folder/findByFileType?" +
@@ -1094,7 +1085,7 @@ export default {
           url: getResUrl,
           type: "GET",
           async: false,
-          success: function(data) {
+          success: function (data) {
             if (data !== "Fail") {
               selectedRes = data;
               for (var j = 0; j < selectedRes.length; j++) {
@@ -1103,17 +1094,17 @@ export default {
                   name: selectedRes[j].name,
                   type: selectedRes[j].type,
                   resourceId: selectedRes[j].resourceId,
-                  source: selectedStepName
+                  source: selectedStepName,
                 });
               }
             } else {
               selectedRes = [];
             }
           },
-          error: function(err) {
+          error: function (err) {
             selectedRes = [];
             console.log("err!");
-          }
+          },
         });
       }
       return mockData;
@@ -1127,7 +1118,7 @@ export default {
             name: this.existingResources[this.targetKeys[i]].name,
             type: this.existingResources[this.targetKeys[i]].type,
             resourceId: this.existingResources[this.targetKeys[i]].resourceId,
-            source: this.existingResources[this.targetKeys[i]].source
+            source: this.existingResources[this.targetKeys[i]].source,
           });
         }
       }
@@ -1157,9 +1148,9 @@ export default {
             "?addFileList=" +
             addFileListStr +
             "&folderId=" +
-            this.activityInfo.stepId
+            this.activityInfo.aid
         )
-        .then(res => {
+        .then((res) => {
           if (res.data == "Offline") {
             this.$store.commit("userLogout");
             this.$router.push({ name: "Login" });
@@ -1171,11 +1162,11 @@ export default {
             this.getResList();
           }
         })
-        .catch(err => {
+        .catch((err) => {
           // console.log(err.data);
         });
     },
-    dataVisualize() {}
-  }
+    dataVisualize() {},
+  },
 };
 </script>

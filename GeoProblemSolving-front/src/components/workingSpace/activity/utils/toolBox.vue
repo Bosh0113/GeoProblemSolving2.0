@@ -183,8 +183,9 @@
 import manageTools from "./../../../tools/toolToStepModal";
 import Avatar from "vue-avatar";
 import { get, del, post, put } from "../../../../axios";
+import * as userRoleJS from "./../../../../api/userRole.js";
 export default {
-  props: ["stepInfo", "userRole", "projectInfo"],
+  props: ["activityInfo"],
   components: {
     manageTools,
     Avatar
@@ -202,6 +203,7 @@ export default {
         }
       },
       userInfo: this.$store.getters.userInfo,
+      userRole: "visitor",
       toolList: [],
       toolsetList: [],
       toolModal: 0,
@@ -243,30 +245,19 @@ export default {
     };
   },
   methods: {
-    permissionIdentity(operation) {
-      if (
-        this.projectInfo.permissionManager != undefined &&
-        operation === "workspace_tool"
-      ) {
-        if (
-          this.userRole == "PManager" &&
-          this.projectInfo.permissionManager.workspace_tool.project_manager
-        ) {
-          return true;
-        } else if (
-          this.userRole == "Manager" &&
-          this.projectInfo.permissionManager.workspace_tool.subproject_manager
-        ) {
-          return true;
-        } else if (
-          this.userRole == "Member" &&
-          this.projectInfo.permissionManager.workspace_tool.member
-        ) {
-          return true;
-        }
-      }
+    roleIdentity() {
+      this.userRole = userRoleJS.roleIdentify(
+        this.activityInfo.members,
+        this.userInfo.userId
+      );
     },
-    
+    permissionIdentity(permission, operation) {
+      return userRoleJS.permissionIdentity(
+        JSON.parse(permission),
+        this.userRole,
+        operation
+      );
+    },    
     getAllTools() {
       if (
         this.stepInfo.toolList != null &&

@@ -3,13 +3,13 @@
 <template>
   <div>
     <Row>
-      <Col span="14">
-        <chat-panel></chat-panel>
+      <Col span="14" style="border-right: 1px solid #d3d3d3;">
+        <chat-panel :activityInfo="activityInfo" :participants="participants"></chat-panel>
       </Col>
       <Col span="10">
         <Tabs type="card">
-          <TabPane label="Tools"><tool-box></tool-box></TabPane>
-          <TabPane label="Resources"><res-list></res-list></TabPane>
+          <TabPane label="Tools"><tool-box :activityInfo="activityInfo"></tool-box></TabPane>
+          <TabPane label="Resources"><res-list :activityInfo="activityInfo"></res-list></TabPane>
         </Tabs>
       </Col>
     </Row>
@@ -20,7 +20,7 @@ import chatPanel from "../utils/chatPanel.vue";
 import resList from "../utils/resList.vue";
 import toolBox from "../utils/toolBox.vue";
 export default {
-  props: ["activityInfo"],
+  props: ["activityInfo", "participants"],
   components: {
     chatPanel,
     resList,
