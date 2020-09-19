@@ -59,7 +59,12 @@ public class SubprojectServiceImpl implements SubprojectService {
             String projectId = subproject.getParent();
             Project project = projectRepository.findById(projectId).get();
             if (project == null) return ResultUtils.error(-1, "Fail: project does not exist.");
-            ArrayList<String> children = project.getChildren();
+            ArrayList<String> children;
+            if(project.getChildren() == null){
+                children = new ArrayList<>();
+            } else {
+                children = project.getChildren();
+            }
             children.add(subprojectId);
             project.setChildren(children);
 
@@ -83,6 +88,9 @@ public class SubprojectServiceImpl implements SubprojectService {
 
             // set type
             subproject.setType(subproject.getType());
+            if(subproject.getType().equals(ActivityType.Activity_Group)){
+                subproject.setChildren(new ArrayList<>());
+            }
 
             // folder
             folderDao.createFolder(subproject.getName(), "", subprojectId);
@@ -156,11 +164,13 @@ public class SubprojectServiceImpl implements SubprojectService {
             Subproject subproject = (Subproject) optional.get();
 
             JSONArray children = new JSONArray();
-            for (String childId : subproject.getChildren()) {
-                optional = activityRepository.findById(childId);
-                if (optional.isPresent()) {
-                    Activity childActivity = (Activity) optional.get();
-                    children.add(childActivity);
+            if(subproject.getChildren() != null){
+                for (String childId : subproject.getChildren()) {
+                    optional = activityRepository.findById(childId);
+                    if (optional.isPresent()) {
+                        Activity childActivity = (Activity) optional.get();
+                        children.add(childActivity);
+                    }
                 }
             }
 

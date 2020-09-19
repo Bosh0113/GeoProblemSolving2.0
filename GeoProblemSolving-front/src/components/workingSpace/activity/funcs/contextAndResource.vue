@@ -1,5 +1,3 @@
-<style scoped>
-</style>
 <template>
   <div>
     <Row>
@@ -7,9 +5,13 @@
         <chat-panel :activityInfo="activityInfo" :participants="participants"></chat-panel>
       </Col>
       <Col span="10">
-        <Tabs type="card">
-          <TabPane label="Tools"><tool-box :activityInfo="activityInfo"></tool-box></TabPane>
-          <TabPane label="Resources"><res-list :activityInfo="activityInfo"></res-list></TabPane>
+        <Tabs type="card" class="activityTab">
+          <TabPane label="Tools">
+            <tool-box :activityInfo="activityInfo"></tool-box>
+          </TabPane>
+          <TabPane label="Resources">
+            <res-list :activityInfo="activityInfo"></res-list>
+          </TabPane>
         </Tabs>
       </Col>
     </Row>
@@ -31,7 +33,12 @@ export default {
   },
   mounted() {},
   beforeDestroy() {},
-  watch: {},
   methods: {},
 };
 </script>
+<style scoped>
+.activityTab >>> .ivu-tabs-bar {
+  margin-bottom: 8px;
+}
+</style>
+

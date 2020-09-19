@@ -8,9 +8,11 @@
         <BreadcrumbItem>Workspace</BreadcrumbItem>
       </Breadcrumb>-->
       <h3 slot="title">Activity list</h3>
-      <div style="padding-right: 15px">
-        <Tree :data="activityTree" :render="renderStyle"></Tree>
-      </div>
+      <vue-scroll :ops="scrollOps" style="height:calc(100vh - 70px)">
+        <div style="padding-right: 15px">
+          <Tree :data="activityTree" :render="renderStyle"></Tree>
+        </div>
+      </vue-scroll>
     </Card>
     <Card dis-hover class="workspaceCard">
       <h3 slot="title">{{slctActivity.name}}</h3>
@@ -170,6 +172,11 @@ export default {
   },
   data() {
     return {
+      scrollOps: {
+        bar: {
+          background: "lightgrey",
+        },
+      },
       projectInfo: {},
       userInfo: JSON.parse(sessionStorage.getItem("userInfo")),
       activityTree: [
@@ -237,7 +244,7 @@ export default {
         level: -1,
         permission: JSON.stringify(userRoleJS.getDefault()),
         type: "Activity_Default",
-        purpose: "Others",
+        purpose: "Context definition & resource collection",
       },
       activityCreateRule: {
         name: [
@@ -293,7 +300,7 @@ export default {
         "Model effectiveness evaluation",
         "Geographical simulation",
         "Quantitative and qualitative analyses",
-        "Decision-making for management",
+        "Decision-making and management",
       ],
       // spinShow: false,
     };
@@ -508,7 +515,7 @@ export default {
       this.slctActivity = activity;
       this.setContent(activity);
       // expand
-      if (activity.type == "Activity_Group" && activity.children.length == 0) {
+      if (activity.type == "Activity_Group" && (activity.children == undefined || activity.children.length == 0)) {
         this.expandActivityTree(activity);
         this.expandNode = activity;
       }

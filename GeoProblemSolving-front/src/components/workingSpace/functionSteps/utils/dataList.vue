@@ -864,7 +864,7 @@ export default {
                       file: this.fileList[i].name
                     };
                     this.$emit("dataBehavior", dataRecords);
-                    this.addHistoryEvent(this.stepInfo.stepId, dataRecords);
+                    // this.addHistoryEvent(this.stepInfo.stepId, dataRecords);
 
                     deleteResType = this.fileList[i].type;
                     this.fileList.splice(i, 1);
@@ -911,19 +911,19 @@ export default {
       }
     },
     addHistoryEvent(scopeId, record) {
-      let form = {};
-      form["description"] = JSON.stringify(record);
-      form["scopeId"] = scopeId;
-      form["eventType"] = "step";
-      form["userId"] = this.$store.getters.userId;
-      this.axios
-        .post("/GeoProblemSolving/history/save", form)
-        .then(res => {
-          console.log(res.data);
-        })
-        .catch(err => {
-          console.log(err.data);
-        });
+      // let form = {};
+      // form["description"] = JSON.stringify(record);
+      // form["scopeId"] = scopeId;
+      // form["eventType"] = "step";
+      // form["userId"] = this.$store.getters.userId;
+      // this.axios
+      //   .post("/GeoProblemSolving/history/save", form)
+      //   .then(res => {
+      //     console.log(res.data);
+      //   })
+      //   .catch(err => {
+      //     console.log(err.data);
+      //   });
     },
     checkData(item) {
       this.selectData = item;

@@ -136,6 +136,9 @@ public class ActivityServiceImpl implements ActivityService {
 
             // set type
             activity.setType(activity.getType());
+            if(activity.getType().equals(ActivityType.Activity_Group)){
+                activity.setChildren(new ArrayList<>());
+            }
 
             // tools and toolsets
             Query queryPublic = new Query(Criteria.where("privacy").is("Public"));
@@ -157,15 +160,21 @@ public class ActivityServiceImpl implements ActivityService {
             folderDao.createFolder(activity.getName(), "", aid);
 
             // update parent activity info
-            if(activity.getLevel() == 2) {
+            if (activity.getLevel() == 2) {
                 String subprojectId = activity.getParent();
                 Optional optional = subprojectRepository.findById(subprojectId);
                 if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: parent activity does not exist.");
                 Subproject parent = (Subproject) optional.get();
 
-                ArrayList<String> children = parent.getChildren();
-                children.add(subprojectId);
+                ArrayList<String> children;
+                if (parent.getChildren() != null) {
+                    children = parent.getChildren();
+                } else {
+                    children = new ArrayList<>();
+                }
+                children.add(aid);
                 parent.setChildren(children);
+
                 subprojectRepository.save(parent);
             } else {
                 String activityId = activity.getParent();
@@ -173,9 +182,15 @@ public class ActivityServiceImpl implements ActivityService {
                 if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: parent activity does not exist.");
                 Activity parent = (Activity) optional.get();
 
-                ArrayList<String> children = parent.getChildren();
-                children.add(activityId);
+                ArrayList<String> children;
+                if (parent.getChildren() != null) {
+                    children = parent.getChildren();
+                } else {
+                    children = new ArrayList<>();
+                }
+                children.add(aid);
                 parent.setChildren(children);
+
                 activityRepository.save(parent);
             }
 
@@ -208,16 +223,16 @@ public class ActivityServiceImpl implements ActivityService {
         try {
             // confirm
             Optional optional = activityRepository.findById(aid);
-            if (! optional.isPresent())  return ResultUtils.error(-1, "Fail: activity does not exist.");
+            if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: activity does not exist.");
             Activity activity = (Activity) optional.get();
 
-            if(activity.getLevel() == 2) {
+            if (activity.getLevel() == 2) {
                 optional = subprojectRepository.findById(activity.getParent());
                 if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: parent activity does not exist.");
                 Subproject parent = (Subproject) optional.get();
 
                 // delete from parent
-                if(parent.getChildren().contains(aid))
+                if (parent.getChildren().contains(aid))
                     parent.getChildren().remove(aid);
                 subprojectRepository.save(parent);
             } else {
@@ -226,7 +241,7 @@ public class ActivityServiceImpl implements ActivityService {
                 Activity parent = (Activity) optional.get();
 
                 // delete from parent
-                if(parent.getChildren().contains(aid))
+                if (parent.getChildren().contains(aid))
                     parent.getChildren().remove(aid);
                 activityRepository.save(parent);
             }
@@ -247,11 +262,13 @@ public class ActivityServiceImpl implements ActivityService {
             Activity activity = (Activity) optional.get();
 
             JSONArray activities = new JSONArray();
-            for (String childId : activity.getChildren()) {
-                optional = activityRepository.findById(childId);
-                if (optional.isPresent()) {
-                    Activity childActivity = (Activity) optional.get();
-                    activities.add(childActivity);
+            if (activity.getChildren() != null) {
+                for (String childId : activity.getChildren()) {
+                    optional = activityRepository.findById(childId);
+                    if (optional.isPresent()) {
+                        Activity childActivity = (Activity) optional.get();
+                        activities.add(childActivity);
+                    }
                 }
             }
 
@@ -262,7 +279,7 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
-    public JsonResult findParticipants(String aid){
+    public JsonResult findParticipants(String aid) {
         try {
             Optional optional = activityRepository.findById(aid);
             if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: subproject does not exist.");
@@ -290,8 +307,7 @@ public class ActivityServiceImpl implements ActivityService {
             participants.put("members", memberinfos);
 
             return ResultUtils.success(participants);
-        }
-        catch (Exception ex){
+        } catch (Exception ex) {
             return ResultUtils.error(-2, "Fail: Exception");
         }
     }

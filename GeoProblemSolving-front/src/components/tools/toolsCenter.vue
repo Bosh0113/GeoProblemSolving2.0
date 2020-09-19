@@ -959,7 +959,7 @@ export default {
         "Model effectiveness evaluation",
         "Geographical simulation",
         "Quantitative and qualitative analyses",
-        "Decision-making for management",
+        "Decision-making and management",
         "Others"
       ],
       toolInfoRule: {
@@ -1001,7 +1001,7 @@ export default {
         "Model effectiveness evaluation",
         "Geographical simulation",
         "Quantitative and qualitative analyses",
-        "Decision-making for management"
+        "Decision-making and management"
       ],
       visible: false,
       //表示图片

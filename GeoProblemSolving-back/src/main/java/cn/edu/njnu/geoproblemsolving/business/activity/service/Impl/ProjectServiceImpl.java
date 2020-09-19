@@ -148,6 +148,9 @@ public class ProjectServiceImpl implements ProjectService {
 
             // set type
             project.setType(project.getType());
+            if(project.getType().equals(ActivityType.Activity_Group)){
+                project.setChildren(new ArrayList<>());
+            }
 
             // children
             ArrayList<String> children = new ArrayList<>();
@@ -238,11 +241,13 @@ public class ProjectServiceImpl implements ProjectService {
             Project project = (Project) optional.get();
 
             JSONArray children = new JSONArray();
-            for (String childId : project.getChildren()) {
-                optional = subprojectRepository.findById(childId);
-                if (optional.isPresent()) {
-                    Subproject childActivity = (Subproject) optional.get();
-                    children.add(childActivity);
+            if(project.getChildren() != null) {
+                for (String childId : project.getChildren()) {
+                    optional = subprojectRepository.findById(childId);
+                    if (optional.isPresent()) {
+                        Subproject childActivity = (Subproject) optional.get();
+                        children.add(childActivity);
+                    }
                 }
             }
 

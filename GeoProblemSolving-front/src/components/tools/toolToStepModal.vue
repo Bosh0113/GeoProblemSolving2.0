@@ -435,7 +435,7 @@ export default {
         "Model effectiveness evaluation",
         "Geographical simulation",
         "Quantitative and qualitative analyses",
-        "Decision-making for management",
+        "Decision-making and management",
         "Others"
       ],
       infoModal: false,
@@ -742,7 +742,7 @@ export default {
           case "Model effectiveness evaluation":
           case "Geographical simulation":
           case "Quantitative and qualitative analyses":
-          case "Decision-making for management": {
+          case "Decision-making and management": {
             var stepTypes = item.recomStep;
             for (var i = 0; i < stepTypes.length; i++) {
               if (stepTypes[i] == selectedType) {

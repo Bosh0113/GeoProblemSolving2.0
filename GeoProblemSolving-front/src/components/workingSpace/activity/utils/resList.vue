@@ -1,74 +1,3 @@
-<style scoped>
-.table table {
-  table-layout: auto;
-  width: 100% !important;
-}
-.fileBtnHoverGreen:hover {
-  background-color: #19be6b;
-  color: white;
-}
-.fileBtnHoverBlue:hover {
-  background-color: dodgerblue;
-  color: white;
-}
-.fileBtnHoverRed:hover {
-  background-color: #ed4014;
-  color: white;
-}
-.dataInfo {
-  margin: 5px 0;
-}
-.dataLabel {
-  width: 90px;
-  display: inline-block;
-  font-size: 13px;
-  font-weight: bold;
-  vertical-align: top;
-  color: dodgerblue;
-}
-.dataContent {
-  width: 180px;
-  display: inline-block;
-  padding-left: 10px;
-}
-.dataText {
-  padding-left: 10px;
-  display: inline-block;
-  word-break: break-word;
-  width: 470px;
-}
-.toolDataLabel {
-  font-weight: bold;
-  vertical-align: top;
-  color: dodgerblue;
-}
-.toolDataText {
-  width: 100px;
-  word-break: break-word;
-  /* display: inline-block; */
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-}
-#toolData {
-  width: 100%;
-  height: 100;
-  border: 1px solid #dcdee2;
-}
-#toolDataHeader {
-  font-size: 12px;
-  font-weight: bold;
-  padding: 10px 15px;
-  border-bottom: 1px solid #e8eaec;
-  background-color: #f8f8f9;
-}
-.resCard {
-    height: calc(100vh - 120px);
-}
-.resCard >>> .ivu-card-head {
-    padding: 6px 16px;
-}
-</style>
 <template>
   <div>
     <Card class="resCard" dis-hover>
@@ -92,6 +21,7 @@
         <Button
           v-if="userRole != 'Visitor'"
           shape="circle"
+          size="small"
           icon="md-shuffle"
           @click="getPreviousRes()"
           style="margin-right:10px"
@@ -100,6 +30,7 @@
         <Button
           v-if="userRole != 'Visitor'"
           shape="circle"
+          size="small"
           icon="md-cloud-upload"
           @click="dataUploadModalShow"
           title="Upload resources"
@@ -118,7 +49,7 @@
         <Option value="toolData">Results</Option>
       </Select>
       <div style="display: flex; justify-content: space-between;">
-        <div style="width:99%; height:100" v-if="dataListStyle">
+        <div style="width:100%;" v-if="dataListStyle">
           <Table
             :columns="tableColName"
             :data="fileList"
@@ -167,10 +98,10 @@
           </Table>
         </div>
         <div id="toolData" v-else>
-          <Card style="width:30%; height:150px; float:left; margin:5px" v-if="fileList.length == 0">
+          <Card style="width:150px; height:150px; float:left; margin:5px" v-if="fileList.length == 0">
             <div>There is no resource.</div>
           </Card>
-          <vue-scroll :ops="ops" style="height: calc(100vh - 200px)">
+          <vue-scroll :ops="ops" style="max-height: calc(100vh - 245px)" v-else>
             <div v-for="(item,index) in fileList" :key="index">
               <Card style="width:150px; height:150px; float:left; margin:5px">
                 <div style="float:left">
@@ -523,9 +454,9 @@ export default {
   },
   watch: {
     checkDataModal(value) {
-      if (!value) {
-        this.panel.close();
-      }
+      // if (!value) {
+      //   this.panel.close();
+      // }
     },
     activityInfo() {
       this.getResList();
@@ -1170,3 +1101,73 @@ export default {
   },
 };
 </script>
+<style scoped>
+.table table {
+  table-layout: auto;
+  width: 100% !important;
+}
+.fileBtnHoverGreen:hover {
+  background-color: #19be6b;
+  color: white;
+}
+.fileBtnHoverBlue:hover {
+  background-color: dodgerblue;
+  color: white;
+}
+.fileBtnHoverRed:hover {
+  background-color: #ed4014;
+  color: white;
+}
+.dataInfo {
+  margin: 5px 0;
+}
+.dataLabel {
+  width: 90px;
+  display: inline-block;
+  font-size: 13px;
+  font-weight: bold;
+  vertical-align: top;
+  color: dodgerblue;
+}
+.dataContent {
+  width: 180px;
+  display: inline-block;
+  padding-left: 10px;
+}
+.dataText {
+  padding-left: 10px;
+  display: inline-block;
+  word-break: break-word;
+  width: 470px;
+}
+.toolDataLabel {
+  font-weight: bold;
+  vertical-align: top;
+  color: dodgerblue;
+}
+.toolDataText {
+  width: 100px;
+  word-break: break-word;
+  /* display: inline-block; */
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+#toolData {
+  width: 100%;
+  border: 1px solid #dcdee2;
+}
+#toolDataHeader {
+  font-size: 12px;
+  font-weight: bold;
+  padding: 10px 15px;
+  border-bottom: 1px solid #e8eaec;
+  background-color: #f8f8f9;
+}
+.resCard {
+    max-height: calc(100vh - 165px);
+}
+.resCard >>> .ivu-card-head {
+    padding: 6px 16px;
+}
+</style>

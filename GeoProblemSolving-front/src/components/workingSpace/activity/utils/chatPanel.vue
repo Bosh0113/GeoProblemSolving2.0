@@ -515,6 +515,10 @@ export default {
   text-align: center;
 }
 
+.searchPanel {
+  background-color: linen;
+}
+
 .searchmessageList {
   overflow-y: auto;
 }
@@ -552,7 +556,7 @@ export default {
   padding: 25px;
   overflow-y: auto;
   background-color: #e7e7e73a;
-  height: calc(100vh - 235px);
+  height: calc(100vh - 285px);
 }
 
 .chat-bubble-r {

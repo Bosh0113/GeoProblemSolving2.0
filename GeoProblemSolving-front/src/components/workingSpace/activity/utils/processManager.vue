@@ -215,11 +215,6 @@ export default {
   props: ["activityInfo"],
   data() {
     return {
-      scrollOps: {
-        bar: {
-          background: "lightgrey",
-        },
-      },
       // user
       userInfo: JSON.parse(sessionStorage.getItem("userInfo")),
       userRole: "visitor",
@@ -257,7 +252,7 @@ export default {
         "Model effectiveness evaluation",
         "Geographical simulation",
         "Quantitative and qualitative analyses",
-        "Decision-making for management",
+        "Decision-making and management",
       ],
       // 步骤逻辑图
       stepChart: null,
@@ -505,7 +500,7 @@ export default {
               icon: "circle",
             },
             {
-              name: "Decision-making for management",
+              name: "Decision-making and management",
               icon: "circle",
             },
           ],
@@ -549,7 +544,7 @@ export default {
                 name: "Quantitative and qualitative analyses",
               },
               {
-                name: "Decision-making for management",
+                name: "Decision-making and management",
               },
             ],
             links: [],
@@ -724,7 +719,7 @@ export default {
       } else if (category == 6) {
         purpose = "Quantitative and qualitative analyses";
       } else if (category == 7) {
-        purpose = "Decision-making for management";
+        purpose = "Decision-making and management";
       }
       return purpose;
     },
@@ -744,7 +739,7 @@ export default {
         category = 5;
       } else if (purpose == "Quantitative and qualitative analyses") {
         category = 6;
-      } else if (purpose == "Decision-making for management") {
+      } else if (purpose == "Decision-making and management") {
         category = 7;
       }
       return category;
