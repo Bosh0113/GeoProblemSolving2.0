@@ -223,6 +223,11 @@ public class ProjectServiceImpl implements ProjectService {
             user.setManageProjects(projectIds);
             userRepository.save(user);
 
+            // delete children
+            if (project.getChildren() != null) {
+                deleteChildren(project);
+            }
+
             // delete project
             projectRepository.deleteById(aid);
 
@@ -230,6 +235,26 @@ public class ProjectServiceImpl implements ProjectService {
 
         } catch (Exception ex) {
             return ResultUtils.error(-2, "Fail: Exception");
+        }
+    }
+
+    private void deleteChildren(Activity activity) {
+        for (String childId : activity.getChildren()) {
+            if(activity.getLevel() == 1) {
+                Optional optional = activity.getLevel() > 1 ? activityRepository.findById(childId) : subprojectRepository.findById(childId);
+                if (optional.isPresent()) {
+                    Activity child = (Activity) optional.get();
+                    if (child.getChildren() == null) {
+                        if (activity.getLevel() > 1) {
+                            activityRepository.deleteById(childId);
+                        } else {
+                            subprojectRepository.deleteById(childId);
+                        }
+                    } else {
+                        deleteChildren(child);
+                    }
+                }
+            }
         }
     }
 

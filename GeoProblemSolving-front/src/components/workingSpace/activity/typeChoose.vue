@@ -28,8 +28,8 @@
             <!-- <div style="text-align:center;margin-top:2%" v-if="permissionIdentity(activityInfo.permission, userRole, 'manage_workspace_type')"> -->
             <div style="text-align:center;margin-top:2%">
               <h3>
-                Set this content as
-                <a @click="selectTypeModalShow('Activity_Unit')">Do it right now</a>
+                Select this type ->
+                <a @click="selectTypeModalShow('Activity_Unit')">Go</a>
               </h3>
             </div>
           </Card>
@@ -52,10 +52,8 @@
             <!-- <div style="text-align:center;margin-top:2%" v-if="permissionIdentity(activityInfo.permission, userRole, 'manage_workspace_type')">                 -->
             <div style="text-align:center;margin-top:2%">
               <h3>
-                Set this content as
-                <a
-                  @click="selectTypeModalShow('Activity_Group')"
-                >Design workflow graph</a>
+                Select this type ->
+                <a @click="selectTypeModalShow('Activity_Group')">Go</a>
               </h3>
             </div>
           </Card>
@@ -67,9 +65,20 @@
       title="Set the workspace type"
       @on-ok="setType()"
       ok-text="Yes"
-      cancel-text="Think again"
+      cancel-text="Think again..."
     >
       <h2>Do you want to select this type?</h2>
+      <div v-if="selectType == 'Activity_Unit'" style="margin-top: 20px">
+        <Label>Select purpose: </Label>
+        <Select
+         style="margin-top: 10px"
+          v-model="purpose"
+          placeholder="Select the purpose of this activity"
+          readonly
+        >
+          <Option v-for="item in purposes" :key="item.index" :value="item">{{item}}</Option>
+        </Select>
+      </div>
     </Modal>
   </Row>
 </template>
@@ -82,6 +91,17 @@ export default {
       selectType: "Activity_Default",
       selectTypeModal: false,
       userRole: "visitor",
+      purposes: [
+        "Context definition & resource collection",
+        "Data processing",
+        "Data visualization",
+        "Geographic model construction",
+        "Model effectiveness evaluation",
+        "Geographical simulation",
+        "Quantitative and qualitative analyses",
+        "Decision-making and management",
+      ],
+      purpose: ""
     };
   },
   mounted() {
@@ -120,8 +140,10 @@ export default {
       let aid = this.activityInfo.aid;
       let data = this.preEditting(this.activityInfo);
       data.type = this.selectType;
-      if(this.selectType == "Activity_Group"){
-          data.children = [];
+      if (this.selectType == "Activity_Group") {
+        data.children = [];
+      } else if(this.selectType == "Activity_Unit"){
+        data.purpose = this.purpose;
       }
       if (this.activityInfo.level == 1) {
         url = "/GeoProblemSolving/subproject/" + aid;

@@ -1,21 +1,35 @@
 <template>
   <div style="display: flex;background-color:lightgrey">
-    <Card dis-hover class="activityCard">
-      <!-- <Breadcrumb style="display: inline-block" separator=">">
-        <BreadcrumbItem>
-          <a @click="toProjectDetailPage">Project</a>
-        </BreadcrumbItem>
-        <BreadcrumbItem>Workspace</BreadcrumbItem>
-      </Breadcrumb>-->
+    <Button
+      title="Unold the activity tree"
+      @click="unfoldTree"
+      v-show="treeFold"
+      class="foldTreeBtn"
+    >
+      <Icon type="md-arrow-dropright-circle" size="20" />
+    </Button>
+    <Card dis-hover class="activityCard" id="ActivityTree">
       <h3 slot="title">Activity list</h3>
+      <Icon
+        slot="extra"
+        type="ios-arrow-dropleft"
+        size="20"
+        title="Fold the activity tree"
+        style="cursor: pointer"
+        @click="foldTree"
+      />
       <vue-scroll :ops="scrollOps" style="height:calc(100vh - 70px)">
         <div style="padding-right: 15px">
           <Tree :data="activityTree" :render="renderStyle"></Tree>
         </div>
       </vue-scroll>
     </Card>
-    <Card dis-hover class="workspaceCard">
-      <h3 slot="title">{{slctActivity.name}}</h3>
+    <Card dis-hover class="workspaceCard" id="ActivityContent">
+      <h3 slot="title">
+        <Breadcrumb style="display: inline-block" separator=">">
+          <BreadcrumbItem v-for="name in cascader" :key="name">{{name}}</BreadcrumbItem>
+        </Breadcrumb>
+      </h3>
       <div slot="extra" v-show="slctActivity.level > 0">
         <!-- <Button
           icon="md-create"
@@ -37,7 +51,7 @@
           icon="md-create"
           size="small"
           style="margin-top:-10px; margin-right: 10px"
-          @click="activityEditModal = true"
+          @click="preEditting()"
         >Edit</Button>
         <Button
           icon="md-trash"
@@ -76,25 +90,50 @@
       title="Edit information of the activity"
       :mask-closable="false"
     >
-      <Form ref="activityForm" :model="slctActivity" :rules="activityEditRule" :label-width="120">
+      <Form
+        ref="editActivityForm"
+        :model="editActivityForm"
+        :rules="activityEditRule"
+        :label-width="120"
+      >
         <FormItem label="Name" prop="name">
           <Input
             type="text"
-            v-model="slctActivity.name"
+            v-model="editActivityForm.name"
             placeholder="Fill in the name (less than 60 characters) ..."
           ></Input>
         </FormItem>
         <FormItem label="Description" prop="description">
           <Input
-            v-model="slctActivity.description"
+            v-model="editActivityForm.description"
             placeholder="Fill in the description..."
             :rows="4"
             type="textarea"
           ></Input>
         </FormItem>
+        <FormItem label="Activity type:" prop="type" v-show="slctActivity.type!='Activity_Default'">
+          <Select
+            v-model="editActivityForm.type"
+            placeholder="Select the type of this activity"
+            readonly
+          >
+            <Option value="Activity_Default">Select type later</Option>
+            <Option value="Activity_Unit">Single activity</Option>
+            <Option value="Activity_Group">Multi activities</Option>
+          </Select>
+        </FormItem>
+        <FormItem label="Purpose:" prop="purpose" v-show="editActivityForm.type=='Activity_Unit'">
+          <Select
+            v-model="editActivityForm.purpose"
+            placeholder="Select the purpose of this activity"
+            readonly
+          >
+            <Option v-for="item in purposes" :key="item.index" :value="item">{{item}}</Option>
+          </Select>
+        </FormItem>
       </Form>
       <div slot="footer" style="display: inline-block">
-        <Button type="primary" @click="editActivity('activityForm')" style="float:right;">OK</Button>
+        <Button type="primary" @click="editActivity('editActivityForm')" style="float:right;">OK</Button>
         <Button @click="activityEditModal = false" style="float:right;margin-right: 15px;">Cancel</Button>
       </div>
     </Modal>
@@ -102,10 +141,13 @@
       v-model="activityDeleteModal"
       title="Delete the current activity"
       @on-ok="delActivity"
-      ok-text="OK"
-      cancel-text="Cancel"
+      ok-text="Yes"
+      cancel-text="Think again..."
     >
-      <h3 style="color:red">Do you really want to delete this activity?</h3>
+      <h3>Do you really want to delete this activity?</h3>
+      <h3
+        style="color:red; margin-top: 10px"
+      >* The selected activity and its all child activities will be deleted!</h3>
     </Modal>
     <Modal
       v-model="createActivityModel"
@@ -177,8 +219,9 @@ export default {
           background: "lightgrey",
         },
       },
-      projectInfo: {},
-      userInfo: JSON.parse(sessionStorage.getItem("userInfo")),
+      treeFold: false,
+      cascader: [],
+      cascaderIndex: [],
       activityTree: [
         {
           aid: "111",
@@ -232,6 +275,8 @@ export default {
           expand: true,
         },
       ],
+      projectInfo: {},
+      userInfo: JSON.parse(sessionStorage.getItem("userInfo")),
       slctActivity: {},
       expandNode: {}, // 使用引用传递，记录expand的位置，对activity tree 进行修改
       parentNode: {}, // 记录所创建/选择activity的父节点位置，对activity tree 进行修改
@@ -244,7 +289,17 @@ export default {
         level: -1,
         permission: JSON.stringify(userRoleJS.getDefault()),
         type: "Activity_Default",
-        purpose: "Context definition & resource collection",
+        purpose: "Universal",
+      },
+      editActivityForm: {
+        name: "",
+        description: "",
+        parent: "",
+        creator: "",
+        level: -1,
+        permission: JSON.stringify(userRoleJS.getDefault()),
+        type: "Activity_Default",
+        purpose: "Universal",
       },
       activityCreateRule: {
         name: [
@@ -293,6 +348,7 @@ export default {
       activityDeleteModal: false,
       contentType: -1,
       purposes: [
+        "Universal",
         "Context definition & resource collection",
         "Data processing",
         "Data visualization",
@@ -387,10 +443,28 @@ export default {
         ]
       );
     },
+    foldTree() {
+      this.treeFold = true;
+      document.getElementById("ActivityTree").style.width = 0;
+      // document.getElementById("ActivityTree").style.height = 0;
+      document.getElementById("ActivityTree").style.margin = 0;
+      document.getElementById("ActivityContent").style.width =
+        window.innerWidth - 10 + "px";
+    },
+    unfoldTree() {
+      this.treeFold = false;
+      document.getElementById("ActivityTree").style.width = 250 + "px";
+      // document.getElementById("ActivityTree").style.height =
+      //   window.innerHeight - 10 + "px";
+      document.getElementById("ActivityTree").style.margin = 5 + "px";
+      document.getElementById("ActivityContent").style.width =
+        window.innerWidth - 260 + "px";
+    },
     getProjectInfo() {
       this.projectInfo = parent.vm.projectInfo;
       this.initActivityTree();
       this.slctActivity = this.projectInfo;
+      this.cascader = [this.projectInfo.name];
       this.setContent(this.slctActivity);
     },
     roleIdentity(activity) {
@@ -513,15 +587,36 @@ export default {
         this.parentNode = {};
       }
       this.slctActivity = activity;
+      this.getCascader(root, node);
       this.setContent(activity);
       // expand
-      if (activity.type == "Activity_Group" && (activity.children == undefined || activity.children.length == 0)) {
+      if (
+        activity.type == "Activity_Group" &&
+        (activity.children == undefined || activity.children.length == 0)
+      ) {
         this.expandActivityTree(activity);
         this.expandNode = activity;
       }
       // } else {
       //   this.contentType = 3;
       // }
+    },
+    getCascader(root, node) {
+      this.cascader = [];
+      this.cascaderIndex = [];
+      this.getCascaderIndex(root, node);
+
+      for (var i = this.cascaderIndex.length - 1; i >= 0; i--) {
+        this.cascader.push(root[this.cascaderIndex[i]].node.name);
+      }
+    },
+    getCascaderIndex(root, node) {
+      this.cascaderIndex.push(node.nodeKey);
+      if (node.nodeKey == 0) {
+        return;
+      } else {
+        this.getCascaderIndex(root, root[node.parent]);
+      }
     },
     setContent(activity) {
       if (activity.type == "Activity_Default") {
@@ -565,9 +660,19 @@ export default {
                 }
                 this.parentNode.children.push({ aid: "add" });
                 this.slctActivity = res.data.data;
-                this.setContent(this.slctActivity);
                 // change content
-                //...
+                this.setContent(this.slctActivity);
+
+                this.activityForm = {
+                  name: "",
+                  description: "",
+                  parent: "",
+                  creator: "",
+                  level: -1,
+                  permission: JSON.stringify(userRoleJS.getDefault()),
+                  type: "Activity_Default",
+                  purpose: "Universal",
+                };
               } else {
                 console.log(res.data.msg);
               }
@@ -579,32 +684,63 @@ export default {
         }
       });
     },
-    preEditting(activity) {
+    preEditting() {
       let children = [];
+      let activity = Object.assign({}, this.slctActivity);
       if (activity.children != undefined) {
         for (let i = 0; i < activity.children.length; i++) {
           children.push(activity.children[i].aid);
         }
         activity.children = children;
       }
-      return activity;
+      this.editActivityForm = activity;
+      this.activityEditModal = true;
     },
     editActivity(name) {
       this.$refs[name].validate((valid) => {
         if (valid) {
+          if (this.editActivityForm.type != this.slctActivity.type) {
+            if (this.slctActivity.type == "Activity_Unit") {
+              this.editActivityForm.purpose = "Universal";
+            } else if (this.slctActivity.type == "Activity_Group") {
+              if (
+                this.slctActivity.children != undefined &&
+                this.slctActivity.children.length > 1
+              ) {
+                this.$Notice.info({
+                  title: "Fail",
+                  desc:
+                    "Please make sure no child activity, before change the type of current activity.",
+                });
+                this.activityEditModal = false;
+                return;
+              } else {
+                this.editActivityForm.pathway = [];
+              }
+            }
+          }
+          // url
           let url = "";
-          let aid = this.slctActivity.aid;
-          let data = this.preEditting(this.slctActivity);
           if (this.slctActivity.level == 1) {
-            url = "/GeoProblemSolving/subproject/" + aid;
+            url = "/GeoProblemSolving/subproject/" + this.slctActivity.aid;
           } else if (this.slctActivity.level > 1) {
-            url = "/GeoProblemSolving/activity/" + aid;
+            url = "/GeoProblemSolving/activity/" + this.slctActivity.aid;
           }
           this.axios
-            .put(url, data)
+            .put(url, this.editActivityForm)
             .then((res) => {
               if (res.data.code == 0) {
                 this.$Notice.info({ title: "Result", desc: "Success!" });
+                // update activity tree
+                this.slctActivity.name = this.editActivityForm.name;
+                this.slctActivity.description = this.editActivityForm.description;
+                this.slctActivity.type = this.editActivityForm.type;
+                this.slctActivity.purpose = this.editActivityForm.purpose;
+                // cascader
+                let index = this.cascader.length - 1;
+                this.$set(this.cascader, index, this.editActivityForm.name);
+                // change content
+                this.setContent(this.slctActivity);
               } else {
                 this.$Notice.info({ title: "Result", desc: res.data.msg });
               }
@@ -612,6 +748,7 @@ export default {
             .catch((err) => {
               console.log(err);
             });
+
           this.activityEditModal = false;
         }
       });
@@ -653,10 +790,18 @@ export default {
 };
 </script>
 <style scoped>
+.foldTreeBtn {
+  padding: 5px 8px 6px;
+  height: calc(100vh - 10px);
+  margin: 5px;
+  border: 0px;
+}
 .activityCard {
   margin: 5px;
   width: 250px;
+  height: calc(100vh - 10px);
   overflow-y: auto;
+  border: 0;
 }
 .activityCard >>> .ivu-card-body {
   padding: 5px 10px;
@@ -666,6 +811,7 @@ export default {
   height: calc(100vh - 10px);
   background-color: white;
   margin: 5px;
+  border: 0;
   overflow-x: auto;
 }
 .workspaceCard >>> .ivu-card-body {

@@ -68,8 +68,13 @@
 
         <div v-show="activeMenu=='Workspace'">
           <vue-scroll :ops="scrollOps" style="height:calc(100vh - 120px); margin-top:5px">
+            <universal-space
+              v-if="activityInfo.purpose=='Universal'"
+              :activityInfo="activityInfo"
+              :participants="participants"
+            ></universal-space>
             <context-res
-              v-if="activityInfo.purpose=='Context definition & resource collection'"
+              v-else-if="activityInfo.purpose=='Context definition & resource collection'"
               :activityInfo="activityInfo"
               :participants="participants"
             ></context-res>
@@ -119,6 +124,7 @@
 </template>
 <script>
 import taskManager from "./utils/taskManger.vue";
+import universalSpace from "./funcs/universalSpace.vue";
 import contextRes from "./funcs/contextAndResource.vue";
 import dataProcessing from "./funcs/dataProcessing.vue";
 import dataVisual from "./funcs/dataVisualization.vue";
@@ -131,6 +137,7 @@ export default {
   props: ["activityInfo"],
   components: {
     taskManager,
+    universalSpace,
     contextRes,
     dataProcessing,
     dataVisual,

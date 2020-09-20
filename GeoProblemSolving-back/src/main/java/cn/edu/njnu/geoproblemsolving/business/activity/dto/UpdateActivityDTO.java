@@ -4,6 +4,7 @@ import cn.edu.njnu.geoproblemsolving.Dto.ToDomainConverter;
 import cn.edu.njnu.geoproblemsolving.business.activity.enums.ActivityType;
 import cn.edu.njnu.geoproblemsolving.business.activity.enums.ProjectCategory;
 import cn.edu.njnu.geoproblemsolving.business.activity.enums.ProjectPrivacy;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import lombok.Data;
 
@@ -17,7 +18,7 @@ public class UpdateActivityDTO implements ToDomainConverter {
     private String description;
     private String purpose;
     private ActivityType type;
-    private JSONObject pathway;
+    private JSONArray pathway;
     private String permission;
 
 

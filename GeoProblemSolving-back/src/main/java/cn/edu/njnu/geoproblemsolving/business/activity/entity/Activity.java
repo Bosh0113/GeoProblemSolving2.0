@@ -56,7 +56,7 @@ public class Activity implements Serializable {
      */
     private String parent;
     private ArrayList<String> children;
-    private JSONObject pathway;
+    private JSONArray pathway;
 
     /**
      * Permission Manager

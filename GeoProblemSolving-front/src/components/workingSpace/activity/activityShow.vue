@@ -34,9 +34,12 @@
         <div style="heigth:50%; width:40%; float:left">
           <div style=" margin: 10px 0;">
             <Label>Total child activities:</Label>
-            <span
+            <span v-if="activityInfo.children != undefined"
               style="margin-left: 10px; cursor: pointer; color:#2d8cf0"
             >{{activityInfo.children.length}}</span>
+            <span v-else
+              style="margin-left: 10px; cursor: pointer; color:#2d8cf0"
+            >0</span>
           </div>
           <div style=" margin: 10px 0; margin-bottom: 30px">
             <Label>Total participants:</Label>

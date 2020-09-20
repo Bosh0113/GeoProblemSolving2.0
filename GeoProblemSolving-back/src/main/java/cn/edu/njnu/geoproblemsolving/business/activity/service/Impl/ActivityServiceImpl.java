@@ -136,7 +136,7 @@ public class ActivityServiceImpl implements ActivityService {
 
             // set type
             activity.setType(activity.getType());
-            if(activity.getType().equals(ActivityType.Activity_Group)){
+            if (activity.getType().equals(ActivityType.Activity_Group)) {
                 activity.setChildren(new ArrayList<>());
             }
 
@@ -226,12 +226,12 @@ public class ActivityServiceImpl implements ActivityService {
             if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: activity does not exist.");
             Activity activity = (Activity) optional.get();
 
+            // delete from parent
             if (activity.getLevel() == 2) {
                 optional = subprojectRepository.findById(activity.getParent());
                 if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: parent activity does not exist.");
                 Subproject parent = (Subproject) optional.get();
 
-                // delete from parent
                 if (parent.getChildren().contains(aid))
                     parent.getChildren().remove(aid);
                 subprojectRepository.save(parent);
@@ -240,16 +240,34 @@ public class ActivityServiceImpl implements ActivityService {
                 if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: parent activity does not exist.");
                 Activity parent = (Activity) optional.get();
 
-                // delete from parent
                 if (parent.getChildren().contains(aid))
                     parent.getChildren().remove(aid);
                 activityRepository.save(parent);
+            }
+
+            // delete children
+            if (activity.getChildren() != null) {
+                deleteChildren(activity);
             }
 
             activityRepository.deleteById(aid);
             return ResultUtils.success("Success");
         } catch (Exception ex) {
             return ResultUtils.error(-2, "Fail: Exception");
+        }
+    }
+
+    private void deleteChildren(Activity activity) {
+        for (String childId : activity.getChildren()) {
+            Optional optional = activityRepository.findById(childId);
+            if (optional.isPresent()) {
+                Activity child = (Activity) optional.get();
+                if (child.getChildren() == null) {
+                    activityRepository.deleteById(childId);
+                } else {
+                    deleteChildren(child);
+                }
+            }
         }
     }
 

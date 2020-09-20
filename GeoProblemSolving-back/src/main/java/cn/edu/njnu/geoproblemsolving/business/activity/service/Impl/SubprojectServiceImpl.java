@@ -148,11 +148,30 @@ public class SubprojectServiceImpl implements SubprojectService {
             if(project.getChildren().contains(aid))
                 project.getChildren().remove(aid);
 
+            // delete children
+            if (subproject.getChildren() != null) {
+                deleteChildren(subproject);
+            }
+
             projectRepository.save(project);
             subprojectRepository.deleteById(aid);
             return ResultUtils.success("Success");
         } catch (Exception ex) {
             return ResultUtils.error(-2, "Fail: Exception");
+        }
+    }
+
+    private void deleteChildren(Activity activity) {
+        for (String childId : activity.getChildren()) {
+            Optional optional = activityRepository.findById(childId);
+            if (optional.isPresent()) {
+                Activity child = (Activity) optional.get();
+                if (child.getChildren() == null) {
+                    activityRepository.deleteById(childId);
+                } else {
+                    deleteChildren(child);
+                }
+            }
         }
     }
 
