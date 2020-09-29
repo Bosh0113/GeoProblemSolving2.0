@@ -24,7 +24,6 @@
         .resourceBtnDiv {
             display: flex;
             align-items: center;
-            height: 20px;
             padding: 5px;
         }
 
@@ -37,8 +36,8 @@
         }
 
         .fileItemName {
-            width: 35%;
-            margin-right: 5%;
+            width: 20%;
+            margin-right: 2.5%;
             display: inline-block;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -46,7 +45,16 @@
             cursor: pointer;
             overflow: hidden;
         }
-
+        .fileItemDesc {
+            width: 30%;
+            margin-right: 2.5%;
+            display: inline-block;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            vertical-align: top;
+            cursor: pointer;
+            overflow: hidden;
+        }
         .fileItemSize {
             width: 10%;
             margin-right: 5%;
@@ -131,7 +139,7 @@
                 <div slot="title" class="resourceTitle">
                     <strong>Resources list</strong>
                 </div>
-                <div slot="extra" class="resourceBtnDiv">
+                <div class="resourceBtnDiv">
                     <Tooltip content="Back" placement="bottom" class="fileBtn">
                         <i-button @click="backforeFolder" class="fileBtnHoverGray">
                             <Icon type="md-arrow-round-back" size="20"></Icon>
@@ -193,6 +201,7 @@
                                         <Checkbox :label="file.pathURL">&nbsp;</Checkbox>
                                         <Icon type="ios-document-outline" class="itemIcon" size="25"></Icon>
                                         <span @click="getFileInfo(file)" class="fileItemName" :title="file.name">{{file.name}}</span>
+                                        <span class="fileItemDesc" :title="file.description">{{file.description}}</span>
                                         <span class="fileItemSize">{{file.fileSize}}</span>
                                         <span style="width:20%;margin-right:5%">{{file.uploadTime.substring(0,10)}}</span>
                                         <div style="float:right" v-if="role != 'Visitor'&& role!='Token'">
@@ -505,7 +514,7 @@
             methods: {
                 resizeContent() {
                     if (window.innerHeight > 735) {
-                        this.listContentCSS = window.innerHeight - 345 + 'px';
+                        this.listContentCSS = window.innerHeight - 385 + 'px';
                     } else {
                         this.listContentCSS = '390px';
                     }
