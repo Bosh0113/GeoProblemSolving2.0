@@ -1252,6 +1252,10 @@ export default {
           "ws://localhost:8081/GeoProblemSolving/Abseir/" +
           this.pageParams.pageId;
       }
+      if(window.location.port=="8083"){
+          abseirSocketURL = "wss://"+ window.location.hostname+":8083/GeoProblemSolving/Abseir" +
+          this.pageParams.pageId;
+      }
       this.abseirSocket = new WebSocket(abseirSocketURL);
       this.abseirSocket.onopen = this.onOpen;
       this.abseirSocket.onmessage = this.onMessage;

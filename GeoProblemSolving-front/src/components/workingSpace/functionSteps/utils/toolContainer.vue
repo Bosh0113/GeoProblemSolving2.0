@@ -166,6 +166,17 @@
     >
       <h3>Note: Jupyter notebooks will be accessed by all members in this project.</h3>
     </Modal>
+    <!-- <Modal
+      v-model="openToolModal"
+      title="Open tool"
+    >
+      <h2>How would you like to open this tool?</h2>
+      <small style="color:#ff9900">*Some tools should be accessed in a new tab.</small>
+      <div slot="footer" style="text-align:center">
+        <Button @click="openToolInWindow" type="primary" style="margin:0 15px">This tab</Button>
+        <Button @click="openToolNewWindow" style="margin:0 15px">New tab</Button>
+      </div>
+    </Modal> -->
   </div>
 </template>
 <script>
@@ -196,7 +207,9 @@ export default {
       toolsetToolList: [],
       showToolsetToolsModal: false,
       panelList: [],
-      jupyterModal: false
+      jupyterModal: false,
+      selectedTool:{},
+      // openToolModal:false
     };
   },
   mounted() {
@@ -376,6 +389,19 @@ export default {
         });
     },
     useTool(toolInfo) {
+      this.selectedTool = toolInfo;
+      // this.openToolModal = true;
+      var toolUrl = toolInfo.toolUrl;
+      if(toolUrl.indexOf("multipleChat")!==-1||toolUrl.indexOf("p2pChat")!==-1||toolUrl.indexOf("limesurvey")!==-1){
+        this.openToolNewWindow();
+      }
+      else{
+        this.openToolInWindow();
+      }
+    },
+    openToolInWindow(){
+      var toolInfo = this.selectedTool;
+      // this.openToolModal = false;
       // 记录信息
       let toolRecords = {
         type: "tools",
@@ -423,6 +449,34 @@ export default {
       $(".jsPanel-content").css("font-size", "0");
       this.panelList.push(panel);
       this.$emit("toolPanel", panel);
+    },
+    openToolNewWindow(){
+      var toolInfo = this.selectedTool;
+      // this.openToolModal = false;
+      // 记录信息
+      let toolRecords = {
+        type: "tools",
+        time: new Date().Format("yyyy-MM-dd HH:mm:ss"),
+        who: this.userInfo.userName,
+        content: "used a tool",
+        toolType: toolInfo.toolName
+      };
+      this.$emit("toolBehavior", toolRecords);
+
+      if (toolInfo.toolName == "Jupyter notebook") {
+        this.jupyterModal = true;
+        return;
+      }
+
+      var toolURL =
+        toolInfo.toolUrl +
+        "?userName=" +
+        this.userInfo.userName +
+        "&userID=" +
+        this.userInfo.userId +
+        "&groupID=" +
+        this.stepInfo.stepId;
+        window.open(toolURL);
     },
     checkJupyterUser() {
       this.axios

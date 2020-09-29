@@ -2,19 +2,30 @@
  * Webrtc相关
  */
 //选择的人的Id
-var userID;
+var userID="";
 //在线的成员
 var olParticipants=[];
-var thisURL= window.location.href;
 var thisUserId="";
 var thisRoomId="";
-var regUserId = /userId=(\S*)/;
-var regRoomId = /roomId=(\S*)&/;
-if(thisURL.search(regUserId)!=-1){
-  thisUserId = thisURL.match(regUserId)[1];
-}
-if(thisURL.search(regRoomId)!=-1){
-  thisRoomId = thisURL.match(regRoomId)[1];
+var thisUserName="";
+
+var href = window.location.href;
+var url = href.split("&");
+for (var i = 0; i < url.length; i++) {
+    if (/groupID/.test(url[i])) {
+        thisRoomId = url[i].match(/groupID=(\S*)/)[1];
+        continue;
+    }
+
+    if (/userID/.test(url[i])) {
+        thisUserId = url[i].match(/userID=(\S*)/)[1];
+        continue;
+    }
+
+    if (/userName/.test(url[i])) {
+       thisUserName = url[i].match(/userName=(\S*)/)[1];
+        continue;
+    }
 }
 
 $(document).ready(function () {
@@ -50,10 +61,7 @@ $(document).ready(function () {
     var ws;
     if(WebSocket)
     {
-        thisRoomId = "123"
-        // ws = new WebSocket("wss://223.2.44.124:8083/GeoProblemSolving/VideoChatServer/" + thisRoomId);
         ws = new WebSocket("wss://"+ window.location.hostname +":8083/GeoProblemSolving/VideoChatServer/"+thisRoomId);
-        // ws = new WebSocket("wss://172.21.213.185:8083/GeoProblemSolving/VideoChatServer/"+thisRoomId);
 
     }
 
@@ -61,7 +69,7 @@ $(document).ready(function () {
     $("#send-request").on("click",function () {
         displayBtn(cancelBtn);
         isAvailable = false;
-        var request = JSON.stringify({"type": "request","to":userID});
+        var request = JSON.stringify({"type": "request","to":userID, "from":thisUserId});
         ws.send(request);
         //超过20秒无应答，用户可重新发起请求
         setTimeout(function reset() {
@@ -94,6 +102,7 @@ $(document).ready(function () {
     $("#send-reject").on("click",function () {
         var reject = JSON.stringify({"type": "reject","to":userID});
         isAvailable = true;
+        userID = "";
         hideBtn(responseBtn);
         hideBtn(rejectBtn);
         ws.send(reject);
@@ -104,6 +113,7 @@ $(document).ready(function () {
         resetAll();
         var hangup = JSON.stringify({"type": "hangup","to":userID});
         isAvailable = true;
+        userID = "";
         ws.send(hangup);
     });
 
@@ -229,6 +239,7 @@ $(document).ready(function () {
                     //如果B是空闲状态
                     else
                     {
+                        userID = message.from;
                         //否则将B设置为忙碌状态
                         isAvailable = false;
                         consoleLog("There is a video chat request...");
