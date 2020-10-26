@@ -83,7 +83,7 @@ public class UserController {
                 session.setAttribute("userName",user.getUserName());
                 session.setAttribute("avatar",user.getAvatar());
                 session.setAttribute("email",user.getEmail());
-                session.setMaxInactiveInterval(30*60);
+                session.setMaxInactiveInterval(60*60*2);
                 System.out.println("User login. UserName: "+user.getUserName());
             }
             return object;
