@@ -1,12 +1,12 @@
 <template>
-  <div style="display: flex;background-color:lightgrey">
+  <div style="display: flex; background-color: lightgrey">
     <Button
-      title="Unold the activity tree"
+      title="Activity tree"
       @click="unfoldTree"
       v-show="treeFold"
       class="foldTreeBtn"
     >
-      <Icon type="md-arrow-dropright-circle" size="20" />
+      <Icon type="md-arrow-dropright-circle" size="20" title="Unfold the activity tree" />
     </Button>
     <Card dis-hover class="activityCard" id="ActivityTree">
       <h3 slot="title">Activity list</h3>
@@ -18,7 +18,7 @@
         style="cursor: pointer"
         @click="foldTree"
       />
-      <vue-scroll :ops="scrollOps" style="height:calc(100vh - 70px)">
+      <vue-scroll :ops="scrollOps" style="height: calc(100vh - 70px)">
         <div style="padding-right: 15px">
           <Tree :data="activityTree" :render="renderStyle"></Tree>
         </div>
@@ -27,7 +27,9 @@
     <Card dis-hover class="workspaceCard" id="ActivityContent">
       <h3 slot="title">
         <Breadcrumb style="display: inline-block" separator=">">
-          <BreadcrumbItem v-for="name in cascader" :key="name">{{name}}</BreadcrumbItem>
+          <BreadcrumbItem v-for="name in cascader" :key="name">{{
+            name
+          }}</BreadcrumbItem>
         </Breadcrumb>
       </h3>
       <div slot="extra" v-show="slctActivity.level > 0">
@@ -50,37 +52,39 @@
         <Button
           icon="md-create"
           size="small"
-          style="margin-top:-10px; margin-right: 10px"
+          style="margin-top: -10px; margin-right: 10px"
           @click="preEditting()"
-        >Edit</Button>
+          >Edit</Button
+        >
         <Button
           icon="md-trash"
           size="small"
-          style="margin-top:-10px"
+          style="margin-top: -10px"
           @click="activityDeleteModal = true"
-        >Delete</Button>
+          >Delete</Button
+        >
       </div>
       <!-- <Spin size="large" fix v-if="spinShow"></Spin> -->
       <type-choose
-        v-if="contentType==0"
+        v-if="contentType == 0"
         :activityInfo="slctActivity"
         :userInfo="userInfo"
         @typeChanged="typeChanged"
         :key="slctActivity.aid"
       ></type-choose>
       <single-activity
-        v-else-if="contentType==1"
+        v-else-if="contentType == 1"
         :activityInfo="slctActivity"
         :key="slctActivity.aid"
       ></single-activity>
       <multi-activity
-        v-else-if="contentType==2"
+        v-else-if="contentType == 2"
         :activityInfo="slctActivity"
         :userInfo="userInfo"
         :key="slctActivity.aid"
       ></multi-activity>
       <activity-show
-        v-else-if="contentType==3"
+        v-else-if="contentType == 3"
         :activityInfo="slctActivity"
         :key="slctActivity.aid"
       ></activity-show>
@@ -111,7 +115,11 @@
             type="textarea"
           ></Input>
         </FormItem>
-        <FormItem label="Activity type:" prop="type" v-show="slctActivity.type!='Activity_Default'">
+        <FormItem
+          label="Activity type:"
+          prop="type"
+          v-show="slctActivity.type != 'Activity_Default'"
+        >
           <Select
             v-model="editActivityForm.type"
             placeholder="Select the type of this activity"
@@ -122,19 +130,34 @@
             <Option value="Activity_Group">Multi activities</Option>
           </Select>
         </FormItem>
-        <FormItem label="Purpose:" prop="purpose" v-show="editActivityForm.type=='Activity_Unit'">
+        <FormItem
+          label="Purpose:"
+          prop="purpose"
+          v-show="editActivityForm.type == 'Activity_Unit'"
+        >
           <Select
             v-model="editActivityForm.purpose"
             placeholder="Select the purpose of this activity"
             readonly
           >
-            <Option v-for="item in purposes" :key="item.index" :value="item">{{item}}</Option>
+            <Option v-for="item in purposes" :key="item.index" :value="item">{{
+              item
+            }}</Option>
           </Select>
         </FormItem>
       </Form>
       <div slot="footer" style="display: inline-block">
-        <Button type="primary" @click="editActivity('editActivityForm')" style="float:right;">OK</Button>
-        <Button @click="activityEditModal = false" style="float:right;margin-right: 15px;">Cancel</Button>
+        <Button
+          type="primary"
+          @click="editActivity('editActivityForm')"
+          style="float: right"
+          >OK</Button
+        >
+        <Button
+          @click="activityEditModal = false"
+          style="float: right; margin-right: 15px"
+          >Cancel</Button
+        >
       </div>
     </Modal>
     <Modal
@@ -145,17 +168,22 @@
       cancel-text="Think again..."
     >
       <h3>Do you really want to delete this activity?</h3>
-      <h3
-        style="color:red; margin-top: 10px"
-      >* The selected activity and its all child activities will be deleted!</h3>
+      <h3 style="color: red; margin-top: 10px">
+        * The selected activity and its all child activities will be deleted!
+      </h3>
     </Modal>
-    <Modal
+    <!-- <Modal
       v-model="createActivityModel"
       title="Create a new activity"
       width="800"
       :mask-closable="false"
     >
-      <Form ref="activityForm" :model="activityForm" :rules="activityCreateRule" :label-width="120">
+      <Form
+        ref="activityForm"
+        :model="activityForm"
+        :rules="activityCreateRule"
+        :label-width="120"
+      >
         <FormItem label="Name" prop="name">
           <Input
             type="text"
@@ -182,21 +210,36 @@
             <Option value="Activity_Group">Multi activities</Option>
           </Select>
         </FormItem>
-        <FormItem label="Purpose:" prop="purpose" v-show="activityForm.type=='Activity_Unit'">
+        <FormItem
+          label="Purpose:"
+          prop="purpose"
+          v-show="activityForm.type == 'Activity_Unit'"
+        >
           <Select
             v-model="activityForm.purpose"
             placeholder="Select the purpose of this activity"
             readonly
           >
-            <Option v-for="item in purposes" :key="item.index" :value="item">{{item}}</Option>
+            <Option v-for="item in purposes" :key="item.index" :value="item">{{
+              item
+            }}</Option>
           </Select>
         </FormItem>
       </Form>
       <div slot="footer" style="display: inline-block">
-        <Button type="primary" @click="createActivity('activityForm')" style="float:right;">OK</Button>
-        <Button @click="createActivityModel = false" style="float:right;margin-right: 15px;">Cancel</Button>
+        <Button
+          type="primary"
+          @click="createActivity('activityForm')"
+          style="float: right"
+          >OK</Button
+        >
+        <Button
+          @click="createActivityModel = false"
+          style="float: right; margin-right: 15px"
+          >Cancel</Button
+        >
       </div>
-    </Modal>
+    </Modal> -->
   </div>
 </template>
 <script>
@@ -222,75 +265,22 @@ export default {
       treeFold: false,
       cascader: [],
       cascaderIndex: [],
-      activityTree: [
-        {
-          aid: "111",
-          name: "activity 1",
-          level: 0,
-          children: [
-            {
-              aid: "121",
-              name: "activity 1-1",
-              level: 1,
-              children: [
-                {
-                  aid: "122",
-                  name: "leaf 1-1-1",
-                  level: 2,
-                },
-                {
-                  aid: "123",
-                  name: "leaf 1-1-2",
-                  level: 2,
-                },
-                {
-                  aid: "add",
-                },
-              ],
-            },
-            {
-              aid: "130",
-              name: "activity 1-2",
-              level: 1,
-              children: [
-                {
-                  aid: "131",
-                  name: "leaf 1-2-1",
-                  level: 2,
-                },
-                {
-                  aid: "132",
-                  name: "leaf 1-2-1",
-                  level: 2,
-                },
-                {
-                  aid: "add",
-                },
-              ],
-            },
-            {
-              aid: "add",
-            },
-          ],
-          expand: true,
-        },
-      ],
+      activityTree: [],
       projectInfo: {},
       userInfo: JSON.parse(sessionStorage.getItem("userInfo")),
       slctActivity: {},
       expandNode: {}, // 使用引用传递，记录expand的位置，对activity tree 进行修改
       parentNode: {}, // 记录所创建/选择activity的父节点位置，对activity tree 进行修改
-      createActivityModel: false,
-      activityForm: {
-        name: "",
-        description: "",
-        parent: "",
-        creator: "",
-        level: -1,
-        permission: JSON.stringify(userRoleJS.getDefault()),
-        type: "Activity_Default",
-        purpose: "Universal",
-      },
+      // activityForm: {
+      //   name: "",
+      //   description: "",
+      //   parent: "",
+      //   creator: "",
+      //   level: -1,
+      //   permission: JSON.stringify(userRoleJS.getDefault()),
+      //   type: "Activity_Default",
+      //   purpose: "Others",
+      // },
       editActivityForm: {
         name: "",
         description: "",
@@ -299,33 +289,33 @@ export default {
         level: -1,
         permission: JSON.stringify(userRoleJS.getDefault()),
         type: "Activity_Default",
-        purpose: "Universal",
+        purpose: "Others",
       },
-      activityCreateRule: {
-        name: [
-          {
-            required: true,
-            message: "The name should not be empty and more than 60 characters",
-            trigger: "blur",
-            type: "string",
-            max: 60,
-          },
-        ],
-        description: [
-          {
-            required: true,
-            message: "The description should not be empty",
-            trigger: "blur",
-          },
-        ],
-        purpose: [
-          {
-            required: true,
-            message: "The purpose should not be empty",
-            trigger: "blur",
-          },
-        ],
-      },
+      // activityCreateRule: {
+      //   name: [
+      //     {
+      //       required: true,
+      //       message: "The name should not be empty and more than 60 characters",
+      //       trigger: "blur",
+      //       type: "string",
+      //       max: 60,
+      //     },
+      //   ],
+      //   description: [
+      //     {
+      //       required: true,
+      //       message: "The description should not be empty",
+      //       trigger: "blur",
+      //     },
+      //   ],
+      //   purpose: [
+      //     {
+      //       required: true,
+      //       message: "The purpose should not be empty",
+      //       trigger: "blur",
+      //     },
+      //   ],
+      // },
       activityEditRule: {
         name: [
           {
@@ -344,11 +334,12 @@ export default {
           },
         ],
       },
+      // createActivityModel: false,
       activityEditModal: false,
       activityDeleteModal: false,
       contentType: -1,
       purposes: [
-        "Universal",
+        "Others",
         "Context definition & resource collection",
         "Data processing",
         "Data visualization",
@@ -370,7 +361,7 @@ export default {
     next();
   },
   mounted() {
-    this.getProjectInfo();
+    this.changeActivityByUrl();
   },
   methods: {
     renderStyle(h, { root, node, data }) {
@@ -379,38 +370,22 @@ export default {
       let on = {};
       let name = "";
 
-      if (data.aid == "add") {
-        props = Object.assign({}, this.buttonProps, {
-          icon: "ios-add",
-        });
+      name = data.name;
+      if (this.slctActivity.aid !== data.aid) {
         style = {
           width: "100%",
-          backgroundColor: "#e4e7ed",
         };
         on = {
           click: () => {
-            this.preCreation(root, node);
+            this.switchActivity(root, node, data);
           },
         };
-        name = "Create activity";
       } else {
-        name = data.name;
-        if (this.slctActivity.aid !== data.aid) {
-          style = {
-            width: "100%",
-          };
-          on = {
-            click: () => {
-              this.switchActivity(root, node, data);
-            },
-          };
-        } else {
-          style = {
-            width: "100%",
-            backgroundColor: "lightblue",
-            cursor: "default",
-          };
-        }
+        style = {
+          width: "100%",
+          backgroundColor: "lightblue",
+          cursor: "default",
+        };
       }
 
       return h(
@@ -446,7 +421,6 @@ export default {
     foldTree() {
       this.treeFold = true;
       document.getElementById("ActivityTree").style.width = 0;
-      // document.getElementById("ActivityTree").style.height = 0;
       document.getElementById("ActivityTree").style.margin = 0;
       document.getElementById("ActivityContent").style.width =
         window.innerWidth - 10 + "px";
@@ -454,30 +428,45 @@ export default {
     unfoldTree() {
       this.treeFold = false;
       document.getElementById("ActivityTree").style.width = 250 + "px";
-      // document.getElementById("ActivityTree").style.height =
-      //   window.innerHeight - 10 + "px";
       document.getElementById("ActivityTree").style.margin = 5 + "px";
       document.getElementById("ActivityContent").style.width =
         window.innerWidth - 260 + "px";
     },
+    changeActivityByUrl() {
+      let aid = this.getURLParameter("aid");
+      let level = this.getURLParameter("level");
+
+      if (level > 1) {
+        this.getActivityBranch(aid);
+      } else if (level == 1) {
+        this.getSubprojectBranch(aid);
+      } else if (levle == 0) {
+        this.getProjectInfo();
+      }
+      // if (aid != undefined && index != undefined) {
+      //   parent.history.replaceState(
+      //     null,
+      //     null,
+      //     "/GeoProblemSolving/projectInfo/" +
+      //       this.projectInfo.aid +
+      //       "?content=workspace"
+      //   );
+      // } else {
+      //   this.projectInfo = this.activityTree[0];
+      //   this.searchActivity(aid, index);
+      // }
+    },
+    getURLParameter(name) {
+      var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+      var r = parent.location.search.substr(1).match(reg);
+      if (r != null) {
+        return unescape(r[2]);
+      }
+      return null;
+    },
     getProjectInfo() {
       this.projectInfo = parent.vm.projectInfo;
-      this.initActivityTree();
-      this.slctActivity = this.projectInfo;
       this.cascader = [this.projectInfo.name];
-      this.setContent(this.slctActivity);
-    },
-    roleIdentity(activity) {
-      return userRoleJS.roleIdentify(activity.members, this.userInfo.userId);
-    },
-    permissionIdentity(permission, role, operation) {
-      return userRoleJS.permissionIdentity(
-        JSON.parse(permission),
-        role,
-        operation
-      );
-    },
-    initActivityTree() {
       this.activityTree = [];
       if (this.projectInfo.type == "Activity_Group") {
         this.axios
@@ -495,21 +484,14 @@ export default {
                 }
               }
 
-              // if (
-              //   this.permissionIdentity(
-              //     this.projectInfo.permission,
-              //     this.roleIdentity(this.projectInfo),
-              //     "manage_child_activity"
-              //   )
-              // ) {
-              children.push({ aid: "add" }); // create activity node
-              // }
-
               let root = Object.assign({}, this.projectInfo);
               root["expand"] = true;
               root["children"] = children;
 
-              this.activityTree.push(root);
+              // update activity tree
+              this.activityTree = [root];
+              this.slctActivity = root;
+              this.setContent(this.slctActivity, "init");
             } else {
               console.log(res.data.msg);
             }
@@ -522,12 +504,102 @@ export default {
         this.activityTree.push(root);
       }
     },
+    getSubprojectBranch(aid) {
+      // init
+      this.cascader = [];
+      this.activityTree = [];
+      // url
+      let url = "/GeoProblemSolving/subproject/" + aid + "/ancestor";
+
+      this.axios
+        .get(url)
+        .then((res) => {
+          if (res.data.code == 0) {
+            let root = res.data.data.ancestors[1];
+            root["expand"] = true;
+            let subproject = res.data.data.ancestors[0];
+            subproject.children = res.data.data.children;
+
+
+            for (let i = 0; i < root.children.length; i++) {
+              if ((root.children[i] = subproject.aid)) {
+                root.children[i] = subproject;
+              }
+
+              // update activity tree
+              this.activityTree = [root];
+
+              this.slctActivity = subproject;
+              this.setContent(this.slctActivity, "init");
+            }
+          } else {
+            console.log(res.data.msg);
+          }
+        })
+        .catch((err) => {
+          console.log(err.data);
+        });
+    },
+    getActivityBranch(aid) {
+      // init
+      this.cascader = [];
+      this.activityTree = [];
+      // url
+      let url = "/GeoProblemSolving/activity/" + aid + "/ancestor";
+
+      this.axios
+        .get(url)
+        .then((res) => {
+          if (res.data.code == 0) {
+            let branch = res.data.data;
+            let current = branch[0];
+            for (let i = 1; i < branch.length; i++) {
+
+              let activity = branch[i];
+              for (let j = 0; j < activity.children.length; j++) {
+
+                if ((activity.children[i] = current.aid)) {
+                  root.children[i] = subproject;
+                }
+              }
+
+              // update activity tree
+              this.activityTree = [root];
+
+              this.slctActivity = subproject;
+              this.setContent(this.slctActivity, "init");
+            }
+          } else {
+            console.log(res.data.msg);
+          }
+        })
+        .catch((err) => {
+          console.log(err.data);
+        });
+    },
+    // searchActivity(aid, index) {
+    //   if (aid != undefined && index != undefined) {
+    //     // search the opened activity
+    //     let node = this.activityTree[0];
+    //     this.cascader = [node.name];
+    //     for (var i = 1; i < index.length; i++) {
+    //       if (
+    //         Object.prototype.toString.call(node.children) == "[object Array]"
+    //       ) {
+    //         node = node.children[Number(index[i])];
+    //         this.cascader.push(node.name);
+    //       }
+    //     }
+    //     if (node.aid == aid && this.cascader.length == this.cascader.length) {
+    //       this.setContent(node, "init");
+    //       return;
+    //     }
+    //   }
+    //   this.getProjectInfo();
+    // },
     typeChanged(type) {
-      if (type == "Activity_Group") {
-        this.slctActivity.children = [{ aid: "add" }];
-      }
       this.slctActivity.type = type;
-      this.setContent(this.slctActivity);
+      this.setContent(this.slctActivity, "type");
     },
     expandActivityTree(activity) {
       if (activity.type == "Activity_Group") {
@@ -551,21 +623,10 @@ export default {
                   children[i].children = [];
                 }
               }
-
-              // if (
-              //   this.permissionIdentity(
-              //     activity.permission,
-              //     this.roleIdentity(activity),
-              //     "manage_child_activity"
-              //   )
-              // ) {
-              children.push({
-                aid: "add",
-              });
-              // }
-
+              // expand activity tree
               this.expandNode["expand"] = true;
               this.expandNode["children"] = children;
+              this.setContent(activity, "switch");
             } else {
               console.log(res.data.msg);
             }
@@ -588,7 +649,6 @@ export default {
       }
       this.slctActivity = activity;
       this.getCascader(root, node);
-      this.setContent(activity);
       // expand
       if (
         activity.type == "Activity_Group" &&
@@ -618,7 +678,7 @@ export default {
         this.getCascaderIndex(root, root[node.parent]);
       }
     },
-    setContent(activity) {
+    setContent(activity, operation) {
       if (activity.type == "Activity_Default") {
         this.contentType = 0;
       } else if (activity.type == "Activity_Unit") {
@@ -626,63 +686,71 @@ export default {
       } else if (activity.type == "Activity_Group") {
         this.contentType = 2;
       }
-    },
-    preCreation(root, node) {
-      this.parentNode = root[node.parent].node;
+      // if (operation !== "init") {
 
-      this.activityForm.parent = this.parentNode.aid;
-      this.activityForm.creator = this.userInfo.userId;
-      this.activityForm.level = this.parentNode.level + 1;
-
-      this.createActivityModel = true;
+      //   parent.location.href =
+      //     "/GeoProblemSolving/projectInfo/" +
+      //     this.projectInfo.aid +
+      //     "?content=workspace&aid=" +
+      //     activity.aid +
+      //     "&index=" +
+      //     index;
+      // }
     },
+    // preCreation(root, node) {
+    //   this.parentNode = root[node.parent].node;
+
+    //   this.activityForm.parent = this.parentNode.aid;
+    //   this.activityForm.creator = this.userInfo.userId;
+    //   this.activityForm.level = this.parentNode.level + 1;
+
+    //   this.createActivityModel = true;
+    // },
     createActivity(name) {
-      this.$refs[name].validate((valid) => {
-        if (valid) {
-          let url = "";
-          if (this.activityForm.level == 1) {
-            // subproject
-            url = "/GeoProblemSolving/subproject";
-          } else if (this.activityForm.level > 1) {
-            // activity
-            url = "/GeoProblemSolving/activity";
-          }
-
-          this.axios
-            .post(url, this.activityForm)
-            .then((res) => {
-              if (res.data.code == 0) {
-                // change activity tree
-                for (let i = 0; i < this.parentNode.children.length; i++) {
-                  if (this.parentNode.children[i].aid == "add") {
-                    this.parentNode.children[i] = res.data.data;
-                  }
-                }
-                this.parentNode.children.push({ aid: "add" });
-                this.slctActivity = res.data.data;
-                // change content
-                this.setContent(this.slctActivity);
-
-                this.activityForm = {
-                  name: "",
-                  description: "",
-                  parent: "",
-                  creator: "",
-                  level: -1,
-                  permission: JSON.stringify(userRoleJS.getDefault()),
-                  type: "Activity_Default",
-                  purpose: "Universal",
-                };
-              } else {
-                console.log(res.data.msg);
-              }
-            })
-            .catch((err) => {
-              console.log(err);
-            });
-          this.createActivityModel = false;
-        }
-      });
+      // this.$refs[name].validate((valid) => {
+      //   if (valid) {
+      //     let url = "";
+      //     if (this.activityForm.level == 1) {
+      //       // subproject
+      //       url = "/GeoProblemSolving/subproject";
+      //     } else if (this.activityForm.level > 1) {
+      //       // activity
+      //       url = "/GeoProblemSolving/activity";
+      //     }
+      //     this.axios
+      //       .post(url, this.activityForm)
+      //       .then((res) => {
+      //         if (res.data.code == 0) {
+      //           // change activity tree
+      //           for (let i = 0; i < this.parentNode.children.length; i++) {
+      //             if (this.parentNode.children[i].aid == "add") {
+      //               this.parentNode.children[i] = res.data.data;
+      //             }
+      //           }
+      //           // this.parentNode.children.push({ aid: "add" });
+      //           this.slctActivity = res.data.data;
+      //           // change content
+      //           this.setContent(this.slctActivity, "create");
+      //           this.activityForm = {
+      //             name: "",
+      //             description: "",
+      //             parent: "",
+      //             creator: "",
+      //             level: -1,
+      //             permission: JSON.stringify(userRoleJS.getDefault()),
+      //             type: "Activity_Default",
+      //             purpose: "Others",
+      //           };
+      //         } else {
+      //           console.log(res.data.msg);
+      //         }
+      //       })
+      //       .catch((err) => {
+      //         console.log(err);
+      //       });
+      //     this.createActivityModel = false;
+      //   }
+      // });
     },
     preEditting() {
       let children = [];
@@ -701,7 +769,7 @@ export default {
         if (valid) {
           if (this.editActivityForm.type != this.slctActivity.type) {
             if (this.slctActivity.type == "Activity_Unit") {
-              this.editActivityForm.purpose = "Universal";
+              this.editActivityForm.purpose = "Others";
             } else if (this.slctActivity.type == "Activity_Group") {
               if (
                 this.slctActivity.children != undefined &&
@@ -740,7 +808,7 @@ export default {
                 let index = this.cascader.length - 1;
                 this.$set(this.cascader, index, this.editActivityForm.name);
                 // change content
-                this.setContent(this.slctActivity);
+                this.setContent(this.slctActivity, "edit");
               } else {
                 this.$Notice.info({ title: "Result", desc: res.data.msg });
               }
@@ -768,7 +836,7 @@ export default {
           if (res.data.code == 0) {
             if (this.parentNode != {}) {
               this.slctActivity = this.parentNode;
-              this.setContent(this.slctActivity);
+              this.setContent(this.slctActivity, "delete");
 
               // delete activity from activity tree
               let children = this.parentNode.children;

@@ -69,7 +69,7 @@
         <div v-show="activeMenu=='Workspace'">
           <vue-scroll :ops="scrollOps" style="height:calc(100vh - 120px); margin-top:5px">
             <universal-space
-              v-if="activityInfo.purpose=='Universal'"
+              v-if="activityInfo.purpose=='Others'"
               :activityInfo="activityInfo"
               :participants="participants"
             ></universal-space>

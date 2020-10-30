@@ -258,7 +258,6 @@ export default {
             that.$router.push({ name: "Login" });
           } else if (data != "None" && data != "Fail") {
             that.projectInfo = data[0];
-            that.$store.commit("setProjectInfo", data[0]);
           } else {
             console.log(data);
           }

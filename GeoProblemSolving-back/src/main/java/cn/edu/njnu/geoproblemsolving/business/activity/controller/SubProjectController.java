@@ -75,6 +75,16 @@ public class SubProjectController {
     }
 
     /**
+     * get ancestors of one subproject
+     * @param aid
+     * @return
+     */
+    @RequestMapping(value = "/{aid}/lineage", method = RequestMethod.GET)
+    public JsonResult getLineage(@PathVariable("aid") String aid){
+        return subprojectService.findLineage(aid);
+    }
+
+    /**
      * join a subproject
      * @param aid
      * @param userId

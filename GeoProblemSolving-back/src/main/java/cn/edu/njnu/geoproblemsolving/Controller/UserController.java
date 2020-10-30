@@ -78,12 +78,11 @@ public class UserController {
             if(!object.equals("Fail")){
                 UserEntity user=(UserEntity)object;
                 HttpSession session=request.getSession();
-                session.setMaxInactiveInterval(30*60);
                 session.setAttribute("userId",user.getUserId());
                 session.setAttribute("userName",user.getUserName());
                 session.setAttribute("avatar",user.getAvatar());
                 session.setAttribute("email",user.getEmail());
-                session.setMaxInactiveInterval(30*60);
+                session.setMaxInactiveInterval(60*60);
                 System.out.println("User login. UserName: "+user.getUserName());
             }
             return object;

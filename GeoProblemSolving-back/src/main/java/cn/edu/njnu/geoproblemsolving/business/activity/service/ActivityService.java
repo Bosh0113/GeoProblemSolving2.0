@@ -19,6 +19,8 @@ public interface ActivityService {
 
     public JsonResult findParticipants(String aid);
 
+    public JsonResult findLineage(String aid);
+
     public JsonResult findLast(String aid);
 
     public JsonResult findNext(String aid);

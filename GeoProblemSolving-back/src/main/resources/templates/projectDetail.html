@@ -255,27 +255,27 @@
     <template>
         <div :style="{height: contentPageCSS}" style="margin-top: 60px;">
             <div span="2" style="height: inherit;width: 90px;position: absolute;">
-                <i-menu :active-name="activeMenu" @on-select="changeMenuItem"
+                <i-menu :active-name="activeMenu"
                         style="height: inherit;width: fit-content;z-index:98">
-                    <menu-item name="projectOverview" class="projectMenuItem">
+                    <menu-item name="overview" class="projectMenuItem" :to="'/GeoProblemSolving/projectInfo/' + projectInfo.aid +'?content=overview'">
                         <Icon type="md-home" title="Overview" size="35"></Icon>
                     </menu-item>
-                    <menu-item name="projectDetail" class="projectMenuItem">
+                    <menu-item name="info" class="projectMenuItem" :to="'/GeoProblemSolving/projectInfo/' + projectInfo.aid +'?content=info'">
                         <Icon type="ios-information-circle" title="Information" size="35"></Icon>
                     </menu-item>
-                    <menu-item name="tasks" class="projectMenuItem">
+                    <menu-item name="task" class="projectMenuItem":to="'/GeoProblemSolving/projectInfo/' + projectInfo.aid +'?content=task'">
                         <Icon type="md-calendar" title="Tasks" size="35"></Icon>
                     </menu-item>
-                    <menu-item name="workspace" class="projectMenuItem">
+                    <menu-item name="workspace" class="projectMenuItem" :to="'/GeoProblemSolving/projectInfo/' + projectInfo.aid +'?content=workspace'">
                         <Icon type="md-git-branch" title="Workspace" size="35"></Icon>
                     </menu-item>
-                    <menu-item name="resources" class="projectMenuItem">
+                    <menu-item name="resource" class="projectMenuItem" :to="'/GeoProblemSolving/projectInfo/' + projectInfo.aid +'?content=resource'">
                         <Icon type="ios-folder" title="Resources" size="35"></Icon>
                     </menu-item>
                 </i-menu>
             </div>
             <div style="margin-left: 90px;height: inherit;min-height: fit-content;">
-                <div v-show="activeMenu=='projectOverview'" style="height: inherit;min-height: fit-content;">
+                <div v-show="activeMenu=='overview'" style="height: inherit;min-height: fit-content;">
                     <div style="background:#eee;padding: 10px;height: inherit;min-height: fit-content;">
                         <Card :bordered="false" dis-hover
                               style="height: -webkit-fill-available; flex-flow: column;min-height: fit-content;">
@@ -320,7 +320,7 @@
                                             </div>
                                             <div style="text-align:center">
                                                 <h3>
-                                                    <a @click="gotoIntroduction()">Click to check it</a>
+                                                    <a :href="'/GeoProblemSolving/projectInfo/' + projectInfo.aid +'?content=info'">Click to check it</a>
                                                 </h3>
                                             </div>
                                         </Card>
@@ -345,7 +345,7 @@
                                             </div>
                                             <div style="text-align:center">
                                                 <h3>
-                                                    <a @click="gotoTaskassignment()">Click to check it</a>
+                                                    <a :href="'/GeoProblemSolving/projectInfo/' + projectInfo.aid +'?content=task'">Click to check it</a>
                                                 </h3>
                                             </div>
                                         </Card>
@@ -369,7 +369,7 @@
                                             </div>
                                             <div style="text-align:center">
                                                 <h3>
-                                                    <a @click="gotoWorking()">Click to check it</a>
+                                                    <a :href="'/GeoProblemSolving/projectInfo/' + projectInfo.aid +'?content=workspace'">Click to check it</a>
                                                 </h3>
                                             </div>
                                         </Card>
@@ -394,7 +394,7 @@
                                             </div>
                                             <div style="text-align:center">
                                                 <h3>
-                                                    <a @click="gotoResource()">Click to check it</a>
+                                                    <a :href="'/GeoProblemSolving/projectInfo/' + projectInfo.aid +'?content=resource'">Click to check it</a>
                                                 </h3>
                                             </div>
                                         </Card>
@@ -410,7 +410,7 @@
                         </Card>
                     </div>
                 </div>
-                <div v-show="activeMenu=='projectDetail'" style="height: inherit;min-height: fit-content;">
+                <div v-show="activeMenu=='info'" style="height: inherit;min-height: fit-content;">
                     <div style="background:#eee;padding: 10px;height: inherit;min-height: fit-content;">
                         <Card :bordered="false" dis-hover
                               style="height: -webkit-fill-available;flex-flow: column;min-height: fit-content;">
@@ -538,7 +538,7 @@
                                                     <div>
                                                         <Poptip trigger="hover" content="Invite members"
                                                                 v-if="permissionIdentity('invite_member')"
-                                                                placement="bottom">
+                                                                placement="left">
                                                             <i-button class="changeInviteColor"
                                                                       @click="inviteModalShow()">
                                                                 <Icon type="md-person-add" :size="20"></Icon>
@@ -585,11 +585,11 @@
                     <div style="background:#eee;padding: 10px;height: inherit;min-height: fit-content;">
                         <div style="width: -webkit-fill-available;height: -webkit-fill-available;">
                             <iframe style="width: -webkit-fill-available;height: -webkit-fill-available;border-width:0"
-                                    :src="ipPort+'/activity/' + projectInfo.level +'/'+ projectInfo.aid"></iframe>
+                                    :src="ipPort+'/activity/' + projectInfo.aid"></iframe>
                         </div>
                     </div>
                 </div>
-                <div v-show="activeMenu=='resources'" style="height: inherit;min-height: fit-content;">
+                <div v-show="activeMenu=='resource'" style="height: inherit;min-height: fit-content;">
                     <div style="background:#eee;padding: 10px;height: inherit;min-height: fit-content;">
                         <Card :bordered="false" dis-hover
                               style="height: -webkit-fill-available;min-height: 565px;min-height: fit-content;">
@@ -620,7 +620,7 @@
                         </Card>
                     </div>
                 </div>
-                <div v-show="activeMenu=='tasks'" style="height: inherit;min-height: fit-content;">
+                <div v-show="activeMenu=='task'" style="height: inherit;min-height: fit-content;">
                     <div style="background:#eee;padding: 10px;height: inherit;min-height: fit-content;">
                         <Card :bordered="false" dis-hover
                               style="height: -webkit-fill-available;min-height: 565px;min-height: fit-content;">
@@ -1056,7 +1056,7 @@
                         avatar: '',
                     },
                     projectInfo: projectInfo,
-                    activeMenu: "projectOverview",
+                    activeMenu: "overview",
                     contentPageCSS: '',
                     membersContentCSS: '',
                     workspaceCSS: '',
@@ -1254,7 +1254,7 @@
                 changeMenuByUrl() {
                     var content = this.getURLParameter("content");
                     if (content != null) {
-                        var array = ["projectOverview", "projectDetail", "tasks", "workspace", "resources"];
+                        var array = ["overview", "info", "task", "workspace", "resource"];
                         if (array.includes(content)) {
                             this.activeMenu = content;
                         }
@@ -1319,35 +1319,6 @@
                 },
                 sendNotice(recipientId) {
                     this.$refs.navigationEl.sendMessage(recipientId);
-                },
-                changeMenuItem(name) {
-                    this.activeMenu = name;
-                    var projectId = this.projectInfo.aid;
-                    var tokenParam = '';
-                    if (this.tokenStr != null) {
-                        tokenParam = "&token=" + this.tokenStr;
-                    }
-                    window.history.replaceState(null, null, '/GeoProblemSolving/projectDetail/' + projectId + "?content=" + name + tokenParam);
-                },
-                gotoIntroduction() {
-                    this.changeMenuItem("projectDetail");
-                },
-                gotoResource() {
-                    if (this.userRole == "visitor") {
-                        this.joinProjectNotice = true;
-                    } else {
-                        this.changeMenuItem("resources");
-                    }
-                },
-                gotoWorking() {
-                    if (this.userRole == "visitor") {
-                        this.joinProjectNotice = true;
-                    } else {
-                        this.changeMenuItem("workspace");
-                    }
-                },
-                gotoTaskassignment() {
-                    this.changeMenuItem("tasks");
                 },
                 getAllSubProjects() {
                     // if (this.projectInfo.type == "type0") {
@@ -1953,7 +1924,7 @@
                                 .then(res => {
                                     if (res.data.code == 0) {
                                         this.$Message.info("Join this project successfully");
-                                        window.location.href = "/GeoProblemSolving/projectDetail/" + this.applyProjectInfo.aid;
+                                        window.location.href = "/GeoProblemSolving/projectInfo/" + this.applyProjectInfo.aid;
                                     } else {
                                         this.$Message.info(res.data.msg);
                                     }

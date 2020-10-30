@@ -4,6 +4,7 @@ import cn.edu.njnu.geoproblemsolving.Dao.Folder.FolderDaoImpl;
 import cn.edu.njnu.geoproblemsolving.business.activity.dto.UpdateActivityDTO;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Project;
 import cn.edu.njnu.geoproblemsolving.business.activity.enums.ActivityType;
+import cn.edu.njnu.geoproblemsolving.business.activity.repository.ProjectRepository;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.LinkProtocol;
@@ -38,6 +39,7 @@ public class ActivityServiceImpl implements ActivityService {
     private final MongoTemplate mongoTemplate;
     private final FolderDaoImpl folderDao;
     private final SubprojectRepository subprojectRepository;
+    private final ProjectRepository projectRepository;
 
     @Autowired
     public ActivityServiceImpl(ActivityRepository activityRepository,
@@ -45,13 +47,14 @@ public class ActivityServiceImpl implements ActivityService {
                                UserRepository userRepository,
                                SubprojectRepository subprojectRepository,
                                MongoTemplate mongoTemplate,
-                               FolderDaoImpl folderDao) {
+                               FolderDaoImpl folderDao, ProjectRepository projectRepository) {
         this.activityRepository = activityRepository;
         this.protocolRepository = protocolRepository;
         this.userRepository = userRepository;
         this.mongoTemplate = mongoTemplate;
         this.folderDao = folderDao;
         this.subprojectRepository = subprojectRepository;
+        this.projectRepository = projectRepository;
     }
 
     private User findByUserId(String userId) {
@@ -300,7 +303,7 @@ public class ActivityServiceImpl implements ActivityService {
     public JsonResult findParticipants(String aid) {
         try {
             Optional optional = activityRepository.findById(aid);
-            if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: subproject does not exist.");
+            if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: activity does not exist.");
             Activity activity = (Activity) optional.get();
 
             // creator
@@ -325,6 +328,56 @@ public class ActivityServiceImpl implements ActivityService {
             participants.put("members", memberinfos);
 
             return ResultUtils.success(participants);
+        } catch (Exception ex) {
+            return ResultUtils.error(-2, "Fail: Exception");
+        }
+    }
+
+    @Override
+    public JsonResult findLineage(String aid){
+        try{
+
+            Optional optional = activityRepository.findById(aid);
+            if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: activity does not exist.");
+            Activity activity = (Activity) optional.get();
+
+            // children
+            JSONArray children = new JSONArray();
+            if (activity.getChildren() != null) {
+                for (String childId : activity.getChildren()) {
+                    optional = activityRepository.findById(childId);
+                    if (optional.isPresent()) {
+                        Activity childActivity = (Activity) optional.get();
+                        children.add(childActivity);
+                    }
+                }
+            }
+
+            // ancestors
+            JSONArray ancestors = new JSONArray();
+            ancestors.add(activity);
+
+            int level = activity.getLevel();
+            for(int i = level-1; i > 0; i++){
+                if(i == 0){
+                    optional = projectRepository.findById(aid);
+                    if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: project does not exist.");
+                } else if(i == 1) {
+                    optional = subprojectRepository.findById(aid);
+                    if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: subproject does not exist.");
+                } else {
+                    optional = activityRepository.findById(aid);
+                    if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: activity does not exist.");
+                }
+                activity = (Activity) optional.get();
+                ancestors.add(activity);
+            }
+
+            JSONObject lineage = new JSONObject();
+            lineage.put("ancestors", ancestors);
+            lineage.put("children", children);
+
+            return ResultUtils.success(lineage);
         } catch (Exception ex) {
             return ResultUtils.error(-2, "Fail: Exception");
         }
