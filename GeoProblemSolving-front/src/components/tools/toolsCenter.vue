@@ -1078,11 +1078,11 @@ export default {
         "General step",
         "Context definition & resource collection",
         "Data processing",
+        "Data analysis",
         "Data visualization",
         "Geographic model construction",
         "Model effectiveness evaluation",
         "Geographical simulation",
-        "Quantitative and qualitative analysis",
         "Decision-making for management",
         "Others"
       ],
@@ -1120,11 +1120,11 @@ export default {
         "General step",
         "Context definition & resource collection",
         "Data processing",
+        "Data analysis",
         "Data visualization",
         "Geographic model construction",
         "Model effectiveness evaluation",
         "Geographical simulation",
-        "Quantitative and qualitative analysis",
         "Decision-making for management"
       ],
       visible: false,
@@ -1611,11 +1611,11 @@ export default {
           case "General step":
           case "Context definition & resource collection":
           case "Data processing":
+          case "Data analysis":
           case "Data visualization":
           case "Geographic model construction":
           case "Model effectiveness evaluation":
           case "Geographical simulation":
-          case "Quantitative and qualitative analysis":
           case "Decision-making for management": {
             var stepTypes = item.recomStep;
             for (var i = 0; i < stepTypes.length; i++) {
