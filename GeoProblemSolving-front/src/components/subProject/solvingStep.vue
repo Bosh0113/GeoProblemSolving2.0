@@ -276,11 +276,11 @@ export default {
       typeList: [
         "Context definition & resource collection",
         "Data processing",
+        "Data analysis",
         "Data visualization",
         "Geographic model construction",
         "Model effectiveness evaluation",
         "Geographical simulation",
-        "Quantitative and qualitative analysis",
         "Decision-making for management"
       ],
       // 步骤逻辑图
@@ -622,6 +622,10 @@ export default {
               icon: "circle"
             },
             {
+              name: "Data analysis",
+              icon: "circle"
+            },
+            {
               name: "Data visualization",
               icon: "circle"
             },
@@ -635,10 +639,6 @@ export default {
             },
             {
               name: "Geographical simulation",
-              icon: "circle"
-            },
-            {
-              name: "Quantitative and qualitative analysis",
               icon: "circle"
             },
             {
@@ -671,6 +671,9 @@ export default {
                 name: "Data processing"
               },
               {
+                name: "Data analysis"
+              },
+              {
                 name: "Data visualization"
               },
               {
@@ -681,9 +684,6 @@ export default {
               },
               {
                 name: "Geographical simulation"
-              },
-              {
-                name: "Quantitative and qualitative analysis"
               },
               {
                 name: "Decision-making for management"
@@ -860,7 +860,7 @@ export default {
       } else if (category == 5) {
         type = "Geographical simulation";
       } else if (category == 6) {
-        type = "Quantitative and qualitative analysis";
+        type = "Data analysis";
       } else if (category == 7) {
         type = "Decision-making for management";
       }
@@ -880,7 +880,7 @@ export default {
         category = 4;
       } else if (type == "Geographical simulation") {
         category = 5;
-      } else if (type == "Quantitative and qualitative analysis") {
+      } else if (type == "Data analysis") {
         category = 6;
       } else if (type == "Decision-making for management") {
         category = 7;

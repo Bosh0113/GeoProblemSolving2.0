@@ -87,6 +87,10 @@ export default {
               icon: "circle"
             },
             {
+              name: "Data analysis",
+              icon: "circle"
+            },
+            {
               name: "Data visualization",
               icon: "circle"
             },
@@ -100,10 +104,6 @@ export default {
             },
             {
               name: "Geographical simulation",
-              icon: "circle"
-            },
-            {
-              name: "Quantitative and qualitative analysis",
               icon: "circle"
             },
             {
@@ -135,6 +135,9 @@ export default {
                 name: "Data processing"
               },
               {
+                name: "Data analysis"
+              },
+              {
                 name: "Data visualization"
               },
               {
@@ -145,9 +148,6 @@ export default {
               },
               {
                 name: "Geographical simulation"
-              },
-              {
-                name: "Quantitative and qualitative analysis"
               },
               {
                 name: "Decision-making for management"
