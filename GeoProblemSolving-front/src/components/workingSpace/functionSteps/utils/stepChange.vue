@@ -87,11 +87,15 @@ export default {
               icon: "circle"
             },
             {
+              name: "Data analysis",
+              icon: "circle"
+            },
+            {
               name: "Data visualization",
               icon: "circle"
             },
             {
-              name: "Geographic model construction",
+              name: "Geo-analysis model construction",
               icon: "circle"
             },
             {
@@ -100,10 +104,6 @@ export default {
             },
             {
               name: "Geographical simulation",
-              icon: "circle"
-            },
-            {
-              name: "Quantitative and qualitative analysis",
               icon: "circle"
             },
             {
@@ -135,19 +135,19 @@ export default {
                 name: "Data processing"
               },
               {
+                name: "Data analysis"
+              },
+              {
                 name: "Data visualization"
               },
               {
-                name: "Geographic model construction"
+                name: "Geo-analysis model construction"
               },
               {
                 name: "Model effectiveness evaluation"
               },
               {
                 name: "Geographical simulation"
-              },
-              {
-                name: "Quantitative and qualitative analysis"
               },
               {
                 name: "Decision-making for management"
