@@ -278,7 +278,7 @@ export default {
         "Data processing",
         "Data analysis",
         "Data visualization",
-        "Geographic model construction",
+        "Geo-analysis model construction",
         "Model effectiveness evaluation",
         "Geographical simulation",
         "Decision-making for management"
@@ -630,7 +630,7 @@ export default {
               icon: "circle"
             },
             {
-              name: "Geographic model construction",
+              name: "Geo-analysis model construction",
               icon: "circle"
             },
             {
@@ -677,7 +677,7 @@ export default {
                 name: "Data visualization"
               },
               {
-                name: "Geographic model construction"
+                name: "Geo-analysis model construction"
               },
               {
                 name: "Model effectiveness evaluation"
@@ -854,7 +854,7 @@ export default {
       } else if (category == 2) {
         type = "Data visualization";
       } else if (category == 3) {
-        type = "Geographic model construction";
+        type = "Geo-analysis model construction";
       } else if (category == 4) {
         type = "Model effectiveness evaluation";
       } else if (category == 5) {
@@ -874,7 +874,7 @@ export default {
         category = 1;
       } else if (type == "Data visualization") {
         category = 2;
-      } else if (type == "Geographic model construction") {
+      } else if (type == "Geo-analysis model construction") {
         category = 3;
       } else if (type == "Model effectiveness evaluation") {
         category = 4;

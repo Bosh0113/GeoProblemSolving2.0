@@ -1080,7 +1080,7 @@ export default {
         "Data processing",
         "Data analysis",
         "Data visualization",
-        "Geographic model construction",
+        "Geo-analysis model construction",
         "Model effectiveness evaluation",
         "Geographical simulation",
         "Decision-making for management",
@@ -1122,7 +1122,7 @@ export default {
         "Data processing",
         "Data analysis",
         "Data visualization",
-        "Geographic model construction",
+        "Geo-analysis model construction",
         "Model effectiveness evaluation",
         "Geographical simulation",
         "Decision-making for management"
@@ -1613,7 +1613,7 @@ export default {
           case "Data processing":
           case "Data analysis":
           case "Data visualization":
-          case "Geographic model construction":
+          case "Geo-analysis model construction":
           case "Model effectiveness evaluation":
           case "Geographical simulation":
           case "Decision-making for management": {

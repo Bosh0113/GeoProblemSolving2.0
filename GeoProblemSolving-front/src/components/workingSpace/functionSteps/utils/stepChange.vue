@@ -95,7 +95,7 @@ export default {
               icon: "circle"
             },
             {
-              name: "Geographic model construction",
+              name: "Geo-analysis model construction",
               icon: "circle"
             },
             {
@@ -141,7 +141,7 @@ export default {
                 name: "Data visualization"
               },
               {
-                name: "Geographic model construction"
+                name: "Geo-analysis model construction"
               },
               {
                 name: "Model effectiveness evaluation"
