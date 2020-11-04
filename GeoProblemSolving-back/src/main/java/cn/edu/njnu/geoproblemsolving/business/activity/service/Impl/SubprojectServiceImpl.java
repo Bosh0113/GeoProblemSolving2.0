@@ -182,21 +182,27 @@ public class SubprojectServiceImpl implements SubprojectService {
             if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: subproject does not exist");
             Subproject subproject = (Subproject) optional.get();
 
-            JSONArray children = new JSONArray();
-            if (subproject.getChildren() != null) {
-                for (String childId : subproject.getChildren()) {
-                    optional = activityRepository.findById(childId);
-                    if (optional.isPresent()) {
-                        Activity childActivity = (Activity) optional.get();
-                        children.add(childActivity);
-                    }
-                }
-            }
+            ArrayList<Activity> children = getChildActivities(subproject);
 
             return ResultUtils.success(children);
         } catch (Exception ex) {
             return ResultUtils.error(-2, "Fail: Exception");
         }
+    }
+
+    private ArrayList getChildActivities(Activity activity) {
+        ArrayList<Activity> activities = new ArrayList<>();
+
+        if (activity.getChildren() != null) {
+            for (String childId : activity.getChildren()) {
+                Optional optional = activity.getLevel() > 0 ? activityRepository.findById(childId) : subprojectRepository.findById(childId);
+                if (optional.isPresent()) {
+                    Activity childActivity = (Activity) optional.get();
+                    activities.add(childActivity);
+                }
+            }
+        }
+        return activities;
     }
 
     @Override
@@ -238,32 +244,27 @@ public class SubprojectServiceImpl implements SubprojectService {
         try {
             Optional optional = subprojectRepository.findById(aid);
             if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: subproject does not exist.");
-            Activity subproject = (Activity) optional.get();
+            Activity activity = (Activity) optional.get();
 
             // children
-            JSONArray children = new JSONArray();
-            if (subproject.getChildren() != null) {
-                for (String childId : subproject.getChildren()) {
-                    optional = activityRepository.findById(childId);
-                    if (optional.isPresent()) {
-                        Activity childActivity = (Activity) optional.get();
-                        children.add(childActivity);
-                    }
-                }
-            }
+            ArrayList<Activity> children = getChildActivities(activity);
 
             // ancestors
             ArrayList<Activity> ancestors = new ArrayList<>();
-            ancestors.add(subproject);
+            ancestors.add(activity);
 
-            optional = projectRepository.findById(aid);
+            optional = projectRepository.findById(activity.getParent());
             if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: project does not exist.");
-            subproject = (Activity) optional.get();
-            ancestors.add(subproject);
+            activity = (Activity) optional.get();
+            ancestors.add(activity);
+
+            // brothers
+            ArrayList<Activity> brothers = getChildActivities(ancestors.get(1));
 
             // result
             JSONObject lineage = new JSONObject();
             lineage.put("ancestors", ancestors);
+            lineage.put("brothers", brothers);
             lineage.put("children", children);
 
             return ResultUtils.success(lineage);

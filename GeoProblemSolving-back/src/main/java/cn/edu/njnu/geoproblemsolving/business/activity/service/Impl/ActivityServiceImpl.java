@@ -282,20 +282,31 @@ public class ActivityServiceImpl implements ActivityService {
             if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: activity does not exist.");
             Activity activity = (Activity) optional.get();
 
-            JSONArray activities = new JSONArray();
+            ArrayList<Activity> activities = getChildActivities(activity);
+
+            return ResultUtils.success(activities);
+        } catch (Exception ex) {
+            return ResultUtils.error(-2, "Fail: Exception");
+        }
+    }
+
+    private ArrayList getChildActivities(Activity activity) {
+        if(activity.getLevel() >= 0) {
+            ArrayList<Activity> activities = new ArrayList<>();
+
             if (activity.getChildren() != null) {
                 for (String childId : activity.getChildren()) {
-                    optional = activityRepository.findById(childId);
+                    Optional optional = activity.getLevel() > 0 ? activityRepository.findById(childId) : subprojectRepository.findById(childId);
+
                     if (optional.isPresent()) {
                         Activity childActivity = (Activity) optional.get();
                         activities.add(childActivity);
                     }
                 }
             }
-
-            return ResultUtils.success(activities);
-        } catch (Exception ex) {
-            return ResultUtils.error(-2, "Fail: Exception");
+            return activities;
+        } else {
+            return new ArrayList<>();
         }
     }
 
@@ -334,35 +345,27 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
-    public JsonResult findLineage(String aid){
-        try{
+    public JsonResult findLineage(String aid) {
+        try {
 
             Optional optional = activityRepository.findById(aid);
             if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: activity does not exist.");
             Activity activity = (Activity) optional.get();
 
             // children
-            JSONArray children = new JSONArray();
-            if (activity.getChildren() != null) {
-                for (String childId : activity.getChildren()) {
-                    optional = activityRepository.findById(childId);
-                    if (optional.isPresent()) {
-                        Activity childActivity = (Activity) optional.get();
-                        children.add(childActivity);
-                    }
-                }
-            }
+            ArrayList<Activity> children = getChildActivities(activity);
 
             // ancestors
-            JSONArray ancestors = new JSONArray();
+            ArrayList<Activity> ancestors = new ArrayList<>();
             ancestors.add(activity);
 
             int level = activity.getLevel();
-            for(int i = level-1; i > 0; i++){
-                if(i == 0){
+            for (int i = level - 1; i >= 0; i--) {
+                aid = activity.getParent();
+                if (i == 0) {
                     optional = projectRepository.findById(aid);
                     if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: project does not exist.");
-                } else if(i == 1) {
+                } else if (i == 1) {
                     optional = subprojectRepository.findById(aid);
                     if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: subproject does not exist.");
                 } else {
@@ -373,8 +376,12 @@ public class ActivityServiceImpl implements ActivityService {
                 ancestors.add(activity);
             }
 
+            // brothers
+            ArrayList<Activity> brothers = getChildActivities(ancestors.get(1));
+
             JSONObject lineage = new JSONObject();
             lineage.put("ancestors", ancestors);
+            lineage.put("brothers", brothers);
             lineage.put("children", children);
 
             return ResultUtils.success(lineage);

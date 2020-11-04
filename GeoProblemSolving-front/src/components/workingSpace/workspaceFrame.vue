@@ -6,7 +6,11 @@
       v-show="treeFold"
       class="foldTreeBtn"
     >
-      <Icon type="md-arrow-dropright-circle" size="20" title="Unfold the activity tree" />
+      <Icon
+        type="md-arrow-dropright-circle"
+        size="20"
+        title="Unfold the activity tree"
+      />
     </Button>
     <Card dis-hover class="activityCard" id="ActivityTree">
       <h3 slot="title">Activity list</h3>
@@ -264,9 +268,8 @@ export default {
       },
       treeFold: false,
       cascader: [],
-      cascaderIndex: [],
       activityTree: [],
-      projectInfo: {},
+      projectInfo: parent.vm.projectInfo,
       userInfo: JSON.parse(sessionStorage.getItem("userInfo")),
       slctActivity: {},
       expandNode: {}, // 使用引用传递，记录expand的位置，对activity tree 进行修改
@@ -361,23 +364,28 @@ export default {
     next();
   },
   mounted() {
-    this.changeActivityByUrl();
+    this.locateActivity();
   },
   methods: {
     renderStyle(h, { root, node, data }) {
       let props = {};
       let style = {};
       let on = {};
-      let name = "";
+      let name = data.name + " (Level:" +data.level+")";
 
-      name = data.name;
       if (this.slctActivity.aid !== data.aid) {
         style = {
           width: "100%",
         };
         on = {
           click: () => {
-            this.switchActivity(root, node, data);
+            parent.location.href =
+              "/GeoProblemSolving/projectInfo/" +
+              this.projectInfo.aid +
+              "?content=workspace&aid=" +
+              data.aid +
+              "&level=" +
+              data.level;
           },
         };
       } else {
@@ -432,29 +440,28 @@ export default {
       document.getElementById("ActivityContent").style.width =
         window.innerWidth - 260 + "px";
     },
-    changeActivityByUrl() {
+    locateActivity() {
       let aid = this.getURLParameter("aid");
       let level = this.getURLParameter("level");
 
-      if (level > 1) {
-        this.getActivityBranch(aid);
-      } else if (level == 1) {
-        this.getSubprojectBranch(aid);
-      } else if (levle == 0) {
+      if (aid == undefined || level == undefined) {
         this.getProjectInfo();
+      } else {
+        if (level > 1) {
+          this.getActivityBranch(aid);
+        } else if (level == 1) {
+          this.getSubprojectBranch(aid);
+        } else {
+          this.getProjectInfo();
+          parent.history.replaceState(
+            null,
+            null,
+            "/GeoProblemSolving/projectInfo/" +
+              this.projectInfo.aid +
+              "?content=workspace"
+          );
+        }
       }
-      // if (aid != undefined && index != undefined) {
-      //   parent.history.replaceState(
-      //     null,
-      //     null,
-      //     "/GeoProblemSolving/projectInfo/" +
-      //       this.projectInfo.aid +
-      //       "?content=workspace"
-      //   );
-      // } else {
-      //   this.projectInfo = this.activityTree[0];
-      //   this.searchActivity(aid, index);
-      // }
     },
     getURLParameter(name) {
       var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
@@ -465,7 +472,6 @@ export default {
       return null;
     },
     getProjectInfo() {
-      this.projectInfo = parent.vm.projectInfo;
       this.cascader = [this.projectInfo.name];
       this.activityTree = [];
       if (this.projectInfo.type == "Activity_Group") {
@@ -509,29 +515,18 @@ export default {
       this.cascader = [];
       this.activityTree = [];
       // url
-      let url = "/GeoProblemSolving/subproject/" + aid + "/ancestor";
+      let url = "/GeoProblemSolving/subproject/" + aid + "/lineage";
 
       this.axios
         .get(url)
         .then((res) => {
           if (res.data.code == 0) {
-            let root = res.data.data.ancestors[1];
-            root["expand"] = true;
-            let subproject = res.data.data.ancestors[0];
-            subproject.children = res.data.data.children;
-
-
-            for (let i = 0; i < root.children.length; i++) {
-              if ((root.children[i] = subproject.aid)) {
-                root.children[i] = subproject;
-              }
-
-              // update activity tree
-              this.activityTree = [root];
-
-              this.slctActivity = subproject;
-              this.setContent(this.slctActivity, "init");
-            }
+            let branch = res.data.data;
+            this.buildActivityTree(
+              branch.ancestors,
+              branch.brothers,
+              branch.children
+            );
           } else {
             console.log(res.data.msg);
           }
@@ -545,30 +540,18 @@ export default {
       this.cascader = [];
       this.activityTree = [];
       // url
-      let url = "/GeoProblemSolving/activity/" + aid + "/ancestor";
+      let url = "/GeoProblemSolving/activity/" + aid + "/lineage";
 
       this.axios
         .get(url)
         .then((res) => {
           if (res.data.code == 0) {
             let branch = res.data.data;
-            let current = branch[0];
-            for (let i = 1; i < branch.length; i++) {
-
-              let activity = branch[i];
-              for (let j = 0; j < activity.children.length; j++) {
-
-                if ((activity.children[i] = current.aid)) {
-                  root.children[i] = subproject;
-                }
-              }
-
-              // update activity tree
-              this.activityTree = [root];
-
-              this.slctActivity = subproject;
-              this.setContent(this.slctActivity, "init");
-            }
+            this.buildActivityTree(
+              branch.ancestors,
+              branch.brothers,
+              branch.children
+            );
           } else {
             console.log(res.data.msg);
           }
@@ -577,26 +560,64 @@ export default {
           console.log(err.data);
         });
     },
-    // searchActivity(aid, index) {
-    //   if (aid != undefined && index != undefined) {
-    //     // search the opened activity
-    //     let node = this.activityTree[0];
-    //     this.cascader = [node.name];
-    //     for (var i = 1; i < index.length; i++) {
-    //       if (
-    //         Object.prototype.toString.call(node.children) == "[object Array]"
-    //       ) {
-    //         node = node.children[Number(index[i])];
-    //         this.cascader.push(node.name);
-    //       }
-    //     }
-    //     if (node.aid == aid && this.cascader.length == this.cascader.length) {
-    //       this.setContent(node, "init");
-    //       return;
-    //     }
-    //   }
-    //   this.getProjectInfo();
-    // },
+    buildActivityTree(ancestors, brothers, children) {
+      // child activities normalization
+      if (children.length > 0) {
+        for (var i = 0; i < children.length; i++) {
+          children[i].children = [];
+        }
+        ancestors[0].children = children;
+        ancestors[0]["expand"] = true;
+      }
+
+      // brother activities normalization
+      for (var i = 0; i < brothers.length; i++) {
+        if (brothers[i].aid !== ancestors[0].aid) {
+          brothers[i].children = [];
+        }
+      }
+      ancestors[1].children = brothers;
+
+      // ancestor activities normalization
+      for (let i = 1; i < ancestors.length; i++) {
+        let parentActivity = ancestors[i];
+        let current = ancestors[i - 1];
+
+        let childrenNum = parentActivity.children.length;
+        parentActivity["expand"] = true;
+
+        for (let j = 0; j < childrenNum; j++) {
+          if (
+            Object.prototype.toString.call(parentActivity.children[j]) ==
+            "[object String]"
+          ) {
+            if (parentActivity.children[j] == current.aid) {
+              parentActivity.children = [current];
+              break;
+            }
+          } else if (
+            Object.prototype.toString.call(parentActivity.children[j]) ==
+            "[object Object]"
+          ) {
+            if (parentActivity.children[j].aid == current.aid) {
+              parentActivity.children[j] = current;
+              break;
+            }
+          }
+        }
+      }
+
+      // update activity tree
+      let root = ancestors[ancestors.length - 1];
+      this.activityTree = [root];
+      this.slctActivity = ancestors[0];
+      this.setContent(this.slctActivity, "init");
+
+      // Cascader names
+      for (let i = ancestors.length - 1; i >= 0; i--) {
+        this.cascader.push(ancestors[i].name);
+      }
+    },
     typeChanged(type) {
       this.slctActivity.type = type;
       this.setContent(this.slctActivity, "type");
@@ -636,48 +657,31 @@ export default {
           });
       }
     },
-    switchActivity(root, node, activity) {
-      // if (
-      //   this.roleIdentity(activity) != "visitor" ||
-      //   activity.permission.observe == "Yes"
-      // ) {
-      //content
-      if (activity.level > 0) {
-        this.parentNode = root[node.parent].node;
-      } else {
-        this.parentNode = {};
-      }
-      this.slctActivity = activity;
-      this.getCascader(root, node);
-      // expand
-      if (
-        activity.type == "Activity_Group" &&
-        (activity.children == undefined || activity.children.length == 0)
-      ) {
-        this.expandActivityTree(activity);
-        this.expandNode = activity;
-      }
-      // } else {
-      //   this.contentType = 3;
-      // }
-    },
-    getCascader(root, node) {
-      this.cascader = [];
-      this.cascaderIndex = [];
-      this.getCascaderIndex(root, node);
-
-      for (var i = this.cascaderIndex.length - 1; i >= 0; i--) {
-        this.cascader.push(root[this.cascaderIndex[i]].node.name);
-      }
-    },
-    getCascaderIndex(root, node) {
-      this.cascaderIndex.push(node.nodeKey);
-      if (node.nodeKey == 0) {
-        return;
-      } else {
-        this.getCascaderIndex(root, root[node.parent]);
-      }
-    },
+    // switchActivity(root, node, activity) {
+    //   // if (
+    //   //   this.roleIdentity(activity) != "visitor" ||
+    //   //   activity.permission.observe == "Yes"
+    //   // ) {
+    //   //content
+    //   if (activity.level > 0) {
+    //     this.parentNode = root[node.parent].node;
+    //   } else {
+    //     this.parentNode = {};
+    //   }
+    //   this.slctActivity = activity;
+    //   this.getCascader(root, node);
+    //   // expand
+    //   if (
+    //     activity.type == "Activity_Group" &&
+    //     (activity.children == undefined || activity.children.length == 0)
+    //   ) {
+    //     this.expandActivityTree(activity);
+    //     this.expandNode = activity;
+    //   }
+    //   // } else {
+    //   //   this.contentType = 3;
+    //   // }
+    // },
     setContent(activity, operation) {
       if (activity.type == "Activity_Default") {
         this.contentType = 0;
