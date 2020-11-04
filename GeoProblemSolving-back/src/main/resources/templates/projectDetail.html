@@ -255,21 +255,21 @@
     <template>
         <div :style="{height: contentPageCSS}" style="margin-top: 60px;">
             <div span="2" style="height: inherit;width: 90px;position: absolute;">
-                <i-menu :active-name="activeMenu"
+                <i-menu :active-name="activeMenu" @on-select="changeMenuItem"
                         style="height: inherit;width: fit-content;z-index:98">
-                    <menu-item name="overview" class="projectMenuItem" :to="'/GeoProblemSolving/projectInfo/' + projectInfo.aid +'?content=overview'">
+                    <menu-item name="overview" class="projectMenuItem">
                         <Icon type="md-home" title="Overview" size="35"></Icon>
                     </menu-item>
-                    <menu-item name="info" class="projectMenuItem" :to="'/GeoProblemSolving/projectInfo/' + projectInfo.aid +'?content=info'">
+                    <menu-item name="info" class="projectMenuItem">
                         <Icon type="ios-information-circle" title="Information" size="35"></Icon>
                     </menu-item>
-                    <menu-item name="task" class="projectMenuItem":to="'/GeoProblemSolving/projectInfo/' + projectInfo.aid +'?content=task'">
+                    <menu-item name="task" class="projectMenuItem">
                         <Icon type="md-calendar" title="Tasks" size="35"></Icon>
                     </menu-item>
-                    <menu-item name="workspace" class="projectMenuItem" :to="'/GeoProblemSolving/projectInfo/' + projectInfo.aid +'?content=workspace'">
+                    <menu-item name="workspace" class="projectMenuItem">
                         <Icon type="md-git-branch" title="Workspace" size="35"></Icon>
                     </menu-item>
-                    <menu-item name="resource" class="projectMenuItem" :to="'/GeoProblemSolving/projectInfo/' + projectInfo.aid +'?content=resource'">
+                    <menu-item name="resource" class="projectMenuItem">
                         <Icon type="ios-folder" title="Resources" size="35"></Icon>
                     </menu-item>
                 </i-menu>
@@ -320,7 +320,7 @@
                                             </div>
                                             <div style="text-align:center">
                                                 <h3>
-                                                    <a :href="'/GeoProblemSolving/projectInfo/' + projectInfo.aid +'?content=info'">Click to check it</a>
+                                                    <a @click="changeMenuItem('info')">Click to check it</a>
                                                 </h3>
                                             </div>
                                         </Card>
@@ -345,7 +345,7 @@
                                             </div>
                                             <div style="text-align:center">
                                                 <h3>
-                                                    <a :href="'/GeoProblemSolving/projectInfo/' + projectInfo.aid +'?content=task'">Click to check it</a>
+                                                    <a @click="changeMenuItem('task')">Click to check it</a>
                                                 </h3>
                                             </div>
                                         </Card>
@@ -369,7 +369,7 @@
                                             </div>
                                             <div style="text-align:center">
                                                 <h3>
-                                                    <a :href="'/GeoProblemSolving/projectInfo/' + projectInfo.aid +'?content=workspace'">Click to check it</a>
+                                                    <a @click="changeMenuItem('workspace')">Click to check it</a>
                                                 </h3>
                                             </div>
                                         </Card>
@@ -394,7 +394,7 @@
                                             </div>
                                             <div style="text-align:center">
                                                 <h3>
-                                                    <a :href="'/GeoProblemSolving/projectInfo/' + projectInfo.aid +'?content=resource'">Click to check it</a>
+                                                    <a @click="changeMenuItem('resource')">Click to check it</a>
                                                 </h3>
                                             </div>
                                         </Card>
@@ -960,15 +960,6 @@
                     <i-button type="primary" @click="resetProjectType()">Submit</i-button>
                 </div>
             </Modal>
-            <Modal
-                    v-model="joinProjectNotice"
-                    title="Permission restrictions"
-            >
-                <h2 style="color: #2db7f5">Please join this project before getting more information.</h2>
-                <div slot="footer">
-                    <i-button type="primary" @click="joinProjectNotice=false">OK</i-button>
-                </div>
-            </Modal>
         </div>
 </div>
 </template>
@@ -1040,7 +1031,6 @@
             mounted() {
                 this.userEnter();
                 this.resizeContent();
-                this.getAllSubProjects();
                 this.roleIdentity();
                 this.changeMenuByUrl();
             },
@@ -1057,6 +1047,7 @@
                     },
                     projectInfo: projectInfo,
                     activeMenu: "overview",
+                    workspaceUrl: '/GeoProblemSolving/projectInfo/' + this.projectInfo.aid + "?content=workspace",
                     contentPageCSS: '',
                     membersContentCSS: '',
                     workspaceCSS: '',
@@ -1230,7 +1221,6 @@
                     haveApplied: false,
                     resetProjectTypeNotice: false,
                     resetProjectTypeModel: false,
-                    joinProjectNotice: false,
                     workPanels: [],
                 }
             },
@@ -1272,9 +1262,9 @@
                     if (this.userRole != "Token") {
                         if (!this.userInfo.userState) {
                             window.location.href = "/GeoProblemSolving/login";
-                        } else{
+                        } else {
                             if (this.projectInfo.privacy != "Public" && this.userRole == "visitor") {
-                                    window.location.href = "/GeoProblemSolving/projectList";
+                                window.location.href = "/GeoProblemSolving/projectList";
                             }
                         }
 
@@ -1320,25 +1310,17 @@
                 sendNotice(recipientId) {
                     this.$refs.navigationEl.sendMessage(recipientId);
                 },
-                getAllSubProjects() {
-                    // if (this.projectInfo.type == "type0") {
-                    //     axios
-                    //         .get(
-                    //             "/GeoProblemSolving/subProject/inquiry" + "?key=projectId" + "&value=" + this.projectInfo.aid
-                    //         )
-                    //         .then(res => {
-                    //             if (res.data == "Offline") {
-                    //                 this.$refs.navigationEl.logout("login");
-                    //             } else if (res.data == "None" || res.data == "Fail") {
-                    //                 console.log(res.data);
-                    //             } else {
-                    //                 this.subProjectList = res.data;
-                    //             }
-                    //         })
-                    //         .catch(err => {
-                    //             console.log(err.data)
-                    //         });
-                    // }
+                changeMenuItem(name) {
+                    this.activeMenu = name;
+                    var tokenParam = '';
+                    if (this.tokenStr != null) {
+                        tokenParam = "&token=" + this.tokenStr;
+                    }
+                    if (name == "workspace") {
+                        window.history.replaceState(null, null, this.workspaceUrl);
+                    } else {
+                        window.history.replaceState(null, null, '/GeoProblemSolving/projectInfo/' + this.projectInfo.aid + "?content=" + name + tokenParam);
+                    }
                 },
                 memberListStr(members) {
                     let membersStr = '';

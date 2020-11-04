@@ -371,7 +371,7 @@ export default {
       let props = {};
       let style = {};
       let on = {};
-      let name = data.name + " (Level:" +data.level+")";
+      let name = data.name + " (Level:" + data.level + ")";
 
       if (this.slctActivity.aid !== data.aid) {
         style = {
@@ -444,6 +444,14 @@ export default {
       let aid = this.getURLParameter("aid");
       let level = this.getURLParameter("level");
 
+      parent.vm.workspaceUrl =
+        "/GeoProblemSolving/projectInfo/" +
+        this.projectInfo.aid +
+        "?content=workspace&aid=" +
+        aid +
+        "&level=" +
+        level;
+
       if (aid == undefined || level == undefined) {
         this.getProjectInfo();
       } else {
@@ -453,19 +461,19 @@ export default {
           this.getSubprojectBranch(aid);
         } else {
           this.getProjectInfo();
-          parent.history.replaceState(
-            null,
-            null,
+          let url =
             "/GeoProblemSolving/projectInfo/" +
-              this.projectInfo.aid +
-              "?content=workspace"
-          );
+            this.projectInfo.aid +
+            "?content=workspace";
+          parent.history.replaceState(null, null, url);
+          parent.vm.workspaceUrl = url;
         }
       }
     },
     getURLParameter(name) {
       var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
       var r = parent.location.search.substr(1).match(reg);
+
       if (r != null) {
         return unescape(r[2]);
       }
