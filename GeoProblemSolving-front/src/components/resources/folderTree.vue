@@ -103,55 +103,68 @@
       <div slot="title" class="resourceTitle">
         <strong>Resources</strong>
       </div>
-      <div slot="extra" class="resourceBtnDiv" v-show="userRole != 'Visitor'">
-        <Tooltip content="Back" placement="bottom" class="fileBtn">
-          <Button @click="backforeFolder" class="fileBtnHoverGray">
-            <Icon type="md-arrow-round-back" size="20" />
-          </Button>
-        </Tooltip>
-        <Tooltip content="New folder" placement="bottom" class="fileBtn">
-          <Button @click="addFolderModalShow" class="fileBtnHoverGreen">
-            <Icon type="ios-folder" size="20" />
-          </Button>
-        </Tooltip>
-      </div>
+      <div
+        slot="extra"
+        class="resourceBtnDiv"
+        v-show="userRole != 'Visitor'"
+      ></div>
 
       <!-- 内容 -->
       <div class="folderContent">
-        <Card v-if="folderNameStack.length>0" :padding="5" dis-hover>
-          <div style="display:flex;align-items:center">
-            <div style="min-width:60px" v-show="currentFolder.files.length>0">
+        <Card v-if="folderStack.length > 0" :padding="5" dis-hover>
+          <div style="display: flex; align-items: center">
+            <div
+              style="min-width: 60px"
+              v-show="currentFolder.files.length > 0"
+            >
               <Checkbox
                 :indeterminate="indeterminate"
                 :value="checkAll"
                 @click.prevent.native="handleCheckAll"
-                v-show="currentFolder.files.length>0"
-                style="align-items:center"
-              >All files</Checkbox>
+                v-show="currentFolder.files.length > 0"
+                style="align-items: center"
+                >All files</Checkbox
+              >
             </div>
-            <div style="flex:1;margin-left:3px;">
-              <Breadcrumb>
-                <BreadcrumbItem>
-                  <Icon type="md-folder" />
-                </BreadcrumbItem>
+            <div style="margin-left: 3px">
+              <Breadcrumb >
                 <BreadcrumbItem
-                  v-for="(folderName,index) in folderNameStack"
-                  :key="index"
-                  v-if="index!=0"
-                >{{folderName}}</BreadcrumbItem>
+                  v-for="(folder, index) in folderStack"
+                  :key="folder.folderId"
+                  @click.native="switchFolder(folder, index)"
+                  style="cursor: pointer"
+                >
+                  <span v-if="folder.folderId == activityInfo.aid"
+                    ><Icon type="md-folder" style="color: #08ab2b"
+                  /></span>
+                  <span v-else style="color: #08ab2b">{{ folder.folderName }}</span>
+                </BreadcrumbItem>
               </Breadcrumb>
             </div>
-            <div style="align-items:flex-end" v-if="userRole != 'Visitor'">
+             <Divider type="vertical" style="margin-left: 20px" />
+            <div style="flex: 1; margin-left: 10px">
+              <Tooltip content="Back" placement="bottom" class="fileBtn">
+                  <Icon type="md-arrow-round-back" @click="backforeFolder" style="cursor:pointer; color: #2d8cf0"/>
+              </Tooltip>
+              <Tooltip content="New folder" placement="bottom" class="fileBtn">
+                  <Icon type="ios-folder"  @click="addFolderModalShow" style="cursor:pointer; color: #f9c245"/>
+              </Tooltip>
+            </div>
+            <div style="align-items: flex-end" v-if="userRole != 'Visitor'">
               <Tooltip content="Download" placement="bottom" class="fileBtn">
                 <Button
                   @click="downloadSelectFile"
-                  v-show="currentFolder.files.length>0"
+                  v-show="currentFolder.files.length > 0"
                   shape="circle"
                   icon="md-cloud-download"
                   class="fileBtnHoverGray"
                 ></Button>
               </Tooltip>
-              <Tooltip content="Upload files" placement="bottom" class="fileBtn">
+              <Tooltip
+                content="Upload files"
+                placement="bottom"
+                class="fileBtn"
+              >
                 <Button
                   @click="uploadModalShow"
                   shape="circle"
@@ -159,7 +172,11 @@
                   class="fileBtnHoverGreen"
                 ></Button>
               </Tooltip>
-              <Tooltip content="Share personal files" placement="left" class="fileBtn">
+              <Tooltip
+                content="Share personal files"
+                placement="left"
+                class="fileBtn"
+              >
                 <Button
                   @click="shareModalShow"
                   shape="circle"
@@ -170,17 +187,26 @@
             </div>
           </div>
         </Card>
-        <div v-if="currentFolder.folders.length>0 || currentFolder.files.length>0">
-          <vue-scroll :ops="ops" :style="{height:contentHeight+'px'}">
-            <Card v-for="(folder) in currentFolder.folders" :key="folder.index" :padding="5">
+        <div
+          v-if="
+            currentFolder.folders.length > 0 || currentFolder.files.length > 0
+          "
+        >
+          <vue-scroll :ops="ops" :style="{ height: contentHeight + 'px' }">
+            <Card
+              v-for="folder in currentFolder.folders"
+              :key="folder.index"
+              :padding="5"
+            >
               <div>
                 <Icon type="ios-folder-open" class="itemIcon" size="25" />
                 <a
                   @click="enterFolder(folder.uid)"
                   class="fileItemName"
                   :title="folder.name"
-                >{{folder.name}}</a>
-                <div style="float:right" v-if="userRole != 'Visitor'">
+                  >{{ folder.name }}</a
+                >
+                <div style="float: right" v-if="userRole != 'Visitor'">
                   <Button
                     @click="renameFolderModalShow(folder)"
                     class="fileBtnHoverBlue"
@@ -197,24 +223,34 @@
                     icon="ios-trash"
                     title="Delete"
                     size="small"
-                    style="margin-left:5px"
+                    style="margin-left: 5px"
                     type="text"
                   ></Button>
                 </div>
               </div>
             </Card>
-            <CheckboxGroup v-model="chooseFilesArray" @on-change="checkAllGroupChange">
-              <Card v-for="(file) in currentFolder.files" :key="file.index" :padding="5">
+            <CheckboxGroup
+              v-model="chooseFilesArray"
+              @on-change="checkAllGroupChange"
+            >
+              <Card
+                v-for="file in currentFolder.files"
+                :key="file.index"
+                :padding="5"
+              >
                 <Checkbox :label="file.pathURL">&nbsp;</Checkbox>
                 <Icon type="ios-document-outline" class="itemIcon" size="25" />
                 <span
                   @click="getFileInfo(file)"
                   class="fileItemName"
                   :title="file.name"
-                >{{file.name}}</span>
-                <span class="fileItemSize">{{file.fileSize}}</span>
-                <span style="width:20%;margin-right:5%">{{file.uploadTime.substring(0,10)}}</span>
-                <div style="float:right" v-if="userRole != 'Visitor'">
+                  >{{ file.name }}</span
+                >
+                <span class="fileItemSize">{{ file.fileSize }}</span>
+                <span style="width: 20%; margin-right: 5%">{{
+                  file.uploadTime.substring(0, 10)
+                }}</span>
+                <div style="float: right" v-if="userRole != 'Visitor'">
                   <Button
                     @click="filePreview(file)"
                     shape="circle"
@@ -242,7 +278,14 @@
                     class="fileBtnHoverOrange"
                     type="text"
                   ></Button>
-                  <template v-if="permissionIdentity(activityInfo.permission, 'manage_resource')">
+                  <template
+                    v-if="
+                      permissionIdentity(
+                        activityInfo.permission,
+                        'manage_resource'
+                      )
+                    "
+                  >
                     <Button
                       @click="fileEditModelShow(file)"
                       shape="circle"
@@ -267,12 +310,19 @@
             </CheckboxGroup>
           </vue-scroll>
         </div>
-        <div v-else style="text-align:center">
-          <div style="color:lightgray;font-size:2em; font-weight:bold">No file or folder</div>
+        <div v-else style="text-align: center">
+          <div style="color: lightgray; font-size: 2em; font-weight: bold">
+            No file or folder
+          </div>
         </div>
       </div>
     </Card>
-    <Modal v-model="renameFolderModal" title="Rename folder" ok-text="Assure" cancel-text="Cancel">
+    <Modal
+      v-model="renameFolderModal"
+      title="Rename folder"
+      ok-text="Assure"
+      cancel-text="Cancel"
+    >
       <Form
         ref="renameValidate"
         :model="renameValidate"
@@ -288,8 +338,10 @@
         </FormItem>
       </Form>
       <div slot="footer">
-        <Button @click="renameFolderModal=false">Cancel</Button>
-        <Button type="success" @click="renameFolder('renameValidate')">Rename</Button>
+        <Button @click="renameFolderModal = false">Cancel</Button>
+        <Button type="success" @click="renameFolder('renameValidate')"
+          >Rename</Button
+        >
       </div>
     </Modal>
     <Modal v-model="newFolderModal" title="New folder">
@@ -309,7 +361,7 @@
         </FormItem>
       </Form>
       <div slot="footer">
-        <Button @click="newFolderModal=false">Cancel</Button>
+        <Button @click="newFolderModal = false">Cancel</Button>
         <Button type="success" @click="addFolder('newValidate')">New</Button>
       </div>
     </Modal>
@@ -322,7 +374,7 @@
         label-position="left"
       >
         <FormItem label="Privacy" prop="privacy">
-          <RadioGroup v-model="uploadValidate.privacy" style="width:80%">
+          <RadioGroup v-model="uploadValidate.privacy" style="width: 80%">
             <Radio label="private">Private</Radio>
             <Radio label="public">Public</Radio>
           </RadioGroup>
@@ -339,39 +391,49 @@
           </RadioGroup>
         </FormItem>
         <FormItem label="Description" prop="description">
-          <Input type="textarea" :rows="4" v-model="uploadValidate.description" />
+          <Input
+            type="textarea"
+            :rows="4"
+            v-model="uploadValidate.description"
+          />
         </FormItem>
       </Form>
-      <Upload :max-size="1024*1024" multiple type="drag" :before-upload="gatherFile" action="-">
+      <Upload
+        :max-size="1024 * 1024"
+        multiple
+        type="drag"
+        :before-upload="gatherFile"
+        action="-"
+      >
         <div style="padding: 20px 0">
           <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
           <p>
             Click or drag files here to upload (The file size must control in
-            <span
-              style="color:red"
-            >1GB</span>)
+            <span style="color: red">1GB</span>)
           </p>
         </div>
       </Upload>
-      <div style="padding:0 10px 0 10px;max-height:200px;overflow-y:auto">
-        <ul v-for="(list,index) in toUploadFiles" :key="index">
-          <li style="display:flex">
+      <div style="padding: 0 10px 0 10px; max-height: 200px; overflow-y: auto">
+        <ul v-for="(list, index) in toUploadFiles" :key="index">
+          <li style="display: flex">
             File name:
-            <span
-              style="font-size:10px;margin: 0 5px 0 5px"
-            >{{ list.name }} ( {{list.fileSize}} )</span>
+            <span style="font-size: 10px; margin: 0 5px 0 5px"
+              >{{ list.name }} ( {{ list.fileSize }} )</span
+            >
             <Icon
               type="ios-close"
               size="20"
               @click="delFileList(index)"
-              style="display:flex;justify-content:flex-end;cursor:pointer"
+              style="display: flex; justify-content: flex-end; cursor: pointer"
             ></Icon>
           </li>
         </ul>
       </div>
       <div slot="footer">
-        <Button @click="uploadModal=false">Cancel</Button>
-        <Button type="success" @click="folderUpload('uploadValidate')">Upload</Button>
+        <Button @click="uploadModal = false">Cancel</Button>
+        <Button type="success" @click="folderUpload('uploadValidate')"
+          >Upload</Button
+        >
       </div>
     </Modal>
     <Modal
@@ -392,7 +454,7 @@
         :show-header="false"
       ></Table>
       <div slot="footer">
-        <Button type="primary" @click="fileInfoModal=false">OK</Button>
+        <Button type="primary" @click="fileInfoModal = false">OK</Button>
       </div>
     </Modal>
     <Modal
@@ -402,7 +464,7 @@
       :mask-closable="false"
     >
       <div>
-        <vue-scroll :ops="ops" style="height:300px;">
+        <vue-scroll :ops="ops" style="height: 300px">
           <CheckboxGroup v-model="selectedFilesToShare">
             <Card dis-hover v-for="file in userResourceList" :key="file.index">
               <Checkbox
@@ -411,7 +473,7 @@
                 :title="file.name"
                 v-if="canBeShare(file.resourceId)"
               >
-                <strong>{{file.name}}</strong>
+                <strong>{{ file.name }}</strong>
               </Checkbox>
               <Checkbox
                 :label="file.resourceId"
@@ -420,21 +482,30 @@
                 disabled
                 v-else
               >
-                <strong>{{file.name}}</strong>
+                <strong>{{ file.name }}</strong>
               </Checkbox>
               <span
                 class="personalFileDes"
-                style="width:150px;"
+                style="width: 150px"
                 :title="file.description"
-              >{{file.description}}</span>
-              <span style="display: inline-block;vertical-align: top;">{{file.fileSize}}</span>
+                >{{ file.description }}</span
+              >
+              <span style="display: inline-block; vertical-align: top">{{
+                file.fileSize
+              }}</span>
             </Card>
           </CheckboxGroup>
         </vue-scroll>
       </div>
       <div slot="footer" style="display: inline-block">
-        <i-button type="primary" @click="shareFile()" style="float:right;">Submit</i-button>
-        <i-button @click="closeshareModel()" style="float:right;margin-right: 15px;">Cancel</i-button>
+        <i-button type="primary" @click="shareFile()" style="float: right"
+          >Submit</i-button
+        >
+        <i-button
+          @click="closeshareModel()"
+          style="float: right; margin-right: 15px"
+          >Cancel</i-button
+        >
       </div>
     </Modal>
     <Modal v-model="editFileModel" title="Edit file info">
@@ -463,21 +534,31 @@
           />
         </FormItem>
         <FormItem label="Description" prop="description">
-          <Input type="textarea" :rows="4" v-model="editFileValidate.description" />
+          <Input
+            type="textarea"
+            :rows="4"
+            v-model="editFileValidate.description"
+          />
         </FormItem>
       </Form>
       <div slot="footer">
-        <Button @click="editFileModel=false">Cancel</Button>
-        <Button type="success" @click="editFileInfo('editFileValidate')">Submit</Button>
+        <Button @click="editFileModel = false">Cancel</Button>
+        <Button type="success" @click="editFileInfo('editFileValidate')"
+          >Submit</Button
+        >
       </div>
     </Modal>
-    <Modal v-model="copyFileModal" title="Copy file to personal center" width="500">
+    <Modal
+      v-model="copyFileModal"
+      title="Copy file to personal center"
+      width="500"
+    >
       <RadioGroup v-model="copyFilePrivacy">
         <Radio label="public">Public</Radio>
         <Radio label="private">Private</Radio>
       </RadioGroup>
       <div slot="footer">
-        <Button @click="copyFileModal=false">Cancel</Button>
+        <Button @click="copyFileModal = false">Cancel</Button>
         <Button type="success" @click="copyFileToCenter">Copy</Button>
       </div>
     </Modal>
@@ -495,7 +576,7 @@ export default {
         folders: [],
         files: [],
       },
-      folderNameStack: [],
+      folderStack: [],
       newFolderModal: false,
       setFolderName: "",
       newValidate: {
@@ -662,6 +743,13 @@ export default {
         this.$Message.warning("This is the root folder.");
       }
     },
+    switchFolder(folder, index) {
+      let popTimes = this.folderStack.length - index - 1;
+      for (let i = 0; i < popTimes; i++) {
+        this.folderStack.pop();
+      }
+      this.changeFolder(folder.folderId, "switch");
+    },
     changeFolder(folderId, type) {
       this.axios
         .get("/GeoProblemSolving/folder/inquiry" + "?folderId=" + folderId)
@@ -673,9 +761,9 @@ export default {
             var folderInfo = res.data;
             this.currentFolder = res.data;
             if (type == "enter") {
-              this.folderNameStack.push(folderInfo.folderName);
+              this.folderStack.push(folderInfo);
             } else if (type == "back") {
-              this.folderNameStack.pop();
+              this.folderStack.pop();
             }
           } else {
             this.$Message.warning("Get folder info fail.");

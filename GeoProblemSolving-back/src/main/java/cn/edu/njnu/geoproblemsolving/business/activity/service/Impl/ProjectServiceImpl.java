@@ -58,7 +58,13 @@ public class ProjectServiceImpl implements ProjectService {
         Optional optional = projectRepository.findById(aid);
 
         if (optional.isPresent()) {
-            Object project = optional.get();
+            Project project = (Project) optional.get();
+
+            // Update active time
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            project.setActiveTime(dateFormat.format(new Date()));
+            projectRepository.save(project);
+
             return ResultUtils.success(project);
         } else {
             return ResultUtils.error(-1, "None");
@@ -189,6 +195,11 @@ public class ProjectServiceImpl implements ProjectService {
 
             Project project = (Project) optional.get();
             update.updateTo(project);
+
+            // Update active time
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            project.setActiveTime(dateFormat.format(new Date()));
+
             projectRepository.save(project);
 
             return ResultUtils.success(project);
@@ -276,6 +287,11 @@ public class ProjectServiceImpl implements ProjectService {
                 }
             }
 
+            // Update active time
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            project.setActiveTime(dateFormat.format(new Date()));
+            projectRepository.save(project);
+
             return ResultUtils.success(children);
         } catch (Exception ex) {
             return ResultUtils.error(-2, "Fail: Exception");
@@ -307,6 +323,11 @@ public class ProjectServiceImpl implements ProjectService {
                 }
             }
             participants.put("members", memberinfos);
+
+            // Update active time
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            project.setActiveTime(dateFormat.format(new Date()));
+            projectRepository.save(project);
 
             return ResultUtils.success(participants);
         } catch (Exception ex) {
@@ -352,6 +373,10 @@ public class ProjectServiceImpl implements ProjectService {
             joinedProjects.add(aid);
             user.setManageProjects(joinedProjects);
 
+            // Update active time
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            project.setActiveTime(dateFormat.format(new Date()));
+
             //save
             projectRepository.save(project);
             userRepository.save(user);
@@ -386,6 +411,11 @@ public class ProjectServiceImpl implements ProjectService {
                 }
             }
             project.setMembers(members);
+
+            // Update active time
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            project.setActiveTime(dateFormat.format(new Date()));
+
             projectRepository.save(project);
 
             return ResultUtils.success(project);
@@ -423,6 +453,10 @@ public class ProjectServiceImpl implements ProjectService {
                     joinedProjects.remove(projectId);
             }
             user.setJoinedProjects(joinedProjects);
+
+            // Update active time
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            project.setActiveTime(dateFormat.format(new Date()));
 
             //save
             projectRepository.save(project);

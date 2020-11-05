@@ -16,33 +16,23 @@
           <div>
             <h2>{{ activityInfo.name }}</h2>
           </div>
-          <div style="heigth: 50%; width: 60%; float: left">
+          <div style="heigth: 50%; width: 50%; float: left">
             <div style="margin: 10px 0">
               <Label>Purpose:</Label>
               <span style="margin-left: 10px">{{ activityInfo.purpose }}</span>
             </div>
             <div style="margin: 10px 0">
-              <Label>Creator:</Label>
-              <span
-                style="margin-left: 10px; cursor: pointer; color: #2d8cf0"
-                @click="gotoPersonalSpace(creatorInfo.userId)"
-                >{{ creatorInfo.name }}</span
-              >
-            </div>
-            <div style="margin: 10px 0">
-              <Label>Created time:</Label>
+              <Label>Total participants:</Label>
               <span style="margin-left: 10px">{{
-                activityInfo.createdTime
+                activityInfo.members.length
               }}</span>
             </div>
-          </div>
-          <div style="heigth: 50%; width: 40%; float: left">
             <div style="margin: 10px 0">
               <Label>Total child activities:</Label>
               <span
                 v-if="activityInfo.children != undefined"
-                style="margin-left: 10px; cursor: pointer; color: #2d8cf0"
-                >{{ activityInfo.children.length}}</span
+                style="margin-left: 10px"
+                >{{ activityInfo.children.length }}</span
               >
               <span
                 v-else
@@ -50,11 +40,14 @@
                 >0</span
               >
             </div>
+          </div>
+          <div style="heigth: 50%; width: 50%; float: left">
             <div style="margin: 10px 0">
-              <Label>Total participants:</Label>
+              <Label>Creator:</Label>
               <span
                 style="margin-left: 10px; cursor: pointer; color: #2d8cf0"
-                >{{ activityInfo.members.length }}</span
+                @click="gotoPersonalSpace(creatorInfo.userId)"
+                >{{ creatorInfo.name }}</span
               >
             </div>
             <div style="margin: 10px 0">
@@ -65,6 +58,12 @@
               >
                 <Icon type="ios-create" />
               </span>
+            </div>
+            <div style="margin: 10px 0">
+              <Label>Last active time:</Label>
+              <span style="margin-left: 10px">{{
+                activityInfo.activeTime.split(" ")[0]
+              }}</span>
             </div>
           </div>
           <div style="margin: 10px 0">
@@ -99,6 +98,7 @@
                 margin: 0 10px 10px 0;
                 cursor: pointer;
               "
+              @click.native="enterChildActivity(item)"
             >
               <p slot="title">{{ item.name }}</p>
               <div
@@ -106,18 +106,18 @@
                 v-if="userRole == 'visitor'"
                 style="margin-top: -10px; margin-right: -5px"
               >
-                <Poptip
+                <Tooltip
                   trigger="hover"
                   content="Apply to join this activity"
                   placement="bottom"
                   ><Icon
-                    type="ios-log-in"
+                    type="md-log-in"
                     class="changeInviteColor"
                     size="small"
-                    style="cursor: pointer"
+                    style="cursor: pointer; color: #2d8cf0"
                     @click="preApplication(item)"
                   />
-                </Poptip>
+                </Tooltip>
               </div>
               <div
                 slot="extra"
@@ -142,9 +142,9 @@
               "
             >
               <div
-                style="text-align: center; margin-top: 20px"
+                style="text-align: center; margin-top: 20px; color: #2d8cf0"
                 title="Create activity"
-                @click="preCreation(item)"
+                @click="preCreation()"
               >
                 <Icon type="ios-add" size="80" />
               </div>
@@ -355,6 +355,7 @@ export default {
           background: "lightgrey",
         },
       },
+      projectInfo: parent.vm.projectInfo,
       userInfo: JSON.parse(sessionStorage.getItem("userInfo")),
       userRole: "visitor",
       creatorInfo: { name: "XXX", email: "XXX@XX.com" },
@@ -485,15 +486,57 @@ export default {
     getAllTasks() {},
     getAllResource() {},
     modifyPermission() {
-      window.location.href =
+      parent.location.href =
         "/GeoProblemSolving/permission/" + this.projectInfo.aid;
     },
-    preCreation(parent) {
-      this.activityForm.parent = parent.aid;
+    preCreation() {
+      this.activityForm.parent = this.activityInfo.aid;
       this.activityForm.creator = this.userInfo.userId;
-      this.activityForm.level = parent.level + 1;
+      this.activityForm.level = this.activityInfo.level + 1;
 
       this.createActivityModel = true;
+    },
+    createActivity(name) {
+      this.$refs[name].validate((valid) => {
+        if (valid) {
+          let url = "";
+          if (this.activityForm.level == 1) {
+            // subproject
+            url = "/GeoProblemSolving/subproject";
+          } else if (this.activityForm.level > 1) {
+            // activity
+            url = "/GeoProblemSolving/activity";
+          }
+          this.axios
+            .post(url, this.activityForm)
+            .then((res) => {
+              if (res.data.code == 0) {
+                parent.location.href =
+                  "/GeoProblemSolving/projectInfo/" +
+                  this.projectInfo.aid +
+                  "?content=workspace&aid=" +
+                  res.data.data.aid +
+                  "&level=" +
+                  res.data.data.level;
+              } else {
+                console.log(res.data.msg);
+              }
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+          this.createActivityModel = false;
+        }
+      });
+    },
+    enterChildActivity(activity) {
+      parent.location.href =
+        "/GeoProblemSolving/projectInfo/" +
+        this.projectInfo.aid +
+        "?content=workspace&aid=" +
+        activity.aid +
+        "&level=" +
+        activity.level;
     },
     preApplication(activity) {
       this.appliedActivity = activity;

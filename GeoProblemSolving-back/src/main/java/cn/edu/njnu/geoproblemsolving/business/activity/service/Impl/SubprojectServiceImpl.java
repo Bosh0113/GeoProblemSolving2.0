@@ -48,6 +48,15 @@ public class SubprojectServiceImpl implements SubprojectService {
         }
     }
 
+    private void updateActiveTime(Subproject subproject) {
+        // Update active time
+        Date date = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        subproject.setActiveTime(dateFormat.format(date));
+
+        subprojectRepository.save(subproject);
+    }
+
     @Override
     public JsonResult createSubproject(Subproject subproject) {
         try {
@@ -109,10 +118,14 @@ public class SubprojectServiceImpl implements SubprojectService {
     public JsonResult inquirySubproject(String aid) {
         try {
             Optional result = subprojectRepository.findById(aid);
-            if (result.isPresent())
-                return ResultUtils.success(result.get());
-            else
+            if (result.isPresent()) {
+                Subproject subproject = (Subproject) result.get();
+                // Update active time
+                updateActiveTime(subproject);
+                return ResultUtils.success(subproject);
+            } else {
                 return ResultUtils.error(-1, "Fail: subproject does not exist.");
+            }
         } catch (Exception ex) {
             return ResultUtils.error(-2, "Fail: Exception");
         }
@@ -127,6 +140,10 @@ public class SubprojectServiceImpl implements SubprojectService {
 
             Subproject subproject = (Subproject) result.get();
             update.updateTo(subproject);
+
+            // Update active time
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            subproject.setActiveTime(dateFormat.format(new Date()));
 
             return ResultUtils.success(subprojectRepository.save(subproject));
         } catch (Exception ex) {
@@ -184,6 +201,9 @@ public class SubprojectServiceImpl implements SubprojectService {
 
             ArrayList<Activity> children = getChildActivities(subproject);
 
+            // Update active time
+            updateActiveTime(subproject);
+
             return ResultUtils.success(children);
         } catch (Exception ex) {
             return ResultUtils.error(-2, "Fail: Exception");
@@ -233,6 +253,9 @@ public class SubprojectServiceImpl implements SubprojectService {
             }
             participants.put("members", memberinfos);
 
+            // Update active time
+            updateActiveTime(subproject);
+
             return ResultUtils.success(participants);
         } catch (Exception ex) {
             return ResultUtils.error(-2, "Fail: Exception");
@@ -245,6 +268,9 @@ public class SubprojectServiceImpl implements SubprojectService {
             Optional optional = subprojectRepository.findById(aid);
             if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: subproject does not exist.");
             Activity activity = (Activity) optional.get();
+
+            // Update active time
+            updateActiveTime((Subproject) optional.get());
 
             // children
             ArrayList<Activity> children = getChildActivities(activity);
@@ -299,6 +325,12 @@ public class SubprojectServiceImpl implements SubprojectService {
             newUser.put("role", "");
             members.add(newUser);
             subproject.setMembers(members);
+
+
+            // Update active time
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            subproject.setActiveTime(dateFormat.format(new Date()));
+
             subprojectRepository.save(subproject);
 
             return ResultUtils.success("Success");
@@ -328,6 +360,11 @@ public class SubprojectServiceImpl implements SubprojectService {
                 }
             }
             subproject.setMembers(members);
+
+            // Update active time
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            subproject.setActiveTime(dateFormat.format(new Date()));
+
             subprojectRepository.save(subproject);
 
             return ResultUtils.success("Success");
@@ -354,6 +391,11 @@ public class SubprojectServiceImpl implements SubprojectService {
                 }
             }
             subproject.setMembers(members);
+
+            // Update active time
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            subproject.setActiveTime(dateFormat.format(new Date()));
+
             subprojectRepository.save(subproject);
 
             return ResultUtils.success("Success");
