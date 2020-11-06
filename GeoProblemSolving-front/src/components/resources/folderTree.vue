@@ -135,16 +135,16 @@
                   style="cursor: pointer"
                 >
                   <span v-if="folder.folderId == activityInfo.aid"
-                    ><Icon type="md-folder" style="color: #08ab2b"
+                    ><Icon type="md-folder" style="color: #2d8cf0"
                   /></span>
-                  <span v-else style="color: #08ab2b">{{ folder.folderName }}</span>
+                  <span v-else style="color: #2d8cf0">{{ folder.folderName }}</span>
                 </BreadcrumbItem>
               </Breadcrumb>
             </div>
              <Divider type="vertical" style="margin-left: 20px" />
             <div style="flex: 1; margin-left: 10px">
               <Tooltip content="Back" placement="bottom" class="fileBtn">
-                  <Icon type="md-arrow-round-back" @click="backforeFolder" style="cursor:pointer; color: #2d8cf0"/>
+                  <Icon type="md-arrow-round-back" @click="backforeFolder" style="cursor:pointer; color: #08ab2b"/>
               </Tooltip>
               <Tooltip content="New folder" placement="bottom" class="fileBtn">
                   <Icon type="ios-folder"  @click="addFolderModalShow" style="cursor:pointer; color: #f9c245"/>

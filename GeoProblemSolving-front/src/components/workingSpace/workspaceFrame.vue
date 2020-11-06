@@ -86,6 +86,8 @@
         :activityInfo="slctActivity"
         :userInfo="userInfo"
         :key="slctActivity.aid"
+        :childActivities="childActivities"
+        :brotherActivities="brotherActivities"
       ></multi-activity>
       <activity-show
         v-else-if="contentType == 3"
@@ -204,6 +206,8 @@ export default {
       projectInfo: parent.vm.projectInfo,
       userInfo: JSON.parse(sessionStorage.getItem("userInfo")),
       slctActivity: {},
+      childActivities: [],
+      brotherActivities: [],
       parentNode: {}, // 记录所创建/选择activity的父节点位置，对activity tree 进行修改
       editActivityForm: {
         name: "",
@@ -385,6 +389,8 @@ export default {
           .then((res) => {
             if (res.data.code == 0) {
               let children = res.data.data;
+              this.childActivities = children;
+              this.brotherActivities = [];
 
               // 处理掉异常
               for (let i = 0; i < children.length; i++) {
@@ -425,6 +431,9 @@ export default {
         .then((res) => {
           if (res.data.code == 0) {
             let branch = res.data.data;
+            this.childActivities = branch.children;
+            this.brotherActivities = branch.brothers;
+
             this.buildActivityTree(
               branch.ancestors,
               branch.brothers,
@@ -450,6 +459,9 @@ export default {
         .then((res) => {
           if (res.data.code == 0) {
             let branch = res.data.data;
+            this.childActivities = branch.children;
+            this.brotherActivities = branch.brothers;
+
             this.buildActivityTree(
               branch.ancestors,
               branch.brothers,

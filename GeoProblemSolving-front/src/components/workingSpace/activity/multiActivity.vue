@@ -33,7 +33,7 @@
       ></folder-tree>
     </div>
     <div v-show="activeMenu=='Tasks'">
-      <task-manager :activityInfo="activityInfo"></task-manager>
+      <task-manager :activityInfo="activityInfo" :childActivities="childActivities" :brotherActivities="brotherActivities"></task-manager>
     </div>
     <div v-show="activeMenu=='Activities'">
       <process-manager :activityInfo="activityInfo"></process-manager>
@@ -48,7 +48,7 @@ import taskManager from "./utils/taskManger.vue";
 import processManager from "./utils/processManager.vue";
 
 export default {
-  props: ["activityInfo", "userInfo"],
+  props: ["activityInfo", "userInfo","childActivities","brotherActivities"],
   components: {
     activityShow,
     folderTree,
