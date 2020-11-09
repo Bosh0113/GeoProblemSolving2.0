@@ -281,7 +281,7 @@ export default {
         "Geo-analysis model construction",
         "Model effectiveness evaluation",
         "Geographical simulation",
-        "Decision-making for management"
+        "Decision making"
       ],
       // 步骤逻辑图
       stepChart: null,
@@ -642,7 +642,7 @@ export default {
               icon: "circle"
             },
             {
-              name: "Decision-making for management",
+              name: "Decision making",
               icon: "circle"
             }
           ]
@@ -686,7 +686,7 @@ export default {
                 name: "Geographical simulation"
               },
               {
-                name: "Decision-making for management"
+                name: "Decision making"
               }
             ],
             links: [],
@@ -862,7 +862,7 @@ export default {
       } else if (category == 6) {
         type = "Data analysis";
       } else if (category == 7) {
-        type = "Decision-making for management";
+        type = "Decision making";
       }
       return type;
     },
@@ -882,7 +882,7 @@ export default {
         category = 5;
       } else if (type == "Data analysis") {
         category = 6;
-      } else if (type == "Decision-making for management") {
+      } else if (type == "Decision making") {
         category = 7;
       }
       return category;
