@@ -1083,7 +1083,7 @@ export default {
         "Geo-analysis model construction",
         "Model effectiveness evaluation",
         "Geographical simulation",
-        "Decision-making for management",
+        "Decision making",
         "Others"
       ],
       toolInfoRule: {
@@ -1125,7 +1125,7 @@ export default {
         "Geo-analysis model construction",
         "Model effectiveness evaluation",
         "Geographical simulation",
-        "Decision-making for management"
+        "Decision making"
       ],
       visible: false,
       //表示图片
@@ -1616,7 +1616,7 @@ export default {
           case "Geo-analysis model construction":
           case "Model effectiveness evaluation":
           case "Geographical simulation":
-          case "Decision-making for management": {
+          case "Decision making": {
             var stepTypes = item.recomStep;
             for (var i = 0; i < stepTypes.length; i++) {
               if (stepTypes[i] == selectedType) {

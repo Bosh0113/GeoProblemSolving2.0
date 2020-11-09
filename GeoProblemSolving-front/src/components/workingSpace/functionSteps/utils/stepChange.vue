@@ -107,7 +107,7 @@ export default {
               icon: "circle"
             },
             {
-              name: "Decision-making for management",
+              name: "Decision making",
               icon: "circle"
             }
           ]
@@ -150,7 +150,7 @@ export default {
                 name: "Geographical simulation"
               },
               {
-                name: "Decision-making for management"
+                name: "Decision making"
               }
             ],
             links: [],
