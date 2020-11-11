@@ -87,7 +87,6 @@
         :userInfo="userInfo"
         :key="slctActivity.aid"
         :childActivities="childActivities"
-        :brotherActivities="brotherActivities"
       ></multi-activity>
       <activity-show
         v-else-if="contentType == 3"
@@ -207,7 +206,6 @@ export default {
       userInfo: JSON.parse(sessionStorage.getItem("userInfo")),
       slctActivity: {},
       childActivities: [],
-      brotherActivities: [],
       parentNode: {}, // 记录所创建/选择activity的父节点位置，对activity tree 进行修改
       editActivityForm: {
         name: "",
@@ -217,7 +215,7 @@ export default {
         level: -1,
         permission: JSON.stringify(userRoleJS.getDefault()),
         type: "Activity_Default",
-        purpose: "Others",
+        purpose: "Multi-purpose",
       },
       activityEditRule: {
         name: [
@@ -241,15 +239,15 @@ export default {
       activityDeleteModal: false,
       contentType: -1,
       purposes: [
-        "Others",
+        "Multi-purpose",
         "Context definition & resource collection",
         "Data processing",
-        "Data analyses",
+        "Data analysis",
         "Data visualization",
         "Geo-analysis model construction",
         "Model effectiveness evaluation",
         "Geographical simulation",
-        "Decision-making and management",
+        "Decision making",
       ],
       // spinShow: false,
     };
@@ -390,7 +388,6 @@ export default {
             if (res.data.code == 0) {
               let children = res.data.data;
               this.childActivities = children;
-              this.brotherActivities = [];
 
               // 处理掉异常
               for (let i = 0; i < children.length; i++) {
@@ -432,7 +429,6 @@ export default {
           if (res.data.code == 0) {
             let branch = res.data.data;
             this.childActivities = branch.children;
-            this.brotherActivities = branch.brothers;
 
             this.buildActivityTree(
               branch.ancestors,
@@ -460,7 +456,6 @@ export default {
           if (res.data.code == 0) {
             let branch = res.data.data;
             this.childActivities = branch.children;
-            this.brotherActivities = branch.brothers;
 
             this.buildActivityTree(
               branch.ancestors,
@@ -563,7 +558,7 @@ export default {
         if (valid) {
           if (this.editActivityForm.type != this.slctActivity.type) {
             if (this.slctActivity.type == "Activity_Unit") {
-              this.editActivityForm.purpose = "Others";
+              this.editActivityForm.purpose = "Multi-purpose";
             } else if (this.slctActivity.type == "Activity_Group") {
               if (
                 this.slctActivity.children != undefined &&

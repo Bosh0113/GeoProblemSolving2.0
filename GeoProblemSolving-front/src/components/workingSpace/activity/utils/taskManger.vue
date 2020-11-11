@@ -938,7 +938,7 @@ export default {
     dayjs,
     ganttElastic: GanttElastic,
   },
-  props: ["activityInfo", "childActivities", "brotherActivities"],
+  props: ["activityInfo", "childActivities"],
   data() {
     return {
       projectInfo: parent.vm.projectInfo,

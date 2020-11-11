@@ -397,7 +397,7 @@ export default {
         level: -1,
         permission: JSON.stringify(userRoleJS.getDefault()),
         type: "Activity_Default",
-        purpose: "Others",
+        purpose: "Multi-purpose",
       },
       activityCreateRule: {
         name: [
@@ -425,15 +425,15 @@ export default {
         ],
       },
       purposes: [
-        "Others",
+        "Multi-purpose",
         "Context definition & resource collection",
         "Data processing",
         "Data visualization",
-        "Geographic model construction",
+        "Geo-analysis model construction",
         "Model effectiveness evaluation",
         "Geographical simulation",
-        "Quantitative and qualitative analyses",
-        "Decision-making and management",
+        "Data analysis",
+        "Decision making",
       ],
       potentialMembers: [],
       listStyle: { width: "280px", height: "360px" },
