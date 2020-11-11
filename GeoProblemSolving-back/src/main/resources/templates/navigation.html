@@ -110,50 +110,50 @@
                 <img :src='window.location.origin+"/GeoProblemSolving/Images/OGMS.png"' id="logo" class="pic" @click="goHome" style="cursor:pointer;margin-left:5%">
                 <div v-if="useMenuCSS">
                     <div class="navPart">
-                        <i-menu class="header" mode="horizontal" theme="dark" @on-select="turnContent" :style="`z-index:0;background:headerBgColor`" width="auto"
+                        <i-menu class="header" mode="horizontal" theme="dark" :style="`z-index:0;background:headerBgColor`" width="auto"
                             :active-name="activeType">
-                            <menu-item name="home" class="menuItem" style="margin-left:35%">
+                            <menu-item name="home" class="menuItem" style="margin-left:35%" to="/GeoProblemSolving/home">
                                 <span>Home</span>
                             </menu-item>
-                            <menu-item name="projects" class="menuItem">
+                            <menu-item name="projects" class="menuItem" to="/GeoProblemSolving/projectList">
                                 <span>Projects</span>
                             </menu-item>
-                            <menu-item name="resources" class="menuItem">
+                            <menu-item name="resources" class="menuItem" to="/GeoProblemSolving/publicResource">
                                 <span>Resources</span>
                             </menu-item>
-                            <menu-item name="toolsCenter" class="menuItem">
+                            <menu-item name="toolsCenter" class="menuItem" to="/GeoProblemSolving/toolsCenter">
                                 <span>Tools</span>
                             </menu-item>
-                            <menu-item name="help" class="menuItem">
+                            <menu-item name="help" class="menuItem" to="/GeoProblemSolving/help">
                                 <span>Help</span>
                             </menu-item>
                         </i-menu>
                     </div>
                     <div class="userState">
-                        <i-menu mode="horizontal" theme="dark" @on-select="unlogin" :style="`z-index:0;background:`+headerBgColor" v-show="!userInfoNav.userState||userInfoNav.userState==undefined"
+                        <i-menu mode="horizontal" theme="dark" :style="`z-index:0;background:`+headerBgColor" v-show="!userInfoNav.userState||userInfoNav.userState==undefined"
                             class="menuItem">
-                            <menu-item name="login">
+                            <menu-item name="login" to="/GeoProblemSolving/login">
                                 <span>Login</span>
                             </menu-item>
-                            <menu-item name="register">
+                            <menu-item name="register" to="/GeoProblemSolving/register">
                                 <span>Sign up</span>
                             </menu-item>
                         </i-menu>
 
-                        <i-menu mode="horizontal" theme="dark" @on-select="logged" :style="`z-index:0;background:`+headerBgColor" v-show="userInfoNav.userState"
+                        <i-menu mode="horizontal" theme="dark" :style="`z-index:0;background:`+headerBgColor" v-show="userInfoNav.userState"
                             class="menuItem">
-                            <menu-item name="notification">
+                            <menu-item name="notification" to="/GeoProblemSolving/notifications">
                                 <Badge :count="unreadNoticeCount" id="noticeBadge">
                                     <Icon type="ios-notifications-outline" size="25"></Icon>
                                 </Badge>
                             </menu-item>
                             <menu-item name="personal" style="width:100px">
                                 <dropdown @on-click="changeSelect" placement="bottom-start">
-                                    <div @click="toPersonalPage">
+                                    <a href="/GeoProblemSolving/personalPage">
                                         <img v-if="userInfoNav.avatar!=''&&userInfoNav.avatar!=undefined&&userInfoNav.avatar!=null" :title="userInfoNav.userName"
-                                            :src="userInfoNav.avatar" style="width:40px;height:40px;vertical-align:middle;">
+                                             :src="userInfoNav.avatar" style="width:40px;height:40px;vertical-align:middle;">
                                         <avatar :username="userInfoNav.userName" :size="40" style="margin-top:10px" :title="userInfoNav.userName" v-else></avatar>
-                                    </div>
+                                    </a>
                                     <dropdown-menu slot="list">
                                         <dropdown-item name="logout">Log out</dropdown-item>
                                     </dropdown-menu>
@@ -247,36 +247,8 @@
                         this.useMenuCSS = true;
                     }
                 },
-                turnContent(name) {
-                    if (name === "home") {
-                        window.location.href = "/GeoProblemSolving/home"
-                    } else if (name == "projects") {
-                        window.location.href = "/GeoProblemSolving/projectList"
-                    } else if (name == "resources") {
-                        window.location.href = "/GeoProblemSolving/publicResource"
-                    } else if (name == "toolsCenter") {
-                        window.location.href = "/GeoProblemSolving/toolsCenter"
-                    } else if (name == "community") {
-                        window.location.href = "/GeoProblemSolving/community"
-                    } else if (name == "help") {
-                        window.location.href = "/GeoProblemSolving/help"
-                    }
-                },
                 goHome() {
                     window.location.href = "/GeoProblemSolving/home"
-                },
-                unlogin(name) {
-                    if (name === "login") {
-                        window.location.href = "/GeoProblemSolving/login"
-                    } else if (name == "register") {
-                        window.location.href = "/GeoProblemSolving/register"
-                    }
-                },
-                logged(name) {
-                    if (name === "notification") {
-                        window.location.href = "/GeoProblemSolving/notifications"
-                    } else if (name === "personal") {
-                    }
                 },
                 toPersonalPage() {
                     window.location.href = "/GeoProblemSolving/personalPage"

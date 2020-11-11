@@ -1321,13 +1321,11 @@ export default {
       //     }
       //   } else if (res.data != "Fail") {
       //     if (this.activityInfo.level == 0) {
-      //       this.$store.commit("setProjectInfo", res.data);
       //       //   parent.vm.projectInfo = res.data;
       //       this.$Notice.info({
       //         desc: "Project update successfully!",
       //       });
       //     } else if (this.activityInfo.level == 1) {
-      //       this.$store.commit("setSubProjectInfo", res.data);
       //       this.$Notice.info({
       //         desc: "Subproject update successfully!",
       //       });
@@ -1358,7 +1356,6 @@ export default {
       //     if (res.data == "Offline") {
       //       parent.location.href = "/GeoProblemSolving/login";
       //     } else if (res.data != "Fail") {
-      //       this.$store.commit("setSubProjectInfo", res.data);
       //       this.$emit("changeSubProjectInfo", res.data);
       //     } else {
       //       this.$Message.error("Set purpose failed.");

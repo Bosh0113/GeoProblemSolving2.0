@@ -25,7 +25,7 @@ public class ReturnPageController {
         this.staticPagesBuilder = staticPagesBuilder;
     }
 
-    @RequestMapping(value = "/projectDetail/{aid}",method = RequestMethod.GET)
+    @RequestMapping(value = "/projectInfo/{aid}",method = RequestMethod.GET)
     public String projectPage(@PathVariable String aid) throws IOException {
         //此请求根路径在templates文件夹，考虑隐藏后缀，用此方法请求。
         String servicePath = getServicePath();

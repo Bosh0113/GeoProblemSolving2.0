@@ -170,7 +170,6 @@ footer {
                     ></avatar>
                   </div>
                   <DropdownMenu slot="list">
-                    <!-- <DropdownItem name="personalPage">User Space</DropdownItem> -->
                     <DropdownItem name="logout">Log out</DropdownItem>
                   </DropdownMenu>
                 </Dropdown>

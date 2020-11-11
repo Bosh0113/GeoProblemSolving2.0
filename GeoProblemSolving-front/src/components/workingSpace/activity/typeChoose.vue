@@ -2,23 +2,45 @@
   <Row>
     <Col span="24">
       <div style="text-align: center; margin-top: 20px">
-        <div style="max-width:80%;text-align: left;display: inline-block;margin-buttom:2%">
-          <span style="margin:25px 0; font-size:28px">Activity</span>
-          <span
-            style="margin: 0px 10px;font-size: 14px;"
-          >contains workspaces to support collaborative geo-problem solving. Here provides two activity types for different solutions of geo-problems.</span>
+        <div
+          style="
+            max-width: 80%;
+            text-align: left;
+            display: inline-block;
+            margin-buttom: 2%;
+          "
+        >
+          <span style="margin: 25px 0; font-size: 20px" title="Activity name"
+            >{{activityInfo.name}}</span
+          >
+          <span style="margin: 0px 10px; font-size: 14px" title="Activity description">{{
+            activityInfo.description
+          }}</span>
         </div>
+      </div>      
+      <div style="text-align: center; margin-top: 10px; color: grey">
+        Activity contains workspaces to support collaborative geo-problem
+        solving. Here provides two activity types for different solutions of
+        geo-problems.
       </div>
-      <Row type="flex" justify="space-around" class="code-row-bg" style="margin-top:25px">
+      <Row
+        type="flex"
+        justify="space-around"
+        class="code-row-bg"
+        style="margin-top: 20px"
+      >
         <Col span="9">
-          <Card style="min-height: 400px;">
-            <div style="text-align:center;">
-              <img src="../../../assets/images/startWork.png" style="height:150px" />
+          <Card style="min-height: 350px">
+            <div style="text-align: center; margin-top:10px">
+              <img
+                src="../../../assets/images/startWork.png"
+                style="height: 150px"
+              />
             </div>
-            <div style="margin:10px 0;text-align:center;">
+            <div style="margin: 10px 0; text-align: center">
               <h3>Single-activity type</h3>
             </div>
-            <div style="padding: 0 5%;min-height: 85px;">
+            <div style="padding: 0 5%; min-height: 85px">
               <ul>
                 <li>A individual workspaces</li>
                 <li>Start working directly</li>
@@ -26,7 +48,7 @@
               </ul>
             </div>
             <!-- <div style="text-align:center;margin-top:2%" v-if="permissionIdentity(activityInfo.permission, userRole, 'manage_workspace_type')"> -->
-            <div style="text-align:center;margin-top:2%">
+            <div style="text-align: center; margin-top: 2%">
               <h3>
                 Select this type ->
                 <a @click="selectTypeModalShow('Activity_Unit')">Go</a>
@@ -35,14 +57,17 @@
           </Card>
         </Col>
         <Col span="9">
-          <Card style="min-height: 400px;">
-            <div style="text-align:center;">
-              <img src="../../../assets/images/designWorkflow.png" style="height:150px" />
+          <Card style="min-height: 350px">
+            <div style="text-align: center; margin-top:10px">
+              <img
+                src="../../../assets/images/designWorkflow.png"
+                style="height: 150px"
+              />
             </div>
-            <div style="margin:10px 0;text-align:center;">
+            <div style="margin: 10px 0; text-align: center">
               <h3>Multi-acitivites type</h3>
             </div>
-            <div style="padding: 0 5%;min-height: 85px;">
+            <div style="padding: 0 5%; min-height: 85px">
               <ul>
                 <li>Several activities for different purposes</li>
                 <li>Hierarchical activity management</li>
@@ -50,7 +75,7 @@
               </ul>
             </div>
             <!-- <div style="text-align:center;margin-top:2%" v-if="permissionIdentity(activityInfo.permission, userRole, 'manage_workspace_type')">                 -->
-            <div style="text-align:center;margin-top:2%">
+            <div style="text-align: center; margin-top: 2%">
               <h3>
                 Select this type ->
                 <a @click="selectTypeModalShow('Activity_Group')">Go</a>
@@ -71,12 +96,14 @@
       <div v-if="selectType == 'Activity_Unit'" style="margin-top: 20px">
         <Label>Select purpose: </Label>
         <Select
-         style="margin-top: 10px"
+          style="margin-top: 10px"
           v-model="purpose"
           placeholder="Select the purpose of this activity"
           readonly
         >
-          <Option v-for="item in purposes" :key="item.index" :value="item">{{item}}</Option>
+          <Option v-for="item in purposes" :key="item.index" :value="item">{{
+            item
+          }}</Option>
         </Select>
       </div>
     </Modal>
@@ -101,7 +128,7 @@ export default {
         "Quantitative and qualitative analyses",
         "Decision-making and management",
       ],
-      purpose: ""
+      purpose: "",
     };
   },
   mounted() {
@@ -142,7 +169,7 @@ export default {
       data.type = this.selectType;
       if (this.selectType == "Activity_Group") {
         data.children = [];
-      } else if(this.selectType == "Activity_Unit"){
+      } else if (this.selectType == "Activity_Unit") {
         data.purpose = this.purpose;
       }
       if (this.activityInfo.level == 1) {

@@ -80,13 +80,23 @@ public class ActivityController {
     }
 
     /**
-     * get participants of one subproject
+     * get participants of one activity
      * @param aid
      * @return
      */
     @RequestMapping(value = "/{aid}/user", method = RequestMethod.GET)
     public JsonResult getSubprojectParticipants(@PathVariable("aid") String aid){
         return activityService.findParticipants(aid);
+    }
+
+    /**
+     * get ancestors of one activity
+     * @param aid
+     * @return
+     */
+    @RequestMapping(value = "/{aid}/lineage", method = RequestMethod.GET)
+    public JsonResult getLineage(@PathVariable("aid") String aid){
+        return activityService.findLineage(aid);
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/{aid}/next")

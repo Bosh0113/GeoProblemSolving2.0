@@ -1480,7 +1480,6 @@ export default {
             }
           } else if (res.data != "Fail") {
             if (this.scopeType == "project") {
-              this.$store.commit("setProjectInfo", res.data);
               parent.vm.projectInfo = res.data;
               // 如果是项目下的步骤，需要更新sessionStorage
               // sessionStorage.setItem("projectInfo", JSON.stringify(res.data));
@@ -1550,7 +1549,6 @@ export default {
           if (res.data == "Offline") {
             parent.location.href = "/GeoProblemSolving/login";
           } else if (res.data != "Fail") {
-            this.$store.commit("setProjectInfo", res.data);
             this.$emit("changeProjectInfo", res.data);
           } else {
             this.$Message.error("Set type failed.");

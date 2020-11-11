@@ -13,8 +13,7 @@ export default new Vuex.Store({
             avatar: '',
         },
         projectImg: '',
-        project: {},
-        subProject: {},
+        activityTree:[],
         IP_Port: window.location.host,
         // IP_Port:"172.21.213.185:8080",
         // IP_Port:"localhost:8080",
@@ -37,11 +36,8 @@ export default new Vuex.Store({
         userInfo: state => {
             return state.userInfo;
         },
-        project: state => {
-            return state.project;
-        },
-        subProject: state => {
-            return state.subProject;
+        activityTree: state => {
+            return state.activityTree;
         }
     },
     mutations: {
@@ -87,26 +83,8 @@ export default new Vuex.Store({
         setUserInfo: (state, userInfo) => {
             state.userInfo = userInfo;
         },
-        setProjectInfo: (state, project) => {
-            state.project = project;
-
-            // sessionStorage.setItem("projectInfo", JSON.stringify(project));
-            // var CryptoJS = require("crypto-js");
-            // var key = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
-            // var iv = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
-            // var context = JSON.stringify(project);
-            // var srcs = CryptoJS.enc.Utf8.parse(context);
-            // var encrypted = CryptoJS.AES.encrypt(srcs, key, {
-            //     iv: iv,
-            //     mode: CryptoJS.mode.CBC,
-            //     padding: CryptoJS.pad.Pkcs7
-            // });
-            // sessionStorage.setItem("projectInfo", encrypted.toString());
-
-        },
-        setSubProjectInfo: (state, subProject) => {
-            sessionStorage.setItem("subProjectInfo", JSON.stringify(subProject));
-            state.subProject = subProject;
+        setActivityTree: (state, activityTree) => {
+            state.activityTree = activityTree;
         }
     }
 })

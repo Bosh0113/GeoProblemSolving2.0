@@ -60,7 +60,7 @@ public class SubprojectServiceImpl implements SubprojectService {
             Project project = projectRepository.findById(projectId).get();
             if (project == null) return ResultUtils.error(-1, "Fail: project does not exist.");
             ArrayList<String> children;
-            if(project.getChildren() == null){
+            if (project.getChildren() == null) {
                 children = new ArrayList<>();
             } else {
                 children = project.getChildren();
@@ -88,7 +88,7 @@ public class SubprojectServiceImpl implements SubprojectService {
 
             // set type
             subproject.setType(subproject.getType());
-            if(subproject.getType().equals(ActivityType.Activity_Group)){
+            if (subproject.getType().equals(ActivityType.Activity_Group)) {
                 subproject.setChildren(new ArrayList<>());
             }
 
@@ -138,14 +138,14 @@ public class SubprojectServiceImpl implements SubprojectService {
     public JsonResult deleteSubproject(String aid) {
         try {
             Optional optional = subprojectRepository.findById(aid);
-            if (! optional.isPresent())  return ResultUtils.error(-1, "Fail: subproject does not exist.");
+            if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: subproject does not exist.");
             Subproject subproject = (Subproject) optional.get();
             optional = projectRepository.findById(subproject.getParent());
-            if (! optional.isPresent())  return ResultUtils.error(-1, "Fail: subproject does not exist.");
+            if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: subproject does not exist.");
             Project project = (Project) optional.get();
 
             // delete from parent
-            if(project.getChildren().contains(aid))
+            if (project.getChildren().contains(aid))
                 project.getChildren().remove(aid);
 
             // delete children
@@ -182,21 +182,27 @@ public class SubprojectServiceImpl implements SubprojectService {
             if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: subproject does not exist");
             Subproject subproject = (Subproject) optional.get();
 
-            JSONArray children = new JSONArray();
-            if(subproject.getChildren() != null){
-                for (String childId : subproject.getChildren()) {
-                    optional = activityRepository.findById(childId);
-                    if (optional.isPresent()) {
-                        Activity childActivity = (Activity) optional.get();
-                        children.add(childActivity);
-                    }
-                }
-            }
+            ArrayList<Activity> children = getChildActivities(subproject);
 
             return ResultUtils.success(children);
         } catch (Exception ex) {
             return ResultUtils.error(-2, "Fail: Exception");
         }
+    }
+
+    private ArrayList getChildActivities(Activity activity) {
+        ArrayList<Activity> activities = new ArrayList<>();
+
+        if (activity.getChildren() != null) {
+            for (String childId : activity.getChildren()) {
+                Optional optional = activity.getLevel() > 0 ? activityRepository.findById(childId) : subprojectRepository.findById(childId);
+                if (optional.isPresent()) {
+                    Activity childActivity = (Activity) optional.get();
+                    activities.add(childActivity);
+                }
+            }
+        }
+        return activities;
     }
 
     @Override
@@ -228,6 +234,40 @@ public class SubprojectServiceImpl implements SubprojectService {
             participants.put("members", memberinfos);
 
             return ResultUtils.success(participants);
+        } catch (Exception ex) {
+            return ResultUtils.error(-2, "Fail: Exception");
+        }
+    }
+
+    @Override
+    public JsonResult findLineage(String aid) {
+        try {
+            Optional optional = subprojectRepository.findById(aid);
+            if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: subproject does not exist.");
+            Activity activity = (Activity) optional.get();
+
+            // children
+            ArrayList<Activity> children = getChildActivities(activity);
+
+            // ancestors
+            ArrayList<Activity> ancestors = new ArrayList<>();
+            ancestors.add(activity);
+
+            optional = projectRepository.findById(activity.getParent());
+            if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: project does not exist.");
+            activity = (Activity) optional.get();
+            ancestors.add(activity);
+
+            // brothers
+            ArrayList<Activity> brothers = getChildActivities(ancestors.get(1));
+
+            // result
+            JSONObject lineage = new JSONObject();
+            lineage.put("ancestors", ancestors);
+            lineage.put("brothers", brothers);
+            lineage.put("children", children);
+
+            return ResultUtils.success(lineage);
         } catch (Exception ex) {
             return ResultUtils.error(-2, "Fail: Exception");
         }

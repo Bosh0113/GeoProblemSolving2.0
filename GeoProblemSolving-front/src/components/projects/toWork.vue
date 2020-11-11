@@ -81,7 +81,6 @@ export default {
           if (data != "None" && data != "Fail") {
             this.projectInfo = data[0];
             this.identifyUserRole();
-            this.$store.commit("setProjectInfo", data[0]);
           } else {
             console.log(data);
           }

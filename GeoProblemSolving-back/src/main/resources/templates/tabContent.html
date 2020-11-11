@@ -239,7 +239,7 @@
         methods: {
             projectInfoModalShow(projectInfo) {
                 if (projectInfo.isMember || projectInfo.isManager) {
-                    window.location.href = "/GeoProblemSolving/projectDetail/" + projectInfo.aid;
+                    window.location.href = "/GeoProblemSolving/projectInfo/" + projectInfo.aid;
                 } else {
                     this.selectedProjectInfo = Object.assign({}, projectInfo);
 
@@ -326,7 +326,7 @@
                                     if (res.data === "Success") {
                                         this.$Message.info("Join the project successfuly");
 
-                                        window.location.href = "/GeoProblemSolving/projectDetail/" + this.applyProjectInfo.projectId;
+                                        window.location.href = "/GeoProblemSolving/projectInfo/" + this.applyProjectInfo.projectId;
                                     } else if (res.data === "Fail") {
                                         this.$Message.info("Fail to join in this project");
                                     }
@@ -443,7 +443,7 @@
                 // window.sessionStorage.setItem("projectInfo",JSON.stringify(projectInfo));
                 if (this.applyProjectInfo.permission == "" || this.applyProjectInfo.permission == undefined || JSON.parse(this.applyProjectInfo.permission).observe.visitor != "No") {
                     // window.sessionStorage.setItem("projectInfo", this.encrypto(projectInfo));
-                    window.location.href = "/GeoProblemSolving/projectDetail/" + projectInfo.aid;
+                    window.location.href = "/GeoProblemSolving/projectInfo/" + projectInfo.aid;
                 }
             },
             // encrypto(context) {

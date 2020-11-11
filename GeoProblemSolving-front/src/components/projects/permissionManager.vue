@@ -376,8 +376,6 @@ export default {
   },
   methods: {
     getPermission() {
-      let projectInfo = this.$store.getters.project;
-
       if (JSON.stringify(projectInfo) != "{}") {
         this.projectInfo = projectInfo;
         if (this.projectInfo.permission != undefined) {
@@ -398,7 +396,6 @@ export default {
               this.$router.push({ name: "Login" });
             } else if (data != "None" && data != "Fail") {
               this.projectInfo = data;
-              this.$store.commit("setProjectInfo", data);
 
               if (this.projectInfo.permission != undefined) {
                 this.permission = JSON.parse(this.projectInfo.permission);
@@ -656,7 +653,6 @@ export default {
           if (res.data == "Offline") {
             parent.location.href = "/GeoProblemSolving/login";
           } else if (res.data.code == 0) {
-            this.$store.commit("setProjectInfo", res.data.data);
             this.$Notice.info({
               desc: "Update permission successfully. "
             });

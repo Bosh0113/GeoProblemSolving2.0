@@ -349,7 +349,6 @@ export default {
         .post("/GeoProblemSolving/history/save", form)
         .then((res) => {
           if (res.data === "Success") {
-            this.$store.commit("setProjectInfo", this.createProjectInfo);
             window.location.href =
               "/GeoProblemSolving/projectDetail/" + scopeId;
           } else {
