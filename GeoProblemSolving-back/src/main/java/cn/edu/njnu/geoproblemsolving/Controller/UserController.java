@@ -54,15 +54,15 @@ public class UserController {
         }
     }
 
-    @RequestMapping(value = "/update", produces = {"application/json;charset=UTF-8"}, method = RequestMethod.POST)
-    public Object updateUser(HttpServletRequest request) {
-        UserDaoImpl userDao = new UserDaoImpl(mongoTemplate);
-        try {
-            return userDao.updateUser(request);
-        }catch (Exception e){
-            return "Fail";
-        }
-    }
+    // @RequestMapping(value = "/update", produces = {"application/json;charset=UTF-8"}, method = RequestMethod.POST)
+    // public Object updateUser(HttpServletRequest request) {
+    //     UserDaoImpl userDao = new UserDaoImpl(mongoTemplate);
+    //     try {
+    //         return userDao.updateUser(request);
+    //     }catch (Exception e){
+    //         return "Fail";
+    //     }
+    // }
 
     @RequestMapping(value = "/newPassword", method = RequestMethod.GET)
     public Object updateNewPassword(@RequestParam("email") String email,@RequestParam("password") String password) {
@@ -70,51 +70,51 @@ public class UserController {
         return userDao.updatePassword(email,password);
     }
 
-    @RequestMapping(value = "/login", method = RequestMethod.GET)
-    public Object login(@RequestParam("email") String email, @RequestParam("password") String password, HttpServletRequest request) {
-        UserDaoImpl userDao = new UserDaoImpl(mongoTemplate);
-        try {
-            Object object=userDao.login(email,password);
-            if(!object.equals("Fail")){
-                UserEntity user=(UserEntity)object;
-                HttpSession session=request.getSession();
-                session.setAttribute("userId",user.getUserId());
-                session.setAttribute("userName",user.getUserName());
-                session.setAttribute("avatar",user.getAvatar());
-                session.setAttribute("email",user.getEmail());
-                session.setMaxInactiveInterval(60*60);
-                System.out.println("User login. UserName: "+user.getUserName());
-            }
-            return object;
-        } catch (Exception e) {
-            return "Fail";
-        }
-    }
+    // @RequestMapping(value = "/login", method = RequestMethod.GET)
+    // public Object login(@RequestParam("email") String email, @RequestParam("password") String password, HttpServletRequest request) {
+    //     UserDaoImpl userDao = new UserDaoImpl(mongoTemplate);
+    //     try {
+    //         Object object=userDao.login(email,password);
+    //         if(!object.equals("Fail")){
+    //             UserEntity user=(UserEntity)object;
+    //             HttpSession session=request.getSession();
+    //             session.setAttribute("userId",user.getUserId());
+    //             session.setAttribute("userName",user.getUserName());
+    //             session.setAttribute("avatar",user.getAvatar());
+    //             session.setAttribute("email",user.getEmail());
+    //             session.setMaxInactiveInterval(60*60);
+    //             System.out.println("User login. UserName: "+user.getUserName());
+    //         }
+    //         return object;
+    //     } catch (Exception e) {
+    //         return "Fail";
+    //     }
+    // }
 
-    @RequestMapping(value = "/logout", produces = {"application/json;charset=UTF-8"}, method = RequestMethod.GET)
-    public void logout(HttpServletRequest request){
-        HttpSession session=request.getSession();
-        System.out.println("User logout. UserName: "+session.getAttribute("userName"));
-        session.invalidate();
-    }
+    // @RequestMapping(value = "/logout", produces = {"application/json;charset=UTF-8"}, method = RequestMethod.GET)
+    // public void logout(HttpServletRequest request){
+    //     HttpSession session=request.getSession();
+    //     System.out.println("User logout. UserName: "+session.getAttribute("userName"));
+    //     session.invalidate();
+    // }
 
-    @RequestMapping(value = "/state", method = RequestMethod.POST)
-    public Object userState(HttpServletRequest request){
-        try {
-            HttpSession session=request.getSession();
-            if (session.getAttribute("userId")!=null){
-                UserDaoImpl userDao=new UserDaoImpl(mongoTemplate);
-                UserEntity userInfo=(UserEntity) userDao.readUser("userId",session.getAttribute("userId").toString());
-                userInfo.setPassword("");
-                return userInfo;
-            }
-            else {
-                return false;
-            }
-        }catch (Exception e){
-            return false;
-        }
-    }
+    // @RequestMapping(value = "/state", method = RequestMethod.POST)
+    // public Object userState(HttpServletRequest request){
+    //     try {
+    //         HttpSession session=request.getSession();
+    //         if (session.getAttribute("userId")!=null){
+    //             UserDaoImpl userDao=new UserDaoImpl(mongoTemplate);
+    //             UserEntity userInfo=(UserEntity) userDao.readUser("userId",session.getAttribute("userId").toString());
+    //             userInfo.setPassword("");
+    //             return userInfo;
+    //         }
+    //         else {
+    //             return false;
+    //         }
+    //     }catch (Exception e){
+    //         return false;
+    //     }
+    // }
 
     @RequestMapping(value = "/isRegistered", method = RequestMethod.GET)
     public Boolean isRegistered(@RequestParam("email") String email){
