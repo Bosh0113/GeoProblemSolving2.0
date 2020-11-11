@@ -1,5 +1,6 @@
 package cn.edu.njnu.geoproblemsolving.Config;
 
+import cn.edu.njnu.geoproblemsolving.business.StaticParams;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.ServletOutputStream;
@@ -12,7 +13,8 @@ public class MyInterceptor implements HandlerInterceptor{
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handle) throws IOException {
         HttpSession session = request.getSession();
-        if(session.getAttribute("userId")==null){
+        // session.getAttribute("userId")==null
+        if(StaticParams.loginUser == null){
             ServletOutputStream writer = response.getOutputStream();
             writer.print("Offline");
             writer.flush();

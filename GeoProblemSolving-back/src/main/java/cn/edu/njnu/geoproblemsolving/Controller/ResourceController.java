@@ -15,11 +15,11 @@ public class ResourceController {
     @Resource
     private MongoTemplate mongoTemplate;
 
-    @RequestMapping(value = "/upload", method = RequestMethod.POST)
-    public Object uploadResource(HttpServletRequest request) {
-        ResourceDaoImpl resourceDao = new ResourceDaoImpl(mongoTemplate);
-        return resourceDao.saveResource(request);
-    }
+    // @RequestMapping(value = "/upload", method = RequestMethod.POST)
+    // public Object uploadResource(HttpServletRequest request) {
+    //     ResourceDaoImpl resourceDao = new ResourceDaoImpl(mongoTemplate);
+    //     return resourceDao.saveResource(request);
+    // }
 
     @RequestMapping(value = "/inquiry", method = RequestMethod.GET)
     public Object readResource(@RequestParam("key") String key, @RequestParam("value") String value) {

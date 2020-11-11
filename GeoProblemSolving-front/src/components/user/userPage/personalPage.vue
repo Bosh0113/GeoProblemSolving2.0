@@ -815,11 +815,11 @@ import Avatar from "vue-avatar";
 export default {
   beforeRouteEnter: (to, from, next) => {
     next(vm => {
-      if (!vm.$store.getters.userState) {
-        next("/login");
-      } else {
+      // if (!vm.$store.getters.userState) {
+      //   next("/login");
+      // } else {
         next();
-      }
+      // }
     });
   },
   mounted() {
@@ -1199,21 +1199,21 @@ export default {
     },
     //获取用户可管理支配的全部项目列表
     getManagerProjectList() {
-      this.axios
-        .get(
-          "/GeoProblemSolving/user" +
-            "?key=managerId" +
-            "&value=" +
-            this.userDetail.userId
-        )
-        .then(res => {
-          if (res.data != "None" && res.data != "Fail") {
-            this.userManagerProjectList = res.data;
-          } else {
-            this.userManagerProjectList = [];
-          }
-        })
-        .catch(err => {});
+      // this.axios
+      //   .get(
+      //     "/GeoProblemSolving/user" +
+      //       "?key=managerId" +
+      //       "&value=" +
+      //       this.userDetail.userId
+      //   )
+      //   .then(res => {
+      //     if (res.data != "None" && res.data != "Fail") {
+      //       this.userManagerProjectList = res.data;
+      //     } else {
+      //       this.userManagerProjectList = [];
+      //     }
+      //   })
+      //   .catch(err => {});
     },
     //注销的模态框按钮
     logOutModalShow() {
@@ -1302,8 +1302,8 @@ export default {
     authorize() {
       this.axios
         .get(
-          "/GeoProblemSolving/project/" + this.currentProject.projectId + "/user" +            
-            "?userId=" + this.selectManagerId + 
+          "/GeoProblemSolving/project/" + this.currentProject.projectId + "/user" +
+            "?userId=" + this.selectManagerId +
             "&role=manager"
         )
         .then(res => {
