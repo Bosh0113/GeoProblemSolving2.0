@@ -1,7 +1,10 @@
 package cn.edu.njnu.geoproblemsolving.business.user.entity;
 
 import cn.edu.njnu.geoproblemsolving.business.user.enums.UserTitle;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -9,6 +12,8 @@ import java.util.ArrayList;
 
 @Data
 @Document(collection = "User")
+@NoArgsConstructor
+@AllArgsConstructor
 public class User {
 
     /**

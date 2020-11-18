@@ -428,7 +428,7 @@
                             <div slot="extra">
                                 <div>
                                     <Poptip trigger="hover" content="Edit project information" placement="left"
-                                            v-if="permissionIdentity('edit_info')">
+                                            v-if="permissionIdentity(projectInfo.permission, userRole, 'edit_info')">
                                         <i-button style="margin: 0 5px;" class="changeEditColor"
                                                   @click="editModelShow()">
                                             <Icon type="ios-create" :size="20"></Icon>
@@ -537,7 +537,7 @@
                                                 <div slot="extra">
                                                     <div>
                                                         <Poptip trigger="hover" content="Invite members"
-                                                                v-if="permissionIdentity('invite_member')"
+                                                                v-if="permissionIdentity(projectInfo.permission, userRole, 'invite_member')"
                                                                 placement="left">
                                                             <i-button class="changeInviteColor"
                                                                       @click="inviteModalShow()">
@@ -545,7 +545,7 @@
                                                             </i-button>
                                                         </Poptip>
                                                         <Poptip trigger="hover" content="Remove members"
-                                                                v-if="permissionIdentity('manage_member')"
+                                                                v-if="permissionIdentity(projectInfo.permission, userRole, 'manage_member')"
                                                                 placement="left">
                                                             <i-button style="margin-left:5px;"
                                                                       class="changeRemoveColor"
@@ -1041,13 +1041,13 @@
                     tokenStr: '',
                     userInfo: {
                         userState: false,
-                        userName: 'visitor',
+                        name: 'visitor',
                         userId: '',
                         avatar: '',
                     },
                     projectInfo: projectInfo,
                     activeMenu: "overview",
-                    workspaceUrl: '/GeoProblemSolving/projectInfo/' + this.projectInfo.aid + "?content=workspace",
+                    workspaceUrl: '/GeoProblemSolving/projectInfo/' + projectInfo.aid + "?content=workspace",
                     contentPageCSS: '',
                     membersContentCSS: '',
                     workspaceCSS: '',
@@ -1238,8 +1238,18 @@
                 }
             },
             methods: {
-                permissionIdentity(operation) {
-                    return permissionIdentity(JSON.parse(this.projectInfo.permission), this.userRole, operation);
+                roleIdentity() {
+                    this.userRole = roleIdentify(
+                        this.projectInfo.members,
+                        this.userInfo.userId
+                    );
+                },
+                permissionIdentity(permission, role, operation) {
+                    return permissionIdentity(
+                        JSON.parse(permission),
+                        role,
+                        operation
+                    );
                 },
                 changeMenuByUrl() {
                     var content = this.getURLParameter("content");
@@ -1270,25 +1280,14 @@
 
                     }
                 },
-                roleIdentity() {
-                    let role = roleIdentify(this.projectInfo.members, this.userInfo.userId);
-
-                    if (role == "visitor") {
-                        if (this.userRole != 'Token') {
-                            this.userRole = role;
-                        }
-                    } else {
-                        this.userRole = role;
-                    }
-                },
                 resizeContent() {
                     if (window.innerHeight > 735) {
                         this.membersContentCSS = window.innerHeight - 330 + 'px';
-                        this.contentPageCSS = window.innerHeight - 130 + 'px';
+                        // this.contentPageCSS = window.innerHeight - 130 + 'px';
                         this.workspaceCSS = window.innerHeight - 240 + 'px';
                     } else {
                         this.membersContentCSS = '407px';
-                        this.contentPageCSS = 'fit-content';
+                        // this.contentPageCSS = 'fit-content';
                         this.workspaceCSS = '495px';
                     }
                     window.onresize = () => {

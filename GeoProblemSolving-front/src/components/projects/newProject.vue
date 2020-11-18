@@ -305,6 +305,7 @@ export default {
             tag: this.formInline.tagList.toString(),
             privacy: this.formInline.privacy,
             picture: this.pictureUrl,
+            type: "Activity_Default",
             description: this.formInline.description,
             type: "Activity_Default",
             // creator: "5d1c51e5020a3e3ad80b717e",

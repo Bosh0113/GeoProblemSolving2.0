@@ -444,7 +444,7 @@ export default {
     this.roleIdentity();
   },
   methods: {
-    roleIdentity(activity) {
+    roleIdentity() {
       this.userRole = userRoleJS.roleIdentify(
         this.activityInfo.members,
         this.userInfo.userId
