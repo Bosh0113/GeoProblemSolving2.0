@@ -306,6 +306,7 @@ export default {
             privacy: this.formInline.privacy,
             picture: this.pictureUrl,
             description: this.formInline.description,
+            type: "Activity_Default",
             // creator: "5d1c51e5020a3e3ad80b717e",
             creator: this.$store.getters.userId,
             permission: JSON.stringify(permission),

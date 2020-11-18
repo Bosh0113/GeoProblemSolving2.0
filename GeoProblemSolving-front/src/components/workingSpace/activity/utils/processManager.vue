@@ -69,14 +69,37 @@
               >Unlink</Button
             >
             <Button
+              v-if="linkStep == 0"
+              type="default"
+              size="small"
+              @click="linkActivities()"
+              icon="md-link"
+              title="Start to link"
+              style="float: right; margin-left: 10px"
+              id="linkBegin"
+              >Start to link</Button
+            >
+            <Button
+              v-else-if="linkStep == 1"
+              type="info"
+              size="small"
+              @click="linkActivities()"
+              icon="md-link"
+              title="Confirm the beginning activities"
+              style="float: right; margin-left: 10px"
+              id="Linking"
+              >Linking</Button
+            >
+            <Button
+              v-else-if="linkStep == 2"
               type="success"
               size="small"
               @click="linkActivities()"
               icon="md-link"
-              title="Active the activity"
+              title="Confirm the end activities"
               style="float: right; margin-left: 10px"
-              id="linkBtn"
-              >Link</Button
+              id="linkEnd"
+              >Complete linking</Button
             >
             <!-- <template v-if="permissionIdentity(activityInfo.permission, 'activity_manage')">
                 <Button
@@ -123,23 +146,38 @@
                   style="float:right;margin-left:10px; cursor:default"
                 >Unlink</Button>
                 <Button
-                  v-if="linkBtn"
+                  v-if="linkStep == 0"
+                  type="default"
+                  size="small"
+                  @click="linkActivities()"
+                  icon="md-link"
+                  title="Start to link"
+                  style="float: right; margin-left: 10px"
+                  id="linkBegin"
+                  >Start to link</Button
+                >
+                <Button
+                  v-else-if="linkStep == 1"
+                  type="info"
+                  size="small"
+                  @click="linkActivities()"
+                  icon="md-link"
+                  title="Confirm the beginning activities"
+                  style="float: right; margin-left: 10px"
+                  id="Linking"
+                  >Linking</Button
+                >
+                <Button
+                  v-else-if="linkStep == 2"
                   type="success"
                   size="small"
                   @click="linkActivities()"
                   icon="md-link"
-                  title="Active the activity"
-                  style="float:right;margin-left:10px;"
-                  id="linkBtn"
-                >Link</Button>
-                <Button
-                  v-else
-                  type="default"
-                  size="small"
-                  icon="md-link"
-                  title="Please select at least one node (activity)"
-                  style="float:right;margin-left:10px; cursor:default"
-                >Link</Button>
+                  title="Confirm the end activities"
+                  style="float: right; margin-left: 10px"
+                  id="linkEnd"
+                  >Complete linking</Button
+                >
               </template> -->
           </div>
           <div id="steps"></div>
@@ -283,8 +321,11 @@ export default {
       userRole: "visitor",
       //button
       removeLinkBtn: false,
-      linkBtn: false,
       nodePositionBtn: false,
+      //link
+      linkStep: 0,
+      beginNodes: [],
+      endNodes: [],
       // 添加/编辑step
       stepInfo: {
         aid: "",
@@ -314,8 +355,6 @@ export default {
       stepChart: null,
       // 选择的活动
       selectedActivities: [],
-      // 关联活动
-      selectedPreActivities: [],
       // 模态框
       addActivityModal: false,
       delModal: false,
@@ -396,20 +435,16 @@ export default {
         this.processStructure.length <= 0 ||
         this.processStructure.length == undefined
       ) {
-        this.linkBtn = false;
         this.removeLinkBtn = false;
         this.nodePositionBtn = false;
       } else {
         this.nodePositionBtn = true;
         if (this.selectedActivities.length == 0) {
-          this.linkBtn = false;
           this.removeLinkBtn = false;
         } else if (this.selectedActivities.length == 1) {
           this.removeLinkBtn = true;
-          this.linkBtn = true;
         } else if (this.selectedActivities.length > 1) {
           this.removeLinkBtn = false;
-          this.linkBtn = true;
         }
       }
     },
@@ -760,7 +795,7 @@ export default {
     linkInstruct() {
       this.driver.defineSteps([
         {
-          element: "#linkBtn",
+          element: "#linkBegin",
           popover: {
             title: "Before we start",
             description:
@@ -777,7 +812,7 @@ export default {
           },
         },
         {
-          element: "#linkBtn",
+          element: "#Linking",
           popover: {
             title: "Click the Link button",
             description:
@@ -794,7 +829,7 @@ export default {
           },
         },
         {
-          element: "#linkBtn",
+          element: "#linkEnd",
           popover: {
             title: "Click the Link button",
             description: "Confirm the end activities and build links.",
@@ -805,70 +840,76 @@ export default {
       this.driver.start();
     },
     linkActivities(activities) {
-      let driverShow = sessionStorage.getItem("driver");
-      if (driverShow == undefined) {
-        this.linkInstruct();
-        sessionStorage.setItem("driver", true);
+      if (this.linkStep == 0) {
+        let driverShow = sessionStorage.getItem("driver");
+        if (driverShow == undefined) {
+          this.linkInstruct();
+          sessionStorage.setItem("driver", false);
+        }
+        this.showSteps();
+        this.selectedActivities = [];
+        this.linkStep = 1;
+      } else if (this.linkStep == 1) {
+        if (this.selectedActivities.length > 0) {
+          // operation
+          this.beginNodes = this.selectedActivities;
+          // record
+          this.showSteps();
+          this.selectedActivities = [];
+          this.linkStep = 2;
+        } else {
+          this.$Notice.info({
+            desc: "Please select at least one node!",
+          });
+        }
+      } else if (this.linkStep == 2) {
+        if (this.selectedActivities.length > 0) {
+          // operation
+          this.endNodes = this.selectedActivities;
+          this.buildLink();
+          // record and end
+          this.showSteps();
+          this.linkStep = 0;
+        } else {
+          this.$Notice.info({
+            desc: "Please select at least one node!",
+          });
+        }
       }
-
-      // // 如果没有选择需要连接的节点
-      // if (this.selectedActivities.length == 0) {
-      //   this.$Notice.info({
-      //     desc: "Please select at least one node!",
-      //   });
-      //   return;
-      // } else {
-      //   if (this.selectedPreActivities.length <= 0) {
-      //     // The pre-activities have been selected
-      //     this.selectedPreActivities = Object.assign(this.selectedActivities);
-      //     this.selectedActivities = [];
-      //     this.$Notice.info({
-      //       desc:
-      //         'Please select the next activities to link, and click the "Link" button again!',
-      //     });
-      //   } else {
-      //     // The next-activities have been selected
-      //     for (var i = 0; i < this.selectedPreActivities.length; i++) {
-      //       for (var j = 0; j < this.selectedActivities.length; j++) {
-      //         // 前后继承关系
-      //         let lastnode = {
-      //           name: this.selectedPreActivities[i].name,
-      //           id: this.selectedPreActivities[i].id,
-      //         };
-      //         let nextnode = {
-      //           name: this.selectedActivities[j].name,
-      //           id: this.selectedActivities[j].id,
-      //         };
-
-      //         for (var k = 0; k < this.processStructure.length; k++) {
-      //           if (
-      //             this.processStructure[k].aid == this.selectedActivities[j].aid
-      //           ) {
-      //             if (!this.processStructure[k].last.contains(lastnode)) {
-      //               this.processStructure[k].last.push(lastnode);
-      //             }
-      //           }
-
-      //           if (
-      //             this.processStructure[k].aid ==
-      //             this.selectedPreActivities[i].aid
-      //           ) {
-      //             if (!this.processStructure[k].next.contains(nextnode)) {
-      //               this.processStructure[k].next.push(nextnode);
-      //             }
-      //           }
-      //         }
-      //       }
-      //     }
-      //     // update activityInfo/selectedActivities/graph
-      //     this.selectedPreActivities = [];
-      //     this.selectedActivities = [];
-      //     // 重新渲染
-      //     this.updateStepchart();
-      //     // 更新Step
-      //     this.updateSteps();
-      //   }
-      // }
+    },
+    buildLink() {
+      // The next-activities have been selected
+      for (var i = 0; i < this.beginNodes.length; i++) {
+        for (var j = 0; j < this.endNodes.length; j++) {
+          // 前后继承关系
+          let lastnode = {
+            name: this.beginNodes[i].name,
+            id: this.beginNodes[i].id,
+          };
+          let nextnode = {
+            name: this.endNodes[j].name,
+            id: this.endNodes[j].id,
+          };
+          for (var k = 0; k < this.processStructure.length; k++) {
+            if (this.processStructure[k].aid == this.endNodes[j].aid) {
+              if (!this.processStructure[k].last.contains(lastnode)) {
+                this.processStructure[k].last.push(lastnode);
+              }
+            }
+            if (this.processStructure[k].aid == this.beginNodes[i].aid) {
+              if (!this.processStructure[k].next.contains(nextnode)) {
+                this.processStructure[k].next.push(nextnode);
+              }
+            }
+          }
+        }
+      }
+      this.beginNodes = [];
+      this.endNodes = [];
+      // 重新渲染
+      this.updateStepchart();
+      // 更新Step
+      this.updateSteps();
     },
     addNewActivtiy() {
       // 防止Link与add相互干扰

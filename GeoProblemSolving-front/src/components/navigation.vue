@@ -189,7 +189,7 @@ footer {
                 <Cell @click.native="turnToURL('/GeoProblemSolving/toolsCenter')" class="menuItemCell">Tools</Cell>
                 <Cell @click.native="turnToURL('/GeoProblemSolving/help')" class="menuItemCell">Help</Cell>
                 <Divider style="margin: 5px 0"/>
-                <Cell v-show="!userState" @click.native="turnToURL('/GeoProblemSolving/login')" class="menuItemCell">Login</Cell>
+                <Cell v-show="!userState" @click.native="turnToURL('/GeoProblemSolving/user/login?pageUrl='+window.location.href)" class="menuItemCell">Login</Cell>
                 <Cell v-show="!userState" @click.native="turnToURL('/GeoProblemSolving/register')" class="menuItemCell">Sign up</Cell>
                 <Cell  v-show="userState" @click.native="turnToURL('/GeoProblemSolving/notifications')" class="menuItemCell">Notification</Cell>
                 <Cell  v-show="userState" @click.native="toPersonalPage" class="menuItemCell">Personal Page</Cell>

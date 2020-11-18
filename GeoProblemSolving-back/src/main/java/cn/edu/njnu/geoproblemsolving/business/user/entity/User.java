@@ -2,6 +2,7 @@ package cn.edu.njnu.geoproblemsolving.business.user.entity;
 
 import cn.edu.njnu.geoproblemsolving.business.user.enums.UserTitle;
 import lombok.Data;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.ArrayList;
@@ -13,6 +14,7 @@ public class User {
     /**
      * Necessary
      */
+    @Id
     private String userId;  //UUID
     private String name;
     private String password;    //MD5
