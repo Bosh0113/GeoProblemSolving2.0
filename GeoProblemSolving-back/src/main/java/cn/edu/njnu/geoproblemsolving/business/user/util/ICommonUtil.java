@@ -4,7 +4,6 @@ import cn.edu.njnu.geoproblemsolving.business.StaticParams;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
-import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
@@ -24,41 +23,22 @@ public class ICommonUtil {
             if (key.equals("userState")){
                 continue;
             }
+            //local user update
             update.set(key, value);
-            if (key.equals("gender")){
-                continue;
-            }
-            switch (key){
-                case "mobilePhone":
-                    String phoneStr = "phoneNum";
-                    long phoneNum = Long.parseLong(value);
-                    StaticParams.paramsMap.add(phoneStr, phoneNum);
-                    break;
-                case "jobTitle":
-                    String titleStr = "title";
-                    StaticParams.paramsMap.add(titleStr, value);
-                    break;
-                case "userName":
-                    String nameStr = "name";
-                    StaticParams.paramsMap.add(nameStr, value);
-                    break;
-                default:
-                    StaticParams.paramsMap.add(key, value);
-            }
+            //remote userBase update
+            StaticParams.paramsMap.add(key, value);
         }
         return update;
     }
-    public MultiValueMap<String,Object> gsm2BaseUser(){
+    public Object gsm2BaseUser(MultiValueMap<String, Object> updateInfo){
         RestTemplate restTemplate = new RestTemplate();
         String updateUrl  = "http://106.14.78.235/ResServer/user/update";
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization","Bearer " + StaticParams.access_token);
-        HttpEntity<MultiValueMap<String, Object>> httpEntity = new HttpEntity<>(StaticParams.paramsMap,headers);
+        HttpEntity<MultiValueMap<String, Object>> httpEntity = new HttpEntity<>(updateInfo, headers);
         ResponseEntity<String> entity = restTemplate.postForEntity(updateUrl, httpEntity, String.class);
         String body = entity.getBody();
-        System.out.println(entity);
-        System.out.println(body);
-        return StaticParams.paramsMap;
+        return body;
     }
     public void sendAuth(){
         RestTemplate restTemplate = new RestTemplate();

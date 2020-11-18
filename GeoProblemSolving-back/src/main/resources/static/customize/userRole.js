@@ -114,19 +114,23 @@ function roleLevelIdentify(role) {
         case "manager":
         case "creator": {
             roleLevel = "manager";
+            break;
         };
         case "researcher":
         case "expert":
         case "core-member": {
             roleLevel = "coreteam";
+            break;
         };
         case "decision-maker":
         case "stakeholder":
         case "consultant": {
             roleLevel = "widerteam";
+            break;
         };
         case "visitor": {
             roleLevel = "visitor";
+            break;
         }
     }
     return roleLevel;

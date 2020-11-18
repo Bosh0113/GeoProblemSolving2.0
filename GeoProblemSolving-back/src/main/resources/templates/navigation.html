@@ -132,7 +132,7 @@
                     <div class="userState">
                         <i-menu mode="horizontal" theme="dark" :style="`z-index:0;background:`+headerBgColor" v-show="!userInfoNav.userState||userInfoNav.userState==undefined"
                             class="menuItem">
-                            <menu-item name="login" to="/GeoProblemSolving/login">
+                            <menu-item name="login" @click.native = "login">
                                 <span>Login</span>
                             </menu-item>
                             <menu-item name="register" to="/GeoProblemSolving/register">
@@ -150,9 +150,9 @@
                             <menu-item name="personal" style="width:100px">
                                 <dropdown @on-click="changeSelect" placement="bottom-start">
                                     <a href="/GeoProblemSolving/personalPage">
-                                        <img v-if="userInfoNav.avatar!=''&&userInfoNav.avatar!=undefined&&userInfoNav.avatar!=null" :title="userInfoNav.userName"
+                                        <img v-if="userInfoNav.avatar!=''&&userInfoNav.avatar!=undefined&&userInfoNav.avatar!=null" :title="userInfoNav.name"
                                              :src="userInfoNav.avatar" style="width:40px;height:40px;vertical-align:middle;">
-                                        <avatar :username="userInfoNav.userName" :size="40" style="margin-top:10px" :title="userInfoNav.userName" v-else></avatar>
+                                        <avatar :username="userInfoNav.name" :size="40" style="margin-top:10px" :title="userInfoNav.name" v-else></avatar>
                                     </a>
                                     <dropdown-menu slot="list">
                                         <dropdown-item name="logout">Log out</dropdown-item>
@@ -223,7 +223,7 @@
                     headerWidth: "",
                     //用户
                     userInfoNav: {
-                        userName: ""
+                        name: ""
                     },
                     useMenuCSS: true
                 }
@@ -341,11 +341,19 @@
                         this.logout("home");
                     }
                 },
+                login(){
+                    var pageUrl = window.location.href;
+                    axios
+                        .get("/GeoProblemSolving/user/login?pageUrl="+pageUrl)
+                        .then(res=>{
+                            window.location.href = res.data;
+                        }).catch(err=>{})
+                },
                 logout(page) {
                     axios
                         .get("/GeoProblemSolving/user/logout")
                         .then(res => {
-                            this.userInfoNav = { userName: "" };
+                            this.userInfoNav = { name: "" };
                             sessionStorage.removeItem("userInfo");
                             this.noticeSocket.close();
                             window.location.href = "/GeoProblemSolving/" + page;

@@ -195,7 +195,7 @@ body {
                 <avatar
                   style="width:200px"
                   class="avatarStyle"
-                  :username="userDetail.userName"
+                  :username="userDetail.name"
                   :size="200"
                   :rounded="false"
                   v-else
@@ -204,10 +204,10 @@ body {
               <div
                 style="margin-top: 10px; border:1px solid lightgray;border-radius: 4px;padding:10px"
               >
-                <div class="single-info" :title="`Name: `+ userDetail.userName">
+                <div class="single-info" :title="`Name: `+ userDetail.name">
                   <span class="profileInfo">
                     <Icon type="ios-contact-outline" :size="20" />
-                    {{userDetail.userName}}
+                    {{userDetail.name}}
                   </span>
                 </div>
                 <div class="single-info" :title="`Email:  ` + userDetail.email">
@@ -218,18 +218,18 @@ body {
                 </div>
                 <div
                   class="single-info"
-                  :title="`Phone number:  ` + userDetail.mobilePhone"
-                  v-show="userDetail.mobilePhone!=''"
+                  :title="`Phone number:  ` + userDetail.phone"
+                  v-show="userDetail.phone!=''"
                 >
                   <span class="profileInfo">
                     <Icon type="ios-call-outline" :size="20" />
-                    {{userDetail.mobilePhone}}
+                    {{userDetail.phone}}
                   </span>
                 </div>
-                <div class="single-info" :title="`Title:  `+userDetail.jobTitle">
+                <div class="single-info" :title="`Title:  `+userDetail.title">
                   <span class="profileInfo">
                     <Icon type="ios-school-outline" :size="20" />
-                    {{userDetail.jobTitle}}
+                    {{userDetail.title}}
                   </span>
                 </div>
                 <div
@@ -243,28 +243,28 @@ body {
                     <span>&nbsp{{userDetail.country}}</span>
                   </span>
                 </div>
-                <div
-                  class="single-info"
-                  :title="`Organization:  `+ userDetail.organization"
-                  v-show="userDetail.organization!=''"
-                  style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis"
-                >
-                  <span class="profileInfo">
-                    <Icon type="ios-home-outline" :size="20" />
-                    {{userDetail.organization}}
-                  </span>
-                </div>
-                <div
-                  class="single-info"
-                  :title="`Area of interest:  `+ userDetail.direction"
-                  v-show="userDetail.direction!=''"
-                  style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis"
-                >
-                  <span class="profileInfo">
-                    <Icon type="ios-contract" :size="20" />
-                    {{userDetail.direction}}
-                  </span>
-                </div>
+<!--                <div-->
+<!--                  class="single-info"-->
+<!--                  :title="`Organization:  `+ userDetail.organizations[0]"-->
+<!--                  v-show="userDetail.organizations[0]!=''"-->
+<!--                  style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis"-->
+<!--                >-->
+<!--                  <span class="profileInfo">-->
+<!--                    <Icon type="ios-home-outline" :size="20" />-->
+<!--                    {{userDetail.organizations[0]}}-->
+<!--                  </span>-->
+<!--                </div>-->
+<!--                <div-->
+<!--                  class="single-info"-->
+<!--                  :title="`Area of interest:  `+ userDetail.domain[0]"-->
+<!--                  v-show="userDetail.domain[0]!=''"-->
+<!--                  style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis"-->
+<!--                >-->
+<!--                  <span class="profileInfo">-->
+<!--                    <Icon type="ios-contract" :size="20" />-->
+<!--                    {{userDetail.domain[0]}}-->
+<!--                  </span>-->
+<!--                </div>-->
                 <div
                   class="single-info"
                   :title="`Home Page:  `+ userDetail.homePage"
@@ -316,13 +316,13 @@ body {
                       </FormItem>
                       <FormItem label="Name" prop="userName">
                         <Input
-                          v-model="personalInfoItem.userName"
+                          v-model="personalInfoItem.name"
                           :class="{InputStyle: inputstyle}"
                         ></Input>
                       </FormItem>
                       <FormItem label="Title" prop="jobTitle">
                         <Select
-                          v-model="personalInfoItem.jobTitle"
+                          v-model="personalInfoItem.title"
                           placeholder="Plase enter your title"
                           :class="{InputStyle: inputstyle}"
                         >
@@ -337,7 +337,7 @@ body {
                       </FormItem>
                       <FormItem label="Organization" prop="organization">
                         <Input
-                          v-model="personalInfoItem.organization"
+                          v-model="personalInfoItem.organizations"
                           :class="{InputStyle: inputstyle}"
                         ></Input>
                       </FormItem>
@@ -349,13 +349,13 @@ body {
                       </FormItem>
                       <FormItem label="Phone number" prop="mobilePhone">
                         <Input
-                          v-model="personalInfoItem.mobilePhone"
+                          v-model="personalInfoItem.phone"
                           :class="{InputStyle: inputstyle}"
                         ></Input>
                       </FormItem>
                       <FormItem label="Area of interest" prop="direction">
                         <Input
-                          v-model="personalInfoItem.direction"
+                          v-model="personalInfoItem.domain"
                           :class="{InputStyle: inputstyle}"
                         ></Input>
                       </FormItem>
@@ -910,21 +910,20 @@ export default {
       currentProject: {},
       //当前用户信息的表单
       personalInfoItem: {
-        userName: "",
+        name: "",
         email: "",
-        jobTitle: "",
-        mobilePhone: "",
-        gender: "",
+        title: "",
+        phone: "",
         country: "",
         city: "",
-        organization: "",
+        organizations: "",
         introduction: "",
-        direction: "",
+        domain: "",
         homePage: "",
         avatar: ""
       },
       ruleValidate: {
-        userName: [
+        name: [
           {
             required: true,
             message: "The name cannot be empty",
@@ -958,21 +957,21 @@ export default {
             trigger: "blur"
           }
         ],
-        jobTitle: [
+        title: [
           {
             required: true,
             message: "Job Title cannot be empty",
             trigger: "blur"
           }
         ],
-        gender: [
-          {
-            required: true,
-            message: "Please select gender",
-            trigger: "change"
-          }
-        ],
-        mobilePhone: [
+        // gender: [
+        //   {
+        //     required: true,
+        //     message: "Please select gender",
+        //     trigger: "change"
+        //   }
+        // ],
+        phone: [
           {
             required: false,
             message: "Please enter your phone number",
@@ -993,7 +992,7 @@ export default {
             trigger: "blur"
           }
         ],
-        organization: [
+        organizations: [
           {
             required: true,
             message: "Please enter your affiliation",
@@ -1008,7 +1007,7 @@ export default {
           },
           {
             type: "string",
-            min: 20,
+            min: 5,
             message: "Introduction no less than 20 characters",
             trigger: "blur"
           }
@@ -1437,6 +1436,12 @@ export default {
                   title: "notification",
                   desc: "Profile update successfully"
                 });
+                var org = "";
+                for (let i of res.data.organizations){
+                  org += i +";"
+                }
+                res.data.organizations = org;
+
                 let userInfo = res.data;
                 userInfo.userState = true;
                 this.$store.commit("setUserInfo", userInfo);
