@@ -33,7 +33,7 @@ public class IUserController {
             StaticParams.referPageUrl = pageUrl;
             // String contextPath = req.getRequestURI().toString();
             //发送邮件
-            return "http://106.14.78.235/AuthServer/oauth/authorize?grant_type=authorization_code&response_type=code&client_id=zhengzhong&scope=all";
+            return "http://106.14.78.235/AuthServer/oauth/authorize?grant_type=authorization_code&response_type=code&client_id=GSM&scope=all";
         } catch (Exception e) {
             return null;
         }

@@ -2,7 +2,6 @@ package cn.edu.njnu.geoproblemsolving.business.activity.service.Impl;
 
 import cn.edu.njnu.geoproblemsolving.Dao.Folder.FolderDaoImpl;
 import cn.edu.njnu.geoproblemsolving.business.activity.dto.UpdateActivityDTO;
-import cn.edu.njnu.geoproblemsolving.business.activity.entity.Project;
 import cn.edu.njnu.geoproblemsolving.business.activity.enums.ActivityType;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ProjectRepository;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
@@ -101,11 +100,23 @@ public class ActivityServiceImpl implements ActivityService {
         return next;
     }
 
+    private void updateActiveTime(Activity activity){
+        // Update active time
+        Date date = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        activity.setActiveTime(dateFormat.format(date));
+
+        activityRepository.save(activity);
+    }
+
     @Override
     public JsonResult findActivity(String aid) {
         try {
             Activity activity = findActivityById(aid);
             if (activity == null) return ResultUtils.error(-1, "Fail: activity does not exist.");
+
+            // Update active time
+            updateActiveTime(activity);
 
             return ResultUtils.success(activity);
         } catch (Exception ex) {
@@ -215,6 +226,11 @@ public class ActivityServiceImpl implements ActivityService {
             Activity activity = (Activity) result.get();
 
             update.updateTo(activity);
+
+            // Update active time
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            activity.setActiveTime(dateFormat.format(new Date()));
+
             return ResultUtils.success(activityRepository.save(activity));
         } catch (Exception ex) {
             return ResultUtils.error(-2, "Fail: Exception");
@@ -284,6 +300,9 @@ public class ActivityServiceImpl implements ActivityService {
 
             ArrayList<Activity> activities = getChildActivities(activity);
 
+            // Update active time
+            updateActiveTime(activity);
+
             return ResultUtils.success(activities);
         } catch (Exception ex) {
             return ResultUtils.error(-2, "Fail: Exception");
@@ -338,6 +357,9 @@ public class ActivityServiceImpl implements ActivityService {
             }
             participants.put("members", memberinfos);
 
+            // Update active time
+            updateActiveTime(activity);
+
             return ResultUtils.success(participants);
         } catch (Exception ex) {
             return ResultUtils.error(-2, "Fail: Exception");
@@ -384,6 +406,9 @@ public class ActivityServiceImpl implements ActivityService {
             lineage.put("brothers", brothers);
             lineage.put("children", children);
 
+            // Update active time
+            updateActiveTime(activity);
+
             return ResultUtils.success(lineage);
         } catch (Exception ex) {
             return ResultUtils.error(-2, "Fail: Exception");
@@ -405,6 +430,10 @@ public class ActivityServiceImpl implements ActivityService {
                     activities.add(lastActivity);
                 }
             }
+
+            // Update active time
+            updateActiveTime(current);
+
             return ResultUtils.success(activities);
         } catch (Exception ex) {
             return ResultUtils.error(-2, "Fail: Exception");
@@ -427,6 +456,10 @@ public class ActivityServiceImpl implements ActivityService {
                     activities.add(nextActivity);
                 }
             }
+
+            // Update active time
+            updateActiveTime(current);
+
             return ResultUtils.success(activities);
         } catch (Exception ex) {
             return ResultUtils.error(-2, "Fail: Exception");
@@ -449,6 +482,11 @@ public class ActivityServiceImpl implements ActivityService {
 
             next = saveNextActivityInfo(aid, pid, next);
             current = saveLastActivityInfo(nextId, pid, current);
+
+
+            // Update active time
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            current.setActiveTime(dateFormat.format(new Date()));
 
             protocolRepository.save(protocol);
             activityRepository.save(next);
@@ -575,6 +613,11 @@ public class ActivityServiceImpl implements ActivityService {
             userInfo.put("role", "");
             members.add(userInfo);
             activity.setMembers(members);
+
+            // Update active time
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            activity.setActiveTime(dateFormat.format(new Date()));
+
             activityRepository.save(activity);
 
             return ResultUtils.success("Success");
@@ -599,6 +642,11 @@ public class ActivityServiceImpl implements ActivityService {
                 }
             }
             activity.setMembers(members);
+
+            // Update active time
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            activity.setActiveTime(dateFormat.format(new Date()));
+
             activityRepository.save(activity);
 
             return ResultUtils.success("Success");

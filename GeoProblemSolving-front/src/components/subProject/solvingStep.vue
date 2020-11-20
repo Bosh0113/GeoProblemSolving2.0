@@ -277,11 +277,11 @@ export default {
         "Context definition & resource collection",
         "Data processing",
         "Data visualization",
-        "Geographic model construction",
+        "Geo-analysis model construction",
         "Model effectiveness evaluation",
         "Geographical simulation",
-        "Quantitative and qualitative analyses",
-        "Decision-making and management"
+        "Data analysis",
+        "Decision making"
       ],
       // 步骤逻辑图
       stepChart: null,
@@ -626,7 +626,7 @@ export default {
               icon: "circle"
             },
             {
-              name: "Geographic model construction",
+              name: "Geo-analysis model construction",
               icon: "circle"
             },
             {
@@ -638,11 +638,11 @@ export default {
               icon: "circle"
             },
             {
-              name: "Quantitative and qualitative analyses",
+              name: "Data analysis",
               icon: "circle"
             },
             {
-              name: "Decision-making and management",
+              name: "Decision making",
               icon: "circle"
             }
           ]
@@ -674,7 +674,7 @@ export default {
                 name: "Data visualization"
               },
               {
-                name: "Geographic model construction"
+                name: "Geo-analysis model construction"
               },
               {
                 name: "Model effectiveness evaluation"
@@ -683,10 +683,10 @@ export default {
                 name: "Geographical simulation"
               },
               {
-                name: "Quantitative and qualitative analyses"
+                name: "Data analysis"
               },
               {
-                name: "Decision-making and management"
+                name: "Decision making"
               }
             ],
             links: [],
@@ -854,15 +854,15 @@ export default {
       } else if (category == 2) {
         type = "Data visualization";
       } else if (category == 3) {
-        type = "Geographic model construction";
+        type = "Geo-analysis model construction";
       } else if (category == 4) {
         type = "Model effectiveness evaluation";
       } else if (category == 5) {
         type = "Geographical simulation";
       } else if (category == 6) {
-        type = "Quantitative and qualitative analyses";
+        type = "Data analysis";
       } else if (category == 7) {
-        type = "Decision-making and management";
+        type = "Decision making";
       }
       return type;
     },
@@ -874,15 +874,15 @@ export default {
         category = 1;
       } else if (type == "Data visualization") {
         category = 2;
-      } else if (type == "Geographic model construction") {
+      } else if (type == "Geo-analysis model construction") {
         category = 3;
       } else if (type == "Model effectiveness evaluation") {
         category = 4;
       } else if (type == "Geographical simulation") {
         category = 5;
-      } else if (type == "Quantitative and qualitative analyses") {
+      } else if (type == "Data analysis") {
         category = 6;
-      } else if (type == "Decision-making and management") {
+      } else if (type == "Decision making") {
         category = 7;
       }
       return category;

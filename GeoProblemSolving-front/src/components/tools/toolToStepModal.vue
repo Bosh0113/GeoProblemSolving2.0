@@ -431,11 +431,11 @@ export default {
         "Context definition & resource collection",
         "Data processing",
         "Data visualization",
-        "Geographic model construction",
+        "Geo-analysis model construction",
         "Model effectiveness evaluation",
         "Geographical simulation",
-        "Quantitative and qualitative analyses",
-        "Decision-making and management",
+        "Data analysis",
+        "Decision making",
         "Others"
       ],
       infoModal: false,
@@ -738,11 +738,11 @@ export default {
           case "Context definition & resource collection":
           case "Data processing":
           case "Data visualization":
-          case "Geographic model construction":
+          case "Geo-analysis model construction":
           case "Model effectiveness evaluation":
           case "Geographical simulation":
-          case "Quantitative and qualitative analyses":
-          case "Decision-making and management": {
+          case "Data analysis":
+          case "Decision making": {
             var stepTypes = item.recomStep;
             for (var i = 0; i < stepTypes.length; i++) {
               if (stepTypes[i] == selectedType) {

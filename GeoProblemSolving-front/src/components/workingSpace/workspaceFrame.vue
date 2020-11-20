@@ -1,5 +1,5 @@
 <template>
-  <div style="display: flex; background-color: lightgrey">
+  <div style="display: flex; background-color: #eee">
     <Button
       title="Activity tree"
       @click="unfoldTree"
@@ -86,6 +86,7 @@
         :activityInfo="slctActivity"
         :userInfo="userInfo"
         :key="slctActivity.aid"
+        :childActivities="childActivities"
       ></multi-activity>
       <activity-show
         v-else-if="contentType == 3"
@@ -176,74 +177,6 @@
         * The selected activity and its all child activities will be deleted!
       </h3>
     </Modal>
-    <!-- <Modal
-      v-model="createActivityModel"
-      title="Create a new activity"
-      width="800"
-      :mask-closable="false"
-    >
-      <Form
-        ref="activityForm"
-        :model="activityForm"
-        :rules="activityCreateRule"
-        :label-width="120"
-      >
-        <FormItem label="Name" prop="name">
-          <Input
-            type="text"
-            v-model="activityForm.name"
-            placeholder="Fill in the name (less than 60 characters) ..."
-          ></Input>
-        </FormItem>
-        <FormItem label="Description" prop="description">
-          <Input
-            v-model="activityForm.description"
-            placeholder="Fill in the description..."
-            :rows="4"
-            type="textarea"
-          ></Input>
-        </FormItem>
-        <FormItem label="Activity type:" prop="type">
-          <Select
-            v-model="activityForm.type"
-            placeholder="Select the type of this activity"
-            readonly
-          >
-            <Option value="Activity_Default">Select type later</Option>
-            <Option value="Activity_Unit">Single activity</Option>
-            <Option value="Activity_Group">Multi activities</Option>
-          </Select>
-        </FormItem>
-        <FormItem
-          label="Purpose:"
-          prop="purpose"
-          v-show="activityForm.type == 'Activity_Unit'"
-        >
-          <Select
-            v-model="activityForm.purpose"
-            placeholder="Select the purpose of this activity"
-            readonly
-          >
-            <Option v-for="item in purposes" :key="item.index" :value="item">{{
-              item
-            }}</Option>
-          </Select>
-        </FormItem>
-      </Form>
-      <div slot="footer" style="display: inline-block">
-        <Button
-          type="primary"
-          @click="createActivity('activityForm')"
-          style="float: right"
-          >OK</Button
-        >
-        <Button
-          @click="createActivityModel = false"
-          style="float: right; margin-right: 15px"
-          >Cancel</Button
-        >
-      </div>
-    </Modal> -->
   </div>
 </template>
 <script>
@@ -272,18 +205,8 @@ export default {
       projectInfo: parent.vm.projectInfo,
       userInfo: JSON.parse(sessionStorage.getItem("userInfo")),
       slctActivity: {},
-      expandNode: {}, // 使用引用传递，记录expand的位置，对activity tree 进行修改
+      childActivities: [],
       parentNode: {}, // 记录所创建/选择activity的父节点位置，对activity tree 进行修改
-      // activityForm: {
-      //   name: "",
-      //   description: "",
-      //   parent: "",
-      //   creator: "",
-      //   level: -1,
-      //   permission: JSON.stringify(userRoleJS.getDefault()),
-      //   type: "Activity_Default",
-      //   purpose: "Others",
-      // },
       editActivityForm: {
         name: "",
         description: "",
@@ -292,33 +215,8 @@ export default {
         level: -1,
         permission: JSON.stringify(userRoleJS.getDefault()),
         type: "Activity_Default",
-        purpose: "Others",
+        purpose: "Multi-purpose",
       },
-      // activityCreateRule: {
-      //   name: [
-      //     {
-      //       required: true,
-      //       message: "The name should not be empty and more than 60 characters",
-      //       trigger: "blur",
-      //       type: "string",
-      //       max: 60,
-      //     },
-      //   ],
-      //   description: [
-      //     {
-      //       required: true,
-      //       message: "The description should not be empty",
-      //       trigger: "blur",
-      //     },
-      //   ],
-      //   purpose: [
-      //     {
-      //       required: true,
-      //       message: "The purpose should not be empty",
-      //       trigger: "blur",
-      //     },
-      //   ],
-      // },
       activityEditRule: {
         name: [
           {
@@ -337,20 +235,19 @@ export default {
           },
         ],
       },
-      // createActivityModel: false,
       activityEditModal: false,
       activityDeleteModal: false,
       contentType: -1,
       purposes: [
-        "Others",
+        "Multi-purpose",
         "Context definition & resource collection",
         "Data processing",
+        "Data analysis",
         "Data visualization",
-        "Geographic model construction",
+        "Geo-analysis model construction",
         "Model effectiveness evaluation",
         "Geographical simulation",
-        "Quantitative and qualitative analyses",
-        "Decision-making and management",
+        "Decision making",
       ],
       // spinShow: false,
     };
@@ -429,14 +326,12 @@ export default {
     foldTree() {
       this.treeFold = true;
       document.getElementById("ActivityTree").style.width = 0;
-      document.getElementById("ActivityTree").style.margin = 0;
       document.getElementById("ActivityContent").style.width =
         window.innerWidth - 10 + "px";
     },
     unfoldTree() {
       this.treeFold = false;
       document.getElementById("ActivityTree").style.width = 250 + "px";
-      document.getElementById("ActivityTree").style.margin = 5 + "px";
       document.getElementById("ActivityContent").style.width =
         window.innerWidth - 260 + "px";
     },
@@ -444,29 +339,28 @@ export default {
       let aid = this.getURLParameter("aid");
       let level = this.getURLParameter("level");
 
-      parent.vm.workspaceUrl =
-        "/GeoProblemSolving/projectInfo/" +
-        this.projectInfo.aid +
-        "?content=workspace&aid=" +
-        aid +
-        "&level=" +
-        level;
-
       if (aid == undefined || level == undefined) {
         this.getProjectInfo();
+        let url =
+          "/GeoProblemSolving/projectInfo/" +
+          this.projectInfo.aid +
+          "?content=workspace";
+        parent.history.replaceState(null, null, url);
+        parent.vm.workspaceUrl = url;
       } else {
+        parent.vm.workspaceUrl =
+          "/GeoProblemSolving/projectInfo/" +
+          this.projectInfo.aid +
+          "?content=workspace&aid=" +
+          aid +
+          "&level=" +
+          level;
         if (level > 1) {
           this.getActivityBranch(aid);
         } else if (level == 1) {
           this.getSubprojectBranch(aid);
         } else {
           this.getProjectInfo();
-          let url =
-            "/GeoProblemSolving/projectInfo/" +
-            this.projectInfo.aid +
-            "?content=workspace";
-          parent.history.replaceState(null, null, url);
-          parent.vm.workspaceUrl = url;
         }
       }
     },
@@ -490,6 +384,7 @@ export default {
           .then((res) => {
             if (res.data.code == 0) {
               let children = res.data.data;
+              this.childActivities = children;
 
               // 处理掉异常
               for (let i = 0; i < children.length; i++) {
@@ -505,7 +400,7 @@ export default {
               // update activity tree
               this.activityTree = [root];
               this.slctActivity = root;
-              this.setContent(this.slctActivity, "init");
+              this.setContent(this.slctActivity);
             } else {
               console.log(res.data.msg);
             }
@@ -516,6 +411,8 @@ export default {
       } else {
         let root = Object.assign({}, this.projectInfo);
         this.activityTree.push(root);
+        this.slctActivity = root;
+        this.setContent(this.slctActivity);
       }
     },
     getSubprojectBranch(aid) {
@@ -530,6 +427,8 @@ export default {
         .then((res) => {
           if (res.data.code == 0) {
             let branch = res.data.data;
+            this.childActivities = branch.children;
+
             this.buildActivityTree(
               branch.ancestors,
               branch.brothers,
@@ -555,6 +454,8 @@ export default {
         .then((res) => {
           if (res.data.code == 0) {
             let branch = res.data.data;
+            this.childActivities = branch.children;
+
             this.buildActivityTree(
               branch.ancestors,
               branch.brothers,
@@ -619,7 +520,7 @@ export default {
       let root = ancestors[ancestors.length - 1];
       this.activityTree = [root];
       this.slctActivity = ancestors[0];
-      this.setContent(this.slctActivity, "init");
+      this.setContent(this.slctActivity);
 
       // Cascader names
       for (let i = ancestors.length - 1; i >= 0; i--) {
@@ -628,68 +529,8 @@ export default {
     },
     typeChanged(type) {
       this.slctActivity.type = type;
-      this.setContent(this.slctActivity, "type");
+      this.setContent(this.slctActivity);
     },
-    expandActivityTree(activity) {
-      if (activity.type == "Activity_Group") {
-        let url = "";
-        if (activity.level == 1) {
-          url = "/GeoProblemSolving/subproject/" + activity.aid + "/children";
-        } else if (activity.level > 1) {
-          url = "/GeoProblemSolving/activity/" + activity.aid + "/children";
-        }
-
-        this.axios
-          .get(url)
-          .then((res) => {
-            if (res.data.code == 0) {
-              // children
-              let children = res.data.data;
-
-              // 处理掉异常
-              for (let i = 0; i < children.length; i++) {
-                if (children[i].children != undefined) {
-                  children[i].children = [];
-                }
-              }
-              // expand activity tree
-              this.expandNode["expand"] = true;
-              this.expandNode["children"] = children;
-              this.setContent(activity, "switch");
-            } else {
-              console.log(res.data.msg);
-            }
-          })
-          .catch((err) => {
-            console.log(err.data);
-          });
-      }
-    },
-    // switchActivity(root, node, activity) {
-    //   // if (
-    //   //   this.roleIdentity(activity) != "visitor" ||
-    //   //   activity.permission.observe == "Yes"
-    //   // ) {
-    //   //content
-    //   if (activity.level > 0) {
-    //     this.parentNode = root[node.parent].node;
-    //   } else {
-    //     this.parentNode = {};
-    //   }
-    //   this.slctActivity = activity;
-    //   this.getCascader(root, node);
-    //   // expand
-    //   if (
-    //     activity.type == "Activity_Group" &&
-    //     (activity.children == undefined || activity.children.length == 0)
-    //   ) {
-    //     this.expandActivityTree(activity);
-    //     this.expandNode = activity;
-    //   }
-    //   // } else {
-    //   //   this.contentType = 3;
-    //   // }
-    // },
     setContent(activity, operation) {
       if (activity.type == "Activity_Default") {
         this.contentType = 0;
@@ -698,71 +539,6 @@ export default {
       } else if (activity.type == "Activity_Group") {
         this.contentType = 2;
       }
-      // if (operation !== "init") {
-
-      //   parent.location.href =
-      //     "/GeoProblemSolving/projectInfo/" +
-      //     this.projectInfo.aid +
-      //     "?content=workspace&aid=" +
-      //     activity.aid +
-      //     "&index=" +
-      //     index;
-      // }
-    },
-    // preCreation(root, node) {
-    //   this.parentNode = root[node.parent].node;
-
-    //   this.activityForm.parent = this.parentNode.aid;
-    //   this.activityForm.creator = this.userInfo.userId;
-    //   this.activityForm.level = this.parentNode.level + 1;
-
-    //   this.createActivityModel = true;
-    // },
-    createActivity(name) {
-      // this.$refs[name].validate((valid) => {
-      //   if (valid) {
-      //     let url = "";
-      //     if (this.activityForm.level == 1) {
-      //       // subproject
-      //       url = "/GeoProblemSolving/subproject";
-      //     } else if (this.activityForm.level > 1) {
-      //       // activity
-      //       url = "/GeoProblemSolving/activity";
-      //     }
-      //     this.axios
-      //       .post(url, this.activityForm)
-      //       .then((res) => {
-      //         if (res.data.code == 0) {
-      //           // change activity tree
-      //           for (let i = 0; i < this.parentNode.children.length; i++) {
-      //             if (this.parentNode.children[i].aid == "add") {
-      //               this.parentNode.children[i] = res.data.data;
-      //             }
-      //           }
-      //           // this.parentNode.children.push({ aid: "add" });
-      //           this.slctActivity = res.data.data;
-      //           // change content
-      //           this.setContent(this.slctActivity, "create");
-      //           this.activityForm = {
-      //             name: "",
-      //             description: "",
-      //             parent: "",
-      //             creator: "",
-      //             level: -1,
-      //             permission: JSON.stringify(userRoleJS.getDefault()),
-      //             type: "Activity_Default",
-      //             purpose: "Others",
-      //           };
-      //         } else {
-      //           console.log(res.data.msg);
-      //         }
-      //       })
-      //       .catch((err) => {
-      //         console.log(err);
-      //       });
-      //     this.createActivityModel = false;
-      //   }
-      // });
     },
     preEditting() {
       let children = [];
@@ -781,16 +557,16 @@ export default {
         if (valid) {
           if (this.editActivityForm.type != this.slctActivity.type) {
             if (this.slctActivity.type == "Activity_Unit") {
-              this.editActivityForm.purpose = "Others";
+              this.editActivityForm.purpose = "Multi-purpose";
             } else if (this.slctActivity.type == "Activity_Group") {
               if (
                 this.slctActivity.children != undefined &&
-                this.slctActivity.children.length > 1
+                this.slctActivity.children.length > 0
               ) {
                 this.$Notice.info({
                   title: "Fail",
                   desc:
-                    "Please make sure no child activity, before change the type of current activity.",
+                    "Please make sure no child activity, before changing the type of current activity.",
                 });
                 this.activityEditModal = false;
                 return;
@@ -820,7 +596,7 @@ export default {
                 let index = this.cascader.length - 1;
                 this.$set(this.cascader, index, this.editActivityForm.name);
                 // change content
-                this.setContent(this.slctActivity, "edit");
+                this.setContent(this.slctActivity);
               } else {
                 this.$Notice.info({ title: "Result", desc: res.data.msg });
               }
@@ -848,14 +624,14 @@ export default {
           if (res.data.code == 0) {
             if (this.parentNode != {}) {
               this.slctActivity = this.parentNode;
-              this.setContent(this.slctActivity, "delete");
 
-              // delete activity from activity tree
-              let children = this.parentNode.children;
-              children.splice(
-                children.findIndex((item) => item.aid === aid),
-                1
-              );
+              parent.location.href =
+                "/GeoProblemSolving/projectInfo/" +
+                this.projectInfo.aid +
+                "?content=workspace&aid=" +
+                this.parentNode.aid +
+                "&level=" +
+                this.parentNode.level;
             }
           } else {
             console.log(res.data.msg);
@@ -873,11 +649,11 @@ export default {
 .foldTreeBtn {
   padding: 5px 8px 6px;
   height: calc(100vh - 10px);
-  margin: 5px;
+  margin-right: 5px;
   border: 0px;
 }
 .activityCard {
-  margin: 5px;
+  margin-right: 5px;
   width: 250px;
   height: calc(100vh - 10px);
   overflow-y: auto;
@@ -890,7 +666,6 @@ export default {
   width: calc(100vw - 260px);
   height: calc(100vh - 10px);
   background-color: white;
-  margin: 5px;
   border: 0;
   overflow-x: auto;
 }

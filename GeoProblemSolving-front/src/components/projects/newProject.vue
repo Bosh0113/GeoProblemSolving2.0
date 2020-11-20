@@ -193,7 +193,6 @@ h1 {
               type="success"
               @click="createProject('formInline')"
               class="create"
-              :disabled="clickForbidden"
             >Create</Button>
           </div>
         </FormItem>
@@ -224,8 +223,6 @@ export default {
   },
   data() {
     return {
-      // 控制按钮禁用的
-      clickForbidden: false,
       formInline: {
         name: "",
         category: "",
@@ -298,7 +295,6 @@ export default {
 
       this.$refs[name].validate((valid) => {
         if (valid) {
-          this.clickForbidden = true;
           let createProjectForm = {
             category: this.formInline.category,
             name: this.formInline.name,
@@ -307,6 +303,7 @@ export default {
             picture: this.pictureUrl,
             type: "Activity_Default",
             description: this.formInline.description,
+            type: "Activity_Default",
             // creator: "5d1c51e5020a3e3ad80b717e",
             creator: this.$store.getters.userId,
             permission: JSON.stringify(permission),
@@ -351,7 +348,7 @@ export default {
         .then((res) => {
           if (res.data === "Success") {
             window.location.href =
-              "/GeoProblemSolving/projectDetail/" + scopeId;
+              "/GeoProblemSolving/projectInfo/" + scopeId;
           } else {
             confirm("Created project fail.");
           }

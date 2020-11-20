@@ -279,11 +279,11 @@ export default {
         "Context definition & resource collection",
         "Data processing",
         "Data visualization",
-        "Geographic model construction",
+        "Geo-analysis model construction",
         "Model effectiveness evaluation",
         "Geographical simulation",
-        "Quantitative and qualitative analyses",
-        "Decision-making and management"
+        "Data analysis",
+        "Decision making"
       ]
     };
   },

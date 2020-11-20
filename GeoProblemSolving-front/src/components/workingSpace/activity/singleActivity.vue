@@ -89,7 +89,7 @@
               :participants="participants"
             ></data-visual>
             <model-build
-              v-else-if="activityInfo.purpose=='Geographic model construction'"
+              v-else-if="activityInfo.purpose=='Geo-analysis model construction'"
               :activityInfo="activityInfo"
               :participants="participants"
             ></model-build>
@@ -104,12 +104,12 @@
               :participants="participants"
             ></geo-simulation>
             <geo-analysis
-              v-else-if="activityInfo.purpose=='Quantitative and qualitative analyses'"
+              v-else-if="activityInfo.purpose=='Data analysis'"
               :activityInfo="activityInfo"
               :participants="participants"
             ></geo-analysis>
             <decision-making
-              v-else-if="activityInfo.purpose=='Decision-making and management'"
+              v-else-if="activityInfo.purpose=='Decision making'"
               :activityInfo="activityInfo"
               :participants="participants"
             ></decision-making>

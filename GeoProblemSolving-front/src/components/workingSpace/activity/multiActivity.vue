@@ -9,14 +9,14 @@
       <MenuItem name="Introduction">
         <Icon type="ios-paper" />Introduction
       </MenuItem>
-      <MenuItem name="Resources">
-        <Icon type="ios-albums" />Resources
+      <MenuItem name="Activities">
+        <Icon type="logo-steam" />Pathway
       </MenuItem>
       <MenuItem name="Tasks">
-        <Icon type="ios-construct" />Tasks
+        <Icon type="ios-construct" />Task
       </MenuItem>
-      <MenuItem name="Activities">
-        <Icon type="ios-analytics" />Activities
+      <MenuItem name="Resources">
+        <Icon type="ios-albums" />Resource
       </MenuItem>
       <!-- <MenuItem name="Discussion">
         <Icon type="ios-people" />Discussion
@@ -33,10 +33,10 @@
       ></folder-tree>
     </div>
     <div v-show="activeMenu=='Tasks'">
-      <task-manager :activityInfo="activityInfo"></task-manager>
+      <task-manager :activityInfo="activityInfo" :childActivities="childActivities" ></task-manager>
     </div>
     <div v-show="activeMenu=='Activities'">
-      <process-manager :activityInfo="activityInfo"></process-manager>
+      <process-manager :activityInfo="activityInfo" :childActivities="childActivities" ></process-manager>
     </div>
     <div v-show="activeMenu=='Discussion'"></div>
   </div>
@@ -48,7 +48,7 @@ import taskManager from "./utils/taskManger.vue";
 import processManager from "./utils/processManager.vue";
 
 export default {
-  props: ["activityInfo", "userInfo"],
+  props: ["activityInfo", "userInfo","childActivities","brotherActivities"],
   components: {
     activityShow,
     folderTree,

@@ -122,11 +122,11 @@ export default {
         "Context definition & resource collection",
         "Data processing",
         "Data visualization",
-        "Geographic model construction",
+        "Geo-analysis model construction",
         "Model effectiveness evaluation",
         "Geographical simulation",
-        "Quantitative and qualitative analyses",
-        "Decision-making and management",
+        "Data analysis",
+        "Decision making",
       ],
       purpose: "",
     };
@@ -176,6 +176,8 @@ export default {
         url = "/GeoProblemSolving/subproject/" + aid;
       } else if (this.activityInfo.level > 1) {
         url = "/GeoProblemSolving/activity/" + aid;
+      } else {
+        url = "/GeoProblemSolving/project/" + aid;
       }
       this.axios
         .put(url, data)
