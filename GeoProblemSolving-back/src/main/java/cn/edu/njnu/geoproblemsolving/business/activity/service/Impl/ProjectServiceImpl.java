@@ -164,8 +164,11 @@ public class ProjectServiceImpl implements ProjectService {
             User user = findByUserId(creator.getString("userId"));
             if (user == null) return ResultUtils.error(-1, "Fail: user does not exist");
 
-            // ArrayList<String> manageProjects = user.getManageProjects();
-            ArrayList<String> managedProjects = new ArrayList<>();
+            ArrayList<String> managedProjects = user.getManageProjects();
+            if (managedProjects == null){
+                managedProjects = new ArrayList<>();
+            }
+            // ArrayList<String> managedProjects = new ArrayList<>();
             managedProjects.add(projectId);
             user.setManageProjects(managedProjects);
             /**
