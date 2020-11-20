@@ -71,7 +71,6 @@
         }
 
         .projectDescriptionContent {
-            height: calc(100vh - 530px);
             overflow-y: auto;
             padding: 10px 5px;
             word-break: break-word;
@@ -253,34 +252,33 @@
 <div id="projectDetailPage" v-cloak>
     <child-navigation ref="navigationEl" active-type="projects" :user-info="userInfo"></child-navigation>
     <template>
-        <div :style="{height: contentPageCSS}" style="margin-top: 60px;">
+        <div :style="{height: contentPageCSS + 'px'}" style="margin-top: 60px;">
             <div span="2" style="height: inherit;width: 90px;position: absolute;">
                 <i-menu :active-name="activeMenu" @on-select="changeMenuItem"
                         style="height: inherit;width: fit-content;z-index:98">
-                    <menu-item name="overview" class="projectMenuItem">
-                        <Icon type="md-home" title="Overview" size="35"></Icon>
+                    <menu-item name="overview" class="projectMenuItem" style="padding: 14px">
+                        <Icon type="md-home" title="Overview" size="35" style="margin: 0 3px;"></Icon>
                     </menu-item>
-                    <menu-item name="info" class="projectMenuItem">
-                        <Icon type="ios-information-circle" title="Information" size="35"></Icon>
+                    <menu-item name="info" class="projectMenuItem" style="padding: 14px">
+                        <Icon type="ios-information-circle" title="Information" size="35" style="margin: 0 3px;"></Icon>
                     </menu-item>
-                    <menu-item name="task" class="projectMenuItem">
-                        <Icon type="md-calendar" title="Tasks" size="35"></Icon>
+                    <menu-item name="task" class="projectMenuItem" style="padding: 14px">
+                        <Icon type="md-calendar" title="Tasks" size="35" style="margin: 0 3px;"></Icon>
                     </menu-item>
-                    <menu-item name="workspace" class="projectMenuItem">
-                        <Icon type="md-git-branch" title="Workspace" size="35"></Icon>
+                    <menu-item name="workspace" class="projectMenuItem" style="padding: 14px">
+                        <Icon type="md-git-branch" title="Workspace" size="35" style="margin: 0 3px;"></Icon>
                     </menu-item>
-                    <menu-item name="resource" class="projectMenuItem">
-                        <Icon type="ios-folder" title="Resources" size="35"></Icon>
+                    <menu-item name="resource" class="projectMenuItem" style="padding: 14px">
+                        <Icon type="ios-folder" title="Resources" size="35" style="margin: 0 3px;"></Icon>
                     </menu-item>
                 </i-menu>
             </div>
-            <div style="margin-left: 90px;height: inherit;min-height: fit-content;">
-                <div v-show="activeMenu=='overview'" style="height: inherit;min-height: fit-content;">
-                    <div style="background:#eee;padding: 10px;height: inherit;min-height: fit-content;">
+            <div style="margin-left: 70px;height: inherit;min-height: fit-content;">
+                <div v-show="activeMenu=='overview'" :style="{height: contentPageCSS + 'px'}">
+                    <div style="background:#eee;padding: 10px;">
                         <Card :bordered="false" dis-hover
                               style="height: -webkit-fill-available; flex-flow: column;min-height: fit-content;">
                             <div slot="title">
-                                <!--                                <h1 class="projectMenuItemTitle">Overview </h1>-->
                                 <div style="margin-left:20px;top: 15px; position:absolute;left:50px;">
                                     <strong style="font-size:1.5rem;">Project</strong>
                                     <Divider type="vertical"></Divider>
@@ -300,7 +298,8 @@
                                     </i-button>
                                 </div>
                             </div>
-                            <Row style="margin-left:60px">
+                            <Row style="margin-left:60px"  :style="{height: contentPageCSS - 105 + 'px'}">
+                                <vue-scroll :ops="scrollOps" >
                                 <i-col span="10" offset="1">
                                     <div style="margin:20px">
                                         <Card style="width:100%;height:10%">
@@ -406,12 +405,13 @@
                                         <span style="margin: 0px 10px; font-size: 14px;"> is created for dealing with geo-problems in a participatory manner. </span>
                                     </div>
                                 </i-col>
+                                </vue-scroll>
                             </Row>
                         </Card>
                     </div>
                 </div>
-                <div v-show="activeMenu=='info'" style="height: inherit;min-height: fit-content;">
-                    <div style="background:#eee;padding: 10px;height: inherit;min-height: fit-content;">
+                <div v-show="activeMenu=='info'"  :style="{height: contentPageCSS + 'px'}">
+                    <div style="background:#eee;padding: 10px;">
                         <Card :bordered="false" dis-hover
                               style="height: -webkit-fill-available;flex-flow: column;min-height: fit-content;">
                             <div slot="title">
@@ -484,7 +484,7 @@
                                                                              color="grey"></Icon>
                                                                     </span>
                                                                 </p>
-                                                                <p><strong>Category: </strong><span id="projectCategory"
+                                                                 <p><strong>Category: </strong><span id="projectCategory"
                                                                                                     th:text="${projectInfo.category}">Project category</span>
                                                                 </p>
                                                                 <p><strong>Tag: </strong><span id="projectTag"
@@ -516,7 +516,7 @@
                                             <div class="flex1" style="margin-top: 10px;">
                                                 <div style="flex: 1;padding: 5px;min-height: 100px;border: #e8eaec 0.1px dashed;">
                                                     <h3>Description:</h3>
-                                                    <div class="projectDescriptionContent">
+                                                    <div class="projectDescriptionContent" :style="{height: contentPageCSS - 343 + 'px'}">
                                                         <vue-scroll :ops="scrollOps">
                                                             <div id="projectDescription" style="white-space: pre-line;"
                                                                  th:text="${projectInfo.description}">
@@ -555,24 +555,6 @@
                                                         </Poptip>
                                                     </div>
                                                 </div>
-                                                <!--                                                <div :style="{height: membersContentCSS}" style="overflow-y:auto;">-->
-                                                <!--                                                    <vue-scroll :ops="scrollOps">-->
-                                                <!--                                                        <Card style="background-color: #dcdee2;border-color: #c5c8ce;cursor: pointer;"-->
-                                                <!--                                                              @click.native=goPersonalPage(projectInfo.managerId)>-->
-                                                <!--                                                            <div title="Manager">-->
-                                                <!--                                                                <h2 style="color: white" class="overEllipsis">-->
-                                                <!--                                                                    {{projectInfo.managerName}}</h2>-->
-                                                <!--                                                            </div>-->
-                                                <!--                                                        </Card>-->
-                                                <!--                                                        <Card v-for="member in projectInfo.members"-->
-                                                <!--                                                              style="margin-top: 5px;cursor: pointer;"-->
-                                                <!--                                                              @click.native=goPersonalPage(member.userId)>-->
-                                                <!--                                                            <div title="Member">-->
-                                                <!--                                                                <h2 class="overEllipsis">{{member.userName}}</h2>-->
-                                                <!--                                                            </div>-->
-                                                <!--                                                        </Card>-->
-                                                <!--                                                    </vue-scroll>-->
-                                                <!--                                                </div>-->
                                             </Card>
                                         </div>
                                     </i-col>
@@ -581,16 +563,16 @@
                         </Card>
                     </div>
                 </div>
-                <div v-show="activeMenu=='workspace'" style="height: inherit;min-height: fit-content;">
-                    <div style="background:#eee;padding: 10px;height: inherit;min-height: fit-content;">
+                <div v-show="activeMenu=='workspace'" :style="{height: contentPageCSS + 'px'}">
+                    <div style="background:#eee;padding: 10px;">
                         <div style="width: -webkit-fill-available;height: -webkit-fill-available;">
-                            <iframe style="width: -webkit-fill-available;height: -webkit-fill-available;border-width:0"
+                            <iframe style="width: -webkit-fill-available;border-width:0" :style="{height: contentPageCSS - 20 + 'px'}"
                                     :src="ipPort+'/activity/' + projectInfo.aid"></iframe>
                         </div>
                     </div>
                 </div>
-                <div v-show="activeMenu=='resource'" style="height: inherit;min-height: fit-content;">
-                    <div style="background:#eee;padding: 10px;height: inherit;min-height: fit-content;">
+                <div v-show="activeMenu=='resource'" :style="{height: contentPageCSS + 'px'}">
+                    <div style="background:#eee;padding: 10px;">
                         <Card :bordered="false" dis-hover
                               style="height: -webkit-fill-available;min-height: 565px;min-height: fit-content;">
                             <!--                            <h1 slot="title" class="projectMenuItemTitle">Resources</h1>-->
@@ -611,7 +593,7 @@
                                     </i-button>
                                 </Tooltip>
                             </div>
-                            <div :style="{height:workspaceCSS}">
+                            <div :style="{height: contentPageCSS - 105 + 'px'}">
                                 <child-folder
                                         :role="userRole"
                                         :project-info="projectInfo"
@@ -621,7 +603,7 @@
                     </div>
                 </div>
                 <div v-show="activeMenu=='task'" style="height: inherit;min-height: fit-content;">
-                    <div style="background:#eee;padding: 10px;height: inherit;min-height: fit-content;">
+                    <div style="background:#eee;padding: 10px">
                         <Card :bordered="false" dis-hover
                               style="height: -webkit-fill-available;min-height: 565px;min-height: fit-content;">
                             <!--                            <h1 slot="title" class="projectMenuItemTitle">Task assignment</h1>-->
@@ -635,7 +617,7 @@
                                     <span class="project_title title_mw">{{projectInfo.name}}</span>
                                 </div>
                             </div>
-                            <div>
+                            <div :style="{height: contentPageCSS - 105 + 'px'}">
                                 <child-task
                                         :project-info="projectInfo"
                                         :user-role="userRole"
@@ -1048,9 +1030,7 @@
                     projectInfo: projectInfo,
                     activeMenu: "overview",
                     workspaceUrl: '/GeoProblemSolving/projectInfo/' + projectInfo.aid + "?content=workspace",
-                    contentPageCSS: '',
-                    membersContentCSS: '',
-                    workspaceCSS: '',
+                    contentPageCSS: 0,
                     scrollOps: {
                         bar: {
                             background: "#808695"
@@ -1282,13 +1262,9 @@
                 },
                 resizeContent() {
                     if (window.innerHeight > 735) {
-                        this.membersContentCSS = window.innerHeight - 330 + 'px';
-                        // this.contentPageCSS = window.innerHeight - 130 + 'px';
-                        this.workspaceCSS = window.innerHeight - 240 + 'px';
+                        this.contentPageCSS = window.innerHeight - 120 ;
                     } else {
-                        this.membersContentCSS = '407px';
-                        // this.contentPageCSS = 'fit-content';
-                        this.workspaceCSS = '495px';
+                        this.contentPageCSS = 610;
                     }
                     window.onresize = () => {
                         return (() => {

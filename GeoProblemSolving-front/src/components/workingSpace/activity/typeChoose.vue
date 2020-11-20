@@ -176,6 +176,8 @@ export default {
         url = "/GeoProblemSolving/subproject/" + aid;
       } else if (this.activityInfo.level > 1) {
         url = "/GeoProblemSolving/activity/" + aid;
+      } else {
+        url = "/GeoProblemSolving/project/" + aid;
       }
       this.axios
         .put(url, data)

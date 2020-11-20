@@ -1,5 +1,5 @@
 <template>
-  <div style="display: flex; background-color: lightgrey">
+  <div style="display: flex; background-color: #eee">
     <Button
       title="Activity tree"
       @click="unfoldTree"
@@ -326,14 +326,12 @@ export default {
     foldTree() {
       this.treeFold = true;
       document.getElementById("ActivityTree").style.width = 0;
-      document.getElementById("ActivityTree").style.margin = 0;
       document.getElementById("ActivityContent").style.width =
         window.innerWidth - 10 + "px";
     },
     unfoldTree() {
       this.treeFold = false;
       document.getElementById("ActivityTree").style.width = 250 + "px";
-      document.getElementById("ActivityTree").style.margin = 5 + "px";
       document.getElementById("ActivityContent").style.width =
         window.innerWidth - 260 + "px";
     },
@@ -341,29 +339,28 @@ export default {
       let aid = this.getURLParameter("aid");
       let level = this.getURLParameter("level");
 
-      parent.vm.workspaceUrl =
-        "/GeoProblemSolving/projectInfo/" +
-        this.projectInfo.aid +
-        "?content=workspace&aid=" +
-        aid +
-        "&level=" +
-        level;
-
       if (aid == undefined || level == undefined) {
         this.getProjectInfo();
+        let url =
+          "/GeoProblemSolving/projectInfo/" +
+          this.projectInfo.aid +
+          "?content=workspace";
+        parent.history.replaceState(null, null, url);
+        parent.vm.workspaceUrl = url;
       } else {
+        parent.vm.workspaceUrl =
+          "/GeoProblemSolving/projectInfo/" +
+          this.projectInfo.aid +
+          "?content=workspace&aid=" +
+          aid +
+          "&level=" +
+          level;
         if (level > 1) {
           this.getActivityBranch(aid);
         } else if (level == 1) {
           this.getSubprojectBranch(aid);
         } else {
           this.getProjectInfo();
-          let url =
-            "/GeoProblemSolving/projectInfo/" +
-            this.projectInfo.aid +
-            "?content=workspace";
-          parent.history.replaceState(null, null, url);
-          parent.vm.workspaceUrl = url;
         }
       }
     },
@@ -414,6 +411,8 @@ export default {
       } else {
         let root = Object.assign({}, this.projectInfo);
         this.activityTree.push(root);
+        this.slctActivity = root;
+        this.setContent(this.slctActivity);
       }
     },
     getSubprojectBranch(aid) {
@@ -650,11 +649,11 @@ export default {
 .foldTreeBtn {
   padding: 5px 8px 6px;
   height: calc(100vh - 10px);
-  margin: 5px;
+  margin-right: 5px;
   border: 0px;
 }
 .activityCard {
-  margin: 5px;
+  margin-right: 5px;
   width: 250px;
   height: calc(100vh - 10px);
   overflow-y: auto;
@@ -667,7 +666,6 @@ export default {
   width: calc(100vw - 260px);
   height: calc(100vh - 10px);
   background-color: white;
-  margin: 5px;
   border: 0;
   overflow-x: auto;
 }

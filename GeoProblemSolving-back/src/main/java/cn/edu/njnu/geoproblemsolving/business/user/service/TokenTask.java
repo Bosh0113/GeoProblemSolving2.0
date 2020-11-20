@@ -31,8 +31,8 @@ public class TokenTask {
         if ("".equals(StaticParams.access_token) && code != null){
             LinkedMultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
             map.add("code", code);
-            map.add("client_id", "zhengzhong");
-            map.add("client_secret", "zz");
+            map.add("client_id", "GSM");
+            map.add("client_secret", "mzy");
             map.add("redirect_uri", redirect_uri);
             map.add("grant_type", "authorization_code");
             String authUrl = "http://" + authIp +"/AuthServer/oauth/token";
@@ -60,8 +60,8 @@ public class TokenTask {
     public void tokenTask(){
         if (!StaticParams.refresh_token.equals("")){
             LinkedMultiValueMap<Object, Object> map = new LinkedMultiValueMap<>();
-            map.add("client_id", "zhengzhong");
-            map.add("client_secret", "zz");
+            map.add("client_id", "GSM");
+            map.add("client_secret", "mzy");
             map.add("refresh_token", StaticParams.refresh_token);
             map.add("grant_type", "refresh_token");
             String authUrl = "http://"+ authIp + "/oauth/token";

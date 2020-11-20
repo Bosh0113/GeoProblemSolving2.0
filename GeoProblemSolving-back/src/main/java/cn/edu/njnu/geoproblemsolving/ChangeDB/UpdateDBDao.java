@@ -4,6 +4,7 @@ import cn.edu.njnu.geoproblemsolving.Entity.*;
 import cn.edu.njnu.geoproblemsolving.Entity.Resources.FolderEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.Resources.FolderItem;
 import cn.edu.njnu.geoproblemsolving.Entity.Resources.ResourceEntity;
+import cn.edu.njnu.geoproblemsolving.business.user.entity.User;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -253,13 +254,13 @@ public class UpdateDBDao {
 
     public String md5Password(){
         try{
-            List<UserEntity> userEntities = mongoTemplate.findAll(UserEntity.class);
-            for(UserEntity user :userEntities){
+            List<User> userEntities = mongoTemplate.findAll(User.class);
+            for(User user :userEntities){
                 String passWordMD5 = DigestUtils.md5DigestAsHex(user.getPassword().getBytes());
                 Query query = new Query(Criteria.where("userId").is(user.getUserId()));
                 Update update = new Update();
                 update.set("password",passWordMD5);
-                mongoTemplate.updateFirst(query,update, UserEntity.class);
+                mongoTemplate.updateFirst(query,update, User.class);
             }
             return "Success";
         }catch (Exception e){
