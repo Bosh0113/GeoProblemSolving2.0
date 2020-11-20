@@ -167,15 +167,15 @@
                             </Breadcrumb>
                         </div>
                         <div style="align-items:flex-end" v-if="userRole != 'visitor'&& userRole!='Token'">
-                            <Tooltip content="Download" placement="bottom" class="fileBtn" v-if="this.permissionIdentity(this.projectInfo.permission, this.userRole,'use_resource')">
+                            <Tooltip content="Download" placement="bottom" class="fileBtn" v-if="folderPermissionIdentity(projectInfo.permission, userRole,'use_resource')">
                                 <i-button @click="downloadSelectFile" shape="circle" icon="md-cloud-download"
                                           class="fileBtnHoverGray" v-show="currentFolder.files.length>0"></i-button>
                             </Tooltip>
-                            <Tooltip content="Upload files" placement="bottom" class="fileBtn" v-if="this.permissionIdentity(this.projectInfo.permission, this.userRole,'upload_resource')">
+                            <Tooltip content="Upload files" placement="bottom" class="fileBtn" v-if="folderPermissionIdentity(projectInfo.permission, userRole,'upload_resource')">
                                 <i-button @click="uploadModalShow" shape="circle" icon="md-cloud-upload"
                                           class="fileBtnHoverGreen"></i-button>
                             </Tooltip>
-                            <Tooltip content="Share personal files" placement="left" class="fileBtn" v-if="this.permissionIdentity(this.projectInfo.permission, this.userRole,'upload_resource')">
+                            <Tooltip content="Share personal files" placement="left" class="fileBtn" v-if="folderPermissionIdentity(projectInfo.permission, userRole,'upload_resource')">
                                 <i-button @click="shareModalShow" shape="circle" icon="ios-copy"
                                           class="fileBtnHoverOrange"></i-button>
                             </Tooltip>
@@ -189,7 +189,7 @@
                             <div>
                                 <Icon type="ios-folder-open" class="itemIcon" size="25"></Icon>
                                 <a @click="enterFolder(folder.uid)" class="fileItemName" :title="folder.name">{{folder.name}}</a>
-                                <div style="float:right" v-if="this.permissionIdentity(this.projectInfo.permission, this.userRole, 'manage_resource') || folder.creatorId == userInfo.userId">
+                                <div style="float:right" v-if="folderPermissionIdentity(projectInfo.permission, userRole, 'manage_resource') || folder.creatorId == userInfo.userId">
                                     <i-button @click="renameFolderModalShow(folder)" class="fileBtnHoverBlue"
                                               shape="circle" icon="ios-create" title="Rename"
                                               size="small" type="text"></i-button>
@@ -211,16 +211,16 @@
                                         <i-button @click="filePreview(file)" shape="circle" icon="md-eye"
                                                   title="Preview" size="small" class="fileBtnHoverGreen"
                                                   type="text"></i-button>
-                                        <i-button v-if="this.permissionIdentity(this.projectInfo.permission, this.userRole, 'use_resource')" @click="fileDownload(file)"
+                                        <i-button v-if="folderPermissionIdentity(projectInfo.permission, userRole, 'use_resource')" @click="fileDownload(file)"
                                                   shape="circle" icon="ios-cloud-download"
                                                   title="Download" size="small" class="fileBtnHoverGray"
                                                   type="text"></i-button>
-                                        <i-button v-if="this.permissionIdentity(this.projectInfo.permission, this.userRole, 'use_resource')"
+                                        <i-button v-if="this.permissionIdentity(projectInfo.permission, userRole, 'use_resource')"
                                                   @click="showCopyFileModel(file)" shape="circle" icon="ios-share-alt"
                                                   title="Copy to personal center" size="small"
                                                   class="fileBtnHoverOrange" type="text"></i-button>
                                         <template
-                                                v-if="this.permissionIdentity(this.projectInfo.permission, this.userRole, 'manage_resource') || file.uploaderId == userInfo.userId">
+                                                v-if="folderPermissionIdentity(projectInfo.permission, userRole, 'manage_resource') || file.uploaderId == userInfo.userId">
                                             <i-button @click="fileEditModelShow(file)" shape="circle" icon="md-create"
                                                       title="Edit info" size="small" class="fileBtnHoverBlue"
                                                       type="text"></i-button>
@@ -540,7 +540,7 @@
             },
             //最好不要取重名的方法名，this.permissionIdentity读取的是这个方法
             //而permissionIdentity则读取的是userRole.js中的方法
-            permissionIdentity(permission, role, operation){
+            folderPermissionIdentity(permission, role, operation){
                 return permissionIdentity(
                   JSON.parse(permission),
                   role,

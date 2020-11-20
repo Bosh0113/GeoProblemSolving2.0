@@ -428,7 +428,7 @@
                             <div slot="extra">
                                 <div>
                                     <Poptip trigger="hover" content="Edit project information" placement="left"
-                                            v-if="permissionIdentity(projectInfo.permission, userRole, 'edit_info')">
+                                            v-if="detailPermissionIdentity(projectInfo.permission, userRole, 'edit_info')">
                                         <i-button style="margin: 0 5px;" class="changeEditColor"
                                                   @click="editModelShow()">
                                             <Icon type="ios-create" :size="20"></Icon>
@@ -537,7 +537,7 @@
                                                 <div slot="extra">
                                                     <div>
                                                         <Poptip trigger="hover" content="Invite members"
-                                                                v-if="permissionIdentity(projectInfo.permission, userRole, 'invite_member')"
+                                                                v-if="detailPermissionIdentity(projectInfo.permission, userRole, 'invite_member')"
                                                                 placement="left">
                                                             <i-button class="changeInviteColor"
                                                                       @click="inviteModalShow()">
@@ -545,7 +545,7 @@
                                                             </i-button>
                                                         </Poptip>
                                                         <Poptip trigger="hover" content="Remove members"
-                                                                v-if="permissionIdentity(projectInfo.permission, userRole, 'manage_member')"
+                                                                v-if="detailPermissionIdentity(projectInfo.permission, userRole, 'manage_member')"
                                                                 placement="left">
                                                             <i-button style="margin-left:5px;"
                                                                       class="changeRemoveColor"
@@ -1224,7 +1224,7 @@
                         this.userInfo.userId
                     );
                 },
-                permissionIdentity(permission, role, operation) {
+                detailPermissionIdentity(permission, role, operation) {
                     return permissionIdentity(
                         JSON.parse(permission),
                         role,
