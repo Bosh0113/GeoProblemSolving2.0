@@ -498,7 +498,7 @@ export default {
     },
     jupyterLogin(jupyterUserId) {
       let jupyterUrl = "";
-      if (this.$store.state.IP_Port == "localhost:8080") {
+      if (this.$store.state.IP_Port == "localhost:8080" || this.$store.state.IP_Port == "172.21.213.137:80") {
         jupyterUrl =
           "http://172.21.212.83";
       }
@@ -518,7 +518,7 @@ export default {
       data.append("login-info", info);
       this.axios
         .post(
-          jupyterUrl+ "/hub/login?next=/hub/user/" + jupyterUserId,
+          jupyterUrl+ "/hub/login?next=//hub//user//" + jupyterUserId,
           data
         )
         .then(res => {
@@ -532,7 +532,7 @@ export default {
     },
     prepareJupyter() {
       let jupyterUrl = "";
-      if (this.$store.state.IP_Port == "localhost:8080") {
+      if (this.$store.state.IP_Port == "localhost:8080" || this.$store.state.IP_Port == "172.21.213.137:80") {
         jupyterUrl =
           "http://172.21.212.83";
       }
