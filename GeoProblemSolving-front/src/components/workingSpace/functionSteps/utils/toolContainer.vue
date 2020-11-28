@@ -518,15 +518,15 @@ export default {
       data.append("login-info", info);
       this.axios
         .post(
-          jupyterUrl+ "/hub/login?next=//hub//user//" + jupyterUserId,
+          jupyterUrl+ "/PExploration/hub/login?next=//hub//user//" + jupyterUserId,
           data
         )
         .then(res => {
-          let url = jupyterUrl + "/hub/user/" + jupyterUserId;
+          let url = jupyterUrl + "/PExploration/hub/user/" + jupyterUserId;
           window.open(url);
         })
         .catch(err => {
-          let url = jupyterUrl + "/hub/user/" + jupyterUserId;
+          let url = jupyterUrl + "/PExploration/hub/user/" + jupyterUserId;
           window.open(url);
         });
     },
