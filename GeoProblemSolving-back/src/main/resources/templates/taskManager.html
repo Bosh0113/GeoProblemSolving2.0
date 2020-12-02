@@ -313,12 +313,12 @@
 </template>
 <script th:fragment="task-js">
 
+    //父子组件传参，从projectDetail组件，将projectInfo以及userRole传过来。
     Vue.component('child-task', {
         template: '#taskComponent',
         props: ["projectInfo", "userRole"], //子项目管理者Manager，项目管理者PManager,成员Member
         data() {
             return {
-                userRole: "visitor",
                 todoLoading: true,
                 doingLoading: true,
                 doneLoading: true,
@@ -477,7 +477,6 @@
             this.inquiryTask();
             // this.getProjectInfo();
             window.addEventListener("resize", this.initSize);
-            this.roleIdentity();
         },
         beforeRouteLeave(to, from, next) {
             this.removeTimer();
@@ -487,12 +486,6 @@
             window.removeEventListener("resize", this.initSize);
         },
         methods: {
-            roleIdentity(){
-              this.userRole = roleIdentify(
-                  this.projectInfo.members,
-                  this.userInfo.userId
-              );
-            },
             taskPermissionIdentity(permission, role, operation){
                 return permissionIdentity(
                     JSON.parse(permission),
@@ -608,7 +601,7 @@
                         taskForm["creatorName"] = this.userInfo.name;
                         taskForm["managerName"] = this.userInfo.name;
                         taskForm["importance"] = this.formValidate.importanceCheck ? 1 : 0;
-                        taskForm["subProjectId"] = this.projectInfo.aid;  //此处subProjectId是由于后台当初设计只考虑设在子项目，此处当作scopeId使用即可。
+                        taskForm["aid"] = this.projectInfo.aid;
                         taskForm["state"] = "todo";
                         taskForm["order"] = this.taskTodo.length;
                         axios

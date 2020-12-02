@@ -1,6 +1,6 @@
 package cn.edu.njnu.geoproblemsolving.Config;
 
-import cn.edu.njnu.geoproblemsolving.business.StaticParams;
+import cn.edu.njnu.geoproblemsolving.business.user.StaticParams;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.ServletOutputStream;

@@ -450,7 +450,13 @@
                 },
                 newProject() {
                     if (this.userState == false) {
-                        window.location.href = "/GeoProblemSolving/login"
+                        // window.location.href = "/GeoProblemSolving/login"
+                        var pageUrl = window.location.href;
+                        axios
+                            .get("/GeoProblemSolving/user/login?pageUrl="+pageUrl)
+                            .then(res=>{
+                                window.location.href = res.data;
+                            })
                     } else {
                         window.location.href = "/GeoProblemSolving/newProject"
                     }

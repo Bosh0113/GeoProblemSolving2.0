@@ -438,7 +438,14 @@
                 });
             },
             login() {
-                window.location.href = "/GeoProblemSolving/login"
+                // window.location.href = "/GeoProblemSolving/login"
+                var pageUrl = window.location.href;
+                axios
+                    .get("/GeoProblemSolving/user/login?pageUrl="+pageUrl)
+                    .then(res=>{
+                        window.location.href = res.data;
+                    })
+
             },
             enterProject(projectInfo) {
                 // window.sessionStorage.setItem("projectInfo",JSON.stringify(projectInfo));

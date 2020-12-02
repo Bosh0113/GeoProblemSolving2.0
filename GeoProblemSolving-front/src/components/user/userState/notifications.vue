@@ -207,7 +207,13 @@ export default {
   beforeRouteEnter: (to, from, next) => {
     next(vm => {
       if (!vm.$store.getters.userState) {
-        next("/login");
+        // next("/login");
+        var pageUrl = window.location.href;
+        this.axios
+          .get("/GeoProblemSolving/user/login?pageUrl="+pageUrl)
+          .then(res=>{
+            window.location.href = res.data;
+          })
       } else {
         next();
       }

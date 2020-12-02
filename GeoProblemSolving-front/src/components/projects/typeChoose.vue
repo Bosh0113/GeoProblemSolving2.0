@@ -17,7 +17,7 @@
                         </div>
                         <div style="margin:10px 0;min-height: 85px;">
                             <p style="text-indent:2em">
-                                In this workspace, you can divide a complex problem into a series of sub-problems. Different subprojects can be established for distinct sub-problems. 
+                                In this workspace, you can divide a complex problem into a series of sub-problems. Different subprojects can be established for distinct sub-problems.
                             </p>
                         </div>
                         <div style="padding: 0 5%;min-height: 85px;">
@@ -29,7 +29,7 @@
                         </div>
                         <div style="text-align:center;margin-top:2%" v-if="userRole != 'Visitor'">
                             <h3>
-                            To: 
+                            To:
                             <a @click="selectTypeModalShow('type0')">Create subprojects</a>
                             </h3>
                         </div>
@@ -54,7 +54,7 @@
                         </div>
                         <div style="text-align:center;margin-top:2%" v-if="userRole != 'Visitor'">
                             <h3>
-                            To: 
+                            To:
                             <a @click="selectTypeModalShow('type1')">Design problem-solving workflow</a>
                             </h3>
                         </div>
@@ -78,7 +78,7 @@
                         </div>
                         <div style="text-align:center;margin-top:2%" v-if="userRole != 'Visitor'">
                             <h3>
-                            To: 
+                            To:
                             <a @click="selectTypeModalShow('type2')">Do it right now</a>
                             </h3>
                         </div>
@@ -130,7 +130,13 @@ export default {
             .post("/GeoProblemSolving/step/createForType", Step)
             .then(res => {
             if (res.data == "Offline") {
-                parent.location.href="/GeoProblemSolving/login"
+                // parent.location.href="/GeoProblemSolving/login"
+              var pageUrl = parent.location.href;
+              this.axios
+                .get("/GeoProblemSolving/user/login?pageUrl="+pageUrl)
+                .then(res=>{
+                  parent.location.href = res.data;
+                })
             } else if (res.data === "Fail") {
                 this1.$Message.info("Fail");
             } else {
@@ -144,7 +150,13 @@ export default {
                     .then(res => {
                         this.selectTypeModal = false;
                         if (res.data == "Offline") {
-                            parent.location.href="/GeoProblemSolving/login"
+                            // parent.location.href="/GeoProblemSolving/login"
+                          var pageUrl = parent.location.href;
+                          this.axios
+                            .get("/GeoProblemSolving/user/login?pageUrl="+pageUrl)
+                            .then(res=>{
+                              parent.location.href = res.data;
+                            })
                         } else if (res.data != "Fail") {
                             this.$emit("changeProjectInfo", res.data);
                         } else {

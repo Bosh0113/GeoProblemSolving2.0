@@ -212,7 +212,12 @@ export default {
         success: function (data) {
           if (!data) {
             vm.$store.commit("userLogout");
-            vm.$router.push({ name: "Login" });
+            var pageUrl = window.location.href;
+            this.axios
+              .get("/GeoProblemSolving/user/login?pageUrl="+pageUrl)
+              .then(res=>{
+                window.location.href = res.data;
+              })
           }
         },
         error: function (err) {

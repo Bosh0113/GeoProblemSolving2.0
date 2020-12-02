@@ -207,7 +207,7 @@
                                     <span @click="getFileInfo(file)" class="fileItemName" :title="file.name">{{file.name}}</span>
                                     <span class="fileItemSize">{{file.fileSize}}</span>
                                     <span style="width:20%;margin-right:5%">{{file.uploadTime.substring(0,10)}}</span>
-                                    <div style="float:right" v-if="userRole != 'visitor'&& role!='Token'">
+                                    <div style="float:right" v-if="userRole != 'visitor'&& userRole!='Token'">
                                         <i-button @click="filePreview(file)" shape="circle" icon="md-eye"
                                                   title="Preview" size="small" class="fileBtnHoverGreen"
                                                   type="text"></i-button>
@@ -215,7 +215,7 @@
                                                   shape="circle" icon="ios-cloud-download"
                                                   title="Download" size="small" class="fileBtnHoverGray"
                                                   type="text"></i-button>
-                                        <i-button v-if="this.permissionIdentity(projectInfo.permission, userRole, 'use_resource')"
+                                        <i-button v-if="folderPermissionIdentity(projectInfo.permission, userRole, 'use_resource')"
                                                   @click="showCopyFileModel(file)" shape="circle" icon="ios-share-alt"
                                                   title="Copy to personal center" size="small"
                                                   class="fileBtnHoverOrange" type="text"></i-button>

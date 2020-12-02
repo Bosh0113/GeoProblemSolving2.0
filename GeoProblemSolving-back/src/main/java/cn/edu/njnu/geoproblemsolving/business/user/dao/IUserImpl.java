@@ -1,8 +1,13 @@
 package cn.edu.njnu.geoproblemsolving.business.user.dao;
 
+import cn.edu.njnu.geoproblemsolving.business.activity.entity.Project;
+import cn.edu.njnu.geoproblemsolving.business.activity.service.Impl.ProjectServiceImpl;
+import cn.edu.njnu.geoproblemsolving.business.activity.service.ProjectService;
 import cn.edu.njnu.geoproblemsolving.business.user.entity.User;
 import cn.edu.njnu.geoproblemsolving.business.user.entity.UserDto;
 import cn.edu.njnu.geoproblemsolving.business.user.util.ICommonUtil;
+import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
+import cn.edu.njnu.geoproblemsolving.common.utils.ResultUtils;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -12,6 +17,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 
 @Repository
 public class IUserImpl implements IUserDao {
@@ -72,5 +78,20 @@ public class IUserImpl implements IUserDao {
         }catch (Exception e){
             return e;
         }
+    }
+
+    @Override
+    public JsonResult getMangeProjectList(String[] projectIdList) {
+        ArrayList<Project> projects = new ArrayList<>();
+        for (int i=0; i<projectIdList.length; i++){
+            try {
+                Query query = new Query(Criteria.where("_id").is(projectIdList[i]));
+                Project project = mongoTemplate.findOne(query, Project.class);
+                projects.add(project);
+            }catch (Exception e){
+                return ResultUtils.error(-1,"Fail");
+            }
+        }
+        return ResultUtils.success(projects);
     }
 }

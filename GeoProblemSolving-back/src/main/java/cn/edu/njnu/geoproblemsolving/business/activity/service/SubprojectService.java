@@ -21,6 +21,8 @@ public interface SubprojectService{
 
     public JsonResult findLineage(String aid);
 
+    public JsonResult findSubProject(String aid);
+
     public JsonResult joinSubproject(String aid, String userId);
 
     public JsonResult updateMemberRole(String aid, String userId, String role);

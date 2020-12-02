@@ -1,3 +1,4 @@
+<!--workspace introduction-->
 <template>
   <div style="padding: 5px 10px">
     <div
@@ -21,12 +22,14 @@
               <Label>Purpose:</Label>
               <span style="margin-left: 10px">{{ activityInfo.purpose }}</span>
             </div>
+
             <div style="margin: 10px 0">
               <Label>Total participants:</Label>
               <span style="margin-left: 10px">{{
                 activityInfo.members.length
               }}</span>
             </div>
+
             <div style="margin: 10px 0">
               <Label>Total child activities:</Label>
               <span
@@ -47,10 +50,10 @@
               <span
                 style="margin-left: 10px; cursor: pointer; color: #2d8cf0"
                 @click="gotoPersonalSpace(creatorInfo.userId)"
-                >{{ creatorInfo.name }}</span
-              >
+                >{{ creatorInfo.name }}
+              </span>
             </div>
-            <div style="margin: 10px 0">
+            <div style="margin: 10px 0" v-if="permissionIdentity(projectInfo.permission,userRole, 'manage_resource')">
               <Label>Permission:</Label>
               <span
                 style="margin-left: 10px; cursor: pointer; color: #2d8cf0"
@@ -131,7 +134,7 @@
               </div>
             </Card>
           </div>
-          <div>
+          <div v-if="permissionIdentity(projectInfo.permission, userRole, 'manage_child_activity')">
             <Card
               style="
                 height: 120px;
@@ -165,7 +168,7 @@
       <div>
         <span style="font-size: 1.17em; font-weight: bold">Participants</span>
         <Icon
-          v-if="activityInfo.level > 0"
+          v-if="permissionIdentity(projectInfo.permission, userRole, 'invite_member')"
           type="md-person-add"
           size="16"
           title="Invite users"
@@ -198,11 +201,16 @@
                 :src="member.avatar"
                 style="width: 40px; height: 40px"
               />
+<!--              <avatar-->
+<!--                :username="member.name"-->
+<!--                :size="40"-->
+<!--                :rounded="false"-->
+<!--                v-else-->
+<!--              />-->
               <avatar
-                v-else
                 :username="member.name"
-                :size="40"
                 :rounded="false"
+                v-else
               ></avatar>
               <div class="onlinecircle"></div>
             </div>
@@ -252,11 +260,11 @@
           :label-width="120"
         >
           <FormItem label="Reason" prop="reason">
-            <i-input
+            <Input
               v-model="applyJoinForm.reason"
               :rows="4"
               type="textarea"
-            ></i-input>
+            />
           </FormItem>
         </Form>
       </div>
@@ -291,7 +299,7 @@
             type="text"
             v-model="activityForm.name"
             placeholder="Fill in the name (less than 60 characters) ..."
-          ></Input>
+          />
         </FormItem>
         <FormItem label="Description" prop="description">
           <Input
@@ -299,7 +307,7 @@
             placeholder="Fill in the description..."
             :rows="4"
             type="textarea"
-          ></Input>
+          />
         </FormItem>
         <FormItem label="Activity type:" prop="type">
           <Select
@@ -358,19 +366,9 @@ export default {
       projectInfo: parent.vm.projectInfo,
       userInfo: JSON.parse(sessionStorage.getItem("userInfo")),
       userRole: "visitor",
+      //需要修改部分
       creatorInfo: { name: "XXX", email: "XXX@XX.com" },
       participants: [
-        { name: "AAA", role: "manager" },
-        { name: "AAA", role: "manager" },
-        { name: "AAA", role: "manager" },
-        { name: "AAA", role: "manager" },
-        { name: "AAA", role: "manager" },
-        { name: "AAA", role: "manager" },
-        { name: "AAA", role: "manager" },
-        { name: "AAA", role: "manager" },
-        { name: "AAA", role: "manager" },
-        { name: "AAA", role: "manager" },
-        { name: "AAA", role: "manager" },
         { name: "AAA", role: "manager" },
       ],
       inviteModal: false,
@@ -439,9 +437,14 @@ export default {
       listStyle: { width: "280px", height: "360px" },
     };
   },
-  mounted() {
-    // this.getParticipants();
+  created() {
     this.roleIdentity();
+    this.getParticipants();
+  },
+  mounted() {
+      console.log("========activityInfo==========")
+      console.log(this.activityInfo)
+      console.log("========activityInfo==========")
   },
   methods: {
     roleIdentity() {
@@ -460,14 +463,14 @@ export default {
     getParticipants() {
       let url = "";
       let activity = this.activityInfo;
-      if (activity.level == 1) {
+      if (activity.level == 0){
+        url = "/GeoProblemSolving/project/"+activity.aid+"/user";
+      }else if (activity.level == 1){
         url = "/GeoProblemSolving/subproject/" + activity.aid + "/user";
-      } else if (activity.level > 1) {
+      }else if (activity.level > 1){
         url = "/GeoProblemSolving/activity/" + activity.aid + "/user";
-      } else {
-        return;
       }
-
+      //callback setTimeBack
       this.axios
         .get(url)
         .then((res) => {
@@ -487,7 +490,7 @@ export default {
     getAllResource() {},
     modifyPermission() {
       parent.location.href =
-        "/GeoProblemSolving/permission/" + this.projectInfo.aid;
+        "/GeoProblemSolving/permission/" + this.activityInfo.level + this.activityInfo.aid;
     },
     preCreation() {
       this.activityForm.parent = this.activityInfo.aid;

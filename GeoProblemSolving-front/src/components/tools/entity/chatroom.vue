@@ -610,7 +610,7 @@ export default {
         right: "0px",
         borderRight: "0px"
       },
-      // 原有的变量字段     
+      // 原有的变量字段
       groupInfo: {},
       participants: [],
       participantsDetail: [],
@@ -708,11 +708,11 @@ export default {
     },
 
     async getGroupId() {
-      let groupId = this.$route.query.groupID;     
+      let groupId = this.$route.query.groupID;
       let data = await this.axios.get(
         `/GeoProblemSolving/step/inquiry?key=stepId&value=${groupId}`
       );
-     
+
       let subProjectId = data.data[0].subProjectId;
       if (subProjectId == undefined || subProjectId == "") {
         this.scopeId = data.data[0].projectId;
@@ -1085,9 +1085,15 @@ export default {
   beforeRouteEnter: (to, from, next) => {
     next(vm => {
       if (!vm.$store.getters.userState || vm.$store.getters.userId == "") {
-        vm.$router.push({
-          name: "Login"
-        });
+        // vm.$router.push({
+        //   name: "Login"
+        // });
+        var pageUrl = window.location.href;
+        this.axios
+          .get("/GeoProblemSolving/user/login?pageUrl="+pageUrl)
+          .then(res=>{
+            window.location.href = res.data;
+          })
       } else {
       }
     });

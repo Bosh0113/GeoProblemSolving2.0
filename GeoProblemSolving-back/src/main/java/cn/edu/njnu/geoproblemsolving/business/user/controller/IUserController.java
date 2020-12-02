@@ -1,21 +1,20 @@
 package cn.edu.njnu.geoproblemsolving.business.user.controller;
 
-import cn.edu.njnu.geoproblemsolving.business.StaticParams;
+import cn.edu.njnu.geoproblemsolving.business.user.StaticParams;
 import cn.edu.njnu.geoproblemsolving.business.user.dao.IUserImpl;
 import cn.edu.njnu.geoproblemsolving.business.user.entity.User;
-import cn.edu.njnu.geoproblemsolving.business.user.entity.UserDto;
 import cn.edu.njnu.geoproblemsolving.business.user.service.TokenTask;
 import cn.edu.njnu.geoproblemsolving.business.user.util.ICommonUtil;
+import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
 
 @RestController
 @RequestMapping(value = "/user")
@@ -33,7 +32,7 @@ public class IUserController {
             StaticParams.referPageUrl = pageUrl;
             // String contextPath = req.getRequestURI().toString();
             //发送邮件
-            return "http://106.14.78.235/AuthServer/oauth/authorize?grant_type=authorization_code&response_type=code&client_id=GSM&scope=all";
+            return "http://106.14.78.235/AuthServer/oauth/authorize?grant_type=authorization_code&response_type=code&client_id=zhengzhong&scope=all";
         } catch (Exception e) {
             return null;
         }
@@ -79,7 +78,7 @@ public class IUserController {
     }
 
     @RequestMapping(value = "/logout", method = RequestMethod.GET)
-    public void logout(HttpServletRequest request) {
+    public void logout(HttpServletRequest request, HttpServletResponse resp) throws IOException {
         HttpSession session = request.getSession();
         System.out.println("User logout. UserName: " + StaticParams.loginUser.getName());
         session.invalidate();
@@ -101,5 +100,11 @@ public class IUserController {
         userInfo.setPassword("");
         commonUtil.gsm2BaseUser(StaticParams.paramsMap);
         return userInfo;
+    }
+
+    @RequestMapping(value = "/getMProject",method = RequestMethod.POST)
+    public JsonResult getManagerProjectList(@RequestBody String[] manageProjectList){
+        System.out.println(manageProjectList);
+        return userDao.getMangeProjectList(manageProjectList);
     }
 }

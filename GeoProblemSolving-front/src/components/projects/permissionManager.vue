@@ -14,7 +14,7 @@
         <Divider style="margin: 5px 0" />
         <div>{{projectInfo.name}}</div>
       </div>
-      <div style="margin: 20px 0">
+      <div style="margin: 20px 0" v-if="projectLevel == 0">
         <h2>Privacy</h2>
         <Divider style="margin: 5px 0" />
         <div>{{projectInfo.privacy}}</div>
@@ -353,14 +353,22 @@ export default {
       permission: {},
       // project 信息
       projectId: this.$route.params.id,
-      projectInfo: {}
+      projectLevel: this.$route.params.level,
+      projectInfo: {},
     };
   },
   beforeRouteEnter: (to, from, next) => {
     next(vm => {
       if (!vm.$store.getters.userState) {
-        next("/login");
+        // next("/login");
+        var pageUrl = window.location.href;
+        this.axios
+          .get("/GeoProblemSolving/user/login?pageUrl="+pageUrl)
+          .then(res=>{
+            window.location.href = res.data;
+          })
       } else {
+        //projectInfo去哪拿？
         // if (vm.projectInfo.managerId !== vm.$store.getters.userId) {
         //   vm.$Message.error("You have no property to access it");
         //   // next(`/project/${vm.$store.getters.currentProjectId}`);
@@ -376,7 +384,7 @@ export default {
   },
   methods: {
     getPermission() {
-      if (JSON.stringify(projectInfo) != "{}") {
+      if (JSON.stringify(this.projectInfo) != "{}") {
         this.projectInfo = projectInfo;
         if (this.projectInfo.permission != undefined) {
           this.permission = JSON.parse(this.projectInfo.permission);
@@ -385,17 +393,29 @@ export default {
         }
         this.getPermissionList();
       } else {
+        var projectUrl = "/GeoProblemSolving";
+        switch (this.projectLevel) {
+          case "0":
+            projectUrl += "/project/" +this.projectId;
+            break;
+          case "1":
+            projectUrl += "/subproject/" + this.projectId;
+            break;
+          default:
+            projectUrl += "/activity/" +  this.projectId;
+        }
         $.ajax({
           url:
-            "/GeoProblemSolving/project/" + this.projectId,
+            // "/GeoProblemSolving/project/" + this.projectId,
+          projectUrl,
           type: "GET",
           async: false,
           success: data => {
             if (data == "Offline") {
               this.$store.commit("userLogout");
-              this.$router.push({ name: "Login" });
+              // this.$router.push({ name: "Login" });
             } else if (data != "None" && data != "Fail") {
-              this.projectInfo = data;
+              this.projectInfo = data.data;
 
               if (this.projectInfo.permission != undefined) {
                 this.permission = JSON.parse(this.projectInfo.permission);
@@ -410,7 +430,7 @@ export default {
         });
       }
     },
-    getPermissionList() {      
+    getPermissionList() {
       this.permissionList = userRoleJS.permissionJson2Array(this.permission);
     },
     savePermission(value, key, index, operation) {
@@ -638,7 +658,7 @@ export default {
           this.permission.subproject_task_manage.visitor = value;
           this.permissionList[index].visitor = value;
         }
-      }      
+      }
     },
     setDefault() {
       this.permission = userRoleJS.getDefault();
@@ -651,7 +671,13 @@ export default {
         .then(res => {
           this.resetProjectTypeModel = false;
           if (res.data == "Offline") {
-            parent.location.href = "/GeoProblemSolving/login";
+            // parent.location.href = "/GeoProblemSolving/login";
+            var pageUrl = parent.location.href;
+            this.axios
+              .get("/GeoProblemSolving/user/login?pageUrl="+pageUrl)
+              .then(res=>{
+                parent.location.href = res.data;
+              })
           } else if (res.data.code == 0) {
             this.$Notice.info({
               desc: "Update permission successfully. "

@@ -39,6 +39,16 @@ public class SubProjectController {
     }
 
     /**
+     * zhengzhong 2020/11/26
+     * find subProject
+     * @param aid
+     * @return
+     */
+    @RequestMapping(produces = {"application/json;charset=UTF-8"},method = RequestMethod.GET, value = "/{aid}")
+    public JsonResult getSubProject(@PathVariable("aid") String aid){
+        return subprojectService.findSubProject(aid);
+    }
+    /**
      * update subproject
      * @param subproject
      * @return

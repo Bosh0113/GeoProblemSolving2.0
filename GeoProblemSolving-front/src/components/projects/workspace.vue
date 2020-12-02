@@ -157,7 +157,13 @@ export default {
         )
         .then(res => {
           if (res.data == "Offline") {
-            parent.location.href = "/GeoProblemSolving/login";
+            // parent.location.href = "/GeoProblemSolving/login";
+            var pageUrl = parent.location.href;
+            this.axios
+              .get("/GeoProblemSolving/user/login?pageUrl="+pageUrl)
+              .then(res=>{
+                parent.location.href = res.data;
+              })
           } else if (res.data != "None" && res.data != "Fail") {
             this.$set(this, "stepInfo", res.data[0]);
             this.getParticipants();
@@ -178,7 +184,13 @@ export default {
         .then(res => {
           this.resetProjectTypeModel = false;
           if (res.data == "Offline") {
-            parent.location.href = "/GeoProblemSolving/login";
+            // parent.location.href = "/GeoProblemSolving/login";
+            var pageUrl = parent.location.href;
+            this.axios
+              .get("/GeoProblemSolving/user/login?pageUrl="+pageUrl)
+              .then(res=>{
+                parent.location.href = res.data;
+              })
           } else if (res.data != "Fail") {
             this.$emit("changeProjectInfo", res.data);
           } else {

@@ -17,6 +17,8 @@
               style="font-size: larger;white-space: pre-line;word-break: break-word; padding-top:5px"
             >{{activityInfo.description}}</p>
             <Divider style="margin:10px 0" />
+
+<!--            项目成员显示-->
             <h3>Members:</h3>
             <Card
               v-for="(member, index) in participants"
@@ -158,18 +160,18 @@ export default {
       userInfo: JSON.parse(sessionStorage.getItem("userInfo")),
       contentHeight: 560,
       participants: [
-        { name: "AAA", role: "manager" },
-        { name: "AAA", role: "manager" },
-        { name: "AAA", role: "manager" },
-        { name: "AAA", role: "manager" },
-        { name: "AAA", role: "manager" },
-        { name: "AAA", role: "manager" },
-        { name: "AAA", role: "manager" },
-        { name: "AAA", role: "manager" },
-        { name: "AAA", role: "manager" },
-        { name: "AAA", role: "manager" },
-        { name: "AAA", role: "manager" },
-        { name: "AAA", role: "manager" },
+        // { name: "AAA", role: "manager" },
+        // { name: "AAA", role: "manager" },
+        // { name: "AAA", role: "manager" },
+        // { name: "AAA", role: "manager" },
+        // { name: "AAA", role: "manager" },
+        // { name: "AAA", role: "manager" },
+        // { name: "AAA", role: "manager" },
+        // { name: "AAA", role: "manager" },
+        // { name: "AAA", role: "manager" },
+        // { name: "AAA", role: "manager" },
+        // { name: "AAA", role: "manager" },
+        // { name: "AAA", role: "manager" },
       ],
     };
   },

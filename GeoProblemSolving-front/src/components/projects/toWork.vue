@@ -76,7 +76,13 @@ export default {
         async: false,
         success: data => {
           if (data == "Offline") {
-            parent.location.href = "/GeoProblemSolving/login";
+            // parent.location.href = "/GeoProblemSolving/login";
+            var pageUrl = parent.location.href;
+            this.axios
+              .get("/GeoProblemSolving/user/login?pageUrl="+pageUrl)
+              .then(res=>{
+                parent.location.href = res.data;
+              })
           }
           if (data != "None" && data != "Fail") {
             this.projectInfo = data[0];

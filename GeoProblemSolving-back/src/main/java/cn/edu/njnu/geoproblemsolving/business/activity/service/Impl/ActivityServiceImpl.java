@@ -343,19 +343,18 @@ public class ActivityServiceImpl implements ActivityService {
 
             // members
             JSONArray members = activity.getMembers();
-            JSONArray memberinfos = new JSONArray();
+            JSONArray memberInfos = new JSONArray();
             for (Object member : members) {
-                if (member instanceof JSONObject) {
-                    User user = findByUserId(((JSONObject) member).getString("userId"));
-                    JSONObject userInfo = (JSONObject) member;
-                    userInfo.put("name", user.getName());
-                    userInfo.put("avatar", user.getAvatar());
-                    userInfo.put("email", user.getEmail());
-                    userInfo.put("title", user.getTitle());
-                    memberinfos.add(userInfo);
-                }
+                String userId =  (String)((HashMap) member).get("userId");
+                User user = findByUserId(userId);
+                HashMap<String, Object> userInfo = (HashMap)member;
+                userInfo.put("name", user.getName());
+                userInfo.put("avatar", user.getAvatar());
+                userInfo.put("email", user.getEmail());
+                userInfo.put("title", user.getTitle());
+                memberInfos.add(userInfo);
             }
-            participants.put("members", memberinfos);
+            participants.put("members", memberInfos);
 
             // Update active time
             updateActiveTime(activity);

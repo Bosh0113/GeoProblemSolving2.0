@@ -180,27 +180,29 @@ body {
 </style>
 <template>
   <div>
+<!--    左侧用户基本信息界面 -->
     <Row>
       <Col span="22" offset="1">
         <Row>
           <Col span="5">
             <div class="detailSidebar">
+<!--              userImage-->
               <div class="user-img">
                 <img
-                  v-bind:src="userDetail.avatar"
+                  v-if="userDetail.avatar!='' && userDetail.avatar!=undefined && userDetail.avatar!=null"
+                  :src="userDetail.avatar"
                   class="u_img"
-                  v-if="userDetail.avatar!=''&&userDetail.avatar!='undefined'
-                  &&userDetail.avatar!='null'"
                 />
                 <avatar
+                  :username = "userDetail.name"
                   style="width:200px"
                   class="avatarStyle"
-                  :username="userDetail.name"
                   :size="200"
                   :rounded="false"
                   v-else
-                ></avatar>
+                />
               </div>
+<!--              user information-->
               <div
                 style="margin-top: 10px; border:1px solid lightgray;border-radius: 4px;padding:10px"
               >
@@ -219,7 +221,7 @@ body {
                 <div
                   class="single-info"
                   :title="`Phone number:  ` + userDetail.phone"
-                  v-show="userDetail.phone!=''"
+                  v-show="userDetail.phone != 'null' &&userDetail.phone != '' "
                 >
                   <span class="profileInfo">
                     <Icon type="ios-call-outline" :size="20" />
@@ -268,7 +270,7 @@ body {
                 <div
                   class="single-info"
                   :title="`Home Page:  `+ userDetail.homePage"
-                  v-show="userDetail.homePage!=''"
+                  v-show="userDetail.homePage != 'null' && userDetail.homePage !='' && userDetail.homePage != undefined"
                   style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis"
                 >
                   <span class="profileInfo">
@@ -284,6 +286,7 @@ body {
                   <vue-scroll :ops="ops">{{userDetail.introduction}}</vue-scroll>
                 </div>
               </div>
+
               <div style="display:flex;justify-content:center;margin-bottom:10px">
                 <Button
                   class="fileBtnHoverBlue"
@@ -314,13 +317,13 @@ body {
                           disabled
                         ></Input>
                       </FormItem>
-                      <FormItem label="Name" prop="userName">
+                      <FormItem label="Name" prop="name">
                         <Input
                           v-model="personalInfoItem.name"
                           :class="{InputStyle: inputstyle}"
                         ></Input>
                       </FormItem>
-                      <FormItem label="Title" prop="jobTitle">
+                      <FormItem label="Title" prop="title">
                         <Select
                           v-model="personalInfoItem.title"
                           placeholder="Plase enter your title"
@@ -335,9 +338,9 @@ body {
                           <Option value="Mx">Mx</Option>
                         </Select>
                       </FormItem>
-                      <FormItem label="Organization" prop="organization">
+                      <FormItem label="Organization" prop="organizations">
                         <Input
-                          v-model="personalInfoItem.organizations"
+                          v-model="personalInfoItem.organizations[0]"
                           :class="{InputStyle: inputstyle}"
                         ></Input>
                       </FormItem>
@@ -353,11 +356,22 @@ body {
                           :class="{InputStyle: inputstyle}"
                         ></Input>
                       </FormItem>
-                      <FormItem label="Area of interest" prop="direction">
+                      <FormItem label="Area of interest" prop="domain">
+<!--                        <Input-->
+<!--                          v-model="personalInfoItem.domain[0]"-->
+<!--                          :class="{InputStyle: inputstyle}"-->
+<!--                        ></Input>-->
                         <Input
-                          v-model="personalInfoItem.domain"
-                          :class="{InputStyle: inputstyle}"
-                        ></Input>
+                          v-model="domainTag"
+                          placeholder="Enter some your area of interest"
+                          @keyup.enter.native="addDomainTag(domainTag)"
+                          />
+                        {{this.personalInfoItem.domain}}
+<!--                        <vue-tags-input-->
+<!--                          v-model="tag"-->
+<!--                          :tags = "tags"-->
+<!--                          @tags-changed="newTags => tags = newTags"-->
+<!--                        />-->
                       </FormItem>
                       <FormItem label="Home page" prop="homePage">
                         <Input
@@ -375,7 +389,7 @@ body {
                       </FormItem>
                       <FormItem label="Avatar" prop="avatar">
                         <div>
-                          <div class="demo-upload-list" v-if="personalInfoItem.avatar!=''">
+                          <div class="demo-upload-list" v-if="personalInfoItem.avatar!=''&& personalInfoItem.avatar != null  && personalInfoItem.avatar != undefined">
                             <template>
                               <img v-bind:src="personalInfoItem.avatar" class="avatarImage" />
                               <div class="demo-upload-list-cover">
@@ -607,7 +621,7 @@ body {
                           <Col span="10" offset="1">
                             <div class="projectItem" @click="goSingleProject(mProject)">
                               <Card style="height:320px;margin-top:20px">
-                                <p slot="title" class="projectsTitle">{{mProject.title}}</p>
+                                <p slot="title" class="projectsTitle">{{mProject.name}}</p>
                                 <Button
                                   class="authorBtn"
                                   type="default"
@@ -630,13 +644,13 @@ body {
                                 <p
                                   style="height:200px;text-indent:2em;word-break:break-word;white-space: pre-line;"
                                 >
-                                  <vue-scroll :ops="ops">{{mProject.introduction}}</vue-scroll>
+                                  <vue-scroll :ops="ops">{{mProject.description}}</vue-scroll>
                                 </p>
                                 <!-- <hr> -->
                                 <br />
                                 <div>
                                   <span style="float:left">CreateTime:</span>
-                                  <span style="float:right">{{mProject.createTime}}</span>
+                                  <span style="float:right">{{mProject.createdTime}}</span>
                                 </div>
                               </Card>
                             </div>
@@ -653,6 +667,8 @@ body {
         <div></div>
       </Col>
     </Row>
+
+
     <!-- 授权的modal -->
     <Modal
       v-model="authorizeProjectModal"
@@ -815,16 +831,28 @@ import Avatar from "vue-avatar";
 export default {
   beforeRouteEnter: (to, from, next) => {
     next(vm => {
-      // if (!vm.$store.getters.userState) {
-      //   next("/login");
-      // } else {
-        next();
+      if (!vm.$store.getters.userState) {
+        // next("/login");
+        var pageUrl = window.location.href;
+        this.axios
+          .get("/GeoProblemSolving/user/login?pageUrl="+pageUrl)
+          .then(res=>{
+            window.location.href = res.data;
+          })
+      }
+      // else {
+      //   next();
       // }
     });
   },
-  mounted() {
-    // 获取用户信息
+  beforeMount() {
+    /*
+    获取用户信息，放到Mounted()中会因为第一次模板编译的时候，userDetails没值
+    导致vue-avatar报错，直接报错，当后面数据更新时，也无法正确运行
+     */
     this.getUserProfile();
+  },
+  mounted() {
     //获取用户资源
     this.getUserResource();
     // 获取用户管理的项目信息
@@ -857,6 +885,8 @@ export default {
       }
     };
     return {
+      domainTag: '',
+      orgsTag: '',
       tabContentHeight: 600,
       userDetail: {},
       resourceColumn: [
@@ -916,9 +946,9 @@ export default {
         phone: "",
         country: "",
         city: "",
-        organizations: "",
+        organizations: [],
         introduction: "",
-        domain: "",
+        domain: [],
         homePage: "",
         avatar: ""
       },
@@ -964,13 +994,6 @@ export default {
             trigger: "blur"
           }
         ],
-        // gender: [
-        //   {
-        //     required: true,
-        //     message: "Please select gender",
-        //     trigger: "change"
-        //   }
-        // ],
         phone: [
           {
             required: false,
@@ -1012,7 +1035,7 @@ export default {
             trigger: "blur"
           }
         ],
-        field: [
+        domain: [
           {
             required: false,
             message: "Please enter your research field",
@@ -1137,6 +1160,19 @@ export default {
     };
   },
   methods: {
+    //添加标签
+    addOrgsTag(tag){
+      if (tag != "" && !this.personalInfoItem.organization.contains(tag)){
+        this.personalInfoItem.organization.push(tag);
+        this.orgsTag = "";
+      }
+    },
+    addDomainTag(tag){
+      if (tag!="" && !this.personalInfoItem.domain.contains(tag)){
+        this.personalInfoItem.domain.push(tag);
+        this.domainTag = "";
+      }
+    },
     // 初始化侧边栏样式
     initStyle() {
       if (window.innerHeight > 735) {
@@ -1152,6 +1188,7 @@ export default {
       delete this.userDetail.joinedProjects;
       delete this.userDetail.manageProjects;
       this.joinedProjectIndexList = this.$store.getters.userInfo.joinedProjects;
+      console.log(this.userDetail)
     },
     //获取用户参与的项目列表
     getParticipatoryList(projectIds) {
@@ -1198,21 +1235,16 @@ export default {
     },
     //获取用户可管理支配的全部项目列表
     getManagerProjectList() {
-      // this.axios
-      //   .get(
-      //     "/GeoProblemSolving/user" +
-      //       "?key=managerId" +
-      //       "&value=" +
-      //       this.userDetail.userId
-      //   )
-      //   .then(res => {
-      //     if (res.data != "None" && res.data != "Fail") {
-      //       this.userManagerProjectList = res.data;
-      //     } else {
-      //       this.userManagerProjectList = [];
-      //     }
-      //   })
-      //   .catch(err => {});
+      this.axios
+        .post("/GeoProblemSolving/user/getMProject", this.$store.getters.userInfo.manageProjects)
+        .then(res =>{
+          if (res.data.data != "Fail" && res.data.data !="None"){
+            this.userManagerProjectList = res.data.data;
+          }else {
+            this.userManagerProjectList = [];
+          }
+        })
+        .catch(e=>{})
     },
     //注销的模态框按钮
     logOutModalShow() {
@@ -1464,7 +1496,7 @@ export default {
       // sessionStorage.setItem("projectInfo", JSON.stringify(projectInfo));
       // sessionStorage.setItem("projectInfo", this.encrypto(projectInfo));
       window.location.href =
-        "/GeoProblemSolving/projectDetail/" + projectInfo.projectId;
+        "/GeoProblemSolving/projectDetail/" + projectInfo.aid;
     },
     readPersonalEvent() {
       this.axios

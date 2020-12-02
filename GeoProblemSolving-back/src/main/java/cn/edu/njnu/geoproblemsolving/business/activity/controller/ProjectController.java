@@ -87,6 +87,17 @@ public class ProjectController {
     }
 
     /**
+     * get project
+     * @param aid
+     * @return
+     */
+    @RequestMapping(produces = {"application/json;charset=UTF-8"}, method = RequestMethod.GET, value = "/{aid}")
+    public JsonResult getProject(@PathVariable("aid") String aid){
+        JsonResult project = projectService.findProject(aid);
+        return project;
+    }
+
+    /**
      * Delete project
      * @param aid
      * @return

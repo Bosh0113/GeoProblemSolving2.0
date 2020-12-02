@@ -2,6 +2,7 @@ package cn.edu.njnu.geoproblemsolving.business.activity.service.Impl;
 
 import cn.edu.njnu.geoproblemsolving.Dao.Email.EmailDaoImpl;
 import cn.edu.njnu.geoproblemsolving.Dao.Folder.FolderDaoImpl;
+import cn.edu.njnu.geoproblemsolving.View.StaticPagesBuilder;
 import cn.edu.njnu.geoproblemsolving.business.activity.dto.UpdateActivityDTO;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Subproject;
 import cn.edu.njnu.geoproblemsolving.business.activity.enums.ActivityType;
@@ -16,6 +17,7 @@ import cn.edu.njnu.geoproblemsolving.business.activity.repository.ProjectReposit
 import cn.edu.njnu.geoproblemsolving.business.activity.service.ProjectService;
 import cn.edu.njnu.geoproblemsolving.business.user.repository.UserRepository;
 import cn.edu.njnu.geoproblemsolving.common.utils.ResultUtils;
+import cn.hutool.system.UserInfo;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.data.domain.PageRequest;
@@ -154,7 +156,7 @@ public class ProjectServiceImpl implements ProjectService {
 
             // set type
             project.setType(project.getType());
-            if(project.getType().equals(ActivityType.Activity_Group)){
+            if (project.getType().equals(ActivityType.Activity_Group)) {
                 project.setChildren(new ArrayList<>());
             }
 
@@ -170,8 +172,10 @@ public class ProjectServiceImpl implements ProjectService {
             User user = findByUserId(creator.getString("userId"));
             if (user == null) return ResultUtils.error(-1, "Fail: user does not exist");
 
-            // ArrayList<String> manageProjects = user.getManageProjects();
-            ArrayList<String> managedProjects = new ArrayList<>();
+            ArrayList<String> managedProjects = user.getManageProjects();
+            if (managedProjects == null) {
+                managedProjects = new ArrayList<>();
+            }
             managedProjects.add(projectId);
             user.setManageProjects(managedProjects);
             /**
@@ -195,13 +199,45 @@ public class ProjectServiceImpl implements ProjectService {
                 return ResultUtils.error(-1, "Fail: no this project");
 
             Project project = (Project) optional.get();
+
+            // if original project's privacy is private
+            Boolean updateProjectListPage = false;
+            if (!update.getPrivacy().equals(project.getPrivacy())) {
+                updateProjectListPage = isUpdateProjectListStaticPage(aid, !project.getPrivacy().equals("Private"));
+            }
             update.updateTo(project);
             projectRepository.save(project);
+
+            StaticPagesBuilder staticPagesBuilder = new StaticPagesBuilder();
+            staticPagesBuilder.projectDetailPageBuilder(project);
+            if (updateProjectListPage) {
+                staticPagesBuilder.projectListPageBuilder(findProjectsByPage(1, 18));
+            }
 
             return ResultUtils.success(project);
         } catch (Exception ex) {
             return ResultUtils.error(-2, "Fail: Exception");
         }
+    }
+
+    private Boolean isUpdateProjectListStaticPage(String projectId, Boolean noPrivate) {
+        JsonResult result = inquiryByConditions("", "", "", "", 1, 18);
+        try {
+            List<Project> projects = (List<Project>) result.getData();
+            long count = projects.size();
+            if (count < 18 && noPrivate) { //如果首页数量少于页面数量规格且有新的可见条目，则更新
+                return true;
+            }
+            for (Project project : projects) {
+                if (projectId.equals(project.getAid())) {
+                    return true;
+                }
+            }
+        } catch (Exception ex) {
+            return false;
+        }
+
+        return false;
     }
 
     @Override
@@ -247,7 +283,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     private void deleteChildren(Activity activity) {
         for (String childId : activity.getChildren()) {
-            if(activity.getLevel() == 1) {
+            if (activity.getLevel() == 1) {
                 Optional optional = activity.getLevel() > 1 ? activityRepository.findById(childId) : subprojectRepository.findById(childId);
                 if (optional.isPresent()) {
                     Activity child = (Activity) optional.get();
@@ -273,7 +309,7 @@ public class ProjectServiceImpl implements ProjectService {
             Project project = (Project) optional.get();
 
             JSONArray children = new JSONArray();
-            if(project.getChildren() != null) {
+            if (project.getChildren() != null) {
                 for (String childId : project.getChildren()) {
                     optional = subprojectRepository.findById(childId);
                     if (optional.isPresent()) {
@@ -301,19 +337,27 @@ public class ProjectServiceImpl implements ProjectService {
             participants.put("creator", creator);
 
             JSONArray members = project.getMembers();
-            JSONArray memberinfos = new JSONArray();
+            JSONArray memberInfos = new JSONArray();
             for (Object member : members) {
-                if (member instanceof JSONObject) {
-                    User user = findByUserId(((JSONObject) member).getString("userId"));
-                    JSONObject userInfo = (JSONObject) member;
-                    userInfo.put("name", user.getName());
-                    userInfo.put("avatar", user.getAvatar());
-                    userInfo.put("email", user.getEmail());
-                    userInfo.put("title", user.getTitle());
-                    memberinfos.add(userInfo);
-                }
+                // if (member instanceof JSONObject) {
+                //     User user = findByUserId(((JSONObject) member).getString("userId"));
+                //     JSONObject userInfo = (JSONObject) member;
+                //     userInfo.put("name", user.getName());
+                //     userInfo.put("avatar", user.getAvatar());
+                //     userInfo.put("email", user.getEmail());
+                //     userInfo.put("title", user.getTitle());
+                //     memberinfos.add(userInfo);
+                // }
+                String userId =  (String)((HashMap) member).get("userId");
+                User user = findByUserId(userId);
+                HashMap<String, Object> userInfo = (HashMap)member;
+                userInfo.put("name", user.getName());
+                userInfo.put("avatar", user.getAvatar());
+                userInfo.put("email", user.getEmail());
+                userInfo.put("title", user.getTitle());
+                memberInfos.add(userInfo);
             }
-            participants.put("members", memberinfos);
+            participants.put("members", memberInfos);
 
             return ResultUtils.success(participants);
         } catch (Exception ex) {
