@@ -239,19 +239,18 @@ public class SubprojectServiceImpl implements SubprojectService {
 
             // members
             JSONArray members = subproject.getMembers();
-            JSONArray memberinfos = new JSONArray();
+            JSONArray memberInfos = new JSONArray();
             for (Object member : members) {
-                if (member instanceof JSONObject) {
-                    User user = findByUserId(((JSONObject) member).getString("userId"));
-                    JSONObject userInfo = (JSONObject) member;
-                    userInfo.put("name", user.getName());
-                    userInfo.put("avatar", user.getAvatar());
-                    userInfo.put("email", user.getEmail());
-                    userInfo.put("title", user.getTitle());
-                    memberinfos.add(userInfo);
-                }
+                String userId =  (String)((HashMap) member).get("userId");
+                User user = findByUserId(userId);
+                HashMap<String, Object> userInfo = (HashMap)member;
+                userInfo.put("name", user.getName());
+                userInfo.put("avatar", user.getAvatar());
+                userInfo.put("email", user.getEmail());
+                userInfo.put("title", user.getTitle());
+                memberInfos.add(userInfo);
             }
-            participants.put("members", memberinfos);
+            participants.put("members", memberInfos);
 
             // Update active time
             updateActiveTime(subproject);
@@ -296,6 +295,23 @@ public class SubprojectServiceImpl implements SubprojectService {
             return ResultUtils.success(lineage);
         } catch (Exception ex) {
             return ResultUtils.error(-2, "Fail: Exception");
+        }
+    }
+
+    @Override
+    public JsonResult findSubProject(String aid) {
+        Optional<Subproject> optional = subprojectRepository.findById(aid);
+        if (optional.isPresent()){
+            Subproject subproject = optional.get();
+
+            //Update active time
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            subproject.setActiveTime(simpleDateFormat.format(new Date()));
+            subprojectRepository.save(subproject);
+
+            return ResultUtils.success(subproject);
+        }else {
+            return ResultUtils.error(-1, "None");
         }
     }
 

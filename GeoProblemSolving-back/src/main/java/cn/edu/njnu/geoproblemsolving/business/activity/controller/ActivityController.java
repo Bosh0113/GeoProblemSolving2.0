@@ -58,6 +58,16 @@ public class ActivityController {
     }
 
     /**
+     * get activity
+     * @param aid
+     * @return
+     */
+    @RequestMapping(produces = "application/json;charset=UTF-8", method = RequestMethod.GET, value = "/{aid}")
+    public JsonResult getActivity(@PathVariable("aid") String aid){
+        return activityService.findActivity(aid);
+    }
+
+    /**
      * Delete activity
      * @param aid
      * @return

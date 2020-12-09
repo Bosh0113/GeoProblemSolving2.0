@@ -15,6 +15,7 @@ export default new Vuex.Store({
         projectImg: '',
         activityTree:[],
         IP_Port: window.location.host,
+        //用于当前选择的页面内容
         // IP_Port:"172.21.213.185:8080",
         // IP_Port:"localhost:8080",
         // IP_Port:"172.21.212.72:8082",
@@ -38,7 +39,7 @@ export default new Vuex.Store({
         },
         activityTree: state => {
             return state.activityTree;
-        }
+        },
     },
     mutations: {
         getUserInfo: state => {

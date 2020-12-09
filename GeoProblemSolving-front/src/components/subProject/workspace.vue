@@ -107,7 +107,13 @@ export default {
         .then(res => {
           this.resetProjectTypeModel = false;
           if (res.data == "Offline") {
-            parent.location.href = "/GeoProblemSolving/login";
+            var pageUrl = parent.location.href;
+            this.axios
+              .get("/GeoProblemSolving/user/login?pageUrl="+pageUrl)
+              .then(res=>{
+                parent.location.href = res.data;
+              })
+            // parent.location.href = "/GeoProblemSolving/login";
           } else if (res.data != "Fail") {
             this.$store.commit("setSubProjectInfo", res.data);
             this.$emit("changeSubProjectInfo", res.data);

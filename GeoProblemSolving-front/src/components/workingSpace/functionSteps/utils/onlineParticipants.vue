@@ -162,15 +162,15 @@ export default {
   beforeRouteEnter: (to, from, next) => {
     next(vm => {
       if (!vm.$store.getters.userState || vm.$store.getters.userId == "") {
-        vm.$router.push({
-          name: "Login"
-        });
+        // vm.$router.push({
+        //   name: "Login"
+        // });
       } else {
       }
     });
   },
   updated: function() {},
-  methods: {    
+  methods: {
     gotoPersonalSpace(id) {
       if (id == this.$store.getters.userId) {
         this.$router.push({ name: "PersonalPage" });

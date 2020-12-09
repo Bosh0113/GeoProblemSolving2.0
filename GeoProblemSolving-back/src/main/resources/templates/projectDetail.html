@@ -428,7 +428,7 @@
                             <div slot="extra">
                                 <div>
                                     <Poptip trigger="hover" content="Edit project information" placement="left"
-                                            v-if="permissionIdentity(projectInfo.permission, userRole, 'edit_info')">
+                                            v-if="detailPermissionIdentity(projectInfo.permission, userRole, 'edit_info')">
                                         <i-button style="margin: 0 5px;" class="changeEditColor"
                                                   @click="editModelShow()">
                                             <Icon type="ios-create" :size="20"></Icon>
@@ -516,7 +516,7 @@
                                             <div class="flex1" style="margin-top: 10px;">
                                                 <div style="flex: 1;padding: 5px;min-height: 100px;border: #e8eaec 0.1px dashed;">
                                                     <h3>Description:</h3>
-                                                    <div class="projectDescriptionContent" :style="{height: contentPageCSS - 343 + 'px'}">
+                                                    <div class="projectDescriptionContent" :style="{height: contentPageCSS - 393 + 'px'}">
                                                         <vue-scroll :ops="scrollOps">
                                                             <div id="projectDescription" style="white-space: pre-line;"
                                                                  th:text="${projectInfo.description}">
@@ -537,7 +537,7 @@
                                                 <div slot="extra">
                                                     <div>
                                                         <Poptip trigger="hover" content="Invite members"
-                                                                v-if="permissionIdentity(projectInfo.permission, userRole, 'invite_member')"
+                                                                v-if="detailPermissionIdentity(projectInfo.permission, userRole, 'invite_member')"
                                                                 placement="left">
                                                             <i-button class="changeInviteColor"
                                                                       @click="inviteModalShow()">
@@ -545,7 +545,7 @@
                                                             </i-button>
                                                         </Poptip>
                                                         <Poptip trigger="hover" content="Remove members"
-                                                                v-if="permissionIdentity(projectInfo.permission, userRole, 'manage_member')"
+                                                                v-if="detailPermissionIdentity(projectInfo.permission, userRole, 'manage_member')"
                                                                 placement="left">
                                                             <i-button style="margin-left:5px;"
                                                                       class="changeRemoveColor"
@@ -595,7 +595,7 @@
                             </div>
                             <div :style="{height: contentPageCSS - 105 + 'px'}">
                                 <child-folder
-                                        :role="userRole"
+                                        :user-role="userRole"
                                         :project-info="projectInfo"
                                         ref="folderTreeEl"></child-folder>
                             </div>
@@ -959,13 +959,6 @@
                 'avatar': VueAvatar.Avatar
             },
             created() {
-                var userInfo = {
-                    userState: false,
-                    userName: 'visitor',
-                    userId: '',
-                    avatar: ''
-                };
-                sessionStorage.setItem('userInfo', JSON.stringify(userInfo));
                 this.tokenStr = this.getURLParameter("token");
                 if (this.tokenStr != null) {
                     $.ajax({
@@ -981,7 +974,6 @@
                             console.log("Check token info fail.");
                         }
                     });
-
                 }
                 $.ajax({
                     url: "/GeoProblemSolving/user/state",
@@ -1009,11 +1001,11 @@
                 if (window.location.host == "localhost:8080") {
                     this.ipPort = 'http://localhost:8080';
                 }
+                this.roleIdentity();
             },
             mounted() {
                 this.userEnter();
                 this.resizeContent();
-                this.roleIdentity();
                 this.changeMenuByUrl();
             },
             data() {
@@ -1224,7 +1216,7 @@
                         this.userInfo.userId
                     );
                 },
-                permissionIdentity(permission, role, operation) {
+                detailPermissionIdentity(permission, role, operation) {
                     return permissionIdentity(
                         JSON.parse(permission),
                         role,

@@ -25,9 +25,9 @@
                     type="default"
                     class="createTaskBtn"
                     style="margin-top: -8px"
+                    v-if="taskPermissionIdentity(projectInfo.permission, userRole, 'create_task')"
                     @click="createTaskModalShow()"
-                    >Add</Button
-                  >
+                    >Add</Button>
                   <!-- <Button
                     slot="extra"
                     type="default"
@@ -1084,10 +1084,10 @@ export default {
   },
   created() {
     this.initSize();
+    this.roleIdentity();
   },
   mounted() {
     this.inquiryTask();
-    this.roleIdentity();
     window.addEventListener("resize", this.initSize);
   },
   beforeRouteLeave(to, from, next) {
@@ -1107,10 +1107,10 @@ export default {
         this.userInfo.userId
       );
     },
-    permissionIdentity(permission, operation) {
+    taskPermissionIdentity(permission, role ,operation) {
       return userRoleJS.permissionIdentity(
         JSON.parse(permission),
-        this.userRole,
+        role,
         operation
       );
     },

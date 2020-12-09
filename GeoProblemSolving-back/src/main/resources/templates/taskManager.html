@@ -62,7 +62,7 @@
                                 <h3 slot="title">Todo</h3>
                                 <i-button slot="extra" type="default" class="createTaskBtn" style="margin-top:-8px"
                                           @click="createTaskModalShow()"
-                                          v-if="permissionIdentity('create_task')">Add
+                                          v-if="taskPermissionIdentity(projectInfo.permission, userRole, 'create_task')">Add
                                 </i-button>
                                 <vue-scroll :ops="ops" :style="{height:contentHeight-80+'px'}">
                                     <draggable :disabled="taskItemDraggable()" class="taskList" element="ul"
@@ -81,11 +81,11 @@
                                                 <strong style="color:#57a3f3" class="taskName" :title="item.taskName">{{item.taskName}}</strong>
                                             </span>
                                                 <div style="float:right">
-                                                    <Rate :disabled="!(permissionIdentity('manage_task') || userInfo.userId == item.creatorId)"
+                                                    <Rate :disabled="!(taskPermissionIdentity(projectInfo.permission, userRole,'manage_task') || userInfo.userId == item.creatorId)"
                                                           v-model="item.importance" :count="1" clearable
                                                           title="Importance" @on-change="changeImportance(item)"
                                                     ></Rate>
-                                                    <template v-if="permissionIdentity('manage_task') || userInfo.userId == item.creatorId">
+                                                    <template v-if="taskPermissionIdentity(projectInfo.permission, userRole, 'manage_task') || userInfo.userId == item.creatorId">
                                                         <span title="Edit">
                                                             <Icon type="ios-create" color="gray" :size="20"
                                                                   style="cursor:pointer"
@@ -131,10 +131,10 @@
                                                 <strong style="color:#57a3f3" class="taskName" :title="item.taskName">{{item.taskName}}</strong>
                                             </span>
                                                 <div style="float:right">
-                                                    <Rate :disabled="!(permissionIdentity('manage_task') || userInfo.userId == item.creatorId)"
+                                                    <Rate :disabled="!(taskPermissionIdentity(projectInfo.permission, userRole, 'manage_task') || userInfo.userId == item.creatorId)"
                                                           v-model="item.importance" :count="1" clearable
                                                           title="Importance" @on-change="changeImportance(item)"></Rate>
-                                                    <template v-if="permissionIdentity('manage_task') || userInfo.userId == item.creatorId">
+                                                    <template v-if="taskPermissionIdentity(projectInfo.permission, userRole, 'manage_task') || userInfo.userId == item.creatorId">
                                                     <span title="Edit">
                                                         <Icon type="ios-create" color="gray" :size="20"
                                                               style="cursor:pointer"
@@ -178,10 +178,10 @@
                                                 <strong style="color:#57a3f3" class="taskName" :title="item.taskName">{{item.taskName}}</strong>
                                             </span>
                                                 <div style="float:right">
-                                                    <Rate :disabled="!(permissionIdentity('manage_task') || userInfo.userId == item.creatorId)"
+                                                    <Rate :disabled="!(taskPermissionIdentity(projectInfo.permission, userRole, 'manage_task') || userInfo.userId == item.creatorId)"
                                                           v-model="item.importance" :count="1" clearable
                                                           title="Importance" @on-change="changeImportance(item)"></Rate>
-                                                    <template v-if="permissionIdentity('manage_task') || userInfo.userId == item.creatorId">
+                                                    <template v-if="taskPermissionIdentity(projectInfo.permission, userRole, 'manage_task') || userInfo.userId == item.creatorId">
                                                     <span title="Edit">
                                                         <Icon type="ios-create" color="gray" :size="20"
                                                               style="cursor:pointer"
@@ -313,6 +313,7 @@
 </template>
 <script th:fragment="task-js">
 
+    //父子组件传参，从projectDetail组件，将projectInfo以及userRole传过来。
     Vue.component('child-task', {
         template: '#taskComponent',
         props: ["projectInfo", "userRole"], //子项目管理者Manager，项目管理者PManager,成员Member
@@ -323,7 +324,7 @@
                 doneLoading: true,
                 userInfo: {
                     userState: false,
-                    userName: 'Visitor',
+                    name: 'visitor',
                     userId: '',
                     avatar: '',
                 },
@@ -485,6 +486,13 @@
             window.removeEventListener("resize", this.initSize);
         },
         methods: {
+            taskPermissionIdentity(permission, role, operation){
+                return permissionIdentity(
+                    JSON.parse(permission),
+                    role,
+                    operation
+                );
+            },
             initSize() {
                 if (window.innerHeight > 735) {
                     this.contentHeight = window.innerHeight - 236;
@@ -590,10 +598,10 @@
                         taskForm["startTime"] = new Date(this.formValidate.startTime);
                         taskForm["endTime"] = new Date(this.formValidate.endTime);
                         taskForm["creatorId"] = this.userInfo.userId;
-                        taskForm["creatorName"] = this.userInfo.userName;
-                        taskForm["managerName"] = this.userInfo.userName;
+                        taskForm["creatorName"] = this.userInfo.name;
+                        taskForm["managerName"] = this.userInfo.name;
                         taskForm["importance"] = this.formValidate.importanceCheck ? 1 : 0;
-                        taskForm["subProjectId"] = this.projectInfo.aid;  //此处subProjectId是由于后台当初设计只考虑设在子项目，此处当作scopeId使用即可。
+                        taskForm["aid"] = this.projectInfo.aid;
                         taskForm["state"] = "todo";
                         taskForm["order"] = this.taskTodo.length;
                         axios
@@ -604,7 +612,7 @@
                                 } else if (res.data != "Fail") {
                                     // 任务更新socket
                                     this.socketMsg.whoid = this.userInfo.userId;
-                                    this.socketMsg.who = this.userInfo.userName;
+                                    this.socketMsg.who = this.userInfo.name;
                                     this.socketMsg.type = "tasks";
                                     this.socketMsg.content = "created a new task.";
                                     this.socketMsg.time = new Date().toLocaleString();
@@ -634,7 +642,7 @@
                             confirm("You are offline, please login again.");
                         } else if (res.data != "None" && res.data != "Fail") {
                             this.socketMsg.whoid = this.userInfo.userId;
-                            this.socketMsg.who = this.userInfo.userName;
+                            this.socketMsg.who = this.userInfo.name;
                             this.socketMsg.type = "tasks";
                             this.socketMsg.content = "Changed the importance of one task.";
                             this.socketMsg.time = new Date().toLocaleString();
@@ -750,7 +758,7 @@
                                 } else if (res.data != "None" && res.data != "Fail") {
                                     this.updateTaskList(res.data); // 只更新单个任务
                                     this.socketMsg.whoid = this.userInfo.userId;
-                                    this.socketMsg.who = this.userInfo.userName;
+                                    this.socketMsg.who = this.userInfo.name;
                                     this.socketMsg.type = "tasks";
                                     this.socketMsg.content = "edited a new task.";
                                     this.socketMsg.time = new Date().toLocaleString();
@@ -854,7 +862,7 @@
             },
             taskOrderUpdate(taskList, type) {
                 if (this.userRole != "Visitor" && this.userRole != "Token") {
-                    let thisUserName = this.userInfo.userName;
+                    let thisUserName = this.userInfo.name;
                     let stateChangeIndex = 0;
                     let count = taskList.length;
                     for (let i = 0; i < taskList.length; i++) {
@@ -912,7 +920,7 @@
             endMove() {
                 // 任务更新socket
                 this.socketMsg.whoid = this.userInfo.userId;
-                this.socketMsg.who = this.userInfo.userName;
+                this.socketMsg.who = this.userInfo.name;
                 this.socketMsg.type = "tasks";
                 this.socketMsg.content = "changed the task schedule.";
                 this.socketMsg.time = new Date().toLocaleString();
@@ -935,7 +943,7 @@
                             this.taskList.splice(this.selectTaskIndex, 1);
                             // 任务更新socket
                             this.socketMsg.whoid = this.userInfo.userId;
-                            this.socketMsg.who = this.userInfo.userName;
+                            this.socketMsg.who = this.userInfo.name;
                             this.socketMsg.type = "tasks";
                             this.socketMsg.content = "removed a task.";
                             this.socketMsg.time = new Date().toLocaleString();
@@ -961,9 +969,6 @@
                 } else {
                     return false;
                 }
-            },
-            permissionIdentity(operation) {
-                return permissionIdentity(JSON.parse(this.projectInfo.permission), this.userRole, operation);
             },
             taskItemDraggable() {
                 if (this.userRole == 'Manager' || this.userRole == 'PManager' || this.userRole == 'Member') {

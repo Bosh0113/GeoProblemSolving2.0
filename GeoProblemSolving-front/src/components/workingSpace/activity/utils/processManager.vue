@@ -20,6 +20,7 @@
             <span style="font-weight: bold; font-size: 16px"
               >Procedure of the current activity</span
             >
+<!--            右侧三个按钮-->
             <Button
               v-if="nodePositionBtn && procedureDrag"
               type="warning"
@@ -49,6 +50,7 @@
               style="float: right; margin-left: 10px; cursor: default"
               >Move node</Button
             >
+<!--            link按钮      -->
             <Button
               v-if="removeLinkBtn"
               type="error"
@@ -68,6 +70,7 @@
               style="float: right; margin-left: 10px; cursor: default"
               >Unlink</Button
             >
+<!--            link的三种状态 -->
             <Button
               v-if="linkStep == 0"
               type="default"

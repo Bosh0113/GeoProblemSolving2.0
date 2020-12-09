@@ -8,7 +8,8 @@ const routes = [
     path: '/', name: 'Navigation', component: resolve => (require(["@/components/navigation"], resolve)), children: [
       { path: '', redirect: 'staticPage' },
       { path: 'staticPage', name: 'StaticPage', component: resolve => (require(["@/components/navigationContent/staticPage"], resolve)) },
-      { path: 'permission/:id', name: 'permission', component: resolve => (require(["@/components/projects/permissionManager"], resolve)) },
+      //add level
+      { path: 'permission/:level:id', name: 'permission', component: resolve => (require(["@/components/projects/permissionManager"], resolve)) },
       // {
       //   path: 'project/:id/subproject/', name: 'subproject', component: resolve => (require(["@/components/subProject/subprojectNav"], resolve)), children: [
       //     { path: '', redirect: 'overview' },

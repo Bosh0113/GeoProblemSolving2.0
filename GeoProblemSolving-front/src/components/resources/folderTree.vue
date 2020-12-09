@@ -158,6 +158,7 @@
                   shape="circle"
                   icon="md-cloud-download"
                   class="fileBtnHoverGray"
+                  v-if="permissionIdentity(activityInfo.permission, userRole, 'use_resource')"
                 ></Button>
               </Tooltip>
               <Tooltip
@@ -170,6 +171,7 @@
                   shape="circle"
                   icon="md-cloud-upload"
                   class="fileBtnHoverGreen"
+                  v-if="permissionIdentity(activityInfo.permission, userRole, 'upload_resource')"
                 ></Button>
               </Tooltip>
               <Tooltip
@@ -206,7 +208,9 @@
                   :title="folder.name"
                   >{{ folder.name }}</a
                 >
-                <div style="float: right" v-if="userRole != 'Visitor'">
+
+<!--                文件夹结构-->
+                <div style="float: right" >
                   <Button
                     @click="renameFolderModalShow(folder)"
                     class="fileBtnHoverBlue"
@@ -215,6 +219,7 @@
                     title="Rename"
                     size="small"
                     type="text"
+                    v-if="permissionIdentity(activityInfo.permission, userRole, 'manage_resource')"
                   ></Button>
                   <Button
                     @click="deleteFolder(folder)"
@@ -225,6 +230,7 @@
                     size="small"
                     style="margin-left: 5px"
                     type="text"
+                    v-if="permissionIdentity(activityInfo.permission, userRole, 'manage_resource')"
                   ></Button>
                 </div>
               </div>
@@ -250,7 +256,9 @@
                 <span style="width: 20%; margin-right: 5%">{{
                   file.uploadTime.substring(0, 10)
                 }}</span>
-                <div style="float: right" v-if="userRole != 'Visitor'">
+
+<!--                使用资源-->
+                <div style="float: right"  v-if="permissionIdentity(activityInfo.permission, userRole, 'use_resource')">
                   <Button
                     @click="filePreview(file)"
                     shape="circle"
@@ -278,14 +286,9 @@
                     class="fileBtnHoverOrange"
                     type="text"
                   ></Button>
-                  <template
-                    v-if="
-                      permissionIdentity(
-                        activityInfo.permission,
-                        'manage_resource'
-                      )
-                    "
-                  >
+
+<!--                  管理资源-->
+                  <template  v-if="permissionIdentity(activityInfo.permission, userRole, 'manage_resource')">
                     <Button
                       @click="fileEditModelShow(file)"
                       shape="circle"
@@ -720,10 +723,10 @@ export default {
         this.userInfo.userId
       );
     },
-    permissionIdentity(permission, operation) {
+    permissionIdentity(permission, role,operation) {
       return userRoleJS.permissionIdentity(
         JSON.parse(permission),
-        this.userRole,
+        role,
         operation
       );
     },

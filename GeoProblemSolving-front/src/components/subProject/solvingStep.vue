@@ -1016,7 +1016,13 @@ export default {
               this.$store.commit("userLogout");
               this.$router.push({ name: "Login" });
             } else {
-              parent.location.href = "/GeoProblemSolving/login";
+              // parent.location.href = "/GeoProblemSolving/login";
+              var pageUrl = parent.location.href;
+              this.axios
+                .get("/GeoProblemSolving/user/login?pageUrl="+pageUrl)
+                .then(res=>{
+                  parent.location.href = res.data;
+                })
             }
           } else if (res.data === "Fail") {
             this1.$Message.info("Fail");
@@ -1173,7 +1179,13 @@ export default {
               this.$store.commit("userLogout");
               this.$router.push({ name: "Login" });
             } else {
-              parent.location.href = "/GeoProblemSolving/login";
+              // parent.location.href = "/GeoProblemSolving/login";
+              var pageUrl = parent.location.href;
+              this.axios
+                .get("/GeoProblemSolving/user/login?pageUrl="+pageUrl)
+                .then(res=>{
+                  parent.location.href = res.data;
+                })
             }
           } else if (res.data === "Fail") {
             // this.$Notice.error({ desc: "Loading tools fail." });
@@ -1198,7 +1210,13 @@ export default {
               this.$store.commit("userLogout");
               this.$router.push({ name: "Login" });
             } else {
-              parent.location.href = "/GeoProblemSolving/login";
+              // parent.location.href = "/GeoProblemSolving/login";
+              var pageUrl = parent.location.href;
+              this.axios
+                .get("/GeoProblemSolving/user/login?pageUrl="+pageUrl)
+                .then(res=>{
+                  parent.location.href = res.data;
+                })
             }
           } else if (res.data === "Fail") {
             // this.$Notice.error({ desc: "Loading tool fail." });
@@ -1231,7 +1249,13 @@ export default {
               this.$store.commit("userLogout");
               this.$router.push({ name: "Login" });
             } else {
-              parent.location.href = "/GeoProblemSolving/login";
+              // parent.location.href = "/GeoProblemSolving/login";
+              var pageUrl = parent.location.href;
+              this.axios
+                .get("/GeoProblemSolving/user/login?pageUrl="+pageUrl)
+                .then(res=>{
+                  parent.location.href = res.data;
+                })
             }
           } else if (res.data === "Fail") {
             // this.$Notice.error({ desc: "Loading toolsets fail." });
@@ -1258,7 +1282,13 @@ export default {
               this.$store.commit("userLogout");
               this.$router.push({ name: "Login" });
             } else {
-              parent.location.href = "/GeoProblemSolving/login";
+              // parent.location.href = "/GeoProblemSolving/login";
+              var pageUrl = parent.location.href;
+              this.axios
+                .get("/GeoProblemSolving/user/login?pageUrl="+pageUrl)
+                .then(res=>{
+                  parent.location.href = res.data;
+                })
             }
           } else if (res.data === "Fail") {
             // this.$Notice.error({ desc: "Loading toolsets fail." });
@@ -1476,7 +1506,13 @@ export default {
               this.$store.commit("userLogout");
               this.$router.push({ name: "Login" });
             } else {
-              parent.location.href = "/GeoProblemSolving/login";
+              // parent.location.href = "/GeoProblemSolving/login";
+              var pageUrl = parent.location.href;
+              this.axios
+                .get("/GeoProblemSolving/user/login?pageUrl="+pageUrl)
+                .then(res=>{
+                  parent.location.href = res.data;
+                })
             }
           } else if (res.data != "Fail") {
             if (this.scopeType == "project") {
@@ -1525,7 +1561,13 @@ export default {
         .then(res => {
           this.resetProjectTypeModel = false;
           if (res.data == "Offline") {
-            parent.location.href = "/GeoProblemSolving/login";
+            // parent.location.href = "/GeoProblemSolving/login";
+            var pageUrl = parent.location.href;
+            this.axios
+              .get("/GeoProblemSolving/user/login?pageUrl="+pageUrl)
+              .then(res=>{
+                parent.location.href = res.data;
+              })
           } else if (res.data != "Fail") {
             this.$store.commit("setSubProjectInfo", res.data);
             this.$emit("changeSubProjectInfo", res.data);
@@ -1547,7 +1589,13 @@ export default {
         .then(res => {
           this.resetProjectTypeModel = false;
           if (res.data == "Offline") {
-            parent.location.href = "/GeoProblemSolving/login";
+            // parent.location.href = "/GeoProblemSolving/login";
+            var pageUrl = parent.location.href;
+            this.axios
+              .get("/GeoProblemSolving/user/login?pageUrl="+pageUrl)
+              .then(res=>{
+                parent.location.href = res.data;
+              })
           } else if (res.data != "Fail") {
             this.$emit("changeProjectInfo", res.data);
           } else {

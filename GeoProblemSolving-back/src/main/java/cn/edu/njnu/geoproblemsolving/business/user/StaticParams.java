@@ -1,4 +1,4 @@
-package cn.edu.njnu.geoproblemsolving.business;
+package cn.edu.njnu.geoproblemsolving.business.user;
 
 import cn.edu.njnu.geoproblemsolving.business.user.entity.User;
 import cn.edu.njnu.geoproblemsolving.business.user.entity.UserDto;

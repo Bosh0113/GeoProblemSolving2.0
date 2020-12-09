@@ -17,7 +17,7 @@
             activityInfo.description
           }}</span>
         </div>
-      </div>      
+      </div>
       <div style="text-align: center; margin-top: 10px; color: grey">
         Activity contains workspaces to support collaborative geo-problem
         solving. Here provides two activity types for different solutions of
@@ -49,7 +49,7 @@
             </div>
             <!-- <div style="text-align:center;margin-top:2%" v-if="permissionIdentity(activityInfo.permission, userRole, 'manage_workspace_type')"> -->
             <div style="text-align: center; margin-top: 2%">
-              <h3>
+              <h3 v-if="operationPermissionIdentity(this.activityInfo.permission, this.userRole, 'manage_workspace_type')">
                 Select this type ->
                 <a @click="selectTypeModalShow('Activity_Unit')">Go</a>
               </h3>
@@ -76,7 +76,7 @@
             </div>
             <!-- <div style="text-align:center;margin-top:2%" v-if="permissionIdentity(activityInfo.permission, userRole, 'manage_workspace_type')">                 -->
             <div style="text-align: center; margin-top: 2%">
-              <h3>
+              <h3 v-if="operationPermissionIdentity(this.activityInfo.permission, this.userRole, 'manage_workspace_type')">
                 Select this type ->
                 <a @click="selectTypeModalShow('Activity_Group')">Go</a>
               </h3>
@@ -132,17 +132,17 @@ export default {
     };
   },
   mounted() {
-    this.roleIdentity();
+    this.currentRoleIdentity();
   },
   methods: {
-    roleIdentity() {
+    currentRoleIdentity() {
       this.userRole = userRoleJS.roleIdentify(
         this.activityInfo.members,
         this.userInfo.userId
       );
     },
-    permissionIdentity(permission, role, operation) {
-      return userRoleJS.permissionIdentity(
+    operationPermissionIdentity(permission, role, operation) {
+       return userRoleJS.permissionIdentity(
         JSON.parse(permission),
         role,
         operation
@@ -186,6 +186,9 @@ export default {
             this.$store.commit("userLogout");
             this.$router.push({ name: "Login" });
           } else if (res.data.code == 0) {
+            if(res.data.data.level == 0){
+              parent.vm.projectInfo = res.data.data;
+            }
             this.$emit("typeChanged", this.selectType);
           } else {
             this.$Notice.info({ title: "Result", desc: res.data.msg });

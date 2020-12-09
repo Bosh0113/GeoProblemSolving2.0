@@ -8,6 +8,7 @@
     <link href="https://cdn.bootcss.com/iview/2.14.0/styles/iview.css" rel="stylesheet">
     <script src="https://cdn.bootcss.com/iview/2.14.0/iview.min.js"></script>
     <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+    <script src="/GeoProblemSolving/customize/userRole.js"></script>
     <style scoped th:fragment="common-css">
         .folderContent {
             height: fit-content;
@@ -139,7 +140,7 @@
                     </i-button>
                 </Tooltip>
                 <Tooltip content="New folder" placement="bottom" class="fileBtn"
-                         v-if="role != 'Visitor'&& role!='Token'">
+                         v-if="userRole != 'visitor'&& userRole!='Token'">
                     <i-button @click="addFolderModalShow" class="fileBtnHoverGreen">
                         <Icon type="ios-folder" size="20"></Icon>
                     </i-button>
@@ -165,16 +166,16 @@
                                 </Breadcrumb-item>
                             </Breadcrumb>
                         </div>
-                        <div style="align-items:flex-end" v-if="role != 'Visitor'&& role!='Token'">
-                            <Tooltip content="Download" placement="bottom" class="fileBtn" v-if="permissionIdentity('use_resource')">
+                        <div style="align-items:flex-end" v-if="userRole != 'visitor'&& userRole!='Token'">
+                            <Tooltip content="Download" placement="bottom" class="fileBtn" v-if="folderPermissionIdentity(projectInfo.permission, userRole,'use_resource')">
                                 <i-button @click="downloadSelectFile" shape="circle" icon="md-cloud-download"
                                           class="fileBtnHoverGray" v-show="currentFolder.files.length>0"></i-button>
                             </Tooltip>
-                            <Tooltip content="Upload files" placement="bottom" class="fileBtn" v-if="permissionIdentity('upload_resource')">
+                            <Tooltip content="Upload files" placement="bottom" class="fileBtn" v-if="folderPermissionIdentity(projectInfo.permission, userRole,'upload_resource')">
                                 <i-button @click="uploadModalShow" shape="circle" icon="md-cloud-upload"
                                           class="fileBtnHoverGreen"></i-button>
                             </Tooltip>
-                            <Tooltip content="Share personal files" placement="left" class="fileBtn" v-if="permissionIdentity('upload_resource')">
+                            <Tooltip content="Share personal files" placement="left" class="fileBtn" v-if="folderPermissionIdentity(projectInfo.permission, userRole,'upload_resource')">
                                 <i-button @click="shareModalShow" shape="circle" icon="ios-copy"
                                           class="fileBtnHoverOrange"></i-button>
                             </Tooltip>
@@ -188,7 +189,7 @@
                             <div>
                                 <Icon type="ios-folder-open" class="itemIcon" size="25"></Icon>
                                 <a @click="enterFolder(folder.uid)" class="fileItemName" :title="folder.name">{{folder.name}}</a>
-                                <div style="float:right" v-if="permissionIdentity('manage_resource') || folder.creatorId == userInfo.userId">
+                                <div style="float:right" v-if="folderPermissionIdentity(projectInfo.permission, userRole, 'manage_resource') || folder.creatorId == userInfo.userId">
                                     <i-button @click="renameFolderModalShow(folder)" class="fileBtnHoverBlue"
                                               shape="circle" icon="ios-create" title="Rename"
                                               size="small" type="text"></i-button>
@@ -206,20 +207,20 @@
                                     <span @click="getFileInfo(file)" class="fileItemName" :title="file.name">{{file.name}}</span>
                                     <span class="fileItemSize">{{file.fileSize}}</span>
                                     <span style="width:20%;margin-right:5%">{{file.uploadTime.substring(0,10)}}</span>
-                                    <div style="float:right" v-if="role != 'Visitor'&& role!='Token'">
+                                    <div style="float:right" v-if="userRole != 'visitor'&& userRole!='Token'">
                                         <i-button @click="filePreview(file)" shape="circle" icon="md-eye"
                                                   title="Preview" size="small" class="fileBtnHoverGreen"
                                                   type="text"></i-button>
-                                        <i-button v-if="permissionIdentity('use_resource')" @click="fileDownload(file)"
+                                        <i-button v-if="folderPermissionIdentity(projectInfo.permission, userRole, 'use_resource')" @click="fileDownload(file)"
                                                   shape="circle" icon="ios-cloud-download"
                                                   title="Download" size="small" class="fileBtnHoverGray"
                                                   type="text"></i-button>
-                                        <i-button v-if="permissionIdentity('use_resource')"
+                                        <i-button v-if="folderPermissionIdentity(projectInfo.permission, userRole, 'use_resource')"
                                                   @click="showCopyFileModel(file)" shape="circle" icon="ios-share-alt"
                                                   title="Copy to personal center" size="small"
                                                   class="fileBtnHoverOrange" type="text"></i-button>
                                         <template
-                                                v-if="permissionIdentity('manage_resource') || file.uploaderId == userInfo.userId">
+                                                v-if="folderPermissionIdentity(projectInfo.permission, userRole, 'manage_resource') || file.uploaderId == userInfo.userId">
                                             <i-button @click="fileEditModelShow(file)" shape="circle" icon="md-create"
                                                       title="Edit info" size="small" class="fileBtnHoverBlue"
                                                       type="text"></i-button>
@@ -387,7 +388,7 @@
 
     Vue.component('child-folder', {
         template: '#folderTreeComponent',
-        props: ["role", "projectInfo"],
+        props: ["userRole", "projectInfo"],
         mounted() {
             this.resizeContent();
             this.enterFolder(this.projectInfo.aid);
@@ -398,7 +399,7 @@
                 listContentCSS: '',
                 userInfo: {
                     userState: false,
-                    userName: 'Visitor',
+                    name: 'visitor',
                     userId: '',
                     avatar: '',
                 },
@@ -531,6 +532,21 @@
             };
         },
         methods: {
+            roleIdentity(){
+                this.userRole = roleIdentify(
+                    this.projectInfo.members,
+                    this.userInfo.userId
+                );
+            },
+            //最好不要取重名的方法名，this.permissionIdentity读取的是这个方法
+            //而permissionIdentity则读取的是userRole.js中的方法
+            folderPermissionIdentity(permission, role, operation){
+                return permissionIdentity(
+                  JSON.parse(permission),
+                  role,
+                  operation
+                );
+            },
             resizeContent() {
                 if (window.innerHeight > 735) {
                     this.listContentCSS = window.innerHeight - 345 + 'px';
@@ -538,23 +554,23 @@
                     this.listContentCSS = '390px';
                 }
             },
-            isMmember(members) {
-                let isMember = false;
-                for (let i = 0; i < members.length; i++) {
-                    if (members[i].userId === this.userInfo.userId) {
-                        isMember = true;
-                        break;
-                    }
-                }
-                if (isMember) {
-                    return true;
-                } else {
-                    return false;
-                }
-            },
-            permissionIdentity(operation) {
-                return permissionIdentity(JSON.parse(this.projectInfo.permission), this.userRole, operation);
-            },
+            // isMmember(members) {
+            //     let isMember = false;
+            //     for (let i = 0; i < members.length; i++) {
+            //         if (members[i].userId === this.userInfo.userId) {
+            //             isMember = true;
+            //             break;
+            //         }
+            //     }
+            //     if (isMember) {
+            //         return true;
+            //     } else {
+            //         return false;
+            //     }
+            // },
+            // permissionIdentity(operation) {
+            //     return permissionIdentity(JSON.parse(this.projectInfo.permission), this.userRole, operation);
+            // },
             enterFolder(currentFolderId) {
                 this.chooseFilesArray = [];
                 this.checkAll = false;

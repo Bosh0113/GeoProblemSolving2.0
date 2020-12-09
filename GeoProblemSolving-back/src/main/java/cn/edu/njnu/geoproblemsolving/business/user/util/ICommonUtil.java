@@ -1,6 +1,6 @@
 package cn.edu.njnu.geoproblemsolving.business.user.util;
 
-import cn.edu.njnu.geoproblemsolving.business.StaticParams;
+import cn.edu.njnu.geoproblemsolving.business.user.StaticParams;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
