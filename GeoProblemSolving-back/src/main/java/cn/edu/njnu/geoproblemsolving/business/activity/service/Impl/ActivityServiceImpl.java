@@ -35,7 +35,7 @@ public class ActivityServiceImpl implements ActivityService {
     private final ActivityRepository activityRepository;
     private final ProtocolRepository protocolRepository;
     private final UserRepository userRepository;
-    private final MongoTemplate mongoTemplate;
+//    private final MongoTemplate mongoTemplate;
     private final FolderDaoImpl folderDao;
     private final SubprojectRepository subprojectRepository;
     private final ProjectRepository projectRepository;
@@ -50,7 +50,7 @@ public class ActivityServiceImpl implements ActivityService {
         this.activityRepository = activityRepository;
         this.protocolRepository = protocolRepository;
         this.userRepository = userRepository;
-        this.mongoTemplate = mongoTemplate;
+//        this.mongoTemplate = mongoTemplate;
         this.folderDao = folderDao;
         this.subprojectRepository = subprojectRepository;
         this.projectRepository = projectRepository;
@@ -155,20 +155,20 @@ public class ActivityServiceImpl implements ActivityService {
             }
 
             // tools and toolsets
-            Query queryPublic = new Query(Criteria.where("privacy").is("Public"));
-            List<ToolEntity> toolEntities = mongoTemplate.find(queryPublic, ToolEntity.class);
-            ArrayList<String> tools = new ArrayList<>();
-            for (ToolEntity toolEntity : toolEntities) {
-                tools.add(toolEntity.getTid());
-            }
-            activity.setToolList(tools);
-
-            List<ToolsetEntity> toolsetEntities = mongoTemplate.find(queryPublic, ToolsetEntity.class);
-            ArrayList<String> toolsets = new ArrayList<>();
-            for (ToolsetEntity toolsetEntity : toolsetEntities) {
-                toolsets.add(toolsetEntity.getTsid());
-            }
-            activity.setToolsetList(toolsets);
+//            Query queryPublic = new Query(Criteria.where("privacy").is("Public"));
+//            List<ToolEntity> toolEntities = mongoTemplate.find(queryPublic, ToolEntity.class);
+//            ArrayList<String> tools = new ArrayList<>();
+//            for (ToolEntity toolEntity : toolEntities) {
+//                tools.add(toolEntity.getTid());
+//            }
+//            activity.setToolList(tools);
+//
+//            List<ToolsetEntity> toolsetEntities = mongoTemplate.find(queryPublic, ToolsetEntity.class);
+//            ArrayList<String> toolsets = new ArrayList<>();
+//            for (ToolsetEntity toolsetEntity : toolsetEntities) {
+//                toolsets.add(toolsetEntity.getTsid());
+//            }
+//            activity.setToolsetList(toolsets);
 
             //folder
             folderDao.createFolder(activity.getName(), "", aid);

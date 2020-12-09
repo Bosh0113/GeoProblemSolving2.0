@@ -4,7 +4,6 @@ import cn.edu.njnu.geoproblemsolving.business.user.enums.UserTitle;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -47,5 +46,5 @@ public class User {
      * adi
      */
     private ArrayList<String> joinedProjects;
-    private ArrayList<String> manageProjects;
+    private ArrayList<String> createdProjects;
 }

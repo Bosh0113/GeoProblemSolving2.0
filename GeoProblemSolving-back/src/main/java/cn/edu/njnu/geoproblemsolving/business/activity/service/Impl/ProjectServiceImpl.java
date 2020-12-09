@@ -170,9 +170,9 @@ public class ProjectServiceImpl implements ProjectService {
             User user = findByUserId(creator.getString("userId"));
             if (user == null) return ResultUtils.error(-1, "Fail: user does not exist");
 
-             ArrayList<String> managedProjects = user.getManageProjects();
-            managedProjects.add(projectId);
-            user.setManageProjects(managedProjects);
+            ArrayList<String> createdProjects = user.getCreatedProjects();
+            createdProjects.add(projectId);
+            user.setCreatedProjects(createdProjects);
             /**
              * Resource folder
              */
@@ -229,9 +229,9 @@ public class ProjectServiceImpl implements ProjectService {
             String userId = project.getCreator();
             User user = findByUserId(userId);
             if (user == null) return ResultUtils.error(-1, "Fail: user does not exist");
-            ArrayList<String> projectIds = user.getManageProjects();
+            ArrayList<String> projectIds = user.getCreatedProjects();
             projectIds.removeIf(projectId -> projectId.equals(aid));
-            user.setManageProjects(projectIds);
+            user.setCreatedProjects(projectIds);
             userRepository.save(user);
 
             // delete children
@@ -371,7 +371,7 @@ public class ProjectServiceImpl implements ProjectService {
             }
 
             joinedProjects.add(aid);
-            user.setManageProjects(joinedProjects);
+            user.setCreatedProjects(joinedProjects);
 
             // Update active time
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");

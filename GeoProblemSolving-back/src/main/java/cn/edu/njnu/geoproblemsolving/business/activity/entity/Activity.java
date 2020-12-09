@@ -56,7 +56,7 @@ public class Activity implements Serializable {
      */
     private String parent;
     private ArrayList<String> children;
-    private JSONArray pathway;
+//    private JSONArray pathway;
 
     /**
      * Permission Manager
@@ -68,13 +68,6 @@ public class Activity implements Serializable {
      * level=0: project; level=1: sub-project
      */
     private Integer level;
-
-    /**
-     * tools
-     * toolsets
-     */
-    private ArrayList<String> toolList;
-    private ArrayList<String> toolsetList;
 
     /**
      * Time
