@@ -22,14 +22,10 @@
               <Label>Purpose:</Label>
               <span style="margin-left: 10px">{{ activityInfo.purpose }}</span>
             </div>
-
             <div style="margin: 10px 0">
               <Label>Total participants:</Label>
-              <span style="margin-left: 10px">{{
-                activityInfo.members.length
-              }}</span>
+              <span style="margin-left: 10px">{{ participants.length }}</span>
             </div>
-
             <div style="margin: 10px 0">
               <Label>Total child activities:</Label>
               <span
@@ -53,7 +49,16 @@
                 >{{ creatorInfo.name }}
               </span>
             </div>
-            <div style="margin: 10px 0" v-if="permissionIdentity(projectInfo.permission,userRole, 'manage_resource')">
+            <div
+              style="margin: 10px 0"
+              v-if="
+                permissionIdentity(
+                  projectInfo.permission,
+                  userRole,
+                  'manage_resource'
+                )
+              "
+            >
               <Label>Permission:</Label>
               <span
                 style="margin-left: 10px; cursor: pointer; color: #2d8cf0"
@@ -134,7 +139,15 @@
               </div>
             </Card>
           </div>
-          <div v-if="permissionIdentity(projectInfo.permission, userRole, 'manage_child_activity')">
+          <div
+            v-if="
+              permissionIdentity(
+                projectInfo.permission,
+                userRole,
+                'manage_child_activity'
+              )
+            "
+          >
             <Card
               style="
                 height: 120px;
@@ -168,7 +181,34 @@
       <div>
         <span style="font-size: 1.17em; font-weight: bold">Participants</span>
         <Icon
-          v-if="permissionIdentity(projectInfo.permission, userRole, 'invite_member')"
+          v-if="
+            activityInfo.level > 0 &&
+            permissionIdentity(
+              projectInfo.permission,
+              userRole,
+              'manage_member'
+            )
+          "
+          type="md-trash"
+          size="16"
+          title="Remove users"
+          @click="delUserBtn = !delUserBtn"
+          style="
+            float: right;
+            margin: 5px 20px 0 0;
+            cursor: pointer;
+            color: #ed4014;
+          "
+        />
+        <Icon
+          v-if="
+            activityInfo.level > 0 &&
+            permissionIdentity(
+              projectInfo.permission,
+              userRole,
+              'invite_member'
+            )
+          "
           type="md-person-add"
           size="16"
           title="Invite users"
@@ -186,32 +226,30 @@
         style="margin-top: 10px; height: calc(100vh - 190px)"
       >
         <Card
-          v-for="(member, index) in participants"
-          :key="index"
           style="margin: 5px 0"
           :padding="5"
+          v-for="member in participants"
+          :key="member.name"
         >
+          <div v-if="delUserBtn">
+            <Icon type="md-remove-circle" size="20" color="#ed4014" />
+          </div>
           <div
             style="display: flex; align-items: center; cursor: pointer"
             @click="gotoPersonalSpace(member.userId)"
           >
             <div class="memberImg" style="position: relative">
               <img
-                v-if="member.avatar != '' && member.avatar != 'undefined'"
+                v-if="member.avatar != '' && member.avatar != undefined"
                 :src="member.avatar"
                 style="width: 40px; height: 40px"
               />
-<!--              <avatar-->
-<!--                :username="member.name"-->
-<!--                :size="40"-->
-<!--                :rounded="false"-->
-<!--                v-else-->
-<!--              />-->
               <avatar
-                :username="member.name"
-                :rounded="false"
                 v-else
-              ></avatar>
+                :username="member.name"
+                :size="40"
+                :rounded="true"
+              />
               <div class="onlinecircle"></div>
             </div>
             <div class="memberDetail">
@@ -236,7 +274,7 @@
     >
       <Transfer
         :data="potentialMembers"
-        :target-keys="participants"
+        :target-keys="invitingMembers"
         :list-style="listStyle"
         :render-format="memberRender"
         :titles="['Members of the parent activity', 'Members of this activity']"
@@ -260,11 +298,7 @@
           :label-width="120"
         >
           <FormItem label="Reason" prop="reason">
-            <Input
-              v-model="applyJoinForm.reason"
-              :rows="4"
-              type="textarea"
-            />
+            <Input v-model="applyJoinForm.reason" :rows="4" type="textarea" />
           </FormItem>
         </Form>
       </div>
@@ -354,7 +388,13 @@
 </template>
 <script>
 import * as userRoleJS from "./../../../api/userRole.js";
+import { get, del, post, put } from "../../../axios";
+import * as socketApi from "./../../../api/socket.js";
+import Avatar from "vue-avatar";
 export default {
+  components: {
+    Avatar,
+  },
   props: ["activityInfo"],
   data() {
     return {
@@ -366,12 +406,16 @@ export default {
       projectInfo: parent.vm.projectInfo,
       userInfo: JSON.parse(sessionStorage.getItem("userInfo")),
       userRole: "visitor",
-      //需要修改部分
-      creatorInfo: { name: "XXX", email: "XXX@XX.com" },
-      participants: [
-        { name: "AAA", role: "manager" },
-      ],
+      // Members
+      creatorInfo: {},
+      participants: [],
+      // add
+      potentialMembers: [],
+      invitingMembers: [],
       inviteModal: false,
+      // remove
+      delUserBtn: false,
+      // apply
       applyJoinActivityModal: false,
       createActivityModel: false,
       appliedActivity: {},
@@ -387,6 +431,7 @@ export default {
           },
         ],
       },
+      // Activity
       activityForm: {
         name: "",
         description: "",
@@ -433,7 +478,6 @@ export default {
         "Data analysis",
         "Decision making",
       ],
-      potentialMembers: [],
       listStyle: { width: "280px", height: "360px" },
     };
   },
@@ -442,9 +486,15 @@ export default {
     this.getParticipants();
   },
   mounted() {
-      console.log("========activityInfo==========")
-      console.log(this.activityInfo)
-      console.log("========activityInfo==========")
+    Array.prototype.contains = function (obj) {
+      var i = this.length;
+      while (i--) {
+        if (this[i].userId != undefined && this[i].userId === obj.userId) {
+          return true;
+        }
+      }
+      return false;
+    };
   },
   methods: {
     roleIdentity() {
@@ -463,11 +513,11 @@ export default {
     getParticipants() {
       let url = "";
       let activity = this.activityInfo;
-      if (activity.level == 0){
-        url = "/GeoProblemSolving/project/"+activity.aid+"/user";
-      }else if (activity.level == 1){
+      if (activity.level == 0) {
+        url = "/GeoProblemSolving/project/" + activity.aid + "/user";
+      } else if (activity.level == 1) {
         url = "/GeoProblemSolving/subproject/" + activity.aid + "/user";
-      }else if (activity.level > 1){
+      } else if (activity.level > 1) {
         url = "/GeoProblemSolving/activity/" + activity.aid + "/user";
       }
       //callback setTimeBack
@@ -477,20 +527,21 @@ export default {
           if (res.data.code == 0) {
             this.creatorInfo = res.data.data.creator;
             this.participants = res.data.data.members;
-            console.log(this.participants);
           } else {
             console.log(res.data.msg);
           }
         })
         .catch((err) => {
-          console.log(err);
+          throw err;
         });
     },
     getAllTasks() {},
     getAllResource() {},
     modifyPermission() {
       parent.location.href =
-        "/GeoProblemSolving/permission/" + this.activityInfo.level + this.activityInfo.aid;
+        "/GeoProblemSolving/permission/" +
+        this.activityInfo.level +
+        this.activityInfo.aid;
     },
     preCreation() {
       this.activityForm.parent = this.activityInfo.aid;
@@ -526,7 +577,7 @@ export default {
               }
             })
             .catch((err) => {
-              console.log(err);
+              throw err;
             });
           this.createActivityModel = false;
         }
@@ -546,82 +597,127 @@ export default {
       this.applyJoinActivityModal = true;
     },
     applyJoinActivity() {},
-    preInvitation() {
-      // let url = "";
-      // let activity = this.activityInfo;
-      // if (activity.level == 1) {
-      //   url = "/GeoProblemSolving/project/" + activity.parent + "/user";
-      // } else if (activity.level == 2) {
-      //   url = "/GeoProblemSolving/subproject/" + activity.parent + "/user";
-      // } else if (activity.level > 2) {
-      //   url = "/GeoProblemSolving/activity/" + activity.parent + "/user";
-      // } else {
-      //   return;
-      // }
-      // this.axios
-      //   .get(url)
-      //   .then((res) => {
-      //     if (res.data.code == 0) {
-      //       let candidates = res.data.data.members;
-      //       this.potentialMembers = [];
-      //       for (let i = 0; i < candidates.length; i++) {
-      //         let exist = false;
-      //         for (let j = 0; j < this.participants.length; j++) {
-      //           if (candidates[i].userId === this.participants[j].userId) {
-      //             exist = true;
-      //             break;
-      //           }
-      //         }
-      //         if (!exist) {
-      //           this.potentialMembers.push({
-      //             key: this.potentialMembers.length,
-      //             userId: candidates[i].userId,
-      //             name: candidates[i].name,
-      //             role: candidates[i].role,
-      //           });
-      //         }
-      //       }
-      //     } else {
-      //       console.log(res.data.msg);
-      //     }
-      //   })
-      //   .catch((err) => {
-      //     console.log(err);
-      //   });
-      // this.inviteModal = true;
+    async preInvitation() {
+      let url = "";
+      let activity = this.activityInfo;
+      if (activity.level == 1) {
+        url = "/GeoProblemSolving/project/" + activity.parent + "/user";
+      } else if (activity.level == 2) {
+        url = "/GeoProblemSolving/subproject/" + activity.parent + "/user";
+      } else if (activity.level > 2) {
+        url = "/GeoProblemSolving/activity/" + activity.parent + "/user";
+      } else {
+        return;
+      }
+      let data = await get(url);
+
+      this.potentialMembers = [];
+      this.invitingMembers = [];
+      let candidates = data.members;
+      for (let i = 0; i < candidates.length; i++) {
+        this.potentialMembers.push({
+          key: this.potentialMembers.length,
+          userId: candidates[i].userId,
+          name: candidates[i].name,
+          role: candidates[i].role,
+        });
+      }
+      this.invitingMembers = this.getTargetKeys();
+      this.inviteModal = true;
     },
     getTargetKeys() {
-      // let mockData = [];
-      // if (this.potentialMembers.length > 0) {
-      //   for (var i = 0; i < this.participants.length; i++) {
-      //     mockData.push({
-      //       key: this.participants[i],
-      //       name: this.potentialMembers[this.participants[i]].name,
-      //       role: this.potentialMembers[this.participants[i]].role,
-      //       userId: this.potentialMembers[this.participants[i]].userId,
-      //     });
-      //   }
-      // }
-      // return mockData;
+      return this.potentialMembers
+        .filter((item) => {
+          return this.participants.contains(item);
+        })
+        .map((item) => item.key);
     },
     memberRender(item) {
-      // return item.type + " - " + item.name;
-      // return `<span title="${item.name} - ${item.role}">${item.name} - ${item.role}</span>`;
+      return `<span title="${item.name} - ${item.role}">${item.name} - ${item.role}</span>`;
     },
     filterMethod(data, query) {
-      // return data.type.indexOf(query) > -1;
+      return data.name.indexOf(query) > -1;
     },
     handleChange(newTargetKeys) {
-      // this.participants = newTargetKeys;
+      this.invitingMembers = newTargetKeys;
     },
     inviteMembers() {
-      // let selectResource = this.getTargetKeys();
+      let activity = this.activityInfo;
+
+      // add members
+      for (var i = 0; i < this.invitingMembers.length; i++) {
+        let index = this.invitingMembers[i];
+        if (this.participants.contains(this.potentialMembers[index])) continue;
+
+        let user = this.potentialMembers[index];
+        let url = "";
+        if (activity.level == 1) {
+          url =
+            "/GeoProblemSolving/subproject/" +
+            activity.aid +
+            "/user?userId=" +
+            user.userId;
+        } else if (activity.level > 1) {
+          url =
+            "/GeoProblemSolving/activity/" +
+            activity.aid +
+            "/user?userId=" +
+            user.userId;
+        } else {
+          return;
+        }
+
+        this.axios
+          .post(url)
+          .then((res) => {
+            if (res.data.code == 0) {
+              this.sendInvitation(user, activity);
+              this.participants.push(user);
+            } else {
+              console.log(res.data.msg);
+            }
+          })
+          .catch((err) => {
+            throw err;
+          });
+      }
     },
+    sendInvitation(user, activity) {
+      //notice
+      let notice = {
+        recipientId: user.userId,
+        type: "notice",
+        content: {
+          title: "Join subproject",
+          description:
+            "You have been invited by " +
+            this.userInfo.name +
+            " to join the activity: " +
+            activity.name +
+            " in project: " +
+            this.projectInfo.name +
+            " , and now you are a member in this activity!",
+        },
+      };
+      this.axios
+        .post("/GeoProblemSolving/notice/save", notice)
+        .then((result) => {
+          if (result.data == "Success") {
+            this.$emit("sendNotice", this.inviteList[i]); // 改apply.content.userId
+          } else {
+            this.$Message.error("Notice fail.");
+          }
+        })
+        .catch((err) => {
+          throw err;
+        });
+    },
+    removeUser() {},
     gotoPersonalSpace(id) {
       if (id == this.$store.getters.userId) {
-        this.$router.push({ name: "PersonalPage" });
+        parent.location.href = "/GeoProblemSolving/personalPage";
       } else {
-        this.$router.push({ name: "MemberDetailPage", params: { id: id } });
+        parent.location.href = "/GeoProblemSolving/memberPage/" + id;
       }
     },
   },

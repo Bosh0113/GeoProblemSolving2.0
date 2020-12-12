@@ -3,7 +3,7 @@ package cn.edu.njnu.geoproblemsolving.business.activity.service.Impl;
 import cn.edu.njnu.geoproblemsolving.Dao.Email.EmailDaoImpl;
 import cn.edu.njnu.geoproblemsolving.Dao.Folder.FolderDaoImpl;
 import cn.edu.njnu.geoproblemsolving.View.StaticPagesBuilder;
-import cn.edu.njnu.geoproblemsolving.business.activity.dto.UpdateActivityDTO;
+import cn.edu.njnu.geoproblemsolving.business.activity.dto.UpdateProjectDTO;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Subproject;
 import cn.edu.njnu.geoproblemsolving.business.activity.enums.ActivityType;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
@@ -164,7 +164,6 @@ public class ProjectServiceImpl implements ProjectService {
             ArrayList<String> children = new ArrayList<>();
             project.setChildren(children);
 
-
             /**
              * Update user info
              */
@@ -192,7 +191,7 @@ public class ProjectServiceImpl implements ProjectService {
         }
     }
 
-    public JsonResult updateProject(String aid, UpdateActivityDTO update) {
+    public JsonResult updateProject(String aid, UpdateProjectDTO update) {
         try {
             Optional optional = projectRepository.findById(aid);
             if (!optional.isPresent())
@@ -339,15 +338,6 @@ public class ProjectServiceImpl implements ProjectService {
             JSONArray members = project.getMembers();
             JSONArray memberInfos = new JSONArray();
             for (Object member : members) {
-                // if (member instanceof JSONObject) {
-                //     User user = findByUserId(((JSONObject) member).getString("userId"));
-                //     JSONObject userInfo = (JSONObject) member;
-                //     userInfo.put("name", user.getName());
-                //     userInfo.put("avatar", user.getAvatar());
-                //     userInfo.put("email", user.getEmail());
-                //     userInfo.put("title", user.getTitle());
-                //     memberinfos.add(userInfo);
-                // }
                 String userId =  (String)((HashMap) member).get("userId");
                 User user = findByUserId(userId);
                 HashMap<String, Object> userInfo = (HashMap)member;
@@ -378,6 +368,7 @@ public class ProjectServiceImpl implements ProjectService {
             // add user info to project
             // if user exist in project?
             JSONArray members = project.getMembers();
+            if(members == null) members = new JSONArray();
             for (Object member : members) {
                 if (member instanceof JSONObject) {
                     if (((JSONObject) member).get("userId").equals(userId)) {
@@ -388,24 +379,32 @@ public class ProjectServiceImpl implements ProjectService {
 
             JSONObject newUser = new JSONObject();
             newUser.put("userId", userId);
-            newUser.put("role", "");
+            newUser.put("role", "ordinary-member");
             members.add(newUser);
             project.setMembers(members);
 
             // update user info
             // if user exist in project?
             ArrayList<String> joinedProjects = user.getJoinedProjects();
+            if(joinedProjects == null) joinedProjects = new ArrayList<>();
             for (String projectId : joinedProjects) {
                 if (projectId.equals(aid))
                     return ResultUtils.error(-3, "Fail: project already exists in personal joined projects");
             }
 
             joinedProjects.add(aid);
-            user.setCreatedProjects(joinedProjects);
+            user.setJoinedProjects(joinedProjects);
+
+            // Update active time
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            project.setActiveTime(dateFormat.format(new Date()));
 
             //save
             projectRepository.save(project);
             userRepository.save(user);
+
+            StaticPagesBuilder staticPagesBuilder = new StaticPagesBuilder();
+            staticPagesBuilder.projectDetailPageBuilder(project);
 
             return ResultUtils.success(project);
         } catch (Exception ex) {
@@ -437,6 +436,11 @@ public class ProjectServiceImpl implements ProjectService {
                 }
             }
             project.setMembers(members);
+
+            // Update active time
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            project.setActiveTime(dateFormat.format(new Date()));
+
             projectRepository.save(project);
 
             return ResultUtils.success(project);

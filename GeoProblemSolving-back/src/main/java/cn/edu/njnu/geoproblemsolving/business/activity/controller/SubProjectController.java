@@ -6,6 +6,8 @@ import cn.edu.njnu.geoproblemsolving.business.activity.entity.Subproject;
 import cn.edu.njnu.geoproblemsolving.business.activity.service.SubprojectService;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+
 
 @CrossOrigin(origins = "*",allowCredentials = "true")
 @RestController

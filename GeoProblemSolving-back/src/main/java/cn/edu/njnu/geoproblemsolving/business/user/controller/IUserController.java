@@ -7,6 +7,7 @@ import cn.edu.njnu.geoproblemsolving.business.user.service.TokenTask;
 import cn.edu.njnu.geoproblemsolving.business.user.util.ICommonUtil;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import com.alibaba.fastjson.JSONObject;
+import org.omg.CosNaming.NamingContextExtPackage.StringNameHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.web.bind.annotation.*;
@@ -32,11 +33,10 @@ public class IUserController {
             StaticParams.referPageUrl = pageUrl;
             // String contextPath = req.getRequestURI().toString();
             //发送邮件
-            return "http://106.14.78.235/AuthServer/oauth/authorize?grant_type=authorization_code&response_type=code&client_id=zhengzhong&scope=all";
+            return "http://106.14.78.235/AuthServer/oauth/authorize?grant_type=authorization_code&response_type=code&client_id=GSM&scope=all";
         } catch (Exception e) {
             return null;
         }
-
     }
 
     @RequestMapping(value = "/getToken", method = RequestMethod.GET)
@@ -106,5 +106,28 @@ public class IUserController {
     public JsonResult getManagerProjectList(@RequestBody String[] manageProjectList){
         System.out.println(manageProjectList);
         return userDao.getMangeProjectList(manageProjectList);
+    }
+
+    /**
+     * Inquiry information of one user
+     * @param key：userId, email
+     * @param value
+     * @return
+     * @Author mzy
+     */
+    @RequestMapping(method = RequestMethod.GET)
+    public JsonResult getUserInfo(@RequestParam String key, @RequestParam String value){
+        return userDao.getUserInfo(key, value);
+    }
+
+    /**
+     * Store user information to database
+     * @param user
+     * @return
+     * @Author mzy
+     */
+    @RequestMapping(method = RequestMethod.POST)
+    public JsonResult addUserInfo(@RequestBody User user){
+        return userDao.addUserInfo(user);
     }
 }

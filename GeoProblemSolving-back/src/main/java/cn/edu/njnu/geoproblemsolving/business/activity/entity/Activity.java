@@ -31,7 +31,7 @@ public class Activity implements Serializable {
      * User
      * creator contains: userId,
      * members contains: userId, role
-     * role: manager // researcher, expert(e.g. engineer), core-member(students, workers...) // decision-maker, stakeholder, consultant // visitor(the public)
+     * role: (Leader) manager // (Technique) researcher, expert(e.g. engineer), decision-maker, core-member(students, workers...) // (Awareness) stakeholder, consultant, ordinary-member // visitor(the public)
      */
     private String creator;
     private JSONArray members;

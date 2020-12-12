@@ -213,6 +213,7 @@ footer {
 </template>
 <script>
 import Avatar from "vue-avatar";
+import { get, del, post, put } from "../axios";
 export default {
   name: "HelloWorld",
   data() {
@@ -456,7 +457,7 @@ export default {
         this.logout();
       }
     },
-    logout() {
+    async logout() {
       // this.axios
       //   .get("/GeoProblemSolving/user/logout")
       //   .then(res => {
@@ -475,10 +476,8 @@ export default {
       //   .then(res=>{
       //     window.location.href = res.data;
       //   })
-      this.axios.get("/GeoProblemSolving/user/logout").then();
-      setTimeout(function () {
-        window.location.href = "http://106.14.78.235/AuthServer/logout"
-      }, 500)
+      await get("/GeoProblemSolving/user/logout");
+      window.location.href = "http://106.14.78.235/AuthServer/logout";
 
       // var pageUrl = window.location.href;
       // this.axios.get("/GeoProblemSolving/user/logout?pageUrl="+pageUrl).then();

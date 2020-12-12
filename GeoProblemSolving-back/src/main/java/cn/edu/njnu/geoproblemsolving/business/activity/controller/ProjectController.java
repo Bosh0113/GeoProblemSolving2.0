@@ -1,7 +1,7 @@
 package cn.edu.njnu.geoproblemsolving.business.activity.controller;
 
 import cn.edu.njnu.geoproblemsolving.Entity.EmailEntity;
-import cn.edu.njnu.geoproblemsolving.business.activity.dto.UpdateActivityDTO;
+import cn.edu.njnu.geoproblemsolving.business.activity.dto.UpdateProjectDTO;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Project;
 import cn.edu.njnu.geoproblemsolving.business.activity.service.ProjectService;
@@ -76,7 +76,7 @@ public class ProjectController {
      * @throws IOException
      */
     @RequestMapping(produces = {"application/json;charset=UTF-8"}, method = RequestMethod.PUT, value = "/{aid}")
-    public JsonResult updateProject(@PathVariable("aid") String aid, @RequestBody UpdateActivityDTO project) throws IOException {
+    public JsonResult updateProject(@PathVariable("aid") String aid, @RequestBody UpdateProjectDTO project) throws IOException {
         JsonResult result = projectService.updateProject(aid, project);
         // Thymeleaf
         if(result.getCode() == 0) {

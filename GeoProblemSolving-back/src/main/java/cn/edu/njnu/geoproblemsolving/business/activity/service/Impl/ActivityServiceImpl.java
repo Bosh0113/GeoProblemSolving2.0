@@ -599,6 +599,7 @@ public class ActivityServiceImpl implements ActivityService {
             // add user info to subproject
             // if user exist in subproject?
             JSONArray members = activity.getMembers();
+            if(members == null) members = new JSONArray();
             for (Object member : members) {
                 if (member instanceof JSONObject) {
                     if (((JSONObject) member).get("userId").equals(userId)) {
@@ -609,7 +610,7 @@ public class ActivityServiceImpl implements ActivityService {
 
             JSONObject userInfo = new JSONObject();
             userInfo.put("userId", user.getUserId());
-            userInfo.put("role", "");
+            userInfo.put("role", "ordinary-member");
             members.add(userInfo);
             activity.setMembers(members);
 

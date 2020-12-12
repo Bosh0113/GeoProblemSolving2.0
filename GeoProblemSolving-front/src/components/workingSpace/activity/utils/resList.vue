@@ -758,7 +758,7 @@ export default {
                     deleteResType = this.fileList[i].type;
                     this.fileList.splice(i, 1);
                   } catch (err) {
-                    console.log(err);
+                    throw err;
                   }
                 }
               }

@@ -1101,7 +1101,7 @@ export default {
     //       }
     //     })
     //     .catch((err) => {
-    //       console.log(err);
+    //       throw err;
     //     });
     // },
     // getPersonalTools() {
@@ -1126,7 +1126,7 @@ export default {
     //       }
     //     })
     //     .catch((err) => {
-    //       console.log(err);
+    //       throw err;
     //     });
     // },
     // getPublicToolsets() {
@@ -1155,7 +1155,7 @@ export default {
     //       }
     //     })
     //     .catch((err) => {
-    //       console.log(err);
+    //       throw err;
     //     });
     // },
     // getPersonalToolsets() {
@@ -1182,7 +1182,7 @@ export default {
     //       }
     //     })
     //     .catch((err) => {
-    //       console.log(err);
+    //       throw err;
     //     });
     // },
     filterShowListByType(purpose) {

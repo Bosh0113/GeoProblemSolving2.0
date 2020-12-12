@@ -395,7 +395,7 @@
                     startTime: [{required: true, type: "date", trigger: "blur"}],
                     endTime: [{required: true, type: "date", trigger: "blur"}]
                 },
-                contentHeight: "",
+                contentHeight: 0,
                 chartSwitch: false, // 切换至甘特图
                 // gantt 图
                 ganttTasks: [
@@ -497,7 +497,7 @@
                 if (window.innerHeight > 735) {
                     this.contentHeight = window.innerHeight - 236;
                 } else {
-                    this.contentHeight = "499";
+                    this.contentHeight = 499;
                 }
             },
             closeStepSocket() {

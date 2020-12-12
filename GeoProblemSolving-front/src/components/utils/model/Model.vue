@@ -394,7 +394,7 @@ export default {
             }
           })
           .catch(function(err) {
-            console.log(err);
+            throw err;
           });
       });
     },
