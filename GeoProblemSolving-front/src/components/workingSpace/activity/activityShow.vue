@@ -111,7 +111,7 @@
               <p slot="title">{{ item.name }}</p>
               <div
                 slot="extra"
-                v-if="userRole == 'visitor'"
+                v-if="roleIdentity(item) == 'visitor'"
                 style="margin-top: -10px; margin-right: -5px"
               >
                 <Tooltip
@@ -139,15 +139,7 @@
               </div>
             </Card>
           </div>
-          <div
-            v-if="
-              permissionIdentity(
-                projectInfo.permission,
-                userRole,
-                'manage_child_activity'
-              )
-            "
-          >
+          <div>
             <Card
               style="
                 height: 120px;
@@ -220,6 +212,14 @@
             color: #2d8cf0;
           "
         />
+        <Icon
+          v-if="userRole != 'visitor'"
+          type="md-log-out"
+          size="16"
+          title="Leave the activity"
+          @click="quitActivityModal = true"
+          style="float: right; margin: 5px 20px 0 0; cursor: pointer"
+        />
       </div>
       <vue-scroll
         :ops="scrollOps"
@@ -231,33 +231,44 @@
           v-for="member in participants"
           :key="member.name"
         >
-          <div v-if="delUserBtn">
-            <Icon type="md-remove-circle" size="20" color="#ed4014" />
-          </div>
-          <div
-            style="display: flex; align-items: center; cursor: pointer"
-            @click="gotoPersonalSpace(member.userId)"
-          >
-            <div class="memberImg" style="position: relative">
-              <img
-                v-if="member.avatar != '' && member.avatar != undefined"
-                :src="member.avatar"
-                style="width: 40px; height: 40px"
-              />
-              <avatar
-                v-else
-                :username="member.name"
-                :size="40"
-                :rounded="true"
-              />
-              <div class="onlinecircle"></div>
+          <div style="display: flex; align-items: center">
+            <div
+              v-if="delUserBtn"
+              style="cursor: pointer; margin-right: 10px"
+              @click="
+                (member) => {
+                  slctDletMember = member;
+                  removeMemberModal = true;
+                }
+              "
+            >
+              <Icon type="md-remove-circle" size="20" color="#ed4014" />
             </div>
-            <div class="memberDetail">
-              <div class="memberName">
-                <span>{{ member.name }}</span>
+            <div
+              @click="gotoPersonalSpace(member.userId)"
+              style="display: flex; align-items: center; cursor: pointer"
+            >
+              <div class="memberImg" style="position: relative">
+                <img
+                  v-if="member.avatar != '' && member.avatar != undefined"
+                  :src="member.avatar"
+                  style="width: 40px; height: 40px"
+                />
+                <avatar
+                  v-else
+                  :username="member.name"
+                  :size="40"
+                  :rounded="true"
+                />
+                <div class="onlinecircle"></div>
               </div>
-              <div class="memberRole">
-                <span>{{ member.role }}</span>
+              <div class="memberDetail">
+                <div class="memberName">
+                  <span>{{ member.name }}</span>
+                </div>
+                <div class="memberRole">
+                  <span>{{ member.role }}</span>
+                </div>
               </div>
             </div>
           </div>
@@ -285,28 +296,40 @@
       ></Transfer>
     </Modal>
     <Modal
+      v-model="removeMemberModal"
+      width="400px"
+      title="Remove this member"
+      @on-ok="removeUser()"
+      ok-text="Ok"
+      cancel-text="Cancel"
+    >
+      <h4 style="color: red">Are you sure to remove this member?</h4>
+    </Modal>
+    <Modal
+      v-model="quitActivityModal"
+      width="400px"
+      title="Leave this activity"
+      @on-ok="leaveActivity()"
+      ok-text="Ok"
+      cancel-text="Cancel"
+    >
+      <h4 style="color: red">Are you sure to quit this subproject?</h4>
+    </Modal>
+    <Modal
       v-model="applyJoinActivityModal"
       title="Apply to join the activity"
       width="800px"
       :mask-closable="false"
     >
       <div>
-        <Form
-          ref="applyJoinForm"
-          :model="applyJoinForm"
-          :rules="applyJoinRule"
-          :label-width="120"
-        >
+        <Form ref="applyJoinForm" :model="applyJoinForm" :label-width="120">
           <FormItem label="Reason" prop="reason">
             <Input v-model="applyJoinForm.reason" :rows="4" type="textarea" />
           </FormItem>
         </Form>
       </div>
       <div slot="footer" style="display: inline-block">
-        <Button
-          type="primary"
-          @click="applyJoinActivity('applyJoinForm')"
-          style="float: right"
+        <Button type="primary" @click="applyJoinActivity()" style="float: right"
           >OK</Button
         >
         <Button
@@ -415,21 +438,16 @@ export default {
       inviteModal: false,
       // remove
       delUserBtn: false,
+      slctDletMember: {},
+      removeMemberModal: false,
+      // leave
+      quitActivityModal: false,
       // apply
       applyJoinActivityModal: false,
       createActivityModel: false,
       appliedActivity: {},
       applyJoinForm: {
         reason: "",
-      },
-      applyJoinRule: {
-        reason: [
-          {
-            required: true,
-            message: "The description can't be empty",
-            trigger: "blur",
-          },
-        ],
       },
       // Activity
       activityForm: {
@@ -482,7 +500,7 @@ export default {
     };
   },
   created() {
-    this.roleIdentity();
+    this.userRole = this.roleIdentity(this.activityInfo);
     this.getParticipants();
   },
   mounted() {
@@ -497,18 +515,37 @@ export default {
     };
   },
   methods: {
-    roleIdentity() {
-      this.userRole = userRoleJS.roleIdentify(
-        this.activityInfo.members,
-        this.userInfo.userId
-      );
+    roleIdentity(activity) {
+      return userRoleJS.roleIdentify(activity.members, this.userInfo.userId);
     },
     permissionIdentity(permission, role, operation) {
-      return userRoleJS.permissionIdentity(
-        JSON.parse(permission),
-        role,
-        operation
-      );
+      if (operation == "auto_join") {
+        if (JSON.parse(permission).auto_join.visitor == "Yes") return true;
+        else if (JSON.parse(permission).auto_join.visitor == "No") return false;
+        else {
+          return this.getParentPermission();
+        }
+      } else {
+        return userRoleJS.permissionIdentity(
+          JSON.parse(permission),
+          role,
+          operation
+        );
+      }
+    },
+    async getParentPermission() {
+      let url = "";
+      if (this.appliedActivity.level == 0 || this.appliedActivity.level == 1) {
+        return this.projectInfo.members.contains(this.userInfo);
+      } else if (this.appliedActivity.level == 2) {
+        url = "/GeoProblemSolving/subproject/" + this.appliedActivity.parent;
+        let parent = await get(url);
+        return parent.members.contains(this.userInfo);
+      } else if (this.appliedActivity.level > 2) {
+        url = "/GeoProblemSolving/activity/" + this.appliedActivity.parent;
+        let parent = await get(url);
+        return parent.members.contains(this.userInfo);
+      }
     },
     getParticipants() {
       let url = "";
@@ -544,6 +581,16 @@ export default {
         this.activityInfo.aid;
     },
     preCreation() {
+      if (
+        !this.permissionIdentity(
+          this.projectInfo.permission,
+          this.userRole,
+          "manage_child_activity"
+        )
+      ) {
+        this.$Notice.info({ desc: "Please join the activity firstly." });
+        return;
+      }
       this.activityForm.parent = this.activityInfo.aid;
       this.activityForm.creator = this.userInfo.userId;
       this.activityForm.level = this.activityInfo.level + 1;
@@ -584,6 +631,8 @@ export default {
       });
     },
     enterChildActivity(activity) {
+      if (this.roleIdentity(activity) == "visitor") return;
+
       parent.location.href =
         "/GeoProblemSolving/projectInfo/" +
         this.projectInfo.aid +
@@ -594,9 +643,73 @@ export default {
     },
     preApplication(activity) {
       this.appliedActivity = activity;
-      this.applyJoinActivityModal = true;
+      if (
+        this.permissionIdentity(activity.permission, "visitor", "auto_join")
+      ) {
+        this.joinActivity();
+      } else {
+        this.applyJoinActivityModal = true;
+      }
     },
-    applyJoinActivity() {},
+    joinActivity() {
+      let url = "";
+      if (this.appliedActivity.level == 1) {
+        url =
+          "/GeoProblemSolving/subproject/" +
+          this.appliedActivity.aid +
+          "/user?userId=" +
+          this.userInfo.userId;
+      } else if (this.appliedActivity.levell > 1) {
+        url =
+          "/GeoProblemSolving/activity/" +
+          this.appliedActivity.aid +
+          "/user?userId=" +
+          this.userInfo.userId;
+      } else {
+        return;
+      }
+
+      this.axios
+        .post(url)
+        .then((res) => {
+          if (res.data.code == 0) {
+            parent.location.href =
+              "/GeoProblemSolving/projectInfo/" +
+              this.projectInfo.aid +
+              "?content=workspace&aid=" +
+              this.appliedActivity.aid +
+              "&level=" +
+              this.appliedActivity.level;
+          } else if (res.data.code == -3) {
+            this.$Notice.info( {desc:
+              "You has already been a member of the activity."}
+            );
+          } else {
+            console.log(res.data.msg);
+          }
+        })
+        .catch((err) => {
+          throw err;
+        });
+    },
+    applyJoinActivity() {
+      let notice = {
+        recipientId: userRoleJS.getMemberByRole(this.applyJoinForm, "manager"),
+        type: "apply",
+        content: {
+          title:
+            "Application of joining the activity: " + this.appliedActivity.name,
+          activityId: this.appliedActivity.aid,
+          activityName: this.appliedActivity.name,
+          activityLevel: this.appliedActivity.level,
+          userEmail: this.userInfo.email,
+          userName: this.userInfo.name,
+          userId: this.userInfo.userId,
+          description: this.applyJoinForm.reason,
+        },
+      };
+      this.sendNotice(activity, notice);
+    },
     async preInvitation() {
       let url = "";
       let activity = this.activityInfo;
@@ -671,8 +784,24 @@ export default {
           .post(url)
           .then((res) => {
             if (res.data.code == 0) {
-              this.sendInvitation(user, activity);
               this.participants.push(user);
+              //notice
+              let notice = {
+                recipientId: user.userId,
+                type: "notice",
+                content: {
+                  title: "Join activity",
+                  description:
+                    "You have been invited by " +
+                    this.userInfo.name +
+                    " to join the activity: " +
+                    activity.name +
+                    " in project: " +
+                    this.projectInfo.name +
+                    " , and now you are a member in this activity!",
+                },
+              };
+              this.sendNotice(activity, notice);
             } else {
               console.log(res.data.msg);
             }
@@ -682,37 +811,144 @@ export default {
           });
       }
     },
-    sendInvitation(user, activity) {
-      //notice
-      let notice = {
-        recipientId: user.userId,
-        type: "notice",
-        content: {
-          title: "Join subproject",
-          description:
-            "You have been invited by " +
-            this.userInfo.name +
-            " to join the activity: " +
-            activity.name +
-            " in project: " +
-            this.projectInfo.name +
-            " , and now you are a member in this activity!",
-        },
-      };
+    removeUser() {
+      let url = "";
+      let member = this.slctDletMember;
+      let activity = this.activityInfo;
+      if (activity.level == 1) {
+        url =
+          "/GeoProblemSolving/subproject/" +
+          activity.aid +
+          "/user?userId=" +
+          member.userId;
+      } else if (activity.level > 1) {
+        url =
+          "/GeoProblemSolving/activity/" +
+          activity.aid +
+          "/user?userId=" +
+          member.userId;
+      } else {
+        return;
+      }
+
       this.axios
-        .post("/GeoProblemSolving/notice/save", notice)
-        .then((result) => {
-          if (result.data == "Success") {
-            this.$emit("sendNotice", this.inviteList[i]); // 改apply.content.userId
+        .delete(url)
+        .then((res) => {
+          if (res.data.code == 0) {
+            let index = this.participants.indexOf(member);
+            this.participants.splice(index, 1);
+            //notice
+            let notice = {
+              recipientId: member.userId,
+              type: "notice",
+              content: {
+                title: "Leave activity",
+                description:
+                  "You have been remove from the activity: " +
+                  activity.name +
+                  " in project: " +
+                  this.projectInfo.name +
+                  ".",
+              },
+            };
+            this.sendNotice(activity, notice);
           } else {
-            this.$Message.error("Notice fail.");
+            console.log(res.data.msg);
           }
         })
         .catch((err) => {
           throw err;
         });
     },
-    removeUser() {},
+    leaveActivity() {
+      let member = this.userInfo;
+      let activity = this.activityInfo;
+      // get url
+      let url = "";
+      if (activity.level == 1) {
+        url =
+          "/GeoProblemSolving/subproject/" +
+          activity.aid +
+          "/user?userId=" +
+          member.userId;
+      } else if (activity.level > 1) {
+        url =
+          "/GeoProblemSolving/activity/" +
+          activity.aid +
+          "/user?userId=" +
+          member.userId;
+      } else {
+        return;
+      }
+
+      this.axios
+        .delete(url)
+        .then((res) => {
+          if (res.data.code == 0) {
+            parent.location.href =
+              "/GeoProblemSolving/projectInfo/" +
+              this.projectInfo.aid +
+              "?content=workspace&aid=" +
+              activity.parent +
+              "&level=" +
+              (activity.level - 1).toString();
+            //notice
+            let notice = {
+              recipientId: userRoleJS.getMemberByRole(this.activityInfo, "manager"),
+              type: "notice",
+              content: {
+                title: "Leave activity",
+                description:
+                  member.name +
+                  " left the activity: " +
+                  activity.name +
+                  " in project: " +
+                  this.projectInfo.name +
+                  ".",
+              },
+            };
+            this.sendNotice(activity, notice);
+          } else {
+            console.log(res.data.msg);
+          }
+        })
+        .catch((err) => {
+          throw err;
+        });
+    },
+    sendNotice(activity, notice) {
+      if (
+        Object.prototype.toString.call(activity.recipientId) == "[object Array]"
+      ) {
+        for (let i = 0; i < activity.recipientId.length; i++) {
+          this.axios
+            .post("/GeoProblemSolving/notice/save", notice)
+            .then((result) => {
+              if (result.data == "Success") {
+                parent.vm.$emit("sendNotice", notice.recipientId[i]);
+              } else {
+                this.$Message.error("Notice fail.");
+              }
+            })
+            .catch((err) => {
+              throw err;
+            });
+        }
+      } else {
+        this.axios
+          .post("/GeoProblemSolving/notice/save", notice)
+          .then((result) => {
+            if (result.data == "Success") {
+              parent.vm.$emit("sendNotice", notice.recipientId);
+            } else {
+              this.$Message.error("Notice fail.");
+            }
+          })
+          .catch((err) => {
+            throw err;
+          });
+      }
+    },
     gotoPersonalSpace(id) {
       if (id == this.$store.getters.userId) {
         parent.location.href = "/GeoProblemSolving/personalPage";
@@ -760,6 +996,6 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  max-width: 50%;
+  max-width: 100%;
 }
 </style>

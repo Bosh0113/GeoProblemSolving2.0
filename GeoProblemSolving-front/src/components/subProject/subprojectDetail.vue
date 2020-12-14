@@ -693,7 +693,7 @@ export default {
                 .post("/GeoProblemSolving/notice/save", replyNotice)
                 .then(result => {
                   if (result.data == "Success") {
-                    this.$emit("sendNotice", this.inviteList[i]); // 改apply.content.userId
+                    this.$emit("sendNotice", this.inviteList[i]); // 改apply.content.userId                    
                   } else {
                     this.$Message.error("reply fail.");
                   }
