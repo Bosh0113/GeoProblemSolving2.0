@@ -44,6 +44,7 @@ const routes = [
       //     { path: 'decisionMaking', name: 'decisionMakingP', component: resolve => (require(["@/components/workingSpace/functionSteps/decisionMakingContent"], resolve)) },
       //   ],
       // },
+      {path: 'newPersonalPage', name: 'newPersonalPage', component: resolve => (require(["@/components/user/userPage/newPersonalPage"], resolve))},
       { path: 'newproject', name: 'NewProject', component: resolve => (require(["@/components/projects/newProject"], resolve)) },
       { path: 'community', name: 'Community', component: resolve => (require(["@/components/community/community"], resolve)) },
       { path: 'community/:id', name: 'Communityreply', component: resolve => (require(["@/components/community/communityReply"], resolve)) },
@@ -90,6 +91,9 @@ const routes = [
   { path: '/tinymce', name: 'tinymce', component: resolve => (require(["@/components/tools/entity/singleUtils/tinymce"], resolve)) },
   { path: '/modelItem/:doi', name: 'Model', component: resolve => (require(["@/components/utils/model/Model"], resolve)) },
   { path: '/toolShow', name: 'toolTemplate', component: resolve => (require(["@/components/tools/toolPreview"], resolve)) },
+
+//  个人空间路由内容
+  {path: '/test', component: resolve => (require(["@/components/user/subPage/project"], resolve)) },
 ]
 
 export default new Router({

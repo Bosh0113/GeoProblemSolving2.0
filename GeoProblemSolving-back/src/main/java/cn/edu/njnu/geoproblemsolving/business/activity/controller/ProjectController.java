@@ -62,6 +62,7 @@ public class ProjectController {
 
         // Thymeleaf
         if(result.getCode() == 0){
+            //将内容同步内容放到这个部分
             staticPagesBuilder.projectDetailPageBuilder((Project) result.getData());
             staticPagesBuilder.projectListPageBuilder(projectService.findProjectsByPage(1,18));
         }
