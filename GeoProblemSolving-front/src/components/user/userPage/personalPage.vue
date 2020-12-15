@@ -180,11 +180,11 @@ body {
 </style>
 <template>
   <div>
-<!--    左侧用户基本信息界面 -->
     <Row>
       <Col span="22" offset="1">
         <Row>
           <Col span="5">
+            <!--    左侧用户基本信息界面 -->
             <div class="detailSidebar">
 <!--              userImage-->
               <div class="user-img">
@@ -550,50 +550,50 @@ body {
                       style="padding:5px;border:#dcdee2 solid 1px;"
                     >
                       <vue-scroll :ops="ops">
-                        <Card :bordered="false" v-if="joinedProjectsList.length == 0">
-                          <div style="display:flex;justify-content:center">
-                            <Icon type="md-alert" size="40" color="gray" />
-                          </div>
-                          <br />
-                          <div style="display:flex;justify-content:center">
-                            <h3
-                              style="text-align:center;width:80%"
-                            >Sorry, you didn't participate in any projects.</h3>
-                          </div>
-                        </Card>
-                        <div
-                          v-for="(item,index) in joinedProjectsList"
-                          :key="index"
-                          v-show="joinedProjectsList!=[]"
-                        >
-                          <Col span="10" offset="1">
-                            <div @click="goSingleProject(item)" class="projectItem">
-                              <Card style="height:320px;margin-top:20px;">
-                                <p
-                                  slot="title"
-                                  style="height:40x"
-                                  class="projectsTitle"
-                                >{{item.title}}</p>
-                                <Button
-                                  class="fileBtnHoverRed"
-                                  slot="extra"
-                                  @click.stop="quitModalShow(item)"
-                                >Quit</Button>
-                                <p
-                                  style="height:200px;text-indent:2em;word-break:break-word;white-space: pre-line;"
-                                >
-                                  <vue-scroll :ops="ops">{{item.introduction}}</vue-scroll>
-                                </p>
-                                <br />
-                                <div style="height:40px">
-                                  <span style="float:left">CreateTime:</span>
-                                  <span style="float:right">{{item.createTime}}</span>
-                                </div>
-                              </Card>
-                            </div>
-                          </Col>
+                      <Card :bordered="false" v-if="joinedProjectsList.length == 0">
+                        <div style="display:flex;justify-content:center">
+                          <Icon type="md-alert" size="40" color="gray" />
                         </div>
-                      </vue-scroll>
+                        <br />
+                        <div style="display:flex;justify-content:center">
+                          <h3
+                            style="text-align:center;width:80%"
+                          >Sorry, you didn't participate in any projects.</h3>
+                        </div>
+                      </Card>
+                      <div
+                        v-for="(item,index) in joinedProjectsList"
+                        :key="index"
+                        v-show="joinedProjectsList!=[]"
+                      >
+                        <Col span="10" offset="1">
+                          <div @click="goSingleProject(item)" class="projectItem">
+                            <Card style="height:320px;margin-top:20px;">
+                              <p
+                                slot="title"
+                                style="height: 40px"
+                                class="projectsTitle"
+                              >{{item.title}}</p>
+                              <Button
+                                class="fileBtnHoverRed"
+                                slot="extra"
+                                @click.stop="quitModalShow(item)"
+                              >Quit</Button>
+                              <p
+                                style="height:200px;text-indent:2em;word-break:break-word;white-space: pre-line;"
+                              >
+                                <vue-scroll :ops="ops">{{item.introduction}}</vue-scroll>
+                              </p>
+                              <br />
+                              <div style="height:40px">
+                                <span style="float:left">CreateTime:</span>
+                                <span style="float:right">{{item.createTime}}</span>
+                              </div>
+                            </Card>
+                          </div>
+                        </Col>
+                      </div>
+                    </vue-scroll>
                     </div>
                   </TabPane>
                   <TabPane label="Managed projects" name="Management">

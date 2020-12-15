@@ -141,7 +141,7 @@ public class ProjectServiceImpl implements ProjectService {
 
             // Aid
             String projectId = UUID.randomUUID().toString();
-            project.setAid(projectId);
+             project.setAid(projectId);
 
             // Set project member
             String creatorId = project.getCreator();

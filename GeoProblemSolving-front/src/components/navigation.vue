@@ -346,18 +346,18 @@ export default {
         })
     },
     unlogin(name) {
-      if (name === "login" || name == "register") {
-        // this.$router.push({ name: "Login" });
-        var pageUrl = window.location.href;
-        this.axios
-          .get("/GeoProblemSolving/user/login?pageUrl="+pageUrl)
-          .then(res=>{
-            window.location.href = res.data;
-          })
+      if (name === "login") {
+        this.$router.push({ name: "Login" });
+        // var pageUrl = window.location.href;
+        // this.axios
+        //   .get("/GeoProblemSolving/user/login?pageUrl="+pageUrl)
+        //   .then(res=>{
+        //     window.location.href = res.data;
+        //   })
       }
-      // else if (name == "register") {
-      //   this.$router.push({ name: "Register" });
-      // }
+      else if (name == "register") {
+        this.$router.push({ name: "Register" });
+      }
     },
     logged(name) {
       if (name === "notification") {
@@ -457,32 +457,17 @@ export default {
         this.logout();
       }
     },
-    async logout() {
-      // this.axios
-      //   .get("/GeoProblemSolving/user/logout")
-      //   .then(res => {
-      //     this.$store.commit("userLogout");
-      //     this.noticeSocket.close();
-      //     window.location.href = "/GeoProblemSolving/home";
-      //   })
-      //   .catch(err => {
-      //     confirm("logout fail!");
-      //   });
-      //在前端发送logout请求
-      // var pageUrl = window.location.href;
-      // window.location.href = "http://106.14.78.235/AuthServer/logout";
-      // this.axios
-      //   .get("/GeoProblemSolving/user/login?pageUrl="+pageUrl)
-      //   .then(res=>{
-      //     window.location.href = res.data;
-      //   })
-      await get("/GeoProblemSolving/user/logout");
-      window.location.href = "http://106.14.78.235/AuthServer/logout";
-
-      // var pageUrl = window.location.href;
-      // this.axios.get("/GeoProblemSolving/user/logout?pageUrl="+pageUrl).then();
-
-
+    logout() {
+      this.axios
+        .get("/GeoProblemSolving/user/logout")
+        .then(res => {
+          this.$store.commit("userLogout");
+          this.noticeSocket.close();
+          window.location.href = "/GeoProblemSolving/home";
+        })
+        .catch(err => {
+          confirm("logout fail!");
+        });
     }
   }
 };
