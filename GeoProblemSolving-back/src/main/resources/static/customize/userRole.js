@@ -118,13 +118,14 @@ function roleLevelIdentify(role) {
         };
         case "researcher":
         case "expert":
+        case "decision-maker":
         case "core-member": {
             roleLevel = "coreteam";
             break;
         };
-        case "decision-maker":
         case "stakeholder":
-        case "consultant": {
+        case "consultant":
+        case "ordinary-member":  {
             roleLevel = "widerteam";
             break;
         };

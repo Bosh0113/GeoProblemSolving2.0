@@ -328,6 +328,7 @@ public class SubprojectServiceImpl implements SubprojectService {
             // if user exist in subproject?
             Subproject subproject = (Subproject) optional.get();
             JSONArray members = subproject.getMembers();
+            if(members == null) members = new JSONArray();
             for (Object member : members) {
                 if (member instanceof JSONObject) {
                     if (((JSONObject) member).get("userId").equals(userId)) {
@@ -338,10 +339,9 @@ public class SubprojectServiceImpl implements SubprojectService {
 
             JSONObject newUser = new JSONObject();
             newUser.put("userId", userId);
-            newUser.put("role", "");
+            newUser.put("role", "ordinary-member");
             members.add(newUser);
             subproject.setMembers(members);
-
 
             // Update active time
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");

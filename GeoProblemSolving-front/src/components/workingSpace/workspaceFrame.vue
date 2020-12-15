@@ -622,7 +622,7 @@
                 }
               })
               .catch((err) => {
-                console.log(err);
+                throw err;
               });
 
             this.activityEditModal = false;
@@ -658,7 +658,7 @@
             }
           })
           .catch((err) => {
-            console.log(err);
+            throw err;
           });
         // }
       },

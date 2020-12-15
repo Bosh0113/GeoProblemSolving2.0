@@ -9,11 +9,11 @@
       <MenuItem name="Introduction">
         <Icon type="ios-paper" />Introduction
       </MenuItem>
-      <MenuItem name="Activities">
-        <Icon type="logo-steam" />Pathway
-      </MenuItem>
       <MenuItem name="Tasks">
         <Icon type="ios-construct" />Task
+      </MenuItem>
+      <MenuItem name="Activities">
+        <Icon type="logo-steam" />Pathway
       </MenuItem>
       <MenuItem name="Resources">
         <Icon type="ios-albums" />Resource

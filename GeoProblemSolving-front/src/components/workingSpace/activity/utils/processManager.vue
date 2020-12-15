@@ -521,10 +521,6 @@ export default {
               icon: "circle",
             },
             {
-              name: "Data analysis",
-              icon: "circle",
-            },
-            {
               name: "Data visualization",
               icon: "circle",
             },
@@ -538,6 +534,10 @@ export default {
             },
             {
               name: "Geographical simulation",
+              icon: "circle",
+            },
+            {
+              name: "Data analysis",
               icon: "circle",
             },
             {
@@ -574,9 +574,6 @@ export default {
                 name: "Data processing",
               },
               {
-                name: "Data analysis",
-              },
-              {
                 name: "Data visualization",
               },
               {
@@ -587,6 +584,9 @@ export default {
               },
               {
                 name: "Geographical simulation",
+              },
+              {
+                name: "Data analysis",
               },
               {
                 name: "Decision making",
@@ -1101,7 +1101,7 @@ export default {
     //       }
     //     })
     //     .catch((err) => {
-    //       console.log(err);
+    //       throw err;
     //     });
     // },
     // getPersonalTools() {
@@ -1126,7 +1126,7 @@ export default {
     //       }
     //     })
     //     .catch((err) => {
-    //       console.log(err);
+    //       throw err;
     //     });
     // },
     // getPublicToolsets() {
@@ -1155,7 +1155,7 @@ export default {
     //       }
     //     })
     //     .catch((err) => {
-    //       console.log(err);
+    //       throw err;
     //     });
     // },
     // getPersonalToolsets() {
@@ -1182,7 +1182,7 @@ export default {
     //       }
     //     })
     //     .catch((err) => {
-    //       console.log(err);
+    //       throw err;
     //     });
     // },
     filterShowListByType(purpose) {

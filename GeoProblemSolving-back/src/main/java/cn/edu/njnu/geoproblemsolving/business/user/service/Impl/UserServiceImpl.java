@@ -77,7 +77,7 @@ public class UserServiceImpl implements UserService {
             user.setUserId(userId);
 
             user.setJoinedProjects(new ArrayList<>());
-            user.setManageProjects(new ArrayList<>());
+            user.setCreatedProjects(new ArrayList<>());
 
             userRepository.save(user);
             return user;

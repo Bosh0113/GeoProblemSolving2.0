@@ -353,7 +353,7 @@ export default {
             }
           })
           .catch(err => {
-            console.log(err);
+            throw err;
           });
       }
     },
@@ -538,7 +538,7 @@ export default {
           this.createJupyterUser(name_jupyterhub);
         })
         .catch(err => {
-          console.log(err);
+          throw err;
         });
     },
     createJupyterUser(name_jupyterhub) {

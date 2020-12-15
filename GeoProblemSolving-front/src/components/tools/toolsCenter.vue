@@ -1169,7 +1169,7 @@ export default {
           }
         })
         .catch(err => {
-          console.log(err);
+          throw err;
         });
     },
     getPublicToolsets() {
@@ -1195,7 +1195,7 @@ export default {
           }
         })
         .catch(err => {
-          console.log(err);
+          throw err;
         });
     },
     async getPublicTools() {
@@ -1426,7 +1426,7 @@ export default {
               }
             })
             .catch(err => {
-              console.log(err);
+              throw err;
             });
         } else {
         }
@@ -1647,7 +1647,7 @@ export default {
               }
             })
             .catch(err => {
-              console.log(err);
+              throw err;
             });
 
           var updateReq = {};

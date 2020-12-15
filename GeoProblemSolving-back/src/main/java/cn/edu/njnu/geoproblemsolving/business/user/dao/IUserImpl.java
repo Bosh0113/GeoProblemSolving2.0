@@ -1,8 +1,7 @@
 package cn.edu.njnu.geoproblemsolving.business.user.dao;
 
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Project;
-import cn.edu.njnu.geoproblemsolving.business.activity.service.Impl.ProjectServiceImpl;
-import cn.edu.njnu.geoproblemsolving.business.activity.service.ProjectService;
+import cn.edu.njnu.geoproblemsolving.business.user.dto.InquiryUserDto;
 import cn.edu.njnu.geoproblemsolving.business.user.entity.User;
 import cn.edu.njnu.geoproblemsolving.business.user.entity.UserDto;
 import cn.edu.njnu.geoproblemsolving.business.user.util.ICommonUtil;
@@ -93,5 +92,35 @@ public class IUserImpl implements IUserDao {
             }
         }
         return ResultUtils.success(projects);
+    }
+
+    @Override
+    public JsonResult getUserInfo(String key, String value){
+        try{
+            Query query = new Query(Criteria.where(key).is(value));
+            InquiryUserDto user = mongoTemplate.findOne(query, InquiryUserDto.class);
+            if(user == null){
+                return ResultUtils.error(-1, "Fail: user does not exist.");
+            } else {
+                return ResultUtils.success(user);
+            }
+        } catch (Exception ex){
+            return ResultUtils.error(-2, "Fail: Exception");
+        }
+    }
+
+    @Override
+    public JsonResult addUserInfo(User user){
+        try {
+            // Confirm
+            Query query = new Query(Criteria.where("userId").is(user.getUserId()));
+            User user1 = mongoTemplate.findOne(query, User.class);
+            if(user1 != null) return ResultUtils.error(-3, "Fail: user already exists in the database.");
+
+            return ResultUtils.success(mongoTemplate.save(user));
+
+        } catch (Exception ex){
+            return ResultUtils.error(-2, "Fail: Exception");
+        }
     }
 }
