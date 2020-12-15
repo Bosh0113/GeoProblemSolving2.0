@@ -111,7 +111,7 @@
               <p slot="title">{{ item.name }}</p>
               <div
                 slot="extra"
-                v-if="userRole == 'visitor'"
+                v-if="roleIdentity(item) == 'visitor'"
                 style="margin-top: -10px; margin-right: -5px"
               >
                 <Tooltip
@@ -139,15 +139,7 @@
               </div>
             </Card>
           </div>
-          <div
-            v-if="
-              permissionIdentity(
-                projectInfo.permission,
-                userRole,
-                'manage_child_activity'
-              )
-            "
-          >
+          <div>
             <Card
               style="
                 height: 120px;
@@ -183,11 +175,11 @@
         <Icon
           v-if="
             activityInfo.level > 0 &&
-            permissionIdentity(
-              projectInfo.permission,
-              userRole,
-              'manage_member'
-            )
+              permissionIdentity(
+                projectInfo.permission,
+                userRole,
+                'manage_member'
+              )
           "
           type="md-trash"
           size="16"
@@ -203,11 +195,11 @@
         <Icon
           v-if="
             activityInfo.level > 0 &&
-            permissionIdentity(
-              projectInfo.permission,
-              userRole,
-              'invite_member'
-            )
+              permissionIdentity(
+                projectInfo.permission,
+                userRole,
+                'invite_member'
+              )
           "
           type="md-person-add"
           size="16"
@@ -219,6 +211,14 @@
             cursor: pointer;
             color: #2d8cf0;
           "
+        />
+        <Icon
+          v-if="userRole != 'visitor'"
+          type="md-log-out"
+          size="16"
+          title="Leave the activity"
+          @click="quitActivityModal = true"
+          style="float: right; margin: 5px 20px 0 0; cursor: pointer"
         />
       </div>
       <vue-scroll
@@ -235,7 +235,12 @@
             <div
               v-if="delUserBtn"
               style="cursor: pointer; margin-right: 10px"
-              @click="removeUser(member)"
+              @click="
+                member => {
+                  slctDletMember = member;
+                  removeMemberModal = true;
+                }
+              "
             >
               <Icon type="md-remove-circle" size="20" color="#ed4014" />
             </div>
@@ -291,28 +296,40 @@
       ></Transfer>
     </Modal>
     <Modal
+      v-model="removeMemberModal"
+      width="400px"
+      title="Remove this member"
+      @on-ok="removeUser()"
+      ok-text="Ok"
+      cancel-text="Cancel"
+    >
+      <h4 style="color: red">Are you sure to remove this member?</h4>
+    </Modal>
+    <Modal
+      v-model="quitActivityModal"
+      width="400px"
+      title="Leave this activity"
+      @on-ok="leaveActivity()"
+      ok-text="Ok"
+      cancel-text="Cancel"
+    >
+      <h4 style="color: red">Are you sure to quit this subproject?</h4>
+    </Modal>
+    <Modal
       v-model="applyJoinActivityModal"
       title="Apply to join the activity"
       width="800px"
       :mask-closable="false"
     >
       <div>
-        <Form
-          ref="applyJoinForm"
-          :model="applyJoinForm"
-          :rules="applyJoinRule"
-          :label-width="120"
-        >
+        <Form ref="applyJoinForm" :model="applyJoinForm" :label-width="120">
           <FormItem label="Reason" prop="reason">
             <Input v-model="applyJoinForm.reason" :rows="4" type="textarea" />
           </FormItem>
         </Form>
       </div>
       <div slot="footer" style="display: inline-block">
-        <Button
-          type="primary"
-          @click="applyJoinActivity('applyJoinForm')"
-          style="float: right"
+        <Button type="primary" @click="applyJoinActivity()" style="float: right"
           >OK</Button
         >
         <Button
@@ -399,15 +416,15 @@ import * as socketApi from "./../../../api/socket.js";
 import Avatar from "vue-avatar";
 export default {
   components: {
-    Avatar,
+    Avatar
   },
   props: ["activityInfo"],
   data() {
     return {
       scrollOps: {
         bar: {
-          background: "lightgrey",
-        },
+          background: "lightgrey"
+        }
       },
       projectInfo: parent.vm.projectInfo,
       userInfo: JSON.parse(sessionStorage.getItem("userInfo")),
@@ -421,21 +438,16 @@ export default {
       inviteModal: false,
       // remove
       delUserBtn: false,
+      slctDletMember: {},
+      removeMemberModal: false,
+      // leave
+      quitActivityModal: false,
       // apply
       applyJoinActivityModal: false,
       createActivityModel: false,
       appliedActivity: {},
       applyJoinForm: {
-        reason: "",
-      },
-      applyJoinRule: {
-        reason: [
-          {
-            required: true,
-            message: "The description can't be empty",
-            trigger: "blur",
-          },
-        ],
+        reason: ""
       },
       // Activity
       activityForm: {
@@ -446,7 +458,7 @@ export default {
         level: -1,
         permission: JSON.stringify(userRoleJS.getDefault()),
         type: "Activity_Default",
-        purpose: "Multi-purpose",
+        purpose: "Multi-purpose"
       },
       activityCreateRule: {
         name: [
@@ -455,23 +467,23 @@ export default {
             message: "The name should not be empty and more than 60 characters",
             trigger: "blur",
             type: "string",
-            max: 60,
-          },
+            max: 60
+          }
         ],
         description: [
           {
             required: true,
             message: "The description should not be empty",
-            trigger: "blur",
-          },
+            trigger: "blur"
+          }
         ],
         purpose: [
           {
             required: true,
             message: "The purpose should not be empty",
-            trigger: "blur",
-          },
-        ],
+            trigger: "blur"
+          }
+        ]
       },
       purposes: [
         "Multi-purpose",
@@ -482,17 +494,17 @@ export default {
         "Model effectiveness evaluation",
         "Geographical simulation",
         "Data analysis",
-        "Decision making",
+        "Decision making"
       ],
-      listStyle: { width: "280px", height: "360px" },
+      listStyle: { width: "280px", height: "360px" }
     };
   },
   created() {
-    this.roleIdentity();
+    this.userRole = this.roleIdentity(this.activityInfo);
     this.getParticipants();
   },
   mounted() {
-    Array.prototype.contains = function (obj) {
+    Array.prototype.contains = function(obj) {
       var i = this.length;
       while (i--) {
         if (this[i].userId != undefined && this[i].userId === obj.userId) {
@@ -503,18 +515,37 @@ export default {
     };
   },
   methods: {
-    roleIdentity() {
-      this.userRole = userRoleJS.roleIdentify(
-        this.activityInfo.members,
-        this.userInfo.userId
-      );
+    roleIdentity(activity) {
+      return userRoleJS.roleIdentify(activity.members, this.userInfo.userId);
     },
     permissionIdentity(permission, role, operation) {
-      return userRoleJS.permissionIdentity(
-        JSON.parse(permission),
-        role,
-        operation
-      );
+      if (operation == "auto_join") {
+        if (JSON.parse(permission).auto_join.visitor == "Yes") return true;
+        else if (JSON.parse(permission).auto_join.visitor == "No") return false;
+        else {
+          return this.getParentPermission();
+        }
+      } else {
+        return userRoleJS.permissionIdentity(
+          JSON.parse(permission),
+          role,
+          operation
+        );
+      }
+    },
+    async getParentPermission() {
+      let url = "";
+      if (this.appliedActivity.level == 0 || this.appliedActivity.level == 1) {
+        return this.projectInfo.members.contains(this.userInfo);
+      } else if (this.appliedActivity.level == 2) {
+        url = "/GeoProblemSolving/subproject/" + this.appliedActivity.parent;
+        let parent = await get(url);
+        return parent.members.contains(this.userInfo);
+      } else if (this.appliedActivity.level > 2) {
+        url = "/GeoProblemSolving/activity/" + this.appliedActivity.parent;
+        let parent = await get(url);
+        return parent.members.contains(this.userInfo);
+      }
     },
     getParticipants() {
       let url = "";
@@ -529,7 +560,7 @@ export default {
       //callback setTimeBack
       this.axios
         .get(url)
-        .then((res) => {
+        .then(res => {
           if (res.data.code == 0) {
             this.creatorInfo = res.data.data.creator;
             this.participants = res.data.data.members;
@@ -537,7 +568,7 @@ export default {
             console.log(res.data.msg);
           }
         })
-        .catch((err) => {
+        .catch(err => {
           throw err;
         });
     },
@@ -550,6 +581,16 @@ export default {
         this.activityInfo.aid;
     },
     preCreation() {
+      if (
+        !this.permissionIdentity(
+          this.projectInfo.permission,
+          this.userRole,
+          "manage_child_activity"
+        )
+      ) {
+        this.$Notice.info({ desc: "Please join the activity firstly." });
+        return;
+      }
       this.activityForm.parent = this.activityInfo.aid;
       this.activityForm.creator = this.userInfo.userId;
       this.activityForm.level = this.activityInfo.level + 1;
@@ -557,7 +598,7 @@ export default {
       this.createActivityModel = true;
     },
     createActivity(name) {
-      this.$refs[name].validate((valid) => {
+      this.$refs[name].validate(valid => {
         if (valid) {
           let url = "";
           if (this.activityForm.level == 1) {
@@ -569,7 +610,7 @@ export default {
           }
           this.axios
             .post(url, this.activityForm)
-            .then((res) => {
+            .then(res => {
               if (res.data.code == 0) {
                 parent.location.href =
                   "/GeoProblemSolving/projectInfo/" +
@@ -582,7 +623,7 @@ export default {
                 console.log(res.data.msg);
               }
             })
-            .catch((err) => {
+            .catch(err => {
               throw err;
             });
           this.createActivityModel = false;
@@ -590,6 +631,8 @@ export default {
       });
     },
     enterChildActivity(activity) {
+      if (this.roleIdentity(activity) == "visitor") return;
+
       parent.location.href =
         "/GeoProblemSolving/projectInfo/" +
         this.projectInfo.aid +
@@ -600,9 +643,73 @@ export default {
     },
     preApplication(activity) {
       this.appliedActivity = activity;
-      this.applyJoinActivityModal = true;
+      if (
+        this.permissionIdentity(activity.permission, "visitor", "auto_join")
+      ) {
+        this.joinActivity();
+      } else {
+        this.applyJoinActivityModal = true;
+      }
     },
-    applyJoinActivity() {},
+    joinActivity() {
+      let url = "";
+      if (this.appliedActivity.level == 1) {
+        url =
+          "/GeoProblemSolving/subproject/" +
+          this.appliedActivity.aid +
+          "/user?userId=" +
+          this.userInfo.userId;
+      } else if (this.appliedActivity.levell > 1) {
+        url =
+          "/GeoProblemSolving/activity/" +
+          this.appliedActivity.aid +
+          "/user?userId=" +
+          this.userInfo.userId;
+      } else {
+        return;
+      }
+
+      this.axios
+        .post(url)
+        .then(res => {
+          if (res.data.code == 0) {
+            parent.location.href =
+              "/GeoProblemSolving/projectInfo/" +
+              this.projectInfo.aid +
+              "?content=workspace&aid=" +
+              this.appliedActivity.aid +
+              "&level=" +
+              this.appliedActivity.level;
+          } else if (res.data.code == -3) {
+            this.$Notice.info({
+              desc: "You has already been a member of the activity."
+            });
+          } else {
+            console.log(res.data.msg);
+          }
+        })
+        .catch(err => {
+          throw err;
+        });
+    },
+    applyJoinActivity() {
+      let notice = {
+        recipientId: userRoleJS.getMemberByRole(this.applyJoinForm, "manager"),
+        type: "apply",
+        content: {
+          title:
+            "Application of joining the activity: " + this.appliedActivity.name,
+          activityId: this.appliedActivity.aid,
+          activityName: this.appliedActivity.name,
+          activityLevel: this.appliedActivity.level,
+          userEmail: this.userInfo.email,
+          userName: this.userInfo.name,
+          userId: this.userInfo.userId,
+          description: this.applyJoinForm.reason
+        }
+      };
+      this.sendNotice(activity, notice);
+    },
     async preInvitation() {
       let url = "";
       let activity = this.activityInfo;
@@ -625,7 +732,7 @@ export default {
           key: this.potentialMembers.length,
           userId: candidates[i].userId,
           name: candidates[i].name,
-          role: candidates[i].role,
+          role: candidates[i].role
         });
       }
       this.invitingMembers = this.getTargetKeys();
@@ -633,10 +740,10 @@ export default {
     },
     getTargetKeys() {
       return this.potentialMembers
-        .filter((item) => {
+        .filter(item => {
           return this.participants.contains(item);
         })
-        .map((item) => item.key);
+        .map(item => item.key);
     },
     memberRender(item) {
       return `<span title="${item.name} - ${item.role}">${item.name} - ${item.role}</span>`;
@@ -675,8 +782,9 @@ export default {
 
         this.axios
           .post(url)
-          .then((res) => {
+          .then(res => {
             if (res.data.code == 0) {
+              this.participants.push(user);
               //notice
               let notice = {
                 recipientId: user.userId,
@@ -690,43 +798,45 @@ export default {
                     activity.name +
                     " in project: " +
                     this.projectInfo.name +
-                    " , and now you are a member in this activity!",
-                },
+                    " , and now you are a member in this activity!"
+                }
               };
-              this.sendNotice(user, activity, notice);
-              this.participants.push(user);
+              this.sendNotice(activity, notice);
             } else {
               console.log(res.data.msg);
             }
           })
-          .catch((err) => {
+          .catch(err => {
             throw err;
           });
       }
     },
-    removeUser(member) {
+    removeUser() {
       let url = "";
+      let member = this.slctDletMember;
       let activity = this.activityInfo;
       if (activity.level == 1) {
         url =
           "/GeoProblemSolving/subproject/" +
           activity.aid +
           "/user?userId=" +
-          user.userId;
+          member.userId;
       } else if (activity.level > 1) {
         url =
           "/GeoProblemSolving/activity/" +
           activity.aid +
           "/user?userId=" +
-          user.userId;
+          member.userId;
       } else {
         return;
       }
 
       this.axios
         .delete(url)
-        .then((res) => {
+        .then(res => {
           if (res.data.code == 0) {
+            let index = this.participants.indexOf(member);
+            this.participants.splice(index, 1);
             //notice
             let notice = {
               recipientId: member.userId,
@@ -738,32 +848,109 @@ export default {
                   activity.name +
                   " in project: " +
                   this.projectInfo.name +
-                  ".",
-              },
+                  "."
+              }
             };
-            this.sendNotice(member, activity, notice);
-            this.participants.push(user);
+            this.sendNotice(activity, notice);
           } else {
             console.log(res.data.msg);
           }
         })
-        .catch((err) => {
+        .catch(err => {
           throw err;
         });
     },
-    sendNotice(user, activity, notice) {
+    leaveActivity() {
+      let member = this.userInfo;
+      let activity = this.activityInfo;
+      // get url
+      let url = "";
+      if (activity.level == 1) {
+        url =
+          "/GeoProblemSolving/subproject/" +
+          activity.aid +
+          "/user?userId=" +
+          member.userId;
+      } else if (activity.level > 1) {
+        url =
+          "/GeoProblemSolving/activity/" +
+          activity.aid +
+          "/user?userId=" +
+          member.userId;
+      } else {
+        return;
+      }
+
       this.axios
-        .post("/GeoProblemSolving/notice/save", notice)
-        .then((result) => {
-          if (result.data == "Success") {
-            this.$emit("sendNotice", this.inviteList[i]); // 改apply.content.userId
+        .delete(url)
+        .then(res => {
+          if (res.data.code == 0) {
+            parent.location.href =
+              "/GeoProblemSolving/projectInfo/" +
+              this.projectInfo.aid +
+              "?content=workspace&aid=" +
+              activity.parent +
+              "&level=" +
+              (activity.level - 1).toString();
+            //notice
+            let notice = {
+              recipientId: userRoleJS.getMemberByRole(
+                this.activityInfo,
+                "manager"
+              ),
+              type: "notice",
+              content: {
+                title: "Leave activity",
+                description:
+                  member.name +
+                  " left the activity: " +
+                  activity.name +
+                  " in project: " +
+                  this.projectInfo.name +
+                  "."
+              }
+            };
+            this.sendNotice(activity, notice);
           } else {
-            this.$Message.error("Notice fail.");
+            console.log(res.data.msg);
           }
         })
-        .catch((err) => {
+        .catch(err => {
           throw err;
         });
+    },
+    sendNotice(activity, notice) {
+      if (
+        Object.prototype.toString.call(activity.recipientId) == "[object Array]"
+      ) {
+        for (let i = 0; i < activity.recipientId.length; i++) {
+          this.axios
+            .post("/GeoProblemSolving/notice/save", notice)
+            .then(result => {
+              if (result.data == "Success") {
+                parent.vm.$emit("sendNotice", notice.recipientId[i]);
+              } else {
+                this.$Message.error("Notice fail.");
+              }
+            })
+            .catch(err => {
+              throw err;
+            });
+        }
+      } else {
+        this.axios
+          .post("/GeoProblemSolving/notice/save", notice)
+          .then(result => {
+            if (result.data == "Success") {
+              parent.vm.$emit("sendNotice", notice.recipientId);
+            } else {
+              this.$Message.error("Notice fail.");
+            }
+          })
+          .catch(err => {
+            throw err;
+          });
+      }
     },
     gotoPersonalSpace(id) {
       if (id == this.$store.getters.userId) {
@@ -771,8 +958,8 @@ export default {
       } else {
         parent.location.href = "/GeoProblemSolving/memberPage/" + id;
       }
-    },
-  },
+    }
+  }
 };
 </script>
 <style scoped>

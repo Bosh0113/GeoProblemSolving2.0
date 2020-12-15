@@ -9,7 +9,7 @@ const routes = [
       { path: '', redirect: 'staticPage' },
       { path: 'staticPage', name: 'StaticPage', component: resolve => (require(["@/components/navigationContent/staticPage"], resolve)) },
       //add level
-      { path: 'permission/:level:id', name: 'permission', component: resolve => (require(["@/components/projects/permissionManager"], resolve)) },
+      { path: 'permission/:level/:id', name: 'permission', component: resolve => (require(["@/components/workingSpace/permissionManager"], resolve)) },
       // {
       //   path: 'project/:id/subproject/', name: 'subproject', component: resolve => (require(["@/components/subProject/subprojectNav"], resolve)), children: [
       //     { path: '', redirect: 'overview' },
@@ -44,6 +44,7 @@ const routes = [
       //     { path: 'decisionMaking', name: 'decisionMakingP', component: resolve => (require(["@/components/workingSpace/functionSteps/decisionMakingContent"], resolve)) },
       //   ],
       // },
+      {path: 'newPersonalPage', name: 'newPersonalPage', component: resolve => (require(["@/components/user/userPage/newPersonalPage"], resolve))},
       { path: 'newproject', name: 'NewProject', component: resolve => (require(["@/components/projects/newProject"], resolve)) },
       { path: 'community', name: 'Community', component: resolve => (require(["@/components/community/community"], resolve)) },
       { path: 'community/:id', name: 'Communityreply', component: resolve => (require(["@/components/community/communityReply"], resolve)) },
@@ -90,6 +91,9 @@ const routes = [
   { path: '/tinymce', name: 'tinymce', component: resolve => (require(["@/components/tools/entity/singleUtils/tinymce"], resolve)) },
   { path: '/modelItem/:doi', name: 'Model', component: resolve => (require(["@/components/utils/model/Model"], resolve)) },
   { path: '/toolShow', name: 'toolTemplate', component: resolve => (require(["@/components/tools/toolPreview"], resolve)) },
+
+//  个人空间路由内容
+  {path: '/test', component: resolve => (require(["@/components/user/subPage/project"], resolve)) },
 ]
 
 export default new Router({

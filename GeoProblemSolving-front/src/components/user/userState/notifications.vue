@@ -46,117 +46,187 @@
 }
 </style>
 <template>
-<div>
-  <Row>
-    <Col span="22" offset="1">
-      <h1 style="margin-top:20px">Notifications</h1>
-      <Tabs type="card" value="notice" style="margin:20px 0">
-        <TabPane :label="noticeTab" name="notice">
-          <Card>
-            <h3 slot="title">Notice Detail</h3>
-            <a slot="extra" @click="readAllNotice">All read</a>
-            <div class="detailContent">
-              <Card class="noDetail" v-if="this.noticeList.length<1">
-                <h1>No Notice Notifications</h1>
-              </Card>
-              <template v-else-if="this.noticeList.length>0">
-                <div class="noticeDetail" v-for="notice in noticeList" :key="notice.index">
-                  <template v-if="notice.type =='work'">
-                    <Card style="height:100%">
-                      <template v-if="notice.state=='unread'">
-                        <Badge dot>
-                          <h4>{{notice.content.title}}</h4>
-                        </Badge>
-                        <span class="noticeDeleteBtn" @click="deleteNotice(notice)">×</span>
-                      </template>
-                      <h4 v-else>{{notice.content.title}}
-                        <span class="noticeDeleteBtn" @click="deleteNotice(notice)">×</span>
-                      </h4>
-                      <small class="noticeDescription">{{notice.content.description}}</small>
-                      <small>{{notice.createTime}}</small>
-                      <Button class="noticeReadBtn" v-if="notice.state=='unread'" @click="gotoWork(notice.noticeId, notice.content.subProjectId)">Go</Button>
-                    </Card>
-                  </template>
-                  <template v-else>
-                    <Card style="height:100%">
-                      <template v-if="notice.state=='unread'">
-                        <Badge dot>
-                          <h4>{{notice.content.title}}</h4>
-                        </Badge>
-                        <span class="noticeDeleteBtn" @click="deleteNotice(notice)">×</span>
-                      </template>
-                      <h4 v-else>{{notice.content.title}}
-                        <span class="noticeDeleteBtn" @click="deleteNotice(notice)">×</span>
-                      </h4>
-                      <small class="noticeDescription">{{notice.content.description}}</small>
-                      <small>{{notice.createTime}}</small>
-                      <Button class="noticeReadBtn" v-if="notice.state=='unread'" @click="readNotice(notice.noticeId)">Got it</Button>
-                    </Card>
-                  </template>
-                </div>
-              </template>
-            </div>
-          </Card>
-        </TabPane>
-        <TabPane :label="replyTab" name="reply">
-          <Card>
-            <h3 slot="title">Reply Detail</h3>
-            <div class="detailContent">
-              <Card class="noDetail" v-if="this.replyList.length<1">
-                <h1>No Reply Notifications</h1>
-              </Card>
-              <template v-else-if="this.replyList.length>0">
-                <div class="noticeDetail" v-for="reply in this.replyList" :key="reply.index">
-                  <Card style="height:100%">
-                  Reply Datail
-                  <!-- 此处添加回复类型通知的Card显示 -->
+  <div>
+    <Row>
+      <Col span="22" offset="1">
+        <h1 style="margin-top: 20px">Notifications</h1>
+        <Tabs type="card" value="notice" style="margin: 20px 0">
+          <TabPane :label="noticeTab" name="notice">
+            <Card>
+              <h3 slot="title">Notice Detail</h3>
+              <a slot="extra" @click="readAllNotice">All read</a>
+              <div class="detailContent">
+                <Card class="noDetail" v-if="this.noticeList.length < 1">
+                  <h1>No Notice Notifications</h1>
                 </Card>
-                </div>
-              </template>
-            </div>
-          </Card>
-        </TabPane>
-        <TabPane :label="applyTab" name="apply">
-          <Card>
-            <h3 slot="title">Apply Detail</h3>
-            <div class="detailContent">
-              <Card class="noDetail" v-if="this.applyList.length<1">
-                <h1>No Apply Notifications</h1>
-              </Card>
-              <template v-else-if="this.applyList.length>0">
-                <div class="noticeDetail" v-for="apply in this.applyList" :key="apply.index">
-                  <Card style="height:100%">
-                    <template v-if="apply.state=='unread'">
-                      <Badge dot>
-                        <h4>{{apply.content.title}}</h4>
-                      </Badge>
-                      <span class="noticeDeleteBtn" @click="deleteNotice(apply)">×</span>
+                <template v-else-if="this.noticeList.length > 0">
+                  <div
+                    class="noticeDetail"
+                    v-for="notice in noticeList"
+                    :key="notice.index"
+                  >
+                    <template v-if="notice.type == 'work'">
+                      <Card style="height: 100%">
+                        <template v-if="notice.state == 'unread'">
+                          <Badge dot>
+                            <h4>{{ notice.content.title }}</h4>
+                          </Badge>
+                          <span
+                            class="noticeDeleteBtn"
+                            @click="deleteNotice(notice)"
+                            >×</span
+                          >
+                        </template>
+                        <h4 v-else>
+                          {{ notice.content.title }}
+                          <span
+                            class="noticeDeleteBtn"
+                            @click="deleteNotice(notice)"
+                            >×</span
+                          >
+                        </h4>
+                        <small class="noticeDescription">{{
+                          notice.content.description
+                        }}</small>
+                        <small>{{ notice.createTime }}</small>
+                        <Button
+                          class="noticeReadBtn"
+                          v-if="notice.state == 'unread'"
+                          @click="
+                            gotoWork(
+                              notice.noticeId,
+                              notice.content.subProjectId
+                            )
+                          "
+                          >Go</Button
+                        >
+                      </Card>
                     </template>
-                    <h4 v-else>{{apply.content.title}}
-                      <span class="noticeDeleteBtn" @click="deleteNotice(apply)">×</span>
-                    </h4>
-                    <small class="noticeDescription">{{apply.content.description}}</small>
-                    <small>{{apply.createTime}}</small>
-                    <template v-if="apply.content.approve=='unknow'">
-                      <Button class="approveApplyBtn" v-if="apply.state=='unread'" @click="refuseApply(apply)">×</Button>
-                      <Button class="refuseApplyBtn" v-if="apply.state=='unread'" @click="approveApply(apply)">√</Button>
+                    <template v-else>
+                      <Card style="height: 100%">
+                        <template v-if="notice.state == 'unread'">
+                          <Badge dot>
+                            <h4>{{ notice.content.title }}</h4>
+                          </Badge>
+                          <span
+                            class="noticeDeleteBtn"
+                            @click="deleteNotice(notice)"
+                            >×</span
+                          >
+                        </template>
+                        <h4 v-else>
+                          {{ notice.content.title }}
+                          <span
+                            class="noticeDeleteBtn"
+                            @click="deleteNotice(notice)"
+                            >×</span
+                          >
+                        </h4>
+                        <small class="noticeDescription">{{
+                          notice.content.description
+                        }}</small>
+                        <small>{{ notice.createTime }}</small>
+                        <Button
+                          class="noticeReadBtn"
+                          v-if="notice.state == 'unread'"
+                          @click="readNotice(notice.noticeId)"
+                          >Got it</Button
+                        >
+                      </Card>
                     </template>
-                    <template v-else-if="apply.content.approve=='true'">
-                      <Button disabled style="float:right;">√</Button>
-                    </template>
-                    <template v-else-if="apply.content.approve=='false'">
-                      <Button disabled style="float:right;">×</Button>
-                    </template>
-                  </Card>
-                </div>
-              </template>
-            </div>
-          </Card>
-        </TabPane>
-      </Tabs>
-    </Col>
-  </Row>
-</div>
+                  </div>
+                </template>
+              </div>
+            </Card>
+          </TabPane>
+          <TabPane :label="replyTab" name="reply">
+            <Card>
+              <h3 slot="title">Reply Detail</h3>
+              <div class="detailContent">
+                <Card class="noDetail" v-if="this.replyList.length < 1">
+                  <h1>No Reply Notifications</h1>
+                </Card>
+                <template v-else-if="this.replyList.length > 0">
+                  <div
+                    class="noticeDetail"
+                    v-for="reply in this.replyList"
+                    :key="reply.index"
+                  >
+                    <Card style="height: 100%">
+                      Reply Datail
+                      <!-- 此处添加回复类型通知的Card显示 -->
+                    </Card>
+                  </div>
+                </template>
+              </div>
+            </Card>
+          </TabPane>
+          <TabPane :label="applyTab" name="apply">
+            <Card>
+              <h3 slot="title">Apply Detail</h3>
+              <div class="detailContent">
+                <Card class="noDetail" v-if="this.applyList.length < 1">
+                  <h1>No Apply Notifications</h1>
+                </Card>
+                <template v-else-if="this.applyList.length > 0">
+                  <div
+                    class="noticeDetail"
+                    v-for="apply in this.applyList"
+                    :key="apply.index"
+                  >
+                    <Card style="height: 100%">
+                      <template v-if="apply.state == 'unread'">
+                        <Badge dot>
+                          <h4>{{ apply.content.title }}</h4>
+                        </Badge>
+                        <span
+                          class="noticeDeleteBtn"
+                          @click="deleteNotice(apply)"
+                          >×</span
+                        >
+                      </template>
+                      <h4 v-else>
+                        {{ apply.content.title }}
+                        <span
+                          class="noticeDeleteBtn"
+                          @click="deleteNotice(apply)"
+                          >×</span
+                        >
+                      </h4>
+                      <small class="noticeDescription">{{
+                        apply.content.description
+                      }}</small>
+                      <small>{{ apply.createdTime }}</small>
+                      <template v-if="apply.content.approve == 'unknow'">
+                        <Button
+                          class="approveApplyBtn"
+                          v-if="apply.state == 'unread'"
+                          @click="refuseApply(apply)"
+                          >×</Button
+                        >
+                        <Button
+                          class="refuseApplyBtn"
+                          v-if="apply.state == 'unread'"
+                          @click="approveApply(apply)"
+                          >√</Button
+                        >
+                      </template>
+                      <template v-else-if="apply.content.approve == 'true'">
+                        <Button disabled style="float: right">√</Button>
+                      </template>
+                      <template v-else-if="apply.content.approve == 'false'">
+                        <Button disabled style="float: right">×</Button>
+                      </template>
+                    </Card>
+                  </div>
+                </template>
+              </div>
+            </Card>
+          </TabPane>
+        </Tabs>
+      </Col>
+    </Row>
+  </div>
 </template>
 <script>
 export default {
@@ -171,49 +241,49 @@ export default {
       noticeList: [],
       replyList: [],
       applyList: [],
-      noticeTab: h => {
+      noticeTab: (h) => {
         return h("div", [
           h("span", "Notice"),
           h("Badge", {
             props: {
-              count: this.noticeUnreadCount
-            }
-          })
+              count: this.noticeUnreadCount,
+            },
+          }),
         ]);
       },
-      replyTab: h => {
+      replyTab: (h) => {
         return h("div", [
           h("span", "Reply"),
           h("Badge", {
             props: {
-              count: this.replyUnreadCount
-            }
-          })
+              count: this.replyUnreadCount,
+            },
+          }),
         ]);
       },
-      applyTab: h => {
+      applyTab: (h) => {
         return h("div", [
           h("span", "Apply"),
           h("Badge", {
             props: {
-              count: this.applyUnreadCount
-            }
-          })
+              count: this.applyUnreadCount,
+            },
+          }),
         ]);
-      }
+      },
     };
   },
   // add by mzy for navigation guards
   beforeRouteEnter: (to, from, next) => {
-    next(vm => {
+    next((vm) => {
       if (!vm.$store.getters.userState) {
         // next("/login");
         var pageUrl = window.location.href;
         this.axios
-          .get("/GeoProblemSolving/user/login?pageUrl="+pageUrl)
-          .then(res=>{
+          .get("/GeoProblemSolving/user/login?pageUrl=" + pageUrl)
+          .then((res) => {
             window.location.href = res.data;
-          })
+          });
       } else {
         next();
       }
@@ -228,7 +298,7 @@ export default {
             "&value=" +
             this.$store.getters.userId
         )
-        .then(res => {
+        .then((res) => {
           if (res.data !== "Fail") {
             let noticeListTest = [];
             let noticeUnreadCount = 0;
@@ -238,7 +308,10 @@ export default {
             let applyUnreadCount = 0;
             let notifications = res.data;
             for (let i = 0; i < notifications.length; i++) {
-              if (notifications[i].type === "notice"|| notifications[i].type === "work") {
+              if (
+                notifications[i].type === "notice" ||
+                notifications[i].type === "work"
+              ) {
                 noticeListTest.push(notifications[i]);
                 if (notifications[i].state === "unread") {
                   noticeUnreadCount++;
@@ -264,26 +337,26 @@ export default {
             this.$set(this, "replyList", replyListTest);
             this.$set(this, "applyUnreadCount", applyUnreadCount);
             this.$set(this, "applyList", applyListTest);
-          }
-          else{
+          } else {
             this.$Message.error("load notifications fail");
           }
         })
-        .catch(err => {
+        .catch((err) => {
           this.$Message.error("load notifications fail");
         });
     },
     deleteNotice(notice) {
       this.axios
-        .get("/GeoProblemSolving/notice/delete" + "?noticeId=" + notice.noticeId)
-        .then(res => {
-          if(res.data == "Offline"){
+        .get(
+          "/GeoProblemSolving/notice/delete" + "?noticeId=" + notice.noticeId
+        )
+        .then((res) => {
+          if (res.data == "Offline") {
             this.$store.commit("userLogout");
             this.$router.push({ name: "Login" });
-          }
-          else if (res.data == "Success") {
+          } else if (res.data == "Success") {
             this.$Message.success("delete notification success.");
-            if(notice.state=="unread"){
+            if (notice.state == "unread") {
               this.$emit("readNotification");
             }
             this.loadNotifications();
@@ -291,49 +364,51 @@ export default {
             this.$Message.error("delete notification fail.");
           }
         })
-        .catch(err => {
+        .catch((err) => {
           this.$Message.error("delete notification fail.");
         });
     },
-    readAllNotice(){
-      var unreadList = this.noticeList.filter(function(notice){
-        if(notice.state=='unread'){
+    readAllNotice() {
+      var unreadList = this.noticeList.filter(function (notice) {
+        if (notice.state == "unread") {
           return notice;
         }
       });
       var unreadCount = unreadList.length;
-      for(var i=0;i<unreadList.length;i++){
+      for (var i = 0; i < unreadList.length; i++) {
         this.axios
-        .get("/GeoProblemSolving/notice/read" + "?noticeId=" + unreadList[i].noticeId)
-        .then(res => {
-          if(res.data == "Offline"){
-            this.$store.commit("userLogout");
-            this.$router.push({ name: "Login" });
-          }
-          else if (res.data == "Success") {
-            this.$emit("readNotification");
-            this.$store.commit("getUserInfo");
-            if(--unreadCount==0){
-              this.loadNotifications();
+          .get(
+            "/GeoProblemSolving/notice/read" +
+              "?noticeId=" +
+              unreadList[i].noticeId
+          )
+          .then((res) => {
+            if (res.data == "Offline") {
+              this.$store.commit("userLogout");
+              this.$router.push({ name: "Login" });
+            } else if (res.data == "Success") {
+              this.$emit("readNotification");
+              this.$store.commit("getUserInfo");
+              if (--unreadCount == 0) {
+                this.loadNotifications();
+              }
+            } else {
+              this.$Message.error("update notification fail.");
             }
-          } else {
+          })
+          .catch((err) => {
             this.$Message.error("update notification fail.");
-          }
-        })
-        .catch(err => {
-          this.$Message.error("update notification fail.");
-        });
+          });
       }
     },
     readNotice(noticeId) {
       this.axios
         .get("/GeoProblemSolving/notice/read" + "?noticeId=" + noticeId)
-        .then(res => {
-          if(res.data == "Offline"){
+        .then((res) => {
+          if (res.data == "Offline") {
             this.$store.commit("userLogout");
             this.$router.push({ name: "Login" });
-          }
-          else if (res.data == "Success") {
+          } else if (res.data == "Success") {
             this.$emit("readNotification");
             this.$store.commit("getUserInfo");
             this.loadNotifications();
@@ -341,31 +416,30 @@ export default {
             this.$Message.error("update notification fail.");
           }
         })
-        .catch(err => {
+        .catch((err) => {
           this.$Message.error("update notification fail.");
         });
     },
-    gotoWork(noticeId,subProjectId){
+    gotoWork(noticeId, subProjectId) {
       //路由跳转好像和回调的关系有点问题，这样在回调之前就已经跳转了，回调的内容好像没啥用
       this.axios
         .get("/GeoProblemSolving/notice/read" + "?noticeId=" + noticeId)
-        .then(res => {
-          if(res.data == "Offline"){
+        .then((res) => {
+          if (res.data == "Offline") {
             this.$store.commit("userLogout");
             this.$router.push({ name: "Login" });
-          }
-          else if (res.data == "Success") {
+          } else if (res.data == "Success") {
             this.$emit("readNotification");
             this.loadNotifications();
           } else {
             this.$Message.error("update notification fail.");
           }
         })
-        .catch(err => {
+        .catch((err) => {
           this.$Message.error("update notification fail.");
         });
 
-      this.$router.push( `./project/${id}/subproject`);
+      this.$router.push(`./project/${id}/subproject`);
     },
     refuseApply(apply) {
       let updateApply = new URLSearchParams();
@@ -374,12 +448,11 @@ export default {
       updateApply.append("state", "read");
       this.axios
         .post("/GeoProblemSolving/notice/update", updateApply)
-        .then(res => {
-          if(res.data == "Offline"){
+        .then((res) => {
+          if (res.data == "Offline") {
             this.$store.commit("userLogout");
             this.$router.push({ name: "Login" });
-          }
-          else if (res.data == "Success") {
+          } else if (res.data == "Success") {
             this.$emit("readNotification");
             this.loadNotifications();
             let replyNotice = {};
@@ -388,27 +461,27 @@ export default {
             replyNotice["content"] = {
               title: "Result for application",
               description:
-                "Sorry, you were refused to join the project: " +
-                apply.content.projectTitle +
-                " ."
+                "Sorry, you were refused to join the activity: " +
+                apply.content.activityName +
+                " .",
             };
             this.axios
               .post("/GeoProblemSolving/notice/save", replyNotice)
-              .then(result => {
+              .then((result) => {
                 if (result.data == "Success") {
                   this.$emit("sendNotice", apply.content.userId);
                 } else {
                   this.$Message.error("reply fail.");
                 }
               })
-              .catch(err => {
+              .catch((err) => {
                 this.$Message.error("reply fail.");
               });
           } else {
             this.$Message.error("update notification fail.");
-          };
+          }
         })
-        .catch(err => {
+        .catch((err) => {
           this.$Message.error("update notification fail.");
         });
     },
@@ -417,37 +490,20 @@ export default {
       updateApply.append("noticeId", apply.noticeId);
       updateApply.append("content.approve", "true");
       updateApply.append("state", "read");
+      // 更新通知
       this.axios
         .post("/GeoProblemSolving/notice/update", updateApply)
-        .then(res => {
-          if(res.data == "Offline"){
+        .then((res) => {
+          if (res.data == "Offline") {
             this.$store.commit("userLogout");
             this.$router.push({ name: "Login" });
-          }
-          else if (res.data == "Success") {
+          } else if (res.data == "Success") {
             this.$emit("readNotification");
             this.loadNotifications();
+
             //update project members
-            this.axios
-              .get(
-                "/GeoProblemSolving/"+apply.content.scope+"/join?" +
-                  apply.content.scope+"Id=" +
-                  apply.content.projectId +
-                  "&userId=" +
-                  apply.content.userId
-              )
-              .then(res => {
-                if (res.data === "Fail") {
-                  this.$Message.error("Join fail.");
-                } else if (res.data === "Exist") {
-                  this.$Message.info(
-                    "He/she is already a member of the "+ apply.content.scope +"."
-                  );
-                }
-              })
-              .catch(err => {
-                this.$Message.error("Join fail");
-              });
+            this.joinActivity(apply);
+
             //reply to applicant
             let replyNotice = {};
             replyNotice["recipientId"] = apply.content.userId;
@@ -455,59 +511,105 @@ export default {
             replyNotice["content"] = {
               title: "Result for application",
               description:
-                "Congratulations for joining the "+apply.content.scope+": " +
-                apply.content.projectTitle +
-                " ."
+                "Congratulations for joining the activity: " +
+                apply.content.activityName +
+                " .",
             };
             this.axios
               .post("/GeoProblemSolving/notice/save", replyNotice)
-              .then(result => {
+              .then((result) => {
                 if (result.data == "Success") {
                   this.$emit("sendNotice", apply.content.userId);
                   let resultEmailBody = {};
                   resultEmailBody["recipient"] = apply.content.userEmail;
                   resultEmailBody["mailTitle"] = "Join project result";
-                  resultEmailBody["mailContent"] = "Hello, "+ apply.content.userName + ", Congratulations for joining the "+apply.content.scope+": " + apply.content.projectTitle + " .";
-                  this.axios.post("/GeoProblemSolving/email/send", resultEmailBody)
-                  .then(res=>{
-                    if (res.data == "Success") {
+                  resultEmailBody["mailContent"] =
+                    "Hello, " +
+                    apply.content.userName +
+                    ", Congratulations for joining the activity: " +
+                    apply.content.activityName +
+                    " .";
+                  this.axios
+                    .post("/GeoProblemSolving/email/send", resultEmailBody)
+                    .then((res) => {
+                      if (res.data == "Success") {
                         this.$Notice.success({
                           title: "Result for application",
                           desc:
-                            "The process result email has been sent,if he/she doesn't online,the email will remind the joiner in time."
+                            "The process result email has been sent,if he/she doesn't online,the email will remind the joiner in time.",
                         });
                       } else {
                         this.$Notice.error({
                           title: "Email send fail",
-                          desc: "The invitation isn't be sent successfully."
+                          desc: "The invitation isn't be sent successfully.",
                         });
                       }
-                  })
-                  .catch(err=>{
-                    console.log(err.data);
-                  })
+                    })
+                    .catch((err) => {
+                      console.log(err.data);
+                    });
                 } else {
                   this.$Message.error("reply fail.");
                 }
               })
-              .catch(err => {
+              .catch((err) => {
                 this.$Message.error("reply fail.");
               });
 
-              // 发送审核通过的邮件
-              // let resultEmailBody = {};
-              // resultEmailBody["recipient"] =
-
-
-
+            // 发送审核通过的邮件
+            // let resultEmailBody = {};
+            // resultEmailBody["recipient"] =
           } else {
             this.$Message.error("update notification fail.");
           }
         })
-        .catch(err => {
+        .catch((err) => {
           this.$Message.error("update notification fail.");
         });
-    }
-  }
+    },
+    joinActivity(apply) {
+      let url = "";
+      if (apply.content.activityLevel == 0) {
+        url =
+          "/GeoProblemSolving/project/" +
+          apply.content.activityId +
+          "/user?userId=" +
+          apply.content.userId;
+      } else if (apply.content.activityLevel == 1) {
+        url =
+          "/GeoProblemSolving/subproject/" +
+          apply.content.activityId +
+          "/user?userId=" +
+          apply.content.userId;
+      } else if (apply.content.activityLevel > 1) {
+        url =
+          "/GeoProblemSolving/activity/" +
+          apply.content.activityId +
+          "/user?userId=" +
+          apply.content.userId;
+      } else {
+        return;
+      }
+
+      this.axios
+        .post(url)
+        .then((res) => {
+          if (res.data.code == 0) {
+            this.$Message.info("Successfully approval.");
+          } else if (res.data.code == -3) {
+            this.$Message.info(
+              "The applicant has already been a member of the activity: " +
+                apply.content.activityName +
+                " ."
+            );
+          } else {
+            console.log(res.data.msg);
+          }
+        })
+        .catch((err) => {
+          throw err;
+        });
+    },
+  },
 };
 </script>

@@ -141,7 +141,7 @@ public class ProjectServiceImpl implements ProjectService {
 
             // Aid
             String projectId = UUID.randomUUID().toString();
-            project.setAid(projectId);
+             project.setAid(projectId);
 
             // Set project member
             String creatorId = project.getCreator();
@@ -463,10 +463,9 @@ public class ProjectServiceImpl implements ProjectService {
             // remove the user from the project
             JSONArray members = project.getMembers();
             for (Object member : members) {
-                if (member instanceof JSONObject) {
-                    if (((JSONObject) member).get("userId").equals(userId)) {
-                        members.remove(member);
-                    }
+                if (((HashMap) member).get("userId").equals(userId)) {
+                    members.remove(member);
+                    break;
                 }
             }
             project.setMembers(members);

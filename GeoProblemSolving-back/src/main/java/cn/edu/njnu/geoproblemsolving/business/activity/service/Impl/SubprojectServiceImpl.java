@@ -241,9 +241,9 @@ public class SubprojectServiceImpl implements SubprojectService {
             JSONArray members = subproject.getMembers();
             JSONArray memberInfos = new JSONArray();
             for (Object member : members) {
-                String userId =  (String)((HashMap) member).get("userId");
+                String userId = (String) ((HashMap) member).get("userId");
                 User user = findByUserId(userId);
-                HashMap<String, Object> userInfo = (HashMap)member;
+                HashMap<String, Object> userInfo = (HashMap) member;
                 userInfo.put("name", user.getName());
                 userInfo.put("avatar", user.getAvatar());
                 userInfo.put("email", user.getEmail());
@@ -301,7 +301,7 @@ public class SubprojectServiceImpl implements SubprojectService {
     @Override
     public JsonResult findSubProject(String aid) {
         Optional<Subproject> optional = subprojectRepository.findById(aid);
-        if (optional.isPresent()){
+        if (optional.isPresent()) {
             Subproject subproject = optional.get();
 
             //Update active time
@@ -310,7 +310,7 @@ public class SubprojectServiceImpl implements SubprojectService {
             subprojectRepository.save(subproject);
 
             return ResultUtils.success(subproject);
-        }else {
+        } else {
             return ResultUtils.error(-1, "None");
         }
     }
@@ -328,7 +328,7 @@ public class SubprojectServiceImpl implements SubprojectService {
             // if user exist in subproject?
             Subproject subproject = (Subproject) optional.get();
             JSONArray members = subproject.getMembers();
-            if(members == null) members = new JSONArray();
+            if (members == null) members = new JSONArray();
             for (Object member : members) {
                 if (member instanceof JSONObject) {
                     if (((JSONObject) member).get("userId").equals(userId)) {
@@ -399,11 +399,11 @@ public class SubprojectServiceImpl implements SubprojectService {
 
             // remove the user from the project
             JSONArray members = subproject.getMembers();
+            if (members == null) members = new JSONArray();
             for (Object member : members) {
-                if (member instanceof JSONObject) {
-                    if (((JSONObject) member).get("userId").equals(userId)) {
-                        members.remove(member);
-                    }
+                if (((HashMap) member).get("userId").equals(userId)) {
+                    members.remove(member);
+                    break;
                 }
             }
             subproject.setMembers(members);

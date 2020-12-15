@@ -200,7 +200,7 @@ export default {
           },
           {
             type: "string",
-            min: 6,
+            min: 3,
             message: "The length of password can not be less than 6 characters",
             trigger: "blur"
           }
@@ -250,7 +250,8 @@ export default {
           // var passwordFro = this.loginForm.password;
           // var passwordAES = this.encrypto(passwordFro);
           // var passwordAESURI = window.encodeURIComponent(passwordAES);
-          var passwordAESURI = md5(this.loginForm.password);
+          // var passwordAESURI = md5(this.loginForm.password);
+          var passwordAESURI = this.loginForm.password;
           this.axios
             .get(
               "/GeoProblemSolving/user/login" +

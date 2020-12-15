@@ -5,5 +5,3 @@ GeoProblemSolving-back/src/main/resources/templates/staticPage
 GeoProblemSolving-front/target.md
 GeoProblemSolving-front/node_modules
 GeoProblemSolving-back/geoproblemsolving.iml
-GeoProblemSolving-back/src/main/java/cn/edu/njnu/geoproblemsolving/business/user/service/TokenTask.java
-GeoProblemSolving-back/src/main/java/cn/edu/njnu/geoproblemsolving/business/user/controller/IUserController.java

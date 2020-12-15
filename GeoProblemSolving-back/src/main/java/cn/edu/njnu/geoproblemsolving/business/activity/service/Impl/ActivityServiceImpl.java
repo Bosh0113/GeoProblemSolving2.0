@@ -634,11 +634,9 @@ public class ActivityServiceImpl implements ActivityService {
 
             JSONArray members = activity.getMembers();
             for (Object member : members) {
-                if (member instanceof JSONObject) {
-                    if (((JSONObject) member).get("userId").equals(userId)) {
-                        members.remove(member);
-                        break;
-                    }
+                if (((HashMap) member).get("userId").equals(userId)) {
+                    members.remove(member);
+                    break;
                 }
             }
             activity.setMembers(members);
