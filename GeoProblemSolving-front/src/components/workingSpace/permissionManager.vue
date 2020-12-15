@@ -102,11 +102,11 @@ export default {
                   }),
                   h("Option", {
                     props: {
-                      value: "Same to the parent"
+                      value: "Parent activity members"
                     },
                     attrs: {
                       title:
-                        "Same to the parent activity"
+                        "Parent activity members can access"
                     }
                   }),
                   h("Option", {
@@ -177,11 +177,11 @@ export default {
                   }),
                   h("Option", {
                     props: {
-                      value: "Same to the parent"
+                      value: "Parent activity members"
                     },
                     attrs: {
                       title:
-                        "Same to the parent activity"
+                        "Parent activity members can access"
                     }
                   }),
                   h("Option", {
@@ -252,11 +252,11 @@ export default {
                   }),
                   h("Option", {
                     props: {
-                      value: "Same to the parent"
+                      value: "Parent activity members"
                     },
                     attrs: {
                       title:
-                        "Same to the parent activity"
+                        "Parent activity members can access"
                     }
                   }),
                   h("Option", {
@@ -327,11 +327,11 @@ export default {
                   }),
                  h("Option", {
                     props: {
-                      value: "Same to the parent"
+                      value: "Parent activity members"
                     },
                     attrs: {
                       title:
-                        "Same to the parent activity"
+                        "Parent activity members can access"
                     }
                   }),
                   h("Option", {

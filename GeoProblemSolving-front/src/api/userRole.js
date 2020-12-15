@@ -143,6 +143,17 @@ function getDefault() {
     return permission;
 }
 
+// Get participants' userId by their roles
+function getMemberByRole(activity, role) {
+    let members = [];
+    for(let i = 0; i< activity.members.length;i++){
+        if(activity.members[i].role == role){
+            members.push(activity.members[i].userId)
+        }
+    }
+    return members;
+}
+
 // Permission: from Json to Array
 function permissionJson2Array(currentPermission) {
 
@@ -470,4 +481,4 @@ function permissionIdentity(currentPermission, role, operation) {
 }
 
 
-export { roleIdentify, getDefault, permissionJson2Array, permissionIdentity }
+export { roleIdentify, getDefault, getMemberByRole, permissionJson2Array, permissionIdentity }

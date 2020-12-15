@@ -776,9 +776,8 @@
                         :mask-closable="false"
                         width="600">
                     <Radio-group v-model="removeMemberName">
-                        <div v-for="(member,index) in projectInfo.members" :key="index"
-                             @click="getRemoveMemberId(member.userId)">
-                            <Radio :label="member.userName"></Radio>
+                        <div @click="getRemoveMemberId(member.userId)">
+                            <Radio  v-for="member in participants" :key="member.name" :label="member.name" style="margin-right: 30px"></Radio>
                         </div>
                     </Radio-group>
                     <div slot="footer" style="display: inline-block">
@@ -1134,9 +1133,9 @@
                     let membersStr = '';
                     for (let i = 0; i < members.length; i++) {
                         if (i == 0) {
-                            membersStr += members[i].userName;
+                            membersStr += members[i].name;
                         } else {
-                            membersStr += ',' + members[i].userName;
+                            membersStr += ',' + members[i].name;
                         }
                     }
                     return membersStr;
@@ -1450,14 +1449,14 @@
                             ) {
                                 return;
                             } else {
+                                let userDetail = this.userInfo;
                                 let description = "User " +
-                                    userDetail.userName +
+                                    userDetail.name +
                                     " apply to join your project: " +
                                     this.applyProjectInfo.name +
                                     " ." +
                                     " The reason for application is: " +
                                     this.applyValidate.reason;
-                                let userDetail = this.userInfo;
                                 for (var i = 0; i < this.applyProjectInfo.members.length; i++) {
                                     if (this.applyProjectInfo.members[i].role == "manager") {
                                         let managerId = this.applyProjectInfo.members[i].userId;
@@ -1465,14 +1464,14 @@
                                         joinForm["recipientId"] = managerId;
                                         joinForm["type"] = "apply";
                                         joinForm["content"] = {
+                                            title: "Project application",
+                                            activityId: this.applyProjectInfo.aid,
+                                            activityName: this.applyProjectInfo.name,
+                                            activityLevel: this.applyProjectInfo.level,
                                             userEmail: userDetail.email,
-                                            userName: userDetail.userName,
+                                            userName: userDetail.name,
                                             userId: userDetail.userId,
-                                            title: "Group application",
                                             description: description,
-                                            projectId: this.applyProjectInfo.aid,
-                                            projectTitle: this.applyProjectInfo.name,
-                                            scope: "project",
                                             approve: "unknow"
                                         };
 
