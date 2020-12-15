@@ -9,6 +9,7 @@ import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import com.alibaba.fastjson.JSONObject;
 import org.omg.CosNaming.NamingContextExtPackage.StringNameHelper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,6 +25,8 @@ public class IUserController {
     TokenTask tokenTask;
     @Autowired
     IUserImpl userDao;
+    @Value("$AuthUrl")
+    String redirectUri;
 
     //存储-1页面
     @RequestMapping(value = "/login", method = RequestMethod.GET)
@@ -33,7 +36,7 @@ public class IUserController {
             StaticParams.referPageUrl = pageUrl;
             // String contextPath = req.getRequestURI().toString();
             //发送邮件
-            return "http://106.14.78.235/AuthServer/oauth/authorize?grant_type=authorization_code&response_type=code&client_id=GSM&scope=all";
+            return "http://106.14.78.235/AuthServer/oauth/authorize?grant_type=authorization_code&response_type=code&client_id=zzy&scope=all";
         } catch (Exception e) {
             return null;
         }

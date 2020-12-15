@@ -47,7 +47,7 @@
       title="Manage toolset and tools"
       width="800"
       :mask-closable="false"
-      :styles="{top: '15px'}"
+      :styles="{ top: '15px' }"
     >
       <Row>
         <Col span="16">
@@ -75,27 +75,51 @@
             </Menu>
           </div>
           <Card dis-hover style="margin-left: 80px">
-            <h2 slot="title" style="padding-top:5px;color: #2d8cf099">{{listTitle()}}</h2>
+            <h2 slot="title" style="padding-top:5px;color: #2d8cf099">
+              {{ listTitle() }}
+            </h2>
             <div slot="extra" style="width:210px;">
-              <Select v-model="typeSelected" @on-change="typeChanged" style="width:160px">
-                <Option v-for="item in typeOptions" :key="item.index" :value="item">{{ item }}</Option>
+              <Select
+                v-model="typeSelected"
+                @on-change="typeChanged"
+                style="width:160px"
+              >
+                <Option
+                  v-for="item in typeOptions"
+                  :key="item.index"
+                  :value="item"
+                  >{{ item }}</Option
+                >
               </Select>
               <i-switch v-model="isPublic">
                 <Icon type="logo-dropbox" slot="open" title="Public"></Icon>
                 <Icon type="ios-cube" slot="close" title="Personal"></Icon>
               </i-switch>
             </div>
-            <div v-if="isPublic&&showMenuItem=='allToolsets'" style="height: 400px;">
+            <div
+              v-if="isPublic && showMenuItem == 'allToolsets'"
+              style="height: 400px;"
+            >
               <vue-scroll :ops="ops" style="height:400px;">
                 <Row>
-                  <draggable element="ul" :options="{group:'toolset'}" v-model="publicToolsetsShow">
-                    <Col span="8" v-for="toolset in publicToolsetsShow" :key="toolset.index">
-                      <Card style="background-color: ghostwhite;margin: 0 5px 10px 5px">
+                  <draggable
+                    element="ul"
+                    :options="{ group: 'toolset' }"
+                    v-model="publicToolsetsShow"
+                  >
+                    <Col
+                      span="8"
+                      v-for="toolset in publicToolsetsShow"
+                      :key="toolset.index"
+                    >
+                      <Card
+                        style="background-color: ghostwhite;margin: 0 5px 10px 5px"
+                      >
                         <div style="text-align:center">
                           <Tooltip placement="bottom" max-width="600">
                             <img
                               :src="toolset.toolsetImg"
-                              v-if="toolset.toolsetImg!=''"
+                              v-if="toolset.toolsetImg != ''"
                               style="height:100%;max-height:50px;"
                             />
                             <avatar
@@ -105,17 +129,19 @@
                               v-else
                             ></avatar>
                             <div slot="content">
-                              <span>{{toolset.description}}</span>
-                              <br v-if="toolset.categoryTag.length>0" />
+                              <span>{{ toolset.description }}</span>
+                              <br v-if="toolset.categoryTag.length > 0" />
                               <p>
-                                <i>{{toolset.categoryTag.join('|')}}</i>
+                                <i>{{ toolset.categoryTag.join("|") }}</i>
                               </p>
                             </div>
                           </Tooltip>
                           <h4
                             :title="toolset.toolsetName"
                             style="display:block;width:90px;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;"
-                          >{{toolset.toolsetName}}</h4>
+                          >
+                            {{ toolset.toolsetName }}
+                          </h4>
                         </div>
                       </Card>
                     </Col>
@@ -123,21 +149,30 @@
                 </Row>
               </vue-scroll>
             </div>
-            <div v-if="!isPublic&&showMenuItem=='allToolsets'" style="height: 400px;">
+            <div
+              v-if="!isPublic && showMenuItem == 'allToolsets'"
+              style="height: 400px;"
+            >
               <vue-scroll :ops="ops" style="height:400px;">
                 <Row>
                   <draggable
                     element="ul"
-                    :options="{group:'toolset'}"
+                    :options="{ group: 'toolset' }"
                     v-model="personalToolsetsShow"
                   >
-                    <Col span="8" v-for="toolset in personalToolsetsShow" :key="toolset.index">
-                      <Card style="background-color: #faebd794;margin: 0 5px 10px 5px">
+                    <Col
+                      span="8"
+                      v-for="toolset in personalToolsetsShow"
+                      :key="toolset.index"
+                    >
+                      <Card
+                        style="background-color: #faebd794;margin: 0 5px 10px 5px"
+                      >
                         <div style="text-align:center">
                           <Tooltip placement="bottom" max-width="600">
                             <img
                               :src="toolset.toolsetImg"
-                              v-if="toolset.toolsetImg!=''"
+                              v-if="toolset.toolsetImg != ''"
                               style="height:100%;max-height:50px;"
                             />
                             <avatar
@@ -147,10 +182,10 @@
                               v-else
                             ></avatar>
                             <div slot="content">
-                              <span>{{toolset.description}}</span>
-                              <br v-if="toolset.categoryTag.length>0" />
+                              <span>{{ toolset.description }}</span>
+                              <br v-if="toolset.categoryTag.length > 0" />
                               <p>
-                                <i>{{toolset.categoryTag.join('|')}}</i>
+                                <i>{{ toolset.categoryTag.join("|") }}</i>
                               </p>
                             </div>
                           </Tooltip>
@@ -158,7 +193,9 @@
                             :title="toolset.toolsetName"
                             style="width:90px;"
                             class="ellipsis"
-                          >{{toolset.toolsetName}}</h4>
+                          >
+                            {{ toolset.toolsetName }}
+                          </h4>
                         </div>
                       </Card>
                     </Col>
@@ -166,11 +203,22 @@
                 </Row>
               </vue-scroll>
             </div>
-            <div v-if="isPublic&&showMenuItem=='allTools'" style="height: 400px;">
+            <div
+              v-if="isPublic && showMenuItem == 'allTools'"
+              style="height: 400px;"
+            >
               <vue-scroll :ops="ops" style="height:400px;">
                 <Row>
-                  <draggable element="ul" :options="{group:'tool'}" v-model="publicToolsShow">
-                    <Col span="8" v-for="tool in publicToolsShow" :key="tool.index">
+                  <draggable
+                    element="ul"
+                    :options="{ group: 'tool' }"
+                    v-model="publicToolsShow"
+                  >
+                    <Col
+                      span="8"
+                      v-for="tool in publicToolsShow"
+                      :key="tool.index"
+                    >
                       <Card
                         style="background-color: ghostwhite;margin: 0 5px 10px 5px;cursor: pointer;"
                       >
@@ -178,7 +226,7 @@
                           <Tooltip placement="bottom" max-width="600">
                             <img
                               :src="tool.toolImg"
-                              v-if="tool.toolImg!=''"
+                              v-if="tool.toolImg != ''"
                               style="height:100%;max-height:50px;"
                             />
                             <avatar
@@ -188,17 +236,19 @@
                               v-else
                             ></avatar>
                             <div slot="content">
-                              <span>{{tool.description}}</span>
-                              <br v-if="tool.categoryTag.length>0" />
+                              <span>{{ tool.description }}</span>
+                              <br v-if="tool.categoryTag.length > 0" />
                               <span>
-                                <i>{{tool.categoryTag.join('|')}}</i>
+                                <i>{{ tool.categoryTag.join("|") }}</i>
                               </span>
                             </div>
                           </Tooltip>
                           <h4
                             :title="tool.toolName"
                             style="display:block;width:90px;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;"
-                          >{{tool.toolName}}</h4>
+                          >
+                            {{ tool.toolName }}
+                          </h4>
                         </div>
                       </Card>
                     </Col>
@@ -206,11 +256,22 @@
                 </Row>
               </vue-scroll>
             </div>
-            <div v-if="!isPublic&&showMenuItem=='allTools'" style="height: 400px;">
+            <div
+              v-if="!isPublic && showMenuItem == 'allTools'"
+              style="height: 400px;"
+            >
               <vue-scroll :ops="ops" style="height:400px;">
                 <Row>
-                  <draggable element="ul" :options="{group:'tool'}" v-model="personalToolsShow">
-                    <Col span="8" v-for="tool in personalToolsShow" :key="tool.index">
+                  <draggable
+                    element="ul"
+                    :options="{ group: 'tool' }"
+                    v-model="personalToolsShow"
+                  >
+                    <Col
+                      span="8"
+                      v-for="tool in personalToolsShow"
+                      :key="tool.index"
+                    >
                       <Card
                         style="background-color: #faebd794;margin: 0 5px 10px 5px;cursor: pointer;"
                       >
@@ -218,7 +279,7 @@
                           <Tooltip placement="bottom" max-width="600">
                             <img
                               :src="tool.toolImg"
-                              v-if="tool.toolImg!=''"
+                              v-if="tool.toolImg != ''"
                               style="height:100%;max-height:50px;"
                             />
                             <avatar
@@ -228,10 +289,10 @@
                               v-else
                             ></avatar>
                             <div slot="content">
-                              <span>{{tool.description}}</span>
-                              <br v-if="tool.categoryTag.length>0" />
+                              <span>{{ tool.description }}</span>
+                              <br v-if="tool.categoryTag.length > 0" />
                               <span>
-                                <i>{{tool.categoryTag.join('|')}}</i>
+                                <i>{{ tool.categoryTag.join("|") }}</i>
                               </span>
                             </div>
                           </Tooltip>
@@ -239,7 +300,9 @@
                             :title="tool.toolName"
                             style="width:90px;"
                             class="ellipsis"
-                          >{{tool.toolName}}</h4>
+                          >
+                            {{ tool.toolName }}
+                          </h4>
                         </div>
                       </Card>
                     </Col>
@@ -255,20 +318,28 @@
               <h2
                 slot="title"
                 style="padding-top:5px"
-                v-if="showMenuItem=='allToolsets'"
-              >Toolsets in step</h2>
-              <h2 slot="title" style="padding-top:5px" v-if="showMenuItem=='allTools'">Tools in step</h2>
-              <div style="height: 400px;" v-if="showMenuItem=='allToolsets'">
+                v-if="showMenuItem == 'allToolsets'"
+              >
+                Toolsets in step
+              </h2>
+              <h2
+                slot="title"
+                style="padding-top:5px"
+                v-if="showMenuItem == 'allTools'"
+              >
+                Tools in step
+              </h2>
+              <div style="height: 400px;" v-if="showMenuItem == 'allToolsets'">
                 <vue-scroll :ops="ops" style="height:400px;">
                   <draggable
                     element="ul"
-                    :group="{name:'toolset', put:true, pull:false}"
+                    :group="{ name: 'toolset', put: true, pull: false }"
                     v-model="stepToolsetsShow"
                     @add="addToolsettoStep"
                     style="min-height:400px"
                   >
                     <Card
-                      v-for="(toolset,index) in stepToolsetsShow"
+                      v-for="(toolset, index) in stepToolsetsShow"
                       :key="toolset.index"
                       class="stepItems"
                       style="margin:0 0 5px 0"
@@ -278,8 +349,9 @@
                           class="ellipsis"
                           type="text"
                           style="width: 140px;padding:0"
-                          @click="showInfo(toolset,toolset.toolsetName)"
-                        >{{toolset.toolsetName}}</Button>
+                          @click="showInfo(toolset, toolset.toolsetName)"
+                          >{{ toolset.toolsetName }}</Button
+                        >
                         <Button
                           shape="circle"
                           icon="md-remove"
@@ -293,17 +365,17 @@
                   </draggable>
                 </vue-scroll>
               </div>
-              <div style="height: 400px;" v-if="showMenuItem=='allTools'">
+              <div style="height: 400px;" v-if="showMenuItem == 'allTools'">
                 <vue-scroll :ops="ops" style="height:400px;">
                   <draggable
                     element="ul"
-                    :group="{name:'tool', put:true, pull:false}"
+                    :group="{ name: 'tool', put: true, pull: false }"
                     v-model="stepToolsShow"
                     @add="addTooltoStep"
                     style="min-height:400px"
                   >
                     <Card
-                      v-for="(tool,index) in stepToolsShow"
+                      v-for="(tool, index) in stepToolsShow"
                       :key="tool.index"
                       class="stepItems"
                       style="margin:0 0 5px 0"
@@ -313,8 +385,9 @@
                           class="ellipsis"
                           type="text"
                           style="width: 140px;padding:0"
-                          @click="showInfo(tool,tool.toolName)"
-                        >{{tool.toolName}}</Button>
+                          @click="showInfo(tool, tool.toolName)"
+                          >{{ tool.toolName }}</Button
+                        >
                         <Button
                           shape="circle"
                           icon="md-remove"
@@ -333,8 +406,8 @@
         </Col>
       </Row>
       <div slot="footer">
-        <Button @click="stepToolModal=false">Cancel</Button>
-        <Button type="success" @click="confirmSetting()">Save</Button>
+        <Button @click="stepToolModal = false">Cancel</Button>
+        <Button type="success" @click="confirmSetting">Save</Button>
       </div>
     </Modal>
     <Modal v-model="infoModal" title="Info of the toolset or tool" width="400">
@@ -349,25 +422,25 @@
           <tbody>
             <tr>
               <td>Name</td>
-              <td>{{itemInfo.name}}</td>
+              <td>{{ itemInfo.name }}</td>
             </tr>
             <tr>
               <td>Description</td>
-              <td>{{itemInfo.description}}</td>
+              <td>{{ itemInfo.description }}</td>
             </tr>
             <tr>
               <td>Tags</td>
-              <td>{{itemInfo.tags.join(',')}}</td>
+              <td>{{ itemInfo.tags.join(",") }}</td>
             </tr>
             <tr>
               <td>Step</td>
-              <td>{{itemInfo.recomStep.join(',')}}</td>
+              <td>{{ itemInfo.recomStep.join(",") }}</td>
             </tr>
           </tbody>
         </table>
       </div>
       <div slot="footer">
-        <Button type="info" @click="infoModal=false">OK</Button>
+        <Button type="info" @click="infoModal = false">OK</Button>
       </div>
     </Modal>
   </div>
@@ -378,14 +451,17 @@ import Avatar from "vue-avatar";
 import draggable from "vuedraggable";
 import { get, del, post, put } from "../../axios";
 export default {
-  props: ["stepInfo"],
+  props: ["activityInfo"],
   components: {
     draggable,
     Avatar
   },
   watch: {
-    stepInfo(val) {
-      this.init();
+    activityInfo: {
+      handler(val) {
+        this.init();
+      },
+      deep: true
     },
     stepToolModal(val) {
       if (!val) {
@@ -462,9 +538,10 @@ export default {
       };
     },
     init() {
-      this.stepId = this.stepInfo.stepId;
-      this.stepToolsetIds = this.stepInfo.toolsetList;
-      this.stepToolIds = this.stepInfo.toolList;
+      console.log(this.activityInfo);
+      this.stepId = this.activityInfo.aid;
+      this.stepToolsetIds = this.activityInfo.toolsetList;
+      this.stepToolIds = this.activityInfo.toolList;
     },
     getAllListInfo() {
       this.getPublicToolsets();
@@ -817,6 +894,7 @@ export default {
       }
       this.filterShowListByType();
     },
+
     confirmSetting() {
       var newStepToolsets = [];
       var newStepTools = [];
@@ -826,12 +904,24 @@ export default {
       this.stepToolsShow.forEach(tool => {
         newStepTools.push(tool.tid);
       });
-      let obj = new URLSearchParams();
-      obj.append("stepId", this.stepInfo.stepId);
-      obj.append("toolsetList", newStepToolsets);
-      obj.append("toolList", newStepTools);
+      // let obj = new URLSearchParams();
+      // obj.append("aid", this.activityInfo.aid);
+      // obj.append("toolsetList", newStepToolsets);
+      // obj.append("toolList", newStepTools);
+      let object = {
+        toolsetList: newStepToolsets,
+        toolList: newStepTools
+      };
+
+      console.log(this.activityInfo);
+      let flag = "";
+      if (this.activityInfo.level <= 1) {
+        flag = "project";
+      } else {
+        flag = "activity";
+      }
       this.axios
-        .post("/GeoProblemSolving/step/update", obj)
+        .put(`/GeoProblemSolving/${flag}/${this.activityInfo.aid}`, object)
         .then(res => {
           if (res.data == "Offline") {
             this.$store.commit("userLogout");
@@ -842,6 +932,7 @@ export default {
             // this.$Notice.error({ desc: "There is no existing tool" });
           } else {
             //此处要更新父组件的列表
+            console.log(res.data);
             this.$emit("updateStepTools", newStepTools, newStepToolsets);
             this.stepToolModal = false;
           }

@@ -231,33 +231,39 @@
           v-for="member in participants"
           :key="member.name"
         >
-          <div v-if="delUserBtn">
-            <Icon type="md-remove-circle" size="20" color="#ed4014" />
-          </div>
-          <div
-            style="display: flex; align-items: center; cursor: pointer"
-            @click="gotoPersonalSpace(member.userId)"
-          >
-            <div class="memberImg" style="position: relative">
-              <img
-                v-if="member.avatar != '' && member.avatar != undefined"
-                :src="member.avatar"
-                style="width: 40px; height: 40px"
-              />
-              <avatar
-                v-else
-                :username="member.name"
-                :size="40"
-                :rounded="true"
-              />
-              <div class="onlinecircle"></div>
+          <div style="display: flex; align-items: center">
+            <div
+              v-if="delUserBtn"
+              style="cursor: pointer; margin-right: 10px"
+              @click="removeUser(member)"
+            >
+              <Icon type="md-remove-circle" size="20" color="#ed4014" />
             </div>
-            <div class="memberDetail">
-              <div class="memberName">
-                <span>{{ member.name }}</span>
+            <div
+              @click="gotoPersonalSpace(member.userId)"
+              style="display: flex; align-items: center; cursor: pointer"
+            >
+              <div class="memberImg" style="position: relative">
+                <img
+                  v-if="member.avatar != '' && member.avatar != undefined"
+                  :src="member.avatar"
+                  style="width: 40px; height: 40px"
+                />
+                <avatar
+                  v-else
+                  :username="member.name"
+                  :size="40"
+                  :rounded="true"
+                />
+                <div class="onlinecircle"></div>
               </div>
-              <div class="memberRole">
-                <span>{{ member.role }}</span>
+              <div class="memberDetail">
+                <div class="memberName">
+                  <span>{{ member.name }}</span>
+                </div>
+                <div class="memberRole">
+                  <span>{{ member.role }}</span>
+                </div>
               </div>
             </div>
           </div>
@@ -671,7 +677,23 @@ export default {
           .post(url)
           .then((res) => {
             if (res.data.code == 0) {
-              this.sendInvitation(user, activity);
+              //notice
+              let notice = {
+                recipientId: user.userId,
+                type: "notice",
+                content: {
+                  title: "Join activity",
+                  description:
+                    "You have been invited by " +
+                    this.userInfo.name +
+                    " to join the activity: " +
+                    activity.name +
+                    " in project: " +
+                    this.projectInfo.name +
+                    " , and now you are a member in this activity!",
+                },
+              };
+              this.sendNotice(user, activity, notice);
               this.participants.push(user);
             } else {
               console.log(res.data.msg);
@@ -682,23 +704,54 @@ export default {
           });
       }
     },
-    sendInvitation(user, activity) {
-      //notice
-      let notice = {
-        recipientId: user.userId,
-        type: "notice",
-        content: {
-          title: "Join subproject",
-          description:
-            "You have been invited by " +
-            this.userInfo.name +
-            " to join the activity: " +
-            activity.name +
-            " in project: " +
-            this.projectInfo.name +
-            " , and now you are a member in this activity!",
-        },
-      };
+    removeUser(member) {
+      let url = "";
+      let activity = this.activityInfo;
+      if (activity.level == 1) {
+        url =
+          "/GeoProblemSolving/subproject/" +
+          activity.aid +
+          "/user?userId=" +
+          user.userId;
+      } else if (activity.level > 1) {
+        url =
+          "/GeoProblemSolving/activity/" +
+          activity.aid +
+          "/user?userId=" +
+          user.userId;
+      } else {
+        return;
+      }
+
+      this.axios
+        .delete(url)
+        .then((res) => {
+          if (res.data.code == 0) {
+            //notice
+            let notice = {
+              recipientId: member.userId,
+              type: "notice",
+              content: {
+                title: "Leave activity",
+                description:
+                  "You have been remove from the activity: " +
+                  activity.name +
+                  " in project: " +
+                  this.projectInfo.name +
+                  ".",
+              },
+            };
+            this.sendNotice(member, activity, notice);
+            this.participants.push(user);
+          } else {
+            console.log(res.data.msg);
+          }
+        })
+        .catch((err) => {
+          throw err;
+        });
+    },
+    sendNotice(user, activity, notice) {
       this.axios
         .post("/GeoProblemSolving/notice/save", notice)
         .then((result) => {
@@ -712,7 +765,6 @@ export default {
           throw err;
         });
     },
-    removeUser() {},
     gotoPersonalSpace(id) {
       if (id == this.$store.getters.userId) {
         parent.location.href = "/GeoProblemSolving/personalPage";
@@ -760,6 +812,6 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  max-width: 50%;
+  max-width: 100%;
 }
 </style>

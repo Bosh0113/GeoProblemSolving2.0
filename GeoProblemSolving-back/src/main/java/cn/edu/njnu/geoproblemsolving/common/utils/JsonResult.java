@@ -26,5 +26,6 @@ public class JsonResult<T> {
 
     @ApiModelProperty (value = "数据体")
     private T data;
+
 }
 
