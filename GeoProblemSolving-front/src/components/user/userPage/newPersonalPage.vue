@@ -75,7 +75,7 @@
         </div>
       </Col>
 
-      <Col span="20" offset="1">
+      <Col span="19" offset="1">
         <notification />
       </Col>
     </Row>
