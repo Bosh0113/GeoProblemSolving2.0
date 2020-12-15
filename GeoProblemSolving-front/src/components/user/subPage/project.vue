@@ -167,36 +167,38 @@
       <Col span="3" offset="1">
         <!--    Event History-->
         <Card dis-hover class="historyLine" >
-          <p slot="title">Event line</p>
-          <div class="timeLineStyle">
-            <vue-scroll :ops="ops">
-              <Timeline>
-                <div v-if="userEventList.length==0">
-                  <div style="display:flex;justify-content:center">
-                    <Icon type="md-alert" size="40" color="gray" />
-                  </div>
-                  <br />
-                  <div style="display:flex;justify-content:center">
-                    <h3
-                      style="text-align:center;width:80%"
-                    >Sorry, there are no events now.</h3>
-                  </div>
+        <p slot="title">Event line</p>
+        <div class="timeLineStyle">
+          <vue-scroll :ops="ops">
+            <Timeline>
+              <div v-if="userEventList.length==0">
+                <div style="display:flex;justify-content:center">
+                  <Icon type="md-alert" size="40" color="gray" />
                 </div>
-                <TimelineItem
-                  v-for="(item,index) in userEventList"
-                  :key="index"
-                  v-show="userEventList.length>0"
-                >
-                  <strong>
-                    <p class="time">{{item.createTime}}</p>
-                  </strong>
-                  <p class="content">{{item.description}}</p>
-                </TimelineItem>
-              </Timeline>
-            </vue-scroll>
-          </div>
-        </Card>
+                <br />
+                <div style="display:flex;justify-content:center">
+                  <h3
+                    style="text-align:center;width:80%"
+                  >Sorry, there are no events now.</h3>
+                </div>
+              </div>
+              <TimelineItem
+                v-for="(item,index) in userEventList"
+                :key="index"
+                v-show="userEventList.length>0"
+              >
+                <strong>
+                  <p class="time">{{item.createTime}}</p>
+                </strong>
+                <p class="content">{{item.description}}</p>
+              </TimelineItem>
+            </Timeline>
+          </vue-scroll>
+        </div>
+      </Card>
       </Col>
+
+<!--      模态框     -->
       <Modal
         v-model="deleteProjectModal"
         @on-ok="deleteProject"

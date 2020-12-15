@@ -67,12 +67,12 @@ public class IResourceServiceImpl implements IResourceService {
                         if (part.getSize() < 1024 * 1024 * 1024) {
                             String fileName = part.getSubmittedFileName();
                             MultipartFile multipartFile = new MockMultipartFile(ContentType.APPLICATION_OCTET_STREAM.toString(), part.getInputStream());
-                            valueMap.add("ogmsdata", multipartFile.getResource());
+                            valueMap.add("datafile", multipartFile.getResource());
                             valueMap.add("name", fileName);
                             valueMap.add("userId", session.getAttribute("userId"));
                             valueMap.add("serverNode", "china");
                             valueMap.add("origination", "GeoProblemSolving");
-                            String uploadRemoteUrl = "http://" + dataRemoteIp + "/dataNoneConfig";
+                            String uploadRemoteUrl = "http://" + dataRemoteIp + "/data";
                             //向dataContainer传输数据
                             JSONObject uploadRemoteResult = httpUtil.uploadRemote(uploadRemoteUrl, valueMap);
                             String uploadResultInfo = (String)uploadRemoteResult.get("msg");

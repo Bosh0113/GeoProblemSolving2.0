@@ -103,7 +103,7 @@
                   <h4 style="font-size: 13px">{{item.content.title}}</h4>
                   <p style="font-weight: 400; font-size: 15px">{{item.content.description}}</p>
                   <small style="font-size: 11px">{{item.createTime}}</small>
-                  <Icon type="md-close" class="applyBtn" style="color: #ed4014" @click="delNotification(item)" />
+                  <Icon type="md-close" class="applyBtn" style="color: #ed4014" @click="deleteNotice(item)" />
                 </Card>
               </div>
             </div>
@@ -111,8 +111,6 @@
             <div v-else>
               <Card>
                 <h1 style="color: darkgray; text-align: center;">No Notifications</h1>
-                {{selectNoteNum}}
-
               </Card>
 
             </div>
@@ -284,154 +282,15 @@
           this.$Message.error("load notifications fail");
         })
       },
-      refuseApply(item) {
-        let updateApply = new URLSearchParams();
-        updateApply.append("noticeId", item.noticeId);
-        updateApply.append("content.approve", "false");
-        updateApply.append("state", "read");
+      deleteNotice(notice) {
         this.axios
-          .post("/GeoProblemSolving/notice/update", updateApply)
-          .then(res => {
+          .get(
+            "/GeoProblemSolving/notice/delete" + "?noticeId=" + notice.noticeId
+          )
+          .then((res) => {
             if (res.data == "Offline") {
               this.$store.commit("userLogout");
-              this.$router.push({name: "Login"});
-            } else if (res.data == "Success") {
-              //????????这个什么意思
-              this.$emit("readNotification");
-              //也算是JSONObject
-              let replyNotice = {};
-              replyNotice["recipientId"] = item.content.userId;
-              replyNotice["type"] = "notice";
-              replyNotice["content"] = {
-                title: "Result for application",
-                description:
-                  "Sorry, you were refused to join the project: " + item.content.projectTitle + "."
-              };
-              this.axios.post("/GeoProblemSolving/notice/save", replyNotice)
-                .then(res => {
-                  if (res.data == "Success") {
-                    this.$emit("sendNotice", item.content.userId);
-                  } else {
-                    this.$Message.error("reply fail.")
-                  }
-                })
-                .catch(err => {
-                  this.$Message.error("reply fail.")
-                })
-            }
-          }).catch(err => {
-          this.$Message.error("update notification fail.")
-        })
-      },
-      approveApply(item) {
-        let updateApply = new URLSearchParams();
-        updateApply.append("noticeId", item.noticeId);
-        updateApply.append("content.approve", "true");
-        updateApply.append("state", "read");
-        this.axios.post("/GeoProblemSolving/notice/update", updateApply)
-          .then(res => {
-            if (res.data == "Offline") {
-              this.$store.commit("userLogout");
-              this.$router.push({name: "Login"});
-            } else if (res.data == "Success") {
-              this.$emit("readNotification");
-              //更新项目成员
-              this.axios
-                .get(
-                  "/GeoProblemSolving/" + item.content.scope + "/join?" +
-                  item.content.scope + "Id=" + item.content.projectId +
-                  "&userId=" + item.content.userId)
-                .then(res => {
-                  if (res.data === "Fail") {
-                    this.$Message.error("Join fail.");
-                  } else if (res.data === "Exist") {
-                    this.$Message.info(
-                      "He/she is already a member of the " + item.content.scope + "."
-                    );
-                  }
-                })
-                .catch(err => {
-                  this.$Message.error("Join fail.")
-                })
-              //reply to apply
-              let replyNotice = {};
-              replyNotice["recipientId"] = item.content.userId;
-              replyNotice["type"] = "notice";
-              replyNotice["content"] = {
-                title: "Result for application",
-                description:
-                  "Congratulations for joining the " + item.content.scope +
-                  ":" + item.content.projectTitle + "."
-              };
-              this.axios
-                .post("/GeoProblemSolving/notice/save", replyNotice)
-                .then(res => {
-                  if (res.data == "Success") {
-                    this.$emit("sendNotice", item.content.userId);
-                    let resultEmailBody = {};
-                    resultEmailBody["recipient"] = item.content.userEmail;
-                    resultEmailBody["mailTitle"] = "Join project result";
-                    resultEmailBody["mailContent"] = "Hello, " + apply.content.userName + ", Congratulations for joining the " + apply.content.scope + ": " + apply.content.projectTitle + " .";
-                    this.axios.post("/GeoProblemSolving/email/send", resultEmailBody)
-                      .then(res => {
-                        if (res.data == "Success") {
-                          this.$Notice.success({
-                            title: "Result for application",
-                            desc:
-                              "The process result email has been sent,if he/she doesn't online,the email will remind the joiner in time."
-                          });
-                        } else {
-                          this.$Notice.error({
-                            title: "Email send fail",
-                            desc: "The invitation isn't be sent successfully."
-                          })
-                        }
-                      })
-                      .catch(err => {
-                        console.log(err.data);
-                      })
-                  } else {
-                    this.$Message.error("reply fail.")
-                  }
-                })
-                .catch(err => {
-                  this.$Message.error("replay fail.");
-                })
-
-            }
-          })
-          .catch(err => {
-            this.$Message.error("reply fail.")
-          })
-      },
-      readNotice(noticeId) {
-        this.axios
-          .get("/GeoProblemSolving/notice/read" + "?noticeId=" + noticeId)
-          .then(res => {
-            if (res.data == "Offline") {
-              this.$store.commit("userLogout");
-              this.$router.push({name: "Login"});
-            } else if (res.data == "Success") {
-              this.$emit("readNotification");
-              this.$store.commit("getUserInfo");
-              this.loadNotifications();
-            } else {
-              this.$Message.error("update notification fail.");
-            }
-          })
-          .catch(err => {
-            this.$Message.error("update notification fail.");
-          });
-      },
-      readAllNotice() {
-      },
-      delNotification(item) {
-        this.axios
-          .get("/GeoProblemSolving/notice/delete" + "?noticeId=" + item.noticeId)
-          .then(res => {
-            if (res.data == "Offline") {
-              this.$store.commit("userLogout");
-              this.$router.push({name: "Login"});
+              this.$router.push({ name: "Login" });
             } else if (res.data == "Success") {
               this.$Message.success("delete notification success.");
               if (notice.state == "unread") {
@@ -442,8 +301,250 @@
               this.$Message.error("delete notification fail.");
             }
           })
-          .catch(err => {
+          .catch((err) => {
             this.$Message.error("delete notification fail.");
+          });
+      },
+      readAllNotice() {
+        var unreadList = this.noticeList.filter(function (notice) {
+          if (notice.state == "unread") {
+            return notice;
+          }
+        });
+        var unreadCount = unreadList.length;
+        for (var i = 0; i < unreadList.length; i++) {
+          this.axios
+            .get(
+              "/GeoProblemSolving/notice/read" +
+              "?noticeId=" +
+              unreadList[i].noticeId
+            )
+            .then((res) => {
+              if (res.data == "Offline") {
+                this.$store.commit("userLogout");
+                this.$router.push({ name: "Login" });
+              } else if (res.data == "Success") {
+                this.$emit("readNotification");
+                this.$store.commit("getUserInfo");
+                if (--unreadCount == 0) {
+                  this.loadNotifications();
+                }
+              } else {
+                this.$Message.error("update notification fail.");
+              }
+            })
+            .catch((err) => {
+              this.$Message.error("update notification fail.");
+            });
+        }
+      },
+      readNotice(noticeId) {
+        this.axios
+          .get("/GeoProblemSolving/notice/read" + "?noticeId=" + noticeId)
+          .then((res) => {
+            if (res.data == "Offline") {
+              this.$store.commit("userLogout");
+              this.$router.push({ name: "Login" });
+            } else if (res.data == "Success") {
+              this.$emit("readNotification");
+              this.$store.commit("getUserInfo");
+              this.loadNotifications();
+            } else {
+              this.$Message.error("update notification fail.");
+            }
+          })
+          .catch((err) => {
+            this.$Message.error("update notification fail.");
+          });
+      },
+      gotoWork(noticeId, subProjectId) {
+        //路由跳转好像和回调的关系有点问题，这样在回调之前就已经跳转了，回调的内容好像没啥用
+        this.axios
+          .get("/GeoProblemSolving/notice/read" + "?noticeId=" + noticeId)
+          .then((res) => {
+            if (res.data == "Offline") {
+              this.$store.commit("userLogout");
+              this.$router.push({ name: "Login" });
+            } else if (res.data == "Success") {
+              this.$emit("readNotification");
+              this.loadNotifications();
+            } else {
+              this.$Message.error("update notification fail.");
+            }
+          })
+          .catch((err) => {
+            this.$Message.error("update notification fail.");
+          });
+
+        this.$router.push(`./project/${id}/subproject`);
+      },
+      refuseApply(apply) {
+        let updateApply = new URLSearchParams();
+        updateApply.append("noticeId", apply.noticeId);
+        updateApply.append("content.approve", "false");
+        updateApply.append("state", "read");
+        this.axios
+          .post("/GeoProblemSolving/notice/update", updateApply)
+          .then((res) => {
+            if (res.data == "Offline") {
+              this.$store.commit("userLogout");
+              this.$router.push({ name: "Login" });
+            } else if (res.data == "Success") {
+              this.$emit("readNotification");
+              this.loadNotifications();
+              let replyNotice = {};
+              replyNotice["recipientId"] = apply.content.userId;
+              replyNotice["type"] = "notice";
+              replyNotice["content"] = {
+                title: "Result for application",
+                description:
+                  "Sorry, you were refused to join the activity: " +
+                  apply.content.activityName +
+                  " .",
+              };
+              this.axios
+                .post("/GeoProblemSolving/notice/save", replyNotice)
+                .then((result) => {
+                  if (result.data == "Success") {
+                    this.$emit("sendNotice", apply.content.userId);
+                  } else {
+                    this.$Message.error("reply fail.");
+                  }
+                })
+                .catch((err) => {
+                  this.$Message.error("reply fail.");
+                });
+            } else {
+              this.$Message.error("update notification fail.");
+            }
+          })
+          .catch((err) => {
+            this.$Message.error("update notification fail.");
+          });
+      },
+      approveApply(apply) {
+        let updateApply = new URLSearchParams();
+        updateApply.append("noticeId", apply.noticeId);
+        updateApply.append("content.approve", "true");
+        updateApply.append("state", "read");
+        // 更新通知
+        this.axios
+          .post("/GeoProblemSolving/notice/update", updateApply)
+          .then((res) => {
+            if (res.data == "Offline") {
+              this.$store.commit("userLogout");
+              this.$router.push({ name: "Login" });
+            } else if (res.data == "Success") {
+              this.$emit("readNotification");
+              this.loadNotifications();
+
+              //update project members
+              this.joinActivity(apply);
+
+              //reply to applicant
+              let replyNotice = {};
+              replyNotice["recipientId"] = apply.content.userId;
+              replyNotice["type"] = "notice";
+              replyNotice["content"] = {
+                title: "Result for application",
+                description:
+                  "Congratulations for joining the activity: " +
+                  apply.content.activityName +
+                  " .",
+              };
+              this.axios
+                .post("/GeoProblemSolving/notice/save", replyNotice)
+                .then((result) => {
+                  if (result.data == "Success") {
+                    this.$emit("sendNotice", apply.content.userId);
+                    let resultEmailBody = {};
+                    resultEmailBody["recipient"] = apply.content.userEmail;
+                    resultEmailBody["mailTitle"] = "Join project result";
+                    resultEmailBody["mailContent"] =
+                      "Hello, " +
+                      apply.content.userName +
+                      ", Congratulations for joining the activity: " +
+                      apply.content.activityName +
+                      " .";
+                    this.axios
+                      .post("/GeoProblemSolving/email/send", resultEmailBody)
+                      .then((res) => {
+                        if (res.data == "Success") {
+                          this.$Notice.success({
+                            title: "Result for application",
+                            desc:
+                              "The process result email has been sent,if he/she doesn't online,the email will remind the joiner in time.",
+                          });
+                        } else {
+                          this.$Notice.error({
+                            title: "Email send fail",
+                            desc: "The invitation isn't be sent successfully.",
+                          });
+                        }
+                      })
+                      .catch((err) => {
+                        console.log(err.data);
+                      });
+                  } else {
+                    this.$Message.error("reply fail.");
+                  }
+                })
+                .catch((err) => {
+                  this.$Message.error("reply fail.");
+                });
+
+              // 发送审核通过的邮件
+              // let resultEmailBody = {};
+              // resultEmailBody["recipient"] =
+            } else {
+              this.$Message.error("update notification fail.");
+            }
+          })
+          .catch((err) => {
+            this.$Message.error("update notification fail.");
+          });
+      },
+      joinActivity(apply) {
+        let url = "";
+        if (apply.content.activityLevel == 0) {
+          url =
+            "/GeoProblemSolving/project/" +
+            apply.content.activityId +
+            "/user?userId=" +
+            apply.content.userId;
+        } else if (apply.content.activityLevel == 1) {
+          url =
+            "/GeoProblemSolving/subproject/" +
+            apply.content.activityId +
+            "/user?userId=" +
+            apply.content.userId;
+        } else if (apply.content.activityLevel > 1) {
+          url =
+            "/GeoProblemSolving/activity/" +
+            apply.content.activityId +
+            "/user?userId=" +
+            apply.content.userId;
+        } else {
+          return;
+        }
+
+        this.axios
+          .post(url)
+          .then((res) => {
+            if (res.data.code == 0) {
+              this.$Message.info("Successfully approval.");
+            } else if (res.data.code == -3) {
+              this.$Message.info(
+                "The applicant has already been a member of the activity: " +
+                apply.content.activityName +
+                " ."
+              );
+            } else {
+              console.log(res.data.msg);
+            }
+          })
+          .catch((err) => {
+            throw err;
           });
       },
     }
@@ -481,7 +582,8 @@
 
   .applyBtn {
     float: right;
-    padding: 1px 20px;
+    padding: 5px 10px;
+    margin: 0 10px;
     cursor: pointer;
   }
 </style>

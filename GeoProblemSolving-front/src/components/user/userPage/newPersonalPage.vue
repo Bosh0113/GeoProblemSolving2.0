@@ -76,7 +76,8 @@
       </Col>
 
       <Col span="19" offset="1">
-        <notification />
+<!--        <notification />-->
+        <resource />
       </Col>
     </Row>
   </div>
@@ -87,13 +88,15 @@
   import projectVue from "../subPage/project.vue";
   import ToWork from "../../projects/toWork";
   import notification from "../subPage/notification";
+  import resource from "../subPage/resource";
 
   export default {
     name: "newPersonalPage",
     components: {
       ToWork,
       projectVue,
-      notification
+      notification,
+      resource
     },
     data() {
       return {}
