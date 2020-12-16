@@ -7,7 +7,7 @@ import lombok.Data;
 
 import java.util.List;
 
-@ApiModel(value = "概念图对象：ConceptMap")
+@ApiModel(value = "ConceptMap")
 @Data
 public class ConceptMap {
     String id;

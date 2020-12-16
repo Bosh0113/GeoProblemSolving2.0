@@ -3,12 +3,12 @@
     <!-- <el-button @click="getAllRecords">getAllRecords</el-button>
     <el-button @click="loadingClose">close</el-button>-->
     <el-row class="title">
-      <el-col>{{ modelIntroduction.modelName }}</el-col>
+      <el-col>{{ modelIntroduction.name }}</el-col>
     </el-row>
 
     <el-row>
       <el-col :span="6">
-        <p class="des">{{ modelIntroduction.modelIntro }}</p>
+        <p class="des">{{ modelIntroduction.description }}</p>
       </el-col>
       <el-col :span="2" :offset="12" class="save-btn">
         <el-button plain type="primary" @click="invokeTest">
@@ -179,7 +179,7 @@
     </el-row>
     <el-dialog
       :visible.sync="selectDataDialogShow"
-      width="50%"
+      width="1000px"
       title="Select data from Resource Center or Upload"
     >
       <resource-list></resource-list>

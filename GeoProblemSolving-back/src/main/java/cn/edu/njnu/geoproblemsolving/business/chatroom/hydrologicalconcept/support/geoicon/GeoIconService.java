@@ -35,7 +35,7 @@ public class GeoIconService {
         File file = new File(folderPath,new Date().getTime() + "_geoIcon.png");
         mfile.transferTo(file);
 
-        geoIcon.setPathUrl("/static/geoIcon/" + file.getName());
+        geoIcon.setPathUrl("/static/static/geoIcon/" + file.getName());
         geoIconDao.insert(geoIcon);
         return "ok";
     }

@@ -66,7 +66,7 @@ public class ConceptMapService {
         MxGraphUtils mxGraphUtils = new MxGraphUtils();
         mxGraphUtils.exportImage(conceptMap.getWidth(), conceptMap.getHeight(), conceptMap.getXml(), resourcePath+"/conceptMap/", name);
 
-        conceptMap.setPathUrl("/static/conceptMap/" + name);
+        conceptMap.setPathUrl("/static/static/conceptMap/" + name);
         Boolean f = conceptMapDao.existsByGeoId(conceptMap.getGeoId());
         if (f){
             ConceptMap map = conceptMapDao.findConceptMapByGeoId(conceptMap.getGeoId());

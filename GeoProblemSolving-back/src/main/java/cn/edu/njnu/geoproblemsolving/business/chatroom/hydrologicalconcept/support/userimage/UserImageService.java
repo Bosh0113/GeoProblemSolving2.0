@@ -40,7 +40,7 @@ public class UserImageService {
         UserImage userImage = new UserImage();
         userImage.setGeoId(UUID.randomUUID().toString());
         userImage.setName(mfile.getOriginalFilename());
-        userImage.setPathUrl("/static/userImage/" + file.getName());
+        userImage.setPathUrl("/static/static/userImage/" + file.getName());
 
         //获取conceptId
         Concepts c = conceptsService.findByName(conceptName);
@@ -59,7 +59,7 @@ public class UserImageService {
 
         userImage.setGeoId(UUID.randomUUID().toString());
         userImage.setName(name);
-        userImage.setPathUrl("/static/userImage/" + name);
+        userImage.setPathUrl("/static/static/userImage/" + name);
 
         //获取conceptId
         Concepts c = conceptsService.findByName(conceptName);

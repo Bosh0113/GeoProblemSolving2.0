@@ -5,7 +5,7 @@ import lombok.Data;
 
 import java.util.List;
 
-@ApiModel("地理图标对象：GeoIcon")
+@ApiModel("GeoIcon")
 @Data
 public class GeoIcon {
     String geoId;

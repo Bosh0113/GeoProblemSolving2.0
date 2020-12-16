@@ -55,7 +55,11 @@ public class ChatServerSocket {
     public void onOpen(@PathParam("roomId") String roomId, Session session, EndpointConfig config) throws IOException {
         HttpSession httpSession = (HttpSession) config.getUserProperties().get(HttpSession.class.getName());
         String userId = httpSession.getAttribute("userId").toString();
-        String userName = httpSession.getAttribute("userName").toString();
+        String a = httpSession.getAttribute("email").toString();
+        String userName = ((HttpSession) config.getUserProperties().get(HttpSession.class.getName())).getAttribute("name").toString();
+//        String userName = httpSession.getAttribute(" name").toString();
+
+
 //        JsonResult userInfo =  iUserDao.getUserInfo("userId",userId);
 //        String userAvatar = ((InquiryUserDto)userInfo.getData()).getAvatar();
 

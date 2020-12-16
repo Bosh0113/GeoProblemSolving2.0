@@ -1,16 +1,24 @@
 <template>
   <div class="panel-body" id="concept-panel">
-    <vue-scroll :ops="ops" :style="{height:height-50+'px'}">
-      <Collapse simple v-for="(map,indexMap) in conceptMap" :key="indexMap">
+    <vue-scroll :ops="ops" style="height:calc(79vh)">
+      <Collapse simple v-for="(map, indexMap) in conceptMap" :key="indexMap">
         <Panel>
-          {{map.name}}
+          {{ map.name }}
           <div slot="content">
             <Collapse accordion v-model="collapseValue">
               <Panel name="MainMap" v-show="map.pathUrl != ''">
                 Main Map
                 <div slot="content">
                   <Col>
-                    <img :src="'http://'+ windowHost+'/GeoProblemSolving'+map.pathUrl" class="pic" />
+                    <img
+                      :src="
+                        'http://' +
+                          windowHost +
+                          '/GeoProblemSolving' +
+                          map.pathUrl
+                      "
+                      class="pic"
+                    />
                   </Col>
                 </div>
               </Panel>
@@ -19,63 +27,92 @@
                 <div slot="content">
                   <Row>
                     <Col
-                      :span="8"
-                      v-for="(item,index) in map.concept[0].relateImages"
-                      :key="indexMap+'Concepts'+index"
+                      :span="24"
+                      v-for="(item, index) in map.concept[0].relateImages"
+                      :key="indexMap + 'Concepts' + index"
                     >
                       <img
-                        :src="'http://'+ windowHost+'/GeoProblemSolving'+item.pathUrl"
+                        :src="
+                          'http://' +
+                            windowHost +
+                            '/GeoProblemSolving' +
+                            item.pathUrl
+                        "
                         class="itemPic"
                       />
                     </Col>
                   </Row>
                 </div>
               </Panel>
-              <Panel name="Positions" v-show="map.spacePosition.relateImages != ''">
+              <Panel
+                name="Positions"
+                v-show="map.spacePosition.relateImages != ''"
+              >
                 Positions
                 <div slot="content">
                   <Row>
                     <Col
-                      :span="8"
-                      v-for="(item,index) in map.spacePosition.relateImages"
-                      :key="indexMap+'Positions'+index"
+                      :span="24"
+                      v-for="(item, index) in map.spacePosition.relateImages"
+                      :key="indexMap + 'Positions' + index"
                     >
                       <img
-                        :src="'http://'+ windowHost+'/GeoProblemSolving'+item.pathUrl"
+                        :src="
+                          'http://' +
+                            windowHost +
+                            '/GeoProblemSolving' +
+                            item.pathUrl
+                        "
                         class="itemPic"
                       />
                     </Col>
                   </Row>
                 </div>
               </Panel>
-              <Panel name="Property" v-show="map.properties[0].relateImages != ''">
+              <Panel
+                name="Property"
+                v-show="map.properties[0].relateImages != ''"
+              >
                 Property
                 <div slot="content">
                   <Row>
                     <Col
-                      :span="8"
-                      v-for="(item,index) in map.properties[0].relateImages"
-                      :key="indexMap+'property'+index"
+                      :span="24"
+                      v-for="(item, index) in map.properties[0].relateImages"
+                      :key="indexMap + 'property' + index"
                     >
                       <img
-                        :src="'http://'+ windowHost+'/GeoProblemSolving'+item.pathUrl"
+                        :src="
+                          'http://' +
+                            windowHost +
+                            '/GeoProblemSolving' +
+                            item.pathUrl
+                        "
                         class="itemPic"
                       />
                     </Col>
                   </Row>
                 </div>
               </Panel>
-              <Panel name="Process" v-show="map.processes[0].relateImages != ''">
+              <Panel
+                name="Process"
+                v-show="map.processes[0].relateImages != ''"
+              >
                 Process
                 <div slot="content">
                   <Row>
                     <Col
-                      :span="8"
-                      v-for="(item,index) in map.processes[0].relateImages"
-                      :key="indexMap+'process'+index"
+                      :span="24"
+                      v-for="(item, index) in map.processes[0].relateImages"
+                      :key="indexMap + 'process' + index"
                     >
                       <img
-                        :src="'http://'+ windowHost+'/GeoProblemSolving'+item.pathUrl"
+                        :src="
+                          'http://' +
+                            windowHost +
+                            '/GeoProblemSolving' +
+                            item.pathUrl
+                        "
                         class="itemPic"
                       />
                     </Col>
@@ -87,12 +124,17 @@
                 <div slot="content">
                   <Row>
                     <Col
-                      :span="8"
-                      v-for="(item,index) in map.shapeInfo.relateImages"
-                      :key="indexMap+'shape'+index"
+                      :span="24"
+                      v-for="(item, index) in map.shapeInfo.relateImages"
+                      :key="indexMap + 'shape' + index"
                     >
                       <img
-                        :src="'http://'+ windowHost+'/GeoProblemSolving'+item.pathUrl"
+                        :src="
+                          'http://' +
+                            windowHost +
+                            '/GeoProblemSolving' +
+                            item.pathUrl
+                        "
                         class="itemPic"
                       />
                     </Col>
@@ -158,17 +200,17 @@ export default {
 };
 </script>
 
-<style lang='scss' scoped>
+<style lang="scss" scoped>
 .panel-body {
-  width: 490px;
-  margin: 0 5px;
+  width: 100%;
+  margin: 0;
 }
 .pic {
-  max-width: 430px;
+  max-width: 100%;
   height: auto;
 }
 .itemPic {
-  width: 140px;
+  width: 100%;
   height: auto;
   text-align: center;
 }
