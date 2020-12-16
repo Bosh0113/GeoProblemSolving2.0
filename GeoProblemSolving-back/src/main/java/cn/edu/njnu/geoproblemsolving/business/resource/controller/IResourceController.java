@@ -1,12 +1,14 @@
 package cn.edu.njnu.geoproblemsolving.business.resource.controller;
 
 import cn.edu.njnu.geoproblemsolving.business.resource.service.IResourceServiceImpl;
+import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 
 @CrossOrigin(origins = "*", allowCredentials = "true")
@@ -76,6 +78,21 @@ public class IResourceController {
     public Object delSomeRemote(@RequestParam("oids") ArrayList<String> sourceStoreIds){
         Object delResult = IResourceService.delSomeRemote(sourceStoreIds);
         return delResult;
+    }
+
+    @RequestMapping(produces = "application/json;charset=UTF-8", value = "/{uid}", method = RequestMethod.GET)
+    public JsonResult selectResourceByUidAndType(@PathVariable("uid") String userId, @RequestParam("type") String resType){
+        HashMap<String, String> filedMap = new HashMap<String, String>();
+        filedMap.put("uploaderId", userId);
+        filedMap.put("type", resType);
+        return IResourceService.inquiryLocal(filedMap);
+    }
+
+    @RequestMapping(produces = "application/json;charset=UTF-8", method = RequestMethod.GET)
+    public JsonResult selectResourceByPrivacy(@RequestParam("privacy") String privacyType){
+        HashMap<String, String> filedMap = new HashMap<>();
+        filedMap.put("privacy", privacyType);
+        return IResourceService.inquiryLocal(filedMap);
     }
 
 }
