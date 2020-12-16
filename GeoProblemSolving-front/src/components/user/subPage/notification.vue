@@ -100,10 +100,11 @@
                 :key="readIndex"
               >
                 <Card>
-                  <h4 style="font-size: 13px">{{item.content.title}}</h4>
+<!--                  <h4 style="font-size: 13px">{{item.content.title}}</h4>-->
+                  <p slot="title">{{item.content.title}}</p>
                   <p style="font-weight: 400; font-size: 15px">{{item.content.description}}</p>
                   <small style="font-size: 11px">{{item.createTime}}</small>
-                  <Icon type="md-close" class="applyBtn" style="color: #ed4014" @click="deleteNotice(item)" />
+                  <Icon slot="extra" type="md-close" class="applyBtn" style="color: #ed4014" @click="deleteNotice(item)" />
                 </Card>
               </div>
             </div>
@@ -582,7 +583,6 @@
 
   .applyBtn {
     float: right;
-    padding: 5px 10px;
     margin: 0 10px;
     cursor: pointer;
   }

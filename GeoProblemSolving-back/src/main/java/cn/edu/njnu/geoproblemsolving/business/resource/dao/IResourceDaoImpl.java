@@ -3,6 +3,8 @@ package cn.edu.njnu.geoproblemsolving.business.resource.dao;
 import cn.edu.njnu.geoproblemsolving.Entity.Resources.ResourceEntity;
 import cn.edu.njnu.geoproblemsolving.business.resource.entity.IResourceEntity;
 import cn.edu.njnu.geoproblemsolving.business.resource.util.RestTemplateUtil;
+import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
+import cn.edu.njnu.geoproblemsolving.common.utils.ResultUtils;
 import com.alibaba.fastjson.JSONObject;
 import com.mongodb.client.result.DeleteResult;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +19,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Repository
 public class IResourceDaoImpl implements IResourceDao {
@@ -29,14 +28,14 @@ public class IResourceDaoImpl implements IResourceDao {
     @Autowired
     IResourceEntity resourceEntity;
 
-    @Value("${dataContainerIpAndPort_minyuan}")
+    @Value("${dataContainer}")
     String dataContainerIp;
 
 
     @Override
     public String UploadRemote(LinkedMultiValueMap<String, Object> paramMap) {
         RestTemplate restTemplate = new RestTemplate();
-        String uploadUrl = "http://" + dataContainerIp + "/dataNoneConfig";
+        String uploadUrl = "http://" + dataContainerIp + ":8082/data";
         try {
             JSONObject uploadResp = restTemplate.postForObject(uploadUrl, paramMap, JSONObject.class);
             String uploadResult = (String) uploadResp.get("msg");
@@ -113,6 +112,19 @@ public class IResourceDaoImpl implements IResourceDao {
             return deleteResult.getDeletedCount()+"";
         }catch (Exception e){
             return "Fail";
+        }
+    }
+
+    @Override
+    public JsonResult inquiryResource(Map<String, String> inquiryKeyAndValue) {
+        Query query = new Query();
+        for (Map.Entry<String, String> entry: inquiryKeyAndValue.entrySet()){
+            query.addCriteria(Criteria.where(entry.getKey()).is(entry.getValue()));
+        }
+        try {
+            return ResultUtils.success(mongoTemplate.find(query, ResourceEntity.class));
+        }catch (Exception e){
+            return ResultUtils.error(-2, "Fail");
         }
     }
 

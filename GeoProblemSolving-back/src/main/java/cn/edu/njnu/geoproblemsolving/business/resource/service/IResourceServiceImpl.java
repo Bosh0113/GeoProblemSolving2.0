@@ -5,6 +5,7 @@ import cn.edu.njnu.geoproblemsolving.business.resource.entity.IResourceEntity;
 import cn.edu.njnu.geoproblemsolving.business.resource.entity.IUploadResult;
 import cn.edu.njnu.geoproblemsolving.business.resource.util.ResCovertUtil;
 import cn.edu.njnu.geoproblemsolving.business.resource.util.RestTemplateUtil;
+import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import com.alibaba.fastjson.JSONObject;
 import com.mongodb.client.result.DeleteResult;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
@@ -24,16 +25,13 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class IResourceServiceImpl implements IResourceService {
     @Autowired
     IResourceDaoImpl resourceDao;
-    @Value("${dataContainerIpAndPort_minyuan}")
+    @Value("${dataContainer}")
     String dataRemoteIp;
 
     /**
@@ -72,7 +70,7 @@ public class IResourceServiceImpl implements IResourceService {
                             valueMap.add("userId", session.getAttribute("userId"));
                             valueMap.add("serverNode", "china");
                             valueMap.add("origination", "GeoProblemSolving");
-                            String uploadRemoteUrl = "http://" + dataRemoteIp + "/data";
+                            String uploadRemoteUrl = "http://" + dataRemoteIp + ":8082/data";
                             //向dataContainer传输数据
                             JSONObject uploadRemoteResult = httpUtil.uploadRemote(uploadRemoteUrl, valueMap);
                             String uploadResultInfo = (String)uploadRemoteResult.get("msg");
@@ -143,7 +141,7 @@ public class IResourceServiceImpl implements IResourceService {
      */
     public ResponseEntity<byte[]> downloadRemote(String sourceStoreId) {
         RestTemplateUtil httpUtil = new RestTemplateUtil();
-        String downRemoteUrl = "http://" + dataRemoteIp + "/data/uid?=" + sourceStoreId;
+        String downRemoteUrl = "http://" + dataRemoteIp + ":8082/data/uid?=" + sourceStoreId;
         ResponseEntity<byte[]> response = httpUtil.getDownRemoteResult(downRemoteUrl);
         return response;
     }
@@ -164,7 +162,7 @@ public class IResourceServiceImpl implements IResourceService {
             }
             oids += oid;
         }
-        String downSomeRemoteUrl = "http://" + dataRemoteIp + "/bulkDownload?oids=" + oids;
+        String downSomeRemoteUrl = "http://" + dataRemoteIp + ":8082/bulkDownload?oids=" + oids;
         RestTemplateUtil httpUtil = new RestTemplateUtil();
         ResponseEntity<byte[]> response = httpUtil.getDownRemoteResult(downSomeRemoteUrl);
         return response;
@@ -177,7 +175,7 @@ public class IResourceServiceImpl implements IResourceService {
 
     @Override
     public Object deleteRemote(String uid) {
-        String delRemoteUrl = "http://" + dataRemoteIp + "/del?uid=" + uid;
+        String delRemoteUrl = "http://" + dataRemoteIp + ":8082/del?uid=" + uid;
         RestTemplateUtil httpUtil = new RestTemplateUtil();
         ResponseEntity response = httpUtil.getDelRemoteResult(delRemoteUrl);
         //远程删除成功，开始删除本地数据库中的内容
@@ -201,7 +199,7 @@ public class IResourceServiceImpl implements IResourceService {
                 oids += oid;
             }
         }
-        String delSomeRemoteUrl = "http://" + dataRemoteIp + "/bulkDel?oids=" + oids;
+        String delSomeRemoteUrl = "http://" + dataRemoteIp + ":8082/bulkDel?oids=" + oids;
         RestTemplateUtil httpUtil = new RestTemplateUtil();
         ResponseEntity response = httpUtil.getDelRemoteResult(delSomeRemoteUrl);
         return response.getBody();
@@ -210,6 +208,16 @@ public class IResourceServiceImpl implements IResourceService {
     @Override
     public Object searchRemote(String fileName) {
         return null;
+    }
+
+    /**
+     * 从本地数据库中查询资源
+     * @param filedAndValue 可进行多字段复合查询
+     * @return
+     */
+    @Override
+    public JsonResult inquiryLocal(Map<String, String> filedAndValue) {
+        return resourceDao.inquiryResource(filedAndValue);
     }
 
 }
