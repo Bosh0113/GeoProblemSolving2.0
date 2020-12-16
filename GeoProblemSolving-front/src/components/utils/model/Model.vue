@@ -181,6 +181,7 @@
       :visible.sync="selectDataDialogShow"
       width="1000px"
       title="Select data from Resource Center or Upload"
+      :close-on-click-modal="false"
     >
       <resource-list></resource-list>
     </el-dialog>
