@@ -1,5 +1,7 @@
 package cn.edu.njnu.geoproblemsolving.business.resource.controller;
 
+import cn.edu.njnu.geoproblemsolving.business.resource.entity.AddIResourceDTO;
+import cn.edu.njnu.geoproblemsolving.business.resource.entity.IResourceEntity;
 import cn.edu.njnu.geoproblemsolving.business.resource.service.IResourceServiceImpl;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -93,6 +97,18 @@ public class IResourceController {
         HashMap<String, String> filedMap = new HashMap<>();
         filedMap.put("privacy", privacyType);
         return IResourceService.inquiryLocal(filedMap);
+    }
+
+    /**
+     * 单文件上传
+     * POST, form-data
+     * @param
+     * @return
+     */
+    @RequestMapping(value = "/bind", method = RequestMethod.POST)
+    public Object bindResource( @RequestBody AddIResourceDTO iResourceEntity) throws IOException, URISyntaxException {
+        Object uploadResult = IResourceService.saveResource(iResourceEntity);
+        return uploadResult;
     }
 
 }

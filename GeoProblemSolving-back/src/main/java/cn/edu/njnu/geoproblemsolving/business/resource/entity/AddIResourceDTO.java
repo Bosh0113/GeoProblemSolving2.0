@@ -1,15 +1,16 @@
 package cn.edu.njnu.geoproblemsolving.business.resource.entity;
 
-import lombok.Builder;
+import cn.edu.njnu.geoproblemsolving.Dto.ToDomainConverter;
 import lombok.Data;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.stereotype.Component;
 
+/**
+ * @Author ：Zhiyi
+ * @Date ：2020/12/18 18:48
+ * @modified By：
+ * @version: 1.0.0
+ */
 @Data
-@Component
-@Document(collection = "Resource")
-public class IResourceEntity {
-    private String resourceId;
+public class AddIResourceDTO implements ToDomainConverter<IResourceEntity> {
     private String name;
     private String description;
     private String type;

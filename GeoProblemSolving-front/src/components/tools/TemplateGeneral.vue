@@ -108,14 +108,21 @@
       >
         <div v-show="this.currentStep === 0">
           <FormItem label="Name:" prop="toolName">
-            <Input v-model="toolInfo.toolName" placeholder="Enter the toolName of your tool"></Input>
+            <Input
+              v-model="toolInfo.toolName"
+              placeholder="Enter the toolName of your tool"
+            ></Input>
           </FormItem>
 
           <FormItem label="Url:" prop="toolUrl">
-            <Input v-model="toolInfo.toolUrl" placeholder="Enter the url of your tool" />
-            <p
-              style="font-style:italic"
-            >If you copy the doi from Open Geographic Modeling System, please enter the ... first</p>
+            <Input
+              v-model="toolInfo.toolUrl"
+              placeholder="Enter the url of your tool"
+            />
+            <p style="font-style:italic">
+              If you copy the doi from Open Geographic Modeling System, please
+              enter the ... first
+            </p>
           </FormItem>
 
           <FormItem label="Step:" prop="recomStep">
@@ -124,7 +131,12 @@
               multiple
               placeholder="Select the recommended step of your tool"
             >
-              <Option v-for="item in stepList" :key="item.index" :value="item">{{ item }}</Option>
+              <Option
+                v-for="item in stepList"
+                :key="item.index"
+                :value="item"
+                >{{ item }}</Option
+              >
             </Select>
           </FormItem>
 
@@ -149,7 +161,8 @@
               size="small"
               @click="addCreateToolTag(inputToolTag)"
               style="margin-left:2.5%"
-            >Add tag</Button>
+              >Add tag</Button
+            >
             <div>
               <Tag
                 color="primary"
@@ -157,7 +170,8 @@
                 :key="index"
                 closable
                 @on-close="deleteCreateToolTag(index)"
-              >{{ item }}</Tag>
+                >{{ item }}</Tag
+              >
             </div>
             <div>
               <span>Example:</span>
@@ -176,12 +190,18 @@
 
           <FormItem label="Image:" prop="toolImg">
             <div class="inline_style">
-              <div class="demo-upload-list" v-if="toolInfo.toolImg!=''">
+              <div class="demo-upload-list" v-if="toolInfo.toolImg != ''">
                 <template>
                   <img :src="toolInfo.toolImg" />
                   <div class="demo-upload-list-cover">
-                    <Icon type="ios-eye-outline" @click.native="handleView()"></Icon>
-                    <Icon type="ios-trash-outline" @click.native="handleRemove()"></Icon>
+                    <Icon
+                      type="ios-eye-outline"
+                      @click.native="handleView()"
+                    ></Icon>
+                    <Icon
+                      type="ios-trash-outline"
+                      @click.native="handleRemove()"
+                    ></Icon>
                   </div>
                 </template>
               </div>
@@ -189,7 +209,7 @@
                 <Upload
                   ref="upload"
                   :show-upload-list="false"
-                  :format="['jpg','jpeg','png', 'gif']"
+                  :format="['jpg', 'jpeg', 'png', 'gif']"
                   :max-size="2048"
                   :before-upload="handleBeforeUpload"
                   action
@@ -202,14 +222,18 @@
                 </Upload>
               </div>
               <Modal title="View Image" v-model="visible">
-                <img :src="toolInfo.toolImg" v-if="visible" style="width: 100%" />
+                <img
+                  :src="toolInfo.toolImg"
+                  v-if="visible"
+                  style="width: 100%"
+                />
               </Modal>
             </div>
           </FormItem>
         </div>
         <div v-show="this.currentStep === 1">
           <FormItem label="Detail:" prop="detail" :label-width="0">
-            <tinymce ref="editor" v-model="toolInfo.detail" :height="300" />
+            <tinymce ref="editor" :value="toolInfo.detail" :height="300" />
           </FormItem>
         </div>
       </Form>
@@ -228,6 +252,9 @@ export default {
   props: {
     step: {
       type: Number
+    },
+    info: {
+      type: Object
     }
   },
   data() {
@@ -332,6 +359,15 @@ export default {
     step: {
       handler(val) {
         this.currentStep = val;
+      },
+      deep: true
+    },
+    info: {
+      handler(val) {
+        console.log(val);
+        if (val != "") {
+          this.toolInfo = val;
+        }
       },
       deep: true
     }

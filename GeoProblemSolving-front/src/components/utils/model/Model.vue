@@ -10,11 +10,26 @@
       <el-col :span="6">
         <p class="des">{{ modelIntroduction.description }}</p>
       </el-col>
-      <el-col :span="2" :offset="12" class="save-btn">
-        <el-button plain type="primary" @click="invokeTest">
-          <i class="el-icon-setting"></i>&nbsp;invoke
-        </el-button>
-      </el-col>
+      <!-- <el-col :span="1" :offset="11"> -->
+      <el-button
+        type="primary"
+        @click="invokeTest"
+        style="float:right;width:110px;margin-right:15%"
+      >
+        <i class="el-icon-setting"></i>&nbsp;Invoke
+      </el-button>
+      <el-button
+        type="warning"
+        @click="bindAll"
+        v-if="record.status == 2"
+        style="float:right;width:160px;margin-right:20px"
+      >
+        <i class="el-icon-paperclip"></i>&nbsp;Bind all outputs
+      </el-button>
+      <!-- </el-col>
+      <el-col :span="1" :offset="1" class="save-btn"> -->
+
+      <!-- </el-col> -->
     </el-row>
     <el-divider></el-divider>
     <el-row
@@ -85,42 +100,84 @@
                     </el-table>
                   </div>
                   <div v-else>
-                    <el-button @click="selectDataDialogShow = true">
-                      Select data
-                    </el-button>
-                    <!-- <el-select
-                      v-model="modelInEvent.url"
-                      clearable
-                      placeholder="Please select data"
-                      @change="selectDatatoModel($event, index, inEventIndex)"
+                    <div
+                      v-if="
+                        modelInEvent.hasOwnProperty('url') &&
+                          modelInEvent.url != '' &&
+                          modelInEvent.urlName != ''
+                      "
                     >
-                      <el-option
-                        v-for="(item, dataIndex) in resources.dataItemList"
-                        :key="dataIndex"
-                        :label="item.name"
-                        :value="item.url"
-                      ></el-option>
-                    </el-select> -->
+                      <div class="select-data select-data-line">
+                        <div class="data-name">{{ modelInEvent.urlName }}</div>
+                        <el-button
+                          type="success"
+                          icon="el-icon-download"
+                          size="mini"
+                          circle
+                          @click="download(modelInEvent)"
+                        ></el-button>
+                        <el-button
+                          type="warning"
+                          icon="el-icon-close"
+                          size="mini"
+                          circle
+                          @click="remove(modelInEvent)"
+                        ></el-button>
+                        <!-- <i
+                          class="el-icon-close"
+                          @click="remove(modelInEvent)"
+                        ></i> -->
+                      </div>
+                    </div>
+                    <div v-else>
+                      <el-button
+                        type="primary"
+                        plain
+                        @click="selectDataDialog(index, inEventIndex)"
+                      >
+                        Select data
+                      </el-button>
+                    </div>
                   </div>
                 </el-row>
-                <el-col :span="6" :offset="1" v-else>
-                  <el-button @click="selectDataDialogShow = true">
-                    Select data
-                  </el-button>
-                  <!-- <el-select
-                    v-model="modelInEvent.url"
-                    clearable
-                    placeholder="Please select data"
-                    @change="selectDatatoModel($event, index, inEventIndex)"
-                  >
-                    <el-option
-                      v-for="(item, dataIndex) in resources.dataItemList"
-                      :key="dataIndex"
-                      :label="item.name"
-                      :value="item.url"
-                    ></el-option>
-                  </el-select> -->
-                </el-col>
+                <el-row v-else>
+                  <el-col :span="6" :offset="1">
+                    <div
+                      v-if="
+                        modelInEvent.hasOwnProperty('url') &&
+                          modelInEvent.url != '' &&
+                          modelInEvent.urlName != ''
+                      "
+                    >
+                      <div class="select-data select-data-line">
+                        <div class="data-name">{{ modelInEvent.urlName }}</div>
+                        <el-button
+                          type="success"
+                          icon="el-icon-download"
+                          size="mini"
+                          circle
+                          @click="download(modelInEvent)"
+                        ></el-button>
+                        <el-button
+                          type="warning"
+                          icon="el-icon-close"
+                          size="mini"
+                          circle
+                          @click="remove(modelInEvent)"
+                        ></el-button>
+                      </div>
+                    </div>
+                    <div v-else>
+                      <el-button
+                        type="primary"
+                        plain
+                        @click="selectDataDialog(index, inEventIndex)"
+                      >
+                        Select data
+                      </el-button>
+                    </div>
+                  </el-col>
+                </el-row>
               </el-row>
               <el-row>
                 <el-divider class="eventDivider"></el-divider>
@@ -151,22 +208,26 @@
                 <el-col :span="6" :offset="1">
                   <div class="_btn-group">
                     <el-button
-                      size="small"
                       plain
                       round
                       type="warning"
                       @click="download(modelOutEvent)"
-                      :disabled="status"
+                      v-if="
+                        modelOutEvent.hasOwnProperty('url') &&
+                          modelOutEvent.url != ''
+                      "
                       >Download</el-button
                     >
-
                     <el-button
-                      size="small"
                       plain
                       round
                       type="warning"
                       @click="bind(modelOutEvent)"
-                      :disabled="status"
+                      :class="{ bindClass: modelOutEvent.bind }"
+                      v-if="
+                        modelOutEvent.hasOwnProperty('url') &&
+                          modelOutEvent.url != ''
+                      "
                       >Bind</el-button
                     >
                   </div>
@@ -182,8 +243,12 @@
       width="1000px"
       title="Select data from Resource Center or Upload"
       :close-on-click-modal="false"
+      :destroy-on-close="true"
     >
-      <resource-list></resource-list>
+      <resource-list
+        :pageParams="pageParams"
+        @selectData="selectData"
+      ></resource-list>
     </el-dialog>
   </div>
 </template>
@@ -244,23 +309,39 @@ export default {
           }
         ]
       },
-      status: true,
+      // status: true,
       record: {},
       // page info
       pageParams: { pageId: "", userId: "", userName: "" },
       userInfo: {},
       bindFileName: "",
-      selectDataDialogShow: false
+      selectDataDialogShow: false,
+      currentStateIndex: "",
+      currentEventIndex: ""
     };
   },
 
   methods: {
+    getQueryString(name) {
+      var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+      var r = window.location.search.substr(1).match(reg);
+      if (r != null) {
+        return unescape(r[2]);
+      }
+      return null;
+    },
     getPageInfo() {
-      let receive = window.opener["pageParams"];
-      //获取接收到的数
-      this.pageParams.pageId = receive["groupID"];
-      this.pageParams.userId = receive["userId"];
-      this.pageParams.userName = receive["userName"];
+      if (window.opener == null) {
+        this.pageParams.userName = this.getQueryString("userName");
+        this.pageParams.userId = this.getQueryString("userId");
+        this.pageParams.pageId = this.getQueryString("groupID");
+      } else {
+        let receive = window.opener["pageParams"];
+        //获取接收到的数
+        this.pageParams.pageId = receive["groupID"];
+        this.pageParams.userId = receive["userId"];
+        this.pageParams.userName = receive["userName"];
+      }
     },
 
     getUserInfo() {
@@ -315,12 +396,6 @@ export default {
       this.invokeForm.username = this.pageParams.userId;
     },
 
-    //获得上传到数据容器的数据的id
-    getNewStateList(data) {
-      this.stateList = data;
-      this.getStateEvent();
-    },
-
     //invoke --form表单创建
     getStateEvent() {
       let stateList = this.stateList;
@@ -346,10 +421,10 @@ export default {
             let outputTemplate = events[j].datasetItem;
             console.log(outputTemplate);
             //如果是external template["type"] = id,不然为空
-            if (outputTemplate[0].type === "external") {
+            if (outputTemplate.type === "external") {
               template = {
                 type: "id",
-                value: outputTemplate[0].externalId
+                value: outputTemplate.externalId
               };
             } else {
               template = {
@@ -367,6 +442,7 @@ export default {
     },
 
     async invokeTest() {
+      this.loading();
       await this.createFilefromParam();
       this.getStateEvent();
       //测试数据没有弄 直接运行 根据ip+id
@@ -387,7 +463,7 @@ export default {
         });
         // this.status = false;
       } else {
-        this.status = false;
+        // this.status = false;
         this.getOutputs(refreshForm);
       }
     },
@@ -441,7 +517,8 @@ export default {
         if (this.record.status == 2) {
           clearInterval(this.timer);
           await this.getStateEventOut(this.record);
-          await this.getDataResourceLinkInstance();
+          this.fullscreenLoading.close();
+          // await this.getDataResourceLinkInstance();
           return;
         } else {
           let { data } = await post(
@@ -461,32 +538,12 @@ export default {
           outputUrl.forEach(el => {
             if (el.statename == state.name && el.event == event.name) {
               this.$set(this.stateList[index].Event[eventIndex], "url", el.url);
+              this.$set(
+                this.stateList[index].Event[eventIndex],
+                "urlName",
+                `${el.tag}.${el.suffix}`
+              );
             }
-          });
-        });
-      });
-      await this.emitInstance(record);
-    },
-
-    getDataResourceLinkInstance() {
-      let stateList = this.stateList;
-      let directDataResource = this.resources.dataItemList;
-
-      stateList.forEach(state => {
-        state.Event.forEach(event => {
-          directDataResource.forEach(data => {
-            if (event.url == data.url) {
-              if (
-                !data.hasOwnProperty("toModelInstanceList") ||
-                data["toModelInstanceList"] == null
-              ) {
-                data["toModelInstanceList"] = [];
-              }
-
-              data["toModelInstanceList"].push(this.modelInstance.id);
-              // break;
-            }
-            this.updateDataItem(data.id, data);
           });
         });
       });
@@ -496,8 +553,8 @@ export default {
       window.open(event.url);
     },
 
-    dataURItoBlob(event) {
-      this.urlToBlob(event.url, blob => {
+    async dataURItoBlob2(event) {
+      this.urlToBlob(event.url, async blob => {
         let file = new File([blob], this.bindFileName);
         let formData = new FormData();
 
@@ -510,6 +567,28 @@ export default {
 
         this.axios
           .post("/GeoProblemSolving/folder/uploadToFolder", formData)
+          .then(res => {
+            console.log(res);
+            if (res.data.uploaded != null) {
+              this.$message({
+                message: "You have binded the resource Successfully!",
+                type: "success"
+              });
+            }
+          })
+          .catch(function(err) {
+            throw err;
+          });
+
+        let formData2 = new FormData();
+        formData2.append("file", file);
+        formData2.append("type", "data");
+        formData2.append("uploaderId", this.pageParams.userId);
+
+        formData2.append("privacy", "private");
+
+        this.axios
+          .post("/GeoProblemSolving/resource/upload", formData2)
           .then(res => {
             console.log(res);
             if (res.data.uploaded != null) {
@@ -548,8 +627,30 @@ export default {
     },
 
     async bind(event) {
-      this.dataURItoBlob(event);
+      // console.log(event);
+      // await this.dataURItoBlob(event);
+
+      let json = {
+        name: event.urlName,
+        description: event.description,
+        type: "data",
+        fileSize: "",
+        pathURL: event.url,
+        uploaderId: this.pageParams.userId,
+        uploaderName: this.pageParams.userName,
+        privacy: "private"
+      };
+
+      let data = await post("/GeoProblemSolving/resource/bind", json);
+      event.bind = true;
+      this.$forceUpdate();
+      this.$message({
+        message: "You have bind to the resource center successfully!",
+        type: "success"
+      });
     },
+
+    async bindAll() {},
 
     inEventList(state) {
       return state.Event.filter(value => {
@@ -588,6 +689,7 @@ export default {
         background: "rgba(0, 0, 0, 0.7)"
       });
     },
+
     initLoading() {
       this.fullscreenLoading = this.$loading({
         lock: true,
@@ -595,17 +697,6 @@ export default {
         spinner: "el-icon-loading",
         background: "rgba(0, 0, 0, 0.7)"
       });
-    },
-
-    async saveRecords(modelInstanceId) {
-      let data = await this.axios.post(
-        "/GeoProblemSolving/modelItem/saveRecord",
-        {
-          modelInstanceId: modelInstanceId,
-          userId: this.userId,
-          stepId: this.stepId
-        }
-      );
     },
 
     async getAllRecords() {
@@ -632,6 +723,29 @@ export default {
         console.log("返回记录失败");
       }
       console.log(this.recordList);
+    },
+
+    selectData(val) {
+      this.$set(
+        this.stateList[this.currentStateIndex].Event[this.currentEventIndex],
+        "url",
+        val.pathURL
+      );
+      this.$set(
+        this.stateList[this.currentStateIndex].Event[this.currentEventIndex],
+        "urlName",
+        val.name
+      );
+      this.selectDataDialogShow = false;
+    },
+    selectDataDialog(stateIndex, eventIndex) {
+      this.currentStateIndex = stateIndex;
+      this.currentEventIndex = eventIndex;
+      this.selectDataDialogShow = true;
+    },
+    remove(event) {
+      event.url == "";
+      event.urlName = "";
     }
   },
 
@@ -645,7 +759,12 @@ export default {
 .main {
   position: relative;
 }
-
+.state-name {
+  line-height: 2;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
 .state-desc {
   margin: 0px 0px 15px 0px;
   padding: 4px 0px;
@@ -726,5 +845,40 @@ export default {
   font-weight: 600;
   font-size: 20px;
   margin: 20px 0 10px 0;
+}
+
+.data-name {
+  float: left;
+  width: 200px;
+  font-weight: 600;
+  font-size: 16px;
+}
+.select-data-line {
+  margin: 0 0 0 0;
+  line-height: 40px;
+}
+.select-data {
+  background-color: #f0f9eb;
+  display: inline-block;
+  height: 40px;
+  padding: 0 10px;
+
+  font-size: 12px;
+  color: #3a701f;
+  border: 1px solid #e1f3d8;
+  border-radius: 4px;
+  box-sizing: border-box;
+  white-space: nowrap;
+}
+.select-data:hover {
+  cursor: pointer;
+  transition: all 0.2s ease-out;
+  background-color: #cffab8;
+}
+.bindClass {
+  background-color: rgb(255 231 231 / 72%);
+  size: 20px;
+  border-color: #8f2727;
+  color: #8f2727;
 }
 </style>

@@ -1,125 +1,179 @@
 <!--  -->
 <template>
   <div>
-    <div class="switch-label">
-      <div v-if="switchValue">Private data</div>
-      <div v-else>Public data</div>
-    </div>
-    <el-switch
-      v-model="switchValue"
-      active-color="#13ce66"
-      inactive-color="#409eff"
-    >
-    </el-switch>
+    <el-row style="margin:5px 0 ;line-height:40px">
+      <div class="switch-label">
+        <div v-if="switchValue">Private data</div>
+        <div v-else>Public data</div>
+      </div>
+      <div class="switch-label">
+        <el-switch
+          v-model="switchValue"
+          active-color="#13ce66"
+          inactive-color="#409eff"
+        >
+        </el-switch>
+      </div>
+      <div style="float:right">
+        <!-- <el-button @click="uploadNewData">Upload new data</el-button> -->
+        <el-upload
+          action
+          :auto-upload="true"
+          :show-file-list="false"
+          ref="upload"
+          :http-request="uploadNewData"
+        >
+          <el-button type="primary" size="mini" style="font-size: 14px"
+            >Upload {{ switchValue ? "private" : "public" }} data</el-button
+          >
+        </el-upload>
+      </div>
+    </el-row>
+
     <el-table
-      :data="switchValue ? privateData : publicData"
       border
       style="width: 100%"
+      max-height="400"
+      highlight-current-row
+      :data="switchValue ? privateData : publicData"
+      @row-click="handleCurrentChange"
+      @row-dblclick="handleCurrentChangeSubmit"
     >
-      <el-table-column label="Select" sortable width="50">
-        <template slot-scope="scope">
-          <el-radio
-            v-model="scope.row.isSelect"
-            label="true"
-            @change="selectChange(scope.row)"
-          >
-          </el-radio>
-          <!-- <el-radio-group v-model="scope.row.isSelect">
-            <el-radio-button label="1"></el-radio-button>
-          </el-radio-group> -->
-        </template>
-      </el-table-column>
       <el-table-column prop="name" label="Name" sortable width="200">
       </el-table-column>
-      <el-table-column prop="type" label="Type" width="100"> </el-table-column>
-      <el-table-column prop="description" label="Description" width="300">
+
+      <el-table-column prop="description" label="Description" width="269">
+      </el-table-column
+      ><el-table-column prop="type" label="Type" width="80"> </el-table-column>
+      <el-table-column prop="privacy" label="Privacy" width="80">
       </el-table-column>
       <el-table-column prop="uploaderName" label="Provider" width="150">
       </el-table-column>
-      <el-table-column prop="uploadTime" label="Upload time" width="150">
+      <el-table-column prop="uploadTime" label="Upload time" width="180">
       </el-table-column>
     </el-table>
-    {{ privateData }}
+    <div v-if="Object.keys(selectData).length === 0">
+      <div class="data-name select-title" style="width:300px">
+        You haven't selected any data!
+      </div>
+    </div>
+    <div v-else style="line-height:40px">
+      <div class="data-name select-title">
+        Data you have selected:
+      </div>
+      <div class="select-data select-data-line">
+        <div class="data-name">{{ selectData.name }}</div>
+        <i class="el-icon-close" @click="remove(selectData)"></i>
+      </div>
+      <div style="float:right" class="select-data-line">
+        <el-button @click="submit" size="small" type="warning" plain
+          >OK</el-button
+        >
+      </div>
+    </div>
+    <div style="clear:both"></div>
   </div>
 </template>
 
 <script>
 import { get, del, post, put, patch } from "@/axios";
 export default {
+  props: ["pageParams"],
   components: {},
 
-  watch: {},
+  watch: {
+    pageParams: {
+      async handler(val) {
+        // console.log(val);
+      },
+      deep: true
+    }
+    // switchValue: {
+    //   handler(val) {
+    //     console.log(val);
+    //     // this.selectData = {};
+    //     // this.handleCurrentChange("");
+    //     if (val) {
+    //       this.tableData = this.privateData;
+    //     } else {
+    //       this.tableData = this.publicData;
+    //     }
+    //   },
+    //   deep: true
+    // }
+  },
 
   computed: {},
 
   data() {
     return {
       switchValue: true,
-      privateData: [
-        {
-          resourceId: "1",
-          name: "1.jpg",
-          description: "",
-          type: "data",
-          fileSize: "1.14MB",
-          pathURL: "/GeoProblemSolving/resource/upload/1186921.jpg",
-          uploaderId: "1bfbe06c-be1e-40dc-bf13-bdd330ad607e",
-          uploaderName: "luyuchen",
-          uploadTime: "2019/05/08 21:34:38",
-          privacy: "private"
-        },
-        {
-          resourceId: "22",
-          name: "1.jpg",
-          description: "",
-          type: "data",
-          fileSize: "1.14MB",
-          pathURL: "/GeoProblemSolving/resource/upload/1186921.jpg",
-          uploaderId: "1bfbe06c-be1e-40dc-bf13-bdd330ad607e",
-          uploaderName: "luyuchen",
-          uploadTime: "2019/05/08 21:34:38",
-          privacy: "private"
-        }
-      ],
-      publicData: [
-        {
-          resourceId: "665a1c21-f141-4342-b92d-b3357927",
-          name: "空白.txt",
-          description: "测试",
-          belong: "平台测试",
-          type: "data",
-          fileSize: "0.00KB",
-          pathURL: "/GeoProblemSolving/resource/upload/空白870631.txt",
-          uploaderId: "172c8d44-6537-4e35-9ef7-068f1c48f67b",
-          uploaderName: "zbc",
-          uploadTime: "2019/05/08 14:46:45",
-          organization: "NNU",
-          privacy: "public"
-        }
-      ]
+      privateData: [],
+      publicData: [],
+      selectData: {},
+      // tableData: []
+      fileList: [], //el-upload上传的文件列表,
+      file: {}
     };
   },
 
   methods: {
+    async init() {
+      await this.getPrivateResources();
+      await this.getPublicResources();
+    },
     async getPrivateResources() {
-      await get();
+      let data = await get(
+        `/GeoProblemSolving/resource/${this.pageParams.userId}?type=data`
+      );
+      // data.forEach(e => (e.isSelect = "false"));
+      this.privateData = data;
     },
     async getPublicResources() {
-      await get();
+      let data = await get(`/GeoProblemSolving/resource?privacy=public`);
+      this.publicData = data;
+    },
+    handleCurrentChange(val) {
+      this.selectData = val;
+    },
+    handleCurrentChangeSubmit(val) {
+      this.selectData = val;
+      this.submit();
+    },
+    remove() {
+      this.selectData = {};
     },
 
-    selectChange(val) {
-      console.log(val);
+    async uploadNewData({ file }) {
+      let formData = new FormData();
+      formData.append("file", file);
+      formData.append("type", "data");
+      formData.append("uploaderId", this.pageParams.userId);
 
-      this.privateData.forEach(data => {
-        data.isSelect = "false";
-      });
-      val.isSelect = "true";
-      this.$forceUpdate();
+      let flag = this.switchValue ? "private" : "public";
+      // console.log(flag);
+
+      formData.append("privacy", flag);
+
+      let { data } = await this.axios.post(
+        `/GeoProblemSolving/resource/upload`,
+        formData
+      );
+      if (flag == "private") {
+        await this.getPrivateResources();
+      } else {
+        await this.getPublicResources();
+      }
+    },
+
+    submit() {
+      this.$emit("selectData", this.selectData);
     }
   },
 
-  mounted() {}
+  mounted() {
+    this.init();
+  }
 };
 </script>
 <style lang="scss" scoped>
@@ -128,5 +182,49 @@ export default {
   float: left;
   font-weight: 600;
   font-size: 16px;
+}
+.data-name {
+  float: left;
+  width: 200px;
+  font-weight: 600;
+  font-size: 16px;
+  // padding-left: 5px;
+}
+.select-data-line {
+  margin: 15px 0 0 0;
+  line-height: 30px;
+  .el-button {
+    width: 138px;
+  }
+}
+.select-data {
+  background-color: #f0f9eb;
+  display: inline-block;
+  height: 32px;
+  padding: 0 10px;
+
+  font-size: 12px;
+  color: #67c23a;
+  border: 1px solid #e1f3d8;
+  border-radius: 4px;
+  box-sizing: border-box;
+  white-space: nowrap;
+
+  //   background-color: #f0f9eb;
+  // border-color: #e1f3d8;
+  // color: #67c23a;
+}
+.select-data:hover {
+  // width: 250px;
+  cursor: pointer;
+  transition: all 0.2s ease-out;
+  color: #60a83c;
+  background-color: #c8f3d3;
+}
+.select-title {
+  width: 200px;
+  float: left;
+  line-height: 30px;
+  margin: 18px 0 0 0;
 }
 </style>

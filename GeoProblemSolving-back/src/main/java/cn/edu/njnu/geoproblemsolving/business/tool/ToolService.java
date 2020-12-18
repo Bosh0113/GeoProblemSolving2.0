@@ -38,7 +38,7 @@ public class ToolService  {
     private MongoTemplate mongoTemplate;
 
     public ToolEntity createTool(AddToolEntityDTO add) {
-        toolRepository.findFirstByToolName(add.getToolName()).ifPresent((el)->{
+        toolRepository.findFirstByToolNameAndProvider(add.getToolName(), add.getProvider()).ifPresent((el)->{
             throw new MyException(ResultEnum.EXISTS_OBJECT);
         });
         ToolEntity toolEntity = new ToolEntity();
@@ -100,7 +100,7 @@ public class ToolService  {
                         randomNum = randomNum * 10 + (int) (Math.random() * 10 + 1);
                     }
                     String newFileTitle = saveName + randomNum + "." + suffix;
-                    String localPath = temp + "/" + newFileTitle;
+                    String localPath =temp + "/" + newFileTitle;
                     System.out.println("图片上传到本地路径：" + localPath);
                     File file = new File(localPath);
                     FileOutputStream fileOutputStream = new FileOutputStream(file);
@@ -115,13 +115,13 @@ public class ToolService  {
 
                     String reqPath = request.getRequestURL().toString();
                     pathURL = reqPath.replaceAll("localhost", ip) + "/" + newFileTitle;
-                    String regexGetUrl = "(/GeoProblemSolving[\\S]*)";
-                    Pattern regexPattern = Pattern.compile(regexGetUrl);
-                    Matcher matcher = regexPattern.matcher(pathURL);
-                    if (matcher.find()) {
-                        pathURL = matcher.group(1);
-                    }
-                    break;
+//                    String regexGetUrl = "(/GeoProblemSolving[\\S]*)";
+//                    Pattern regexPattern = Pattern.compile(regexGetUrl);
+//                    Matcher matcher = regexPattern.matcher(pathURL);
+//                    if (matcher.find()) {
+//                        pathURL = matcher.group(1);
+//                    }
+//                    break;
                 }
             }
             return pathURL;

@@ -27,7 +27,7 @@
 .extendedPanel {
   width: 300px;
   height: 100%;
-  z-index: 999;
+  /* z-index: 999; */
 }
 
 /* 右侧布 */
@@ -276,7 +276,7 @@
         <!-- 日期选择器 -->
       </div>
 
-      <Modal v-model="toolModalShow" width="800" footer-hide>
+      <Modal v-model="toolModalShow" width="820" footer-hide>
         <tool-modal
           :userId="userId"
           @selectedTools="sendTools"
@@ -429,9 +429,9 @@ export default {
         content: messageUrl
       };
       if (this.socketApi.getSocketInfo().linked) {
-        this.msglist.push(this.send_msg);
         this.msgRecords.push(this.send_msg);
         this.socketApi.sendSock(this.send_msg, this.getSocketConnect); //连接后台onopen方法
+        this.msglist.push(this.send_msg);
       } else {
         let chatMsg = {
           type: "notice",
