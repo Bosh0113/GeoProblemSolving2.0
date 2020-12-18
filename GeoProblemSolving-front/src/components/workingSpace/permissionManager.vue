@@ -8,21 +8,21 @@
 <template>
   <Row>
     <Col span="6" offset="2">
-      <h1 style="margin-top: 20px;">Permission management</h1>
+      <h1 style="margin-top: 20px">Permission management</h1>
       <div style="margin: 40px 0 20px 0">
-        <h2>Project name</h2>
+        <h2>Activity name</h2>
         <Divider style="margin: 5px 0" />
-        <div>{{projectInfo.name}}</div>
+        <div>{{ activityInfo.name }}</div>
       </div>
       <div style="margin: 20px 0" v-if="projectLevel == 0">
         <h2>Privacy</h2>
         <Divider style="margin: 5px 0" />
-        <div>{{projectInfo.privacy}}</div>
+        <div>{{ activityInfo.privacy }}</div>
       </div>
       <div style="margin: 20px 0">
-        <h2>Project description</h2>
+        <h2>Activity description</h2>
         <Divider style="margin: 5px 0" />
-        <div>{{projectInfo.description}}</div>
+        <div>{{ activityInfo.description }}</div>
       </div>
       <div class="btnPermission">
         <Button @click="setDefault">Default</Button>
@@ -42,6 +42,7 @@
 </template>
 <script>
 import * as userRoleJS from "./../../api/userRole.js";
+import { get, del, post, put } from "../../axios";
 export default {
   data() {
     return {
@@ -59,18 +60,18 @@ export default {
             ) {
               return h("Checkbox", {
                 props: {
-                  value: row_value
+                  value: row_value,
                 },
                 on: {
-                  "on-change": e => {
+                  "on-change": (e) => {
                     this.savePermission(
                       e,
                       1,
                       params.index,
                       params.row.operation
                     );
-                  }
-                }
+                  },
+                },
               });
             } else if (
               Object.prototype.toString.call(row_value) == "[object String]"
@@ -81,39 +82,38 @@ export default {
                   props: {
                     value: row_value,
                     size: "small",
-                    placeholder: row_value
+                    placeholder: row_value,
                   },
                   on: {
-                    "on-change": e => {
+                    "on-change": (e) => {
                       this.savePermission(
                         e,
                         1,
                         params.index,
                         params.row.operation
                       );
-                    }
-                  }
+                    },
+                  },
                 },
                 [
                   h("Option", {
                     props: {
-                      value: "Yes"
-                    }
+                      value: "Yes",
+                    },
                   }),
                   h("Option", {
                     props: {
-                      value: "Parent activity members"
+                      value: "Parent activity members",
                     },
                     attrs: {
-                      title:
-                        "Parent activity members can access"
-                    }
+                      title: "Parent activity members can access",
+                    },
                   }),
                   h("Option", {
                     props: {
-                      value: "No"
-                    }
-                  })
+                      value: "No",
+                    },
+                  }),
                 ]
               );
             } else if (
@@ -121,7 +121,7 @@ export default {
               "[object Null]"
             ) {
             }
-          }
+          },
         },
         {
           title: "Core team",
@@ -134,18 +134,18 @@ export default {
             ) {
               return h("Checkbox", {
                 props: {
-                  value: row_value
+                  value: row_value,
                 },
                 on: {
-                  "on-change": e => {
+                  "on-change": (e) => {
                     this.savePermission(
                       e,
                       2,
                       params.index,
                       params.row.operation
                     );
-                  }
-                }
+                  },
+                },
               });
             } else if (
               Object.prototype.toString.call(row_value) == "[object String]"
@@ -156,39 +156,38 @@ export default {
                   props: {
                     value: row_value,
                     size: "small",
-                    placeholder: row_value
+                    placeholder: row_value,
                   },
                   on: {
-                    "on-change": e => {
+                    "on-change": (e) => {
                       this.savePermission(
                         e,
                         2,
                         params.index,
                         params.row.operation
                       );
-                    }
-                  }
+                    },
+                  },
                 },
                 [
                   h("Option", {
                     props: {
-                      value: "Yes"
-                    }
+                      value: "Yes",
+                    },
                   }),
                   h("Option", {
                     props: {
-                      value: "Parent activity members"
+                      value: "Parent activity members",
                     },
                     attrs: {
-                      title:
-                        "Parent activity members can access"
-                    }
+                      title: "Parent activity members can access",
+                    },
                   }),
                   h("Option", {
                     props: {
-                      value: "No"
-                    }
-                  })
+                      value: "No",
+                    },
+                  }),
                 ]
               );
             } else if (
@@ -196,7 +195,7 @@ export default {
               "[object Null]"
             ) {
             }
-          }
+          },
         },
         {
           title: "Wider team",
@@ -209,18 +208,18 @@ export default {
             ) {
               return h("Checkbox", {
                 props: {
-                  value: row_value
+                  value: row_value,
                 },
                 on: {
-                  "on-change": e => {
+                  "on-change": (e) => {
                     this.savePermission(
                       e,
                       3,
                       params.index,
                       params.row.operation
                     );
-                  }
-                }
+                  },
+                },
               });
             } else if (
               Object.prototype.toString.call(row_value) == "[object String]"
@@ -231,39 +230,38 @@ export default {
                   props: {
                     value: row_value,
                     size: "small",
-                    placeholder: row_value
+                    placeholder: row_value,
                   },
                   on: {
-                    "on-change": e => {
+                    "on-change": (e) => {
                       this.savePermission(
                         e,
                         3,
                         params.index,
                         params.row.operation
                       );
-                    }
-                  }
+                    },
+                  },
                 },
                 [
                   h("Option", {
                     props: {
-                      value: "Yes"
-                    }
+                      value: "Yes",
+                    },
                   }),
                   h("Option", {
                     props: {
-                      value: "Parent activity members"
+                      value: "Parent activity members",
                     },
                     attrs: {
-                      title:
-                        "Parent activity members can access"
-                    }
+                      title: "Parent activity members can access",
+                    },
                   }),
                   h("Option", {
                     props: {
-                      value: "No"
-                    }
-                  })
+                      value: "No",
+                    },
+                  }),
                 ]
               );
             } else if (
@@ -271,7 +269,7 @@ export default {
               "[object Null]"
             ) {
             }
-          }
+          },
         },
         {
           title: "Visitor (Logged in)",
@@ -284,18 +282,18 @@ export default {
             ) {
               return h("Checkbox", {
                 props: {
-                  value: row_value
+                  value: row_value,
                 },
                 on: {
-                  "on-change": e => {
+                  "on-change": (e) => {
                     this.savePermission(
                       e,
                       4,
                       params.index,
                       params.row.operation
                     );
-                  }
-                }
+                  },
+                },
               });
             } else if (
               Object.prototype.toString.call(row_value) == "[object String]"
@@ -306,39 +304,38 @@ export default {
                   props: {
                     value: row_value,
                     size: "small",
-                    placeholder: row_value
+                    placeholder: row_value,
                   },
                   on: {
-                    "on-change": e => {
+                    "on-change": (e) => {
                       this.savePermission(
                         e,
                         4,
                         params.index,
                         params.row.operation
                       );
-                    }
-                  }
+                    },
+                  },
                 },
                 [
                   h("Option", {
                     props: {
-                      value: "Yes"
-                    }
-                  }),
-                 h("Option", {
-                    props: {
-                      value: "Parent activity members"
+                      value: "Yes",
                     },
-                    attrs: {
-                      title:
-                        "Parent activity members can access"
-                    }
                   }),
                   h("Option", {
                     props: {
-                      value: "No"
-                    }
-                  })
+                      value: "Parent activity members",
+                    },
+                    attrs: {
+                      title: "Parent activity members can access",
+                    },
+                  }),
+                  h("Option", {
+                    props: {
+                      value: "No",
+                    },
+                  }),
                 ]
               );
             } else if (
@@ -346,36 +343,24 @@ export default {
               "[object Null]"
             ) {
             }
-          }
-        }
+          },
+        },
       ],
       permissionList: [],
       permission: {},
-      // project 信息
-      projectId: this.$route.params.id,
-      projectLevel: this.$route.params.level,
-      projectInfo: {},
+      userInfo: JSON.parse(sessionStorage.getItem("userInfo")),
+      // activity 信息
+      activityId: this.$route.params.id,
+      activityLevel: this.$route.params.level,
+      activityInfo: {},
     };
   },
   beforeRouteEnter: (to, from, next) => {
-    next(vm => {
+    next((vm) => {
       if (!vm.$store.getters.userState) {
-        // next("/login");
-        var pageUrl = window.location.href;
-        this.axios
-          .get("/GeoProblemSolving/user/login?pageUrl="+pageUrl)
-          .then(res=>{
-            window.location.href = res.data;
-          })
+        next("/login");
       } else {
-        //projectInfo去哪拿？
-        // if (vm.projectInfo.managerId !== vm.$store.getters.userId) {
-        //   vm.$Message.error("You have no property to access it");
-        //   // next(`/project/${vm.$store.getters.currentProjectId}`);
-        //   vm.$router.go(-1);
-        // } else {
-        //   next();
-        // }
+        next();
       }
     });
   },
@@ -383,52 +368,35 @@ export default {
     this.getPermission();
   },
   methods: {
-    getPermission() {
-      if (JSON.stringify(this.projectInfo) != "{}") {
-        this.projectInfo = projectInfo;
-        if (this.projectInfo.permission != undefined) {
-          this.permission = JSON.parse(this.projectInfo.permission);
-        } else {
-          this.permission = userRoleJS.getDefault();
-        }
-        this.getPermissionList();
+    async getPermission() {
+      let url = "/GeoProblemSolving";
+      if (this.activityLevel == 0) {
+        url += "/project/" + this.activityId;
+      } else if (this.activityLevel == 1) {
+        url += "/subproject/" + this.activityId;
+      } else if (this.activityLevel > 1) {
+        url += "/activity/" + this.activityId;
       } else {
-        var projectUrl = "/GeoProblemSolving";
-        switch (this.projectLevel) {
-          case "0":
-            projectUrl += "/project/" +this.projectId;
-            break;
-          case "1":
-            projectUrl += "/subproject/" + this.projectId;
-            break;
-          default:
-            projectUrl += "/activity/" +  this.projectId;
-        }
-        $.ajax({
-          url:
-            // "/GeoProblemSolving/project/" + this.projectId,
-          projectUrl,
-          type: "GET",
-          async: false,
-          success: data => {
-            if (data == "Offline") {
-              this.$store.commit("userLogout");
-              // this.$router.push({ name: "Login" });
-            } else if (data != "None" && data != "Fail") {
-              this.projectInfo = data.data;
-
-              if (this.projectInfo.permission != undefined) {
-                this.permission = JSON.parse(this.projectInfo.permission);
-              } else {
-                this.permission = userRoleJS.getDefault();
-              }
-              this.getPermissionList();
-            } else {
-              console.log(data);
-            }
-          }
-        });
+        window.history.go(-1);
       }
+
+      this.activityInfo = await get(url);
+
+      if (
+        userRoleJS.roleIdentify(
+          this.activityInfo.members,
+          this.userInfo.userId
+        ) != "manager"
+      ) {
+        this.$Message.error("You are not the activity manager.");
+      }
+
+      if (this.activityInfo.permission != undefined) {
+        this.permission = JSON.parse(this.activityInfo.permission);
+      } else {
+        this.permission = userRoleJS.getDefault();
+      }
+      this.getPermissionList();
     },
     getPermissionList() {
       this.permissionList = userRoleJS.permissionJson2Array(this.permission);
@@ -665,31 +633,34 @@ export default {
       this.getPermissionList();
     },
     save2Project() {
-      this.projectInfo.permission = JSON.stringify(this.permission);
+      this.activityInfo.permission = JSON.stringify(this.permission);
       this.axios
-        .put("/GeoProblemSolving/project/"+ this.projectInfo.aid, this.projectInfo)
-        .then(res => {
+        .put(
+          "/GeoProblemSolving/project/" + this.activityInfo.aid,
+          this.activityInfo
+        )
+        .then((res) => {
           this.resetProjectTypeModel = false;
           if (res.data == "Offline") {
             // parent.location.href = "/GeoProblemSolving/login";
             var pageUrl = parent.location.href;
             this.axios
-              .get("/GeoProblemSolving/user/login?pageUrl="+pageUrl)
-              .then(res=>{
+              .get("/GeoProblemSolving/user/login?pageUrl=" + pageUrl)
+              .then((res) => {
                 parent.location.href = res.data;
-              })
+              });
           } else if (res.data.code == 0) {
             this.$Notice.info({
-              desc: "Update permission successfully. "
+              desc: "Update permission successfully. ",
             });
           } else {
             this.$Message.error(res.data.msg);
           }
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err.data);
         });
-    }
-  }
+    },
+  },
 };
 </script>

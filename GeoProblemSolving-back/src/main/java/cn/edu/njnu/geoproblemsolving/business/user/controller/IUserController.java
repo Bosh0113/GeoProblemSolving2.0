@@ -150,4 +150,30 @@ public class IUserController {
     //     String[] memberName = {"zhengzhong","zhansan", "Lisi"};
     //     return ResultUtils.success(memberName);
     // }
+
+    /**
+     * @Author mzy
+     * @Date 2020.12.18
+     */
+
+    /**
+     * Inquiry information of one user
+     * @param key：userId, email
+     * @param value
+     * @return
+     */
+    @RequestMapping(method = RequestMethod.GET)
+    public JsonResult getUserInfo(@RequestParam String key, @RequestParam String value){
+        return userDao.getUserInfo(key, value);
+    }
+
+    /**
+     * Store user information to database
+     * @param user
+     * @return
+     */
+    @RequestMapping(method = RequestMethod.POST)
+    public JsonResult addUserInfo(@RequestBody User user){
+        return userDao.addUserInfo(user);
+    }
 }

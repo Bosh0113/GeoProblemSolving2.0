@@ -1085,15 +1085,9 @@ export default {
   beforeRouteEnter: (to, from, next) => {
     next(vm => {
       if (!vm.$store.getters.userState || vm.$store.getters.userId == "") {
-        // vm.$router.push({
-        //   name: "Login"
-        // });
-        var pageUrl = window.location.href;
-        this.axios
-          .get("/GeoProblemSolving/user/login?pageUrl="+pageUrl)
-          .then(res=>{
-            window.location.href = res.data;
-          })
+        vm.$router.push({
+          name: "Login"
+        });
       } else {
       }
     });

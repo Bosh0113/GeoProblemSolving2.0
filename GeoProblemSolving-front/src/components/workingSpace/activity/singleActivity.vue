@@ -1,63 +1,142 @@
 <template>
   <div>
-    <div style="display:flex; background-color: #f8f8f9;">
+    <div style="display: flex; background-color: #f8f8f9">
       <div
-        style="width:250px;margin-right: 5px; border-right: 1px solid #dcdee2;; background-color: white;"
+        style="
+          width: 250px;
+          margin-right: 5px;
+          border-right: 1px solid #dcdee2;
+          background-color: white;
+        "
       >
-        <vue-scroll :ops="scrollOps" style="height:calc(100vh - 70px)">
-          <div style="padding:5px 10px;">
-            <h3 style="display:inline-block">Name:</h3>
-            <p style="font-size: medium; padding-top:5px">{{activityInfo.name}}</p>
-            <Divider style="margin:10px 0" />
-            <h3 style="display:inline-block">Purpose:</h3>
-            <p style="font-size: medium; padding-top:5px">{{activityInfo.purpose}}</p>
-            <Divider style="margin:10px 0" />
+        <vue-scroll :ops="scrollOps" style="height: calc(100vh - 70px)">
+          <div style="padding: 5px 10px">
+            <h3 style="display: inline-block">Name:</h3>
+            <p style="font-size: medium; padding-top: 5px">
+              {{ activityInfo.name }}
+            </p>
+            <Divider style="margin: 10px 0" />
+            <h3 style="display: inline-block">Purpose:</h3>
+            <p style="font-size: medium; padding-top: 5px">
+              {{ activityInfo.purpose }}
+            </p>
+            <Divider style="margin: 10px 0" />
             <h3>Description:</h3>
             <p
-              style="font-size: larger;white-space: pre-line;word-break: break-word; padding-top:5px"
-            >{{activityInfo.description}}</p>
-            <Divider style="margin:10px 0" />
-
-<!--            项目成员显示-->
-            <h3>Members:</h3>
-            <Card
-              v-for="(member, index) in participants"
-              :key="'online' + index"
-              style="margin:5px 0"
-              :padding="5"
+              style="
+                font-size: small;
+                white-space: normal;
+                word-break: break-word;
+                padding-top: 5px;
+              "
             >
-              <div
-                style="display:flex;align-items:center;cursor:pointer"
-                @click="gotoPersonalSpace(member.userId)"
-              >
-                <div class="memberImg" style="position:relative">
-                  <img
-                    v-if="member.avatar != '' && member.avatar!='undefined'"
-                    :src="member.avatar"
-                    style="width:40px;height:40px"
-                  />
-                  <avatar v-else :username="member.userName" :size="40" :rounded="false"></avatar>
-                  <div class="onlinecircle"></div>
+              {{ activityInfo.description }}
+            </p>
+            <Divider style="margin: 10px 0" />
+            <!--项目成员显示-->
+            <h3 style="display: contents">Members:</h3>
+            <Icon
+              v-if="
+                activityInfo.level > 0 &&
+                permissionIdentity(
+                  activityInfo.permission,
+                  userRole,
+                  'manage_member'
+                )
+              "
+              type="md-trash"
+              size="16"
+              title="Remove users"
+              @click="delUserBtn = !delUserBtn"
+              style="
+                float: right;
+                margin: 5px 20px 0 0;
+                cursor: pointer;
+                color: #ed4014;
+              "
+            />
+            <Icon
+              v-if="
+                activityInfo.level > 0 &&
+                permissionIdentity(
+                  activityInfo.permission,
+                  userRole,
+                  'invite_member'
+                )
+              "
+              type="md-person-add"
+              size="16"
+              title="Invite users"
+              @click="preInvitation()"
+              style="
+                float: right;
+                margin: 5px 20px 0 0;
+                cursor: pointer;
+                color: #2d8cf0;
+              "
+            />
+            <Icon
+              v-if="userRole != 'visitor'"
+              type="md-log-out"
+              size="16"
+              title="Leave the activity"
+              @click="quitActivityModal = true"
+              style="float: right; margin: 5px 20px 0 0; cursor: pointer"
+            />
+            <Card
+              style="margin: 5px 0"
+              :padding="5"
+              v-for="member in participants"
+              :key="member.name"
+            >
+              <div style="display: flex; align-items: center">
+                <div
+                  v-if="delUserBtn"
+                  style="cursor: pointer; margin-right: 10px"
+                  @click="selectMember(member)"
+                >
+                  <Icon type="md-remove-circle" size="20" color="#ed4014" />
                 </div>
-                <div class="memberDetail">
-                  <div class="memberName">
-                    <span>{{member.name}}</span>
+                <div
+                  @click="gotoPersonalSpace(member.userId)"
+                  style="display: flex; align-items: center; cursor: pointer"
+                >
+                  <div class="memberImg" style="position: relative">
+                    <img
+                      v-if="member.avatar != '' && member.avatar != undefined"
+                      :src="member.avatar"
+                      style="width: 40px; height: 40px"
+                    />
+                    <avatar
+                      v-else
+                      :username="member.name"
+                      :size="40"
+                      :rounded="true"
+                    />
+                    <div class="onlinecircle"></div>
                   </div>
-                  <div class="memberRole">
-                    <span>{{member.role}}</span>
+                  <div class="memberDetail">
+                    <div class="memberName">
+                      <span>{{ member.name }}</span>
+                    </div>
+                    <div class="memberRole">
+                      <span>{{ member.role }}</span>
+                    </div>
                   </div>
                 </div>
               </div>
             </Card>
-            <Divider style="margin:10px 0" />
+            <Divider style="margin: 10px 0" />
           </div>
         </vue-scroll>
       </div>
-      <div style="flex:1; border-left: 1px solid #dcdee2; background-color: white;">
+      <div
+        style="flex: 1; border-left: 1px solid #dcdee2; background-color: white"
+      >
         <Menu
           mode="horizontal"
           :active-name="activeMenu"
-          style="height: 45px; line-height: 45px;"
+          style="height: 45px; line-height: 45px"
           @on-select="changeMenuItem"
         >
           <MenuItem name="Workspace">
@@ -68,63 +147,116 @@
           </MenuItem>
         </Menu>
 
-        <div v-show="activeMenu=='Workspace'">
-          <vue-scroll :ops="scrollOps" style="height:calc(100vh - 120px); margin-top:5px">
+        <div v-show="activeMenu == 'Workspace'">
+          <vue-scroll
+            :ops="scrollOps"
+            style="height: calc(100vh - 120px); margin-top: 5px"
+          >
             <universal-space
-              v-if="activityInfo.purpose=='Others'"
+              v-if="activityInfo.purpose == 'Others'"
               :activityInfo="activityInfo"
               :participants="participants"
             ></universal-space>
             <context-res
-              v-else-if="activityInfo.purpose=='Context definition & resource collection'"
+              v-else-if="
+                activityInfo.purpose ==
+                'Context definition & resource collection'
+              "
               :activityInfo="activityInfo"
               :participants="participants"
             ></context-res>
             <data-processing
-              v-else-if="activityInfo.purpose=='Data processing'"
+              v-else-if="activityInfo.purpose == 'Data processing'"
               :activityInfo="activityInfo"
               :participants="participants"
             ></data-processing>
             <data-visual
-              v-else-if="activityInfo.purpose=='Data visualization'"
+              v-else-if="activityInfo.purpose == 'Data visualization'"
               :activityInfo="activityInfo"
               :participants="participants"
             ></data-visual>
             <model-build
-              v-else-if="activityInfo.purpose=='Geo-analysis model construction'"
+              v-else-if="
+                activityInfo.purpose == 'Geo-analysis model construction'
+              "
               :activityInfo="activityInfo"
               :participants="participants"
             ></model-build>
             <model-evaluation
-              v-else-if="activityInfo.purpose=='Model effectiveness evaluation'"
+              v-else-if="
+                activityInfo.purpose == 'Model effectiveness evaluation'
+              "
               :activityInfo="activityInfo"
               :participants="participants"
             ></model-evaluation>
             <geo-simulation
-              v-else-if="activityInfo.purpose=='Geographical simulation'"
+              v-else-if="activityInfo.purpose == 'Geographical simulation'"
               :activityInfo="activityInfo"
               :participants="participants"
             ></geo-simulation>
             <geo-analysis
-              v-else-if="activityInfo.purpose=='Data analysis'"
+              v-else-if="activityInfo.purpose == 'Data analysis'"
               :activityInfo="activityInfo"
               :participants="participants"
             ></geo-analysis>
             <decision-making
-              v-else-if="activityInfo.purpose=='Decision making'"
+              v-else-if="activityInfo.purpose == 'Decision making'"
               :activityInfo="activityInfo"
               :participants="participants"
             ></decision-making>
           </vue-scroll>
         </div>
-        <div v-show="activeMenu=='Task'">
+        <div v-show="activeMenu == 'Task'">
           <task-manager :activityInfo="activityInfo"></task-manager>
         </div>
       </div>
     </div>
+    <Modal
+      v-model="inviteModal"
+      width="660px"
+      title="Invite new members"
+      @on-ok="inviteMembers"
+      ok-text="Ok"
+      cancel-text="Cancel"
+    >
+      <Transfer
+        :data="potentialMembers"
+        :target-keys="invitingMembers"
+        :list-style="listStyle"
+        :render-format="memberRender"
+        :titles="['Members of the parent activity', 'Members of this activity']"
+        filter-placeholder="Enter key words..."
+        filterable
+        :filter-method="filterMethod"
+        @on-change="handleChange"
+      ></Transfer>
+    </Modal>
+    <Modal
+      v-model="removeMemberModal"
+      width="400px"
+      title="Remove this member"
+      @on-ok="removeUser()"
+      ok-text="Ok"
+      cancel-text="Cancel"
+    >
+      <h4 style="color: red">Are you sure to remove this member?</h4>
+    </Modal>
+    <Modal
+      v-model="quitActivityModal"
+      width="400px"
+      title="Leave this activity"
+      @on-ok="leaveActivity()"
+      ok-text="Ok"
+      cancel-text="Cancel"
+    >
+      <h4 style="color: red">Are you sure to quit this subproject?</h4>
+    </Modal>
   </div>
 </template>
 <script>
+import Avatar from "vue-avatar";
+import * as userRoleJS from "./../../../api/userRole.js";
+import { get, del, post, put } from "../../../axios";
 import taskManager from "./utils/taskManger.vue";
 import universalSpace from "./funcs/universalSpace.vue";
 import contextRes from "./funcs/contextAndResource.vue";
@@ -138,6 +270,7 @@ import decisionMaking from "./funcs/decisionMaking.vue";
 export default {
   props: ["activityInfo"],
   components: {
+    Avatar,
     taskManager,
     universalSpace,
     contextRes,
@@ -156,27 +289,294 @@ export default {
           background: "lightgrey",
         },
       },
+      projectInfo: parent.vm.projectInfo,
       activeMenu: "Workspace",
       userInfo: JSON.parse(sessionStorage.getItem("userInfo")),
-      contentHeight: 560,
-      participants: [
-        // { name: "AAA", role: "manager" },
-        // { name: "AAA", role: "manager" },
-        // { name: "AAA", role: "manager" },
-        // { name: "AAA", role: "manager" },
-        // { name: "AAA", role: "manager" },
-        // { name: "AAA", role: "manager" },
-        // { name: "AAA", role: "manager" },
-        // { name: "AAA", role: "manager" },
-        // { name: "AAA", role: "manager" },
-        // { name: "AAA", role: "manager" },
-        // { name: "AAA", role: "manager" },
-        // { name: "AAA", role: "manager" },
-      ],
+      userRole: "visitor",
+      participants: [],
+      // add
+      potentialMembers: [],
+      invitingMembers: [],
+      inviteModal: false,
+      // remove
+      delUserBtn: false,
+      slctDletMember: {},
+      removeMemberModal: false,
+      // leave
+      quitActivityModal: false,
+      listStyle: { width: "280px", height: "360px" },
     };
   },
-  mounted() {},
+  created() {
+    this.userRole = this.roleIdentity(this.activityInfo);
+    this.getParticipants();
+  },
   methods: {
+    roleIdentity(activity) {
+      return userRoleJS.roleIdentify(activity.members, this.userInfo.userId);
+    },
+    permissionIdentity(permission, role, operation) {
+      if (operation == "auto_join") {
+        if (JSON.parse(permission).auto_join.visitor == "Yes") return true;
+        else if (JSON.parse(permission).auto_join.visitor == "No") return false;
+        else {
+          return this.getParentPermission();
+        }
+      } else {
+        return userRoleJS.permissionIdentity(
+          JSON.parse(permission),
+          role,
+          operation
+        );
+      }
+    },
+    async preInvitation() {
+      let url = "";
+      let activity = this.activityInfo;
+      if (activity.level == 1) {
+        url = "/GeoProblemSolving/project/" + activity.parent + "/user";
+      } else if (activity.level == 2) {
+        url = "/GeoProblemSolving/subproject/" + activity.parent + "/user";
+      } else if (activity.level > 2) {
+        url = "/GeoProblemSolving/activity/" + activity.parent + "/user";
+      } else {
+        return;
+      }
+      let data = await get(url);
+
+      this.potentialMembers = [];
+      this.invitingMembers = [];
+      let candidates = data.members;
+      for (let i = 0; i < candidates.length; i++) {
+        this.potentialMembers.push({
+          key: this.potentialMembers.length,
+          userId: candidates[i].userId,
+          name: candidates[i].name,
+          role: candidates[i].role,
+          disabled: this.participants.contains(candidates[i])
+        });
+      }
+      this.invitingMembers = this.getTargetKeys();
+      this.inviteModal = true;
+    },
+    getTargetKeys() {
+      return this.potentialMembers
+        .filter((item) => {
+          return item.disabled;
+        })
+        .map((item) => item.key);
+    },
+    memberRender(item) {
+      return `<span title="${item.name} - ${item.role}">${item.name} - ${item.role}</span>`;
+    },
+    filterMethod(data, query) {
+      return data.name.indexOf(query) > -1;
+    },
+    handleChange(newTargetKeys) {
+      this.invitingMembers = newTargetKeys;
+    },
+    inviteMembers() {
+      let activity = this.activityInfo;
+
+      // add members
+      for (var i = 0; i < this.invitingMembers.length; i++) {
+        let index = this.invitingMembers[i];
+        if (this.participants.contains(this.potentialMembers[index])) continue;
+
+        let user = this.potentialMembers[index];
+        let url = "";
+        if (activity.level == 1) {
+          url =
+            "/GeoProblemSolving/subproject/" +
+            activity.aid +
+            "/user?userId=" +
+            user.userId;
+        } else if (activity.level > 1) {
+          url =
+            "/GeoProblemSolving/activity/" +
+            activity.aid +
+            "/user?userId=" +
+            user.userId;
+        } else {
+          return;
+        }
+
+        this.axios
+          .post(url)
+          .then((res) => {
+            if (res.data.code == 0) {
+              this.participants.push(user);
+              //notice
+              let notice = {
+                recipientId: user.userId,
+                type: "notice",
+                content: {
+                  title: "Join activity",
+                  description:
+                    "You have been invited by " +
+                    this.userInfo.name +
+                    " to join the activity: " +
+                    activity.name +
+                    " in project: " +
+                    this.projectInfo.name +
+                    " , and now you are a member in this activity!",
+                },
+              };
+              this.sendNotice(activity, notice);
+            } else {
+              console.log(res.data.msg);
+            }
+          })
+          .catch((err) => {
+            throw err;
+          });
+      }
+    },
+    selectMember(member) {
+      this.slctDletMember = member;
+      this.removeMemberModal = true;
+    },
+    removeUser() {
+      let url = "";
+      let member = this.slctDletMember;
+      let activity = this.activityInfo;
+      if (activity.level == 1) {
+        url =
+          "/GeoProblemSolving/subproject/" +
+          activity.aid +
+          "/user?userId=" +
+          member.userId;
+      } else if (activity.level > 1) {
+        url =
+          "/GeoProblemSolving/activity/" +
+          activity.aid +
+          "/user?userId=" +
+          member.userId;
+      } else {
+        return;
+      }
+
+      this.axios
+        .delete(url)
+        .then((res) => {
+          if (res.data.code == 0) {
+            let index = this.participants.indexOf(member);
+            this.participants.splice(index, 1);
+            //notice
+            let notice = {
+              recipientId: member.userId,
+              type: "notice",
+              content: {
+                title: "Leave activity",
+                description:
+                  "You have been remove from the activity: " +
+                  activity.name +
+                  " in project: " +
+                  this.projectInfo.name +
+                  ".",
+              },
+            };
+            this.sendNotice(activity, notice);
+          } else {
+            console.log(res.data.msg);
+          }
+        })
+        .catch((err) => {
+          throw err;
+        });
+    },
+    leaveActivity() {
+      let member = this.userInfo;
+      let activity = this.activityInfo;
+      // get url
+      let url = "";
+      if (activity.level == 1) {
+        url =
+          "/GeoProblemSolving/subproject/" +
+          activity.aid +
+          "/user?userId=" +
+          member.userId;
+      } else if (activity.level > 1) {
+        url =
+          "/GeoProblemSolving/activity/" +
+          activity.aid +
+          "/user?userId=" +
+          member.userId;
+      } else {
+        return;
+      }
+
+      this.axios
+        .delete(url)
+        .then((res) => {
+          if (res.data.code == 0) {
+            parent.location.href =
+              "/GeoProblemSolving/projectInfo/" +
+              this.projectInfo.aid +
+              "?content=workspace&aid=" +
+              activity.parent +
+              "&level=" +
+              (activity.level - 1).toString();
+            //notice
+            let notice = {
+              recipientId: userRoleJS.getMemberByRole(
+                this.activityInfo,
+                "manager"
+              ),
+              type: "notice",
+              content: {
+                title: "Leave activity",
+                description:
+                  member.name +
+                  " left the activity: " +
+                  activity.name +
+                  " in project: " +
+                  this.projectInfo.name +
+                  ".",
+              },
+            };
+            this.sendNotice(activity, notice);
+          } else {
+            console.log(res.data.msg);
+          }
+        })
+        .catch((err) => {
+          throw err;
+        });
+    },
+    sendNotice(activity, notice) {
+      if (
+        Object.prototype.toString.call(activity.recipientId) == "[object Array]"
+      ) {
+        for (let i = 0; i < activity.recipientId.length; i++) {
+          this.axios
+            .post("/GeoProblemSolving/notice/save", notice)
+            .then((result) => {
+              if (result.data == "Success") {
+                parent.vm.$emit("sendNotice", notice.recipientId[i]);
+              } else {
+                this.$Message.error("Notice fail.");
+              }
+            })
+            .catch((err) => {
+              throw err;
+            });
+        }
+      } else {
+        this.axios
+          .post("/GeoProblemSolving/notice/save", notice)
+          .then((result) => {
+            if (result.data == "Success") {
+              parent.vm.$emit("sendNotice", notice.recipientId);
+            } else {
+              this.$Message.error("Notice fail.");
+            }
+          })
+          .catch((err) => {
+            throw err;
+          });
+      }
+    },
     gotoPersonalSpace(id) {
       if (id == this.$store.getters.userId) {
         this.$router.push({ name: "PersonalPage" });
@@ -186,6 +586,31 @@ export default {
     },
     changeMenuItem(name) {
       this.activeMenu = name;
+    },
+    getParticipants() {
+      let url = "";
+      let activity = this.activityInfo;
+      if (activity.level == 0) {
+        url = "/GeoProblemSolving/project/" + activity.aid + "/user";
+      } else if (activity.level == 1) {
+        url = "/GeoProblemSolving/subproject/" + activity.aid + "/user";
+      } else if (activity.level > 1) {
+        url = "/GeoProblemSolving/activity/" + activity.aid + "/user";
+      }
+      //callback setTimeBack
+      this.axios
+        .get(url)
+        .then((res) => {
+          if (res.data.code == 0) {
+            this.creatorInfo = res.data.data.creator;
+            this.participants = res.data.data.members;
+          } else {
+            console.log(res.data.msg);
+          }
+        })
+        .catch((err) => {
+          throw err;
+        });
     },
   },
 };
@@ -224,6 +649,6 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  max-width: 50%;
+  max-width: 100%;
 }
 </style>

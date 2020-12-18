@@ -77,7 +77,6 @@
             </div>
             <FormItem
               label="Password"
-              v-if="passwordInputShow"
               style="margin-top: 20px"
             >
               <Input
@@ -185,7 +184,13 @@ export default {
           throw err;
         });
     },
-    joinProject(userId) {
+    async joinProject(userId) {
+      
+      if(this.password == "") {
+        this.$Message.error("Please fill in your password.");
+        return;
+      }
+      
       this.axios
         .post(
           "/GeoProblemSolving/project/" +
@@ -195,11 +200,17 @@ export default {
         )
         .then((res) => {
           if (res.data.code == 0) {
-            let url =
-              window.location.origin + 
-              "/GeoProblemSolving/projectInfo/" +
-              this.projectId;
-            this.login(url);
+            if (
+              this.$store.getters.userState &&
+              this.$store.getters.userId == userId
+            ) {
+              window.location.href("/GeoProblemSolving/projectInfo/" + this.$route.params.id);
+            } else if(!this.$store.getters.userState) {
+              this.autoLogin()
+            } else if (this.$store.getters.userId != userId){
+              await get("/GeoProblemSolving/user/logout");
+              this.autoLogin()
+            }
           } else {
             console.log(res.data.msg);
           }
@@ -209,6 +220,10 @@ export default {
         });
     },
     async registerAndJoin() {
+      if(this.password == "") {
+        this.$Message.error("Please fill in your password.");
+        return;
+      }
       // register in UserServer
       let userInfo = {
         email: this.email,
@@ -235,14 +250,24 @@ export default {
           throw err;
         });
     },
-    async login(url) {
-      if (this.userState) {
-        await get("/GeoProblemSolving/user/logout");
-      }
+    autoLogin() {
       this.axios
-        .get("/GeoProblemSolving/user/login?pageUrl=" + url)
+        .get(
+          "/GeoProblemSolving/user/login" +
+            "?email=" +
+            this.email +
+            "&password=" +
+            this.passsword
+        )
         .then((res) => {
-          window.location.href = res.data;
+          if (res.data === "Email") {
+            this.$Message.error("Email does not exist.");
+          } else if (res.data === "Password" || res.data === "Fail") {
+            this.$Message.error("Invalid account or password.");
+          } else {
+            this.$store.commit("userLogin", res.data);
+            window.location.href("/GeoProblemSolving/projectInfo/" + this.$route.params.id);
+          }
         });
     },
   },

@@ -24,18 +24,10 @@
                     slot="extra"
                     type="default"
                     class="createTaskBtn"
-                    style="margin-top: -8px"
-                    v-if="taskPermissionIdentity(projectInfo.permission, userRole, 'create_task')"
-                    @click="createTaskModalShow()"
-                    >Add</Button>
-                  <!-- <Button
-                    slot="extra"
-                    type="default"
-                    class="createTaskBtn"
                     style="margin-top:-8px"
-                    v-if="permissionIdentity(activityInfo.permission, 'create_task')"
+                    v-if="permissionIdentity(activityInfo.permission, userRole, 'create_task')"
                     @click="createTaskModalShow()"
-                  >Add</Button> -->
+                  >Add</Button>
                   <vue-scroll
                     :ops="ops"
                     :style="{ height: contentHeight - 80 + 'px' }"
@@ -107,9 +99,9 @@
                                 />
                               </span>
                             </div>
-                            <!-- <div style="float:right">
+                            <div style="float:right">
                             <Rate
-                              :disabled="!(permissionIdentity(activityInfo.permission, 'manage_task') || (permissionIdentity(activityInfo.permission, 'create_task') && item.creatorId == userInfo.userId))"
+                              :disabled="!(permissionIdentity(activityInfo.permission, userRole,  'manage_task') || (permissionIdentity(activityInfo.permission, userRole, 'create_task') && item.creatorId == userInfo.userId))"
                               v-model="item.importance"
                               :count="1"
                               clearable
@@ -117,7 +109,7 @@
                               @on-change="changeImportance(item)"
                             />
                             <template
-                              v-if="permissionIdentity(activityInfo.permission, 'manage_task') || (permissionIdentity(activityInfo.permission, 'create_task') && item.creatorId == userInfo.userId)"
+                              v-if="permissionIdentity(activityInfo.permission, userRole,  'manage_task') || (permissionIdentity(activityInfo.permission, userRole, 'create_task') && item.creatorId == userInfo.userId)"
                             >
                               <span title="Edit">
                                 <Icon
@@ -136,7 +128,7 @@
                                 <Icon type="ios-trash" :size="20" color="gray" />
                               </span>
                             </template>
-                          </div> -->
+                          </div>
                             <p
                               style="
                                 word-break: break-word;
@@ -206,9 +198,9 @@
                                 />
                               </span>
                             </div>
-                            <!-- <div style="float:right">
+                            <div style="float:right">
                             <Rate
-                              :disabled="!(permissionIdentity(activityInfo.permission, 'manage_task') || (permissionIdentity(activityInfo.permission, 'create_task') && item.creatorId == userInfo.userId))"
+                              :disabled="!(permissionIdentity(activityInfo.permission, userRole,  'manage_task') || (permissionIdentity(activityInfo.permission, userRole,  'create_task') && item.creatorId == userInfo.userId))"
                               v-model="item.importance"
                               :count="1"
                               clearable
@@ -216,7 +208,7 @@
                               @on-change="changeImportance(item)"
                             />
                             <template
-                              v-if="permissionIdentity(activityInfo.permission, 'manage_task') || (permissionIdentity(activityInfo.permission, 'create_task') && item.creatorId == userInfo.userId)"
+                              v-if="permissionIdentity(activityInfo.permission, userRole,  'manage_task') || (permissionIdentity(activityInfo.permission, userRole,  'create_task') && item.creatorId == userInfo.userId)"
                             >
                               <span title="Edit">
                                 <Icon
@@ -235,7 +227,7 @@
                                 <Icon type="ios-trash" :size="20" color="gray" />
                               </span>
                             </template>
-                          </div> -->
+                          </div>
                             <p
                               style="
                                 word-break: break-word;
@@ -342,9 +334,9 @@
                                 />
                               </span>
                             </div>
-                            <!-- <div style="float:right" v-show="userRole != 'visitor'">
+                            <div style="float:right" v-show="userRole != 'visitor'">
                             <Rate
-                              :disabled="!(permissionIdentity(activityInfo.permission, 'manage_task') || (permissionIdentity(activityInfo.permission, 'create_task') && item.creatorId == userInfo.userId))"
+                              :disabled="!(permissionIdentity(activityInfo.permission, userRole, 'manage_task') || (permissionIdentity(activityInfo.permission, userRole, 'create_task') && item.creatorId == userInfo.userId))"
                               v-model="item.importance"
                               :count="1"
                               clearable
@@ -352,7 +344,7 @@
                               @on-change="changeImportance(item)"
                             />
                             <template
-                              v-if="permissionIdentity(activityInfo.permission, 'manage_task') || (permissionIdentity(activityInfo.permission, 'create_task') && item.creatorId == userInfo.userId)"
+                              v-if="permissionIdentity(activityInfo.permission, userRole, 'manage_task') || (permissionIdentity(activityInfo.permission, userRole, 'create_task') && item.creatorId == userInfo.userId)"
                             >
                               <span title="Edit">
                                 <Icon
@@ -371,7 +363,7 @@
                                 <Icon type="ios-trash" :size="20" color="gray" />
                               </span>
                             </template>
-                          </div> -->
+                          </div>
                           </div>
                           <p
                             style="
@@ -443,9 +435,9 @@
                                 />
                               </span>
                             </div>
-                            <!-- <div style="float:right" v-show="userRole != 'visitor'">
+                            <div style="float:right" v-show="userRole != 'visitor'">
                             <Rate
-                              :disabled="!(permissionIdentity(activityInfo.permission, 'manage_task') || (permissionIdentity(activityInfo.permission, 'create_task') && item.creatorId == userInfo.userId))"
+                              :disabled="!(permissionIdentity(activityInfo.permission, userRole, 'manage_task') || (permissionIdentity(activityInfo.permission, userRole, 'create_task') && item.creatorId == userInfo.userId))"
                               v-model="item.importance"
                               :count="1"
                               clearable
@@ -453,7 +445,7 @@
                               @on-change="changeImportance(item)"
                             />
                             <template
-                              v-if="permissionIdentity(activityInfo.permission, 'manage_task') || (permissionIdentity(activityInfo.permission, 'create_task') && item.creatorId == userInfo.userId)"
+                              v-if="permissionIdentity(activityInfo.permission, userRole, 'manage_task') || (permissionIdentity(activityInfo.permission, userRole, 'create_task') && item.creatorId == userInfo.userId)"
                             >
                               <span title="Edit">
                                 <Icon
@@ -472,7 +464,7 @@
                                 <Icon type="ios-trash" :size="20" color="gray" />
                               </span>
                             </template>
-                          </div> -->
+                          </div>
                           </div>
                           <p
                             style="
@@ -573,9 +565,9 @@
                                 />
                               </span>
                             </div>
-                            <!-- <div style="float:right" v-show="userRole != 'visitor'">
+                            <div style="float:right" v-show="userRole != 'visitor'">
                             <Rate
-                              :disabled="!(permissionIdentity(activityInfo.permission, 'manage_task') || (permissionIdentity(activityInfo.permission, 'create_task') && item.creatorId == userInfo.userId))"
+                              :disabled="!(permissionIdentity(activityInfo.permission, userRole, 'manage_task') || (permissionIdentity(activityInfo.permission, userRole, 'create_task') && item.creatorId == userInfo.userId))"
                               v-model="item.importance"
                               :count="1"
                               clearable
@@ -583,7 +575,7 @@
                               @on-change="changeImportance(item)"
                             />
                             <template
-                              v-if="permissionIdentity(activityInfo.permission, 'manage_task') || (permissionIdentity(activityInfo.permission, 'create_task') && item.creatorId == userInfo.userId)"
+                              v-if="permissionIdentity(activityInfo.permission, userRole, 'manage_task') || (permissionIdentity(activityInfo.permission, userRole, 'create_task') && item.creatorId == userInfo.userId)"
                             >
                               <span title="Edit">
                                 <Icon
@@ -602,7 +594,7 @@
                                 <Icon type="ios-trash" :size="20" color="gray" />
                               </span>
                             </template>
-                          </div> -->
+                          </div>
                             <p
                               style="
                                 word-break: break-word;
@@ -672,9 +664,9 @@
                                 />
                               </span>
                             </div>
-                            <!-- <div style="float:right" v-show="userRole != 'visitor'">
+                            <div style="float:right" v-show="userRole != 'visitor'">
                             <Rate
-                              :disabled="!(permissionIdentity(activityInfo.permission, 'manage_task') || (permissionIdentity(activityInfo.permission, 'create_task') && item.creatorId == userInfo.userId))"
+                              :disabled="!(permissionIdentity(activityInfo.permission, userRole, 'manage_task') || (permissionIdentity(activityInfo.permission, userRole, 'create_task') && item.creatorId == userInfo.userId))"
                               v-model="item.importance"
                               :count="1"
                               clearable
@@ -682,7 +674,7 @@
                               @on-change="changeImportance(item)"
                             />
                             <template
-                              v-if="permissionIdentity(activityInfo.permission, 'manage_task') || (permissionIdentity(activityInfo.permission, 'create_task') && item.creatorId == userInfo.userId)"
+                              v-if="permissionIdentity(activityInfo.permission, userRole, 'manage_task') || (permissionIdentity(activityInfo.permission, userRole, 'create_task') && item.creatorId == userInfo.userId)"
                             >
                               <span title="Edit">
                                 <Icon
@@ -701,7 +693,7 @@
                                 <Icon type="ios-trash" :size="20" color="gray" />
                               </span>
                             </template>
-                          </div> -->
+                          </div>
                             <p
                               style="
                                 word-break: break-word;
@@ -1107,7 +1099,7 @@ export default {
         this.userInfo.userId
       );
     },
-    taskPermissionIdentity(permission, role ,operation) {
+    permissionIdentity(permission, role ,operation) {
       return userRoleJS.permissionIdentity(
         JSON.parse(permission),
         role,
