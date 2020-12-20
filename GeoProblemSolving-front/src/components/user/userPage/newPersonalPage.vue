@@ -108,7 +108,9 @@
       <Col span="19" offset="1">
         <Row style="margin-top: 30px"></Row>
         <Row>
-          <todo-list></todo-list>
+<!--          <todo-list></todo-list>-->
+<!--          <notification></notification>-->
+          <resource></resource>
         </Row>
 
 <!--                <notification />-->
@@ -125,10 +127,12 @@
   import notification from "../subPage/notification";
   import resource from "../subPage/resource";
   import todoList from "../subPage/todoList";
+  import Project from "../subPage/project";
 
   export default {
     name: "newPersonalPage",
     components: {
+      Project,
       ToWork,
       projectVue,
       notification,

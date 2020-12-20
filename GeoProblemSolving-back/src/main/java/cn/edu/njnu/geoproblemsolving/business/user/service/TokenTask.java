@@ -57,6 +57,7 @@ public class TokenTask {
      */
     public JSONObject getUserFromResServer(String access_token){
         HttpHeaders headers = new HttpHeaders();
+        StaticParams.access_token = access_token;
         headers.add("Authorization", "Bearer "+ access_token);
         //httpEntity = httpHeader + httpBody,当然也可以只有其中一部分
         HttpEntity<Object> httpEntity = new HttpEntity<>(headers);

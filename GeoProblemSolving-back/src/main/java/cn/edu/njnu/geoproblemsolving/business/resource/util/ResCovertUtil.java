@@ -15,6 +15,7 @@ public class ResCovertUtil {
         userBaseRes.put("address", "dataContainer");
         userBaseRes.put("parent", "no info");
         userBaseRes.put("md5", resMd5);
+        userBaseRes.put("privacy", resourceEntity.getPrivacy());
         userBaseRes.put("suffix", "");
         userBaseRes.put("description", resourceEntity.getDescription());
         userBaseRes.put("template", "");

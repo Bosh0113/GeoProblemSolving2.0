@@ -47,6 +47,7 @@ public class IUserController {
     //     }
     //
     // }
+
    @RequestMapping(value = "/login", method = RequestMethod.GET)
    public Object login(@RequestParam("email") String email, @RequestParam("password") String password, HttpServletRequest request) {
        HttpSession session = request.getSession();
@@ -79,7 +80,7 @@ public class IUserController {
     //         //查询如果无的话，则将此用户存入到本地数据库中
     //         StaticParams.loginUser = userDao.findUserById(userId);
     //         if (StaticParams.loginUser == null) {
-    //             // StaticParams.loginUser = (User) userDao.saveUser(userBase);
+    //             StaticParams.loginUser = (User) userDao.saveUser(userBase);
     //             StaticParams.loginUser = (User) userDao.saveLocalUser(gsmUser);
     //         }
     //         HttpSession session = req.getSession();
