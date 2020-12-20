@@ -27,29 +27,39 @@
     </Row>
     <Row>
       <Col span="22" offset="1">
-
-        <Card>
+        <Card >
           <!--         新建任务   -->
-          <div>
-            <Input prefix="ios-contact" suffix="md-calendar"/>
+          <div >
+            <DatePicker
+              type="date"
+              style="position: absolute;top: 18px; right: 50px; z-index: 3"
+              class="customDatePicker custom"
+              title="select endTime"
+              @on-change ="handleChange"
+            >
+            </DatePicker>
+            <Input
+              v-model="newTask.discription"
+              prefix="ios-radio-button-off"
+              placeholder="Add Todo"
+              size="large"
+              @on-enter="addTask()"
+              style="display: inline-block;"
+              class="customIcon"
+            />
           </div>
+
           <!--      未完成            -->
           <div>
             <Card>
               <p slot="title">Doing</p>
               <div>
-                <Card>
-                  This is doing task space.On the path towards power systems with high renewable penetrations and ultimately carbon-neutral, more and more synchronous generation is being displaced by variable renewable generation that does not currently provide system inertia nor reactive power support. This could create serious issues of power system stability in the near future, and countries with high renewable penetrations such as Ireland are already facing these challenges. Therefore, this paper aims at answering the questions of whether and how explicitly including inertia and reactive power constraints in generation expansion planning would affect the optimal capacity mix of the power system of the future. Towards this end, we propose the novel Low-carbon Expansion Generation Optimization model, which explicitly accounts for: unit commitment constraints, Rate of Change of Frequency inertia requirements and virtual inertia provision, and, a second-order cone programming approximation of the AC power flow, accounting for reactive power constraints. An illustrative case study underlines that disregarding inertia and reactive power constraints in generation expansion planning can result in additional system cost, system infeasibilities, a distortion of optimal resource allocation and inability to reach established policy goals.
-                  <p slot="title">
-                    x
-                  <div style="display: inline-block;float: left">
-                    <Icon type="ios-star-outline"/>
-                    <Icon type="ios-star"/>
-                  </div>
-                  </p>
-                  <!--                  标记与否 -->
-
-
+                <Card class="customIcon">
+                  <Icon type="ios-radio-button-off" size="20" />
+                  <Icon type="ios-close"  size="31" style="float: right;color: #ff7800;cursor: pointer; line-height: .8" />
+                  <Icon v-if="test" size="20" type="ios-star-outline" style="float: right;cursor: pointer;margin-right: 20px" />
+                  <Icon v-else size="20" type="ios-star" style="float: right;cursor:pointer;margin-right: 20px" />
+                  This is doing task space.
                 </Card>
               </div>
             </Card>
@@ -60,9 +70,12 @@
               <p slot="title">Done</p>
               <!--            显示内容                -->
               <div>
-                <Card>
-                  This is done task space.
-
+                <Card class="customIcon">
+                  <Icon type="ios-checkmark-circle-outline" size="20" style="line-height: .8"/>
+                  <Icon type="ios-close"  size="31" style="float: right;color: #ff7800;cursor: pointer; line-height: .8" />
+                  <Icon v-if="test" size="20" type="ios-star-outline" style="float: right;cursor: pointer;margin-right: 20px" />
+                  <Icon v-else size="20" type="ios-star" style="float: right;cursor:pointer;margin-right: 20px" />
+                  <span>This is done task space.</span>
                 </Card>
 
               </div>
@@ -81,7 +94,12 @@
       return {
         selectedTaskType: [],
         doneList: [],
-        doingList: []
+        doingList: [],
+        newTask: {
+          userId: "",
+          discription: "",
+          endTime: "",
+        }
       }
     },
     mounted() {
@@ -94,6 +112,21 @@
           .catch(err => {
             this.$Message.error("Todo Task Loading Fail.")
           })
+      },
+      addTask: function(){
+        this.newTask.userId = this.$store.getters.userId;
+        if (this.newTask.discription != ""){
+          this.newTask.discription = "";
+          this.newTask.endTime = "";
+        }
+        console.log(this.newTask)
+
+      },
+      handleChange: function(date){
+        this.newTask.endTime = date;
+      },
+      test: function () {
+        console.log("123131")
       }
     },
   }
@@ -114,5 +147,37 @@
     background-color: #999999;
     border-radius: 10px;
   }
+  .customCardHead >>> .ivu-card-head {
+    border-bottom-color: white;
+    padding: 4px 6px;
+  }
+  .customDatePicker >>> .ivu-input{
+    display: inline-block;
+    width: 100%;
+    height: 32px;
+    line-height: 1.5;
+    padding: 4px 7px;
+    font-size: 12px;
+    border: 1px solid white;
+    text-align: center;
+    border-radius: 0px;
+    color: #515a6e;
+    background-color: #fff;
+    background-image: none;
+    position: relative;
+    cursor: text;
+    transition: border .2s ease-in-out,background .2s ease-in-out,box-shadow .2s ease-in-out;
+  }
+  .customDatePicker:hover >>> .ivu-input{
+    cursor: pointer;
+  }
+  .customIcon >>> .ivu-icon {
+    font-weight: 700;
+  }
 
+  .custom >>> .ivu-input-suffix i {
+    font-size: 22px;
+    line-height: 30px;
+    font-weight: 700;
+  }
 </style>
