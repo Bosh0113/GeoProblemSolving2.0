@@ -136,7 +136,7 @@
         <Menu
           mode="horizontal"
           :active-name="activeMenu"
-          style="height: 45px; line-height: 45px"
+          style="height: 45px; line-height: 45px;z-index:1"
           @on-select="changeMenuItem"
         >
           <MenuItem name="Workspace">
@@ -280,14 +280,14 @@ export default {
     modelEvaluation,
     geoSimulation,
     geoAnalysis,
-    decisionMaking,
+    decisionMaking
   },
   data() {
     return {
       scrollOps: {
         bar: {
-          background: "lightgrey",
-        },
+          background: "lightgrey"
+        }
       },
       projectInfo: parent.vm.projectInfo,
       activeMenu: "Workspace",

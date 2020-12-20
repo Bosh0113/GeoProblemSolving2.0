@@ -1,10 +1,13 @@
 <template>
   <div>
     <Row>
-      <Col span="14" style="border-right: 1px solid #d3d3d3;">
-        <chat-panel :activityInfo="activityInfo" :participants="participants"></chat-panel>
+      <Col span="16" style="border-right: 1px solid #d3d3d3;">
+        <chat-panel
+          :activityInfo="activityInfo"
+          :participants="participants"
+        ></chat-panel>
       </Col>
-      <Col span="10">
+      <Col span="8">
         <Tabs type="card" class="activityTab">
           <TabPane label="Tools">
             <tool-box :activityInfo="activityInfo"></tool-box>
@@ -18,7 +21,8 @@
   </div>
 </template>
 <script>
-import chatPanel from "../utils/chatPanel.vue";
+import chatPanel from "../utils/chatroom/chatroom.vue";
+// import chatPanel from "../utils/chatPanel.vue";
 import resList from "../utils/resList.vue";
 import toolBox from "../utils/toolBox.vue";
 export default {
@@ -26,14 +30,14 @@ export default {
   components: {
     chatPanel,
     resList,
-    toolBox,
+    toolBox
   },
   data() {
     return {};
   },
   mounted() {},
   beforeDestroy() {},
-  methods: {},
+  methods: {}
 };
 </script>
 <style scoped>
@@ -41,4 +45,3 @@ export default {
   margin-bottom: 8px;
 }
 </style>
-

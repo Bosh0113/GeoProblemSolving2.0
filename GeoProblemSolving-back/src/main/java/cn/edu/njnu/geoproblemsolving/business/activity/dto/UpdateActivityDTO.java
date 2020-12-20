@@ -5,6 +5,8 @@ import cn.edu.njnu.geoproblemsolving.business.activity.enums.ActivityType;
 import com.alibaba.fastjson.JSONArray;
 import lombok.Data;
 
+import java.util.List;
+
 
 @Data
 public class UpdateActivityDTO implements ToDomainConverter {
@@ -17,5 +19,11 @@ public class UpdateActivityDTO implements ToDomainConverter {
     private ActivityType type;
     private JSONArray pathway;
     private String permission;
+
+    /**
+     * MIMI
+     */
+    List<String> toolsetList;
+    List<String> toolList;
 
 }

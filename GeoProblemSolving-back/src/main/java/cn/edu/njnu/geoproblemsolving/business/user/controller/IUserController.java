@@ -9,6 +9,7 @@ import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import cn.edu.njnu.geoproblemsolving.common.utils.ResultUtils;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.bind.annotation.*;
@@ -29,6 +30,8 @@ public class IUserController {
     TokenTask tokenTask;
     @Autowired
     IUserImpl userDao;
+    @Value("$AuthUrl")
+    String redirectUri;
 
     //存储-1页面
     // @RequestMapping(value = "/login", method = RequestMethod.GET)
@@ -143,6 +146,30 @@ public class IUserController {
     public JsonResult getManagerProjectList(@RequestBody String[] manageProjectList) {
         System.out.println(manageProjectList);
         return userDao.getMangeProjectList(manageProjectList);
+    }
+
+
+    /**
+     * Inquiry information of one user
+     * @param key：userId, email
+     * @param value
+     * @return
+     * @Author mzy
+     */
+    @RequestMapping(method = RequestMethod.GET)
+    public JsonResult getUserInfo(@RequestParam String key, @RequestParam String value){
+        return userDao.getUserInfo(key, value);
+    }
+
+    /**
+     * Store user information to database
+     * @param user
+     * @return
+     * @Author mzy
+     */
+    @RequestMapping(method = RequestMethod.POST)
+    public JsonResult addUserInfo(@RequestBody User user){
+        return userDao.addUserInfo(user);
     }
 
     // @RequestMapping(value = "/getMember", method = RequestMethod.POST)

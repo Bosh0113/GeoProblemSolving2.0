@@ -1,5 +1,9 @@
 <template>
-  <div :class="{fullscreen:fullscreen}" class="tinymce-container" :style="{width:containerWidth}">
+  <div
+    :class="{ fullscreen: fullscreen }"
+    class="tinymce-container"
+    :style="{ width: containerWidth }"
+  >
     <textarea :id="tinymceId" class="tinymce-textarea" />
     <!-- <div class="editor-custom-btn-container">
       <customOperation color="#1890ff" class="editor-upload-btn" @successCBK="imageSuccessCBK" />
@@ -153,32 +157,30 @@ export default {
             _this.fullscreen = e.state;
           });
         },
-        images_upload_url: "/GeoProblemSolving/tool/picture", //上传路径
+        images_upload_url: `http://${window.location.host}/GeoProblemSolving/tool/picture`, //上传路径
 
         images_upload_handler: (blobInfo, success, failure) => {
-
           if (blobInfo.blob().size > self.maxSize) {
             failure("The size of picture > 4M");
           }
 
-            let formData = new FormData();
-            // 服务端接收文件的参数名，文件数据，文件名
-            formData.append("toolImg", blobInfo.blob(), blobInfo.filename());
-            this.axios({
-              method: "POST",
-              // 上传地址
-              url: "/GeoProblemSolving/tool/picture",
-              data: formData
+          let formData = new FormData();
+          // 服务端接收文件的参数名，文件数据，文件名
+          formData.append("toolImg", blobInfo.blob(), blobInfo.filename());
+          this.axios({
+            method: "POST",
+            // 上传地址
+            url: "/GeoProblemSolving/tool/picture",
+            data: formData
+          })
+            .then(res => {
+              console.log(res.data.data);
+              // 返回de图片的地址
+              success(res.data.data);
             })
-              .then(res => {
-                console.log(res.data.data);
-                // 返回de图片的地址
-                success(res.data.data);
-              })
-              .catch(() => {
-                failure("上传失败");
-              });
-
+            .catch(() => {
+              failure("上传失败");
+            });
         }
       });
     },

@@ -27,7 +27,7 @@ import java.io.IOException;
  */
 @RestController
 @RequestMapping(value = "/dataItem")
-public class DataContainerController {
+public class RemoteDataContainerController {
     @Autowired
     DataItemService dataItemService;
 

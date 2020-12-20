@@ -411,15 +411,15 @@ import * as socketApi from "./../../../api/socket.js";
 import Avatar from "vue-avatar";
 export default {
   components: {
-    Avatar,
+    Avatar
   },
   props: ["activityInfo"],
   data() {
     return {
       scrollOps: {
         bar: {
-          background: "lightgrey",
-        },
+          background: "lightgrey"
+        }
       },
       projectInfo: parent.vm.projectInfo,
       userInfo: JSON.parse(sessionStorage.getItem("userInfo")),
@@ -442,7 +442,7 @@ export default {
       createActivityModel: false,
       appliedActivity: {},
       applyJoinForm: {
-        reason: "",
+        reason: ""
       },
       // Activity
       activityForm: {
@@ -453,7 +453,7 @@ export default {
         level: -1,
         permission: JSON.stringify(userRoleJS.getDefault()),
         type: "Activity_Default",
-        purpose: "Multi-purpose",
+        purpose: "Multi-purpose"
       },
       activityCreateRule: {
         name: [
@@ -462,23 +462,23 @@ export default {
             message: "The name should not be empty and more than 60 characters",
             trigger: "blur",
             type: "string",
-            max: 60,
-          },
+            max: 60
+          }
         ],
         description: [
           {
             required: true,
             message: "The description should not be empty",
-            trigger: "blur",
-          },
+            trigger: "blur"
+          }
         ],
         purpose: [
           {
             required: true,
             message: "The purpose should not be empty",
-            trigger: "blur",
-          },
-        ],
+            trigger: "blur"
+          }
+        ]
       },
       purposes: [
         "Multi-purpose",
@@ -489,9 +489,9 @@ export default {
         "Model effectiveness evaluation",
         "Geographical simulation",
         "Data analysis",
-        "Decision making",
+        "Decision making"
       ],
-      listStyle: { width: "280px", height: "360px" },
+      listStyle: { width: "280px", height: "360px" }
     };
   },
   created() {
@@ -499,7 +499,7 @@ export default {
     this.getParticipants();
   },
   mounted() {
-    Array.prototype.contains = function (obj) {
+    Array.prototype.contains = function(obj) {
       var i = this.length;
       while (i--) {
         if (this[i].userId != undefined && this[i].userId === obj.userId) {
@@ -555,7 +555,7 @@ export default {
       //callback setTimeBack
       this.axios
         .get(url)
-        .then((res) => {
+        .then(res => {
           if (res.data.code == 0) {
             this.creatorInfo = res.data.data.creator;
             this.participants = res.data.data.members;
@@ -563,7 +563,7 @@ export default {
             console.log(res.data.msg);
           }
         })
-        .catch((err) => {
+        .catch(err => {
           throw err;
         });
     },
@@ -593,7 +593,7 @@ export default {
       this.createActivityModel = true;
     },
     createActivity(name) {
-      this.$refs[name].validate((valid) => {
+      this.$refs[name].validate(valid => {
         if (valid) {
           let url = "";
           if (this.activityForm.level == 1) {
@@ -605,7 +605,7 @@ export default {
           }
           this.axios
             .post(url, this.activityForm)
-            .then((res) => {
+            .then(res => {
               if (res.data.code == 0) {
                 parent.location.href =
                   "/GeoProblemSolving/projectInfo/" +
@@ -618,7 +618,7 @@ export default {
                 console.log(res.data.msg);
               }
             })
-            .catch((err) => {
+            .catch(err => {
               throw err;
             });
           this.createActivityModel = false;
@@ -666,7 +666,7 @@ export default {
 
       this.axios
         .post(url)
-        .then((res) => {
+        .then(res => {
           if (res.data.code == 0) {
             parent.location.href =
               "/GeoProblemSolving/projectInfo/" +
@@ -676,14 +676,14 @@ export default {
               "&level=" +
               this.appliedActivity.level;
           } else if (res.data.code == -3) {
-            this.$Notice.info( {desc:
-              "You has already been a member of the activity."}
-            );
+            this.$Notice.info({
+              desc: "You has already been a member of the activity."
+            });
           } else {
             console.log(res.data.msg);
           }
         })
-        .catch((err) => {
+        .catch(err => {
           throw err;
         });
     },
@@ -700,8 +700,8 @@ export default {
           userEmail: this.userInfo.email,
           userName: this.userInfo.name,
           userId: this.userInfo.userId,
-          description: this.applyJoinForm.reason,
-        },
+          description: this.applyJoinForm.reason
+        }
       };
       this.sendNotice(activity, notice);
     },
@@ -739,7 +739,7 @@ export default {
         .filter((item) => {
           return item.disabled;
         })
-        .map((item) => item.key);
+        .map(item => item.key);
     },
     memberRender(item) {
       return `<span title="${item.name} - ${item.role}">${item.name} - ${item.role}</span>`;
@@ -778,7 +778,7 @@ export default {
 
         this.axios
           .post(url)
-          .then((res) => {
+          .then(res => {
             if (res.data.code == 0) {
               this.participants.push(user);
               //notice
@@ -794,15 +794,15 @@ export default {
                     activity.name +
                     " in project: " +
                     this.projectInfo.name +
-                    " , and now you are a member in this activity!",
-                },
+                    " , and now you are a member in this activity!"
+                }
               };
               this.sendNotice(activity, notice);
             } else {
               console.log(res.data.msg);
             }
           })
-          .catch((err) => {
+          .catch(err => {
             throw err;
           });
       }
@@ -833,7 +833,7 @@ export default {
 
       this.axios
         .delete(url)
-        .then((res) => {
+        .then(res => {
           if (res.data.code == 0) {
             let index = this.participants.indexOf(member);
             this.participants.splice(index, 1);
@@ -848,15 +848,15 @@ export default {
                   activity.name +
                   " in project: " +
                   this.projectInfo.name +
-                  ".",
-              },
+                  "."
+              }
             };
             this.sendNotice(activity, notice);
           } else {
             console.log(res.data.msg);
           }
         })
-        .catch((err) => {
+        .catch(err => {
           throw err;
         });
     },
@@ -883,7 +883,7 @@ export default {
 
       this.axios
         .delete(url)
-        .then((res) => {
+        .then(res => {
           if (res.data.code == 0) {
             parent.location.href =
               "/GeoProblemSolving/projectInfo/" +
@@ -894,7 +894,10 @@ export default {
               (activity.level - 1).toString();
             //notice
             let notice = {
-              recipientId: userRoleJS.getMemberByRole(this.activityInfo, "manager"),
+              recipientId: userRoleJS.getMemberByRole(
+                this.activityInfo,
+                "manager"
+              ),
               type: "notice",
               content: {
                 title: "Leave activity",
@@ -904,15 +907,15 @@ export default {
                   activity.name +
                   " in project: " +
                   this.projectInfo.name +
-                  ".",
-              },
+                  "."
+              }
             };
             this.sendNotice(activity, notice);
           } else {
             console.log(res.data.msg);
           }
         })
-        .catch((err) => {
+        .catch(err => {
           throw err;
         });
     },
@@ -923,28 +926,28 @@ export default {
         for (let i = 0; i < activity.recipientId.length; i++) {
           this.axios
             .post("/GeoProblemSolving/notice/save", notice)
-            .then((result) => {
+            .then(result => {
               if (result.data == "Success") {
                 parent.vm.$emit("sendNotice", notice.recipientId[i]);
               } else {
                 this.$Message.error("Notice fail.");
               }
             })
-            .catch((err) => {
+            .catch(err => {
               throw err;
             });
         }
       } else {
         this.axios
           .post("/GeoProblemSolving/notice/save", notice)
-          .then((result) => {
+          .then(result => {
             if (result.data == "Success") {
               parent.vm.$emit("sendNotice", notice.recipientId);
             } else {
               this.$Message.error("Notice fail.");
             }
           })
-          .catch((err) => {
+          .catch(err => {
             throw err;
           });
       }
@@ -955,8 +958,8 @@ export default {
       } else {
         parent.location.href = "/GeoProblemSolving/memberPage/" + id;
       }
-    },
-  },
+    }
+  }
 };
 </script>
 <style scoped>

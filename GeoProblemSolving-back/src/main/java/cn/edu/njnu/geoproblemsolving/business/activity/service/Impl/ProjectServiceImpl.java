@@ -201,7 +201,7 @@ public class ProjectServiceImpl implements ProjectService {
 
             // if original project's privacy is private
             Boolean updateProjectListPage = false;
-            if (!update.getPrivacy().equals(project.getPrivacy())) {
+            if (update.getPrivacy() != null && update.getPrivacy().equals(project.getPrivacy())) {
                 updateProjectListPage = isUpdateProjectListStaticPage(aid, !project.getPrivacy().equals("Private"));
             }
             update.updateTo(project);
