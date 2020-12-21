@@ -24,9 +24,14 @@ public class IUserImpl implements IUserDao {
     MongoTemplate mongoTemplate;
     @Override
     public User findUserById(String userId) {
-        Query query = new Query(Criteria.where("userId").is(userId));
-        User user = mongoTemplate.findOne(query, User.class);
-        return user;
+        //错误处理
+        try {
+            Query query = new Query(Criteria.where("userId").is(userId));
+            User user = mongoTemplate.findOne(query, User.class);
+            return user;
+        }catch (Exception e){
+            throw e;
+        }
     }
 
     @Override

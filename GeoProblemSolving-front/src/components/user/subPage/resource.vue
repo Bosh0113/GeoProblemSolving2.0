@@ -31,7 +31,7 @@
         </CheckboxGroup>
       </Card>
     </Col>
-    <Col span="3" offset="1">
+    <Col span="4">
       <Card dis-hover class="historyLine" >
         <p slot="title">Event line</p>
         <div class="timeLineStyle">

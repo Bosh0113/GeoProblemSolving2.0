@@ -164,7 +164,7 @@
 
 
       </Col>
-      <Col span="3" offset="1">
+      <Col span="4">
         <!--    Event History-->
         <Card dis-hover class="historyLine" >
         <p slot="title">Event line</p>
@@ -213,10 +213,9 @@
 </template>
 
 <script>
-  import timeLine from "./timeLine";
   export default {
     name: "project",
-    components: {"time-line": timeLine},
+    components: {},
     data() {
       return {
         joinedProjectsList: [],
