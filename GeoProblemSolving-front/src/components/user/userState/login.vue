@@ -250,8 +250,8 @@ export default {
           // var passwordFro = this.loginForm.password;
           // var passwordAES = this.encrypto(passwordFro);
           // var passwordAESURI = window.encodeURIComponent(passwordAES);
-          // var passwordAESURI = md5(this.loginForm.password);
-          var passwordAESURI = this.loginForm.password;
+          var passwordAESURI = md5(this.loginForm.password);
+          // var passwordAESURI = this.loginForm.password;
           this.axios
             .get(
               "/GeoProblemSolving/user/login" +

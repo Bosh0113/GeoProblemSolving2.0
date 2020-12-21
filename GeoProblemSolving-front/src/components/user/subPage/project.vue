@@ -64,7 +64,7 @@
               <div style="display:flex;justify-content:center">
                 <h3
                   style="text-align:center;width:80%"
-                >Sorry, you didn't created any projects.</h3>
+                >Sorry, you did not create any projects.</h3>
               </div>
             </Card>
 
@@ -122,7 +122,7 @@
                   <div style="display:flex;justify-content:center">
                     <h3
                       style="text-align:center;width:80%"
-                    >Sorry, you didn't participate in any projects.</h3>
+                    >Sorry, you did not participate in any projects.</h3>
                   </div>
                 </Card>
                 <div

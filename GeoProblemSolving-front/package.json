@@ -10,6 +10,7 @@
     "build": "node build/build.js"
   },
   "dependencies": {
+    "@johmun/vue-tags-input": "^2.1.0",
     "@kevinfaguiar/vue-twemoji-picker": "^5.7.4",
     "@tinymce/tinymce-vue": "^3.0.1",
     "agentmaps": "^2.2.2",
