@@ -56,6 +56,7 @@ public class IUserController {
            return "Fail";
        }
        String access_token = (String)token.get("access_token");
+
        //获取到用户服务器对象
        JSONObject userBaseJson = tokenTask.getUserFromResServer(access_token);
        User userBase =  JSONObject.toJavaObject(userBaseJson, User.class);
@@ -65,7 +66,7 @@ public class IUserController {
        if (localUser == null){
            userDao.saveLocalUser(userBase);
        }
-       HttpSession session = request.getSession();
+        HttpSession session = request.getSession();
        session.setAttribute("userId", userBase.getUserId());
        session.setAttribute("name", userBase.getName());
        session.setAttribute("avatar", userBase.getAvatar());
@@ -191,7 +192,7 @@ public class IUserController {
      * @return
      */
     @RequestMapping(method = RequestMethod.POST)
-    public JsonResult addUserInfo(@RequestBody User user){
+    public JsonResult addUserInfo(@RequestBody JSONObject user){
         return userDao.addUserInfo(user);
     }
 }
