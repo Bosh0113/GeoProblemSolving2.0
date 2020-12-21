@@ -103,7 +103,7 @@ public class IUserController {
         String userId = (String)session.getAttribute("userId");
         if (userId == null){
             return false;
-        }else {
+        } else {
             User user = userDao.findUserById(userId);
             return user;
         }
@@ -149,30 +149,6 @@ public class IUserController {
         return userDao.getMangeProjectList(manageProjectList);
     }
 
-
-    /**
-     * Inquiry information of one user
-     * @param key：userId, email
-     * @param value
-     * @return
-     * @Author mzy
-     */
-    @RequestMapping(method = RequestMethod.GET)
-    public JsonResult getUserInfo(@RequestParam String key, @RequestParam String value){
-        return userDao.getUserInfo(key, value);
-    }
-
-    /**
-     * Store user information to database
-     * @param user
-     * @return
-     * @Author mzy
-     */
-    @RequestMapping(method = RequestMethod.POST)
-    public JsonResult addUserInfo(@RequestBody User user){
-        return userDao.addUserInfo(user);
-    }
-
     // @RequestMapping(value = "/getMember", method = RequestMethod.POST)
     // public JsonResult getProjectMember(@RequestBody String[] memberIds){
     //     String[] memberName = {"zhengzhong","zhansan", "Lisi"};
@@ -197,11 +173,11 @@ public class IUserController {
 
     /**
      * Store user information to database
-     * @param user
+     * @param jsonObject
      * @return
      */
     @RequestMapping(method = RequestMethod.POST)
-    public JsonResult addUserInfo(@RequestBody User user){
-        return userDao.addUserInfo(user);
+    public JsonResult addUserInfo(@RequestBody JSONObject jsonObject){
+        return userDao.addUserInfo(jsonObject);
     }
 }

@@ -9,19 +9,26 @@ import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import cn.edu.njnu.geoproblemsolving.common.utils.ResultUtils;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.http.*;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.Map;
 
 @Repository
 public class IUserImpl implements IUserDao {
     @Autowired
     MongoTemplate mongoTemplate;
+    @Value("${authServerIp}")
+    String authServerIp;
     @Override
     public User findUserById(String userId) {
         Query query = new Query(Criteria.where("userId").is(userId));
@@ -110,14 +117,39 @@ public class IUserImpl implements IUserDao {
     }
 
     @Override
-    public JsonResult addUserInfo(User user){
+    public JsonResult addUserInfo(JSONObject jsonObject){
         try {
-            // Confirm
-            Query query = new Query(Criteria.where("userId").is(user.getUserId()));
-            User user1 = mongoTemplate.findOne(query, User.class);
-            if(user1 != null) return ResultUtils.error(-3, "Fail: user already exists in the database.");
+            RestTemplate restTemplate = new RestTemplate();
+//            LinkedMultiValueMap<String, Object> valueMap = new LinkedMultiValueMap<>();
+//            for (Map.Entry entry : jsonObject.entrySet()){
+//                String filedName =  (String)entry.getKey();
+//                valueMap.add(filedName, entry.getValue());
+//            }
+            String url = "http://" + authServerIp + "/AuthServer/user/add";
+            HttpHeaders httpHeaders = new HttpHeaders();
+            MediaType mediaType = MediaType.parseMediaType("application/json;charset=UTF-8");
+            httpHeaders.setContentType(mediaType);
+            HttpEntity<Object> httpEntity = new HttpEntity<>(jsonObject.toString(), httpHeaders);
+            ResponseEntity<JSONObject> registerResult = restTemplate.exchange(url, HttpMethod.POST, httpEntity, JSONObject.class);
+            int resCode = (int)registerResult.getBody().get("code");
+            if (resCode == 0){
+                User user = JSONObject.toJavaObject(jsonObject, User.class);
+                Query query = new Query(Criteria.where("userId").is(user.getUserId()));
+                User user1 = mongoTemplate.findOne(query, User.class);
+                return ResultUtils.success(mongoTemplate.save(user));
+            }else if (resCode == -3){
+                return ResultUtils.error(-3, "Fail: user already exists in the database.");
+            }else {
+                return ResultUtils.error(-2, (String) registerResult.getBody().get("msg"));
+            }
 
-            return ResultUtils.success(mongoTemplate.save(user));
+            // Confirm
+//            User user = JSONObject.toJavaObject(jsonObject, User.class);
+//            Query query = new Query(Criteria.where("userId").is(user.getUserId()));
+//            User user1 = mongoTemplate.findOne(query, User.class);
+//            if(user1 != null) return ResultUtils.error(-3, "Fail: user already exists in the database.");
+
+//            return ResultUtils.success(mongoTemplate.save(user));
 
         } catch (Exception ex){
             return ResultUtils.error(-2, "Fail: Exception");

@@ -75,10 +75,7 @@
                 project.
               </span>
             </div>
-            <FormItem
-              label="Password"
-              style="margin-top: 20px"
-            >
+            <FormItem label="Password" style="margin-top: 20px">
               <Input
                 v-model="password"
                 type="password"
@@ -185,42 +182,34 @@ export default {
         });
     },
     async joinProject(userId) {
-      
-      if(this.password == "") {
+      if (this.password == "") {
         this.$Message.error("Please fill in your password.");
         return;
       }
-      
-      this.axios
-        .post(
-          "/GeoProblemSolving/project/" +
-            this.projectId +
-            "/user?userId=" +
-            userId
-        )
-        .then((res) => {
-          if (res.data.code == 0) {
-            if (
-              this.$store.getters.userState &&
-              this.$store.getters.userId == userId
-            ) {
-              window.location.href("/GeoProblemSolving/projectInfo/" + this.$route.params.id);
-            } else if(!this.$store.getters.userState) {
-              this.autoLogin()
-            } else if (this.$store.getters.userId != userId){
-              await get("/GeoProblemSolving/user/logout");
-              this.autoLogin()
-            }
-          } else {
-            console.log(res.data.msg);
-          }
-        })
-        .catch((err) => {
-          throw err;
-        });
+
+      await post(
+        "/GeoProblemSolving/project/" +
+          this.projectId +
+          "/user?userId=" +
+          userId
+      );
+
+      if (
+        this.$store.getters.userState &&
+        this.$store.getters.userId == userId
+      ) {
+        window.location.href(
+          "/GeoProblemSolving/projectInfo/" + this.$route.params.id
+        );
+      } else if (!this.$store.getters.userState) {
+        this.autoLogin();
+      } else if (this.$store.getters.userId != userId) {
+        await get("/GeoProblemSolving/user/logout");
+        this.autoLogin();
+      }
     },
     async registerAndJoin() {
-      if(this.password == "") {
+      if (this.password == "") {
         this.$Message.error("Please fill in your password.");
         return;
       }
@@ -266,7 +255,9 @@ export default {
             this.$Message.error("Invalid account or password.");
           } else {
             this.$store.commit("userLogin", res.data);
-            window.location.href("/GeoProblemSolving/projectInfo/" + this.$route.params.id);
+            window.location.href(
+              "/GeoProblemSolving/projectInfo/" + this.$route.params.id
+            );
           }
         });
     },
