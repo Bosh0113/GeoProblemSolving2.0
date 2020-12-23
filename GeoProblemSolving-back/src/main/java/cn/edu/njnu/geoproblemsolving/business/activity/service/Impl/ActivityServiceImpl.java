@@ -120,7 +120,7 @@ public class ActivityServiceImpl implements ActivityService {
 
             return ResultUtils.success(activity);
         } catch (Exception ex) {
-            return ResultUtils.error(-2, "Fail: Exception");
+            return ResultUtils.error(-2, ex.toString());
         }
     }
 
@@ -213,7 +213,7 @@ public class ActivityServiceImpl implements ActivityService {
 
             return ResultUtils.success(activity);
         } catch (Exception ex) {
-            return ResultUtils.error(-2, "Fail: Exception");
+            return ResultUtils.error(-2, ex.toString());
         }
     }
 
@@ -233,7 +233,7 @@ public class ActivityServiceImpl implements ActivityService {
 
             return ResultUtils.success(activityRepository.save(activity));
         } catch (Exception ex) {
-            return ResultUtils.error(-2, "Fail: Exception");
+            return ResultUtils.error(-2, ex.toString());
         }
     }
 
@@ -272,7 +272,7 @@ public class ActivityServiceImpl implements ActivityService {
             activityRepository.deleteById(aid);
             return ResultUtils.success("Success");
         } catch (Exception ex) {
-            return ResultUtils.error(-2, "Fail: Exception");
+            return ResultUtils.error(-2, ex.toString());
         }
     }
 
@@ -305,7 +305,7 @@ public class ActivityServiceImpl implements ActivityService {
 
             return ResultUtils.success(activities);
         } catch (Exception ex) {
-            return ResultUtils.error(-2, "Fail: Exception");
+            return ResultUtils.error(-2, ex.toString());
         }
     }
 
@@ -361,7 +361,7 @@ public class ActivityServiceImpl implements ActivityService {
 
             return ResultUtils.success(participants);
         } catch (Exception ex) {
-            return ResultUtils.error(-2, "Fail: Exception");
+            return ResultUtils.error(-2, ex.toString());
         }
     }
 
@@ -410,7 +410,7 @@ public class ActivityServiceImpl implements ActivityService {
 
             return ResultUtils.success(lineage);
         } catch (Exception ex) {
-            return ResultUtils.error(-2, "Fail: Exception");
+            return ResultUtils.error(-2, ex.toString());
         }
     }
 
@@ -435,7 +435,7 @@ public class ActivityServiceImpl implements ActivityService {
 
             return ResultUtils.success(activities);
         } catch (Exception ex) {
-            return ResultUtils.error(-2, "Fail: Exception");
+            return ResultUtils.error(-2, ex.toString());
         }
     }
 
@@ -461,7 +461,7 @@ public class ActivityServiceImpl implements ActivityService {
 
             return ResultUtils.success(activities);
         } catch (Exception ex) {
-            return ResultUtils.error(-2, "Fail: Exception");
+            return ResultUtils.error(-2, ex.toString());
         }
 
     }
@@ -493,7 +493,7 @@ public class ActivityServiceImpl implements ActivityService {
 
             return ResultUtils.success(current);
         } catch (Exception ex) {
-            return ResultUtils.error(-2, "Fail: Exception");
+            return ResultUtils.error(-2, ex.toString());
         }
     }
 
@@ -519,7 +519,7 @@ public class ActivityServiceImpl implements ActivityService {
 
             return ResultUtils.success(current);
         } catch (Exception ex) {
-            return ResultUtils.error(-2, "Fail: Exception");
+            return ResultUtils.error(-2, ex.toString());
         }
     }
 
@@ -543,7 +543,7 @@ public class ActivityServiceImpl implements ActivityService {
 
             return ResultUtils.success("Success");
         } catch (Exception ex) {
-            return ResultUtils.error(-2, "Fail: Exception");
+            return ResultUtils.error(-2, ex.toString());
         }
     }
 
@@ -583,7 +583,7 @@ public class ActivityServiceImpl implements ActivityService {
 
             return ResultUtils.success("Success");
         } catch (Exception ex) {
-            return ResultUtils.error(-2, "Fail: Exception");
+            return ResultUtils.error(-2, ex.toString());
         }
     }
 
@@ -622,7 +622,7 @@ public class ActivityServiceImpl implements ActivityService {
 
             return ResultUtils.success("Success");
         } catch (Exception ex) {
-            return ResultUtils.error(-2, "Fail: Exception");
+            return ResultUtils.error(-2, ex.toString());
         }
     }
 
@@ -649,7 +649,7 @@ public class ActivityServiceImpl implements ActivityService {
 
             return ResultUtils.success("Success");
         } catch (Exception ex) {
-            return ResultUtils.error(-2, "Fail: Exception");
+            return ResultUtils.error(-2, ex.toString());
         }
     }
 }

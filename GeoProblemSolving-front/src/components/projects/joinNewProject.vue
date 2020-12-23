@@ -174,7 +174,7 @@ export default {
             this.registeredHintShow = false;
             this.passwordInputShow = true;
           } else {
-            console.log(res.data.data);
+            console.log(res.data.msg);
           }
         })
         .catch((err) => {

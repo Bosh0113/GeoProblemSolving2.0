@@ -346,7 +346,6 @@ export default {
       this.$refs[name].validate((valid) => {
         if (valid) {
           let organizations = [];
-          console.log(this.registerForm);
           for(let i = 0; i < this.registerForm.organizations.length; i++){
             organizations.push(this.registerForm.organizations[i].text);
           }
@@ -362,6 +361,7 @@ export default {
           this.axios
             .post("/GeoProblemSolving/user", userData)
             .then((res) => {
+              console.log(res.data.code);
               if (res.data.code == -3) {
                 this.$Message.success("This email has been registered!");
               } else if (res.data.code == 0) {

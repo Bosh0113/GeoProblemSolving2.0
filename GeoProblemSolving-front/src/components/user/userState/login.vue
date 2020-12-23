@@ -97,7 +97,12 @@ img {
 </style>
 <template>
   <div class="layout">
-    <div class="content" ref="homePage" v-if="UserState===false" v-bind:style="contentStyle">
+    <div
+      class="content"
+      ref="homePage"
+      v-if="UserState == false"
+      v-bind:style="contentStyle"
+    >
       <div class="loginDiv" v-bind:style="loginStyle">
         <div class="loginTitle">Log in</div>
         <div class="login-content">
@@ -125,19 +130,25 @@ img {
             <div class="reUseDiv">
               <p>
                 Forgot password?
-                <a @click="resetModalSHow=true">Reset</a>
+                <a @click="resetModalSHow = true">Reset</a>
               </p>
             </div>
             <br />
             <FormItem>
               <div class="reUseDiv">
-                <Button type="default" @click="login('loginForm')" class="loginBtn">Log in</Button>
+                <Button
+                  type="default"
+                  @click="login('loginForm')"
+                  class="loginBtn"
+                  >Log in</Button
+                >
                 <Button
                   type="default"
                   @click="register"
                   class="loginBtn"
-                  style="margin-left:10px"
-                >Sign up</Button>
+                  style="margin-left: 10px"
+                  >Sign up</Button
+                >
               </div>
             </FormItem>
           </Form>
@@ -147,7 +158,6 @@ img {
     <Modal
       v-model="resetModalSHow"
       @on-ok="sendResetEmail"
-      @on-cancel
       ok-text="Confirm"
       cancel-text="Cancel"
       title="Reset password board"
@@ -157,8 +167,16 @@ img {
         <Input v-model="loginForm.user" />
       </div>
       <div class="resetReuseDiv">
-        <Icon type="ios-information-circle-outline" :size="20" color="lightblue" />
-        <p>We will send you an email with a url you can visit it and reset your password, if you agree, you can click the Confirm button and you will get an email soon.</p>
+        <Icon
+          type="ios-information-circle-outline"
+          :size="20"
+          color="lightblue"
+        />
+        <p>
+          We will send you an email with a url you can visit it and reset your
+          password, if you agree, you can click the Confirm button and you will
+          get an email soon.
+        </p>
       </div>
     </Modal>
   </div>
@@ -171,7 +189,7 @@ export default {
   computed: {
     UserState() {
       return this.$store.getters.userState;
-    }
+    },
   },
   created() {
     if (this.$store.getters.userState) {
@@ -182,35 +200,35 @@ export default {
     return {
       loginForm: {
         user: "",
-        password: ""
+        password: "",
       },
       loginFormRule: {
         user: [
           {
             required: true,
             message: "User name can not be empty",
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         password: [
           {
             required: true,
             message: "Password can not be empty",
-            trigger: "blur"
+            trigger: "blur",
           },
           {
             type: "string",
             min: 3,
             message: "The length of password can not be less than 6 characters",
-            trigger: "blur"
-          }
-        ]
+            trigger: "blur",
+          },
+        ],
       },
       loginStyle: {
-        marginTop: ""
+        marginTop: "",
       },
       contentStyle: {
-        height: ""
+        height: "",
       },
       checked: false,
       changePwdEmailStyle:
@@ -219,7 +237,7 @@ export default {
         "http://" +
         this.$store.state.IP_Port +
         "/GeoProblemSolving/resetPassword/",
-      resetModalSHow: false
+      resetModalSHow: false,
     };
   },
   mounted() {
@@ -233,7 +251,7 @@ export default {
       this.loginStyle.marginTop = window.innerHeight / 5 + "px";
     },
     login(form) {
-      this.$refs[form].validate(valid => {
+      this.$refs[form].validate((valid) => {
         if (valid) {
           if (this.checked == true) {
             localStorage.setItem("user", this.loginForm.user);
@@ -260,7 +278,7 @@ export default {
                 "&password=" +
                 passwordAESURI
             )
-            .then(res => {
+            .then((res) => {
               if (res.data === "Email") {
                 this.$Message.error("Email does not exist.");
               } else if (res.data === "Password" || res.data === "Fail") {
@@ -314,52 +332,47 @@ export default {
       // return encrypted.toString();
     },
     decrypto(context) {
-      var CryptoJS = require("crypto-js");
-      var key = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
-      var iv = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
-      var decrypt = CryptoJS.AES.decrypt(context, key, {
-        iv: iv,
-        mode: CryptoJS.mode.CBC,
-        padding: CryptoJS.pad.Pkcs7
-      });
-      var decryptedStr = decrypt.toString(CryptoJS.enc.Utf8);
-      return decryptedStr.toString();
+      // var CryptoJS = require("crypto-js");
+      // var key = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
+      // var iv = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
+      // var decrypt = CryptoJS.AES.decrypt(context, key, {
+      //   iv: iv,
+      //   mode: CryptoJS.mode.CBC,
+      //   padding: CryptoJS.pad.Pkcs7,
+      // });
+      // var decryptedStr = decrypt.toString(CryptoJS.enc.Utf8);
+      // return decryptedStr.toString();
     },
     goRegister() {
       this.$router.push({ name: "Register" });
     },
     sendResetEmail() {
-      var emailFormBody = {};
-      emailFormBody["recipient"] = this.loginForm.user;
-      emailFormBody["mailTitle"] = "Reset password notification";
-      emailFormBody["mailContent"] =
-        this.changePwdEmailStyle +
-        this.urlAddress +
-        this.loginForm.user +
-        " to change your password, thanks.";
       this.axios
-        .post("/GeoProblemSolving/email/send", emailFormBody)
-        .then(res => {
-          if (res.data == "Success") {
-            this.$Notice.success({
-              title: "Email send success",
-              desc: "The email has been sent successfully."
+        .post(
+          "http://106.14.78.235/AuthServer/user/resetPassword?email=" +
+            this.loginForm.user
+        )
+        .then((res) => {
+          if (res.data.code == 0) {
+            this.$router.push({
+              name: "resetPassword",
+              params: { email: this.loginForm.user },
             });
-          } else {
+          } else if (res.data.code == -1) {
             this.$Notice.error({
-              title: "Email send fail",
-              desc: "Maybe you input a wrong email , please check it out."
+              title: "Fail",
+              desc: "The email has not been registered.",
             });
           }
         })
-        .catch(err => {
-          console.log(err.data);
+        .catch((err) => {
+          throw err;
         });
     },
     register() {
       this.$router.push({ name: "Register" });
-    }
-  }
+    },
+  },
 };
 </script>
 

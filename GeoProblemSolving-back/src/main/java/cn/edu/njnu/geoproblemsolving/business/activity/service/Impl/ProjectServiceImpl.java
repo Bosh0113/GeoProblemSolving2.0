@@ -123,7 +123,7 @@ public class ProjectServiceImpl implements ProjectService {
                 return ResultUtils.success(projects);
 
         } catch (Exception ex) {
-            return ResultUtils.error(-2, "Fail: Exception");
+            return ResultUtils.error(-2, ex.toString());
         }
     }
 
@@ -187,7 +187,7 @@ public class ProjectServiceImpl implements ProjectService {
 
             return ResultUtils.success(project);
         } catch (Exception ex) {
-            return ResultUtils.error(-2, "Fail: Exception");
+            return ResultUtils.error(-2, ex.toString());
         }
     }
 
@@ -215,7 +215,7 @@ public class ProjectServiceImpl implements ProjectService {
 
             return ResultUtils.success(project);
         } catch (Exception ex) {
-            return ResultUtils.error(-2, "Fail: Exception");
+            return ResultUtils.error(-2, ex.toString());
         }
     }
 
@@ -276,7 +276,7 @@ public class ProjectServiceImpl implements ProjectService {
             return ResultUtils.success("Success");
 
         } catch (Exception ex) {
-            return ResultUtils.error(-2, "Fail: Exception");
+            return ResultUtils.error(-2, ex.toString());
         }
     }
 
@@ -320,7 +320,7 @@ public class ProjectServiceImpl implements ProjectService {
 
             return ResultUtils.success(children);
         } catch (Exception ex) {
-            return ResultUtils.error(-2, "Fail: Exception");
+            return ResultUtils.error(-2, ex.toString());
         }
     }
 
@@ -351,7 +351,7 @@ public class ProjectServiceImpl implements ProjectService {
 
             return ResultUtils.success(participants);
         } catch (Exception ex) {
-            return ResultUtils.error(-2, "Fail: Exception");
+            return ResultUtils.error(-2, ex.toString());
         }
     }
 
@@ -408,7 +408,7 @@ public class ProjectServiceImpl implements ProjectService {
 
             return ResultUtils.success(project);
         } catch (Exception ex) {
-            return ResultUtils.error(-2, "Fail: Exception");
+            return ResultUtils.error(-2, ex.toString());
         }
     }
 
@@ -445,7 +445,7 @@ public class ProjectServiceImpl implements ProjectService {
 
             return ResultUtils.success(project);
         } catch (Exception ex) {
-            return ResultUtils.error(-2, "Fail: Exception");
+            return ResultUtils.error(-2, ex.toString());
         }
     }
 
@@ -484,7 +484,7 @@ public class ProjectServiceImpl implements ProjectService {
 
             return ResultUtils.success("Success");
         } catch (Exception ex) {
-            return ResultUtils.error(-2, "Fail: Exception");
+            return ResultUtils.error(-2, ex.toString());
         }
     }
 
@@ -507,7 +507,7 @@ public class ProjectServiceImpl implements ProjectService {
                 }
             }
         } catch (Exception ex) {
-            return ResultUtils.error(-2, "Fail: Exception");
+            return ResultUtils.error(-2, ex.toString());
         }
     }
 
@@ -539,7 +539,7 @@ public class ProjectServiceImpl implements ProjectService {
 
             return ResultUtils.success("Success");
         } catch (Exception ex) {
-            return ResultUtils.error(-2, "Fail: Exception");
+            return ResultUtils.error(-2, ex.toString());
         }
     }
 }

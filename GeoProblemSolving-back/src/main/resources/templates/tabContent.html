@@ -298,7 +298,7 @@
                     ];
 
                     axios
-                        .get("/GeoProblemSolving/project/" + projectInfo.aid + "/user?userId=" + this.userInfo.userId)
+                        .get("/GeoProblemSolving/project/" + projectInfo.aid + "/user")
                         .then(res => {
                             if (res.data.code === 0) {
                                 var participants = res.data.data;
@@ -459,8 +459,6 @@
                                 window.location.href = "/GeoProblemSolving/login"
                             }
                         }
-                    } else {
-                        this.$Message.error("Fail!");
                     }
                 });
             },
