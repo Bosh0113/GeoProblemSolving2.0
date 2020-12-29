@@ -3,6 +3,7 @@ package cn.edu.njnu.geoproblemsolving.business.datacontainer;
 
 import cn.edu.njnu.geoproblemsolving.common.enums.ResultEnum;
 import cn.edu.njnu.geoproblemsolving.common.exception.MyException;
+import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
@@ -14,6 +15,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.File;
+import java.net.URLEncoder;
 
 /**
  * @ClassName dataItemService
@@ -71,5 +73,19 @@ public class DataIContainerService {
 //        String urlResult = result.getJSONObject("data").getString("source_store_id");
         String urlResult = result.getJSONObject("data").getString("id");
         return urlResult;
+    }
+
+    public JSONObject getDataService(String id,String type) {
+        RestTemplate restTemplate = new RestTemplate();
+        String token = "POMaXlYttteoEeV7GrO8Ww==";
+        String urlStr = "http://111.229.14.128:8898/capability?id=" + id + "&type="+type+"&token="+ URLEncoder.encode(token);
+        ResponseEntity<JSONObject> jsonObjectResponseEntity = restTemplate.getForEntity(urlStr, JSONObject.class);
+        if (!jsonObjectResponseEntity.getStatusCode().is2xxSuccessful()) {
+            throw new MyException(ResultEnum.ERROR);
+        }
+        JSONObject result = jsonObjectResponseEntity.getBody();//获得上传数据的URL
+//        String urlResult = result.getJSONObject("data").getString("source_store_id");
+        JSONObject data = result.getJSONObject("data");
+        return  data;
     }
 }
