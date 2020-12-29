@@ -57,11 +57,15 @@ public class IResourceServiceImpl implements IResourceService {
         this.mongoTemplate = mongoTemplate;
     }
 
+    @Value("${resServerIp}")
+    String userResServer;
+
     /**
      * 文件上传，涉及到三个地方：
      * 1. dataContainer
      * 2. Local database
      * 3. userBase(UserServer)
+     *
      * @param req
      * @return
      */
@@ -86,6 +90,8 @@ public class IResourceServiceImpl implements IResourceService {
                 try {
                     if (part.getName().equals("file")) {
                         if (part.getSize() < 1024 * 1024 * 1024) {
+
+                            //将资源上传到数据容器
                             String fileName = part.getSubmittedFileName();
                             MultipartFile multipartFile = new MockMultipartFile(ContentType.APPLICATION_OCTET_STREAM.toString(), part.getInputStream());
                             valueMap.add("datafile", multipartFile.getResource());
@@ -96,14 +102,14 @@ public class IResourceServiceImpl implements IResourceService {
                             String uploadRemoteUrl = "http://" + dataRemoteIp + ":8082/data";
                             //向dataContainer传输数据
                             JSONObject uploadRemoteResult = httpUtil.uploadRemote(uploadRemoteUrl, valueMap);
-                            Integer uploadResultInfo = uploadRemoteResult.getInteger("code");
-
-                            if (!uploadResultInfo.equals(1)) {
+                            String uploadResultInfo = (String) uploadRemoteResult.get("result");
+                            if (!uploadResultInfo.equals("suc")) {
                                 uploadInfos.failed.add(fileName);
                                 valueMap.clear();
                                 continue;
                             }
-                            //上传成功，将资源基本信息写入本地数据库及用户服务器
+                            //成功将资源上传到数据容器中
+                            // 接下来将资源基本信息写入本地数据库及用户服务器
                             String fileSize;
                             DecimalFormat df = new DecimalFormat("##0.00");
                             if (part.getSize() > 1024 * 1024) {
@@ -133,19 +139,31 @@ public class IResourceServiceImpl implements IResourceService {
                             resourceEntity.setDescription((String) req.getParameter("description"));
                             String resUUID = UUID.randomUUID().toString();
                             resourceEntity.setResourceId(resUUID);
-                            IResourceEntity resDetails = resourceDao.saveResDetails(resourceEntity);
 
-//                            String userBaseUrl = "http://" + remoteResIp +"/ResServer/user/updateJson";
-//                            //修改userServer中用户信息,应该是和资源相关的内容，包括userId和资源有关的内容
-//                            JSONObject userBaseJson = new JSONObject();
-//                            //计算文件的MD5值,此操作很费时间
-//                            String resMd5 = DigestUtils.md5DigestAsHex(multipartFile.getInputStream());
-//                            ResCovertUtil resCovertUtil = new ResCovertUtil();
-//                            JSONObject userBaseRes = resCovertUtil.gsmRes2UserBaseRes(resourceEntity, resMd5);
-//                            userBaseJson.put("userId", uploaderId);
-//                            userBaseJson.put("resources", userBaseRes);
-//                            httpUtil.setUserBase(userBaseUrl, userBaseJson);
-                            uploadInfos.uploaded.add(resDetails) ;
+                            //更新用户服务器中用户字段
+                            // String userBaseUrl = "http://" + userResServer + "/ResServer/resource";
+                            String userBaseUrl = "http://localhost:8090/ResServer/resource";
+                            //修改userServer中用户信息,应该是和资源相关的内容，包括userId和资源有关的内容
+                            JSONObject userBaseJson = new JSONObject();
+                            //计算文件的MD5值,此操作很费时间
+                            String resMd5 = DigestUtils.md5DigestAsHex(multipartFile.getInputStream());
+
+                            //参与式平台资源与用户资源字段有所不同，临时转换，后期完全统一过后，就不用了
+                            ResCovertUtil resCovertUtil = new ResCovertUtil();
+                            JSONObject userBaseRes = resCovertUtil.gsmRes2UserBaseRes(resourceEntity, resMd5);
+                            ArrayList resourceList = new ArrayList();
+                            resourceList.add(userBaseRes);
+                            //用户服务器资源无uploaderId这个说法
+                            userBaseJson.put("userId", uploaderId);
+                            userBaseJson.put("resources", resourceList);
+                            JSONObject uploadToUserServerResult = httpUtil.setUserBase(userBaseUrl, userBaseJson);
+                            if ((int)uploadToUserServerResult.get("code") !=0){
+                                uploadInfos.failed.add(part.getSubmittedFileName());
+                            }
+
+                            //最后存入本地数据库中
+                            IResourceEntity resDetails = resourceDao.saveResDetails(resourceEntity);
+                            uploadInfos.uploaded.add(resDetails);
                         } else {
                             uploadInfos.sizeOver.add(part.getSubmittedFileName());
                         }
@@ -217,9 +235,9 @@ public class IResourceServiceImpl implements IResourceService {
         for (int i = 0; i < sourceStoreIds.size(); i++) {
             String oid = sourceStoreIds.get(i);
             //删除本地数据库中的资源详情数据
-            String delResult = (String)resourceDao.delResById(oid);
-            if (delResult.equals("0")){
-                return "Fail.The local database doesn't have "+ oid;
+            String delResult = (String) resourceDao.delResById(oid);
+            if (delResult.equals("0")) {
+                return "Fail.The local database doesn't have " + oid;
             }
             if (i != sourceStoreIds.size() - 1) {
                 oids += oid + ",";
@@ -240,6 +258,7 @@ public class IResourceServiceImpl implements IResourceService {
 
     /**
      * 从本地数据库中查询资源
+     *
      * @param filedAndValue 可进行多字段复合查询
      * @return
      */
