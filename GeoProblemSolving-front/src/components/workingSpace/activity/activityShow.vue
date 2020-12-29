@@ -53,7 +53,7 @@
               style="margin: 10px 0"
               v-if="
                 permissionIdentity(
-                  projectInfo.permission,
+                  activityInfo.permission,
                   userRole,
                   'manage_resource'
                 )
@@ -175,11 +175,11 @@
         <Icon
           v-if="
             activityInfo.level > 0 &&
-              permissionIdentity(
-                projectInfo.permission,
-                userRole,
-                'manage_member'
-              )
+            permissionIdentity(
+              activityInfo.permission,
+              userRole,
+              'manage_member'
+            )
           "
           type="md-trash"
           size="16"
@@ -195,11 +195,11 @@
         <Icon
           v-if="
             activityInfo.level > 0 &&
-              permissionIdentity(
-                projectInfo.permission,
-                userRole,
-                'invite_member'
-              )
+            permissionIdentity(
+              activityInfo.permission,
+              userRole,
+              'invite_member'
+            )
           "
           type="md-person-add"
           size="16"
@@ -235,12 +235,7 @@
             <div
               v-if="delUserBtn"
               style="cursor: pointer; margin-right: 10px"
-              @click="
-                member => {
-                  slctDletMember = member;
-                  removeMemberModal = true;
-                }
-              "
+              @click="selectMember(member)"
             >
               <Icon type="md-remove-circle" size="20" color="#ed4014" />
             </div>
@@ -577,13 +572,13 @@ export default {
     modifyPermission() {
       parent.location.href =
         "/GeoProblemSolving/permission/" +
-        this.activityInfo.level +
+        this.activityInfo.level + "/" +
         this.activityInfo.aid;
     },
     preCreation() {
       if (
         !this.permissionIdentity(
-          this.projectInfo.permission,
+          this.activityInfo.permission,
           this.userRole,
           "manage_child_activity"
         )
@@ -732,7 +727,8 @@ export default {
           key: this.potentialMembers.length,
           userId: candidates[i].userId,
           name: candidates[i].name,
-          role: candidates[i].role
+          role: candidates[i].role,
+          disabled: this.participants.contains(candidates[i])
         });
       }
       this.invitingMembers = this.getTargetKeys();
@@ -740,8 +736,8 @@ export default {
     },
     getTargetKeys() {
       return this.potentialMembers
-        .filter(item => {
-          return this.participants.contains(item);
+        .filter((item) => {
+          return item.disabled;
         })
         .map(item => item.key);
     },
@@ -810,6 +806,10 @@ export default {
             throw err;
           });
       }
+    },
+    selectMember(member) {
+      this.slctDletMember = member;
+      this.removeMemberModal = true;
     },
     removeUser() {
       let url = "";

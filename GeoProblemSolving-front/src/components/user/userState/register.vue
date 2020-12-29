@@ -88,6 +88,24 @@
   display: flex;
   justify-content: center;
 }
+.organization >>> .ti-input {
+  display: inline-block;
+  width: 400px;
+  height: 32px;
+  line-height: 1.5;
+  padding: 4px 7px;
+  font-size: 12px;
+  border: 1px solid #dcdee2;
+  border-radius: 4px;
+  color: #515a6e;
+  background-color: #fff;
+  background-image: none;
+  position: relative;
+  cursor: text;
+}
+.organization >>> input{
+  opacity: 0.5;
+}
 </style>
 <template>
   <div>
@@ -115,31 +133,25 @@
                       <Input
                         v-model="registerForm.email"
                         placeholder="Plase enter your email"
-                        :class="{InputStyle: inputstyle}"
+                        :class="{ InputStyle: inputstyle }"
                       ></Input>
                     </FormItem>
                   </div>
                   <div class="formStyle">
-                    <FormItem label="Name" prop="userName">
+                    <FormItem label="Name" prop="name">
                       <Input
-                        v-model="registerForm.userName"
-                        placeholder="Plase enter username"
-                        :class="{InputStyle: inputstyle}"
+                        v-model="registerForm.name"
+                        placeholder="Plase enter user name"
+                        :class="{ InputStyle: inputstyle }"
                       ></Input>
                     </FormItem>
                   </div>
-                  <!-- <div class="formStyle">
-                  <FormItem label="Phone" prop="mobilePhone">
-                    <Input v-model="registerForm.mobilePhone" placeholder="Plase enter your mobilePhone"
-                      :class="{InputStyle: inputstyle}"></Input>
-                  </FormItem>
-                  </div>-->
                   <div class="formStyle">
-                    <FormItem label="Title" prop="jobTitle">
+                    <FormItem label="Title" prop="title">
                       <Select
-                        v-model="registerForm.jobTitle"
+                        v-model="registerForm.title"
                         placeholder="Plase enter your title"
-                        :class="{InputStyle: inputstyle}"
+                        :class="{ InputStyle: inputstyle }"
                       >
                         <Option value="Professor">Professor</Option>
                         <Option value="Dr">Dr</Option>
@@ -156,17 +168,23 @@
                       <Input
                         v-model="registerForm.country"
                         placeholder="Plase enter your country"
-                        :class="{InputStyle: inputstyle}"
+                        :class="{ InputStyle: inputstyle }"
                       ></Input>
                     </FormItem>
                   </div>
                   <div class="formStyle">
-                    <FormItem label="Organization" prop="organization">
-                      <Input
-                        v-model="registerForm.organization"
+                    <FormItem label="Organizations" prop="organizations">
+                      <!-- <Input
+                        v-model="registerForm.organizations"
                         placeholder="Plase enter your affiliation"
-                        :class="{InputStyle: inputstyle}"
-                      ></Input>
+                        :class="{ InputStyle: inputstyle }"
+                      ></Input> -->
+                      <vue-tags-input
+                        class="organization"
+                        v-model="organization"
+                        :tags="registerForm.organizations"
+                        @tags-changed="(newTags) => (registerForm.organizations = newTags)"
+                      />
                     </FormItem>
                   </div>
                   <div class="formStyle">
@@ -174,12 +192,20 @@
                       <Input
                         v-model="registerForm.password"
                         placeholder="Plase enter password"
-                        :class="{InputStyle: inputstyle}"
+                        :class="{ InputStyle: inputstyle }"
                         :type="pwdType"
                       >
                         <Button slot="append" @click="changeType()">
-                          <Icon type="ios-eye" size="20" v-show="pwdType=='text'" />
-                          <Icon type="ios-eye-off" size="20" v-show="pwdType=='password'" />
+                          <Icon
+                            type="ios-eye"
+                            size="20"
+                            v-show="pwdType == 'text'"
+                          />
+                          <Icon
+                            type="ios-eye-off"
+                            size="20"
+                            v-show="pwdType == 'password'"
+                          />
                         </Button>
                       </Input>
                     </FormItem>
@@ -189,72 +215,23 @@
                       <Input
                         v-model="registerForm.confimPassword"
                         placeholder="Plase enter password again"
-                        :class="{InputStyle: inputstyle}"
+                        :class="{ InputStyle: inputstyle }"
                         :type="pwdType"
                       ></Input>
                     </FormItem>
                   </div>
-                  <!-- <div class="formStyle">
-                  <FormItem label="City" prop="city">
-                    <Input v-model="registerForm.city" placeholder="Plase enter your city"
-                      :class="{InputStyle: inputstyle}"></Input>
-                  </FormItem>
-                </div>
-                <div class="formStyle">
-                  <FormItem label="Field" prop="field">
-                    <Input v-model="registerForm.field" placeholder="Plase enter your research field"
-                      :class="{InputStyle: inputstyle}"></Input>
-                  </FormItem>
-                </div>
-                <div class="formStyle">
-                  <FormItem label="Home page" prop="homePage">
-                    <Input v-model="registerForm.homePage" placeholder="Plase enter your homepage url"
-                      :class="{InputStyle: inputstyle}"></Input>
-                  </FormItem>
-                  </div>-->
-                  <!-- <div class="formStyle">
-                  <FormItem label="Gender" prop="gender">
-                    <RadioGroup v-model="registerForm.gender" :class="{InputStyle: inputstyle}">
-                      <Radio label="male">Male</Radio>
-                      <Radio label="female">Female</Radio>
-                    </RadioGroup>
-                  </FormItem>
-                  </div>-->
-                  <!-- <div class="formStyle">
-                  <FormItem label="Avatar" prop="avatar">
-                    <div :class="{InputStyle: inputstyle}">
-                      <div class="demo-upload-list" v-if="avatar!=''">
-                        <template>
-                          <img v-bind:src="avatar" />
-                          <div class="demo-upload-list-cover">
-                            <Icon type="ios-eye-outline" @click.native="handleView()"></Icon>
-                            <Icon type="ios-trash-outline" @click.native="handleRemove()"></Icon>
-                          </div>
-                        </template>
-                      </div>
-                      <div class="uploadBox">
-                        <Icon type="ios-camera" size="20" style="position:absolute;margin:18px;"></Icon>
-                        <input @change="uploadPhoto($event)" type="file" class="uploadAvatar" id="avatarInput" />
-                      </div>
-                      <Modal title="View Image" v-model="visible">
-                        <img :src="avatar" v-if="visible" style="width: 100%" />
-                      </Modal>
-                    </div>
-                  </FormItem>
-                  </div>-->
-                  <!-- <div class="formStyle">
-                  <FormItem label="Introduction" prop="introduction">
-                    <Input v-model="registerForm.introduction" type="textarea" :autosize="{minRows: 2,maxRows: 5}"
-                      placeholder="Plase introduce yourself" :class="{InputStyle: inputstyle}"></Input>
-                  </FormItem>
-                  </div>-->
                   <div class="formStyle">
-                    <Button @click="handleReset('registerForm')" style="float:left">Reset</Button>
+                    <Button
+                      @click="handleReset('registerForm')"
+                      style="float: left"
+                      >Reset</Button
+                    >
                     <Button
                       type="primary"
                       @click="handleSubmit('registerForm')"
                       style="margin-left: 50%"
-                    >Create</Button>
+                      >Create</Button
+                    >
                   </div>
                 </Form>
                 <!-- 注册样式结束 -->
@@ -264,17 +241,17 @@
         </Row>
       </Content>
     </Layout>
-    <!-- <app-header></app-header> -->
   </div>
 </template>
 <script>
 import md5 from "js-md5";
+import VueTagsInput from "@johmun/vue-tags-input";
 export default {
-  components: { md5 },
+  components: { md5, VueTagsInput },
   computed: {
     avatar() {
       return this.$store.getters.avatar;
-    }
+    },
   },
   data() {
     var validatePass = (rule, value, callback) => {
@@ -292,205 +269,108 @@ export default {
       //input的样式设定
       inputstyle: true,
       //表单验证
+      organization: "",
       registerForm: {
-        userName: "",
         email: "",
+        name: "",
+        title: "",
+        country: "",
+        organizations: [],
         password: "",
         confimPassword: "",
-        jobTitle: "",
-        mobilePhone: "",
-        gender: "",
-        country: "",
-        city: "",
-        organization: "",
-        introduction: "",
-        field: "",
-        homePage: "",
-        avatar: ""
       },
       registerFormValidate: {
-        userName: [
+        name: [
           {
             required: true,
             message: "The name cannot be empty",
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         email: [
           {
             required: true,
-            message: "Mailbox cannot be empty",
-            trigger: "blur"
+            message: "Email address cannot be empty",
+            trigger: "blur",
           },
           {
             type: "email",
             message: "Incorrect email format",
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         password: [
           {
             required: true,
             min: 6,
             message: "Password must more than 6 words",
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         confimPassword: [
           {
             required: true,
             validator: validatePass,
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
-        jobTitle: [
+        title: [
           {
             required: true,
-            message: "Job Title cannot be empty",
-            trigger: "blur"
-          }
+            message: "Title cannot be empty",
+            trigger: "blur",
+          },
         ],
-        // gender: [
+        // country: [
         //   {
         //     required: false,
-        //     message: "Please select gender",
-        //     trigger: "change"
-        //   }
-        // ],
-        // mobilePhone: [
-        //   {
-        //     required: false,
-        //     message: "Please enter your phone number",
-        //     trigger: "blur"
-        //   }
-        // ],
-        country: [
-          {
-            required: true,
-            message: "Please enter your country",
-            trigger: "blur"
-          }
-        ],
-        // city: [
-        //   {
-        //     required: false,
-        //     message: "Please enter your city",
-        //     trigger: "blur"
-        //   }
-        // ],
-        organization: [
-          {
-            required: true,
-            message: "Please enter your affiliation",
-            trigger: "blur"
-          }
-        ]
-        // introduction: [
-        //   {
-        //     required: false,
-        //     message: "Please enter a personal introduction",
-        //     trigger: "blur"
+        //     message: "Please enter your country",
+        //     trigger: "blur",
         //   },
-        //   {
-        //     type: "string",
-        //     min: 20,
-        //     message: "Introduction no less than 20 characters",
-        //     trigger: "blur"
-        //   }
         // ],
-        // field: [
+        // organizations: [
         //   {
         //     required: false,
-        //     message: "Please enter your research field",
-        //     trigger: "blur"
-        //   }
+        //     message: "Please enter your organizations",
+        //     trigger: "blur",
+        //   },
         // ],
-        // homePage: [
-        //   {
-        //     required: false,
-        //     message: "Please enter your home page url",
-        //     trigger: "blur"
-        //   }
-        // ]
       },
       visible: false,
       // 隐藏密码图标样式
-      pwdType: "password" // 密码类型
+      pwdType: "password", // 密码类型
     };
   },
   methods: {
     handleSubmit(name) {
-      this.$refs[name].validate(valid => {
+      this.$refs[name].validate((valid) => {
         if (valid) {
-          var userJson = {};
-          userJson["userName"] = this.registerForm.userName;
-          userJson["email"] = this.registerForm.email;
-          userJson["password"] = md5(this.registerForm.password);
-          userJson["mobilePhone"] = this.registerForm.mobilePhone;
-          userJson["gender"] = this.registerForm.gender;
-          userJson["jobTitle"] = this.registerForm.jobTitle;
-          userJson["country"] = this.registerForm.country;
-          userJson["city"] = this.registerForm.city;
-          userJson["organization"] = this.registerForm.organization;
-          userJson["introduction"] = this.registerForm.introduction;
-          userJson["direction"] = this.registerForm.field;
-          userJson["homePage"] = this.registerForm.homePage;
-          userJson["avatar"] = this.registerForm.avatar;
+          let organizations = [];
+          for(let i = 0; i < this.registerForm.organizations.length; i++){
+            organizations.push(this.registerForm.organizations[i].text);
+          }
+          var userData = {
+            name: this.registerForm.name,
+            email: this.registerForm.email,
+            title: this.registerForm.title,
+            password: md5(this.registerForm.password),
+            country: this.registerForm.country,
+            organizations: organizations,
+          };
 
-          // var passwordFro = this.registerForm.password;
-          // var passwordAES = this.encrypto(passwordFro);
-          var passwordAES = md5(this.registerForm.password);
-          var email = this.registerForm.email;
           this.axios
-            .post("/GeoProblemSolving/user/register", userJson)
-            .then(res => {
-              if (res.data == "Email") {
-                this.$Message.success("Email has been used!");
-                // } else if (res.data == "MobilePhone") {
-                //   this.$Message.success("Phone number has been used!");
-              } else {
+            .post("/GeoProblemSolving/user", userData)
+            .then((res) => {
+              console.log(res.data.code);
+              if (res.data.code == -3) {
+                this.$Message.success("This email has been registered!");
+              } else if (res.data.code == 0) {
                 this.$Message.success("Register successfully!");
-
-                this.axios
-                  .get(
-                    "/GeoProblemSolving/user/login" +
-                      "?email=" +
-                      email +
-                      "&password=" +
-                      passwordAES
-                  )
-                  .then(res => {
-                    if (res.data === "Fail") {
-                      this.$Message.error("Invalid account or password.");
-                    } else {
-                      this.$store.commit("userLogin", res.data);
-
-                      let registerEmailBody = {};
-                      registerEmailBody["recipient"] = this.registerForm.email;
-                      registerEmailBody["mailTitle"] = "Register result";
-                      registerEmailBody["mailContent"] =
-                        "Welcome to join in Geo-Future Lab. In this platform, you can deal with geo-problems with your colleagues collaboratively.";
-                      this.axios
-                        .post(
-                          "/GeoProblemSolving/email/send",
-                          registerEmailBody
-                        )
-                        .then(res => {
-                          // console.log(res.data);
-                        })
-                        .catch(err => {
-                          // console.log(err.data);
-                        });
-                      this.$router.go(-1);
-                    }
-                  })
-                  .catch(err => {
-                    this.$Message.error("Login fail!");
-                  });
+                this.$router.push({ name: "Login" });
               }
             })
-            .catch(err => {
-              this.$Message.error("Register fail!");
+            .catch((err) => {
+              throw err;
             });
         } else {
           this.$Message.error("Form fill error!");
@@ -513,7 +393,7 @@ export default {
       }
       var reader = new FileReader();
       reader.readAsDataURL(file);
-      reader.onload = e => {
+      reader.onload = (e) => {
         // 读取到的图片base64 数据编码 将此编码字符串传给后台即可
         imgcode = e.target.result;
 
@@ -552,8 +432,8 @@ export default {
       //   padding: CryptoJS.pad.Pkcs7
       // });
       // return encrypted.toString();
-    }
-  }
+    },
+  },
 };
 </script>
 

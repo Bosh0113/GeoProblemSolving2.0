@@ -110,7 +110,8 @@
         <Row>
 <!--          <todo-list></todo-list>-->
 <!--          <notification></notification>-->
-          <resource></resource>
+<!--          <resource></resource>-->
+          <Project></Project>
         </Row>
 
 <!--                <notification />-->

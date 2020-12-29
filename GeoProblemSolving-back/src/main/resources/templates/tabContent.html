@@ -10,6 +10,7 @@
     <script src="https://cdn.bootcss.com/iview/3.4.2/iview.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue-avatar@2.1.7/dist/vue-avatar.min.js"></script>
     <script src="/GeoProblemSolving/js/crypto-js.js"></script>
+    <script src="/GeoProblemSolving/customize/userRole.js"></script>
 
     <style scoped th:fragment="tab-style">
         img {
@@ -237,7 +238,24 @@
         },
 
         methods: {
-
+            roleIdentity(activity) {
+                return roleIdentify(activity.members, this.userInfo.userId);
+            },
+            projectPermissionIdentity(permission, role, operation) {
+                if (operation == "auto_join") {
+                    if (JSON.parse(permission).auto_join.visitor == "Yes") return true;
+                    else if (JSON.parse(permission).auto_join.visitor == "No") return false;
+                    else {
+                        return this.getParentPermission();
+                    }
+                } else {
+                    return permissionIdentity(
+                        JSON.parse(permission),
+                        role,
+                        operation
+                    );
+                }
+            },
             projectInfoModalShow(projectInfo) {
                 if (projectInfo.isMember || projectInfo.isManager) {
                     window.location.href = "/GeoProblemSolving/projectInfo/" + projectInfo.aid;
@@ -280,7 +298,7 @@
                     ];
 
                     axios
-                        .get("/GeoProblemSolving/project/" + projectInfo.aid + "/user?userId=" + this.userInfo.userId)
+                        .get("/GeoProblemSolving/project/" + projectInfo.aid + "/user")
                         .then(res => {
                             if (res.data.code === 0) {
                                 var participants = res.data.data;
@@ -318,22 +336,29 @@
                     this.applyProjectInfo = Object.assign([], applyProjectInfo);
                     this.applyValidate.reason = "";
                     if (this.applyProjectInfo.privacy == "Public") {
-                        if (this.applyProjectInfo.permission != undefined && this.applyProjectInfo.permission.auto_join.visitor) {
+                        if (this.projectPermissionIdentity(this.applyProjectInfo.permission, this.roleIdentity(this.applyProjectInfo.members), "auto_join")) {
 
                             // join the project directly
-                            axios
-                                .get("/GeoProblemSolving/project/join?" + "projectId=" + this.applyProjectInfo.projectId + "&userId=" + this.userInfo.userId)
-                                .then(res => {
-                                    if (res.data === "Success") {
+                            let url = "/GeoProblemSolving/project/" + this.applyProjectInfo.aid + "/user?userId=" + this.userInfo.userId;
+                            this.axios
+                                .post(url)
+                                .then((res) => {
+                                    if (res.data.code == 0) {
                                         this.$Message.info("Join the project successfuly");
-
                                         window.location.href = "/GeoProblemSolving/projectInfo/" + this.applyProjectInfo.projectId;
-                                    } else if (res.data === "Fail") {
+                                    } else if (res.data.code == -3) {
+                                        this.$Notice.info({
+                                                desc:
+                                                    "You has already been a member of the project."
+                                            }
+                                        );
+                                    } else {
                                         this.$Message.info("Fail to join in this project");
+                                        console.log(res.data.msg);
                                     }
                                 })
-                                .catch(err => {
-                                    console.log(err.data);
+                                .catch((err) => {
+                                    throw err;
                                 });
                         } else {
                             this.applyJoinModal = true;
@@ -349,103 +374,96 @@
                 this.$refs[name].validate(valid => {
                     if (valid) {
                         this.applyJoinModal = false;
-                        var data = this.applyProjectInfo;
                         if (
                             this.haveApplied == true &&
-                            data.projectId == sessionStorage.getItem("applyId")
+                            this.applyProjectInfo.projectId == sessionStorage.getItem("applyId")
                         ) {
                             this.$Notice.warning({
-                                title: "repeat apply warning",
+                                title: "Repeat apply warning",
                                 desc: "You have applied successfully, no need to click again!"
                             });
                         } else {
                             if (this.UserState) {
-                                let userDetail = this.userInfo;
-                                let joinForm = {};
-                                sessionStorage.setItem("applyId", data.projectId);
-                                joinForm["recipientId"] = data.managerId;
-                                joinForm["type"] = "apply";
-                                joinForm["content"] = {
-                                    userEmail: userDetail.email,
-                                    userName: this.userInfo.userName,
-                                    userId: this.userInfo.userId,
-                                    title: "Group application",
-                                    description:
-                                        "User " +
-                                        this.userInfo.userName +
-                                        " apply to join your project: " +
-                                        data.title +
-                                        " ." +
-                                        " The reason for application is: " +
-                                        this.applyValidate.reason,
-                                    projectId: data.projectId,
-                                    projectTitle: data.title,
-                                    scope: "project",
-                                    approve: "unknow"
-                                };
-                                axios
-                                    .post("/GeoProblemSolving/notice/save", joinForm)
-                                    .then(res => {
-                                        if (res.data == "Success") {
-                                            this.$Notice.open({
-                                                title: "Apply Successfully",
-                                                desc:
-                                                    "The project's manager will process your apply in time,you can get a notification later to tell you the result."
-                                            });
-                                            this.$emit("sendNotice", data.managerId);
-                                            this.haveApplied = true;
-                                        } else {
-                                            this.$Notice.open({
-                                                desc: "Apply failed"
-                                            });
-                                        }
-                                    })
-                                    .catch(err => {
-                                        console.log("申请失败的原因是：" + err.data);
-                                    });
+                                sessionStorage.setItem("applyId", this.applyProjectInfo.aid);
+                                let managers = getMemberByRole(this.applyJoinForm, "manager");
+                                for (var i = 0; i < managers.length; i++) {
+                                    let managerId = managers[i];
+                                    let joinForm = {};
+                                    joinForm["recipientId"] = managerId;
+                                    joinForm["type"] = "apply";
+                                    joinForm["content"] = {
+                                        title: "Joining project application",
+                                        activityId: this.applyProjectInfo.aid,
+                                        activityName: this.applyProjectInfo.name,
+                                        activityLevel: 0,
+                                        userEmail: this.userInfo.email,
+                                        userName: this.userInfo.name,
+                                        userId: this.userInfo.userId,
+                                        description:
+                                            "The user: " +
+                                            this.userInfo.name +
+                                            " apply to join your project: " +
+                                            this.applyProjectInfo.name +
+                                            " ." +
+                                            " The reason for application is: " +
+                                            this.applyValidate.reason,
+                                        approve: "unknow"
+                                    };
+                                    axios
+                                        .post("/GeoProblemSolving/notice/save", joinForm)
+                                        .then(res => {
+                                            if (res.data == "Success") {
+                                                this.$Notice.open({
+                                                    title: "Apply successfully",
+                                                    desc:
+                                                        "The project manager will process your apply in time,you can get a notification later to tell you the result."
+                                                });
+                                                this.$emit("sendNotice", managerId);
+                                                this.haveApplied = true;
+                                            } else {
+                                                this.$Notice.open({
+                                                    desc: "Notification failed."
+                                                });
+                                            }
+                                        })
+                                        .catch(err => {
+                                            throw err;
+                                        });
 
-                                let emailObject = {
-                                    recipient: joinForm.recipientId,
-                                    mailTitle: "Group application",
-                                    mailContent:
-                                        joinForm.content.description +
-                                        "<br>" +
-                                        "You can click this url and enter the site to process this application: " +
-                                        "http://" +
-                                        window.location.host +
-                                        "/GeoProblemSolving/home"
-                                };
-                                axios
-                                    .post("/GeoProblemSolving/project/applyByMail", emailObject)
-                                    .then(res => {
-                                        if (res.data == "Success") {
-                                            console.log("Email Success.");
-                                        } else {
+                                    let emailObject = {
+                                        recipient: managerId,
+                                        mailTitle: "Project application",
+                                        mailContent:
+                                            joinForm.content.description +
+                                            "<br>" +
+                                            "You can click this url and enter the site to process this application: " +
+                                            "http://" +
+                                            window.location.host +
+                                            "/GeoProblemSolving/home"
+                                    };
+                                    axios
+                                        .post("/GeoProblemSolving/project/"+this.applyProjectInfo.aid+"/application", emailObject)
+                                        .then(res => {
+                                            if (res.data == "Success") {
+                                                console.log("Email Success.");
+                                            } else {
+                                                console.log("Email fail.");
+                                            }
+                                        })
+                                        .catch(err => {
                                             console.log("Email fail.");
-                                        }
-                                    })
-                                    .catch(err => {
-                                        console.log("Email fail.");
-                                    });
+                                        });
+                                }
                             } else {
-                                this.$Message.error("you must have an account before you apply");
+                                this.$Message.error("you must have an account before application.");
                                 window.location.href = "/GeoProblemSolving/login"
                             }
                         }
-                    } else {
-                        this.$Message.error("Fail!");
                     }
                 });
             },
             login() {
-                // window.location.href = "/GeoProblemSolving/login"
-                var pageUrl = window.location.href;
-                axios
-                    .get("/GeoProblemSolving/user/login?pageUrl="+pageUrl)
-                    .then(res=>{
-                        window.location.href = res.data;
-                    })
-
+                window.location.href = "/GeoProblemSolving/login"
             },
             enterProject(projectInfo) {
                 // window.sessionStorage.setItem("projectInfo",JSON.stringify(projectInfo));

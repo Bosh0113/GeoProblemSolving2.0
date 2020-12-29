@@ -46,8 +46,13 @@ public class TokenTask {
         paramMap.add("scope", "all");
         paramMap.add("grant_type", "password");
         String authUri = "http://"+ authIp + "/AuthServer/oauth/token";
-        JSONObject tokenJson = restTemplate.postForObject(authUri, paramMap, JSONObject.class);
-        return tokenJson;
+        //添加错误处理机制,成功后返回是JSONString,失败的话不是。
+        try {
+            JSONObject tokenResult = restTemplate.postForObject(authUri, paramMap, JSONObject.class);
+            return tokenResult;
+        }catch (Exception e){
+            return null;
+        }
     }
 
     /**

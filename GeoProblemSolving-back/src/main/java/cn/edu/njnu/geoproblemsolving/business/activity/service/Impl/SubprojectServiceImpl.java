@@ -110,7 +110,7 @@ public class SubprojectServiceImpl implements SubprojectService {
 
             return ResultUtils.success(subproject);
         } catch (Exception ex) {
-            return ResultUtils.error(-2, "Fail: Exception");
+            return ResultUtils.error(-2, ex.toString());
         }
     }
 
@@ -127,7 +127,7 @@ public class SubprojectServiceImpl implements SubprojectService {
                 return ResultUtils.error(-1, "Fail: subproject does not exist.");
             }
         } catch (Exception ex) {
-            return ResultUtils.error(-2, "Fail: Exception");
+            return ResultUtils.error(-2, ex.toString());
         }
     }
 
@@ -147,7 +147,7 @@ public class SubprojectServiceImpl implements SubprojectService {
 
             return ResultUtils.success(subprojectRepository.save(subproject));
         } catch (Exception ex) {
-            return ResultUtils.error(-2, "Fail: Exception");
+            return ResultUtils.error(-2, ex.toString());
         }
     }
 
@@ -174,7 +174,7 @@ public class SubprojectServiceImpl implements SubprojectService {
             subprojectRepository.deleteById(aid);
             return ResultUtils.success("Success");
         } catch (Exception ex) {
-            return ResultUtils.error(-2, "Fail: Exception");
+            return ResultUtils.error(-2, ex.toString());
         }
     }
 
@@ -206,7 +206,7 @@ public class SubprojectServiceImpl implements SubprojectService {
 
             return ResultUtils.success(children);
         } catch (Exception ex) {
-            return ResultUtils.error(-2, "Fail: Exception");
+            return ResultUtils.error(-2, ex.toString());
         }
     }
 
@@ -257,7 +257,7 @@ public class SubprojectServiceImpl implements SubprojectService {
 
             return ResultUtils.success(participants);
         } catch (Exception ex) {
-            return ResultUtils.error(-2, "Fail: Exception");
+            return ResultUtils.error(-2, ex.toString());
         }
     }
 
@@ -294,7 +294,7 @@ public class SubprojectServiceImpl implements SubprojectService {
 
             return ResultUtils.success(lineage);
         } catch (Exception ex) {
-            return ResultUtils.error(-2, "Fail: Exception");
+            return ResultUtils.error(-2, ex.toString());
         }
     }
 
@@ -351,7 +351,7 @@ public class SubprojectServiceImpl implements SubprojectService {
 
             return ResultUtils.success("Success");
         } catch (Exception ex) {
-            return ResultUtils.error(-2, "Fail: Exception");
+            return ResultUtils.error(-2, ex.toString());
         }
     }
 
@@ -385,7 +385,7 @@ public class SubprojectServiceImpl implements SubprojectService {
 
             return ResultUtils.success("Success");
         } catch (Exception ex) {
-            return ResultUtils.error(-2, "Fail: Exception");
+            return ResultUtils.error(-2, ex.toString());
         }
     }
 
@@ -416,7 +416,7 @@ public class SubprojectServiceImpl implements SubprojectService {
 
             return ResultUtils.success("Success");
         } catch (Exception ex) {
-            return ResultUtils.error(-2, "Fail: Exception");
+            return ResultUtils.error(-2, ex.toString());
         }
     }
 

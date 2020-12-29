@@ -558,7 +558,7 @@ body {
                         <div style="display:flex;justify-content:center">
                           <h3
                             style="text-align:center;width:80%"
-                          >Sorry, you didn't participate in any projects.</h3>
+                          >Sorry, you did not participate in any projects.</h3>
                         </div>
                       </Card>
                       <div
@@ -610,7 +610,7 @@ body {
                           <div style="display:flex;justify-content:center">
                             <h3
                               style="text-align:center;width:80%"
-                            >Sorry, you didn't created any projects.</h3>
+                            >Sorry, you did not create any projects.</h3>
                           </div>
                         </Card>
                         <div
@@ -832,13 +832,7 @@ export default {
   beforeRouteEnter: (to, from, next) => {
     next(vm => {
       if (!vm.$store.getters.userState) {
-        // next("/login");
-        var pageUrl = window.location.href;
-        this.axios
-          .get("/GeoProblemSolving/user/login?pageUrl="+pageUrl)
-          .then(res=>{
-            window.location.href = res.data;
-          })
+        next("/login");
       }
       // else {
       //   next();
@@ -1188,7 +1182,6 @@ export default {
       delete this.userDetail.joinedProjects;
       delete this.userDetail.manageProjects;
       this.joinedProjectIndexList = this.$store.getters.userInfo.joinedProjects;
-      console.log(this.userDetail)
     },
     //获取用户参与的项目列表
     getParticipatoryList(projectIds) {

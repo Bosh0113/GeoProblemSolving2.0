@@ -13,7 +13,7 @@
           <span style="margin: 25px 0; font-size: 20px" title="Activity name"
             >{{activityInfo.name}}</span
           >
-          <span style="margin: 0px 10px; font-size: 14px" title="Activity description">{{
+          <span style="margin: 0px 10px; font-size: 14px;overflow: hidden;width: 90%;display: inline-block;text-overflow: ellipsis;" title="Activity description">{{
             activityInfo.description
           }}</span>
         </div>
@@ -47,7 +47,6 @@
                 <li>Accessible participatory tools and resources</li>
               </ul>
             </div>
-            <!-- <div style="text-align:center;margin-top:2%" v-if="permissionIdentity(activityInfo.permission, userRole, 'manage_workspace_type')"> -->
             <div style="text-align: center; margin-top: 2%">
               <h3 v-if="operationPermissionIdentity(this.activityInfo.permission, this.userRole, 'manage_workspace_type')">
                 Select this type ->
@@ -74,8 +73,7 @@
                 <li>Task coordination and participant management</li>
               </ul>
             </div>
-            <!-- <div style="text-align:center;margin-top:2%" v-if="permissionIdentity(activityInfo.permission, userRole, 'manage_workspace_type')">                 -->
-            <div style="text-align: center; margin-top: 2%">
+            <div style="text-align:center;margin-top:2%">
               <h3 v-if="operationPermissionIdentity(this.activityInfo.permission, this.userRole, 'manage_workspace_type')">
                 Select this type ->
                 <a @click="selectTypeModalShow('Activity_Group')">Go</a>

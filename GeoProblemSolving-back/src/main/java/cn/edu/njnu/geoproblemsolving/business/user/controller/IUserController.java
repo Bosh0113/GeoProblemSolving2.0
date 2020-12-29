@@ -50,11 +50,23 @@ public class IUserController {
 
    @RequestMapping(value = "/login", method = RequestMethod.GET)
    public Object login(@RequestParam("email") String email, @RequestParam("password") String password, HttpServletRequest request) {
-       HttpSession session = request.getSession();
+
        JSONObject token = tokenTask.getTokenUsePwd(email, password);
+       if (token == null){
+           return "Fail";
+       }
        String access_token = (String)token.get("access_token");
+
+       //获取到用户服务器对象
        JSONObject userBaseJson = tokenTask.getUserFromResServer(access_token);
        User userBase =  JSONObject.toJavaObject(userBaseJson, User.class);
+
+       //如果本地数据库中无此对象，则将其存入本地数据库中
+       User localUser = userDao.findUserById(userBase.getUserId());
+       if (localUser == null){
+           userDao.saveLocalUser(userBase);
+       }
+        HttpSession session = request.getSession();
        session.setAttribute("userId", userBase.getUserId());
        session.setAttribute("name", userBase.getName());
        session.setAttribute("avatar", userBase.getAvatar());
@@ -104,6 +116,7 @@ public class IUserController {
         if (userId == null){
             return false;
         }else {
+            //从本地数据库
             User user = userDao.findUserById(userId);
             return user;
         }
@@ -149,13 +162,16 @@ public class IUserController {
         return userDao.getMangeProjectList(manageProjectList);
     }
 
+    /**
+     * @Author mzy
+     * @Date 2020.12.18
+     */
 
     /**
      * Inquiry information of one user
      * @param key：userId, email
      * @param value
      * @return
-     * @Author mzy
      */
     @RequestMapping(method = RequestMethod.GET)
     public JsonResult getUserInfo(@RequestParam String key, @RequestParam String value){
@@ -166,16 +182,9 @@ public class IUserController {
      * Store user information to database
      * @param user
      * @return
-     * @Author mzy
      */
     @RequestMapping(method = RequestMethod.POST)
-    public JsonResult addUserInfo(@RequestBody User user){
+    public JsonResult addUserInfo(@RequestBody JSONObject user){
         return userDao.addUserInfo(user);
     }
-
-    // @RequestMapping(value = "/getMember", method = RequestMethod.POST)
-    // public JsonResult getProjectMember(@RequestBody String[] memberIds){
-    //     String[] memberName = {"zhengzhong","zhansan", "Lisi"};
-    //     return ResultUtils.success(memberName);
-    // }
 }

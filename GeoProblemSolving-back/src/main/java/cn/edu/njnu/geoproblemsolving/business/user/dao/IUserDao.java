@@ -7,6 +7,7 @@ import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import com.alibaba.fastjson.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
 
 public interface IUserDao {
     Object findUserById(String userId);
@@ -24,5 +25,5 @@ public interface IUserDao {
 
     JsonResult getUserInfo(String key, String value);
 
-    JsonResult addUserInfo(User user);
+    JsonResult addUserInfo(JSONObject user);
 }

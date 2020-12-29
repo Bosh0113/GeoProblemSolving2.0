@@ -64,7 +64,7 @@
               <div style="display:flex;justify-content:center">
                 <h3
                   style="text-align:center;width:80%"
-                >Sorry, you didn't created any projects.</h3>
+                >Sorry, you did not create any projects.</h3>
               </div>
             </Card>
 
@@ -122,7 +122,7 @@
                   <div style="display:flex;justify-content:center">
                     <h3
                       style="text-align:center;width:80%"
-                    >Sorry, you didn't participate in any projects.</h3>
+                    >Sorry, you did not participate in any projects.</h3>
                   </div>
                 </Card>
                 <div
@@ -164,7 +164,7 @@
 
 
       </Col>
-      <Col span="3" offset="1">
+      <Col span="4">
         <!--    Event History-->
         <Card dis-hover class="historyLine" >
         <p slot="title">Event line</p>
@@ -213,10 +213,9 @@
 </template>
 
 <script>
-  import timeLine from "./timeLine";
   export default {
     name: "project",
-    components: {"time-line": timeLine},
+    components: {},
     data() {
       return {
         joinedProjectsList: [],

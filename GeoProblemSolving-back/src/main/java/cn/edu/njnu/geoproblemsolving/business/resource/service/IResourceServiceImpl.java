@@ -104,8 +104,9 @@ public class IResourceServiceImpl implements IResourceService {
                             String uploadRemoteUrl = "http://" + dataRemoteIp + ":8082/data";
                             //向dataContainer传输数据
                             JSONObject uploadRemoteResult = httpUtil.uploadRemote(uploadRemoteUrl, valueMap);
-                            String uploadResultInfo = (String) uploadRemoteResult.get("result");
-                            if (!uploadResultInfo.equals("suc")) {
+                            Integer uploadResultInfo = uploadRemoteResult.getInteger("code");
+
+                            if (!uploadResultInfo.equals(1)) {
                                 uploadInfos.failed.add(fileName);
                                 valueMap.clear();
                                 continue;

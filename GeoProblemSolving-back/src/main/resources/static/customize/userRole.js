@@ -125,7 +125,7 @@ function roleLevelIdentify(role) {
         };
         case "stakeholder":
         case "consultant":
-        case "ordinary-member":  {
+        case "ordinary-member": {
             roleLevel = "widerteam";
             break;
         };
@@ -141,6 +141,17 @@ function roleLevelIdentify(role) {
 function getDefault() {
     var permission = defaultPermission;
     return permission;
+}
+
+// Get participants' userId by their roles
+function getMemberByRole(activity, role) {
+    let members = [];
+    for(let i = 0; i< activity.members.length;i++){
+        if(activity.members[i].role == role){
+            members.push(activity.members[i].userId)
+        }
+    }
+    return members;
 }
 
 // Permission: from Json to Array
@@ -468,4 +479,5 @@ function permissionIdentity(currentPermission, role, operation) {
         }
     }
 }
+
 
