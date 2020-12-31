@@ -100,6 +100,40 @@ public class ActivityController {
     }
 
     /**
+     * join an activity
+     * @param aid
+     * @param userId
+     * @return
+     */
+    @RequestMapping(value = "/{aid}/user", method = RequestMethod.POST)
+    public JsonResult joinSubproject(@PathVariable("aid") String aid, @RequestParam("userId") String userId){
+        return activityService.joinActivity(aid, userId);
+    }
+
+    /**
+     * change the role of member
+     * @param aid
+     * @param userId
+     * @param role
+     * @return
+     */
+    @RequestMapping(value = "/{aid}/user", method = RequestMethod.PUT)
+    public JsonResult changeUserRole(@PathVariable("aid") String aid, @RequestParam("userId") String userId, @RequestParam("role") String role){
+        return activityService.updateMemberRole(aid, userId, role);
+    }
+
+    /**
+     * Exit an activity
+     * @param aid
+     * @param userId
+     * @return
+     */
+    @RequestMapping(value = "/{aid}/user", method = RequestMethod.DELETE)
+    public JsonResult quitSubproject(@PathVariable("aid") String aid, @RequestParam("userId") String userId){
+        return activityService.quitActivity(aid, userId);
+    }
+
+    /**
      * get ancestors of one activity
      * @param aid
      * @return
@@ -134,24 +168,48 @@ public class ActivityController {
         return activityService.createLast(aid, lastId, protocol);
     }
 
+    /**
+     * Link two activity
+     * @param aid1
+     * @param aid2
+     * @return
+     */
     @RequestMapping(method = RequestMethod.POST, value = "/link/{aid1}/{aid2}")
-    public JsonResult linkActivities(@PathVariable("aid1") String aid1, @PathVariable("aid2") String aid2, @RequestBody LinkProtocol protocol) {
+    public JsonResult linkActivities(@PathVariable("aid1") String aid1, @PathVariable("aid2") String aid2, @RequestParam("pid") String pid, @RequestBody UpdateActivityDTO update) {
         logger.info("linkActivities");
-        return activityService.linkActivities(aid1, aid2, protocol);
+        return activityService.linkActivities(update, aid1, aid2, pid);
     }
 
+    /**
+     * Separate two activities
+     * @param aid1
+     * @param aid2
+     * @return
+     */
     @RequestMapping(method = RequestMethod.POST, value = "/separate/{aid1}/{aid2}")
-    public JsonResult separateActivities(@PathVariable("aid1") String aid1, @PathVariable("aid2") String aid2) {
+    public JsonResult separateActivities(@PathVariable("aid1") String aid1, @PathVariable("aid2") String aid2, @RequestBody UpdateActivityDTO update) {
         logger.info("separateActivities");
-        return activityService.separateActivities(aid1, aid2);
+        return activityService.separateActivities(update, aid1, aid2);
     }
 
+    /**
+     * Join activity
+     * @param aid
+     * @param userId
+     * @return
+     */
     @RequestMapping(method = RequestMethod.GET, value = "/join")
     public JsonResult joinActivity(@RequestParam("aid") String aid, @RequestParam("userId") String userId) {
         logger.info("joinActivity");
         return activityService.joinActivity(aid, userId);
     }
 
+    /**
+     * Leave the activity
+     * @param aid
+     * @param userId
+     * @return
+     */
     @RequestMapping(method = RequestMethod.GET, value = "/quit")
     public JsonResult quitActivity(@RequestParam("aid") String aid, @RequestParam("userId") String userId) {
         logger.info("quitActivity");

@@ -673,7 +673,6 @@ body {
     <Modal
       v-model="authorizeProjectModal"
       @on-ok="authorize()"
-      @on-cancel
       ok-text="Assure"
       cancel-text="Cancel"
     >

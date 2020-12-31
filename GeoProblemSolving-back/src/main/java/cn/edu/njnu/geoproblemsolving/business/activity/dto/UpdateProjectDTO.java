@@ -15,6 +15,7 @@ public class UpdateProjectDTO implements ToDomainConverter<Project> {
     /**
      * Common activity
      */
+    private String aid;
     private String name;
     private String description;
     private String purpose;

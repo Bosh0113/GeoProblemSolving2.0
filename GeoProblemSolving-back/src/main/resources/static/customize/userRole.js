@@ -115,20 +115,23 @@ function roleLevelIdentify(role) {
         case "creator": {
             roleLevel = "manager";
             break;
-        };
+        }
+            ;
         case "researcher":
         case "expert":
         case "decision-maker":
         case "core-member": {
             roleLevel = "coreteam";
             break;
-        };
+        }
+            ;
         case "stakeholder":
         case "consultant":
         case "ordinary-member": {
             roleLevel = "widerteam";
             break;
-        };
+        }
+            ;
         case "visitor": {
             roleLevel = "visitor";
             break;
@@ -143,11 +146,43 @@ function getDefault() {
     return permission;
 }
 
+// Compare the level between roles
+// 0: same level; 1: role1 has the higher level than role2; -1: role1 has the lower level than role2
+function roleCompare(role1, role2) {
+    let roleLevel1 = roleLevelIdentify(role1);
+    let roleLevel2 = roleLevelIdentify(role2);
+    if (roleLevel1 == "manager") {
+        if (roleLevel2 == "manager")
+            return 0;
+        else
+            return 1
+    } else if (roleLevel1 == "coreteam") {
+        if (roleLevel2 == "manager")
+            return -1;
+        else if (roleLevel2 == "coreteam")
+            return 0
+        else
+            return 1
+    } else if (roleLevel1 == "widerteam") {
+        if (roleLevel2 == "visitor")
+            return 1;
+        else if (roleLevel2 == "widerteam")
+            return 0
+        else
+            return -1
+    } else if (roleLevel1 == "visitor") {
+        if (roleLevel2 == "visitor")
+            return 0;
+        else
+            return -1
+    }
+}
+
 // Get participants' userId by their roles
 function getMemberByRole(activity, role) {
     let members = [];
-    for(let i = 0; i< activity.members.length;i++){
-        if(activity.members[i].role == role){
+    for (let i = 0; i < activity.members.length; i++) {
+        if (activity.members[i].role == role) {
             members.push(activity.members[i].userId)
         }
     }
@@ -216,7 +251,7 @@ function permissionJson2Array(currentPermission) {
     }
     if (permission.create_task != undefined) {
         var row = {
-            operation: "Create activity tasks",
+            operation: "Create tasks in activities",
             manager: permission.create_task.manager,
             coreteam: permission.create_task.coreteam,
             widerteam: permission.create_task.widerteam,
@@ -226,7 +261,7 @@ function permissionJson2Array(currentPermission) {
     }
     if (permission.manage_task != undefined) {
         var row = {
-            operation: "Manage activity tasks",
+            operation: "Manage tasks in activities",
             manager: permission.manage_task.manager,
             coreteam: permission.manage_task.coreteam,
             widerteam: permission.manage_task.widerteam,
@@ -328,8 +363,7 @@ function permissionIdentity(currentPermission, role, operation) {
     var permission = {};
     if (currentPermission == undefined || currentPermission == {}) {
         return false;
-    }
-    else {
+    } else {
         permission = currentPermission;
     }
 
@@ -345,8 +379,7 @@ function permissionIdentity(currentPermission, role, operation) {
         } else if (roleLevel == "visitor") {
             return permission.edit_info.visitor;
         }
-    }
-    else if (operation === "invite_member") {
+    } else if (operation === "invite_member") {
         if (roleLevel == "manager") {
             return permission.invite_member.manager;
         } else if (roleLevel == "coreteam") {
@@ -356,8 +389,7 @@ function permissionIdentity(currentPermission, role, operation) {
         } else if (roleLevel == "visitor") {
             return permission.invite_member.visitor;
         }
-    }
-    else if (operation === "manage_member") {
+    } else if (operation === "manage_member") {
         if (roleLevel == "manager") {
             return permission.manage_member.manager;
         } else if (roleLevel == "coreteam") {
@@ -367,8 +399,7 @@ function permissionIdentity(currentPermission, role, operation) {
         } else if (roleLevel == "visitor") {
             return permission.manage_member.visitor;
         }
-    }
-    else if (operation === "create_task") {
+    } else if (operation === "create_task") {
         if (roleLevel == "manager") {
             return permission.create_task.manager;
         } else if (roleLevel == "coreteam") {
@@ -378,8 +409,7 @@ function permissionIdentity(currentPermission, role, operation) {
         } else if (roleLevel == "visitor") {
             return permission.create_task.visitor;
         }
-    }
-    else if (operation === "manage_task") {
+    } else if (operation === "manage_task") {
         if (roleLevel == "manager") {
             return permission.manage_task.manager;
         } else if (roleLevel == "coreteam") {
@@ -389,8 +419,7 @@ function permissionIdentity(currentPermission, role, operation) {
         } else if (roleLevel == "visitor") {
             return permission.manage_task.visitor;
         }
-    }
-    else if (operation === "upload_resource") {
+    } else if (operation === "upload_resource") {
         if (roleLevel == "manager") {
             return permission.upload_resource.manager;
         } else if (roleLevel == "coreteam") {
@@ -400,8 +429,7 @@ function permissionIdentity(currentPermission, role, operation) {
         } else if (roleLevel == "visitor") {
             return permission.upload_resource.visitor;
         }
-    }
-    else if (operation === "use_resource") {
+    } else if (operation === "use_resource") {
         if (roleLevel == "manager") {
             return permission.use_resource.manager;
         } else if (roleLevel == "coreteam") {
@@ -411,8 +439,7 @@ function permissionIdentity(currentPermission, role, operation) {
         } else if (roleLevel == "visitor") {
             return permission.use_resource.visitor;
         }
-    }
-    else if (operation === "manage_resource") {
+    } else if (operation === "manage_resource") {
         if (roleLevel == "manager") {
             return permission.manage_resource.manager;
         } else if (roleLevel == "coreteam") {
@@ -422,8 +449,7 @@ function permissionIdentity(currentPermission, role, operation) {
         } else if (roleLevel == "visitor") {
             return permission.manage_resource.visitor;
         }
-    }
-    else if (operation === "manage_workspace_type") {
+    } else if (operation === "manage_workspace_type") {
         if (roleLevel == "manager") {
             return permission.manage_workspace_type.manager;
         } else if (roleLevel == "coreteam") {
@@ -433,8 +459,7 @@ function permissionIdentity(currentPermission, role, operation) {
         } else if (roleLevel == "visitor") {
             return permission.manage_workspace_type.visitor;
         }
-    }
-    else if (operation === "import_tool") {
+    } else if (operation === "import_tool") {
         if (roleLevel == "manager") {
             return permission.import_tool.manager;
         } else if (roleLevel == "coreteam") {
@@ -444,8 +469,7 @@ function permissionIdentity(currentPermission, role, operation) {
         } else if (roleLevel == "visitor") {
             return permission.import_tool.visitor;
         }
-    }
-    else if (operation === "use_tool") {
+    } else if (operation === "use_tool") {
         if (roleLevel == "manager") {
             return permission.edit_info.manager;
         } else if (roleLevel == "coreteam") {
@@ -455,8 +479,7 @@ function permissionIdentity(currentPermission, role, operation) {
         } else if (roleLevel == "visitor") {
             return permission.edit_info.visitor;
         }
-    }
-    else if (operation === "manage_tool") {
+    } else if (operation === "manage_tool") {
         if (roleLevel == "manager") {
             return permission.manage_tool.manager;
         } else if (roleLevel == "coreteam") {
@@ -466,8 +489,7 @@ function permissionIdentity(currentPermission, role, operation) {
         } else if (roleLevel == "visitor") {
             return permission.manage_tool.visitor;
         }
-    }
-    else if (operation === "manage_child_activity") {
+    } else if (operation === "manage_child_activity") {
         if (roleLevel == "manager") {
             return permission.manage_child_activity.manager;
         } else if (roleLevel == "coreteam") {

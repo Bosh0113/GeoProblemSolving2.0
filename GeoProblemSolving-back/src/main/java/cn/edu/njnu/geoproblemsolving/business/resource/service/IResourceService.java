@@ -20,4 +20,5 @@ public interface IResourceService {
     Object searchRemote(String fileName);
     JsonResult inquiryLocal(Map<String, String> filedAndValue);
     Object saveResource(AddIResourceDTO add) throws IOException, URISyntaxException;
+    JsonResult uploadImage(HttpServletRequest request);
 }

@@ -1,6 +1,7 @@
 package cn.edu.njnu.geoproblemsolving.business.activity.controller;
 
 import cn.edu.njnu.geoproblemsolving.Entity.EmailEntity;
+import cn.edu.njnu.geoproblemsolving.business.activity.dto.UpdateActivityDTO;
 import cn.edu.njnu.geoproblemsolving.business.activity.dto.UpdateProjectDTO;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Project;
@@ -82,7 +83,6 @@ public class ProjectController {
         // Thymeleaf
         if(result.getCode() == 0) {
             staticPagesBuilder.projectDetailPageBuilder((Project) result.getData());
-            staticPagesBuilder.projectListPageBuilder(projectService.findProjectsByPage(1, 18));
         }
         return result;
     }
@@ -204,7 +204,6 @@ public class ProjectController {
 
         if(result.getCode() == 0) {
             staticPagesBuilder.projectDetailPageBuilder((Project) result.getData());
-//            staticPagesBuilder.projectListPageBuilder(projectService.findProjectsByPage(0, 18));
         }
         return result;
     }
@@ -218,5 +217,40 @@ public class ProjectController {
     @RequestMapping(value = "/{aid}/application", produces = {"application/json;charset=UTF-8"}, method = RequestMethod.POST)
     public JsonResult sendEmail(@PathVariable("aid") String aid, @RequestBody EmailEntity emailEntity) {
         return projectService.applyJoinProject(aid, emailEntity);
+    }
+
+
+    /**
+     * Link two activity
+     * @param aid1
+     * @param aid2
+     * @return
+     */
+    @RequestMapping(method = RequestMethod.POST, value = "/link/{aid1}/{aid2}")
+    public JsonResult linkActivities(@PathVariable("aid1") String aid1, @PathVariable("aid2") String aid2, @RequestParam("pid") String pid, @RequestBody UpdateActivityDTO update) throws IOException {
+        logger.info("linkActivities");
+        JsonResult result =  projectService.linkActivities(update, aid1, aid2, pid);
+
+        if(result.getCode() == 0) {
+            staticPagesBuilder.projectDetailPageBuilder((Project) result.getData());
+        }
+        return result;
+    }
+
+    /**
+     * Separate two activities
+     * @param aid1
+     * @param aid2
+     * @return
+     */
+    @RequestMapping(method = RequestMethod.POST, value = "/separate/{aid1}/{aid2}")
+    public JsonResult separateActivities(@PathVariable("aid1") String aid1, @PathVariable("aid2") String aid2, @RequestBody UpdateActivityDTO update) throws IOException {
+        logger.info("separateActivities");
+        JsonResult result = projectService.separateActivities(update, aid1, aid2);
+
+        if(result.getCode() == 0) {
+            staticPagesBuilder.projectDetailPageBuilder((Project) result.getData());
+        }
+        return result;
     }
 }

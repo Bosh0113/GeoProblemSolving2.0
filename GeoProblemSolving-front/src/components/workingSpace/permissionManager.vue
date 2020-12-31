@@ -14,7 +14,7 @@
         <Divider style="margin: 5px 0" />
         <div>{{ activityInfo.name }}</div>
       </div>
-      <div style="margin: 20px 0" v-if="projectLevel == 0">
+      <div style="margin: 20px 0" v-if="activityInfo.level == 0">
         <h2>Privacy</h2>
         <Divider style="margin: 5px 0" />
         <div>{{ activityInfo.privacy }}</div>
@@ -26,7 +26,7 @@
       </div>
       <div class="btnPermission">
         <Button @click="setDefault">Default</Button>
-        <Button @click="save2Project">Save</Button>
+        <Button @click="save2Activity">Save</Button>
       </div>
     </Col>
     <Col span="14" style="margin: 30px 15px">
@@ -434,196 +434,196 @@ export default {
       }
       if (operation == "Edit the information of the activity") {
         if (key == 1) {
-          this.permission.project_edit_info.manager = value;
+          this.permission.edit_info.manager = value;
           this.permissionList[index].manager = value;
         } else if (key == 2) {
-          this.permission.project_edit_info.coreteam = value;
+          this.permission.edit_info.coreteam = value;
           this.permissionList[index].coreteam = value;
         } else if (key == 3) {
-          this.permission.project_edit_info.widerteam = value;
+          this.permission.edit_info.widerteam = value;
           this.permissionList[index].widerteam = value;
         } else if (key == 4) {
-          this.permission.project_edit_info.visitor = value;
+          this.permission.edit_info.visitor = value;
           this.permissionList[index].visitor = value;
         }
       }
       if (operation == "Invite other person to join the activity") {
         if (key == 1) {
-          this.permission.project_invite_member.manager = value;
+          this.permission.invite_member.manager = value;
           this.permissionList[index].manager = value;
         } else if (key == 2) {
-          this.permission.project_invite_member.coreteam = value;
+          this.permission.invite_member.coreteam = value;
           this.permissionList[index].coreteam = value;
         } else if (key == 3) {
-          this.permission.project_invite_member.widerteam = value;
+          this.permission.invite_member.widerteam = value;
           this.permissionList[index].widerteam = value;
         } else if (key == 4) {
-          this.permission.project_invite_member.visitor = value;
+          this.permission.invite_member.visitor = value;
           this.permissionList[index].visitor = value;
         }
       }
       if (operation == "Manage members") {
         if (key == 1) {
-          this.permission.project_remove_member.manager = value;
+          this.permission.manage_member.manager = value;
           this.permissionList[index].manager = value;
         } else if (key == 2) {
-          this.permission.project_remove_member.coreteam = value;
+          this.permission.manage_member.coreteam = value;
           this.permissionList[index].coreteam = value;
         } else if (key == 3) {
-          this.permission.project_remove_member.widerteam = value;
+          this.permission.manage_member.widerteam = value;
           this.permissionList[index].widerteam = value;
         } else if (key == 4) {
-          this.permission.project_remove_member.visitor = value;
+          this.permission.manage_member.visitor = value;
           this.permissionList[index].visitor = value;
         }
       }
-      if (operation == "Create activity tasks") {
+      if (operation == "Create tasks in activities") {
         if (key == 1) {
-          this.permission.project_task_create.manager = value;
+          this.permission.create_task.manager = value;
           this.permissionList[index].manager = value;
         } else if (key == 2) {
-          this.permission.project_task_create.coreteam = value;
+          this.permission.create_task.coreteam = value;
           this.permissionList[index].coreteam = value;
         } else if (key == 3) {
-          this.permission.project_task_create.widerteam = value;
+          this.permission.create_task.widerteam = value;
           this.permissionList[index].widerteam = value;
         } else if (key == 4) {
-          this.permission.project_task_create.visitor = value;
+          this.permission.create_task.visitor = value;
           this.permissionList[index].visitor = value;
         }
       }
-      if (operation == "Manage activity tasks") {
+      if (operation == "Manage tasks in activities") {
         if (key == 1) {
-          this.permission.project_task_manage.manager = value;
+          this.permission.manage_task.manager = value;
           this.permissionList[index].manager = value;
         } else if (key == 2) {
-          this.permission.project_task_manage.coreteam = value;
+          this.permission.manage_task.coreteam = value;
           this.permissionList[index].coreteam = value;
         } else if (key == 3) {
-          this.permission.project_task_manage.widerteam = value;
+          this.permission.manage_task.widerteam = value;
           this.permissionList[index].widerteam = value;
         } else if (key == 4) {
-          this.permission.project_task_manage.visitor = value;
+          this.permission.manage_task.visitor = value;
           this.permissionList[index].visitor = value;
         }
       }
       if (operation == "Upload resources") {
         if (key == 1) {
-          this.permission.project_resource_manage.manager = value;
+          this.permission.upload_resource.manager = value;
           this.permissionList[index].manager = value;
         } else if (key == 2) {
-          this.permission.project_resource_manage.coreteam = value;
+          this.permission.upload_resource.coreteam = value;
           this.permissionList[index].coreteam = value;
         } else if (key == 3) {
-          this.permission.project_resource_manage.widerteam = value;
+          this.permission.upload_resource.widerteam = value;
           this.permissionList[index].widerteam = value;
         } else if (key == 4) {
-          this.permission.project_resource_manage.visitor = value;
+          this.permission.upload_resource.visitor = value;
           this.permissionList[index].visitor = value;
         }
       }
       if (operation == "Use resources") {
         if (key == 1) {
-          this.permission.project_workspace_type_manage.manager = value;
+          this.permission.use_resource.manager = value;
           this.permissionList[index].manager = value;
         } else if (key == 2) {
-          this.permission.project_workspace_type_manage.coreteam = value;
+          this.permission.use_resource.coreteam = value;
           this.permissionList[index].coreteam = value;
         } else if (key == 3) {
-          this.permission.project_workspace_type_manage.widerteam = value;
+          this.permission.use_resource.widerteam = value;
           this.permissionList[index].widerteam = value;
         } else if (key == 4) {
-          this.permission.project_workspace_type_manage.visitor = value;
+          this.permission.use_resource.visitor = value;
           this.permissionList[index].visitor = value;
         }
       }
       if (operation == "Manage resources") {
         if (key == 1) {
-          this.permission.subprojects_manage.manager = value;
+          this.permission.manage_resource.manager = value;
           this.permissionList[index].manager = value;
         } else if (key == 2) {
-          this.permission.subprojects_manage.coreteam = value;
+          this.permission.manage_resource.coreteam = value;
           this.permissionList[index].coreteam = value;
         } else if (key == 3) {
-          this.permission.subprojects_manage.widerteam = value;
+          this.permission.manage_resource.widerteam = value;
           this.permissionList[index].widerteam = value;
         } else if (key == 4) {
-          this.permission.subprojects_manage.visitor = value;
+          this.permission.manage_resource.visitor = value;
           this.permissionList[index].visitor = value;
         }
       }
       if (operation == "Switch the type of workspace") {
         if (key == 1) {
-          this.permission.subproject_edit_info.manager = value;
+          this.permission.manage_workspace_type.manager = value;
           this.permissionList[index].manager = value;
         } else if (key == 2) {
-          this.permission.subproject_edit_info.coreteam = value;
+          this.permission.manage_workspace_type.coreteam = value;
           this.permissionList[index].coreteam = value;
         } else if (key == 3) {
-          this.permission.subproject_edit_info.widerteam = value;
+          this.permission.manage_workspace_type.widerteam = value;
           this.permissionList[index].widerteam = value;
         } else if (key == 4) {
-          this.permission.subproject_edit_info.visitor = value;
+          this.permission.manage_workspace_type.visitor = value;
           this.permissionList[index].visitor = value;
         }
       }
       if (operation == "Import tools or toolsets") {
         if (key == 1) {
-          this.permission.subproject_invite_member.manager = value;
+          this.permission.import_tool.manager = value;
           this.permissionList[index].manager = value;
         } else if (key == 2) {
-          this.permission.subproject_invite_member.coreteam = value;
+          this.permission.import_tool.coreteam = value;
           this.permissionList[index].coreteam = value;
         } else if (key == 3) {
-          this.permission.subproject_invite_member.widerteam = value;
+          this.permission.import_tool.widerteam = value;
           this.permissionList[index].widerteam = value;
         } else if (key == 4) {
-          this.permission.subproject_invite_member.visitor = value;
+          this.permission.import_tool.visitor = value;
           this.permissionList[index].visitor = value;
         }
       }
       if (operation == "Use tools or toolsets") {
         if (key == 1) {
-          this.permission.subproject_remove_member.manager = value;
+          this.permission.use_tool.manager = value;
           this.permissionList[index].manager = value;
         } else if (key == 2) {
-          this.permission.subproject_remove_member.coreteam = value;
+          this.permission.use_tool.coreteam = value;
           this.permissionList[index].coreteam = value;
         } else if (key == 3) {
-          this.permission.subproject_remove_member.widerteam = value;
+          this.permission.use_tool.widerteam = value;
           this.permissionList[index].widerteam = value;
         } else if (key == 4) {
-          this.permission.subproject_remove_member.visitor = value;
+          this.permission.use_tool.visitor = value;
           this.permissionList[index].visitor = value;
         }
       }
       if (operation == "Manage tools or toolsets") {
         if (key == 1) {
-          this.permission.subproject_task_create.manager = value;
+          this.permission.manage_tool.manager = value;
           this.permissionList[index].manager = value;
         } else if (key == 2) {
-          this.permission.subproject_task_create.coreteam = value;
+          this.permission.manage_tool.coreteam = value;
           this.permissionList[index].coreteam = value;
         } else if (key == 3) {
-          this.permission.subproject_task_create.widerteam = value;
+          this.permission.manage_tool.widerteam = value;
           this.permissionList[index].widerteam = value;
         } else if (key == 4) {
-          this.permission.subproject_task_create.visitor = value;
+          this.permission.manage_tool.visitor = value;
           this.permissionList[index].visitor = value;
         }
       }
       if (operation == "Manage child activity") {
         if (key == 1) {
-          this.permission.subproject_task_manage.manager = value;
+          this.permission.manage_child_activity.manager = value;
           this.permissionList[index].manager = value;
         } else if (key == 2) {
-          this.permission.subproject_task_manage.coreteam = value;
+          this.permission.manage_child_activity.coreteam = value;
           this.permissionList[index].coreteam = value;
         } else if (key == 3) {
-          this.permission.subproject_task_manage.widerteam = value;
+          this.permission.manage_child_activity.widerteam = value;
           this.permissionList[index].widerteam = value;
         } else if (key == 4) {
-          this.permission.subproject_task_manage.visitor = value;
+          this.permission.manage_child_activity.visitor = value;
           this.permissionList[index].visitor = value;
         }
       }
@@ -632,20 +632,34 @@ export default {
       this.permission = userRoleJS.getDefault();
       this.getPermissionList();
     },
-    save2Project() {
+    save2Activity() {
       this.activityInfo.permission = JSON.stringify(this.permission);
+      let url = "";
+      if (this.activityInfo.level == 0) {
+        url =
+          "/GeoProblemSolving/project/" +
+          this.activityInfo.aid;
+      } else if (this.activityInfo.level == 1) {
+        url =
+          "/GeoProblemSolving/subproject/" +
+          this.activityInfo.aid;
+      } else if (this.activityInfo.levell > 1) {
+        url =
+          "/GeoProblemSolving/activity/" +
+          this.activityInfo.aid;
+      } else {
+        console.log("Activity level error.")
+        return;
+      }
       this.axios
-        .put(
-          "/GeoProblemSolving/project/" + this.activityInfo.aid,
-          this.activityInfo
-        )
+        .put(url, this.activityInfo)
         .then((res) => {
           this.resetProjectTypeModel = false;
           if (res.data == "Offline") {
             // parent.location.href = "/GeoProblemSolving/login";
             var pageUrl = parent.location.href;
             this.axios
-              .get("/GeoProblemSolving/user/login?pageUrl=" + pageUrl)
+              .get("/GeoProblemSolving/user/login")
               .then((res) => {
                 parent.location.href = res.data;
               });
@@ -658,7 +672,7 @@ export default {
           }
         })
         .catch((err) => {
-          console.log(err.data);
+          throw err;
         });
     },
   },

@@ -10,45 +10,33 @@ import javax.annotation.Resource;
 
 @CrossOrigin(origins = "*",allowCredentials = "true")
 @RestController
-@RequestMapping("/changeDB")
+@RequestMapping("/mapping")
 public class UpdateDBController {
 
     @Resource
     private MongoTemplate mongoTemplate;
 
-    @RequestMapping(value = "/createProjectFolder", method = RequestMethod.GET)
+    @RequestMapping(value = "/project", method = RequestMethod.GET)
     public String createProjectFolder(){
         UpdateDBDao updateDBDao = new UpdateDBDao(mongoTemplate);
-        return updateDBDao.createProjectFolder();
+        return updateDBDao.projectUpdate();
     }
 
-    @RequestMapping(value = "/fileStrucToFolder", method = RequestMethod.GET)
+    @RequestMapping(value = "/subproject", method = RequestMethod.GET)
     public String fileStrucToFolder(){
         UpdateDBDao updateDBDao = new UpdateDBDao(mongoTemplate);
-        return updateDBDao.fileStrucToFolder();
+        return updateDBDao.subprojectUpdate();
     }
 
-    @RequestMapping(value = "/folderAddScopeId", method = RequestMethod.GET)
+    @RequestMapping(value = "/activity", method = RequestMethod.GET)
     public String foldersAddScopeId(){
         UpdateDBDao updateDBDao = new UpdateDBDao(mongoTemplate);
-        return updateDBDao.foldersAddScopeId();
+        return updateDBDao.activityUpdate();
     }
 
-    @RequestMapping(value = "/moduleToStepTree", method = RequestMethod.GET)
+    @RequestMapping(value = "/user", method = RequestMethod.GET)
     public String moduleToStepTree(){
         UpdateDBDao updateDBDao = new UpdateDBDao(mongoTemplate);
-        return updateDBDao.moduleToStepTree();
-    }
-
-    @RequestMapping(value = "/updatePasswordMD5", method = RequestMethod.GET)
-    public String updatePasswordMD5(){
-        UpdateDBDao updateDBDao = new UpdateDBDao(mongoTemplate);
-        return updateDBDao.md5Password();
-    }
-
-    @RequestMapping(value = "/updatePermission", method = RequestMethod.GET)
-    public String updatePermission(){
-        UpdateDBDao updateDBDao = new UpdateDBDao(mongoTemplate);
-        return updateDBDao.setPermission();
+        return updateDBDao.userUpdate();
     }
 }

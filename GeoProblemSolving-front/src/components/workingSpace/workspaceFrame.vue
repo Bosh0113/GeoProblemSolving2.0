@@ -312,11 +312,17 @@ export default {
   },
   mounted() {
     this.locateActivity();
-
+        
     Array.prototype.contains = function (obj) {
       var i = this.length;
       while (i--) {
-        if (this[i].userId != undefined && this[i].userId === obj.userId) {
+        if (
+          (this[i].userId != undefined && this[i].userId === obj.userId) ||
+          (this[i].tid != undefined && this[i].tid === obj.tid) ||
+          (this[i].tsId != undefined && this[i].tsId === obj.tsId) ||
+          (this[i].id != undefined && this[i].id === obj.id) ||
+          (this[i].aid != undefined && this[i].aid === obj.aid)
+        ) {
           return true;
         }
       }
@@ -765,9 +771,9 @@ export default {
               "&level=" +
               this.slctActivity.level;
           } else if (res.data.code == -3) {
-            this.$Notice.info( {desc:
-              "You has already been a member of the activity."}
-            );
+            this.$Notice.info({
+              desc: "You has already been a member of the activity.",
+            });
           } else {
             console.log(res.data.msg);
           }
@@ -777,56 +783,40 @@ export default {
         });
     },
     applyJoinActivity() {
-      let notice = {
-        recipientId: userRoleJS.getMemberByRole(this.slctActivity, "manager"),
-        type: "apply",
-        content: {
-          title:
-            "Application of joining the activity: " + this.slctActivity.name,
-          activityId: this.slctActivity.aid,
-          activityName: this.slctActivity.name,
-          activityLevel: this.slctActivity.level,
-          userEmail: this.userInfo.email,
-          userName: this.userInfo.name,
-          userId: this.userInfo.userId,
-          description: this.applyJoinForm.reason,
-          approve: "unknow",
-        },
-      };
-      this.sendNotice(activity, notice);
+      let managers = userRoleJS.getMemberByRole(this.slctActivity, "manager");
+      for (var i = 0; i < managers.length; i++) {
+        let notice = {
+          recipientId: managers[i],
+          type: "apply",
+          content: {
+            title:
+              "Application of joining the activity: " + this.slctActivity.name,
+            activityId: this.slctActivity.aid,
+            activityName: this.slctActivity.name,
+            activityLevel: this.slctActivity.level,
+            userEmail: this.userInfo.email,
+            userName: this.userInfo.name,
+            userId: this.userInfo.userId,
+            description: this.applyJoinForm.reason,
+            approve: "unknow",
+          },
+        };
+        this.sendNotice(activity, notice);
+      }
     },
     sendNotice(activity, notice) {
-      if (
-        Object.prototype.toString.call(activity.recipientId) == "[object Array]"
-      ) {
-        for (let i = 0; i < activity.recipientId.length; i++) {
-          this.axios
-            .post("/GeoProblemSolving/notice/save", notice)
-            .then((result) => {
-              if (result.data == "Success") {
-                parent.vm.$emit("sendNotice", notice.recipientId[i]);
-              } else {
-                this.$Message.error("Notice fail.");
-              }
-            })
-            .catch((err) => {
-              throw err;
-            });
-        }
-      } else {
-        this.axios
-          .post("/GeoProblemSolving/notice/save", notice)
-          .then((result) => {
-            if (result.data == "Success") {
-              parent.vm.$emit("sendNotice", notice.recipientId);
-            } else {
-              this.$Message.error("Notice fail.");
-            }
-          })
-          .catch((err) => {
-            throw err;
-          });
-      }
+      this.axios
+        .post("/GeoProblemSolving/notice/save", notice)
+        .then((result) => {
+          if (result.data == "Success") {
+            parent.vm.$emit("sendNotice", notice.recipientId);
+          } else {
+            this.$Message.error("Notice fail.");
+          }
+        })
+        .catch((err) => {
+          throw err;
+        });
     },
     delActivity() {
       if (this.userInfo.userId !== this.slctActivity.creator) return;

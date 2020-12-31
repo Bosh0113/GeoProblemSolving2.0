@@ -76,7 +76,11 @@
               "
             />
             <Icon
-              v-if="userRole != 'visitor'"
+              v-if="
+                activityInfo.level > 0 &&
+                userRole != 'visitor' &&
+                activityInfo.creator != userInfo.userId
+              "
               type="md-log-out"
               size="16"
               title="Leave the activity"
@@ -91,7 +95,7 @@
             >
               <div style="display: flex; align-items: center">
                 <div
-                  v-if="delUserBtn"
+                  v-if="delUserBtn && member.userId != userInfo.userId"
                   style="cursor: pointer; margin-right: 10px"
                   @click="selectMember(member)"
                 >
@@ -136,7 +140,7 @@
         <Menu
           mode="horizontal"
           :active-name="activeMenu"
-          style="height: 45px; line-height: 45px;z-index:1"
+          style="height: 45px; line-height: 45px; z-index: 1"
           @on-select="changeMenuItem"
         >
           <MenuItem name="Workspace">
@@ -280,14 +284,14 @@ export default {
     modelEvaluation,
     geoSimulation,
     geoAnalysis,
-    decisionMaking
+    decisionMaking,
   },
   data() {
     return {
       scrollOps: {
         bar: {
-          background: "lightgrey"
-        }
+          background: "lightgrey",
+        },
       },
       projectInfo: parent.vm.projectInfo,
       activeMenu: "Workspace",
@@ -353,7 +357,7 @@ export default {
           userId: candidates[i].userId,
           name: candidates[i].name,
           role: candidates[i].role,
-          disabled: this.participants.contains(candidates[i])
+          disabled: this.participants.contains(candidates[i]),
         });
       }
       this.invitingMembers = this.getTargetKeys();
@@ -420,6 +424,7 @@ export default {
                     " in project: " +
                     this.projectInfo.name +
                     " , and now you are a member in this activity!",
+                  approve: "unknow",
                 },
               };
               this.sendNotice(activity, notice);
@@ -474,6 +479,7 @@ export default {
                   " in project: " +
                   this.projectInfo.name +
                   ".",
+                approve: "unknow",
               },
             };
             this.sendNotice(activity, notice);
@@ -517,25 +523,27 @@ export default {
               activity.parent +
               "&level=" +
               (activity.level - 1).toString();
+
             //notice
-            let notice = {
-              recipientId: userRoleJS.getMemberByRole(
-                this.activityInfo,
-                "manager"
-              ),
-              type: "notice",
-              content: {
-                title: "Leave activity",
-                description:
-                  member.name +
-                  " left the activity: " +
-                  activity.name +
-                  " in project: " +
-                  this.projectInfo.name +
-                  ".",
-              },
-            };
-            this.sendNotice(activity, notice);
+            let managers = userRoleJS.getMemberByRole(activity, "manager");
+            for (var i = 0; i < managers.length; i++) {
+              let notice = {
+                recipientId: managers[i],
+                type: "notice",
+                content: {
+                  title: "Leave activity",
+                  description:
+                    member.name +
+                    " left the activity: " +
+                    activity.name +
+                    " in project: " +
+                    this.projectInfo.name +
+                    ".",
+                  approve: "unknow",
+                },
+              };
+              this.sendNotice(activity, notice);
+            }
           } else {
             console.log(res.data.msg);
           }
@@ -545,37 +553,18 @@ export default {
         });
     },
     sendNotice(activity, notice) {
-      if (
-        Object.prototype.toString.call(activity.recipientId) == "[object Array]"
-      ) {
-        for (let i = 0; i < activity.recipientId.length; i++) {
-          this.axios
-            .post("/GeoProblemSolving/notice/save", notice)
-            .then((result) => {
-              if (result.data == "Success") {
-                parent.vm.$emit("sendNotice", notice.recipientId[i]);
-              } else {
-                this.$Message.error("Notice fail.");
-              }
-            })
-            .catch((err) => {
-              throw err;
-            });
-        }
-      } else {
-        this.axios
-          .post("/GeoProblemSolving/notice/save", notice)
-          .then((result) => {
-            if (result.data == "Success") {
-              parent.vm.$emit("sendNotice", notice.recipientId);
-            } else {
-              this.$Message.error("Notice fail.");
-            }
-          })
-          .catch((err) => {
-            throw err;
-          });
-      }
+      this.axios
+        .post("/GeoProblemSolving/notice/save", notice)
+        .then((result) => {
+          if (result.data == "Success") {
+            parent.vm.$emit("sendNotice", notice.recipientId);
+          } else {
+            this.$Message.error("Notice fail.");
+          }
+        })
+        .catch((err) => {
+          throw err;
+        });
     },
     gotoPersonalSpace(id) {
       if (id == this.$store.getters.userId) {

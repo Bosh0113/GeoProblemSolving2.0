@@ -1,10 +1,14 @@
 package cn.edu.njnu.geoproblemsolving.ChangeDB;
 
-import cn.edu.njnu.geoproblemsolving.Entity.*;
 import cn.edu.njnu.geoproblemsolving.Entity.Resources.FolderEntity;
-import cn.edu.njnu.geoproblemsolving.Entity.Resources.FolderItem;
 import cn.edu.njnu.geoproblemsolving.Entity.Resources.ResourceEntity;
-import cn.edu.njnu.geoproblemsolving.business.user.entity.User;
+import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
+import cn.edu.njnu.geoproblemsolving.business.activity.entity.Project;
+import cn.edu.njnu.geoproblemsolving.business.activity.entity.Subproject;
+import cn.edu.njnu.geoproblemsolving.business.activity.enums.ActivityType;
+import cn.edu.njnu.geoproblemsolving.business.activity.enums.ProjectCategory;
+import cn.edu.njnu.geoproblemsolving.business.activity.enums.ProjectPrivacy;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -14,7 +18,10 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 import org.springframework.util.DigestUtils;
 
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 @Component
@@ -22,284 +29,200 @@ public class UpdateDBDao {
     private final MongoTemplate mongoTemplate;
 
     @Autowired
-    public UpdateDBDao(MongoTemplate mongoTemplate){
-        this.mongoTemplate=mongoTemplate;
+    public UpdateDBDao(MongoTemplate mongoTemplate) {
+        this.mongoTemplate = mongoTemplate;
     }
 
-    public String createProjectFolder(){
-//        List<ProjectEntity> projects = mongoTemplate.findAll(ProjectEntity.class);
-//        for(ProjectEntity project:projects){
-//            String projectId = project.getProjectId();
-//            Query query = new Query(Criteria.where("scope.projectId").is(projectId));
-//            FolderEntity folderEntity = new FolderEntity();
-//            folderEntity.setParentId("");
-//            folderEntity.setFolderName(project.getTitle());
-//            folderEntity.setFolderId(projectId);
-//            folderEntity.setFolders(new ArrayList<>());
-//            List<ResourceEntity> resources = mongoTemplate.find(query,ResourceEntity.class);
-//            ArrayList<ResourceEntity> files = new ArrayList<>(resources);
-//            folderEntity.setFiles(files);
-//            mongoTemplate.save(folderEntity);
-//        }
-        return "Success";
-    }
-
-    public String fileStrucToFolder(){
-        List<OldSubProjectEntity> subProjects = mongoTemplate.findAll(OldSubProjectEntity.class);
-        for(OldSubProjectEntity subProject : subProjects){
+    public String projectUpdate() {
+        List<ProjectEntity> projects = mongoTemplate.findAll(ProjectEntity.class);
+        for (ProjectEntity oldProject : projects) {
             try {
-                String fileStruc = subProject.getFileStruct();
-                if(fileStruc != null){
-                    FileStructEntity fileStructEntity = JSONObject.parseObject(fileStruc,FileStructEntity.class);
-                    transToFolder(fileStructEntity,"");
-                }else {
-                    FolderEntity folderEntity = new FolderEntity();
-                    folderEntity.setFiles(new ArrayList<>());
-                    folderEntity.setFolders(new ArrayList<>());
-                    folderEntity.setFolderId(subProject.getSubProjectId());
-                    folderEntity.setFolderName(subProject.getTitle());
-                    folderEntity.setParentId("");
-                    mongoTemplate.save(folderEntity);
+                Project newProject = new Project();
+
+                newProject.setAid(oldProject.getProjectId());
+                newProject.setName(oldProject.getTitle());
+                newProject.setDescription(oldProject.getDescription());
+                newProject.setCategory(ProjectCategory.valueOf(oldProject.getCategory()));
+                newProject.setCreator(oldProject.getManagerId());
+                newProject.setPrivacy(ProjectPrivacy.valueOf(oldProject.getPrivacy()));
+                newProject.setTag(oldProject.getTag());
+                newProject.setPicture(oldProject.getPicture());
+                newProject.setCreatedTime(oldProject.getCreateTime());
+                newProject.setActiveTime(oldProject.getCreateTime());
+                newProject.setLevel(0);
+                // set members
+                JSONArray members = new JSONArray();
+                JSONObject member = new JSONObject();
+                member.put("userId", oldProject.getManagerId());
+                member.put("role", "manager");
+                members.add(member);
+                JSONArray oldMembers = oldProject.getMembers();
+                for (Object oldmember : oldMembers) {
+                    member.put("userId", ((HashMap) oldmember).get("userId"));
+                    member.put("role", "ordinary-member");
+                    members.add(member);
                 }
-            }catch (Exception e){
+                newProject.setMembers(members);
+                // project type
+                if (oldProject.getType().equals("")) {
+                    newProject.setType(ActivityType.Activity_Default);
+                } else {
+                    newProject.setType(ActivityType.Activity_Group);
+                }
+                // pathway
+                String pathwayStr = oldProject.getSolvingProcess();
+                JSONArray pathway = new JSONArray();
+                if (pathwayStr != null && !pathwayStr.equals("")) {
+                    pathway = pathwayMapping(pathwayStr);
+                    newProject.setPathway(pathway);
+                }
+                // children
+                ArrayList<String> children = new ArrayList<>();
+                if (oldProject.getType().equals("type0")) {
+                    List<SubProjectEntity> subproject = mongoTemplate.findAll(SubProjectEntity.class);
+                    for (SubProjectEntity oldsubproject : subproject) {
+                        children.add(oldsubproject.getSubProjectId());
+                    }
+                } else if (oldProject.getType().equals("type1")) {
+                    for (Object step : pathway) {
+                        String aid = (String) ((HashMap) step).get("aid");
+                        children.add(aid);
+                    }
+                }
+                newProject.setChildren(children);
+
+                mongoTemplate.save(newProject);
+
+            } catch (Exception ex) {
                 continue;
             }
         }
         return "Success";
     }
 
-    private void transToFolder(FileStructEntity fileStruct, String parentId){
-        String name = fileStruct.getName();
-        String uid = fileStruct.getUid();
-        ArrayList<FileStructEntity> folders = fileStruct.getFolders();
-        ArrayList<FileNodeEntity> files = fileStruct.getFiles();
+    public String subprojectUpdate() {
+        List<SubProjectEntity> subprojects = mongoTemplate.findAll(SubProjectEntity.class);
+        for (SubProjectEntity oldSubproject : subprojects) {
+            try {
+                Subproject newSubproject = new Subproject();
 
-        FolderEntity folderEntity = new FolderEntity();
-        folderEntity.setParentId(parentId);
-        folderEntity.setFolderId(uid);
-        folderEntity.setFolderName(name);
+                newSubproject.setAid(oldSubproject.getSubProjectId());
+                newSubproject.setName(oldSubproject.getTitle());
+                newSubproject.setDescription(oldSubproject.getDescription());
+                newSubproject.setParent(oldSubproject.getProjectId());
+                newSubproject.setLevel(0);
+                newSubproject.setCreatedTime(oldSubproject.getCreateTime());
+                newSubproject.setCreator(oldSubproject.getManagerId());
+                // set members
+                JSONArray members = new JSONArray();
+                JSONObject member = new JSONObject();
+                member.put("userId", oldSubproject.getManagerId());
+                member.put("role", "manager");
+                members.add(member);
+                JSONArray oldMembers = oldSubproject.getMembers();
+                if (oldMembers == null) oldMembers = new JSONArray();
+                for (Object oldMember : oldMembers) {
+                    member.put("userId", ((HashMap) oldMember).get("userId"));
+                    member.put("role", "ordinary-member");
+                    members.add(member);
+                }
+                newSubproject.setMembers(members);
+                // subproject type
+                if (oldSubproject.getType().equals("")) {
+                    newSubproject.setType(ActivityType.Activity_Default);
+                } else {
+                    newSubproject.setType(ActivityType.Activity_Group);
+                }
+                // pathway
+                String pathwayStr = oldSubproject.getSolvingProcess();
+                JSONArray pathway = pathwayMapping(pathwayStr);
+                newSubproject.setPathway(pathway);
+                // children
+                if (oldSubproject.getType().equals("type0")) {
+                    ArrayList<String> children = new ArrayList<>();
+                    for (Object step : pathway) {
+                        String aid = (String) ((HashMap) step).get("aid");
+                        children.add(aid);
+                    }
+                    newSubproject.setChildren(children);
+                }
 
-        ArrayList<FolderItem> ffolders = new ArrayList();
-        for (FileStructEntity folder:folders){
-            FolderItem folderItem = new FolderItem();
-            folderItem.setName(folder.getName());
-            folderItem.setUid(folder.getUid());
-            ffolders.add(folderItem);
-        }
-        folderEntity.setFolders(ffolders);
-
-        ArrayList<ResourceEntity> ffiles = new ArrayList<>();
-        for(FileNodeEntity file:files){
-            String resourceId = file.getUid();
-            Query query = new Query(Criteria.where("resourceId").is(resourceId));
-            ResourceEntity resourceEntity = mongoTemplate.findOne(query,ResourceEntity.class);
-            ffiles.add(resourceEntity);
-        }
-        folderEntity.setFiles(ffiles);
-
-        mongoTemplate.save(folderEntity);
-
-        for (FileStructEntity folder:folders){
-            transToFolder(folder,fileStruct.getUid());
-        }
-    }
-
-    public String foldersAddScopeId(){
-        try{
-//            List<ProjectEntity> projectEntities = mongoTemplate.findAll(ProjectEntity.class);
-//            List<SubProjectEntity> subProjectEntities = mongoTemplate.findAll(SubProjectEntity.class);
-//            List<ModuleEntity> moduleEntities = mongoTemplate.findAll(ModuleEntity.class);
-//            for (ProjectEntity projectEntity:projectEntities){
-//                Query query = new Query(Criteria.where("folderId").is(projectEntity.getProjectId()));
-//                FolderEntity folderEntity = mongoTemplate.findOne(query,FolderEntity.class);
-//                folderAddScopeId(folderEntity,projectEntity.getProjectId());
-//            }
-//            for (SubProjectEntity subProjectEntity:subProjectEntities){
-//                Query query = new Query(Criteria.where("folderId").is(subProjectEntity.getSubProjectId()));
-//                FolderEntity folderEntity = mongoTemplate.findOne(query,FolderEntity.class);
-//                folderAddScopeId(folderEntity,subProjectEntity.getSubProjectId());
-//            }
-//            for (ModuleEntity moduleEntity:moduleEntities){
-//                Query query = new Query(Criteria.where("folderId").is(moduleEntity.getSubProjectId()));
-//                FolderEntity folderEntity = mongoTemplate.findOne(query,FolderEntity.class);
-//                folderAddScopeId(folderEntity,moduleEntity.getModuleId());
-//            }
-            return "Success";
-        }catch (Exception e){
-            return "Fail";
-        }
-    }
-
-    private void folderAddScopeId(FolderEntity folderEntity, String scopeId){
-        Query query = new Query(Criteria.where("folderId").is(folderEntity.getFolderId()));
-        Update update = new Update();
-        update.set("scopeId",scopeId);
-        mongoTemplate.updateFirst(query,update,FolderEntity.class);
-        ArrayList<FolderItem> folderItems = folderEntity.getFolders();
-        for(FolderItem folderItem : folderItems){
-            Query query1 = new Query(Criteria.where("folderId").is(folderItem.getUid()));
-            FolderEntity folderEntity1 = mongoTemplate.findOne(query1,FolderEntity.class);
-            folderAddScopeId(folderEntity1,scopeId);
-        }
-    }
-
-    public String moduleToStepTree(){
-        try{
-//            List<SubProjectEntity> subProjectEntities = mongoTemplate.findAll(SubProjectEntity.class);
-//            for(SubProjectEntity subProject : subProjectEntities){
-//                Query query = new Query(Criteria.where("subProjectId").is(subProject.getSubProjectId()));
-//                List<ModuleEntity> moduleEntities = mongoTemplate.find(query,ModuleEntity.class);
-//                if(moduleEntities.size()>0){
-//                    ArrayList<StepNodeEntity> stepNodes = new ArrayList<>();
-//                    for(int i=0;i<moduleEntities.size();i++){
-//                        ModuleEntity moduleInfo = moduleEntities.get(i);
-//                        StepEntity stepEntity = new StepEntity();
-//                        stepEntity.setType(transStepType(moduleInfo.getType()));
-//                        stepEntity.setName(moduleInfo.getTitle());
-//                        stepEntity.setDescription(moduleInfo.getDescription());
-//                        stepEntity.setSubProjectId(moduleInfo.getSubProjectId());
-//                        stepEntity.setCreator(moduleInfo.getCreator());
-//                        stepEntity.setContent(new JSONObject());
-//
-//                        StepNodeEntity stepNode = new StepNodeEntity();
-//                        stepNode.setId(i);
-//                        StepDaoImpl  stepDao = new StepDaoImpl(mongoTemplate);
-//                        stepNode.setStepID(stepDao.createStep(stepEntity));
-//                        stepNode.setName(stepEntity.getName());
-//                        stepNode.setCategory(transStepCategory(stepEntity.getType()));
-//                        ArrayList<StepListNodeEntity> last = new ArrayList<>();
-//                        if (i!=0){
-//                            StepListNodeEntity stepListNodeEntity = new StepListNodeEntity();
-//                            stepListNodeEntity.setId(i-1);
-//                            stepListNodeEntity.setName(moduleEntities.get(i-1).getTitle());
-//                            last.add(stepListNodeEntity);
-//                        }
-//                        stepNode.setLast(last);
-//                        ArrayList<StepListNodeEntity> next = new ArrayList<>();
-//                        if(i!=moduleEntities.size()-1){
-//                            StepListNodeEntity stepListNodeEntity = new StepListNodeEntity();
-//                            stepListNodeEntity.setId(i+1);
-//                            stepListNodeEntity.setName(moduleEntities.get(i+1).getTitle());
-//                            next.add(stepListNodeEntity);
-//                        }
-//                        stepNode.setNext(next);
-//                        if(i==0){
-//                            stepNode.setX(0);
-//                        }
-//                        else {
-//                            stepNode.setX(i*((float)800/(float)moduleEntities.size()));
-//                        }
-//                        stepNode.setY(200);
-//                        stepNode.setLevel(i);
-//                        if(i!=moduleEntities.size()-1){
-//                            stepNode.setEnd(false);
-//                            stepNode.setActiveStatus(false);
-//                        }
-//                        else {
-//                            stepNode.setEnd(true);
-//                            stepNode.setActiveStatus(true);
-//                        }
-//                        stepNodes.add(stepNode);
-//                    }
-//                    Update update = new Update();
-//                    update.set("solvingProcess",JSONObject.toJSONString(stepNodes));
-//                    mongoTemplate.updateFirst(query,update,SubProjectEntity.class);
-//                }
-//            }
-            return "Success";
-        }catch (Exception e){
-            return "Fail";
-        }
-    }
-
-    private String transStepType(String oldType){
-        switch (oldType){
-            case "Preparation":
-                return "Context definition & resource collection";
-            case "Analysis":
-                return "Data processing";
-            case "Modeling":
-                return "Modeling for geographic process";
-            case "Simulation":
-                return "Simulation/Prediction";
-            case "Validation":
-                return "Visualization & representation";
-            case "Comparison":
-                return "Model evaluation";
-            default:
-                return "Decision-making & management";
-        }
-    }
-
-    private int transStepCategory(String type){
-        switch (type){
-            case "Context definition & resource collection":
-                return 0;
-            case "Data processing":
-                return 1;
-            case "Modeling for geographic process":
-                return 2;
-            case "Model evaluation":
-                return 3;
-            case "Quantitative and qualitative analysis":
-                return 4;
-            case "Simulation/Prediction":
-                return 5;
-            case "Visualization & representation":
-                return 6;
-            default:
-                return 7;
-        }
-    }
-
-    public String md5Password(){
-        try{
-            List<User> userEntities = mongoTemplate.findAll(User.class);
-            for(User user :userEntities){
-                String passWordMD5 = DigestUtils.md5DigestAsHex(user.getPassword().getBytes());
-                Query query = new Query(Criteria.where("userId").is(user.getUserId()));
-                Update update = new Update();
-                update.set("password",passWordMD5);
-                mongoTemplate.updateFirst(query,update, User.class);
+                mongoTemplate.save(newSubproject);
+            } catch (Exception ex) {
+                continue;
             }
-            return "Success";
-        }catch (Exception e){
-            return "Fail";
         }
+        return "Success";
     }
 
-    public String setPermission(){
-        try{
-//            List<ProjectEntity> projectEntities = mongoTemplate.findAll(ProjectEntity.class);
-//            for(ProjectEntity projectEntity:projectEntities){
-//
-//                if(projectEntity.getPermissionManager() == null){
-//
-//                    String privacy = projectEntity.getPrivacy();
-//
-//                    // permission
-//                    JSONObject permission = new JSONObject();
-//                    String strPublicPermission = "{\"observe\":{\"project_manager\":null,\"subproject_manager\":null,\"member\":null,\"visitor\":\"At project level\"},\"auto_join\":{\"project_manager\":null,\"subproject_manager\":null,\"member\":null,\"visitor\":false},\"project_edit_info\":{\"project_manager\":true,\"subproject_manager\":null,\"member\":false,\"visitor\":null},\"project_invite_member\":{\"project_manager\":true,\"subproject_manager\":null,\"member\":true,\"visitor\":null},\"project_remove_member\":{\"project_manager\":true,\"subproject_manager\":null,\"member\":false,\"visitor\":null},\"project_task_create\":{\"project_manager\":true,\"subproject_manager\":null,\"member\":true,\"visitor\":null},\"project_task_manage\":{\"project_manager\":true,\"subproject_manager\":null,\"member\":\"Yes, partly\",\"visitor\":null},\"project_resource_manage\":{\"project_manager\":true,\"subproject_manager\":null,\"member\":\"Yes, partly\",\"visitor\":null},\"project_workspace_type_manage\":{\"project_manager\":true,\"subproject_manager\":null,\"member\":false,\"visitor\":null},\"subprojects_manage\":{\"project_manager\":true,\"subproject_manager\":null,\"member\":\"Yes, partly\",\"visitor\":null},\"subproject_edit_info\":{\"project_manager\":true,\"subproject_manager\":true,\"member\":false,\"visitor\":null},\"subproject_invite_member\":{\"project_manager\":true,\"subproject_manager\":true,\"member\":true,\"visitor\":null},\"subproject_remove_member\":{\"project_manager\":true,\"subproject_manager\":true,\"member\":false,\"visitor\":null},\"subproject_task_create\":{\"project_manager\":true,\"subproject_manager\":true,\"member\":true,\"visitor\":null},\"subproject_task_manage\":{\"project_manager\":true,\"subproject_manager\":true,\"member\":\"Yes, partly\",\"visitor\":null},\"subproject_resource_manage\":{\"project_manager\":\"Yes, partly\",\"subproject_manager\":true,\"member\":\"Yes, partly\",\"visitor\":null},\"subproject_workspace_type_manage\":{\"project_manager\":true,\"subproject_manager\":true,\"member\":false,\"visitor\":null},\"activity_manage\":{\"project_manager\":true,\"subproject_manager\":true,\"member\":true,\"visitor\":null},\"workspace_resource\":{\"project_manager\":\"Yes\",\"subproject_manager\":true,\"member\":\"Yes, partly\",\"visitor\":null},\"workspace_tool\":{\"project_manager\":true,\"subproject_manager\":true,\"member\":true,\"visitor\":null},\"workspace_edit\":{\"project_manager\":true,\"subproject_manager\":true,\"member\":true,\"visitor\":null}}";
-//                    String strDiscoverablePermission = "{\"observe\":{\"project_manager\":null,\"subproject_manager\":null,\"member\":null,\"visitor\":\"No\"},\"auto_join\":{\"project_manager\":null,\"subproject_manager\":null,\"member\":null,\"visitor\":null},\"project_edit_info\":{\"project_manager\":true,\"subproject_manager\":null,\"member\":false,\"visitor\":null},\"project_invite_member\":{\"project_manager\":true,\"subproject_manager\":null,\"member\":false,\"visitor\":null},\"project_remove_member\":{\"project_manager\":true,\"subproject_manager\":null,\"member\":false,\"visitor\":null},\"project_task_create\":{\"project_manager\":true,\"subproject_manager\":null,\"member\":true,\"visitor\":null},\"project_task_manage\":{\"project_manager\":true,\"subproject_manager\":null,\"member\":\"Yes, partly\",\"visitor\":null},\"project_resource_manage\":{\"project_manager\":true,\"subproject_manager\":null,\"member\":\"Yes, partly\",\"visitor\":null},\"project_workspace_type_manage\":{\"project_manager\":true,\"subproject_manager\":null,\"member\":false,\"visitor\":null},\"subprojects_manage\":{\"project_manager\":true,\"subproject_manager\":null,\"member\":\"Yes, partly\",\"visitor\":null},\"subproject_edit_info\":{\"project_manager\":false,\"subproject_manager\":true,\"member\":false,\"visitor\":null},\"subproject_invite_member\":{\"project_manager\":false,\"subproject_manager\":true,\"member\":false,\"visitor\":null},\"subproject_remove_member\":{\"project_manager\":false,\"subproject_manager\":true,\"member\":false,\"visitor\":null},\"subproject_task_create\":{\"project_manager\":true,\"subproject_manager\":true,\"member\":true,\"visitor\":null},\"subproject_task_manage\":{\"project_manager\":\"Yes, partly\",\"subproject_manager\":true,\"member\":\"Yes, partly\",\"visitor\":null},\"subproject_resource_manage\":{\"project_manager\":\"Yes, partly\",\"subproject_manager\":true,\"member\":\"Yes, partly\",\"visitor\":null},\"subproject_workspace_type_manage\":{\"project_manager\":false,\"subproject_manager\":true,\"member\":false,\"visitor\":null},\"activity_manage\":{\"project_manager\":false,\"subproject_manager\":true,\"member\":false,\"visitor\":null},\"workspace_resource\":{\"project_manager\":\"Yes, partly\",\"subproject_manager\":true,\"member\":\"Yes, partly\",\"visitor\":null},\"workspace_tool\":{\"project_manager\":true,\"subproject_manager\":true,\"member\":true,\"visitor\":null},\"workspace_edit\":{\"project_manager\":false,\"subproject_manager\":true,\"member\":false,\"visitor\":null}}";
-//                    String strPrivatePermission = "{\"observe\":{\"project_manager\":null,\"subproject_manager\":null,\"member\":null,\"visitor\":\"No\"},\"auto_join\":{\"project_manager\":null,\"subproject_manager\":null,\"member\":null,\"visitor\":null},\"project_edit_info\":{\"project_manager\":true,\"subproject_manager\":null,\"member\":false,\"visitor\":null},\"project_invite_member\":{\"project_manager\":true,\"subproject_manager\":null,\"member\":false,\"visitor\":null},\"project_remove_member\":{\"project_manager\":true,\"subproject_manager\":null,\"member\":false,\"visitor\":null},\"project_task_create\":{\"project_manager\":true,\"subproject_manager\":null,\"member\":true,\"visitor\":null},\"project_task_manage\":{\"project_manager\":true,\"subproject_manager\":null,\"member\":\"Yes, partly\",\"visitor\":null},\"project_resource_manage\":{\"project_manager\":true,\"subproject_manager\":null,\"member\":\"Yes, partly\",\"visitor\":null},\"project_workspace_type_manage\":{\"project_manager\":true,\"subproject_manager\":null,\"member\":false,\"visitor\":null},\"subprojects_manage\":{\"project_manager\":true,\"subproject_manager\":null,\"member\":\"Yes, partly\",\"visitor\":null},\"subproject_edit_info\":{\"project_manager\":false,\"subproject_manager\":true,\"member\":false,\"visitor\":null},\"subproject_invite_member\":{\"project_manager\":false,\"subproject_manager\":true,\"member\":false,\"visitor\":null},\"subproject_remove_member\":{\"project_manager\":false,\"subproject_manager\":true,\"member\":false,\"visitor\":null},\"subproject_task_create\":{\"project_manager\":true,\"subproject_manager\":true,\"member\":true,\"visitor\":null},\"subproject_task_manage\":{\"project_manager\":false,\"subproject_manager\":true,\"member\":\"Yes, partly\",\"visitor\":null},\"subproject_resource_manage\":{\"project_manager\":\"Yes, partly\",\"subproject_manager\":true,\"member\":\"Yes, partly\",\"visitor\":null},\"subproject_workspace_type_manage\":{\"project_manager\":true,\"subproject_manager\":true,\"member\":false,\"visitor\":null},\"activity_manage\":{\"project_manager\":false,\"subproject_manager\":true,\"member\":false,\"visitor\":null},\"workspace_resource\":{\"project_manager\":\"Yes, partly\",\"subproject_manager\":true,\"member\":\"Yes, partly\",\"visitor\":null},\"workspace_tool\":{\"project_manager\":true,\"subproject_manager\":true,\"member\":true,\"visitor\":null},\"workspace_edit\":{\"project_manager\":false,\"subproject_manager\":true,\"member\":false,\"visitor\":null}}";
-//
-//                    if(privacy.equals("Public")) {
-//                        permission = (JSONObject) JSONObject.parse(strPublicPermission);
-//                    } else if (privacy.equals("Discoverable")) {
-//                        permission = (JSONObject) JSONObject.parse(strDiscoverablePermission);
-//                    } else if (privacy.equals("Private")) {
-//                        permission = (JSONObject) JSONObject.parse(strPrivatePermission);
-//                    }
-//
-//                    Query query = new Query(Criteria.where("projectId").is(projectEntity.getProjectId()));
-//                    Update update = new Update();
-//                    update.set("permissionManager",permission);
-//
-//                    mongoTemplate.updateFirst(query,update,ProjectEntity.class);
-//                }
-//            }
+    public String activityUpdate() {
+        List<StepEntity> steps = mongoTemplate.findAll(StepEntity.class);
+        for (StepEntity step : steps) {
+            try {
+                Activity activity = new Activity();
+
+                activity.setAid(step.getStepId());
+                activity.setName(step.getName());
+                activity.setDescription(step.getDescription());
+                activity.setType(ActivityType.Activity_Unit);
+                activity.setPurpose(step.getType());
+                activity.setLevel(2);
+                activity.setCreator(step.getCreator());
+                activity.setCreatedTime(step.getCreateTime());
+                activity.setActiveTime(step.getCreateTime());
+                // parent
+                String subprojectId = step.getSubProjectId();
+                String projectId = step.getProjectId();
+                if (subprojectId != null && !subprojectId.equals("")) {
+                    activity.setParent(subprojectId);
+                } else if (projectId != null && !projectId.equals("")) {
+                    activity.setParent(projectId);
+                } else {
+                    return "";
+                }
+                // tools and toolsets
+                ArrayList<String> toolList = step.getToolList();
+                ArrayList<String> toolsetList = step.getToolsetList();
+                if (toolList != null) {
+                    activity.setToolList(toolList);
+                }
+                if (toolsetList != null) {
+                    activity.setToolsetList(toolsetList);
+                }
+                mongoTemplate.save(activity);
+            } catch (Exception e) {
+                continue;
+            }
+        }
+        return "Success";
+    }
+
+    private JSONArray pathwayMapping(String pathwayStr) {
+        JSONArray newPathway = new JSONArray();
+        if (pathwayStr != null && !pathwayStr.equals("")) {
+            JSONArray pathway = JSONArray.parseArray(pathwayStr);
+            JSONObject step = new JSONObject();
+            for (Object node : pathway) {
+                step.put("id", ((HashMap) node).get("id"));
+                step.put("aid", ((HashMap) node).get("stepID"));
+                step.put("name", ((HashMap) node).get("name"));
+                step.put("category", ((HashMap) node).get("category"));
+                step.put("last", ((HashMap) node).get("last"));
+                step.put("next", ((HashMap) node).get("next"));
+                step.put("x", ((HashMap) node).get("x"));
+                step.put("y", ((HashMap) node).get("y"));
+                step.put("status", ((HashMap) node).get("activeStatus"));
+                newPathway.add(step);
+            }
+        }
+        return newPathway;
+    }
+
+    public String userUpdate() {
+        try {
+
             return "Success";
-        }catch (Exception e){
+        } catch (Exception e) {
             return "Fail";
         }
     }

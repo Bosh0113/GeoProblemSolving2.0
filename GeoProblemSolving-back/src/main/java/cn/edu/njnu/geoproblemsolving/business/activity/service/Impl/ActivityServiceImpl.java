@@ -19,6 +19,7 @@ import cn.edu.njnu.geoproblemsolving.business.tool.ToolEntity;
 import cn.edu.njnu.geoproblemsolving.common.utils.ResultUtils;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -35,7 +36,7 @@ public class ActivityServiceImpl implements ActivityService {
     private final ActivityRepository activityRepository;
     private final ProtocolRepository protocolRepository;
     private final UserRepository userRepository;
-//    private final MongoTemplate mongoTemplate;
+    //    private final MongoTemplate mongoTemplate;
     private final FolderDaoImpl folderDao;
     private final SubprojectRepository subprojectRepository;
     private final ProjectRepository projectRepository;
@@ -82,6 +83,7 @@ public class ActivityServiceImpl implements ActivityService {
         nextInfo.put("protocolId", pid);
 
         JSONArray nextActivities = last.getNext();
+        if(nextActivities == null) nextActivities = new JSONArray();
         nextActivities.add(nextInfo);
         last.setNext(nextActivities);
 
@@ -94,13 +96,14 @@ public class ActivityServiceImpl implements ActivityService {
         lastInfo.put("protocolId", pid);
 
         JSONArray lastActivities = next.getLast();
+        if(lastActivities == null) lastActivities = new JSONArray();
         lastActivities.add(lastInfo);
         next.setLast(lastActivities);
 
         return next;
     }
 
-    private void updateActiveTime(Activity activity){
+    private void updateActiveTime(Activity activity) {
         // Update active time
         Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
@@ -310,7 +313,7 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     private ArrayList getChildActivities(Activity activity) {
-        if(activity.getLevel() >= 0) {
+        if (activity.getLevel() >= 0) {
             ArrayList<Activity> activities = new ArrayList<>();
 
             if (activity.getChildren() != null) {
@@ -343,11 +346,12 @@ public class ActivityServiceImpl implements ActivityService {
 
             // members
             JSONArray members = activity.getMembers();
+            if (members == null) members = new JSONArray();
             JSONArray memberInfos = new JSONArray();
             for (Object member : members) {
-                String userId =  (String)((HashMap) member).get("userId");
+                String userId = (String) ((HashMap) member).get("userId");
                 User user = findByUserId(userId);
-                HashMap<String, Object> userInfo = (HashMap)member;
+                JSONObject userInfo = (JSONObject) member;
                 userInfo.put("name", user.getName());
                 userInfo.put("avatar", user.getAvatar());
                 userInfo.put("email", user.getEmail());
@@ -524,22 +528,26 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
-    public JsonResult linkActivities(String aid1, String aid2, LinkProtocol protocol) {
+    public JsonResult linkActivities(UpdateActivityDTO update, String aid1, String aid2, String pid) {
         try {
             // Confirm aid
             Activity activity1 = findActivityById(aid1);
             if (activity1 == null) return ResultUtils.error(-1, "Fail: activity does not exist.");
             Activity activity2 = findActivityById(aid2);
             if (activity2 == null) return ResultUtils.error(-1, "Fail: activity does not exist.");
+            Activity activity = findActivityById(update.getAid());
+            if (activity == null) return ResultUtils.error(-1, "Fail: activity does not exist.");
 
-            // Save the protocol
-            String pid = protocolRepository.save(protocol).getPid();
+            // Save the pathway
+            update.updateTo(activity);
 
-            // Save the last activity
+            // Save the protocol------------------------------------------------待完善----------------------------------
+            // String pid = protocolRepository.save(protocol).getPid();
+
+            // Save activities
             activityRepository.save(saveLastActivityInfo(aid2, pid, activity1));
-
-            // Update the next activity
             activityRepository.save(saveNextActivityInfo(aid1, pid, activity2));
+            activityRepository.save(activity);
 
             return ResultUtils.success("Success");
         } catch (Exception ex) {
@@ -548,13 +556,18 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
-    public JsonResult separateActivities(String lastAid, String nextAid) {
+    public JsonResult separateActivities(UpdateActivityDTO update, String lastAid, String nextAid) {
         try {
             // Confirm aid
             Activity activity1 = findActivityById(lastAid);
             if (activity1 == null) return ResultUtils.error(-1, "Fail: activity does not exist.");
             Activity activity2 = findActivityById(nextAid);
             if (activity2 == null) return ResultUtils.error(-1, "Fail: activity does not exist.");
+            Activity activity = findActivityById(update.getAid());
+            if (activity == null) return ResultUtils.error(-1, "Fail: activity does not exist.");
+
+            // Save the pathway
+            update.updateTo(activity);
 
             // Save the last activity
             JSONArray nextActivities = activity1.getNext();
@@ -578,6 +591,8 @@ public class ActivityServiceImpl implements ActivityService {
             });
             activity2.setLast(lastActivities);
 
+            // Save activities
+            activityRepository.save(activity);
             activityRepository.save(activity1);
             activityRepository.save(activity2);
 
@@ -599,12 +614,10 @@ public class ActivityServiceImpl implements ActivityService {
             // add user info to subproject
             // if user exist in subproject?
             JSONArray members = activity.getMembers();
-            if(members == null) members = new JSONArray();
+            if (members == null) members = new JSONArray();
             for (Object member : members) {
-                if (member instanceof JSONObject) {
-                    if (((JSONObject) member).get("userId").equals(userId)) {
-                        return ResultUtils.error(-3, "Fail: member already exists in the subproject");
-                    }
+                if (((HashMap) member).get("userId").equals(userId)) {
+                    return ResultUtils.error(-3, "Fail: member already exists in the subproject");
                 }
             }
 
@@ -648,6 +661,45 @@ public class ActivityServiceImpl implements ActivityService {
             activityRepository.save(activity);
 
             return ResultUtils.success("Success");
+        } catch (Exception ex) {
+            return ResultUtils.error(-2, ex.toString());
+        }
+    }
+
+    @Override
+    public JsonResult updateMemberRole(String aid, String userId, String role){
+        try {
+            // check
+            Optional optional = activityRepository.findById(aid);
+            if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: activity does not exist.");
+            Activity activity = (Activity) optional.get();
+
+            // Update roles
+            JSONArray members = activity.getMembers();
+            JSONArray newMembers = new JSONArray();
+            if (members == null) members = new JSONArray();
+            for (Object member : members) {
+                if (((HashMap) member).get("userId").equals(userId)) {
+                    JSONObject userInfo = new JSONObject();
+                    userInfo.put("userId", userId);
+                    userInfo.put("role", role);
+                    newMembers.add(userInfo);
+                } else {
+                    ObjectMapper personMap = new ObjectMapper();
+                    String personStr = personMap.writeValueAsString(member);
+                    JSONObject userInfo = JSONObject.parseObject(personStr);
+                    newMembers.add(userInfo);
+                }
+            }
+            activity.setMembers(newMembers);
+
+            // Update active time
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            activity.setActiveTime(dateFormat.format(new Date()));
+
+            activityRepository.save(activity);
+
+            return ResultUtils.success(activity);
         } catch (Exception ex) {
             return ResultUtils.error(-2, ex.toString());
         }
