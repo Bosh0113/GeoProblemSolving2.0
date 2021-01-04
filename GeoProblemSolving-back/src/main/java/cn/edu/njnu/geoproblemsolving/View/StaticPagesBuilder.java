@@ -1,6 +1,7 @@
 package cn.edu.njnu.geoproblemsolving.View;
 
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Project;
+import com.alibaba.fastjson.JSONObject;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
@@ -41,7 +42,7 @@ public class StaticPagesBuilder {
         }
     }
 
-    public void projectListPageBuilder(List<Project> projects) {
+    public void projectListPageBuilder(JSONObject projects) {
         ClassLoaderTemplateResolver resolver = new ClassLoaderTemplateResolver();
         resolver.setPrefix("templates/");//模板所在目录，相对于当前classloader的classpath。
         resolver.setSuffix(".html");//模板文件后缀

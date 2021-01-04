@@ -199,7 +199,7 @@
         new Vue({
             el: '#vueBody',
             data: {
-                currentProjectList: projectsInfo,
+                currentProjectList: projectsInfo.projectList,
                 projectType: [],
                 currentTab: "All",
                 //初始化信息总条数
@@ -209,7 +209,7 @@
                 totalCount: projectsInfo.count,
                 //每页显示多少条
                 pageSize: 18,
-                tabPageData: projectsInfo,
+                tabPageData: projectsInfo.projectList,
                 tabPaneType: [{label: "All", name: "All", icon: "icon ion-md-list"},
                     {label: "Investigational", name: "Investigational", icon: "icon ion-md-globe"},
                     {label: "Intercomparable", name: "Intercomparable", icon: "icon ion-md-git-compare"},
@@ -282,8 +282,8 @@
                 }
                 else {
                     this.userState = false;
-                    this.judgeMember(projectsInfo);
-                    this.tabPageData = Object.assign([], projectsInfo);
+                    this.judgeMember(projectsInfo.projectList);
+                    this.tabPageData = Object.assign([], projectsInfo.projectList);
                     this.freshEle++;
                 }
                 window.onresize = () => {
@@ -310,7 +310,7 @@
                     }
 
                     if (type == "All" && !this.userState) {
-                        this.judgeMember(projectsInfo);
+                        this.judgeMember(projectsInfo.projectList);
                         this.tabPageData = Object.assign([], this.currentProjectList);
                         this.freshEle++;
                         this.totalCount = projectsInfo.count;
@@ -387,7 +387,7 @@
                                         this.currentProjectList = [];
                                     }
                                     else {
-                                        this.judgeMember(res.data.data);
+                                        this.judgeMember(res.data.data.projectList);
                                     }
                                     this.tabPageData = Object.assign([], this.currentProjectList);
                                     this.totalCount = res.data.data.count;

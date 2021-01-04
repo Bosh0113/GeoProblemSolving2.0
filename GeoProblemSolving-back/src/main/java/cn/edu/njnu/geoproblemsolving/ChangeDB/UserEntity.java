@@ -3,7 +3,7 @@ package cn.edu.njnu.geoproblemsolving.ChangeDB;
 import com.alibaba.fastjson.JSONArray;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "User")
+@Document(collection = "UserOld")
 public class UserEntity {
 
     private String userId;

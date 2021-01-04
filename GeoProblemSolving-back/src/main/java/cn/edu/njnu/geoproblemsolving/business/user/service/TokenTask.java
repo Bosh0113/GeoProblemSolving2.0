@@ -51,6 +51,7 @@ public class TokenTask {
             JSONObject tokenResult = restTemplate.postForObject(authUri, paramMap, JSONObject.class);
             return tokenResult;
         }catch (Exception e){
+            System.out.println("Exception: " + e.toString());
             return null;
         }
     }

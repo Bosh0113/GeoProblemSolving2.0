@@ -63,7 +63,7 @@ public class ActivityServiceImpl implements ActivityService {
             Object user = optional.get();
             return (User) user;
         } else {
-            return null;
+            return new User();
         }
     }
 
@@ -351,7 +351,9 @@ public class ActivityServiceImpl implements ActivityService {
             for (Object member : members) {
                 String userId = (String) ((HashMap) member).get("userId");
                 User user = findByUserId(userId);
-                JSONObject userInfo = (JSONObject) member;
+                JSONObject userInfo = new JSONObject();
+                userInfo.put("userId", userId);
+                userInfo.put("role", ((HashMap) member).get("role"));
                 userInfo.put("name", user.getName());
                 userInfo.put("avatar", user.getAvatar());
                 userInfo.put("email", user.getEmail());

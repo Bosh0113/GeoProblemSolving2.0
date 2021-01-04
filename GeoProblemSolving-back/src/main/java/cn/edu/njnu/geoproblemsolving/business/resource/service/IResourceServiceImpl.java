@@ -318,7 +318,7 @@ public class IResourceServiceImpl implements IResourceService {
             for (Part part : parts) {
                 if (part.getName().equals("picture")) {
                     String filePath = part.getSubmittedFileName();
-                    String folderPath = servicePath + "resources/images";
+                    String folderPath = servicePath + "resource/images";
 
 
                     JsonResult storeResult = fileStore(part, filePath, folderPath);

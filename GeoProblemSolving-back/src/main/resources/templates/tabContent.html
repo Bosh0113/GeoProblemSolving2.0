@@ -299,7 +299,7 @@
                                 if (participants.creator != null) {
                                     this.projectDetailInfo[4].value = participants.creator.name;
                                 } else {
-                                    this.$Message.info("Fail to get the information of the creator");
+                                    this.$Message.info("Fail to get the information of the creator.");
                                 }
                                 // members
                                 var membersName = "";
@@ -314,7 +314,8 @@
 
                                 this.projectInfoModal = true;
                             } else {
-                                this.$Message.info(res.data.msg);
+                                this.$Message.info("Fail to get the information of participants");
+                                console.log(res.data.msg);
                                 this.projectInfoModal = true;
                             }
                         })
@@ -447,7 +448,7 @@
                                         });
                                 }
                             } else {
-                                this.$Message.error("you must have an account before application.");
+                                this.$Message.error("You must have an account before application.");
                                 window.location.href = "/GeoProblemSolving/login"
                             }
                         }
@@ -458,7 +459,7 @@
                 window.location.href = "/GeoProblemSolving/login";
             },
             enterProject(projectInfo) {
-                if (JSON.parse(projectInfo.permission).observe.visitor === "Yes") {
+                if (projectInfo.permission != null && JSON.parse(projectInfo.permission).observe.visitor === "Yes") {
                     window.location.href = "/GeoProblemSolving/projectInfo/" + projectInfo.aid;
                 }
             },

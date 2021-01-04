@@ -31,15 +31,15 @@ public class User {
     private String phone;
     private UserTitle title;
     private String country;
-    private String province;    // County / State / Province
+    private String state;    // County / State / Province
     private String city;
-    private String homepage;
+    private String homePage;
     private String introduction;
     private String createdTime;
     private ArrayList<String> organizations;
     private ArrayList<String> domain;
     private ArrayList<String> loginIp;
-    //private ArrayList<String> resource;
+    private ArrayList<Object> resource;
 
     /**
      * Unique

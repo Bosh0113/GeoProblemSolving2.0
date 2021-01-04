@@ -22,6 +22,7 @@ import cn.hutool.system.UserInfo;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -54,7 +55,7 @@ public class ProjectServiceImpl implements ProjectService {
             Object user = optional.get();
             return (User) user;
         } else {
-            return null;
+            return new User();
         }
     }
 
@@ -77,9 +78,14 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<Project> findProjectsByPage(int page, int size) {
+    public JSONObject findProjectsByPage(int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
-        return projectRepository.findAll(pageable).getContent();
+        Page<Project> projects = projectRepository.findAll(pageable);
+        JSONObject result = new JSONObject();
+        result.put("totalPage", projects.getTotalPages());
+        result.put("count", projects.getTotalElements());
+        result.put("projectList", projects.getContent());
+        return result;
     }
 
     @Override
@@ -88,42 +94,46 @@ public class ProjectServiceImpl implements ProjectService {
             Sort sort = new Sort(Sort.Direction.DESC, "createdTime");
             Pageable pageable = PageRequest.of(page - 1, size, sort);
 
-            List<Project> projects = new ArrayList<>();
+            Page<Project> projects = null;
             if (!keyword.equals("")) {
                 if (userId.equals("")) {
                     if (category.equals("All")) {
-                        projects = projectRepository.findProjectsByPrivacyIsNot("Private", pageable).getContent();
+                        projects = projectRepository.findProjectsByPrivacyIsNot("Private", pageable);
                     } else {
                         if (tag.equals("")) {
-                            projects = projectRepository.findProjectsByPrivacyIsNotAndCategoryEquals("Private", category, pageable).getContent();
+                            projects = projectRepository.findProjectsByPrivacyIsNotAndCategoryEquals("Private", category, pageable);
                         } else {
-                            projects = projectRepository.findProjectsByPrivacyIsNotAndCategoryEqualsAndTagContaining("Private", category, tag, pageable).getContent();
+                            projects = projectRepository.findProjectsByPrivacyIsNotAndCategoryEqualsAndTagContaining("Private", category, tag, pageable);
                         }
                     }
                 } else {
                     if (category.equals("All")) {
-                        projects = projectRepository.findProjectsByPrivacyIsAndCreatorIsOrPrivacyIsNot("Private", userId, "Private", pageable).getContent();
+                        projects = projectRepository.findProjectsByPrivacyIsAndCreatorIsOrPrivacyIsNot("Private", userId, "Private", pageable);
                     } else {
                         if (tag.equals("")) {
-                            projects = projectRepository.findProjectsByPrivacyIsAndCreatorIsOrPrivacyIsNotAndCategoryEquals("Private", userId, "Private", category, pageable).getContent();
+                            projects = projectRepository.findProjectsByPrivacyIsAndCreatorIsOrPrivacyIsNotAndCategoryEquals("Private", userId, "Private", category, pageable);
                         } else {
-                            projects = projectRepository.findProjectsByPrivacyIsAndCreatorIsOrPrivacyIsNotAndCategoryEqualsAndTagContaining("Private", userId, "Private", category, tag, pageable).getContent();
+                            projects = projectRepository.findProjectsByPrivacyIsAndCreatorIsOrPrivacyIsNotAndCategoryEqualsAndTagContaining("Private", userId, "Private", category, tag, pageable);
                         }
                     }
                 }
             } else {
                 if (userId.equals("")) {
-                    projects = projectRepository.findProjectsByNameLikeOrDescriptionLikeAndPrivacyIsNot(keyword, keyword, "Private", pageable).getContent();
+                    projects = projectRepository.findProjectsByNameLikeOrDescriptionLikeAndPrivacyIsNot(keyword, keyword, "Private", pageable);
                 } else {
-                    projects = projectRepository.findProjectsByNameLikeOrDescriptionLikeAndPrivacyIsAndCreatorIsOrPrivacyIsNot(keyword, keyword, "Private", userId, "Private", pageable).getContent();
+                    projects = projectRepository.findProjectsByNameLikeOrDescriptionLikeAndPrivacyIsAndCreatorIsOrPrivacyIsNot(keyword, keyword, "Private", userId, "Private", pageable);
                 }
             }
 
+            JSONObject result = new JSONObject();
+            result.put("totalPage", projects.getTotalPages());
+            result.put("count", projects.getTotalElements());
+            result.put("projectList", projects.getContent());
 
             if (projects.isEmpty())
                 return ResultUtils.error(-1, "None");
             else
-                return ResultUtils.success(projects);
+                return ResultUtils.success(result);
 
         } catch (Exception ex) {
             return ResultUtils.error(-2, ex.toString());
@@ -224,7 +234,7 @@ public class ProjectServiceImpl implements ProjectService {
     private Boolean isUpdateProjectListStaticPage(String projectId, Boolean noPrivate) {
         JsonResult result = inquiryByConditions("", "", "", "", 1, 18);
         try {
-            List<Project> projects = (List<Project>) result.getData();
+            List<Project> projects = (List<Project>)((JSONObject) result.getData()).get("projectList");
             long count = projects.size();
             if (count < 18 && noPrivate) { //如果首页数量少于页面数量规格且有新的可见条目，则更新
                 return true;
@@ -341,7 +351,9 @@ public class ProjectServiceImpl implements ProjectService {
             for (Object member : members) {
                 String userId = (String) ((HashMap) member).get("userId");
                 User user = findByUserId(userId);
-                JSONObject userInfo = (JSONObject) member;
+                JSONObject userInfo = new JSONObject();
+                userInfo.put("userId", userId);
+                userInfo.put("role", ((HashMap) member).get("role"));
                 userInfo.put("name", user.getName());
                 userInfo.put("avatar", user.getAvatar());
                 userInfo.put("email", user.getEmail());

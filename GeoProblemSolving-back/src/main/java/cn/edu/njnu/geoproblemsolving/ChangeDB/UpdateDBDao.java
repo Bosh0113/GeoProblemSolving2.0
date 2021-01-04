@@ -8,6 +8,9 @@ import cn.edu.njnu.geoproblemsolving.business.activity.entity.Subproject;
 import cn.edu.njnu.geoproblemsolving.business.activity.enums.ActivityType;
 import cn.edu.njnu.geoproblemsolving.business.activity.enums.ProjectCategory;
 import cn.edu.njnu.geoproblemsolving.business.activity.enums.ProjectPrivacy;
+import cn.edu.njnu.geoproblemsolving.business.user.StaticParams;
+import cn.edu.njnu.geoproblemsolving.business.user.entity.User;
+import cn.edu.njnu.geoproblemsolving.business.user.enums.UserTitle;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,8 +18,14 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.DigestUtils;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
+import sun.security.provider.MD5;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -42,14 +51,29 @@ public class UpdateDBDao {
                 newProject.setAid(oldProject.getProjectId());
                 newProject.setName(oldProject.getTitle());
                 newProject.setDescription(oldProject.getDescription());
-                newProject.setCategory(ProjectCategory.valueOf(oldProject.getCategory()));
                 newProject.setCreator(oldProject.getManagerId());
                 newProject.setPrivacy(ProjectPrivacy.valueOf(oldProject.getPrivacy()));
-                newProject.setTag(oldProject.getTag());
-                newProject.setPicture(oldProject.getPicture());
                 newProject.setCreatedTime(oldProject.getCreateTime());
                 newProject.setActiveTime(oldProject.getCreateTime());
                 newProject.setLevel(0);
+                // picture url
+                String url = oldProject.getPicture();
+                url.replace("project/picture","resource/images");
+                newProject.setPicture(url);
+                // tags and category
+                String tags = oldProject.getTag();
+                try {
+                    newProject.setCategory(ProjectCategory.valueOf(oldProject.getCategory()));
+                } catch (Exception ex){
+                    newProject.setCategory(ProjectCategory.valueOf("Investigational"));
+                    String category = oldProject.getCategory();
+                    if(tags != "") {
+                        tags = tags + "," + category;
+                    } else {
+                        tags = category;
+                    }
+                }
+                newProject.setTag(tags);
                 // set members
                 JSONArray members = new JSONArray();
                 JSONObject member = new JSONObject();
@@ -85,7 +109,7 @@ public class UpdateDBDao {
                     }
                 } else if (oldProject.getType().equals("type1")) {
                     for (Object step : pathway) {
-                        String aid = (String) ((HashMap) step).get("aid");
+                        String aid = (String) ((JSONObject) step).get("aid");
                         children.add(aid);
                     }
                 }
@@ -97,7 +121,7 @@ public class UpdateDBDao {
                 continue;
             }
         }
-        return "Success";
+        return "Finished";
     }
 
     public String subprojectUpdate() {
@@ -141,7 +165,7 @@ public class UpdateDBDao {
                 if (oldSubproject.getType().equals("type0")) {
                     ArrayList<String> children = new ArrayList<>();
                     for (Object step : pathway) {
-                        String aid = (String) ((HashMap) step).get("aid");
+                        String aid = (String) ((JSONObject) step).get("aid");
                         children.add(aid);
                     }
                     newSubproject.setChildren(children);
@@ -152,7 +176,7 @@ public class UpdateDBDao {
                 continue;
             }
         }
-        return "Success";
+        return "Finished";
     }
 
     public String activityUpdate() {
@@ -194,7 +218,7 @@ public class UpdateDBDao {
                 continue;
             }
         }
-        return "Success";
+        return "Finished";
     }
 
     private JSONArray pathwayMapping(String pathwayStr) {
@@ -203,15 +227,15 @@ public class UpdateDBDao {
             JSONArray pathway = JSONArray.parseArray(pathwayStr);
             JSONObject step = new JSONObject();
             for (Object node : pathway) {
-                step.put("id", ((HashMap) node).get("id"));
-                step.put("aid", ((HashMap) node).get("stepID"));
-                step.put("name", ((HashMap) node).get("name"));
-                step.put("category", ((HashMap) node).get("category"));
-                step.put("last", ((HashMap) node).get("last"));
-                step.put("next", ((HashMap) node).get("next"));
-                step.put("x", ((HashMap) node).get("x"));
-                step.put("y", ((HashMap) node).get("y"));
-                step.put("status", ((HashMap) node).get("activeStatus"));
+                step.put("id", ((JSONObject) node).get("id"));
+                step.put("aid", ((JSONObject) node).get("stepID"));
+                step.put("name", ((JSONObject) node).get("name"));
+                step.put("category", ((JSONObject) node).get("category"));
+                step.put("last", ((JSONObject) node).get("last"));
+                step.put("next", ((JSONObject) node).get("next"));
+                step.put("x", ((JSONObject) node).get("x"));
+                step.put("y", ((JSONObject) node).get("y"));
+                step.put("status", ((JSONObject) node).get("activeStatus"));
                 newPathway.add(step);
             }
         }
@@ -219,11 +243,71 @@ public class UpdateDBDao {
     }
 
     public String userUpdate() {
-        try {
+        List<UserEntity> users = mongoTemplate.findAll(UserEntity.class);
+        for (UserEntity oldUser : users) {
+            try {
+                User user = new User();
 
-            return "Success";
-        } catch (Exception e) {
-            return "Fail";
+                // 存用户服务器
+                user.setUserId(oldUser.getUserId());
+                user.setName(oldUser.getUserName());
+                user.setEmail(oldUser.getEmail());
+                user.setAvatar(oldUser.getAvatar());
+                user.setPhone(oldUser.getMobilePhone());
+                user.setCountry(oldUser.getCountry());
+                user.setCity(oldUser.getCity());
+                user.setHomePage(oldUser.getHomePage());
+                user.setIntroduction(oldUser.getIntroduction());
+                //title
+                try {
+                    user.setTitle(UserTitle.valueOf(oldUser.getJobTitle()));
+                } catch (Exception ex){
+                    user.setTitle(UserTitle.valueOf("Mr"));
+                }
+                // organizations 字符串转数组
+                ArrayList<String> organizations = new ArrayList<>();
+                String organization = oldUser.getOrganization();
+                if(organization != null) {
+                    organizations.add(organization);
+                    user.setOrganizations(organizations);
+                }
+
+
+//                // 存用户服务器
+//                // password 加密处理
+//                String oldpw = oldUser.getPassword();
+//                String password = DigestUtils.md5DigestAsHex(oldpw.getBytes());
+//                user.setPassword(password);
+//
+//                RestTemplate restTemplate = new RestTemplate();
+//                String updateUrl  = "http://106.14.78.235/AuthServer/user/tempAdd";
+//                restTemplate.postForEntity(updateUrl, user, User.class);
+
+
+                // 存本地
+                // CreatedProject and JoinedProject
+                JSONArray managedProjects = oldUser.getManageProjects();
+                ArrayList<String> createdProjects = new ArrayList<>();
+                for(Object project : managedProjects){
+                    String aid = (String) ((HashMap) project).get("projectId");
+                    createdProjects.add(aid);
+                }
+                user.setCreatedProjects(createdProjects);
+
+                JSONArray joinedProjects = oldUser.getJoinedProjects();
+                ArrayList<String> newJoinedProjects = new ArrayList<>();
+                for(Object project : joinedProjects){
+                    String aid = (String) ((HashMap) project).get("projectId");
+                    newJoinedProjects.add(aid);
+                }
+                user.setJoinedProjects(newJoinedProjects);
+
+                mongoTemplate.save(user);
+
+            } catch (Exception e) {
+                continue;
+            }
         }
+        return "Finished";
     }
 }

@@ -5,6 +5,7 @@ import cn.edu.njnu.geoproblemsolving.business.activity.dto.UpdateProjectDTO;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Project;
 import cn.edu.njnu.geoproblemsolving.Entity.EmailEntity;
+import com.alibaba.fastjson.JSONObject;
 
 import java.util.List;
 
@@ -13,7 +14,7 @@ public interface ProjectService {
 
     JsonResult findProject(String aid);
 
-    List<Project> findProjectsByPage(int page, int size);
+    JSONObject findProjectsByPage(int page, int size);
 
     JsonResult deleteProject(String aid);
 
