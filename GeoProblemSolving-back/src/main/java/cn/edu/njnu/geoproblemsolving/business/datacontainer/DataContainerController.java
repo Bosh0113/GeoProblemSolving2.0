@@ -66,4 +66,9 @@ public class DataContainerController {
         return ResultUtils.success(dataIContainerService.upload(file,userId,userName));
     }
 
+    @RequestMapping(value = "/dataService/{id}/{type}", method = RequestMethod.GET)
+    public JsonResult getDataService(@PathVariable("id") String id,@PathVariable("type") String type) {
+        return ResultUtils.success( dataIContainerService.getDataService(id,type));
+    }
+
 }
