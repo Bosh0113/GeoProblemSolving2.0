@@ -101,8 +101,9 @@
         v-else-if="contentType == 2"
         :activityInfo="slctActivity"
         :userInfo="userInfo"
-        :key="slctActivity.aid"
         :childActivities="childActivities"
+        :nameConfirm="nameConfirm"
+        :key="slctActivity.aid"
       ></multi-activity>
       <activity-visitor
         v-else-if="contentType == 3"
@@ -247,6 +248,7 @@ export default {
       },
       treeFold: false,
       cascader: [],
+      nameConfirm: [],
       activityTree: [],
       projectInfo: parent.vm.projectInfo,
       userInfo: JSON.parse(sessionStorage.getItem("userInfo")),
@@ -312,7 +314,7 @@ export default {
   },
   mounted() {
     this.locateActivity();
-        
+
     Array.prototype.contains = function (obj) {
       var i = this.length;
       while (i--) {
@@ -372,7 +374,7 @@ export default {
       let props = {};
       let style = {};
       let on = {};
-      let name = data.name + " (Level:" + data.level + ")";
+      let name = data.name;
 
       if (this.slctActivity.aid !== data.aid) {
         style = {
@@ -413,17 +415,24 @@ export default {
                 props: props,
                 style: style,
                 on: on,
+                attrs: { title: name },
               },
-              name
+              [
+                h(
+                  "div",
+                  {
+                    style: {
+                      overflow: "hidden",
+                      maxWidth: "120px",
+                      textOverflow: "ellipsis",
+                      margin: "0 auto",
+                    },
+                  },
+                  name
+                ),
+              ]
             ),
           ]),
-          h("span", {
-            style: {
-              display: "inline-block",
-              float: "right",
-              marginRight: "32px",
-            },
-          }),
         ]
       );
     },
@@ -577,10 +586,12 @@ export default {
         });
     },
     buildActivityTree(ancestors, brothers, children) {
+      this.nameConfirm = [];
       // child activities normalization
       if (children.length > 0) {
         for (var i = 0; i < children.length; i++) {
           children[i].children = [];
+          this.nameConfirm.push(children[i].name);
         }
         ancestors[0].children = children;
         ancestors[0]["expand"] = true;
@@ -590,6 +601,7 @@ export default {
       for (var i = 0; i < brothers.length; i++) {
         if (brothers[i].aid !== ancestors[0].aid) {
           brothers[i].children = [];
+          this.nameConfirm.push(brothers[i].name);
         }
       }
       ancestors[1].children = brothers;
@@ -597,6 +609,7 @@ export default {
       // ancestor activities normalization
       for (let i = 1; i < ancestors.length; i++) {
         let parentActivity = ancestors[i];
+        this.nameConfirm.push(parentActivity.name);
         let current = ancestors[i - 1];
 
         let childrenNum = parentActivity.children.length;
@@ -609,6 +622,7 @@ export default {
           ) {
             if (parentActivity.children[j] == current.aid) {
               parentActivity.children = [current];
+              this.nameConfirm.push(current.name);
               break;
             }
           } else if (
@@ -617,6 +631,7 @@ export default {
           ) {
             if (parentActivity.children[j].aid == current.aid) {
               parentActivity.children[j] = current;
+              this.nameConfirm.push(current.name);
               break;
             }
           }

@@ -64,14 +64,14 @@ const routes = [
     ]
   },
   {
-    path: '/activity/:projectId', name: 'workspaceContent', component: resolve => (require(["@/components/workingSpace/workspaceFrame.vue"], resolve)), children: [
+    path: '/activityInfo/:projectId', name: 'workspaceContent', component: resolve => (require(["@/components/workingSpace/workspaceFrame.vue"], resolve)), children: [
       { path: 'type', name: 'activityType', component: resolve => (require(["@/components/workingSpace/activity/typeChoose"], resolve)) },
       { path: 'work', name: 'workSpace', component: resolve => (require(["@/components/workingSpace/activity/singleActivity"], resolve)) },
       { path: 'info', name: 'activityInfo', component: resolve => (require(["@/components/workingSpace/activity/multiActivity"], resolve)) },
     ]
   },
   // { path: '/projectTypeContent/:projectId', name: 'projectTypeContent', component: resolve => (require(["@/components/projects/toWork"], resolve)) },
-  { path: '/chat', name: 'chatUtil', component: resolve => (require(["@/components/tools/entity/chatroom"], resolve)) },
+  { path: '/chat', name: 'chatUtil', component: resolve => (require(["@/components/workingSpace/activity/utils/chatroom/chatroom.vue"], resolve)) },
   { path: '/draw', name: 'drawUtil', component: resolve => (require(["@/components/tools/entity/drawBoard"], resolve)) },
   { path: '/map', name: 'mapTool', component: resolve => (require(["@/components/tools/entity/mapTool"], resolve)) },
   { path: '/lineChart', name: 'lineChart', component: resolve => (require(["@/components/tools/entity/charts/lineChart"], resolve)) },

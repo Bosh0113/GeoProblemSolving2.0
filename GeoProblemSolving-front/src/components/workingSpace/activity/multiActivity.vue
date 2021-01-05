@@ -23,7 +23,7 @@
       </MenuItem> -->
     </Menu>
     <div v-show="activeMenu=='Introduction'">
-      <activity-show :activityInfo="activityInfo"></activity-show>
+      <activity-show :activityInfo="activityInfo" :nameConfirm="nameConfirm"></activity-show>
     </div>
     <div v-show="activeMenu=='Resources'">
       <folder-tree
@@ -48,7 +48,7 @@ import taskManager from "./utils/taskManger.vue";
 import processManager from "./utils/processManager.vue";
 
 export default {
-  props: ["activityInfo", "userInfo","childActivities","brotherActivities"],
+  props: ["activityInfo", "userInfo","childActivities","nameConfirm"],
   components: {
     activityShow,
     folderTree,

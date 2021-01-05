@@ -57,6 +57,25 @@
             />
             <Icon
               v-if="
+                permissionIdentity(
+                  activityInfo.permission,
+                  userRole,
+                  'manage_member'
+                )
+              "
+              type="md-people"
+              size="16"
+              title="Change user role"
+              @click="userRoleBtn = !userRoleBtn"
+              style="
+                float: right;
+                margin: 5px 10px 0 0;
+                cursor: pointer;
+                color: #8bc34a;
+              "
+            />
+            <Icon
+              v-if="
                 activityInfo.level > 0 &&
                 permissionIdentity(
                   activityInfo.permission,
@@ -97,9 +116,34 @@
                 <div
                   v-if="delUserBtn && member.userId != userInfo.userId"
                   style="cursor: pointer; margin-right: 10px"
-                  @click="selectMember(member)"
+                  @click="selectMember(member, 'delete')"
                 >
                   <Icon type="md-remove-circle" size="20" color="#ed4014" />
+                </div>
+                <div
+                  v-if="
+                    userRoleBtn &&
+                    member.userId != userInfo.userId &&
+                    roleCompare(userRole, member.role) != -1
+                  "
+                  title="Set user role"
+                  style="cursor: pointer; margin-right: 10px"
+                  @click="selectMember(member, 'role')"
+                >
+                  <Icon type="md-people" size="20" color="#8bc34a" />
+                </div>
+                <div
+                  v-if="
+                    userRoleBtn &&
+                    (member.userId == userInfo.userId ||
+                      roleCompare(userRole, member.role) == -1)
+                  "
+                  :title="
+                    member.role.charAt(0).toUpperCase() + member.role.slice(1)
+                  "
+                  style="cursor: default; margin-right: 10px"
+                >
+                  <Icon type="md-people" size="20" color="grey" />
                 </div>
                 <div
                   @click="gotoPersonalSpace(member.userId)"
@@ -124,7 +168,7 @@
                       <span>{{ member.name }}</span>
                     </div>
                     <div class="memberRole">
-                      <span>{{ member.role }}</span>
+                      <span>{{ member.role.charAt(0).toUpperCase() + member.role.slice(1) }}</span>
                     </div>
                   </div>
                 </div>
@@ -246,6 +290,58 @@
       <h4 style="color: red">Are you sure to remove this member?</h4>
     </Modal>
     <Modal
+      v-model="memberRoleModal"
+      width="400px"
+      title="Set the role of this member"
+      @on-ok="updateActivity()"
+      ok-text="Ok"
+      cancel-text="Cancel"
+    >
+      <h4>Select user role</h4>
+      <Select v-model="roleSelected" text="Role" style="margin: 10px 0">
+        <Option value="manager" v-show="roleCompare(userRole, 'manager') != -1"
+          >Manager</Option
+        >
+        <Divider style="margin: 5px 0"></Divider>
+        <Option value="core" disabled>Core team</Option>
+        <Option
+          value="researcher"
+          v-show="roleCompare(userRole, 'researcher') != -1"
+          >Researcher</Option
+        >
+        <Option value="expert" v-show="roleCompare(userRole, 'expert') != -1"
+          >Expert</Option
+        >
+        <Option
+          value="decision-maker"
+          v-show="roleCompare(userRole, 'decision-maker') != -1"
+          >Decision-maker</Option
+        >
+        <Option
+          value="core-member"
+          v-show="roleCompare(userRole, 'core-member') != -1"
+          >Core-member</Option
+        >
+        <Divider style="margin: 5px 0"></Divider>
+        <Option value="ordinary" disabled>Ordinary team</Option>
+        <Option
+          value="stakeholder"
+          v-show="roleCompare(userRole, 'stakeholder') != -1"
+          >Stakeholder</Option
+        >
+        <Option
+          value="consultant"
+          v-show="roleCompare(userRole, 'consultant') != -1"
+          >Consultant</Option
+        >
+        <Option
+          value="ordinary-member"
+          v-show="roleCompare(userRole, 'ordinary-member') != -1"
+          >Ordinary-member</Option
+        >
+      </Select>
+    </Modal>
+    <Modal
       v-model="quitActivityModal"
       width="400px"
       title="Leave this activity"
@@ -309,6 +405,11 @@ export default {
       // leave
       quitActivityModal: false,
       listStyle: { width: "280px", height: "360px" },
+      // update
+      slctRoleMember: {},
+      memberRoleModal: false,
+      userRoleBtn: false,
+      roleSelected: "",
     };
   },
   created() {
@@ -333,6 +434,9 @@ export default {
           operation
         );
       }
+    },
+    roleCompare(role1, role2) {
+      return userRoleJS.roleCompare(role1, role2);
     },
     async preInvitation() {
       let url = "";
@@ -438,8 +542,14 @@ export default {
       }
     },
     selectMember(member) {
-      this.slctDletMember = member;
-      this.removeMemberModal = true;
+      if (operation == "delete") {
+        this.slctDletMember = member;
+        this.removeMemberModal = true;
+      } else if (operation == "role") {
+        this.slctRoleMember = member;
+        this.memberRoleModal = true;
+        this.roleSelected = member.role;
+      }
     },
     removeUser() {
       let url = "";

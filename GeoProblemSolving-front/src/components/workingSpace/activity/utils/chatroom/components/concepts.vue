@@ -52,9 +52,9 @@ export default {
   }
 };
 </script>
-<style lang="scss" scoped>
+<style scoped>
 .panel-body {
   width: 400px;
-  height: 500px;
+  height: calc(100vh - 280px);
 }
 </style>

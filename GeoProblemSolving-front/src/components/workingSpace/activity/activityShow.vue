@@ -85,6 +85,7 @@
                 word-break: break-word;
                 margin-left: 10px;
               "
+              :title="activityInfo.description"
             >
               {{ activityInfo.description }}
             </div>
@@ -97,10 +98,11 @@
             v-for="item in activityInfo.children"
             :key="item.aid"
             class="childrenCard"
+            style="display: inline-block"
           >
             <Card
               style="
-                height: 120px;
+                height: 160px;
                 width: 220px;
                 float: left;
                 margin: 0 10px 10px 0;
@@ -108,7 +110,7 @@
               "
               @click.native="enterChildActivity(item)"
             >
-              <p slot="title">{{ item.name }}</p>
+              <p slot="title" :title="item.name">{{ item.name }}</p>
               <div
                 slot="extra"
                 v-if="roleIdentity(item) == 'visitor'"
@@ -134,7 +136,11 @@
               >
                 <Icon type="ios-person" :size="20"> </Icon>
               </div>
-              <div style="margin-top: 5px" :title="item.description">
+              <div
+                style="margin-top: 5px"
+                :title="item.description"
+                class="childDescription"
+              >
                 {{ item.description }}
               </div>
             </Card>
@@ -274,12 +280,25 @@
                 userRoleBtn &&
                 member.userId != userInfo.userId &&
                 roleCompare(userRole, member.role) != -1
-              "
+              "              
               title="Set user role"
               style="cursor: pointer; margin-right: 10px"
               @click="selectMember(member, 'role')"
             >
               <Icon type="md-people" size="20" color="#8bc34a" />
+            </div>
+            <div
+              v-if="
+                userRoleBtn &&
+                (member.userId == userInfo.userId ||
+                  roleCompare(userRole, member.role) == -1)
+              "
+              :title="
+                member.role.charAt(0).toUpperCase() + member.role.slice(1)
+              "
+              style="cursor: default; margin-right: 10px"
+            >
+              <Icon type="md-people" size="20" color="grey" />
             </div>
             <div
               @click="gotoPersonalSpace(member.userId)"
@@ -509,7 +528,7 @@ export default {
   components: {
     Avatar,
   },
-  props: ["activityInfo"],
+  props: ["activityInfo","nameConfirm"],
   data() {
     return {
       scrollOps: {
@@ -599,8 +618,7 @@ export default {
     this.userRole = this.roleIdentity(this.activityInfo);
     this.getParticipants();
   },
-  mounted() {
-  },
+  mounted() {},
   methods: {
     roleIdentity(activity) {
       return userRoleJS.roleIdentify(activity.members, this.userInfo.userId);
@@ -690,6 +708,12 @@ export default {
     createActivity(name) {
       this.$refs[name].validate((valid) => {
         if (valid) {
+          for(let i = 0;i<this.nameConfirm.length;i++){
+            if(this.nameConfirm[i] == this.activityForm.name){
+              this.$Message.error("Repeated naming in the same project.")
+              return;
+            }
+          }
           let url = "";
           if (this.activityForm.level == 1) {
             // subproject
@@ -721,7 +745,8 @@ export default {
       });
     },
     enterChildActivity(activity) {
-      if (this.roleIdentity(activity) == "visitor") return;
+      if (this.roleIdentity(activity) == "visitor")
+        this.$Message.info("Please join this activity.");
 
       parent.location.href =
         "/GeoProblemSolving/projectInfo/" +
@@ -1168,5 +1193,12 @@ export default {
   text-overflow: ellipsis;
   white-space: nowrap;
   max-width: 100%;
+}
+.childDescription {
+  display: -webkit-box;
+  word-break: break-all;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 5;
+  overflow: hidden;
 }
 </style>

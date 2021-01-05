@@ -291,7 +291,8 @@ export default {
           var nodeCategory = this.getStepCategroy(
             this.childActivities[i].purpose
           );
-          // create step node
+          // create step node          
+          let rows = Math.round( Math.sqrt(this.childActivities.length/2)) * 2;
           var newStepNode = {
             id: i,
             aid: this.childActivities[i].aid,
@@ -299,8 +300,8 @@ export default {
             category: nodeCategory,
             last: [],
             next: [],
-            x: (i % 5) * 100,
-            y: Math.floor(i / 5) * 100,
+            x: (i % rows) * 100,
+            y: Math.floor(i / rows) * 100,
             status: true,
           };
           this.activityInfo.pathway.push(newStepNode);

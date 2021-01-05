@@ -363,21 +363,12 @@
                     this.showPageList();
                 },
                 showPageList() {
-                        let userId = "";
-                        let joinedProjects = [];
-                        if (this.userState) {
-                            userId = this.userInfo.userId;
-                            for (let i = 0; i < this.userInfo.joinedProjects.length; i++) {
-                                joinedProjects.push(this.userInfo.joinedProjects[i].projectId);
-                            }
-                        }
-                        // this.$Spin.show();
                         axios
                             .get("/GeoProblemSolving/project" +
                                 "?category=" + this.currentTab +
                                 "&tag=" + this.selectTag +
                                 "&page=" + this.currentPage +
-                                "&userId=" + userId +
+                                "&userId=" + this.userInfo.userId +
                                 "&pageSize=" + this.pageSize +
                                 "&keyword=" + this.searchText )
                             .then(res => {

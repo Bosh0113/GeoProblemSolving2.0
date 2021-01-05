@@ -1,5 +1,6 @@
 package cn.edu.njnu.geoproblemsolving.ChangeDB;
 
+import cn.edu.njnu.geoproblemsolving.Entity.ModelTools.CModel.ComputableModelEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.Resources.FolderEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.Resources.ResourceEntity;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
@@ -58,16 +59,16 @@ public class UpdateDBDao {
                 newProject.setLevel(0);
                 // picture url
                 String url = oldProject.getPicture();
-                url.replace("project/picture","resource/images");
+                url = url.replace("project/picture", "resource/images");
                 newProject.setPicture(url);
                 // tags and category
                 String tags = oldProject.getTag();
                 try {
                     newProject.setCategory(ProjectCategory.valueOf(oldProject.getCategory()));
-                } catch (Exception ex){
+                } catch (Exception ex) {
                     newProject.setCategory(ProjectCategory.valueOf("Investigational"));
                     String category = oldProject.getCategory();
-                    if(tags != "") {
+                    if (tags != "") {
                         tags = tags + "," + category;
                     } else {
                         tags = category;
@@ -82,6 +83,7 @@ public class UpdateDBDao {
                 members.add(member);
                 JSONArray oldMembers = oldProject.getMembers();
                 for (Object oldmember : oldMembers) {
+                    member = new JSONObject();
                     member.put("userId", ((HashMap) oldmember).get("userId"));
                     member.put("role", "ordinary-member");
                     members.add(member);
@@ -105,12 +107,23 @@ public class UpdateDBDao {
                 if (oldProject.getType().equals("type0")) {
                     List<SubProjectEntity> subproject = mongoTemplate.findAll(SubProjectEntity.class);
                     for (SubProjectEntity oldsubproject : subproject) {
-                        children.add(oldsubproject.getSubProjectId());
+                        if (oldsubproject.getProjectId().equals(oldProject.getProjectId())) {
+                            children.add(oldsubproject.getSubProjectId());
+                        }
                     }
                 } else if (oldProject.getType().equals("type1")) {
                     for (Object step : pathway) {
                         String aid = (String) ((JSONObject) step).get("aid");
                         children.add(aid);
+                    }
+                } else if (oldProject.getType().equals("type2")) {
+                    List<StepEntity> steps = mongoTemplate.findAll(StepEntity.class);
+                    for (StepEntity step : steps) {
+                        String projectId = step.getProjectId();
+                        String subprojectId = step.getSubProjectId();
+                        if((subprojectId != null && subprojectId.equals("")) && (projectId != null && projectId.equals(oldProject.getProjectId()))) {
+                            children.add(step.getStepId());
+                        }
                     }
                 }
                 newProject.setChildren(children);
@@ -134,7 +147,7 @@ public class UpdateDBDao {
                 newSubproject.setName(oldSubproject.getTitle());
                 newSubproject.setDescription(oldSubproject.getDescription());
                 newSubproject.setParent(oldSubproject.getProjectId());
-                newSubproject.setLevel(0);
+                newSubproject.setLevel(1);
                 newSubproject.setCreatedTime(oldSubproject.getCreateTime());
                 newSubproject.setCreator(oldSubproject.getManagerId());
                 // set members
@@ -146,6 +159,7 @@ public class UpdateDBDao {
                 JSONArray oldMembers = oldSubproject.getMembers();
                 if (oldMembers == null) oldMembers = new JSONArray();
                 for (Object oldMember : oldMembers) {
+                    member = new JSONObject();
                     member.put("userId", ((HashMap) oldMember).get("userId"));
                     member.put("role", "ordinary-member");
                     members.add(member);
@@ -162,14 +176,22 @@ public class UpdateDBDao {
                 JSONArray pathway = pathwayMapping(pathwayStr);
                 newSubproject.setPathway(pathway);
                 // children
+                ArrayList<String> children = new ArrayList<>();
                 if (oldSubproject.getType().equals("type0")) {
-                    ArrayList<String> children = new ArrayList<>();
                     for (Object step : pathway) {
                         String aid = (String) ((JSONObject) step).get("aid");
                         children.add(aid);
                     }
-                    newSubproject.setChildren(children);
+                } else if (oldSubproject.getType().equals("type1")){
+                    List<StepEntity> steps = mongoTemplate.findAll(StepEntity.class);
+                    for (StepEntity step : steps) {
+                        String subprojectId = step.getSubProjectId();
+                        if(subprojectId != null && subprojectId.equals(oldSubproject.getSubProjectId())) {
+                            children.add(step.getStepId());
+                        }
+                    }
                 }
+                newSubproject.setChildren(children);
 
                 mongoTemplate.save(newSubproject);
             } catch (Exception ex) {
@@ -190,7 +212,6 @@ public class UpdateDBDao {
                 activity.setDescription(step.getDescription());
                 activity.setType(ActivityType.Activity_Unit);
                 activity.setPurpose(step.getType());
-                activity.setLevel(2);
                 activity.setCreator(step.getCreator());
                 activity.setCreatedTime(step.getCreateTime());
                 activity.setActiveTime(step.getCreateTime());
@@ -199,11 +220,26 @@ public class UpdateDBDao {
                 String projectId = step.getProjectId();
                 if (subprojectId != null && !subprojectId.equals("")) {
                     activity.setParent(subprojectId);
+                    activity.setLevel(2);
                 } else if (projectId != null && !projectId.equals("")) {
                     activity.setParent(projectId);
+                    activity.setLevel(1);
                 } else {
                     return "";
                 }
+                // members
+                JSONArray members = new JSONArray();
+                if(activity.getLevel().equals(1)){
+                    Query query = Query.query(Criteria.where("aid").is(projectId));
+                    List<Project> parent = mongoTemplate.find(query, Project.class);
+                    members = parent.get(0).getMembers();
+
+                } else if(activity.getLevel().equals(2)){
+                    Query query = Query.query(Criteria.where("aid").is(subprojectId));
+                    List<Subproject> parent = mongoTemplate.find(query, Subproject.class);
+                    members = parent.get(0).getMembers();
+                }
+                activity.setMembers(members);
                 // tools and toolsets
                 ArrayList<String> toolList = step.getToolList();
                 ArrayList<String> toolsetList = step.getToolsetList();
@@ -225,8 +261,8 @@ public class UpdateDBDao {
         JSONArray newPathway = new JSONArray();
         if (pathwayStr != null && !pathwayStr.equals("")) {
             JSONArray pathway = JSONArray.parseArray(pathwayStr);
-            JSONObject step = new JSONObject();
             for (Object node : pathway) {
+                JSONObject step = new JSONObject();
                 step.put("id", ((JSONObject) node).get("id"));
                 step.put("aid", ((JSONObject) node).get("stepID"));
                 step.put("name", ((JSONObject) node).get("name"));
@@ -248,7 +284,6 @@ public class UpdateDBDao {
             try {
                 User user = new User();
 
-                // 存用户服务器
                 user.setUserId(oldUser.getUserId());
                 user.setName(oldUser.getUserName());
                 user.setEmail(oldUser.getEmail());
@@ -261,13 +296,13 @@ public class UpdateDBDao {
                 //title
                 try {
                     user.setTitle(UserTitle.valueOf(oldUser.getJobTitle()));
-                } catch (Exception ex){
+                } catch (Exception ex) {
                     user.setTitle(UserTitle.valueOf("Mr"));
                 }
                 // organizations 字符串转数组
                 ArrayList<String> organizations = new ArrayList<>();
                 String organization = oldUser.getOrganization();
-                if(organization != null) {
+                if (organization != null) {
                     organizations.add(organization);
                     user.setOrganizations(organizations);
                 }
@@ -288,7 +323,7 @@ public class UpdateDBDao {
                 // CreatedProject and JoinedProject
                 JSONArray managedProjects = oldUser.getManageProjects();
                 ArrayList<String> createdProjects = new ArrayList<>();
-                for(Object project : managedProjects){
+                for (Object project : managedProjects) {
                     String aid = (String) ((HashMap) project).get("projectId");
                     createdProjects.add(aid);
                 }
@@ -296,11 +331,18 @@ public class UpdateDBDao {
 
                 JSONArray joinedProjects = oldUser.getJoinedProjects();
                 ArrayList<String> newJoinedProjects = new ArrayList<>();
-                for(Object project : joinedProjects){
+                for (Object project : joinedProjects) {
                     String aid = (String) ((HashMap) project).get("projectId");
                     newJoinedProjects.add(aid);
                 }
                 user.setJoinedProjects(newJoinedProjects);
+
+                // email 重复注册用户处理
+                Query query = Query.query(Criteria.where("email").is(oldUser.getEmail()));
+                List<User> userCollection = mongoTemplate.find(query, User.class);
+                if (!userCollection.isEmpty()) {
+                    mongoTemplate.remove(userCollection);
+                }
 
                 mongoTemplate.save(user);
 

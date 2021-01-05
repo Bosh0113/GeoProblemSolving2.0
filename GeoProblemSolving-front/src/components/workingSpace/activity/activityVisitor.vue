@@ -104,12 +104,12 @@
             >
               <div class="memberImg" style="position: relative">
                 <img
-                  v-if="member.avatar != '' && member.avatar != undefined"
+                  v-if="member.avatar != undefined && member.avatar != ''"
                   :src="member.avatar"
                   style="width: 40px; height: 40px"
                 />
                 <avatar
-                  v-else
+                  v-else-if="member.name != undefined && member.name != ''" 
                   :username="member.name"
                   :size="40"
                   :rounded="true"
