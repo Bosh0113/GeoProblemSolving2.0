@@ -81,7 +81,7 @@ public class IntegrationController {
                                        @RequestParam(value = "sortElement") String sortElement,
                                        HttpServletRequest request) {
         HttpSession session = request.getSession();
-        if (session.getAttribute("uid") == null) {
+        if (session.getAttribute("userId") == null) {
             return ResultUtils.error(-1, "no login");
         } else {
             return ResultUtils.success(integrationService.PageIntegrateTaskByActivity(aid, pageNum, pageSize, asc, sortElement));
@@ -90,14 +90,14 @@ public class IntegrationController {
     }
 
     @RequestMapping(value = "/saveIntegratedTask", method = RequestMethod.POST)
-    JsonResult saveIntegratedTask(@RequestBody IntegratedTaskAddDto integratedTaskAddDto,
+    JsonResult saveIntegratedTask(@RequestBody IntegratedTaskAddDto integratedTaskAddDto, @RequestParam("aid") String aid,
                                   HttpServletRequest request
     ){
         HttpSession session = request.getSession();
-        if(session.getAttribute("uid") == null){
+        if(session.getAttribute("userId") == null){
             return ResultUtils.error(-1, "no login");
         }else {
-            String userName = session.getAttribute("uid").toString();
+            String userId = session.getAttribute("userId").toString();
             String xml = integratedTaskAddDto.getXml();
             String mxgraph = integratedTaskAddDto.getMxgraph();
             List<Map<String,String>> models = integratedTaskAddDto.getModels();
@@ -109,7 +109,7 @@ public class IntegrationController {
             String description = integratedTaskAddDto.getDescription();
             String taskName = integratedTaskAddDto.getTaskName();
 
-            return ResultUtils.success(integrationService.saveIntegratedTask(xml, mxgraph, models,processingTools, modelActions,dataProcessings,dataItems,dataLinks,userName,taskName,description));
+            return ResultUtils.success(integrationService.saveIntegratedTask(xml, mxgraph, models,processingTools, modelActions,dataProcessings,dataItems,dataLinks,aid,userId,taskName,description));
         }
     }
 
@@ -118,10 +118,10 @@ public class IntegrationController {
                                         HttpServletRequest request
     ){
         HttpSession session = request.getSession();
-        if(session.getAttribute("uid") == null){
+        if(session.getAttribute("userId") == null){
             return ResultUtils.error(-1, "no login");
         }else {
-            String userName = session.getAttribute("uid").toString();
+            String userName = session.getAttribute("userId").toString();
             String taskOid = integratedTaskAddDto.getTaskOid();
             String xml = integratedTaskAddDto.getXml();
             String mxgraph = integratedTaskAddDto.getMxgraph();
@@ -142,7 +142,7 @@ public class IntegrationController {
                                   HttpServletRequest request
     ){
         HttpSession session = request.getSession();
-        if(session.getAttribute("uid") == null){
+        if(session.getAttribute("userId") == null){
             return ResultUtils.error(-1, "no login");
         }else {
 
@@ -156,11 +156,11 @@ public class IntegrationController {
                                   @RequestParam("taskOid") String taskOid,
                                   HttpServletRequest request) throws IOException {
         HttpSession session = request.getSession();
-        if(session.getAttribute("uid")==null) {
+        if(session.getAttribute("userId")==null) {
             return ResultUtils.error(-1, "no login");
         }
         else {
-            String username = session.getAttribute("uid").toString();
+            String username = session.getAttribute("userId").toString();
             RestTemplate restTemplate=new RestTemplate();
             String url="http://" + managerServerIpAndPort + "/GeoModeling/task/runTask";//远程接口
             String suffix="."+ FilenameUtils.getExtension(file.getOriginalFilename());
@@ -205,10 +205,10 @@ public class IntegrationController {
                                        @RequestParam(value = "taskName")String taskName,
                                        HttpServletRequest request){
         HttpSession session = request.getSession();
-        if(session.getAttribute("uid") == null){
+        if(session.getAttribute("userId") == null){
             return ResultUtils.error(-1, "no login");
         }else {
-            String userName = session.getAttribute("uid").toString();
+            String userName = session.getAttribute("userId").toString();
             return ResultUtils.success(integrationService.updateIntegrateTaskName(taskOid,taskName));
         }
 
@@ -219,10 +219,10 @@ public class IntegrationController {
                                               @RequestParam(value = "taskDescription")String taskDescription,
                                               HttpServletRequest request){
         HttpSession session = request.getSession();
-        if(session.getAttribute("uid") == null){
+        if(session.getAttribute("userId") == null){
             return ResultUtils.error(-1, "no login");
         }else {
-            String userName = session.getAttribute("uid").toString();
+            String userName = session.getAttribute("userId").toString();
             return ResultUtils.success(integrationService.updateIntegrateTaskDescription(taskOid,taskDescription));
         }
 
@@ -257,7 +257,7 @@ public class IntegrationController {
         return ResultUtils.success(integrationService.pageByClassi(asc,page,size,sortEle,searchText,classification));
     }
 
-    @RequestMapping(value = "/methods/getApplication",method = RequestMethod.POST)
+    @RequestMapping(value = "/getDataprocessing",method = RequestMethod.POST)
     JsonResult getApplication(@RequestBody DataApplicationFindDTO dataApplicationFindDTO){
         return  ResultUtils.success(integrationService.searchDataProcessing(dataApplicationFindDTO));
     }

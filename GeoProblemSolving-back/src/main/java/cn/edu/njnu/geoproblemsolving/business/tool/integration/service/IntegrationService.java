@@ -99,7 +99,7 @@ public class IntegrationService {
     }
 
     public String saveIntegratedTask(String xml, String mxgraph, List<Map<String,String>> models, List<Map<String,String>> processingTools,
-                                     List<ModelAction> modelActions, List<DataProcessing> dataProcessings, List<Map<String,Object>> dataItems, List<Map<String,String>> dataLinks, String userName, String taskName, String description){
+                                     List<ModelAction> modelActions, List<DataProcessing> dataProcessings, List<Map<String,Object>> dataItems, List<Map<String,String>> dataLinks, String aid, String userId, String taskName, String description){
         IntegratedTask integratedTask = new IntegratedTask();
 
         integratedTask.setOid(UUID.randomUUID().toString());
@@ -112,7 +112,8 @@ public class IntegrationService {
         integratedTask.setXml(xml);
         integratedTask.setMxGraph(mxgraph);
         integratedTask.setStatus(0);
-        integratedTask.setUserId(userName);
+        integratedTask.setAid(aid);
+        integratedTask.setUserId(userId);
         integratedTask.setTaskName(taskName);
         integratedTask.setDescription(description);
         Date now = new Date();
@@ -299,7 +300,7 @@ public class IntegrationService {
 
     public JSONObject pageByClassi(int asc, int page, int pageSize, String sortEle, String searchText, String classification){
         RestTemplate restTemplate = new RestTemplate();
-        String urlStr = "http://geomodeling.njnu.edu.cn/computableModel/pageByClassi?asc=" + asc + "&page=" +page+ "&size" + pageSize +"&sortEle=" + sortEle + "&searchText=" + searchText + "&classification=" + classification;
+        String urlStr = "http://172.21.212.167:8080/computableModel/pageByClassi?asc=" + asc + "&page=" +page+ "&size=" + pageSize +"&sortEle=" + sortEle + "&searchText=" + searchText + "&classification=" + classification;
 
         ResponseEntity<JSONObject> jsonObjectResponseEntity = restTemplate.getForEntity(urlStr, JSONObject.class);//虚拟http请求
         if (!jsonObjectResponseEntity.getStatusCode().is2xxSuccessful()) {
@@ -311,7 +312,7 @@ public class IntegrationService {
 
     public JSONObject searchDataProcessing(DataApplicationFindDTO dataApplicationFindDTO){
         RestTemplate restTemplate = new RestTemplate();
-        String urlStr = "http://geomodeling.njnu.edu.cn/dataApplication/methods/getApplicationInvokable";
+        String urlStr = "http://172.21.212.167:8080/dataApplication/methods/getApplicationInvokable";
 
         ResponseEntity<JSONObject> jsonObjectResponseEntity = restTemplate.postForEntity(urlStr, dataApplicationFindDTO, JSONObject.class);
         if (!jsonObjectResponseEntity.getStatusCode().is2xxSuccessful()) {

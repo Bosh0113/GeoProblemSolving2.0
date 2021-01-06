@@ -548,6 +548,7 @@ var vue = new Vue({
             this.isInSearch = 0;
 
             let funcs={
+                'general':()=>{return},
                 'modelItem':this.getModelItemList,
                 'dataMethod':this.getDataMethodList,
             }
@@ -676,7 +677,7 @@ var vue = new Vue({
                 sortTypeName:'createTime',
                 method:classi
             }
-            axios.post("/integration/getDataprocessing",data)
+            axios.post("/GeoProblemSolving/integration/getDataprocessing",data)
                 .then((res)=>{
                     setTimeout(()=>{
                         this.dataMethodList=res.data.data.list;
@@ -1391,7 +1392,7 @@ var vue = new Vue({
 
         editTaskNameComfirm() {
             $.ajax({
-                url: "/integration/updateIntegrateTaskName",
+                url: "/GeoProblemSolving/integration/updateIntegrateTaskName",
                 async: true,
                 data: {
                     taskOid: this.checkedTask.oid,
@@ -1409,7 +1410,7 @@ var vue = new Vue({
 
         editTaskDescriptionComfirm() {
             $.ajax({
-                url: "/integration/updateIntegrateTaskDescription",
+                url: "/GeoProblemSolving/integration/updateIntegrateTaskDescription",
                 async: true,
                 data: {
                     taskOid: this.checkedTask.oid,
@@ -1682,7 +1683,7 @@ var vue = new Vue({
                     var _this = this;
 
                     $.ajax({
-                        url: "/integration/runIntegratedTask",
+                        url: "/GeoProblemSolving/integration/runIntegratedTask",
                         data: formData,
                         type: "POST",
                         processData: false,
@@ -1718,7 +1719,7 @@ var vue = new Vue({
 
         checkIntegratedTask(taskId,interval){
             $.ajax({
-                url: "/integration/checkIntegratedTask/" + taskId,
+                url: "/GeoProblemSolving/integration/checkIntegratedTask/" + taskId,
                 data: {},
                 type: "GET",
                 success: (obj) => {
@@ -2055,7 +2056,7 @@ var vue = new Vue({
             }
 
             $.ajax({
-                url: "/integration/updateIntegratedTaskInfo",
+                url: "/GeoProblemSolving/integration/updateIntegratedTaskInfo",
                 async: true,
                 data: JSON.stringify(data),
                 // traditional:true,
@@ -2096,7 +2097,7 @@ var vue = new Vue({
 
             let saveStatus
             $.ajax({
-                url: "/integration/saveIntegratedTask",
+                url: "/GeoProblemSolving/integration/saveIntegratedTask?aid="+this.getStepInfo(),
                 async: true,
                 data: JSON.stringify(data),
                 // traditional:true,
@@ -2122,7 +2123,7 @@ var vue = new Vue({
 
         updateTaskId(taskOid,taskId){//把managerserver返回的taskid更新到门户数据库
             $.ajax({
-                url: "/integration/updateIntegrateTaskId",
+                url: "/GeoProblemSolving/integration/updateIntegrateTaskId",
                 async: true,
                 data: {
                     taskOid:taskOid,
@@ -2339,7 +2340,7 @@ var vue = new Vue({
         checkTaskInfo(task){
             this.taskInfoVisible = true
             console.log(this.integratedTaskList[0].id)
-            axios.get('/integration/getIntegrateTaskByOid',{
+            axios.get('/GeoProblemSolving/integration/getIntegrateTaskByOid',{
                 params:{
                     taskOid:task.oid
                 }
@@ -2562,7 +2563,7 @@ var vue = new Vue({
                         instance.confirmButtonLoading = true;
                         instance.confirmButtonText = 'deleting...';
                         setTimeout(() => {
-                            axios.delete("/integration/deleteIntegratedTask",{
+                            axios.delete("/GeoProblemSolving/integration/deleteIntegratedTask",{
                                 params:{
                                     taskOid:task.oid
                                 }
