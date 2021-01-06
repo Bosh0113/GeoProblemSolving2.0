@@ -102,7 +102,10 @@ public class IResourceServiceImpl implements IResourceService {
                         if (part.getSize() < 1024 * 1024 * 1024) {
 
                             //将资源上传到数据容器
-                            String fileName = part.getSubmittedFileName();
+                            String file = part.getSubmittedFileName();
+                            String temp[] = file.split("\\.");
+                            String fileName = temp[0];
+
                             MultipartFile multipartFile = new MockMultipartFile(ContentType.APPLICATION_OCTET_STREAM.toString(), part.getInputStream());
                             valueMap.add("datafile", multipartFile.getResource());
                             valueMap.add("name", fileName);
@@ -136,7 +139,7 @@ public class IResourceServiceImpl implements IResourceService {
                             String uploaderId = (String) session.getAttribute("userId");
                             String uploaderName = (String) session.getAttribute("name");
                             IResourceEntity resourceEntity = new IResourceEntity();
-                            resourceEntity.setName(fileName);
+                            resourceEntity.setName(file);
                             resourceEntity.setFileSize(fileSize);
                             resourceEntity.setUploaderId(uploaderId);
                             resourceEntity.setUploaderName(uploaderName);
@@ -153,7 +156,8 @@ public class IResourceServiceImpl implements IResourceService {
                             resourceEntity.setResourceId(resUUID);
 
                             //更新用户服务器中用户字段
-                            String userBaseUrl = "http://"+ userResServer +"/ResServer/resource";
+                            // String userBaseUrl = "http://" + userResServer + "/ResServer/resource";
+                            String userBaseUrl = "http://"+userResServer+"/ResServer/resource";
                             //修改userServer中用户信息,应该是和资源相关的内容，包括userId和资源有关的内容
                             JSONObject userBaseJson = new JSONObject();
                             //计算文件的MD5值,此操作很费时间
@@ -364,22 +368,21 @@ public class IResourceServiceImpl implements IResourceService {
 //        fis.close();
 //        bis.close();
 //    }
+public static String copyByUrl(String urlStr,String fileName,String savePath)throws IOException {
+    URL url = new URL(urlStr);
+     FileUtils.copyURLToFile(url, new File(savePath+ File.separator+fileName));
+    File file = new File(savePath+ File.separator+fileName);
 
-    private String copyByUrl(String urlStr, String fileName, String savePath) throws IOException {
-        URL url = new URL(urlStr);
-        FileUtils.copyURLToFile(url, new File(savePath + File.separator + fileName));
-        File file = new File(savePath + File.separator + fileName);
-
-        Long fileSize = file.length();
-        String size;
-        DecimalFormat df = new DecimalFormat("##0.00");
-        if (fileSize > 1024 * 1024) {
-            size = df.format((float) fileSize / (float) (1024 * 1024)) + "MB";
-        } else {
-            size = df.format((float) fileSize / (float) (1024)) + "KB";
-        }
-        return size;
+    Long fileSize =file.length();
+    String size;
+    DecimalFormat df = new DecimalFormat("##0.00");
+    if (fileSize > 1024 * 1024) {
+        size = df.format((float)fileSize / (float) (1024 * 1024)) + "MB";
+    } else {
+        size = df.format((float) fileSize / (float) (1024)) + "KB";
     }
+    return size;
+}
 
     private JsonResult fileStore(Part part, String filePath, String folderPath){
         try {
