@@ -1,5 +1,6 @@
 package cn.edu.njnu.geoproblemsolving.business.user.dao;
 
+import cn.edu.njnu.geoproblemsolving.business.resource.entity.ResourcePojo;
 import cn.edu.njnu.geoproblemsolving.business.user.dto.InquiryUserDto;
 import cn.edu.njnu.geoproblemsolving.business.user.entity.User;
 import cn.edu.njnu.geoproblemsolving.business.user.entity.UserDto;
@@ -26,4 +27,6 @@ public interface IUserDao {
     JsonResult getUserInfo(String key, String value);
 
     JsonResult addUserInfo(JSONObject user);
+
+    JsonResult updateUserRes(String uploaderId, ResourcePojo res);
 }

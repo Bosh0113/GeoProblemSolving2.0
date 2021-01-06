@@ -46,60 +46,49 @@
         >
           <Menu style="height:calc(100vh - 120px);">
             <MenuGroup>
-              <router-link to="./home" >
+
               <MenuItem name="overview" class="sideItem">
                 <Icon type="ios-book" size="25"/>
-                <sapn class="customFont"> Overview </sapn>
+                <router-link to="overView" class="customFont">Overview</router-link>
               </MenuItem>
-              </router-link>
 
-              <router-link to="/test">
               <MenuItem name="project" class="sideItem">
                 <Icon type="ios-cube" size="25"/>
-                <sapn class="customFont">Project</sapn>
+                <router-link to="project" class="customFont">Project</router-link>
               </MenuItem>
-              </router-link>
 
-              <router-link to="./home">
               <MenuItem name="resource" class="sideItem">
                 <Icon type="ios-cloud" size="25"/>
-                <sapn class="customFont">Resource</sapn>
+                <router-link to="resource" class="customFont">Resource</router-link>
               </MenuItem>
-              </router-link>
-              <router-link to="./home" >
+
               <MenuItem name="tool" class="sideItem">
                 <Icon type="ios-cog" size="25"/>
-                <span class="customFont">Tool</span>
+                <router-link to="tool" class="customFont">Tool</router-link>
               </MenuItem>
-              </router-link>
+
               <MenuItem name="todoList" class="sideItem">
                 <Icon type="ios-clipboard" size="25"/>
-                <router-link to="./home" class="customFont">TodoList</router-link>
+                <router-link to="todoList" class="customFont">TodoList</router-link>
               </MenuItem>
             </MenuGroup>
 
             <MenuGroup>
-              <router-link to="./home">
               <MenuItem name="userInfo" class="sideItem">
                 <Icon type="ios-contact-outline" size="25"/>
-<!--                <router-link to="./home" ></router-link>-->
-                <span class="customFont">UserInfo</span>
+                <router-link to="userInfo" class="customFont">UserInfo</router-link>
               </MenuItem>
-              </router-link>
 
-              <router-link to="./home">
               <MenuItem name="notification" class="sideItem">
                 <Icon type="ios-list" size="25"/>
-                <span class="customFont">Notification</span>
+                <router-link to="notification" class="customFont">Notification</router-link>
               </MenuItem>
-              </router-link>
 
-              <router-link to="./home" >
               <MenuItem name="trash" class="sideItem">
                 <Icon type="ios-trash-outline" size="25"/>
-                <span class="customFont">Trash</span>
+                <router-link to="todoList" class="customFont">Trash</router-link>
               </MenuItem>
-              </router-link>
+
             </MenuGroup>
           </Menu>
         </div>
@@ -108,14 +97,8 @@
       <Col span="19" offset="1">
         <Row style="margin-top: 30px"></Row>
         <Row>
-<!--          <todo-list></todo-list>-->
-<!--          <notification></notification>-->
-<!--          <resource></resource>-->
-          <Project></Project>
+          <router-view></router-view>
         </Row>
-
-<!--                <notification />-->
-<!--        <resource/>-->
       </Col>
     </Row>
   </div>
@@ -129,6 +112,7 @@
   import resource from "../subPage/resource";
   import todoList from "../subPage/todoList";
   import Project from "../subPage/project";
+  import tool from "../subPage/tool";
 
   export default {
     name: "newPersonalPage",
@@ -139,6 +123,7 @@
       notification,
       resource,
       "todo-list": todoList,
+      tool
     },
     data() {
       return {}

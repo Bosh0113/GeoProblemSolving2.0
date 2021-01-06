@@ -6,8 +6,10 @@ import cn.edu.njnu.geoproblemsolving.business.resource.dao.IResourceDaoImpl;
 import cn.edu.njnu.geoproblemsolving.business.resource.entity.AddIResourceDTO;
 import cn.edu.njnu.geoproblemsolving.business.resource.entity.IResourceEntity;
 import cn.edu.njnu.geoproblemsolving.business.resource.entity.IUploadResult;
+import cn.edu.njnu.geoproblemsolving.business.resource.entity.ResourcePojo;
 import cn.edu.njnu.geoproblemsolving.business.resource.util.ResCovertUtil;
 import cn.edu.njnu.geoproblemsolving.business.resource.util.RestTemplateUtil;
+import cn.edu.njnu.geoproblemsolving.business.user.dao.IUserImpl;
 import cn.edu.njnu.geoproblemsolving.business.user.entity.User;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import cn.edu.njnu.geoproblemsolving.common.utils.ResultUtils;
@@ -48,6 +50,9 @@ import java.util.*;
 public class IResourceServiceImpl implements IResourceService {
     @Autowired
     IResourceDaoImpl resourceDao;
+    @Autowired
+    IUserImpl userDao;
+
     @Value("${dataContainer}")
     String dataRemoteIp;
     @Value("${resServerIp}")
@@ -104,6 +109,7 @@ public class IResourceServiceImpl implements IResourceService {
                             String uploadRemoteUrl = "http://" + dataRemoteIp + ":8082/data";
                             //向dataContainer传输数据
                             JSONObject uploadRemoteResult = httpUtil.uploadRemote(uploadRemoteUrl, valueMap);
+                            String remoteResId = (String) JSONObject.parseObject(JSONObject.toJSONString(uploadRemoteResult.get("data"))).get("id");
                             Integer uploadResultInfo = uploadRemoteResult.getInteger("code");
 
                             if (!uploadResultInfo.equals(1)) {
@@ -144,8 +150,7 @@ public class IResourceServiceImpl implements IResourceService {
                             resourceEntity.setResourceId(resUUID);
 
                             //更新用户服务器中用户字段
-                            // String userBaseUrl = "http://" + userResServer + "/ResServer/resource";
-                            String userBaseUrl = "http://localhost:8090/ResServer/resource";
+                            String userBaseUrl = "http://"+ userResServer +"/ResServer/resource";
                             //修改userServer中用户信息,应该是和资源相关的内容，包括userId和资源有关的内容
                             JSONObject userBaseJson = new JSONObject();
                             //计算文件的MD5值,此操作很费时间
@@ -153,7 +158,7 @@ public class IResourceServiceImpl implements IResourceService {
 
                             //参与式平台资源与用户资源字段有所不同，临时转换，后期完全统一过后，就不用了
                             ResCovertUtil resCovertUtil = new ResCovertUtil();
-                            JSONObject userBaseRes = resCovertUtil.gsmRes2UserBaseRes(resourceEntity, resMd5);
+                            JSONObject userBaseRes = resCovertUtil.gsmRes2UserBaseRes(resourceEntity, resMd5, remoteResId);
                             ArrayList resourceList = new ArrayList();
                             resourceList.add(userBaseRes);
                             //用户服务器资源无uploaderId这个说法
@@ -166,6 +171,10 @@ public class IResourceServiceImpl implements IResourceService {
 
                             //最后存入本地数据库中
                             IResourceEntity resDetails = resourceDao.saveResDetails(resourceEntity);
+                            //更新本地用户 resource 字段
+                            ResourcePojo localUserResField = userBaseRes.toJavaObject(ResourcePojo.class);
+                            userDao.updateUserRes(uploaderId, localUserResField);
+
                             uploadInfos.uploaded.add(resDetails);
                         } else {
                             uploadInfos.sizeOver.add(part.getSubmittedFileName());

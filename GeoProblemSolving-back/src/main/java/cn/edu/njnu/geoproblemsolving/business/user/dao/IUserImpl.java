@@ -1,6 +1,7 @@
 package cn.edu.njnu.geoproblemsolving.business.user.dao;
 
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Project;
+import cn.edu.njnu.geoproblemsolving.business.resource.entity.ResourcePojo;
 import cn.edu.njnu.geoproblemsolving.business.user.dto.InquiryUserDto;
 import cn.edu.njnu.geoproblemsolving.business.user.entity.User;
 import cn.edu.njnu.geoproblemsolving.business.user.entity.UserDto;
@@ -16,7 +17,6 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.http.*;
 import org.springframework.stereotype.Repository;
-import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
@@ -158,6 +158,25 @@ public class IUserImpl implements IUserDao {
 
         } catch (Exception ex){
             return ResultUtils.error(-2, "Fail: Exception");
+        }
+    }
+
+    @Override
+    public JsonResult updateUserRes(String uploaderId, ResourcePojo res) {
+        Query query = new Query(Criteria.where("userId").is(uploaderId));
+        Update update = new Update();
+        update.set("resources", res);
+        try {
+            User user = mongoTemplate.findOne(query, User.class);
+            ArrayList<ResourcePojo> resources = user.getResources();
+            if (resources == null){
+                resources = new ArrayList<ResourcePojo>();
+            }
+            resources.add(res);
+            mongoTemplate.updateFirst(query, update, User.class);
+            return ResultUtils.success(mongoTemplate.findOne(query, User.class));
+        }catch (Exception e){
+            return ResultUtils.error(-2, "Failed to update user resource filed.");
         }
     }
 }

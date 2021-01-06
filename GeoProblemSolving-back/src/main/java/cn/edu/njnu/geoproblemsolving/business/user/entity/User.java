@@ -1,5 +1,6 @@
 package cn.edu.njnu.geoproblemsolving.business.user.entity;
 
+import cn.edu.njnu.geoproblemsolving.business.resource.entity.ResourcePojo;
 import cn.edu.njnu.geoproblemsolving.business.user.enums.UserTitle;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -39,7 +40,7 @@ public class User {
     private ArrayList<String> organizations;
     private ArrayList<String> domain;
     private ArrayList<String> loginIp;
-    //private ArrayList<String> resource;
+    private ArrayList<ResourcePojo> resources;
 
     /**
      * Unique

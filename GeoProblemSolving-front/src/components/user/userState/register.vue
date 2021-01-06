@@ -366,7 +366,7 @@ export default {
                 this.$Message.success("This email has been registered!");
               } else if (res.data.code == 0) {
                 this.$Message.success("Register successfully!");
-                this.$router.push({ name: "Login" });
+                this.$router.replace({ name: "Login" });
               }
             })
             .catch((err) => {

@@ -120,17 +120,6 @@ public class IUserController {
             User user = userDao.findUserById(userId);
             return user;
         }
-        // if (StaticParams.loginUser != null) {
-        // User userInfo = StaticParams.loginUser;
-        // //从本地数据库读取数据
-        // User user = userDao.findUserById(StaticParams.loginUser.getUserId());
-        // session.setMaxInactiveInterval(60 * 60 * 2);
-        // session.setAttribute("userId", userInfo.getUserId());
-        // session.setAttribute("userName", userInfo.getName());
-        // userInfo.setPassword("");
-        // return user;
-        // }
-        // return false;
     }
 
     @RequestMapping(value = "/logout", method = RequestMethod.GET)
@@ -156,6 +145,11 @@ public class IUserController {
         return userInfo;
     }
 
+    /**
+     * 查询项目
+     * @param manageProjectList
+     * @return
+     */
     @RequestMapping(value = "/getMProject", method = RequestMethod.POST)
     public JsonResult getManagerProjectList(@RequestBody String[] manageProjectList) {
         System.out.println(manageProjectList);
@@ -195,4 +189,6 @@ public class IUserController {
     public JsonResult addUserInfo(@RequestBody JSONObject user){
         return userDao.addUserInfo(user);
     }
+
+
 }

@@ -7,19 +7,19 @@
           <CheckboxGroup v-model="selectedTaskType">
             <Checkbox label="Doing">
               <sapn>Doing</sapn>
-              <span class="badge">1</span>
+              <span class="badge">{{doingList.length}}</span>
             </Checkbox>
             <Checkbox label="Done">
               <span>Done</span>
-              <span class="badge">5</span>
-            </Checkbox>
-            <Checkbox label="Importance">
-              <span>Importance</span>
-              <span class="badge">2</span>
+              <span class="badge">{{doneList.length}}</span>
             </Checkbox>
             <Checkbox label="Assigned">
               <span>Assigned to you</span>
               <span class="badge">10</span>
+            </Checkbox>
+            <Checkbox label="Importance" :disabled="true">
+              <span>Importance</span>
+              <span class="badge">{{importanceNum}}</span>
             </Checkbox>
           </CheckboxGroup>
         </Card>
@@ -27,19 +27,19 @@
     </Row>
     <Row>
       <Col span="22" offset="1">
-        <Card >
+        <Card dis-hover>
           <!--         新建任务   -->
-          <div >
+          <div>
             <DatePicker
               type="date"
               style="position: absolute;top: 18px; right: 50px; z-index: 3"
               class="customDatePicker custom"
               title="select endTime"
-              @on-change ="handleChange"
+              @on-change="handleChange"
             >
             </DatePicker>
             <Input
-              v-model="newTask.discription"
+              v-model="newTask.content"
               prefix="ios-radio-button-off"
               placeholder="Add Todo"
               size="large"
@@ -49,33 +49,79 @@
             />
           </div>
 
+
           <!--      未完成            -->
           <div>
-            <Card>
+            <Card
+              dis-hover
+              v-if="selectedTaskType.includes('Doing')"
+            >
               <p slot="title">Doing</p>
-              <div>
-                <Card class="customIcon">
-                  <Icon type="ios-radio-button-off" size="20" />
-                  <Icon type="ios-close"  size="31" style="float: right;color: #ff7800;cursor: pointer; line-height: .8" />
-                  <Icon v-if="test" size="20" type="ios-star-outline" style="float: right;cursor: pointer;margin-right: 20px" />
-                  <Icon v-else size="20" type="ios-star" style="float: right;cursor:pointer;margin-right: 20px" />
-                  This is doing task space.
+              <div
+                v-for="(item, doingIndex) in doingList"
+                :key="doingIndex"
+              >
+                <Card
+                  class="customIcon"
+                >
+                  <Icon type="ios-radio-button-off"
+                        size="20"
+                        style="cursor:pointer;"
+                        @click="changeState(item, doingIndex)"
+                  />
+                  <Icon type="ios-close" size="31"
+                        style="float: right;color: #ff7800;cursor: pointer; line-height: .8"
+                        @click="delTask(item.ptId, doingIndex, 'doing')"
+                  />
+                  <Icon v-if="item.importance == 0"
+                        size="20" type="ios-star-outline"
+                        style="float: right;cursor: pointer;margin-right: 20px"
+                        @click="changeImportance(item, doingIndex, 'doing')"
+                  />
+                  <Icon v-else size="20"
+                        type="ios-star"
+                        style="float: right;cursor:pointer;margin-right: 20px"
+                        @click="changeImportance(item, doingIndex, 'doing')"
+                  />
+                  <label
+                    style="margin-left: 10px;"
+                  >{{item.content}}</label>
                 </Card>
               </div>
             </Card>
           </div>
           <!--        已完成      -->
           <div>
-            <Card>
+            <Card
+              dis-hover
+              v-if="selectedTaskType.includes('Done')"
+            >
               <p slot="title">Done</p>
               <!--            显示内容                -->
-              <div>
+              <div
+                v-for="(item, doneIndex) in doneList"
+                :key="doneIndex"
+              >
                 <Card class="customIcon">
-                  <Icon type="ios-checkmark-circle-outline" size="20" style="line-height: .8"/>
-                  <Icon type="ios-close"  size="31" style="float: right;color: #ff7800;cursor: pointer; line-height: .8" />
-                  <Icon v-if="test" size="20" type="ios-star-outline" style="float: right;cursor: pointer;margin-right: 20px" />
-                  <Icon v-else size="20" type="ios-star" style="float: right;cursor:pointer;margin-right: 20px" />
-                  <span>This is done task space.</span>
+                  <Icon type="ios-checkmark-circle-outline" size="20" style="line-height: .8; cursor: pointer"
+                        @click="changeState(item, doneIndex)"/>
+                  <Icon type="ios-close" size="31"
+                        style="float: right;color: #ff7800;cursor: pointer; line-height: .8"
+                        @click="delTask(item.ptId, doneIndex, 'done')"
+                  />
+                  <Icon v-if="item.importance == 1"
+                        size="20"
+                        type="ios-star"
+                        style="float: right;cursor:pointer;margin-right: 20px"
+                        @click="changeImportance(item, doneIndex, 'done')"
+                  />
+                  <Icon v-else
+                        size="20"
+                        type="ios-star-outline"
+                        style="float: right;cursor: pointer;margin-right: 20px"
+                        @click="changeImportance(item, doneIndex, 'done')"
+                  />
+                  <label style="margin-left: 10px;">{{item.content}}</label>
                 </Card>
 
               </div>
@@ -92,43 +138,161 @@
     name: "todoList",
     data() {
       return {
-        selectedTaskType: [],
+        selectedTaskType: ["Doing", "Done", "Importance"],
         doneList: [],
         doingList: [],
+        importanceNum: 0,
         newTask: {
           userId: "",
-          discription: "",
+          content: "",
           endTime: "",
+          importance: "0",
+          state: "doing"
         }
       }
     },
     mounted() {
+      this.initTodoList();
     },
     methods: {
       initTodoList: function () {
         this.axios
-          .get()
-          .then()
+          .get("/GeoProblemSolving/pTask/" + this.$store.getters.userId)
+          .then(res => {
+            let doingListTemp = [];
+            let doneListTemp = [];
+            if (res.data.code == 0) {
+              let todoList = res.data.data;
+              for (let index = 0; index < todoList.length; index++) {
+                if (todoList[index].state == "doing" && todoList[index].importance == 1) {
+                  doingListTemp.unshift(todoList[index]);
+                  this.importanceNum++;
+                } else if (todoList[index].state == "doing" && todoList[index].importance == 0) {
+                  doingListTemp.push(todoList[index]);
+                } else if (todoList[index].state == "done" && todoList[index].importance == 1) {
+                  doneListTemp.unshift(todoList[index]);
+                  this.importanceNum++;
+                } else if (todoList[index].state == "done" && todoList[index].importance == 0) {
+                  doneListTemp.push(todoList[index]);
+                }
+              }
+              this.$set(this, "doneList", doneListTemp);
+              this.$set(this, "doingList", doingListTemp);
+            } else if (res.code == -2) {
+              this.$Message.error("Todo Task Loading Fail.")
+            }
+          })
           .catch(err => {
             this.$Message.error("Todo Task Loading Fail.")
           })
       },
-      addTask: function(){
+      addTask: function () {
         this.newTask.userId = this.$store.getters.userId;
-        if (this.newTask.discription != ""){
-          this.newTask.discription = "";
-          this.newTask.endTime = "";
+        if (this.newTask.content !== "") {
+          this.axios
+            .post("/GeoProblemSolving/pTask", this.newTask)
+            .then(res => {
+              console.log(res);
+              if (res.data.code == 0) {
+                this.doingList.push(res.data.data);
+                this.newTask.content = "";
+                this.newTask.endTime = "";
+              }
+            })
+            .catch(err => {
+              this.$Message.error("Failed to create todo task")
+            })
         }
-        console.log(this.newTask)
+      },
+      // 选择日期
+      handleChange: function (date) {
+        this.newTask.endTime = date;
+      },
+      changeState: function (item, index) {
+        let changeType = 0;
+        if (item.state == "doing") {
+          item.state = "done";
+          changeType = 1;
+        } else if (item.state == "done") {
+          item.state = "doing";
+          changeType = 2;
+        }
+        this.axios
+          .put("/GeoProblemSolving/pTask", item)
+          .then(res => {
+            if (res.data.code == 0) {
+              //
+              if (changeType == 1) {
+                this.doneList.push(item);
+                this.doingList.splice(index, 1);
+              } else if (changeType == 2) {
+                this.doingList.push(item);
+                this.doneList.splice(index, 1);
+              }
+            }
+          })
+          .catch(err => {
+            this.$Message.error("Change task state Fail.")
+          })
 
       },
-      handleChange: function(date){
-        this.newTask.endTime = date;
+      changeImportance: function (item, index, state) {
+        if (item.importance == 0) {
+          item.importance = 1;
+        } else if (item.importance == 1) {
+          item.importance = 0;
+          this.importanceNum--;
+        }
+        this.axios
+          .put("/GeoProblemSolving/pTask", item)
+          .then(res => {
+            if (res.data.code == 0) {
+              if (state == "doing" && item.importance == 1) {
+                this.doingList.unshift(this.doingList.splice(index, 1)[0]);
+                this.importanceNum++;
+              } else if (state == "done" && item.importance == 1) {
+                this.doneList.unshift(this.doneList.splice(index, 1)[0]);
+                this.importanceNum++;
+              }
+            }
+          })
+          .catch()
+      },
+      delTask: function (ptId, index, state) {
+        this.axios
+          .delete("/GeoProblemSolving/pTask/" + ptId)
+          .then(res => {
+            if (res.data.code == 0) {
+              if (state == "doing") {
+                this.doingList.splice(index, 1);
+              } else if (state == "done") {
+                this.doneList.splice(index, 1);
+              }
+            } else {
+              this.$Message.error("Delete Fail.")
+            }
+          })
+          .catch(err => {
+            this.$Message.error("Delete Fail.")
+          })
+      },
+      //使用计算属性还是方法更好？？？
+      timeCompare: function (time) {
+        let nowTime = new Date();
+        let formatTime = Date.parse(time);
+        let secondsNum = nowTime - formatTime - 86400000;
+        if (secondsNum > 0) {
+          return true;
+        } else {
+          return false;
+        }
       },
       test: function () {
         console.log("123131")
       }
     },
+    //用一个计算属性动态捕捉doing/done List 的变化
+    computed: {},
   }
 </script>
 
@@ -147,11 +311,13 @@
     background-color: #999999;
     border-radius: 10px;
   }
+
   .customCardHead >>> .ivu-card-head {
     border-bottom-color: white;
     padding: 4px 6px;
   }
-  .customDatePicker >>> .ivu-input{
+
+  .customDatePicker >>> .ivu-input {
     display: inline-block;
     width: 100%;
     height: 32px;
@@ -166,11 +332,13 @@
     background-image: none;
     position: relative;
     cursor: text;
-    transition: border .2s ease-in-out,background .2s ease-in-out,box-shadow .2s ease-in-out;
+    transition: border .2s ease-in-out, background .2s ease-in-out, box-shadow .2s ease-in-out;
   }
-  .customDatePicker:hover >>> .ivu-input{
+
+  .customDatePicker:hover >>> .ivu-input {
     cursor: pointer;
   }
+
   .customIcon >>> .ivu-icon {
     font-weight: 700;
   }

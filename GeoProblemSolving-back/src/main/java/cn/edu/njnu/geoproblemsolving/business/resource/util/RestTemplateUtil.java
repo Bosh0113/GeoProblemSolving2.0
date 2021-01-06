@@ -58,7 +58,7 @@ public class RestTemplateUtil {
         headers.add("Authorization", "Bearer "+ StaticParams.access_token);
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<JSONObject> httpEntity = new HttpEntity<>(userBaseJson, headers);
-        ResponseEntity<String> response = restTemplate.exchange(userServerUrl, HttpMethod.PUT, httpEntity, String.class);
+        ResponseEntity<String> response = restTemplate.exchange(userServerUrl, HttpMethod.POST, httpEntity, String.class);
         String resultStr = response.getBody();
         JSONObject uploadToUserServer = JSONObject.parseObject(resultStr);
         return uploadToUserServer;
