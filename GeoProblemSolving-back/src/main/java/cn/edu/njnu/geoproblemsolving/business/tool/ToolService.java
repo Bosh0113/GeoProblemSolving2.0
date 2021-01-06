@@ -2,8 +2,8 @@ package cn.edu.njnu.geoproblemsolving.business.tool;
 
 import cn.edu.njnu.geoproblemsolving.common.enums.ResultEnum;
 import cn.edu.njnu.geoproblemsolving.common.exception.MyException;
-import cn.edu.njnu.geoproblemsolving.business.tool.dto.AddToolEntityDTO;
-import cn.edu.njnu.geoproblemsolving.business.tool.dto.UpdateToolEntityDTO;
+import cn.edu.njnu.geoproblemsolving.business.tool.support.dto.AddToolEntityDTO;
+import cn.edu.njnu.geoproblemsolving.business.tool.support.dto.UpdateToolEntityDTO;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -21,8 +21,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * @Author Zhiyi
