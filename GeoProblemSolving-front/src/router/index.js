@@ -185,7 +185,7 @@ const routes = [
     ]
   },
   {
-    path: "/dataService/:id",
+    path: "/dataService/:id/:token/:type",
     name: "dataService",
     component: resolve =>
       require(["@/components/utils/data/dataService"], resolve)

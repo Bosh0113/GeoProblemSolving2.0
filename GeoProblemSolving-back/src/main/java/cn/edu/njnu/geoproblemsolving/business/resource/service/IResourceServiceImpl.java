@@ -62,6 +62,7 @@ public class IResourceServiceImpl implements IResourceService {
     @Value("${resServerIp}")
     String userResServer;
 
+
     /**
      * 文件上传，涉及到三个地方：
      * 1. dataContainer
@@ -94,7 +95,10 @@ public class IResourceServiceImpl implements IResourceService {
                         if (part.getSize() < 1024 * 1024 * 1024) {
 
                             //将资源上传到数据容器
-                            String fileName = part.getSubmittedFileName();
+                            String file = part.getSubmittedFileName();
+                            String temp[] = file.split("\\.");
+                            String fileName = temp[0];
+
                             MultipartFile multipartFile = new MockMultipartFile(ContentType.APPLICATION_OCTET_STREAM.toString(), part.getInputStream());
                             valueMap.add("datafile", multipartFile.getResource());
                             valueMap.add("name", fileName);
@@ -127,7 +131,7 @@ public class IResourceServiceImpl implements IResourceService {
                             String uploaderId = (String) session.getAttribute("userId");
                             String uploaderName = (String) session.getAttribute("name");
                             IResourceEntity resourceEntity = new IResourceEntity();
-                            resourceEntity.setName(fileName);
+                            resourceEntity.setName(file);
                             resourceEntity.setFileSize(fileSize);
                             resourceEntity.setUploaderId(uploaderId);
                             resourceEntity.setUploaderName(uploaderName);
@@ -145,7 +149,7 @@ public class IResourceServiceImpl implements IResourceService {
 
                             //更新用户服务器中用户字段
                             // String userBaseUrl = "http://" + userResServer + "/ResServer/resource";
-                            String userBaseUrl = "http://localhost:8090/ResServer/resource";
+                            String userBaseUrl = "http://"+userResServer+"/ResServer/resource";
                             //修改userServer中用户信息,应该是和资源相关的内容，包括userId和资源有关的内容
                             JSONObject userBaseJson = new JSONObject();
                             //计算文件的MD5值,此操作很费时间
