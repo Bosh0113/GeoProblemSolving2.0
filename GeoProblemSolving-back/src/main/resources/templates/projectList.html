@@ -17,6 +17,7 @@
     <script src="/GeoProblemSolving/js/vue-avatar.min.js"></script>
     <script src="/GeoProblemSolving/js/axios.min.js"></script>
     <script src="/GeoProblemSolving/js/crypto-js.js"></script>
+    <script src="/GeoProblemSolving/customize/userRole.js"></script>
 
 
     <script th:replace="navigation :: commonHeader-css"></script>
@@ -137,6 +138,7 @@
             left: 43%;
             font-size: 14px;
             text-align: center;
+            margin-bottom: 10px;
         }
 
         .tab-content {
@@ -171,15 +173,6 @@
                                 <span class="picdesc">{{selectCatalog.introduction}}</span>
                             </div>
                             <div style="margin-top:10px; margin-left: 100px">
-<!--                                <span class="picTag" id="Terrestrial" @click="filtTags('Terrestrial')">Terrestrial</span>-->
-<!--                                <span class="picTag" id="Coastal" @click="filtTags('Coastal')">Coastal</span>-->
-<!--                                <span class="picTag" id="Marine" @click="filtTags('Marine')">Marine</span>-->
-<!--                                <span class="picTag" id="Climate" @click="filtTags('Climate')">Climate</span>-->
-<!--                                <span class="picTag" id="Ecological" @click="filtTags('Ecological')">Ecological</span>-->
-<!--                                <span class="picTag" id="Geological" @click="filtTags('Geological')">Geological</span>-->
-<!--                                <span class="picTag" id="Human" @click="filtTags('Human')">Human</span>-->
-<!--                                <span class="picTag" id="GIS-RS" @click="filtTags('GIS-RS')">GIS & RS</span>-->
-<!--                                <span class="picTag" id="General" @click="filtTags('General')">General</span>-->
                                 <span class="picTag" v-for="tag in selectCatalog.tags" :key="tag.index" :id="tag" @click=filtTags(tag)>{{tag}}</span>
                             </div>
                         </div>
@@ -206,7 +199,7 @@
         new Vue({
             el: '#vueBody',
             data: {
-                currentProjectList: projectsInfo,
+                currentProjectList: projectsInfo.projectList,
                 projectType: [],
                 currentTab: "All",
                 //初始化信息总条数
@@ -216,7 +209,7 @@
                 totalCount: projectsInfo.count,
                 //每页显示多少条
                 pageSize: 18,
-                tabPageData: projectsInfo,
+                tabPageData: projectsInfo.projectList,
                 tabPaneType: [{label: "All", name: "All", icon: "icon ion-md-list"},
                     {label: "Investigational", name: "Investigational", icon: "icon ion-md-globe"},
                     {label: "Intercomparable", name: "Intercomparable", icon: "icon ion-md-git-compare"},
@@ -289,8 +282,8 @@
                 }
                 else {
                     this.userState = false;
-                    this.judgeMember(projectsInfo);
-                    this.tabPageData = Object.assign([], projectsInfo);
+                    this.judgeMember(projectsInfo.projectList);
+                    this.tabPageData = Object.assign([], projectsInfo.projectList);
                     this.freshEle++;
                 }
                 window.onresize = () => {
@@ -303,7 +296,7 @@
 
             methods: {
                 resizeContent() {
-                    this.contentMinHeight = window.innerHeight - 100.38;
+                    this.contentMinHeight = window.innerHeight - 253;
                 },
                 changeTab(type) {
                     this.currentTab = type;
@@ -311,13 +304,13 @@
                     this.$nextTick(function () {
                         this.$refs['pages'].currentPage = 1;
                     });
-                    if(this.selectTag != ""){
+                    if(this.selectTag !== ""){
                         document.getElementById(this.selectTag).style.backgroundColor="#608ebded";
                         this.selectTag = "";
                     }
 
                     if (type == "All" && !this.userState) {
-                        this.judgeMember(projectsInfo);
+                        this.judgeMember(projectsInfo.projectList);
                         this.tabPageData = Object.assign([], this.currentProjectList);
                         this.freshEle++;
                         this.totalCount = projectsInfo.count;
@@ -370,21 +363,12 @@
                     this.showPageList();
                 },
                 showPageList() {
-                        let userId = "";
-                        let joinedProjects = [];
-                        if (this.userState) {
-                            userId = this.userInfo.userId;
-                            for (let i = 0; i < this.userInfo.joinedProjects.length; i++) {
-                                joinedProjects.push(this.userInfo.joinedProjects[i].projectId);
-                            }
-                        }
-                        // this.$Spin.show();
                         axios
                             .get("/GeoProblemSolving/project" +
                                 "?category=" + this.currentTab +
                                 "&tag=" + this.selectTag +
                                 "&page=" + this.currentPage +
-                                "&userId=" + userId +
+                                "&userId=" + this.userInfo.userId +
                                 "&pageSize=" + this.pageSize +
                                 "&keyword=" + this.searchText )
                             .then(res => {
@@ -394,7 +378,7 @@
                                         this.currentProjectList = [];
                                     }
                                     else {
-                                        this.judgeMember(res.data.data);
+                                        this.judgeMember(res.data.data.projectList);
                                     }
                                     this.tabPageData = Object.assign([], this.currentProjectList);
                                     this.totalCount = res.data.data.count;
@@ -412,17 +396,14 @@
 
                 judgeMember(projectList) {
                     //判断登录状态
-                    if (this.userState == true) {
-                        if (projectList.length != 0) {
+                    if (this.userState) {
+                        if (projectList.length !== 0) {
                             for (var i = 0; i < projectList.length; i++) {
                                 let members = projectList[i].members;
                                     for (var j = 0; j < members.length; j++) {
-                                    if (members[j].userId == this.userInfo.userId) {
+                                    if (members[j].userId === this.userInfo.userId) {
                                         projectList[i]["isMember"] = true;
-                                        if(members[j].role == "manager")
-                                            projectList[i]["isManager"] = true;
-                                        else
-                                            projectList[i]["isManager"] = false;
+                                        projectList[i]["isManager"] = members[j].role === "manager";
                                         break;
                                     } else {
                                         projectList[i]["isMember"] = false;

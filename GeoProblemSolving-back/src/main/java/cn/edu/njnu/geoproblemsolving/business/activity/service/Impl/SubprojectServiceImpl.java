@@ -16,10 +16,12 @@ import cn.edu.njnu.geoproblemsolving.business.user.repository.UserRepository;
 import cn.edu.njnu.geoproblemsolving.common.utils.ResultUtils;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.IntStream;
 
 @Service
 public class SubprojectServiceImpl implements SubprojectService {
@@ -44,7 +46,7 @@ public class SubprojectServiceImpl implements SubprojectService {
             Object user = optional.get();
             return (User) user;
         } else {
-            return null;
+            return new User();
         }
     }
 
@@ -64,19 +66,6 @@ public class SubprojectServiceImpl implements SubprojectService {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
             String subprojectId = UUID.randomUUID().toString();
 
-            // update project info
-            String projectId = subproject.getParent();
-            Project project = projectRepository.findById(projectId).get();
-            if (project == null) return ResultUtils.error(-1, "Fail: project does not exist.");
-            ArrayList<String> children;
-            if (project.getChildren() == null) {
-                children = new ArrayList<>();
-            } else {
-                children = project.getChildren();
-            }
-            children.add(subprojectId);
-            project.setChildren(children);
-
             // Created time
             subproject.setCreatedTime(dateFormat.format(data));
             subproject.setActiveTime(dateFormat.format(data));
@@ -85,7 +74,7 @@ public class SubprojectServiceImpl implements SubprojectService {
             subproject.setAid(subprojectId);
 
             // members
-            String creatorId = project.getCreator();
+            String creatorId = subproject.getCreator();
             JSONObject creator = new JSONObject();
             JSONArray members = new JSONArray();
 
@@ -104,13 +93,26 @@ public class SubprojectServiceImpl implements SubprojectService {
             // folder
             folderDao.createFolder(subproject.getName(), "", subprojectId);
 
+            // update project info
+            String projectId = subproject.getParent();
+            Project project = projectRepository.findById(projectId).get();
+            if (project == null) return ResultUtils.error(-1, "Fail: project does not exist.");
+            ArrayList<String> children;
+            if (project.getChildren() == null) {
+                children = new ArrayList<>();
+            } else {
+                children = project.getChildren();
+            }
+            children.add(subprojectId);
+            project.setChildren(children);
+
             // Save
             subprojectRepository.save(subproject);
             projectRepository.save(project);
 
             return ResultUtils.success(subproject);
         } catch (Exception ex) {
-            return ResultUtils.error(-2, "Fail: Exception");
+            return ResultUtils.error(-2, ex.toString());
         }
     }
 
@@ -127,7 +129,7 @@ public class SubprojectServiceImpl implements SubprojectService {
                 return ResultUtils.error(-1, "Fail: subproject does not exist.");
             }
         } catch (Exception ex) {
-            return ResultUtils.error(-2, "Fail: Exception");
+            return ResultUtils.error(-2, ex.toString());
         }
     }
 
@@ -147,7 +149,7 @@ public class SubprojectServiceImpl implements SubprojectService {
 
             return ResultUtils.success(subprojectRepository.save(subproject));
         } catch (Exception ex) {
-            return ResultUtils.error(-2, "Fail: Exception");
+            return ResultUtils.error(-2, ex.toString());
         }
     }
 
@@ -174,7 +176,7 @@ public class SubprojectServiceImpl implements SubprojectService {
             subprojectRepository.deleteById(aid);
             return ResultUtils.success("Success");
         } catch (Exception ex) {
-            return ResultUtils.error(-2, "Fail: Exception");
+            return ResultUtils.error(-2, ex.toString());
         }
     }
 
@@ -206,7 +208,7 @@ public class SubprojectServiceImpl implements SubprojectService {
 
             return ResultUtils.success(children);
         } catch (Exception ex) {
-            return ResultUtils.error(-2, "Fail: Exception");
+            return ResultUtils.error(-2, ex.toString());
         }
     }
 
@@ -239,11 +241,14 @@ public class SubprojectServiceImpl implements SubprojectService {
 
             // members
             JSONArray members = subproject.getMembers();
+            if (members == null) members = new JSONArray();
             JSONArray memberInfos = new JSONArray();
             for (Object member : members) {
                 String userId = (String) ((HashMap) member).get("userId");
                 User user = findByUserId(userId);
-                HashMap<String, Object> userInfo = (HashMap) member;
+                JSONObject userInfo = new JSONObject();
+                userInfo.put("userId", userId);
+                userInfo.put("role", ((HashMap) member).get("role"));
                 userInfo.put("name", user.getName());
                 userInfo.put("avatar", user.getAvatar());
                 userInfo.put("email", user.getEmail());
@@ -257,7 +262,7 @@ public class SubprojectServiceImpl implements SubprojectService {
 
             return ResultUtils.success(participants);
         } catch (Exception ex) {
-            return ResultUtils.error(-2, "Fail: Exception");
+            return ResultUtils.error(-2, ex.toString());
         }
     }
 
@@ -294,7 +299,7 @@ public class SubprojectServiceImpl implements SubprojectService {
 
             return ResultUtils.success(lineage);
         } catch (Exception ex) {
-            return ResultUtils.error(-2, "Fail: Exception");
+            return ResultUtils.error(-2, ex.toString());
         }
     }
 
@@ -330,10 +335,8 @@ public class SubprojectServiceImpl implements SubprojectService {
             JSONArray members = subproject.getMembers();
             if (members == null) members = new JSONArray();
             for (Object member : members) {
-                if (member instanceof JSONObject) {
-                    if (((JSONObject) member).get("userId").equals(userId)) {
-                        return ResultUtils.error(-3, "Fail: member already exists in the subproject");
-                    }
+                if (((HashMap) member).get("userId").equals(userId)) {
+                    return ResultUtils.error(-3, "Fail: member already exists in the subproject");
                 }
             }
 
@@ -351,7 +354,7 @@ public class SubprojectServiceImpl implements SubprojectService {
 
             return ResultUtils.success("Success");
         } catch (Exception ex) {
-            return ResultUtils.error(-2, "Fail: Exception");
+            return ResultUtils.error(-2, ex.toString());
         }
     }
 
@@ -365,17 +368,22 @@ public class SubprojectServiceImpl implements SubprojectService {
 
             // Update roles
             JSONArray members = subproject.getMembers();
+            JSONArray newMembers = new JSONArray();
+            if (members == null) members = new JSONArray();
             for (Object member : members) {
-                if (member instanceof JSONObject) {
-                    if (((JSONObject) member).get("userId").equals(userId)) {
-                        members.remove(member);
-                        JSONObject userInfo = (JSONObject) member;
-                        userInfo.put("role", role);
-                        members.add(userInfo);
-                    }
+                if (((HashMap) member).get("userId").equals(userId)) {
+                    JSONObject userInfo = new JSONObject();
+                    userInfo.put("userId", userId);
+                    userInfo.put("role", role);
+                    newMembers.add(userInfo);
+                } else {
+                    ObjectMapper personMap = new ObjectMapper();
+                    String personStr = personMap.writeValueAsString(member);
+                    JSONObject userInfo = JSONObject.parseObject(personStr);
+                    newMembers.add(userInfo);
                 }
             }
-            subproject.setMembers(members);
+            subproject.setMembers(newMembers);
 
             // Update active time
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
@@ -383,9 +391,9 @@ public class SubprojectServiceImpl implements SubprojectService {
 
             subprojectRepository.save(subproject);
 
-            return ResultUtils.success("Success");
+            return ResultUtils.success(subproject);
         } catch (Exception ex) {
-            return ResultUtils.error(-2, "Fail: Exception");
+            return ResultUtils.error(-2, ex.toString());
         }
     }
 
@@ -416,8 +424,114 @@ public class SubprojectServiceImpl implements SubprojectService {
 
             return ResultUtils.success("Success");
         } catch (Exception ex) {
-            return ResultUtils.error(-2, "Fail: Exception");
+            return ResultUtils.error(-2, ex.toString());
         }
     }
 
+    @Override
+    public JsonResult linkActivities(UpdateActivityDTO update, String aid1, String aid2, String pid){
+        try {
+            // Confirm aid
+            Optional optional = subprojectRepository.findById(update.getAid());
+            if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: subproject does not exist.");
+            Subproject subproject = (Subproject) optional.get();
+            optional = activityRepository.findById(aid1);
+            if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: activity does not exist.");
+            Activity activity1 = (Activity) optional.get();
+            optional = activityRepository.findById(aid2);
+            if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: activity does not exist.");
+            Activity activity2 = (Activity) optional.get();
+
+            // Save the pathway
+            update.updateTo(subproject);
+
+            // Save the protocol------------------------------------------------待完善----------------------------------
+            // String pid = protocolRepository.save(protocol).getPid();
+
+            // Save activities
+            activityRepository.save(saveLastActivityInfo(aid2, pid, activity1));
+            activityRepository.save(saveNextActivityInfo(aid1, pid, activity2));
+            subprojectRepository.save(subproject);
+
+            return ResultUtils.success("Success");
+        } catch (Exception ex){
+            return ResultUtils.error(-2, ex.toString());
+        }
+    }
+
+    @Override
+    public JsonResult separateActivities(UpdateActivityDTO update, String lastAid, String nextAid){
+        try {
+            // Confirm aid
+            Optional optional = subprojectRepository.findById(update.getAid());
+            if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: subproject does not exist.");
+            Subproject subproject = (Subproject) optional.get();
+            optional = activityRepository.findById(lastAid);
+            if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: activity does not exist.");
+            Activity activity1 = (Activity) optional.get();
+            optional = activityRepository.findById(nextAid);
+            if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: activity does not exist.");
+            Activity activity2 = (Activity) optional.get();
+
+            // Save the pathway
+            update.updateTo(subproject);
+
+            // Save the last activity
+            JSONArray nextActivities = activity1.getNext();
+
+            IntStream.range(0, nextActivities.size()).forEach(i -> {
+                String aid = nextActivities.getJSONObject(i).getString("aid");
+                if (aid.equals(nextAid)) {
+                    nextActivities.remove(i);
+                }
+            });
+            activity1.setNext(nextActivities);
+
+            // Save the next activity
+            JSONArray lastActivities = activity2.getLast();
+
+            IntStream.range(0, lastActivities.size()).forEach(i -> {
+                String aid = lastActivities.getJSONObject(i).getString("aid");
+                if (aid.equals(lastAid)) {
+                    lastActivities.remove(i);
+                }
+            });
+            activity2.setLast(lastActivities);
+
+            // Save activities
+            subprojectRepository.save(subproject);
+            activityRepository.save(activity1);
+            activityRepository.save(activity2);
+
+            return ResultUtils.success("Success");
+        } catch (Exception ex){
+            return ResultUtils.error(-2, ex.toString());
+        }
+    }
+
+    private Activity saveLastActivityInfo(String aid, String pid, Activity last) {
+        JSONObject nextInfo = new JSONObject();
+        nextInfo.put("aid", aid);
+        nextInfo.put("protocolId", pid);
+
+        JSONArray nextActivities = last.getNext();
+        if(nextActivities == null) nextActivities = new JSONArray();
+        nextActivities.add(nextInfo);
+        last.setNext(nextActivities);
+
+        return last;
+    }
+
+    private Activity saveNextActivityInfo(String aid, String pid, Activity next) {
+        JSONObject lastInfo = new JSONObject();
+        lastInfo.put("aid", aid);
+        lastInfo.put("protocolId", pid);
+
+        JSONArray lastActivities = next.getLast();
+        if(lastActivities == null) lastActivities = new JSONArray();
+        lastActivities.add(lastInfo);
+        next.setLast(lastActivities);
+
+        return next;
+    }
 }

@@ -1,9 +1,10 @@
 package cn.edu.njnu.geoproblemsolving.ChangeDB;
+
 import com.alibaba.fastjson.JSONArray;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "SubProject")
-public class OldSubProjectEntity {
+public class SubProjectEntity {
 
     private String projectId;
     private String subProjectId;
@@ -13,8 +14,43 @@ public class OldSubProjectEntity {
     private String managerName;
     private JSONArray members;
     private String createTime;
-    private String fileStruct;
     private String solvingProcess;
+    private String background;
+    private String limitation;
+    private String type; //type0|type1
+    private String stepId;
+
+    public String getStepId() {
+        return stepId;
+    }
+
+    public void setStepId(String stepId) {
+        this.stepId = stepId;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getBackground() {
+        return background;
+    }
+
+    public String getLimitation() {
+        return limitation;
+    }
+
+    public void setBackground(String background) {
+        this.background = background;
+    }
+
+    public void setLimitation(String limitation) {
+        this.limitation = limitation;
+    }
 
     public String getManagerName() {
         return managerName;
@@ -82,14 +118,6 @@ public class OldSubProjectEntity {
 
     public void setSubProjectId(String subProjectId) {
         this.subProjectId = subProjectId;
-    }
-
-    public String getFileStruct() {
-        return fileStruct;
-    }
-
-    public void setFileStruct(String fileStruct) {
-        this.fileStruct = fileStruct;
     }
 
     public void setSolvingProcess(String solvingProcess) {

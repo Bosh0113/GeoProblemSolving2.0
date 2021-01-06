@@ -7,33 +7,35 @@ import cn.edu.njnu.geoproblemsolving.business.activity.entity.LinkProtocol;
 
 public interface ActivityService {
 
-    public JsonResult findActivity(String aid);
+    JsonResult findActivity(String aid);
 
-    public JsonResult createActivity(Activity activity);
+    JsonResult createActivity(Activity activity);
 
-    public JsonResult updateActivity(String aid, UpdateActivityDTO update);
+    JsonResult updateActivity(String aid, UpdateActivityDTO update);
 
-    public JsonResult deleteActivity(String aid);
+    JsonResult deleteActivity(String aid);
 
-    public JsonResult findChildren(String aid);
+    JsonResult findChildren(String aid);
 
-    public JsonResult findParticipants(String aid);
+    JsonResult findParticipants(String aid);
 
-    public JsonResult findLineage(String aid);
+    JsonResult updateMemberRole(String aid, String userId, String role);
 
-    public JsonResult findLast(String aid);
+    JsonResult joinActivity(String aid, String userId);
 
-    public JsonResult findNext(String aid);
+    JsonResult quitActivity(String aid, String userId);
 
-    public JsonResult createNext(String aid, String nextId, LinkProtocol protocol);
+    JsonResult findLineage(String aid);
 
-    public JsonResult createLast(String aid, String lastId, LinkProtocol protocol);
+    JsonResult findLast(String aid);
 
-    public JsonResult linkActivities(String aid1, String aid2, LinkProtocol protocol);
+    JsonResult findNext(String aid);
 
-    public JsonResult separateActivities(String aid1, String aid2);
+    JsonResult createNext(String aid, String nextId, LinkProtocol protocol);
 
-    public JsonResult joinActivity(String aid, String userId);
+    JsonResult createLast(String aid, String lastId, LinkProtocol protocol);
 
-    public JsonResult quitActivity(String aid, String userId);
+    JsonResult linkActivities(UpdateActivityDTO update, String aid1, String aid2, String pid);
+
+    JsonResult separateActivities(UpdateActivityDTO update, String lastAid, String nextAid);
 }

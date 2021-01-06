@@ -3,6 +3,7 @@ package cn.edu.njnu.geoproblemsolving.business.activity.service.Impl;
 import cn.edu.njnu.geoproblemsolving.Dao.Email.EmailDaoImpl;
 import cn.edu.njnu.geoproblemsolving.Dao.Folder.FolderDaoImpl;
 import cn.edu.njnu.geoproblemsolving.View.StaticPagesBuilder;
+import cn.edu.njnu.geoproblemsolving.business.activity.dto.UpdateActivityDTO;
 import cn.edu.njnu.geoproblemsolving.business.activity.dto.UpdateProjectDTO;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Subproject;
 import cn.edu.njnu.geoproblemsolving.business.activity.enums.ActivityType;
@@ -20,6 +21,8 @@ import cn.edu.njnu.geoproblemsolving.common.utils.ResultUtils;
 import cn.hutool.system.UserInfo;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -27,6 +30,7 @@ import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.IntStream;
 
 @Service
 public class ProjectServiceImpl implements ProjectService {
@@ -51,7 +55,7 @@ public class ProjectServiceImpl implements ProjectService {
             Object user = optional.get();
             return (User) user;
         } else {
-            return null;
+            return new User();
         }
     }
 
@@ -74,9 +78,14 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<Project> findProjectsByPage(int page, int size) {
+    public JSONObject findProjectsByPage(int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
-        return projectRepository.findAll(pageable).getContent();
+        Page<Project> projects = projectRepository.findAll(pageable);
+        JSONObject result = new JSONObject();
+        result.put("totalPage", projects.getTotalPages());
+        result.put("count", projects.getTotalElements());
+        result.put("projectList", projects.getContent());
+        return result;
     }
 
     @Override
@@ -85,45 +94,49 @@ public class ProjectServiceImpl implements ProjectService {
             Sort sort = new Sort(Sort.Direction.DESC, "createdTime");
             Pageable pageable = PageRequest.of(page - 1, size, sort);
 
-            List<Project> projects = new ArrayList<>();
+            Page<Project> projects = null;
             if (!keyword.equals("")) {
                 if (userId.equals("")) {
                     if (category.equals("All")) {
-                        projects = projectRepository.findProjectsByPrivacyIsNot("Private", pageable).getContent();
+                        projects = projectRepository.findProjectsByPrivacyIsNot("Private", pageable);
                     } else {
                         if (tag.equals("")) {
-                            projects = projectRepository.findProjectsByPrivacyIsNotAndCategoryEquals("Private", category, pageable).getContent();
+                            projects = projectRepository.findProjectsByPrivacyIsNotAndCategoryEquals("Private", category, pageable);
                         } else {
-                            projects = projectRepository.findProjectsByPrivacyIsNotAndCategoryEqualsAndTagContaining("Private", category, tag, pageable).getContent();
+                            projects = projectRepository.findProjectsByPrivacyIsNotAndCategoryEqualsAndTagContaining("Private", category, tag, pageable);
                         }
                     }
                 } else {
                     if (category.equals("All")) {
-                        projects = projectRepository.findProjectsByPrivacyIsAndCreatorIsOrPrivacyIsNot("Private", userId, "Private", pageable).getContent();
+                        projects = projectRepository.findProjectsByPrivacyIsAndCreatorIsOrPrivacyIsNot("Private", userId, "Private", pageable);
                     } else {
                         if (tag.equals("")) {
-                            projects = projectRepository.findProjectsByPrivacyIsAndCreatorIsOrPrivacyIsNotAndCategoryEquals("Private", userId, "Private", category, pageable).getContent();
+                            projects = projectRepository.findProjectsByPrivacyIsAndCreatorIsOrPrivacyIsNotAndCategoryEquals("Private", userId, "Private", category, pageable);
                         } else {
-                            projects = projectRepository.findProjectsByPrivacyIsAndCreatorIsOrPrivacyIsNotAndCategoryEqualsAndTagContaining("Private", userId, "Private", category, tag, pageable).getContent();
+                            projects = projectRepository.findProjectsByPrivacyIsAndCreatorIsOrPrivacyIsNotAndCategoryEqualsAndTagContaining("Private", userId, "Private", category, tag, pageable);
                         }
                     }
                 }
             } else {
                 if (userId.equals("")) {
-                    projects = projectRepository.findProjectsByNameLikeOrDescriptionLikeAndPrivacyIsNot(keyword, keyword, "Private", pageable).getContent();
+                    projects = projectRepository.findProjectsByNameLikeOrDescriptionLikeAndPrivacyIsNot(keyword, keyword, "Private", pageable);
                 } else {
-                    projects = projectRepository.findProjectsByNameLikeOrDescriptionLikeAndPrivacyIsAndCreatorIsOrPrivacyIsNot(keyword, keyword, "Private", userId, "Private", pageable).getContent();
+                    projects = projectRepository.findProjectsByNameLikeOrDescriptionLikeAndPrivacyIsAndCreatorIsOrPrivacyIsNot(keyword, keyword, "Private", userId, "Private", pageable);
                 }
             }
 
+            JSONObject result = new JSONObject();
+            result.put("totalPage", projects.getTotalPages());
+            result.put("count", projects.getTotalElements());
+            result.put("projectList", projects.getContent());
 
             if (projects.isEmpty())
                 return ResultUtils.error(-1, "None");
             else
-                return ResultUtils.success(projects);
+                return ResultUtils.success(result);
 
         } catch (Exception ex) {
-            return ResultUtils.error(-2, "Fail: Exception");
+            return ResultUtils.error(-2, ex.toString());
         }
     }
 
@@ -141,7 +154,7 @@ public class ProjectServiceImpl implements ProjectService {
 
             // Aid
             String projectId = UUID.randomUUID().toString();
-             project.setAid(projectId);
+            project.setAid(projectId);
 
             // Set project member
             String creatorId = project.getCreator();
@@ -187,7 +200,7 @@ public class ProjectServiceImpl implements ProjectService {
 
             return ResultUtils.success(project);
         } catch (Exception ex) {
-            return ResultUtils.error(-2, "Fail: Exception");
+            return ResultUtils.error(-2, ex.toString());
         }
     }
 
@@ -208,21 +221,20 @@ public class ProjectServiceImpl implements ProjectService {
             projectRepository.save(project);
 
             StaticPagesBuilder staticPagesBuilder = new StaticPagesBuilder();
-            staticPagesBuilder.projectDetailPageBuilder(project);
             if (updateProjectListPage) {
                 staticPagesBuilder.projectListPageBuilder(findProjectsByPage(1, 18));
             }
 
             return ResultUtils.success(project);
         } catch (Exception ex) {
-            return ResultUtils.error(-2, "Fail: Exception");
+            return ResultUtils.error(-2, ex.toString());
         }
     }
 
     private Boolean isUpdateProjectListStaticPage(String projectId, Boolean noPrivate) {
         JsonResult result = inquiryByConditions("", "", "", "", 1, 18);
         try {
-            List<Project> projects = (List<Project>) result.getData();
+            List<Project> projects = (List<Project>)((JSONObject) result.getData()).get("projectList");
             long count = projects.size();
             if (count < 18 && noPrivate) { //如果首页数量少于页面数量规格且有新的可见条目，则更新
                 return true;
@@ -250,10 +262,8 @@ public class ProjectServiceImpl implements ProjectService {
             // joined project
             JSONArray members = project.getMembers();
             for (Object member : members) {
-                if (member instanceof JSONObject) {
-                    String userId = ((JSONObject) member).getString("userId");
-                    quitProject(aid, userId);
-                }
+                String userId = (String) ((HashMap) member).get("userId");
+                quitProject(aid, userId);
             }
 
             // created project
@@ -276,7 +286,7 @@ public class ProjectServiceImpl implements ProjectService {
             return ResultUtils.success("Success");
 
         } catch (Exception ex) {
-            return ResultUtils.error(-2, "Fail: Exception");
+            return ResultUtils.error(-2, ex.toString());
         }
     }
 
@@ -320,7 +330,7 @@ public class ProjectServiceImpl implements ProjectService {
 
             return ResultUtils.success(children);
         } catch (Exception ex) {
-            return ResultUtils.error(-2, "Fail: Exception");
+            return ResultUtils.error(-2, ex.toString());
         }
     }
 
@@ -336,11 +346,14 @@ public class ProjectServiceImpl implements ProjectService {
             participants.put("creator", creator);
 
             JSONArray members = project.getMembers();
+            if (members == null) members = new JSONArray();
             JSONArray memberInfos = new JSONArray();
             for (Object member : members) {
-                String userId =  (String)((HashMap) member).get("userId");
+                String userId = (String) ((HashMap) member).get("userId");
                 User user = findByUserId(userId);
-                HashMap<String, Object> userInfo = (HashMap)member;
+                JSONObject userInfo = new JSONObject();
+                userInfo.put("userId", userId);
+                userInfo.put("role", ((HashMap) member).get("role"));
                 userInfo.put("name", user.getName());
                 userInfo.put("avatar", user.getAvatar());
                 userInfo.put("email", user.getEmail());
@@ -351,7 +364,7 @@ public class ProjectServiceImpl implements ProjectService {
 
             return ResultUtils.success(participants);
         } catch (Exception ex) {
-            return ResultUtils.error(-2, "Fail: Exception");
+            return ResultUtils.error(-2, ex.toString());
         }
     }
 
@@ -368,12 +381,10 @@ public class ProjectServiceImpl implements ProjectService {
             // add user info to project
             // if user exist in project?
             JSONArray members = project.getMembers();
-            if(members == null) members = new JSONArray();
+            if (members == null) members = new JSONArray();
             for (Object member : members) {
-                if (member instanceof JSONObject) {
-                    if (((JSONObject) member).get("userId").equals(userId)) {
-                        return ResultUtils.error(-3, "Fail: member already exists in the project");
-                    }
+                if (((HashMap) member).get("userId").equals(userId)) {
+                    return ResultUtils.error(-3, "Fail: member already exists in the project");
                 }
             }
 
@@ -386,7 +397,7 @@ public class ProjectServiceImpl implements ProjectService {
             // update user info
             // if user exist in project?
             ArrayList<String> joinedProjects = user.getJoinedProjects();
-            if(joinedProjects == null) joinedProjects = new ArrayList<>();
+            if (joinedProjects == null) joinedProjects = new ArrayList<>();
             for (String projectId : joinedProjects) {
                 if (projectId.equals(aid))
                     return ResultUtils.error(-3, "Fail: project already exists in personal joined projects");
@@ -408,7 +419,7 @@ public class ProjectServiceImpl implements ProjectService {
 
             return ResultUtils.success(project);
         } catch (Exception ex) {
-            return ResultUtils.error(-2, "Fail: Exception");
+            return ResultUtils.error(-2, ex.toString());
         }
     }
 
@@ -425,17 +436,22 @@ public class ProjectServiceImpl implements ProjectService {
 
             // Update roles
             JSONArray members = project.getMembers();
+            JSONArray newMembers = new JSONArray();
+            if (members == null) members = new JSONArray();
             for (Object member : members) {
-                if (member instanceof JSONObject) {
-                    if (((JSONObject) member).get("userId").equals(userId)) {
-                        members.remove(member);
-                        JSONObject userInfo = (JSONObject) member;
-                        userInfo.put("role", role);
-                        members.add(userInfo);
-                    }
+                if (((HashMap) member).get("userId").equals(userId)) {
+                    JSONObject userInfo = new JSONObject();
+                    userInfo.put("userId", userId);
+                    userInfo.put("role", role);
+                    newMembers.add(userInfo);
+                } else {
+                    ObjectMapper personMap = new ObjectMapper();
+                    String personStr = personMap.writeValueAsString(member);
+                    JSONObject userInfo = JSONObject.parseObject(personStr);
+                    newMembers.add(userInfo);
                 }
             }
-            project.setMembers(members);
+            project.setMembers(newMembers);
 
             // Update active time
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
@@ -445,7 +461,7 @@ public class ProjectServiceImpl implements ProjectService {
 
             return ResultUtils.success(project);
         } catch (Exception ex) {
-            return ResultUtils.error(-2, "Fail: Exception");
+            return ResultUtils.error(-2, ex.toString());
         }
     }
 
@@ -472,11 +488,10 @@ public class ProjectServiceImpl implements ProjectService {
 
             // update user info
             ArrayList<String> joinedProjects = user.getJoinedProjects();
-            for (String projectId : joinedProjects) {
-                if (projectId.equals(aid))
-                    joinedProjects.remove(projectId);
+            if (joinedProjects != null) {
+                joinedProjects.removeIf(projectId -> projectId.equals(aid));
+                user.setJoinedProjects(joinedProjects);
             }
-            user.setJoinedProjects(joinedProjects);
 
             //save
             projectRepository.save(project);
@@ -484,7 +499,7 @@ public class ProjectServiceImpl implements ProjectService {
 
             return ResultUtils.success("Success");
         } catch (Exception ex) {
-            return ResultUtils.error(-2, "Fail: Exception");
+            return ResultUtils.error(-2, ex.toString());
         }
     }
 
@@ -507,7 +522,7 @@ public class ProjectServiceImpl implements ProjectService {
                 }
             }
         } catch (Exception ex) {
-            return ResultUtils.error(-2, "Fail: Exception");
+            return ResultUtils.error(-2, ex.toString());
         }
     }
 
@@ -522,15 +537,13 @@ public class ProjectServiceImpl implements ProjectService {
             String addresses = "";
             JSONArray members = project.getMembers();
             for (Object member : members)
-                if (member instanceof JSONObject) {
-                    if (((JSONObject) member).get("role").equals("manager")) {
-                        String userId = ((JSONObject) member).getString("userId");
+                if (((HashMap) member).get("role").equals("manager")) {
+                    String userId = ((JSONObject) member).getString("userId");
 
-                        User user = findByUserId(userId);
-                        if (user == null) return ResultUtils.error(-1, "Fail: user does not exist");
-                        addresses += user.getEmail();
-                        addresses += ",";
-                    }
+                    User user = findByUserId(userId);
+                    if (user == null) return ResultUtils.error(-1, "Fail: user does not exist");
+                    addresses += user.getEmail();
+                    addresses += ",";
                 }
             addresses = addresses.substring(0, addresses.length() - 1);
             emailEntity.setRecipient(addresses);
@@ -539,7 +552,114 @@ public class ProjectServiceImpl implements ProjectService {
 
             return ResultUtils.success("Success");
         } catch (Exception ex) {
-            return ResultUtils.error(-2, "Fail: Exception");
+            return ResultUtils.error(-2, ex.toString());
         }
+    }
+
+    @Override
+    public JsonResult linkActivities(UpdateActivityDTO update, String aid1, String aid2, String pid){
+        try {
+            // Confirm aid
+            Optional optional = projectRepository.findById(update.getAid());
+            if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: subproject does not exist.");
+            Project project = (Project) optional.get();
+            optional = subprojectRepository.findById(aid1);
+            if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: activity does not exist.");
+            Subproject activity1 = (Subproject) optional.get();
+            optional = subprojectRepository.findById(aid2);
+            if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: activity does not exist.");
+            Subproject activity2 = (Subproject) optional.get();
+
+            // Save the pathway
+            update.updateTo(project);
+
+            // Save the protocol------------------------------------------------待完善----------------------------------
+            // String pid = protocolRepository.save(protocol).getPid();
+
+            // Save activities
+            subprojectRepository.save(saveLastActivityInfo(aid2, pid, activity1));
+            subprojectRepository.save(saveNextActivityInfo(aid1, pid, activity2));
+            projectRepository.save(project);
+
+            return ResultUtils.success(project);
+        } catch (Exception ex){
+            return ResultUtils.error(-2, ex.toString());
+        }
+    }
+
+    @Override
+    public JsonResult separateActivities(UpdateActivityDTO update, String lastAid, String nextAid){
+        try {
+            // Confirm aid
+            Optional optional = projectRepository.findById(update.getAid());
+            if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: subproject does not exist.");
+            Project project = (Project) optional.get();
+            optional = subprojectRepository.findById(lastAid);
+            if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: activity does not exist.");
+            Subproject activity1 = (Subproject) optional.get();
+            optional = subprojectRepository.findById(nextAid);
+            if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: activity does not exist.");
+            Subproject activity2 = (Subproject) optional.get();
+
+            // Save the pathway
+            update.updateTo(project);
+
+            // Save the last activity
+            JSONArray nextActivities = activity1.getNext();
+
+            IntStream.range(0, nextActivities.size()).forEach(i -> {
+                String aid = nextActivities.getJSONObject(i).getString("aid");
+                if (aid.equals(nextAid)) {
+                    nextActivities.remove(i);
+                }
+            });
+            activity1.setNext(nextActivities);
+
+            // Save the next activity
+            JSONArray lastActivities = activity2.getLast();
+
+            IntStream.range(0, lastActivities.size()).forEach(i -> {
+                String aid = lastActivities.getJSONObject(i).getString("aid");
+                if (aid.equals(lastAid)) {
+                    lastActivities.remove(i);
+                }
+            });
+            activity2.setLast(lastActivities);
+
+            // Save activities
+            projectRepository.save(project);
+            subprojectRepository.save(activity1);
+            subprojectRepository.save(activity2);
+
+            return ResultUtils.success(project);
+        } catch (Exception ex){
+            return ResultUtils.error(-2, ex.toString());
+        }
+    }
+
+    private Subproject saveLastActivityInfo(String aid, String pid, Subproject last) {
+        JSONObject nextInfo = new JSONObject();
+        nextInfo.put("aid", aid);
+        nextInfo.put("protocolId", pid);
+
+        JSONArray nextActivities = last.getNext();
+        if(nextActivities == null) nextActivities = new JSONArray();
+        nextActivities.add(nextInfo);
+        last.setNext(nextActivities);
+
+        return last;
+    }
+
+    private Subproject saveNextActivityInfo(String aid, String pid, Subproject next) {
+        JSONObject lastInfo = new JSONObject();
+        lastInfo.put("aid", aid);
+        lastInfo.put("protocolId", pid);
+
+        JSONArray lastActivities = next.getLast();
+        if(lastActivities == null) lastActivities = new JSONArray();
+        lastActivities.add(lastInfo);
+        next.setLast(lastActivities);
+
+        return next;
     }
 }

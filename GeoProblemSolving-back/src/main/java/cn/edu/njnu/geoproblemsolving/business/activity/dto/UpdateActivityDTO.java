@@ -13,6 +13,7 @@ public class UpdateActivityDTO implements ToDomainConverter {
     /**
      * Common activity
      */
+    private String aid;
     private String name;
     private String description;
     private String purpose;

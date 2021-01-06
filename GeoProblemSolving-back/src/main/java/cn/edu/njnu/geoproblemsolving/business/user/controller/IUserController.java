@@ -156,14 +156,6 @@ public class IUserController {
         return userDao.getMangeProjectList(manageProjectList);
     }
 
-
-
-    // @RequestMapping(value = "/getMember", method = RequestMethod.POST)
-    // public JsonResult getProjectMember(@RequestBody String[] memberIds){
-    //     String[] memberName = {"zhengzhong","zhansan", "Lisi"};
-    //     return ResultUtils.success(memberName);
-    // }
-
     /**
      * @Author mzy
      * @Date 2020.12.18

@@ -242,19 +242,11 @@
                 return roleIdentify(activity.members, this.userInfo.userId);
             },
             projectPermissionIdentity(permission, role, operation) {
-                if (operation == "auto_join") {
-                    if (JSON.parse(permission).auto_join.visitor == "Yes") return true;
-                    else if (JSON.parse(permission).auto_join.visitor == "No") return false;
-                    else {
-                        return this.getParentPermission();
-                    }
-                } else {
-                    return permissionIdentity(
-                        JSON.parse(permission),
-                        role,
-                        operation
-                    );
-                }
+                return permissionIdentity(
+                    JSON.parse(permission),
+                    role,
+                    operation
+                );
             },
             projectInfoModalShow(projectInfo) {
                 if (projectInfo.isMember || projectInfo.isManager) {
@@ -298,7 +290,7 @@
                     ];
 
                     axios
-                        .get("/GeoProblemSolving/project/" + projectInfo.aid + "/user?userId=" + this.userInfo.userId)
+                        .get("/GeoProblemSolving/project/" + projectInfo.aid + "/user")
                         .then(res => {
                             if (res.data.code === 0) {
                                 var participants = res.data.data;
@@ -307,22 +299,23 @@
                                 if (participants.creator != null) {
                                     this.projectDetailInfo[4].value = participants.creator.name;
                                 } else {
-                                    this.$Message.info("Fail to get the information of the creator");
+                                    this.$Message.info("Fail to get the information of the creator.");
                                 }
                                 // members
                                 var membersName = "";
                                 for (var i = 0; i < participants.members.length; i++) {
-                                    if (i == 0) {
+                                    if (i === 0) {
                                         membersName = participants.members[i].name;
                                     } else {
-                                        membersName = membersName + "," + participants.members[i].name;
+                                        membersName = membersName + ", " + participants.members[i].name;
                                     }
                                 }
                                 this.projectDetailInfo[5].value = membersName;
 
                                 this.projectInfoModal = true;
                             } else {
-                                this.$Message.info(res.data.msg);
+                                this.$Message.info("Fail to get the information of participants");
+                                console.log(res.data.msg);
                                 this.projectInfoModal = true;
                             }
                         })
@@ -336,7 +329,7 @@
                     this.applyProjectInfo = Object.assign([], applyProjectInfo);
                     this.applyValidate.reason = "";
                     if (this.applyProjectInfo.privacy == "Public") {
-                        if (this.projectPermissionIdentity(this.applyProjectInfo.permission, this.roleIdentity(this.applyProjectInfo.members), "auto_join")) {
+                        if (JSON.parse(this.applyProjectInfo.permission).auto_join.visitor === "Yes") {
 
                             // join the project directly
                             let url = "/GeoProblemSolving/project/" + this.applyProjectInfo.aid + "/user?userId=" + this.userInfo.userId;
@@ -379,13 +372,13 @@
                             this.applyProjectInfo.projectId == sessionStorage.getItem("applyId")
                         ) {
                             this.$Notice.warning({
-                                title: "Repeat apply warning",
+                                title: "Repeatedly apply",
                                 desc: "You have applied successfully, no need to click again!"
                             });
                         } else {
                             if (this.UserState) {
                                 sessionStorage.setItem("applyId", this.applyProjectInfo.aid);
-                                let managers = getMemberByRole(this.applyJoinForm, "manager");
+                                let managers = getMemberByRole(this.applyProjectInfo, "manager");
                                 for (var i = 0; i < managers.length; i++) {
                                     let managerId = managers[i];
                                     let joinForm = {};
@@ -442,7 +435,7 @@
                                             "/GeoProblemSolving/home"
                                     };
                                     axios
-                                        .post("/GeoProblemSolving/project/"+this.applyProjectInfo.aid+"/application", emailObject)
+                                        .post("/GeoProblemSolving/project/" + this.applyProjectInfo.aid + "/application", emailObject)
                                         .then(res => {
                                             if (res.data == "Success") {
                                                 console.log("Email Success.");
@@ -455,41 +448,23 @@
                                         });
                                 }
                             } else {
-                                this.$Message.error("you must have an account before application.");
+                                this.$Message.error("You must have an account before application.");
                                 window.location.href = "/GeoProblemSolving/login"
                             }
                         }
-                    } else {
-                        this.$Message.error("Fail!");
                     }
                 });
             },
             login() {
-                window.location.href = "/GeoProblemSolving/login"
+                window.location.href = "/GeoProblemSolving/login";
             },
             enterProject(projectInfo) {
-                // window.sessionStorage.setItem("projectInfo",JSON.stringify(projectInfo));
-                if (this.applyProjectInfo.permission == "" || this.applyProjectInfo.permission == undefined || JSON.parse(this.applyProjectInfo.permission).observe.visitor != "No") {
-                    // window.sessionStorage.setItem("projectInfo", this.encrypto(projectInfo));
+                if (projectInfo.permission != null && JSON.parse(projectInfo.permission).observe.visitor === "Yes") {
                     window.location.href = "/GeoProblemSolving/projectInfo/" + projectInfo.aid;
+                } else {
+                    this.$Message.error("Please apply to join the activity.");
                 }
             },
-            // encrypto(context) {
-            //     var key = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
-            //     var iv = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
-            //     var encrypted = "";
-            //     if (typeof context == "string") {
-            //     } else if (typeof context == "object") {
-            //         context = JSON.stringify(context);
-            //     }
-            //     var srcs = CryptoJS.enc.Utf8.parse(context);
-            //     encrypted = CryptoJS.AES.encrypt(srcs, key, {
-            //         iv: iv,
-            //         mode: CryptoJS.mode.CBC,
-            //         padding: CryptoJS.pad.Pkcs7
-            //     });
-            //     return encrypted.toString();
-            // }
         }
     });
 

@@ -147,11 +147,11 @@
                 </Tooltip>
             </div>
             <div class="folderContent">
-                <Card v-if="folderNameStack.length>0" :padding="5" dis-hover>
+                <Card v-if="folderNameStack!= undefined && folderNameStack.length>0" :padding="5" dis-hover>
                     <div style="display:flex;align-items:center">
-                        <div style="min-width:60px" v-show="currentFolder.files.length>0">
+                        <div style="min-width:60px" v-show="currentFolder.files != undefined && currentFolder.files.length>0">
                             <Checkbox :indeterminate="indeterminate" :value="checkAll"
-                                      @click.prevent.native="handleCheckAll" v-show="currentFolder.files.length>0"
+                                      @click.prevent.native="handleCheckAll" v-show="currentFolder.files != undefined && currentFolder.files.length>0"
                                       style="align-items:center">
                                 All files
                             </Checkbox>
@@ -169,7 +169,7 @@
                         <div style="align-items:flex-end" v-if="userRole != 'visitor'&& userRole!='Token'">
                             <Tooltip content="Download" placement="bottom" class="fileBtn" v-if="folderPermissionIdentity(projectInfo.permission, userRole,'use_resource')">
                                 <i-button @click="downloadSelectFile" shape="circle" icon="md-cloud-download"
-                                          class="fileBtnHoverGray" v-show="currentFolder.files.length>0"></i-button>
+                                          class="fileBtnHoverGray" v-show="currentFolder.files != undefined && currentFolder.files.length>0"></i-button>
                             </Tooltip>
                             <Tooltip content="Upload files" placement="bottom" class="fileBtn" v-if="folderPermissionIdentity(projectInfo.permission, userRole,'upload_resource')">
                                 <i-button @click="uploadModalShow" shape="circle" icon="md-cloud-upload"
@@ -182,7 +182,7 @@
                         </div>
                     </div>
                 </Card>
-                <div v-if="currentFolder.folders.length>0 || currentFolder.files.length>0"
+                <div v-if="(currentFolder.folders!= undefined && currentFolder.folders.length>0) || (currentFolder.files != undefined && currentFolder.files.length>0)"
                      :style="{height:listContentCSS}">
                     <vue-scroll :ops="ops">
                         <Card v-for="(folder,index) in currentFolder.folders" :key="folder.index" :padding="5">

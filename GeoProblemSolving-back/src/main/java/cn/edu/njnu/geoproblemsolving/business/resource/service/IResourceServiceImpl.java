@@ -38,6 +38,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 import java.io.*;
+import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -45,6 +46,8 @@ import java.nio.file.Files;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class IResourceServiceImpl implements IResourceService {
@@ -141,7 +144,7 @@ public class IResourceServiceImpl implements IResourceService {
                             resourceEntity.setPrivacy(req.getParameter("privacy"));
                             resourceEntity.setType(req.getParameter("type"));
 
-                            String url = "http://" + dataRemoteIp + ":8082/data/"+ uploadRemoteResult.getJSONObject("data").getString("id");
+                            String url = "http://" + dataRemoteIp + ":8082/data/" + uploadRemoteResult.getJSONObject("data").getString("id");
                             resourceEntity.setPathURL(url);
 
                             resourceEntity.setEditToolInfo(req.getParameter("editToolInfo"));
@@ -165,7 +168,7 @@ public class IResourceServiceImpl implements IResourceService {
                             userBaseJson.put("userId", uploaderId);
                             userBaseJson.put("resources", resourceList);
                             JSONObject uploadToUserServerResult = httpUtil.setUserBase(userBaseUrl, userBaseJson);
-                            if ((int)uploadToUserServerResult.get("code") !=0){
+                            if ((int) uploadToUserServerResult.get("code") != 0) {
                                 uploadInfos.failed.add(part.getSubmittedFileName());
                             }
 
@@ -287,7 +290,7 @@ public class IResourceServiceImpl implements IResourceService {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         String uploadTime = simpleDateFormat.format(uploadDate);
 
-        String fileSize = copyByUrl(add.getPathURL(),"123.txt","D:\\test")+"byte";
+        String fileSize = copyByUrl(add.getPathURL(), "123.txt", "D:\\test") + "byte";
 
         IResourceEntity iResourceEntity = new IResourceEntity();
         add.convertTo(iResourceEntity);
@@ -298,38 +301,118 @@ public class IResourceServiceImpl implements IResourceService {
 
     }
 
-//    private static void downloadUsingStream(String urlStr) throws IOException{
+    /**
+     * upload image
+     * @param request
+     * @return
+     * @author mzy
+     */
+    @Override
+    public JsonResult uploadImage(HttpServletRequest request) {
+        try {
+            InetAddress address = InetAddress.getLocalHost();
+            String ip = address.getHostAddress();
+            String servicePath = request.getSession().getServletContext().getRealPath("/");
+            String pathURL = "Fail";
+            String reqPath = request.getRequestURL().toString();
+            String newFileName = "";
+
+            // Confirm
+            if (!ServletFileUpload.isMultipartContent(request)) {
+                System.out.println("File is not multimedia.");
+                return ResultUtils.error(-2, "File is not multimedia.");
+            }
+
+            Collection<Part> parts = request.getParts();
+            for (Part part : parts) {
+                if (part.getName().equals("picture")) {
+                    String filePath = part.getSubmittedFileName();
+                    String folderPath = servicePath + "resource/images";
+
+
+                    JsonResult storeResult = fileStore(part, filePath, folderPath);
+                    if(storeResult.getCode() == 0)
+                        newFileName = storeResult.getData().toString();
+                    else
+                        return storeResult;
+                    pathURL = reqPath.replaceAll("localhost", ip) + "/" + newFileName;
+                    String regexGetUrl = "(/GeoProblemSolving[\\S]*)";
+                    Pattern regexPattern = Pattern.compile(regexGetUrl);
+                    Matcher matcher = regexPattern.matcher(pathURL);
+                    if (matcher.find()) {
+                        pathURL = matcher.group(1);
+                    }
+                    break;
+                }
+            }
+            return ResultUtils.success(pathURL);
+        } catch (Exception ex) {
+            return ResultUtils.error(-2, ex.toString());
+        }
+    }
+
+//    private static void downloadUsingStream(String urlStr) throws IOException {
 //        String file = "/123.txt";
 //        URL url = new URL(urlStr);
 //        BufferedInputStream bis = new BufferedInputStream(url.openStream());
 //        FileOutputStream fis = new FileOutputStream(file);
 //        byte[] buffer = new byte[1024];
-//        int count=0;
-//        while((count = bis.read(buffer,0,1024)) != -1)
-//        {
+//        int count = 0;
+//        while ((count = bis.read(buffer, 0, 1024)) != -1) {
 //            fis.write(buffer, 0, count);
 //        }
 //        fis.close();
 //        bis.close();
 //    }
-public static String copyByUrl(String urlStr,String fileName,String savePath)throws IOException {
-    URL url = new URL(urlStr);
-     FileUtils.copyURLToFile(url, new File(savePath+ File.separator+fileName));
-    File file = new File(savePath+ File.separator+fileName);
 
-    Long fileSize =file.length();
-    String size;
-    DecimalFormat df = new DecimalFormat("##0.00");
-    if (fileSize > 1024 * 1024) {
-        size = df.format((float)fileSize / (float) (1024 * 1024)) + "MB";
-    } else {
-        size = df.format((float) fileSize / (float) (1024)) + "KB";
+    private String copyByUrl(String urlStr, String fileName, String savePath) throws IOException {
+        URL url = new URL(urlStr);
+        FileUtils.copyURLToFile(url, new File(savePath + File.separator + fileName));
+        File file = new File(savePath + File.separator + fileName);
+
+        Long fileSize = file.length();
+        String size;
+        DecimalFormat df = new DecimalFormat("##0.00");
+        if (fileSize > 1024 * 1024) {
+            size = df.format((float) fileSize / (float) (1024 * 1024)) + "MB";
+        } else {
+            size = df.format((float) fileSize / (float) (1024)) + "KB";
+        }
+        return size;
     }
-    return size;
-}
 
+    private JsonResult fileStore(Part part, String filePath, String folderPath){
+        try {
+            String fileName = filePath.substring(0, filePath.lastIndexOf("."));
+            String suffix = filePath.substring(filePath.lastIndexOf(".") + 1);
+            String regexp = "[^A-Za-z_0-9\\u4E00-\\u9FA5]";
+            String saveName = fileName.replaceAll(regexp, "");
 
+            File temp = new File(folderPath);
+            if (!temp.exists()) {
+                temp.mkdirs();
+            }
+            int randomNum = (int) (Math.random() * 10 + 1);
+            for (int i = 0; i < 5; i++) {
+                randomNum = randomNum * 10 + (int) (Math.random() * 10 + 1);
+            }
+            String newFileTitle = saveName + "_" + randomNum + "." + suffix;
+            String localPath = temp + "/" + newFileTitle;
 
+            File file = new File(localPath);
+            FileOutputStream fileOutputStream = new FileOutputStream(file);
+            InputStream inputStream = part.getInputStream();
+            byte[] buffer = new byte[1024 * 1024];
+            int byteRead;
+            while ((byteRead = inputStream.read(buffer)) != -1) {
+                fileOutputStream.write(buffer, 0, byteRead);
+            }
+            fileOutputStream.close();
+            inputStream.close();
 
-
+            return ResultUtils.success(newFileTitle);
+        } catch (Exception ex){
+            return ResultUtils.error(-2, ex.toString());
+        }
+    }
 }

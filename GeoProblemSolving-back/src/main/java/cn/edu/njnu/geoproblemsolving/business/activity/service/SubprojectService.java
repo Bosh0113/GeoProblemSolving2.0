@@ -7,25 +7,29 @@ import cn.edu.njnu.geoproblemsolving.business.activity.entity.Subproject;
 
 
 public interface SubprojectService{
-    public JsonResult createSubproject(Subproject subproject);
+    JsonResult createSubproject(Subproject subproject);
 
-    public JsonResult inquirySubproject(String aid);
+    JsonResult inquirySubproject(String aid);
 
-    public JsonResult updateSubproject(String aid, UpdateActivityDTO update);
+    JsonResult updateSubproject(String aid, UpdateActivityDTO update);
 
-    public JsonResult deleteSubproject(String aid);
+    JsonResult deleteSubproject(String aid);
 
-    public JsonResult findChildren(String aid);
+    JsonResult findChildren(String aid);
 
-    public JsonResult findParticipants(String aid);
+    JsonResult findParticipants(String aid);
 
-    public JsonResult findLineage(String aid);
+    JsonResult findLineage(String aid);
 
-    public JsonResult findSubProject(String aid);
+    JsonResult findSubProject(String aid);
 
-    public JsonResult joinSubproject(String aid, String userId);
+    JsonResult joinSubproject(String aid, String userId);
 
-    public JsonResult updateMemberRole(String aid, String userId, String role);
+    JsonResult updateMemberRole(String aid, String userId, String role);
 
-    public JsonResult quitSubproject(String aid, String userId);
+    JsonResult quitSubproject(String aid, String userId);
+
+    JsonResult linkActivities(UpdateActivityDTO update, String aid1, String aid2, String pid);
+
+    JsonResult separateActivities(UpdateActivityDTO update, String lastAid, String nextAid);
 }

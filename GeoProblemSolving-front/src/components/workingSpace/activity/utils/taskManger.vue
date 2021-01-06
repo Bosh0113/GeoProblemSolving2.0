@@ -64,41 +64,7 @@
                                 :title="item.name"
                                 >{{ item.name }}</strong
                               >
-                            </span>
-                            <div style="float: right">
-                              <Rate
-                                v-model="item.importance"
-                                :count="1"
-                                clearable
-                                title="Importance"
-                                @on-change="changeImportance(item)"
-                              />
-                              <span title="Edit">
-                                <Icon
-                                  type="ios-create"
-                                  color="gray"
-                                  :size="20"
-                                  style="cursor: pointer"
-                                  @click="editOneTask(index, taskTodo)"
-                                />
-                              </span>
-                              <span
-                                style="
-                                  margin-left: 5px;
-                                  margin-right: 3px;
-                                  cursor: pointer;
-                                  color: gray;
-                                "
-                                title="Delete"
-                                @click="taskRemoveAssure(index, taskTodo)"
-                              >
-                                <Icon
-                                  type="ios-trash"
-                                  :size="20"
-                                  color="gray"
-                                />
-                              </span>
-                            </div>
+                            </span>                            
                             <div style="float:right">
                             <Rate
                               :disabled="!(permissionIdentity(activityInfo.permission, userRole,  'manage_task') || (permissionIdentity(activityInfo.permission, userRole, 'create_task') && item.creatorId == userInfo.userId))"
@@ -164,40 +130,6 @@
                                 >{{ item.name }}</strong
                               >
                             </span>
-                            <div style="float: right">
-                              <Rate
-                                v-model="item.importance"
-                                :count="1"
-                                clearable
-                                title="Importance"
-                                @on-change="changeImportance(item)"
-                              />
-                              <span title="Edit">
-                                <Icon
-                                  type="ios-create"
-                                  color="gray"
-                                  :size="20"
-                                  style="cursor: pointer"
-                                  @click="editOneTask(index, taskTodo)"
-                                />
-                              </span>
-                              <span
-                                style="
-                                  margin-left: 5px;
-                                  margin-right: 3px;
-                                  cursor: pointer;
-                                  color: gray;
-                                "
-                                title="Delete"
-                                @click="taskRemoveAssure(index, taskTodo)"
-                              >
-                                <Icon
-                                  type="ios-trash"
-                                  :size="20"
-                                  color="gray"
-                                />
-                              </span>
-                            </div>
                             <div style="float:right">
                             <Rate
                               :disabled="!(permissionIdentity(activityInfo.permission, userRole,  'manage_task') || (permissionIdentity(activityInfo.permission, userRole,  'create_task') && item.creatorId == userInfo.userId))"
@@ -300,40 +232,6 @@
                                 >{{ item.name }}</strong
                               >
                             </span>
-                            <div style="float: right">
-                              <Rate
-                                v-model="item.importance"
-                                :count="1"
-                                clearable
-                                title="Importance"
-                                @on-change="changeImportance(item)"
-                              />
-                              <span title="Edit">
-                                <Icon
-                                  type="ios-create"
-                                  color="gray"
-                                  :size="20"
-                                  style="cursor: pointer"
-                                  @click="editOneTask(index, taskDoing)"
-                                />
-                              </span>
-                              <span
-                                style="
-                                  margin-left: 5px;
-                                  margin-right: 3px;
-                                  cursor: pointer;
-                                  color: gray;
-                                "
-                                title="Delete"
-                                @click="taskRemoveAssure(index, taskDoing)"
-                              >
-                                <Icon
-                                  type="ios-trash"
-                                  :size="20"
-                                  color="gray"
-                                />
-                              </span>
-                            </div>
                             <div style="float:right" v-show="userRole != 'visitor'">
                             <Rate
                               :disabled="!(permissionIdentity(activityInfo.permission, userRole, 'manage_task') || (permissionIdentity(activityInfo.permission, userRole, 'create_task') && item.creatorId == userInfo.userId))"
@@ -392,7 +290,7 @@
                                 color="gray"
                                 :size="20"
                               />
-                            </span>
+                            </span>                            
                             <span style="padding: 5px">
                               <strong
                                 style="color: #57a3f3"
@@ -401,40 +299,6 @@
                                 >{{ item.name }}</strong
                               >
                             </span>
-                            <div style="float: right">
-                              <Rate
-                                v-model="item.importance"
-                                :count="1"
-                                clearable
-                                title="Importance"
-                                @on-change="changeImportance(item)"
-                              />
-                              <span title="Edit">
-                                <Icon
-                                  type="ios-create"
-                                  color="gray"
-                                  :size="20"
-                                  style="cursor: pointer"
-                                  @click="editOneTask(index, taskDoing)"
-                                />
-                              </span>
-                              <span
-                                style="
-                                  margin-left: 5px;
-                                  margin-right: 3px;
-                                  cursor: pointer;
-                                  color: gray;
-                                "
-                                title="Delete"
-                                @click="taskRemoveAssure(index, taskDoing)"
-                              >
-                                <Icon
-                                  type="ios-trash"
-                                  :size="20"
-                                  color="gray"
-                                />
-                              </span>
-                            </div>
                             <div style="float:right" v-show="userRole != 'visitor'">
                             <Rate
                               :disabled="!(permissionIdentity(activityInfo.permission, userRole, 'manage_task') || (permissionIdentity(activityInfo.permission, userRole, 'create_task') && item.creatorId == userInfo.userId))"
@@ -531,40 +395,6 @@
                                 >{{ item.name }}</strong
                               >
                             </span>
-                            <div style="float: right">
-                              <Rate
-                                v-model="item.importance"
-                                :count="1"
-                                clearable
-                                title="Importance"
-                                @on-change="changeImportance(item)"
-                              />
-                              <span title="Edit">
-                                <Icon
-                                  type="ios-create"
-                                  color="gray"
-                                  :size="20"
-                                  style="cursor: pointer"
-                                  @click="editOneTask(index, taskDone)"
-                                />
-                              </span>
-                              <span
-                                style="
-                                  margin-left: 5px;
-                                  margin-right: 3px;
-                                  cursor: pointer;
-                                  color: gray;
-                                "
-                                title="Delete"
-                                @click="taskRemoveAssure(index, taskDone)"
-                              >
-                                <Icon
-                                  type="ios-trash"
-                                  :size="20"
-                                  color="gray"
-                                />
-                              </span>
-                            </div>
                             <div style="float:right" v-show="userRole != 'visitor'">
                             <Rate
                               :disabled="!(permissionIdentity(activityInfo.permission, userRole, 'manage_task') || (permissionIdentity(activityInfo.permission, userRole, 'create_task') && item.creatorId == userInfo.userId))"
@@ -630,40 +460,6 @@
                                 >{{ item.name }}</strong
                               >
                             </span>
-                            <div style="float: right">
-                              <Rate
-                                v-model="item.importance"
-                                :count="1"
-                                clearable
-                                title="Importance"
-                                @on-change="changeImportance(item)"
-                              />
-                              <span title="Edit">
-                                <Icon
-                                  type="ios-create"
-                                  color="gray"
-                                  :size="20"
-                                  style="cursor: pointer"
-                                  @click="editOneTask(index, taskDone)"
-                                />
-                              </span>
-                              <span
-                                style="
-                                  margin-left: 5px;
-                                  margin-right: 3px;
-                                  cursor: pointer;
-                                  color: gray;
-                                "
-                                title="Delete"
-                                @click="taskRemoveAssure(index, taskDone)"
-                              >
-                                <Icon
-                                  type="ios-trash"
-                                  :size="20"
-                                  color="gray"
-                                />
-                              </span>
-                            </div>
                             <div style="float:right" v-show="userRole != 'visitor'">
                             <Rate
                               :disabled="!(permissionIdentity(activityInfo.permission, userRole, 'manage_task') || (permissionIdentity(activityInfo.permission, userRole, 'create_task') && item.creatorId == userInfo.userId))"

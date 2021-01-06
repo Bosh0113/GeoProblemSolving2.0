@@ -101,8 +101,9 @@
         v-else-if="contentType == 2"
         :activityInfo="slctActivity"
         :userInfo="userInfo"
-        :key="slctActivity.aid"
         :childActivities="childActivities"
+        :nameConfirm="nameConfirm"
+        :key="slctActivity.aid"
       ></multi-activity>
       <activity-visitor
         v-else-if="contentType == 3"
@@ -247,6 +248,7 @@ export default {
       },
       treeFold: false,
       cascader: [],
+      nameConfirm: [],
       activityTree: [],
       projectInfo: parent.vm.projectInfo,
       userInfo: JSON.parse(sessionStorage.getItem("userInfo")),
@@ -316,7 +318,13 @@ export default {
     Array.prototype.contains = function (obj) {
       var i = this.length;
       while (i--) {
-        if (this[i].userId != undefined && this[i].userId === obj.userId) {
+        if (
+          (this[i].userId != undefined && this[i].userId === obj.userId) ||
+          (this[i].tid != undefined && this[i].tid === obj.tid) ||
+          (this[i].tsId != undefined && this[i].tsId === obj.tsId) ||
+          (this[i].id != undefined && this[i].id === obj.id) ||
+          (this[i].aid != undefined && this[i].aid === obj.aid)
+        ) {
           return true;
         }
       }
@@ -366,7 +374,7 @@ export default {
       let props = {};
       let style = {};
       let on = {};
-      let name = data.name + " (Level:" + data.level + ")";
+      let name = data.name;
 
       if (this.slctActivity.aid !== data.aid) {
         style = {
@@ -407,17 +415,24 @@ export default {
                 props: props,
                 style: style,
                 on: on,
+                attrs: { title: name },
               },
-              name
+              [
+                h(
+                  "div",
+                  {
+                    style: {
+                      overflow: "hidden",
+                      maxWidth: "120px",
+                      textOverflow: "ellipsis",
+                      margin: "0 auto",
+                    },
+                  },
+                  name
+                ),
+              ]
             ),
           ]),
-          h("span", {
-            style: {
-              display: "inline-block",
-              float: "right",
-              marginRight: "32px",
-            },
-          }),
         ]
       );
     },
@@ -571,10 +586,12 @@ export default {
         });
     },
     buildActivityTree(ancestors, brothers, children) {
+      this.nameConfirm = [];
       // child activities normalization
       if (children.length > 0) {
         for (var i = 0; i < children.length; i++) {
           children[i].children = [];
+          this.nameConfirm.push(children[i].name);
         }
         ancestors[0].children = children;
         ancestors[0]["expand"] = true;
@@ -584,6 +601,7 @@ export default {
       for (var i = 0; i < brothers.length; i++) {
         if (brothers[i].aid !== ancestors[0].aid) {
           brothers[i].children = [];
+          this.nameConfirm.push(brothers[i].name);
         }
       }
       ancestors[1].children = brothers;
@@ -591,6 +609,7 @@ export default {
       // ancestor activities normalization
       for (let i = 1; i < ancestors.length; i++) {
         let parentActivity = ancestors[i];
+        this.nameConfirm.push(parentActivity.name);
         let current = ancestors[i - 1];
 
         let childrenNum = parentActivity.children.length;
@@ -603,6 +622,7 @@ export default {
           ) {
             if (parentActivity.children[j] == current.aid) {
               parentActivity.children = [current];
+              this.nameConfirm.push(current.name);
               break;
             }
           } else if (
@@ -611,6 +631,7 @@ export default {
           ) {
             if (parentActivity.children[j].aid == current.aid) {
               parentActivity.children[j] = current;
+              this.nameConfirm.push(current.name);
               break;
             }
           }
@@ -765,9 +786,9 @@ export default {
               "&level=" +
               this.slctActivity.level;
           } else if (res.data.code == -3) {
-            this.$Notice.info( {desc:
-              "You has already been a member of the activity."}
-            );
+            this.$Notice.info({
+              desc: "You has already been a member of the activity.",
+            });
           } else {
             console.log(res.data.msg);
           }
@@ -777,56 +798,40 @@ export default {
         });
     },
     applyJoinActivity() {
-      let notice = {
-        recipientId: userRoleJS.getMemberByRole(this.slctActivity, "manager"),
-        type: "apply",
-        content: {
-          title:
-            "Application of joining the activity: " + this.slctActivity.name,
-          activityId: this.slctActivity.aid,
-          activityName: this.slctActivity.name,
-          activityLevel: this.slctActivity.level,
-          userEmail: this.userInfo.email,
-          userName: this.userInfo.name,
-          userId: this.userInfo.userId,
-          description: this.applyJoinForm.reason,
-          approve: "unknow",
-        },
-      };
-      this.sendNotice(activity, notice);
+      let managers = userRoleJS.getMemberByRole(this.slctActivity, "manager");
+      for (var i = 0; i < managers.length; i++) {
+        let notice = {
+          recipientId: managers[i],
+          type: "apply",
+          content: {
+            title:
+              "Application of joining the activity: " + this.slctActivity.name,
+            activityId: this.slctActivity.aid,
+            activityName: this.slctActivity.name,
+            activityLevel: this.slctActivity.level,
+            userEmail: this.userInfo.email,
+            userName: this.userInfo.name,
+            userId: this.userInfo.userId,
+            description: this.applyJoinForm.reason,
+            approve: "unknow",
+          },
+        };
+        this.sendNotice(activity, notice);
+      }
     },
     sendNotice(activity, notice) {
-      if (
-        Object.prototype.toString.call(activity.recipientId) == "[object Array]"
-      ) {
-        for (let i = 0; i < activity.recipientId.length; i++) {
-          this.axios
-            .post("/GeoProblemSolving/notice/save", notice)
-            .then((result) => {
-              if (result.data == "Success") {
-                parent.vm.$emit("sendNotice", notice.recipientId[i]);
-              } else {
-                this.$Message.error("Notice fail.");
-              }
-            })
-            .catch((err) => {
-              throw err;
-            });
-        }
-      } else {
-        this.axios
-          .post("/GeoProblemSolving/notice/save", notice)
-          .then((result) => {
-            if (result.data == "Success") {
-              parent.vm.$emit("sendNotice", notice.recipientId);
-            } else {
-              this.$Message.error("Notice fail.");
-            }
-          })
-          .catch((err) => {
-            throw err;
-          });
-      }
+      this.axios
+        .post("/GeoProblemSolving/notice/save", notice)
+        .then((result) => {
+          if (result.data == "Success") {
+            parent.vm.$emit("sendNotice", notice.recipientId);
+          } else {
+            this.$Message.error("Notice fail.");
+          }
+        })
+        .catch((err) => {
+          throw err;
+        });
     },
     delActivity() {
       if (this.userInfo.userId !== this.slctActivity.creator) return;

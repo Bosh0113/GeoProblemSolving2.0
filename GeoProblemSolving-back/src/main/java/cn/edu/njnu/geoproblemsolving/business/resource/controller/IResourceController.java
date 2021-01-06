@@ -1,5 +1,6 @@
 package cn.edu.njnu.geoproblemsolving.business.resource.controller;
 
+import cn.edu.njnu.geoproblemsolving.Dao.Resource.ResourceDaoImpl;
 import cn.edu.njnu.geoproblemsolving.business.resource.entity.AddIResourceDTO;
 import cn.edu.njnu.geoproblemsolving.business.resource.entity.IResourceEntity;
 import cn.edu.njnu.geoproblemsolving.business.resource.service.IResourceServiceImpl;
@@ -13,6 +14,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 
 @CrossOrigin(origins = "*", allowCredentials = "true")
@@ -109,6 +111,12 @@ public class IResourceController {
     public Object bindResource( @RequestBody AddIResourceDTO iResourceEntity) throws IOException, URISyntaxException {
         Object uploadResult = IResourceService.saveResource(iResourceEntity);
         return uploadResult;
+    }
+
+    @RequestMapping(value = "/image", method = RequestMethod.POST)
+    public JsonResult uploadPicture(HttpServletRequest request) {
+        JsonResult result = IResourceService.uploadImage(request);
+        return result;
     }
 
 }

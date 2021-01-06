@@ -25,14 +25,15 @@
               ></Input>
             </FormItem>
 
-            <FormItem label="Old password" prop="oldPwd">
+            <FormItem label="Verification" prop="oldPwd">
               <Poptip
-                placement="right"
-                content="old password refers to ....."
+                placement="top-start"
+                content="Old password or verification code in your the feedback email to modify the password."
+                width="300px"
               >
                 <Input
-                  v-model="oldPwd"
-                  placeholder="Please enter old password"
+                  v-model="formValidate.oldPwd"
+                  placeholder="Please enter old password or the verification code"
                   style="width: 300px"
                 ></Input>
               </Poptip>
@@ -69,7 +70,6 @@
       </Col>
     </Row>
   </div>
-
 </template>
 <script>
   import md5 from "js-md5";
@@ -91,9 +91,7 @@
       return {
         inputstyle: true,
         pwdType: "password",
-        newPassword: "",
         confirmPassword: "",
-        oldPwd: "",
         formValidate: {
           email: "",
           oldPwd: "",
@@ -117,7 +115,7 @@
           oldPwd: [
             {
               required: true,
-              message: "Input your old password",
+              message: "Input your old password or verification code",
               trigger: "blur"
             }
           ],
@@ -143,15 +141,29 @@
       this.formValidate.email = this.$route.params.email;
     },
     methods: {
+      // resetPwd() {
+      //   this.axios
+      //     .get("/GeoProblemSolving/user/newPassword?email="+this.formValidate.email+"&password="+md5(this.formValidate.newPassword))
+      //     .then(res => {
+      //       if (res.data !== "Fail") {
+      //         this.$Notice.success({
+      //           title: "notification",
+      //           desc: "Password update successfully,you can use it to login again!"
+      //         });
+      //         this.$router.push({ name: "Login" });
+      //       }
+      //     })
+      //     .catch(err => {});
+      // },
       resetPwd() {
-        var md5_newPwd =  md5(this.newPassword);
-        var md5_oldPwd = md5(this.oldPwd);
+        var md5_newPwd =  md5(this.formValidate.newPassword);
+        var md5_oldPwd = md5(this.formValidate.oldPwd);
         var paramUrl = "email=" + this.formValidate.email + "&oldPwd=" + md5_oldPwd + "&newPwd=" + md5_newPwd;
         this.axios
           .post("http://106.14.78.235/AuthServer/user/newPassword?" + paramUrl)
           .then(res => {
             if (res.data == 1){
-              this.$router.push({name: "Login"})
+              this.$router.replace({name: "Login"})
             }else {
               this.$Message.info("Old password error")
             }

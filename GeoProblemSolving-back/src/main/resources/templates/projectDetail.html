@@ -556,7 +556,8 @@
                                                         </Poptip>
                                                     </div>
                                                 </div>
-                                                <div :style="{height: contentPageCSS - 200 + 'px'}" style="overflow-y:auto;">
+                                                <div :style="{height: contentPageCSS - 200 + 'px'}"
+                                                     style="overflow-y:auto;">
                                                     <vue-scroll :ops="scrollOps">
                                                         <Card v-for="member in participants"
                                                               style="margin-top: 5px;cursor: pointer;"
@@ -580,7 +581,7 @@
                         <div style="width: -webkit-fill-available;height: -webkit-fill-available;">
                             <iframe style="width: -webkit-fill-available;border-width:0"
                                     :style="{height: contentPageCSS - 20 + 'px'}"
-                                    :src="ipPort+'/activity/' + projectInfo.aid"></iframe>
+                                    :src="ipPort+'/activityInfo/' + projectInfo.aid"></iframe>
                         </div>
                     </div>
                 </div>
@@ -641,7 +642,7 @@
                 </div>
                 <Modal
                         v-model="editProjectModal"
-                        title="Edit project"
+                        title="Edit project information"
                         :mask-closable="false"
                         width="900"
                 >
@@ -716,7 +717,7 @@
                                                 id="choosePicture"
                                         />
                                     </div>
-                                    <Modal title="View Image" v-model="visible">
+                                    <Modal title="View image" v-model="visible">
                                         <img :src="pictureUrl" v-if="visible" style="width: 100%"/>
                                     </Modal>
                                 </div>
@@ -740,7 +741,7 @@
                 </Modal>
                 <Modal
                         v-model="inviteModal"
-                        title="Invite others join the Project"
+                        title="Invite others to join the project"
                         :mask-closable="false"
                         width="800">
                     <i-form ref="emailInfo" :model="emailInfo" :rules="emailInfoRule" :label-width="200" inline>
@@ -766,22 +767,25 @@
                         </Form-item>
                     </i-form>
                     <div slot="footer" style="display: inline-block">
-                        <i-button type="primary" @click="invite('emailInfo')" style="float:right;">Assure</i-button>
+                        <i-button type="primary" @click="invite('emailInfo')" style="float:right;">Confirm</i-button>
                         <i-button @click="closeInviteModel()" style="float:right;margin-right: 15px;">Cancel</i-button>
                     </div>
                 </Modal>
                 <Modal
                         v-model="deleteMemberModel"
-                        title="Remove members from project"
+                        title="Remove a member from the project"
                         :mask-closable="false"
                         width="600">
                     <Radio-group v-model="removeMemberName">
-                        <div @click="getRemoveMemberId(member.userId)">
-                            <Radio  v-for="member in participants" :key="member.name" :label="member.name" style="margin-right: 30px"></Radio>
-                        </div>
+                        <span v-for="member in participants" :key="member.name"
+                              @click="getRemoveMemberId(member.userId)">
+                            <Radio :label="member.name" style="margin-right: 30px"
+                                   v-if="member.userId != userInfo.userId">
+                            </Radio>
+                        </span>
                     </Radio-group>
                     <div slot="footer" style="display: inline-block">
-                        <i-button type="primary" @click="removeMembersAlertShow()" style="float:right;">Assure
+                        <i-button type="primary" @click="removeMembersAlertShow()" style="float:right;">Confirm
                         </i-button>
                         <i-button @click="closeDeleteMembersModel()" style="float:right;margin-right: 15px;">Cancel
                         </i-button>
@@ -789,7 +793,7 @@
                 </Modal>
                 <Modal
                         v-model="removeMemberAlertModel"
-                        title="Remove Member alert"
+                        title="Remove the member"
                         @on-ok="removeMember"
                         ok-text="OK"
                         cancel-text="Cancel">
@@ -1175,16 +1179,18 @@
                             let formData = new FormData();
                             formData.append("picture", file);
                             axios
-                                .post("/GeoProblemSolving/resource/projectPic", formData)
+                                .post("/GeoProblemSolving/resource/image", formData)
                                 .then(res => {
-                                    if (res.data != "Fail") {
-                                        this.pictureUrl = res.data;
+                                    if (res.data.code === 0) {
+                                        this.pictureUrl = res.data.data;
                                         $('#choosePicture').val('');
                                     } else {
-                                        this.$Message.error("upload picture Fail!");
+                                        this.$Message.error("Upload picture fail!");
                                     }
                                 })
-                                .catch();
+                                .catch(err => {
+                                    throw err;
+                                });
                         };
                     }
                 },
@@ -1204,7 +1210,6 @@
                     this.projectEditForm.editTags.splice(index, 1);
                 },
                 editProjectSubmit(form) {
-
                     this.$refs[form].validate(valid => {
                         if (valid) {
                             let form = {
@@ -1212,13 +1217,12 @@
                                 name: this.projectEditForm.name,
                                 category: this.projectEditForm.category,
                                 description: this.projectEditForm.description,
-                                tag: this.projectEditForm.editTags,
+                                tag: this.projectEditForm.editTags.toString(),
                                 privacy: this.projectEditForm.privacy,
                                 picture: this.pictureUrl,
-                                creator: this.userInfo.userId,
                             };
                             axios
-                                .put("/GeoProblemSolving/project ", form)
+                                .put("/GeoProblemSolving/project/" + this.projectInfo.aid, form)
                                 .then(res => {
                                     if (res.data == "Offline") {
                                         this.$refs.navigationEl.logout("login");
@@ -1336,6 +1340,7 @@
                 },
                 removeMembersAlertShow() {
                     if (this.removeMemberName != '') {
+                        this.deleteMemberModel = false;
                         this.removeMemberAlertModel = true;
                     } else {
                         this.$Message.warning("There are no member be selected.");
@@ -1345,31 +1350,24 @@
                     this.removeMemberId = userId;
                 },
                 removeMember() {
+                    this.deleteMemberModel = false;
                     axios
-                        .get(
-                            "/GeoProblemSolving/project/quit" +
-                            "?projectId=" +
-                            this.projectInfo.aid +
-                            "&userId=" +
-                            this.removeMemberId
-                        )
+                        .delete("/GeoProblemSolving/project/" + this.projectInfo.aid + "/user?userId=" + this.removeMemberId)
                         .then(res => {
-                            if (res.data == "Offline") {
+                            if (res.data === "Offline") {
                                 this.$refs.navigationEl.logout("login");
-                            } else if (res.data == "None") {
+                            } else if (res.data.code === -1) {
                                 this.$Notice.warning({
-                                    title: "Operate result",
-                                    desc: "The project doesn't exist."
+                                    title: "Result",
+                                    desc: "The person is not the member of this project."
                                 });
-                            } else {
+                            } else if (res.data.code === 0) {
                                 this.$Notice.success({
-                                    title: "Operate result",
-                                    desc: "The member has been removed from the project successfully."
+                                    title: "Result",
+                                    desc: "The member has been removed from the project."
                                 });
-                                this.deleteMemberModel = false;
-                                var members = this.projectInfo.members;
-                                for (var i = 0; i < members.length; i++) {
-                                    if (members[i].userId == this.removeMemberId) {
+                                for (var i = 0; i < this.projectInfo.members.length; i++) {
+                                    if (this.projectInfo.members[i].userId == this.removeMemberId) {
                                         this.projectInfo.members.splice(i, 1);
                                         break;
                                     }
@@ -1377,6 +1375,7 @@
                             }
                         })
                         .catch(err => {
+                            throw err;
                         });
                 },
                 goPersonalPage(userId) {
@@ -1387,7 +1386,7 @@
                     }
                 },
                 modifyPermission() {
-                    window.location.href = "/GeoProblemSolving/project/" + this.projectInfo.aid + "/permission";
+                    window.location.href = "/GeoProblemSolving/permission/" + this.projectInfo.level + "/" + this.projectInfo.aid;
                 },
                 resetProjectType() {
                     this.projectInfo.type = "";
@@ -1417,9 +1416,9 @@
                         this.applyProjectInfo = Object.assign([], this.projectInfo);
 
                         // join the project directly
-                        if (this.applyProjectInfo.permission != undefined && this.applyProjectInfo.permission.auto_join.visitor) {
+                        if (this.applyProjectInfo.permission != undefined && this.applyProjectInfo.permission != "" && JSON.parse(this.applyProjectInfo.permission).auto_join.visitor) {
                             axios
-                                .get("/GeoProblemSolving/project/" + this.applyProjectInfo.aid + "/user?" + "userId=" + this.userInfo.userId)
+                                .post("/GeoProblemSolving/project/" + this.applyProjectInfo.aid + "/user?" + "userId=" + this.userInfo.userId)
                                 .then(res => {
                                     if (res.data.code == 0) {
                                         this.$Message.info("Join this project successfully");

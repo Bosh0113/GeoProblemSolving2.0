@@ -57,6 +57,25 @@
             />
             <Icon
               v-if="
+                permissionIdentity(
+                  activityInfo.permission,
+                  userRole,
+                  'manage_member'
+                )
+              "
+              type="md-people"
+              size="16"
+              title="Change user role"
+              @click="userRoleBtn = !userRoleBtn"
+              style="
+                float: right;
+                margin: 5px 10px 0 0;
+                cursor: pointer;
+                color: #8bc34a;
+              "
+            />
+            <Icon
+              v-if="
                 activityInfo.level > 0 &&
                 permissionIdentity(
                   activityInfo.permission,
@@ -76,7 +95,11 @@
               "
             />
             <Icon
-              v-if="userRole != 'visitor'"
+              v-if="
+                activityInfo.level > 0 &&
+                userRole != 'visitor' &&
+                activityInfo.creator != userInfo.userId
+              "
               type="md-log-out"
               size="16"
               title="Leave the activity"
@@ -91,11 +114,36 @@
             >
               <div style="display: flex; align-items: center">
                 <div
-                  v-if="delUserBtn"
+                  v-if="delUserBtn && member.userId != userInfo.userId"
                   style="cursor: pointer; margin-right: 10px"
-                  @click="selectMember(member)"
+                  @click="selectMember(member, 'delete')"
                 >
                   <Icon type="md-remove-circle" size="20" color="#ed4014" />
+                </div>
+                <div
+                  v-if="
+                    userRoleBtn &&
+                    member.userId != userInfo.userId &&
+                    roleCompare(userRole, member.role) != -1
+                  "
+                  title="Set user role"
+                  style="cursor: pointer; margin-right: 10px"
+                  @click="selectMember(member, 'role')"
+                >
+                  <Icon type="md-people" size="20" color="#8bc34a" />
+                </div>
+                <div
+                  v-if="
+                    userRoleBtn &&
+                    (member.userId == userInfo.userId ||
+                      roleCompare(userRole, member.role) == -1)
+                  "
+                  :title="
+                    member.role.charAt(0).toUpperCase() + member.role.slice(1)
+                  "
+                  style="cursor: default; margin-right: 10px"
+                >
+                  <Icon type="md-people" size="20" color="grey" />
                 </div>
                 <div
                   @click="gotoPersonalSpace(member.userId)"
@@ -120,7 +168,7 @@
                       <span>{{ member.name }}</span>
                     </div>
                     <div class="memberRole">
-                      <span>{{ member.role }}</span>
+                      <span>{{ member.role.charAt(0).toUpperCase() + member.role.slice(1) }}</span>
                     </div>
                   </div>
                 </div>
@@ -136,7 +184,7 @@
         <Menu
           mode="horizontal"
           :active-name="activeMenu"
-          style="height: 45px; line-height: 45px;z-index:1"
+          style="height: 45px; line-height: 45px; z-index: 1"
           @on-select="changeMenuItem"
         >
           <MenuItem name="Workspace">
@@ -242,6 +290,58 @@
       <h4 style="color: red">Are you sure to remove this member?</h4>
     </Modal>
     <Modal
+      v-model="memberRoleModal"
+      width="400px"
+      title="Set the role of this member"
+      @on-ok="updateActivity()"
+      ok-text="Ok"
+      cancel-text="Cancel"
+    >
+      <h4>Select user role</h4>
+      <Select v-model="roleSelected" text="Role" style="margin: 10px 0">
+        <Option value="manager" v-show="roleCompare(userRole, 'manager') != -1"
+          >Manager</Option
+        >
+        <Divider style="margin: 5px 0"></Divider>
+        <Option value="core" disabled>Core team</Option>
+        <Option
+          value="researcher"
+          v-show="roleCompare(userRole, 'researcher') != -1"
+          >Researcher</Option
+        >
+        <Option value="expert" v-show="roleCompare(userRole, 'expert') != -1"
+          >Expert</Option
+        >
+        <Option
+          value="decision-maker"
+          v-show="roleCompare(userRole, 'decision-maker') != -1"
+          >Decision-maker</Option
+        >
+        <Option
+          value="core-member"
+          v-show="roleCompare(userRole, 'core-member') != -1"
+          >Core-member</Option
+        >
+        <Divider style="margin: 5px 0"></Divider>
+        <Option value="ordinary" disabled>Ordinary team</Option>
+        <Option
+          value="stakeholder"
+          v-show="roleCompare(userRole, 'stakeholder') != -1"
+          >Stakeholder</Option
+        >
+        <Option
+          value="consultant"
+          v-show="roleCompare(userRole, 'consultant') != -1"
+          >Consultant</Option
+        >
+        <Option
+          value="ordinary-member"
+          v-show="roleCompare(userRole, 'ordinary-member') != -1"
+          >Ordinary-member</Option
+        >
+      </Select>
+    </Modal>
+    <Modal
       v-model="quitActivityModal"
       width="400px"
       title="Leave this activity"
@@ -280,14 +380,14 @@ export default {
     modelEvaluation,
     geoSimulation,
     geoAnalysis,
-    decisionMaking
+    decisionMaking,
   },
   data() {
     return {
       scrollOps: {
         bar: {
-          background: "lightgrey"
-        }
+          background: "lightgrey",
+        },
       },
       projectInfo: parent.vm.projectInfo,
       activeMenu: "Workspace",
@@ -305,6 +405,11 @@ export default {
       // leave
       quitActivityModal: false,
       listStyle: { width: "280px", height: "360px" },
+      // update
+      slctRoleMember: {},
+      memberRoleModal: false,
+      userRoleBtn: false,
+      roleSelected: "",
     };
   },
   created() {
@@ -330,6 +435,9 @@ export default {
         );
       }
     },
+    roleCompare(role1, role2) {
+      return userRoleJS.roleCompare(role1, role2);
+    },
     async preInvitation() {
       let url = "";
       let activity = this.activityInfo;
@@ -353,7 +461,7 @@ export default {
           userId: candidates[i].userId,
           name: candidates[i].name,
           role: candidates[i].role,
-          disabled: this.participants.contains(candidates[i])
+          disabled: this.participants.contains(candidates[i]),
         });
       }
       this.invitingMembers = this.getTargetKeys();
@@ -420,6 +528,7 @@ export default {
                     " in project: " +
                     this.projectInfo.name +
                     " , and now you are a member in this activity!",
+                  approve: "unknow",
                 },
               };
               this.sendNotice(activity, notice);
@@ -433,8 +542,14 @@ export default {
       }
     },
     selectMember(member) {
-      this.slctDletMember = member;
-      this.removeMemberModal = true;
+      if (operation == "delete") {
+        this.slctDletMember = member;
+        this.removeMemberModal = true;
+      } else if (operation == "role") {
+        this.slctRoleMember = member;
+        this.memberRoleModal = true;
+        this.roleSelected = member.role;
+      }
     },
     removeUser() {
       let url = "";
@@ -474,6 +589,7 @@ export default {
                   " in project: " +
                   this.projectInfo.name +
                   ".",
+                approve: "unknow",
               },
             };
             this.sendNotice(activity, notice);
@@ -517,25 +633,27 @@ export default {
               activity.parent +
               "&level=" +
               (activity.level - 1).toString();
+
             //notice
-            let notice = {
-              recipientId: userRoleJS.getMemberByRole(
-                this.activityInfo,
-                "manager"
-              ),
-              type: "notice",
-              content: {
-                title: "Leave activity",
-                description:
-                  member.name +
-                  " left the activity: " +
-                  activity.name +
-                  " in project: " +
-                  this.projectInfo.name +
-                  ".",
-              },
-            };
-            this.sendNotice(activity, notice);
+            let managers = userRoleJS.getMemberByRole(activity, "manager");
+            for (var i = 0; i < managers.length; i++) {
+              let notice = {
+                recipientId: managers[i],
+                type: "notice",
+                content: {
+                  title: "Leave activity",
+                  description:
+                    member.name +
+                    " left the activity: " +
+                    activity.name +
+                    " in project: " +
+                    this.projectInfo.name +
+                    ".",
+                  approve: "unknow",
+                },
+              };
+              this.sendNotice(activity, notice);
+            }
           } else {
             console.log(res.data.msg);
           }
@@ -545,37 +663,18 @@ export default {
         });
     },
     sendNotice(activity, notice) {
-      if (
-        Object.prototype.toString.call(activity.recipientId) == "[object Array]"
-      ) {
-        for (let i = 0; i < activity.recipientId.length; i++) {
-          this.axios
-            .post("/GeoProblemSolving/notice/save", notice)
-            .then((result) => {
-              if (result.data == "Success") {
-                parent.vm.$emit("sendNotice", notice.recipientId[i]);
-              } else {
-                this.$Message.error("Notice fail.");
-              }
-            })
-            .catch((err) => {
-              throw err;
-            });
-        }
-      } else {
-        this.axios
-          .post("/GeoProblemSolving/notice/save", notice)
-          .then((result) => {
-            if (result.data == "Success") {
-              parent.vm.$emit("sendNotice", notice.recipientId);
-            } else {
-              this.$Message.error("Notice fail.");
-            }
-          })
-          .catch((err) => {
-            throw err;
-          });
-      }
+      this.axios
+        .post("/GeoProblemSolving/notice/save", notice)
+        .then((result) => {
+          if (result.data == "Success") {
+            parent.vm.$emit("sendNotice", notice.recipientId);
+          } else {
+            this.$Message.error("Notice fail.");
+          }
+        })
+        .catch((err) => {
+          throw err;
+        });
     },
     gotoPersonalSpace(id) {
       if (id == this.$store.getters.userId) {

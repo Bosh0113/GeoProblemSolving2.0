@@ -673,7 +673,6 @@ body {
     <Modal
       v-model="authorizeProjectModal"
       @on-ok="authorize()"
-      @on-cancel
       ok-text="Assure"
       cancel-text="Cancel"
     >
@@ -1183,7 +1182,6 @@ export default {
       delete this.userDetail.joinedProjects;
       delete this.userDetail.manageProjects;
       this.joinedProjectIndexList = this.$store.getters.userInfo.joinedProjects;
-      console.log(this.userDetail)
     },
     //获取用户参与的项目列表
     getParticipatoryList(projectIds) {

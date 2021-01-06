@@ -225,7 +225,7 @@ export default {
         console.log(this.totalPages);
       } else {
         this.totalMsg = data;
-        this.$Message.warning("This is no record here!");
+        this.$Message.warning("There is no record here!");
       }
     },
     //inifte scroll

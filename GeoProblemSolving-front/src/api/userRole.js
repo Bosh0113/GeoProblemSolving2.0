@@ -143,11 +143,43 @@ function getDefault() {
     return permission;
 }
 
+// Compare the level between roles
+// 0: same level; 1: role1 has the higher level than role2; -1: role1 has the lower level than role2
+function roleCompare(role1, role2) {
+    let roleLevel1 = roleLevelIdentify(role1);
+    let roleLevel2 = roleLevelIdentify(role2);
+    if (roleLevel1 == "manager") {
+        if (roleLevel2 == "manager")
+            return 0;
+        else
+            return 1
+    } else if (roleLevel1 == "coreteam") {
+        if (roleLevel2 == "manager")
+            return -1;
+        else if (roleLevel2 == "coreteam")
+            return 0
+        else
+            return 1
+    } else if (roleLevel1 == "widerteam") {
+        if (roleLevel2 == "visitor")
+            return 1;
+        else if (roleLevel2 == "widerteam")
+            return 0
+        else
+            return -1
+    } else if (roleLevel1 == "visitor") {
+        if (roleLevel2 == "visitor")
+            return 0;
+        else
+            return -1
+    }
+}
+
 // Get participants' userId by their roles
 function getMemberByRole(activity, role) {
     let members = [];
-    for(let i = 0; i< activity.members.length;i++){
-        if(activity.members[i].role == role){
+    for (let i = 0; i < activity.members.length; i++) {
+        if (activity.members[i].role == role) {
             members.push(activity.members[i].userId)
         }
     }
@@ -216,7 +248,7 @@ function permissionJson2Array(currentPermission) {
     }
     if (permission.create_task != undefined) {
         var row = {
-            operation: "Create activity tasks",
+            operation: "Create tasks in activities",
             manager: permission.create_task.manager,
             coreteam: permission.create_task.coreteam,
             widerteam: permission.create_task.widerteam,
@@ -226,7 +258,7 @@ function permissionJson2Array(currentPermission) {
     }
     if (permission.manage_task != undefined) {
         var row = {
-            operation: "Manage activity tasks",
+            operation: "Manage tasks in activities",
             manager: permission.manage_task.manager,
             coreteam: permission.manage_task.coreteam,
             widerteam: permission.manage_task.widerteam,
@@ -481,4 +513,4 @@ function permissionIdentity(currentPermission, role, operation) {
 }
 
 
-export { roleIdentify, getDefault, getMemberByRole, permissionJson2Array, permissionIdentity }
+export { roleIdentify, getDefault, getMemberByRole, roleCompare, permissionJson2Array, permissionIdentity }
