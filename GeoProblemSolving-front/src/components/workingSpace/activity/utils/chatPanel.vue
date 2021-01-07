@@ -234,7 +234,7 @@ export default {
         } else {
           let chatMsg = {
             type: "notice",
-            content: "You are disconnected with others.",
+            content: "You are disconnecting with others.",
           };
           this.msglist.push(chatMsg);
         }

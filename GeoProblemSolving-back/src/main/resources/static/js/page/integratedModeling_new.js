@@ -789,7 +789,7 @@ var vue = new Vue({
         async checkNodeContent(invokeService){
             let result = null
 
-            await axios.get("/dataServer/checkNodeContent",{
+            await axios.get("/GeoProblemSolving/integration/checkNodeContent",{
                 params:{
                     serverId:invokeService.serviceId,
                     token:invokeService.token,
@@ -931,38 +931,38 @@ var vue = new Vue({
 
         listDataItem(){
             this.loading = true
-            $.ajax({
-                type: "GET",
-                url: "/dataServer/pageDataItemChecked",
-                data:{
-                    page:this.pageOptionDataItem.currentPage-1,
-                    pageSize:this.pageOptionDataItem.pageSize,
-                    asc:1,
-                    sortEle:"name",
-                    searchText: this.pageOptionDataItem.searchText
-                },
-                async:false,
-                success: (res) => {
-                    if (res.code == -1) {
-                        this.$alert("Please login first!")
-                        window.location.href="/user/login";
-                    } else {
-                        if(res.data == undefined){
-
-                        }else{
-                            let data = res.data
-                            this.dataItems = data.content
-                            this.pageOptionDataItem.total = data.total
-                            setTimeout(()=>{
-                                this.loading = false
-                            },125)
-                        }
-                    }
-                },
-                error:res=>{
-                    this.loading = false
-                }
-            })
+            // $.ajax({
+            //     type: "GET",
+            //     url: "/GeoProblemSolving/integration/pageDataItemChecked",
+            //     data:{
+            //         page:this.pageOptionDataItem.currentPage-1,
+            //         pageSize:this.pageOptionDataItem.pageSize,
+            //         asc:1,
+            //         sortEle:"name",
+            //         searchText: this.pageOptionDataItem.searchText
+            //     },
+            //     async:false,
+            //     success: (res) => {
+            //         if (res.code == -1) {
+            //             this.$alert("Please login first!")
+            //             window.location.href="/user/login";
+            //         } else {
+            //             if(res.data == undefined){
+            //
+            //             }else{
+            //                 let data = res.data
+            //                 this.dataItems = data.content
+            //                 this.pageOptionDataItem.total = data.total
+            //                 setTimeout(()=>{
+            //                     this.loading = false
+            //                 },125)
+            //             }
+            //         }
+            //     },
+            //     error:res=>{
+            //         this.loading = false
+            //     }
+            // })
         },
 
         /**
@@ -1243,64 +1243,63 @@ var vue = new Vue({
         getDataServer() {
             this.nodeLoading=true
             this.dataNode.status = 0
-            $.ajax({
-                type: "GET",
-                url: "/dataServer/getUserNodes",
-                async: true,
-                success: (res) => {
-                    if (res.code == -1) {
-                        this.$alert("If you want to use this functon, please login first and make your data server online!")
-                        // window.location.href="/user/login";
-                    } else {
-                        if(res.data == undefined||Object.keys(res.data).length == 0||res.data=='offline'){
-                            this.dataNode.status = 0
-                            this.nodeLoading=false
-                        }else{
-                            this.dataNode.baseInfo=res.data
-                            this.dataNode.status = 1
-                            this.getNodeContent(this.dataNode.baseInfo.token,"Data")
-                            this.nodeLoading=false
-                        }
-                    }
-                },
-                error:res=>{
-                    this.nodeLoading=false
-                }
-            })
+            // $.ajax({
+            //     type: "GET",
+            //     url: "/GeoProblemSolving/integration/getUserNodes",
+            //     async: true,
+            //     success: (res) => {
+            //         if (res.code == -1) {
+            //             this.$alert("If you want to use this functon, please login first and make your data server online!")
+            //             // window.location.href="/user/login";
+            //         } else {
+            //             if(res.data == undefined||Object.keys(res.data).length == 0||res.data=='offline'){
+            //                 this.dataNode.status = 0
+            //                 this.nodeLoading=false
+            //             }else{
+            //                 this.dataNode.baseInfo=res.data
+            //                 this.dataNode.status = 1
+            //                 this.getNodeContent(this.dataNode.baseInfo.token,"Data")
+            //                 this.nodeLoading=false
+            //             }
+            //         }
+            //     },
+            //     error:res=>{
+            //         this.nodeLoading=false
+            //     }
+            // })
         },
 
         getNodeContent(token,type){
             let data
             this.nodeLoading=true
-            $.ajax({
-                type: "GET",
-                url: "/dataServer/getNodeContentCheck",
-                data:{
-                    token:token,
-                    type:type,
-                },
-                async:false,
-                success: (res) => {
-                    if (res.code == -1) {
-                        // this.$alert("Please login first!")
-                        // window.location.href="/user/login";
-                    } else {
-                        if(res.data == undefined){
-
-                        }else{
-                            data = res.data
-                            this.dataNode[type.toLowerCase()] = data
-                            setTimeout(()=>{
-                                this.nodeLoading = false
-                            },150)
-                        }
-                    }
-                },
-                error:res=>{
-                    this.nodeLoading = false
-                }
-            })
-
+            // $.ajax({
+            //     type: "GET",
+            //     url: "/GeoProblemSolving/integration/getNodeContentCheck",
+            //     data:{
+            //         token:token,
+            //         type:type,
+            //     },
+            //     async:false,
+            //     success: (res) => {
+            //         if (res.code == -1) {
+            //             // this.$alert("Please login first!")
+            //             // window.location.href="/user/login";
+            //         } else {
+            //             if(res.data == undefined){
+            //
+            //             }else{
+            //                 data = res.data
+            //                 this.dataNode[type.toLowerCase()] = data
+            //                 setTimeout(()=>{
+            //                     this.nodeLoading = false
+            //                 },150)
+            //             }
+            //         }
+            //     },
+            //     error:res=>{
+            //         this.nodeLoading = false
+            //     }
+            // })
         },
 
         selectDataFromDataServer(data){
@@ -2148,18 +2147,17 @@ var vue = new Vue({
         },
 
         openModelPage(modelOid){
-            window.open('/computableModel/'+modelOid)
+            window.open('http://geomodeling.njnu.edu.cn/computableModel/'+modelOid)
         },
 
         openModelContributer(modelOid){
-            axios.get("/computableModel/getUserOidByOid",{
+            axios.get("http://geomodeling.njnu.edu.cn/computableModel/getUserOidByOid",{
                 params:{
                     oid:modelOid
                 }
             }).then(res => {
                     window.open('/profile/'+res.data.data)
                 }
-
             )
         },
 
@@ -3636,7 +3634,7 @@ var vue = new Vue({
                 this.modelActions = this.iframeWindow.getModels();
                 this.modelActions.forEach((model) => {
                     $.ajax({
-                        url: '/computableModel/getComputableModelsBySearchTerms',
+                        url: 'http://geomodeling.njnu.edu.cn/computableModel/getComputableModelsBySearchTerms',
                         data: {
                             searchTerms: model.name
                         },

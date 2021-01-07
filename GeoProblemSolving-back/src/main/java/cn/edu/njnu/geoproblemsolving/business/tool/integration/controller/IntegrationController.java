@@ -1,6 +1,7 @@
 package cn.edu.njnu.geoproblemsolving.business.tool.integration.controller;
 
 import cn.edu.njnu.geoproblemsolving.business.tool.support.dto.DataApplicationFindDTO;
+import cn.edu.njnu.geoproblemsolving.business.tool.support.entity.ModelService;
 import cn.edu.njnu.geoproblemsolving.business.tool.support.entity.TaskRecord;
 import cn.edu.njnu.geoproblemsolving.business.tool.integration.dto.IntegratedTaskAddDto;
 import cn.edu.njnu.geoproblemsolving.business.tool.integration.entity.DataProcessing;
@@ -23,6 +24,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -231,7 +233,8 @@ public class IntegrationController {
     @RequestMapping(value="/checkIntegratedTask/{taskId}", method = RequestMethod.GET)
     JsonResult checkIntegratedTask(@PathVariable("taskId") String taskId,HttpServletRequest request){
 
-        return ResultUtils.success(integrationService.checkIntegratedTask(taskId));
+        JSONObject result = integrationService.checkIntegratedTask(taskId);
+        return ResultUtils.success(result);
     }
 
     @RequestMapping(value = "/updateIntegrateTaskId", method = RequestMethod.POST)//把managerserver返回的taskid更新到门户数据库
@@ -244,6 +247,65 @@ public class IntegrationController {
     JsonResult getIntegrateTaskByOid(@RequestParam("taskOid") String taskOid){
         return ResultUtils.success(integrationService.getIntegratedTaskByOid(taskOid));
     }
+
+    @RequestMapping(value = "/checkNodeContent", method = RequestMethod.GET)
+    public JsonResult checkNodeContent(@RequestParam("serverId") String serverId,
+                                       @RequestParam("token") String token,
+                                       @RequestParam("type") String type
+    ){
+
+        return ResultUtils.success(integrationService.checkNodeContent(serverId,token,type));
+
+    }
+
+//    @RequestMapping(value = "/pageDataItemChecked", method = RequestMethod.GET)
+//    public JsonResult pageAllDataItemChecked(@RequestParam(value = "page") int page,
+//                                             @RequestParam(value = "pageSize") int pageSize,
+//                                             @RequestParam(value="asc") int asc,
+//                                             @RequestParam(value="sortEle") String sortEle,
+//                                             @RequestParam(value="searchText") String searchText,
+//                                             HttpServletRequest request
+//    ){
+//        HttpSession session = request.getSession();
+//        if(session.getAttribute("userId")==null){
+//            return ResultUtils.error(-1,"no login");
+//        }
+//        else{
+//            String userId = session.getAttribute("uid").toString();
+//            return ResultUtils.success(integrationService.pageDataItemChecked(page,pageSize,asc,sortEle,searchText,userId));
+//        }
+//    }
+
+//    @RequestMapping(value = "/getUserNodes", method = RequestMethod.GET)
+//    public JsonResult getUserNodes(HttpServletRequest request) throws DocumentException {
+//
+//        HttpSession session = request.getSession();
+//
+//        String userName = session.getAttribute("uid").toString();
+//        if(userName==null){
+//            return ResultUtils.error(-1, "no login");
+//        }else{
+//            JSONObject jsonObject = integrationService.getUserNode(userName);
+//            if(jsonObject.isEmpty()){
+//                return ResultUtils.success("offline");
+//            }else {
+//                return ResultUtils.success(jsonObject);
+//            }
+//        }
+//    }
+
+//    @RequestMapping(value = "/getNodeContentCheck", method = RequestMethod.GET)
+//    public JsonResult getNodeContentCheck(@RequestParam("token") String token,@RequestParam("type") String type,HttpServletRequest request) throws Exception {
+//
+//        HttpSession session = request.getSession();
+//
+//        String userName = session.getAttribute("uid").toString();
+//        if(userName==null){
+//            return ResultUtils.error(-1, "no login");
+//        }else {
+//            return ResultUtils.success(integrationService.getNodeContentCheck(token,type));
+//        }
+//    }
 
     @RequestMapping(value="/pageByClassi",method = RequestMethod.GET)
     public JsonResult pageByClassi(@RequestParam(value="asc") int asc,

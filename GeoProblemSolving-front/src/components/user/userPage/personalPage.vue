@@ -1754,7 +1754,7 @@ export default {
                 this.uploadProgress = 0;
               });
           } else {
-            this.$Message.warning("Upload file is null.");
+            this.$Message.warning("File is not existing.");
           }
         }
       });

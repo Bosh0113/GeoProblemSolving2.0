@@ -1,13 +1,13 @@
 <template>
   <div>
     <Row>
-      <Col span="16" style="border-right: 1px solid #d3d3d3;">
+      <Col span="14" style="border-right: 1px solid #d3d3d3;">
         <chat-panel
           :activityInfo="activityInfo"
           :participants="participants"
         ></chat-panel>
       </Col>
-      <Col span="8">
+      <Col span="10">
         <Tabs type="card" class="activityTab">
           <TabPane label="Tools">
             <tool-box :activityInfo="activityInfo"></tool-box>

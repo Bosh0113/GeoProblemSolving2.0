@@ -1,183 +1,6 @@
 <template>
   <div>
-    <div style="display: flex; background-color: #f8f8f9">
-      <div
-        style="
-          width: 250px;
-          margin-right: 5px;
-          border-right: 1px solid #dcdee2;
-          background-color: white;
-        "
-      >
-        <vue-scroll :ops="scrollOps" style="height: calc(100vh - 70px)">
-          <div style="padding: 5px 10px">
-            <h3 style="display: inline-block">Name:</h3>
-            <p style="font-size: medium; padding-top: 5px">
-              {{ activityInfo.name }}
-            </p>
-            <Divider style="margin: 10px 0" />
-            <h3 style="display: inline-block">Purpose:</h3>
-            <p style="font-size: medium; padding-top: 5px">
-              {{ activityInfo.purpose }}
-            </p>
-            <Divider style="margin: 10px 0" />
-            <h3>Description:</h3>
-            <p
-              style="
-                font-size: small;
-                white-space: normal;
-                word-break: break-word;
-                padding-top: 5px;
-              "
-            >
-              {{ activityInfo.description }}
-            </p>
-            <Divider style="margin: 10px 0" />
-            <!--项目成员显示-->
-            <h3 style="display: contents">Members:</h3>
-            <Icon
-              v-if="
-                activityInfo.level > 0 &&
-                permissionIdentity(
-                  activityInfo.permission,
-                  userRole,
-                  'manage_member'
-                )
-              "
-              type="md-trash"
-              size="16"
-              title="Remove users"
-              @click="delUserBtn = !delUserBtn"
-              style="
-                float: right;
-                margin: 5px 20px 0 0;
-                cursor: pointer;
-                color: #ed4014;
-              "
-            />
-            <Icon
-              v-if="
-                permissionIdentity(
-                  activityInfo.permission,
-                  userRole,
-                  'manage_member'
-                )
-              "
-              type="md-people"
-              size="16"
-              title="Change user role"
-              @click="userRoleBtn = !userRoleBtn"
-              style="
-                float: right;
-                margin: 5px 10px 0 0;
-                cursor: pointer;
-                color: #8bc34a;
-              "
-            />
-            <Icon
-              v-if="
-                activityInfo.level > 0 &&
-                permissionIdentity(
-                  activityInfo.permission,
-                  userRole,
-                  'invite_member'
-                )
-              "
-              type="md-person-add"
-              size="16"
-              title="Invite users"
-              @click="preInvitation()"
-              style="
-                float: right;
-                margin: 5px 20px 0 0;
-                cursor: pointer;
-                color: #2d8cf0;
-              "
-            />
-            <Icon
-              v-if="
-                activityInfo.level > 0 &&
-                userRole != 'visitor' &&
-                activityInfo.creator != userInfo.userId
-              "
-              type="md-log-out"
-              size="16"
-              title="Leave the activity"
-              @click="quitActivityModal = true"
-              style="float: right; margin: 5px 20px 0 0; cursor: pointer"
-            />
-            <Card
-              style="margin: 5px 0"
-              :padding="5"
-              v-for="member in participants"
-              :key="member.name"
-            >
-              <div style="display: flex; align-items: center">
-                <div
-                  v-if="delUserBtn && member.userId != userInfo.userId"
-                  style="cursor: pointer; margin-right: 10px"
-                  @click="selectMember(member, 'delete')"
-                >
-                  <Icon type="md-remove-circle" size="20" color="#ed4014" />
-                </div>
-                <div
-                  v-if="
-                    userRoleBtn &&
-                    member.userId != userInfo.userId &&
-                    roleCompare(userRole, member.role) != -1
-                  "
-                  title="Set user role"
-                  style="cursor: pointer; margin-right: 10px"
-                  @click="selectMember(member, 'role')"
-                >
-                  <Icon type="md-people" size="20" color="#8bc34a" />
-                </div>
-                <div
-                  v-if="
-                    userRoleBtn &&
-                    (member.userId == userInfo.userId ||
-                      roleCompare(userRole, member.role) == -1)
-                  "
-                  :title="
-                    member.role.charAt(0).toUpperCase() + member.role.slice(1)
-                  "
-                  style="cursor: default; margin-right: 10px"
-                >
-                  <Icon type="md-people" size="20" color="grey" />
-                </div>
-                <div
-                  @click="gotoPersonalSpace(member.userId)"
-                  style="display: flex; align-items: center; cursor: pointer"
-                >
-                  <div class="memberImg" style="position: relative">
-                    <img
-                      v-if="member.avatar != '' && member.avatar != undefined"
-                      :src="member.avatar"
-                      style="width: 40px; height: 40px"
-                    />
-                    <avatar
-                      v-else
-                      :username="member.name"
-                      :size="40"
-                      :rounded="true"
-                    />
-                    <div class="onlinecircle"></div>
-                  </div>
-                  <div class="memberDetail">
-                    <div class="memberName">
-                      <span>{{ member.name }}</span>
-                    </div>
-                    <div class="memberRole">
-                      <span>{{ member.role.charAt(0).toUpperCase() + member.role.slice(1) }}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Card>
-            <Divider style="margin: 10px 0" />
-          </div>
-        </vue-scroll>
-      </div>
+    <div style="display: flex; background-color: #f8f8f9">      
       <div
         style="flex: 1; border-left: 1px solid #dcdee2; background-color: white"
       >
@@ -187,14 +10,20 @@
           style="height: 45px; line-height: 45px; z-index: 1"
           @on-select="changeMenuItem"
         >
+          <MenuItem name="Introduction">
+            <Icon type="ios-paper" />Introduction
+          </MenuItem>
           <MenuItem name="Workspace">
-            <Icon type="ios-paper" />Workspace
+            <Icon type="ios-globe" />Workspace
           </MenuItem>
           <MenuItem name="Task">
             <Icon type="ios-git-network" />Task management
           </MenuItem>
         </Menu>
 
+        <div v-show="activeMenu == 'Introduction'">
+          <activity-show :activityInfo="activityInfo"></activity-show>
+        </div>
         <div v-show="activeMenu == 'Workspace'">
           <vue-scroll
             :ops="scrollOps"
@@ -357,6 +186,7 @@
 import Avatar from "vue-avatar";
 import * as userRoleJS from "./../../../api/userRole.js";
 import { get, del, post, put } from "../../../axios";
+import activityShow from "./activityShow.vue";
 import taskManager from "./utils/taskManger.vue";
 import universalSpace from "./funcs/universalSpace.vue";
 import contextRes from "./funcs/contextAndResource.vue";
@@ -371,6 +201,7 @@ export default {
   props: ["activityInfo"],
   components: {
     Avatar,
+    activityShow,
     taskManager,
     universalSpace,
     contextRes,

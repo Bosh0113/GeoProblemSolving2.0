@@ -762,7 +762,7 @@ export default {
               });
             }
           } else {
-            this.$Message.warning("Upload data is null.");
+            this.$Message.warning("Data is empty.");
           }
         }
       });

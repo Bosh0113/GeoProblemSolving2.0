@@ -71,7 +71,7 @@
               "
             >
               {{ activityInfo.description }}
-            </div>          
+            </div>
         </div>
       </vue-scroll>
     </div>

@@ -5,6 +5,7 @@ import cn.edu.njnu.geoproblemsolving.business.tool.integration.entity.Integrated
 import cn.edu.njnu.geoproblemsolving.business.tool.integration.entity.ModelAction;
 import cn.edu.njnu.geoproblemsolving.business.tool.integration.repository.IntegratedTaskDao;
 import cn.edu.njnu.geoproblemsolving.business.tool.support.dto.DataApplicationFindDTO;
+import cn.edu.njnu.geoproblemsolving.business.tool.support.entity.ModelService;
 import cn.edu.njnu.geoproblemsolving.business.tool.support.entity.TaskRecord;
 import cn.edu.njnu.geoproblemsolving.business.tool.support.repository.TaskRecordDao;
 import cn.edu.njnu.geoproblemsolving.common.enums.ResultEnum;
@@ -18,11 +19,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.net.URLEncoder;
 import java.util.*;
 
 import static cn.edu.njnu.geoproblemsolving.business.modeltask.Utils.convertMdl;
@@ -60,6 +63,9 @@ public class IntegrationService {
 
     @Value("${managerServerIpAndPort}")
     private String managerServerIpAndPort;
+
+    @Value("${dataServerManager}")
+    private String dataServerManager;
 
     @Value("${dataContainerIpAndPort}")
     private String dataContainerIpAndPort;
@@ -201,6 +207,9 @@ public class IntegrationService {
             List<ModelAction> failedModelActions = converseOutputModelAction(j_modelActionList.getJSONArray("failed"));
             updateIntegratedTaskOutput(task,finishedModelActions,failedModelActions);
 
+            // save to resource
+            // ????????????
+
             //todo common task 与 integrated task的合并
             TaskRecord comTask = taskRecordDao.findFirstByTaskId(task.getOid());
             switch (status){
@@ -232,6 +241,7 @@ public class IntegrationService {
             JSONObject fromModelAction = modelActionArray.getJSONObject(i);
             ModelAction modelAction = new ModelAction();
             modelAction.setId(fromModelAction.getString("id"));
+            // output data
             JSONArray output = fromModelAction.getJSONObject("outputData").getJSONArray("outputs");
             List<Map<String,Object>> outputDatas = new ArrayList<>();
             for(int j=0;j<output.size();j++){
@@ -321,4 +331,131 @@ public class IntegrationService {
         JSONObject result = jsonObjectResponseEntity.getBody().getJSONObject("data");
         return result;
     }
+
+    public JSONObject checkNodeContent(String serverId, String token, String type){
+
+        String contentType = type.equals("Visualization")?"Visualization":"Processing";
+
+        String url = "http://"+dataServerManager+"/capability?"+"id="+serverId+"&token="+ URLEncoder.encode(token)+"&type="+contentType;
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Type","application/json");
+        Map<String,String> mheader = new HashMap<>();
+        mheader.put("Content-Type","application/json");
+
+        HttpEntity<MultiValueMap> requestEntity = new HttpEntity<MultiValueMap>(null, headers);
+
+        SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
+        requestFactory.setConnectTimeout(6000);// 设置超时
+        requestFactory.setReadTimeout(6000);
+        RestTemplate restTemplate = new RestTemplate(requestFactory);
+
+        JSONObject result = new JSONObject();
+
+        try{
+            ResponseEntity<JSONObject> response = restTemplate.exchange(url, HttpMethod.GET, requestEntity, JSONObject.class);
+            JSONObject j_result = response.getBody();
+
+            try{
+                int code = j_result.getInteger("code");
+                if(code==0){
+                    JSONObject capability = j_result.getJSONObject("Capability");
+                    result.put("content",capability.get("data"));
+                }else{
+                    result.put("content","offline");
+                }
+
+            }catch (Exception e){
+                result.put("content","offline");
+            }
+        }catch (Exception e){
+            result.put("content","offline");
+        }
+        return result;
+    }
+
+//    public JSONArray getNodeContentCheck(String token, String type) throws Exception{
+//        //因为dataservice不提供直接查询接口，因此只能先找token再遍历
+//        String baseUrl = "http://" + dataServerManager + "/onlineNodesAllPcs";
+//        JSONArray j_nodes = new JSONArray();
+//
+//        String url = baseUrl + "?token=" + URLEncoder.encode(token) + "&type=" + type;
+//        String xml = null;
+//
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.add("Content-Type","application/json");
+//        Map<String,String> mheader = new HashMap<>();
+//        mheader.put("Content-Type","application/json");
+//
+//        HttpEntity<MultiValueMap> requestEntity = new HttpEntity<MultiValueMap>(null, headers);
+//        SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
+//        requestFactory.setConnectTimeout(6000);// 设置超时
+//        requestFactory.setReadTimeout(6000);
+//        RestTemplate restTemplate = new RestTemplate(requestFactory);
+//        ResponseEntity<JSONObject> response = restTemplate.exchange(url,HttpMethod.GET, requestEntity, JSONObject.class);
+//        JSONObject j_result = response.getBody();
+//
+//        try{
+//            xml = MyHttpUtils.GET(url, "utf-8", null);
+//        }catch (Exception e){
+//            return null;
+//        }
+//
+//        JSONObject jsonObject = XmlTool.xml2Json(xml);
+//        JSONArray j_processings = new JSONArray();
+//        JSONArray result = new JSONArray();
+//        try {
+//            j_processings = jsonObject.getJSONArray("AvailablePcs");
+//            result = updateUserNodeContent(j_processings,token,type);
+//        } catch (Exception e) {
+//            JSONObject j_processing = jsonObject.getJSONObject("AvailablePcs");
+//            j_processing.put("token", token);
+//            DataNodeContent dataNodeContent = dataNodeContentDao.findAllByServerIdAndToken(j_processing.getString("id"),token);
+//
+//            if(dataNodeContent!=null){
+//                dataNodeContent.setChecked(1);
+//                j_processing.put("bindItems",dataNodeContent.getBindItems());
+//            }
+//            List<DataNodeContent> dataNodeContentList = dataNodeContentDao.findAllByTokenAndType(token,type);
+//            for(int i=0;i<dataNodeContentList.size();i++){
+//                DataNodeContent content = dataNodeContentList.get(i);
+//                if(dataNodeContent.getChecked()==0){
+//                    dataNodeContentDao.delete(content);
+//                }else {
+//                    content.setChecked(0);
+//                }
+//
+//            }
+//            result.add(j_processing);
+//        }
+//        return result;
+//    }
+//
+//    public JSONArray updateUserNodeContent(JSONArray nodeContents,String token,String type){
+//        JSONArray result = new JSONArray();
+//        for (int i = 0; nodeContents != null && i < nodeContents.size(); i++) {
+//            JSONObject j_process = nodeContents.getJSONObject(i);
+//            j_process.put("token", token);
+//            DataNodeContent dataNodeContent = dataNodeContentDao.findAllByServerIdAndToken(j_process.getString("id"),token);
+//
+//            if(dataNodeContent!=null){
+//                dataNodeContent.setChecked(1);
+//                dataNodeContentDao.save(dataNodeContent);
+//                j_process.put("bindItems",dataNodeContent.getBindItems());
+//            }
+//            result.add(j_process);
+//        }
+//
+//        List<DataNodeContent> dataNodeContentList = dataNodeContentDao.findAllByTokenAndType(token,type);
+//        for(int i=0;i<dataNodeContentList.size();i++){
+//            DataNodeContent dataNodeContent = dataNodeContentList.get(i);
+//            if(dataNodeContent.getChecked()==0){
+//                dataNodeContentDao.delete(dataNodeContent);
+//            }else {
+//                dataNodeContent.setChecked(0);
+//            }
+//
+//        }
+//
+//        return result;
+//    }
 }

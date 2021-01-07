@@ -74,7 +74,7 @@
               }}</span>
             </div>
           </div>
-          <div style="margin: 10px 0">
+          <div style="margin: 10px 0" v-if="activityInfo.type == 'Activity_Group'">
             <Label style="float: left">Description: </Label>
             <div
               style="
@@ -92,7 +92,7 @@
           </div>
         </div>
         <Divider style="margin: 10px 0"></Divider>
-        <div>
+        <div v-if="activityInfo.type == 'Activity_Group'">
           <h4 style="margin: 8px 0">Child activities</h4>
           <div
             v-for="item in activityInfo.children"
@@ -145,10 +145,10 @@
               </div>
             </Card>
           </div>
-          <div>
+          <div style="display: inline-block">
             <Card
               style="
-                height: 120px;
+                height: 160px;
                 width: 220px;
                 float: left;
                 margin: 0 10px 10px 0;
@@ -163,7 +163,7 @@
               "
             >
               <div
-                style="text-align: center; margin-top: 20px; color: #2d8cf0"
+                style="text-align: center; margin-top: 40px; color: #2d8cf0"
                 title="Create activity"
                 @click="preCreation()"
               >
@@ -171,6 +171,21 @@
               </div>
             </Card>
           </div>
+        </div>
+        <div v-else>
+          <h3 style="margin: 8px 0">Description</h3>
+          <div
+              style="
+                float: left;
+                min-height: 40px;
+                max-height: 120px;
+                overflow-y: auto;
+                word-break: break-word;
+                margin-left: 10px;
+              "
+            >
+              {{ activityInfo.description }}
+            </div>
         </div>
       </vue-scroll>
     </div>

@@ -8,7 +8,7 @@
           size="24"
           @click="dataListStyle = false"
           title="Resources list style"
-          style="margin-right:10px; cursor: pointer"
+          style="margin-right: 10px; cursor: pointer"
         />
         <Icon
           v-else
@@ -16,7 +16,7 @@
           size="24"
           @click="dataListStyle = true"
           title="Resources list style"
-          style="margin-right:10px; cursor: pointer"
+          style="margin-right: 10px; cursor: pointer"
         />
         <Button
           v-if="userRole != 'Visitor'"
@@ -24,7 +24,7 @@
           size="small"
           icon="md-shuffle"
           @click="getPreviousRes()"
-          style="margin-right:10px"
+          style="margin-right: 10px"
           title="Get resources from the previous activities"
         ></Button>
         <Button
@@ -41,20 +41,20 @@
         v-model="resouceModel"
         size="small"
         @on-change="changeResModel"
-        style="width:150px;margin:5px 10px"
+        style="width: 150px; margin: 5px 10px"
       >
         <Option value="resources">All resources</Option>
         <Option value="data">Data</Option>
         <Option value="materials">Other resources</Option>
         <Option value="toolData">Results</Option>
       </Select>
-      <div style="display: flex; justify-content: space-between;">
-        <div style="width:100%;" v-if="dataListStyle">
+      <div style="display: flex; justify-content: space-between">
+        <div style="width: 100%" v-if="dataListStyle">
           <Table
             :columns="tableColName"
             :data="fileList"
             class="table"
-            v-show="fileList!=[] && fileList!='None'"
+            v-show="fileList != [] && fileList != 'None'"
             height="400"
             no-data-text="No resource"
           >
@@ -72,7 +72,14 @@
                 type="text"
               ></Button>
               <template
-                v-if="permissionIdentity(activityInfo.permission, 'use_resource') || (permissionIdentity(activityInfo.permission, 'upload_resource') && item.uploaderId == userInfo.userId)"
+                v-if="
+                  permissionIdentity(activityInfo.permission, 'use_resource') ||
+                  (permissionIdentity(
+                    activityInfo.permission,
+                    'upload_resource'
+                  ) &&
+                    item.uploaderId == userInfo.userId)
+                "
               >
                 <a :href="row.pathURL" :download="row.name" title="Download">
                   <Button
@@ -98,14 +105,21 @@
           </Table>
         </div>
         <div id="toolData" v-else>
-          <Card style="width:150px; height:150px; float:left; margin:5px" v-if="fileList.length == 0">
+          <Card
+            style="width: 150px; height: 150px; float: left; margin: 5px"
+            v-if="fileList.length == 0"
+          >
             <div>There is no resource.</div>
           </Card>
           <vue-scroll :ops="ops" style="max-height: calc(100vh - 245px)" v-else>
-            <div v-for="(item,index) in fileList" :key="index">
-              <Card style="width:150px; height:150px; float:left; margin:5px">
-                <div style="float:left">
-                  <template v-if="item.thumbnail == ''||item.thumbnail == undefined">
+            <div v-for="(item, index) in fileList" :key="index">
+              <Card
+                style="width: 150px; height: 150px; float: left; margin: 5px"
+              >
+                <div style="float: left">
+                  <template
+                    v-if="item.thumbnail == '' || item.thumbnail == undefined"
+                  >
                     <img
                       v-if="item.type == 'data'"
                       :src="dataUrl"
@@ -160,9 +174,11 @@
                     <img :src="item.thumbnail" height="118px" width="118px" />
                   </template>
                 </div>
-                <div style="float:left;margin: 0 10px">
+                <div style="float: left; margin: 0 10px">
                   <div>
-                    <div class="toolDataText" :title="item.name">{{item.name}}</div>
+                    <div class="toolDataText" :title="item.name">
+                      {{ item.name }}
+                    </div>
                   </div>
                   <!-- <div>
                     <Label class="toolDataLabel">Description:</Label>
@@ -173,24 +189,39 @@
                       size="small"
                       title="Check"
                       icon="md-eye"
-                      style="margin: 10px 20px 0 0;"
+                      style="margin: 10px 20px 0 0"
                       @click="checkData(item)"
                     ></Button>
                     <a :href="item.pathURL" :download="item.name">
                       <Button
-                        v-if="permissionIdentity(activityInfo.permission, 'use_resource')"
+                        v-if="
+                          permissionIdentity(
+                            activityInfo.permission,
+                            'use_resource'
+                          )
+                        "
                         size="small"
                         title="Download"
                         icon="md-download"
-                        style="margin: 10px 20px 0 0;"
+                        style="margin: 10px 20px 0 0"
                       ></Button>
                     </a>
                     <Button
-                      v-if="permissionIdentity(activityInfo.permission, 'manage_resource') || (permissionIdentity(activityInfo.permission, 'upload_resource') && item.uploaderId == userInfo.userId)"
+                      v-if="
+                        permissionIdentity(
+                          activityInfo.permission,
+                          'manage_resource'
+                        ) ||
+                        (permissionIdentity(
+                          activityInfo.permission,
+                          'upload_resource'
+                        ) &&
+                          item.uploaderId == userInfo.userId)
+                      "
                       size="small"
                       title="Delete"
                       icon="md-close"
-                      style="margin-top: 10px;"
+                      style="margin-top: 10px"
                       @click="deleteResourceModalShow(item.resourceId)"
                     ></Button>
                   </div>
@@ -213,23 +244,23 @@
           <div style>
             <div class="dataInfo">
               <Label class="dataLabel">Name:</Label>
-              <span class="dataText">{{selectData.name}}</span>
+              <span class="dataText">{{ selectData.name }}</span>
             </div>
             <div class="dataInfo">
               <Label class="dataLabel">Type:</Label>
-              <span class="dataContent">{{selectData.type}}</span>
+              <span class="dataContent">{{ selectData.type }}</span>
               <Label class="dataLabel">Provider:</Label>
-              <span class="dataContent">{{selectData.uploaderName}}</span>
+              <span class="dataContent">{{ selectData.uploaderName }}</span>
             </div>
             <div class="dataInfo">
               <Label class="dataLabel">File size:</Label>
-              <span class="dataContent">{{selectData.fileSize}}</span>
+              <span class="dataContent">{{ selectData.fileSize }}</span>
               <Label class="dataLabel">Creation time:</Label>
-              <span class="dataContent">{{selectData.uploadTime}}</span>
+              <span class="dataContent">{{ selectData.uploadTime }}</span>
             </div>
             <div class="dataInfo">
               <Label class="dataLabel">Description:</Label>
-              <span class="dataText">{{selectData.description}}</span>
+              <span class="dataText">{{ selectData.description }}</span>
             </div>
           </div>
         </TabPane>
@@ -246,13 +277,13 @@
       width="800px"
       v-model="inheritResModal"
       title="Get resources from previous activities"
-      :styles="{top: '20px'}"
+      :styles="{ top: '20px' }"
       @on-ok="saveResources()"
       ok-text="Save"
       cancel-text="Cancel"
     >
-      <div style="margin-left:75px">
-        <div style="font-size:14px">Select the needed data:</div>
+      <div style="margin-left: 75px">
+        <div style="font-size: 14px">Select the needed data:</div>
         <Transfer
           :data="existingResources"
           :target-keys="targetKeys"
@@ -275,7 +306,7 @@
         label-position="left"
       >
         <FormItem label="Privacy" prop="privacy">
-          <RadioGroup v-model="uploadDataInfo.privacy" style="width:80%">
+          <RadioGroup v-model="uploadDataInfo.privacy" style="width: 80%">
             <Radio label="private">Private</Radio>
             <Radio label="public">Public</Radio>
           </RadioGroup>
@@ -292,39 +323,49 @@
           </RadioGroup>
         </FormItem>
         <FormItem label="Description" prop="description">
-          <Input type="textarea" :rows="4" v-model="uploadDataInfo.description" />
+          <Input
+            type="textarea"
+            :rows="4"
+            v-model="uploadDataInfo.description"
+          />
         </FormItem>
       </Form>
-      <Upload :max-size="1024*1024" multiple type="drag" :before-upload="gatherFile" action="-">
+      <Upload
+        :max-size="1024 * 1024"
+        multiple
+        type="drag"
+        :before-upload="gatherFile"
+        action="-"
+      >
         <div style="padding: 20px 0">
           <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
           <p>
             Click or drag files here to upload (The file size must control in
-            <span
-              style="color:red"
-            >1GB</span>)
+            <span style="color: red">1GB</span>)
           </p>
         </div>
       </Upload>
-      <div style="padding:0 10px 0 10px;max-height:200px;overflow-y:auto">
-        <ul v-for="(list,index) in toUploadFiles" :key="index">
-          <li style="display:flex">
+      <div style="padding: 0 10px 0 10px; max-height: 200px; overflow-y: auto">
+        <ul v-for="(list, index) in toUploadFiles" :key="index">
+          <li style="display: flex">
             File name:
-            <span
-              style="font-size:10px;margin: 0 5px 0 5px"
-            >{{ list.name }} ( {{list.fileSize}} )</span>
+            <span style="font-size: 10px; margin: 0 5px 0 5px"
+              >{{ list.name }} ( {{ list.fileSize }} )</span
+            >
             <Icon
               type="ios-close"
               size="20"
               @click="delFileList(index)"
-              style="display:flex;justify-content:flex-end;cursor:pointer"
+              style="display: flex; justify-content: flex-end; cursor: pointer"
             ></Icon>
           </li>
         </ul>
       </div>
       <div slot="footer">
-        <Button @click="dataUploadModal=false">Cancel</Button>
-        <Button type="success" @click="folderUpload('uploadDataInfo')">Upload</Button>
+        <Button @click="dataUploadModal = false">Cancel</Button>
+        <Button type="success" @click="folderUpload('uploadDataInfo')"
+          >Upload</Button
+        >
       </div>
     </Modal>
     <Modal
@@ -707,7 +748,7 @@ export default {
               });
             }
           } else {
-            this.$Message.warning("Upload data is null.");
+            this.$Message.warning("Data is empty.");
           }
         }
       });
@@ -951,49 +992,21 @@ export default {
       this.inheritResModal = true;
     },
     getPreActivities() {
-      // this.preActivities = [];
-      // let processStructure = [];
-      // // get solving process
-      // if (
-      //   this.projectInfo.solvingProcess == null ||
-      //   this.projectInfo.solvingProcess == undefined ||
-      //   JSON.parse(this.projectInfo.solvingProcess).length == 0
-      // ) {
-      //     $.ajax({
-      //       url:
-      //         "/GeoProblemSolving/subProject/inquiry" +
-      //         "?key=aid" +
-      //         "&value=" +
-      //         this.activityInfo.aid,
-      //       type: "GET",
-      //       async: false,
-      //       success: data => {
-      //         if (data == "Offline") {
-      //           this.$store.commit("userLogout");
-      //           this.$router.push({ name: "Login" });
-      //         } else if (data != "None" && data != "Fail") {
-      //           let subprojectInfo = data[0];
-      //           processStructure = JSON.parse(subprojectInfo.solvingProcess);
-      //         } else {
-      //           console.log(data);
-      //         }
-      //       },
-      //       error: function(err) {
-      //         console.log("Get manager name fail.");
-      //       }
-      //     });
-      //   }
-      // for (var i = 0; i < processStructure.length; i++) {
-      //   if (processStructure[i].aid == this.activityInfo.aid) {
-      //     let last = processStructure[i].last;
-      //     if (last.length > 0) {
-      //       for (var j = 0; j < last.length; j++) {
-      //         this.preActivities.push(processStructure[last[j].id]);
-      //       }
-      //       this.getInheritResource();
-      //     }
-      //   }
-      // }
+      this.preActivities = [];
+      // parent
+      if (
+        this.activityInfo.parent != undefined &&
+        this.activityInfo.parent != ""
+      ) {
+        this.preActivities.push(this.activityInfo.parent);
+      }
+      // last activities
+      if (this.activityInfo.last != undefined) {
+        for (var i = 0; i < this.activityInfo.last.length; i++) {
+          this.preActivities.push(this.activityInfo.last[i]);
+        }
+        this.getInheritResource();
+      }
     },
     getInheritResource() {
       this.existingResources = this.getMockData();
@@ -1165,9 +1178,9 @@ export default {
   background-color: #f8f8f9;
 }
 .resCard {
-    max-height: calc(100vh - 165px);
+  max-height: calc(100vh - 165px);
 }
 .resCard >>> .ivu-card-head {
-    padding: 6px 16px;
+  padding: 6px 16px;
 }
 </style>
