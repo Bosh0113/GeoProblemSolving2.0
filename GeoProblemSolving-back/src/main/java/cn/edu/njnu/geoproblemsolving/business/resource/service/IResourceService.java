@@ -12,13 +12,22 @@ import java.util.Map;
 
 public interface IResourceService {
     Object uploadRemote(HttpServletRequest request);
+
     Object upSomeRemote();
+
     Object downloadRemote(String uid);
+
     Object downSomeRemote(ArrayList<String> oids);
-    Object deleteRemote(String uid);
-    Object delSomeRemote(ArrayList<String> oids);
+
+    JsonResult deleteRemote(String uid, String rid);
+
+    Object delSomeRemote(String uid, ArrayList<String> oids);
+
     Object searchRemote(String fileName);
+
     JsonResult inquiryLocal(Map<String, String> filedAndValue);
+
     Object saveResource(AddIResourceDTO add) throws IOException, URISyntaxException;
+
     JsonResult uploadImage(HttpServletRequest request);
 }

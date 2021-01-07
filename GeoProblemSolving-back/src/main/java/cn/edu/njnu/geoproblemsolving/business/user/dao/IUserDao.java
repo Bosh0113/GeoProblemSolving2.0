@@ -28,5 +28,12 @@ public interface IUserDao {
 
     JsonResult addUserInfo(JSONObject user);
 
-    JsonResult updateUserRes(String uploaderId, ResourcePojo res);
+
+
+    // 用户资源字段 curd 处理
+    JsonResult uploadUserRes(String uploaderId, ResourcePojo res);
+
+    JsonResult delUserRes(String userId, String[] rids);
+
+
 }

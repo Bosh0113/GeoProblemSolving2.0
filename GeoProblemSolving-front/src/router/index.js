@@ -27,7 +27,15 @@ const routes = [
         path: "newPersonalPage",
         name: "newPersonalPage",
         component: resolve =>
-          require(["@/components/user/userPage/newPersonalPage"], resolve)
+          require(["@/components/user/userPage/newPersonalPage"], resolve),
+        children: [
+          {
+            path: "resource",
+            name: "resource",
+            component: resolve => require(["@/components/user/subPage/resource"], resolve),
+          },
+
+        ]
       },
       {
         path: "newproject",

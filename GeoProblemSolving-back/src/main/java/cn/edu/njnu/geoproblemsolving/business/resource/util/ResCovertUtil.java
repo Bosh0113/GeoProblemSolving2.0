@@ -4,7 +4,7 @@ import cn.edu.njnu.geoproblemsolving.business.resource.entity.IResourceEntity;
 import com.alibaba.fastjson.JSONObject;
 
 public class ResCovertUtil {
-    public JSONObject gsmRes2UserBaseRes(IResourceEntity resourceEntity, String resMd5, String remoteResId){
+    public JSONObject gsmRes2UserBaseRes(IResourceEntity resourceEntity, String resMd5){
         JSONObject userBaseRes = new JSONObject();
         userBaseRes.put("uid", resourceEntity.getResourceId());
         userBaseRes.put("name", resourceEntity.getName());
@@ -12,7 +12,7 @@ public class ResCovertUtil {
         userBaseRes.put("thumbnail",resourceEntity.getThumbnail());
         userBaseRes.put("editToolInfo", resourceEntity.getEditToolInfo());
         userBaseRes.put("fileSize", resourceEntity.getFileSize());
-        userBaseRes.put("address", "dataContainer: " + remoteResId);
+        userBaseRes.put("address", resourceEntity.getPathURL());
         userBaseRes.put("parent", "no info");
         userBaseRes.put("md5", resMd5);
         userBaseRes.put("privacy", resourceEntity.getPrivacy());

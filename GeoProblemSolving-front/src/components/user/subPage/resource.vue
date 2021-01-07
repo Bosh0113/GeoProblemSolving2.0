@@ -36,8 +36,8 @@
             <p slot="title">Resource List</p>
             <div slot="extra">
 
-<!--              <Icon type="md-unlock" size="25" color="green"/>-->
-<!--              <Icon type="md-lock" size="25" color="red"/>-->
+              <!--              <Icon type="md-unlock" size="25" color="green"/>-->
+              <!--              <Icon type="md-lock" size="25" color="red"/>-->
               <Icon type="md-cloud-upload"
                     size="25"
                     @click="uploadModal = true"
@@ -247,10 +247,41 @@
       this.getUserResource();
     },
     methods: {
-      selectedRes: function(selection){
+      selectedRes: function (selection) {
+        console.log(selection)
         this.selectedResList = selection;
       },
-      delResItem: function(){
+      delResItem: function () {
+        if (this.selectedResList.length > 0) {
+          if (this.selectedResList.length == 1) {
+            let rid = this.selectedResList[0].pathURL.split("/data/")[1];
+            this.axios
+              .delete("/GeoProblemSolving/resource/deleteRemote/" + this.$store.getters.userId + "?rid=" + rid)
+              .then(res => {
+                console.log(res);
+              })
+              .catch(err => {
+                this.$Message.error("DELETE FAILED.")
+              })
+          } else {
+            let rids = "";
+            for (let i = 0; i < this.selectedResList.length; i++) {
+              if (i == this.selectedResList.length - 1) {
+                rids += this.selectedResList[i].pathURL.split("/data/")[1]
+              } else {
+                rids += this.selectedResList[i].pathURL.split("/data/")[1] + ","
+              }
+            }
+            this.axios
+              .delete("/GeoProblemSolving/resource/delSomeRemote/" + this.$store.getters.userId + "?rids=" + rids)
+              .then(res => {
+                console.log(res);
+              })
+              .catch(err => {
+                this.$Message.error("DELETE FAILED.")
+              })
+          }
+        }
       },
       getUserResource() {
         this.axios
@@ -273,6 +304,7 @@
       },
       shareRes: function (sharedUserId) {
       },
+      //上传之前的钩子
       gatherFile: function (file) {
         let that = this;
         if (that.toUploadFiles.length >= 5) {
@@ -305,9 +337,12 @@
             let uploadFiles = this.toUploadFiles;
             if (uploadFiles.length > 0) {
               this.uploadModal = false;
-              //FormData
+              // FormData
               let formData = new FormData();
               for (let i = 0; i < uploadFiles.length; i++) {
+                // let file = new File([uploadFiles[i]], uploadFiles[i].name, {
+                //   type: uploadFiles[i].type,
+                // });
                 formData.append("file", uploadFiles[i]);
               }
               formData.append("description", this.resFormItems.description);
@@ -318,11 +353,15 @@
               this.axios({
                 url: "/GeoProblemSolving/resource/upload",
                 method: "post",
+                cache: false,
+                processData: false,
+                contentType: false,
+                async: true,
+                data: formData,
                 onUploadProgress: progressEvent => {
                   this.uploadProgress =
                     ((progressEvent.loaded / progressEvent.total) * 100) | 0;
                 },
-                data: formData
               })
                 .then(res => {
                   if (res.data != "Fail") {

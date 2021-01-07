@@ -17,5 +17,6 @@ public interface IResourceDao {
     Object deleteSomeRemote(ArrayList<String> oids);
     Object delResById(String resId);
     JsonResult inquiryResource(Map<String, String> inquiryKeyAndValue);
+    Object delResByPathUrl(String pathUrl);
     // Object delResByIds(ArrayList<String> resIds);
 }

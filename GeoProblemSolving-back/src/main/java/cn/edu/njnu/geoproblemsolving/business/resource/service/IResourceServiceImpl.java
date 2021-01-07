@@ -19,10 +19,12 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.entity.ContentType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -31,6 +33,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
@@ -105,9 +108,14 @@ public class IResourceServiceImpl implements IResourceService {
                             String file = part.getSubmittedFileName();
                             String temp[] = file.split("\\.");
                             String fileName = temp[0];
+                            String suffix = "." + temp[1];
 
-                            MultipartFile multipartFile = new MockMultipartFile(ContentType.APPLICATION_OCTET_STREAM.toString(), part.getInputStream());
-                            valueMap.add("datafile", multipartFile.getResource());
+                            File fileTemp = File.createTempFile(fileName, suffix);//创建临时文件
+                            FileUtils.copyInputStreamToFile(part.getInputStream(), fileTemp);
+                            // MultipartFile multipartFile = new MockMultipartFile(ContentType.APPLICATION_OCTET_STREAM.toString(), part.getInputStream());
+                            FileSystemResource multipartFile = new FileSystemResource(fileTemp);      //临时文件
+
+                            valueMap.add("datafile", multipartFile);
                             valueMap.add("name", fileName);
                             valueMap.add("userId", session.getAttribute("userId"));
                             valueMap.add("serverNode", "china");
@@ -115,7 +123,6 @@ public class IResourceServiceImpl implements IResourceService {
                             String uploadRemoteUrl = "http://" + dataRemoteIp + ":8082/data";
                             //向dataContainer传输数据
                             JSONObject uploadRemoteResult = httpUtil.uploadRemote(uploadRemoteUrl, valueMap);
-                            String remoteResId = (String) JSONObject.parseObject(JSONObject.toJSONString(uploadRemoteResult.get("data"))).get("id");
                             Integer uploadResultInfo = uploadRemoteResult.getInteger("code");
 
                             if (!uploadResultInfo.equals(1)) {
@@ -123,6 +130,7 @@ public class IResourceServiceImpl implements IResourceService {
                                 valueMap.clear();
                                 continue;
                             }
+
                             //成功将资源上传到数据容器中
                             // 接下来将资源基本信息写入本地数据库及用户服务器
                             String fileSize;
@@ -152,35 +160,39 @@ public class IResourceServiceImpl implements IResourceService {
 
                             resourceEntity.setEditToolInfo(req.getParameter("editToolInfo"));
                             resourceEntity.setDescription((String) req.getParameter("description"));
+
+                            //还是各自有自己的 uid 更好，使用 pathUrl 进行判断。
                             String resUUID = UUID.randomUUID().toString();
                             resourceEntity.setResourceId(resUUID);
 
                             //更新用户服务器中用户字段
-                            // String userBaseUrl = "http://" + userResServer + "/ResServer/resource";
-                            String userBaseUrl = "http://"+userResServer+"/ResServer/resource";
-                            //修改userServer中用户信息,应该是和资源相关的内容，包括userId和资源有关的内容
-                            JSONObject userBaseJson = new JSONObject();
                             //计算文件的MD5值,此操作很费时间
                             String resMd5 = DigestUtils.md5DigestAsHex(multipartFile.getInputStream());
 
                             //参与式平台资源与用户资源字段有所不同，临时转换，后期完全统一过后，就不用了
                             ResCovertUtil resCovertUtil = new ResCovertUtil();
-                            JSONObject userBaseRes = resCovertUtil.gsmRes2UserBaseRes(resourceEntity, resMd5, remoteResId);
+                            JSONObject userBaseRes = resCovertUtil.gsmRes2UserBaseRes(resourceEntity, resMd5);
                             ArrayList resourceList = new ArrayList();
                             resourceList.add(userBaseRes);
-                            //用户服务器资源无uploaderId这个说法
+
+                            //用户服务器资源
+                            String userBaseUrl = "http://" + userResServer + "/ResServer/resource";
+                            //修改userServer中用户信息,应该是和资源相关的内容，包括userId和资源有关的内容
+                            JSONObject userBaseJson = new JSONObject();
                             userBaseJson.put("userId", uploaderId);
                             userBaseJson.put("resources", resourceList);
                             JSONObject uploadToUserServerResult = httpUtil.setUserBase(userBaseUrl, userBaseJson);
+
                             if ((int) uploadToUserServerResult.get("code") != 0) {
                                 uploadInfos.failed.add(part.getSubmittedFileName());
                             }
 
                             //最后存入本地数据库中
                             IResourceEntity resDetails = resourceDao.saveResDetails(resourceEntity);
+
                             //更新本地用户 resource 字段
                             ResourcePojo localUserResField = userBaseRes.toJavaObject(ResourcePojo.class);
-                            userDao.updateUserRes(uploaderId, localUserResField);
+                            userDao.uploadUserRes(uploaderId, localUserResField);
 
                             uploadInfos.uploaded.add(resDetails);
                         } else {
@@ -239,18 +251,41 @@ public class IResourceServiceImpl implements IResourceService {
     }
 
     @Override
-    public Object deleteRemote(String uid) {
-        String delRemoteUrl = "http://" + dataRemoteIp + ":8082/del?uid=" + uid;
+    public JsonResult deleteRemote(String uid, String rid) {
+        String delRemoteUrl = "http://" + dataRemoteIp + ":8082/data/" + rid;
+        //后端发送 http 的工具类
         RestTemplateUtil httpUtil = new RestTemplateUtil();
         ResponseEntity response = httpUtil.getDelRemoteResult(delRemoteUrl);
-        //远程删除成功，开始删除本地数据库中的内容
-        DeleteResult delResByResult = (DeleteResult) resourceDao.delResById(uid);
-        return response.getBody();
+        JSONObject delResult = JSONObject.parseObject((String) response.getBody());
+        if (delResult.getString("result").equals("suc")) {
+            //数据容器删除成功，开始删除用户服务器内容
+            String delUserBaseResUrl = "http://" + remoteResIp + "/resource?userId" + uid + "&rid=" + rid;
+            JSONObject jsonObject = httpUtil.delUserBaseResource(delUserBaseResUrl);
+            if (jsonObject.getString("code").equals("0")) {
+                //用户服务器内容更新成功，接下来是本地内容，先删除数据库中 resource 记录，然后再删除用户中 resources 字段中的记录
+                resourceDao.delResByPathUrl(delRemoteUrl);
+                //更新用户数据库
+                String[] rids = {rid};
+                userDao.delUserRes(uid, rids);
+                return ResultUtils.success();
+
+            }
+        } else {
+            return ResultUtils.error(-2, "DataContainer delete Failed:" + rid);
+        }
+        //用户服务器删除成功，开始删除本地数据库中的内容
+        DeleteResult delResByResult = (DeleteResult) resourceDao.delResById(rid);
+
+        //本地数据库中的内容删除成功，开始更新本地用户字段
+
+        return null;
     }
 
     @Override
-    public Object delSomeRemote(ArrayList<String> sourceStoreIds) {
+    public Object delSomeRemote(String userId, ArrayList<String> sourceStoreIds) {
         String oids = "";
+        User user = mongoTemplate.findOne(new Query(Criteria.where("userId").is(userId)), User.class);
+        //先把本地内容删除，然后再删除远端内容
         for (int i = 0; i < sourceStoreIds.size(); i++) {
             String oid = sourceStoreIds.get(i);
             //删除本地数据库中的资源详情数据
@@ -264,9 +299,20 @@ public class IResourceServiceImpl implements IResourceService {
                 oids += oid;
             }
         }
-        String delSomeRemoteUrl = "http://" + dataRemoteIp + ":8082/bulkDel?oids=" + oids;
+
+        //更新 参与式平台用户 resources 字段
+        String[] rids = (String[]) sourceStoreIds.toArray();
+        userDao.delUserRes(userId, rids);
+
+        //更新用户服务器 字段
         RestTemplateUtil httpUtil = new RestTemplateUtil();
+        String delUserBaseURL = "http://" + remoteResIp + "/resource?userId=" + userId + "&rid=" + oids;
+        JSONObject jsonObject = httpUtil.delUserBaseResource(delUserBaseURL);
+
+        //删除 数据容器 中的资源
+        String delSomeRemoteUrl = "http://" + dataRemoteIp + ":8082/batchData?oids=" + oids;
         ResponseEntity response = httpUtil.getDelRemoteResult(delSomeRemoteUrl);
+
         return response.getBody();
     }
 
@@ -307,6 +353,7 @@ public class IResourceServiceImpl implements IResourceService {
 
     /**
      * upload image
+     *
      * @param request
      * @return
      * @author mzy
@@ -335,7 +382,7 @@ public class IResourceServiceImpl implements IResourceService {
 
 
                     JsonResult storeResult = fileStore(part, filePath, folderPath);
-                    if(storeResult.getCode() == 0)
+                    if (storeResult.getCode() == 0)
                         newFileName = storeResult.getData().toString();
                     else
                         return storeResult;
@@ -355,7 +402,7 @@ public class IResourceServiceImpl implements IResourceService {
         }
     }
 
-//    private static void downloadUsingStream(String urlStr) throws IOException {
+    //    private static void downloadUsingStream(String urlStr) throws IOException {
 //        String file = "/123.txt";
 //        URL url = new URL(urlStr);
 //        BufferedInputStream bis = new BufferedInputStream(url.openStream());
@@ -368,23 +415,24 @@ public class IResourceServiceImpl implements IResourceService {
 //        fis.close();
 //        bis.close();
 //    }
-public static String copyByUrl(String urlStr,String fileName,String savePath)throws IOException {
-    URL url = new URL(urlStr);
-     FileUtils.copyURLToFile(url, new File(savePath+ File.separator+fileName));
-    File file = new File(savePath+ File.separator+fileName);
 
-    Long fileSize =file.length();
-    String size;
-    DecimalFormat df = new DecimalFormat("##0.00");
-    if (fileSize > 1024 * 1024) {
-        size = df.format((float)fileSize / (float) (1024 * 1024)) + "MB";
-    } else {
-        size = df.format((float) fileSize / (float) (1024)) + "KB";
+    private String copyByUrl(String urlStr, String fileName, String savePath) throws IOException {
+        URL url = new URL(urlStr);
+        FileUtils.copyURLToFile(url, new File(savePath + File.separator + fileName));
+        File file = new File(savePath + File.separator + fileName);
+
+        Long fileSize = file.length();
+        String size;
+        DecimalFormat df = new DecimalFormat("##0.00");
+        if (fileSize > 1024 * 1024) {
+            size = df.format((float) fileSize / (float) (1024 * 1024)) + "MB";
+        } else {
+            size = df.format((float) fileSize / (float) (1024)) + "KB";
+        }
+        return size;
     }
-    return size;
-}
 
-    private JsonResult fileStore(Part part, String filePath, String folderPath){
+    private JsonResult fileStore(Part part, String filePath, String folderPath) {
         try {
             String fileName = filePath.substring(0, filePath.lastIndexOf("."));
             String suffix = filePath.substring(filePath.lastIndexOf(".") + 1);
@@ -414,7 +462,7 @@ public static String copyByUrl(String urlStr,String fileName,String savePath)thr
             inputStream.close();
 
             return ResultUtils.success(newFileTitle);
-        } catch (Exception ex){
+        } catch (Exception ex) {
             return ResultUtils.error(-2, ex.toString());
         }
     }
