@@ -39,13 +39,7 @@
             <el-divider class="left-divider"></el-divider>
             <div style="font-weight: 600;font-size: 16px;">Description</div>
             <div v-if="dataService.hasOwnProperty('metaDetail')">
-              {{
-                dataService.metaDetail.hasOwnProperty("Description")
-                  ? dataService.metaDetail.Description[0]
-                  : dataService.metaDetail.hasOwnProperty("description")
-                  ? dataService.metaDetail.description
-                  : ""
-              }}
+              {{ dataService.metaDetail.Description[0] }}
             </div>
           </div>
           <div class="des">{{ dataService.date }}</div>
@@ -120,10 +114,7 @@
             </el-row>
           </div>
         </div>
-        <div
-          class="_params-group"
-          v-if="dataService.metaDetail.Parameter.length != 0"
-        >
+        <div class="_params-group">
           <div class="stateTitle">
             Parameter
           </div>
@@ -162,7 +153,7 @@
             :key="index"
             class="event"
           >
-            <el-row style="height:100px">
+            <el-row>
               <el-col :span="17" class="_event-desc">
                 <span class="event_name" :title="output.name">{{
                   output.name
@@ -171,8 +162,8 @@
                   {{ output.description }}
                 </p>
               </el-col>
-              <div>
-                <div class="_btn-group" v-if="type == ' Visualization'">
+              <el-col :span="6" :offset="1">
+                <div class="_btn-group">
                   <el-button
                     plain
                     round
@@ -191,36 +182,7 @@
                     >Bind</el-button
                   >
                 </div>
-                <div v-else-if="type == 'Processing'">
-                  <div class="output-pic" @mouseenter="maskVisible">
-                    <el-avatar
-                      shape="square"
-                      :size="80"
-                      fit="fill"
-                      :src="output.url"
-                    ></el-avatar>
-                  </div>
-                  <div v-show="showMask" @mouseout="maskInvisible">
-                    <div class="mask">
-                      <i
-                        class="el-icon-view mask-icon"
-                        style="margin-left:20px"
-                        @click="zoomOutPicDialog(output.url)"
-                      />
-                      <i
-                        class="el-icon-download mask-icon"
-                        @click="download(output)"
-                      />
-                    </div>
-                  </div>
-
-                  <!-- <img
-                      src="https://bkimg.cdn.bcebos.com/pic/0e2442a7d933c89566f98647d91373f082020002?x-bce-process=image/resize,m_lfit,w_480,limit_1"
-                      height="90"
-                      width="200"
-                    /> -->
-                </div>
-              </div>
+              </el-col>
             </el-row>
           </div>
         </div>
@@ -238,15 +200,6 @@
         @selectData="selectData"
       ></resource-list>
     </el-dialog>
-    <el-dialog
-      :visible.sync="zoomOutPicDialogShow"
-      width="1000px"
-      title="Output Picture"
-      :close-on-click-modal="false"
-      :destroy-on-close="true"
-    >
-      <img :src="zoomOutPicDialog" width="950" />
-    </el-dialog>
   </div>
 </template>
 
@@ -263,7 +216,6 @@ export default {
       dataToken: decodeURIComponent(
         decodeURIComponent(this.$route.params.token)
       ),
-      type: this.$route.params.type, ///Processing,Visualization,Data
       dataService: {},
       dataServiceDetail: {},
       record: {},
@@ -272,10 +224,7 @@ export default {
       // page info
       pageParams: { pageId: "", userId: "", userName: "" },
       inputIndex: "",
-      input2: "",
-      showMask: false,
-      zoomOutPicDialogShow: false,
-      zoomUrl: ""
+      input2: ""
     };
   },
 
@@ -325,7 +274,7 @@ export default {
       let json = {
         serverId: this.id,
         token: this.dataToken,
-        type: this.type
+        type: "Processing"
       };
       let { data } = await post(
         `/GeoProblemSolving/dataContainer/dataService/getData`,
@@ -339,7 +288,8 @@ export default {
     async getRemoteData() {
       let json = {
         serverId: this.id,
-        token: this.dataToken
+        token: this.dataToken,
+        type: "Processing"
       };
       let { id } = await post(`/GeoProblemSolving/dataContainer/remote`, json);
       let remoteDataList = id;
@@ -431,16 +381,6 @@ export default {
     remove(event) {
       event.url == "";
       event.urlName = "";
-    },
-    maskVisible() {
-      this.showMask = true;
-    },
-    maskInvisible() {
-      this.showMask = false;
-    },
-    zoomOutPicDialog(url) {
-      this.zoomUrl = url;
-      this.zoomOutPicDialog = true;
     }
   },
 
@@ -585,32 +525,5 @@ export default {
 }
 .el-card__body {
   padding: 0;
-}
-.output-pic {
-  position: absolute;
-  right: 18%;
-}
-.mask {
-  position: absolute;
-  width: 80px;
-  height: 80px;
-  top: 0;
-  backdrop-filter: blur(5px);
-  background: rgba(230, 230, 230, 0.3);
-  right: 18%;
-}
-/* .mask:hover {
-  top: 0;
-} */
-.mask-icon {
-  font-size: 20px;
-  color: white;
-  text-align: center;
-  vertical-align: middle;
-  line-height: 80px;
-  font-weight: 600;
-}
-.mask:hover {
-  cursor: pointer;
 }
 </style>

@@ -255,6 +255,9 @@ export default {
     },
     info: {
       type: Object
+    },
+    editToolInfo:{
+      type: Object
     }
   },
   data() {
@@ -316,7 +319,7 @@ export default {
       createToolFlag: null,
       pageParams: { pageId: "", userId: "", userName: "" },
       //step
-      currentStep: this.step
+      currentStep: this.step,
     };
   },
 
@@ -370,7 +373,13 @@ export default {
         }
       },
       deep: true
-    }
+    },
+    editToolInfo: {
+      handler(val) {
+        this.toolInfo = val;
+      },
+      deep: true
+    },
   }
 };
 </script>

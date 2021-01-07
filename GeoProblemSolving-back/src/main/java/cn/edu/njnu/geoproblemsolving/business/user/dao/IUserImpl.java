@@ -1,6 +1,7 @@
 package cn.edu.njnu.geoproblemsolving.business.user.dao;
 
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Project;
+import cn.edu.njnu.geoproblemsolving.business.resource.entity.ResourcePojo;
 import cn.edu.njnu.geoproblemsolving.business.user.dto.InquiryUserDto;
 import cn.edu.njnu.geoproblemsolving.business.user.entity.User;
 import cn.edu.njnu.geoproblemsolving.business.user.entity.UserDto;
@@ -16,11 +17,11 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.http.*;
 import org.springframework.stereotype.Repository;
-import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Map;
 
 @Repository
@@ -158,6 +159,56 @@ public class IUserImpl implements IUserDao {
 
         } catch (Exception ex){
             return ResultUtils.error(-2, "Fail: Exception");
+        }
+    }
+
+    @Override
+    public JsonResult uploadUserRes(String uploaderId, ResourcePojo res) {
+        Query query = new Query(Criteria.where("userId").is(uploaderId));
+        Update update = new Update();
+        // update.set("resources", res);
+        try {
+            User user = mongoTemplate.findOne(query, User.class);
+            ArrayList<ResourcePojo> resources = user.getResources();
+            if (resources == null){
+                resources = new ArrayList<ResourcePojo>();
+            }
+            resources.add(res);
+            update.set("resources", resources);
+            mongoTemplate.updateFirst(query, update, User.class);
+            return ResultUtils.success(mongoTemplate.findOne(query, User.class));
+        }catch (Exception e){
+            return ResultUtils.error(-2, "Failed to update user resource filed.");
+        }
+    }
+
+    @Override
+    public JsonResult delUserRes(String userId, String[] rids) {
+        Query query = new Query(Criteria.where("userId").is(userId));
+        User user = mongoTemplate.findOne(query, User.class);
+        try {
+            ArrayList<ResourcePojo> resources = user.getResources();
+            //ArrayList 的动态删除
+            ArrayList<Integer> indexArray = new ArrayList<>();
+            for (int i = 0; i < rids.length; i++){
+                for (int index =0; index < resources.size(); index++){
+                    if (resources.get(index).getUid().equals(rids[i])){
+                        indexArray.add(index);
+                        break;
+                    }
+                }
+            }
+            indexArray.sort(Comparator.naturalOrder());
+            for (int j=0; j < indexArray.size(); j++){
+                resources.remove(indexArray.get(j) - j);
+            }
+            Update update = new Update();
+            update.set("resources", resources);
+            mongoTemplate.updateFirst(query ,update, User.class);
+            return ResultUtils.success();
+
+        }catch (Exception e){
+            return ResultUtils.error(-2, "Delete local user field failed.");
         }
     }
 }

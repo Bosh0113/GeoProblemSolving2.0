@@ -753,6 +753,7 @@ body {
         <Button type="success" @click="changeFileInfo('editFileValidate')">Submit</Button>
       </div>
     </Modal>
+
     <Modal v-model="uploadModal" title="Upload file" width="600">
       <Form
         ref="uploadValidate"
@@ -1227,16 +1228,18 @@ export default {
     },
     //获取用户可管理支配的全部项目列表
     getManagerProjectList() {
-      this.axios
-        .post("/GeoProblemSolving/user/getMProject", this.$store.getters.userInfo.manageProjects)
-        .then(res =>{
-          if (res.data.data != "Fail" && res.data.data !="None"){
-            this.userManagerProjectList = res.data.data;
-          }else {
-            this.userManagerProjectList = [];
-          }
-        })
-        .catch(e=>{})
+      if (this.$store.getters.userInfo.createdProjects != null){
+        this.axios
+          .post("/GeoProblemSolving/user/getMProject", this.$store.getters.userInfo.createdProjects)
+          .then(res =>{
+            if (res.data.data != "Fail" && res.data.data !="None"){
+              this.userManagerProjectList = res.data.data;
+            }else {
+              this.userManagerProjectList = [];
+            }
+          })
+          .catch(e=>{})
+      }
     },
     //注销的模态框按钮
     logOutModalShow() {

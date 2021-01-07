@@ -5,9 +5,11 @@ import cn.edu.njnu.geoproblemsolving.business.resource.entity.AddIResourceDTO;
 import cn.edu.njnu.geoproblemsolving.business.resource.entity.IResourceEntity;
 import cn.edu.njnu.geoproblemsolving.business.resource.service.IResourceServiceImpl;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
+import com.sun.javafx.collections.MappingChange;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -37,6 +39,50 @@ public class IResourceController {
     }
 
     /**
+     * 测试接口
+     * @param multipartFile
+     * @param description
+     * @param type
+     * @param uploaderId
+     * @param privacy
+     * @return
+     */
+    @RequestMapping(value = "/uploadTest", method = RequestMethod.POST)
+    public Object up(@RequestParam("files") MultipartFile[] multipartFile,
+                     @RequestParam("description") String description,
+                     @RequestParam("type") String type,
+                     @RequestParam("uploaderId") String uploaderId,
+                     @RequestParam("privacy") String privacy){
+        System.out.println("sss");
+        return null;
+    }
+
+
+    /**
+     * 删除：单个文件
+     * GET，uid, String
+     * /resource/deleteRemote?uid=0b86cb92-4380-4075-b6bb-a9a3ac94ad07
+     * @param sourceStoreId
+     * @return
+     */
+    @RequestMapping(value = "/deleteRemote/{uid}", method = RequestMethod.DELETE)
+    public Object deleteRemote(@PathVariable("uid") String userId, @RequestParam("rid") String sourceStoreId){
+        return IResourceService.deleteRemote(userId, sourceStoreId);
+    }
+
+    /**
+     * 删除：多文件
+     * @param sourceStoreIds
+     * @return
+     */
+    @RequestMapping(value = "/delSomeRemote/{uid}", method = RequestMethod.DELETE)
+    public Object delSomeRemote(@PathVariable("uid") String userId, @RequestParam("rids") ArrayList<String> sourceStoreIds){
+        Object delResult = IResourceService.delSomeRemote(userId, sourceStoreIds);
+        return delResult;
+    }
+
+
+    /**
      * 单文件下载
      * GET，sourceStoreId,String
      * /resource/downloadRemote?uid=0b86cb92-4380-4075-b6bb-a9a3ac94ad07
@@ -62,29 +108,7 @@ public class IResourceController {
         return responseEntity;
     }
 
-    /**
-     * 删除：单个文件
-     * GET，uid, String
-     * /resource/deleteRemote?uid=0b86cb92-4380-4075-b6bb-a9a3ac94ad07
-     * @param sourceStoreId
-     * @return
-     */
-    @RequestMapping(value = "/deleteRemote", method = RequestMethod.GET)
-    public Object deleteRemote(@RequestParam("uid") String sourceStoreId){
-        String responseBody = (String)IResourceService.deleteRemote(sourceStoreId);
-        return responseBody;
-    }
 
-    /**
-     * 删除：多文件
-     * @param sourceStoreIds
-     * @return
-     */
-    @RequestMapping(value = "/delSomeRemote", method = RequestMethod.GET)
-    public Object delSomeRemote(@RequestParam("oids") ArrayList<String> sourceStoreIds){
-        Object delResult = IResourceService.delSomeRemote(sourceStoreIds);
-        return delResult;
-    }
 
     @RequestMapping(produces = "application/json;charset=UTF-8", value = "/{uid}", method = RequestMethod.GET)
     public JsonResult selectResourceByUidAndType(@PathVariable("uid") String userId, @RequestParam("type") String resType){

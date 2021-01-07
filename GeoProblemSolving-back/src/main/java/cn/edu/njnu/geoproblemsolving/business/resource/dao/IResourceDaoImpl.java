@@ -128,6 +128,12 @@ public class IResourceDaoImpl implements IResourceDao {
         }
     }
 
+    @Override
+    public Object delResByPathUrl(String pathUrl) {
+        DeleteResult deleteResult = mongoTemplate.remove(new Query(Criteria.where("pathURL").is(pathUrl)), IResourceEntity.class);
+        return deleteResult.getDeletedCount();
+    }
+
 
     // @Override
     // public Object delResByIds(ArrayList<String> resIds) {

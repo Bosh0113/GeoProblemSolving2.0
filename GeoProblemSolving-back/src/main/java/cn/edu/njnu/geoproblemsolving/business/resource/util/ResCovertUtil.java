@@ -12,7 +12,7 @@ public class ResCovertUtil {
         userBaseRes.put("thumbnail",resourceEntity.getThumbnail());
         userBaseRes.put("editToolInfo", resourceEntity.getEditToolInfo());
         userBaseRes.put("fileSize", resourceEntity.getFileSize());
-        userBaseRes.put("address", "dataContainer");
+        userBaseRes.put("address", resourceEntity.getPathURL());
         userBaseRes.put("parent", "no info");
         userBaseRes.put("md5", resMd5);
         userBaseRes.put("privacy", resourceEntity.getPrivacy());

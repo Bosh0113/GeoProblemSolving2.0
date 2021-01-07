@@ -27,7 +27,15 @@ const routes = [
         path: "newPersonalPage",
         name: "newPersonalPage",
         component: resolve =>
-          require(["@/components/user/userPage/newPersonalPage"], resolve)
+          require(["@/components/user/userPage/newPersonalPage"], resolve),
+        children: [
+          {
+            path: "resource",
+            name: "resource",
+            component: resolve => require(["@/components/user/subPage/resource"], resolve),
+          },
+
+        ]
       },
       {
         path: "newproject",
@@ -151,7 +159,7 @@ const routes = [
     ]
   },
   {
-    path: "/dataService/:id",
+    path: "/dataService/:id/:token/:type",
     name: "dataService",
     component: resolve =>
       require(["@/components/utils/data/dataService"], resolve)

@@ -18,6 +18,7 @@ public class RestTemplateUtil {
 
     /**
      * 文件下载请求
+     *
      * @param downRemoteUrl
      * @return
      */
@@ -39,6 +40,7 @@ public class RestTemplateUtil {
 
     /**
      * 将数据上传到数据容器
+     *
      * @param uploadRemoteUrl
      * @param paramMap
      * @return
@@ -53,14 +55,39 @@ public class RestTemplateUtil {
     //     ResponseEntity response =  restTemplate.postForObject(userServerUrl, paramMap, ResponseEntity.class);
     //     return response;
     // }
-    public JSONObject setUserBase(String userServerUrl,JSONObject userBaseJson){
+    /*
+    ==========================================用户服务器资源相关操作========================================================
+     */
+
+    /**
+     * 上传资源
+     * @param userServerUrl
+     * @param userBaseJson
+     * @return
+     */
+    public JSONObject setUserBase(String userServerUrl, JSONObject userBaseJson) {
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", "Bearer "+ StaticParams.access_token);
+        headers.add("Authorization", "Bearer " + StaticParams.access_token);
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<JSONObject> httpEntity = new HttpEntity<>(userBaseJson, headers);
-        ResponseEntity<String> response = restTemplate.exchange(userServerUrl, HttpMethod.PUT, httpEntity, String.class);
+        ResponseEntity<String> response = restTemplate.exchange(userServerUrl, HttpMethod.POST, httpEntity, String.class);
         String resultStr = response.getBody();
         JSONObject uploadToUserServer = JSONObject.parseObject(resultStr);
         return uploadToUserServer;
     }
+
+    public JSONObject delUserBaseResource(String delUserBaseResUrl){
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer" + StaticParams.access_token);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<JSONObject> httpEntity = new HttpEntity<>(headers);
+        ResponseEntity<String> response = restTemplate.exchange(delUserBaseResUrl, HttpMethod.DELETE, httpEntity, String.class);
+        String resultStr = response.getBody();
+        return JSONObject.parseObject(resultStr);
+    }
+
+    /*
+    ====================================================================================================================
+     */
+
 }

@@ -3,14 +3,12 @@ package cn.edu.njnu.geoproblemsolving.business.datacontainer;
 
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import cn.edu.njnu.geoproblemsolving.common.utils.ResultUtils;
+import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.ServletException;
@@ -54,7 +52,7 @@ public class DataContainerController {
     @RequestMapping(value = "/uploadSingle", method = RequestMethod.POST)
     public JsonResult uploadData(HttpServletRequest request) throws IOException, ServletException {
         String userId = (String) request.getSession().getAttribute("userId");
-        String userName = (String) request.getSession().getAttribute("userName");
+        String userName = (String) request.getSession().getAttribute("name");
         MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest) request;
         Part part = multiRequest.getPart("datafile");
         String header = part.getHeader("Content-Disposition");
@@ -66,9 +64,24 @@ public class DataContainerController {
         return ResultUtils.success(dataIContainerService.upload(file,userId,userName));
     }
 
-    @RequestMapping(value = "/dataService/{id}/{type}", method = RequestMethod.GET)
-    public JsonResult getDataService(@PathVariable("id") String id,@PathVariable("type") String type) {
-        return ResultUtils.success( dataIContainerService.getDataService(id,type));
+    @RequestMapping(value = "/dataService/getData", method = RequestMethod.POST)
+    public JsonResult getDataService(@RequestBody JSONObject jsonObject) {
+        String id = jsonObject.getString("serverId");
+        String token = jsonObject.getString("token");
+        String type = jsonObject.getString("type");
+        return ResultUtils.success( dataIContainerService.getDataService(id,token,type));
+    }
+
+    @RequestMapping(value = "/remote", method = RequestMethod.POST)
+    public JsonResult getRemoteData(@RequestBody JSONObject jsonObject) {
+        String id = jsonObject.getString("serverId");
+        String token = jsonObject.getString("token");
+        return ResultUtils.success( dataIContainerService.getRemoteData(id,token));
+    }
+
+    @RequestMapping(value = "/invoke", method = RequestMethod.POST)
+    public JsonResult invoke(@RequestBody JSONObject jsonObject) {
+        return ResultUtils.success( dataIContainerService.invoke(jsonObject));
     }
 
 }

@@ -291,7 +291,7 @@ public class UpdateDBDao {
                 user.setPhone(oldUser.getMobilePhone());
                 user.setCountry(oldUser.getCountry());
                 user.setCity(oldUser.getCity());
-                user.setHomePage(oldUser.getHomePage());
+                user.setHomepage(oldUser.getHomePage());
                 user.setIntroduction(oldUser.getIntroduction());
                 //title
                 try {

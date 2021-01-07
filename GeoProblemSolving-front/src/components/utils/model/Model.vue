@@ -510,6 +510,15 @@ export default {
       }
     },
 
+    async submitUpload(stateIndex, eventIndex, uploadFileForm) {
+      let data = await post(
+        `/GeoProblemSolving/dataContainer/uploadSingle`,
+        uploadFileForm
+      );
+      let resultId = `http://221.226.60.2:8082/data?uid=${data}`;
+      this.$set(this.stateList[stateIndex].Event[eventIndex], "url", resultId);
+    },
+
     async getOutputs(refreshForm) {
       //获得结果
       this.record = {};
