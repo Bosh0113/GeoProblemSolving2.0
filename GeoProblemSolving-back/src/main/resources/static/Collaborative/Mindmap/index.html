@@ -192,7 +192,7 @@
 
         function startWebsocket(roomId) {
 
-            var wsUrl = `${window.location.protocol === 'https' ? 'wss://' : 'ws://'}` + RouteInfo.getIPPort() + "/GeoProblemSolving/Mindmap/" + roomId;
+            var wsUrl = `${window.location.protocol === 'https:' ? 'wss://' : 'ws://'}` + RouteInfo.getIPPort() + "/GeoProblemSolving/Mindmap/" + roomId;
             if(window.location.host === "localhost:8080"){
                 wsUrl = "ws://localhost:8081/GeoProblemSolving/Mindmap/" + roomId;
             }

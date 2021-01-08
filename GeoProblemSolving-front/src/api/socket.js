@@ -6,7 +6,7 @@ var websockLinked = false;
 
 function initWebSocket(para, IP_Port) { //初始化websocket
 
-    var wsurl = `${window.location.protocol === 'https' ? 'wss://' : 'ws://'}` + IP_Port + "/GeoProblemSolving/" + para;
+    var wsurl = `${window.location.protocol === 'https:' ? 'wss://' : 'ws://'}` + IP_Port + "/GeoProblemSolving/" + para;
     if (IP_Port == "localhost:8080") {
         wsurl = "ws://localhost:8081/GeoProblemSolving/" + para;
     }

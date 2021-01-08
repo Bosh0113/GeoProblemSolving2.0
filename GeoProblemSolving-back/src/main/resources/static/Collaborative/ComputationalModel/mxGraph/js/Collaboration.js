@@ -85,7 +85,7 @@ var userName = userInfo.userName;
             if (url.search(reg) != -1) {
                 localStorage.setItem("historyURL", url);
                 let groupID = url.match(reg)[1];
-                var socketURL = `${window.location.protocol === 'https' ? 'wss://' : 'ws://'}` + window.location.host + "/GeoProblemSolving/ComputationalModel/" + groupID;
+                var socketURL = `${window.location.protocol === 'https:' ? 'wss://' : 'ws://'}` + window.location.host + "/GeoProblemSolving/ComputationalModel/" + groupID;
                 if(window.location.host === "localhGost:8080"){
                     socketURL = "ws://localhost:8081/GeoProblemSolving/ComputationalModel/" + groupID;
                 }

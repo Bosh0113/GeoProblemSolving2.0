@@ -282,7 +282,7 @@
                     if (this.noticeSocket != null) {
                         this.noticeSocket = null;
                     }
-                    var noticeSocketURL = `${window.location.protocol === 'https' ? 'wss://' : 'ws://'}` + window.location.host + "/GeoProblemSolving/NoticeSocket";
+                    var noticeSocketURL = `${window.location.protocol === 'https:' ? 'wss://' : 'ws://'}` + window.location.host + "/GeoProblemSolving/NoticeSocket";
                     if(window.location.host === "localhost:8080"){
                         noticeSocketURL = "ws://localhost:8081/GeoProblemSolving/NoticeSocket";
                     }

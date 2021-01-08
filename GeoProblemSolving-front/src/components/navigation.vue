@@ -453,7 +453,7 @@ export default {
         this.noticeSocket = null;
       }
       var noticeSocketURL =
-        `${location.protocol === "https" ? "wss://" : "ws://"}` +
+        `${window.location.protocol === "https:" ? "wss://" : "ws://"}` +
         window.location.host +
         "/GeoProblemSolving/NoticeSocket";
       if (this.$store.state.IP_Port == "localhost:8080") {

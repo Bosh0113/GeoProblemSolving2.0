@@ -410,7 +410,7 @@
                 }
 
                 var roomId = this.pageParams.pageId;
-                var excelSocketURL = `${window.location.protocol === 'https' ? 'wss://' : 'ws://'}` + + window.location.host + "/GeoProblemSolving/ExcelTool/" + roomId;
+                var excelSocketURL = `${window.location.protocol === 'https:' ? 'wss://' : 'ws://'}` + + window.location.host + "/GeoProblemSolving/ExcelTool/" + roomId;
                 if (window.location.host === "localhost:8080") {
                     excelSocketURL = "ws://localhost:8081/GeoProblemSolving/ExcelTool/" + roomId;
                 }

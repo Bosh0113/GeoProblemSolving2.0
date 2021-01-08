@@ -69,7 +69,7 @@ var userName=userInfo.userName;
             if (url.search(reg) != -1) {
                 localStorage.setItem("historyURL", url);
                 let groupID = url.match(reg)[1];
-                var wsUrl = `${window.location.protocol === 'https' ? 'wss://' : 'ws://'}` + window.location.host + "/GeoProblemSolving/ConceptualModel/" + groupID;
+                var wsUrl = `${window.location.protocol === 'https:' ? 'wss://' : 'ws://'}` + window.location.host + "/GeoProblemSolving/ConceptualModel/" + groupID;
                 if(window.location.host === "localhost:8080"){
                     wsUrl = "ws://localhost:8081/GeoProblemSolving/ConceptualModel/" + groupID;
                 }

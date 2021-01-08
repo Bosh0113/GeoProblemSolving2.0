@@ -107,7 +107,7 @@ $(document).ready(function() {
 
     var roomId = sessionStorage.getItem("moduleId");
     if (WebSocket) {
-        var wsUrl = `${window.location.protocol === 'https' ? 'wss://' : 'ws://'}` + window.location.host+"/GeoProblemSolving/3DviewerServer/"+roomId;
+        var wsUrl = `${window.location.protocol === 'https:' ? 'wss://' : 'ws://'}` + window.location.host+"/GeoProblemSolving/3DviewerServer/"+roomId;
         if(window.location.host === "localhost:8080"){
             wsUrl = "ws://localhost:8081/GeoProblemSolving/3DviewerServer/"+roomId;
         }

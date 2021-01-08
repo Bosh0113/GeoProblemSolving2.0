@@ -1243,7 +1243,7 @@ export default {
         this.abseirSocket = null;
       }
       var abseirSocketURL =
-        `${location.protocol === "https" ? "wss://" : "ws://"}` +
+        `${window.location.protocol === "https:" ? "wss://" : "ws://"}` +
         this.$store.state.IP_Port +
         "/GeoProblemSolving/Abseir/" +
         this.pageParams.pageId;
