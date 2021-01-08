@@ -459,11 +459,20 @@
                 window.location.href = "/GeoProblemSolving/login";
             },
             enterProject(projectInfo) {
-                if (JSON.parse(projectInfo.permission).observe.visitor === "Yes") {
-                    window.location.href = "/GeoProblemSolving/projectInfo/" + projectInfo.aid;
+                if(projectInfo.permission == undefined){
+                    if (JSON.parse(projectInfo.permission).observe.visitor === "Yes") {
+                        window.location.href = "/GeoProblemSolving/projectInfo/" + projectInfo.aid;
+                    } else {
+                        this.$Message.error("Please apply to join the activity.");
+                    }
                 } else {
-                    this.$Message.error("Please apply to join the activity.");
+                    if (getDefaultPermission().observe.visitor === "Yes") {
+                        window.location.href = "/GeoProblemSolving/projectInfo/" + projectInfo.aid;
+                    } else {
+                        this.$Message.error("Please apply to join the activity.");
+                    }
                 }
+
             },
         }
     });

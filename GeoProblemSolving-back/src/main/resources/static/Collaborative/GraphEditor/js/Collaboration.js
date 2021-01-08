@@ -72,9 +72,9 @@ var waitingList = [];
                 if(window.location.port=="5500"){
                     socketUrl="localhost:8081";
                 }
-                var wsUrl = "ws://"+window.location.host+"/GeoProblemSolving/GraphEditorSocket/" + pageParams.pageId;
-                if(window.location.port=="8083"){
-                    wsUrl = "wss://"+ window.location.hostname+":8083/GeoProblemSolving/GraphEditorSocket/" + pageParams.pageId;
+                var wsUrl = `${window.location.protocol === 'https' ? 'wss://' : 'ws://'}`+window.location.host+"/GeoProblemSolving/GraphEditorSocket/" + pageParams.pageId;
+                if(window.location.host === "localhost:8080"){
+                    wsUrl = "ws://localhost:8081/GeoProblemSolving/GraphEditorSocket/" + pageParams.pageId;
                 }
                 mxGraphSocket = new WebSocket(wsUrl);
                 mxGraphSocket.onopen = function () {

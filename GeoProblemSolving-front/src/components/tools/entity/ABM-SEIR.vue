@@ -1243,17 +1243,13 @@ export default {
         this.abseirSocket = null;
       }
       var abseirSocketURL =
-        "ws://" +
+        `${location.protocol === "https" ? "wss://" : "ws://"}` +
         this.$store.state.IP_Port +
         "/GeoProblemSolving/Abseir/" +
         this.pageParams.pageId;
       if (this.$store.state.IP_Port == "localhost:8080") {
         abseirSocketURL =
           "ws://localhost:8081/GeoProblemSolving/Abseir/" +
-          this.pageParams.pageId;
-      }
-      if(window.location.port=="8083"){
-          abseirSocketURL = "wss://"+ window.location.hostname+":8083/GeoProblemSolving/Abseir" +
           this.pageParams.pageId;
       }
       this.abseirSocket = new WebSocket(abseirSocketURL);

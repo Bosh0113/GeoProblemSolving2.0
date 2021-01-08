@@ -69,15 +69,11 @@ var userName=userInfo.userName;
             if (url.search(reg) != -1) {
                 localStorage.setItem("historyURL", url);
                 let groupID = url.match(reg)[1];
-                var wsUrl = "ws://"+window.location.host+"/GeoProblemSolving/ConceptualModel/" + groupID;
-                if(window.location.port=="8083"){
-                    wsUrl = "wss://"+ window.location.hostname+":8083/GeoProblemSolving/ConceptualModel/" + groupID;
+                var wsUrl = `${window.location.protocol === 'https' ? 'wss://' : 'ws://'}` + window.location.host + "/GeoProblemSolving/ConceptualModel/" + groupID;
+                if(window.location.host === "localhost:8080"){
+                    wsUrl = "ws://localhost:8081/GeoProblemSolving/ConceptualModel/" + groupID;
                 }
                 wsMxgraph = new WebSocket(wsUrl);
-                // wsMxgraph = new WebSocket("ws://localhost:8081/GeoProblemSolving/ConceptualModel/" + groupID);
-                // wsMxgraph = new WebSocket("ws://172.21.212.72:8082/GeoProblemSolving/ConceptualModel/" + groupID);
-                // wsMxgraph = new WebSocket("ws://94.191.49.160:8080/GeoProblemSolving/ConceptualModel/" + groupID);
-                // wsMxgraph = new WebSocket("ws://172.21.213.185:8080/GeoProblemSolving/ConceptualModel/" + groupID);
             }
         }
         else {

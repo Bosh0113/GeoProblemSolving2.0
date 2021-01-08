@@ -512,7 +512,7 @@
                 }
 
                 let roomId = this.projectInfo.aid + "task";
-                var projectSocketURL = "ws://" + window.location.host + "/GeoProblemSolving/Module/" + roomId;
+                var projectSocketURL = `${window.location.protocol === 'https' ? 'wss://' : 'ws://'}` + window.location.host + "/GeoProblemSolving/Module/" + roomId;
                 if (window.location.host == "localhost:8080") {
                     projectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + roomId;
                 }
