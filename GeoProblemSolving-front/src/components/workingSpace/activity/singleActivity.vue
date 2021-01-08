@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div style="display: flex; background-color: #f8f8f9">      
+    <div style="display: flex; background-color: #f8f8f9">
       <div
         style="flex: 1; border-left: 1px solid #dcdee2; background-color: white"
       >
@@ -29,13 +29,8 @@
             :ops="scrollOps"
             style="height: calc(100vh - 120px); margin-top: 5px"
           >
-            <universal-space
-              v-if="activityInfo.purpose == 'Others'"
-              :activityInfo="activityInfo"
-              :participants="participants"
-            ></universal-space>
             <context-res
-              v-else-if="
+              v-if="
                 activityInfo.purpose ==
                 'Context definition & resource collection'
               "
@@ -81,6 +76,11 @@
               :activityInfo="activityInfo"
               :participants="participants"
             ></decision-making>
+            <universal-space
+              v-else
+              :activityInfo="activityInfo"
+              :participants="participants"
+            ></universal-space>
           </vue-scroll>
         </div>
         <div v-show="activeMenu == 'Task'">

@@ -459,7 +459,7 @@
                 window.location.href = "/GeoProblemSolving/login";
             },
             enterProject(projectInfo) {
-                if (projectInfo.permission != null && JSON.parse(projectInfo.permission).observe.visitor === "Yes") {
+                if (JSON.parse(projectInfo.permission).observe.visitor === "Yes") {
                     window.location.href = "/GeoProblemSolving/projectInfo/" + projectInfo.aid;
                 } else {
                     this.$Message.error("Please apply to join the activity.");

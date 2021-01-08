@@ -131,6 +131,7 @@ public class UpdateDBDao {
                 mongoTemplate.save(newProject);
 
             } catch (Exception ex) {
+                System.out.println("aid: " + oldProject.getStepId());
                 continue;
             }
         }
@@ -195,6 +196,7 @@ public class UpdateDBDao {
 
                 mongoTemplate.save(newSubproject);
             } catch (Exception ex) {
+                System.out.println("aid: " + oldSubproject.getStepId());
                 continue;
             }
         }
@@ -206,51 +208,79 @@ public class UpdateDBDao {
         for (StepEntity step : steps) {
             try {
                 Activity activity = new Activity();
+                Subproject subproject = new Subproject();
 
-                activity.setAid(step.getStepId());
-                activity.setName(step.getName());
-                activity.setDescription(step.getDescription());
-                activity.setType(ActivityType.Activity_Unit);
-                activity.setPurpose(step.getType());
-                activity.setCreator(step.getCreator());
-                activity.setCreatedTime(step.getCreateTime());
-                activity.setActiveTime(step.getCreateTime());
                 // parent
                 String subprojectId = step.getSubProjectId();
                 String projectId = step.getProjectId();
                 if (subprojectId != null && !subprojectId.equals("")) {
                     activity.setParent(subprojectId);
                     activity.setLevel(2);
+                    activity.setAid(step.getStepId());
+                    activity.setName(step.getName());
+                    activity.setDescription(step.getDescription());
+                    activity.setType(ActivityType.Activity_Unit);
+                    activity.setPurpose(step.getType());
+                    activity.setCreator(step.getCreator());
+                    activity.setCreatedTime(step.getCreateTime());
+                    activity.setActiveTime(step.getCreateTime());
+                    // members
+                    JSONArray members = new JSONArray();
+                    Query query = Query.query(Criteria.where("aid").is(subprojectId));
+                    List<Subproject> parent = mongoTemplate.find(query, Subproject.class);
+                    if(parent.isEmpty()){
+                        continue;
+                    }
+                    members = parent.get(0).getMembers();
+                    activity.setMembers(members);
+                    // tools and toolsets
+                    ArrayList<String> toolList = step.getToolList();
+                    ArrayList<String> toolsetList = step.getToolsetList();
+                    if (toolList != null) {
+                        activity.setToolList(toolList);
+                    }
+                    if (toolsetList != null) {
+                        activity.setToolsetList(toolsetList);
+                    }
+
+                    mongoTemplate.save(activity);
                 } else if (projectId != null && !projectId.equals("")) {
-                    activity.setParent(projectId);
-                    activity.setLevel(1);
+                    subproject.setParent(projectId);
+                    subproject.setLevel(1);
+                    subproject.setAid(step.getStepId());
+                    subproject.setName(step.getName());
+                    subproject.setDescription(step.getDescription());
+                    subproject.setType(ActivityType.Activity_Unit);
+                    subproject.setPurpose(step.getType());
+                    subproject.setCreator(step.getCreator());
+                    subproject.setCreatedTime(step.getCreateTime());
+                    subproject.setActiveTime(step.getCreateTime());
+                    // members
+                    JSONArray members = new JSONArray();
+                    Query query = Query.query(Criteria.where("aid").is(projectId));
+                    List<Project> parent = mongoTemplate.find(query, Project.class);
+                    if(parent.isEmpty()){
+                        continue;
+                    }
+                    members = parent.get(0).getMembers();
+                    subproject.setMembers(members);
+                    // tools and toolsets
+                    ArrayList<String> toolList = step.getToolList();
+                    ArrayList<String> toolsetList = step.getToolsetList();
+                    if (toolList != null) {
+                        subproject.setToolList(toolList);
+                    }
+                    if (toolsetList != null) {
+                        subproject.setToolsetList(toolsetList);
+                    }
+
+                    mongoTemplate.save(subproject);
                 } else {
                     return "";
                 }
-                // members
-                JSONArray members = new JSONArray();
-                if(activity.getLevel().equals(1)){
-                    Query query = Query.query(Criteria.where("aid").is(projectId));
-                    List<Project> parent = mongoTemplate.find(query, Project.class);
-                    members = parent.get(0).getMembers();
 
-                } else if(activity.getLevel().equals(2)){
-                    Query query = Query.query(Criteria.where("aid").is(subprojectId));
-                    List<Subproject> parent = mongoTemplate.find(query, Subproject.class);
-                    members = parent.get(0).getMembers();
-                }
-                activity.setMembers(members);
-                // tools and toolsets
-                ArrayList<String> toolList = step.getToolList();
-                ArrayList<String> toolsetList = step.getToolsetList();
-                if (toolList != null) {
-                    activity.setToolList(toolList);
-                }
-                if (toolsetList != null) {
-                    activity.setToolsetList(toolsetList);
-                }
-                mongoTemplate.save(activity);
             } catch (Exception e) {
+                System.out.println("aid: " + step.getStepId());
                 continue;
             }
         }
@@ -308,43 +338,46 @@ public class UpdateDBDao {
                 }
 
 
-//                // 存用户服务器
-//                // password 加密处理
-//                String oldpw = oldUser.getPassword();
-//                String password = DigestUtils.md5DigestAsHex(oldpw.getBytes());
-//                user.setPassword(password);
+                // 存用户服务器
+                if(oldUser.getEmail().equals("820152160@qq.com")){
+                    continue;
+                }
+                // password 加密处理
+                String oldpw = oldUser.getPassword();
+                String password = DigestUtils.md5DigestAsHex(oldpw.getBytes());
+                user.setPassword(password);
+
+                RestTemplate restTemplate = new RestTemplate();
+                String updateUrl  = "http://106.14.78.235/AuthServer/user/tempAdd";
+                restTemplate.postForEntity(updateUrl, user, User.class);
+
+
+//                // 存本地
+//                // CreatedProject and JoinedProject
+//                JSONArray managedProjects = oldUser.getManageProjects();
+//                ArrayList<String> createdProjects = new ArrayList<>();
+//                for (Object project : managedProjects) {
+//                    String aid = (String) ((HashMap) project).get("projectId");
+//                    createdProjects.add(aid);
+//                }
+//                user.setCreatedProjects(createdProjects);
 //
-//                RestTemplate restTemplate = new RestTemplate();
-//                String updateUrl  = "http://106.14.78.235/AuthServer/user/tempAdd";
-//                restTemplate.postForEntity(updateUrl, user, User.class);
-
-
-                // 存本地
-                // CreatedProject and JoinedProject
-                JSONArray managedProjects = oldUser.getManageProjects();
-                ArrayList<String> createdProjects = new ArrayList<>();
-                for (Object project : managedProjects) {
-                    String aid = (String) ((HashMap) project).get("projectId");
-                    createdProjects.add(aid);
-                }
-                user.setCreatedProjects(createdProjects);
-
-                JSONArray joinedProjects = oldUser.getJoinedProjects();
-                ArrayList<String> newJoinedProjects = new ArrayList<>();
-                for (Object project : joinedProjects) {
-                    String aid = (String) ((HashMap) project).get("projectId");
-                    newJoinedProjects.add(aid);
-                }
-                user.setJoinedProjects(newJoinedProjects);
-
-                // email 重复注册用户处理
-                Query query = Query.query(Criteria.where("email").is(oldUser.getEmail()));
-                List<User> userCollection = mongoTemplate.find(query, User.class);
-                if (!userCollection.isEmpty()) {
-                    mongoTemplate.remove(userCollection);
-                }
-
-                mongoTemplate.save(user);
+//                JSONArray joinedProjects = oldUser.getJoinedProjects();
+//                ArrayList<String> newJoinedProjects = new ArrayList<>();
+//                for (Object project : joinedProjects) {
+//                    String aid = (String) ((HashMap) project).get("projectId");
+//                    newJoinedProjects.add(aid);
+//                }
+//                user.setJoinedProjects(newJoinedProjects);
+//
+//                // email 重复注册用户处理
+//                Query query = Query.query(Criteria.where("email").is(oldUser.getEmail()));
+//                List<User> userCollection = mongoTemplate.find(query, User.class);
+//                if (!userCollection.isEmpty()) {
+//                    mongoTemplate.remove(userCollection);
+//                }
+//
+//                mongoTemplate.save(user);
 
             } catch (Exception e) {
                 continue;

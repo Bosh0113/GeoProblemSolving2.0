@@ -362,7 +362,7 @@ function permissionIdentity(currentPermission, role, operation) {
 
     var permission = {};
     if (currentPermission == undefined || currentPermission == {}) {
-        return false;
+        permission = defaultPermission;
     } else {
         permission = currentPermission;
     }

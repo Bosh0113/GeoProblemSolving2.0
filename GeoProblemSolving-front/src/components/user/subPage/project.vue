@@ -320,7 +320,7 @@
         // sessionStorage.setItem("projectInfo", JSON.stringify(projectInfo));
         // sessionStorage.setItem("projectInfo", this.encrypto(projectInfo));
         window.location.href =
-          "/GeoProblemSolving/projectDetail/" + projectInfo.aid;
+          "/GeoProblemSolving/projectInfo/" + projectInfo.aid;
       },
 
       deleteProjectModalShow(pid) {

@@ -95,7 +95,7 @@ public class ProjectServiceImpl implements ProjectService {
             Pageable pageable = PageRequest.of(page - 1, size, sort);
 
             Page<Project> projects = null;
-            if (!keyword.equals("")) {
+            if (keyword.equals("")) {
                 if (userId.equals("")) {
                     if (category.equals("All")) {
                         projects = projectRepository.findProjectsByPrivacyIsNot("Private", pageable);

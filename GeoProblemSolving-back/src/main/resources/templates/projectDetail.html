@@ -1416,7 +1416,7 @@
                         this.applyProjectInfo = Object.assign([], this.projectInfo);
 
                         // join the project directly
-                        if (this.applyProjectInfo.permission != undefined && this.applyProjectInfo.permission != "" && JSON.parse(this.applyProjectInfo.permission).auto_join.visitor) {
+                        if (this.applyProjectInfo.permission != "" && JSON.parse(this.applyProjectInfo.permission).auto_join.visitor) {
                             axios
                                 .post("/GeoProblemSolving/project/" + this.applyProjectInfo.aid + "/user?" + "userId=" + this.userInfo.userId)
                                 .then(res => {
