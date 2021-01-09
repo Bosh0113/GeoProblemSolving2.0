@@ -3,8 +3,12 @@ package cn.edu.njnu.geoproblemsolving.business.resource.controller;
 import cn.edu.njnu.geoproblemsolving.Dao.Resource.ResourceDaoImpl;
 import cn.edu.njnu.geoproblemsolving.business.resource.entity.AddIResourceDTO;
 import cn.edu.njnu.geoproblemsolving.business.resource.entity.IResourceEntity;
+import cn.edu.njnu.geoproblemsolving.business.resource.entity.ResourcePojo;
 import cn.edu.njnu.geoproblemsolving.business.resource.service.IResourceServiceImpl;
+import cn.edu.njnu.geoproblemsolving.business.user.service.Impl.UserServiceImpl;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
+import cn.edu.njnu.geoproblemsolving.common.utils.ResultUtils;
+import com.mongodb.client.result.UpdateResult;
 import com.sun.javafx.collections.MappingChange;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +29,8 @@ import java.util.Map;
 public class IResourceController {
     @Autowired
     IResourceServiceImpl IResourceService;
-
+    @Autowired
+    UserServiceImpl userService;
     /**
      * 单文件上传
      * POST, form-data
@@ -36,25 +41,6 @@ public class IResourceController {
     public Object uploadResource(HttpServletRequest req){
         Object uploadResult = IResourceService.uploadRemote(req);
         return uploadResult;
-    }
-
-    /**
-     * 测试接口
-     * @param multipartFile
-     * @param description
-     * @param type
-     * @param uploaderId
-     * @param privacy
-     * @return
-     */
-    @RequestMapping(value = "/uploadTest", method = RequestMethod.POST)
-    public Object up(@RequestParam("files") MultipartFile[] multipartFile,
-                     @RequestParam("description") String description,
-                     @RequestParam("type") String type,
-                     @RequestParam("uploaderId") String uploaderId,
-                     @RequestParam("privacy") String privacy){
-        System.out.println("sss");
-        return null;
     }
 
 
@@ -95,6 +81,16 @@ public class IResourceController {
         return responseEntity;
     }
 
+    @RequestMapping(value = "/shareRes", method = RequestMethod.GET)
+    public JsonResult shareRes(@RequestParam("email") String email, @RequestParam("rids") ArrayList<String> rids){
+        //发邮件，省略通知这一步，直接加入用户 user resources 字段中。
+        //先从 collection resource 中找到这些资源，然后到给传过去
+        ArrayList<ResourcePojo> res = IResourceService.getRes(rids);
+        return userService.uploadResourceField(email, res);
+    }
+
+
+
     /**
      * 文件批量下载
      * GET，sourceStoreId，ArrayList<String>
@@ -125,6 +121,19 @@ public class IResourceController {
         return IResourceService.inquiryLocal(filedMap);
     }
 
+
+    @RequestMapping(produces = "application/json;charset=UTF-8", method = RequestMethod.PUT)
+    public JsonResult updateRes(@RequestBody IResourceEntity resource){
+        String rid = resource.getResourceId();
+        UpdateResult updateResult = IResourceService.updateRes(rid, resource);
+        if (updateResult.getMatchedCount() == 1){
+            return ResultUtils.success();
+        }else {
+            return ResultUtils.error(-2, "Fail.");
+        }
+
+    }
+
     /**
      * 单文件上传
      * POST, form-data
@@ -142,5 +151,6 @@ public class IResourceController {
         JsonResult result = IResourceService.uploadImage(request);
         return result;
     }
+
 
 }

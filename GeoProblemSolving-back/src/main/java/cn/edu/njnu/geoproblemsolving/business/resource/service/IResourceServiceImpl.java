@@ -1,7 +1,5 @@
 package cn.edu.njnu.geoproblemsolving.business.resource.service;
 
-import cn.edu.njnu.geoproblemsolving.Entity.Resources.ResourceEntity;
-import cn.edu.njnu.geoproblemsolving.Entity.Resources.UploadResult;
 import cn.edu.njnu.geoproblemsolving.business.resource.dao.IResourceDaoImpl;
 import cn.edu.njnu.geoproblemsolving.business.resource.entity.AddIResourceDTO;
 import cn.edu.njnu.geoproblemsolving.business.resource.entity.IResourceEntity;
@@ -14,38 +12,28 @@ import cn.edu.njnu.geoproblemsolving.business.user.entity.User;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import cn.edu.njnu.geoproblemsolving.common.utils.ResultUtils;
 import com.alibaba.fastjson.JSONObject;
-import com.mongodb.client.result.DeleteResult;
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.disk.DiskFileItem;
+import com.mongodb.client.result.UpdateResult;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.http.entity.ContentType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 import java.io.*;
 import java.net.InetAddress;
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Files;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -190,9 +178,10 @@ public class IResourceServiceImpl implements IResourceService {
                             //最后存入本地数据库中
                             IResourceEntity resDetails = resourceDao.saveResDetails(resourceEntity);
 
-                            //更新本地用户 resource 字段
-                            ResourcePojo localUserResField = userBaseRes.toJavaObject(ResourcePojo.class);
-                            userDao.uploadUserRes(uploaderId, localUserResField);
+                            //更新本地用户 resource 字段, 并将其入库
+                            // ResourcePojo localUserResField = userBaseRes.toJavaObject(ResourcePojo.class);
+                            // userDao.uploadUserRes(uploaderId, localUserResField);
+                            // resourceDao.saveResDetail(localUserResField);
 
                             uploadInfos.uploaded.add(resDetails);
                         } else {
@@ -259,26 +248,25 @@ public class IResourceServiceImpl implements IResourceService {
         JSONObject delResult = JSONObject.parseObject((String) response.getBody());
         if (delResult.getString("result").equals("suc")) {
             //数据容器删除成功，开始删除用户服务器内容
-            String delUserBaseResUrl = "http://" + remoteResIp + "/resource?userId" + uid + "&rid=" + rid;
+            String localResId = mongoTemplate.findOne(new Query(Criteria.where("pathURL").is(delRemoteUrl)), IResourceEntity.class).getResourceId();
+            String delUserBaseResUrl = "http://" + remoteResIp + "/ResServer/resource?userId=" + uid + "&rid=" + localResId;
             JSONObject jsonObject = httpUtil.delUserBaseResource(delUserBaseResUrl);
+
             if (jsonObject.getString("code").equals("0")) {
                 //用户服务器内容更新成功，接下来是本地内容，先删除数据库中 resource 记录，然后再删除用户中 resources 字段中的记录
-                resourceDao.delResByPathUrl(delRemoteUrl);
+                resourceDao.delResById(localResId);
+
                 //更新用户数据库
-                String[] rids = {rid};
-                userDao.delUserRes(uid, rids);
+                // String[] rids = {rid};
+                // userDao.delUserRes(uid, rids);
                 return ResultUtils.success();
 
             }
         } else {
             return ResultUtils.error(-2, "DataContainer delete Failed:" + rid);
         }
-        //用户服务器删除成功，开始删除本地数据库中的内容
-        DeleteResult delResByResult = (DeleteResult) resourceDao.delResById(rid);
-
         //本地数据库中的内容删除成功，开始更新本地用户字段
-
-        return null;
+        return ResultUtils.success();
     }
 
     @Override
@@ -286,27 +274,36 @@ public class IResourceServiceImpl implements IResourceService {
         String oids = "";
         User user = mongoTemplate.findOne(new Query(Criteria.where("userId").is(userId)), User.class);
         //先把本地内容删除，然后再删除远端内容
+        //rids 是本地和用户服务器资源 id, 传入的id 是 数据容器中的id
+        String rids = "";
         for (int i = 0; i < sourceStoreIds.size(); i++) {
             String oid = sourceStoreIds.get(i);
             //删除本地数据库中的资源详情数据
-            String delResult = (String) resourceDao.delResById(oid);
-            if (delResult.equals("0")) {
-                return "Fail.The local database doesn't have " + oid;
+            String pathUrl = "http://"+dataRemoteIp+":8082/data/"+oid;
+            String localResId = mongoTemplate.findOne(new Query(Criteria.where("pathURL").is(pathUrl)), IResourceEntity.class).getResourceId();
+            if (i == sourceStoreIds.size() -1){
+                rids += localResId;
+            }else {
+                rids += localResId + ",";
             }
-            if (i != sourceStoreIds.size() - 1) {
-                oids += oid + ",";
-            } else {
-                oids += oid;
-            }
+            resourceDao.delResByPathUrl(pathUrl);
+            // if (delResult.equals("0")) {
+            //     return "Fail.The local database doesn't have " + oid;
+            // }
+            // if (i != sourceStoreIds.size() - 1) {
+            //     oids += oid + ",";
+            // } else {
+            //     oids += oid;
+            // }
         }
 
         //更新 参与式平台用户 resources 字段
-        String[] rids = (String[]) sourceStoreIds.toArray();
-        userDao.delUserRes(userId, rids);
+        // String[] rids = (String[]) sourceStoreIds.toArray();
+        // userDao.delUserRes(userId, rids);
 
         //更新用户服务器 字段
         RestTemplateUtil httpUtil = new RestTemplateUtil();
-        String delUserBaseURL = "http://" + remoteResIp + "/resource?userId=" + userId + "&rid=" + oids;
+        String delUserBaseURL = "http://" + remoteResIp + "/ResServer/resource?userId=" + userId + "&rid=" + rids;
         JSONObject jsonObject = httpUtil.delUserBaseResource(delUserBaseURL);
 
         //删除 数据容器 中的资源
@@ -400,6 +397,20 @@ public class IResourceServiceImpl implements IResourceService {
         } catch (Exception ex) {
             return ResultUtils.error(-2, ex.toString());
         }
+    }
+
+    @Override
+    public ArrayList<ResourcePojo> getRes(ArrayList<String> rids) {
+        return resourceDao.getRes(rids);
+    }
+
+    @Override
+    public UpdateResult updateRes(String rid, IResourceEntity resource) {
+        Update update = new Update();
+        update.set("privacy", resource.getPrivacy());
+        update.set("type", resource.getType());
+        update.set("description", resource.getDescription());
+        return resourceDao.updateRes(rid, update);
     }
 
     //    private static void downloadUsingStream(String urlStr) throws IOException {

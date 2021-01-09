@@ -1,38 +1,35 @@
 <template>
   <div>
     <Row>
-      <Col span="20">
-        <Card>
-          <CheckboxGroup style="display: inline-block">
-            <Checkbox label="noticeList">
+      <Col span="20" offset="1">
+        <Card dis-hover>
+          <CheckboxGroup v-model="checkedType">
+            <Checkbox label="public">
               <span>Private</span>
-              <span class="badge">1</span>
+              <span class="badge">{{publicResNum}}</span>
             </Checkbox>
-            <Checkbox label="replyList">
+            <Checkbox label="private">
               <span>Public</span>
-              <span class="badge">2</span>
+              <span class="badge">{{privateResNum}}</span>
             </Checkbox>
-            <!--          <Checkbox label="applyList">-->
-            <!--            <span>Apply</span>-->
-            <!--            <span class="badge">1</span>-->
-            <!--          </Checkbox>-->
           </CheckboxGroup>
-          <span style="margin: 0 20px"></span>
-          <CheckboxGroup style="display: inline-block">
-            <Checkbox label="read">
-              <span>Owned by me</span>
-              <span class="badge">3</span>
-            </Checkbox>
-            <Checkbox label="unRead">
-              <span>Shared with me</span>
-              <span class="badge">2</span>
-            </Checkbox>
 
-          </CheckboxGroup>
+<!--          <span style="margin: 0 20px"></span>-->
+<!--          <CheckboxGroup style="display: inline-block">-->
+<!--            <Checkbox label="read">-->
+<!--              <span>Owned by me</span>-->
+<!--              <span class="badge">3</span>-->
+<!--            </Checkbox>-->
+<!--            <Checkbox label="unRead">-->
+<!--              <span>Shared with me</span>-->
+<!--              <span class="badge">2</span>-->
+<!--            </Checkbox>-->
+<!--          </CheckboxGroup>-->
+
         </Card>
 
         <div>
-          <Card>
+          <Card dis-hover>
             <p slot="title">Resource List</p>
             <div slot="extra">
 
@@ -43,65 +40,69 @@
                     @click="uploadModal = true"
                     style="cursor: pointer"
               />
+              <Icon type="md-cloud-download"
+                    size="25"
+                    style="cursor: pointer"
+                    @click="downLoadRes"
+              />
               <Icon type="md-share-alt"
                     size="25"
                     style="cursor: pointer"
+                    @click="shareResModal = true"
               />
               <Icon type="ios-trash-outline" color="red"
                     size="25"
                     style="cursor: pointer"
                     title="Delete"
-                    @click="delResItem"
+                    @click="confirmDelModal = true"
               />
             </div>
             <Table
               ref="selection" stripe
               :columns="colName"
+              no-data-text="There aren't any resources."
               :data="resourceList"
               @on-select="selectedRes"
+              @on-select-cancel="selectedRes"
+              @on-row-click="showResDetail"
             >
             </Table>
-            <div>
-              <Card>
-
-              </Card>
-            </div>
           </Card>
         </div>
       </Col>
 
-      <Col span="4">
-        <Card dis-hover class="historyLine">
-          <p slot="title">Event line</p>
-          <div class="timeLineStyle">
-            <vue-scroll :ops="ops">
-              <!--            <Timeline>-->
-              <!--              <div v-if="userEventList.length==0">-->
-              <!--                <div style="display:flex;justify-content:center">-->
-              <!--                  <Icon type="md-alert" size="40" color="gray" />-->
-              <!--                </div>-->
-              <!--                <br />-->
-              <!--                <div style="display:flex;justify-content:center">-->
-              <!--                  <h3-->
-              <!--                    style="text-align:center;width:80%"-->
-              <!--                  >Sorry, there are no events now.</h3>-->
-              <!--                </div>-->
-              <!--              </div>-->
-              <!--              <TimelineItem-->
-              <!--                v-for="(item,index) in userEventList"-->
-              <!--                :key="index"-->
-              <!--                v-show="userEventList.length>0"-->
-              <!--              >-->
-              <!--                <strong>-->
-              <!--                  <p class="time">{{item.createTime}}</p>-->
-              <!--                </strong>-->
-              <!--                <p class="content">{{item.description}}</p>-->
-              <!--              </TimelineItem>-->
-              <!--            </Timeline>-->
-            </vue-scroll>
-          </div>
-        </Card>
-      </Col>
+<!--      <Col span="4">-->
+<!--        <Card dis-hover class="historyLine">-->
+<!--          <p slot="title">Event line</p>-->
+<!--          <div class="timeLineStyle">-->
+<!--            <vue-scroll :ops="ops">-->
+<!--              &lt;!&ndash;            <Timeline>&ndash;&gt;-->
+<!--              &lt;!&ndash;              <div v-if="userEventList.length==0">&ndash;&gt;-->
+<!--              &lt;!&ndash;                <div style="display:flex;justify-content:center">&ndash;&gt;-->
+<!--              &lt;!&ndash;                  <Icon type="md-alert" size="40" color="gray" />&ndash;&gt;-->
+<!--              &lt;!&ndash;                </div>&ndash;&gt;-->
+<!--              &lt;!&ndash;                <br />&ndash;&gt;-->
+<!--              &lt;!&ndash;                <div style="display:flex;justify-content:center">&ndash;&gt;-->
+<!--              &lt;!&ndash;                  <h3&ndash;&gt;-->
+<!--              &lt;!&ndash;                    style="text-align:center;width:80%"&ndash;&gt;-->
+<!--              &lt;!&ndash;                  >Sorry, there are no events now.</h3>&ndash;&gt;-->
+<!--              &lt;!&ndash;                </div>&ndash;&gt;-->
+<!--              &lt;!&ndash;              </div>&ndash;&gt;-->
+<!--              &lt;!&ndash;              <TimelineItem&ndash;&gt;-->
+<!--              &lt;!&ndash;                v-for="(item,index) in userEventList"&ndash;&gt;-->
+<!--              &lt;!&ndash;                :key="index"&ndash;&gt;-->
+<!--              &lt;!&ndash;                v-show="userEventList.length>0"&ndash;&gt;-->
+<!--              &lt;!&ndash;              >&ndash;&gt;-->
+<!--              &lt;!&ndash;                <strong>&ndash;&gt;-->
+<!--              &lt;!&ndash;                  <p class="time">{{item.createTime}}</p>&ndash;&gt;-->
+<!--              &lt;!&ndash;                </strong>&ndash;&gt;-->
+<!--              &lt;!&ndash;                <p class="content">{{item.description}}</p>&ndash;&gt;-->
+<!--              &lt;!&ndash;              </TimelineItem>&ndash;&gt;-->
+<!--              &lt;!&ndash;            </Timeline>&ndash;&gt;-->
+<!--            </vue-scroll>-->
+<!--          </div>-->
+<!--        </Card>-->
+<!--      </Col>-->
     </Row>
 
 
@@ -181,18 +182,119 @@
       <Progress :percent="uploadProgress"></Progress>
       <div slot="footer"></div>
     </Modal>
+
+
+    <Modal v-model="confirmDelModal" width="300">
+      <label>Are your sure to delete:</label>
+      <h2>{{selectedResName}}</h2>
+      <div slot="footer">
+        <Button
+          type="warning"
+          @click="confirmDelModal = false"
+        >Cancel
+        </Button>
+        <Button
+          type="success"
+          @click="delResItem"
+        >Ok
+        </Button>
+      </div>
+    </Modal>
+
+    <Modal v-model="shareResModal" width="800" title="Share tool">
+      <Form>
+        <FormItem>
+          <Select v-model="shareResFormItems.select">
+            <Option value="selectProject">Share "{{selectedResName}}" to Project</Option>
+            <Option value="selectUser">Share "{{selectedResName}}" to User</Option>
+          </Select>
+        </FormItem>
+        <FormItem v-if="shareResFormItems.select == 'selectProject'">
+          <Select v-model="shareResFormItems.sharedProjectId" placeholder="Select Project">
+            <Option v-for="item in userProject" :value="item.aid" :key="item.aid">{{ item.name }}</Option>
+          </Select>
+        </FormItem>
+        <FormItem v-if="shareResFormItems.select == 'selectUser'">
+          <Input v-model="shareResFormItems.sharedUserEmail" placeholder="Enter email address"></Input>
+        </FormItem>
+      </Form>
+      <div slot="footer">
+        <Button type="warning" @click="shareResModal = false">Cancel</Button>
+        <Button type="success" @click="shareResources">Share</Button>
+      </div>
+    </Modal>
+
+
+    <Modal v-model="resDetailModal" title="Resource Details" width="575">
+      <Form
+        :model="resDetailFormItems"
+        :rules="resRuleValidate"
+        :label-width="100"
+        label-position="left"
+      >
+        <FormItem label="Privacy" prop="privacy">
+          <RadioGroup v-model="resDetailFormItems.privacy" style="width:80%">
+            <Radio label="private">Private</Radio>
+            <Radio label="public">Public</Radio>
+          </RadioGroup>
+        </FormItem>
+
+        <FormItem label="Type" prop="type">
+          <RadioGroup v-model="resDetailFormItems.type">
+            <Radio label="data"></Radio>
+            <Radio label="paper"></Radio>
+            <Radio label="document"></Radio>
+            <Radio label="model"></Radio>
+            <Radio label="image"></Radio>
+            <Radio label="video"></Radio>
+            <Radio label="others"></Radio>
+          </RadioGroup>
+        </FormItem>
+
+        <FormItem label="Author">
+          <Input v-model="resDetailFormItems.uploaderName" disabled></Input>
+        </FormItem>
+
+        <FormItem label="Description" prop="description">
+          <Input type="textarea" :autosize="{minRows: 2, maxRows: 5}" v-model="resFormItems.description"/>
+        </FormItem>
+      </Form>
+      <div slot="footer">
+        <Button type="success" @click="updateRes">Save</Button>
+      </div>
+    </Modal>
   </div>
 </template>
 
 <script>
+  import resourceList from "../../common/resource/resourceList";
+
   export default {
     name: "resource",
     data() {
       return {
+        checkedType: ["public", "private"],
         toUploadFiles: [],
+        resDetailModal: false,
         uploadModal: false,
         progressModalShow: false,
+        confirmDelModal: false,
+        shareResModal: false,
+        updatedResIndex: null,
         uploadProgress: 0,
+        userProject: [],
+        clickedRes: [],
+        resDetailFormItems: {
+          privacy: "Private",
+          type: "data",
+          description: "",
+          uploaderName: ""
+        },
+        shareResFormItems: {
+          select: "",
+          sharedUserEmail: "",
+          sharedProjectId: "",
+        },
         ops: {
           bar: {
             background: "#808695"
@@ -205,7 +307,7 @@
             align: 'center'
           },
           {
-            title: "Title",
+            title: "Name",
             key: 'name'
           },
           {
@@ -245,6 +347,7 @@
     },
     mounted() {
       this.getUserResource();
+      this.getUserProject();
     },
     methods: {
       selectedRes: function (selection) {
@@ -258,7 +361,17 @@
             this.axios
               .delete("/GeoProblemSolving/resource/deleteRemote/" + this.$store.getters.userId + "?rid=" + rid)
               .then(res => {
-                console.log(res);
+                if (res.data.code == 0){
+                  for (let i = 0; i < this.resourceList.length; i++){
+                    if (this.resourceList[i].resourceId == this.selectedResList[0].resourceId){
+                      this.resourceList.splice(i, 1);
+                    }
+                  }
+                  this.confirmDelModal = false;
+                  this.$Notice.success({
+                    title: "Delete Success."
+                  })
+                }
               })
               .catch(err => {
                 this.$Message.error("DELETE FAILED.")
@@ -275,7 +388,18 @@
             this.axios
               .delete("/GeoProblemSolving/resource/delSomeRemote/" + this.$store.getters.userId + "?rids=" + rids)
               .then(res => {
-                console.log(res);
+                if (res.data.code == 0){
+                  for (let i =0; i < this.selectedResList.length; i++){
+                    let index = this.resourceList.indexOf(this.selectedResList[i]);
+                    this.resourceList.splice(index, 1);
+                  }
+                  this.confirmDelModal = false;
+                  this.$Notice.success({
+                    title: "Delete Success."
+                  })
+                }else {
+                  this.$Message.error("DELETE FAILED.")
+                }
               })
               .catch(err => {
                 this.$Message.error("DELETE FAILED.")
@@ -283,6 +407,7 @@
           }
         }
       },
+      //后期需要修改
       getUserResource() {
         this.axios
           .get(
@@ -299,8 +424,37 @@
             }
           })
           .catch(err => {
-            console.log(err.data);
+            this.$Message.error("Loading resource Failed.");
           });
+      },
+      getUserProject: function () {
+        let userInfo = this.$store.getters.userInfo;
+        let projectIds = "";
+        if (userInfo.createdProjects != null) {
+          for (let i = 0; i < userInfo.createdProjects.length; i++) {
+            if (i != userInfo.createdProjects.length - 1) {
+              projectIds += userInfo.createdProjects[i] + ","
+            } else {
+              projectIds += userInfo.createdProjects[i]
+            }
+          }
+        }
+        if (userInfo.joinedProjects != null) {
+          for (let i = 0; i < userInfo.joinedProjects.length; i++) {
+            if (i != userInfo.joinedProjects.length - 1) {
+              projectIds += userInfo.joinedProjects[i] + ","
+            } else {
+              projectIds += userInfo.joinedProjects[i]
+            }
+          }
+        }
+        this.$axios.get("/GeoProblemSolving/project/getProjects?aids=" + projectIds)
+          .then(res => {
+            this.$set(this, "userProject", res.data.data)
+          })
+          .catch(err => {
+            this.$Message.error("Loading project failed.")
+          })
       },
       shareRes: function (sharedUserId) {
       },
@@ -403,8 +557,154 @@
             }
           }
         })
+      },
+      downLoadRes: function () {
+        let selectedRes = this.selectedResList;
+        if (selectedRes.length == 1) {
+          let downloadUrl = selectedRes[0].pathURL;
+          window.open(downloadUrl);
+        }
+        if (selectedRes.length > 1) {
+          let oids = "";
+          for (let i = 0; i < selectedRes.length; i++) {
+            if (i != selectedRes.length - 1) {
+
+              oids += selectedRes[i].pathURL.split("/data/")[1] + ",";
+            } else {
+              oids += selectedRes[i].pathURL.split("/data/")[1]
+            }
+          }
+          let downloadBatchUrl = "http://221.226.60.2:8082/batchData?oids=" + oids;
+          window.open(downloadBatchUrl)
+        }
+      },
+      sharingResToUser: function () {
+        if (this.shareResFormItems.select == "selectUser") {
+          let userEmail = this.shareResFormItems.sharedUserEmail;
+          let resListTemp = this.selectedResList;
+          let rids = "";
+          for (let i = 0; i < resListTemp.length; i++) {
+            if (i == resListTemp.length - 1) {
+              rids += resListTemp[i].resourceId;
+            } else {
+              rids += resListTemp[i].resourceId + ",";
+            }
+          }
+          let requestUrl = "/GeoProblemSolving/resource/shareRes?email=" + userEmail + "&rids=" + rids;
+          this.axios.get(requestUrl)
+            .then(res => {
+              if (res.data.code == 0) {
+                this.$Message.success("Sharing Success");
+                //然后发送站内通知
+                let emailFormBody = {};
+                emailFormBody["recipient"] = userEmail;
+                emailFormBody["content"] = {
+                  "title": "Resource Sharing",
+                  "description": this.$store.getters.userInfo.name + "has shared " + rids + "to you."
+                };
+                this.shareResModal = false;
+                this.axios.post("/GeoProblemSolving/notice/send", emailFormBody)
+                  .then(res => {
+                    console.log(res);
+                  })
+                  .catch()
+              } else if (res.data.code == -3) {
+                this.$Message.info("No such user, please check if the email is correct.")
+              }
+            })
+            .catch(err => {
+              this.$Message.error("Sharing Failed.")
+            })
+        }
+      },
+      shareResources: function() {
+        let selectResource = this.selectedResList;
+        let addFileList = [];
+        for (var i = 0; i < selectResource.length; i++) {
+          addFileList.push(selectResource[i].resourceId);
+        }
+        let addFileListStr = addFileList.toString();
+
+        this.axios
+          .get(
+            "/GeoProblemSolving/folder/shareToFolder" +
+            "?addFileList=" +
+            addFileListStr +
+            "&folderId=" +
+            this.shareResFormItems.sharedProjectId
+          )
+          .then((res) => {
+            if (res.data == "Offline") {
+              this.$store.commit("userLogout");
+              this.$router.push({ name: "Login" });
+            }else if (res.data == "Success"){
+              this.shareResModal = false;
+              this.$Message.success("Shared success.")
+            } else if (res.data == "Fail") {
+              this.$Message.error(
+                "Failed to get resources from previous activities."
+              );
+            } else {
+              this.getResList();
+            }
+          })
+          .catch((err) => {
+            // console.log(err.data);
+          });
+      },
+      showResDetail: function (res, index) {
+        this.resDetailModal = true;
+        this.updatedResIndex = index;
+        this.resDetailFormItems = res;
+      },
+      updateRes: function () {
+        this.$axios
+          .put("/GeoProblemSolving/resource", this.resDetailFormItems)
+          .then(res=>{
+            if (res.data.code == 0){
+              this.resourceList.splice(this.updatedResIndex, 1);
+              this.resourceList.unshift(this.resDetailFormItems);
+              this.resDetailModal = false;
+              this.$Message.success("Update Success.")
+            }else {
+              this.$Message.error("Update Failed.");
+            }
+          })
+          .catch(err=>{
+            this.$Message.error("Update Failed.");
+          })
       }
+
     },
+    computed: {
+      selectedResName: function () {
+        let resNames = "";
+        if (this.selectedResList.length != 0) {
+          for (let i = 0; i < this.selectedResList.length; i++) {
+            resNames += this.selectedResList[i].name + " ";
+          }
+        }
+        return resNames;
+      },
+      publicResNum: function () {
+        let publicNum = 0;
+        for (let i=0; i< this.resourceList.length; i++){
+          if (this.resourceList[i].privacy == "public"){
+            publicNum ++;
+          }
+        }
+        return publicNum;
+      },
+      privateResNum: function () {
+        let privateNum = 0;
+        for (let i=0; i< this.resourceList.length; i++){
+          if (this.resourceList[i].privacy == "private"){
+            privateNum ++;
+          }
+        }
+        return privateNum;
+      }
+    }
   }
 </script>
 

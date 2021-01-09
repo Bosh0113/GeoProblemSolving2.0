@@ -1,11 +1,13 @@
 package cn.edu.njnu.geoproblemsolving.business.resource.service;
 
 import cn.edu.njnu.geoproblemsolving.business.resource.entity.AddIResourceDTO;
+import cn.edu.njnu.geoproblemsolving.business.resource.entity.IResourceEntity;
+import cn.edu.njnu.geoproblemsolving.business.resource.entity.ResourcePojo;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
+import com.mongodb.client.result.UpdateResult;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Map;
@@ -30,4 +32,9 @@ public interface IResourceService {
     Object saveResource(AddIResourceDTO add) throws IOException, URISyntaxException;
 
     JsonResult uploadImage(HttpServletRequest request);
+
+
+    ArrayList<ResourcePojo> getRes(ArrayList<String> rids);
+
+    UpdateResult updateRes(String rid, IResourceEntity resource);
 }

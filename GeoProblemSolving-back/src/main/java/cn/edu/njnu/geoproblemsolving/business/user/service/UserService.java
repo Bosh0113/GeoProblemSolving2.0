@@ -1,19 +1,22 @@
 package cn.edu.njnu.geoproblemsolving.business.user.service;
 
+import cn.edu.njnu.geoproblemsolving.business.resource.entity.ResourcePojo;
 import cn.edu.njnu.geoproblemsolving.business.user.entity.User;
+import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 
 import java.util.ArrayList;
 
 public interface UserService {
 
-    public User findUser(String userId);
+    User findUser(String userId);
 
-    public Object updataUserInfo(User user);
+    Object updataUserInfo(User user);
 
-    public Object register(User user);
+    Object register(User user);
 
-    public String changePassword(String email, String password);
+    String changePassword(String email, String password);
 
-    public Object login(String email, String password);
+    Object login(String email, String password);
 
+    JsonResult uploadResourceField(String email, ArrayList<ResourcePojo> res);
 }
