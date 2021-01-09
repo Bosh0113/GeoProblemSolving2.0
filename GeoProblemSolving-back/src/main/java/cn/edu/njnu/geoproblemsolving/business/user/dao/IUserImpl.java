@@ -139,9 +139,7 @@ public class IUserImpl implements IUserDao {
             ResponseEntity<JSONObject> registerResult = restTemplate.exchange(url, HttpMethod.POST, httpEntity, JSONObject.class);
             int resCode = (int)registerResult.getBody().get("code");
             if (resCode == 0){
-                User user = JSONObject.toJavaObject(jsonObject, User.class);
-                Query query = new Query(Criteria.where("userId").is(user.getUserId()));
-                User user1 = mongoTemplate.findOne(query, User.class);
+                User user = registerResult.getBody().getJSONObject("data").toJavaObject(User.class);
                 return ResultUtils.success(mongoTemplate.save(user));
             }else if (resCode == -3){
                 return ResultUtils.error(-3, "Fail: user already exists in the database.");
@@ -163,10 +161,14 @@ public class IUserImpl implements IUserDao {
     }
 
     @Override
+    public User findByUserEmail(String email) {
+        return mongoTemplate.findOne(new Query(Criteria.where("email").is(email)), User.class);
+    }
+
+    @Override
     public JsonResult uploadUserRes(String uploaderId, ResourcePojo res) {
         Query query = new Query(Criteria.where("userId").is(uploaderId));
         Update update = new Update();
-        // update.set("resources", res);
         try {
             User user = mongoTemplate.findOne(query, User.class);
             ArrayList<ResourcePojo> resources = user.getResources();
@@ -192,7 +194,9 @@ public class IUserImpl implements IUserDao {
             ArrayList<Integer> indexArray = new ArrayList<>();
             for (int i = 0; i < rids.length; i++){
                 for (int index =0; index < resources.size(); index++){
-                    if (resources.get(index).getUid().equals(rids[i])){
+                    String address = resources.get(index).getAddress();
+                    String rid = address.split("//data//")[1];
+                    if (rid.equals(rids[i])){
                         indexArray.add(index);
                         break;
                     }
@@ -210,5 +214,27 @@ public class IUserImpl implements IUserDao {
         }catch (Exception e){
             return ResultUtils.error(-2, "Delete local user field failed.");
         }
+    }
+
+    @Override
+    public JsonResult sharedUserRes(String email, ArrayList<ResourcePojo> res) {
+        Query query = new Query(Criteria.where("email").is(email));
+        User user = mongoTemplate.findOne(query, User.class);
+        if (user == null){
+            return ResultUtils.error(-3, "No such user, please check if the email is correct.");
+        }
+        ArrayList<ResourcePojo> resources = user.getResources();
+        if (resources == null){
+            resources = new ArrayList<ResourcePojo>();
+        }
+        for (ResourcePojo resourcePojo: res){
+            resources.add(resourcePojo);
+        }
+        Update update = new Update();
+        update.set("resources", resources);
+        mongoTemplate.updateFirst(query, update, User.class);
+        //还得更新远端内容，暂时不写
+
+        return ResultUtils.success();
     }
 }

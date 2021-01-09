@@ -78,7 +78,7 @@ public class RestTemplateUtil {
 
     public JSONObject delUserBaseResource(String delUserBaseResUrl){
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", "Bearer" + StaticParams.access_token);
+        headers.add("Authorization", "Bearer " + StaticParams.access_token);
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<JSONObject> httpEntity = new HttpEntity<>(headers);
         ResponseEntity<String> response = restTemplate.exchange(delUserBaseResUrl, HttpMethod.DELETE, httpEntity, String.class);

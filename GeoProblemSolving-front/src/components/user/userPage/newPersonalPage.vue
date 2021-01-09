@@ -47,10 +47,10 @@
           <Menu style="height:calc(100vh - 120px);">
             <MenuGroup>
 
-              <MenuItem name="overview" class="sideItem">
-                <Icon type="ios-book" size="25"/>
-                <router-link to="overView" class="customFont">Overview</router-link>
-              </MenuItem>
+<!--              <MenuItem name="overview" class="sideItem">-->
+<!--                <Icon type="ios-book" size="25"/>-->
+<!--                <router-link to="overView" class="customFont">Overview</router-link>-->
+<!--              </MenuItem>-->
 
               <MenuItem name="project" class="sideItem">
                 <Icon type="ios-cube" size="25"/>
@@ -69,7 +69,7 @@
 
               <MenuItem name="todoList" class="sideItem">
                 <Icon type="ios-clipboard" size="25"/>
-                <router-link to="todoList" class="customFont">TodoList</router-link>
+                <router-link to="todoList" class="customFont">Todo List</router-link>
               </MenuItem>
             </MenuGroup>
 
@@ -81,12 +81,7 @@
 
               <MenuItem name="notification" class="sideItem">
                 <Icon type="ios-list" size="25"/>
-                <router-link to="notification" class="customFont">Notification</router-link>
-              </MenuItem>
-
-              <MenuItem name="trash" class="sideItem">
-                <Icon type="ios-trash-outline" size="25"/>
-                <router-link to="todoList" class="customFont">Trash</router-link>
+                <router-link to="/notification" class="customFont">Notification</router-link>
               </MenuItem>
 
             </MenuGroup>

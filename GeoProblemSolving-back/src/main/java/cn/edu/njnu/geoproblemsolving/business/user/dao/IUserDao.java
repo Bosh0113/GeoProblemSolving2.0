@@ -8,6 +8,7 @@ import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import com.alibaba.fastjson.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.Map;
 
 public interface IUserDao {
@@ -28,12 +29,15 @@ public interface IUserDao {
 
     JsonResult addUserInfo(JSONObject user);
 
+    User findByUserEmail(String email);
 
 
     // 用户资源字段 curd 处理
     JsonResult uploadUserRes(String uploaderId, ResourcePojo res);
 
     JsonResult delUserRes(String userId, String[] rids);
+
+    JsonResult sharedUserRes(String email, ArrayList<ResourcePojo> res);
 
 
 }

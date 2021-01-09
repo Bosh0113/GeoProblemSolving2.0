@@ -30,10 +30,41 @@ const routes = [
           require(["@/components/user/userPage/newPersonalPage"], resolve),
         children: [
           {
-            path: "resource",
+            path: "",
             name: "resource",
             component: resolve => require(["@/components/user/subPage/resource"], resolve),
           },
+          {
+            path: "notification",
+            name: "notification",
+            component: resolve => require(["@/components/user/subPage/notification"], resolve)
+          },
+          {
+            path: "tool",
+            name: "tool",
+            component: resolve => require(["@/components/user/subPage/tool"], resolve)
+          },
+          {
+            path: "project",
+            name: "project",
+            component: resolve => require(["@/components/user/subPage/project"], resolve)
+          },
+          {
+            path: "todoList",
+            name: "todoList",
+            component: resolve => require(["@/components/user/subPage/todoList"], resolve)
+          },
+          {
+            path: "userInfo",
+            name: "userInfo",
+            component: resolve => require(["@/components/user/subPage/userInfo"], resolve)
+          },
+          {
+            path: "notification",
+            name: "notification",
+            component: resolve => require(["@/components/user/subPage/notification"], resolve)
+          },
+
 
         ]
       },

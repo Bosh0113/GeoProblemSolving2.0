@@ -2,7 +2,12 @@ package cn.edu.njnu.geoproblemsolving.Controller;
 
 import cn.edu.njnu.geoproblemsolving.Dao.Notice.NoticeDaoImpl;
 import cn.edu.njnu.geoproblemsolving.Entity.NoticeEntity;
+import cn.edu.njnu.geoproblemsolving.business.user.dao.IUserImpl;
+import cn.edu.njnu.geoproblemsolving.business.user.entity.User;
+import com.alibaba.fastjson.JSONObject;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -20,6 +25,22 @@ public class NoticeController {
     public String saveNotice(@RequestBody NoticeEntity notice){
         NoticeDaoImpl noticeDao=new NoticeDaoImpl(mongoTemplate);
         return noticeDao.saveNotice(notice);
+    }
+
+    @RequestMapping(value = "/send", produces = {"application/json;charset=UTF-8"},method = RequestMethod.POST)
+    public String sendNotice(@RequestBody JSONObject noticeJson){
+        String recipientEmail = noticeJson.getString("recipient");
+        JSONObject content = noticeJson.getJSONObject("content");
+        IUserImpl userDao = new IUserImpl();
+        User noticedUser = mongoTemplate.findOne(new Query(Criteria.where("email").is(recipientEmail)), User.class);
+        String recipientId = noticedUser.getUserId();
+        NoticeEntity noticeEntity = new NoticeEntity();
+        noticeEntity.setRecipientId(recipientId);
+        noticeEntity.setContent(content);
+        noticeEntity.setState("unread");
+        noticeEntity.setType("notice");
+        NoticeDaoImpl noticeDao=new NoticeDaoImpl(mongoTemplate);
+        return noticeDao.saveNotice(noticeEntity);
     }
 
     @RequestMapping(value = "/inquiry",method = RequestMethod.GET)

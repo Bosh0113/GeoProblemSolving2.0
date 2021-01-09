@@ -1,5 +1,6 @@
 package cn.edu.njnu.geoproblemsolving.business.resource.entity;
 
+import com.alibaba.fastjson.JSONObject;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -7,7 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.ArrayList;
 
 @Data
-@Document(collection = "resource")
+@Document(collection = "resources")
 public class ResourcePojo {
     @Id
     private String uid;
@@ -26,4 +27,8 @@ public class ResourcePojo {
     private String template;
     private String uploadTime;
     private ArrayList<ResourcePojo> children;
+
+    //....
+    private String uploadId;
+
 }

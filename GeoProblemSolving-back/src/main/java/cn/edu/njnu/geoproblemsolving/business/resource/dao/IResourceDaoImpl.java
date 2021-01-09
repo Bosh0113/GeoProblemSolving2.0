@@ -2,19 +2,19 @@ package cn.edu.njnu.geoproblemsolving.business.resource.dao;
 
 import cn.edu.njnu.geoproblemsolving.Entity.Resources.ResourceEntity;
 import cn.edu.njnu.geoproblemsolving.business.resource.entity.IResourceEntity;
-import cn.edu.njnu.geoproblemsolving.business.resource.util.RestTemplateUtil;
+import cn.edu.njnu.geoproblemsolving.business.resource.entity.ResourcePojo;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import cn.edu.njnu.geoproblemsolving.common.utils.ResultUtils;
 import com.alibaba.fastjson.JSONObject;
 import com.mongodb.client.result.DeleteResult;
+import com.mongodb.client.result.UpdateResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Field;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.http.*;
-import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -134,7 +134,45 @@ public class IResourceDaoImpl implements IResourceDao {
         return deleteResult.getDeletedCount();
     }
 
+    /*
+    ======================Resource:latest version,zheng zhong 2021/1/8 ======================     ======================
+     */
 
+    @Override
+    public ArrayList<ResourcePojo> getRes(ArrayList<String> rids) {
+        ArrayList<ResourcePojo> resourcePojos = new ArrayList<>();
+        for (String rid: rids){
+            Query query = new Query(Criteria.where("uid").is(rid));
+            ResourcePojo resourcePojo = mongoTemplate.findOne(query, ResourcePojo.class);
+            resourcePojos.add(resourcePojo);
+        }
+        return resourcePojos;
+    }
+
+    @Override
+    public JsonResult saveResDetail(ResourcePojo resourcePojo) {
+        ResourcePojo resource = mongoTemplate.save(resourcePojo);
+        return ResultUtils.success(resource);
+    }
+
+    @Override
+    public IResourceEntity findById(String rid) {
+        try {
+            return mongoTemplate.findOne(new Query(Criteria.where("resourceId").is(rid)), IResourceEntity.class);
+        }catch(Exception e){
+            throw e;
+        }
+    }
+
+    @Override
+    public UpdateResult updateRes(String rid, Update update) {
+        Query query =  new Query(Criteria.where("resourceId").is(rid));
+        return mongoTemplate.updateFirst(query, update, IResourceEntity.class);
+    }
+
+    /*
+    ====================================================================================================================
+     */
     // @Override
     // public Object delResByIds(ArrayList<String> resIds) {
     //     Query query = new Query();

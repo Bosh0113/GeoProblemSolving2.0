@@ -1,9 +1,14 @@
 package cn.edu.njnu.geoproblemsolving.business.user.service.Impl;
 
 import cn.edu.njnu.geoproblemsolving.Entity.Resources.ResourceEntity;
+import cn.edu.njnu.geoproblemsolving.business.resource.entity.ResourcePojo;
+import cn.edu.njnu.geoproblemsolving.business.user.dao.IUserImpl;
 import cn.edu.njnu.geoproblemsolving.business.user.entity.User;
 import cn.edu.njnu.geoproblemsolving.business.user.repository.UserRepository;
 import cn.edu.njnu.geoproblemsolving.business.user.service.UserService;
+import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
+import cn.edu.njnu.geoproblemsolving.common.utils.ResultUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -20,6 +25,8 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final MongoTemplate mongoTemplate;
+    @Autowired
+    IUserImpl userDao;
 
     public UserServiceImpl(UserRepository userRepository, MongoTemplate mongoTemplate) {
         this.userRepository = userRepository;
@@ -103,6 +110,19 @@ public class UserServiceImpl implements UserService {
         catch (Exception ex){
             return "Fail: Exception";
         }
+    }
+
+    @Override
+    public JsonResult uploadResourceField(String email, ArrayList<ResourcePojo> res) {
+        JsonResult updateUserResFieldResult = userDao.sharedUserRes(email, res);
+        if (updateUserResFieldResult.getCode() == 0){
+            //更新成功，然后发送邮件
+            //增加用户通知
+            return ResultUtils.success();
+        }else {
+            return updateUserResFieldResult;
+        }
+
     }
 
 
