@@ -305,11 +305,11 @@ export default {
     };
   },
   beforeRouteEnter: (to, from, next) => {
-    // next((vm) => {
-    //   if (!vm.$store.getters.userState || vm.$store.getters.userId == "") {
-    //     vm.$router.push({ name: "Login" });
-    //   }
-    // });
+    next((vm) => {
+      if (!vm.$store.getters.userState || vm.$store.getters.userId == "") {
+        vm.$router.push({ name: "Login" });
+      }
+    });
     next();
   },
   mounted() {
@@ -505,7 +505,6 @@ export default {
 
               let root = Object.assign({}, this.projectInfo);
               this.nameConfirm.push(root.name);
-              console.log(this.nameConfirm);
               root["expand"] = true;
               root["children"] = children;
 
