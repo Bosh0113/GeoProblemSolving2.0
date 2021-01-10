@@ -3571,7 +3571,7 @@ angular.module('kityminderEditor')
                     var info = RouteInfo.getInfo();
                     var url = "";
                     if(userId == info.userId){
-                        url = "http://"+RouteInfo.getIPPort()+"/personalPage";
+                        url = "http://"+RouteInfo.getIPPort()+"/GeoProblemSolving/newPersonalPage/overView";
                     }
                     else {
                         url = "http://"+RouteInfo.getIPPort()+"/GeoProblemSolving/memberPage/"+userId;

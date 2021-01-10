@@ -97,18 +97,18 @@ const routes = [
         component: resolve =>
           require(["@/components/navigationContent/help"], resolve)
       },
-      {
-        path: "personalPage",
-        name: "PersonalPage",
-        component: resolve =>
-          require(["@/components/user/userPage/personalPage"], resolve)
-      },
-      {
-        path: "notifications",
-        name: "Notifications",
-        component: resolve =>
-          require(["@/components/user/userState/notifications"], resolve)
-      },
+      // {
+      //   path: "personalPage",
+      //   name: "PersonalPage",
+      //   component: resolve =>
+      //     require(["@/components/user/userPage/personalPage"], resolve)
+      // },
+      // {
+      //   path: "notifications",
+      //   name: "Notifications",
+      //   component: resolve =>
+      //     require(["@/components/user/userState/notifications"], resolve)
+      // },
       {
         path: "memberPage/:id",
         name: "MemberDetailPage",

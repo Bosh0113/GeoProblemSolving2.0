@@ -3,7 +3,7 @@
     <Row>
       <Col span="22" offset="1">
 
-        <Card>
+        <Card dis-hover>
           <CheckboxGroup v-model="selectedNoticeType" style="display: inline-block">
             <Checkbox label="noticeList">
               <span>Notice</span>
@@ -33,7 +33,7 @@
         </Card>
         <!--  通知详情 -->
         <div>
-          <Card>
+          <Card dis-hover>
             <h3 slot="title">Notification Detail</h3>
             <div v-if="selectNoteNum!=0">
               <!--            添加滚动条     -->

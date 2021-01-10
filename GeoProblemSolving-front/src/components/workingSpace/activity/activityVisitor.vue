@@ -109,7 +109,7 @@
                   style="width: 40px; height: 40px"
                 />
                 <avatar
-                  v-else-if="member.name != undefined && member.name != ''" 
+                  v-else-if="member.name != undefined && member.name != ''"
                   :username="member.name"
                   :size="40"
                   :rounded="true"
@@ -203,7 +203,7 @@ export default {
     },
     gotoPersonalSpace(id) {
       if (id == this.$store.getters.userId) {
-        parent.location.href = "/GeoProblemSolving/personalPage";
+        parent.location.href = "/newPersonalPage/overView";
       } else {
         parent.location.href = "/GeoProblemSolving/memberPage/" + id;
       }

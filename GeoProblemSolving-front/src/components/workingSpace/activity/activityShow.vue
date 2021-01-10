@@ -1163,7 +1163,8 @@ export default {
     },
     gotoPersonalSpace(id) {
       if (id == this.$store.getters.userId) {
-        parent.location.href = "/GeoProblemSolving/personalPage";
+        parent.location.href = "/newPersonalPage/overView";
+        // this.$router.push({name: "overView"})
       } else {
         parent.location.href = "/GeoProblemSolving/memberPage/" + id;
       }

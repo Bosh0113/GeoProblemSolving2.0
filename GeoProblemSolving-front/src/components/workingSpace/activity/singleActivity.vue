@@ -509,7 +509,7 @@ export default {
     },
     gotoPersonalSpace(id) {
       if (id == this.$store.getters.userId) {
-        this.$router.push({ name: "PersonalPage" });
+        this.$router.push({ name: "overView" });
       } else {
         this.$router.push({ name: "MemberDetailPage", params: { id: id } });
       }

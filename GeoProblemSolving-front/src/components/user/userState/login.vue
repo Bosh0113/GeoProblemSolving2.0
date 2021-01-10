@@ -193,7 +193,7 @@ export default {
   },
   created() {
     if (this.$store.getters.userState) {
-      this.$router.replace({ name: "PersonalPage" });
+      this.$router.replace({ name: "overView" });
     }
   },
   data() {
