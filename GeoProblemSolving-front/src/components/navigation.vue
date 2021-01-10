@@ -361,12 +361,13 @@ export default {
     },
     logged(name) {
       if (name === "notification") {
-        this.$router.push({ name: "Notifications" });
+        this.$router.push({ name: "notification" });
       } else if (name === "personal") {
       }
     },
     toPersonalPage() {
-      this.$router.push({ name: "PersonalPage" });
+      this.$router.push({ name: "overView"});
+      // this.$router.push({ name: "PersonalPage" });
     },
     // 获取到通知的数量
     getUnreadNoticeCount() {

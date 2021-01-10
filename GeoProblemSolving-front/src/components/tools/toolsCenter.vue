@@ -193,13 +193,13 @@
                 >
                   <Option v-for="item in typeOptions" :key="item.index" :value="item">{{ item }}</Option>
                 </Select>
-                <Button
-                  class="btnHoverGreen"
-                  shape="circle"
-                  icon="ios-add-circle-outline"
-                  @click="createToolModalShow()"
-                  v-show="userInfo.userState"
-                >Create tool</Button>
+<!--                <Button-->
+<!--                  class="btnHoverGreen"-->
+<!--                  shape="circle"-->
+<!--                  icon="ios-add-circle-outline"-->
+<!--                  @click="createToolModalShow()"-->
+<!--                  v-show="userInfo.userState"-->
+<!--                >Create tool</Button>-->
               </div>
               <div
                 v-if="showMenuItem=='publicTools'"

@@ -26,7 +26,7 @@
             <div>Email: {{userInfo.email}}</div>
             <div>Organizations: {{myOrganizations}}</div>
             <hr/>
-            <Button @click="editUserInfoModal = true">Edit Information</Button>
+            <Button @click="showEditUserInfoModal">Edit Information</Button>
             <br/>
             <Button @click="resetPasswordModal = true">Change Password</Button>
           </Card>
@@ -70,7 +70,7 @@
               class="organization"
               v-model="organizations"
               :tags="userInfoFormItems.organizations"
-              @tags-changed="(newTags) => (userInfoFormItems.organizations = newTags)"
+              @tags-changed="newTags => userInfoFormItems.organizations = newTags"
             >
             </vue-tags-input>
             <!--        vue-tags-input -->
@@ -114,6 +114,7 @@
       <Button
         slot="footer"
         type="primary"
+        @click="updateUserInfo"
       >Submit
       </Button>
     </Modal>
@@ -164,8 +165,10 @@
         editUserInfoModal: false,
         resetPasswordModal: false,
         userInfo: {},
+        //tags
         organizations: "",
         domains: "",
+        //编辑的用户表单
         userInfoFormItems: {
           avatar: "",
           name: "",
@@ -237,6 +240,7 @@
             }
           ],
         },
+        //重设密码表单
         resetPwdFormItems: {
           oldPwd: "",
           newPwd: "",
@@ -263,22 +267,19 @@
     methods: {
       initInfo: function () {
         this.userInfo = this.$store.getters.userInfo;
-        this.userInfoFormItems.avatar = this.userInfo.avatar;
-        this.userInfoFormItems.name = this.userInfo.name;
-        this.userInfoFormItems.homePage = this.userInfo.homepage;
-        this.userInfoFormItems.title = this.userInfo.title;
-        this.userInfoFormItems.organizations = this.userInfo.organizations;
-        this.userInfoFormItems.introduction = this.userInfo.introduction;
-        this.userInfoFormItems.domain = this.userInfo.domain;
-        this.userInfoFormItems.phone = this.userInfo.phone;
-        this.userInfoFormItems.country = this.userInfo.country;
-        this.userInfoFormItems.city = this.userInfo.city;
         if (this.userInfo.organizations == null) {
-          this.userInfoFormItems.organizations = [];
+          this.userInfo.organizations = [];
         }
         if (this.userInfo.domain == null) {
-          this.userInfoFormItems.domain = [];
+          this.userInfo.domain = [];
         }
+      },
+      showEditUserInfoModal: function(){
+        this.editUserInfoModal = true;
+        this.userInfoFormItems = this.userInfo;
+      },
+      showResetPwdModal: function(){
+
       },
       resetPwd: function () {
         let md5_newPwd = md5(this.resetPwdFormItems.newPwd);
@@ -288,13 +289,25 @@
           .post("http://106.14.78.235/AuthServer/user/newPassword?" + paramUrl)
           .then(res => {
             if (res.data == 1) {
-              this.$router.push({name: "Login"})
+              this.resetPasswordModal = false;
+              this.$Notice.success({
+                title: "Reset password success."
+              })
+              this.resetPwdFormItems.newPwd = "";
+              this.resetPwdFormItems.oldPwd = "";
+              this.resetPwdFormItems.validPwd = "";
             } else {
               this.$Message.info("Old password error")
+              this.resetPwdFormItems.newPwd = "";
+              this.resetPwdFormItems.oldPwd = "";
+              this.resetPwdFormItems.validPwd = "";
             }
           })
           .catch(err => {
             this.$Message.error("Modify password fail.")
+            this.resetPwdFormItems.newPwd = "";
+            this.resetPwdFormItems.oldPwd = "";
+            this.resetPwdFormItems.validPwd = "";
           })
 
       },
@@ -309,7 +322,6 @@
         }
         console.log("organizations: " + organizations);
         console.log("domains: " + domains);
-
       }
     },
     computed: {

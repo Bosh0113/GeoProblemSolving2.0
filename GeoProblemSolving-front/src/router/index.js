@@ -30,7 +30,12 @@ const routes = [
           require(["@/components/user/userPage/newPersonalPage"], resolve),
         children: [
           {
-            path: "",
+            path: "overView",
+            name: "overView",
+            component: resolve => require(["@/components/user/subPage/overView"], resolve),
+          },
+          {
+            path: "resource",
             name: "resource",
             component: resolve => require(["@/components/user/subPage/resource"], resolve),
           },

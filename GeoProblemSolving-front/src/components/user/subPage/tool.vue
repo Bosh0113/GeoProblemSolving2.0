@@ -8,11 +8,11 @@
             <CheckboxGroup v-model="checkedType">
               <Checkbox label="public">
                 <label>Public</label>
-                <label class="badge">{{publicToolNum}}</label>
+                <label class="badge">{{publicTools.length}}</label>
               </Checkbox>
               <Checkbox label="private">
                 <label>Privacy</label>
-                <label class="badge">{{privateToolNum}}</label>
+                <label class="badge">{{privateTools.length}}</label>
               </Checkbox>
             </CheckboxGroup>
           </Card>
@@ -32,19 +32,17 @@
             </div>
             <!--            工具显示内容  -->
 
-            <div
-              style="width: 210px; display: inline-block; margin-left: 20px"
-              v-for="(tool,index) in personalTools"
-            >
-<!--              显示 public-->
-                <Card
-                  v-if="tool.privacy =='Public' && checkedType.includes('public')"
-                >
+            <div v-if="userToolCount.length != 0">
+              <div
+                style="width: 210px; display: inline-block; margin-left: 20px"
+                v-for="(tool, index) in userToolCount"
+              >
+                <Card>
                   <p slot="title">{{tool.toolName}}</p>
                   <div slot="extra">
                     <Icon type="ios-settings" size="20" class="icon" @click="editTool(tool)"/>
                     <Icon type="ios-share-alt" size="20" class="icon" @click="shareTool(tool)"/>
-                    <Icon type="md-close" size="20" class="icon" @click="delTool(tool.tid, tool.toolName, index)"/>
+                    <Icon type="md-close" size="20" class="icon" @click="delTool(tool.tid, tool.privacy, index, tool.toolName)"/>
                   </div>
                   <img
                     :src="tool.toolImg"
@@ -59,45 +57,21 @@
                   ></avatar>
                   {{tool.description}}
                 </Card>
-
-              <Card
-                v-if="tool.privacy =='Private' && checkedType.includes('private')"
-              >
-                <p slot="title">{{tool.toolName}}</p>
-                <div slot="extra">
-                  <Icon type="ios-settings" size="20" class="icon" @click="editTool(tool)"/>
-                  <Icon type="ios-share-alt" size="20" class="icon" @click="shareTool(tool)"/>
-                  <Icon type="md-close" size="20" class="icon" @click="delTool(tool.tid, tool.toolName, index)"/>
-                </div>
-                <img
-                  :src="tool.toolImg"
-                  v-if="tool.toolImg!=''"
-                  style="height:100%;max-height:50px;"
-                />
-                <avatar
-                  :username="tool.toolName"
-                  :size="50"
-                  style="margin-bottom:6px"
-                  v-else
-                ></avatar>
-                {{tool.description}}
-              </Card>
               </div>
-<!--            </div>-->
-
+            </div>
 
           </Card>
         </Row>
       </Col>
       <!--    History Line-->
-      <Col span="4">
-        <Card dis-hover>
-          <p slot="title">Event Line</p>
-        </Card>
-      </Col>
+<!--      <Col span="4">-->
+<!--        <Card dis-hover>-->
+<!--          <p slot="title">Event Line</p>-->
+<!--        </Card>-->
+<!--      </Col>-->
     </Row>
+
     <!--    Modal 对话框部分 -->
-    <!--  create tool modal -->
     <Modal
       v-model="createToolModal"
       title="Create Tool"
@@ -172,7 +146,7 @@
     <!--    确认删除 Modal-->
     <Modal v-model="confirmDelModal" width="300">
       <label style="font-size: 20px">Are you sure to delete </label>
-      <h2>{{this.delToolName}}</h2>
+      <h2>{{this.delToolInfo.delToolName}}</h2>
       <div slot="footer">
         <Button
           type="warning"
@@ -238,9 +212,12 @@
         toolInfoRule: {},
         // create tool step
         currentStep: 0,
-        delToolId: "",
-        delToolIndex: undefined,
-        delToolName: "",
+        delToolInfo:{
+          delToolId: "",
+          delToolIndex: undefined,
+          delToolType: "",
+          delToolName: ""
+        },
         sharedTool: {}
       }
     },
@@ -295,13 +272,22 @@
       getPersonalTools: function () {
         this.$axios.get("/GeoProblemSolving/tool/findByProvider/" + this.$store.getters.userId)
           .then(res => {
-            this.$set(this, "personalTools", res.data.data);
+            let tempTools = res.data.data;
+            for (let i=0; i < tempTools.length; i++){
+              if (tempTools[i].privacy == "Public"){
+                this.publicTools.push(tempTools[i]);
+              }else {
+                this.privateTools.push(tempTools[i]);
+              }
+            }
+            console.log("publicTools: "+ this.publicTools)
+            console.log("privateTools: "+ this.privateTools)
+
           })
           .catch(err => {
             this.$Message.error("Loading Fail.")
           })
       },
-
       nextStep: function () {
         if (this.currentStep != 1) {
           this.currentStep += 1;
@@ -323,17 +309,31 @@
         this.currentStep = 0;
         this.$Notice.info({desc: "Create successfully"});
       },
-      delTool: function (toolId, toolName, index) {
+      delTool: function (toolId, toolType, index, toolName) {
         this.confirmDelModal = true;
-        this.delToolId = toolId;
-        this.delToolIndex = index;
-        this.delToolName = toolName;
+        this.delToolInfo.delToolId = toolId;
+        this.delToolInfo.delToolIndex = index;
+        this.delToolInfo.delToolType = toolType;
+        this.delToolInfo.delToolName = toolName;
       },
       confirmDelTool: function () {
-        this.$axios.delete("/GeoProblemSolving/tool/delete?tid=" + this.delToolId)
+        this.$axios.delete("/GeoProblemSolving/tool/delete?tid=" + this.delToolInfo.delToolId)
           .then(res => {
             if (res.data.code == 0) {
-              this.personalTools.splice(this.delToolIndex, 1);
+              if (this.checkedType.length == 2){
+                if(this.delToolInfo.delToolType == "Public"){
+                  this.publicTools.splice(this.delToolInfo.delToolIndex, 1);
+                }else if (this.delToolInfo.delToolType == "Private"){
+                  let num =  this.delToolInfo.delToolIndex - this.publicTools.length;
+                  this.privateTools.splice(num, 1);
+                }
+              }else if (this.checkedType.length == 1 && this.checkedType == "public"){
+                this.publicTools.splice(this.delToolInfo.delToolIndex, 1);
+              }else if (this.checkedType.length == 1 && this.checkedType == "private"){
+                this.privateTools.splice(this.delToolInfo.delToolIndex, 1);
+              }
+              this.$Notice.success({title: "Delete Success."})
+              this.confirmDelModal = false;
             } else {
               this.$Message.error("Delete Fail! Try again.")
             }
@@ -369,18 +369,18 @@
         }
         if (updateProject.toolList != null) {
           updateProject.toolList.push(this.sharedTool.tid);
-        } else{
+        } else {
           updateProject.toolList = [this.sharedTool.tid];
         }
         this.$axios
           .put("/GeoProblemSolving/project/" + this.formItem.sharedProjectId, updateProject)
           .then(res => {
-            if (res.data.code == 0){
+            if (res.data.code == 0) {
               this.$Notice.info({desc: "Update successfully."});
               this.shareToolModal = false;
 
               this.userProject[index].toolList = updateProject.toolList;
-            }else {
+            } else {
               this.$Message.error("Sharing Failed.")
             }
 
@@ -391,25 +391,23 @@
       }
     },
     computed: {
-      publicToolNum: function () {
-        let tempTools = this.personalTools;
-        let num = 0;
-        for (let i=0; i<tempTools.length; i++){
-          if (tempTools[i].privacy == "Public"){
-            num ++;
-          }
+      userToolCount: function () {
+        if (this.checkedType.length == 0) {
+          this.personalTools = [];
+          return this.personalTools;
+        } else if (this.checkedType.length == 2) {
+          this.personalTools = [];
+          this.personalTools = this.publicTools.concat(this.privateTools);
+          return this.personalTools;
+        } else if (this.checkedType.length == 1 && this.checkedType[0] == "public") {
+          this.personalTools = [];
+          this.personalTools = this.publicTools;
+          return this.personalTools;
+        } else if (this.checkedType.length == 1 && this.checkedType[0] == "private") {
+          this.personalTools = [];
+          this.personalTools = this.privateTools;
+          return this.personalTools;
         }
-        return num;
-      },
-      privateToolNum: function () {
-        let tempTools = this.personalTools;
-        let num = 0;
-        for (let i=0; i<tempTools.length; i++){
-          if (tempTools[i].privacy == "Private"){
-            num ++;
-          }
-        }
-        return num;
       }
     },
   }

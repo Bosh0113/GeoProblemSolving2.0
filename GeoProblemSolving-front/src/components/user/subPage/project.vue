@@ -60,7 +60,8 @@
             style=" height: 725px; padding: 5px; border: #dcdee2 solid 1px;"
           >
             <vue-scroll :ops="ops">
-              <Card :bordered="false" v-if="createdProjectList.length == 0 && selectedProjectType.includes('createdProject')">
+              <Card :bordered="false"
+                    v-if="createdProjectList.length == 0 && selectedProjectType.includes('createdProject')">
                 <div style="display:flex;justify-content:center">
                   <Icon type="md-alert" size="40" color="gray"/>
                 </div>
@@ -72,7 +73,8 @@
                 </div>
               </Card>
 
-              <Card :bordered="false" v-if="joinedProjectsList.length == 0 && selectedProjectType.includes('joinedProject') && selectedProjectType.length == 1">
+              <Card :bordered="false"
+                    v-if="joinedProjectsList.length == 0 && selectedProjectType.includes('joinedProject') && selectedProjectType.length == 1">
                 <div style="display:flex;justify-content:center">
                   <Icon type="md-alert" size="40" color="gray"/>
                 </div>
@@ -97,6 +99,7 @@
               </Card>
 
 
+              <!--               项目内容显示        -->
               <div v-show="userProjectCount.length != 0">
                 <div
                   v-for="(mProject,index) in createdProjectList"
@@ -185,38 +188,38 @@
       </Col>
 
       <!--    Event History-->
-      <Col span="4">
-        <Card dis-hover class="historyLine">
-          <p slot="title">Event line</p>
-          <div class="timeLineStyle">
-            <vue-scroll :ops="ops">
-              <Timeline>
-                <div v-if="userEventList.length==0">
-                  <div style="display:flex;justify-content:center">
-                    <Icon type="md-alert" size="40" color="gray"/>
-                  </div>
-                  <br/>
-                  <div style="display:flex;justify-content:center">
-                    <h3
-                      style="text-align:center;width:80%"
-                    >Sorry, there are no events now.</h3>
-                  </div>
-                </div>
-                <TimelineItem
-                  v-for="(item,index) in userEventList"
-                  :key="index"
-                  v-show="userEventList.length>0"
-                >
-                  <strong>
-                    <p class="time">{{item.createTime}}</p>
-                  </strong>
-                  <p class="content">{{item.description}}</p>
-                </TimelineItem>
-              </Timeline>
-            </vue-scroll>
-          </div>
-        </Card>
-      </Col>
+<!--      <Col span="4">-->
+<!--        <Card dis-hover class="historyLine">-->
+<!--          <p slot="title">Event line</p>-->
+<!--          <div class="timeLineStyle">-->
+<!--            <vue-scroll :ops="ops">-->
+<!--              <Timeline>-->
+<!--                <div v-if="userEventList.length==0">-->
+<!--                  <div style="display:flex;justify-content:center">-->
+<!--                    <Icon type="md-alert" size="40" color="gray"/>-->
+<!--                  </div>-->
+<!--                  <br/>-->
+<!--                  <div style="display:flex;justify-content:center">-->
+<!--                    <h3-->
+<!--                      style="text-align:center;width:80%"-->
+<!--                    >Sorry, there are no events now.</h3>-->
+<!--                  </div>-->
+<!--                </div>-->
+<!--                <TimelineItem-->
+<!--                  v-for="(item,index) in userEventList"-->
+<!--                  :key="index"-->
+<!--                  v-show="userEventList.length>0"-->
+<!--                >-->
+<!--                  <strong>-->
+<!--                    <p class="time">{{item.createTime}}</p>-->
+<!--                  </strong>-->
+<!--                  <p class="content">{{item.description}}</p>-->
+<!--                </TimelineItem>-->
+<!--              </Timeline>-->
+<!--            </vue-scroll>-->
+<!--          </div>-->
+<!--        </Card>-->
+<!--      </Col>-->
 
       <!--      模态框     -->
       <Modal
@@ -255,11 +258,8 @@
         },
       }
     },
-    created() {
-      this.getManagerProjectList();
-    },
     mounted() {
-      this.getParticipatoryList(this.$store.getters.userInfo.joinedProjects);
+      this.getUserProject();
       this.readPersonalEvent();
     },
     computed: {
@@ -283,6 +283,48 @@
       },
     },
     methods: {
+      getUserProject: function () {
+        let userInfo = this.$store.getters.userInfo;
+
+        if (userInfo.createdProjects != null) {
+          let createdProjectIds = "";
+          for (let i = 0; i < userInfo.createdProjects.length; i++) {
+            if (i != userInfo.createdProjects.length - 1) {
+              createdProjectIds += userInfo.createdProjects[i] + ","
+            } else {
+              createdProjectIds += userInfo.createdProjects[i]
+            }
+          }
+          // project/getProjects?aids=  用户获取项目
+          this.$axios.get("/GeoProblemSolving/project/getProjects?aids=" + createdProjectIds)
+            .then(res => {
+              this.$set(this, "createdProjectList", res.data.data)
+            })
+            .catch(err => {
+              this.$Message.error("Loading project failed.")
+            })
+        }
+
+        if (userInfo.joinedProjects != null) {
+          let joinedProjectIds = "";
+          for (let i = 0; i < userInfo.joinedProjects.length; i++) {
+            if (i != userInfo.joinedProjects.length - 1) {
+              joinedProjectIds += userInfo.joinedProjects[i] + ","
+            } else {
+              joinedProjectIds += userInfo.joinedProjects[i]
+            }
+          }
+          //projectIds 获取所有项目详情
+          this.$axios.get("/GeoProblemSolving/project/getProjects?aids=" + createdProjectIds)
+            .then(res => {
+              this.$set(this, "joinedProjectsList", res.data.data)
+            })
+            .catch(err => {
+              this.$Message.error("Loading project failed.")
+            })
+        }
+      },
+
       deleteProject() {
         if (this.deleteProjectId != "") {
           this.axios
@@ -334,17 +376,17 @@
       },
 
       //获取用户参与的项目列表
-      getParticipatoryList(projectType,projectIds) {
+      getParticipatoryList(projectType, projectIds) {
         let projectTemp = [];
-        if (projectIds != null){
+        if (projectIds != null) {
           this.axios
             .post("/GeoProblemSolving/user/getMProject", projectIds)
             .then(res => {
               if (res.data.data != "Fail" && res.data.data != "None") {
                 projectTemp = res.data.data;
-                if (projectType == "joinedProject"){
+                if (projectType == "joinedProject") {
                   this.$set(this, "joinedProjectsList", projectTemp);
-                }else if (projectType == "createdProject"){
+                } else if (projectType == "createdProject") {
                   this.$set(this, "createdProjectList", projectTemp);
                 }
 
