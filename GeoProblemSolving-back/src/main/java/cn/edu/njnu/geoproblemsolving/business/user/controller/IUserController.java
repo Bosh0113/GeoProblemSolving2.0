@@ -65,15 +65,16 @@ public class IUserController {
        User localUser = userDao.findUserById(userBase.getUserId());
        if (localUser == null){
            userDao.saveLocalUser(userBase);
+           localUser =  userDao.findUserById(userBase.getUserId());
        }
         HttpSession session = request.getSession();
-       session.setAttribute("userId", userBase.getUserId());
-       session.setAttribute("name", userBase.getName());
-       session.setAttribute("avatar", userBase.getAvatar());
-       session.setAttribute("email", userBase.getEmail());
+       session.setAttribute("userId", localUser.getUserId());
+       session.setAttribute("name", localUser.getName());
+       session.setAttribute("avatar", localUser.getAvatar());
+       session.setAttribute("email", localUser.getEmail());
        session.setMaxInactiveInterval(60 * 60 * 2);
-       System.out.println("User login. User name: " + userBase.getName());
-       return userBase;
+       System.out.println("User login. User name: " + localUser.getName());
+       return localUser;
    }
 
     /**
@@ -145,16 +146,6 @@ public class IUserController {
         return userInfo;
     }
 
-    /**
-     * 查询项目
-     * @param joinedProjects
-     * @return
-     */
-    @RequestMapping(value = "/JoinedProjects", method = RequestMethod.POST)
-    public JsonResult getManagerProjectList(@RequestBody String[] joinedProjects) {
-        System.out.println(joinedProjects);
-        return userDao.getJoinedProjectList(joinedProjects);
-    }
 
     /**
      * @Author mzy

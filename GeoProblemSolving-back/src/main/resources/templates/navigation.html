@@ -141,14 +141,14 @@
 
                         <i-menu mode="horizontal" theme="dark" :style="`z-index:0;background:`+headerBgColor" v-show="userInfoNav.userState"
                             class="menuItem">
-                            <menu-item name="notification" to="/GeoProblemSolving/notifications">
+                            <menu-item name="notification" to="/newPersonalPage/notification">
                                 <Badge :count="unreadNoticeCount" id="noticeBadge">
                                     <Icon type="ios-notifications-outline" size="25"></Icon>
                                 </Badge>
                             </menu-item>
                             <menu-item name="personal" style="width:100px">
                                 <dropdown @on-click="changeSelect" placement="bottom-start">
-                                    <a href="/GeoProblemSolving/personalPage">
+                                    <a href="/newPersonalPage/overView">
                                         <img v-if="userInfoNav.avatar!=''&&userInfoNav.avatar!=undefined&&userInfoNav.avatar!=null" :title="userInfoNav.name"
                                              :src="userInfoNav.avatar" style="width:40px;height:40px;vertical-align:middle;">
                                         <avatar :username="userInfoNav.name" :size="40" style="margin-top:10px" :title="userInfoNav.name" v-else></avatar>
@@ -175,7 +175,7 @@
                             <Divider style="margin: 5px 0"></Divider>
                             <Cell v-show="!userInfoNav.userState" @click.native="turnToURL('/GeoProblemSolving/login')" class="menuItemCell">Login</Cell>
                             <Cell v-show="!userInfoNav.userState" @click.native="turnToURL('/GeoProblemSolving/register')" class="menuItemCell">Sign up</Cell>
-                            <Cell  v-show="userInfoNav.userState" @click.native="turnToURL('/GeoProblemSolving/notifications')" class="menuItemCell">Notification</Cell>
+                            <Cell  v-show="userInfoNav.userState" @click.native="turnToURL('/newPersonalPage/notification')" class="menuItemCell">Notification</Cell>
                             <Cell  v-show="userInfoNav.userState" @click.native="toPersonalPage" class="menuItemCell">Personal Page</Cell>
                             <Cell  v-show="userInfoNav.userState" @click.native="logout" class="menuItemCell">Log out</Cell>
                           </Cell-group>
@@ -250,7 +250,7 @@
                     window.location.href = "/GeoProblemSolving/home"
                 },
                 toPersonalPage() {
-                    window.location.href = "/GeoProblemSolving/personalPage"
+                    window.location.href = "/newPersonalPage/overView"
                 },
                 // 获取到通知的数量
                 getUnreadNoticeCount() {
