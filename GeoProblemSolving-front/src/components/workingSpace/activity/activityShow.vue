@@ -74,7 +74,10 @@
               }}</span>
             </div>
           </div>
-          <div style="margin: 10px 0" v-if="activityInfo.type == 'Activity_Group'">
+          <div
+            style="margin: 10px 0"
+            v-if="activityInfo.type == 'Activity_Group'"
+          >
             <Label style="float: left">Description: </Label>
             <div
               style="
@@ -175,17 +178,17 @@
         <div v-else>
           <h3 style="margin: 8px 0">Description</h3>
           <div
-              style="
-                float: left;
-                min-height: 40px;
-                max-height: 120px;
-                overflow-y: auto;
-                word-break: break-word;
-                margin-left: 10px;
-              "
-            >
-              {{ activityInfo.description }}
-            </div>
+            style="
+              float: left;
+              min-height: 40px;
+              max-height: 120px;
+              overflow-y: auto;
+              word-break: break-word;
+              margin-left: 10px;
+            "
+          >
+            {{ activityInfo.description }}
+          </div>
         </div>
       </vue-scroll>
     </div>
@@ -295,7 +298,7 @@
                 userRoleBtn &&
                 member.userId != userInfo.userId &&
                 roleCompare(userRole, member.role) != -1
-              "              
+              "
               title="Set user role"
               style="cursor: pointer; margin-right: 10px"
               @click="selectMember(member, 'role')"
@@ -543,7 +546,7 @@ export default {
   components: {
     Avatar,
   },
-  props: ["activityInfo","nameConfirm"],
+  props: ["activityInfo", "nameConfirm"],
   data() {
     return {
       scrollOps: {
@@ -695,8 +698,6 @@ export default {
           throw err;
         });
     },
-    getAllTasks() {},
-    getAllResource() {},
     modifyPermission() {
       parent.location.href =
         "/GeoProblemSolving/permission/" +
@@ -723,9 +724,9 @@ export default {
     createActivity(name) {
       this.$refs[name].validate((valid) => {
         if (valid) {
-          for(let i = 0;i<this.nameConfirm.length;i++){
-            if(this.nameConfirm[i] == this.activityForm.name){
-              this.$Message.error("Repeated naming in the same project.")
+          for (let i = 0; i < this.nameConfirm.length; i++) {
+            if (this.nameConfirm[i] == this.activityForm.name) {
+              this.$Message.error("Repeated naming in the same project.");
               return;
             }
           }

@@ -22,7 +22,7 @@ public interface IUserDao {
 
     Object saveLocalUser(User user);
 
-    JsonResult getMangeProjectList(String[] projectIdList);
+    JsonResult getJoinedProjectList(String[] projectIdList);
 
     JsonResult getUserInfo(String key, String value);
 

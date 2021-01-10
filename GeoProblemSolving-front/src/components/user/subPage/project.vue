@@ -256,10 +256,10 @@
       }
     },
     created() {
-      this.getManagerProjectList();
+      this.getCreatedProjectList();
     },
     mounted() {
-      this.getParticipatoryList(this.$store.getters.userInfo.joinedProjects);
+      this.getJoinedProjectList(this.$store.getters.userInfo.joinedProjects);
       this.readPersonalEvent();
     },
     computed: {
@@ -334,11 +334,11 @@
       },
 
       //获取用户参与的项目列表
-      getParticipatoryList(projectType,projectIds) {
+      getJoinedProjectList(projectType,projectIds) {
         let projectTemp = [];
         if (projectIds != null){
           this.axios
-            .post("/GeoProblemSolving/user/getMProject", projectIds)
+            .post("/GeoProblemSolving/user/JoinedProjects", projectIds)
             .then(res => {
               if (res.data.data != "Fail" && res.data.data != "None") {
                 projectTemp = res.data.data;
@@ -400,11 +400,11 @@
 
 
       //废弃
-      //获取用户可管理支配的全部项目列表
-      getManagerProjectList() {
+      //获取用户参与支配的全部项目列表
+      getCreatedProjectList() {
         let createdProjectTemp = [];
         this.axios
-          .post("/GeoProblemSolving/user/getMProject", this.$store.getters.userInfo.createdProjects)
+          .post("/GeoProblemSolving/project/getProjects", this.$store.getters.userInfo.createdProjects)
           .then(res => {
             if (res.data.data != "Fail" && res.data.data != "None") {
               createdProjectTemp = res.data.data;

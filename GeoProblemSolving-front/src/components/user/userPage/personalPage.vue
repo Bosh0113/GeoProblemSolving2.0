@@ -850,7 +850,7 @@ export default {
     //获取用户资源
     this.getUserResource();
     // 获取用户管理的项目信息
-    this.getManagerProjectList();
+    this.getJoinedProjectList();
     // 获取用户参与的项目信息（根据参与的项目id、array获取项目详情）
     this.getParticipatoryList(this.joinedProjectIndexList);
     // 获取用户的历史事件记录
@@ -1227,10 +1227,10 @@ export default {
       }
     },
     //获取用户可管理支配的全部项目列表
-    getManagerProjectList() {
+    getJoinedProjectList() {
       if (this.$store.getters.userInfo.createdProjects != null){
         this.axios
-          .post("/GeoProblemSolving/user/getMProject", this.$store.getters.userInfo.createdProjects)
+          .post("/GeoProblemSolving/user/JoinedProjects", this.$store.getters.userInfo.createdProjects)
           .then(res =>{
             if (res.data.data != "Fail" && res.data.data !="None"){
               this.userManagerProjectList = res.data.data;

@@ -291,8 +291,8 @@ export default {
           var nodeCategory = this.getStepCategroy(
             this.childActivities[i].purpose
           );
-          // create step node          
-          let rows = Math.round( Math.sqrt(this.childActivities.length/2)) * 2;
+          // create step node
+          let rows = Math.round(Math.sqrt(this.childActivities.length / 2)) * 2;
           var newStepNode = {
             id: i,
             aid: this.childActivities[i].aid,
@@ -331,6 +331,22 @@ export default {
             status: true,
           };
           this.activityInfo.pathway.push(newStepNode);
+        }
+      } else if (
+        this.activityInfo.pathway.length > this.childActivities.length
+      ) {
+        for (var i = this.activityInfo.pathway.length - 1; i >= 0; i--) {
+          let exist = false;
+          for (var j = 0; j < this.childActivities.length; j++) {
+            if (
+              this.activityInfo.pathway[i].aid == this.childActivities[j].aid
+            ) {
+              exist = true;
+            }
+          }
+          if (!exist) {
+            this.removePathwayNode(this.activityInfo.pathway[i].aid);
+          }
         }
       }
       this.processStructure = this.activityInfo.pathway;
@@ -671,6 +687,7 @@ export default {
               parent.location.href = "/GeoProblemSolving/login";
             }
           } else if (res.data.code == 0) {
+            this.updateStepchart();
             this.$Notice.info({
               desc: "Reshape pathway successfully!",
             });
@@ -682,6 +699,45 @@ export default {
         .catch((err) => {
           throw err;
         });
+    },
+    // remove
+    removePathwayNode(aid) {
+      if (this.activityInfo.pathway != undefined) {
+        let nodeId = -1;
+        for (var i = 0; i < this.activityInfo.pathway.length; i++) {
+          if (this.activityInfo.pathway[i].aid == aid) {
+            nodeId = this.activityInfo.pathway[i].id;
+            // remove mode
+            this.activityInfo.pathway.splice(i, 1);
+          }
+        }
+        // normalize
+        if (nodeId != -1) {
+          for (var i = 0; i < this.activityInfo.pathway.length; i++) {
+            let node = this.activityInfo.pathway[i];
+            // node
+            if (node.id > nodeId) {
+              node.id = node.id - 1;
+            }
+            // last
+            for (var j = 0; j < node.last.length; j++) {
+              if (node.last[j].id == nodeId) {
+                node.last.splice(j, 1);
+              } else if (node.last[j].id > nodeId) {
+                node.last[j].id = node.last[j].id - 1;
+              }
+            }
+            // next
+            for (var j = 0; j < node.next.length; j++) {
+              if (node.next[j].id == nodeId) {
+                node.next.splice(j, 1);
+              } else if (node.next[j].id > nodeId) {
+                node.next[j].id = node.next[j].id - 1;
+              }
+            }
+          }
+        }
+      }
     },
     // link
     linkActivities() {

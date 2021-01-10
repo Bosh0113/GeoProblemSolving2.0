@@ -367,7 +367,7 @@ export default {
     },
     info: {
       handler(val) {
-        console.log(val);
+        // console.log(val);
         if (val != "") {
           this.toolInfo = val;
         }

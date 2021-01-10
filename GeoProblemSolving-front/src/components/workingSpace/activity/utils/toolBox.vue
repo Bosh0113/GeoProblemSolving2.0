@@ -243,7 +243,7 @@ export default {
   },
   watch: {
     activityInfo(val) {
-      console.log(val);
+      // console.log(val);
       this.getAllTools();
     }
   },

@@ -220,7 +220,7 @@ export default {
   watch: {
     instanceId(val) {
       this.postForm.pid = val;
-      console.log(val);
+      // console.log(val);
     }
   }
 };

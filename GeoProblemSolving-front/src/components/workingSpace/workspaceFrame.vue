@@ -111,7 +111,7 @@
         :key="slctActivity.aid"
       ></activity-visitor>
     </Card>
-    <!--    edit project-->
+    <!-- edit project -->
     <Modal
       v-model="activityEditModal"
       title="Edit information of the activity"
@@ -254,7 +254,7 @@ export default {
       userInfo: JSON.parse(sessionStorage.getItem("userInfo")),
       slctActivity: {},
       childActivities: [],
-      parentNode: {}, // 记录所创建/选择activity的父节点位置，对activity tree 进行修改
+      parentActivity: {},
       editActivityForm: {
         name: "",
         description: "",
@@ -361,13 +361,7 @@ export default {
       if (this.slctActivity.level == 0 || this.slctActivity.level == 1) {
         return this.projectInfo.members.contains(this.userInfo);
       } else if (this.slctActivity.level == 2) {
-        url = "/GeoProblemSolving/subproject/" + this.slctActivity.parent;
-        let parent = await get(url);
-        return parent.members.contains(this.userInfo);
-      } else if (this.slctActivity.level > 2) {
-        url = "/GeoProblemSolving/activity/" + this.slctActivity.parent;
-        let parent = await get(url);
-        return parent.members.contains(this.userInfo);
+        return this.parentActivity.members.contains(this.userInfo);
       }
     },
     renderStyle(h, { root, node, data }) {
@@ -455,11 +449,11 @@ export default {
 
       let url = "";
       if (aid == undefined || level == undefined) {
-        this.getProjectInfo();
         url =
           "/GeoProblemSolving/projectInfo/" +
           this.projectInfo.aid +
           "?content=workspace";
+        this.getProjectInfo();
       } else {
         url =
           "/GeoProblemSolving/projectInfo/" +
@@ -475,9 +469,9 @@ export default {
         } else {
           this.getProjectInfo();
         }
-        if (content == "workspace") {
-          parent.vm.workspaceUrl = url;
-        }
+      }
+      if (content == "workspace") {
+        parent.vm.workspaceUrl = url;
       }
     },
     getURLParameter(name) {
@@ -501,33 +495,38 @@ export default {
             if (res.data.code == 0) {
               let children = res.data.data;
               this.childActivities = children;
+              this.nameConfirm = [];
 
               // 处理掉异常
               for (let i = 0; i < children.length; i++) {
-                if (children[i].children != undefined) {
-                  children[i].children = [];
-                }
+                children[i].children = [];
+                this.nameConfirm.push(children[i].name);
               }
 
               let root = Object.assign({}, this.projectInfo);
+              this.nameConfirm.push(root.name);
+              console.log(this.nameConfirm);
               root["expand"] = true;
               root["children"] = children;
 
               // update activity tree
               this.activityTree = [root];
               this.slctActivity = root;
+              this.parentActivity = null;
               this.setContent(this.slctActivity);
             } else {
               console.log(res.data.msg);
             }
           })
           .catch((err) => {
-            console.log(err.data);
+            throw err;
           });
       } else {
         let root = Object.assign({}, this.projectInfo);
         this.activityTree.push(root);
         this.slctActivity = root;
+        this.nameConfirm.push(root.name);
+        this.parentActivity = null;
         this.setContent(this.slctActivity);
       }
     },
@@ -622,7 +621,6 @@ export default {
           ) {
             if (parentActivity.children[j] == current.aid) {
               parentActivity.children = [current];
-              this.nameConfirm.push(current.name);
               break;
             }
           } else if (
@@ -631,7 +629,6 @@ export default {
           ) {
             if (parentActivity.children[j].aid == current.aid) {
               parentActivity.children[j] = current;
-              this.nameConfirm.push(current.name);
               break;
             }
           }
@@ -642,6 +639,7 @@ export default {
       let root = ancestors[ancestors.length - 1];
       this.activityTree = [root];
       this.slctActivity = ancestors[0];
+      this.parentActivity = ancestors[1];
       this.setContent(this.slctActivity);
 
       // Cascader names
@@ -846,17 +844,13 @@ export default {
         .delete(url)
         .then((res) => {
           if (res.data.code == 0) {
-            if (this.parentNode != {}) {
-              this.slctActivity = this.parentNode;
-
-              parent.location.href =
-                "/GeoProblemSolving/projectInfo/" +
-                this.projectInfo.aid +
-                "?content=workspace&aid=" +
-                this.parentNode.aid +
-                "&level=" +
-                this.parentNode.level;
-            }
+            parent.location.href =
+              "/GeoProblemSolving/projectInfo/" +
+              this.projectInfo.aid +
+              "?content=workspace&aid=" +
+              this.slctActivity.parent +
+              "&level=" +
+              (this.slctActivity.level - 1).toString();
           } else {
             console.log(res.data.msg);
           }
@@ -864,7 +858,6 @@ export default {
         .catch((err) => {
           throw err;
         });
-      // }
     },
   },
 };

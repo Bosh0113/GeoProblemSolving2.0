@@ -67,12 +67,14 @@ function sendSock(agentData, callback) {
 
 //数据接收
 function websocketonmessage(e) {
-    var data = JSON.parse(e.data);
-    if (data.type != "ping") {
-        if (global_callback != null && global_callback != "" && global_callback != undefined) {
-            global_callback(data);
+    try {
+        var data = JSON.parse(e.data);
+        if (data.type != "ping") {
+            if (global_callback != null && global_callback != "" && global_callback != undefined) {
+                global_callback(data);
+            }
         }
-    }
+    } catch (err) { };
 }
 
 //数据发送

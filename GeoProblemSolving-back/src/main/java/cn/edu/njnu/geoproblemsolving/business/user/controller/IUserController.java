@@ -147,13 +147,13 @@ public class IUserController {
 
     /**
      * 查询项目
-     * @param manageProjectList
+     * @param joinedProjects
      * @return
      */
-    @RequestMapping(value = "/getMProject", method = RequestMethod.POST)
-    public JsonResult getManagerProjectList(@RequestBody String[] manageProjectList) {
-        System.out.println(manageProjectList);
-        return userDao.getMangeProjectList(manageProjectList);
+    @RequestMapping(value = "/JoinedProjects", method = RequestMethod.POST)
+    public JsonResult getManagerProjectList(@RequestBody String[] joinedProjects) {
+        System.out.println(joinedProjects);
+        return userDao.getJoinedProjectList(joinedProjects);
     }
 
     /**

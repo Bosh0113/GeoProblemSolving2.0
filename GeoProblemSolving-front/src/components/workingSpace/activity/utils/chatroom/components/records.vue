@@ -222,10 +222,9 @@ export default {
       if (data != 0) {
         this.totalMsg = data;
         this.totalPages = Math.ceil(this.totalMsg / this.pageSize);
-        console.log(this.totalPages);
       } else {
         this.totalMsg = data;
-        this.$Message.warning("There is no record here!");
+        // this.$Message.warning("There is no record here!");
       }
     },
     //inifte scroll

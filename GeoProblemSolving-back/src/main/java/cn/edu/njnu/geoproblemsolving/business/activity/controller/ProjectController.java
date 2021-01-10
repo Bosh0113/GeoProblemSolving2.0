@@ -7,12 +7,14 @@ import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Project;
 import cn.edu.njnu.geoproblemsolving.business.activity.service.ProjectService;
 import cn.edu.njnu.geoproblemsolving.View.StaticPagesBuilder;
+import cn.edu.njnu.geoproblemsolving.common.utils.ResultUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 @CrossOrigin(origins = "*", allowCredentials = "true")
 @RestController
@@ -98,6 +100,25 @@ public class ProjectController {
         return project;
     }
 
+    /**
+     * get projects
+     * @param projectIds
+     * @return
+     */
+    @RequestMapping(method = RequestMethod.GET, value = "/getProjects")
+    public JsonResult getProjects(@RequestParam("aids") ArrayList<String> projectIds){
+        try {
+            ArrayList<Project> projects = new ArrayList<>();
+            for (String projectId: projectIds){{
+                JsonResult findResult = projectService.findProject(projectId);
+                Project project = (Project)findResult.getData();
+                projects.add(project);
+            }}
+            return ResultUtils.success(projects);
+        } catch (Exception ex){
+            return ResultUtils.error(-1, ex.toString());
+        }
+    }
 
     /**
      * Delete project
