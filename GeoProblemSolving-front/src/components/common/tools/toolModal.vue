@@ -119,7 +119,6 @@ export default {
     filterPublicTools() {
       let tools = this.publicTools;
       let type = this.typeSelected;
-      console.log(tools);
       this.$set(this, "publicTools", tools);
 
       if (type == "All") {

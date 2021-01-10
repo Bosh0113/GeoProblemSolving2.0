@@ -1,221 +1,338 @@
 <template>
-<div>
+  <div>
     <Row>
       <Col span="22" offset="1">
         <Row>
           <Col :lg="5" :md="8" :sm="10" :xs="12">
-            <div class="detailSidebar" :style="{height:detailSidebarHeight}">
+            <div class="detailSidebar" :style="{ height: detailSidebarHeight }">
               <div class="user-img">
-                <img v-bind:src="userDetail.avatar" class="u_img"
-                  v-if="userDetail.avatar!=''&&userDetail.avatar!='undefined'&&userDetail.avatar!='null'">
+                <img
+                  v-bind:src="userDetail.avatar"
+                  class="u_img"
+                  v-if="
+                    userDetail.avatar != '' &&
+                    userDetail.avatar != 'undefined' &&
+                    userDetail.avatar != 'null'
+                  "
+                />
                 <avatar
-                  style="width:200px"
+                  style="width: 200px"
                   class="avatarStyle"
-                  :username="userDetail.userName"
+                  :username="userDetail.name"
                   :size="200"
                   :rounded="false"
-                  v-else>
+                  v-else
+                >
                 </avatar>
               </div>
               <div
-                style="margin-top: 10px; border:1px solid lightgray;border-radius: 4px;padding:10px"
+                style="
+                  margin-top: 10px;
+                  border: 1px solid lightgray;
+                  border-radius: 4px;
+                  padding: 10px;
+                "
               >
-                <div class="single-info" :title="`Name: `+ userDetail.userName">
+                <div class="single-info" :title="`Name: ` + userDetail.name">
                   <span class="profileInfo">
                     <Icon type="ios-contact-outline" :size="20" />
-                    {{userDetail.userName}}
+                    {{ userDetail.name }}
                   </span>
                 </div>
                 <div class="single-info" :title="`Email:  ` + userDetail.email">
                   <span class="profileInfo">
                     <Icon type="ios-mail-outline" :size="20" />
-                    {{userDetail.email}}
-                  </span>
-                </div>
-                <div class="single-info"  :title="`Phone number:  ` + userDetail.mobilePhone" v-show="userDetail.mobilePhone!=''">
-                  <span class="profileInfo">
-                    <Icon type="ios-call-outline" :size="20" />
-                    {{userDetail.mobilePhone}}
-                  </span>
-                </div>
-                <div class="single-info" :title="`Title:  `+userDetail.jobTitle">
-                  <span class="profileInfo">
-                    <Icon type="ios-school-outline" :size="20" />
-                    {{userDetail.jobTitle}}
+                    {{ userDetail.email }}
                   </span>
                 </div>
                 <div
                   class="single-info"
-                  :title="`Location:  `+ userDetail.city +`, `+ userDetail.country"
-                  v-show="userDetail.city!=''&&userDetail.country!=''"
+                  :title="`Phone number:  ` + userDetail.phone"
+                  v-show="userDetail.phone != ''"
+                >
+                  <span class="profileInfo">
+                    <Icon type="ios-call-outline" :size="20" />
+                    {{ userDetail.phone }}
+                  </span>
+                </div>
+                <div class="single-info" :title="`Title:  ` + userDetail.title">
+                  <span class="profileInfo">
+                    <Icon type="ios-school-outline" :size="20" />
+                    {{ userDetail.title }}
+                  </span>
+                </div>
+                <div
+                  class="single-info"
+                  :title="`Location:  ` + userDetail.country"
+                  v-show="userDetail.country != ''"
                 >
                   <span class="profileInfo">
                     <Icon type="ios-compass-outline" :size="20" />
-                    <span>{{userDetail.city}}</span>
-                    <span>&nbsp{{userDetail.country}}</span>
+                    <span>{{ userDetail.country }}</span>
                   </span>
                 </div>
-                <div
+                <!-- <div
                   class="single-info"
-                  :title="`Organization:  `+ userDetail.organization"
-                  v-show="userDetail.organization!=''"
-                  style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis"
+                  :title="`Organization:  ` + userDetail.organizations"
+                  v-show="userDetail.organizations != ''"
+                  style="
+                    overflow: hidden;
+                    white-space: nowrap;
+                    text-overflow: ellipsis;
+                  "
                 >
                   <span class="profileInfo">
                     <Icon type="ios-home-outline" :size="20" />
-                    {{userDetail.organization}}
+                    {{ userDetail.organizations }}
                   </span>
-                </div>
-                <div
+                </div> -->
+                <!-- <div
                   class="single-info"
-                  :title="`Area of interest:  `+ userDetail.direction"
-                  v-show="userDetail.direction!=''"
-                  style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis"
+                  :title="`Area of interest:  ` + userDetail.direction"
+                  v-show="userDetail.direction != ''"
+                  style="
+                    overflow: hidden;
+                    white-space: nowrap;
+                    text-overflow: ellipsis;
+                  "
                 >
                   <span class="profileInfo">
                     <Icon type="ios-contract" :size="20" />
-                    {{userDetail.direction}}
+                    {{ userDetail.direction }}
                   </span>
-                </div>
+                </div> -->
                 <div
                   class="single-info"
-                  :title="`Home Page:  `+ userDetail.homePage"
-                  v-show="userDetail.homePage!=''"
-                  style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis"
+                  :title="`Home Page:  ` + userDetail.homepage"
+                  v-show="userDetail.homepage != ''"
+                  style="
+                    overflow: hidden;
+                    white-space: nowrap;
+                    text-overflow: ellipsis;
+                  "
                 >
                   <span class="profileInfo">
                     <Icon type="md-link" :size="20" />
-                    {{userDetail.homePage}}
+                    {{ userDetail.homepage }}
                   </span>
                 </div>
                 <div
-                  style="word-break: break-word;padding:10px;font-size:12px;border:1px dotted lightgray;white-space: pre-line;height: 120px;"
+                  style="
+                    word-break: break-word;
+                    padding: 10px;
+                    font-size: 12px;
+                    border: 1px dotted lightgray;
+                    white-space: pre-line;
+                    height: 120px;
+                  "
                   title="Introduction"
-                  v-show="userDetail.introduction!=''"
+                  v-show="userDetail.introduction != ''"
                 >
-                  <vue-scroll :ops="ops">{{userDetail.introduction}}</vue-scroll>
+                  <vue-scroll :ops="ops">{{
+                    userDetail.introduction
+                  }}</vue-scroll>
                 </div>
               </div>
             </div>
           </Col>
           <Col
-            :lg="{span:18,offset:1}"
-            :md="{span:15,offset:1}"
-            :sm="{span:13,offset:1}"
-            :xs="{span:11,offset:1}"
+            :lg="{ span: 18, offset: 1 }"
+            :md="{ span: 15, offset: 1 }"
+            :sm="{ span: 13, offset: 1 }"
+            :xs="{ span: 11, offset: 1 }"
           >
             <div class="rightContent">
-              <Tabs value="Overview" type="card" style="font-weight:bold">
+              <Tabs value="Overview" type="card" style="font-weight: bold">
                 <TabPane label="Overview" name="Overview">
-                  <Col :lg="{span:22,offset:1}" :md="{span:22,offset:1}" :sm="{span:22,offset:1}">
+                  <Col
+                    :lg="{ span: 22, offset: 1 }"
+                    :md="{ span: 22, offset: 1 }"
+                    :sm="{ span: 22, offset: 1 }"
+                  >
                     <Card>
-                      <p slot="title">History Line</p>
-                        <div class="timeLineStyle">
-                          <vue-scroll :ops="ops">
-                            <Timeline
-                              style="margin-top:20px;margin-left:5%;max-height:300px;overflow-y:auto"
+                      <p slot="title">History line</p>
+                      <div class="timeLineStyle">
+                        <vue-scroll :ops="ops">
+                          <Timeline
+                            style="
+                              margin-top: 20px;
+                              margin-left: 5%;
+                              max-height: 300px;
+                              overflow-y: auto;
+                            "
+                          >
+                            <div
+                              v-if="
+                                memberEventList != undefined &&
+                                memberEventList.length == 0
+                              "
                             >
-                            <div v-if="memberEventList.length==0">
-                                  <div style="display:flex;justify-content:center">
-                                    <Icon type="md-alert" size="40" color="gray"/>
-                                  </div>
-                                  <br>
-                                  <div style="display:flex;justify-content:center">
-                                    <h3
-                                      style="text-align:center;width:80%"
-                                    >Sorry, there is no event here. After some projects are created or joined, the events of creation or joining will be listed here.</h3>
-                                  </div>
-                                </div>
-                              <TimelineItem v-for="(item,index) in memberEventList" :key="index" v-show="memberEventList.length>0">
-                                <strong>
-                                  <p class="time">{{item.createTime}}</p>
-                                </strong>
-                                <p class="content">{{item.description}}</p>
-                              </TimelineItem>
-                            </Timeline>
-                          </vue-scroll>
-                        </div>
+                              <div
+                                style="display: flex; justify-content: center"
+                              >
+                                <Icon type="md-alert" size="40" color="gray" />
+                              </div>
+                              <br />
+                              <div
+                                style="display: flex; justify-content: center"
+                              >
+                                <h3 style="text-align: center; width: 80%">
+                                  Sorry, there is no event here. After some
+                                  projects are created or joined, the events of
+                                  creation or joining will be listed here.
+                                </h3>
+                              </div>
+                            </div>
+                            <TimelineItem
+                              v-for="(item, index) in memberEventList"
+                              :key="index"
+                              v-show="
+                                memberEventList != undefined &&
+                                memberEventList.length > 0
+                              "
+                            >
+                              <strong>
+                                <p class="time">{{ item.createTime }}</p>
+                              </strong>
+                              <p class="content">{{ item.description }}</p>
+                            </TimelineItem>
+                          </Timeline>
+                        </vue-scroll>
+                      </div>
                     </Card>
                   </Col>
                 </TabPane>
                 <TabPane label="Joined projects" name="Participatory">
-                    <div style="height:900px;padding:5px;border:#dcdee2 solid 1px;">
-                      <vue-scroll :ops="ops">
-                  <Card :bordered="false" v-if="joinedProjectsList.length == 0">
-                      <div style="display:flex;justify-content:center">
-                        <Icon type="md-alert" size="40" color="gray"/>
-                      </div>
-                      <br>
-                      <div style="display:flex;justify-content:center" >
-                        <h2 style="text-align:center;width:50%">Sorry,this user doesn't participate in any projects.</h2>
-                      </div>
-                  </Card>
                   <div
-                    v-for="(item,index) in joinedProjectsList"
-                    :key="index"
-                    v-show="joinedProjectsList!=[]"
+                    style="
+                      height: 900px;
+                      padding: 5px;
+                      border: #dcdee2 solid 1px;
+                    "
                   >
-                    <Col :lg="{span:11, offset:1}" :md="{span:22, offset:1}">
-                      <div>
-                        <Card style="height:320px;margin-top:20px;">
-                        <p
-                          slot="title"
-                          style="height:40x"
-                          class="projectsTitle"
-                        >{{item.title}}</p>
-                        <p
-                          style="height:200px;text-indent:2em;overflow-y:auto;word-break:break-word;white-space: pre-line;"
-                        ><vue-scroll :ops="ops">{{item.introduction}}</vue-scroll></p>
-                        <br>
-                        <div style="height:40px">
-                          <span style="float:left">CreateTime:</span>
-                          <span style="float:right">{{item.createTime}}</span>
+                    <vue-scroll :ops="ops">
+                      <Card
+                        :bordered="false"
+                        v-if="
+                          joinedProjectsList != undefined &&
+                          joinedProjectsList.length == 0
+                        "
+                      >
+                        <div style="display: flex; justify-content: center">
+                          <Icon type="md-alert" size="40" color="gray" />
+                        </div>
+                        <br />
+                        <div style="display: flex; justify-content: center">
+                          <h2 style="text-align: center; width: 50%">
+                            Sorry, this user didn't join any project.
+                          </h2>
                         </div>
                       </Card>
+                      <div v-for="item in joinedProjectsList" :key="item">
+                        <Col
+                          :lg="{ span: 11, offset: 1 }"
+                          :md="{ span: 22, offset: 1 }"
+                        >
+                          <div>
+                            <Card style="height: 320px; margin-top: 20px">
+                              <p
+                                slot="title"
+                                style="height: 40x"
+                                class="projectsTitle"
+                              >
+                                {{ item.name }}
+                              </p>
+                              <p
+                                style="
+                                  height: 200px;
+                                  text-indent: 2em;
+                                  overflow-y: auto;
+                                  word-break: break-word;
+                                  white-space: pre-line;
+                                "
+                              >
+                                <vue-scroll :ops="ops">{{
+                                  item.description
+                                }}</vue-scroll>
+                              </p>
+                              <br />
+                              <div style="height: 40px">
+                                <span style="float: left">Created time:</span>
+                                <span style="float: right">{{
+                                  item.createdTime
+                                }}</span>
+                              </div>
+                            </Card>
+                          </div>
+                        </Col>
                       </div>
-                    </Col>
-                  </div>
-                  </vue-scroll>
+                    </vue-scroll>
                   </div>
                 </TabPane>
-                <TabPane label="Managed Project" name="Management">
-                    <div style="height:900px;padding:5px;border:#dcdee2 solid 1px;">
-                      <vue-scroll :ops="ops">
-                  <Card :bordered="false" v-if="userManagerProjectList.length == 0">
-                      <div style="display:flex;justify-content:center">
-                        <Icon type="md-alert" size="40" color="gray"/>
-                      </div>
-                      <br>
-                      <div style="display:flex;justify-content:center" >
-                        <h2 style="text-align:center;width:50%">Sorry,this user doesn't manage any projects.</h2>
-                      </div>
-                  </Card>
+                <TabPane label="Created projects" name="Creation">
                   <div
-                    v-for="(mProject,index) in userManagerProjectList"
-                    v-show="userManagerProjectList!='None'"
-                    :key="index"
+                    style="
+                      height: 900px;
+                      padding: 5px;
+                      border: #dcdee2 solid 1px;
+                    "
                   >
-                    <Col :lg="{span:11, offset:1}" :md="{span:22, offset:1}">
-                    <div>
-                      <Card style="height:320px;margin-top:20px">
-                        <p
-                          slot="title"
-                          class="projectsTitle"
-                        >{{mProject.title}}</p>
-                        <p
-                          style="height:200px;text-indent:2em;overflow-y:auto;word-break:break-word;white-space: pre-line;"
-                        ><vue-scroll :ops="ops">{{mProject.introduction}}</vue-scroll></p>
-                        <!-- <hr> -->
-                        <br>
-                        <div>
-                          <span style="float:left">CreateTime:</span>
-                          <span style="float:right">{{mProject.createTime}}</span>
+                    <vue-scroll :ops="ops">
+                      <Card
+                        :bordered="false"
+                        v-if="
+                          createdProjectList != undefined &&
+                          createdProjectList.length == 0
+                        "
+                      >
+                        <div style="display: flex; justify-content: center">
+                          <Icon type="md-alert" size="40" color="gray" />
+                        </div>
+                        <br />
+                        <div style="display: flex; justify-content: center">
+                          <h2 style="text-align: center; width: 50%">
+                            Sorry, this user didn't create any project.
+                          </h2>
                         </div>
                       </Card>
-                    </div>
-                    </Col>
-                  </div>
-                  </vue-scroll>
+                      <div
+                        v-for="mProject in createdProjectList"
+                        :key="mProject"
+                      >
+                        <Col
+                          :lg="{ span: 11, offset: 1 }"
+                          :md="{ span: 22, offset: 1 }"
+                        >
+                          <div>
+                            <Card style="height: 320px; margin-top: 20px">
+                              <p slot="title" class="projectsTitle">
+                                {{ mProject.name }}
+                              </p>
+                              <p
+                                style="
+                                  height: 200px;
+                                  text-indent: 2em;
+                                  overflow-y: auto;
+                                  word-break: break-word;
+                                  white-space: pre-line;
+                                "
+                              >
+                                <vue-scroll :ops="ops">{{
+                                  mProject.description
+                                }}</vue-scroll>
+                              </p>
+                              <br />
+                              <div>
+                                <span style="float: left">Created Time:</span>
+                                <span style="float: right">{{
+                                  mProject.createdTime
+                                }}</span>
+                              </div>
+                            </Card>
+                          </div>
+                        </Col>
+                      </div>
+                    </vue-scroll>
                   </div>
                 </TabPane>
               </Tabs>
@@ -226,8 +343,129 @@
       </Col>
     </Row>
   </div>
-
 </template>
+<script>
+import Avatar from "vue-avatar";
+export default {
+  components: {
+    Avatar,
+  },
+  data() {
+    return {
+      userDetail: {},
+      detailSidebarHeight: "",
+      // 用户event列表
+      memberEventList: [],
+      userResourceList: [],
+      //加入的项目详情数组列表
+      joinedProjectsList: [],
+      createdProjectList: [],
+      ops: {
+        bar: {
+          background: "#808695",
+        },
+      },
+    };
+  },
+  methods: {
+    getMemberDetail() {
+      this.axios
+        .get(url, {
+          params: {
+            id: paramId,
+          },
+        })
+        .then(function (response) {})
+        .catch(function (error) {});
+    },
+    getUserProfile() {
+      this.axios
+        .get(
+          "/GeoProblemSolving/user" +
+            "?key=userId" +
+            "&value=" +
+            this.$route.params.id
+        )
+        .then((res) => {
+          if (res.data.code == 0) {
+            this.userDetail = res.data.data;
+            let joinedProjectsArray = this.userDetail.joinedProjects;
+            if (
+              joinedProjectsArray != undefined &&
+              joinedProjectsArray.length > 0
+            ) {
+              this.getJoinedProjectList(joinedProjectsArray);
+            }
+            let createdProjectsArray = this.userDetail.createdProjects;
+            if (
+              joinedProjectsArray != undefined &&
+              createdProjectsArray.length > 0
+            ) {
+              this.getCreatedProjectList(createdProjectsArray);
+            }
+          }
+        })
+        .catch((err) => {
+          console.log(err.data);
+        });
+    },
+    readPersonalEvent() {
+      this.axios
+        .get(
+          "/GeoProblemSolving/history/inquiry?" +
+            "eventType=project" +
+            "&key=userId" +
+            "&value=" +
+            this.$route.params.id
+        )
+        .then((res) => {
+          if (res.data == "Offline") {
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
+          } else if (res.data != "None" && res.data != "Fail") {
+            this.memberEventList = res.data;
+          }
+        })
+        .catch((err) => {
+          throw err;
+        });
+    },
+    getCreatedProjectList(projectIds) {
+      this.axios
+        .get("/GeoProblemSolving/project/getProjects" + "?aids=" + projectIds)
+        .then((res) => {
+          if (res.data.code == 0) {
+            this.$set(this, "createdProjectList", res.data.data);
+          } else {
+            console.log(res.data.msg);
+          }
+        })
+        .catch((err) => {
+          throw err;
+        });
+    },
+    getJoinedProjectList(projectIds) {
+      this.axios
+        .get("/GeoProblemSolving/project/getProjects" + "?aids=" + projectIds)
+        .then((res) => {
+          if (res.data.code == 0) {
+            this.$set(this, "joinedProjectsList", res.data.data);
+          } else {
+            console.log(res.data.msg);
+          }
+        })
+        .catch((err) => {
+          throw err;
+        });
+    },
+  },
+  mounted() {
+    this.getUserProfile();
+    this.readPersonalEvent();
+    this.detailSidebarHeight = window.innerHeight - 60 + "px";
+  },
+};
+</script>
 <style scoped>
 .detailSidebar {
   margin-right: 20px;
@@ -261,8 +499,8 @@ body {
   margin-top: 20px;
   width: 100%;
   max-height: 100%;
-  text-align: center;  
-  background-color:#d3d3d333;
+  text-align: center;
+  background-color: #d3d3d333;
 }
 .u_img {
   max-width: 100%;
@@ -417,147 +655,4 @@ body {
   cursor: pointer;
 }
 </style>
-<script>
-import Avatar from "vue-avatar";
-export default {
-  components: {
-    Avatar
-  },
-  data() {
-    return {
-      userDetail: {
-        userName: "",
-        email: "",
-        password: "",
-        jobTitle: "",
-        mobilePhone: "",
-        gender: "",
-        country: "",
-        city: "",
-        organization: "",
-        introduction: "",
-        direction: "",
-        homePage: "",
-        avatar: ""
-      },
-      detailSidebarHeight: "",
-      // 用户event列表
-      memberEventList: [],
-      userResourceList: [],
-      joinedProjectsNameArray: [],
-      //加入的项目详情数组列表
-      joinedProjectsList: [],
-      userManagerProjectList: [],
-      ops: {
-        bar: {
-          background: "#808695"
-        }
-      },
-    };
-  },
-  methods: {
-    getMemberDetail() {
-      this.axios
-        .get(url, {
-          params: {
-            id: paramId
-          }
-        })
-        .then(function(response) {})
-        .catch(function(error) {});
-    },
-    getUserProfile() {
-      this.axios
-        .get(
-          "/GeoProblemSolving/user/inquiry" +
-            "?key=userId" +
-            "&value=" +
-            this.$route.params.id
-        )
-        .then(res => {
-          if (res.data != "None" && res.data != "Fail") {
-            this.userDetail = res.data;
-            this.joinedProjectsNameArray = this.userDetail.joinedProjects;
-            if (this.joinedProjectsNameArray.length > 0) {
-              this.getParticipatoryList(this.joinedProjectsNameArray);
-            }
-          }
-        })
-        .catch(err => {
-          console.log(err.data);
-        });
-    },
-    readPersonalEvent() {
-      this.axios
-        .get(
-          "/GeoProblemSolving/history/inquiry?" +
-            "eventType=project" +
-            "&key=userId" +
-            "&value=" +
-            this.$route.params.id
-        )
-        .then(res => {
-          if (res.data == "Offline") {
-            this.$store.commit("userLogout");
-            this.$router.push({ name: "Login" });
-          } else if (res.data != "None" && res.data != "Fail") {
-            this.memberEventList = res.data;
-          }
-        })
-        .catch(err => {
-          console.log(err.data);
-        });
-    },
-    getManagerProjectList() {
-      this.axios
-        .get(
-          "/GeoProblemSolving/project/inquiry" +
-            "?key=managerId" +
-            "&value=" +
-            this.$route.params.id
-        )
-        .then(res => {
-          if (res.data != "None" && res.data != "") {
-            //判断是否为空
-            this.userManagerProjectList = res.data;
-          }
-          // 打印用户所管理的项目
-        })
-        .catch(err => {});
-    },
-    getParticipatoryList(projectIds) {
-      var count = projectIds.length;
-      let participatoryProjectListTemp = [];
-      for (let i = 0; i < projectIds.length; i++) {
-        this.axios
-          .get(
-            "/GeoProblemSolving/project/inquiry" +
-              "?key=projectId" +
-              "&value=" +
-              projectIds[i].projectId
-          )
-          .then(res => {
-            participatoryProjectListTemp.push(res.data[0]);
-            if (--count == 0) {
-              this.$set(
-                this,
-                "joinedProjectsList",
-                participatoryProjectListTemp
-              );
-            }
-          })
-          .catch(err => {
-            console.log(err.data);
-          });
-      }
-    }
-  },
-  mounted() {
-    this.getUserProfile();
-    this.getManagerProjectList();
-    this.readPersonalEvent();
-    this.detailSidebarHeight = window.innerHeight - 60 + "px";
-  }
-};
-</script>
 

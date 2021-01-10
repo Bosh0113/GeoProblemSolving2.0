@@ -410,12 +410,9 @@
                 }
 
                 var roomId = this.pageParams.pageId;
-                var excelSocketURL = "ws://" + window.location.host + "/GeoProblemSolving/ExcelTool/" + roomId;
-                if (window.location.host == "localhost:8080") {
+                var excelSocketURL = `${window.location.protocol === 'https:' ? 'wss://' : 'ws://'}` + + window.location.host + "/GeoProblemSolving/ExcelTool/" + roomId;
+                if (window.location.host === "localhost:8080") {
                     excelSocketURL = "ws://localhost:8081/GeoProblemSolving/ExcelTool/" + roomId;
-                }
-                if(window.location.port=="8083"){
-                    excelSocketURL = "wss://"+ window.location.hostname+":8083/GeoProblemSolving/ExcelTool/" + roomId;
                 }
                 this.excelSocket = new WebSocket(excelSocketURL);
                 this.excelSocket.onopen = this.onOpen;

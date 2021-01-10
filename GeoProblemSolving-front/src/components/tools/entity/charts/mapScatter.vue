@@ -438,7 +438,7 @@ export default {
             coordinateSystem: "bmap",
             data: convertData(data),
             symbolSize: function(val) {
-              console.log(val);
+              // console.log(val);
               return val[2]/maxValue*50;
             },
             label: {

@@ -146,16 +146,6 @@ public class IUserController {
         return userInfo;
     }
 
-    /**
-     * 查询项目
-     * @param createdProjectsIds
-     * @return
-     */
-    @RequestMapping(value = "/getMProject", method = RequestMethod.POST)
-    public JsonResult getManagerProjectList(@RequestBody String[] createdProjectsIds) {
-        System.out.println(createdProjectsIds);
-        return userDao.getMangeProjectList(createdProjectsIds);
-    }
 
     /**
      * @Author mzy

@@ -308,7 +308,6 @@ import conceptMap from "./components/conceptMap";
 
 export default {
   props: ["activityInfo", "participants"],
-
   components: {
     Avatar,
     toolModal,
@@ -320,7 +319,7 @@ export default {
     chatManager,
     records,
     concepts,
-    conceptMap
+    conceptMap,
   },
 
   computed: {
@@ -329,7 +328,7 @@ export default {
     },
     emojiGroups() {
       return EmojiGroups;
-    }
+    },
   },
 
   data() {
@@ -358,8 +357,8 @@ export default {
       selectRoom: [
         {
           userName: this.$store.getters.userName,
-          userId: this.$store.getters.userId
-        }
+          userId: this.$store.getters.userId,
+        },
       ],
       sendToMemberId: this.$store.getters.userId,
       // onlineIds: [],
@@ -368,7 +367,7 @@ export default {
       //聊天记录
       showTabs: true,
       msgConcepts: [],
-      msgConceptMap: []
+      msgConceptMap: [],
     };
   },
 
@@ -403,7 +402,7 @@ export default {
           srcUserName: this.userName,
           srcUserId: this.userId,
           targetUserId: this.sendToMemberId,
-          content: this.message
+          content: this.message,
         };
         if (this.socketApi.getSocketInfo().linked) {
           this.msglist.push(this.send_msg);
@@ -412,7 +411,7 @@ export default {
         } else {
           let chatMsg = {
             type: "notice",
-            content: "You are disconnecting with others."
+            content: "You are disconnecting with others.",
           };
           this.msglist.push(chatMsg);
         }
@@ -426,7 +425,7 @@ export default {
         srcUserName: this.userName,
         srcUserId: this.userId,
         targetUserId: this.sendToMemberId,
-        content: messageUrl
+        content: messageUrl,
       };
       if (this.socketApi.getSocketInfo().linked) {
         this.msgRecords.push(this.send_msg);
@@ -435,20 +434,20 @@ export default {
       } else {
         let chatMsg = {
           type: "notice",
-          content: "You are disconnecting with others."
+          content: "You are disconnecting with others.",
         };
         this.msglist.push(chatMsg);
       }
     },
 
     sendTools(tools) {
-      tools.forEach(item => {
+      tools.forEach((item) => {
         this.send_msg = {
           type: "message_tool",
           srcUserName: this.userName,
           srcUserId: this.userId,
           targetUserId: this.sendToMemberId,
-          content: item
+          content: item,
         };
         if (this.socketApi.getSocketInfo().linked) {
           this.msglist.push(this.send_msg);
@@ -457,7 +456,7 @@ export default {
         } else {
           let chatMsg = {
             type: "notice",
-            content: "You are disconnecting with others."
+            content: "You are disconnecting with others.",
           };
           this.msglist.push(chatMsg);
         }
@@ -491,7 +490,7 @@ export default {
         srcUserId: "test",
         targetUserName: "test",
         targetUserId: "test",
-        content: "Test"
+        content: "Test",
       };
       this.socketApi.sendSock(this.send_msg, this.getSocketConnect);
     },
@@ -509,7 +508,6 @@ export default {
           this.msglist.push(chatMsg);
           this.msgRecords.push(chatMsg);
           this.sendNotify(chatMsg);
-          console.log(chatMsg.frequency);
 
           if (chatMsg.frequency != "" || chatMsg.frequency != undefined) {
             this.msgConcepts = chatMsg.frequency;
@@ -542,10 +540,10 @@ export default {
       let onlineObj = content;
       let manager = [];
       let member = [];
-      manager = onlineObj.filter(par => {
+      manager = onlineObj.filter((par) => {
         return par.userId == this.$store.getters.userId;
       });
-      member = onlineObj.filter(par => {
+      member = onlineObj.filter((par) => {
         return par.userId != this.$store.getters.userId;
       });
       this.$set(this, "manager", manager[0]);
@@ -608,28 +606,28 @@ export default {
           tag: msg.fromid + msg.time,
           icon: require("@/assets/images/OGMS2.png"), //通知的缩略图,
           body: "from   " + msg.from, //通知的具体内容
-          renotify: true
+          renotify: true,
         });
 
         //通知显示
-        notify.onshow = function() {
+        notify.onshow = function () {
           //5s自行停止通知
           setTimeout(notify.close.bind(notify), 5000);
         };
 
         //单击通知，跳转到页面
-        notify.onclick = function() {
+        notify.onclick = function () {
           window.focus();
           notify.close();
         };
 
         //报错处理
-        notify.onerror = function() {
+        notify.onerror = function () {
           console.log("error");
         };
 
         //通知关闭
-        notify.onclose = function() {
+        notify.onclose = function () {
           console.log("HTML5桌面消息关闭！！！");
         };
       }
@@ -637,7 +635,7 @@ export default {
 
     addEmoj(emoj) {
       this.message = this.message + emoj;
-      console.log(this.message);
+      // console.log(this.message);
     },
 
     handleKeyCode(event) {
@@ -647,7 +645,7 @@ export default {
         this.send(); //提交的执行函数
         event.preventDefault(); //禁止回车的默认换行
       }
-    }
+    },
   },
 
   beforeDestroy() {
@@ -659,10 +657,10 @@ export default {
   },
 
   beforeRouteEnter: (to, from, next) => {
-    next(vm => {
+    next((vm) => {
       if (!vm.$store.getters.userState || vm.$store.getters.userId == "") {
         vm.$router.push({
-          name: "Login"
+          name: "Login",
         });
       } else {
       }
@@ -675,6 +673,6 @@ export default {
       var div = this.$el.querySelector(".contentBody");
       div.scrollTop = div.scrollHeight;
     });
-  }
+  },
 };
 </script>

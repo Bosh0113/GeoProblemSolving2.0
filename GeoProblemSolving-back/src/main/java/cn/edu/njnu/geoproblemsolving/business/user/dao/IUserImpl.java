@@ -93,7 +93,7 @@ public class IUserImpl implements IUserDao {
     }
 
     @Override
-    public JsonResult getMangeProjectList(String[] projectIdList) {
+    public JsonResult getJoinedProjectList(String[] projectIdList) {
         ArrayList<Project> projects = new ArrayList<>();
         for (int i=0; i<projectIdList.length; i++){
             try {

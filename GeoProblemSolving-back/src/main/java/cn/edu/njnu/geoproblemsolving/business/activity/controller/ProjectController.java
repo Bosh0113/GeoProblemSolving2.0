@@ -100,17 +100,25 @@ public class ProjectController {
         return project;
     }
 
+    /**
+     * get projects
+     * @param projectIds
+     * @return
+     */
     @RequestMapping(method = RequestMethod.GET, value = "/getProjects")
     public JsonResult getProjects(@RequestParam("aids") ArrayList<String> projectIds){
-        ArrayList<Project> projects = new ArrayList<Project>();
-        for (String projectId: projectIds){{
-            JsonResult findResult = projectService.findProject(projectId);
-            Project project = (Project)findResult.getData();
-            projects.add(project);
-        }}
-        return ResultUtils.success(projects);
+        try {
+            ArrayList<Project> projects = new ArrayList<>();
+            for (String projectId: projectIds){{
+                JsonResult findResult = projectService.findProject(projectId);
+                Project project = (Project)findResult.getData();
+                projects.add(project);
+            }}
+            return ResultUtils.success(projects);
+        } catch (Exception ex){
+            return ResultUtils.error(-1, ex.toString());
+        }
     }
-
 
     /**
      * Delete project

@@ -152,7 +152,7 @@ export default {
     },
     getGeneralInfo(val) {
       this.createToolInfo = val;
-      console.log(val);
+      // console.log(val);
     },
     //创建工具
     async createTool() {

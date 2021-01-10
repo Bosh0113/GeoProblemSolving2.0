@@ -6,12 +6,9 @@ var websockLinked = false;
 
 function initWebSocket(para, IP_Port) { //初始化websocket
 
-    var wsurl = "ws://" + IP_Port + "/GeoProblemSolving/" + para;
+    var wsurl = `${window.location.protocol === 'https:' ? 'wss://' : 'ws://'}` + IP_Port + "/GeoProblemSolving/" + para;
     if (IP_Port == "localhost:8080") {
         wsurl = "ws://localhost:8081/GeoProblemSolving/" + para;
-    }
-    if(window.location.port=="8083"){
-        wsurl = "wss://"+ window.location.hostname+":8083/GeoProblemSolving/" + para;
     }
     //switch 使用时提供一个参数type
     websock = new WebSocket(wsurl);
@@ -70,12 +67,14 @@ function sendSock(agentData, callback) {
 
 //数据接收
 function websocketonmessage(e) {
-    var data = JSON.parse(e.data);
-    if (data.type != "ping") {
-        if (global_callback != null && global_callback != "" && global_callback != undefined) {
-            global_callback(data);
+    try {
+        var data = JSON.parse(e.data);
+        if (data.type != "ping") {
+            if (global_callback != null && global_callback != "" && global_callback != undefined) {
+                global_callback(data);
+            }
         }
-    }
+    } catch (err) { };
 }
 
 //数据发送

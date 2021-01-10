@@ -210,6 +210,10 @@ public class UpdateDBDao {
                 Activity activity = new Activity();
                 Subproject subproject = new Subproject();
 
+                if(step.getStepId().equals("0b97f598-b141-4164-81b0-9c0315deb167")){
+                    int a = 0;
+                }
+
                 // parent
                 String subprojectId = step.getSubProjectId();
                 String projectId = step.getProjectId();

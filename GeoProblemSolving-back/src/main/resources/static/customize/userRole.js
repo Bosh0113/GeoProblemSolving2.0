@@ -141,7 +141,7 @@ function roleLevelIdentify(role) {
 }
 
 // Get default permission
-function getDefault() {
+function getDefaultPermission() {
     var permission = defaultPermission;
     return permission;
 }

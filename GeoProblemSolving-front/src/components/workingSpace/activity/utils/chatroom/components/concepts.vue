@@ -23,7 +23,7 @@ export default {
   watch: {
     msgConcepts: {
       handler(val) {
-        console.log(val);
+        // console.log(val);
         this.conceptList = val;
       },
       deep: true
