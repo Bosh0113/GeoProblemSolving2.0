@@ -1085,7 +1085,7 @@ var ConceptTasksReadDialog = function (editorUi) {
 
     $.ajax({
         type: "GET",
-        url: 'http://' + RouteInfo.getIPPort() + '/GeoProblemSolving/folder/inquiry?folderId=' + groupID,
+        url: window.location.origin + '/GeoProblemSolving/folder/inquiry?folderId=' + groupID,
         success: function (data) {
             if (data == "Fail") {
                 alert("Read Task Fail!");
@@ -1140,12 +1140,13 @@ var ConceptTasksReadDialog = function (editorUi) {
             var name = taskData[$('input[name="tasks"]:checked').val()]["name"];
 
             window.taskID = taskData[$('input[name="tasks"]:checked').val()]["resourceId"];
-            window.taskName = name.substring(0, jsonArray[i]["name"].length - 5);
+            window.taskName = name.substring(0, name.length - 5);
             window.taskDescription = taskData[$('input[name="tasks"]:checked').val()]["description"];
 
 
             let xhr = new XMLHttpRequest();
-            xhr.open("get", url, true);
+            let fileUrl = taskData[$('input[name="tasks"]:checked').val()]["pathURL"];
+            xhr.open("get", fileUrl, true);
             xhr.responseType = "blob";
             xhr.onload = function () {
                 if (this.status == 200) {
@@ -1246,11 +1247,21 @@ var ConceptTasksSaveDialog = function (editorUi) {
     }
 
     var okBtn = mxUtils.button(mxResources.get('ok'), function () {
-        var url = window.location.href;
-        var reg = /groupID=(\S*)/;
-        var groupID = url.match(reg)[1];
-        reg = /userID=(\S*)/;
-        var userID = url.match(reg)[1];
+
+        var groupID = "";
+        var userID = "";
+        var url = window.location.href.split("&");
+
+        for (var i = 0; i < url.length; i++) {
+            if (/groupID/.test(url[i])) {
+                groupID = url[i].match(/groupID=(\S*)/)[1];
+                continue;
+            }
+            if (/userID/.test(url[i])) {
+                userID = url[i].match(/userID=(\S*)/)[1];
+                continue;
+            }
+        }
 
         var conceptualContent = {
             graphXML: graphContentXML,
@@ -1275,22 +1286,16 @@ var ConceptTasksSaveDialog = function (editorUi) {
         formData.append("folderId", groupID);
         formData.append("editToolInfo", JSON.stringify(toolInfo));
 
-        // var dataJSON=new Object();
-        // dataJSON["taskId"]="";
-        // dataJSON["taskName"]=$('#graphNameSave').val();
-        // dataJSON["description"]=$('#graphDescriptionSave').val();
-        // dataJSON["graphXML"]=graphContentXML;
-        // dataJSON["conceptualXML"]=ConceptualScene;
-        // dataJSON["collaborativeId"]=groupID;
         $.ajax({
+            url: window.location.origin + '/GeoProblemSolving/folder/uploadToFolder',
             type: "POST",
-            url: 'http://' + RouteInfo.getIPPort() + '/GeoProblemSolving/folder/uploadToFolder',
             data: formData,
-            dataType: "text",
+            processData: false,
+            contentType: false,
             success: function (data) {
                 if (data === "Size over" || data === "Fail" || data === "Offline") {
                     alert("Fail to save...");
-                } else if (data.failed.length > 0) {
+                } else if (data.failed != undefined && data.failed.length > 0) {
                     alert("Fail to save...");
                 } else if (data.uploaded.length > 0) {
                     alert("Success!");
