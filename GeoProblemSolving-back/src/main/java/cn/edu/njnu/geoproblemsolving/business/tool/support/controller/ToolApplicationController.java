@@ -2,6 +2,7 @@ package cn.edu.njnu.geoproblemsolving.business.tool.support.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -11,14 +12,14 @@ import javax.servlet.http.HttpServletRequest;
 public class ToolApplicationController {
 
     @RequestMapping(value = "/IntegrationApp",method = RequestMethod.GET)
-    String integratedModel(HttpServletRequest request){
-//        ModelAndView modelAndView = new ModelAndView();
-//        modelAndView.setViewName("integratedModeling_new");
-//        modelAndView.addObject("computableModelList", null);
-//
-//        return modelAndView;
+    ModelAndView integratedModel(HttpServletRequest request){
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("integratedModeling_new");
+        modelAndView.addObject("computableModelList", null);
 
-        return "integratedModeling_new";
+        return modelAndView;
+
+//        return "integratedModeling_new";
     }
 
 
