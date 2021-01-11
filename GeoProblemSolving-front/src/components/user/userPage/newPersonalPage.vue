@@ -4,8 +4,8 @@
     border: 2px solid transparent;
     box-sizing: border-box;
     transition: color .3s;
-    padding-left: 40px;
-    padding-right: 65px;
+    /*padding-left: 40px;*/
+    /*padding-right: 65px;*/
   }
 
   .sideItem:hover {
@@ -42,60 +42,55 @@
   <div>
     <Row>
       <Col span="3">
-        <div
-        >
-          <Menu style="height:calc(100vh - 120px);">
-            <MenuGroup>
-              <MenuItem name="overview" class="sideItem">
-                <Icon type="ios-book" size="25"/>
-                <!--                  <label style="font-family: 'Open Sans', sans-serif; font-size: 16px">Overview</label>-->
-                <router-link to="overview" class="customFont">Overview</router-link>
-              </MenuItem>
+        <Menu style="height: calc(100vh - 120px)" >
+          <MenuGroup>
+            <MenuItem name="overView" to="overView">
+              <Icon type="ios-book" size="25"/>
+              <label style="font-family: 'Open Sans', sans-serif; font-size: 16px">Overview</label>
+            </MenuItem>
 
-              <MenuItem name="project" class="sideItem">
-                <Icon type="ios-cube" size="25"/>
-                <router-link to="project" class="customFont">Project</router-link>
-              </MenuItem>
+            <MenuItem name="project" to="project">
+              <Icon type="ios-cube" size="25"/>
+              <label style="font-family: 'Open Sans', sans-serif; font-size: 16px">Project</label>
+            </MenuItem>
 
-              <MenuItem name="resource" class="sideItem">
-                <Icon type="ios-cloud" size="25"/>
-                <router-link to="resource" class="customFont">Resource</router-link>
-              </MenuItem>
 
-              <MenuItem name="tool" class="sideItem">
-                <Icon type="ios-cog" size="25"/>
-                <router-link to="tool" class="customFont">Tool</router-link>
-              </MenuItem>
+            <MenuItem name="resource" to="resource">
+              <Icon type="ios-cloud" size="25"/>
+              <label style="font-family: 'Open Sans', sans-serif; font-size: 16px">Resource</label>
+            </MenuItem>
 
-              <MenuItem name="todoList" class="sideItem">
-                <Icon type="ios-clipboard" size="25"/>
-                <router-link to="todoList" class="customFont">Todo List</router-link>
-              </MenuItem>
-            </MenuGroup>
+            <MenuItem name="tool" to="tool">
+              <Icon type="ios-cog" size="25"/>
+              <label style="font-family: 'Open Sans', sans-serif; font-size: 16px">Tool</label>
 
-            <MenuGroup>
-              <MenuItem name="userInfo" class="sideItem">
-                <Icon type="ios-contact-outline" size="25"/>
-                <router-link to="userInfo" class="customFont">UserInfo</router-link>
-              </MenuItem>
+            </MenuItem>
 
-              <MenuItem name="notification" class="sideItem">
-                <Icon type="ios-list" size="25"/>
-                <router-link to="notification" class="customFont">Notification</router-link>
-              </MenuItem>
+            <MenuItem name="todoList" to="todoList">
+              <Icon type="ios-clipboard" size="25"/>
+              <label style="font-family: 'Open Sans', sans-serif; font-size: 16px">Todo List</label>
+            </MenuItem>
+          </MenuGroup>
 
-            </MenuGroup>
-          </Menu>
-        </div>
+          <MenuGroup>
+            <MenuItem name="userInfo" to="userInfo">
+              <Icon type="ios-contact-outline" size="25"/>
+              <label style="font-family: 'Open Sans', sans-serif; font-size: 16px">My Account</label>
+            </MenuItem>
+
+            <MenuItem name="notification" to="notification">
+              <Icon type="ios-list" size="25"/>
+              <label style="font-family: 'Open Sans', sans-serif; font-size: 16px">Message</label>
+            </MenuItem>
+          </MenuGroup>
+        </Menu>
       </Col>
 
       <Col span="19" offset="1">
-        <Row style="margin-top: 30px"></Row>
-        <Row>
-          <router-view></router-view>
-        </Row>
+        <router-view style="margin-top: 30px"></router-view>
       </Col>
     </Row>
+
   </div>
 
 </template>
@@ -121,7 +116,8 @@
       tool
     },
     data() {
-      return {}
+      return {
+      }
     },
   }
 </script>

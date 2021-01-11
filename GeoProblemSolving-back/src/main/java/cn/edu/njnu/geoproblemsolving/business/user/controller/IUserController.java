@@ -146,6 +146,12 @@ public class IUserController {
         return userInfo;
     }
 
+    @RequestMapping(produces = "application/json;charset=UTF-8", method = RequestMethod.PUT)
+    public JsonResult updateUserInfo(@RequestBody User user){
+
+        return null;
+    }
+
 
     /**
      * @Author mzy
