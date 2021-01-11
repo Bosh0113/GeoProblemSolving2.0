@@ -133,7 +133,7 @@
                       <el-button
                         type="primary"
                         plain
-                        @click="selectDataDialog(index, inEventIndex)"
+                        @click="selectDataDialog(modelInEvent)"
                       >
                         Select data
                       </el-button>
@@ -141,42 +141,43 @@
                   </div>
                 </el-row>
                 <el-row v-else>
-                  <el-col :span="6" :offset="1">
-                    <div
-                      v-if="
-                        modelInEvent.hasOwnProperty('url') &&
-                          modelInEvent.url != '' &&
-                          modelInEvent.urlName != ''
-                      "
-                    >
-                      <div class="select-data select-data-line">
-                        <div class="data-name">{{ modelInEvent.urlName }}</div>
-                        <el-button
-                          type="success"
-                          icon="el-icon-download"
-                          size="mini"
-                          circle
-                          @click="download(modelInEvent)"
-                        ></el-button>
-                        <el-button
-                          type="warning"
-                          icon="el-icon-close"
-                          size="mini"
-                          circle
-                          @click="remove(modelInEvent)"
-                        ></el-button>
-                      </div>
-                    </div>
-                    <div v-else>
+                  <!-- <el-col :span="6" :offset="1"> -->
+
+                  <div
+                    v-if="
+                      modelInEvent.hasOwnProperty('url') &&
+                        modelInEvent.url != '' &&
+                        modelInEvent.urlName != ''
+                    "
+                  >
+                    <div class="select-data select-data-line">
+                      <div class="data-name">{{ modelInEvent.urlName }}</div>
                       <el-button
-                        type="primary"
-                        plain
-                        @click="selectDataDialog(index, inEventIndex)"
-                      >
-                        Select data
-                      </el-button>
+                        type="success"
+                        icon="el-icon-download"
+                        size="mini"
+                        circle
+                        @click="download(modelInEvent)"
+                      ></el-button>
+                      <el-button
+                        type="warning"
+                        icon="el-icon-close"
+                        size="mini"
+                        circle
+                        @click="remove(modelInEvent)"
+                      ></el-button>
                     </div>
-                  </el-col>
+                  </div>
+                  <div v-else>
+                    <el-button
+                      type="primary"
+                      plain
+                      @click="selectDataDialog(modelInEvent)"
+                    >
+                      Select data
+                    </el-button>
+                  </div>
+                  <!-- </el-col> -->
                 </el-row>
               </el-row>
               <el-row>
@@ -317,7 +318,7 @@ export default {
       bindFileName: "",
       selectDataDialogShow: false,
       currentStateIndex: "",
-      currentEventIndex: ""
+      currentEvent: ""
     };
   },
 
@@ -515,7 +516,7 @@ export default {
         `/GeoProblemSolving/dataContainer/uploadSingle`,
         uploadFileForm
       );
-      let resultId = `http://221.226.60.2:8082/data?uid=${data}`;
+      let resultId = `http://221.226.60.2:8082/data/${data}`;
       this.$set(this.stateList[stateIndex].Event[eventIndex], "url", resultId);
     },
 
@@ -540,12 +541,13 @@ export default {
     },
 
     async getStateEventOut(record) {
+      console.log(record);
       let outList = this.stateList;
       let outputUrl = record.outputs;
       outList.forEach((state, index) => {
         state.Event.forEach((event, eventIndex) => {
           outputUrl.forEach(el => {
-            if (el.statename == state.name && el.event == event.name) {
+            if (el.statename == event.stateName && el.event == event.name) {
               this.$set(this.stateList[index].Event[eventIndex], "url", el.url);
               this.$set(
                 this.stateList[index].Event[eventIndex],
@@ -556,61 +558,11 @@ export default {
           });
         });
       });
+      console.log(this.stateList);
     },
 
     download(event) {
       window.open(event.url);
-    },
-
-    async dataURItoBlob2(event) {
-      this.urlToBlob(event.url, async blob => {
-        let file = new File([blob], this.bindFileName);
-        let formData = new FormData();
-
-        formData.append("file", file);
-        formData.append("description", event.description);
-        formData.append("type", "toolData");
-        formData.append("uploaderId", this.pageParams.userId);
-        formData.append("privacy", "private");
-        formData.append("folderId", this.pageParams.pageId);
-
-        this.axios
-          .post("/GeoProblemSolving/folder/uploadToFolder", formData)
-          .then(res => {
-            console.log(res);
-            if (res.data.uploaded != null) {
-              this.$message({
-                message: "You have binded the resource Successfully!",
-                type: "success"
-              });
-            }
-          })
-          .catch(function(err) {
-            throw err;
-          });
-
-        let formData2 = new FormData();
-        formData2.append("file", file);
-        formData2.append("type", "data");
-        formData2.append("uploaderId", this.pageParams.userId);
-
-        formData2.append("privacy", "private");
-
-        this.axios
-          .post("/GeoProblemSolving/resource/upload", formData2)
-          .then(res => {
-            console.log(res);
-            if (res.data.uploaded != null) {
-              this.$message({
-                message: "You have binded the resource Successfully!",
-                type: "success"
-              });
-            }
-          })
-          .catch(function(err) {
-            throw err;
-          });
-      });
     },
 
     urlToBlob(the_url, callback) {
@@ -735,21 +687,28 @@ export default {
     },
 
     selectData(val) {
+      let stateIndex = this.stateList.findIndex(
+        state => state.name == this.currentEvent.stateName
+      );
+
+      let eventIndex = this.stateList[stateIndex].Event.findIndex(
+        event => event.name == this.currentEvent.name
+      );
       this.$set(
-        this.stateList[this.currentStateIndex].Event[this.currentEventIndex],
+        this.stateList[stateIndex].Event[eventIndex],
         "url",
         val.pathURL
       );
       this.$set(
-        this.stateList[this.currentStateIndex].Event[this.currentEventIndex],
+        this.stateList[stateIndex].Event[eventIndex],
         "urlName",
         val.name
       );
+
       this.selectDataDialogShow = false;
     },
-    selectDataDialog(stateIndex, eventIndex) {
-      this.currentStateIndex = stateIndex;
-      this.currentEventIndex = eventIndex;
+    selectDataDialog(event) {
+      this.currentEvent = event;
       this.selectDataDialogShow = true;
     },
     remove(event) {

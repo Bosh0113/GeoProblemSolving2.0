@@ -54,7 +54,7 @@ public class DataContainerController {
         String userId = (String) request.getSession().getAttribute("userId");
         String userName = (String) request.getSession().getAttribute("name");
         MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest) request;
-        Part part = multiRequest.getPart("datafile");
+        Part part = multiRequest.getPart("file");
         String header = part.getHeader("Content-Disposition");
         String filename2 = header.substring(header.indexOf("filename=\"") + 10, header.lastIndexOf("\""));//filename=" (整个字符串长度为10，所以要加10)
         //  获取文件后缀名

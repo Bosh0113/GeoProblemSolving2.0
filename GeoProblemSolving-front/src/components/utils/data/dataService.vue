@@ -39,13 +39,7 @@
             <el-divider class="left-divider"></el-divider>
             <div style="font-weight: 600;font-size: 16px;">Description</div>
             <div v-if="dataService.hasOwnProperty('metaDetail')">
-              {{
-                dataService.metaDetail.hasOwnProperty("Description")
-                  ? dataService.metaDetail.Description[0]
-                  : dataService.metaDetail.hasOwnProperty("description")
-                  ? dataService.metaDetail.description
-                  : ""
-              }}
+              {{ dataService.metaDetail.description }}
             </div>
           </div>
           <div class="des">{{ dataService.date }}</div>
@@ -68,7 +62,7 @@
           </div>
           <el-divider class="stateTitleDivider"></el-divider>
           <div
-            v-for="(input, index) in dataService.metaDetail.Input"
+            v-for="(input, index) in dataService.metaDetail.input"
             :key="index"
             class="event"
           >
@@ -122,14 +116,14 @@
         </div>
         <div
           class="_params-group"
-          v-if="dataService.metaDetail.Parameter.length != 0"
+          v-if="dataService.metaDetail.parameter.length != 0"
         >
           <div class="stateTitle">
             Parameter
           </div>
           <el-divider class="stateTitleDivider"></el-divider>
           <div
-            v-for="(parameter, index) in dataService.metaDetail.Parameter"
+            v-for="(parameter, index) in dataService.metaDetail.parameter"
             :key="index"
             class="event"
           >
@@ -158,7 +152,7 @@
           </div>
           <el-divider class="stateTitleDivider"></el-divider>
           <div
-            v-for="(output, index) in dataService.metaDetail.Output"
+            v-for="(output, index) in dataService.metaDetail.output"
             :key="index"
             class="event"
           >
@@ -172,7 +166,7 @@
                 </p>
               </el-col>
               <div>
-                <div class="_btn-group" v-if="type == ' Visualization'">
+                <div class="_btn-group" v-if="type == 'Processing'">
                   <el-button
                     plain
                     round
@@ -191,7 +185,13 @@
                     >Bind</el-button
                   >
                 </div>
-                <div v-else-if="type == 'Processing'">
+                <div
+                  v-else-if="
+                    type == 'Visualization' &&
+                      output.hasOwnProperty('url') &&
+                      output.url != ''
+                  "
+                >
                   <div class="output-pic" @mouseenter="maskVisible">
                     <el-avatar
                       shape="square"
@@ -245,7 +245,7 @@
       :close-on-click-modal="false"
       :destroy-on-close="true"
     >
-      <img :src="zoomOutPicDialog" width="950" />
+      <img :src="zoomUrl" width="950" />
     </el-dialog>
   </div>
 </template>
@@ -327,12 +327,19 @@ export default {
         token: this.dataToken,
         type: this.type
       };
+
       let { data } = await post(
         `/GeoProblemSolving/dataContainer/dataService/getData`,
         json
       );
+
       console.log(data);
-      this.dataService = data.Capability.data;
+      if (data.code == -1) {
+        console.log("off line");
+        return;
+      }
+
+      this.dataService = data.capability.data;
       //   this.dataServiceDetail = data;
     },
 
@@ -343,7 +350,7 @@ export default {
       };
       let { id } = await post(`/GeoProblemSolving/dataContainer/remote`, json);
       let remoteDataList = id;
-      let inputList = this.dataService.metaDetail.Input;
+      let inputList = this.dataService.metaDetail.input;
 
       inputList.forEach(input => {
         console.log(remoteDataList);
@@ -353,13 +360,13 @@ export default {
         input.url = selectIdUrl[0].url;
         input.urlName = input.name;
       });
-      console.log(this.dataService.metaDetail.Input);
+
       this.$forceUpdate();
     },
 
     async invokeTest() {
       let urlList = "";
-      let inputs = this.dataService.metaDetail.Input;
+      let inputs = this.dataService.metaDetail.input;
       for (let index = 0; index < inputs.length; index++) {
         urlList += inputs[index].url;
         if (index != inputs.length - 1) {
@@ -368,7 +375,7 @@ export default {
       }
 
       let paramList = "";
-      let params = this.dataService.metaDetail.Parameter;
+      let params = this.dataService.metaDetail.parameter;
       for (let index = 0; index < params.length; index++) {
         paramList += params[index].value;
         if (index != params.length - 1) {
@@ -385,7 +392,7 @@ export default {
 
       let data = await post(`/GeoProblemSolving/dataContainer/invoke`, json);
       console.log(data);
-      this.dataService.metaDetail.Output[0].url = data;
+      this.dataService.metaDetail.output[0].url = data;
       this.$forceUpdate();
     },
 
@@ -420,8 +427,8 @@ export default {
 
     selectData(val) {
       let index = this.inputIndex;
-      this.dataService.metaDetail.Input[index].url = val.pathURL;
-      this.dataService.metaDetail.Input[index].urlName = val.name;
+      this.dataService.metaDetail.input[index].url = val.pathURL;
+      this.dataService.metaDetail.input[index].urlName = val.name;
       this.selectDataDialogShow = false;
     },
 
@@ -440,7 +447,7 @@ export default {
     },
     zoomOutPicDialog(url) {
       this.zoomUrl = url;
-      this.zoomOutPicDialog = true;
+      this.zoomOutPicDialogShow = true;
     }
   },
 
