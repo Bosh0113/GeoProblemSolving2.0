@@ -156,7 +156,7 @@ public class FolderDaoImpl implements IFolderDao {
             if (resourceId == null) {
                 uploadResult = (UploadResult) resourceDao.saveResource(request);
             } else {
-                uploadResult = (UploadResult)resourceDao.updateResource(request);
+                uploadResult = (UploadResult) resourceDao.updateResource(request);
 
                 for(int i=0;i<files.size();i++){
                     if(files.get(i).getResourceId().equals(resourceId)){
