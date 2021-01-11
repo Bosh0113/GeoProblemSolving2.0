@@ -1093,12 +1093,13 @@ var ConceptTasksReadDialog = function (editorUi) {
                 str = '<div style="height:150px;width:400px;border:solid 1px #d5d5d5;margin:20px;text-align:center;"><h1>No saved task here.</h1></div>';
             } else {
                 var str = "";
+                var count = 0;
                 var jsonArray = data.files;
                 for (var i = 0; i < jsonArray.length; i++) {
                     if (jsonArray[i].type === "toolData: Conceptual_modeling") {
                         taskData.push(jsonArray[i]);
                         str += '<div style="height:150px;width:400px;border:solid 1px #d5d5d5;margin:20px;">\n' +
-                            '\t\t<input type="radio" name="tasks" id="task" value="' + i + '">\n' +
+                            '\t\t<input type="radio" name="tasks" id="task" value="' + count + '">\n' +
                             '\t\t<span style="font-weight:bold">' + jsonArray[i]["name"].substring(0, jsonArray[i]["name"].length - 5) + '</span>\n' +
                             '\t\t<span class="deleteTask" style="float:right;margin:5px;cursor:pointer;" data-projectid="' + jsonArray[i]["resourceId"] + '" onclick="deleteTask(this)">X</span>\n' +
                             '\t\t<div style="width:350px;height:100px;">\n' +
@@ -1106,6 +1107,7 @@ var ConceptTasksReadDialog = function (editorUi) {
                             '\t\t</div>\n' +
                             '\t\t<sub style="float:right;margin-right:15px;">' + jsonArray[i]["uploadTime"] + '</sub>\n' +
                             '\t</div>';
+                        count++;
                     }
                 }
             }
@@ -1157,13 +1159,13 @@ var ConceptTasksReadDialog = function (editorUi) {
 
                         showGraph(editorUi.toolbar.editorUi.editor.graph, content.graphXML);
                         editorUi.toolbar.editorUi.editor.graph.setConceptItemList(content.conceptualXML);
+
+                        document.getElementById("graphName").value = name.substring(0, name.length - 5);
+                        document.getElementById("graphDescription").value = taskData[$('input[name="tasks"]:checked').val()]["description"];
                     }
                 }
             };
             xhr.send();
-
-            document.getElementById("graphName").value = name.substring(0, jsonArray[i]["name"].length - 5);
-            document.getElementById("graphDescription").value = taskData[$('input[name="tasks"]:checked').val()]["description"];
         }
         editorUi.hideDialog();
     });
