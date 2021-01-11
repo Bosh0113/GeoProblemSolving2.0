@@ -21,6 +21,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.http.entity.ContentType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -98,9 +99,15 @@ public class IResourceServiceImpl implements IResourceService {
                             String file = part.getSubmittedFileName();
                             String temp[] = file.split("\\.");
                             String fileName = temp[0];
+                            String suffix = "."+temp[1];
 
-                            MultipartFile multipartFile = new MockMultipartFile(ContentType.APPLICATION_OCTET_STREAM.toString(), part.getInputStream());
-                            valueMap.add("datafile", multipartFile.getResource());
+
+                            File fileTemp = File.createTempFile(fileName, suffix);//创建临时文件
+                            FileUtils.copyInputStreamToFile(part.getInputStream(), fileTemp);
+                            // MultipartFile multipartFile = new MockMultipartFile(ContentType.APPLICATION_OCTET_STREAM.toString(), part.getInputStream());
+                            FileSystemResource multipartFile = new FileSystemResource(fileTemp);      //临时文件
+
+                            valueMap.add("datafile", multipartFile);
                             valueMap.add("name", fileName);
                             valueMap.add("userId", session.getAttribute("userId"));
                             valueMap.add("serverNode", "china");

@@ -133,12 +133,12 @@ public class DataIContainerService {
 
         HttpEntity<MultiValueMap> requestEntity = new HttpEntity<MultiValueMap>(requestBody, headers);
 
-        String resultXml = restTemplate.postForObject(urlStr,requestEntity,String.class);
+        JSONObject result = restTemplate.postForObject(urlStr,requestEntity,JSONObject.class);
 
 
-        String object = XML.toJSONObject(resultXml).getJSONObject("result").getStr("uid");
+        String url = result.getString("url");
 
-        return object;
+        return url;
     }
 
     public  Object change(Object object){
