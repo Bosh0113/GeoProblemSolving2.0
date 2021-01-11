@@ -318,13 +318,6 @@ const routes = [
     name: "toolTemplate",
     component: resolve => require(["@/components/tools/toolPreview"], resolve)
   },
-
-  //  个人空间路由内容
-  {
-    path: "/test",
-    component: resolve =>
-      require(["@/components/user/subPage/project"], resolve)
-  }
 ];
 
 export default new Router({
