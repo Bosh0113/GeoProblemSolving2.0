@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
+import java.util.List;
 import java.util.UUID;
 
 public class Utils {
@@ -15,6 +16,8 @@ public class Utils {
         JSONArray jsonStates = jsonObject.getJSONArray("ModelClass").getJSONObject(0).getJSONArray("Behavior").getJSONObject(0).getJSONArray("StateGroup").getJSONObject(0).getJSONArray("States").getJSONObject(0).getJSONArray("State");
         JSONArray datasetItem = jsonObject.getJSONArray("ModelClass").getJSONObject(0).getJSONArray("Behavior").getJSONObject(0).getJSONArray("RelatedDatasets").getJSONObject(0).getJSONArray("DatasetItem");
 
+        List responseJsonArray = new JSONArray();
+        List noResponseJsonArray = new JSONArray();
         for (int j = 0; j < jsonStates.size(); j++) {
             String stateId =jsonStates.getJSONObject(j).getString("id");
             String stateName =jsonStates.getJSONObject(j).getString("name");
@@ -56,6 +59,11 @@ public class Utils {
                     }
                 }
 
+                if(event.getString("type").equals("response")){
+                    responseJsonArray.add(event);
+                } else{
+                    noResponseJsonArray.add(event);
+                }
             }
         }
 
