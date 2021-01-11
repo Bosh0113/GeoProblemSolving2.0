@@ -6,35 +6,19 @@
           <CheckboxGroup v-model="checkedType">
             <Checkbox label="public">
               <span>Private</span>
-              <span class="badge">{{publicResNum}}</span>
+              <span class="badge">{{privateResList.length}}</span>
             </Checkbox>
             <Checkbox label="private">
               <span>Public</span>
-              <span class="badge">{{privateResNum}}</span>
+              <span class="badge">{{publicResList.length}}</span>
             </Checkbox>
           </CheckboxGroup>
-
-<!--          <span style="margin: 0 20px"></span>-->
-<!--          <CheckboxGroup style="display: inline-block">-->
-<!--            <Checkbox label="read">-->
-<!--              <span>Owned by me</span>-->
-<!--              <span class="badge">3</span>-->
-<!--            </Checkbox>-->
-<!--            <Checkbox label="unRead">-->
-<!--              <span>Shared with me</span>-->
-<!--              <span class="badge">2</span>-->
-<!--            </Checkbox>-->
-<!--          </CheckboxGroup>-->
-
         </Card>
 
         <div>
           <Card dis-hover>
             <p slot="title">Resource List</p>
             <div slot="extra">
-
-              <!--              <Icon type="md-unlock" size="25" color="green"/>-->
-              <!--              <Icon type="md-lock" size="25" color="red"/>-->
               <Icon type="md-cloud-upload"
                     size="25"
                     @click="uploadModal = true"
@@ -61,9 +45,8 @@
               ref="selection" stripe
               :columns="colName"
               no-data-text="There aren't any resources."
-              :data="resourceList"
-              @on-select="selectedRes"
-              @on-select-cancel="selectedRes"
+              :data="showedResList"
+              @on-selection-change="selectedRes"
               @on-row-click="showResDetail"
             >
             </Table>
@@ -115,6 +98,7 @@
         :label-width="100"
         label-position="left"
       >
+
         <FormItem label="Privacy" prop="privacy">
           <RadioGroup v-model="resFormItems.privacy" style="width:80%">
             <Radio label="private">Private</Radio>
@@ -184,9 +168,8 @@
     </Modal>
 
 
-    <Modal v-model="confirmDelModal" width="300">
-      <label>Are your sure to delete:</label>
-      <h2>{{selectedResName}}</h2>
+    <Modal v-model="confirmDelModal" width="300" title="Are your sure to delete">
+      <div style="font-family: 'Open Sans', sans-serif; font-size: 16px; font-weight: bold">{{selectedResName}}</div>
       <div slot="footer">
         <Button
           type="warning"
@@ -201,13 +184,14 @@
       </div>
     </Modal>
 
-    <Modal v-model="shareResModal" width="800" title="Share tool">
+    <Modal v-model="shareResModal" width="800" title="Share Project">
       <Form>
         <FormItem>
-          <Select v-model="shareResFormItems.select">
-            <Option value="selectProject">Share "{{selectedResName}}" to Project</Option>
-            <Option value="selectUser">Share "{{selectedResName}}" to User</Option>
-          </Select>
+          <div>Share "{{selectedResName}}" to Project</div>
+<!--          <Select v-model="shareResFormItems.select">-->
+<!--            <Option value="selectProject">Share "{{selectedResName}}" to Project</Option>-->
+<!--            <Option value="selectUser">Share "{{selectedResName}}" to User</Option>-->
+<!--          </Select>-->
         </FormItem>
         <FormItem v-if="shareResFormItems.select == 'selectProject'">
           <Select v-model="shareResFormItems.sharedProjectId" placeholder="Select Project">
@@ -232,6 +216,10 @@
         :label-width="100"
         label-position="left"
       >
+        <FormItem label="Name" prop="name">
+          <Input v-model="resDetailFormItems.name" disabled></Input>
+        </FormItem>
+
         <FormItem label="Privacy" prop="privacy">
           <RadioGroup v-model="resDetailFormItems.privacy" style="width:80%">
             <Radio label="private">Private</Radio>
@@ -267,7 +255,6 @@
 </template>
 
 <script>
-  import resourceList from "../../common/resource/resourceList";
 
   export default {
     name: "resource",
@@ -280,7 +267,6 @@
         progressModalShow: false,
         confirmDelModal: false,
         shareResModal: false,
-        updatedResIndex: null,
         uploadProgress: 0,
         userProject: [],
         clickedRes: [],
@@ -291,7 +277,7 @@
           uploaderName: ""
         },
         shareResFormItems: {
-          select: "",
+          select: "selectProject",
           sharedUserEmail: "",
           sharedProjectId: "",
         },
@@ -328,8 +314,11 @@
           }
         ],
         resourceList: [],
+        publicResList: [],
+        privateResList: [],
         selectedResList: [],
         resFormItems: {
+          name: "",
           privacy: "private",
           type: "data",
           description: ""
@@ -350,6 +339,36 @@
       this.getUserProject();
     },
     methods: {
+      getUserResource() {
+        this.axios
+          .get(
+            "/GeoProblemSolving/resource/inquiry" +
+            "?key=uploaderId" +
+            "&value=" +
+            this.$store.getters.userId
+          )
+          .then(res => {
+            if (res.data != "None" && res.data != "Fail") {
+              let tempResList = res.data;
+              let tempPublicResList = [];
+              let tempPrivateResList = [];
+              for (let i=0; i < tempResList.length; i++){
+                if (tempResList[i].privacy == "public"){
+                  tempPublicResList.push(tempResList[i]);
+                }else if (tempResList[i].privacy == "private"){
+                  tempPrivateResList.push(tempResList[i]);
+                }
+              }
+              this.$set(this, "publicResList", tempPublicResList);
+              this.$set(this, "privateResList", tempPrivateResList);
+            } else if (res.data == "None") {
+              this.resourceList = [];
+            }
+          })
+          .catch(err => {
+            this.$Message.error("Loading resource Failed.");
+          });
+      },
       selectedRes: function (selection) {
         console.log(selection)
         this.selectedResList = selection;
@@ -362,12 +381,15 @@
               .delete("/GeoProblemSolving/resource/deleteRemote/" + this.$store.getters.userId + "?rid=" + rid)
               .then(res => {
                 if (res.data.code == 0){
-                  for (let i = 0; i < this.resourceList.length; i++){
-                    if (this.resourceList[i].resourceId == this.selectedResList[0].resourceId){
-                      this.resourceList.splice(i, 1);
-                    }
+                  let index = this.publicResList.indexOf(this.selectedResList[0]);
+                  if (index != -1){
+                    this.publicResList.splice(index, 1);
+                  }else {
+                    index = this.privateResList.indexOf(this.selectedResList[0]);
+                    this.privateResList.splice(index, 1);
                   }
                   this.confirmDelModal = false;
+                  this.selectedResList = [];
                   this.$Notice.success({
                     title: "Delete Success."
                   })
@@ -390,8 +412,14 @@
               .then(res => {
                 if (res.data.code == 0){
                   for (let i =0; i < this.selectedResList.length; i++){
-                    let index = this.resourceList.indexOf(this.selectedResList[i]);
-                    this.resourceList.splice(index, 1);
+                    let index = this.publicResList.indexOf(this.selectedResList[i]);
+                    if (index != -1){
+                      this.publicResList.splice(index, 1);
+
+                    }else {
+                      index = this.privateResList.indexOf(this.selectedResList[i]);
+                      this.privateResList.splice(index, 1);
+                    }
                   }
                   this.confirmDelModal = false;
                   this.$Notice.success({
@@ -406,26 +434,6 @@
               })
           }
         }
-      },
-      //后期需要修改
-      getUserResource() {
-        this.axios
-          .get(
-            "/GeoProblemSolving/resource/inquiry" +
-            "?key=uploaderId" +
-            "&value=" +
-            this.$store.getters.userId
-          )
-          .then(res => {
-            if (res.data != "None" && res.data != "Fail") {
-              this.resourceList = res.data;
-            } else if (res.data == "None") {
-              this.resourceList = [];
-            }
-          })
-          .catch(err => {
-            this.$Message.error("Loading resource Failed.");
-          });
       },
       getUserProject: function () {
         let userInfo = this.$store.getters.userInfo;
@@ -523,7 +531,11 @@
                     let failedList = res.data.failed;
                     let sizeOverList = res.data.sizeOver;
                     for (let i = 0; i < uploadList.length; i++) {
-                      this.resourceList.push(uploadList[i]);
+                      if (uploadList[i].privacy == "public"){
+                        this.publicResList.push(uploadList[i]);
+                      }else if (uploadList[i].privacy == "private"){
+                        this.privateResList.push(uploadList[i]);
+                      }
                     }
                     if (sizeOverList.length > 0) {
                       this.$Notice.warning({
@@ -652,9 +664,8 @@
             // console.log(err.data);
           });
       },
-      showResDetail: function (res, index) {
+      showResDetail: function (res) {
         this.resDetailModal = true;
-        this.updatedResIndex = index;
         this.resDetailFormItems = res;
       },
       updateRes: function () {
@@ -662,8 +673,22 @@
           .put("/GeoProblemSolving/resource", this.resDetailFormItems)
           .then(res=>{
             if (res.data.code == 0){
-              this.resourceList.splice(this.updatedResIndex, 1);
-              this.resourceList.unshift(this.resDetailFormItems);
+              if (this.resDetailFormItems.privacy == "public"){
+                for (let i =0; i<this.publicResList.length;i++){
+                  if (this.resDetailFormItems.resourceId == this.publicResList[i].resourceId){
+                    this.publicResList.splice(i, 1);
+                    this.publicResList.unshift(this.resDetailFormItems);
+                  }
+                }
+              }
+              if (this.resDetailFormItems.privacy == "private"){
+                for (let i =0; i<this.privateResList.length;i++){
+                  if (this.resDetailFormItems.resourceId == this.privateResList[i].resourceId){
+                    this.privateResList.splice(i, 1);
+                    this.privateResList.unshift(this.resDetailFormItems);
+                  }
+                }
+              }
               this.resDetailModal = false;
               this.$Message.success("Update Success.")
             }else {
@@ -681,28 +706,28 @@
         let resNames = "";
         if (this.selectedResList.length != 0) {
           for (let i = 0; i < this.selectedResList.length; i++) {
-            resNames += this.selectedResList[i].name + " ";
+            resNames += this.selectedResList[i].name + " \n ";
           }
         }
         return resNames;
       },
-      publicResNum: function () {
-        let publicNum = 0;
-        for (let i=0; i< this.resourceList.length; i++){
-          if (this.resourceList[i].privacy == "public"){
-            publicNum ++;
-          }
+      showedResList: function () {
+        if (this.checkedType.length == 0) {
+          this.resourceList = [];
+          return this.resourceList;
+        } else if (this.checkedType.length == 2) {
+          this.resourceList = [];
+          this.resourceList = this.publicResList.concat(this.privateResList);
+          return this.resourceList;
+        } else if (this.checkedType.length == 1 && this.checkedType[0] == "public") {
+          this.resourceList = [];
+          this.resourceList = this.publicResList;
+          return this.resourceList;
+        } else if (this.checkedType.length == 1 && this.checkedType[0] == "private") {
+          this.resourceList = [];
+          this.resourceList = this.privateResList;
+          return this.resourceList;
         }
-        return publicNum;
-      },
-      privateResNum: function () {
-        let privateNum = 0;
-        for (let i=0; i< this.resourceList.length; i++){
-          if (this.resourceList[i].privacy == "private"){
-            privateNum ++;
-          }
-        }
-        return privateNum;
       }
     }
   }

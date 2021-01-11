@@ -1,6 +1,7 @@
 package cn.edu.njnu.geoproblemsolving.business.user.util;
 
 import cn.edu.njnu.geoproblemsolving.business.user.StaticParams;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
@@ -23,6 +24,10 @@ public class ICommonUtil {
             if (key.equals("userState")){
                 continue;
             }
+            if (key.equals("userId")){
+                StaticParams.paramsMap.add(key, value);
+                continue;
+            }
             //local user update
             update.set(key, value);
             //remote userBase update
@@ -33,6 +38,7 @@ public class ICommonUtil {
     public Object gsm2BaseUser(MultiValueMap<String, Object> updateInfo){
         RestTemplate restTemplate = new RestTemplate();
         String updateUrl  = "http://106.14.78.235/ResServer/user/update";
+        // String updateUrl  = "http://localhost:8090/ResServer/user/update";
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization","Bearer " + StaticParams.access_token);
         HttpEntity<MultiValueMap<String, Object>> httpEntity = new HttpEntity<>(updateInfo, headers);
