@@ -252,6 +252,7 @@ export default {
       return userRoleJS.roleIdentify(activity.members, this.userInfo.userId);
     },
     permissionIdentity(permission, role, operation) {
+      if(permission == undefined) permission = userRoleJS.getDefault();
       if (operation == "auto_join") {
         if (JSON.parse(permission).auto_join.visitor == "Yes") return true;
         else if (JSON.parse(permission).auto_join.visitor == "No") return false;

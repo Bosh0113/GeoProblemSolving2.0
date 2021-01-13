@@ -336,6 +336,7 @@ export default {
       return userRoleJS.roleIdentify(activity.members, this.userInfo.userId);
     },
     permissionIdentity(permission, role, operation) {
+      if(permission == undefined) permission = userRoleJS.getDefault();
       if (operation == "observe") {
         if (JSON.parse(permission).observe.visitor == "Yes") return true;
         else if (JSON.parse(permission).observe.visitor == "No") return false;
@@ -814,7 +815,7 @@ export default {
             approve: "unknow",
           },
         };
-        this.sendNotice(activity, notice);
+        this.sendNotice(this.slctActivity, notice);
       }
     },
     sendNotice(activity, notice) {
@@ -823,6 +824,8 @@ export default {
         .then((result) => {
           if (result.data == "Success") {
             parent.vm.$emit("sendNotice", notice.recipientId);
+            this.$Notice.info({desc: "Send application successfully."})
+            this.applyJoinActivityModal = false;
           } else {
             this.$Message.error("Notice fail.");
           }

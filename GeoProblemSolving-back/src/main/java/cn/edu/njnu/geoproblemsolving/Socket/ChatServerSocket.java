@@ -167,8 +167,6 @@ public class ChatServerSocket {
     @OnMessage
     public void onMessage(@PathParam("roomId") String roomId, String message, Session session) throws IOException {
         JSONObject messageObject = JSONObject.parseObject(message);
-        String targetUserId = messageObject.getString("targetUserId");
-        String srcUserId = messageObject.getString("srcUserId");
         String messageType = messageObject.getString("type");
         if (messageType.equals("message")) {
             broadcastMessageToRoom(roomId, message);
