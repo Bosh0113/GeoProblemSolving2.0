@@ -6,17 +6,17 @@
         <Card>
           <CheckboxGroup v-model="selectedTaskType">
             <Checkbox label="Doing">
-              <sapn>Doing</sapn>
+              <span>Doing</span>
               <span class="badge">{{doingList.length}}</span>
             </Checkbox>
             <Checkbox label="Done">
               <span>Done</span>
               <span class="badge">{{doneList.length}}</span>
             </Checkbox>
-            <Checkbox label="Assigned">
-              <span>Assigned to you</span>
-              <span class="badge">10</span>
-            </Checkbox>
+<!--            <Checkbox label="Assigned">-->
+<!--              <span>Assigned to you</span>-->
+<!--              <span class="badge">10</span>-->
+<!--            </Checkbox>-->
             <Checkbox label="Importance" :disabled="true">
               <span>Importance</span>
               <span class="badge">{{importanceNum}}</span>
@@ -57,37 +57,44 @@
               v-if="selectedTaskType.includes('Doing')"
             >
               <p slot="title">Doing</p>
-              <div
-                v-for="(item, doingIndex) in doingList"
-                :key="doingIndex"
-              >
-                <Card
-                  class="customIcon"
-                >
-                  <Icon type="ios-radio-button-off"
-                        size="20"
-                        style="cursor:pointer;"
-                        @click="changeState(item, doingIndex)"
-                  />
-                  <Icon type="ios-close" size="31"
-                        style="float: right;color: #ff7800;cursor: pointer; line-height: .8"
-                        @click="delTask(item.ptId, doingIndex, 'doing')"
-                  />
-                  <Icon v-if="item.importance == 0"
-                        size="20" type="ios-star-outline"
-                        style="float: right;cursor: pointer;margin-right: 20px"
-                        @click="changeImportance(item, doingIndex, 'doing')"
-                  />
-                  <Icon v-else size="20"
-                        type="ios-star"
-                        style="float: right;cursor:pointer;margin-right: 20px"
-                        @click="changeImportance(item, doingIndex, 'doing')"
-                  />
-                  <label
-                    style="margin-left: 10px;"
-                  >{{item.content}}</label>
-                </Card>
+              <div :style="{height: contentHeight-contentHeightCompute+'px'}">
+                <vue-scroll :ops="ops">
+                  <div
+                    v-for="(item, doingIndex) in doingList"
+                    :key="doingIndex"
+                  >
+                    <Card
+                      class="customIcon"
+                    >
+                      <Icon type="ios-radio-button-off"
+                            size="20"
+                            style="cursor:pointer;"
+                            title="Change State"
+                            @click="changeState(item, doingIndex)"
+                      />
+                      <Icon type="ios-close" size="31"
+                            style="float: right;color: #ff7800;cursor: pointer; line-height: .8"
+                            title="Delete"
+                            @click="delTask(item.ptId, doingIndex, 'doing')"
+                      />
+                      <Icon v-if="item.importance == 0"
+                            size="20" type="ios-star-outline"
+                            style="float: right;cursor: pointer;margin-right: 20px"
+                            @click="changeImportance(item, doingIndex, 'doing')"
+                      />
+                      <Icon v-else size="20"
+                            type="ios-star"
+                            style="float: right;cursor:pointer;margin-right: 20px"
+                            @click="changeImportance(item, doingIndex, 'doing')"
+                      />
+                      <label
+                        style="margin-left: 10px;"
+                      >{{item.content}}</label>
+                    </Card>
+                  </div>
+                </vue-scroll>
               </div>
+
             </Card>
           </div>
           <!--        已完成      -->
@@ -98,33 +105,38 @@
             >
               <p slot="title">Done</p>
               <!--            显示内容                -->
-              <div
-                v-for="(item, doneIndex) in doneList"
-                :key="doneIndex"
-              >
-                <Card class="customIcon">
-                  <Icon type="ios-checkmark-circle-outline" size="20" style="line-height: .8; cursor: pointer"
-                        @click="changeState(item, doneIndex)"/>
-                  <Icon type="ios-close" size="31"
-                        style="float: right;color: #ff7800;cursor: pointer; line-height: .8"
-                        @click="delTask(item.ptId, doneIndex, 'done')"
-                  />
-                  <Icon v-if="item.importance == 1"
-                        size="20"
-                        type="ios-star"
-                        style="float: right;cursor:pointer;margin-right: 20px"
-                        @click="changeImportance(item, doneIndex, 'done')"
-                  />
-                  <Icon v-else
-                        size="20"
-                        type="ios-star-outline"
-                        style="float: right;cursor: pointer;margin-right: 20px"
-                        @click="changeImportance(item, doneIndex, 'done')"
-                  />
-                  <label style="margin-left: 10px;">{{item.content}}</label>
-                </Card>
+              <div :style="{height: contentHeight-contentHeightCompute+'px'}">
+                <vue-scroll :ops="ops">
+                  <div
+                    v-for="(item, doneIndex) in doneList"
+                    :key="doneIndex"
+                  >
+                    <Card class="customIcon">
+                      <Icon type="ios-checkmark-circle-outline" size="20" style="line-height: .8; cursor: pointer"
+                            @click="changeState(item, doneIndex)"/>
+                      <Icon type="ios-close" size="31"
+                            style="float: right;color: #ff7800;cursor: pointer; line-height: .8"
+                            @click="delTask(item.ptId, doneIndex, 'done')"
+                      />
+                      <Icon v-if="item.importance == 1"
+                            size="20"
+                            type="ios-star"
+                            style="float: right;cursor:pointer;margin-right: 20px"
+                            @click="changeImportance(item, doneIndex, 'done')"
+                      />
+                      <Icon v-else
+                            size="20"
+                            type="ios-star-outline"
+                            style="float: right;cursor: pointer;margin-right: 20px"
+                            @click="changeImportance(item, doneIndex, 'done')"
+                      />
+                      <label style="margin-left: 10px;">{{item.content}}</label>
+                    </Card>
 
+                  </div>
+                </vue-scroll>
               </div>
+
             </Card>
           </div>
         </Card>
@@ -148,13 +160,32 @@
           endTime: "",
           importance: "0",
           state: "doing"
-        }
+        },
+        contentHeight: "",
+        ops: {
+          bar: {
+            background: "#808695"
+          }
+        },
       }
     },
     mounted() {
       this.initTodoList();
+      this.resizeContent();
     },
     methods: {
+      resizeContent() {
+        if (window.innerHeight > 800) {
+          this.contentHeight = window.innerHeight - 120;
+        } else {
+          this.contentHeight = 800;
+        }
+        window.onresize = () => {
+          return (() => {
+            this.resizeContent();
+          })();
+        };
+      },
       initTodoList: function () {
         this.axios
           .get("/GeoProblemSolving/pTask/" + this.$store.getters.userId)
@@ -292,7 +323,17 @@
       }
     },
     //用一个计算属性动态捕捉doing/done List 的变化
-    computed: {},
+    computed: {
+      contentHeightCompute: function () {
+        let tempHeight = "";
+        if (this.selectedTaskType.length == 2){
+          tempHeight = 230;
+        }else if (this.selectedTaskType.length == 3){
+          tempHeight = 600;
+        }
+        return tempHeight;
+      }
+    },
   }
 </script>
 

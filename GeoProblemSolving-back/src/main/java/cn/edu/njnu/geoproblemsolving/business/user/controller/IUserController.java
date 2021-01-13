@@ -14,6 +14,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+import springfox.documentation.spring.web.json.Json;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -148,8 +149,13 @@ public class IUserController {
 
     @RequestMapping(produces = "application/json;charset=UTF-8", method = RequestMethod.PUT)
     public JsonResult updateUserInfo(@RequestBody User user){
-
         return null;
+    }
+
+    @RequestMapping(method = RequestMethod.PUT, value = "/quitProject")
+    public JsonResult updateUserPoject(HttpServletRequest  req){
+        JsonResult result = userDao.deleteUserProject(req);
+        return result;
     }
 
 

@@ -8,6 +8,7 @@ import cn.edu.njnu.geoproblemsolving.business.user.entity.UserDto;
 import cn.edu.njnu.geoproblemsolving.business.user.util.ICommonUtil;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import cn.edu.njnu.geoproblemsolving.common.utils.ResultUtils;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,6 +23,7 @@ import org.springframework.web.client.RestTemplate;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Repository
@@ -30,6 +32,7 @@ public class IUserImpl implements IUserDao {
     MongoTemplate mongoTemplate;
     @Value("${authServerIp}")
     String authServerIp;
+
     @Override
     public User findUserById(String userId) {
         //错误处理
@@ -37,7 +40,7 @@ public class IUserImpl implements IUserDao {
             Query query = new Query(Criteria.where("userId").is(userId));
             User user = mongoTemplate.findOne(query, User.class);
             return user;
-        }catch (Exception e){
+        } catch (Exception e) {
             throw e;
         }
     }
@@ -52,7 +55,7 @@ public class IUserImpl implements IUserDao {
             mongoTemplate.updateFirst(query, update, User.class);
             User newUser = mongoTemplate.findOne(query, User.class);
             return newUser;
-        }catch (Exception e){
+        } catch (Exception e) {
             return "Fail";
         }
     }
@@ -67,16 +70,16 @@ public class IUserImpl implements IUserDao {
     public Object saveUser(JSONObject remoteUser) {
         //JSONObject to Local User
         //只会把相同字段内容写入，多余字段不会写入
-        String userName = (String)remoteUser.get("name");
+        String userName = (String) remoteUser.get("name");
         remoteUser.remove("name");
         remoteUser.put("userName", userName);
         String organizations = remoteUser.get("organizations").toString();
         remoteUser.remove("organizations");
         remoteUser.put("organization", organizations);
         UserDto localUser = JSONObject.toJavaObject(remoteUser, UserDto.class);
-        try{
+        try {
             mongoTemplate.save(localUser);
-        }catch (Exception e){
+        } catch (Exception e) {
             return e;
         }
         return localUser;
@@ -87,7 +90,7 @@ public class IUserImpl implements IUserDao {
         try {
             User localUser = mongoTemplate.save(user);
             return localUser;
-        }catch (Exception e){
+        } catch (Exception e) {
             return e;
         }
     }
@@ -95,35 +98,35 @@ public class IUserImpl implements IUserDao {
     @Override
     public JsonResult getJoinedProjectList(String[] projectIdList) {
         ArrayList<Project> projects = new ArrayList<>();
-        for (int i=0; i<projectIdList.length; i++){
+        for (int i = 0; i < projectIdList.length; i++) {
             try {
                 Query query = new Query(Criteria.where("_id").is(projectIdList[i]));
                 Project project = mongoTemplate.findOne(query, Project.class);
                 projects.add(project);
-            }catch (Exception e){
-                return ResultUtils.error(-1,"Fail");
+            } catch (Exception e) {
+                return ResultUtils.error(-1, "Fail");
             }
         }
         return ResultUtils.success(projects);
     }
 
     @Override
-    public JsonResult getUserInfo(String key, String value){
-        try{
+    public JsonResult getUserInfo(String key, String value) {
+        try {
             Query query = new Query(Criteria.where(key).is(value));
             InquiryUserDto user = mongoTemplate.findOne(query, InquiryUserDto.class);
-            if(user == null){
+            if (user == null) {
                 return ResultUtils.error(-1, "Fail: user does not exist.");
             } else {
                 return ResultUtils.success(user);
             }
-        } catch (Exception ex){
+        } catch (Exception ex) {
             return ResultUtils.error(-2, "Fail: Exception");
         }
     }
 
     @Override
-    public JsonResult addUserInfo(JSONObject jsonObject){
+    public JsonResult addUserInfo(JSONObject jsonObject) {
         try {
             RestTemplate restTemplate = new RestTemplate();
 //            LinkedMultiValueMap<String, Object> valueMap = new LinkedMultiValueMap<>();
@@ -137,13 +140,13 @@ public class IUserImpl implements IUserDao {
             httpHeaders.setContentType(mediaType);
             HttpEntity<Object> httpEntity = new HttpEntity<>(jsonObject.toString(), httpHeaders);
             ResponseEntity<JSONObject> registerResult = restTemplate.exchange(url, HttpMethod.POST, httpEntity, JSONObject.class);
-            int resCode = (int)registerResult.getBody().get("code");
-            if (resCode == 0){
+            int resCode = (int) registerResult.getBody().get("code");
+            if (resCode == 0) {
                 User user = registerResult.getBody().getJSONObject("data").toJavaObject(User.class);
                 return ResultUtils.success(mongoTemplate.save(user));
-            }else if (resCode == -3){
+            } else if (resCode == -3) {
                 return ResultUtils.error(-3, "Fail: user already exists in the database.");
-            }else {
+            } else {
                 return ResultUtils.error(-2, (String) registerResult.getBody().get("msg"));
             }
 
@@ -155,7 +158,7 @@ public class IUserImpl implements IUserDao {
 
 //            return ResultUtils.success(mongoTemplate.save(user));
 
-        } catch (Exception ex){
+        } catch (Exception ex) {
             return ResultUtils.error(-2, "Fail: Exception");
         }
     }
@@ -172,14 +175,14 @@ public class IUserImpl implements IUserDao {
         try {
             User user = mongoTemplate.findOne(query, User.class);
             ArrayList<ResourcePojo> resources = user.getResources();
-            if (resources == null){
+            if (resources == null) {
                 resources = new ArrayList<ResourcePojo>();
             }
             resources.add(res);
             update.set("resources", resources);
             mongoTemplate.updateFirst(query, update, User.class);
             return ResultUtils.success(mongoTemplate.findOne(query, User.class));
-        }catch (Exception e){
+        } catch (Exception e) {
             return ResultUtils.error(-2, "Failed to update user resource filed.");
         }
     }
@@ -192,26 +195,26 @@ public class IUserImpl implements IUserDao {
             ArrayList<ResourcePojo> resources = user.getResources();
             //ArrayList 的动态删除
             ArrayList<Integer> indexArray = new ArrayList<>();
-            for (int i = 0; i < rids.length; i++){
-                for (int index =0; index < resources.size(); index++){
+            for (int i = 0; i < rids.length; i++) {
+                for (int index = 0; index < resources.size(); index++) {
                     String address = resources.get(index).getAddress();
                     String rid = address.split("//data//")[1];
-                    if (rid.equals(rids[i])){
+                    if (rid.equals(rids[i])) {
                         indexArray.add(index);
                         break;
                     }
                 }
             }
             indexArray.sort(Comparator.naturalOrder());
-            for (int j=0; j < indexArray.size(); j++){
+            for (int j = 0; j < indexArray.size(); j++) {
                 resources.remove(indexArray.get(j) - j);
             }
             Update update = new Update();
             update.set("resources", resources);
-            mongoTemplate.updateFirst(query ,update, User.class);
+            mongoTemplate.updateFirst(query, update, User.class);
             return ResultUtils.success();
 
-        }catch (Exception e){
+        } catch (Exception e) {
             return ResultUtils.error(-2, "Delete local user field failed.");
         }
     }
@@ -220,14 +223,14 @@ public class IUserImpl implements IUserDao {
     public JsonResult sharedUserRes(String email, ArrayList<ResourcePojo> res) {
         Query query = new Query(Criteria.where("email").is(email));
         User user = mongoTemplate.findOne(query, User.class);
-        if (user == null){
+        if (user == null) {
             return ResultUtils.error(-3, "No such user, please check if the email is correct.");
         }
         ArrayList<ResourcePojo> resources = user.getResources();
-        if (resources == null){
+        if (resources == null) {
             resources = new ArrayList<ResourcePojo>();
         }
-        for (ResourcePojo resourcePojo: res){
+        for (ResourcePojo resourcePojo : res) {
             resources.add(resourcePojo);
         }
         Update update = new Update();
@@ -236,5 +239,43 @@ public class IUserImpl implements IUserDao {
         //还得更新远端内容，暂时不写
 
         return ResultUtils.success();
+    }
+
+    @Override
+    public JsonResult deleteUserProject(HttpServletRequest req) {
+        String userId = req.getParameter("userId");
+        String projectId = req.getParameter("projectId");
+        Update update = new Update();
+        Query query = new Query(Criteria.where("userId").is(userId));
+        Query projectQuery = new Query(Criteria.where("aid").is(projectId));
+        try {
+            User user = mongoTemplate.findOne(query, User.class);
+            ArrayList<String> joinedProjects = user.getJoinedProjects();
+            for (int i = 0; i < joinedProjects.size(); i++) {
+                if (joinedProjects.get(i).equals(projectId)) {
+                    joinedProjects.remove(i);
+                }
+            }
+            update.set("joinedProjects", joinedProjects);
+            mongoTemplate.updateFirst(query, update, User.class);
+
+            //更新项目成员信息
+            Project updateProject = mongoTemplate.findOne(projectQuery, Project.class);
+            JSONArray members = updateProject.getMembers();
+            for (int i=0; i<members.size(); i++){
+                String quitUserId = members.getJSONObject(i).getString("userId");
+                if (quitUserId.equals(userId)){
+                    members.remove(i);
+                }
+            }
+            Update projectUpdate = new Update();
+            projectUpdate.set("members", members);
+            mongoTemplate.updateFirst(projectQuery, projectUpdate, Project.class);
+
+            return ResultUtils.success();
+        }catch (Exception e){
+            return ResultUtils.error(-2, "Fail");
+        }
+
     }
 }

@@ -2,36 +2,102 @@
   <div>
     <Row>
       <Col span="8" offset="8">
-        <div>
-          <img
-            v-bind:src="userInfo.avatar"
-            v-if="userInfo.avatar!=''&&userInfo.avatar!=undefined&&userInfo.avatar!=null"
-            :title="userInfo.name"
-            style="width:40px;height:40px;vertical-align:middle;"
-          />
-          <avatar
-            :username="userInfo.name"
-            :size="40"
-            style="margin-top:10px"
-            :title="userInfo.name"
-            v-else
-          />
-          <div>
-            <span style="font-size: 18px">Welcome,</span>
-            <span style="color: #0056b3; font-size: 18px">{{userInfo.name}}</span>
-          </div>
+        <div style="text-align: center;font-family: 'Roboto Light'">
+          <h2>Personal Information</h2>
+          <span style="font-size: 14px;font-family: 'Roboto Light'">Basic information you use in Geo-problem solving platform</span>
         </div>
+        <div>
+          <Card>
+            <div slot="title">
+              <Icon type="ios-contact" size="20"/>
+              About {{userInfo.name}}
+            </div>
+            <List>
+              <ListItem>
+                <span class="uTitle">Name</span>
+                <div class="uAlign">
+                  <span class="uContent">{{userInfo.name}}</span>
+                </div>
+              </ListItem>
+              <ListItem>
+                <span class="uTitle">Title</span>
+                <div class="uAlign">
+                  <span class="uContent">{{userInfo.title}}</span>
+                </div>
+              </ListItem>
+              <ListItem>
+                <span class="uTitle">Organizations</span>
+                <div class="uAlign">
+                  <span class="uContent">{{myOrganizations}}</span>
+                </div>
+              </ListItem>
+              <ListItem>
+                <span class="uTitle">Domain</span>
+                <div class="uAlign">
+                  <span class="uContent">{{myDomain}}</span>
+                </div>
+              </ListItem>
+              <ListItem>
+                <span class="uTitle">Phone</span>
+                <div class="uAlign">
+                  <span class="uContent">{{userInfo.phone}}</span>
+                </div>
+              </ListItem>
+              <ListItem>
+                <span class="uTitle">Country</span>
+                <div class="uAlign">
+                  <span class="uContent">{{userInfo.country}}</span>
+                </div>
+              </ListItem>
+              <ListItem>
+                <span class="uTitle">State/Province</span>
+                <div class="uAlign">
+                  <span class="uContent">{{userInfo.privacy}}</span>
+                </div>
+              </ListItem>
+              <ListItem>
+                <span class="uTitle">City</span>
+                <div class="uAlign">
+                  <span class="uContent">{{userInfo.city}}</span>
+                </div>
+              </ListItem>
+            </List>
+            <div style="margin-top: 30px;text-align: right">
+              <Button  @click="showEditUserInfoModal" type="info" style="margin-right: 20px">Edit Information</Button>
+              <Button @click="showResetPwdModal" type="info">Change Password</Button>
+            </div>
+          </Card>
+        </div>
+        <!--        <div style="margin: 0 auto">-->
+        <!--          <img-->
+        <!--            v-bind:src="userInfo.avatar"-->
+        <!--            v-if="userInfo.avatar!=''&&userInfo.avatar!=undefined&&userInfo.avatar!=null"-->
+        <!--            :title="userInfo.name"-->
+        <!--            style="width:40px;height:40px;vertical-align:middle;"-->
+        <!--          />-->
+        <!--          <avatar-->
+        <!--            :username="userInfo.name"-->
+        <!--            :size="40"-->
+        <!--            style="margin-top:10px"-->
+        <!--            :title="userInfo.name"-->
+        <!--            v-else-->
+        <!--          />-->
+        <!--          <div>-->
+        <!--            <span style="font-size: 18px">Welcome,</span>-->
+        <!--            <span style="color: #0056b3; font-size: 18px">{{userInfo.name}}</span>-->
+        <!--          </div>-->
+        <!--        </div>-->
 
-        <Card>
-          <p slot="title">Personal Information</p>
-          <div>Name: {{userInfo.name}}</div>
-          <div>Email: {{userInfo.email}}</div>
-          <div>Organizations: {{myOrganizations}}</div>
-          <hr/>
-          <Button @click="showEditUserInfoModal">Edit Information</Button>
-          <br/>
-          <Button @click="showResetPwdModal">Change Password</Button>
-        </Card>
+        <!--        <Card>-->
+        <!--          <p slot="title">Personal Information</p>-->
+        <!--          <div>Name: <span style="margin-left: 10px;font-size: 15px">{{userInfo.name}}</span></div>-->
+        <!--          <div style="margin-top: 20px">Email: <span style="margin-left: 10px;font-size: 15px">{{userInfo.email}}</span></div>-->
+        <!--          <div style="margin-top: 20px">Organizations: <span style="margin-left: 10px;font-size: 15px">{{myOrganizations}}</span></div>-->
+        <!--          <hr/>-->
+<!--                  <Button @click="showEditUserInfoModal">Edit Information</Button>-->
+<!--                  <br/>-->
+<!--                  <Button @click="showResetPwdModal">Change Password</Button>-->
+<!--                </Card>-->
       </Col>
       <!-- 两个卡片 -->
     </Row>
@@ -65,7 +131,7 @@
             </Select>
           </FormItem>
 
-<!--          @tags-changed="(newTags) => (userInfoFormItems.organizations = newTags)"-->
+          <!--          @tags-changed="(newTags) => (userInfoFormItems.organizations = newTags)"-->
           <FormItem label="Organizations">
             <vue-tags-input
               class="organization"
@@ -112,14 +178,15 @@
           </FormItem>
         </Form>
       </div>
-      <Button
-        slot="footer"
-        type="primary"
-        @click="updateUserInfo"
-      >Submit
-      </Button>
+      <div slot="footer">
+        <Button @click="editUserInfoModal = false">Cancel</Button>
+        <Button
+          type="primary"
+          @click="updateUserInfo"
+        >Save changes
+        </Button>
+      </div>
     </Modal>
-
 
     <Modal v-model="resetPasswordModal">
       <Form ref="formValidate" :model="resetPwdFormItems" :rules="resetPwdRuleValidate">
@@ -155,11 +222,11 @@
     },
     data() {
       const validatePass = (rule, value, callback) => {
-        if (value === ''){
+        if (value === '') {
           callback(new Error('Please enter your password.'));
-        }else if (value !== this.resetPwdFormItems.newPwd){
+        } else if (value !== this.resetPwdFormItems.newPwd) {
           callback(new Error('The two input passwords do not match!'))
-        }else {
+        } else {
           callback();
         }
       }
@@ -268,17 +335,17 @@
     mounted() {
     },
     methods: {
-      orgTags: function(tags){
+      orgTags: function (tags) {
         let orgs = [];
         console.log(tags)
-        for (let i = 0; i < tags.length; i++){
+        for (let i = 0; i < tags.length; i++) {
           orgs.push(tags[i].text);
         }
         this.userInfoFormItems.organizations = orgs;
       },
-      domainTags: function(tags){
+      domainTags: function (tags) {
         let domainTags = [];
-        for (let i = 0; i < tags.length; i++){
+        for (let i = 0; i < tags.length; i++) {
           domainTags.push(tags[i].text);
         }
         this.userInfoFormItems.domain = domainTags;
@@ -310,12 +377,12 @@
         formData.append("homepage", this.userInfoFormItems.homepage);
         this.$axios
           .post("/GeoProblemSolving/user/update", formData)
-          .then(res=>{
+          .then(res => {
             this.userInfo = this.userInfoFormItems;
-            this.editUserInfoModal =false;
+            this.editUserInfoModal = false;
             this.$Notice.success({title: "Update Success."})
           })
-          .catch(err=>{
+          .catch(err => {
 
           })
       },
@@ -359,14 +426,23 @@
         let orgTemp = "";
         if (this.userInfo.organizations != null) {
           for (let i = 0; i < this.userInfo.organizations.length; i++) {
-            orgTemp += this.userInfo.organizations[i] + "; ";
+            orgTemp += this.userInfo.organizations[i] + "  ";
           }
         }
         return orgTemp;
       },
+      myDomain: function(){
+        let domainTemp = "";
+        if (this.userInfo.domain != null){
+          for (let i = 0; i < this.userInfo.domain.length; i++) {
+            domainTemp += this.userInfo.domain[i] + "  ";
+          }
+        }
+        return domainTemp;
+      },
       orgsTags: function () {
         let tempOrgs = [];
-        for (let i =0; i<this.organizationTags.length;i++){
+        for (let i = 0; i < this.organizationTags.length; i++) {
           tempOrgs.push(this.organizationTags[i].text);
         }
         return this.userInfoFormItems.organizations;
@@ -399,5 +475,19 @@
   .formStyle {
     display: flex;
     justify-content: center;
+  }
+  .uTitle {
+    padding-right: 20px;
+    font-family: 'Roboto Light';
+    color: #999999
+  }
+  .uContent {
+    color: #333333;
+  }
+  .uAlign {
+    position: absolute;
+    left: 100px;
+    text-align: left;
+    width: 200px
   }
 </style>

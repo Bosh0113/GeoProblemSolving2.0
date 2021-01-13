@@ -40,4 +40,7 @@ public interface IUserDao {
     JsonResult sharedUserRes(String email, ArrayList<ResourcePojo> res);
 
 
+    //用户项目字段相关
+    JsonResult deleteUserProject(HttpServletRequest req);
+
 }
