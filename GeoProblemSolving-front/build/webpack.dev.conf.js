@@ -83,7 +83,13 @@ module.exports = new Promise((resolve, reject) => {
       devWebpackConfig.plugins.push(new FriendlyErrorsPlugin({
         compilationSuccessInfo: {
           messages: [`Your application is running here: http://${devWebpackConfig.devServer.host}:${port}`],
+          // messages: [
+          //   `App runing at: `,
+          //   `Local: http://localhost:${port}`,
+          //   `Network: http://${require('ip').address()}:${port}`,
+          // ],
         },
+        
         onErrors: config.dev.notifyOnErrors
         ? utils.createNotifierCallback()
         : undefined

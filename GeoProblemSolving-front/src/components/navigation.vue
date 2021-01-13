@@ -111,9 +111,9 @@ footer {
               <MenuItem name="resources" class="menuItem">
                 <span>Resources</span>
               </MenuItem>
-              <MenuItem name="toolsCenter" class="menuItem">
+              <!-- <MenuItem name="toolsCenter" class="menuItem">
                 <span>Tools</span>
-              </MenuItem>
+              </MenuItem> -->
               <!-- <MenuItem name="community" class="menuItem">
                 <span>Community</span>
               </MenuItem>-->

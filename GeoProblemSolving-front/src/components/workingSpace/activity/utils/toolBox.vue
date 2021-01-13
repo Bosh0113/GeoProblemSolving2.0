@@ -357,7 +357,6 @@ export default {
         let data = await get(
           `/GeoProblemSolving/tool/inquiry?key=tid&value=${toolIds[i]}`
         );
-        console.log(data);
         ToolInfos.push(data[0]);
         if (--flagCount < 1) {
           var sortTools = [];

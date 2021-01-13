@@ -120,9 +120,9 @@
                             <menu-item name="resources" class="menuItem" to="/GeoProblemSolving/publicResource">
                                 <span>Resources</span>
                             </menu-item>
-                            <menu-item name="toolsCenter" class="menuItem" to="/GeoProblemSolving/toolsCenter">
-                                <span>Tools</span>
-                            </menu-item>
+<!--                            <menu-item name="toolsCenter" class="menuItem" to="/GeoProblemSolving/toolsCenter">-->
+<!--                                <span>Tools</span>-->
+<!--                            </menu-item>-->
                             <menu-item name="help" class="menuItem" to="/GeoProblemSolving/help">
                                 <span>Help</span>
                             </menu-item>
@@ -170,7 +170,7 @@
                             <Cell @click.native="turnToURL('/GeoProblemSolving/home')" class="menuItemCell">Home</Cell>
                             <Cell @click.native="turnToURL('/GeoProblemSolving/projectList')" class="menuItemCell">Projects</Cell>
                             <Cell @click.native="turnToURL('/GeoProblemSolving/publicResource')" class="menuItemCell">Resources</Cell>
-                            <Cell @click.native="turnToURL('/GeoProblemSolving/toolsCenter')" class="menuItemCell">Tools</Cell>
+<!--                            <Cell @click.native="turnToURL('/GeoProblemSolving/toolsCenter')" class="menuItemCell">Tools</Cell>-->
                             <Cell @click.native="turnToURL('/GeoProblemSolving/help')" class="menuItemCell">Help</Cell>
                             <Divider style="margin: 5px 0"></Divider>
                             <Cell v-show="!userInfoNav.userState" @click.native="turnToURL('/GeoProblemSolving/login')" class="menuItemCell">Login</Cell>

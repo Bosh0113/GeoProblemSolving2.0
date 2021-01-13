@@ -198,9 +198,9 @@ export default {
         this.$store.getters.userState &&
         this.$store.getters.userId == userId
       ) {
-        window.location.href(
+        window.location.href =
           "/GeoProblemSolving/projectInfo/" + this.$route.params.id
-        );
+        ;
       } else if (!this.$store.getters.userState) {
         this.autoLogin();
       } else if (this.$store.getters.userId != userId) {
@@ -255,9 +255,8 @@ export default {
             this.$Message.error("Invalid account or password.");
           } else {
             this.$store.commit("userLogin", res.data);
-            window.location.href(
-              "/GeoProblemSolving/projectInfo/" + this.$route.params.id
-            );
+            window.location.href = 
+              "/GeoProblemSolving/projectInfo/" + this.$route.params.id;
           }
         });
     },
