@@ -63,13 +63,7 @@ const routes = [
             path: "userInfo",
             name: "userInfo",
             component: resolve => require(["@/components/user/subPage/userInfo"], resolve)
-          },
-          {
-            path: "notification",
-            name: "notification",
-            component: resolve => require(["@/components/user/subPage/notification"], resolve)
-          },
-
+          }
 
         ]
       },

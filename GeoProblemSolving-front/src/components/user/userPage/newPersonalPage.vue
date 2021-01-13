@@ -18,6 +18,11 @@
     padding-left: 30px;
   }
 
+  label {
+    font-family: Lato,sans-serif;
+    font-size: 16px
+  }
+
   .sideContainer {
     height: 100%;
     padding-bottom: 150px;
@@ -42,52 +47,52 @@
   <div>
     <Row>
       <Col span="3">
-        <Menu style="height: calc(100vh - 120px)" >
+        <Menu style="height: calc(100vh - 120px);z-index: 2;" width="auto" :active-name="$route.name">
           <MenuGroup>
-            <MenuItem name="overView" to="overView">
+            <MenuItem name="overView" to="overView" class="sideItem">
               <Icon type="ios-book" size="25"/>
-              <label style="font-family: 'Open Sans', sans-serif; font-size: 16px">Overview</label>
+              <label>Overview</label>
             </MenuItem>
 
-            <MenuItem name="project" to="project">
+            <MenuItem name="project" to="project" class="sideItem">
               <Icon type="ios-cube" size="25"/>
-              <label style="font-family: 'Open Sans', sans-serif; font-size: 16px">Project</label>
+              <label>Project</label>
             </MenuItem>
 
 
-            <MenuItem name="resource" to="resource">
+            <MenuItem name="resource" to="resource" class="sideItem">
               <Icon type="ios-cloud" size="25"/>
-              <label style="font-family: 'Open Sans', sans-serif; font-size: 16px">Resource</label>
+              <label>Resource</label>
             </MenuItem>
 
-            <MenuItem name="tool" to="tool">
+            <MenuItem name="tool" to="tool" class="sideItem">
               <Icon type="ios-cog" size="25"/>
-              <label style="font-family: 'Open Sans', sans-serif; font-size: 16px">Tool</label>
+              <label>Tool</label>
 
             </MenuItem>
 
-            <MenuItem name="todoList" to="todoList">
+            <MenuItem name="todoList" to="todoList" class="sideItem">
               <Icon type="ios-clipboard" size="25"/>
-              <label style="font-family: 'Open Sans', sans-serif; font-size: 16px">Todo List</label>
+              <label>Todo List</label>
             </MenuItem>
           </MenuGroup>
 
-          <MenuGroup>
-            <MenuItem name="userInfo" to="userInfo">
+          <MenuGroup >
+            <MenuItem name="userInfo" to="userInfo" class="sideItem">
               <Icon type="ios-contact-outline" size="25"/>
-              <label style="font-family: 'Open Sans', sans-serif; font-size: 16px">My Account</label>
+              <label>My Account</label>
             </MenuItem>
 
-            <MenuItem name="notification" to="notification">
+            <MenuItem name="notification" to="notification" class="sideItem">
               <Icon type="ios-list" size="25"/>
-              <label style="font-family: 'Open Sans', sans-serif; font-size: 16px">Message</label>
+              <label>Message</label>
             </MenuItem>
           </MenuGroup>
         </Menu>
       </Col>
 
       <Col span="19" offset="1">
-        <router-view style="margin-top: 30px"></router-view>
+        <router-view style="margin-top: 60px"></router-view>
       </Col>
     </Row>
 
@@ -105,6 +110,13 @@
   import tool from "../subPage/tool";
 
   export default {
+    beforeRouteEnter: (to, from, next) => {
+      next(vm => {
+        if (!vm.$store.getters.userState || vm.$store.getters.userId == "") {
+          vm.$router.push({ name: "Login" });
+        }
+      });
+    },
     name: "newPersonalPage",
     components: {
       Project,
@@ -117,8 +129,24 @@
     },
     data() {
       return {
+        menuWidth: "",
       }
     },
+
+    methods: {
+      resizeContent() {
+        if (window.innerHeight > 1440) {
+          this.menuWidth = 240;
+        } else {
+          this.menuWidth = 170;
+        }
+        window.onresize = () => {
+          return (() => {
+            this.resizeContent();
+          })();
+        };
+      },
+    }
   }
 </script>
 

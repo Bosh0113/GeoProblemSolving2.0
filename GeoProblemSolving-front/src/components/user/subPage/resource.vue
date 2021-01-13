@@ -1,16 +1,16 @@
 <template>
   <div>
     <Row>
-      <Col span="20" offset="1">
+      <Col span="20">
         <Card dis-hover>
           <CheckboxGroup v-model="checkedType">
             <Checkbox label="public">
-              <span>Private</span>
-              <span class="badge">{{privateResList.length}}</span>
-            </Checkbox>
-            <Checkbox label="private">
               <span>Public</span>
               <span class="badge">{{publicResList.length}}</span>
+            </Checkbox>
+            <Checkbox label="private">
+              <span>Private</span>
+              <span class="badge">{{privateResList.length}}</span>
             </Checkbox>
           </CheckboxGroup>
         </Card>
@@ -21,7 +21,7 @@
             <div slot="extra">
               <Icon type="md-cloud-upload"
                     size="25"
-                    @click="uploadModal = true"
+                    @click="showUploadModal"
                     style="cursor: pointer"
               />
               <Icon type="md-cloud-download"
@@ -41,8 +41,10 @@
                     @click="confirmDelModal = true"
               />
             </div>
+
             <Table
               ref="selection" stripe
+              :height="contentHeight-230"
               :columns="colName"
               no-data-text="There aren't any resources."
               :data="showedResList"
@@ -53,39 +55,6 @@
           </Card>
         </div>
       </Col>
-
-<!--      <Col span="4">-->
-<!--        <Card dis-hover class="historyLine">-->
-<!--          <p slot="title">Event line</p>-->
-<!--          <div class="timeLineStyle">-->
-<!--            <vue-scroll :ops="ops">-->
-<!--              &lt;!&ndash;            <Timeline>&ndash;&gt;-->
-<!--              &lt;!&ndash;              <div v-if="userEventList.length==0">&ndash;&gt;-->
-<!--              &lt;!&ndash;                <div style="display:flex;justify-content:center">&ndash;&gt;-->
-<!--              &lt;!&ndash;                  <Icon type="md-alert" size="40" color="gray" />&ndash;&gt;-->
-<!--              &lt;!&ndash;                </div>&ndash;&gt;-->
-<!--              &lt;!&ndash;                <br />&ndash;&gt;-->
-<!--              &lt;!&ndash;                <div style="display:flex;justify-content:center">&ndash;&gt;-->
-<!--              &lt;!&ndash;                  <h3&ndash;&gt;-->
-<!--              &lt;!&ndash;                    style="text-align:center;width:80%"&ndash;&gt;-->
-<!--              &lt;!&ndash;                  >Sorry, there are no events now.</h3>&ndash;&gt;-->
-<!--              &lt;!&ndash;                </div>&ndash;&gt;-->
-<!--              &lt;!&ndash;              </div>&ndash;&gt;-->
-<!--              &lt;!&ndash;              <TimelineItem&ndash;&gt;-->
-<!--              &lt;!&ndash;                v-for="(item,index) in userEventList"&ndash;&gt;-->
-<!--              &lt;!&ndash;                :key="index"&ndash;&gt;-->
-<!--              &lt;!&ndash;                v-show="userEventList.length>0"&ndash;&gt;-->
-<!--              &lt;!&ndash;              >&ndash;&gt;-->
-<!--              &lt;!&ndash;                <strong>&ndash;&gt;-->
-<!--              &lt;!&ndash;                  <p class="time">{{item.createTime}}</p>&ndash;&gt;-->
-<!--              &lt;!&ndash;                </strong>&ndash;&gt;-->
-<!--              &lt;!&ndash;                <p class="content">{{item.description}}</p>&ndash;&gt;-->
-<!--              &lt;!&ndash;              </TimelineItem>&ndash;&gt;-->
-<!--              &lt;!&ndash;            </Timeline>&ndash;&gt;-->
-<!--            </vue-scroll>-->
-<!--          </div>-->
-<!--        </Card>-->
-<!--      </Col>-->
     </Row>
 
 
@@ -136,7 +105,7 @@
       </Upload>
 
       <div style="padding:0 10px 0 10px;max-height:200px;overflow-y:auto">
-        <ul v-for="(list,index) in toUploadFiles" :key="index">
+        <ul v-for="(list,index) in toUploadFiles" :key="'A'+index">
           <li style="display:flex">
             File name:
             <span
@@ -168,8 +137,12 @@
     </Modal>
 
 
-    <Modal v-model="confirmDelModal" width="300" title="Are your sure to delete">
-      <div style="font-family: 'Open Sans', sans-serif; font-size: 16px; font-weight: bold">{{selectedResName}}</div>
+    <Modal v-model="confirmDelModal" width="350" title="Are your sure to delete">
+      <div style="height: 200px">
+        <vue-scroll :ops="ops">
+          <div style="font-family: 'Open Sans', sans-serif; font-size: 16px; font-weight: bold">{{selectedResName}}</div>
+        </vue-scroll>
+      </div>
       <div slot="footer">
         <Button
           type="warning"
@@ -330,15 +303,31 @@
           type: [
             {required: true, message: "File type cannot be empty", trigger: "blur"}
           ],
-        }
+        },
+        contentHeight: ""
 
       }
     },
-    mounted() {
-      this.getUserResource();
+    created() {
       this.getUserProject();
     },
+    mounted() {
+      this.getUserResource();
+      this.resizeContent();
+    },
     methods: {
+      resizeContent() {
+        if (window.innerHeight > 675) {
+          this.contentHeight = window.innerHeight - 120;
+        } else {
+          this.contentHeight = 555;
+        }
+        window.onresize = () => {
+          return (() => {
+            this.resizeContent();
+          })();
+        };
+      },
       getUserResource() {
         this.axios
           .get(
@@ -381,12 +370,18 @@
               .delete("/GeoProblemSolving/resource/deleteRemote/" + this.$store.getters.userId + "?rid=" + rid)
               .then(res => {
                 if (res.data.code == 0){
-                  let index = this.publicResList.indexOf(this.selectedResList[0]);
-                  if (index != -1){
-                    this.publicResList.splice(index, 1);
+                  if (this.selectedResList[0].privacy == "private"){
+                    for (let i=0;i<this.privateResList.length; i++){
+                      if (this.selectedResList[0].resourceId == this.privateResList[i].resourceId){
+                        this.privateResList.splice(i, 1);
+                      }
+                    }
                   }else {
-                    index = this.privateResList.indexOf(this.selectedResList[0]);
-                    this.privateResList.splice(index, 1);
+                    for (let i=0;i<this.publicResList.length; i++){
+                      if (this.selectedResList[0].resourceId == this.publicResList[i].resourceId){
+                        this.publicResList.splice(i, 1);
+                      }
+                    }
                   }
                   this.confirmDelModal = false;
                   this.selectedResList = [];
@@ -412,13 +407,20 @@
               .then(res => {
                 if (res.data.code == 0){
                   for (let i =0; i < this.selectedResList.length; i++){
-                    let index = this.publicResList.indexOf(this.selectedResList[i]);
-                    if (index != -1){
-                      this.publicResList.splice(index, 1);
-
+                    let selectedResId = this.selectedResList[i].resourceId;
+                    let selectedResPrivacy = this.selectedResList[i].privacy;
+                    if (selectedResPrivacy == "public"){
+                      for (let j = 0; j<this.publicResList.length; j++){
+                        if (this.publicResList[j].resourceId == selectedResId){
+                          this.publicResList.splice(j, 1);
+                        }
+                      }
                     }else {
-                      index = this.privateResList.indexOf(this.selectedResList[i]);
-                      this.privateResList.splice(index, 1);
+                      for (let j = 0; j<this.privateResList.length; j++){
+                        if (this.privateResList[j].resourceId == selectedResId){
+                          this.privateResList.splice(j, 1);
+                        }
+                      }
                     }
                   }
                   this.confirmDelModal = false;
@@ -440,19 +442,23 @@
         let projectIds = "";
         if (userInfo.createdProjects != null) {
           for (let i = 0; i < userInfo.createdProjects.length; i++) {
-            if (i != userInfo.createdProjects.length - 1) {
+            if (userInfo.joinedProjects != null){
               projectIds += userInfo.createdProjects[i] + ","
-            } else {
-              projectIds += userInfo.createdProjects[i]
+            }else if (userInfo.joinedProjects == null){
+              if (i != userInfo.createdProjects.length - 1) {
+                projectIds += userInfo.createdProjects[i] + ","
+              } else {
+                projectIds += userInfo.createdProjects[i]
+              }
             }
           }
         }
         if (userInfo.joinedProjects != null) {
-          for (let i = 0; i < userInfo.joinedProjects.length; i++) {
-            if (i != userInfo.joinedProjects.length - 1) {
-              projectIds += userInfo.joinedProjects[i] + ","
+          for (let j = 0; j < userInfo.joinedProjects.length; j++) {
+            if (j != userInfo.joinedProjects.length - 1) {
+              projectIds += userInfo.joinedProjects[j] + ","
             } else {
-              projectIds += userInfo.joinedProjects[i]
+              projectIds += userInfo.joinedProjects[j]
             }
           }
         }
@@ -492,6 +498,9 @@
       },
       delFileList: function (index) {
         this.toUploadFiles.splice(index, 1);
+      },
+      showUploadModal: function(){
+        this.uploadModal = true;
       },
       resourceUpload: function (resForm) {
         this.$refs[resForm].validate(valid => {

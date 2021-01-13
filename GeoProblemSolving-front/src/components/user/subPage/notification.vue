@@ -1,8 +1,7 @@
 <template>
   <div>
     <Row>
-      <Col span="22" offset="1">
-
+      <Col span="20" >
         <Card dis-hover>
           <CheckboxGroup v-model="selectedNoticeType" style="display: inline-block">
             <Checkbox label="noticeList">
@@ -35,86 +34,92 @@
         <div>
           <Card dis-hover>
             <h3 slot="title">Notification Detail</h3>
-            <div v-if="selectNoteNum!=0">
-              <!--            添加滚动条     -->
-              <!--
-              未读消息(分三种 notice, reply, apply)
-              notice: 只有已读按钮
-              reply: 只有回复按钮
-              apply: 有同意与拒绝按钮
-                 -->
-              <div
-                v-if="readOrUnread.includes('unRead')"
-                v-for="(item, unreadIndex) in unReadNoteList"
-                :key="unreadIndex"
-              >
-                <!--                未读apply    -->
-                <div
-                  v-if="item.type=='apply'"
-                >
-                  <Card>
-                    <Badge dot>
-                      <h4 style="font-size: 15px">{{item.content.title}}</h4>
-                    </Badge>
-                    <br/>
-                    <p style="font-weight: 400; font-size: 17px">{{item.content.description}}</p>
-                    <small style="font-size: 13px">{{item.createTime}}</small>
-                    <Icon type="md-close" class="applyBtn" style="color: #ff9900" @click="refuseApply(item)"/>
-                    <Icon type="md-checkmark" class="applyBtn" style="color: #47cb89" @click="approveApply(item)"/>
-                  </Card>
-                </div>
-                <!--                未读 Notice    -->
-                <div
-                  v-if="item.type=='notice'"
-                >
-                  <Card>
-                    <Badge dot>
-                      <h4 style="font-size: 15px">{{item.content.title}}</h4>
-                    </Badge>
-                    <br/>
-                    <p style="font-weight: 400; font-size: 17px">{{item.content.description}}</p>
-                    <small style="font-size: 13px">{{item.createTime}}</small>
-                    <Icon type="md-checkmark" class="applyBtn" style="color: #47cb89" @click="readNotice(item.noticeId)"/>
-                  </Card>
-                </div>
-                <!--               未读 Reply  -->
-                <div
-                  v-if="item.type=='reply'"
-                >
-                  <Card>
-                    <Badge dot>
-                      <h4 style="font-size: 15px">{{item.content.title}}</h4>
-                    </Badge>
-                    <br/>
-                    <p style="font-weight: 400; font-size: 17px">{{item.content.description}}</p>
-                    <small style="font-size: 13px">{{item.createTime}}</small>
-                    <Icon type="md-checkmark" class="applyBtn" style="color: #47cb89"/>
-                  </Card>
-                </div>
-              </div>
+            <div :style="{height: contentHeight-230+'px'}">
+              <vue-scroll :ops="ops">
+                <div v-if="selectNoteNum!=0">
+                  <!--
+                  未读消息(分三种 notice, reply, apply)
+                  notice: 只有已读按钮
+                  reply: 只有回复按钮
+                  apply: 有同意与拒绝按钮
+                     -->
+                  <div
+                    v-if="readOrUnread.includes('unRead')"
+                    v-for="(item, unreadIndex) in unReadNoteList"
+                    :key="unreadIndex"
+                  >
+                    <!--                未读apply    -->
+                    <div
+                      v-if="item.type=='apply'"
+                    >
+                      <Card>
+                        <Badge dot>
+                          <h4 style="font-size: 15px">{{item.content.title}}</h4>
+                        </Badge>
+                        <br/>
+                        <p style="font-weight: 400; font-size: 17px">{{item.content.description}}</p>
+                        <small style="font-size: 13px">{{item.createTime}}</small>
+                        <Icon type="md-close" class="applyBtn" style="color: #ff9900" @click="refuseApply(item)"/>
+                        <Icon type="md-checkmark" class="applyBtn" style="color: #47cb89" @click="approveApply(item)"/>
+                      </Card>
+                    </div>
+                    <!--                未读 Notice    -->
+                    <div
+                      v-if="item.type=='notice'"
+                    >
+                      <Card>
+                        <Badge dot>
+                          <h4 style="font-size: 15px">{{item.content.title}}</h4>
+                        </Badge>
+                        <br/>
+                        <p style="font-weight: 400; font-size: 17px">{{item.content.description}}</p>
+                        <small style="font-size: 13px">{{item.createTime}}</small>
+                        <Icon type="md-checkmark" class="applyBtn" style="color: #47cb89" @click="readNotice(item.noticeId)"/>
+                      </Card>
+                    </div>
+                    <!--               未读 Reply  -->
+                    <div
+                      v-if="item.type=='reply'"
+                    >
+                      <Card>
+                        <Badge dot>
+                          <h4 style="font-size: 15px">{{item.content.title}}</h4>
+                        </Badge>
+                        <br/>
+                        <p style="font-weight: 400; font-size: 17px">{{item.content.description}}</p>
+                        <small style="font-size: 13px">{{item.createTime}}</small>
+                        <Icon type="md-checkmark" class="applyBtn" style="color: #47cb89"/>
+                      </Card>
+                    </div>
+                  </div>
 
-              <!--            已读消息不区分具体类型   仅有删除按钮    -->
-              <div
-                v-if="readOrUnread.includes('read')"
-                v-for="(item, readIndex) in readNoteList"
-                :key="readIndex"
-              >
-                <Card>
-<!--                  <h4 style="font-size: 13px">{{item.content.title}}</h4>-->
-                  <p slot="title">{{item.content.title}}</p>
-                  <p style="font-weight: 400; font-size: 15px">{{item.content.description}}</p>
-                  <small style="font-size: 11px">{{item.createTime}}</small>
-                  <Icon slot="extra" type="md-close" class="applyBtn" style="color: #ed4014" @click="deleteNotice(item)" />
-                </Card>
-              </div>
-            </div>
-            <!--          无通知消息  -->
-            <div v-else>
-              <Card>
-                <h1 style="color: darkgray; text-align: center;">No Notifications</h1>
-              </Card>
+                  <!--            已读消息不区分具体类型   仅有删除按钮    -->
+                  <div
+                    v-if="readOrUnread.includes('read')"
+                    v-for="(item, readIndex) in readNoteList"
+                    :key="readIndex"
+                  >
+                    <Card>
+                      <!--                  <h4 style="font-size: 13px">{{item.content.title}}</h4>-->
+                      <p slot="title">{{item.content.title}}</p>
+                      <p style="font-weight: 400; font-size: 15px">{{item.content.description}}</p>
+                      <small style="font-size: 11px">{{item.createTime}}</small>
+                      <Icon slot="extra" type="md-close" class="applyBtn" style="color: #ed4014" @click="deleteNotice(item)" />
+                    </Card>
+                  </div>
+                </div>
 
+                <!--          无通知消息  -->
+                <div v-else>
+                  <Card>
+                    <h1 style="color: darkgray; text-align: center;">No Notifications</h1>
+                  </Card>
+
+                </div>
+              </vue-scroll>
             </div>
+
+
           </Card>
         </div>
 
@@ -142,6 +147,7 @@
             background: "#808695"
           }
         },
+        contentHeight: "",
         readOrUnread: ["unRead"],
         selectedNoticeType: ["noticeList", "replyList", "applyList"]
       }
@@ -150,6 +156,7 @@
     },
     mounted() {
       this.loadNotifications();
+      this.resizeContent();
     },
     computed: {
       unReadCount: function () {
@@ -218,6 +225,18 @@
       }
     },
     methods: {
+      resizeContent() {
+        if (window.innerHeight > 675) {
+          this.contentHeight = window.innerHeight - 120;
+        } else {
+          this.contentHeight = 555;
+        }
+        window.onresize = () => {
+          return (() => {
+            this.resizeContent();
+          })();
+        };
+      },
       loadNotifications() {
         this.axios
           .get(
