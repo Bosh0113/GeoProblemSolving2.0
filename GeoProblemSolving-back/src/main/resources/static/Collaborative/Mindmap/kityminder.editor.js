@@ -5870,7 +5870,7 @@ angular.module('kityminderEditor')
                                                     if (data == "Size over" || data == "Fail" || data == "Offline") {
                                                         alert("Fail to save...");
                                                     }
-                                                    else if (data.failed.length > 0) {
+                                                    else if (data.failed != undefined && data.failed.length > 0) {
                                                         alert("Fail to save...");
                                                     }
                                                     else if (data.uploaded.length > 0) {

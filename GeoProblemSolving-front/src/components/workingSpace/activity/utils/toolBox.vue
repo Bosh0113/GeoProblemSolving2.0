@@ -357,7 +357,6 @@ export default {
         let data = await get(
           `/GeoProblemSolving/tool/inquiry?key=tid&value=${toolIds[i]}`
         );
-        console.log(data);
         ToolInfos.push(data[0]);
         if (--flagCount < 1) {
           var sortTools = [];
@@ -464,6 +463,7 @@ export default {
       }
 
       var toolURL = window.location.origin + `${toolInfo.toolUrl}`;
+      // var toolURL = toolInfo.toolUrl;
       var toolContent = `<iframe src="${toolURL}?userName=${this.userInfo.name}&userID=${this.userInfo.userId}&groupID=${this.activityInfo.aid}" style="width: 100%; height:100%;" frameborder="0"></iframe>`;
 
       var demoPanelTimer = null;

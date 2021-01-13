@@ -1085,7 +1085,7 @@ var ConceptTasksReadDialog = function (editorUi) {
 
     $.ajax({
         type: "GET",
-        url: 'http://' + RouteInfo.getIPPort() + '/GeoProblemSolving/folder/inquiry?folderId=' + groupID,
+        url: window.location.origin + '/GeoProblemSolving/folder/inquiry?folderId=' + groupID,
         success: function (data) {
             if (data == "Fail") {
                 alert("Read Task Fail!");
@@ -1093,12 +1093,13 @@ var ConceptTasksReadDialog = function (editorUi) {
                 str = '<div style="height:150px;width:400px;border:solid 1px #d5d5d5;margin:20px;text-align:center;"><h1>No saved task here.</h1></div>';
             } else {
                 var str = "";
+                var count = 0;
                 var jsonArray = data.files;
                 for (var i = 0; i < jsonArray.length; i++) {
                     if (jsonArray[i].type === "toolData: Conceptual_modeling") {
                         taskData.push(jsonArray[i]);
                         str += '<div style="height:150px;width:400px;border:solid 1px #d5d5d5;margin:20px;">\n' +
-                            '\t\t<input type="radio" name="tasks" id="task" value="' + i + '">\n' +
+                            '\t\t<input type="radio" name="tasks" id="task" value="' + count + '">\n' +
                             '\t\t<span style="font-weight:bold">' + jsonArray[i]["name"].substring(0, jsonArray[i]["name"].length - 5) + '</span>\n' +
                             '\t\t<span class="deleteTask" style="float:right;margin:5px;cursor:pointer;" data-projectid="' + jsonArray[i]["resourceId"] + '" onclick="deleteTask(this)">X</span>\n' +
                             '\t\t<div style="width:350px;height:100px;">\n' +
@@ -1106,6 +1107,7 @@ var ConceptTasksReadDialog = function (editorUi) {
                             '\t\t</div>\n' +
                             '\t\t<sub style="float:right;margin-right:15px;">' + jsonArray[i]["uploadTime"] + '</sub>\n' +
                             '\t</div>';
+                        count++;
                     }
                 }
             }
@@ -1140,12 +1142,13 @@ var ConceptTasksReadDialog = function (editorUi) {
             var name = taskData[$('input[name="tasks"]:checked').val()]["name"];
 
             window.taskID = taskData[$('input[name="tasks"]:checked').val()]["resourceId"];
-            window.taskName = name.substring(0, jsonArray[i]["name"].length - 5);
+            window.taskName = name.substring(0, name.length - 5);
             window.taskDescription = taskData[$('input[name="tasks"]:checked').val()]["description"];
 
 
             let xhr = new XMLHttpRequest();
-            xhr.open("get", url, true);
+            let fileUrl = taskData[$('input[name="tasks"]:checked').val()]["pathURL"];
+            xhr.open("get", fileUrl, true);
             xhr.responseType = "blob";
             xhr.onload = function () {
                 if (this.status == 200) {
@@ -1156,13 +1159,13 @@ var ConceptTasksReadDialog = function (editorUi) {
 
                         showGraph(editorUi.toolbar.editorUi.editor.graph, content.graphXML);
                         editorUi.toolbar.editorUi.editor.graph.setConceptItemList(content.conceptualXML);
+
+                        document.getElementById("graphName").value = name.substring(0, name.length - 5);
+                        document.getElementById("graphDescription").value = taskData[$('input[name="tasks"]:checked').val()]["description"];
                     }
                 }
             };
             xhr.send();
-
-            document.getElementById("graphName").value = name.substring(0, jsonArray[i]["name"].length - 5);
-            document.getElementById("graphDescription").value = taskData[$('input[name="tasks"]:checked').val()]["description"];
         }
         editorUi.hideDialog();
     });
@@ -1246,11 +1249,21 @@ var ConceptTasksSaveDialog = function (editorUi) {
     }
 
     var okBtn = mxUtils.button(mxResources.get('ok'), function () {
-        var url = window.location.href;
-        var reg = /groupID=(\S*)/;
-        var groupID = url.match(reg)[1];
-        reg = /userID=(\S*)/;
-        var userID = url.match(reg)[1];
+
+        var groupID = "";
+        var userID = "";
+        var url = window.location.href.split("&");
+
+        for (var i = 0; i < url.length; i++) {
+            if (/groupID/.test(url[i])) {
+                groupID = url[i].match(/groupID=(\S*)/)[1];
+                continue;
+            }
+            if (/userID/.test(url[i])) {
+                userID = url[i].match(/userID=(\S*)/)[1];
+                continue;
+            }
+        }
 
         var conceptualContent = {
             graphXML: graphContentXML,
@@ -1275,22 +1288,16 @@ var ConceptTasksSaveDialog = function (editorUi) {
         formData.append("folderId", groupID);
         formData.append("editToolInfo", JSON.stringify(toolInfo));
 
-        // var dataJSON=new Object();
-        // dataJSON["taskId"]="";
-        // dataJSON["taskName"]=$('#graphNameSave').val();
-        // dataJSON["description"]=$('#graphDescriptionSave').val();
-        // dataJSON["graphXML"]=graphContentXML;
-        // dataJSON["conceptualXML"]=ConceptualScene;
-        // dataJSON["collaborativeId"]=groupID;
         $.ajax({
+            url: window.location.origin + '/GeoProblemSolving/folder/uploadToFolder',
             type: "POST",
-            url: 'http://' + RouteInfo.getIPPort() + '/GeoProblemSolving/folder/uploadToFolder',
             data: formData,
-            dataType: "text",
+            processData: false,
+            contentType: false,
             success: function (data) {
                 if (data === "Size over" || data === "Fail" || data === "Offline") {
                     alert("Fail to save...");
-                } else if (data.failed.length > 0) {
+                } else if (data.failed != undefined && data.failed.length > 0) {
                     alert("Fail to save...");
                 } else if (data.uploaded.length > 0) {
                     alert("Success!");

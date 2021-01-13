@@ -503,13 +503,13 @@ export default {
                 this.nameConfirm.push(children[i].name);
               }
 
-              let root = Object.assign({}, this.projectInfo);
+              var root = Object.assign({}, this.projectInfo);
               this.nameConfirm.push(root.name);
               root["expand"] = true;
               root["children"] = children;
 
               // update activity tree
-              this.activityTree = [root];
+              this.activityTree.push(root);
               this.slctActivity = root;
               this.parentActivity = null;
               this.setContent(this.slctActivity);
@@ -584,6 +584,7 @@ export default {
         });
     },
     buildActivityTree(ancestors, brothers, children) {
+      this.activityTree = [];
       this.nameConfirm = [];
       // child activities normalization
       if (children.length > 0) {
@@ -635,8 +636,8 @@ export default {
       }
 
       // update activity tree
-      let root = ancestors[ancestors.length - 1];
-      this.activityTree = [root];
+      var root = ancestors[ancestors.length - 1];
+      this.activityTree.push(root);
       this.slctActivity = ancestors[0];
       this.parentActivity = ancestors[1];
       this.setContent(this.slctActivity);

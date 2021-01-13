@@ -51,11 +51,14 @@
     >
       <Row>
         <Col span="16">
-          <div span="2" style="height: inherit;width: 90px;position: absolute;">
+          <div
+            span="2"
+            style="height: inherit; width: 90px; position: absolute"
+          >
             <Menu
               :active-name="showMenuItem"
               @on-select="changeMenuItem"
-              style="height: inherit;width: fit-content;z-index:1"
+              style="height: inherit; width: fit-content; z-index: 1"
             >
               <MenuItem name="allToolsets" class="leftMenuItem">
                 <Tooltip content="All toolsets" placement="right">
@@ -75,14 +78,14 @@
             </Menu>
           </div>
           <Card dis-hover style="margin-left: 80px">
-            <h2 slot="title" style="padding-top:5px;color: #2d8cf099">
+            <h2 slot="title" style="padding-top: 5px; color: #2d8cf099">
               {{ listTitle() }}
             </h2>
-            <div slot="extra" style="width:210px;">
+            <div slot="extra" style="width: 210px">
               <Select
                 v-model="typeSelected"
                 @on-change="typeChanged"
-                style="width:160px"
+                style="width: 160px"
               >
                 <Option
                   v-for="item in typeOptions"
@@ -98,9 +101,9 @@
             </div>
             <div
               v-if="isPublic && showMenuItem == 'allToolsets'"
-              style="height: 400px;"
+              style="height: 400px"
             >
-              <vue-scroll :ops="ops" style="height:400px;">
+              <vue-scroll :ops="ops" style="height: 400px">
                 <Row>
                   <draggable
                     element="ul"
@@ -113,19 +116,22 @@
                       :key="toolset.index"
                     >
                       <Card
-                        style="background-color: ghostwhite;margin: 0 5px 10px 5px"
+                        style="
+                          background-color: ghostwhite;
+                          margin: 0 5px 10px 5px;
+                        "
                       >
-                        <div style="text-align:center">
+                        <div style="text-align: center">
                           <Tooltip placement="bottom" max-width="600">
                             <img
                               :src="toolset.toolsetImg"
                               v-if="toolset.toolsetImg != ''"
-                              style="height:100%;max-height:50px;"
+                              style="height: 100%; max-height: 50px"
                             />
                             <avatar
                               :username="toolset.toolsetName"
                               :size="50"
-                              style="margin-bottom:6px"
+                              style="margin-bottom: 6px"
                               v-else
                             ></avatar>
                             <div slot="content">
@@ -138,7 +144,13 @@
                           </Tooltip>
                           <h4
                             :title="toolset.toolsetName"
-                            style="display:block;width:90px;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;"
+                            style="
+                              display: block;
+                              width: 90px;
+                              overflow: hidden;
+                              white-space: nowrap;
+                              text-overflow: ellipsis;
+                            "
                           >
                             {{ toolset.toolsetName }}
                           </h4>
@@ -151,9 +163,9 @@
             </div>
             <div
               v-if="!isPublic && showMenuItem == 'allToolsets'"
-              style="height: 400px;"
+              style="height: 400px"
             >
-              <vue-scroll :ops="ops" style="height:400px;">
+              <vue-scroll :ops="ops" style="height: 400px">
                 <Row>
                   <draggable
                     element="ul"
@@ -166,19 +178,22 @@
                       :key="toolset.index"
                     >
                       <Card
-                        style="background-color: #faebd794;margin: 0 5px 10px 5px"
+                        style="
+                          background-color: #faebd794;
+                          margin: 0 5px 10px 5px;
+                        "
                       >
-                        <div style="text-align:center">
+                        <div style="text-align: center">
                           <Tooltip placement="bottom" max-width="600">
                             <img
                               :src="toolset.toolsetImg"
                               v-if="toolset.toolsetImg != ''"
-                              style="height:100%;max-height:50px;"
+                              style="height: 100%; max-height: 50px"
                             />
                             <avatar
                               :username="toolset.toolsetName"
                               :size="50"
-                              style="margin-bottom:6px"
+                              style="margin-bottom: 6px"
                               v-else
                             ></avatar>
                             <div slot="content">
@@ -191,7 +206,7 @@
                           </Tooltip>
                           <h4
                             :title="toolset.toolsetName"
-                            style="width:90px;"
+                            style="width: 90px"
                             class="ellipsis"
                           >
                             {{ toolset.toolsetName }}
@@ -205,9 +220,9 @@
             </div>
             <div
               v-if="isPublic && showMenuItem == 'allTools'"
-              style="height: 400px;"
+              style="height: 400px"
             >
-              <vue-scroll :ops="ops" style="height:400px;">
+              <vue-scroll :ops="ops" style="height: 400px">
                 <Row>
                   <draggable
                     element="ul"
@@ -220,19 +235,23 @@
                       :key="tool.index"
                     >
                       <Card
-                        style="background-color: ghostwhite;margin: 0 5px 10px 5px;cursor: pointer;"
+                        style="
+                          background-color: ghostwhite;
+                          margin: 0 5px 10px 5px;
+                          cursor: pointer;
+                        "
                       >
-                        <div style="text-align:center" @click="showTool(tool)">
+                        <div style="text-align: center" @click="showTool(tool)">
                           <Tooltip placement="bottom" max-width="600">
                             <img
                               :src="tool.toolImg"
                               v-if="tool.toolImg != ''"
-                              style="height:100%;max-height:50px;"
+                              style="height: 100%; max-height: 50px"
                             />
                             <avatar
                               :username="tool.toolName"
                               :size="50"
-                              style="margin-bottom:6px"
+                              style="margin-bottom: 6px"
                               v-else
                             ></avatar>
                             <div slot="content">
@@ -245,7 +264,13 @@
                           </Tooltip>
                           <h4
                             :title="tool.toolName"
-                            style="display:block;width:90px;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;"
+                            style="
+                              display: block;
+                              width: 90px;
+                              overflow: hidden;
+                              white-space: nowrap;
+                              text-overflow: ellipsis;
+                            "
                           >
                             {{ tool.toolName }}
                           </h4>
@@ -258,9 +283,9 @@
             </div>
             <div
               v-if="!isPublic && showMenuItem == 'allTools'"
-              style="height: 400px;"
+              style="height: 400px"
             >
-              <vue-scroll :ops="ops" style="height:400px;">
+              <vue-scroll :ops="ops" style="height: 400px">
                 <Row>
                   <draggable
                     element="ul"
@@ -273,19 +298,23 @@
                       :key="tool.index"
                     >
                       <Card
-                        style="background-color: #faebd794;margin: 0 5px 10px 5px;cursor: pointer;"
+                        style="
+                          background-color: #faebd794;
+                          margin: 0 5px 10px 5px;
+                          cursor: pointer;
+                        "
                       >
-                        <div style="text-align:center" @click="showTool(tool)">
+                        <div style="text-align: center" @click="showTool(tool)">
                           <Tooltip placement="bottom" max-width="600">
                             <img
                               :src="tool.toolImg"
                               v-if="tool.toolImg != ''"
-                              style="height:100%;max-height:50px;"
+                              style="height: 100%; max-height: 50px"
                             />
                             <avatar
                               :username="tool.toolName"
                               :size="50"
-                              style="margin-bottom:6px"
+                              style="margin-bottom: 6px"
                               v-else
                             ></avatar>
                             <div slot="content">
@@ -298,7 +327,7 @@
                           </Tooltip>
                           <h4
                             :title="tool.toolName"
-                            style="width:90px;"
+                            style="width: 90px"
                             class="ellipsis"
                           >
                             {{ tool.toolName }}
@@ -313,42 +342,42 @@
           </Card>
         </Col>
         <Col span="8">
-          <div style="padding: 0 5px;margin-left: 15px;">
+          <div style="padding: 0 5px; margin-left: 15px">
             <Card dis-hover>
               <h2
                 slot="title"
-                style="padding-top:5px"
+                style="padding-top: 5px"
                 v-if="showMenuItem == 'allToolsets'"
               >
                 Toolsets in step
               </h2>
               <h2
                 slot="title"
-                style="padding-top:5px"
+                style="padding-top: 5px"
                 v-if="showMenuItem == 'allTools'"
               >
                 Tools in step
               </h2>
-              <div style="height: 400px;" v-if="showMenuItem == 'allToolsets'">
-                <vue-scroll :ops="ops" style="height:400px;">
+              <div style="height: 400px" v-if="showMenuItem == 'allToolsets'">
+                <vue-scroll :ops="ops" style="height: 400px">
                   <draggable
                     element="ul"
                     :group="{ name: 'toolset', put: true, pull: false }"
                     v-model="stepToolsetsShow"
                     @add="addToolsettoStep"
-                    style="min-height:400px"
+                    style="min-height: 400px"
                   >
                     <Card
                       v-for="(toolset, index) in stepToolsetsShow"
                       :key="toolset.index"
                       class="stepItems"
-                      style="margin:0 0 5px 0"
+                      style="margin: 0 0 5px 0"
                     >
                       <div>
                         <Button
                           class="ellipsis"
                           type="text"
-                          style="width: 140px;padding:0"
+                          style="width: 140px; padding: 0"
                           @click="showInfo(toolset, toolset.toolsetName)"
                           >{{ toolset.toolsetName }}</Button
                         >
@@ -357,7 +386,7 @@
                           icon="md-remove"
                           class="changeRedColor"
                           size="small"
-                          style="float:right"
+                          style="float: right"
                           @click="removeToolset(index)"
                         ></Button>
                       </div>
@@ -365,26 +394,26 @@
                   </draggable>
                 </vue-scroll>
               </div>
-              <div style="height: 400px;" v-if="showMenuItem == 'allTools'">
-                <vue-scroll :ops="ops" style="height:400px;">
+              <div style="height: 400px" v-if="showMenuItem == 'allTools'">
+                <vue-scroll :ops="ops" style="height: 400px">
                   <draggable
                     element="ul"
                     :group="{ name: 'tool', put: true, pull: false }"
                     v-model="stepToolsShow"
                     @add="addTooltoStep"
-                    style="min-height:400px"
+                    style="min-height: 400px"
                   >
                     <Card
                       v-for="(tool, index) in stepToolsShow"
                       :key="tool.index"
                       class="stepItems"
-                      style="margin:0 0 5px 0"
+                      style="margin: 0 0 5px 0"
                     >
                       <div>
                         <Button
                           class="ellipsis"
                           type="text"
-                          style="width: 140px;padding:0"
+                          style="width: 140px; padding: 0"
                           @click="showInfo(tool, tool.toolName)"
                           >{{ tool.toolName }}</Button
                         >
@@ -393,7 +422,7 @@
                           icon="md-remove"
                           class="changeRedColor"
                           size="small"
-                          style="float:right"
+                          style="float: right"
                           @click="removeTool(index)"
                         ></Button>
                       </div>
@@ -454,20 +483,20 @@ export default {
   props: ["activityInfo"],
   components: {
     draggable,
-    Avatar
+    Avatar,
   },
   watch: {
     activityInfo: {
       handler(val) {
         this.init();
       },
-      deep: true
+      deep: true,
     },
     stepToolModal(val) {
       if (!val) {
         this.panel.close();
       }
-    }
+    },
   },
   created() {
     this.init();
@@ -497,8 +526,8 @@ export default {
       isPublic: true,
       ops: {
         bar: {
-          background: "#808695"
-        }
+          background: "#808695",
+        },
       },
       typeSelected: "All",
       typeOptions: [
@@ -512,16 +541,16 @@ export default {
         "Geographical simulation",
         "Data analysis",
         "Decision making",
-        "Others"
+        "Others",
       ],
       infoModal: false,
       itemInfo: {
         name: "",
         description: "",
         tags: [],
-        recomStep: []
+        recomStep: [],
       },
-      panel: null
+      panel: null,
     };
   },
   methods: {
@@ -586,7 +615,7 @@ export default {
             "&value=" +
             "Public"
         )
-        .then(res => {
+        .then((res) => {
           if (res.data == "Offline") {
             this.$store.commit("userLogout");
             this.$router.push({ name: "Login" });
@@ -598,7 +627,7 @@ export default {
             this.$set(this, "publicToolsets", res.data);
           }
         })
-        .catch(err => {
+        .catch((err) => {
           throw err;
         });
     },
@@ -609,7 +638,7 @@ export default {
             "?provider=" +
             this.userInfo.userId
         )
-        .then(res => {
+        .then((res) => {
           if (res.data == "Offline") {
             this.$store.commit("userLogout");
             this.$router.push({ name: "Login" });
@@ -623,7 +652,7 @@ export default {
             this.filterShowListByType();
           }
         })
-        .catch(err => {
+        .catch((err) => {
           throw err;
         });
     },
@@ -645,7 +674,7 @@ export default {
               "&value=" +
               stepToolsetIds[i]
           )
-          .then(res => {
+          .then((res) => {
             if (res.data == "Offline") {
               this.$store.commit("userLogout");
               this.$router.push({ name: "Login" });
@@ -671,7 +700,7 @@ export default {
               }
             }
           })
-          .catch(err => {
+          .catch((err) => {
             throw err;
           });
       }
@@ -805,7 +834,7 @@ export default {
     },
     getFilterResult(foreList) {
       var selectedType = this.typeSelected;
-      var resultList = foreList.filter(function(item) {
+      var resultList = foreList.filter(function (item) {
         switch (selectedType) {
           case "All": {
             return item;
@@ -898,10 +927,10 @@ export default {
     confirmSetting() {
       var newStepToolsets = [];
       var newStepTools = [];
-      this.stepToolsetsShow.forEach(toolset => {
+      this.stepToolsetsShow.forEach((toolset) => {
         newStepToolsets.push(toolset.tsId);
       });
-      this.stepToolsShow.forEach(tool => {
+      this.stepToolsShow.forEach((tool) => {
         newStepTools.push(tool.tid);
       });
       // let obj = new URLSearchParams();
@@ -910,19 +939,21 @@ export default {
       // obj.append("toolList", newStepTools);
       let object = {
         toolsetList: newStepToolsets,
-        toolList: newStepTools
+        toolList: newStepTools,
       };
 
       console.log(this.activityInfo);
       let flag = "";
-      if (this.activityInfo.level <= 1) {
+      if (this.activityInfo.level == 0) {
         flag = "project";
-      } else {
+      } else if (this.activityInfo.level == 1) {
+        flag = "subproject";
+      } else if (this.activityInfo.level > 1) {
         flag = "activity";
       }
       this.axios
         .put(`/GeoProblemSolving/${flag}/${this.activityInfo.aid}`, object)
-        .then(res => {
+        .then((res) => {
           if (res.data == "Offline") {
             this.$store.commit("userLogout");
             this.$router.push({ name: "Login" });
@@ -937,7 +968,7 @@ export default {
             this.stepToolModal = false;
           }
         })
-        .catch(err => {
+        .catch((err) => {
           throw err;
         });
     },
@@ -991,7 +1022,7 @@ export default {
       //   .catch(err => {
       //     console.log("Get user info fail.");
       //   });
-    }
-  }
+    },
+  },
 };
 </script>

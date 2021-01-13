@@ -104,6 +104,7 @@
             style="display: inline-block"
           >
             <Card
+              v-if="roleIdentity(item) == 'visitor'"
               style="
                 height: 160px;
                 width: 220px;
@@ -111,12 +112,10 @@
                 margin: 0 10px 10px 0;
                 cursor: pointer;
               "
-              @click.native="enterChildActivity(item)"
             >
               <p slot="title" :title="item.name">{{ item.name }}</p>
               <div
                 slot="extra"
-                v-if="roleIdentity(item) == 'visitor'"
                 style="margin-top: -10px; margin-right: -5px"
               >
                 <Tooltip
@@ -131,11 +130,29 @@
                     @click="preApplication(item)"
                   />
                 </Tooltip>
+              </div>              
+              <div
+                style="margin-top: 5px"
+                :title="item.description"
+                class="childDescription"
+              >
+                {{ item.description }}
               </div>
+            </Card>
+            <Card
+                v-else
+              style="
+                height: 160px;
+                width: 220px;
+                float: left;
+                margin: 0 10px 10px 0;
+                cursor: pointer;
+              "
+            >
+              <p slot="title" :title="item.name">{{ item.name }}</p>
               <div
                 slot="extra"
                 style="margin-top: -10px; margin-right: -5px"
-                v-else
               >
                 <Icon type="ios-person" :size="20"> </Icon>
               </div>

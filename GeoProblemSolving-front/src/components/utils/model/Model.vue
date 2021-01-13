@@ -14,7 +14,7 @@
       <el-button
         type="primary"
         @click="invokeTest"
-        style="float:right;width:110px;margin-right:15%"
+        style="float: right; width: 110px; margin-right: 15%"
       >
         <i class="el-icon-setting"></i>&nbsp;Invoke
       </el-button>
@@ -22,7 +22,7 @@
         type="warning"
         @click="bindAll"
         v-if="record.status == 2"
-        style="float:right;width:160px;margin-right:20px"
+        style="float: right; width: 160px; margin-right: 20px"
       >
         <i class="el-icon-paperclip"></i>&nbsp;Bind all outputs
       </el-button>
@@ -103,8 +103,8 @@
                     <div
                       v-if="
                         modelInEvent.hasOwnProperty('url') &&
-                          modelInEvent.url != '' &&
-                          modelInEvent.urlName != ''
+                        modelInEvent.url != '' &&
+                        modelInEvent.urlName != ''
                       "
                     >
                       <div class="select-data select-data-line">
@@ -146,8 +146,8 @@
                   <div
                     v-if="
                       modelInEvent.hasOwnProperty('url') &&
-                        modelInEvent.url != '' &&
-                        modelInEvent.urlName != ''
+                      modelInEvent.url != '' &&
+                      modelInEvent.urlName != ''
                     "
                   >
                     <div class="select-data select-data-line">
@@ -215,7 +215,7 @@
                       @click="download(modelOutEvent)"
                       v-if="
                         modelOutEvent.hasOwnProperty('url') &&
-                          modelOutEvent.url != ''
+                        modelOutEvent.url != ''
                       "
                       >Download</el-button
                     >
@@ -227,7 +227,7 @@
                       :class="{ bindClass: modelOutEvent.bind }"
                       v-if="
                         modelOutEvent.hasOwnProperty('url') &&
-                          modelOutEvent.url != ''
+                        modelOutEvent.url != ''
                       "
                       >Bind</el-button
                     >
@@ -263,7 +263,7 @@ import ResourceList from "../../common/resource/resourceList.vue";
 export default {
   components: {
     file,
-    resourceList
+    resourceList,
   },
   mounted() {
     this.getPageInfo();
@@ -296,8 +296,8 @@ export default {
             statename: "",
             event: "",
             url: "",
-            tag: ""
-          }
+            tag: "",
+          },
         ],
         outputs: [
           {
@@ -305,10 +305,10 @@ export default {
             event: "",
             template: {
               type: "", //id|none
-              value: "" //if tyoe=none value=""
-            }
-          }
-        ]
+              value: "", //if tyoe=none value=""
+            },
+          },
+        ],
       },
       // status: true,
       record: {},
@@ -318,7 +318,7 @@ export default {
       bindFileName: "",
       selectDataDialogShow: false,
       currentStateIndex: "",
-      currentEvent: ""
+      currentEvent: "",
     };
   },
 
@@ -342,6 +342,7 @@ export default {
         this.pageParams.pageId = receive["groupID"];
         this.pageParams.userId = receive["userId"];
         this.pageParams.userName = receive["userName"];
+        console.log(this.pageParams);
       }
     },
 
@@ -356,12 +357,12 @@ export default {
               "&value=" +
               this.pageParams.userId
           )
-          .then(res => {
+          .then((res) => {
             if (res.data != "Fail" && res.data != "None") {
               this.$set(this, "userInfo", res.data);
             }
           })
-          .catch(err => {});
+          .catch((err) => {});
       }
     },
 
@@ -425,12 +426,12 @@ export default {
             if (outputTemplate.type === "external") {
               template = {
                 type: "id",
-                value: outputTemplate.externalId
+                value: outputTemplate.externalId,
               };
             } else {
               template = {
                 type: "none",
-                value: ""
+                value: "",
               };
             }
             detail["template"] = template;
@@ -460,7 +461,7 @@ export default {
       if (data == null) {
         this.$message({
           message: "You have run the model failed",
-          type: "error"
+          type: "error",
         });
         // this.status = false;
       } else {
@@ -499,7 +500,7 @@ export default {
             if (content != "") {
               content = "<Dataset> " + content + " </Dataset>";
               let file = new File([content], events[j].name + ".xml", {
-                type: "text/plain"
+                type: "text/plain",
               });
               uploadFileForm.append("file", file);
 
@@ -546,7 +547,7 @@ export default {
       let outputUrl = record.outputs;
       outList.forEach((state, index) => {
         state.Event.forEach((event, eventIndex) => {
-          outputUrl.forEach(el => {
+          outputUrl.forEach((el) => {
             if (el.statename == event.stateName && el.event == event.name) {
               this.$set(this.stateList[index].Event[eventIndex], "url", el.url);
               this.$set(
@@ -570,7 +571,7 @@ export default {
       xhr.open("get", the_url, true);
       xhr.send();
       var that = this;
-      xhr.onreadystatechange = function() {
+      xhr.onreadystatechange = function () {
         if (this.readyState === 4) {
           let headers = xhr.getAllResponseHeaders();
           //打印文件名，这里打印的是编码（因为兼容不同语言的数据文件名字）后的，前端用unescape('xxx')去解码，解码后是对应的名字
@@ -578,7 +579,7 @@ export default {
         }
       };
 
-      xhr.onload = function() {
+      xhr.onload = function () {
         if (this.status == 200) {
           if (callback) {
             callback(this.response);
@@ -599,7 +600,7 @@ export default {
         pathURL: event.url,
         uploaderId: this.pageParams.userId,
         uploaderName: this.pageParams.userName,
-        privacy: "private"
+        privacy: "private",
       };
 
       let data = await post("/GeoProblemSolving/resource/bind", json);
@@ -607,20 +608,20 @@ export default {
       this.$forceUpdate();
       this.$message({
         message: "You have bind to the resource center successfully!",
-        type: "success"
+        type: "success",
       });
     },
 
     async bindAll() {},
 
     inEventList(state) {
-      return state.Event.filter(value => {
+      return state.Event.filter((value) => {
         return value.type === "response";
       });
     },
 
     outEventList(state) {
-      return state.Event.filter(value => {
+      return state.Event.filter((value) => {
         return value.type === "noresponse";
       });
     },
@@ -647,7 +648,7 @@ export default {
         lock: true,
         text: "Calculating",
         spinner: "el-icon-loading",
-        background: "rgba(0, 0, 0, 0.7)"
+        background: "rgba(0, 0, 0, 0.7)",
       });
     },
 
@@ -656,7 +657,7 @@ export default {
         lock: true,
         text: "Initialization",
         spinner: "el-icon-loading",
-        background: "rgba(0, 0, 0, 0.7)"
+        background: "rgba(0, 0, 0, 0.7)",
       });
     },
 
@@ -688,11 +689,11 @@ export default {
 
     selectData(val) {
       let stateIndex = this.stateList.findIndex(
-        state => state.name == this.currentEvent.stateName
+        (state) => state.name == this.currentEvent.stateName
       );
 
       let eventIndex = this.stateList[stateIndex].Event.findIndex(
-        event => event.name == this.currentEvent.name
+        (event) => event.name == this.currentEvent.name
       );
       this.$set(
         this.stateList[stateIndex].Event[eventIndex],
@@ -714,12 +715,12 @@ export default {
     remove(event) {
       event.url == "";
       event.urlName = "";
-    }
+    },
   },
 
   beforeDestroy() {
     clearInterval(this.timer);
-  }
+  },
 };
 </script>
 
