@@ -160,7 +160,7 @@
         var md5_oldPwd = md5(this.formValidate.oldPwd);
         var paramUrl = "email=" + this.formValidate.email + "&oldPwd=" + md5_oldPwd + "&newPwd=" + md5_newPwd;
         this.axios
-          .post("http://106.14.78.235/AuthServer/user/newPassword?" + paramUrl)
+          .get("/GeoProblemSolving/user/newPassword?" + paramUrl)
           .then(res => {
             if (res.data == 1){
               this.$router.replace({name: "Login"})

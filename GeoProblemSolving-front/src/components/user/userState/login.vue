@@ -347,9 +347,10 @@ export default {
       this.$router.push({ name: "Register" });
     },
     sendResetEmail() {
+      this.$Notice.success({title: "Waiting",desc: "The email is sending."})
       this.axios
-        .post(
-          "http://106.14.78.235/AuthServer/user/resetPassword?email=" +
+        .get(
+          "/GeoProblemSolving/user/resetPassword?email=" +
             this.loginForm.user
         )
         .then((res) => {

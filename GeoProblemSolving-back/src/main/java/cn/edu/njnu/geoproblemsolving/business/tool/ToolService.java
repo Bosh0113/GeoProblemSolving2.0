@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ClassUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.Part;
@@ -69,7 +70,6 @@ public class ToolService  {
             return ToolEntities;
         }
     }
-
     public static String uploadPicture(HttpServletRequest request) {
         try {
             InetAddress address = InetAddress.getLocalHost();
@@ -88,7 +88,7 @@ public class ToolService  {
                     String suffix = fileNames.substring(fileNames.lastIndexOf(".") + 1);
                     String regexp = "[^A-Za-z_0-9\\u4E00-\\u9FA5]";
                     String saveName = fileName.replaceAll(regexp, "");
-                    String folderPath = servicePath + "tool/picture";
+                    String folderPath =  ClassUtils.getDefaultClassLoader().getResource("").getPath() + "static/tool/picture/";
                     File temp = new File(folderPath);
                     if (!temp.exists()) {
                         temp.mkdirs();
@@ -112,7 +112,8 @@ public class ToolService  {
                     inputStream.close();
 
                     String reqPath = request.getRequestURL().toString();
-                    pathURL = reqPath.replaceAll("localhost", ip) + "/" + newFileTitle;
+                    pathURL=reqPath+"/" + newFileTitle;
+//                    pathURL = reqPath.replaceAll("localhost", ip) + "/" + newFileTitle;
 //                    String regexGetUrl = "(/GeoProblemSolving[\\S]*)";
 //                    Pattern regexPattern = Pattern.compile(regexGetUrl);
 //                    Matcher matcher = regexPattern.matcher(pathURL);
@@ -127,6 +128,5 @@ public class ToolService  {
             return "Fail";
         }
     }
-
 
 }

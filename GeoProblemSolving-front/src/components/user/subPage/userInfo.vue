@@ -19,6 +19,14 @@
                   <span class="uContent">{{userInfo.name}}</span>
                 </div>
               </ListItem>
+
+              <ListItem>
+                <span class="uTitle">Email</span>
+                <div class="uAlign">
+                  <span class="uContent">{{userInfo.email}}</span>
+                </div>
+              </ListItem>
+
               <ListItem>
                 <span class="uTitle">Title</span>
                 <div class="uAlign">
@@ -203,7 +211,9 @@
       <Button
         slot="footer"
         type="primary"
-        @click="resetPwd()">Submit
+        @click="resetPwd()"
+        :disabled="resetPwdFormItems.newPwd != resetPwdFormItems.validPwd || resetPwdFormItems.oldPwd == '' || resetPwdFormItems.newPwd == ''"
+      >Submit
       </Button>
     </Modal>
   </div>
@@ -394,7 +404,7 @@
         let md5_oldPwd = md5(this.resetPwdFormItems.oldPwd);
         let paramUrl = "email=" + this.userInfo.email + "&oldPwd=" + md5_oldPwd + "&newPwd=" + md5_newPwd;
         this.axios
-          .post("http://106.14.78.235/AuthServer/user/newPassword?" + paramUrl)
+          .get("/GeoProblemSolving/user/newPassword?" + paramUrl)
           .then(res => {
             if (res.data == 1) {
               this.resetPasswordModal = false;

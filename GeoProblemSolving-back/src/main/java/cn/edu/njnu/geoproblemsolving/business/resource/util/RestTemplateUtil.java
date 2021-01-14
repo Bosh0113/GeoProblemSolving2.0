@@ -1,6 +1,7 @@
 package cn.edu.njnu.geoproblemsolving.business.resource.util;
 
 import cn.edu.njnu.geoproblemsolving.business.user.StaticParams;
+import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
@@ -84,6 +85,20 @@ public class RestTemplateUtil {
         ResponseEntity<String> response = restTemplate.exchange(delUserBaseResUrl, HttpMethod.DELETE, httpEntity, String.class);
         String resultStr = response.getBody();
         return JSONObject.parseObject(resultStr);
+    }
+
+    public Object sendReqToAuthServer(String url,HttpMethod httpMethod){
+        HttpHeaders headers = new HttpHeaders();
+        // headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<JSONObject> httpEntity = new HttpEntity<>(headers);
+        try {
+            ResponseEntity<String> responseEntity = restTemplate.exchange(url, httpMethod, httpEntity, String.class);
+            String resultStr = responseEntity.getBody();
+            return resultStr;
+        }catch (Exception e){
+            return "Fail";
+        }
+
     }
 
     /*

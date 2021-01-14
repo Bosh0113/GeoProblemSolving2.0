@@ -510,7 +510,7 @@
           .put("/GeoProblemSolving/user/quitProject", formData)
           .then(res=>{
             if (res.data.code == 0){
-              this.$Message.success("Quit Success");
+              this.$Notice.success({title: "Quit Success"})
               this.removeQuitProject(quitProjectId);
               let notice = {};
               let recipientId = this.currentProject.members[0].userId;

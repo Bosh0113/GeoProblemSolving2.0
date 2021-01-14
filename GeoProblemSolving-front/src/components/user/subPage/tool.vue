@@ -393,7 +393,7 @@
           this.publicTools.push(data);
         }
         this.currentStep = 0;
-        this.$Notice.info({desc: "Create successfully"});
+        this.$Notice.success({title: "Create successfully"});
       },
       delTool: function (toolId, toolType, index, toolName) {
         this.confirmDelModal = true;
@@ -445,7 +445,7 @@
             this.editToolInfo
           )
           .then((res) => {
-            this.$Notice.info({desc: "Update successfully."});
+            this.$Notice.success({title: "Update successfully."});
             this.currentStep = 0;
             this.editToolModal = false;
           })
@@ -478,7 +478,7 @@
           )
           .then((res) => {
             if (res.data.code == 0) {
-              this.$Notice.info({desc: "Update successfully."});
+              this.$Notice.success({desc: "Sharing successfully."});
               this.shareToolModal = false;
 
               this.userProject[index].toolList = updateProject.toolList;

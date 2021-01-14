@@ -342,6 +342,7 @@ export default {
       this.toolInfo.toolImg = data;
     },
 
+
     handleView() {
       this.visible = true;
     },

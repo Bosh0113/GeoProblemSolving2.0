@@ -130,7 +130,7 @@
                     @click="preApplication(item)"
                   />
                 </Tooltip>
-              </div>              
+              </div>
               <div
                 style="margin-top: 5px"
                 :title="item.description"
@@ -1087,7 +1087,7 @@ export default {
                   activity.name +
                   " in project: " +
                   this.projectInfo.name +
-                  "has changed to" +
+                  " has changed to " +
                   role +
                   ".",
                 approve: "unknow",

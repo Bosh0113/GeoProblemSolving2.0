@@ -3,6 +3,7 @@ package cn.edu.njnu.geoproblemsolving.business.user.controller;
 import cn.edu.njnu.geoproblemsolving.business.user.StaticParams;
 import cn.edu.njnu.geoproblemsolving.business.user.dao.IUserImpl;
 import cn.edu.njnu.geoproblemsolving.business.user.entity.User;
+import cn.edu.njnu.geoproblemsolving.business.user.service.Impl.UserServiceImpl;
 import cn.edu.njnu.geoproblemsolving.business.user.service.TokenTask;
 import cn.edu.njnu.geoproblemsolving.business.user.util.ICommonUtil;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
@@ -31,6 +32,10 @@ public class IUserController {
     TokenTask tokenTask;
     @Autowired
     IUserImpl userDao;
+
+    @Autowired
+    UserServiceImpl userService;
+
     @Value("$AuthUrl")
     String redirectUri;
 
@@ -156,6 +161,19 @@ public class IUserController {
     public JsonResult updateUserPoject(HttpServletRequest  req){
         JsonResult result = userDao.deleteUserProject(req);
         return result;
+    }
+
+
+    @RequestMapping(method = RequestMethod.GET, value = "/resetPassword")
+    public JsonResult sendResetPwdEmail(@RequestParam("email") String email){
+        JsonResult sendEmailResult = userService.sendResetPwdEmail(email);
+        return sendEmailResult;
+    }
+
+    @RequestMapping(method = RequestMethod.GET, value = "/newPassword")
+    public Object resetPwd(@RequestParam String email, @RequestParam String oldPwd, @RequestParam String newPwd){
+        Object resetResult = userService.resetPwd(email, oldPwd, newPwd);
+        return resetResult;
     }
 
 

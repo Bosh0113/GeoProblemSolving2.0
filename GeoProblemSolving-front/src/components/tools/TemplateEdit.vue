@@ -303,8 +303,8 @@ export default {
     async handleBeforeUpload(file) {
       let formData = new FormData();
       formData.append("toolImg", file);
-      let data = await post("/GeoProblemSolving/tool/picture", formData);
-      this.selectedTool.toolImg = data;
+      let {data} = await this.axios.post("/GeoProblemSolving/tool/picture", formData);
+      this.selectedTool.toolImg = data.data;
     },
 
     handleView() {
