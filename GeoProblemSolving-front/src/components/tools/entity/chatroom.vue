@@ -724,7 +724,7 @@ export default {
     Array.prototype.contains = function (obj) {
       var i = this.length;
       while (i--) {
-        if (this[i].userId  != undefined && this[i].userId === obj.userId) {
+        if (this[i].userId != undefined && this[i].userId === obj.userId) {
           return true;
         }
       }
@@ -771,9 +771,7 @@ export default {
     async init() {
       this.initSize();
       await this.getGroupInfo();
-      await this.getParticipants();
-      // 建立通讯
-      this.startWebSocket(this.groupId);
+      this.getParticipants();
     },
 
     async getGroupInfo() {
@@ -798,18 +796,21 @@ export default {
       this.selectGroup.selectName = this.groupInfo.name;
       this.selectGroup.selectId = this.groupInfo.aid;
     },
-    async getParticipants() {
+    getParticipants() {
       let activityLevel = "";
       if (this.groupInfo.level == 0) activityLevel = "project";
       else if (this.groupInfo.level == 1) activityLevel = "subproject";
       else if (this.groupInfo.level > 1) activityLevel = "activity";
       else return;
-      let membersList = await this.axios.get(
-        `/GeoProblemSolving/${activityLevel}/${this.groupId}/user`
-      );
-      if (membersList.data.code == 0) {
-        this.$set(this, "participants", membersList.data.data.members);
-      }
+      this.axios
+        .get(`/GeoProblemSolving/${activityLevel}/${this.groupId}/user`)
+        .then((res) => {
+          if (res.data.code == 0) {
+            this.$set(this, "participants", res.data.data.members);
+            // 建立通讯
+            this.startWebSocket(this.groupId);
+          }
+        });
     },
     send(msg) {
       this.message = msg;

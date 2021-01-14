@@ -403,6 +403,7 @@ export default {
           srcUserId: this.userId,
           targetUserId: this.sendToMemberId,
           content: this.message,
+          toolConcepts: this.toolConceptsShow,
         };
         if (this.socketApi.getSocketInfo().linked) {
           this.msglist.push(this.send_msg);
@@ -426,6 +427,7 @@ export default {
         srcUserId: this.userId,
         targetUserId: this.sendToMemberId,
         content: messageUrl,
+        toolConcepts: this.toolConceptsShow,
       };
       if (this.socketApi.getSocketInfo().linked) {
         this.msgRecords.push(this.send_msg);
@@ -448,6 +450,7 @@ export default {
           srcUserId: this.userId,
           targetUserId: this.sendToMemberId,
           content: item,
+          toolConcepts: this.toolConceptsShow,
         };
         if (this.socketApi.getSocketInfo().linked) {
           this.msglist.push(this.send_msg);
@@ -491,6 +494,7 @@ export default {
         targetUserName: "test",
         targetUserId: "test",
         content: "Test",
+        toolConcepts: this.toolConceptsShow,
       };
       this.socketApi.sendSock(this.send_msg, this.getSocketConnect);
     },

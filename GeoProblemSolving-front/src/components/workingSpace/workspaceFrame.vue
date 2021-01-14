@@ -336,7 +336,7 @@ export default {
       return userRoleJS.roleIdentify(activity.members, this.userInfo.userId);
     },
     permissionIdentity(permission, role, operation) {
-      if(permission == undefined) permission = userRoleJS.getDefault();
+      if(permission == undefined) permission = JSON.stringify(userRoleJS.getDefault());
       if (operation == "observe") {
         if (JSON.parse(permission).observe.visitor == "Yes") return true;
         else if (JSON.parse(permission).observe.visitor == "No") return false;

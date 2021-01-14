@@ -33,7 +33,7 @@
                     :style="{ height: contentHeight - 80 + 'px' }"
                   >
                     <draggable
-                      :disabled="taskItemDraggable()"
+                      :disabled="!(permissionIdentity(activityInfo.permission, userRole, 'manage_task') || (permissionIdentity(activityInfo.permission, userRole, 'create_task') && item.creatorId == userInfo.userId))"
                       class="taskList"
                       element="ul"
                       :options="{ group: 'task' }"
@@ -196,7 +196,7 @@
                     :style="{ height: contentHeight - 80 + 'px' }"
                   >
                     <draggable
-                      :disabled="taskItemDraggable()"
+                      :disabled="!(permissionIdentity(activityInfo.permission, userRole, 'manage_task') || (permissionIdentity(activityInfo.permission, userRole, 'create_task') && item.creatorId == userInfo.userId))"
                       class="taskList"
                       element="ul"
                       :options="{ group: 'task' }"
@@ -363,7 +363,7 @@
                     :style="{ height: contentHeight - 80 + 'px' }"
                   >
                     <draggable
-                      :disabled="taskItemDraggable()"
+                      :disabled="!(permissionIdentity(activityInfo.permission, userRole, 'manage_task') || (permissionIdentity(activityInfo.permission, userRole, 'create_task') && item.creatorId == userInfo.userId))"
                       class="taskList"
                       element="ul"
                       :options="{ group: 'task' }"
@@ -1251,13 +1251,6 @@ export default {
         .catch((err) => {
           this.$Message.error("Fail!");
         });
-    },
-    taskItemDraggable() {
-      // if (this.userRole != "visitor") {
-      return false;
-      // } else {
-      //   return true;
-      // }
     },
     go2Activity(aid) {
       for (let i = 0; i < this.childActivities.length; i++) {

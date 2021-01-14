@@ -654,7 +654,7 @@ export default {
       return userRoleJS.roleIdentify(activity.members, this.userInfo.userId);
     },
     permissionIdentity(permission, role, operation) {
-      if(permission == undefined) permission = userRoleJS.getDefault();
+      if(permission == undefined) permission = JSON.stringify(userRoleJS.getDefault());
       if (operation == "auto_join") {
         if (JSON.parse(permission).auto_join.visitor == "Yes") return true;
         else if (JSON.parse(permission).auto_join.visitor == "No") return false;
@@ -1081,9 +1081,9 @@ export default {
                 description:
                   "Your role in the activity: " +
                   activity.name +
-                  " in project: " +
+                  ", project: " +
                   this.projectInfo.name +
-                  "has changed to" +
+                  "has changed to " +
                   role +
                   ".",
                 approve: "unknow",
