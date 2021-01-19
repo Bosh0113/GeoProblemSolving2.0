@@ -65,10 +65,7 @@ Format.prototype.init = function()
 	{
 		this.refresh();
 	}));
-
-	//修改纸张大小 -- wzh
-	this.changePageSize(5)
-
+	
 	this.refresh();
 };
 
@@ -517,10 +514,6 @@ Format.prototype.refresh = function()
             mxUtils.write(label, mxResources.get('inputEvent'));
             label.style.borderLeftWidth = '0px';
             label.style.fontSize = '16px';
-			// if(this.checkCellRepeat(targetCell.eventId,'eventId')){
-			// 	  alert('You have selected this input yet')
-			// 	  return
-			// }
 
 			let panel = document.getElementsByClassName('geSidebarContainer geFormatContainer')[0]
 			panel.style.width = '240px'
@@ -534,15 +527,9 @@ Format.prototype.refresh = function()
 
             addClickHandler(label, div, idx++);
 		}else if(graph.getSelectionModel().cells[0].response == false){
-        	let targetCell = graph.getSelectionModel().cells[0]
-
             mxUtils.write(label, mxResources.get('outputEvent'));
             label.style.borderLeftWidth = '0px';
             label.style.fontSize = '16px';
-			// if(this.checkCellRepeat(targetCell.eventId,'eventId')){
-			// 	alert('You have selected this output yet')
-			// 	return
-			// }
 
 			let panel = document.getElementsByClassName('geSidebarContainer geFormatContainer')[0]
 			panel.style.width = '240px'
@@ -5826,12 +5813,6 @@ EventPanel.prototype.addinputData = function(div,inputData,model){
         event.style.margin = '0px';
         div.appendChild(event);
 
-        console.log(inputData[i].name)
-		// if(Format.prototype.checkCellRepeat(inputData[i].eventId,'eid',ui.editor.graph)){
-		// 	  // alert('You have selected this input yet')
-		// 	  return
-		// }
-
         event = ui.sidebar.createEventVertexTemplate('shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;strokeWidth=2;strokeColor=#003366;fillColor=none;', 170, 50, inputData[i].eventName, null, null, null,true, model,true,inputData[i]);
 
         div.appendChild(event);
@@ -6224,8 +6205,8 @@ DataServicePanel.prototype.init = function()
 	var cell = graph.getSelectionModel().cells[0];
 
 	this.container.appendChild(this.addData(this.createPanel(),cell.inputData,cell,'input'));
-	if(cell.params!=undefined){
-		this.container.appendChild(this.addParameter(this.createPanel(),cell.params,cell));
+	if(cell.parameter!=undefined){
+		this.container.appendChild(this.addParameter(this.createPanel(),cell.parameter,cell));
 	}
 	this.container.appendChild(this.addData(this.createPanel(),cell.outputData,cell,'output'));
 };
@@ -6248,8 +6229,7 @@ DataServicePanel.prototype.addData = function(div,inputData,cell,type){
 		event.style.margin = '0px';
 		div.appendChild(event);
 
-		event = ui.sidebar.createDataServiceEventVertexTemplate(
-			'shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;strokeWidth=2;strokeColor=#003366;fillColor=none;', 170, 50, inputData[i].name, null, null, null,true, cell,true,inputData[i]);
+		event = ui.sidebar.createDataServiceEventVertexTemplate('shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;strokeWidth=2;strokeColor=#003366;fillColor=none;', 170, 50, inputData[i].name, null, null, null,true, cell,true,inputData[i]);
 
 		div.appendChild(event);
 	}
@@ -6259,16 +6239,21 @@ DataServicePanel.prototype.addData = function(div,inputData,cell,type){
 	return div;
 };
 
-DataServicePanel.prototype.addParameter = function(div,params,cell){
+DataServicePanel.prototype.addParameter = function(div,parameter,cell){
 	var ui = this.editorUi;
 
-	for (var i = 0; i<params.length; i++){
+	var title = this.createTitle("Input Events: ");
+	title.style.paddingBottom = '6px';
+	title.style.fontSize = "14px";
+	title.style.cursor = "default";
+	div.appendChild(title);
+
+	for (var i = 0; i<inputData.length; i++){
 		var event = document.createElement("p");
 		event.style.margin = '0px';
 		div.appendChild(event);
 
-		event = ui.sidebar.createDataServiceEventVertexTemplate(
-			'whiteSpace=wrap;html=1;strokeWidth=2;strokeColor=#003366;fillColor=none;', 136, 50, params[i].name, null, null, null,true, cell,true,params[i]);
+		event = ui.sidebar.createDataServiceEventVertexTemplate('shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;strokeWidth=2;strokeColor=#003366;fillColor=none;', 170, 50, inputData[i].eventName, null, null, null,true, model,true,inputData[i]);
 
 		div.appendChild(event);
 	}
@@ -6688,8 +6673,6 @@ function configCell(index){
 	}
 }
 
-
-
 function getConditionStatus(){
 	let conditionLink = graph.getSelectionModel().cells[0]
 	let condition = conditionLink.source
@@ -6717,30 +6700,4 @@ function getConditionStatus(){
 		}
 	}
 
-}
-
-Format.prototype.changePageSize = function (sizeIndex){
-	let formats = PageSetupDialog.getFormats();
-
-	let format = formats[sizeIndex]
-
-	let pageFormat = format.format
-
-	let ui = this.editorUi
-	let graph = this.editorUi.editor.graph;
-
-	let change = new ChangePageSetup(ui, null, null, pageFormat);
-	change.ignoreColor = true;
-	change.ignoreImage = true;
-
-	graph.model.execute(change);
-}
-
-Format.prototype.checkCellRepeat = function(id,text,graph){//检查拖入的event是否重复
-	var cells = graph.getModel().cells;
-	for(let i in cells){
-		if(cells[i][text]==id)
-			return true
-	}
-	return false
 }

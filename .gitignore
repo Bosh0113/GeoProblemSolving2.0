@@ -5,3 +5,6 @@ GeoProblemSolving-back/src/main/resources/templates/staticPage
 GeoProblemSolving-front/target.md
 GeoProblemSolving-front/node_modules
 GeoProblemSolving-back/geoproblemsolving.iml
+GeoProblemSolving-back/src/main/resources/templates/integratedModeling_new---1.html
+GeoProblemSolving-back/src/main/resources/templates/integratedModelEditor---1.html
+GeoProblemSolving-back/src/main/resources/static/js/page/integratedModeling_new--1.js

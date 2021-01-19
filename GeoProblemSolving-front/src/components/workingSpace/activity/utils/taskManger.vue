@@ -33,7 +33,7 @@
                     :style="{ height: contentHeight - 80 + 'px' }"
                   >
                     <draggable
-                      :disabled="!(permissionIdentity(activityInfo.permission, userRole, 'manage_task') || (permissionIdentity(activityInfo.permission, userRole, 'create_task') && item.creatorId == userInfo.userId))"
+                      :disabled="!permissionIdentity(activityInfo.permission, userRole, 'manage_task')"
                       class="taskList"
                       element="ul"
                       :options="{ group: 'task' }"
@@ -196,7 +196,7 @@
                     :style="{ height: contentHeight - 80 + 'px' }"
                   >
                     <draggable
-                      :disabled="!(permissionIdentity(activityInfo.permission, userRole, 'manage_task') || (permissionIdentity(activityInfo.permission, userRole, 'create_task') && item.creatorId == userInfo.userId))"
+                      :disabled="!permissionIdentity(activityInfo.permission, userRole, 'manage_task')"
                       class="taskList"
                       element="ul"
                       :options="{ group: 'task' }"
@@ -363,7 +363,7 @@
                     :style="{ height: contentHeight - 80 + 'px' }"
                   >
                     <draggable
-                      :disabled="!(permissionIdentity(activityInfo.permission, userRole, 'manage_task') || (permissionIdentity(activityInfo.permission, userRole, 'create_task') && item.creatorId == userInfo.userId))"
+                      :disabled="!permissionIdentity(activityInfo.permission, userRole, 'manage_task')"
                       class="taskList"
                       element="ul"
                       :options="{ group: 'task' }"

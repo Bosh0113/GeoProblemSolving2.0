@@ -643,7 +643,7 @@ export default {
         url =
           "/GeoProblemSolving/subproject/" +
           this.activityInfo.aid;
-      } else if (this.activityInfo.levell > 1) {
+      } else if (this.activityInfo.level > 1) {
         url =
           "/GeoProblemSolving/activity/" +
           this.activityInfo.aid;

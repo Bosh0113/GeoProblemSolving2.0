@@ -37,7 +37,7 @@
         background: #f7f7f7;
     }
 
-    .taskName {
+    .name {
         display: inline-block;
         overflow: hidden;
         white-space: nowrap;
@@ -65,7 +65,7 @@
                                           v-if="taskPermissionIdentity(projectInfo.permission, userRole, 'create_task')">Add
                                 </i-button>
                                 <vue-scroll :ops="ops" :style="{height:contentHeight-80+'px'}">
-                                    <draggable :disabled="!(taskPermissionIdentity(projectInfo.permission, userRole,'manage_task') || userInfo.userId == item.creatorId)" class="taskList" element="ul"
+                                    <draggable :disabled="!taskPermissionIdentity(projectInfo.permission, userRole,'manage_task')" class="taskList" element="ul"
                                                :options="{group:'task'}" v-model="taskTodo"
                                                :style="{height:contentHeight-80+'px'}"
                                                @start="setMoveCount()" @update="updateMoveTask(taskTodo,'todo')"
@@ -78,7 +78,7 @@
                                                 <Icon type="ios-list" color="gray" :size="20"></Icon>
                                             </span>
                                                 <span style="padding:5px">
-                                                <strong style="color:#57a3f3" class="taskName" :title="item.taskName">{{item.taskName}}</strong>
+                                                <strong style="color:#57a3f3" class="name" :title="item.name">{{item.name}}</strong>
                                             </span>
                                                 <div style="float:right">
                                                     <Rate :disabled="!(taskPermissionIdentity(projectInfo.permission, userRole,'manage_task') || userInfo.userId == item.creatorId)"
@@ -114,7 +114,7 @@
                             <Card :padding="0" :border="false">
                                 <h3 slot="title">Doing</h3>
                                 <vue-scroll :ops="ops" :style="{height:contentHeight-80+'px'}">
-                                    <draggable :disabled="!(taskPermissionIdentity(projectInfo.permission, userRole,'manage_task') || userInfo.userId == item.creatorId)" class="taskList" element="ul"
+                                    <draggable :disabled="!taskPermissionIdentity(projectInfo.permission, userRole,'manage_task')" class="taskList" element="ul"
                                                :options="{group:'task'}" v-model="taskDoing"
                                                :style="{height:contentHeight-80+'px'}"
                                                @start="setMoveCount()" @update="updateMoveTask(taskDoing,'doing')"
@@ -128,7 +128,7 @@
                                                       :size="20"></Icon>
                                             </span>
                                                 <span style="padding:5px">
-                                                <strong style="color:#57a3f3" class="taskName" :title="item.taskName">{{item.taskName}}</strong>
+                                                <strong style="color:#57a3f3" class="name" :title="item.name">{{item.name}}</strong>
                                             </span>
                                                 <div style="float:right">
                                                     <Rate :disabled="!(taskPermissionIdentity(projectInfo.permission, userRole, 'manage_task') || userInfo.userId == item.creatorId)"
@@ -162,7 +162,7 @@
                             <Card :padding="0" :border="false">
                                 <h3 slot="title">Done</h3>
                                 <vue-scroll :ops="ops" :style="{height:contentHeight-80+'px'}">
-                                    <draggable :disabled="!(taskPermissionIdentity(projectInfo.permission, userRole,'manage_task') || userInfo.userId == item.creatorId)" class="taskList" element="ul"
+                                    <draggable :disabled="!taskPermissionIdentity(projectInfo.permission, userRole,'manage_task')" class="taskList" element="ul"
                                                :options="{group:'task'}" v-model="taskDone"
                                                :style="{height:contentHeight-80+'px'}"
                                                @start="setMoveCount()" @update="updateMoveTask(taskDone,'done')"
@@ -175,7 +175,7 @@
                                                 <Icon type="md-checkmark-circle-outline"></Icon>
                                             </span>
                                                 <span style="padding:5px">
-                                                <strong style="color:#57a3f3" class="taskName" :title="item.taskName">{{item.taskName}}</strong>
+                                                <strong style="color:#57a3f3" class="name" :title="item.name">{{item.name}}</strong>
                                             </span>
                                                 <div style="float:right">
                                                     <Rate :disabled="!(taskPermissionIdentity(projectInfo.permission, userRole, 'manage_task') || userInfo.userId == item.creatorId)"
@@ -222,8 +222,8 @@
         <Modal v-model="createTaskModal" title="Create Task" width="800px" :closable="false">
             <i-form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="100"
                     style="margin-left: 30px">
-                <Form-item label="Name" prop="taskName">
-                    <i-input v-model="formValidate.taskName" placeholder="Fill in the name of task..."
+                <Form-item label="Name" prop="name">
+                    <i-input v-model="formValidate.name" placeholder="Fill in the name of task..."
                              style="width: 560px"/>
                 </Form-item>
                 <Form-item label="Description" prop="description">
@@ -255,8 +255,8 @@
                :closable="false">
             <i-form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="100"
                     style="margin-left: 30px">
-                <Form-item label="Name" prop="taskName">
-                    <i-input v-model="formValidate.taskName" placeholder="Fill in the name of task..."
+                <Form-item label="Name" prop="name">
+                    <i-input v-model="formValidate.name" placeholder="Fill in the name of task..."
                              style="width: 560px"/>
                 </Form-item>
                 <Form-item label="Description" prop="description">
@@ -286,7 +286,7 @@
         <Modal v-model="taskDetailModal" title="Task Detail" width="800px">
             <div class="taskFormItem">
                 <span style="width:15%">Task name</span>
-                <i-input style="width: 600px" :placeholder="this.taskPlaceHolder.name" v-model="taskInfo.taskName"
+                <i-input style="width: 600px" :placeholder="this.taskPlaceHolder.name" v-model="taskInfo.name"
                          readonly/>
             </div>
             <div class="taskFormItem">
@@ -379,14 +379,14 @@
                     content: ""
                 },
                 formValidate: {
-                    taskName: "",
+                    name: "",
                     description: "",
                     startTime: "",
                     endTime: "",
                     importanceCheck: false
                 },
                 ruleValidate: {
-                    taskName: [
+                    name: [
                         {required: true, message: "Please enter name...", trigger: "blur"}
                     ],
                     description: [
@@ -579,7 +579,7 @@
             //创建任务
             createTaskModalShow() {
                 let taskDefult = {
-                    taskName: "",
+                    name: "",
                     description: "",
                     startTime: "",
                     endTime: "",
@@ -593,7 +593,8 @@
                 this.$refs[name].validate(valid => {
                     if (valid) {
                         let taskForm = {};
-                        taskForm["taskName"] = this.formValidate.taskName;
+                        taskForm["name"] = this.formValidate.name;
+                        taskForm["name"] = this.formValidate.name;
                         taskForm["description"] = this.formValidate.description;
                         taskForm["startTime"] = new Date(this.formValidate.startTime);
                         taskForm["endTime"] = new Date(this.formValidate.endTime);
@@ -744,7 +745,7 @@
                     if (valid) {
                         let taskForm = new URLSearchParams();
                         taskForm.append("taskId", this.formValidate.taskId);
-                        taskForm.append("taskName", this.formValidate.taskName);
+                        taskForm.append("name", this.formValidate.name);
                         taskForm.append("description", this.formValidate.description);
                         taskForm.append("startTime", new Date(this.formValidate.startTime));
                         taskForm.append("endTime", new Date(this.formValidate.endTime));
@@ -975,7 +976,7 @@
                 for (let i = 0; i < this.taskDoing.length; i++) {
                     let gantttask = {
                         id: i + 1,
-                        name: this.taskDoing[i].taskName,
+                        name: this.taskDoing[i].name,
                         user: this.taskDoing[i].managerName,
                         start: new Date(this.taskDoing[i].startTime),
                         end: new Date(this.taskDoing[i].endTime),
@@ -992,7 +993,7 @@
                 for (let i = 0; i < this.taskTodo.length; i++) {
                     let gantttask = {
                         id: this.taskDoing.length + i + 1,
-                        name: this.taskTodo[i].taskName,
+                        name: this.taskTodo[i].name,
                         user: this.taskTodo[i].creatorName,
                         start: new Date(this.taskTodo[i].startTime),
                         end: new Date(this.taskTodo[i].endTime),
@@ -1009,7 +1010,7 @@
                 for (let i = 0; i < this.taskDone.length; i++) {
                     let gantttask = {
                         id: this.taskDoing.length + this.taskTodo.length + i + 1,
-                        name: this.taskDone[i].taskName,
+                        name: this.taskDone[i].name,
                         user: this.taskDone[i].creatorName,
                         start: new Date(this.taskDone[i].startTime),
                         end: new Date(this.taskDone[i].endTime),

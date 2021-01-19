@@ -176,7 +176,7 @@
                     />
                   </template>
                   <template v-else>
-                    <img :src="item.thumbnail" height="118px" width="118px" />
+                    <img :src="item.thumbnail" height="72px" width="72px" />
                   </template>
                 </div>
                 <div style="float: left; margin: 0 10px">
@@ -1043,7 +1043,7 @@ export default {
           async: false,
           success: function (data) {
             if (data !== "Fail") {
-              selectedRes = data;
+              selectedRes = data.files;
               for (var j = 0; j < selectedRes.length; j++) {
                 mockData.push({
                   key: mockData.length.toString(),

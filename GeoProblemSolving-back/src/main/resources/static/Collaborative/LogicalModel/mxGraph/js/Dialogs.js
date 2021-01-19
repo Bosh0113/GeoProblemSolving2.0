@@ -365,7 +365,7 @@ var LogicalTasksSaveDialog = function (editorUi) {
 
         var logialContent = {
             graphXML: graph.getMxgraphListXMLStr(),
-            conceptualXML: graph.getLogicalSceneXMLStr()
+            logicalXML: graph.getLogicalSceneXMLStr()
         }
         var conceptStr = JSON.stringify(logialContent);
         var blob = new Blob([conceptStr], {type: "text/plain;charset=utf-8"});  // type:可以设置别的文件类型
