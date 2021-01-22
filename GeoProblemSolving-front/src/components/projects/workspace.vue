@@ -219,15 +219,15 @@ export default {
       for (var i = 0; i < membersList.length; i++) {
         $.ajax({
           url:
-            "/GeoProblemSolving/user/inquiry" +
-            "?key=" +
-            "userId" +
+          "/GeoProblemSolving/user" +
+            "?key=userId" +
             "&value=" +
             membersList[i].userId,
           type: "GET",
           async: false,
           success: function(data) {
-            participantsTemp.push(data);
+            if(data.code == 0)
+            participantsTemp.push(data.data);
           }
         });
       }

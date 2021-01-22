@@ -99,18 +99,18 @@
                 :src="participant.avatar"  style="width:40px;height:40px;vertical-align:middle;"
               >
               <avatar
-                :username="participant.userName"
+                :username="participant.name"
                 :size="40"
-                :title="participant.userName"
+                :title="participant.name"
                 v-else
               ></avatar>
             </div>
             <div class="memberDetail">
               <div class="memberName">
-                <span>{{participant.userName}}</span>
+                <span>{{participant.name}}</span>
               </div>
               <div class="memberOrganization">
-                <span>{{participant.organization}}</span>
+                <span>{{participant.role}}</span>
               </div>
             </div>
           </div>

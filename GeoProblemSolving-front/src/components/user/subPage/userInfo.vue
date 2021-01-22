@@ -28,6 +28,12 @@
               </ListItem>
 
               <ListItem>
+                <span class="uTitle">Email</span>
+                <div class="uAlign">
+                  <span class="uContent">{{userInfo.email}}</span>
+                </div>
+              </ListItem>
+              <ListItem>
                 <span class="uTitle">Title</span>
                 <div class="uAlign">
                   <span class="uContent">{{userInfo.title}}</span>

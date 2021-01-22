@@ -73,9 +73,14 @@
               ></Button>
               <template
                 v-if="
-                  permissionIdentity(activityInfo.permission, 'use_resource') ||
+                  permissionIdentity(
+                    activityInfo.permission,
+                    userRole,
+                    'use_resource'
+                  ) ||
                   (permissionIdentity(
                     activityInfo.permission,
+                    userRole,
                     'upload_resource'
                   ) &&
                     item.uploaderId == userInfo.userId)
@@ -171,7 +176,7 @@
                     />
                   </template>
                   <template v-else>
-                    <img :src="item.thumbnail" height="118px" width="118px" />
+                    <img :src="item.thumbnail" height="72px" width="72px" />
                   </template>
                 </div>
                 <div style="float: left; margin: 0 10px">
@@ -189,7 +194,7 @@
                       size="small"
                       title="Check"
                       icon="md-eye"
-                      style="margin: 10px 20px 0 0"
+                      style="margin: 10px 5px 0 0"
                       @click="checkData(item)"
                     ></Button>
                     <a :href="item.pathURL" :download="item.name">
@@ -197,23 +202,26 @@
                         v-if="
                           permissionIdentity(
                             activityInfo.permission,
+                            userRole,
                             'use_resource'
                           )
                         "
                         size="small"
                         title="Download"
                         icon="md-download"
-                        style="margin: 10px 20px 0 0"
+                        style="margin: 10px 5px 0 0"
                       ></Button>
                     </a>
                     <Button
                       v-if="
                         permissionIdentity(
                           activityInfo.permission,
+                          userRole,
                           'manage_resource'
                         ) ||
                         (permissionIdentity(
                           activityInfo.permission,
+                          userRole,
                           'upload_resource'
                         ) &&
                           item.uploaderId == userInfo.userId)
@@ -403,7 +411,7 @@ export default {
         },
       },
       userInfo: this.$store.getters.userInfo,
-      userRole: "visitor",
+      userRole: this.roleIdentity(this.activityInfo),
       resouceModel: "resources",
       //资源继承
       preActivities: [],
@@ -536,18 +544,26 @@ export default {
     };
   },
   methods: {
-    roleIdentity() {
-      this.userRole = userRoleJS.roleIdentify(
-        this.activityInfo.members,
-        this.userInfo.userId
-      );
+    roleIdentity(activity) {
+      this.userInfo = this.$store.getters.userInfo;
+      return userRoleJS.roleIdentify(activity.members, this.userInfo.userId);
     },
-    permissionIdentity(permission, operation) {
-      return userRoleJS.permissionIdentity(
-        JSON.parse(permission),
-        this.userRole,
-        operation
-      );
+    permissionIdentity(permission, role, operation) {
+      if (permission == undefined)
+        permission = JSON.stringify(userRoleJS.getDefault());
+      if (operation == "auto_join") {
+        if (JSON.parse(permission).auto_join.visitor == "Yes") return true;
+        else if (JSON.parse(permission).auto_join.visitor == "No") return false;
+        else {
+          return this.getParentPermission();
+        }
+      } else {
+        return userRoleJS.permissionIdentity(
+          JSON.parse(permission),
+          role,
+          operation
+        );
+      }
     },
     getResList() {
       var list = [];
@@ -998,7 +1014,7 @@ export default {
         this.activityInfo.parent != undefined &&
         this.activityInfo.parent != ""
       ) {
-        this.preActivities.push(this.activityInfo.parent);
+        this.preActivities.push({ aid: this.activityInfo.parent });
       }
       // last activities
       if (this.activityInfo.last != undefined) {
@@ -1017,28 +1033,24 @@ export default {
 
       // 前驱步骤的资源
       for (var i = 0; i < this.preActivities.length; i++) {
-        let selectedStepId = this.preActivities[i].aid;
-        let selectedStepName = this.preActivities[i].name;
+        let activityId = this.preActivities[i].aid;
+        let activityName = this.preActivities[i].name;
         let getResUrl =
-          "/GeoProblemSolving/folder/findByFileType?" +
-          "scopeId=" +
-          selectedStepId +
-          "&type=all";
-
+          "/GeoProblemSolving/folder/inquiry" + "?folderId=" + activityId;
         $.ajax({
           url: getResUrl,
           type: "GET",
           async: false,
           success: function (data) {
             if (data !== "Fail") {
-              selectedRes = data;
+              selectedRes = data.files;
               for (var j = 0; j < selectedRes.length; j++) {
                 mockData.push({
                   key: mockData.length.toString(),
                   name: selectedRes[j].name,
                   type: selectedRes[j].type,
                   resourceId: selectedRes[j].resourceId,
-                  source: selectedStepName,
+                  source: activityName,
                 });
               }
             } else {

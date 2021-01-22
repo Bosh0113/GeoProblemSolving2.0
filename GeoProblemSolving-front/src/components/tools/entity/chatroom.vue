@@ -404,33 +404,44 @@
 <template>
   <Row>
     <!-- <Col span="24"> -->
-    <div class="chatPanel" :style="{height:panelHeight+'px',width:panelWidth+'px'}">
+    <div
+      class="chatPanel"
+      :style="{ height: panelHeight + 'px', width: panelWidth + 'px' }"
+    >
       <div class="memberPanel">
         <div class="participants">
           <h4>Participants</h4>
           <div>
             <Card
-              v-for="(participant,index) in onlineParticipants"
-              :key="'online' +index"
-              style="margin:2.5%"
+              v-for="(participant, index) in onlineParticipants"
+              :key="'online' + index"
+              style="margin: 2.5%"
               :padding="5"
             >
-              <div style="display:flex;align-items:center">
-                <div class="memberImg" style="position:relative">
+              <div style="display: flex; align-items: center">
+                <div class="memberImg" style="position: relative">
                   <img
-                    v-if="participant.avatar != '' && participant.avatar!='undefined'"
+                    v-if="
+                      participant.avatar != '' &&
+                      participant.avatar != 'undefined'
+                    "
                     :src="participant.avatar"
-                    style="width:40px;height:40px"
+                    style="width: 40px; height: 40px"
                   />
-                  <avatar v-else :username="participant.userName" :size="40" :rounded="false"></avatar>
+                  <avatar
+                    v-else
+                    :username="participant.name"
+                    :size="40"
+                    :rounded="false"
+                  ></avatar>
                   <div class="onlinecircle"></div>
                 </div>
                 <div class="memberDetail">
                   <div class="memberName">
-                    <span>{{participant.userName}}</span>
+                    <span>{{ participant.name }}</span>
                   </div>
                   <div class="memberOrganization">
-                    <span>{{participant.organization}}</span>
+                    <span>{{ participant.role }}</span>
                   </div>
                 </div>
               </div>
@@ -438,27 +449,35 @@
           </div>
           <div>
             <Card
-              v-for="(participant,index) in offlineParticipants"
-              :key=" 'offline' + index"
-              style="margin:2.5%"
+              v-for="(participant, index) in offlineParticipants"
+              :key="'offline' + index"
+              style="margin: 2.5%"
               :padding="5"
             >
-              <div style="display:flex;align-items:center">
-                <div class="memberImg" style="position:relative">
+              <div style="display: flex; align-items: center">
+                <div class="memberImg" style="position: relative">
                   <img
-                    v-if="participant.avatar != '' && participant.avatar!='undefined'"
+                    v-if="
+                      participant.avatar != '' &&
+                      participant.avatar != 'undefined'
+                    "
                     :src="participant.avatar"
-                    style="width:40px;height:40px"
+                    style="width: 40px; height: 40px"
                   />
-                  <avatar v-else :username="participant.userName" :size="40" :rounded="false"></avatar>
+                  <avatar
+                    v-else
+                    :username="participant.name"
+                    :size="40"
+                    :rounded="false"
+                  ></avatar>
                   <div class="offlinecircle"></div>
                 </div>
                 <div class="memberDetail">
                   <div class="memberName">
-                    <span>{{participant.userName}}</span>
+                    <span>{{ participant.name }}</span>
                   </div>
                   <div class="memberOrganization">
-                    <span>{{participant.organization}}</span>
+                    <span>{{ participant.role }}</span>
                   </div>
                 </div>
               </div>
@@ -470,41 +489,64 @@
         <div class="contentPanel">
           <div class="contentHeader">
             <div class="chatObject">
-              <div class="s_name" v-show="selectGroup.selectName!==''">{{selectGroup.selectName}}</div>
+              <div class="s_name" v-show="selectGroup.selectName !== ''">
+                {{ selectGroup.selectName }}
+              </div>
             </div>
 
             <div class="chatOperate">
-              <Button type="default" class="recordsButton" @click="showRecords">Records</Button>
+              <Button type="default" class="recordsButton" @click="showRecords"
+                >Records</Button
+              >
             </div>
           </div>
 
           <div class="contentBody" :style="message_panelObj" id="contentBody">
-            <div style="display:flex" v-for="(list,index) in msglist" :key="index">
+            <div
+              style="display: flex"
+              v-for="(list, index) in msglist"
+              :key="index"
+            >
               <template v-if="list.type === 'notice'">
-                <div class="chat-notice">{{list.content}}</div>
+                <div class="chat-notice">{{ list.content }}</div>
               </template>
-              <template v-else-if="list.fromid === $store.getters.userId ">
-                <div style="width:95%">
-                  <div class="chat-bubble-r chat-bubble-right">{{list.content}}</div>
+              <template v-else-if="list.srcUserId === $store.getters.userId">
+                <div style="width: 95%">
+                  <div class="chat-bubble-r chat-bubble-right">
+                    {{ list.content }}
+                  </div>
                 </div>
                 <div class="user_detail">
                   <div class="u_img">
-                    <avatar class="user_img" :username="list.from" :size="35"></avatar>
+                    <avatar
+                      class="user_img"
+                      :username="list.from"
+                      :size="35"
+                    ></avatar>
                   </div>
-                  <div class="u_name">{{list.from}}</div>
+                  <div class="u_name">{{ list.from }}</div>
                 </div>
               </template>
               <template v-else>
-                <div class="user_detail" style="margin-left:2.5%;margin-top:5px;">
+                <div
+                  class="user_detail"
+                  style="margin-left: 2.5%; margin-top: 5px"
+                >
                   <div class="u_img">
-                    <avatar class="user_img" :username="list.from" :size="35"></avatar>
+                    <avatar
+                      class="user_img"
+                      :username="list.from"
+                      :size="35"
+                    ></avatar>
                   </div>
                   <div class="u_name">
-                    <span style="font-size:3px;">{{list.from}}</span>
+                    <span style="font-size: 3px">{{ list.from }}</span>
                   </div>
                 </div>
-                <div style="width:95%">
-                  <div class="chat-bubble-l chat-bubble-left">{{list.content}}</div>
+                <div style="width: 95%">
+                  <div class="chat-bubble-l chat-bubble-left">
+                    {{ list.content }}
+                  </div>
                 </div>
               </template>
             </div>
@@ -512,7 +554,12 @@
           <div class="contentFooter">
             <div class="message_bar">
               <div class="u_avater">
-                <avatar class="user_img" username="m e" :size="40" style="margin-top: -4px;"></avatar>
+                <avatar
+                  class="user_img"
+                  username="m e"
+                  :size="40"
+                  style="margin-top: -4px"
+                ></avatar>
               </div>
               <div class="input_panel">
                 <Input
@@ -524,7 +571,9 @@
                 />
               </div>
               <div class="send_panel">
-                <Button class="send_message_btn" @click="send(message)">Send</Button>
+                <Button class="send_message_btn" @click="send(message)"
+                  >Send</Button
+                >
               </div>
             </div>
           </div>
@@ -537,7 +586,7 @@
             <p>Message Records</p>
           </div>
           <!-- 日期选择器 -->
-          <div style="display:flex">
+          <div style="display: flex">
             <DatePicker
               type="date"
               placeholder="Select date"
@@ -554,15 +603,23 @@
           <!-- 聊天记录列表 -->
           <div
             class="searchmessageList"
-            :style="{height:messageListPanelHeight}"
+            :style="{ height: messageListPanelHeight }"
             id="searchmessageList"
           >
             <div class="message_record_board">
-              <div style="display:flex" v-for="(list,index) in currentPageData" :key="'A'+index">
+              <div
+                style="display: flex"
+                v-for="(list, index) in currentPageData"
+                :key="'A' + index"
+              >
                 <div class="single_record">
-                  <span style="color:#2d8cf0; margin-right:2%">{{list.from}}:</span>
-                  <span style="color:lightgray; margin-right:2%">{{list.time}}</span>
-                  <div style="color:gray">{{list.content}}</div>
+                  <span style="color: #2d8cf0; margin-right: 2%"
+                    >{{ list.from }}:</span
+                  >
+                  <span style="color: lightgray; margin-right: 2%">{{
+                    list.time
+                  }}</span>
+                  <div style="color: gray">{{ list.content }}</div>
                 </div>
               </div>
             </div>
@@ -593,7 +650,7 @@ import Avatar from "vue-avatar";
 
 export default {
   components: {
-    Avatar
+    Avatar,
   },
   data() {
     return {
@@ -603,12 +660,12 @@ export default {
         // grid:1,
         right: "300px",
         borderRight: "0px",
-        searchPanelShow: false
+        searchPanelShow: false,
       },
       message_notice: {
         color: "green",
         right: "0px",
-        borderRight: "0px"
+        borderRight: "0px",
       },
       // 原有的变量字段
       groupInfo: {},
@@ -617,7 +674,7 @@ export default {
       selectGroup: {
         selectId: "",
         selectName: "",
-        selectType: ""
+        selectType: "",
       },
       message: "",
       msglist: [],
@@ -630,16 +687,16 @@ export default {
       itemList: [
         {
           value: "Step",
-          label: "Step"
+          label: "Step",
         },
         {
           value: "Subproject",
-          label: "Subproject"
+          label: "Subproject",
         },
         {
           value: "Project",
-          label: "Project"
-        }
+          label: "Project",
+        },
       ],
       onlineParticipants: [],
       onlineUserIdList: [],
@@ -659,11 +716,21 @@ export default {
       msgR_next: [],
       groupId: this.$route.query.groupID,
       scopeId: "",
-      scopeType: ""
+      scopeType: "",
     };
   },
 
   mounted() {
+    Array.prototype.contains = function (obj) {
+      var i = this.length;
+      while (i--) {
+        if (this[i].userId != undefined && this[i].userId === obj.userId) {
+          return true;
+        }
+      }
+      return false;
+    };
+
     $("#app").css("min-width", "0");
     window.addEventListener("blur", this.winBlur); //监听浏览器失焦事件
     window.addEventListener("focus", this.winFocus); //监听浏览器失焦事件
@@ -673,7 +740,7 @@ export default {
     this.supportNotify();
 
     //修改时间格式使其统一
-    Date.prototype.Format = function(fmt) {
+    Date.prototype.Format = function (fmt) {
       var o = {
         "M+": this.getMonth() + 1, //月份
         "d+": this.getDate(), //日
@@ -681,7 +748,7 @@ export default {
         "m+": this.getMinutes(), //分
         "s+": this.getSeconds(), //秒
         "q+": Math.floor((this.getMonth() + 3) / 3), //季度
-        "S+": this.getMilliseconds() //毫毛
+        "S+": this.getMilliseconds(), //毫毛
       };
       if (/(y+)/.test(fmt))
         fmt = fmt.replace(
@@ -703,97 +770,48 @@ export default {
   methods: {
     async init() {
       this.initSize();
-      await this.getGroupId();
       await this.getGroupInfo();
-    },
-
-    async getGroupId() {
-      let groupId = this.$route.query.groupID;
-      let data = await this.axios.get(
-        `/GeoProblemSolving/step/inquiry?key=stepId&value=${groupId}`
-      );
-
-      let subProjectId = data.data[0].subProjectId;
-      if (subProjectId == undefined || subProjectId == "") {
-        this.scopeId = data.data[0].projectId;
-        this.scopeType = "project";
-      } else {
-        this.scopeId = subProjectId;
-        this.scopeType = "subproject";
-      }
+      this.getParticipants();
     },
 
     async getGroupInfo() {
-      let scopeId = this.scopeId;
-      let scopeType = this.scopeType;
-      if (scopeId != undefined && scopeId != "") {
-        if (scopeType == "subproject") {
-          let data = await this.axios.get(
-            `/GeoProblemSolving/subProject/inquiry?key=subProjectId&value=${scopeId}`
-          );
-          if (data.data == "Offline") {
-            this.$store.commit("userLogout");
-            this.$router.push({ name: "Login" });
-          } else if (data.data != "None" && data.data != "Fail") {
-            this.$set(this, "groupInfo", data.data[0]);
-            this.selectGroup.selectName = this.groupInfo.title;
-            this.selectGroup.selectId = this.groupInfo.subProjectId;
-
-            let membersList = this.groupInfo.members;
-            let manager = {
-              userId: this.groupInfo.managerId,
-              userName: this.groupInfo.managerName
-            };
-            membersList.unshift(manager); //在List开头加入manager元素
-            this.$set(this, "participants", membersList);
-            await this.getParticipants();
-            // 建立通讯
-            this.startWebSocket(scopeId);
-          }
-        } else if (scopeType == "project") {
-          let data = await this.axios.get(
-            `/GeoProblemSolving/project/inquiry?key=projectId&value=${scopeId}`
-          );
-          if (data.data == "Offline") {
-            this.$store.commit("userLogout");
-            this.$router.push({ name: "Login" });
-          } else if (data.data != "None" && data.data != "Fail") {
-            this.$set(this, "groupInfo", data.data[0]);
-            this.selectGroup.selectName = this.groupInfo.title;
-            this.selectGroup.selectId = this.groupInfo.projectId;
-
-            let membersList = this.groupInfo.members;
-            let manager = {
-              userId: this.groupInfo.managerId,
-              userName: this.groupInfo.managerName
-            };
-            membersList.unshift(manager); //在List开头加入manager元素
-            this.$set(this, "participants", membersList);
-            await this.getParticipants();
-            // 建立通讯
-            this.startWebSocket(scopeId);
-          }
-        }
-      } else {
-        this.$Notice.error({
-          desc: "Failed to get the group id!"
-        });
-      }
-    },
-
-    async getParticipants() {
-      let membersList = this.participants;
-      let participantsTemp = [];
-      for (let i = 0; i < membersList.length; i++) {
-        let userId = membersList[i].userId;
-        let data = await this.axios.get(
-          `/GeoProblemSolving/user/inquiry?key=userId&value=${userId}`
+      let groupInfo = await this.axios.get(
+        `/GeoProblemSolving/project/${this.groupId}`
+      );
+      if (groupInfo.data.code != 0) {
+        groupInfo = await this.axios.get(
+          `/GeoProblemSolving/subproject/${this.groupId}`
         );
-        participantsTemp.push(data.data);
       }
-      this.$set(this, "participants", participantsTemp);
-    },
+      if (groupInfo.data.code != 0) {
+        groupInfo = await this.axios.get(
+          `/GeoProblemSolving/activity/${this.groupId}`
+        );
+      }
+      if (groupInfo.data.code != 0) {
+        return;
+      }
 
+      this.groupInfo = groupInfo.data.data;
+      this.selectGroup.selectName = this.groupInfo.name;
+      this.selectGroup.selectId = this.groupInfo.aid;
+    },
+    getParticipants() {
+      let activityLevel = "";
+      if (this.groupInfo.level == 0) activityLevel = "project";
+      else if (this.groupInfo.level == 1) activityLevel = "subproject";
+      else if (this.groupInfo.level > 1) activityLevel = "activity";
+      else return;
+      this.axios
+        .get(`/GeoProblemSolving/${activityLevel}/${this.groupId}/user`)
+        .then((res) => {
+          if (res.data.code == 0) {
+            this.$set(this, "participants", res.data.data.members);
+            // 建立通讯
+            this.startWebSocket(this.groupId);
+          }
+        });
+    },
     send(msg) {
       this.message = msg;
       let myDate = new Date().Format("yyyy-MM-dd HH:mm:ss");
@@ -804,9 +822,10 @@ export default {
         this.send_msg = {
           type: "message",
           from: this.$store.getters.userName,
-          fromid: this.$store.getters.userId,
+          srcUserId: this.$store.getters.userId,
           content: this.message,
-          time: current_time
+          time: current_time,
+          targetUserId: this.$store.getters.userId,
         };
         if (this.socketApi.getSocketInfo().linked) {
           this.msglist.push(this.send_msg);
@@ -815,7 +834,7 @@ export default {
         } else {
           let chatMsg = {
             type: "notice",
-            content: "You are disconnecting with others."
+            content: "You are disconnecting with others.",
           };
           this.msglist.push(chatMsg);
         }
@@ -831,7 +850,7 @@ export default {
       this.send_msg = {
         type: "test",
         from: "Test",
-        content: "TestChat"
+        content: "TestChat",
       };
       this.socketApi.sendSock(this.send_msg, this.getSocketConnect);
     },
@@ -839,12 +858,7 @@ export default {
     getSocketConnect(data) {
       var chatMsg = data; //data传回onopen方法里的值
       if (data.type === "members") {
-        let members = data.content
-          .replace("[", "")
-          .replace("]", "")
-          .replace(/\s/g, "")
-          .split(",");
-        this.onlineUserIdList = members;
+        this.onlineUserIdList = data.content;
         this.judgeonlineParticipant();
       } else if (data.type === "message") {
         //判断消息的发出者
@@ -885,7 +899,7 @@ export default {
         this.onlineParticipants = [];
         this.offlineParticipants = [];
         for (let i = 0; i < this.participants.length; i++) {
-          if (this.onlineUserIdList.includes(this.participants[i].userId)) {
+          if (this.onlineUserIdList.contains(this.participants[i])) {
             this.onlineParticipants.push(this.participants[i]);
           } else {
             this.offlineParticipants.push(this.participants[i]);
@@ -942,31 +956,31 @@ export default {
     sendNotify(msg) {
       if (this.windowStatus === "blur") {
         var notify = new Notification("You have got a new message", {
-          tag: msg.fromid + msg.time,
+          tag: msg.srcUserId + msg.time,
           icon: require("@/assets/images/OGMS2.png"), //通知的缩略图,
           body: "from   " + msg.from, //通知的具体内容
-          renotify: true
+          renotify: true,
         });
 
         //通知显示
-        notify.onshow = function() {
+        notify.onshow = function () {
           //5s自行停止通知
           setTimeout(notify.close.bind(notify), 5000);
         };
 
         //单击通知，跳转到页面
-        notify.onclick = function() {
+        notify.onclick = function () {
           window.focus();
           notify.close();
         };
 
         //报错处理
-        notify.onerror = function() {
+        notify.onerror = function () {
           console.log("error");
         };
 
         //通知关闭
-        notify.onclose = function() {
+        notify.onclose = function () {
           console.log("HTML5桌面消息关闭！！！");
         };
       }
@@ -1014,7 +1028,7 @@ export default {
               "&value=" +
               this.selectGroup.selectId
           )
-          .then(res => {
+          .then((res) => {
             if (res.data != "None" && res.data != "Fail") {
               for (let i = 0; i < res.data.length; i++) {
                 let message = JSON.parse(res.data[i].content);
@@ -1046,7 +1060,7 @@ export default {
       }
       this.currentPage = index;
       this.$refs.page.currentPage = index; //分页强制固定
-    }
+    },
   },
 
   // computed:{
@@ -1083,22 +1097,22 @@ export default {
     window.removeEventListener("resize", this.initSize);
   },
   beforeRouteEnter: (to, from, next) => {
-    next(vm => {
+    next((vm) => {
       if (!vm.$store.getters.userState || vm.$store.getters.userId == "") {
         vm.$router.push({
-          name: "Login"
+          name: "Login",
         });
       } else {
       }
     });
   },
-  updated: function() {
-    this.$nextTick(function() {
+  updated: function () {
+    this.$nextTick(function () {
       var div = document.getElementById("contentBody");
       var div2 = document.getElementById("searchmessageList");
       div.scrollTop = div.scrollHeight - 60;
       div2.scrollTop = div.scrollHeight;
     });
-  }
+  },
 };
 </script>

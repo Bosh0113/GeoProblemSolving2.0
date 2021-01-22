@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="https://www.thymeleaf.org">
+<html lang="zh-cmn-Hans" xmlns:th="https://www.thymeleaf.org">
 <head>
     <meta http-equiv="pragma" content="no-cache">
     <meta http-equiv="cache-control" content="no-cache">
@@ -1252,29 +1252,29 @@
                 },
                 deleteProject() {
                     axios
-                        .get(
-                            "/GeoProblemSolving/project/delete?" +
+                        .delete(
+                            "/GeoProblemSolving/project?" +
                             "projectId=" +
                             this.projectInfo.aid
                         )
                         .then(res => {
                             if (res.data == "Offline") {
                                 this.$refs.navigationEl.logout("login");
-                            } else if (res.data == "Fail") {
-                                this.$Notice.error({
-                                    title: "Error",
-                                    desc: "Delete project fail."
-                                });
-                            }
-                            if (res.data == "Success") {
+                            } else if (res.data.code === 0) {
                                 this.$Notice.success({
                                     title: "Success",
                                     desc: "Delete project successfully."
                                 });
                                 window.location.href = '/GeoProblemSolving/projectList';
+                            } else {
+                                this.$Notice.error({
+                                    title: "Error",
+                                    desc: "Fail to remove the project."
+                                });
                             }
                         })
                         .catch(err => {
+                            throw err
                         });
                 },
                 inviteModalShow() {

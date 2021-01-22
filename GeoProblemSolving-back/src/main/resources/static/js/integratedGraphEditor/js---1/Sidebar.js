@@ -123,7 +123,7 @@ Sidebar.prototype.init = function () {
 
 
   // 加载 model_tab 页面的图形
-  // this.addSearchPalette(true);
+  this.addSearchPalette(true);
 
   // this.addComputabelModel(computableModelList, true);
 
@@ -2994,7 +2994,6 @@ Sidebar.prototype.addClickHandler = function (elt, ds, cells) {
   };
 
   ds.mouseMove = function (evt) {
-    var targetCell = graph.getSelectionModel().cells[0];
     if (this.dragElement != null && this.dragElement.style.display == 'none' &&
         first != null && (Math.abs(first.x - mxEvent.getClientX(evt)) > tol ||
             Math.abs(first.y - mxEvent.getClientY(evt)) > tol)) {
@@ -3005,20 +3004,15 @@ Sidebar.prototype.addClickHandler = function (elt, ds, cells) {
   };
 
   ds.mouseUp = function (evt) {
-
-    // if(checkDataRepeat(evt.target.innerText,state.frontId)){
-    //   alert('You have selected this input yet')
-    //   return
-    // }
     if (!mxEvent.isPopupTrigger(evt) && this.currentGraph == null &&
         this.dragElement != null && this.dragElement.style.display == 'none') {
       sb.itemClicked(cells, ds, evt, elt);
     }
+
+
     var parent = graph.getDefaultParent();
 
     oldMouseUp.apply(ds, arguments);
-    targetCell = graph.getSelectionModel().cells[0];
-
     mxUtils.setOpacity(elt, 100);
     first = null;
 
@@ -3031,12 +3025,6 @@ Sidebar.prototype.addClickHandler = function (elt, ds, cells) {
         graph.insertEdge(parent, null, '', targetCell, state, "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;strokeWidth=2;strokeColor=#000066;");
         window.parent.dragIntoDataItem(targetCell)
       } else if (targetCell.response == "0") {
-
-        // if(checkCellRepeat(targetCell.eventId,'eventId')){
-        //   alert('You have selected this output yet')
-        //   return
-        // }
-
         graph.insertEdge(parent, null, '', state, targetCell, "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;strokeWidth=2;strokeColor=#000066;");
         window.parent.dragIntoDataItem(targetCell)
       } else if (targetCell.md5 != undefined&&targetCell.md5 != ''){
@@ -3162,9 +3150,6 @@ Sidebar.prototype.createDataServiceEventVertexTemplate = function (style, width,
     cells[0].style = 'shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;strokeWidth=2;strokeColor=#f46161;fillColor=#aadcf8;'
   }else{
     cells[0].style = 'shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;strokeWidth=2;strokeColor=#23b220;fillColor=#aadcf8;'
-  }
-  if(event.param){
-    cells[0].style = 'whiteSpace=wrap;html=1;strokeWidth=2;strokeColor=#f46161;fillColor=none;'
   }
 
   return this.createVertexTemplateFromCells(cells, width, height, title, showLabel, showTitle, allowCellsInserted);
@@ -3541,12 +3526,12 @@ Sidebar.prototype.destroy = function () {
 //   // }
 //
 //   //绘制指定页码的计算模型
-//   for (var j = 0; j < computableModelList.size; j++) {
-//     var model = computableModelList.content[j];
-//     var modelName = model.name;
-//     var a = this.createStateVertexTemplate('rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;strokeColor=#5bbbf2;fillColor=#5bbbf2;', 200, 50, modelName, model.description, null, null, modelName, model);
-//     div.appendChild(a);
-//   }
+//   // for (var j = 0; j < computableModelList.size; j++) {
+//   //   var model = computableModelList.content[j];
+//   //   var modelName = model.name;
+//   //   var a = this.createStateVertexTemplate('rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;strokeColor=#5bbbf2;fillColor=#5bbbf2;', 200, 50, modelName, model.description, null, null, modelName, model);
+//   //   div.appendChild(a);
+//   // }
 //
 //   var pagination = document.createElement('div');
 //   pagination.className = 'el-pagination';
@@ -3600,16 +3585,16 @@ Sidebar.prototype.destroy = function () {
 //   pagination.appendChild(nextBtn);
 //
 // };
-//
+
 // Sidebar.prototype.addComputabelModelPage = function (computableModelList, div) {
 //
-//   //绘制指定页码的是个计算模型
-//   for (var i = 0; i < computableModelList.numberOfElements; i++) {
-//     var model = computableModelList.content[i];
-//     var modelName = model.name;
-//     var a = this.createStateVertexTemplate('rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;strokeColor=#5bbbf2;fillColor=#5bbbf2;', 200, 50, modelName, model.description, null, null, modelName, model);
-//     div.appendChild(a);
-//   }
+//   // //绘制指定页码的是个计算模型
+//   // for (var i = 0; i < computableModelList.numberOfElements; i++) {
+//   //   var model = computableModelList.content[i];
+//   //   var modelName = model.name;
+//   //   var a = this.createStateVertexTemplate('rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;strokeColor=#5bbbf2;fillColor=#5bbbf2;', 200, 50, modelName, model.description, null, null, modelName, model);
+//   //   div.appendChild(a);
+//   // }
 // };
 
 /**
@@ -3783,10 +3768,7 @@ Sidebar.prototype.addGeneralCellToGraph = function (text,frontId,type) {
 
   hasSearchedTermsComputableModel.push(model)
   var pt = graph.getFreeInsertPoint();
-
-  let x = pt.x>250?pt.x:250
-
-  var cell = graph.insertVertex(parent, null, text, x, pt.y , 100, 60, style[type]);
+  var cell = graph.insertVertex(parent, null, text, pt.x, pt.y, 100, 60, style[type]);
 
   if(type == 'condition'){
     cell.frontId = frontId
@@ -3817,10 +3799,7 @@ Sidebar.prototype.addModelToGraph = function (model) {
 
   hasSearchedTermsComputableModel.push(model)
   var pt = graph.getFreeInsertPoint();
-
-  let x = pt.x>250?pt.x:250
-
-  var cell = graph.insertVertex(parent, null, model.name, x, pt.y+150, 200, 50, "rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;strokeColor=#5bbbf2;fillColor=#5bbbf2;fontSize=14");
+  var cell = graph.insertVertex(parent, null, model.name, pt.x, pt.y, 200, 50, "rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;strokeColor=#5bbbf2;fillColor=#5bbbf2;fontSize=14");
 
   cell.frontId = model.id;
   cell.name = model.name;
@@ -3843,10 +3822,7 @@ Sidebar.prototype.addDataProcessToGraph = function (info) {
 
   var parent = graph.getDefaultParent();
   var pt = graph.getFreeInsertPoint();
-
-  let x = pt.x>250?pt.x:250
-
-  var cell = graph.insertVertex(parent, null, model.name, x, pt.y+150, 200, 50, "rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;strokeColor=#f6aede;fillColor=#f6aede;fontSize=14");
+  var cell = graph.insertVertex(parent, null, model.name, pt.x, pt.y, 200, 50, "rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;strokeColor=#f6aede;fillColor=#f6aede;fontSize=14");
 
   // var a = this.createStateVertexTemplate('rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;strokeColor=#006600;fillColor=#EEFFEE;',
   //     210, 50, modelName, 'Computable Model', null, null, modelName, model);
@@ -3857,7 +3833,6 @@ Sidebar.prototype.addDataProcessToGraph = function (info) {
   cell.frontId = info.id
   cell.inputData = info.inputData;
   cell.outputData = info.outputData;
-  cell.params = info.params;
 
   // ds.drop(graph, evt, null, pt.x, pt.y, true);
 }
@@ -3914,24 +3889,3 @@ function unFoldMultiOutput(model,outputData){
   }
 }
 
-function checkCellRepeat(id,text){
-  var cells = graph.getModel().cells;
-  for(let i in cells){
-    if(cells[i][text]==id)
-      return true
-  }
-  return false
-}
-
-function checkDataRepeat(name,frontId){//检查拖入的event是否重复
-  var cells = graph.getModel().cells;
-  for(let i in cells){
-    if(cells[i].frontId==frontId){
-      if(cells[i].value===name){
-        return true
-      }
-    }
-
-  }
-  return false
-}

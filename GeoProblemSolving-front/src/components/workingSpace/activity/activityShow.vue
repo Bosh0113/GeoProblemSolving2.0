@@ -114,10 +114,7 @@
               "
             >
               <p slot="title" :title="item.name">{{ item.name }}</p>
-              <div
-                slot="extra"
-                style="margin-top: -10px; margin-right: -5px"
-              >
+              <div slot="extra" style="margin-top: -10px; margin-right: -5px">
                 <Tooltip
                   trigger="hover"
                   content="Apply to join this activity"
@@ -140,7 +137,7 @@
               </div>
             </Card>
             <Card
-                v-else
+              v-else
               style="
                 height: 160px;
                 width: 220px;
@@ -148,12 +145,10 @@
                 margin: 0 10px 10px 0;
                 cursor: pointer;
               "
+              @click.native="enterChildActivity(item)"
             >
               <p slot="title" :title="item.name">{{ item.name }}</p>
-              <div
-                slot="extra"
-                style="margin-top: -10px; margin-right: -5px"
-              >
+              <div slot="extra" style="margin-top: -10px; margin-right: -5px">
                 <Icon type="ios-person" :size="20"> </Icon>
               </div>
               <div
@@ -659,6 +654,7 @@ export default {
       return userRoleJS.roleIdentify(activity.members, this.userInfo.userId);
     },
     permissionIdentity(permission, role, operation) {
+      if(permission == undefined) permission = JSON.stringify(userRoleJS.getDefault());
       if (operation == "auto_join") {
         if (JSON.parse(permission).auto_join.visitor == "Yes") return true;
         else if (JSON.parse(permission).auto_join.visitor == "No") return false;
@@ -1085,7 +1081,7 @@ export default {
                 description:
                   "Your role in the activity: " +
                   activity.name +
-                  " in project: " +
+                  ", project: " +
                   this.projectInfo.name +
                   " has changed to " +
                   role +
