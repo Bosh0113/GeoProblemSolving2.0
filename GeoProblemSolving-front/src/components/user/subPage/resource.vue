@@ -589,10 +589,9 @@
           let oids = "";
           for (let i = 0; i < selectedRes.length; i++) {
             if (i != selectedRes.length - 1) {
-
-              oids += selectedRes[i].pathURL.split("/data/")[1] + ",";
+              oids += selectedRes[i].pathURL.split("/resource/")[1] + ",";
             } else {
-              oids += selectedRes[i].pathURL.split("/data/")[1]
+              oids += selectedRes[i].pathURL.split("/resource/")[1]
             }
           }
           let downloadBatchUrl = "http://221.226.60.2:8082/batchData?oids=" + oids;
@@ -660,7 +659,7 @@
               this.$router.push({ name: "Login" });
             }else if (res.data == "Success"){
               this.shareResModal = false;
-              this.$Message.success("Shared success.")
+              this.$Notice.success({title: "Shared success."})
             } else if (res.data == "Fail") {
               this.$Message.error(
                 "Failed to get resources from previous activities."
@@ -699,7 +698,7 @@
                 }
               }
               this.resDetailModal = false;
-              this.$Message.success("Update Success.")
+              this.$Notice.success({title:"Update Success."})
             }else {
               this.$Message.error("Update Failed.");
             }

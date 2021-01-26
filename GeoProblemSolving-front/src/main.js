@@ -38,6 +38,7 @@ Vue.use(ElementUI)
 
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 Vue.prototype.$axios = axios;
+
 // 实例化对象
 new Vue({
   el: '#app',

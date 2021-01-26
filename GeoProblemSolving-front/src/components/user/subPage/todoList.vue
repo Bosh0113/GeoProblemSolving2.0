@@ -296,7 +296,9 @@
             if (res.data.code == 0) {
               if (state == "doing") {
                 this.doingList.splice(index, 1);
+                this.$Notice.success({title: "Delete Success"})
               } else if (state == "done") {
+                this.$Notice.success({title: "Delete Success"})
                 this.doneList.splice(index, 1);
               }
             } else {
