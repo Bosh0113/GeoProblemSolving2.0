@@ -55,9 +55,7 @@ public class ChatServerSocket {
     public void onOpen(@PathParam("roomId") String roomId, Session session, EndpointConfig config) throws IOException {
         HttpSession httpSession = (HttpSession) config.getUserProperties().get(HttpSession.class.getName());
         String userId = httpSession.getAttribute("userId").toString();
-        String a = httpSession.getAttribute("email").toString();
         String userName = ((HttpSession) config.getUserProperties().get(HttpSession.class.getName())).getAttribute("name").toString();
-//        String userName = httpSession.getAttribute(" name").toString();
 
 
 //        JsonResult userInfo =  iUserDao.getUserInfo("userId",userId);
@@ -123,10 +121,10 @@ public class ChatServerSocket {
         ArrayList<Object> memberList = new ArrayList<>();
         for (Map.Entry<String, Session> server : rooms.get(roomId).entrySet()) {
             JSONObject json = new JSONObject();
-            json.put("userId",server.getKey());
             JsonResult userInfo =  iUserDao.getUserInfo("userId",server.getKey());
-//            String userName = ((InquiryUserDto)userInfo.getData()).getName();
-            json.put("userName",((InquiryUserDto)userInfo.getData()).getName());
+            String userName = ((InquiryUserDto)userInfo.getData()).getName();
+            json.put("userId",server.getKey());
+            json.put("userName", userName);
             memberList.add(json);
         }
         JSONObject messageObject = new JSONObject();
@@ -167,15 +165,16 @@ public class ChatServerSocket {
     @OnMessage
     public void onMessage(@PathParam("roomId") String roomId, String message, Session session) throws IOException {
         JSONObject messageObject = JSONObject.parseObject(message);
-        String targetUserId = messageObject.getString("targetUserId");
-        String srcUserId = messageObject.getString("srcUserId");
         String messageType = messageObject.getString("type");
         if (messageType.equals("message")) {
             broadcastMessageToRoom(roomId, message);
+
+            // 添加消息至缓存
+            messagesArray.add(message);
+            messageJson.put(roomId, messagesArray.toString());
         } else if (messageType.equals("message_pic") || messageType.equals("message_tool")) {
             broadcastMessageToRoom(roomId, message);
         }
-
     }
 
 
@@ -184,10 +183,14 @@ public class ChatServerSocket {
         String srcUserId = messageObject.getString("srcUserId");
         String targetUserId = messageObject.getString("targetUserId");
         String content = messageObject.getString("content");
+        Boolean toolConcepts = messageObject.getBoolean("toolConcepts");
 
-        String result = ansjSegService.processInfo(content);
-        String relateConceptSet = ansjSegService.elasticSearch(result);
-
+        if(toolConcepts == null) toolConcepts = false;
+        String relateConceptSet = "";
+        if(toolConcepts) {
+            String result = ansjSegService.processInfo(content);
+            relateConceptSet = ansjSegService.elasticSearch(result);
+        }
 
         //群聊
         if (srcUserId.equals(targetUserId)) {
@@ -195,7 +198,9 @@ public class ChatServerSocket {
                 if (!srcUserId.equals(server.getKey())) {
                     server.getValue().getBasicRemote().sendText(message);
                 }
-                server.getValue().getBasicRemote().sendText(relateConceptSet);
+                if(relateConceptSet.equals("")) {
+                    server.getValue().getBasicRemote().sendText(relateConceptSet);
+                }
 
             }
         } else {
@@ -204,7 +209,9 @@ public class ChatServerSocket {
                 if (targetUserId.equals((server.getKey()))) {
                     server.getValue().getBasicRemote().sendText(message);
                 }
-                server.getValue().getBasicRemote().sendText(relateConceptSet);
+                if(relateConceptSet.equals("")) {
+                    server.getValue().getBasicRemote().sendText(relateConceptSet);
+                }
             }
         }
         saveMessage(roomId, message);

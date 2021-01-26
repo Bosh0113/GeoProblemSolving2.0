@@ -1,7 +1,7 @@
 //说明：integratedEditor页面为iframe嵌入的mxgraph，
 //mxgraph的控制由integratedGraphEditor/js中的数个文件实现：
 //   SideBar.js:{1.添加模型到mxgraph中
-//               2.左侧栏的搜索结果/形成cell列、模型-cell组织 createStateVertexTemplate
+//               2.左侧栏的搜索结果/形成cell列、模型-cell组织createStateVertexTemplate
 //               3.右侧的event-cell组织createEventVertexTemplate
 //               4.鼠标事件down move up 拖拽加入cell
 //   }
@@ -10,9 +10,8 @@
 //
 //   }
 //
-//   format.js:{1.生成events,点击拖拽置入event,在refresh生成panel那里
+//   format.js:{1.生成events,点击拖拽置入event
 //              2.点击event查看event的详细信息
-//              3.修改graph的尺寸Format.prototype.changePageSize
 //
 //
 //   }
@@ -31,11 +30,12 @@
 //   手动连接两个cell: static/js/mxGraph/js/handler/mxConnectionHandler.js mxConnectionHandler.prototype.connect
 //
 //   侧边栏拉入model-cell流程（2020.10.22）：点击，触发format.js中的refresh方法，生成对应元素，没有frontId则先不生成event，同时生成右边栏的文字.
-//   鼠标释放cell，触发sideBar.js 的ds.mouseup,判断条件后调用全局方法加入到vue页面形成modelAction,并把vue页面生成的frontId返回赋值给这个cell--废弃
+//   鼠标释放cell，触发sideBar.js 的ds.mouseup,判断条件后调用全局方法加入到vue页面形成modelAction,并把vue页面生成的frontId返回赋值给这个cell
 //
 //   点击cell触发右侧详情panel生成（2020.10.22）：format refresh-panel.appendChild-各种panel.init
 //
 var dataServerIp = '111.229.14.128:8898'
+
 
 var vue = new Vue({
     el: "#app",
@@ -123,7 +123,7 @@ var vue = new Vue({
             progressBar: true,
             sortAsc: false,
             currentPage: 1,
-            pageSize: 6,
+            pageSize: 8,
             total: 1,
             searchResult: [],
         },
@@ -400,172 +400,11 @@ var vue = new Vue({
 
         invokeServices:[],
 
-        dataItemsCheck:[],
+        dataItems:[],
 
         invokeServiceLoading:false,
 
         mxgraphXml:'',
-
-        previewDialog:false,
-
-        previewUrl:'',
-
-        checkTaskInterval:null,
-
-        iframeLoaded:false,
-
-        computableModelTableDialog:false,
-
-        dataMethodTableDialog:false,
-
-        modelTableLoading:false,
-
-        searchText:'',
-
-        deployedModel:[{
-            name:'',
-        }],
-
-        dataMethodLoading:false,
-
-        recentlyUsed:[
-            {
-                author: "王明",
-                authorId: "王明",
-                createTime: "2019-05-16T13:25:55.947+0000",
-                lastModifyTime: "2019-05-17T13:25:55.947+0000",
-                md5: "15ea8a5740fdcfa951eea30579a33c4d",
-                name: "SWAT_Model",
-                oid: "16e31602-bd05-4da4-bd01-cb7582c21ae8",
-            },
-            {
-                author: "Qiang Dai",
-                authorId: "Qiang_Dai",
-                createTime: "2019-05-16T14:43:40.834+0000",
-                lastModifyTime: "2019-05-16T14:43:40.834+0000",
-                md5: "387e28f188717c4745a071356839ecb0",
-                name: "SWMM",
-                oid: "35c12565-6a5f-41e1-8e4b-5a3c7d256b03",
-            },
-            {
-                author: "Bo Huang",
-                authorId: "Bo_Huang",
-                createTime: "2019-05-16T14:43:03.277+0000",
-                lastModifyTime: "2019-05-16T14:43:03.277+0000",
-                name: "TouchAir",
-                oid: "ff844894-bbb5-492c-b72f-a7e2fa651d57",
-            },
-            {
-                author: "王明",
-                authorId: "王明",
-                createTime: "2019-05-16T14:56:38.504+0000",
-                lastModifyTime: "2019-05-16T14:56:38.504+0000",
-                name: "Fire Dynamics Simulator",
-                oid: "fe6beeac-d4fa-4685-a7fa-3fc58dfb59d3",
-            },
-            {
-                author: "Junzhi Liu",
-                authorId: "Junzhi_Liu",
-                createTime: "2019-06-17T14:03:22.373+0000",
-                lastModifyTime: "2019-06-17T14:03:22.373+0000",
-                name: "SEIMS",
-                oid: "39daf1cf-acdb-4ea0-875b-9963bb80b887",
-            },
-            {
-                author: "Xia Li",
-                authorId: "Xia_Li",
-                createTime: "2019-05-16T07:30:44.453+0000",
-                lastModifyTime: "2019-05-16T07:30:44.453+0000",
-                name: "GeoSOS_ANN_Wrap",
-                oid: "d8754772-86b7-4f5b-9398-60f320c161c9",
-            },
-            {
-                author: "Min Cao",
-                authorId: "Min_Cao",
-                createTime: "2019-06-17T14:43:57.024+0000",
-                lastModifyTime: "2019-06-17T14:43:57.024+0000",
-                name: "GCAM-CA",
-                oid: "ebc7beaf-ff61-49da-9899-bc68e7c920e6",
-            },
-            {
-                author: "A. Stewart Fotheringham",
-                authorId: "A._Stewart_Fotheringham",
-                createTime: "2019-06-17T14:07:05.185+0000",
-                lastModifyTime: "2019-06-17T14:07:05.185+0000",
-                name: "GWR",
-                oid: "fcf84557-3264-405e-93cc-0827b29fae63",
-            },
-            {
-                author: "王明",
-                authorId: "王明",
-                createTime: "2019-05-16T13:31:58.276+0000",
-                lastModifyTime: "2019-05-16T13:31:58.276+0000",
-                name: "TaiHu_Fvcom",
-                oid: "d41dfc74-3509-4d02-8f45-5e2eeaf5eec7",
-            },
-            {
-                author: "Dawen Yang",
-                authorId: "Dawen_Yang",
-                createTime: "2020-06-12T13:35:48.436+0000",
-                lastModifyTime: "2020-06-12T13:35:48.436+0000",
-                name: "GBEHM",
-                oid: "d1057c98-dcf1-4188-9bd4-49e94770901e",
-            },
-            {
-                author: "王明",
-                authorId: "王明",
-                createTime: "2019-05-05T08:00:35.199+0000",
-                lastModifyTime: "2019-05-05T08:00:35.199+0000",
-                name: "Fvcom_lu_step1",
-                oid: "322dcfb0-6a79-48a2-9b80-bb105f1bb36d",
-            },
-            {
-                author: "王明",
-                authorId: "王明",
-                createTime: "2019-05-05T08:01:21.060+0000",
-                lastModifyTime: "2019-05-05T08:01:21.060+0000",
-                name: "Fvcom_lu_step2",
-                oid: "32a4ea56-991b-4f13-87c2-f2f9bb02b61c",
-            },
-            {
-                author: "王明",
-                authorId: "王明",
-                createTime: "2019-05-05T08:02:02.646+0000",
-                lastModifyTime: "2019-05-05T08:02:02.646+0000",
-                name: "Fvcom_lu_step3",
-                oid: "c7e6fb7f-5b88-4130-9522-81fd8fe87369",
-            },
-            {
-                author: "王明",
-                authorId: "王明",
-                createTime: "2019-05-05T07:59:20.528+0000",
-                lastModifyTime: "2019-05-05T07:59:20.528+0000",
-                name: "Fvcom_lu_step4",
-                oid: "c9a9be25-a16b-4812-9ffd-aae6bf37098c",
-            },
-            {
-                author: "Jinfeng Wang",
-                authorId: "Jinfeng_Wang",
-                createTime: "2019-05-16T12:47:36.883+0000",
-                lastModifyTime: "2019-05-16T12:47:36.883+0000",
-                name: "Geographical detector",
-                oid: "e80789bc-d29c-4bd4-9ef8-674541f40d42",
-            },
-            {
-                author: "Xinyue Ye",
-                authorId: "Xinyue_Ye",
-                createTime: "2018-01-02T14:01:01.030+0000",
-                lastModifyTime: "2019-05-16T14:01:01.030+0000",
-                name: "Space-Time Analysis of Regional Systems",
-                oid: "9948998b-1daa-4dec-8d41-d74efb20431a",
-            },
-        ],
-
-        drawerFold:false,
-
-        integratedTaskXml:'',
-
-        singleDataConfigTitle:'',
     },
 
     computed:{
@@ -621,18 +460,6 @@ var vue = new Vue({
                 callback(t);
         },
 
-        handleDrawer(){
-            if(this.drawerFold) {
-                this.drawerFold = !this.drawerFold
-                $('.drawerHandler').animate({left:210},95);
-                $('.itemSelector').animate({width:210},97);
-            }else{
-                this.drawerFold = !this.drawerFold
-                $('.drawerHandler').animate({left:0},40);
-                $('.itemSelector').animate({width:0},40);
-            }
-        },
-
         expandMxgraph(){
             if(this.mxgraphExpand==0){
                 this.mxgraphExpand=1
@@ -654,68 +481,19 @@ var vue = new Vue({
         changeMxView(viewType){
             if(viewType == 'All Items') {
 
-                this.readOnly = false
-                this.iframeWindow.setCXml(this.mxgraphXml);
-
             }else if(viewType == 'Model Items'){
 
                 this.mxgraphXml = this.iframeWindow.getCXml()
-                //把画布清空
-                this.iframeWindow.setCXml('<mxGraphModel dx="670" dy="683" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169">\n' +
-                    '  <root>\n' +
-                    '    <mxCell id="0"/>\n' +
-                    '    <mxCell id="1" parent="0"/>\n' +
-                    '  </root>\n' +
-                    '</mxGraphModel>');
-
-                this.readOnly = true
-                let edges = this.checkActionLink()
-                this.iframeWindow.setModelView(this.modelActions,edges)
             }
 
         },
 
         checkActionLink(){
-            let edges = []
             for(let dataLink of this.dataLinks){
                 let targetActionId = dataLink.targetActionId
                 let sourceActionId = dataLink.sourceActionId
-
-                let targetAction = this.findTargetModelAction(targetActionId)[1]
-                let sourceAction = this.findTargetModelAction(sourceActionId)[1]
-
-                if(targetAction!=undefined&&targetAction.type=='modelService'&&sourceAction.type=='modelService'){
-                    let edge = {
-                        target:targetAction.id,
-                        source:sourceAction.id
-                    }
-                    edges.push(edge)
-                }else if(targetAction!=undefined&&targetAction.type=='dataService'&&sourceAction.type=='modelService'){
-                    let targets=[]
-                    this.getModelTarget(sourceAction.id,targets)
-                    for(let target of targets){
-                        let edge = {
-                            target:target,
-                            source:sourceAction.id
-                        }
-                        edges.push(edge)
-                    }
-                }
             }
-            return edges
-        },
 
-        getModelTarget(source,targets){
-            for(let dataLink of this.dataLinks){
-                if(dataLink.sourceActionId===source){
-                    let targetAction = this.findTargetModelAction(dataLink.targetActionId)[1]
-                    if(targetAction.type==='modelService'){
-                        targets.push(targetAction.id)
-                    }else{
-                        this.getModelTarget(targetAction.id,targets)
-                    }
-                }
-            }
         },
 
         checkMutiFlow(data){//判断是否有输入是其他模型的多输出
@@ -771,8 +549,8 @@ var vue = new Vue({
 
             let funcs={
                 'general':()=>{return},
-                'modelItem':this.modelItemListChange,
-                'dataMethod':this.dataMethodListChange,
+                'modelItem':this.getModelItemList,
+                'dataMethod':this.getDataMethodList,
             }
             let fun = funcs[item]
             fun()
@@ -795,22 +573,11 @@ var vue = new Vue({
             this.getModelItemList(this.currentModelClassi.oid)
         },
 
-        modelItemListChange(){
-            if(this.computableModelList.length==0){
-                this.getModelItemList()
-            }
-        },
-
-        refreshModelItemList(){
-            this.searchModelText = ''
-            this.getModelItemList(this.currentModelClassi.oid)
-        },
-
         getModelItemList(classi){
             if(classi == undefined||classi === ''){
                 classi = 'all'
             }
-            axios.get("/GeoProblemSolving/integration/pageByClassi", {
+            axios.get("/PExploration/integration/pageByClassi", {
                     params: {
                         asc: 0,
                         page: this.pageOption2.currentPage - 1,
@@ -897,24 +664,7 @@ var vue = new Vue({
             this.getDataMethodList(this.currentDataMethodClassi.oid)
         },
 
-        loadDeployedDataMethodClick(){
-            this.dataMethodTableDialog = true
-            this.getDataMethodList()
-        },
-
-        dataMethodListChange(){
-            if(this.dataMethodList.length==0){
-                this.getDataMethodList()
-            }
-        },
-
-        refreshDataMethodList(){
-            this.searchDataMethodText = ''
-            this.getDataMethodList(this.currentDataMethodClassi.oid)
-        },
-
         getDataMethodList(classi){
-            this.dataMethodLoading = true
             if(classi == undefined||classi === ''){
                 classi = 'all'
             }
@@ -927,11 +677,10 @@ var vue = new Vue({
                 sortTypeName:'createTime',
                 method:classi
             }
-            axios.post("/GeoProblemSolving/integration/getDataprocessing",data)
+            axios.post("/PExploration/integration/getDataprocessing",data)
                 .then((res)=>{
                     setTimeout(()=>{
                         this.dataMethodList=res.data.data.list;
-                        this.dataMethodLoading = false
                         this.pageOption3.total=res.data.data.total;
                     },100)
                 });
@@ -956,17 +705,6 @@ var vue = new Vue({
         },
 
         addModelToMxgraph(model){
-            if(this.readOnly){
-                this.$alert('This view is read-only !', 'Tip', {
-                        type:"warning",
-                        confirmButtonText: 'OK',
-                        callback: ()=>{
-                        }
-                    }
-                );
-                return
-            }
-
             var modelEditor = $("#ModelEditor")[0].contentWindow;
             if(model==undefined){
                 model = this.detailComptbModel
@@ -979,17 +717,7 @@ var vue = new Vue({
         },
 
         addDataMethodToMxgraph(dataMethod){
-            if(this.readOnly){
-                this.$alert('This view is read-only !', 'Tip', {
-                        type:"warning",
-                        confirmButtonText: 'OK',
-                        callback: ()=>{
-                            return
-                        }
-                    }
-                );
-                return
-            }
+
             this.showInvokeServices(dataMethod)
             // let dataMethodAction = this.addDataMethodToList(dataMethod)
             // if(dataMethodAction!='check'){
@@ -1037,6 +765,8 @@ var vue = new Vue({
             //     this.addProcessingTools(dataMethod,this.processingTools);
             // }
 
+
+
         },
 
         async selectInvokeService(invokeService){
@@ -1053,14 +783,13 @@ var vue = new Vue({
             invokeService.metaDetail = nodeEle.metaDetail
             this.invokeServiceSelect = invokeService
             this.invokeServiceDialog = false
-            this.dataMethodTableDialog = false
             this.addInvokeService();
         },
 
         async checkNodeContent(invokeService){
             let result = null
 
-            await axios.get("/GeoProblemSolving/integration/checkNodeContent",{
+            await axios.get("/PExploration/integration/checkNodeContent",{
                 params:{
                     serverId:invokeService.serviceId,
                     token:invokeService.token,
@@ -1088,14 +817,6 @@ var vue = new Vue({
 
             this.addProcessingTools(this.configDataMethod,this.processingTools);
 
-            for(let input of dataProcessing.inputData){
-                this.addDataItem(input, dataProcessing.id)
-            }
-
-            for(let output of dataProcessing.outputData){
-                this.addDataItem(output, dataProcessing.id)
-            }
-
             var modelEditor = $("#ModelEditor")[0].contentWindow;
             modelEditor.ui.sidebar.addDataProcessToGraph(dataProcessing)//把这个模型action加入画布
         },
@@ -1104,27 +825,24 @@ var vue = new Vue({
             let dataProcessAction = {
                 inputData:[],
                 outputData:[],
-                params:[],
             }
             let methodDetail = invokeService.metaDetail
-            let inputItems = methodDetail.input;
-            let outputItems = methodDetail.output;
-            let params = methodDetail.parameter;
+            let inputItems = methodDetail.Input;
+            let outputItems = methodDetail.Output;
+            let params = methodDetail.Parameter;
 
             // dataProcessAction.iterationNum=1//迭代次数,默认为1
             dataProcessAction.description=''
             dataProcessAction.name=invokeService.name
-            dataProcessAction.service=invokeService.serviceId
+            dataProcessAction.service=invokeService.serverId
             dataProcessAction.token=invokeService.token
-            dataProcessAction.method=invokeService.method
+            dataProcessAction.param=''
             dataProcessAction.type='dataService'
 
             if(inputItems instanceof Array){
                 for(let input of inputItems){
                     input.eventId = this.generateGUID()
                     input.response = true
-                    input.eventType = 'response'
-                    input.eventName = input.name
                     dataProcessAction.inputData.push(input)
                 }
             } else {
@@ -1133,23 +851,10 @@ var vue = new Vue({
                 dataProcessAction.inputData.push(inputItems)
             }
 
-            if(params instanceof Array){
-                for(let param of params){
-                    param.eventId = this.generateGUID()
-                    param.response = true
-                    param.param = true
-                    param.eventType = 'response'
-                    param.eventName = param.name
-                    dataProcessAction.params.push(param)
-                }
-            }
-
             if(outputItems instanceof Array){
                 for(let output of outputItems){
                     output.eventId = this.generateGUID()
                     output.response = false
-                    output.eventType = 'noresponse'
-                    output.eventName = output.name
                     dataProcessAction.outputData.push(output)
                 }
             } else {
@@ -1203,36 +908,12 @@ var vue = new Vue({
         },
 
         addStartToMxgraph(){
-            if(this.readOnly){
-                this.$alert('This view is read-only !', 'Tip', {
-                        type:"warning",
-                        confirmButtonText: 'OK',
-                        callback: ()=>{
-                            return
-                        }
-                    }
-                );
-                return
-            }
-
             var modelEditor = $("#ModelEditor")[0].contentWindow;
 
             modelEditor.ui.sidebar.addGeneralCellToGraph('Start',undefined,'start')
         },
 
         addCondtionToMxgraph(){
-            if(this.readOnly){
-                this.$alert('This view is read-only !', 'Tip', {
-                        type:"warning",
-                        confirmButtonText: 'OK',
-                        callback: ()=>{
-                            return
-                        }
-                    }
-                );
-                return
-            }
-
             let id = this.generateGUID();
             let condition = {
                 id:id,
@@ -1244,18 +925,6 @@ var vue = new Vue({
         },
 
         addEndToMxgraph(){
-            if(this.readOnly){
-                this.$alert('This view is read-only !', 'Tip', {
-                        type:"warning",
-                        confirmButtonText: 'OK',
-                        callback: ()=>{
-                            return
-                        }
-                    }
-                );
-                return
-            }
-
             var modelEditor = $("#ModelEditor")[0].contentWindow;
             modelEditor.ui.sidebar.addGeneralCellToGraph('End',undefined,'end')
         },
@@ -1264,7 +933,7 @@ var vue = new Vue({
             this.loading = true
             // $.ajax({
             //     type: "GET",
-            //     url: "/GeoProblemSolving/integration/pageDataItemChecked",
+            //     url: "/PExploration/integration/pageDataItemChecked",
             //     data:{
             //         page:this.pageOptionDataItem.currentPage-1,
             //         pageSize:this.pageOptionDataItem.pageSize,
@@ -1279,10 +948,10 @@ var vue = new Vue({
             //             window.location.href="/user/login";
             //         } else {
             //             if(res.data == undefined){
-
+            //
             //             }else{
             //                 let data = res.data
-            //                 this.dataItemsCheck = data.content
+            //                 this.dataItems = data.content
             //                 this.pageOptionDataItem.total = data.total
             //                 setTimeout(()=>{
             //                     this.loading = false
@@ -1308,15 +977,6 @@ var vue = new Vue({
             this.addModelActionToModelActionList(modelAction,this.modelActions)
 
             this.addModelList(model,this.models)
-
-            for(let input of modelAction.inputData){
-                this.addDataItem(input, modelAction.id)
-            }
-
-            for(let output of modelAction.outputData){
-                this.addDataItem(output, modelAction.id)
-            }
-
             return modelAction
         },
 
@@ -1408,21 +1068,16 @@ var vue = new Vue({
                     return [i,this.dataProcessings[i]]
                 }
             }
-            return [undefined,undefined]
         },
 
         deleteModel(modelActionId,md5){
             for(let i=this.modelActions.length-1;i>=0;i--){//从尾部开始寻找，在目标之后的模型任务step都要-1
-                let tmp
                 if(this.modelActions[i].md5===md5&&this.modelActions[i].id === modelActionId){
-                    this.deleteRelatedDataItem(this.modelActions[i])
                     this.modelActions.splice(i,1)
+                    break
                 }else{
                     this.modelActions[i].step--
                 }
-
-                break
-
             }
             for(let i=this.models.length-1;i>=0;i--){//从尾部开始寻找，如果该模型对应的action只有一个则删除
                 if(this.models[i].md5===md5){
@@ -1434,27 +1089,12 @@ var vue = new Vue({
                     break
                 }
             }
-
-
-        },
-
-        deleteRelatedDataItem(modelAction){
-            for(let input of modelAction.inputData){
-                this.deleteDataItem(input.eventId,modelAction.id)
-            }
-            for(let output of modelAction.outputData){
-                this.deleteDataItem(output.eventId,modelAction.id)
-            }
         },
 
         buildNewTask(){
             this.currentTask = {}
             this.models = []
             this.modelActions = []
-            this.processingTools = []
-            this.dataProcessings = []
-            this.dataItemList = {}
-            this.dataItems = []
             //把画布清空
             this.iframeWindow.setCXml('<mxGraphModel dx="670" dy="683" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169">\n' +
                 '  <root>\n' +
@@ -1574,13 +1214,13 @@ var vue = new Vue({
             this.currentEvent = event;
         },
 
-        selectDataspaceFile(file) {
-            this.targetFile = file
-        },
-
-        removeDataspaceFile(file) {
-            this.targetFile = {}
-        },
+        // selectDataspaceFile(file) {
+        //     this.targetFile = file
+        // },
+        //
+        // removeDataspaceFile(file) {
+        //     this.targetFile = {}
+        // },
 
         selectFromDataSpace() {
             if(this.dataFromActive == 'dataSpace'){
@@ -1605,7 +1245,7 @@ var vue = new Vue({
             this.dataNode.status = 0
             // $.ajax({
             //     type: "GET",
-            //     url: "/GeoProblemSolving/integration/getUserNodes",
+            //     url: "/PExploration/integration/getUserNodes",
             //     async: true,
             //     success: (res) => {
             //         if (res.code == -1) {
@@ -1634,7 +1274,7 @@ var vue = new Vue({
             this.nodeLoading=true
             // $.ajax({
             //     type: "GET",
-            //     url: "/GeoProblemSolving/integration/getNodeContentCheck",
+            //     url: "/PExploration/integration/getNodeContentCheck",
             //     data:{
             //         token:token,
             //         type:type,
@@ -1646,7 +1286,7 @@ var vue = new Vue({
             //             // window.location.href="/user/login";
             //         } else {
             //             if(res.data == undefined){
-
+            //
             //             }else{
             //                 data = res.data
             //                 this.dataNode[type.toLowerCase()] = data
@@ -1660,7 +1300,6 @@ var vue = new Vue({
             //         this.nodeLoading = false
             //     }
             // })
-
         },
 
         selectDataFromDataServer(data){
@@ -1713,313 +1352,8 @@ var vue = new Vue({
             }
 
             this.eventConfigDialog = true
-            this.singleDataConfigTitle = 'Input Data Config'
         },
 
-        dataItemConfig(dataItem){
-            this.configEvent = []
-
-            for(let modelAction of this.modelActions){
-                if(modelAction.id==dataItem.parentId){
-                    for(let input of modelAction.inputData){
-                        if(input.eventId === dataItem.eventId){
-                            this.configEvent[0] = input
-                            break;
-                        }
-                    }
-                }
-            }
-
-            for(let modelAction of this.modelActions){
-                if(modelAction.id==dataItem.parentId){
-                    for(let output of modelAction.outputData){
-                        if(output.eventId === dataItem.eventId){
-                            this.configEvent[0] = output
-                            break;
-                        }
-                    }
-                }
-            }
-
-            for(let dataProcessing of this.dataProcessings){
-                if(dataProcessing.id==dataItem.parentId){
-                    for(let input of dataProcessing.inputData){
-                        if(input.eventId === dataItem.eventId){
-                            this.configEvent[0] = input
-                            break;
-                        }
-                    }
-                }
-            }
-
-            for(let dataProcessing of this.dataProcessings){
-                if(dataProcessing.id==dataItem.parentId){
-                    for(let output of dataProcessing.outputData){
-                        if(output.eventId === dataItem.eventId){
-                            this.configEvent[0] = output
-                            break;
-                        }
-                    }
-                }
-            }
-
-            if(dataItem.eventType=='response'){
-                this.singleDataConfigTitle = 'Input Data Config'
-            }else{
-                this.singleDataConfigTitle = 'Output Data Config'
-            }
-
-            this.eventConfigDialog = true
-        },
-
-        checkDataLoaded(dataItem){
-            if(dataItem.eventType=='response'){
-                for(let modelAction of this.modelActions){
-                    if(modelAction.id==dataItem.parentId){
-                        for(let input of modelAction.inputData){
-                            if(input.eventId==dataItem.eventId){
-                                if(input.value!=undefined&&input.value!=''){
-                                    return 'loaded'
-                                }else if((input.link!=undefined&&input.link!='')||input.type=='mixed'){
-                                    return 'linked'
-                                }
-                            }
-                        }
-                    }
-                }
-                for(let dataProcessing of this.dataProcessings){
-                    if(dataProcessing.id==dataItem.parentId){
-                        for(let input of dataProcessing.inputData){
-                            if(input.eventId==dataItem.eventId){
-                                if(input.value!=undefined&&input.value!=''){
-                                    return 'loaded'
-                                }else if((input.link!=undefined&&input.link!='')||input.type=='mixed'){
-                                    return 'linked'
-                                }
-                            }
-
-                        }
-                    }
-                }
-            }
-
-            if(dataItem.eventType=='noresponse'){
-                for(let modelAction of this.modelActions){
-                    if(modelAction.id==dataItem.parentId){
-                        for(let output of modelAction.outputData){
-                            if(output.eventId==dataItem.eventId){
-                                if(output.value!=undefined&&output.value!=''){
-                                    return 'runned'
-                                }
-                            }
-
-                        }
-                    }
-                }
-                for (let dataProcessing of this.dataProcessings) {
-                    if (dataProcessing.id == dataItem.parentId) {
-                        for (let output of dataProcessing.outputData) {
-                            if (output.eventId === dataItem.eventId) {
-                                if (output.value != undefined && output.value != '') {
-                                    return 'runned'
-                                }
-                            }
-                        }
-                    }
-            }
-            }
-
-
-            return false
-        },
-        //旧版本运行方式
-        // execute() {
-        //
-        //     this.createAndUploadParamFile();
-        //     let prepare = setInterval(() => {
-        //         let prepared = true;
-        //
-        //         for (var i = 0; i < this.modelActions.length; i++) {
-        //             for (var j = 0; j < this.modelActions[i].inputData.length; j++) {
-        //                 var event = this.modelActions[i].inputData[j];
-        //                 //判断参数文件是否已经上传
-        //                 let children = event.children;
-        //                 if (children === undefined) {
-        //                     continue;
-        //                 } else {
-        //                     let hasFile = false;
-        //                     for (k = 0; k < children.length; k++) {
-        //                         if (children[k].val != undefined && children[k].val.trim() != "") {
-        //                             hasFile = true;
-        //                             break;
-        //                         }
-        //                     }
-        //                     if (hasFile) {
-        //                         if (event.value == undefined) {
-        //                             prepared = false;
-        //                             break;
-        //                         }
-        //                     }        //
-        //                 }
-        //             }
-        //             if (!prepared) {
-        //                 break;
-        //             }
-        //         }
-        //
-        //         if (prepared) {
-        //             clearInterval(prepare);
-        //
-        //
-        //             this.executeVisible = false;
-        //
-        //             this.$notify.info({
-        //                 title: 'Start Executing !',
-        //                 message: 'You could wait it,and you could also find this task in your Space!',
-        //             });
-        //
-        //             var xml = "";
-        //             var uid = this.generateGUID();
-        //             var name = this.taskName;
-        //             var version = "1.0";
-        //
-        //             xml += "<TaskConfiguration uid='" + uid + "' name='" + name + "' version='" + version + "'>\n" +
-        //                 "\t<Models>\n";
-        //             for (var i = 0; i < this.modelActions.length; i++) {
-        //                 xml += "\t\t<Model name='" + this.modelActions[i].name + "' pid='" + this.modelActions[i].md5 + "' description='" + this.modelActions[i].description + "'>\n" +
-        //                     "\t\t\t<InputData>\n";
-        //                 for (var j = 0; j < this.modelActions[i].inputData.length; j++) {
-        //                     if (this.modelActions[i].inputData[j].value != "") {
-        //                         xml += "\t\t\t\t<DataConfiguration state='" + this.modelActions[i].inputData[j].state + "' event='" + this.modelActions[i].inputData[j].event + "' value='" + this.modelActions[i].inputData[j].value + "' dataId='" + this.modelActions[i].inputData[j].dataId + "' type='" + this.modelActions[i].inputData[j].type + "'/>\n";
-        //                     }
-        //                 }
-        //                 xml += "\t\t\t</InputData>\n" +
-        //                     "\t\t\t<OutputData>\n";
-        //                 for (var k = 0; k < this.modelActions[i].outputData.length; k++) {
-        //                     xml += "\t\t\t\t<DataConfiguration state='" + this.modelActions[i].outputData[k].state + "' event='" + this.modelActions[i].outputData[k].event + "' value='" + this.modelActions[i].outputData[k].value + "' dataId='" + this.modelActions[i].outputData[k].dataId + "' type='" + this.modelActions[i].outputData[k].type + "'/>\n";
-        //                 }
-        //                 xml += "\t\t\t</OutputData>\n" +
-        //                     "\t\t</Model>\n";
-        //             }
-        //             xml += "\t</Models>\n" +
-        //                 "</TaskConfiguration>";
-        //
-        //             console.log(xml);
-        //
-        //             let file = new File([xml], name + '.xml', {
-        //                 type: 'text/xml',
-        //             });
-        //
-        //
-        //             var formData = new FormData();
-        //             formData.append("file", file);
-        //             formData.append("name", this.taskName);
-        //
-        //             $.ajax({
-        //                 url: "/task/runIntegratedTask",
-        //                 data: formData,
-        //                 type: "POST",
-        //                 processData: false,
-        //                 contentType: false,
-        //                 success: (result) => {
-        //                     var taskId = result.data;
-        //
-        //                     let interval = setInterval(() => {
-        //                         $.ajax({
-        //                             url: "/task/checkIntegratedTask/" + taskId,
-        //                             data: {},
-        //                             type: "GET",
-        //                             success: (obj) => {
-        //                                 let status = obj.data.status;
-        //                                 if (status == 0) {
-        //                                     console.log(status);
-        //                                 } else if (status == -1) {
-        //                                     console.log(status);
-        //                                     clearInterval(interval);
-        //                                     this.$alert('Integrated model run failed!', 'Error', {
-        //                                         type: "error",
-        //                                         confirmButtonText: 'OK',
-        //                                         callback: action => {
-        //                                             //this.$message({
-        //                                             //type: 'danger',
-        //                                             //message: `action: ${ action }`
-        //                                             //});
-        //                                         }
-        //                                     });
-        //                                 } else {
-        //                                     console.log(status);
-        //                                     clearInterval(interval);
-        //                                     this.$alert('Integrated model run Success', 'Success', {
-        //                                         type: "success",
-        //                                         confirmButtonText: 'OK',
-        //                                         callback: action => {
-        //                                             //this.$message({
-        //                                             //type: 'success',
-        //                                             //message: `action: ${ action }`
-        //                                             //});
-        //                                         }
-        //                                     });
-        //
-        //                                     let modelActions = obj.data.modelActions;
-        //                                     console.log(modelActions);
-        //
-        //
-        //                                     var cxml = this.iframeWindow.getCXml();
-        //                                     var doc = this.string2XML(cxml);
-        //
-        //
-        //                                     for (let i = 0; i < modelActions.length; i++) {
-        //                                         var output = modelActions[i].outputData.outputs;
-        //                                         for (var j = 0; j < output.length; j++) {
-        //                                             for (var k = 0; k < doc.getElementsByTagName('mxCell').length; k++) {
-        //                                                 var mxCell = doc.getElementsByTagName('mxCell')[k];
-        //                                                 if (output[j].dataId == mxCell.getAttribute('eid')) {
-        //                                                     mxCell.setAttribute('url', output[j].value);
-        //                                                 }
-        //                                             }
-        //                                         }
-        //
-        //                                         // var input = modelActions[i].inputData.inputs;
-        //                                         // for (var j = 0; j<input.length; j++){
-        //                                         //     for (var k = 0; k< doc.getElementsByTagName('mxCell').length; k++){
-        //                                         //         var mxCell = doc.getElementsByTagName('mxCell')[k];
-        //                                         //         if (input[j].dataId == mxCell.getAttribute('eid')){
-        //                                         //             mxCell.setAttribute('url',input[j].value);
-        //                                         //         }
-        //                                         //     }
-        //                                         // }
-        //                                     }
-        //                                     var xml = this.xml2String(doc);
-        //
-        //                                     this.iframeWindow.setCXml(xml);
-        //
-        //                                     // Save
-        //                                     $.ajax({
-        //                                         url: "/task/saveIntegratedTask",
-        //                                         async: true,
-        //                                         data: {
-        //                                             taskId: taskId,
-        //                                             graphXml: xml,
-        //                                             modelParams: this.modelParams,
-        //                                         },
-        //                                         type: "POST",
-        //                                         success: (result) => {
-        //                                             console.log(result);
-        //                                         }
-        //
-        //                                     })
-        //
-        //                                 }
-        //                             }
-        //                         })
-        //                     }, 3000)
-        //
-        //                 }
-        //             })
-        //         }
-        //     }, 2000);
-        //
-        // },
 
         /**
          *在列表寻找对应属性值的对象
@@ -2057,7 +1391,7 @@ var vue = new Vue({
 
         editTaskNameComfirm() {
             $.ajax({
-                url: "/GeoProblemSolving/integration/updateIntegrateTaskName",
+                url: "/PExploration/integration/updateIntegrateTaskName",
                 async: true,
                 data: {
                     taskOid: this.checkedTask.oid,
@@ -2075,7 +1409,7 @@ var vue = new Vue({
 
         editTaskDescriptionComfirm() {
             $.ajax({
-                url: "/GeoProblemSolving/integration/updateIntegrateTaskDescription",
+                url: "/PExploration/integration/updateIntegrateTaskDescription",
                 async: true,
                 data: {
                     taskOid: this.checkedTask.oid,
@@ -2093,14 +1427,8 @@ var vue = new Vue({
 
         generateXml(type){
 
+            var aaa = this.iframeWindow.getCXml();
             let mxModels = this.iframeWindow.getModels();
-
-            if(type==='execute'){
-                if(this.modelActions.length==0&&this.dataProcessings.length==0){
-                    this.$alert('Please select at least one model or data method');
-                    return null
-                }
-            }
 
             for(let model of this.modelActions){
                 for(let ele of mxModels){
@@ -2223,7 +1551,7 @@ var vue = new Vue({
                                 }
                                 if (this.dataProcessings[i].inputData[j].link != undefined && this.dataProcessings[i].inputData[j].link != '') {
                                     xml += " link='" + this.dataProcessings[i].inputData[j].link + "'"
-                                    if(this.dataProcessings[i].inputData[j].type == ''||this.dataProcessings[i].inputData[j].type == undefined){
+                                    if(this.dataProcessings[i].inputData[j].type == ''){
                                         this.dataProcessings[i].inputData[j].type = 'link'
                                     }else if(this.dataProcessings[i].inputData[j].type == 'url'){
                                         this.dataProcessings[i].inputData[j].type = 'mixed'
@@ -2238,15 +1566,9 @@ var vue = new Vue({
                                 }
                                 xml += " type='" + this.dataProcessings[i].inputData[j].type + "'/>\n";
                                 xml += "\t\t\t\t</DataConfiguration>\n"
-                            }
-                            // else if(this.dataProcessings[i].inputData[j].optional==false&&type === 'execute'){
-                            //     this.$alert('Please check input of the dataProcessing '+this.dataProcessings[i].name)
-                            //     return null;
-                            // }
-                        }
-                        if(this.dataProcessings[i].params!=null&&this.dataProcessings[i].params!=undefined){
-                            for (let j = 0;j < this.dataProcessings[i].params.length;j++ ){
-                                xml += `\t\t<Parameter id='${this.dataProcessings[i].params[j].id}' value='${this.dataProcessings[i].params[j].value}' type='${this.dataProcessings[i].params[j].type}'/>`
+                            } else if(this.dataProcessings[i].inputData[j].optional==false&&type === 'execute'){
+                                this.$alert('Please check input of the dataProcessing '+this.dataProcessings[i].name)
+                                return null;
                             }
                         }
                         xml += "\t\t\t</Inputs>\n" +
@@ -2350,7 +1672,7 @@ var vue = new Vue({
                     type: 'text/xml',
                 });
 
-                let saveStatus = this.saveIntegratedTask(xml,mxgraph,this.models,this.modelActions,this.processingTools,this.dataProcessings,this.dataLinks,this.dataItems)
+                let saveStatus = this.saveIntegratedTask(xml,mxgraph,this.models,this.modelActions,this.processingTools,this.dataProcessings,this.dataLinks)
                 if(saveStatus==='suc'){
                     var formData = new FormData();
                     formData.append("file", file);
@@ -2360,7 +1682,7 @@ var vue = new Vue({
                     var _this = this;
 
                     $.ajax({
-                        url: "/GeoProblemSolving/integration/runIntegratedTask",
+                        url: "/PExploration/integration/runIntegratedTask",
                         data: formData,
                         type: "POST",
                         processData: false,
@@ -2369,10 +1691,8 @@ var vue = new Vue({
                             var taskId = result.data;
                             this.updateTaskId(this.currentTaskOid,taskId)
 
-                            clearInterval(this.checkTaskInterval);
-
-                            this.checkTaskInterval = setInterval(() => {
-                                this.checkIntegratedTask(taskId,this.checkTaskInterval)
+                            let interval = setInterval(() => {
+                                this.checkIntegratedTask(taskId,interval)
                             }, 3000)
 
                         }
@@ -2398,7 +1718,7 @@ var vue = new Vue({
 
         checkIntegratedTask(taskId,interval){
             $.ajax({
-                url: "/GeoProblemSolving/integration/checkIntegratedTask/" + taskId,
+                url: "/PExploration/integration/checkIntegratedTask/" + taskId,
                 data: {},
                 type: "GET",
                 success: (obj) => {
@@ -2408,7 +1728,6 @@ var vue = new Vue({
                     this.updateMxgraphNode(taskInfo.modelActionList)
                     this.updateMxgraphNode(taskInfo.dataProcessingList)
                     this.updateTaskoutput(taskInfo)
-                    this.updateTaskDataItems(taskInfo)
                     if (status == 0) {
                         console.log(status);
                     } else if (status == -1) {
@@ -2454,7 +1773,6 @@ var vue = new Vue({
 
         updateTaskoutput(taskInfo,doc){
             let updateModels = taskInfo.modelActionList.completed;
-            let updateDataProcessings = taskInfo.dataProcessingList.completed;
 
             // 将结果更新到 this.modelActions 中
             for (let i = 0; i < this.modelActions.length; i++) {
@@ -2483,31 +1801,6 @@ var vue = new Vue({
                 }
             }
 
-            // 将结果更新到 this.dataProcessings 中
-            for (let i = 0; i < this.dataProcessings.length; i++) {
-                let dataProcessing = this.dataProcessings[i]
-                for(let j = 0;j < updateDataProcessings.length;j++){
-                    let newDP = updateDataProcessings[j]
-                    if(newDP.id == dataProcessing.id){
-                        for(let k = 0;k < this.dataProcessings[i].outputData.length;k++){
-                            let data = this.dataProcessings[i].outputData[k]
-                            for(let l = 0;l<newDP.outputData.outputs.length;l++){
-                                let newData = newDP.outputData.outputs[l]
-                                if(data.eventId === newData.dataId){
-                                    let dataContent = newData.dataContent
-                                    data.value = dataContent.value
-                                    data.fileName = 'result'
-                                    data.suffix = ''
-                                }
-                            }
-                        }
-                    }
-
-                }
-
-
-            }
-
             if(doc!=undefined){
                 for (let i = 0; i < updateModels.length; i++) {
                     var output = updateModels[i].outputData.outputs;
@@ -2533,32 +1826,6 @@ var vue = new Vue({
             }
 
 
-        },
-
-        updateTaskDataItems(task){
-            for(let dataItem of this.dataItems){
-                if(dataItem.eventType=='noresponse'){
-                    for(let modelAction of this.modelActions){
-                        if(modelAction.id==dataItem.parentId){
-                            for(let output of modelAction.outputData){
-                                if(output.eventId==dataItem.eventId){
-                                    dataItem.value = output.value
-                                }
-
-                            }
-                        }
-                    }
-                    for (let dataProcessing of this.dataProcessings) {
-                        if (dataProcessing.id == dataItem.parentId) {
-                            for (let output of dataProcessing.outputData) {
-                                if (output.eventId === dataItem.eventId) {
-                                    dataItem.value = output.value
-                                }
-                            }
-                        }
-                    }
-                }
-            }
         },
 
         unFoldMultiOutput(modelAction,outputData){
@@ -2622,15 +1889,12 @@ var vue = new Vue({
 
             let xml = this.generateXml('save')
 
-            let mxgraph = this.mxgraphXml
-            if(this.mxgraphXml==''){
-                mxgraph = this.iframeWindow.getCXml();
-            }
+            let mxgraph = this.iframeWindow.getCXml();
 
             if (Object.keys(this.currentTask) != 0) {
-                this.updateIntegratedTask(this.currentTask.oid, xml, mxgraph, this.models, this.modelActions,this.processingTools,this.dataProcessings,this.dataLinks,this.dataItems)
+                this.updateIntegratedTask(this.currentTask.oid, xml, mxgraph, this.models, this.modelActions,this.processingTools,this.dataProcessings,this.dataLinks)
             } else {
-                this.saveIntegratedTask(xml, mxgraph, this.models, this.modelActions,this.processingTools,this.dataProcessings,this.dataLinks,this.dataItems)
+                this.saveIntegratedTask(xml, mxgraph, this.models, this.modelActions,this.processingTools,this.dataProcessings,this.dataLinks)
             }
 
 
@@ -2660,7 +1924,6 @@ var vue = new Vue({
                     modelOid:modelAction.modelOid,
                     md5:modelAction.md5,
                     name:modelAction.name,
-                    type:'modelService',
                     description:modelAction.description,
                     outputData:[],
                     inputData:[],
@@ -2705,7 +1968,7 @@ var vue = new Vue({
             let addTools = []
             let addProcessings = []
 
-            //拼接集成模型中的datatools部分
+            //拼接集成模型中的models部分
             for(let tool of processingTools){
                 let addTool={
                     name:tool.name,
@@ -2719,11 +1982,11 @@ var vue = new Vue({
                 addTools.push(addTool)
             }
 
-            //拼接集成模型中的dataProcessing部分
+            //拼接集成模型中的modelActions部分
             for(let dataProcessing of dataProcessings){
                 let addProcessing={
                     id:dataProcessing.id,
-                    type:'dataService',
+                    type:dataProcessing.type,
                     name:dataProcessing.name,
                     service:dataProcessing.service,
                     description:dataProcessing.description,
@@ -2770,11 +2033,11 @@ var vue = new Vue({
 
 
         UpdateIntegrateTaskClick(task){
-            this.updateIntegratedTask(task.oid,task.xml,task.mxGraph,task.models,task.modelActions,task.processingTools,task.dataProcessings,this.dataLinks,this.dataItems)
+            this.updateIntegratedTask(task.oid,task.xml,task.mxGraph,task.models,task.modelActions,task.processingTools,task.dataProcessings,this.dataLinks)
             this.taskInfoVisible = false
         },
 
-        updateIntegratedTask(taskOid,xml,mxgraph,models,modelActions,processTools,dataProcessings,dataLinks,dataItems){
+        updateIntegratedTask(taskOid,xml,mxgraph,models,modelActions,processTools,dataProcessings,dataLinks){
             let model7modelActions = this.generateTaskModelInfo(models,modelActions)
             let tool7Processing = this.generateTaskDataProcessingInfo(processTools,dataProcessings)
 
@@ -2787,13 +2050,12 @@ var vue = new Vue({
                 modelActions: model7modelActions[1],
                 dataProcessings: tool7Processing[1],
                 dataLinks: dataLinks,
-                dataItems: dataItems,
                 description: this.taskDescription,
                 taskName: this.taskName,
             }
 
             $.ajax({
-                url: "/GeoProblemSolving/integration/updateIntegratedTaskInfo",
+                url: "/PExploration/integration/updateIntegratedTaskInfo",
                 async: true,
                 data: JSON.stringify(data),
                 // traditional:true,
@@ -2815,7 +2077,7 @@ var vue = new Vue({
             })
         },
 
-        saveIntegratedTask(xml,mxgraph,models,modelActions,processTools,dataProcessings,dataLinks,dataItems){//保存一个集成模型配置
+        saveIntegratedTask(xml,mxgraph,models,modelActions,processTools,dataProcessings,dataLinks){//保存一个集成模型配置
             let model7modelActions = this.generateTaskModelInfo(models,modelActions)
             let tool7Processing = this.generateTaskDataProcessingInfo(processTools,dataProcessings)
 
@@ -2827,14 +2089,14 @@ var vue = new Vue({
                 modelActions: model7modelActions[1],
                 dataProcessings: tool7Processing[1],
                 dataLinks: dataLinks,
-                dataItems: dataItems,
+                dataItems: this.dataItems,
                 description: this.taskDescription,
                 taskName: this.taskName,
             }
 
             let saveStatus
             $.ajax({
-                url: "/GeoProblemSolving/integration/saveIntegratedTask?aid="+this.getStepInfo(),
+                url: "/PExploration/integration/saveIntegratedTask?aid="+this.getStepInfo(),
                 async: true,
                 data: JSON.stringify(data),
                 // traditional:true,
@@ -2860,7 +2122,7 @@ var vue = new Vue({
 
         updateTaskId(taskOid,taskId){//把managerserver返回的taskid更新到门户数据库
             $.ajax({
-                url: "/GeoProblemSolving/integration/updateIntegrateTaskId",
+                url: "/PExploration/integration/updateIntegrateTaskId",
                 async: true,
                 data: {
                     taskOid:taskOid,
@@ -2878,7 +2140,6 @@ var vue = new Vue({
         checkData() {
 
             this.configVisible = false;
-            this.configDataPVisible = false;
             //检查输入数据是否齐全
             if (true) {
                 this.executeDisabled = false;
@@ -2897,7 +2158,6 @@ var vue = new Vue({
             }).then(res => {
                     window.open('/profile/'+res.data.data)
                 }
-
             )
         },
 
@@ -3024,38 +2284,6 @@ var vue = new Vue({
             })
         },
 
-        downloadDataItem(dataItem){
-            if(dataItem.value!=undefined&&dataItem.value!=''){
-                this.download(dataItem)
-            }else{
-                if(dataItem.eventType=='noresponse') {
-                    for (let modelAction of this.modelActions) {
-                        if (modelAction.id == dataItem.parentId) {
-                            for (let output of modelAction.outputData) {
-                                if (output.eventId === dataItem.eventId) {
-                                    if (output.value != undefined && output.value != '') {
-                                        this.download(output)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    for (let dataProcessing of this.dataProcessings) {
-                        if (dataProcessing.id == dataItem.parentId) {
-                            for (let output of dataProcessing.outputData) {
-                                if (output.eventId === dataItem.eventId) {
-                                    if (output.value != undefined && output.value != '') {
-                                        this.download(output)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-        },
-
         download(event) {
             //下载接口
             if (event.value != undefined) {
@@ -3064,31 +2292,6 @@ var vue = new Vue({
             } else {
                 this.$message.error("No data can be downloaded.");
             }
-        },
-
-        preview(output){
-            let url = output.value
-            // let url = 'http://221.226.60.2:8082/data/ca932e30-e671-4853-b198-cf5c857f58a7'
-            let vthis = this
-
-            var http = new XMLHttpRequest();
-            http.open('HEAD', url);
-            http.onreadystatechange = function() {
-                if (this.readyState == this.DONE) {
-                    if(this.status == 200){
-                        let fileSize = http.getResponseHeader('Content-Length');
-                        if(fileSize<2*1024*1024){
-                            vthis.previewDialog = true
-                            vthis.previewUrl = ''
-                            vthis.previewUrl = url
-                        }else{
-                            vthis.$alert('This file is too large, please download it to view the result.')
-                        }
-
-                    }
-                }
-            };
-            http.send();
         },
 
         generateGUID() {
@@ -3135,7 +2338,7 @@ var vue = new Vue({
         checkTaskInfo(task){
             this.taskInfoVisible = true
             console.log(this.integratedTaskList[0].id)
-            axios.get('/GeoProblemSolving/integration/getIntegrateTaskByOid',{
+            axios.get('/PExploration/integration/getIntegrateTaskByOid',{
                 params:{
                     taskOid:task.oid
                 }
@@ -3147,23 +2350,6 @@ var vue = new Vue({
                 console.log(this.integratedTaskList[0].modelActions.length)
             })
 
-        },
-
-        addDataItemList(){
-            for(let i=0;i<this.dataItems.length;i++){
-                let dataItem = this.dataItems[i]
-                let parentId = dataItem.parentId
-                if(this.dataItemList[parentId]==undefined){
-                    let list = []
-                    list.push(dataItem)
-                    Vue.set(this.dataItemList,parentId,list)
-                    this.addColorPool(parentId)
-                }else{
-                    let list = this.dataItemList[parentId]
-                    list.push(dataItem);
-                    Vue.set(this.dataItemList,parentId,list)
-                }
-            }
         },
 
         loadTask(task){
@@ -3180,10 +2366,16 @@ var vue = new Vue({
             this.dataItems = []
             this.dataItemList = {}
 
-            this.dataItems = task.dataItems
-            this.dataLinks = task.dataLinks
-
-            this.addDataItemList()
+            // if(this.dataItemList[parentId]==undefined){
+            //     let list = []
+            //     list.push(dataItem)
+            //     Vue.set(this.dataItemList,parentId,list)
+            // }else{
+            //     let list = this.dataItemList[parentId]
+            //     list.push(dataItem);
+            //     Vue.set(this.dataItemList,parentId,list)
+            // }
+            // this.addColorPool(parentId)
 
             //loadDataItem
             for(let modelAction of this.modelActions){
@@ -3192,17 +2384,17 @@ var vue = new Vue({
                         let dataItem = input
                         dataItem.parentId = modelAction.id
                         let parentId = modelAction.id
-                        // this.dataItems.push(dataItem)
-                        // if(this.dataItemList[parentId]==undefined){
-                        //     let list = []
-                        //     list.push(dataItem)
-                        //     Vue.set(this.dataItemList,parentId,list)
-                        // }else{
-                        //     let list = this.dataItemList[parentId]
-                        //     list.push(dataItem);
-                        //     Vue.set(this.dataItemList,parentId,list)
-                        // }
-                        // this.addColorPool(parentId)
+                        this.dataItems.push(dataItem)
+                        if(this.dataItemList[parentId]==undefined){
+                            let list = []
+                            list.push(dataItem)
+                            Vue.set(this.dataItemList,parentId,list)
+                        }else{
+                            let list = this.dataItemList[parentId]
+                            list.push(dataItem);
+                            Vue.set(this.dataItemList,parentId,list)
+                        }
+                        this.addColorPool(parentId)
                     }
                 }
                 for(let output of modelAction.outputData){
@@ -3210,17 +2402,17 @@ var vue = new Vue({
                         let dataItem = output
                         dataItem.parentId = modelAction.id
                         let parentId = modelAction.id
-                        // this.dataItems.push(dataItem)
-                        // if(this.dataItemList[parentId]==undefined){
-                        //     let list = []
-                        //     list.push(dataItem)
-                        //     Vue.set(this.dataItemList,parentId,list)
-                        // }else{
-                        //     let list = this.dataItemList[parentId]
-                        //     list.push(dataItem);
-                        //     Vue.set(this.dataItemList,parentId,list)
-                        // }
-                        // this.addColorPool(parentId)
+                        this.dataItems.push(dataItem)
+                        if(this.dataItemList[parentId]==undefined){
+                            let list = []
+                            list.push(dataItem)
+                            Vue.set(this.dataItemList,parentId,list)
+                        }else{
+                            let list = this.dataItemList[parentId]
+                            list.push(dataItem);
+                            Vue.set(this.dataItemList,parentId,list)
+                        }
+                        this.addColorPool(parentId)
                     }
                 }
             }
@@ -3231,17 +2423,17 @@ var vue = new Vue({
                         let dataItem = input
                         dataItem.parentId = action.id
                         let parentId = action.id
-                        // this.dataItems.push(dataItem)
-                        // if(this.dataItemList[parentId]==undefined){
-                        //     let list = []
-                        //     list.push(dataItem)
-                        //     Vue.set(this.dataItemList,parentId,list)
-                        // }else{
-                        //     let list = this.dataItemList[parentId]
-                        //     list.push(dataItem);
-                        //     Vue.set(this.dataItemList,parentId,list)
-                        // }
-                        // this.addColorPool(parentId)
+                        this.dataItems.push(dataItem)
+                        if(this.dataItemList[parentId]==undefined){
+                            let list = []
+                            list.push(dataItem)
+                            Vue.set(this.dataItemList,parentId,list)
+                        }else{
+                            let list = this.dataItemList[parentId]
+                            list.push(dataItem);
+                            Vue.set(this.dataItemList,parentId,list)
+                        }
+                        this.addColorPool(parentId)
                     }
                 }
                 for(let output of action.outputData){
@@ -3249,24 +2441,22 @@ var vue = new Vue({
                         let dataItem = output
                         dataItem.parentId = action.id
                         let parentId = action.id
-                        // this.dataItems.push(dataItem)
-                        // if(this.dataItemList[parentId]==undefined){
-                        //     let list = []
-                        //     list.push(dataItem)
-                        //     Vue.set(this.dataItemList,parentId,list)
-                        // }else{
-                        //     let list = this.dataItemList[parentId]
-                        //     list.push(dataItem);
-                        //     Vue.set(this.dataItemList,parentId,list)
-                        // }
-                        // this.addColorPool(parentId)
+                        this.dataItems.push(dataItem)
+                        if(this.dataItemList[parentId]==undefined){
+                            let list = []
+                            list.push(dataItem)
+                            Vue.set(this.dataItemList,parentId,list)
+                        }else{
+                            let list = this.dataItemList[parentId]
+                            list.push(dataItem);
+                            Vue.set(this.dataItemList,parentId,list)
+                        }
+                        this.addColorPool(parentId)
                     }
                 }
             }
 
-
             this.iframeWindow.setCXml(task.mxGraph);
-
             this.taskInfoVisible = false
             this.currentTask = task
             this.activeTask = 'currentTask'
@@ -3312,7 +2502,7 @@ var vue = new Vue({
 
         listIntegrateTask(){
             let aid = this.getStepInfo();
-            axios.get("/GeoProblemSolving/integration/pageIntegrateTaskByActivity",{
+            axios.get("/PExploration/integration/pageIntegrateTaskByActivity",{
                 params:{
                     aid: aid,
                     asc:0,
@@ -3323,6 +2513,25 @@ var vue = new Vue({
             }).then((res)=>{
                 if(res.data.code == -1){
                     this.integratedTaskList = [];
+                }else{
+                    let data = res.data.data
+                    this.integratedTaskList = data.content
+                    this.pageOption.total = data.total;
+                }
+            })
+        },
+
+        listIntegrateTaskByUser(){
+            axios.get("/PExploration/integration/pageIntegrateTaskByUser",{
+                params:{
+                    asc:0,
+                    pageNum:this.pageOption.currentPage-1,
+                    pageSize:6,
+                    sortElement:'lastModifiedTime'
+                }
+            }).then((res)=>{
+                if(res.data.code == -1){
+                    this.integratedTaskList = 'login'
                 }else{
                     let data = res.data.data
                     this.integratedTaskList = data.content
@@ -3352,7 +2561,7 @@ var vue = new Vue({
                         instance.confirmButtonLoading = true;
                         instance.confirmButtonText = 'deleting...';
                         setTimeout(() => {
-                            axios.delete("/GeoProblemSolving/integration/deleteIntegratedTask",{
+                            axios.delete("/PExploration/integration/deleteIntegratedTask",{
                                 params:{
                                     taskOid:task.oid
                                 }
@@ -3438,21 +2647,11 @@ var vue = new Vue({
         },
 
         deleteDataLink(edgeCell){
-            let targetId
-            let sourceId
-
-            if(edgeCell.edge!=undefined){
-                let targetCell = edgeCell.target//edge的两端是event
-                let sourceCell = edgeCell.source
-                targetId = targetCell.eid
-                sourceId = sourceCell.eid
-            }else{
-                targetId = edgeCell.target
-                sourceId = edgeCell.source
-            }
+            let targetCell = edgeCell.target//edge的两端是event
+            let sourceCell = edgeCell.source
 
             for(let i = this.dataLinks.length-1;i>=0;i--){
-                if( this.dataLinks[i].target === targetId&& this.dataLinks[i].source === sourceId){
+                if( this.dataLinks[i].targetActionId === targetCell.frontId&& this.dataLinks[i].sourceActionId === sourceCell.frontId){
                     this.dataLinks.splice(i,1)
                     break;
                 }
@@ -3724,7 +2923,6 @@ var vue = new Vue({
 
             for(let i=this.dataProcessings.length-1;i>=0;i--){//从尾部开始寻找，在目标之后的模型任务step都要-1
                 if(this.dataProcessings[i][tagName]===tag&&this.dataProcessings[i].id === dataProcessingId){
-                    this.deleteRelatedDataItem(this.dataProcessings[i])
                     this.dataProcessings.splice(i,1)
                     break
                 }else{
@@ -4002,78 +3200,39 @@ var vue = new Vue({
             let targetAction = targetActionInfo[1]
             let parentId = '';
 
-            //拖入时检查重复
-            let data = this.findTargetItem(dataItemCell.eid,'eventId',this.dataItems)
-            if(data == null) {
-                let dataItem = {}
+            let dataItem = {}
 
-                for(let input of targetAction.inputData){
-                    if(input.eventId == dataItemCell.eid){
-                        dataItem.parentId = dataItemCell.frontId
-                        dataItem.link = dataItemCell.link
-                        dataItem.type = dataItemCell.type
-                        dataItem.linkEvent = dataItemCell.linkEvent
-                        dataItem.eventId = input.eventId
-                        dataItem.eventName = input.eventName
-                        dataItem.name = input.name
-                        dataItem.eventType = input.eventType
-                        dataItem.optional = input.optional
-                        dataItem.response = input.response
-                        dataItem.value = input.response
+            for(let input of targetAction.inputData){
+                if(input.eventId == dataItemCell.eid){
+                    dataItem.parentId = dataItemCell.frontId
+                    dataItem.link = dataItemCell.link
+                    dataItem.type = dataItemCell.type
+                    dataItem.linkEvent = dataItemCell.linkEvent
+                    dataItem.eventId = input.eventId
+                    dataItem.eventName = input.eventName
+                    dataItem.name = input.name
+                    dataItem.eventType = input.eventType
+                    dataItem.optional = input.optional
+                    dataItem.response = input.response
+                    dataItem.value = input.response
 
+                    break
+                }
+            }
+            if(parentId==''){
+                for(let output of targetAction.outputData){
+                    if(output.eventId == dataItemCell.eid){
+                        output.parentId = dataItemCell.frontId
+                        output.link = dataItemCell.link
+                        output.type = dataItemCell.type
+                        output.linkEvent = dataItemCell.linkEvent
+                        dataItem = output
                         break
                     }
                 }
-                if(parentId==''){
-                    for(let output of targetAction.outputData){
-                        if(output.eventId == dataItemCell.eid){
-                            output.parentId = dataItemCell.frontId
-                            output.link = dataItemCell.link
-                            output.type = dataItemCell.type
-                            output.linkEvent = dataItemCell.linkEvent
-                            dataItem = output
-                            break
-                        }
-                    }
-                }
-
-                parentId = dataItem.parentId
-                if(this.dataItemList[parentId]==undefined){
-                    let list = []
-                    list.push(dataItem)
-                    Vue.set(this.dataItemList,parentId,list)
-                }else{
-                    let list = this.dataItemList[parentId]
-                    list.push(dataItem);
-                    Vue.set(this.dataItemList,parentId,list)
-                }
-
-                this.dataItems.push(dataItem)
-
-                this.addColorPool(parentId)
             }
 
-
-
-        },
-
-        addDataItem(data,parentId){
-            let dataItem = {}
-            if(data.eventType=='response'){
-                dataItem.eventId = data.eventId
-                dataItem.eventName = data.eventName
-                dataItem.name = data.name
-                dataItem.eventType = data.eventType
-                dataItem.optional = data.optional
-                dataItem.response = data.response
-                dataItem.value = data.response
-
-            }else{
-                dataItem = data
-            }
-
-            dataItem.parentId = parentId
-
+            parentId = dataItem.parentId
             if(this.dataItemList[parentId]==undefined){
                 let list = []
                 list.push(dataItem)
@@ -4089,56 +3248,6 @@ var vue = new Vue({
             this.addColorPool(parentId)
         },
 
-        deleteDataItemInfo(dataItemId,parentId){
-            // let modelDataItems = this.dataItemList[parentId]
-            // for(let i=modelDataItems.length-1;i>=0;i--){
-            //     if(modelDataItems[i].eventId == dataItemId){
-            //         modelDataItems.splice(i,1);
-            //         if(modelDataItems.length>0){
-            //             Vue.set(this.dataItemList,parentId,modelDataItems)
-            //         }else{
-            //             delete this.dataItemList[parentId]
-            //         }
-            //     }
-            // }
-
-            for(let i=this.dataItems.length-1;i>=0;i--){
-                if(this.dataItems[i].eventId == dataItemId ){
-                    this.dataItems[i].value='';
-                    this.dataItems[i].fileName='';
-                    this.dataItems[i].suffix='';
-                }
-            }
-
-            //把所属action中的data数值重置
-            let targetActionInfo = this.findTargetModelAction(parentId)
-
-            let targetAction = targetActionInfo[1]
-            for(let input of targetAction.inputData){
-                if(input.eventId == dataItemId){
-                    input.value=''
-                    input.link=''
-                    input.type=''
-                    input.linkEvent=''
-                    input.fileName=''
-                    input.suffix=''
-
-                    break
-                }
-            }
-
-            this.deleteRelatedLink(dataItemId)
-        },
-
-        deleteRelatedLink(dataItemId){
-            for(let dataLink of this.dataLinks){
-                if(dataLink.target===dataItemId){
-                    this.deleteDataLink(dataLink)
-                }else if(dataLink.source===dataItemId){
-                    this.deleteDataLink(dataLink)
-                }
-            }
-        },
 
         deleteDataItem(dataItemId,parentId){
             let modelDataItems = this.dataItemList[parentId]
@@ -4154,35 +3263,10 @@ var vue = new Vue({
             }
 
             for(let i=this.dataItems.length-1;i>=0;i--){
-                if(this.dataItems[i].eventId == dataItemId ){
+                if(this.dataItems.eventId == dataItemId ){
                     this.dataItems.splice(i,1);
                 }
             }
-
-            //把所属action中的data数值重置
-            let targetActionInfo = this.findTargetModelAction(parentId)
-
-            let targetAction = targetActionInfo[1]
-            for(let input of targetAction.inputData){
-                if(input.eventId == dataItemId){
-                    input.value=''
-                    input.link=''
-                    input.type=''
-                    input.linkEvent=''
-
-                    break
-                }
-            }
-
-
-        },
-
-        getParentName(parentId){
-            let modelAction = this.findTargetModelAction(parentId)[1]
-            if(modelAction != undefined){
-                return modelAction.name
-            }
-
         },
 
         floatMask(mask,width){
@@ -4258,7 +3342,6 @@ var vue = new Vue({
             // for(let card of cards){
             //     card.classList.remove('lightingDataItem')
             // }
-            this.lightDataLinks = []
             setTimeout(()=>{
                 this.linkedDataItems = []
 
@@ -4426,7 +3509,6 @@ var vue = new Vue({
         },
 
         rgb2hex(rgb) {
-            let r,g,b
             if (rgb instanceof Array) {
                 r = Number(rgb[0]);
                 g = Number(rgb[1]);
@@ -4470,214 +3552,11 @@ var vue = new Vue({
             }
         },
 
-        changePageSize(pageIndex){
-            this.$nextTick(()=>{
-                let modelEditor = $("#ModelEditor")[0].contentWindow;
-                modelEditor.ui.format.changePageSize(pageIndex)
-
-            })
-        },
-
-        async getTaskByOid(taskOid){
-            let data
-            await axios.get('/GeoProblemSolving/integration/getIntegrateTaskByOid',{
-                    params:{
-                        taskOid:taskOid
-                    }
-            }).then(res=>{
-                data = res.data.data
-
-            })
-            return data
-        },
-
-        wzhloaded(){
-            this.iframeLoaded = true
-        },
-
-        loadTaskByOid(taskOid){
-            axios.get('/GeoProblemSolving/integration/getIntegrateTaskByOid',{
-                params:{
-                    taskOid:taskOid
-                }
-            }).then(res=>{
-                let task = res.data.data
-                this.loadTask(task)
-            })
-        },
-        //选择模型
-        loadDeployedModelClick() {
-            this.computableModelTableDialog = true;
-            this.pageOption2.currentPage = 1;
-            this.searchResult = '';
-            // this.loadDeployedModel();
-            this.loadRecentlyUsed();
-            this.isSearchModel = false
-        },
-
-        handlePageChangeDeployedModel(val) {
-            this.pageOption2.currentPage = val;
-
-            if(this.inSearch==0){
-                // this.loadDeployedModel();
-                this.loadRecentlyUsed();
-
-            }
-            else
-                this.searchDeployedModel()
-        },
-
-        loadRecentlyUsed(){
-
-            this.modelTableLoading = true;
-            this.inSearch = 0
-            let page = this.pageOption2.currentPage
-            let start = (page-1)*6
-            let end = start+6<this.recentlyUsed.length?start+6:this.recentlyUsed.length
-            this.deployedModel = this.recentlyUsed.slice(start,end)
-
-            this.pageOption2.total = this.recentlyUsed.length;
-            setTimeout(()=>{
-                this.modelTableLoading = false;
-            },95)
-        },
-
-        loadDeployedModel(){
-            this.inSearch = 0
-            this.modelTableLoading = true;
-            axios.get('/computableModel/loadDeployedModel',{
-                params:{
-                    asc:0,
-                    page:this.pageOption2.currentPage-1,
-                    size:6,
-                }
-            }).then(
-                (res)=>{
-                    if(res.data.code==0){
-                        let data = res.data.data;
-                        this.deployedModel = data.content
-                        this.pageOption2.total = data.total;
-                        setTimeout(()=>{
-                            this.modelTableLoading = false;
-                        },100)
-                    }else{
-                        this.$alert('Please try again','Warning', {
-                            confirmButtonText: 'OK',
-                            callback: action => {
-                                this.modelTableLoading = false;
-                            }
-                        })
-
-                    }
-                }
-            )
-        },
-
-        searchDeployedModel(page){
-            this.inSearch = 1
-            this.modelTableLoading = true;
-            let targetPage = page==undefined?this.pageOption2.currentPage:page
-            this.pageOption2.currentPage=targetPage
-
-            if(this.searchText.trim()==''){
-                this.loadRecentlyUsed()
-                return
-            }
-
-            axios.get('/computableModel/searchDeployedModel',{
-                params:{
-                    asc:0,
-                    page:targetPage-1,
-                    size:6,
-                    searchText: this.searchText,
-                }
-            }).then(
-                (res)=>{
-
-                    this.isSearchModel = true
-                    if(res.data.code==0){
-                        let data = res.data.data;
-                        this.deployedModel = data.content
-                        this.pageOption2.total = data.total;
-                        setTimeout(()=>{
-                            this.modelTableLoading = false;
-                        },150)
-
-                    }else{
-                        this.$alert('Please try again','Warning', {
-                            confirmButtonText: 'OK',
-                            callback: action => {
-                                this.modelTableLoading = false;
-                            }
-                        })
-
-                    }
-                }
-            )
-        },
-
-        async getModelInfo(oid) {
-            let data
-            await axios.get('/computableModel/getDeployedModelByOid',{
-                    params:{
-                        oid:oid
-                    }
-            }).then(
-                res=>{
-                    data = res.data.data
-                }
-            )
-
-            return data
-        },
-
-        async selectModel(oid){
-            let model = await this.getModelInfo(oid)
-            this.addModelToMxgraph(model);
-            this.computableModelTableDialog = false
-        },
-
-        viewUser(userId){
-            window.open('/profile/'+userId)
-        },
-
-        loadUser(){
-            $.ajax({
-                    type: "GET",
-                    url: "/user/load",
-                    data: {},
-                    cache: false,
-                    async: false,
-                    xhrFields: {
-                        withCredentials: true
-                    },
-                    crossDomain: true,
-                    success: (data) => {
-
-                        if (data.oid == "") {
-                            this.$alert('You should log in first to use this function。', 'Tip', {
-                                    type:"warning",
-                                    confirmButtonText: 'OK',
-                                    callback: ()=>{
-                                        window.location.href = "/user/login";
-                                    }
-                                }
-                            );
-
-                        } else {
-                        }
-                    }
-                }
-            )
-        },
     },
 
-    async mounted() {
-
-        this.loadUser()
+    mounted() {
 
         this.iframeWindow = $("#ModelEditor")[0].contentWindow;
-        let modelEditor = $("#ModelEditor")[0].contentWindow;
 
         this.listIntegrateTask()
 
@@ -4747,66 +3626,61 @@ var vue = new Vue({
         });
 
         setTimeout(() => {
-            try {
-                if (graphXml != undefined) {
-                    this.iframeWindow = $("#ModelEditor")[0].contentWindow;
-                    this.iframeWindow.setCXml(graphXml);
+            if (graphXml != undefined) {
+                this.iframeWindow = $("#ModelEditor")[0].contentWindow;
+                this.iframeWindow.setCXml(graphXml);
 
-                    // 把图形中的计算模型，加载到词典中
-                    this.modelActions = this.iframeWindow.getModels();
-                    this.modelActions.forEach((model) => {
-                        $.ajax({
-                            url: 'http://geomodeling.njnu.edu.cn/computableModel/getComputableModelsBySearchTerms',
-                            data: {
-                                searchTerms: model.name
-                            },
-                            async: true,
-                            success: (result) => {
-                                for (let m in result) {
-                                    this.iframeWindow.hasSearchedTermsComputableModel.push(result[m]);
-                                }
+                // 把图形中的计算模型，加载到词典中
+                this.modelActions = this.iframeWindow.getModels();
+                this.modelActions.forEach((model) => {
+                    $.ajax({
+                        url: 'http://geomodeling.njnu.edu.cn/computableModel/getComputableModelsBySearchTerms',
+                        data: {
+                            searchTerms: model.name
+                        },
+                        async: true,
+                        success: (result) => {
+                            for (let m in result) {
+                                this.iframeWindow.hasSearchedTermsComputableModel.push(result[m]);
                             }
-                        });
+                        }
                     });
+                });
 
-                    for (var i = 0; i < this.modelActions.length; i++) {
-                        for (var j = 0; j < this.modelActions[i].inputData.length; j++) {
-                            var event = this.modelActions[i].inputData[j];
+                for (var i = 0; i < this.modelActions.length; i++) {
+                    for (var j = 0; j < this.modelActions[i].inputData.length; j++) {
+                        var event = this.modelActions[i].inputData[j];
 
-                            // 把输入数据的 value fileName 和  suffix 复制给 this.modelActions
+                        // 把输入数据的 value fileName 和  suffix 复制给 this.modelActions
 
 
-                            // 把计算模型的 参数数据 复制给 this.modelActions
+                        // 把计算模型的 参数数据 复制给 this.modelActions
 
-                            var nodes = event.data[0].nodes;
-                            let refName = event.data[0].text.toLowerCase();
-                            if (nodes != undefined && refName != "grid" && refName != "table" && refName != "shapes") {
-                                let children = [];
-                                for (k = 0; k < nodes.length; k++) {
-                                    let node = nodes[k];
-                                    let child = {};
-                                    child.dataId = node.text;
-                                    child.event = node.text;
-                                    child.description = node.desc;
-                                    child.eventType = node.dataType;
+                        var nodes = event.data[0].nodes;
+                        let refName = event.data[0].text.toLowerCase();
+                        if (nodes != undefined && refName != "grid" && refName != "table" && refName != "shapes") {
+                            let children = [];
+                            for (k = 0; k < nodes.length; k++) {
+                                let node = nodes[k];
+                                let child = {};
+                                child.dataId = node.text;
+                                child.event = node.text;
+                                child.description = node.desc;
+                                child.eventType = node.dataType;
 
-                                    child.child = true;
-                                    children.push(child);
-                                }
-                                event.children = children;
+                                child.child = true;
+                                children.push(child);
                             }
+                            event.children = children;
                         }
                     }
                 }
-            } catch (err){
-                console.log(err);
+
+
             }
         }, 500);
 
-        this.getModelItemList('all')
-
-
-
+        // this.getModelItemList('all')
         // window.selectInputData = this.selectInputData;
         window.generateGUID = this.generateGUID;
 
@@ -4831,19 +3705,7 @@ var vue = new Vue({
         window.refreshConditionInfo = this.refreshConditionInfo;
         window.dragIntoDataItem = this.dragIntoDataItem;
         window.deleteDataItem = this.deleteDataItem;
-        window.deleteDataItemInfo = this.deleteDataItemInfo;
-        window.wzhloaded = this.wzhloaded;
         //aaa
-        let taskOid = window.localStorage.getItem('taskOid')
-        window.localStorage.removeItem('taskOid')
-        if (taskOid != undefined && taskOid != null) {
-            let i = 0
-            setTimeout(()=>{
-                this.loadTaskByOid(taskOid)
-            },850)
-
-
-        }
     }
 
 });

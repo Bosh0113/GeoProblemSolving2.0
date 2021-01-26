@@ -171,7 +171,7 @@ public class ProjectController {
 
         if(result.getCode() == 0) {
             staticPagesBuilder.projectDetailPageBuilder((Project) result.getData());
-//            staticPagesBuilder.projectListPageBuilder(projectService.findProjectsByPage(0, 18));
+            staticPagesBuilder.projectListPageBuilder(projectService.findProjectsByPage(0, 18));
         }
         return result;
     }
@@ -189,7 +189,7 @@ public class ProjectController {
 
         if(result.getCode() == 0) {
             staticPagesBuilder.projectDetailPageBuilder((Project) result.getData());
-//            staticPagesBuilder.projectListPageBuilder(projectService.findProjectsByPage(0, 18));
+            staticPagesBuilder.projectListPageBuilder(projectService.findProjectsByPage(0, 18));
         }
         return result;
     }

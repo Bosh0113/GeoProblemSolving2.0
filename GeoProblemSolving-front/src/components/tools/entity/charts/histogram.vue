@@ -140,15 +140,14 @@ export default {
       if (this.userInfo == {}) {
         this.axios
           .get(
-            "/GeoProblemSolving/user/inquiry" +
-              "?key=" +
-              "userId" +
-              "&value=" +
+            "/GeoProblemSolving/user" +
+            "?key=userId" +
+            "&value=" +
               this.pageParams.userId
           )
           .then(res => {
-            if (res.data != "Fail" && res.data != "None") {
-              this.$set(this, "userInfo", res.data);
+            if (res.data.code == 0) {
+              this.$set(this, "userInfo", res.data.data);
             }
           })
           .catch(err => {});
@@ -497,15 +496,14 @@ export default {
         for (let i = 0; i < this.olParticipants.length; i++) {
           this.axios
             .get(
-              "/GeoProblemSolving/user/inquiry" +
-                "?key=" +
-                "userId" +
-                "&value=" +
+             "/GeoProblemSolving/user" +
+            "?key=userId" +
+            "&value=" +
                 this.olParticipants[i]
             )
             .then(res => {
-              if (res.data != "None" && res.data != "Fail") {
-                this.participants.push(res.data);
+              if (res.data.code == 0) {
+                this.participants.push(res.data.data);
               } else if (res.data == "None") {
               }
             });
@@ -529,15 +527,14 @@ export default {
           var that = this;
           this.axios
             .get(
-              "/GeoProblemSolving/user/inquiry" +
-                "?key=" +
-                "userId" +
-                "&value=" +
+              "/GeoProblemSolving/user" +
+            "?key=userId" +
+            "&value=" +
                 this.olParticipants[userIndex]
             )
             .then(res => {
-              if (res.data != "None" && res.data != "Fail") {
-                that.participants.push(res.data);
+              if (res.data.code == 0) {
+                that.participants.push(res.data.data);
                 if (userIndex != -1) {
                 }
               } else if (res.data == "None") {

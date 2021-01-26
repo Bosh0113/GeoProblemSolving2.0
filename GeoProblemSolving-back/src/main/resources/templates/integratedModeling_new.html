@@ -11,9 +11,9 @@
     <!--<link rel="stylesheet" href="/GeoProblemSolving/css/common/mdb/mdb.lite.min.css">-->
     <link rel="stylesheet" href="/GeoProblemSolving/css/common/fluent/fluent.css">
     <link rel="stylesheet" href="/GeoProblemSolving/css/base/universal.css">
-<!--    <link rel="stylesheet" type="text/css" media="screen" href="/GeoProblemSolving/css/common/navbar.css"/>-->
-<!--    <link rel="stylesheet" type="text/css" media="screen" href="/GeoProblemSolving/css/common/footerResponse.css"/>-->
-    <link rel="stylesheet" href="/GeoProblemSolving/css/base/style.css">
+    <!-- <link rel="stylesheet" type="text/css" media="screen" href="/GeoProblemSolving/css/common/navbar.css"/> -->
+    <!-- <link rel="stylesheet" type="text/css" media="screen" href="/GeoProblemSolving/css/common/footerResponse.css"/> -->
+<!--    <link rel="stylesheet" href="/GeoProblemSolving/css/base/style.css">-->
     <link rel="stylesheet" href="/GeoProblemSolving/css/common/fluent/fluent.css">
     <link rel="stylesheet" href="/GeoProblemSolving/css/common/wzhStyle.css">
     <link rel="stylesheet" href="/GeoProblemSolving/css/common/wzhFlexContainer.css">
@@ -81,7 +81,7 @@
 <body class="clearfix">
 <div id="app" v-cloak>
 
-<!--    <div th:replace="fragments/navbar :: unlog"></div>-->
+    <div th:replace="fragments/navbar :: unlog"></div>
 
     <div>
         <div class="flexRow" style="padding: 5px 5px">
@@ -102,8 +102,11 @@
                         <!--                   @click="executeVisible=true">Execution-->
                         <!--        </el-button>-->
                         <el-button type="primary" size="small" style="margin:5px;font-weight: 700;" @click="buildNewTask">Build New Task</el-button>
+                        <el-button type="primary" size="small" plain style="margin:5px;font-weight: 700;" @click="loadDeployedModelClick">Select Model</el-button>
+                        <el-button type="primary" size="small" plain style="margin:5px;font-weight: 700;" @click="loadDeployedDataMethodClick">Select Data Method</el-button>
                         <el-button type="success" size="small" style="margin:5px;font-weight: 700;" @click="generateXml()">XML</el-button>
-                        <el-button type="success" size="small" style="margin:5px;font-weight: 700;" @click="taskConfigure(2)"><i class="fa fa-play-circle" aria-hidden="true"></i> Execute</el-button>
+                        <el-button type="success" size="small" style="margin:5px;font-weight: 700;" @click="taskConfigure(2)">
+                            <i class="fa fa-play-circle" aria-hidden="true"></i> Execute</el-button>
                     </div>
                     <div class="flexJustStart flexAlignCenter">
                         <h5>View: </h5>
@@ -133,182 +136,227 @@
 
                 </div>
                 <div class="flexAlignStrench" style="height: calc( 100% - 41px)">
-                    <div role="itemSelector" class="flex1" style="width: 210px;border-right: 1px solid #e6e6e6;">
-                        <el-tabs v-model="itemClassify" @tab-click="changeItem" style="background: #ffffff;height: 100%">
-                            <el-tab-pane label="General" name="general">
+                    <div class="drawerHandler flexCenter" style="left: 210px" @click="handleDrawer">
+                        <i v-if="drawerFold" class="fa fa-chevron-right"></i>
+                        <i v-else class="fa fa-chevron-left"></i>
+                    </div>
+                    <div role="itemSelector" class="flex1 itemSelector" style="width: 210px;border-right: 1px solid #e6e6e6;background: white">
+<!--                        <el-tabs v-model="itemClassify" @tab-click="changeItem" style="background: #ffffff;height: 100%">-->
+
+                        <div class="el-tabs__header is-top">
+                            <div class="el-tabs__nav-wrap is-top">
+                                <div class="el-tabs__nav-scroll">
+                                    <div role="tablist" class="el-tabs__nav is-top" style="transform: translateX(58px);">
+                                        <div class="el-tabs__active-bar is-top"
+                                             style="width: 52px; transform: translateX(20px);"></div>
+                                        <div id="tab-general" aria-controls="pane-general" role="tab"
+                                             aria-selected="true" tabindex="0" class="el-tabs__item is-top is-active">
+                                            General
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div label="General" name="general">
                                 <p class="noMargin"
                                    style="font-style: italic;color: #888888;text-align: center;font-size: 13px;">
                                     Click cell to add to graph.</p>
                                 <div class="flexCol flexAlignCenter" style="width: 100%">
-                                    <div class="startCell flexCenter" style="margin-top: 15px" @click="addStartToMxgraph">
-                                        Start
-                                    </div>
-                                    <div class="conditionCell flexCenter" style="margin-top: 15px" @click="addCondtionToMxgraph">
-
-                                    </div>
-                                    <div class="endCell flexCenter" style="margin-top: 15px" @click="addEndToMxgraph">
-                                        End
-                                    </div>
-                                </div>
-                            </el-tab-pane>
-                            <el-tab-pane label="Model" name="modelItem">
-                                <div class="flexCol flexAlignCenter" style="width: 100%">
-                                    <el-input v-model="searchModelText"
-                                              size="mini"
-                                              placeholder="Search for ..."
-                                              @keyup.enter.native="searchComptbModel"
-                                              style="width: 90%;margin-top: 2px">
-                                        <el-button slot="append" icon="el-icon-search" @click="searchComptbModel"></el-button>
-                                    </el-input>
-                                    <p class="noMargin" style="color: #787878;margin-top: 5px;font-size: 13px;">Classification: {{currentModelClassi.label}}</p>
-                                    <el-button size="mini" type="primary" plain @click="changeModelClassi" round style="width: 90%;margin-top: 3px">Select Classification</el-button>
-                                    <!--                                    <p class="noMargin"-->
-                                    <!--                                       style="font-style: italic;color: #888888;margin-top: 5px;font-size: 13px;">-->
-                                    <!--                                        Click to add to graph.-->
-                                    <!--                                        Right click to view details.</p>-->
-                                    <div class="wzhScrollbar">
-                                        <div class="itemCard flexCenter"
-                                             v-for="(item,key) in computableModelList"
-                                             :key="item.oid" style="padding: 0 25px;" :style="getItemCardBackGround"
-                                        >
-                                            <el-tooltip class="item" effect="dark" :content="item.name"
-                                                        placement="top-start"
-                                            >
-                                                <p class="noMargin twoLine" @click="checkComputableModelDetail(item)">{{item.name}}</p>
-                                            </el-tooltip>
-                                            <div class="circleSmall flexCenter button_blank button_shadow"
-                                                 style="position: absolute;right: 6px;top: 13px"
-                                                 @click.stop ="addModelToMxgraph(item)"
-                                            >
-                                                <i class="fa fa-plus" style="font-size: 13px;color: #52bbf8"></i>
-                                            </div>
+                                    <el-tooltip class="item" effect="dark" content="Start"
+                                                placement="right">
+                                        <div class="startCell flexCenter" style="margin-top: 15px" @click="addStartToMxgraph">
+                                            Start
                                         </div>
-                                    </div>
-                                    <el-pagination @current-change="handlePageChangeModel"
-                                                   :current-page="pageOption2.currentPage"
-                                                   pager-count="4"
-                                                   small
-                                                   layout="prev, pager, next"
-                                                   :page-size="pageOption2.pageSize"
-                                                   :total="pageOption2.total">
-                                    </el-pagination>
-                                </div>
-
-
-                            </el-tab-pane>
-                            <el-tab-pane label="Data processing" name="dataMethod">
-                                <div class="flexCol flexAlignCenter" style="width: 100%">
-                                    <el-input v-model="searchDataMethodText"
-                                              size="mini"
-                                              placeholder="Search for ..."
-                                              @keyup.enter.native="searchDataMethod"
-                                              style="width: 90%;margin-top: 2px">
-                                        <el-button slot="append" icon="el-icon-search" @click="searchDataMethod"></el-button>
-                                    </el-input>
-                                    <p class="noMargin" style="color: #787878;margin-top: 5px;font-size: 13px;">Classification: {{currentDataMethodClassi.label}}</p>
-                                    <el-button size="mini" type="primary" plain @click="changeDataMethodClassi" round style="width: 90%;margin-top: 3px">Select Classification</el-button>
-                                    <!--                                    <p class="noMargin"-->
-                                    <!--                                       style="font-style: italic;color: #888888;margin-top: 5px;font-size: 13px;">-->
-                                    <!--                                        Click to add to graph.-->
-                                    <!--                                        Right click to view details.</p>-->
-                                    <div class="wzhScrollbar">
-                                        <div class="itemCard flexCenter"
-                                             v-for="(item,key) in dataMethodList"
-                                             :key="item.oid"
-                                             style="padding: 0 25px;background: #f6aede"
-                                             :style="getItemCardBackGround"
-                                        >
-                                            <el-tooltip class="item" effect="dark" :content="item.name"
-                                                        placement="top-start">
-                                                <p class="noMargin twoLine" @click="checkDataMethodDetail(item)">{{item.name}}</p>
-                                            </el-tooltip>
-                                            <div class="circleSmall flexCenter button_blank button_shadow"
-                                                 @click="addDataMethodToMxgraph(item)"
-                                                 style="position: absolute;right: 6px;top:13px;">
-                                                <i class="fa fa-plus" style="font-size: 13px;color: #52bbf8"></i>
-                                            </div>
+                                    </el-tooltip>
+                                    <el-tooltip class="item" effect="dark" content="Condition"
+                                                placement="right">
+                                        <div class="conditionCell flexCenter" style="margin-top: 15px" @click="addCondtionToMxgraph"></div>
+                                    </el-tooltip>
+                                    <el-tooltip class="item" effect="dark" content="End"
+                                                placement="right">
+                                        <div class="endCell flexCenter" style="margin-top: 15px" @click="addEndToMxgraph">
+                                            End
                                         </div>
-                                    </div>
-                                    <el-pagination @current-change="handlePageChangeDataMethod"
-                                                   :current-page="pageOption3.currentPage"
-                                                   pager-count="4"
-                                                   small
-                                                   layout="prev, pager, next"
-                                                   :page-size="pageOption3.pageSize"
-                                                   :total="pageOption3.total">
-                                    </el-pagination>
+                                    </el-tooltip>
                                 </div>
-                            </el-tab-pane>
-                        </el-tabs>
+                            </div>
+<!--                            <el-tab-pane label="Model" name="modelItem">-->
+<!--                                <div class="flexCol flexAlignCenter" style="width: 100%">-->
+<!--&lt;!&ndash;                                    <div>&ndash;&gt;-->
+<!--&lt;!&ndash;                                        <el-input v-model="searchModelText"&ndash;&gt;-->
+<!--&lt;!&ndash;                                                  size="mini"&ndash;&gt;-->
+<!--&lt;!&ndash;                                                  placeholder="Search for ..."&ndash;&gt;-->
+<!--&lt;!&ndash;                                                  @keyup.enter.native="searchComptbModel"&ndash;&gt;-->
+<!--&lt;!&ndash;                                                  style="width: 160px;margin-top: 2px">&ndash;&gt;-->
+<!--&lt;!&ndash;                                            <el-button slot="append" icon="el-icon-search" @click="searchComptbModel"></el-button>&ndash;&gt;-->
+<!--&lt;!&ndash;                                        </el-input>&ndash;&gt;-->
+<!--&lt;!&ndash;                                        <el-button size="mini" type="primary" plain style="padding: 7px 9px">&ndash;&gt;-->
+<!--&lt;!&ndash;                                            <i class="fa fa-refresh" @click="refreshModelItemList()"></i>&ndash;&gt;-->
+<!--&lt;!&ndash;                                        </el-button>&ndash;&gt;-->
+<!--&lt;!&ndash;                                    </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                                    <p class="noMargin" style="color: #787878;margin-top: 5px;font-size: 13px;">Classification: {{currentModelClassi.label}}</p>&ndash;&gt;-->
+<!--&lt;!&ndash;                                    <el-button size="mini" type="primary" plain @click="changeModelClassi" round style="width: 90%;margin-top: 3px">Select Classification</el-button>&ndash;&gt;-->
+<!--                                    &lt;!&ndash;                                    <p class="noMargin"&ndash;&gt;-->
+<!--                                    &lt;!&ndash;                                       style="font-style: italic;color: #888888;margin-top: 5px;font-size: 13px;">&ndash;&gt;-->
+<!--                                    &lt;!&ndash;                                        Click to add to graph.&ndash;&gt;-->
+<!--                                    &lt;!&ndash;                                        Right click to view details.</p>&ndash;&gt;-->
+<!--&lt;!&ndash;                                    <div class="wzhScrollbar">&ndash;&gt;-->
+<!--&lt;!&ndash;                                        <div class="itemCard flexCenter"&ndash;&gt;-->
+<!--&lt;!&ndash;                                             v-for="(item,key) in computableModelList"&ndash;&gt;-->
+<!--&lt;!&ndash;                                             :key="item.oid" style="padding: 0 25px;" :style="getItemCardBackGround"&ndash;&gt;-->
+<!--&lt;!&ndash;                                        >&ndash;&gt;-->
+<!--&lt;!&ndash;                                            <el-tooltip class="item" effect="dark" :content="item.name"&ndash;&gt;-->
+<!--&lt;!&ndash;                                                        placement="top"&ndash;&gt;-->
+<!--&lt;!&ndash;                                            >&ndash;&gt;-->
+<!--&lt;!&ndash;                                                <p class="noMargin twoLine" @click="checkComputableModelDetail(item)">{{item.name}}</p>&ndash;&gt;-->
+<!--&lt;!&ndash;                                            </el-tooltip>&ndash;&gt;-->
+<!--&lt;!&ndash;                                            <div class="circleSmall flexCenter button_blank button_shadow"&ndash;&gt;-->
+<!--&lt;!&ndash;                                                 style="position: absolute;right: 6px;top: 13px"&ndash;&gt;-->
+<!--&lt;!&ndash;                                                 @click.stop ="addModelToMxgraph(item)"&ndash;&gt;-->
+<!--&lt;!&ndash;                                            >&ndash;&gt;-->
+<!--&lt;!&ndash;                                                <i class="fa fa-plus" style="font-size: 13px;color: #52bbf8"></i>&ndash;&gt;-->
+<!--&lt;!&ndash;                                            </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                                        </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                                    </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                                    <el-pagination @current-change="handlePageChangeModel"&ndash;&gt;-->
+<!--&lt;!&ndash;                                                   :current-page="pageOption2.currentPage"&ndash;&gt;-->
+<!--&lt;!&ndash;                                                   pager-count="4"&ndash;&gt;-->
+<!--&lt;!&ndash;                                                   small&ndash;&gt;-->
+<!--&lt;!&ndash;                                                   layout="prev, pager, next"&ndash;&gt;-->
+<!--&lt;!&ndash;                                                   :page-size="pageOption2.pageSize"&ndash;&gt;-->
+<!--&lt;!&ndash;                                                   :total="pageOption2.total">&ndash;&gt;-->
+<!--&lt;!&ndash;                                    </el-pagination>&ndash;&gt;-->
+<!--                                    <div class="wzhScrollbar">-->
+<!--                                        <div class="itemCard flexCenter"-->
+<!--                                             style="padding: 0 25px;" :style="getItemCardBackGround"-->
+<!--                                        >-->
+<!--                                            <p>Select Model</p>-->
+<!--                                        </div>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+
+
+<!--                            </el-tab-pane>-->
+<!--                            <el-tab-pane label="Data Method" name="dataMethod">-->
+<!--                                <div class="flexCol flexAlignCenter" style="width: 100%">-->
+<!--                                    <div>-->
+<!--                                        <el-input v-model="searchDataMethodText"-->
+<!--                                                  size="mini"-->
+<!--                                                  placeholder="Search for ..."-->
+<!--                                                  @keyup.enter.native="searchDataMethod"-->
+<!--                                                  style="width: 160px;margin-top: 2px">-->
+<!--                                            <el-button slot="append" icon="el-icon-search" @click="searchDataMethod"></el-button>-->
+<!--                                        </el-input>-->
+<!--                                        <el-button size="mini" type="primary" plain style="padding: 7px 9px">-->
+<!--                                            <i class="fa fa-refresh" @click="refreshDataMethodList()"></i>-->
+<!--                                        </el-button>-->
+<!--                                    </div>-->
+
+<!--                                    <p class="noMargin" style="color: #787878;margin-top: 5px;font-size: 13px;">Classification: {{currentDataMethodClassi.label}}</p>-->
+<!--                                    <el-button size="mini" type="primary" plain @click="changeDataMethodClassi" round style="width: 90%;margin-top: 3px">Select Classification</el-button>-->
+<!--                                    &lt;!&ndash;                                    <p class="noMargin"&ndash;&gt;-->
+<!--                                    &lt;!&ndash;                                       style="font-style: italic;color: #888888;margin-top: 5px;font-size: 13px;">&ndash;&gt;-->
+<!--                                    &lt;!&ndash;                                        Click to add to graph.&ndash;&gt;-->
+<!--                                    &lt;!&ndash;                                        Right click to view details.</p>&ndash;&gt;-->
+<!--                                    <div class="wzhScrollbar">-->
+<!--                                        <div class="itemCard flexCenter"-->
+<!--                                             v-for="(item,key) in dataMethodList"-->
+<!--                                             :key="item.oid"-->
+<!--                                             style="padding: 0 25px;background: #f6aede"-->
+<!--                                             :style="getItemCardBackGround"-->
+<!--                                        >-->
+<!--                                            <el-tooltip class="item" effect="dark" :content="item.name"-->
+<!--                                                        placement="top">-->
+<!--                                                <p class="noMargin twoLine" @click="checkDataMethodDetail(item)">{{item.name}}</p>-->
+<!--                                            </el-tooltip>-->
+<!--                                            <div class="circleSmall flexCenter button_blank button_shadow"-->
+<!--                                                 @click="addDataMethodToMxgraph(item)"-->
+<!--                                                 style="position: absolute;right: 6px;top:13px;">-->
+<!--                                                <i class="fa fa-plus" style="font-size: 13px;color: #52bbf8"></i>-->
+<!--                                            </div>-->
+<!--                                        </div>-->
+<!--                                    </div>-->
+<!--                                    <el-pagination @current-change="handlePageChangeDataMethod"-->
+<!--                                                   :current-page="pageOption3.currentPage"-->
+<!--                                                   pager-count="4"-->
+<!--                                                   small-->
+<!--                                                   layout="prev, pager, next"-->
+<!--                                                   :page-size="pageOption3.pageSize"-->
+<!--                                                   :total="pageOption3.total">-->
+<!--                                    </el-pagination>-->
+<!--                                </div>-->
+<!--                            </el-tab-pane>-->
+<!--                        </el-tabs>-->
 
                     </div>
                     <iframe id="ModelEditor" src="/GeoProblemSolving/common/integratedModelEditor"
-                            style="width: calc(100% - 220px);height: 100%;;border:0px;position:relative;"></iframe>
+                            style="flex-grow: 1;height: 100%;;border:0px;position:relative;"></iframe>
                 </div>
             </div>
             <div role="selectedModelContainer" class="integratedContained"
                  style="width:22%;min-width: 200px;max-width: 400px; margin-left: 10px">
                 <el-tabs v-model="activeTask" type="border-card" class="sideTabs" style="height: 100%;">
-                    <el-tab-pane label="Current Model Action" name="currentTask">
+                    <el-tab-pane label="Current Action" name="currentTask">
                         <div class="flexCol flexJustStart flexAlignCenter wzhScrollbar"
-                             style="padding: 5px;height: calc(100% - 34px);">
+                             style="padding: 5px;height: calc(100% - 34px);max-height: 730px">
                             <div v-if="modelActions!= undefined && modelActions.length==0" style="margin-top: 25px">
                                 <p style="font-style: italic">You haven't selected models yet.</p>
                             </div>
-                            <div class="flexAlignCenter" v-if="modelActions!= undefined && currentTask!={}&&modelActions.length!=0" style="margin-top: 5px;width: 100%">
+                            <div class="flexAlignCenter" v-if="currentTask!={} && modelActions!= undefined && modelActions.length!=0" style="margin-top: 5px;width: 100%">
                                 <p class="noMargin">Current Editing Task: </p>
                                 <a class="cursorPointer" @click="checkTaskInfo(currentTask)">&nbsp{{currentTask.taskName}}</a>
                             </div>
-                            <div class="wzhCard_w100" v-for="(modelAction,frontId) in modelActions" :key="frontId">
-                                <div class="flexJustStart" style="min-height: 40px;max-height: 60px">
-                                    <div class="flexColCenter w100" style="padding: 5px">
-                                        <a class="w100 cursorPointer" @click="seeDetailPage(modelAction.modelOid)">
-                                            <p style="color: inherit;word-break: break-all;font-size: 16px"
-                                               class="itemTitle noMargin twoLine">{{modelAction.name}}</p>
-                                        </a>
-                                        <i class="fa fa-trash-o cursorPointer" style="font-size: 16px;color: #ec0817" @click="deleteModelClick(modelAction)"></i>
+                            <div class="wzhScrollbar" style="width: 100%;padding-right: 10px">
+                                <div class="wzhCard_w100" v-for="(modelAction,frontId) in modelActions" :key="frontId">
+                                    <div class="flexJustStart" style="min-height: 40px;max-height: 60px">
+                                        <div class="flexColCenter w100" style="padding: 5px">
+                                            <a class="w100 cursorPointer" @click="seeDetailPage(modelAction.modelOid)" style=";margin-right: 10px">
+                                                <p style="color: inherit;font-size: 16px"
+                                                   class="itemTitle noMargin twoLine">{{modelAction.name}}</p>
+                                            </a>
+                                            <i class="fa fa-trash-o cursorPointer" style="font-size: 16px;color: #ec0817" @click="deleteModelClick(modelAction)"></i>
+                                        </div>
+                                    </div>
+                                    <div class="flexAlignCenter flexJustEnd flexWrap"
+                                         style="min-height: 60px;max-height: 85px;background: #ecf6ff">
+                                        <el-button type="primary" size="mini" round style="margin-right: 10px"
+                                                   @click="modelConfiguration(modelAction)">Configuration
+                                        </el-button>
+                                        <el-button type="primary" size="mini" round style="margin-right: 10px"
+                                                   @click="dataConfigurationModel(modelAction)">Load/Check Data
+                                        </el-button>
                                     </div>
                                 </div>
-                                <div class="flexAlignCenter flexJustEnd flexWrap"
-                                     style="min-height: 60px;max-height: 85px;">
-                                    <el-button type="primary" size="mini" round style="margin-right: 10px"
-                                               @click="modelConfiguration(modelAction)">Configuration
-                                    </el-button>
-                                    <el-button type="primary" size="mini" round style="margin-right: 10px"
-                                               @click="dataConfigurationModel(modelAction)">Load/Check Data
-                                    </el-button>
-                                </div>
-                            </div>
-                            <div class="wzhCard_w100" v-for="(dataProcessing,frontId) in dataProcessings" v-if="dataProcessing.name!=undefined" :key="frontId">
-                                <div class="flexJustStart" style="min-height: 40px;max-height: 60px">
-                                    <div class="flexColCenter w100" style="padding: 5px">
-                                        <a class="w100 cursorPointer" @click="seeDetailPage(dataProcessing.modelOid)">
-                                            <p style="color: inherit;word-break: break-all;font-size: 16px"
-                                               class="itemTitle noMargin twoLine">{{dataProcessing.name}}</p>
-                                        </a>
-                                        <i class="fa fa-trash-o cursorPointer" style="font-size: 16px;color: #ec0817" @click="deleteDataProcessingClick(dataProcessing)"></i>
+                                <div class="wzhCard_w100" v-for="(dataProcessing,frontId) in dataProcessings" v-if="dataProcessing.name!=undefined" :key="frontId">
+                                    <div class="flexJustStart" style="min-height: 40px;max-height: 60px">
+                                        <div class="flexColCenter w100" style="padding: 5px">
+                                            <a class="w100 cursorPointer" @click="seeDetailPage(dataProcessing.modelOid)" style="margin-right: 10px">
+                                                <p style="color: inherit;font-size: 16px"
+                                                   class="itemTitle noMargin twoLine">{{dataProcessing.name}}</p>
+                                            </a>
+                                            <i class="fa fa-trash-o cursorPointer" style="font-size: 16px;color: #ec0817" @click="deleteDataProcessingClick(dataProcessing)"></i>
+                                        </div>
+                                    </div>
+                                    <div class="flexAlignCenter flexJustEnd flexWrap"
+                                         style="min-height: 60px;max-height: 85px;background: #fcf0ff;">
+                                        <!--                                    <el-button type="primary" size="mini" round style="margin-right: 10px"-->
+                                        <!--                                               @click="modelConfiguration(dataProcessing)">Configuration-->
+                                        <!--                                    </el-button>-->
+                                        <el-button type="primary" size="mini" round style="margin-right: 10px"
+                                                   @click="dataConfigurationDataP(dataProcessing)">Load/Check Data
+                                        </el-button>
                                     </div>
                                 </div>
-                                <div class="flexAlignCenter flexJustEnd flexWrap"
-                                     style="min-height: 60px;max-height: 85px;">
-<!--                                    <el-button type="primary" size="mini" round style="margin-right: 10px"-->
-<!--                                               @click="modelConfiguration(dataProcessing)">Configuration-->
-<!--                                    </el-button>-->
-                                    <el-button type="primary" size="mini" round style="margin-right: 10px"
-                                               @click="dataConfigurationDataP(dataProcessing)">Load/Check Data
-                                    </el-button>
-                                </div>
                             </div>
-                            <el-button v-if="modelActions!= undefined && modelActions.length!=0" type="success" style="margin-top:10px;font-weight: 700;" size="small"
+                           <el-button v-if="modelActions!= undefined && modelActions.length!=0" type="success" style="margin-top:10px;font-weight: 700;" size="small"
                                        @click="taskConfigure(1)">Save Task
                             </el-button>
                         </div>
                     </el-tab-pane>
-                    <!--活动内的集成任务-->
                     <el-tab-pane label="Curremt Integrated Task" name="allTask" style="height: 100%">
                         <div class="flexCol flexJustStart flexAlignCenter wzhScrollbar"
                              style="padding: 5px;height: calc(100% - 34px);">
-                            <div v-if="integratedTaskList!= undefined && integratedTaskList.length==0" style="margin-top: 25px">
+                             <div v-if="integratedTaskList!= undefined && integratedTaskList.length==0" style="margin-top: 25px">
                                 <p style="font-style: italic">There is no integrated task in the current activity.</p>
                             </div>
                             <div class="wzhCard_w100" v-if="integratedTaskList!='login'" v-for="(task,frontId) in integratedTaskList" :key="frontId">
@@ -324,60 +372,25 @@
                                     <el-button type="primary" size="mini" round style="margin-right: 10px" @click="checkTaskInfo(task)">
                                         Check Task Info
                                     </el-button>
+                                    <!--                            <el-button type="primary" size="mini" round style="margin-right: 10px"-->
+                                    <!--                                       @click="modelConfiguration(model)">Configuration-->
+                                    <!--                            </el-button>-->
+                                    <!--                            <el-button type="primary" size="mini" round style="margin-right: 10px"-->
+                                    <!--                                       @click="dataConfiguration(model)">Load/Check Data-->
+                                    <!--                            </el-button>-->
                                 </div>
                             </div>
+
                         </div>
                         <el-pagination style="text-align: center;margin-top:5px"
-                                       v-if="integratedTaskList!= undefined && integratedTaskList!='login' && integratedTaskList.length!=0"
-                                       @Choose Computable Modelscurrent-change="handlePageChange"
+                                       v-if="integratedTaskList!='login'&&integratedTaskList.length!=0"
+                                       @current-change="handlePageChange"
                                        :current-page="pageOption.currentPage"
                                        layout="total, prev, pager, next, jumper"
                                        :page-size="6"
                                        :total="pageOption.total">
                         </el-pagination>
                     </el-tab-pane>
-                    <!--个人的集成任务-->
-<!--                    <el-tab-pane label="My Integrated Task" name="allTask" style="height: 100%">-->
-<!--                        <div class="flexCol flexJustStart flexAlignCenter wzhScrollbar"-->
-<!--                             style="padding: 5px;height: calc(100% - 34px);">-->
-<!--                            <div v-if="integratedTaskList==='login'" style="margin-top: 25px">-->
-<!--                                <p style="font-style: italic">View your integrated tasks, <a style="font-style: normal" href="/GeoProblemSolving/login">log in</a> first.</p>-->
-<!--                            </div>-->
-<!--                            <div v-if="integratedTaskList!= undefined && integratedTaskList.length==0" style="margin-top: 25px">-->
-<!--                                <p style="font-style: italic">You have no integrated task.</p>-->
-<!--                            </div>-->
-<!--                            <div class="wzhCard_w100" v-if="integratedTaskList!='login'" v-for="(task,frontId) in integratedTaskList" :key="frontId">-->
-<!--                                <div class="flexJustStart" style="min-height: 40px;max-height: 60px">-->
-<!--                                    <div class="flexColCenter w100" style="padding: 5px">-->
-<!--                                        <a class="w100">-->
-<!--                                            <p style="color: inherit;word-break: break-all;font-size: 16px"-->
-<!--                                               class="noMargin">{{task.taskName}}</p></a>-->
-<!--                                    </div>-->
-<!--                                </div>-->
-<!--                                <div class="flexAlignCenter flexJustEnd flexWrap"-->
-<!--                                     style="min-height: 60px;max-height: 85px;background-image: linear-gradient(to right, rgb(253, 249, 244) 0%, rgb(235, 246, 248) 100%);">-->
-<!--                                    <el-button type="primary" size="mini" round style="margin-right: 10px" @click="checkTaskInfo(task)">-->
-<!--                                        Check Task Info-->
-<!--                                    </el-button>-->
-<!--                                    &lt;!&ndash;                            <el-button type="primary" size="mini" round style="margin-right: 10px"&ndash;&gt;-->
-<!--                                    &lt;!&ndash;                                       @click="modelConfiguration(model)">Configuration&ndash;&gt;-->
-<!--                                    &lt;!&ndash;                            </el-button>&ndash;&gt;-->
-<!--                                    &lt;!&ndash;                            <el-button type="primary" size="mini" round style="margin-right: 10px"&ndash;&gt;-->
-<!--                                    &lt;!&ndash;                                       @click="dataConfiguration(model)">Load/Check Data&ndash;&gt;-->
-<!--                                    &lt;!&ndash;                            </el-button>&ndash;&gt;-->
-<!--                                </div>-->
-<!--                            </div>-->
-
-<!--                        </div>-->
-<!--                        <el-pagination style="text-align: center;margin-top:5px"-->
-<!--                                       v-if="integratedTaskList!= undefined && integratedTaskList!='login' && integratedTaskList.length!=0"-->
-<!--                                       @Choose Computable Modelscurrent-change="handlePageChange"-->
-<!--                                       :current-page="pageOption.currentPage"-->
-<!--                                       layout="total, prev, pager, next, jumper"-->
-<!--                                       :page-size="6"-->
-<!--                                       :total="pageOption.total">-->
-<!--                        </el-pagination>-->
-<!--                    </el-tab-pane>-->
                 </el-tabs>
 
             </div>
@@ -387,7 +400,7 @@
         <div>
             <div class="clearfix" style="margin: 0px 5px 10px;background: #f5f5f5;box-shadow:0 3.2px 7.2px 0 rgba(0,0,0,0.141), 0 0.6px 1.8px 0 rgba(0, 0, 0, .112)">
                 <h4 style="text-align: center;margin-top: 5px">Data Bus</h4>
-                <div v-for="dataLine in dataLines" class="dataBusContainer flexAlignCenter wzhScrollbar" style="width: 100%;height: 150px">
+                <div v-for="dataLine in dataLines" class="dataBusContainer flexAlignCenter wzhScrollbar" style="width: 100%;height: 150px;z-index: 1;">
                     <!--                    <div class="innerBorder" v-if="Object.keys(dataItemList).length!=0"></div>-->
                     <div class="acrylicMask" ref="acrylicMask" @click="flatContainer($event)"></div>
                     <div class="dataFlowRoad" ref="dataFlowRoad">
@@ -399,11 +412,39 @@
                             <div class="wzhCard " :ref="'dataItemCard'+dataItem.eventId"
                                  v-for="dataItem in dataItems"
                                  :class="linkedDataItems.indexOf(dataItem)==-1?'':'lightingDataItem'"
-                                 style="min-width: 145px;max-width: 145px;height: 130px;border-bottom: 8px solid; "
+                                 style="min-width: 150px;max-width: 150px;height: 130px;border-bottom: 8px solid;padding: 10px 5px "
                                  :style="{borderBottomColor:getBottomBorder(dataItem)}" >
                                 <a class="w100" >
                                     <p class="textEllipsis cursorPointer" :style="{color:getColor(dataItem.parentId)}" @click="riseDataItem(dataItem,i)">{{dataItem.eventName==undefined?dataItem.name:dataItem.eventName}}</p>
                                 </a>
+                                <el-tooltip class="item" effect="dark" :content="'Action: '+getParentName(dataItem.parentId)" placement="top-start">
+                                    <el-tag type="info" v-if="dataItem.eventType==='response'&&!dataItem.optional"><span style="color: #ff0000">*</span> required input</el-tag>
+                                    <el-tag type="info" v-if="dataItem.eventType==='response'&&dataItem.optional">optional input</el-tag>
+                                    <el-tag type="info" v-if="dataItem.eventType==='noresponse'">output</el-tag>
+                                </el-tooltip>
+                                <p></p>
+<!--                                input-->
+                                <el-button style="float: right"
+                                           v-if="dataItem.eventType==='response'"
+                                           size="mini" type="primary" plain round @click="dataItemConfig(dataItem)">
+                                    config
+                                </el-button>
+                                <el-button circle type="success" size="mini" plain icon="el-icon-files"
+                                           v-if="dataItem.eventType=='response'&&checkDataLoaded(dataItem)=='loaded'">
+                                </el-button>
+                                <el-button circle type="success" size="mini" plain icon="el-icon-connection"
+                                           v-if="dataItem.eventType=='response'&&checkDataLoaded(dataItem)=='linked'">
+                                </el-button>
+<!--                                output-->
+                                <el-button circle type="success" size="mini" icon="el-icon-check"
+                                           v-if="dataItem.eventType=='noresponse'&&checkDataLoaded(dataItem)=='runned'"
+                                           @click="downloadDataItem(dataItem)">
+                                </el-button>
+                                <el-button style="float: right"
+                                           v-if="dataItem.eventType==='noresponse'&&checkDataLoaded(dataItem)=='runned'"
+                                           size="mini" type="success" plain round @click="dataItemConfig(dataItem)">
+                                    check output
+                                </el-button>
                             </div>
                         </div>
                     </div>
@@ -623,7 +664,7 @@
                         <div class="_btn-group" v-if="scope.row.children==undefined">
 
                             <el-button plain round type="warning" size="small" id="'download'+ scope.row.dataId"
-                                       v-if="scope.row.value!=''"
+                                       v-if="scope.row.value!=''&&scope.row.value!=null&&scope.row.value!=undefined"
                                        @click="download(scope.row)" style="margin-left: 0px;">
                                 <i class="fa fa-download"></i>
                             </el-button>
@@ -748,9 +789,8 @@
                       row-key="dataId"
                       border
                       default-expand-all>
-
                 <el-table-column
-                        label="Event Name"
+                        label="Name"
                         width="220">
                     <template slot-scope="scope">
                         <span v-if="scope.row.externalId==undefined" :title="scope.row.event">
@@ -851,9 +891,14 @@
                         <div class="_btn-group" v-if="scope.row.children==undefined">
 
                             <el-button plain round type="warning" size="small" id="'download'+ scope.row.dataId"
-                                       v-if="scope.row.value!=''"
+                                       v-if="scope.row.value!=''&&scope.row.value!=null&&scope.row.value!=undefined"
                                        @click="download(scope.row)" style="margin-left: 0px;">
                                 <i class="fa fa-download"></i>
+                            </el-button>
+                            <el-button plain round type="warning" size="small" id="'download'+ scope.row.dataId"
+                                       v-if="scope.row.value!=''&&scope.row.value!=null&&scope.row.value!=undefined&&configDataProcessing.method==='Visualization'"
+                                       @click="preview(scope.row)" style="margin-left: 0px;">
+                                <i class="fa fa-eye"></i>
                             </el-button>
                         </div>
                     </template>
@@ -890,12 +935,12 @@
                width="68%" class="noScroll">
         <el-tabs v-model="dataFromActive" stretch="stretch" @tab-click="changeDataFrom" style="min-height: 105px">
             <el-tab-pane label="My Data Space" name="dataSpace">
-<!--                <user-data-->
-<!--                        @com-selectfile="selectDataspaceFile"-->
-<!--                        @com-removefile="removeDataspaceFile"-->
-<!--                        single-choice-->
-<!--                        ref="userDataSpace" style="height: 505px;">-->
-<!--                </user-data>-->
+                <!-- <user-data
+                        @com-selectfile="selectDataspaceFile"
+                        @com-removefile="removeDataspaceFile"
+                        single-choice
+                        ref="userDataSpace" style="height: 505px;">
+                </user-data> -->
             </el-tab-pane>
             <el-tab-pane label="My Data Server" name="dataServer">
                 <div  style="min-height: 495px">
@@ -938,7 +983,7 @@
             </el-tab-pane>
             <el-tab-pane label="Data Item" name="dataItem">
                 <el-table v-loading="loading"
-                          :data="dataItems">
+                          :data="dataItemsCheck">
                     <el-table-column
                             prop="name"
                             label="Name"
@@ -976,7 +1021,7 @@
     </span>
     </el-dialog>
 
-    <el-dialog title="Input Data Config" :visible.sync="eventConfigDialog" width="60%">
+    <el-dialog :title="Single Data Config Title" :visible.sync="eventConfigDialog" width="60%">
         <el-table :data="configEvent" style="width: 100%"
                   :key="Math.random()"
                   row-key="dataId"
@@ -1046,7 +1091,7 @@
                     <div class="_btn-group" v-if="scope.row.children==undefined">
 
                         <el-button
-                                v-if="(scope.row.link == undefined||scope.row.link == '' )||configModelAction.step>1"
+                                v-if="scope.row.eventType=='response'&&((scope.row.link == undefined||scope.row.link == '' )||configModelAction.step>1)"
                                 plain round type="primary" size="small"
                                 @click="openUserDataSpace(scope.row)">
                             <i class="fa fa-folder-open"></i>
@@ -1476,28 +1521,138 @@
         </el-table>
     </el-dialog>
 
-<!--    <div th:replace="fragments/footer :: footer-mini"></div>-->
+    <el-dialog title="Computable Model" :visible.sync="computableModelTableDialog" width="55%">
+        <div v-loading="modelTableLoading">
+            <div class="flexRow flexJustCenter" style="margin-top: 12px; margin-left: 10px;">
+                <div class="flexRow flexColCenter" style="width: 50%;mini-width:250px">
+                    <input placeholder="Search for ..." v-model="searchText" class="noBorderInput miniInput" @keyup.enter="searchDeployedModel(1)">
+                </div>
+                <i class="fa fa-search cursorPointer" style="font-size: 18px;" @click="searchDeployedModel(1)"></i>
+            </div>
+            <p v-if="!inSearch" style="margin-left: 18px;font-style: italic;color: #999999">Recently used.</p>
+            <p v-else style="margin-left: 18px;font-style: italic;color: #999999">Search result.</p>
+            <el-table style="padding-left:10px "
+                      :data="deployedModel">
+                <el-table-column
+                        label="Name"
+                >
+                    <template slot-scope="scope">
+                        <a class="cursorPointer" @click ="window.open('/computableModel/'+scope.row.oid)">{{scope.row.name}}</a>
+                    </template>
+                </el-table-column>
+                <el-table-column
+                        label="Contributor"
+                        prop="author"
+                >
+                    <template slot-scope="scope">
+                        <a class="cursorPointer" @click="viewUser(scope.row.authorId)">{{scope.row.author}}</a>
+                    </template>
+                </el-table-column>
+                <el-table-column
+                        label="Option"
+                        width="180"
+                >
+                    <template slot-scope="scope">
+                        <el-button size="mini" round type="success" @click="selectModel(scope.row.oid)">select</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <el-pagination style="text-align: center;margin-top:20px"
+                           @current-change="handlePageChangeDeployedModel"
+                           :current-page="pageOption2.currentPage"
+                           layout="total, prev, pager, next, jumper"
+                           :page-size="6"
+                           :total="pageOption2.total">
+            </el-pagination>
+
+        </div>
+        <!--        <div style="max-height:900px;max-width:1600px" :style="'background-image:url('+previewUrl+')'"></div>-->
+
+    </el-dialog>
+
+    <el-dialog title="Data Method" :visible.sync="dataMethodTableDialog" width="55%">
+        <div v-loading="dataMethodLoading">
+            <div class="flexRow flexJustCenter" style="margin-top: 12px; margin-left: 10px;">
+                <div class="flexRow flexColCenter" style="width: 50%;mini-width:250px">
+                    <input placeholder="Search for ..." v-model="searchDataMethodText" class="noBorderInput miniInput" @keyup.enter="searchDataMethod(1)">
+                </div>
+                <i class="fa fa-search cursorPointer" style="font-size: 18px;" @click="searchDataMethod(1)"></i>
+            </div>
+            <p style="margin-left: 18px;font-style: italic;color: #999999">Search result.</p>
+            <el-table style="padding-left:10px "
+                      :data="dataMethodList">
+                <el-table-column
+                        label="Name"
+                >
+                    <template slot-scope="scope">
+                        <a class="cursorPointer" @click ="window.open('/dataApplication/'+scope.row.oid)">{{scope.row.name}}</a>
+                    </template>
+                </el-table-column>
+                <el-table-column
+                        label="Contributor"
+                        prop="author"
+                >
+                    <template slot-scope="scope">
+                        <a class="cursorPointer" @click="viewUser(scope.row.authorId)">{{scope.row.authorName}}</a>
+                    </template>
+                </el-table-column>
+                <el-table-column
+                        label="Option"
+                        width="180"
+                >
+                    <template slot-scope="scope">
+                        <el-button size="mini" round type="success" @click="addDataMethodToMxgraph(scope.row)">select</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <el-pagination style="text-align: center;margin-top:20px"
+                           @current-change="handlePageChangeDataMethod"
+                           :current-page="pageOption3.currentPage"
+                           layout="total, prev, pager, next, jumper"
+                           :page-size="6"
+                           :total="pageOption2.total">
+            </el-pagination>
+
+        </div>
+
+    </el-dialog>
+
+    <el-dialog title="Integrated Task Xml">
+        <div class="wzhScrollbar" style="max-height: 500px">
+            <el-input type="text" v-model="integratedTaskXml"></el-input>
+        </div>
+    </el-dialog>
+
+    <el-dialog title="Preview Result" :visible.sync="previewDialog" width="55%">
+        <div class="flexCenter">
+            <img :src="previewUrl" style="max-height:900px;max-width:1600px">
+        </div>
+<!--        <div style="max-height:900px;max-width:1600px" :style="'background-image:url('+previewUrl+')'"></div>-->
+
+    </el-dialog>
+
+    <div th:replace="fragments/footer :: footer-mini"></div>
 </div>
 </body>
-<!--<template th:replace="modules/userDataSpaceModule :: userDataSpaceModule"></template>-->
-<!--<script src="/GeoProblemSolving/js/modules/userDataSpaceModule.js"></script>-->
+<!-- <template th:replace="modules/userDataSpaceModule :: userDataSpaceModule"></template> -->
+<!-- <script src="/GeoProblemSolving/js/modules/userDataSpaceModule.js"></script> -->
 <template th:replace="modules/computableModelList :: computableModel"></template>
 <script src="/GeoProblemSolving/js/modules/computableModelList.js"></script>
-<template th:replace="modules/dataProcessingList :: dataProcessingList"></template>
-<script src="/GeoProblemSolving/js/modules/dataProcessingList.js"></script>
+<!--<template th:replace="modules/dataProcessingList :: dataProcessingList"></template>-->
+<!--<script src="/GeoProblemSolving/js/modules/dataProcessingList.js"></script>-->
 
 
 <script src="/GeoProblemSolving/js/common/jquery-3.3.1.min.js"></script>
 <script src="/GeoProblemSolving/js/page/integratedModeling_new.js"></script>
 <!--<script src="GeoProblemSolving/KnowledgeGraph/js/echarts/extension/dataTool.js"></script>-->
-<script src="/GeoProblemSolving/js/common/loadUser.js"></script>
+
 <script src="/GeoProblemSolving/element-ui/index.js"></script>
 
 <script src="/GeoProblemSolving/element-ui/umd/locale/en.js"></script>
 <script src="/GeoProblemSolving/js/common/navbar.js"></script>
 <!--imgUpload通用组件-->
-<!--<template th:replace="modules/imgUpload :: imgUpload"></template>-->
-<!--<script src="/GeoProblemSolving/js/modules/imgUpload.js"></script>-->
+<!-- <template th:replace="modules/imgUpload :: imgUpload"></template> -->
+<!-- <script src="/GeoProblemSolving/js/modules/imgUpload.js"></script> -->
 <!--<script src="/GeoProblemSolving/js/common/navbarJquery.js/"></script>-->
 <script>
 

@@ -26,50 +26,70 @@
 </style>
 <template>
   <div>
-    <div class="sidebar" style="width:60px;float:left" :style="{height:windowHeight+'px'}">
-      <div style="display:flex;justify-content:center;margin-top:20px" title="Resources">
-        <span @click="resourceDrawer=true" style="cursor:pointer">
+    <div
+      class="sidebar"
+      style="width: 60px; float: left"
+      :style="{ height: windowHeight + 'px' }"
+    >
+      <div
+        style="display: flex; justify-content: center; margin-top: 20px"
+        title="Resources"
+      >
+        <span @click="resourceDrawer = true" style="cursor: pointer">
           <Icon type="md-folder" :size="40" color="white" />
         </span>
-        <Drawer title="Resources" :closable="false" v-model="resourceDrawer" placement="left">
-          <div style="height:45%;overflow-y:auto">
-            <div style="font-size:1rem;margin-bottom:10px">Papers:</div>
+        <Drawer
+          title="Resources"
+          :closable="false"
+          v-model="resourceDrawer"
+          placement="left"
+        >
+          <div style="height: 45%; overflow-y: auto">
+            <div style="font-size: 1rem; margin-bottom: 10px">Papers:</div>
             <ul>
               <li
-                v-for="(resource,index) in paperList"
+                v-for="(resource, index) in paperList"
                 :key="index"
                 @click="selectResource(resource.pathURL)"
-                style="cursor:pointer;margin-bottom:10px"
+                style="cursor: pointer; margin-bottom: 10px"
                 :title="resource.description"
-              >{{resource.name}}</li>
+              >
+                {{ resource.name }}
+              </li>
             </ul>
           </div>
-          <div style="height:45%;overflow-y:auto">
-            <div style="font-size:1rem;margin-bottom:10px">Documents:</div>
+          <div style="height: 45%; overflow-y: auto">
+            <div style="font-size: 1rem; margin-bottom: 10px">Documents:</div>
             <ul>
               <li
-                v-for="(resource,index) in documentList"
+                v-for="(resource, index) in documentList"
                 :key="index"
                 @click="selectResource(resource.pathURL)"
-                style="cursor:pointer;margin-bottom:10px"
+                style="cursor: pointer; margin-bottom: 10px"
                 :title="resource.description"
-              >{{resource.name}}</li>
+              >
+                {{ resource.name }}
+              </li>
             </ul>
           </div>
         </Drawer>
       </div>
     </div>
-    <div :style="{height:windowHeight+'px'}" style="margin-left:60px">
+    <div :style="{ height: windowHeight + 'px' }" style="margin-left: 60px">
       <template v-if="fileURL != ''" class="pfdPanel">
-        <iframe :width="fileWidth" :height="fileHeight-5" :src="fileURL" frameborder="0">
-          This browser does not support Files. Please download the file to view it:
-          <a
-            :href="fileURL"
-          >Download file</a>
+        <iframe
+          :width="fileWidth"
+          :height="fileHeight - 5"
+          :src="fileURL"
+          frameborder="0"
+        >
+          This browser does not support Files. Please download the file to view
+          it:
+          <a :href="fileURL">Download file</a>
         </iframe>
       </template>
       <template v-else class="pfdPanel">
-        <div :style="{height:fileHeight+'px', width:fileWidth+'px'}">
+        <div :style="{ height: fileHeight + 'px', width: fileWidth + 'px' }">
           <Card class="noDetail">
             <h1>No file selected</h1>
           </Card>
@@ -93,11 +113,11 @@ export default {
       activeItem: "",
       resourceDrawer: false,
       pageParams: { pageId: "", userId: "", userName: "" },
-      userInfo: {}
+      userInfo: {},
     };
   },
   beforeRouteEnter: (to, from, next) => {
-    next(vm => {
+    next((vm) => {
       if (!vm.$store.getters.userState) {
         next("/login");
       } else {
@@ -112,7 +132,7 @@ export default {
     this.getUserInfo();
     this.getResource();
   },
-  beforeDestroy: function() {
+  beforeDestroy: function () {
     window.removeEventListener("resize", this.initSize);
   },
   methods: {
@@ -158,18 +178,17 @@ export default {
       if (this.userInfo == {}) {
         this.axios
           .get(
-            "/GeoProblemSolving/user/inquiry" +
-              "?key=" +
-              "userId" +
+            "/GeoProblemSolving/user" +
+              "?key=userId" +
               "&value=" +
               this.pageParams.userId
           )
-          .then(res => {
-            if (res.data != "Fail" && res.data != "None") {
-              this.$set(this, "userInfo", res.data);
+          .then((res) => {
+            if (res.data.code == 0) {
+              this.$set(this, "userInfo", res.data.data);
             }
           })
-          .catch(err => {});
+          .catch((err) => {});
       }
     },
     getResource() {
@@ -185,7 +204,7 @@ export default {
         .get(
           "/GeoProblemSolving/folder/inquiry?folderId=" + this.pageParams.pageId
         )
-        .then(res => {
+        .then((res) => {
           // 写渲染函数，取到所有资源
           if (res.data !== "None") {
             for (let i = 0; i < res.data.files.length; i++) {
@@ -200,7 +219,7 @@ export default {
             this.documentList = [];
           }
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err.data);
         });
     },
@@ -238,21 +257,21 @@ export default {
       formData.append("folderId", this.pageParams.pageId);
       this.axios
         .post("/GeoProblemSolving/folder/uploadToFolder", formData)
-        .then(res => {
+        .then((res) => {
           if (
             res.data.sizeOver.length > 0 ||
-              res.data.failed.length > 0 ||
-              res.data == "Offline"
-            ) {
-              console.log(res.data);
-            } else if (res.data.uploaded.length > 0) {
+            res.data.failed.length > 0 ||
+            res.data == "Offline"
+          ) {
+            console.log(res.data);
+          } else if (res.data.uploaded.length > 0) {
             let fileName = res.data.uploaded[0].name;
             this.fileURL = "/GeoProblemSolving/resource/upload/" + fileName;
 
             let fileItem = {
               name: file.name,
               description: "file preview tool",
-              pathURL: "/GeoProblemSolving/resource/upload/" + fileName
+              pathURL: "/GeoProblemSolving/resource/upload/" + fileName,
             };
             if (this.isPaper) {
               this.paperList.push(fileItem);
@@ -263,12 +282,12 @@ export default {
             }
           }
         })
-        .catch(err => {});
+        .catch((err) => {});
       return false;
     },
     selectResource(url) {
       this.fileURL = "http://" + this.$store.state.IP_Port + url;
-    }
-  }
+    },
+  },
 };
 </script>

@@ -331,6 +331,7 @@ export default {
             status: true,
           };
           this.activityInfo.pathway.push(newStepNode);
+          this.updatePathway();
         }
       } else if (
         this.activityInfo.pathway.length > this.childActivities.length
@@ -350,6 +351,7 @@ export default {
         }
       }
       this.processStructure = this.activityInfo.pathway;
+      this.updatePathway();
     },
     showSteps() {
       this.selectedActivities = [];
@@ -688,9 +690,9 @@ export default {
             }
           } else if (res.data.code == 0) {
             this.updateStepchart();
-            this.$Notice.info({
-              desc: "Reshape pathway successfully!",
-            });
+            // this.$Notice.info({
+            //   desc: "Reshape pathway successfully!",
+            // });
           } else {
             this.$Message.error("Fail to reshape pathway.");
             console.log(res.data.msg);
