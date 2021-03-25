@@ -46,7 +46,7 @@
         <Option value="resources">All resources</Option>
         <Option value="data">Data</Option>
         <Option value="materials">Other resources</Option>
-        <Option value="toolData">Results</Option>
+        <!-- <Option value="toolData">Results</Option> -->
       </Select>
       <div style="display: flex; justify-content: space-between">
         <div style="width: 100%" v-if="dataListStyle">
@@ -111,7 +111,7 @@
         </div>
         <div id="toolData" v-else>
           <Card
-            style="width: 150px; height: 150px; float: left; margin: 5px"
+            style="width: 100px; height: 100px; float: left; margin: 5px"
             v-if="fileList.length == 0"
           >
             <div>There is no resource.</div>
@@ -119,86 +119,82 @@
           <vue-scroll :ops="ops" style="max-height: calc(100vh - 245px)" v-else>
             <div v-for="(item, index) in fileList" :key="index">
               <Card
-                style="width: 150px; height: 150px; float: left; margin: 5px"
+                style="width: 100px; height: 100px; float: left; margin: 5px"
               >
-                <div style="float: left">
+                <div style="margin-left: 15px">
                   <template
                     v-if="item.thumbnail == '' || item.thumbnail == undefined"
                   >
                     <img
                       v-if="item.type == 'data'"
                       :src="dataUrl"
-                      height="72px"
-                      width="72px"
+                      height="42px"
+                      width="42px"
                       title="Data"
                     />
                     <img
                       v-else-if="item.type == 'model'"
                       :src="modelUrl"
-                      height="72px"
-                      width="72px"
+                      height="42px"
+                      width="42px"
                       title="Model"
                     />
                     <img
                       v-else-if="item.type == 'paper'"
                       :src="paperUrl"
-                      height="72px"
-                      width="72px"
+                      height="42px"
+                      width="42px"
                       title="Paper"
                     />
                     <img
                       v-else-if="item.type == 'document'"
                       :src="documentUrl"
-                      height="72px"
-                      width="72px"
+                      height="42px"
+                      width="42px"
                       title="Document"
                     />
                     <img
                       v-else-if="item.type == 'image'"
                       :src="imageUrl"
-                      height="72px"
-                      width="72px"
+                      height="42px"
+                      width="42px"
                       title="Image"
                     />
                     <img
                       v-else-if="item.type == 'video'"
                       :src="videoUrl"
-                      height="72px"
-                      width="72px"
+                      height="42px"
+                      width="42px"
                       title="Video"
                     />
                     <img
                       v-else-if="item.type == 'others'"
                       :src="otherUrl"
-                      height="72px"
-                      width="72px"
+                      height="42px"
+                      width="42px"
                       title="Others"
                     />
                   </template>
                   <template v-else>
-                    <img :src="item.thumbnail" height="72px" width="72px" />
+                    <img :src="item.thumbnail" height="42px" width="42px" />
                   </template>
                 </div>
-                <div style="float: left; margin: 0 10px">
+                <div style="float: left;">
                   <div>
                     <div class="toolDataText" :title="item.name">
                       {{ item.name }}
                     </div>
                   </div>
-                  <!-- <div>
-                    <Label class="toolDataLabel">Description:</Label>
-                    <div class="toolDataText" :title="item.description">{{item.description}}</div>
-                  </div> -->
                   <div>
-                    <Button
+                    <Icon
                       size="small"
                       title="Check"
-                      icon="md-eye"
-                      style="margin: 10px 5px 0 0"
+                      type="md-eye"
+                      style="margin: 10px 5px 0 0; cursor: pointer"
                       @click="checkData(item)"
-                    ></Button>
+                    ></Icon>
                     <a :href="item.pathURL" :download="item.name">
-                      <Button
+                      <Icon
                         v-if="
                           permissionIdentity(
                             activityInfo.permission,
@@ -208,11 +204,11 @@
                         "
                         size="small"
                         title="Download"
-                        icon="md-download"
-                        style="margin: 10px 5px 0 0"
-                      ></Button>
+                        type="md-download"
+                        style="margin: 10px 5px 0 0; cursor:pointer; color: #515a6e"
+                      ></Icon>
                     </a>
-                    <Button
+                    <Icon
                       v-if="
                         permissionIdentity(
                           activityInfo.permission,
@@ -228,10 +224,10 @@
                       "
                       size="small"
                       title="Delete"
-                      icon="md-close"
-                      style="margin-top: 10px"
+                      type="md-close"
+                      style="margin-top: 10px;cursor: pointer"
                       @click="deleteResourceModalShow(item.resourceId)"
-                    ></Button>
+                    ></Icon>
                   </div>
                 </div>
               </Card>
@@ -353,7 +349,7 @@
           </p>
         </div>
       </Upload>
-      <div style="padding: 0 10px 0 10px; max-height: 200px; overflow-y: auto">
+      <div style="padding: 0 10px; max-height: 200px; overflow-y: auto">
         <ul v-for="(list, index) in toUploadFiles" :key="index">
           <li style="display: flex">
             File name:
@@ -585,7 +581,7 @@ export default {
             this.$set(this, "fileList", list);
             //filte
             this.filterData();
-            this.filterToolData();
+            // this.filterToolData();
             this.filterRelatedRes();
           },
         });
@@ -598,14 +594,14 @@ export default {
       this.$set(this, "stepDataList", filterdata);
     },
 
-    filterToolData() {
-      var filterdata = this.fileList.filter((item) => {
-        if (item.type.indexOf("toolData") != -1) {
-          return item;
-        }
-      });
-      this.$set(this, "toolDataList", filterdata);
-    },
+    // filterToolData() {
+    //   var filterdata = this.fileList.filter((item) => {
+    //     if (item.type.indexOf("toolData") != -1) {
+    //       return item;
+    //     }
+    //   });
+    //   this.$set(this, "toolDataList", filterdata);
+    // },
     filterRelatedRes() {
       var filterdata = this.fileList.filter((item) => {
         return item.type !== "data";
@@ -623,8 +619,8 @@ export default {
         this.fileList = this.relatedResList;
         this.showType = value;
       } else if (value == "toolData") {
-        this.fileList = this.toolDataList;
-        this.showType = value;
+        // this.fileList = this.toolDataList;
+        // this.showType = value;
       }
     },
     gatherFile(file) {
@@ -1171,7 +1167,7 @@ export default {
   color: dodgerblue;
 }
 .toolDataText {
-  width: 100px;
+  width: 80px;
   word-break: break-word;
   /* display: inline-block; */
   text-overflow: ellipsis;

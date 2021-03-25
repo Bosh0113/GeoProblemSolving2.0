@@ -28,7 +28,7 @@
   <div>
     <Card dis-hover class="toolCard">
       <div slot="title">
-        <h4>Toolsets and tools</h4>
+        <h4>Tools</h4>
       </div>
       <div
         slot="extra"
@@ -45,7 +45,7 @@
         ></manage-tools>
       </div>
       <vue-scroll :ops="ops" style="max-height: calc(100vh - 200px)">
-        <div v-if="toolsetList.length < 1" style="text-align: center">
+        <!-- <div v-if="toolsetList.length < 1" style="text-align: center">
           <h2 style="color: #808695">No toolsets</h2>
           <small style="color: #dcdee2"
             >*Click the button on the top right to add toolsets.</small
@@ -54,7 +54,7 @@
         <div
           v-for="toolset in toolsetList"
           :key="toolset.index"
-          style="margin-top: 15px; width: 130px; display: inline-block"
+          style="width: 100px; display: inline-block"
           v-else
         >
           <Card
@@ -95,7 +95,7 @@
             </div>
           </Card>
         </div>
-        <Divider style="margin: 10px 0" />
+        <Divider style="margin: 10px 0" /> -->
         <div v-if="toolList.length < 1" style="text-align: center">
           <h2 style="color: #808695">No tools</h2>
           <small style="color: #dcdee2"
@@ -105,10 +105,10 @@
         <div
           v-for="tool in toolList"
           :key="tool.index"
-          style="margin-top: 15px; width: 130px; display: inline-block"
+          style="width: 100px; display: inline-block"
           v-else
         >
-          <Card style="background-color: ghostwhite; margin: 0 5px 10px 5px">
+          <Card style="background-color: ghostwhite; margin: 5px">
             <div
               style="text-align: center; cursor: pointer"
               @click="useTool(tool)"
@@ -137,7 +137,6 @@
                 :title="tool.toolName"
                 style="
                   display: block;
-                  width: 90px;
                   overflow: hidden;
                   white-space: nowrap;
                   text-overflow: ellipsis;
@@ -166,7 +165,7 @@
               style="margin-top: 15px"
             >
               <Card
-                style="background-color: ghostwhite; margin: 0 5px 10px 5px"
+                style="background-color: ghostwhite; margin: 5px"
               >
                 <div
                   style="text-align: center; cursor: pointer"
@@ -196,7 +195,6 @@
                     :title="tool.toolName"
                     style="
                       display: block;
-                      width: 90px;
                       overflow: hidden;
                       white-space: nowrap;
                       text-overflow: ellipsis;

@@ -10,24 +10,24 @@
           style="height: 45px; line-height: 45px; z-index: 1"
           @on-select="changeMenuItem"
         >
-          <MenuItem name="Introduction">
-            <Icon type="ios-paper" />Introduction
-          </MenuItem>
           <MenuItem name="Workspace">
             <Icon type="ios-globe" />Workspace
           </MenuItem>
           <MenuItem name="Task">
             <Icon type="ios-git-network" />Task management
           </MenuItem>
+          <!-- <MenuItem name="Introduction">
+            <Icon type="ios-paper" />About
+          </MenuItem> -->
         </Menu>
 
-        <div v-show="activeMenu == 'Introduction'">
+        <!-- <div v-show="activeMenu == 'Introduction'">
           <activity-show :activityInfo="activityInfo"></activity-show>
-        </div>
+        </div> -->
         <div v-show="activeMenu == 'Workspace'">
           <vue-scroll
             :ops="scrollOps"
-            style="height: calc(100vh - 120px); margin-top: 5px"
+            style="height: calc(100vh - 105px); margin-top: 5px"
           >
             <context-res
               v-if="
@@ -186,7 +186,7 @@
 import Avatar from "vue-avatar";
 import * as userRoleJS from "./../../../api/userRole.js";
 import { get, del, post, put } from "../../../axios";
-import activityShow from "./activityShow.vue";
+// import activityShow from "./activityShow.vue";
 import taskManager from "./utils/taskManger.vue";
 import universalSpace from "./funcs/universalSpace.vue";
 import contextRes from "./funcs/contextAndResource.vue";
@@ -201,7 +201,7 @@ export default {
   props: ["activityInfo"],
   components: {
     Avatar,
-    activityShow,
+    // activityShow,
     taskManager,
     universalSpace,
     contextRes,
