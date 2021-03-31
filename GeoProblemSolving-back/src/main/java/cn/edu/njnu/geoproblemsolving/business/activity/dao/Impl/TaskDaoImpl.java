@@ -1,7 +1,7 @@
 package cn.edu.njnu.geoproblemsolving.Dao.Task;
 
 import cn.edu.njnu.geoproblemsolving.Dao.Method.CommonMethod;
-import cn.edu.njnu.geoproblemsolving.Entity.TaskEntity;
+import cn.edu.njnu.geoproblemsolving.business.activity.entity.TaskEntity;
 import cn.edu.njnu.geoproblemsolving.business.user.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;

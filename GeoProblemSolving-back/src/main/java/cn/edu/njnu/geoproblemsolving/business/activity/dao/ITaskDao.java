@@ -1,6 +1,6 @@
 package cn.edu.njnu.geoproblemsolving.Dao.Task;
 
-import cn.edu.njnu.geoproblemsolving.Entity.TaskEntity;
+import cn.edu.njnu.geoproblemsolving.business.activity.entity.TaskEntity;
 
 import javax.servlet.http.HttpServletRequest;
 

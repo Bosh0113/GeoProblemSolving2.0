@@ -1,7 +1,7 @@
 package cn.edu.njnu.geoproblemsolving.Controller;
 
-import cn.edu.njnu.geoproblemsolving.Dao.Task.TaskDaoImpl;
-import cn.edu.njnu.geoproblemsolving.Entity.TaskEntity;
+import cn.edu.njnu.geoproblemsolving.business.activity.dao.Impl.TaskDaoImpl;
+import cn.edu.njnu.geoproblemsolving.business.activity.entity.TaskEntity;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.web.bind.annotation.*;
 
