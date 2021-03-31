@@ -24,16 +24,28 @@ import java.util.ArrayList;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ToolEntity extends BaseEntity {
+    /**
+     * basic info
+     */
     @Id
     private String tid;
     private String toolName;
     private String toolUrl;//stateId, oid,mdlId,模型条目？
-    private JSONObject modelInfo; //stateId, oid,mdlId,模型条目？
-    private String description; // 可在多个不同的toolset内，或没有dataset
-    private ArrayList<String> recomStep; // step类型 or general
-    private ArrayList<String> categoryTag;
+
+    /**
+     * description
+     */
+    private String toolImg;
+    private String description;
+    private ArrayList<String> recommendation; // activity类型 or general
+    private ArrayList<String> tag;
+
+    /**
+     * others
+     */
     private String provider;
     private String privacy;
-    private String toolImg;
-    private String detail;
+    private String scope; // 适用于panel打开的内部工具和不适用panel打开的外部工具：inner/outer
+
+//    private JSONObject modelInfo; //stateId, oid,mdlId,模型条目？
 }

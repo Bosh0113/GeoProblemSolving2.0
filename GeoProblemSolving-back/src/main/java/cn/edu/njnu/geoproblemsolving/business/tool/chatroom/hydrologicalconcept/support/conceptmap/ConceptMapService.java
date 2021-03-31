@@ -1,15 +1,15 @@
-package cn.edu.njnu.geoproblemsolving.business.chatroom.hydrologicalconcept.support.conceptmap;
+package cn.edu.njnu.geoproblemsolving.business.tool.chatroom.hydrologicalconcept.support.conceptmap;
 
 
-import cn.edu.njnu.geoproblemsolving.business.chatroom.MxGraphUtils;
-import cn.edu.njnu.geoproblemsolving.business.chatroom.hydrologicalconcept.AnsjSegService;
-import cn.edu.njnu.geoproblemsolving.business.chatroom.hydrologicalconcept.support.concepts.Concepts;
-import cn.edu.njnu.geoproblemsolving.business.chatroom.hydrologicalconcept.support.concepts.ConceptsService;
-import cn.edu.njnu.geoproblemsolving.business.chatroom.hydrologicalconcept.support.georule.GeoRule;
-import cn.edu.njnu.geoproblemsolving.business.chatroom.hydrologicalconcept.support.georule.GeoRuleService;
-import cn.edu.njnu.geoproblemsolving.business.chatroom.hydrologicalconcept.support.georule.rule_enum.Aspect;
-import cn.edu.njnu.geoproblemsolving.business.chatroom.hydrologicalconcept.support.userimage.UserImage;
-import cn.edu.njnu.geoproblemsolving.business.chatroom.hydrologicalconcept.support.userimage.UserImageService;
+import cn.edu.njnu.geoproblemsolving.business.tool.chatroom.MxGraphUtils;
+import cn.edu.njnu.geoproblemsolving.business.tool.chatroom.hydrologicalconcept.AnsjSegService;
+import cn.edu.njnu.geoproblemsolving.business.tool.chatroom.hydrologicalconcept.support.concepts.Concepts;
+import cn.edu.njnu.geoproblemsolving.business.tool.chatroom.hydrologicalconcept.support.concepts.ConceptsService;
+import cn.edu.njnu.geoproblemsolving.business.tool.chatroom.hydrologicalconcept.support.georule.GeoRule;
+import cn.edu.njnu.geoproblemsolving.business.tool.chatroom.hydrologicalconcept.support.georule.GeoRuleService;
+import cn.edu.njnu.geoproblemsolving.business.tool.chatroom.hydrologicalconcept.support.georule.rule_enum.Aspect;
+import cn.edu.njnu.geoproblemsolving.business.tool.chatroom.hydrologicalconcept.support.userimage.UserImage;
+import cn.edu.njnu.geoproblemsolving.business.tool.chatroom.hydrologicalconcept.support.userimage.UserImageService;
 import com.alibaba.fastjson.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

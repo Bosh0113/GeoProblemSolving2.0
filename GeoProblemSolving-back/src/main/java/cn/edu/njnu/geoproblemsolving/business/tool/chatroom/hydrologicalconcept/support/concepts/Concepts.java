@@ -1,4 +1,4 @@
-package cn.edu.njnu.geoproblemsolving.business.chatroom.hydrologicalconcept.support.concepts;
+package cn.edu.njnu.geoproblemsolving.business.tool.chatroom.hydrologicalconcept.support.concepts;
 
 import lombok.Data;
 import org.springframework.data.mongodb.core.mapping.Document;

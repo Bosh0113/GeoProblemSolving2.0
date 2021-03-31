@@ -1,15 +1,15 @@
-package cn.edu.njnu.geoproblemsolving.business.chatroom.hydrologicalconcept;
+package cn.edu.njnu.geoproblemsolving.business.tool.chatroom.hydrologicalconcept;
 
 
-import cn.edu.njnu.geoproblemsolving.business.chatroom.hydrologicalconcept.support.conceptmap.ConceptMap;
-import cn.edu.njnu.geoproblemsolving.business.chatroom.hydrologicalconcept.support.conceptmap.ConceptMapService;
-import cn.edu.njnu.geoproblemsolving.business.chatroom.hydrologicalconcept.support.concepts.Concepts;
-import cn.edu.njnu.geoproblemsolving.business.chatroom.hydrologicalconcept.support.concepts.ConceptsService;
-import cn.edu.njnu.geoproblemsolving.business.chatroom.hydrologicalconcept.support.geoicon.GeoIconService;
-import cn.edu.njnu.geoproblemsolving.business.chatroom.hydrologicalconcept.support.georule.GeoRule;
-import cn.edu.njnu.geoproblemsolving.business.chatroom.hydrologicalconcept.support.georule.GeoRuleService;
-import cn.edu.njnu.geoproblemsolving.business.chatroom.hydrologicalconcept.support.userimage.UserImage;
-import cn.edu.njnu.geoproblemsolving.business.chatroom.hydrologicalconcept.support.userimage.UserImageService;
+import cn.edu.njnu.geoproblemsolving.business.tool.chatroom.hydrologicalconcept.support.conceptmap.ConceptMap;
+import cn.edu.njnu.geoproblemsolving.business.tool.chatroom.hydrologicalconcept.support.conceptmap.ConceptMapService;
+import cn.edu.njnu.geoproblemsolving.business.tool.chatroom.hydrologicalconcept.support.concepts.Concepts;
+import cn.edu.njnu.geoproblemsolving.business.tool.chatroom.hydrologicalconcept.support.concepts.ConceptsService;
+import cn.edu.njnu.geoproblemsolving.business.tool.chatroom.hydrologicalconcept.support.geoicon.GeoIconService;
+import cn.edu.njnu.geoproblemsolving.business.tool.chatroom.hydrologicalconcept.support.georule.GeoRule;
+import cn.edu.njnu.geoproblemsolving.business.tool.chatroom.hydrologicalconcept.support.georule.GeoRuleService;
+import cn.edu.njnu.geoproblemsolving.business.tool.chatroom.hydrologicalconcept.support.userimage.UserImage;
+import cn.edu.njnu.geoproblemsolving.business.tool.chatroom.hydrologicalconcept.support.userimage.UserImageService;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.ansj.domain.Result;

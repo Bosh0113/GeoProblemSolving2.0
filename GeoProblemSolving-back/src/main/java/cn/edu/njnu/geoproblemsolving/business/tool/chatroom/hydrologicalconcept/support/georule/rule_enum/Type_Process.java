@@ -1,4 +1,4 @@
-package cn.edu.njnu.geoproblemsolving.business.chatroom.hydrologicalconcept.support.georule.rule_enum;
+package cn.edu.njnu.geoproblemsolving.business.tool.chatroom.hydrologicalconcept.support.georule.rule_enum;
 
 public enum Type_Process {
     组合关系,

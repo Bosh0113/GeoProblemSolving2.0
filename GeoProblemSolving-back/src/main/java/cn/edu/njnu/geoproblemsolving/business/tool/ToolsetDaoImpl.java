@@ -42,7 +42,7 @@ public class ToolsetDaoImpl implements IToolsetDao {
             toolset.setTsid(tsId);
             Date date = new Date();
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-            toolset.setCreateTime(dateFormat.format(date));
+            toolset.setCreatedTime(dateFormat.format(date));
             toolset.setToolList(new ArrayList<>());
             mongoTemplate.save(toolset);
             return toolset;

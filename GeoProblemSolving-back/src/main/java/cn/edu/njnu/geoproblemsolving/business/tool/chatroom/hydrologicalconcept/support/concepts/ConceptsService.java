@@ -1,4 +1,4 @@
-package cn.edu.njnu.geoproblemsolving.business.chatroom.hydrologicalconcept.support.concepts;
+package cn.edu.njnu.geoproblemsolving.business.tool.chatroom.hydrologicalconcept.support.concepts;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

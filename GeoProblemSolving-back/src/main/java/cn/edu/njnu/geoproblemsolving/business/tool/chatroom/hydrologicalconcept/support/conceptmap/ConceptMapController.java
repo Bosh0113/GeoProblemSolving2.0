@@ -1,4 +1,4 @@
-package cn.edu.njnu.geoproblemsolving.business.chatroom.hydrologicalconcept.support.conceptmap;
+package cn.edu.njnu.geoproblemsolving.business.tool.chatroom.hydrologicalconcept.support.conceptmap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;

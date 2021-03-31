@@ -1,4 +1,4 @@
-package cn.edu.njnu.geoproblemsolving.business.chatroom.hydrologicalconcept.support.support;
+package cn.edu.njnu.geoproblemsolving.business.tool.chatroom.hydrologicalconcept.support.support;
 
 import lombok.Data;
 

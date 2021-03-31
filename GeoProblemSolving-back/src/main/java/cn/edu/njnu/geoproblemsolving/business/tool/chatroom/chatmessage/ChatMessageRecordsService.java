@@ -1,8 +1,8 @@
-package cn.edu.njnu.geoproblemsolving.business.chatroom.chatmessage;
+package cn.edu.njnu.geoproblemsolving.business.tool.chatroom.chatmessage;
 
 
 
-import cn.edu.njnu.geoproblemsolving.business.chatroom.chatmessage.dto.AddChatMessageRecordsDTO;
+import cn.edu.njnu.geoproblemsolving.business.tool.chatroom.chatmessage.dto.AddChatMessageRecordsDTO;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import cn.edu.njnu.geoproblemsolving.common.utils.ResultUtils;
 import org.springframework.beans.factory.annotation.Autowired;

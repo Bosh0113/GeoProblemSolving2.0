@@ -1,6 +1,7 @@
-package cn.edu.njnu.geoproblemsolving.Dao.Task;
+package cn.edu.njnu.geoproblemsolving.business.activity.dao.Impl;
 
 import cn.edu.njnu.geoproblemsolving.Dao.Method.CommonMethod;
+import cn.edu.njnu.geoproblemsolving.business.activity.dao.ITaskDao;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.TaskEntity;
 import cn.edu.njnu.geoproblemsolving.business.user.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Component
-public class TaskDaoImpl implements ITaskDao{
+public class TaskDaoImpl implements ITaskDao {
 
     private final MongoTemplate mongoTemplate;
 

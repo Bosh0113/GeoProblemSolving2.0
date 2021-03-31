@@ -1,4 +1,4 @@
-package cn.edu.njnu.geoproblemsolving.business.chatroom.chat;
+package cn.edu.njnu.geoproblemsolving.business.tool.chatroom.chat;
 
 
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;

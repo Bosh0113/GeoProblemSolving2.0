@@ -1,4 +1,4 @@
-package cn.edu.njnu.geoproblemsolving.business.chatroom;
+package cn.edu.njnu.geoproblemsolving.business.tool.chatroom;
 
 import com.mxgraph.canvas.mxGraphicsCanvas2D;
 import com.mxgraph.canvas.mxICanvas2D;

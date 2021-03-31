@@ -1,4 +1,4 @@
-package cn.edu.njnu.geoproblemsolving.Dao.Task;
+package cn.edu.njnu.geoproblemsolving.business.activity.dao;
 
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.TaskEntity;
 

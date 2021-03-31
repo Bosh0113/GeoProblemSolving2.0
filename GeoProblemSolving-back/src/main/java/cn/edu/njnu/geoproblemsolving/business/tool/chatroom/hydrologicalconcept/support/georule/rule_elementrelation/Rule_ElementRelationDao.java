@@ -1,4 +1,4 @@
-package cn.edu.njnu.geoproblemsolving.business.chatroom.hydrologicalconcept.support.georule.rule_elementrelation;
+package cn.edu.njnu.geoproblemsolving.business.tool.chatroom.hydrologicalconcept.support.georule.rule_elementrelation;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 

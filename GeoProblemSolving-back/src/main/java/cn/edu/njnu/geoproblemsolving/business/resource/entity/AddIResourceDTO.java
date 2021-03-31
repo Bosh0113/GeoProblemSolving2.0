@@ -1,6 +1,6 @@
 package cn.edu.njnu.geoproblemsolving.business.resource.entity;
 
-import cn.edu.njnu.geoproblemsolving.Dto.ToDomainConverter;
+import cn.edu.njnu.geoproblemsolving.common.utils.ToDomainConverter;
 import lombok.Data;
 
 /**

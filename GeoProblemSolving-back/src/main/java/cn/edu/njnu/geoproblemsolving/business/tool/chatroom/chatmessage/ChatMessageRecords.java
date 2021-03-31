@@ -1,4 +1,4 @@
-package cn.edu.njnu.geoproblemsolving.business.chatroom.chatmessage;
+package cn.edu.njnu.geoproblemsolving.business.tool.chatroom.chatmessage;
 
 import cn.edu.njnu.geoproblemsolving.Entity.ModelTools.CModel.support.BaseEntity;
 import lombok.AllArgsConstructor;

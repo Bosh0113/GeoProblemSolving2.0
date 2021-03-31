@@ -1,4 +1,4 @@
-package cn.edu.njnu.geoproblemsolving.Dto;
+package cn.edu.njnu.geoproblemsolving.common.utils;
 
 import cn.edu.njnu.geoproblemsolving.Entity.ModelTools.CModel.support.BaseEntity;
 import cn.edu.njnu.geoproblemsolving.common.exception.MyException;

@@ -1,10 +1,10 @@
-package cn.edu.njnu.geoproblemsolving.business.chatroom.hydrologicalconcept.support.userimage;
+package cn.edu.njnu.geoproblemsolving.business.tool.chatroom.hydrologicalconcept.support.userimage;
 
 
 
-import cn.edu.njnu.geoproblemsolving.business.chatroom.MxGraphUtils;
-import cn.edu.njnu.geoproblemsolving.business.chatroom.hydrologicalconcept.support.concepts.Concepts;
-import cn.edu.njnu.geoproblemsolving.business.chatroom.hydrologicalconcept.support.concepts.ConceptsService;
+import cn.edu.njnu.geoproblemsolving.business.tool.chatroom.MxGraphUtils;
+import cn.edu.njnu.geoproblemsolving.business.tool.chatroom.hydrologicalconcept.support.concepts.Concepts;
+import cn.edu.njnu.geoproblemsolving.business.tool.chatroom.hydrologicalconcept.support.concepts.ConceptsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;

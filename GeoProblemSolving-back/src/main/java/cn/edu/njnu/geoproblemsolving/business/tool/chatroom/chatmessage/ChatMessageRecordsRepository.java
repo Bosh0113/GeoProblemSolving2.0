@@ -1,4 +1,4 @@
-package cn.edu.njnu.geoproblemsolving.business.chatroom.chatmessage;
+package cn.edu.njnu.geoproblemsolving.business.tool.chatroom.chatmessage;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.repository.MongoRepository;

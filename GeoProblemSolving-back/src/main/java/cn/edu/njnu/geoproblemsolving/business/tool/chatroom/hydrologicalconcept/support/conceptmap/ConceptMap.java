@@ -1,7 +1,7 @@
-package cn.edu.njnu.geoproblemsolving.business.chatroom.hydrologicalconcept.support.conceptmap;
+package cn.edu.njnu.geoproblemsolving.business.tool.chatroom.hydrologicalconcept.support.conceptmap;
 
 
-import cn.edu.njnu.geoproblemsolving.business.chatroom.hydrologicalconcept.support.support.*;
+import cn.edu.njnu.geoproblemsolving.business.tool.chatroom.hydrologicalconcept.support.support.*;
 import io.swagger.annotations.ApiModel;
 import lombok.Data;
 

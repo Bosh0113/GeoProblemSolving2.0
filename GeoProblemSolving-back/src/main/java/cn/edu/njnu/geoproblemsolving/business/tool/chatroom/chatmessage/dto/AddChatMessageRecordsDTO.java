@@ -1,9 +1,9 @@
-package cn.edu.njnu.geoproblemsolving.business.chatroom.chatmessage.dto;
+package cn.edu.njnu.geoproblemsolving.business.tool.chatroom.chatmessage.dto;
 
 
 
-import cn.edu.njnu.geoproblemsolving.Dto.ToDomainConverter;
-import cn.edu.njnu.geoproblemsolving.business.chatroom.chatmessage.ChatMessageRecords;
+import cn.edu.njnu.geoproblemsolving.common.utils.ToDomainConverter;
+import cn.edu.njnu.geoproblemsolving.business.tool.chatroom.chatmessage.ChatMessageRecords;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 
