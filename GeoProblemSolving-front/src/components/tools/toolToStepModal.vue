@@ -478,6 +478,7 @@
 // import JPanel from 'JSPanel'
 import Avatar from "vue-avatar";
 import draggable from "vuedraggable";
+import * as operationApi from "@/api/operation.js";
 import { get, del, post, put } from "../../axios";
 export default {
   props: ["activityInfo"],
@@ -923,7 +924,6 @@ export default {
       }
       this.filterShowListByType();
     },
-
     confirmSetting() {
       var newStepToolsets = [];
       var newStepTools = [];
@@ -961,9 +961,8 @@ export default {
             this.$Notice.error({ desc: "Loading tool fail." });
           } else if (res.data === "None") {
             // this.$Notice.error({ desc: "There is no existing tool" });
-          } else {
+          } else {            
             //此处要更新父组件的列表
-            console.log(res.data);
             this.$emit("updateStepTools", newStepTools, newStepToolsets);
             this.stepToolModal = false;
           }

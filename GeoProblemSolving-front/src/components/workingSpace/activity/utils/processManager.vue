@@ -148,7 +148,8 @@
 // import "driver.js/dist/driver.min.css";
 import echarts from "echarts";
 // import Driver from "driver.js";
-import * as userRoleJS from "./../../../../api/userRole.js";
+import * as userRoleJS from "@/api/userRole.js";
+import * as operationApi from "@/api/operation.js";
 export default {
   props: ["activityInfo", "childActivities"],
   data() {
@@ -847,6 +848,8 @@ export default {
               parent.location.href = "/GeoProblemSolving/login";
             }
           } else if (res.data.code == 0) {
+            operationApi.processRecord(this.activityInfo.aid, "link", this.userInfo.userId, begin, end); 
+
             this.$Notice.info({
               desc: "Link activities successfully!",
             });
@@ -920,6 +923,7 @@ export default {
               parent.location.href = "/GeoProblemSolving/login";
             }
           } else if (res.data.code == 0) {
+            operationApi.processRecord(this.activityInfo.aid, "break", this.userInfo.userId, begin, end);
             this.$Notice.info({
               desc: "Seperate activities successfully!",
             });

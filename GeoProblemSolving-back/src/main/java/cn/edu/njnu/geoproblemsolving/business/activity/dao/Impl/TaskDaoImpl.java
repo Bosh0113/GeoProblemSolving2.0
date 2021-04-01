@@ -32,7 +32,7 @@ public class TaskDaoImpl implements ITaskDao {
             Date date=new Date();
             SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
             task.setTaskId(UUID.randomUUID().toString());
-            task.setCreateTime(dateFormat.format(date));
+            task.setCreatedTime(dateFormat.format(date));
             mongoTemplate.save(task);
             return task;
         }catch (Exception e){

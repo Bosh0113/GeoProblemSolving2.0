@@ -226,7 +226,8 @@
   </div>
 </template>
 <script>
-import * as userRoleJS from "./../../api/userRole.js";
+import * as operationApi from "@/api/operation.js";
+import * as userRoleJS from "@/api/userRole.js";
 import typeChoose from "./activity/typeChoose.vue";
 import singleActivity from "./activity/singleActivity.vue";
 import multiActivity from "./activity/multiActivity.vue";
@@ -847,6 +848,9 @@ export default {
         .delete(url)
         .then((res) => {
           if (res.data.code == 0) {
+            
+            operationApi.activityRecord("remove", this.userInfo.userId, this.slctActivity);
+
             parent.location.href =
               "/GeoProblemSolving/projectInfo/" +
               this.projectInfo.aid +

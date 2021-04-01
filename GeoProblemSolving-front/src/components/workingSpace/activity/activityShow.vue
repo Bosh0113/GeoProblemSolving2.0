@@ -551,6 +551,7 @@
 </template>
 <script>
 import * as userRoleJS from "@/api/userRole.js";
+import * as operationApi from "@/api/operation.js"
 import { get, del, post, put } from "@/axios";
 import * as socketApi from "@/api/socket.js";
 import Avatar from "vue-avatar";
@@ -755,6 +756,8 @@ export default {
             .post(url, this.activityForm)
             .then((res) => {
               if (res.data.code == 0) {
+                operationApi.activityRecord("create", this.userInfo.userId, res.data.data);
+
                 parent.location.href =
                   "/GeoProblemSolving/projectInfo/" +
                   this.projectInfo.aid +
@@ -939,6 +942,7 @@ export default {
           .then((res) => {
             if (res.data.code == 0) {
               this.participants.push(user);
+              operationApi.participantUpdate(this.activityInfo.aid, "invite", user.userId, user.name, user.role);
               this.$Notice.info({ desc: "Invite member successfully" });
 
               //notice
@@ -1002,8 +1006,9 @@ export default {
         .delete(url)
         .then((res) => {
           if (res.data.code == 0) {
+            operationApi.participantUpdate(this.activityInfo.aid, "delete", member.userId, member.name, member.role);
             let index = this.participants.indexOf(member);
-            this.participants.splice(index, 1);
+            this.participants.splice(index, 1);            
             this.$Notice.info({ desc: "Remove member successfully" });
 
             //notice
@@ -1070,6 +1075,7 @@ export default {
         .then((res) => {
           if (res.data.code == 0) {
             this.$Notice.info({ desc: "Change the member role successfully" });
+            operationApi.participantUpdate(this.activityInfo.aid, "role", member.userId, member.name, member.role);
             this.getParticipants();
 
             //notice

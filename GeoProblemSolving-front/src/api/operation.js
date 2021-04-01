@@ -35,7 +35,7 @@ function guid() {
 }
 
 // 创建活动时的活动文档初始化
-function activityDocInit(activityInfo, user) {
+export function activityDocInit(activityInfo, user) {
 
     if (activityInfo.type === "Activity_Default") {
         return;
@@ -83,7 +83,7 @@ function activityDocInit(activityInfo, user) {
 }
 
 // 活动类型改变时
-function rebuildActivityDoc(activityInfo, participants, resources, tools) {
+export function rebuildActivityDoc(activityInfo, participants, resources, tools) {
     if (activityInfo.type === "Activity_Default") {
         return;
     }
@@ -154,7 +154,7 @@ function rebuildActivityDoc(activityInfo, participants, resources, tools) {
 }
 
 // inquiry——打开activity时
-function getActivityDoc(aid) {
+export function getActivityDoc(aid) {
     $.ajax({
         url: "/GeoProblemSolving/activityDoc?aid=" + aid,
         type: "GET",
@@ -181,7 +181,7 @@ function getTaskRecords(taskId) {
         return;
     }
 
-    return xmlDoc.getElementById(taskId);    
+    return xmlDoc.getElementById(taskId);
 }
 
 // save
@@ -213,7 +213,7 @@ function saveActivityDoc(aid) {
 }
 
 // update
-function taskUpdate(behavior, taskInfo) {
+export function taskUpdate(aid, behavior, taskInfo) {
     if (xmlDoc === null) {
         alert("Failed to record operation. Please load activity document first!");
         return;
@@ -223,10 +223,10 @@ function taskUpdate(behavior, taskInfo) {
     if (behavior === "create") {
         let TaskList = xmlDoc.getElementsByTagName('TaskList')[0];
         let Task = xmlDoc.createElement('Task');
-        Task.set("id", taskInfo.taskId)
-        Task.set("name", taskInfo.name)
-        Task.set("purpose", taskInfo.description)
-        Task.set("purpose", taskInfo.startTime.Format() + " - " + taskInfo.endTime.Format());
+        Task.set("id", taskInfo.taskId);
+        Task.set("name", taskInfo.name);
+        Task.set("purpose", taskInfo.description);
+        Task.set("time", taskInfo.startTime.Format() + " - " + taskInfo.endTime.Format());
         TaskList.appendChild(Task);
     } else if (behavior === "remove") {
         let Task = xmlDoc.getElementById(taskInfo.taskId);
@@ -234,18 +234,20 @@ function taskUpdate(behavior, taskInfo) {
             Task.set("state", "removed");
         }
     }
+
+    saveActivityDoc(aid);
 }
 
 
-function taskDependencyRecord(behavior, relationId, lasts, nexts) {
+export function taskDependencyRecord(aid, behavior, relationId, lasts, nexts) {
     if (xmlDoc === null) {
         alert("Failed to record operation. Please load activity document first!");
         return;
     }
 
-    // ProtocalList
+    // TaskDependency
     if (behavior === "link") {
-        let TaskDependency = xmlDoc.getElementsByTagName("ChildActivities")[0];
+        let TaskDependency = xmlDoc.getElementsByTagName("TaskDependency")[0];
         let Relation = xmlDoc.createElement('Relation');
         Relation.set("id", relationId);
         Relation.set("name", "Task Dependency");
@@ -267,11 +269,42 @@ function taskDependencyRecord(behavior, relationId, lasts, nexts) {
             Relation.set("state", "removed");
         }
     }
+
+    saveActivityDoc(aid);
 }
 
+export function participantUpdate(aid, behavior, userId, name, role) {
+    if (xmlDoc === null) {
+        alert("Failed to record operation. Please load activity document first!");
+        return;
+    }
+
+    // Participants
+    if (behavior === "invite") {
+        let Participants = xmlDoc.getElementsByTagName('Participants')[0];
+        let Person = xmlDoc.createElement('Person');
+        Person.set("id", userId);
+        Person.set("name", name);
+        Person.set("role", role);
+        Person.set("state", "in");
+        Participants.appendChild(Person);
+    } else if (behavior === "remove") {
+        let Person = xmlDoc.getElementById(userId);
+        if (Person !== null) {
+            Person.set("state", "out");
+        }
+    } else if (behavior === "role") {
+        let Person = xmlDoc.getElementById(userId);
+        if (Person !== null) {
+            Person.set("role", role);
+        }
+    }
+
+    saveActivityDoc(aid);
+}
 
 // operation
-function resOperationRecord(taskId, behavior, userId, resInfo) {
+export function resOperationRecord(aid, taskId, behavior, userId, resInfo) {
     if (xmlDoc === null) {
         alert("Failed to record operation. Please load activity document first!");
         return;
@@ -316,9 +349,11 @@ function resOperationRecord(taskId, behavior, userId, resInfo) {
         Operation.set("id", operationId);
         Task.appendChild(OperationRef);
     }
+
+    saveActivityDoc(aid);
 }
 
-function toolOperationRecord(taskId, behavior, userId, toolInfo) {
+export function toolOperationRecord(aid, taskId, behavior, userId, toolInfo) {
     if (xmlDoc === null) {
         alert("Failed to record operation. Please load activity document first!");
         return;
@@ -361,9 +396,11 @@ function toolOperationRecord(taskId, behavior, userId, toolInfo) {
         Operation.set("id", operationId);
         Task.appendChild(OperationRef);
     }
+
+    saveActivityDoc(aid);
 }
 
-function communicationRecord(taskId, toolId, resId, onlineMembers) {
+export function communicationRecord(aid, taskId, toolId, resId, onlineMembers) {
     if (xmlDoc === null) {
         alert("Failed to record operation. Please load activity document first!");
         return;
@@ -392,9 +429,11 @@ function communicationRecord(taskId, toolId, resId, onlineMembers) {
         Operation.set("id", operationId);
         Task.appendChild(OperationRef);
     }
+
+    saveActivityDoc(aid);
 }
 
-function analysisRecord(taskId, toolId, userId, inputs, outputs, params) {
+export function analysisRecord(aid, taskId, toolId, userId, inputs, outputs, params) {
     if (xmlDoc === null) {
         alert("Failed to record operation. Please load activity document first!");
         return;
@@ -436,10 +475,12 @@ function analysisRecord(taskId, toolId, userId, inputs, outputs, params) {
         Operation.set("id", operationId);
         Task.appendChild(OperationRef);
     }
+
+    saveActivityDoc(aid);
 }
 
 // Child Activity
-function activityRecord(behavior, userId, activityInfo) {
+export function activityRecord(behavior, userId, childInfo) {
     if (xmlDoc === null) {
         alert("Failed to record operation. Please load activity document first!");
         return;
@@ -449,14 +490,14 @@ function activityRecord(behavior, userId, activityInfo) {
     if (behavior === "create") {
         let ChildActivities = xmlDoc.getElementsByTagName("ChildActivities")[0];
         let Child = xmlDoc.createElement('Child');
-        Child.set("id", activityInfo.aid);
-        Child.set("name", activityInfo.name);
-        Child.set("description", activityInfo.description);
-        Child.set("creator", activityInfo.creator);
+        Child.set("id", childInfo.aid);
+        Child.set("name", childInfo.name);
+        Child.set("description", childInfo.description);
+        Child.set("creator", childInfo.creator);
         Child.set("state", "accessible");
         ChildActivities.appendChild(Child);
     } else if (behavior === "remove") {
-        let Child = xmlDoc.getElementById(activityInfo.aid);
+        let Child = xmlDoc.getElementById(childInfo.aid);
         if (Child !== null) {
             Child.set("state", "removed");
         }
@@ -472,37 +513,36 @@ function activityRecord(behavior, userId, activityInfo) {
     Operation.set("operator", userId);
     Operation.set("time", new Date().Format("yyyy-MM-dd HH:mm:ss"));
     OperationRecords.appendChild(Operation);
+
+
+    saveActivityDoc(childInfo.parent);
 }
 
-function processRecord(behavior, userId, protocalInfo, lasts, nexts) {
+export function processRecord(aid, behavior, userId, last, next) {
     if (xmlDoc === null) {
         alert("Failed to record operation. Please load activity document first!");
         return;
     }
 
-    // ProtocalList
+    // ActivityDependencies
+    let relationId = guid();
     if (behavior === "link") {
-        let ProtocalList = xmlDoc.getElementsByTagName("ChildActivities")[0];
-        let Protocal = xmlDoc.createElement('Protocal');
-        Protocal.set("id", protocalInfo.pid);
-        Protocal.set("name", protocalInfo.name);
-        Protocal.set("description", protocalInfo.description);
-        Protocal.set("state", "used");
-        for (var i = 0; i < lasts.length; i++) {
-            let From = xmlDoc.createElement('From');
-            From.set("childRef", lasts[i]);
-            Protocal.appendChild(From);
-        }
-        for (var i = 0; i < nexts.length; i++) {
-            let To = xmlDoc.createElement('To');
-            To.set("childRef", nexts[i]);
-            Protocal.appendChild(To);
-        }
-        ProtocalList.appendChild(Protocal);
+        let ActivityDependencies = xmlDoc.getElementsByTagName("ActivityDependencies")[0];
+        let Relation = xmlDoc.createElement('Relation');
+        Relation.set("id", relationId);
+        Relation.set("name", "ActivityDependency");
+        Relation.set("state", "used");
+        let From = xmlDoc.createElement('From');
+        From.set("childRef", last);
+        Relation.appendChild(From);
+        let To = xmlDoc.createElement('To');
+        To.set("childRef", next);
+        Relation.appendChild(To);
+        ActivityDependencies.appendChild(Relation);
     } else if (behavior === "break") {
-        let Protocal = xmlDoc.getElementById(protocalId);
-        if (Protocal !== null) {
-            Protocal.set("state", "removed");
+        let Relation = xmlDoc.getElementById(protocalId);
+        if (Relation !== null) {
+            Relation.set("state", "removed");
         }
     }
 
@@ -513,14 +553,17 @@ function processRecord(behavior, userId, protocalInfo, lasts, nexts) {
     Operation.set("id", operationId);
     Operation.set("type", "process");
     Operation.set("behavior", behavior);
-    Operation.set("protocal", protocalId);
+    Operation.set("dependency", relationId);
     Operation.set("operator", userId);
     Operation.set("time", new Date().Format("yyyy-MM-dd HH:mm:ss"));
     OperationRecords.appendChild(Operation);
+
+
+    saveActivityDoc(aid);
 }
 
 // delete
-function deleteActivityDoc(aid) {
+export function deleteActivityDoc(aid) {
     $.ajax({
         url: "/GeoProblemSolving/activityDoc?aid=" + aid,
         type: "DELETE",
@@ -539,6 +582,6 @@ function deleteActivityDoc(aid) {
 }
 
 // view
-function buildDocView() {
+export function buildDocView() {
     return;
 }
