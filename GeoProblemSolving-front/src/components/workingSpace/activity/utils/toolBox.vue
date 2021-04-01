@@ -164,9 +164,7 @@
               :key="tool.index"
               style="margin-top: 15px"
             >
-              <Card
-                style="background-color: ghostwhite; margin: 5px"
-              >
+              <Card style="background-color: ghostwhite; margin: 5px">
                 <div
                   style="text-align: center; cursor: pointer"
                   @click="useTool(tool)"
@@ -241,15 +239,15 @@
     <Modal v-model="openToolModal" title="Open tool">
       <h2>How would you like to open this tool?</h2>
       <small style="color: #ff9900"
-        >*Some tools are not supported to be used in window.</small
+        >*Some tools are not supported to be used in page.</small
       >
       <div slot="footer" style="text-align: center">
-        <Button @click="openToolInWindow" type="primary" style="margin: 0 15px"
-          >This window</Button
+        <Button @click="openTool" type="primary" style="margin: 0 15px"
+          >This page</Button
         >
-        <Button @click="openToolNewWindow" style="margin: 0 15px"
-          >New window</Button
-        >
+        <!-- <Button @click="openToolNewpage" style="margin: 0 15px"
+          >New page</Button
+        > -->
       </div>
     </Modal>
   </div>
@@ -288,7 +286,7 @@ export default {
       panelList: [],
       jupyterModal: false,
       selectedTool: {},
-      openToolModal: false,
+      // openToolModal: false,
     };
   },
   created() {
@@ -439,12 +437,14 @@ export default {
     },
     useTool(toolInfo) {
       this.selectedTool = toolInfo;
-      this.openToolModal = true;
+      this.openTool();
+      // this.openToolModal = true;
     },
-    openToolInWindow() {
+    openTool() {
       var toolInfo = this.selectedTool;
-      this.openToolModal = false;
-      // 记录信息
+      // this.openToolModal = false;
+
+      // record
       let toolRecords = {
         type: "tools",
         time: new Date().Format("yyyy-MM-dd HH:mm:ss"),
@@ -455,48 +455,42 @@ export default {
       this.$emit("toolBehavior", toolRecords);
       // this.addHistoryEvent(this.activityInfo.aid, toolRecords);
 
-      if (toolInfo.toolName == "Jupyter notebook") {
-        this.jupyterModal = true;
-        return;
+      if (toolInfo.scope == "outer") {
+        this.openToolNewpage(toolInfo)
+      } else if (toolInfo.scope == "inner") {
+        this.openToolByPanel(toolInfo)
+      } else {
+        this.openToolByPanel(toolInfo)
       }
-
-      // var toolURL = window.location.origin + `${toolInfo.toolUrl}`;
-      var toolURL = toolInfo.toolUrl;
-      var toolContent = `<iframe src="${toolURL}?userName=${this.userInfo.name}&userID=${this.userInfo.userId}&groupID=${this.activityInfo.aid}" style="width: 100%; height:100%;" frameborder="0"></iframe>`;
-
-      var demoPanelTimer = null;
-      var panel = jsPanel.create({
-        theme: "success",
-        headerTitle: toolInfo.toolName,
-        footerToolbar: '<p style="height:10px"></p>',
-        contentSize: "800 400",
-        content: toolContent,
-        disableOnMaximized: true,
-        dragit: {
-          containment: 5,
-        },
-        closeOnEscape: true,
-        onclosed: function (panel, status, closedByUser) {
-          window.clearTimeout(demoPanelTimer);
-        },
-      });
-      // panel.resizeit("disable");
-      $(".jsPanel-content").css("font-size", "0");
-      this.panelList.push(panel);
-      this.$emit("toolPanel", panel);
     },
-    openToolNewWindow() {
-      var toolInfo = this.selectedTool;
+    openToolByPanel(toolInfo){
+        // var toolURL = window.location.origin + `${toolInfo.toolUrl}`;
+        var toolURL = toolInfo.toolUrl;
+        var toolContent = `<iframe src="${toolURL}?userName=${this.userInfo.name}&userID=${this.userInfo.userId}&groupID=${this.activityInfo.aid}" style="width: 100%; height:100%;" frameborder="0"></iframe>`;
+
+        var demoPanelTimer = null;
+        var panel = jsPanel.create({
+          theme: "success",
+          headerTitle: toolInfo.toolName,
+          footerToolbar: '<p style="height:10px"></p>',
+          contentSize: "800 400",
+          content: toolContent,
+          disableOnMaximized: true,
+          dragit: {
+            containment: 5,
+          },
+          closeOnEscape: true,
+          onclosed: function (panel, status, closedByUser) {
+            window.clearTimeout(demoPanelTimer);
+          },
+        });
+        // panel.resizeit("disable");
+        $(".jsPanel-content").css("font-size", "0");
+        this.panelList.push(panel);
+        this.$emit("toolPanel", panel);
+    },
+    openToolNewpage(toolInfo) {
       this.openToolModal = false;
-      // 记录信息
-      let toolRecords = {
-        type: "tools",
-        time: new Date().Format("yyyy-MM-dd HH:mm:ss"),
-        who: this.userInfo.userName,
-        content: "used a tool",
-        toolType: toolInfo.toolName,
-      };
-      this.$emit("toolBehavior", toolRecords);
 
       if (toolInfo.toolName == "Jupyter notebook") {
         this.jupyterModal = true;
@@ -511,6 +505,8 @@ export default {
       };
       var toolURL = window.location.origin + `${toolInfo.toolUrl}`;
       window["pageParams"] = params;
+      
+      // open
       window.open(toolURL);
     },
     checkJupyterUser() {

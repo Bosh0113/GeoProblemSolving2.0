@@ -550,9 +550,9 @@
   </div>
 </template>
 <script>
-import * as userRoleJS from "./../../../api/userRole.js";
-import { get, del, post, put } from "../../../axios";
-import * as socketApi from "./../../../api/socket.js";
+import * as userRoleJS from "@/api/userRole.js";
+import { get, del, post, put } from "@/axios";
+import * as socketApi from "@/api/socket.js";
 import Avatar from "vue-avatar";
 export default {
   components: {
@@ -859,7 +859,7 @@ export default {
             approve: "unknow",
           },
         };
-        this.sendNotice(this.appliedActivity, notice);
+        this.sendNotice(notice);
       }
       this.applyJoinActivityModal = false;
     },
@@ -958,7 +958,7 @@ export default {
                   approve: "unknow",
                 },
               };
-              this.sendNotice(activity, notice);
+              this.sendNotice(notice);
             } else {
               console.log(res.data.msg);
             }
@@ -1021,7 +1021,7 @@ export default {
                 approve: "unknow",
               },
             };
-            this.sendNotice(activity, notice);
+            this.sendNotice(notice);
           } else {
             console.log(res.data.msg);
           }
@@ -1089,7 +1089,7 @@ export default {
                 approve: "unknow",
               },
             };
-            this.sendNotice(activity, notice);
+            this.sendNotice(notice);
           } else {
             console.log(res.data.msg);
           }
@@ -1149,7 +1149,7 @@ export default {
                   approve: "unknow",
                 },
               };
-              this.sendNotice(activity, notice);
+              this.sendNotice(notice);
             }
           } else {
             console.log(res.data.msg);
@@ -1159,7 +1159,7 @@ export default {
           throw err;
         });
     },
-    sendNotice(activity, notice) {
+    sendNotice(notice) {
       this.axios
         .post("/GeoProblemSolving/notice/save", notice)
         .then((result) => {

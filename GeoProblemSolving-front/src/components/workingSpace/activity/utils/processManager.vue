@@ -220,7 +220,7 @@ export default {
     this.btnEnable();
     this.roleIdentity();
   },
-  beforeRouteLeave(to, from, next) {
+  beforeRouteLeave(next) {
     next();
   },
   beforeDestroy: function () {},

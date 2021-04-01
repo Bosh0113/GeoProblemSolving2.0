@@ -98,11 +98,11 @@
   </div>
 </template>
 <script>
-import minimap from "../../../../static/js/Control.MiniMap.min.js";
-import pm from "../../../../static/js/leaflet.pm.min.js";
-import * as socketApi from "./../../../api/socket.js";
-import imIcon from "../../../../static/Images/import.png";
-import exIcon from "../../../../static/Images/export.png";
+import minimap from "@static/js/Control.MiniMap.min.js";
+import pm from "@static/js/leaflet.pm.min.js";
+import * as socketApi from "@/api/socket.js";
+import imIcon from "@static/Images/import.png";
+import exIcon from "@static/Images/export.png";
 //leaflet
 import L from "leaflet";
 import shp from "shpjs";

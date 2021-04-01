@@ -132,9 +132,9 @@
   </div>
 </template>
 <script>
-import * as userRoleJS from "./../../../api/userRole.js";
-import { get, del, post, put } from "../../../axios";
-import * as socketApi from "./../../../api/socket.js";
+import * as userRoleJS from "@/api/userRole.js";
+import { get, del, post, put } from "@/axios";
+import * as socketApi from "@/api/socket.js";
 import Avatar from "vue-avatar";
 export default {
   components: {
