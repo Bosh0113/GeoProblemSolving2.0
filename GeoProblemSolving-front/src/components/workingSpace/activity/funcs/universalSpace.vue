@@ -15,7 +15,7 @@
     <div style="position: absolute; top: 5px; left: 10px">
       <info-btn :activityInfo="activityInfo"></info-btn>
     </div>
-    <div style="width: 280px; border: 1px solid lightgray; position: absolute; top: 5px; right: 10px">
+    <div style="width: 280px; border: 1px solid lightgray; position: absolute; top: 5px; right: 10px; z-index: 10">
       <Collapse simple v-model="unfold" class="panel">
         <Panel name="tool">
           Toolbox

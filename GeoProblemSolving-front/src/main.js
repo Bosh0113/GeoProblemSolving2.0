@@ -15,6 +15,7 @@ import store from './store/store.js'
 //引入index.js文件夹
 // import './mock/index'
 import * as socketApi from './api/socket'
+import * as operationApi from './api/operation'
 // import VCharts from 'v-charts';
 
 //set globe CSS
@@ -26,6 +27,7 @@ import "element-ui/lib/theme-chalk/index.css";
 
 axios.defaults.withCredentials=true;
 Vue.prototype.socketApi = socketApi
+Vue.prototype.operationApi = operationApi
 Vue.config.productionTip = false;
 Vue.config.devtools = true;
 
@@ -34,7 +36,6 @@ Vue.use(Vuex)
 Vue.use(VueAxios,axios)
 Vue.use(vuescroll)
 Vue.use(ElementUI)
-// Vue.use(VCharts)
 
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 Vue.prototype.$axios = axios;

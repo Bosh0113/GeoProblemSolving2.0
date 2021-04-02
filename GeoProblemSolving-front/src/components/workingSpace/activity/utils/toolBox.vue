@@ -39,7 +39,6 @@
         <manage-tools
           :activity-info="activityInfo"
           @updateStepTools="stepToolListChanged"
-          :key="toolModal"
           title="Manage toolsets and tools"
           style="margin-top: -10px"
         ></manage-tools>
@@ -236,7 +235,7 @@
         Note: Jupyter notebooks will be accessed by all members in this project.
       </h3>
     </Modal>
-    <Modal v-model="openToolModal" title="Open tool">
+    <!-- <Modal v-model="openToolModal" title="Open tool">
       <h2>How would you like to open this tool?</h2>
       <small style="color: #ff9900"
         >*Some tools are not supported to be used in page.</small
@@ -245,18 +244,18 @@
         <Button @click="openTool" type="primary" style="margin: 0 15px"
           >This page</Button
         >
-        <!-- <Button @click="openToolNewpage" style="margin: 0 15px"
+        <Button @click="openToolNewpage" style="margin: 0 15px"
           >New page</Button
-        > -->
+        >
       </div>
-    </Modal>
+    </Modal> -->
   </div>
 </template>
 <script>
 import manageTools from "./../../../tools/toolToStepModal";
 import Avatar from "vue-avatar";
 import { get, del, post, put } from "../../../../axios";
-import * as userRoleJS from "./../../../../api/userRole.js";
+import * as userRoleJS from "@/api/userRole.js";
 export default {
   props: ["activityInfo"],
   components: {
@@ -278,9 +277,8 @@ export default {
       },
       userInfo: this.$store.getters.userInfo,
       userRole: "visitor",
+      toolIdList: [],
       toolList: [],
-      toolsetList: [],
-      toolModal: 0,
       toolsetToolList: [],
       showToolsetToolsModal: false,
       panelList: [],
@@ -336,104 +334,23 @@ export default {
       );
     },
     getAllTools() {
-      // console.log(this.activityInfo)
-      if (this.activityInfo.toolList != undefined) {
-        this.getToolInfos(this.activityInfo.toolList);
-      }
-      if (this.activityInfo.toolsetList != undefined) {
-        this.getToolsetInfos(this.activityInfo.toolsetList);
+      this.toolIdList = this.operationApi.getToollist();
+      if (this.toolIdList != undefined && this.toolIdList.length !== 0) {
+        this.getToolInfos();
       }
     },
-
-    async getToolInfos(toolIds) {
-      var toolsCount = toolIds.length;
-      var flagCount = toolsCount;
-      var ToolInfos = [];
-      for (var i = 0; i < toolsCount; i++) {
-        let data = await get(
-          `/GeoProblemSolving/tool/inquiry?key=tid&value=${toolIds[i]}`
-        );
-        ToolInfos.push(data[0]);
-        if (--flagCount < 1) {
-          var sortTools = [];
-          for (var j = 0; j < toolsCount; j++) {
-            for (var k = 0; k < toolsCount; k++) {
-              if (toolIds[j] == ToolInfos[k].tid) {
-                sortTools.push(ToolInfos[k]);
-                break;
-              }
-            }
-          }
-          this.$set(this, "toolList", sortTools);
-        }
-      }
-    },
-    getToolsetInfos(toolsetIds) {
-      var toolsetsCount = toolsetIds.length;
-      var flagCount = toolsetsCount;
-      var toolsetInfos = [];
-      for (var i = 0; i < toolsetsCount; i++) {
-        this.axios
-          .get(
-            "/GeoProblemSolving/toolset/inquiry" +
-              "?key=" +
-              "tsId" +
-              "&value=" +
-              toolsetIds[i]
-          )
-          .then((res) => {
-            if (res.data == "Offline") {
-              this.$store.commit("userLogout");
-              this.$router.push({ name: "Login" });
-            } else if (res.data === "Fail") {
-              this.$Notice.error({ desc: "Loading toolsets fail." });
-            } else if (res.data === "None") {
-              // this.$Notice.error({ desc: "There is no existing toolset" });
-            } else {
-              toolsetInfos.push(res.data[0]);
-              if (--flagCount < 1) {
-                var sortToolsets = [];
-                for (var j = 0; j < toolsetsCount; j++) {
-                  for (var k = 0; k < toolsetsCount; k++) {
-                    if (toolsetIds[j] == toolsetInfos[k].tsId) {
-                      sortToolsets.push(toolsetInfos[k]);
-                      break;
-                    }
-                  }
-                }
-                this.$set(this, "toolsetList", sortToolsets);
-              }
-            }
-          })
-          .catch((err) => {
-            throw err;
-          });
-      }
-    },
-    stepToolListChanged(tools, toolsets) {
-      this.activityInfo.toolList = tools;
-      this.activityInfo.toolsetList = toolsets;
-      this.toolModal++;
-      this.getAllTools(tools, toolsets);
+    async getToolInfos() {
+      let data = await post("/GeoProblemSolving/tool/all", this.toolIdList);
+      this.$set(this, "toolList", data);
+    },    
+    stepToolListChanged(tools, toolsets) { ///////////////////////////////////////
+      this.toolIdList = tools;
+      this.toolIdList.push.apply(this.toolIdList, toolsets);
+      this.getAllTools();
     },
     showTools(toolsetInfo) {
       this.toolsetToolList = toolsetInfo.toolList;
       this.showToolsetToolsModal = true;
-    },
-    addHistoryEvent(scopeId, record) {
-      // let form = {};
-      // form["description"] = JSON.stringify(record);
-      // form["scopeId"] = scopeId;
-      // form["eventType"] = "step";
-      // form["userId"] = this.$store.getters.userId;
-      // this.axios
-      //   .post("/GeoProblemSolving/history/save", form)
-      //   .then((res) => {
-      //     console.log(res.data);
-      //   })
-      //   .catch((err) => {
-      //     console.log(err.data);
-      //   });
     },
     useTool(toolInfo) {
       this.selectedTool = toolInfo;
@@ -453,44 +370,43 @@ export default {
         toolType: toolInfo.toolName,
       };
       this.$emit("toolBehavior", toolRecords);
-      // this.addHistoryEvent(this.activityInfo.aid, toolRecords);
 
       if (toolInfo.scope == "outer") {
-        this.openToolNewpage(toolInfo)
+        this.openToolNewpage(toolInfo);
       } else if (toolInfo.scope == "inner") {
-        this.openToolByPanel(toolInfo)
+        this.openToolByPanel(toolInfo);
       } else {
-        this.openToolByPanel(toolInfo)
+        this.openToolByPanel(toolInfo);
       }
     },
-    openToolByPanel(toolInfo){
-        // var toolURL = window.location.origin + `${toolInfo.toolUrl}`;
-        var toolURL = toolInfo.toolUrl;
-        var toolContent = `<iframe src="${toolURL}?userName=${this.userInfo.name}&userID=${this.userInfo.userId}&groupID=${this.activityInfo.aid}" style="width: 100%; height:100%;" frameborder="0"></iframe>`;
+    openToolByPanel(toolInfo) {
+      // var toolURL = window.location.origin + `${toolInfo.toolUrl}`;
+      var toolURL = toolInfo.toolUrl;
+      var toolContent = `<iframe src="${toolURL}?userName=${this.userInfo.name}&userID=${this.userInfo.userId}&groupID=${this.activityInfo.aid}" style="width: 100%; height:100%;" frameborder="0"></iframe>`;
 
-        var demoPanelTimer = null;
-        var panel = jsPanel.create({
-          theme: "success",
-          headerTitle: toolInfo.toolName,
-          footerToolbar: '<p style="height:10px"></p>',
-          contentSize: "800 400",
-          content: toolContent,
-          disableOnMaximized: true,
-          dragit: {
-            containment: 5,
-          },
-          closeOnEscape: true,
-          onclosed: function (panel, status, closedByUser) {
-            window.clearTimeout(demoPanelTimer);
-          },
-        });
-        // panel.resizeit("disable");
-        $(".jsPanel-content").css("font-size", "0");
-        this.panelList.push(panel);
-        this.$emit("toolPanel", panel);
+      var demoPanelTimer = null;
+      var panel = jsPanel.create({
+        theme: "success",
+        headerTitle: toolInfo.toolName,
+        footerToolbar: '<p style="height:10px"></p>',
+        contentSize: "800 400",
+        content: toolContent,
+        disableOnMaximized: true,
+        dragit: {
+          containment: 5,
+        },
+        closeOnEscape: true,
+        onclosed: function (panel, status, closedByUser) {
+          window.clearTimeout(demoPanelTimer);
+        },
+      });
+      // panel.resizeit("disable");
+      $(".jsPanel-content").css("font-size", "0");
+      this.panelList.push(panel);
+      this.$emit("toolPanel", panel);
     },
     openToolNewpage(toolInfo) {
-      this.openToolModal = false;
+      // this.openToolModal = false;
 
       if (toolInfo.toolName == "Jupyter notebook") {
         this.jupyterModal = true;
@@ -505,7 +421,7 @@ export default {
       };
       var toolURL = window.location.origin + `${toolInfo.toolUrl}`;
       window["pageParams"] = params;
-      
+
       // open
       window.open(toolURL);
     },

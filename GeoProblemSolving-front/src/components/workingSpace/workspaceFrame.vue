@@ -226,7 +226,6 @@
   </div>
 </template>
 <script>
-import * as operationApi from "@/api/operation.js";
 import * as userRoleJS from "@/api/userRole.js";
 import typeChoose from "./activity/typeChoose.vue";
 import singleActivity from "./activity/singleActivity.vue";
@@ -448,6 +447,7 @@ export default {
       let content = this.getURLParameter("content");
       let aid = this.getURLParameter("aid");
       let level = this.getURLParameter("level");
+      this.operationApi.getActivityDoc(aid);
 
       let url = "";
       if (aid == undefined || level == undefined) {
@@ -849,7 +849,7 @@ export default {
         .then((res) => {
           if (res.data.code == 0) {
             
-            operationApi.activityRecord("remove", this.userInfo.userId, this.slctActivity);
+            this.operationApi.activityRecord("remove", this.userInfo.userId, this.slctActivity);
 
             parent.location.href =
               "/GeoProblemSolving/projectInfo/" +

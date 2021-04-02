@@ -44,6 +44,7 @@ export function activityDocInit(activityInfo, user) {
     strDoc = `<Activity></Activity>`;
     loadActivityDoc();
     let Activity = xmlDoc.getElementsByTagName("Activity")[0];
+    if (Activity == undefined) return;
 
     // attr
     Activity.set("id", activityInfo.aid);
@@ -91,6 +92,7 @@ export function rebuildActivityDoc(activityInfo, participants, resources, tools)
     strDoc = `<Activity></Activity>`;
     loadActivityDoc();
     let Activity = xmlDoc.getElementsByTagName("Activity")[0];
+    if (Activity == undefined) return;
 
     // attr
     Activity.set("id", activityInfo.aid);
@@ -162,8 +164,11 @@ export function getActivityDoc(aid) {
         success: function (result) {
             if (result.code === 0) {
                 strDoc = result.data.document;
+                loadActivityDoc();
                 return "success";
             } else if (result.code === -1) {
+                strDoc = `<Activity></Activity>`;
+                loadActivityDoc();
                 return "empty";
             } else if (result.code === -2) {
                 throw new Error(result.msg);
@@ -182,6 +187,38 @@ function getTaskRecords(taskId) {
     }
 
     return xmlDoc.getElementById(taskId);
+}
+
+export function getToollist() {
+    if (xmlDoc === null) {
+        alert("Failed to record operation. Please load activity document first!");
+        return;
+    }
+
+    let toolsDoc = xmlDoc.getElementsByTagName("ToolBox");
+    if (toolsDoc == undefined) return;
+
+    let tools = [];
+    for (var i = 0; i < toolsDoc.length; i++) {
+        tools.push(toolsDoc[i].getAttribute("id"));
+    }
+    return tools;
+}
+
+export function getReslist() {
+    if (xmlDoc === null) {
+        alert("Failed to record operation. Please load activity document first!");
+        return;
+    }
+
+    let resDoc = xmlDoc.getElementsByTagName("ResourceCollection");
+    if (resDoc == undefined) return;
+
+    let resources = [];
+    for (var i = 0; i < resDoc.length; i++) {
+        resources.push(resDoc[i].getAttribute("id"));
+    }
+    return resources;
 }
 
 // save
@@ -222,6 +259,8 @@ export function taskUpdate(aid, behavior, taskInfo) {
     // TaskList
     if (behavior === "create") {
         let TaskList = xmlDoc.getElementsByTagName('TaskList')[0];
+        if (TaskList == undefined) return;
+
         let Task = xmlDoc.createElement('Task');
         Task.set("id", taskInfo.taskId);
         Task.set("name", taskInfo.name);
@@ -248,6 +287,8 @@ export function taskDependencyRecord(aid, behavior, relationId, lasts, nexts) {
     // TaskDependency
     if (behavior === "link") {
         let TaskDependency = xmlDoc.getElementsByTagName("TaskDependency")[0];
+        if (TaskDependency == undefined) return;
+
         let Relation = xmlDoc.createElement('Relation');
         Relation.set("id", relationId);
         Relation.set("name", "Task Dependency");
@@ -282,6 +323,8 @@ export function participantUpdate(aid, behavior, userId, name, role) {
     // Participants
     if (behavior === "invite") {
         let Participants = xmlDoc.getElementsByTagName('Participants')[0];
+        if (Participants == undefined) return;
+
         let Person = xmlDoc.createElement('Person');
         Person.set("id", userId);
         Person.set("name", name);
@@ -313,6 +356,8 @@ export function resOperationRecord(aid, taskId, behavior, userId, resInfo) {
     //ResourceCollection
     if (behavior === "upload") {
         let ResourceCollection = xmlDoc.getElementsByTagName("ResourceCollection")[0];
+        if (ResourceCollection == undefined) return;
+
         let Resource = xmlDoc.createElement('Resource');
         Resource.set("id", resInfo.uid);
         Resource.set("name", resInfo.name);
@@ -333,6 +378,8 @@ export function resOperationRecord(aid, taskId, behavior, userId, resInfo) {
     //OperationRecords
     let operationId = guid();
     let OperationRecords = xmlDoc.getElementsByTagName("OperationRecords")[0];
+    if (OperationRecords == undefined) return;
+
     let Operation = xmlDoc.createElement('Operation');
     Operation.set("id", operationId);
     Operation.set("type", "resource");
@@ -362,6 +409,8 @@ export function toolOperationRecord(aid, taskId, behavior, userId, toolInfo) {
     //ToolBox
     if (behavior === "share") {
         let ToolBox = xmlDoc.getElementsByTagName("ToolBox")[0];
+        if (ToolBox == undefined) return;
+
         let Tool = xmlDoc.createElement('Tool');
         Tool.set("id", toolInfo.tid);
         Tool.set("name", toolInfo.toolName);
@@ -380,6 +429,8 @@ export function toolOperationRecord(aid, taskId, behavior, userId, toolInfo) {
     //OperationRecords
     let operationId = guid();
     let OperationRecords = xmlDoc.getElementsByTagName("OperationRecords")[0];
+    if (OperationRecords == undefined) return;
+
     let Operation = xmlDoc.createElement('Operation');
     Operation.set("id", operationId);
     Operation.set("type", "tool");
@@ -409,6 +460,8 @@ export function communicationRecord(aid, taskId, toolId, resId, onlineMembers) {
     //OperationRecords
     let operationId = guid();
     let OperationRecords = xmlDoc.getElementsByTagName("OperationRecords")[0];
+    if (OperationRecords == undefined) return;
+
     let Operation = xmlDoc.createElement('Operation');
     Operation.set("id", operationId);
     Operation.set("type", "communication");
@@ -442,6 +495,8 @@ export function analysisRecord(aid, taskId, toolId, userId, inputs, outputs, par
     //OperationRecords
     let operationId = guid();
     let OperationRecords = xmlDoc.getElementsByTagName("OperationRecords")[0];
+    if (OperationRecords == undefined) return;
+
     let Operation = xmlDoc.createElement('Operation');
     Operation.set("id", operationId);
     Operation.set("type", "geo-analysis");
@@ -489,6 +544,8 @@ export function activityRecord(behavior, userId, childInfo) {
     // ChildActivities
     if (behavior === "create") {
         let ChildActivities = xmlDoc.getElementsByTagName("ChildActivities")[0];
+        if (ChildActivities == undefined) return;
+
         let Child = xmlDoc.createElement('Child');
         Child.set("id", childInfo.aid);
         Child.set("name", childInfo.name);
@@ -506,6 +563,8 @@ export function activityRecord(behavior, userId, childInfo) {
     //OperationRecords
     let operationId = guid();
     let OperationRecords = xmlDoc.getElementsByTagName("OperationRecords")[0];
+    if (OperationRecords == undefined) return;
+
     let Operation = xmlDoc.createElement('Operation');
     Operation.set("id", operationId);
     Operation.set("type", "activity");
@@ -528,6 +587,8 @@ export function processRecord(aid, behavior, userId, last, next) {
     let relationId = guid();
     if (behavior === "link") {
         let ActivityDependencies = xmlDoc.getElementsByTagName("ActivityDependencies")[0];
+        if (ActivityDependencies == undefined) return;
+
         let Relation = xmlDoc.createElement('Relation');
         Relation.set("id", relationId);
         Relation.set("name", "ActivityDependency");
@@ -549,6 +610,8 @@ export function processRecord(aid, behavior, userId, last, next) {
     //OperationRecords
     let operationId = guid();
     let OperationRecords = xmlDoc.getElementsByTagName("OperationRecords")[0];
+    if (OperationRecords == undefined) return;
+
     let Operation = xmlDoc.createElement('Operation');
     Operation.set("id", operationId);
     Operation.set("type", "process");

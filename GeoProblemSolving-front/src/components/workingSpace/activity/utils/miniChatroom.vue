@@ -49,14 +49,6 @@
 .user_detail {
   height: 60px;
 }
-.u_name {
-  height: 20px;
-  margin-top: 5px;
-  /* margin-left: 10px; */
-  text-align: center;
-  font-size: 10px;
-  line-height: 10px;
-}
 .chat-bubble-r {
   position: relative;
   margin: 12px;
@@ -125,7 +117,7 @@
 }
 .user_img {
   background-color: lightblue;
-  margin-top: 2px;
+  margin-top: 12px;
   margin-left: 5px;
 }
 .input_panel {
@@ -179,9 +171,9 @@
                             class="user_img"
                             :username="item.from"
                             :size="25"
+                            :title="item.from"
                           ></avatar>
                         </div>
-                        <div class="u_name">{{ item.from }}</div>
                       </div>
                     </template>
                     <template v-else>
@@ -193,11 +185,9 @@
                           <avatar
                             class="user_img"
                             :username="item.from"
-                            :size="25"
+                            :size="30"
+                            :title="item.from"
                           ></avatar>
-                        </div>
-                        <div class="u_name">
-                          <span style="font-size: 3px">{{ item.from }}</span>
                         </div>
                       </div>
                       <div style="width: 95%">
@@ -242,7 +232,6 @@
 </template>
 <script>
 import * as socketApi from "@/api/socket.js";
-import * as operationApi from "@/api/operation.js";
 import Avatar from "vue-avatar";
 export default {
   components: {
@@ -285,7 +274,7 @@ export default {
     },
   },
   mounted() {
-    this.readHistoricalRecords();
+    this.startWebSocket();
   },
   updated: function () {
     // this.$refs["vs"].scrollTo(

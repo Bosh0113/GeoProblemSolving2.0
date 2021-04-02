@@ -75,13 +75,5 @@ public class Activity implements Serializable {
      */
     private String createdTime;
     private String activeTime;
-
-    /**
-     * MIMI
-     */
-    List<String> toolsetList;
-    List<String> toolList;
-
-
 }
 

@@ -41,7 +41,7 @@
 </style>
 <template>
   <div>
-    <Button shape="circle" icon="md-cog" @click="stepToolModalShow"></Button>
+    <Button shape="circle" icon="md-cog" @click="stepToolModalShow" size="small"></Button>
     <Modal
       v-model="stepToolModal"
       title="Manage toolset and tools"
@@ -478,7 +478,6 @@
 // import JPanel from 'JSPanel'
 import Avatar from "vue-avatar";
 import draggable from "vuedraggable";
-import * as operationApi from "@/api/operation.js";
 import { get, del, post, put } from "../../axios";
 export default {
   props: ["activityInfo"],

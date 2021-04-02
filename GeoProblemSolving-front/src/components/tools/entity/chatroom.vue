@@ -645,7 +645,6 @@
 </template>
 <script>
 import * as socketApi from "@/api/socket.js";
-import * as operationApi from "@/api/operation.js";
 import Avatar from "vue-avatar";
 export default {
   components: {

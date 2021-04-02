@@ -1,7 +1,9 @@
-package cn.edu.njnu.geoproblemsolving.business.tool;
+package cn.edu.njnu.geoproblemsolving.Dao;
 
 
 import cn.edu.njnu.geoproblemsolving.Entity.ToolReq.UpdateToolListReq;
+import cn.edu.njnu.geoproblemsolving.Entity.ToolsetEntity;
+import cn.edu.njnu.geoproblemsolving.business.tool.ToolEntity;
 
 import javax.servlet.http.HttpServletRequest;
 

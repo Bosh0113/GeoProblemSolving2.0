@@ -1,5 +1,6 @@
-package cn.edu.njnu.geoproblemsolving.business.tool;
+package cn.edu.njnu.geoproblemsolving.Entity;
 
+import cn.edu.njnu.geoproblemsolving.business.tool.ToolEntity;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;

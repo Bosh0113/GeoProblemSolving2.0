@@ -14,9 +14,9 @@ import java.util.ArrayList;
 /**
  * @ClassName
  * @Description
- * @Author Zhiyi
- * @Date 2020/5/26  20:06
- * @Version 1.0.0
+ * @Author Zhiyi, mzy
+ * @Date 2020/5/26  20:06; 2021/4/2
+ * @Version 2.0.0
  */
 @Document(collection = "Tool")
 @Data
@@ -46,6 +46,14 @@ public class ToolEntity extends BaseEntity {
     private String provider;
     private String privacy;
     private String scope; // 适用于panel打开的内部工具和不适用panel打开的外部工具：inner/outer
+    private String createdTime;
+
+    /**
+     * tool or toolset
+     */
+    private Boolean isToolset;
+    private ArrayList<String> toolList; 
 
 //    private JSONObject modelInfo; //stateId, oid,mdlId,模型条目？
+
 }

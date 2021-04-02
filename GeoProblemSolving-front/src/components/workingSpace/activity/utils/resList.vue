@@ -393,7 +393,6 @@
 </template>
 <script>
 import Avatar from "vue-avatar";
-import * as operationApi from "@/api/operation.js";
 import * as userRoleJS from "@/api/userRole.js";
 export default {
   props: ["activityInfo"],
