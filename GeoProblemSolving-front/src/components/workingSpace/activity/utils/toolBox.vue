@@ -38,63 +38,13 @@
       >
         <manage-tools
           :activity-info="activityInfo"
+          :tool-list="toolList"
           @updateStepTools="stepToolListChanged"
           title="Manage toolsets and tools"
           style="margin-top: -10px"
         ></manage-tools>
       </div>
       <vue-scroll :ops="ops" style="max-height: calc(100vh - 200px)">
-        <!-- <div v-if="toolsetList.length < 1" style="text-align: center">
-          <h2 style="color: #808695">No toolsets</h2>
-          <small style="color: #dcdee2"
-            >*Click the button on the top right to add toolsets.</small
-          >
-        </div>
-        <div
-          v-for="toolset in toolsetList"
-          :key="toolset.index"
-          style="width: 100px; display: inline-block"
-          v-else
-        >
-          <Card
-            style="
-              background-color: #3f51b530;
-              cursor: pointer;
-              margin: 0 5px 10px 5px;
-            "
-          >
-            <div style="text-align: center" @click="showTools(toolset)">
-              <Tooltip placement="bottom" max-width="600">
-                <img
-                  :src="toolset.toolsetImg"
-                  v-if="toolset.toolsetImg != ''"
-                  style="height: 100%; max-height: 50px"
-                />
-                <avatar
-                  :username="toolset.toolsetName"
-                  :size="50"
-                  style="margin-bottom: 6px"
-                  v-else
-                ></avatar>
-                <div slot="content">
-                  <span>{{ toolset.description }}</span>
-                  <br v-if="toolset.categoryTag.length > 0" />
-                  <p>
-                    <i>{{ toolset.categoryTag.join(",") }}</i>
-                  </p>
-                </div>
-              </Tooltip>
-              <h4
-                :title="toolset.toolsetName"
-                style="width: 75px"
-                class="ellipsis"
-              >
-                {{ toolset.toolsetName }}
-              </h4>
-            </div>
-          </Card>
-        </div>
-        <Divider style="margin: 10px 0" /> -->
         <div v-if="toolList.length < 1" style="text-align: center">
           <h2 style="color: #808695">No tools</h2>
           <small style="color: #dcdee2"
@@ -107,6 +57,58 @@
           style="width: 100px; display: inline-block"
           v-else
         >
+          <Card
+            style="margin: 5px; height: 50px; width: 50px"
+            v-show="toolsetLevel > 0" 
+            title="Back to last level"
+            ><Icon
+              type="md-arrow-back"
+              size="30"
+              style="text-align: center; margin-top: 10px"
+              color="#5089b8"
+              @click="back2LastLevel()"
+          /></Card>
+          <Card
+            style="background-color: #d3f1b1; margin: 5px"
+            v-if="tool.isToolset"
+          >
+            <div
+              style="text-align: center; cursor: pointer"
+              @click="expandTool(tool)"
+            >
+              <Tooltip placement="bottom" max-width="600">
+                <img
+                  :src="tool.toolImg"
+                  v-if="tool.toolImg != ''"
+                  style="height: 100%; max-height: 50px"
+                />
+                <avatar
+                  :username="tool.toolName"
+                  :size="50"
+                  style="margin-bottom: 6px"
+                  v-else
+                ></avatar>
+                <div slot="content">
+                  <span>{{ tool.description }}</span>
+                  <br v-if="tool.tag.length > 0" />
+                  <span>
+                    <i>{{ tool.tag.join(" | ") }}</i>
+                  </span>
+                </div>
+              </Tooltip>
+              <h4
+                :title="tool.toolName"
+                style="
+                  display: block;
+                  overflow: hidden;
+                  white-space: nowrap;
+                  text-overflow: ellipsis;
+                "
+              >
+                {{ tool.toolName }}
+              </h4>
+            </div>
+          </Card>
           <Card style="background-color: ghostwhite; margin: 5px">
             <div
               style="text-align: center; cursor: pointer"
@@ -126,9 +128,9 @@
                 ></avatar>
                 <div slot="content">
                   <span>{{ tool.description }}</span>
-                  <br v-if="tool.categoryTag.length > 0" />
+                  <br v-if="tool.tag.length > 0" />
                   <span>
-                    <i>{{ tool.categoryTag.join(",") }}</i>
+                    <i>{{ tool.tag.join(" | ") }}</i>
                   </span>
                 </div>
               </Tooltip>
@@ -148,82 +150,6 @@
         </div>
       </vue-scroll>
     </Card>
-    <Modal
-      v-model="showToolsetToolsModal"
-      width="432"
-      title="Tools in the toolset"
-      :closable="false"
-    >
-      <div style="height: 350px" v-if="toolsetToolList.length > 0">
-        <vue-scroll :ops="ops">
-          <Row>
-            <Col
-              span="8"
-              v-for="tool in toolsetToolList"
-              :key="tool.index"
-              style="margin-top: 15px"
-            >
-              <Card style="background-color: ghostwhite; margin: 5px">
-                <div
-                  style="text-align: center; cursor: pointer"
-                  @click="useTool(tool)"
-                >
-                  <Tooltip placement="bottom" max-width="600">
-                    <img
-                      :src="tool.toolImg"
-                      v-if="tool.toolImg != ''"
-                      style="height: 100%; max-height: 50px"
-                    />
-                    <avatar
-                      :username="tool.toolName"
-                      :size="50"
-                      style="margin-bottom: 6px"
-                      v-else
-                    ></avatar>
-                    <div slot="content">
-                      <span>{{ tool.description }}</span>
-                      <br v-if="tool.categoryTag.length > 0" />
-                      <span>
-                        <i>{{ tool.categoryTag.join(",") }}</i>
-                      </span>
-                    </div>
-                  </Tooltip>
-                  <h4
-                    :title="tool.toolName"
-                    style="
-                      display: block;
-                      overflow: hidden;
-                      white-space: nowrap;
-                      text-overflow: ellipsis;
-                    "
-                  >
-                    {{ tool.toolName }}
-                  </h4>
-                </div>
-              </Card>
-            </Col>
-          </Row>
-        </vue-scroll>
-      </div>
-      <div style="height: 200px" v-else>
-        <div style="text-align: center; height: 200px; position: relative">
-          <div
-            style="
-              position: absolute;
-              top: 0;
-              bottom: 0;
-              left: 0;
-              right: 0;
-              margin: auto;
-              height: fit-content;
-            "
-          >
-            <h1>No tools in this toolset.</h1>
-          </div>
-        </div>
-      </div>
-      <div slot="footer"></div>
-    </Modal>
     <Modal
       v-model="jupyterModal"
       title="Open a jupyter notebook environment"
@@ -252,9 +178,9 @@
   </div>
 </template>
 <script>
-import manageTools from "./../../../tools/toolToStepModal";
+import manageTools from "@/components/tools/toolToStepModal";
 import Avatar from "vue-avatar";
-import { get, del, post, put } from "../../../../axios";
+import { get, del, post, put } from "@/axios";
 import * as userRoleJS from "@/api/userRole.js";
 export default {
   props: ["activityInfo"],
@@ -279,8 +205,8 @@ export default {
       userRole: "visitor",
       toolIdList: [],
       toolList: [],
-      toolsetToolList: [],
-      showToolsetToolsModal: false,
+      toolsetLevel: 0,
+      lastLevelList: [],
       panelList: [],
       jupyterModal: false,
       selectedTool: {},
@@ -292,7 +218,6 @@ export default {
   },
   mounted() {
     this.getAllTools();
-
     Date.prototype.Format = function (fmt) {
       var o = {
         "M+": this.getMonth() + 1, //月份
@@ -342,20 +267,30 @@ export default {
     async getToolInfos() {
       let data = await post("/GeoProblemSolving/tool/all", this.toolIdList);
       this.$set(this, "toolList", data);
-    },    
-    stepToolListChanged(tools, toolsets) { ///////////////////////////////////////
+    },
+    stepToolListChanged(tools, toolsets) {
       this.toolIdList = tools;
       this.toolIdList.push.apply(this.toolIdList, toolsets);
       this.getAllTools();
     },
-    showTools(toolsetInfo) {
-      this.toolsetToolList = toolsetInfo.toolList;
-      this.showToolsetToolsModal = true;
-    },
+    // showTools(toolsetInfo) {
+    //   this.toolsetToolList = toolsetInfo.toolList;
+    //   this.showToolsetToolsModal = true;
+    // },
     useTool(toolInfo) {
       this.selectedTool = toolInfo;
       this.openTool();
       // this.openToolModal = true;
+    },
+    back2LastLevel() {
+      this.toolList = Object.assign([], this.lastLevelList);
+      this.toolsetLevel--;
+    },
+    expandTool(toolset) {
+      this.lastLevelList = Object.assign([], this.toolList);
+      this.toolIdList = toolset.toolList;
+      this.getToolInfos();
+      this.toolsetLevel++;
     },
     openTool() {
       var toolInfo = this.selectedTool;

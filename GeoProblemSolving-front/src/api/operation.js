@@ -400,20 +400,21 @@ export function resOperationRecord(aid, taskId, behavior, userId, resInfo) {
     saveActivityDoc(aid);
 }
 
-export function toolOperationRecord(aid, taskId, behavior, userId, toolInfo) {
+export function toolOperationRecord(aid, behavior, userId, toolInfo) {
     if (xmlDoc === null) {
         alert("Failed to record operation. Please load activity document first!");
         return;
     }
 
     //ToolBox
-    if (behavior === "share") {
+    if (behavior === "add") {
         let ToolBox = xmlDoc.getElementsByTagName("ToolBox")[0];
         if (ToolBox == undefined) return;
 
         let Tool = xmlDoc.createElement('Tool');
         Tool.set("id", toolInfo.tid);
-        Tool.set("name", toolInfo.toolName);
+        Tool.set("name", toolInfo.toolName);        
+        Tool.set("type", toolInfo.isToolset?"toolset":"tool");
         Tool.set("function", toolInfo.description);
         Tool.set("provider", toolInfo.provider);
         Tool.set("href", toolInfo.toolUrl);
@@ -439,14 +440,6 @@ export function toolOperationRecord(aid, taskId, behavior, userId, toolInfo) {
     Operation.set("operator", userId);
     Operation.set("time", new Date().Format("yyyy-MM-dd HH:mm:ss"));
     OperationRecords.appendChild(Operation);
-
-    // TaskList
-    let Task = xmlDoc.getElementById(taskId);
-    if (Task !== null) {
-        let OperationRef = xmlDoc.createElement('OperationRef');
-        Operation.set("id", operationId);
-        Task.appendChild(OperationRef);
-    }
 
     saveActivityDoc(aid);
 }

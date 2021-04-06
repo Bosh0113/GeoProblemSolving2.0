@@ -75,5 +75,9 @@ public class Activity implements Serializable {
      */
     private String createdTime;
     private String activeTime;
+
+    // // Temp
+    // private List<String> toolList;
+    // private List<String> toolsetList;
 }
 

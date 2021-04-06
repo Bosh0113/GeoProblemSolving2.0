@@ -2,6 +2,7 @@ package cn.edu.njnu.geoproblemsolving.business.tool;
 
 import cn.edu.njnu.geoproblemsolving.Entity.ModelTools.CModel.support.BaseEntity;
 import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,6 +11,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * @ClassName
@@ -23,7 +25,7 @@ import java.util.ArrayList;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ToolEntity extends BaseEntity {
+public class ToolEntity {
     /**
      * basic info
      */
@@ -38,7 +40,7 @@ public class ToolEntity extends BaseEntity {
     private String toolImg;
     private String description;
     private ArrayList<String> recommendation; // activity类型 or general
-    private ArrayList<String> tag;
+    private ArrayList<String> tags;
 
     /**
      * others
@@ -46,13 +48,15 @@ public class ToolEntity extends BaseEntity {
     private String provider;
     private String privacy;
     private String scope; // 适用于panel打开的内部工具和不适用panel打开的外部工具：inner/outer
-    private String createdTime;
+
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
+    private Date createdTime;
 
     /**
-     * tool or toolset
+     * is a toolset?
      */
     private Boolean isToolset;
-    private ArrayList<String> toolList; 
+    private ArrayList<String> toolList;
 
 //    private JSONObject modelInfo; //stateId, oid,mdlId,模型条目？
 

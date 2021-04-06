@@ -15,7 +15,7 @@ import java.util.Date;
 @Data
 public class BaseEntity {
     @JsonFormat (pattern = "yyyy-MM-dd",timezone = "GMT+8")
-    private Date createdTime;
+    private Date createTime;
     @JsonFormat (pattern = "yyyy-MM-dd",timezone = "GMT+8")
     private Date updateTime;
 
@@ -23,8 +23,8 @@ public class BaseEntity {
     @BeforeInsert
     public void beforeInsert(){
         Date date=new Date();
-        if(createdTime==null){
-            createdTime=date;
+        if(createTime==null){
+            createTime=date;
         }
         if(updateTime==null){
             updateTime=date;
