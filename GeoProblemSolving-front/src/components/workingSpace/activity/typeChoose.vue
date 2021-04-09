@@ -108,7 +108,6 @@
   </Row>
 </template>
 <script>
-import * as userRoleJS from "./../../../api/userRole.js";
 export default {
   props: ["activityInfo", "userInfo"],
   data() {
@@ -134,13 +133,13 @@ export default {
   },
   methods: {
     currentRoleIdentity() {
-      this.userRole = userRoleJS.roleIdentify(
+      this.userRole = this.userRoleApi.roleIdentify(
         this.activityInfo.members,
         this.userInfo.userId
       );
     },
     operationPermissionIdentity(permission, role, operation) {
-       return userRoleJS.permissionIdentity(
+       return this.userRoleApi.permissionIdentity(
         JSON.parse(permission),
         role,
         operation

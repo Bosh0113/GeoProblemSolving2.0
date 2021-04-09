@@ -41,7 +41,6 @@
   </Row>
 </template>
 <script>
-import * as userRoleJS from "./../../api/userRole.js";
 import { get, del, post, put } from "../../axios";
 export default {
   data() {
@@ -383,7 +382,7 @@ export default {
       this.activityInfo = await get(url);
 
       if (
-        userRoleJS.roleIdentify(
+        this.userRoleApi.roleIdentify(
           this.activityInfo.members,
           this.userInfo.userId
         ) != "manager"
@@ -394,12 +393,12 @@ export default {
       if (this.activityInfo.permission != undefined) {
         this.permission = JSON.parse(this.activityInfo.permission);
       } else {
-        this.permission = userRoleJS.getDefault();
+        this.permission = this.userRoleApi.getDefault();
       }
       this.getPermissionList();
     },
     getPermissionList() {
-      this.permissionList = userRoleJS.permissionJson2Array(this.permission);
+      this.permissionList = this.userRoleApi.permissionJson2Array(this.permission);
     },
     savePermission(value, key, index, operation) {
       if (operation == "Learn more about the activity") {
@@ -629,7 +628,7 @@ export default {
       }
     },
     setDefault() {
-      this.permission = userRoleJS.getDefault();
+      this.permission = this.userRoleApi.getDefault();
       this.getPermissionList();
     },
     save2Activity() {

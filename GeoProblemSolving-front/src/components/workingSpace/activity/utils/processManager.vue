@@ -148,7 +148,6 @@
 // import "driver.js/dist/driver.min.css";
 import echarts from "echarts";
 // import Driver from "driver.js";
-import * as userRoleJS from "@/api/userRole.js";
 export default {
   props: ["activityInfo", "childActivities"],
   data() {
@@ -229,13 +228,13 @@ export default {
       window.addEventListener("resize", this.updateStepchart);
     },
     roleIdentity() {
-      this.userRole = userRoleJS.roleIdentify(
+      this.userRole = this.userRoleApi.roleIdentify(
         this.activityInfo.members,
         this.userInfo.userId
       );
     },
     permissionIdentity(permission, operation) {
-      return userRoleJS.permissionIdentity(
+      return this.userRoleApi.permissionIdentity(
         JSON.parse(permission),
         this.userRole,
         operation

@@ -4,7 +4,7 @@
       style="
         width: 100%;
         height: calc(100vh - 115px);
-        float: left;
+        float: left
       "
     >
       <action-container
@@ -12,7 +12,7 @@
         :activityInfo="activityInfo"
       ></action-container>
     </div>
-    <div style="position: absolute; top: 5px; left: 10px">
+    <div style="position: absolute; top: 5px; left: 10px; z-index: 10">
       <info-btn :activityInfo="activityInfo"></info-btn>
     </div>
     <div style="width: 280px; border: 1px solid lightgray; position: absolute; top: 5px; right: 10px; z-index: 10">
@@ -32,7 +32,7 @@
 <script>
 import resList from "../utils/resList";
 import toolBox from "../utils/toolBox";
-import actionContainer from "../utils/actionContainer";
+import actionContainer from "../utils/taskflow/actionContainer";
 import infoBtn from "../utils/infoBtn";
 export default {
   props: ["activityInfo"],

@@ -21,7 +21,7 @@
 import chatPanel from "../utils/chatPanel.vue";
 import resList from "../utils/resList.vue";
 import toolBox from "../utils/toolBox.vue";
-import actionContainer from "../utils/actionContainer.vue";
+import actionContainer from "../utils/taskflow/actionContainer.vue";
 export default {
   props: ["activityInfo", "participants"],
   components: {

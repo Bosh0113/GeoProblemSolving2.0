@@ -719,7 +719,6 @@
 import dayjs from "dayjs";
 import draggable from "vuedraggable";
 import GanttElastic from "gantt-elastic";
-import * as userRoleJS from "./../../../../api/userRole.js";
 export default {
   components: {
     draggable,
@@ -890,13 +889,13 @@ export default {
     },
     cancel() {},
     roleIdentity() {
-      this.userRole = userRoleJS.roleIdentify(
+      this.userRole = this.userRoleApi.roleIdentify(
         this.activityInfo.members,
         this.userInfo.userId
       );
     },
     permissionIdentity(permission, role ,operation) {
-      return userRoleJS.permissionIdentity(
+      return this.userRoleApi.permissionIdentity(
         JSON.parse(permission),
         role,
         operation

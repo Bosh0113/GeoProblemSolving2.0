@@ -550,9 +550,7 @@
   </div>
 </template>
 <script>
-import * as userRoleJS from "@/api/userRole.js";
 import { get, del, post, put } from "@/axios";
-import * as socketApi from "@/api/socket.js";
 import Avatar from "vue-avatar";
 export default {
   components: {
@@ -601,7 +599,7 @@ export default {
         parent: "",
         creator: "",
         level: -1,
-        permission: JSON.stringify(userRoleJS.getDefault()),
+        permission: JSON.stringify(this.userRoleApi.getDefault()),
         type: "Activity_Default",
         purpose: "Multi-purpose",
       },
@@ -651,10 +649,10 @@ export default {
   mounted() {},
   methods: {
     roleIdentity(activity) {
-      return userRoleJS.roleIdentify(activity.members, this.userInfo.userId);
+      return this.userRoleApi.roleIdentify(activity.members, this.userInfo.userId);
     },
     permissionIdentity(permission, role, operation) {
-      if(permission == undefined) permission = JSON.stringify(userRoleJS.getDefault());
+      if(permission == undefined) permission = JSON.stringify(this.userRoleApi.getDefault());
       if (operation == "auto_join") {
         if (JSON.parse(permission).auto_join.visitor == "Yes") return true;
         else if (JSON.parse(permission).auto_join.visitor == "No") return false;
@@ -662,7 +660,7 @@ export default {
           return this.getParentPermission();
         }
       } else {
-        return userRoleJS.permissionIdentity(
+        return this.userRoleApi.permissionIdentity(
           JSON.parse(permission),
           role,
           operation
@@ -670,7 +668,7 @@ export default {
       }
     },
     roleCompare(role1, role2) {
-      return userRoleJS.roleCompare(role1, role2);
+      return this.userRoleApi.roleCompare(role1, role2);
     },
     async getParentPermission() {
       let url = "";
@@ -839,7 +837,7 @@ export default {
         });
     },
     applyJoinActivity(activity) {
-      let managers = userRoleJS.getMemberByRole(
+      let managers = this.userRoleApi.getMemberByRole(
         this.appliedActivity,
         "manager"
       );
@@ -1137,7 +1135,7 @@ export default {
               (activity.level - 1).toString();
 
             //notice
-            let managers = userRoleJS.getMemberByRole(activity, "manager");
+            let managers = this.userRoleApi.getMemberByRole(activity, "manager");
             for (var i = 0; i < managers.length; i++) {
               let notice = {
                 recipientId: managers[i],

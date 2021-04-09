@@ -184,7 +184,6 @@
 </template>
 <script>
 import Avatar from "vue-avatar";
-import * as userRoleJS from "./../../../api/userRole.js";
 import { get, del, post, put } from "../../../axios";
 // import activityShow from "./activityShow.vue";
 import taskManager from "./utils/taskManger.vue";
@@ -249,10 +248,10 @@ export default {
   },
   methods: {
     roleIdentity(activity) {
-      return userRoleJS.roleIdentify(activity.members, this.userInfo.userId);
+      return this.userRoleApi.roleIdentify(activity.members, this.userInfo.userId);
     },
     permissionIdentity(permission, role, operation) {
-      if(permission == undefined) permission = JSON.stringify(userRoleJS.getDefault());
+      if(permission == undefined) permission = JSON.stringify(this.userRoleApi.getDefault());
       if (operation == "auto_join") {
         if (JSON.parse(permission).auto_join.visitor == "Yes") return true;
         else if (JSON.parse(permission).auto_join.visitor == "No") return false;
@@ -260,7 +259,7 @@ export default {
           return this.getParentPermission();
         }
       } else {
-        return userRoleJS.permissionIdentity(
+        return this.userRoleApi.permissionIdentity(
           JSON.parse(permission),
           role,
           operation
@@ -268,7 +267,7 @@ export default {
       }
     },
     roleCompare(role1, role2) {
-      return userRoleJS.roleCompare(role1, role2);
+      return this.userRoleApi.roleCompare(role1, role2);
     },
     async preInvitation() {
       let url = "";
@@ -467,7 +466,7 @@ export default {
               (activity.level - 1).toString();
 
             //notice
-            let managers = userRoleJS.getMemberByRole(activity, "manager");
+            let managers = this.userRoleApi.getMemberByRole(activity, "manager");
             for (var i = 0; i < managers.length; i++) {
               let notice = {
                 recipientId: managers[i],

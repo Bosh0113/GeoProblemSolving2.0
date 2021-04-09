@@ -189,14 +189,196 @@ function getTaskRecords(taskId) {
     return xmlDoc.getElementById(taskId);
 }
 
+export function getResInfo(resId) {
+    if (xmlDoc === null) {
+        alert("Failed to record operation. Please load activity document first!");
+        return;
+    }
+
+    let resNode = xmlDoc.SelectSingleNode("Activity/ResourceCollection/Resource[id='" + resId + "']"); // wait for test
+    if (resNode == null) return null;
+
+    let resource = {}
+    resource["id"] = resNode.getAttribute("id");
+    resource["name"] = resNode.getAttribute("name");
+    resource["type"] = resNode.getAttribute("type");
+    resource["format"] = resNode.getAttribute("format");
+    resource["description"] = resNode.getAttribute("description");
+    resource["provider"] = resNode.getAttribute("provider");
+    resource["href"] = resNode.getAttribute("href");
+
+    return resource;
+}
+
+export function getMemberInfo(pid) {
+    if (xmlDoc === null) {
+        alert("Failed to record operation. Please load activity document first!");
+        return;
+    }
+
+    let personNode = xmlDoc.SelectSingleNode("Activity/Participants/Person[id='" + pid + "']"); // wait for test
+    if (personNode == null) return null;
+
+    let member = {}
+    member["id"] = personNode.getAttribute("id");
+    member["name"] = personNode.getAttribute("name");
+    member["role"] = personNode.getAttribute("role");
+
+    return member;
+}
+
+export function getToolInfo(tid) {
+    if (xmlDoc === null) {
+        alert("Failed to record operation. Please load activity document first!");
+        return;
+    }
+
+    let toolNode = xmlDoc.SelectSingleNode("Activity/ToolBox/Tool[id='" + tid + "']"); // wait for test
+    if (toolNode == null) return null;
+
+    let tool = {}
+    tool["id"] = toolNode.getAttribute("id");
+    tool["name"] = toolNode.getAttribute("name");
+    tool["type"] = toolNode.getAttribute("type");
+    tool["function"] = toolNode.getAttribute("function");
+    tool["provider"] = toolNode.getAttribute("provider");
+    tool["href"] = toolNode.getAttribute("href");
+    return tool;
+}
+
+export function getOperationInfo(oid) {
+    if (xmlDoc === null) {
+        alert("Failed to record operation. Please load activity document first!");
+        return;
+    }
+
+    let operationNode = xmlDoc.SelectSingleNode("Activity/OperationRecords/Operation[id='" + oid + "']"); // wait for test
+    if (operationNode == null) return null;
+
+    let operation = {};
+    operation["id"] = operationNode.getAttribute("id");
+    operation["type"] = operationNode.getAttribute("type");
+
+    if (operationNode.getAttribute("type") === "resource") {
+
+        operation["behavior"] = operationNode.getAttribute("behavior");
+        operation["resRef"] = operationNode.getAttribute("resRef");
+        operation["operator"] = operationNode.getAttribute("operator");
+        operation["time"] = operationNode.getAttribute("time");
+
+    } else if (operationNode.getAttribute("type") === "tool") {
+
+        operation["behavior"] = operationNode.getAttribute("behavior");
+        operation["toolRef"] = operationNode.getAttribute("toolRef");
+        operation["operator"] = operationNode.getAttribute("operator");
+        operation["time"] = operationNode.getAttribute("time");
+
+    } else if (operationNode.getAttribute("type") === "communication") {
+
+        operation["toolRef"] = operationNode.getAttribute("toolRef");
+        operation["resRef"] = operationNode.getAttribute("resRef");
+        operation["time"] = operationNode.getAttribute("time");
+
+        // participants
+        let participants = [];
+        for (var j = 0; j < operationNode.childNodes.length; j++) {
+            let person = operationNode.childNodes[j].getAttribute("id");
+            participants.push(person);
+        }
+        operation["operators"] = participants;
+
+    } else if (operationNode.getAttribute("type") === "geo-analysis") {
+
+        operation["toolRef"] = operationNode.getAttribute("toolRef");
+        operation["operator"] = operationNode.getAttribute("operator");
+        operation["timerange"] = operationNode.getAttribute("timerange");
+
+        // resources
+        let resources = {
+            inputs: [],
+            outputs: [],
+            params: []
+        };
+        for (var j = 0; j < operationNode.childNodes.length; j++) {
+            let resource = operationNode.childNodes[j];
+            if (resource.getAttribute("input") === "input") {
+                resources.inputs.push(resource.getAttribute("id"));
+            } else if (type === "param") {
+                resources.params.push(resource.getAttribute("id"));
+            } else if (type === "output") {
+                resources.outputs.push(resource.getAttribute("id"));
+            }
+        }
+        operation["resesRef"] = resources;
+    }
+
+    return operation;
+}
+
+export function getTaskList() {
+    if (xmlDoc === null) {
+        alert("Failed to record operation. Please load activity document first!");
+        return;
+    }
+
+    let taskDoc = xmlDoc.getElementsByTagName("Task");
+    if (taskDoc == undefined) return [];
+
+    let tasks = [];
+    for (var i = 0; i < taskDoc.length; i++) {
+        let taskInfo = {
+            id: taskDoc[i].getAttribute("id"),
+            name: taskDoc[i].getAttribute("name"),
+            time: taskDoc[i].getAttribute("timerange"),
+            operations: []
+        }
+        let operations = taskDoc[i].childNodes;
+        for (var j = 0; j < operations.length; j++) {
+            taskInfo.operations.push(operations[j].getAttribute("id"));
+        }
+        tasks.push(taskInfo);
+    }
+    return tasks;
+}
+
+export function getTaksDependencies() {
+    if (xmlDoc === null) {
+        alert("Failed to record operation. Please load activity document first!");
+        return;
+    }
+
+    let dependencyDoc = xmlDoc.getElementsByTagName("Relation");
+    if (dependencyDoc == undefined) return [];
+
+    let relations = [];
+    for (var i = 0; i < dependencyDoc.length; i++) {
+        let relation = {
+            id: dependencyDoc[i].getAttribute("id"),
+            name: dependencyDoc[i].getAttribute("name"),
+            from: "",
+            to: ""
+        };
+        for(var j = 0;j < dependencyDoc[i].childNodes.length; j++){
+            let linkNode = dependencyDoc[i].childNodes[j];
+            if(linkNode.tagName == "From"){
+                relation.from = linkNode.getAttribute("taskRef");
+            } else if(linkNode.tagName == "To"){
+                relation.to = linkNode.getAttribute("taskRef");
+            }
+        }
+        relations.push(relation);
+    }
+    return relations;
+}
+
 export function getToollist() {
     if (xmlDoc === null) {
         alert("Failed to record operation. Please load activity document first!");
         return;
     }
 
-    let toolsDoc = xmlDoc.getElementsByTagName("ToolBox");
-    if (toolsDoc == undefined) return;
+    let toolsDoc = xmlDoc.getElementsByTagName("Tool");
+    if (toolsDoc == undefined) return [];
 
     let tools = [];
     for (var i = 0; i < toolsDoc.length; i++) {
@@ -211,8 +393,8 @@ export function getReslist() {
         return;
     }
 
-    let resDoc = xmlDoc.getElementsByTagName("ResourceCollection");
-    if (resDoc == undefined) return;
+    let resDoc = xmlDoc.getElementsByTagName("Resource");
+    if (resDoc == undefined) return [];
 
     let resources = [];
     for (var i = 0; i < resDoc.length; i++) {
@@ -400,7 +582,7 @@ export function resOperationRecord(aid, taskId, behavior, userId, resInfo) {
     saveActivityDoc(aid);
 }
 
-export function toolOperationRecord(aid, behavior, userId, toolInfo) {
+export function toolOperationRecord(aid, taskId, behavior, userId, toolInfo) {
     if (xmlDoc === null) {
         alert("Failed to record operation. Please load activity document first!");
         return;
@@ -413,8 +595,8 @@ export function toolOperationRecord(aid, behavior, userId, toolInfo) {
 
         let Tool = xmlDoc.createElement('Tool');
         Tool.set("id", toolInfo.tid);
-        Tool.set("name", toolInfo.toolName);        
-        Tool.set("type", toolInfo.isToolset?"toolset":"tool");
+        Tool.set("name", toolInfo.toolName);
+        Tool.set("type", toolInfo.isToolset ? "toolset" : "tool");
         Tool.set("function", toolInfo.description);
         Tool.set("provider", toolInfo.provider);
         Tool.set("href", toolInfo.toolUrl);
@@ -440,6 +622,16 @@ export function toolOperationRecord(aid, behavior, userId, toolInfo) {
     Operation.set("operator", userId);
     Operation.set("time", new Date().Format("yyyy-MM-dd HH:mm:ss"));
     OperationRecords.appendChild(Operation);
+
+    // TaskList
+    if (taskId != "") {
+        let Task = xmlDoc.getElementById(taskId);
+        if (Task !== null) {
+            let OperationRef = xmlDoc.createElement('OperationRef');
+            Operation.set("id", operationId);
+            Task.appendChild(OperationRef);
+        }
+    }
 
     saveActivityDoc(aid);
 }

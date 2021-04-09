@@ -393,7 +393,6 @@
 </template>
 <script>
 import Avatar from "vue-avatar";
-import * as userRoleJS from "@/api/userRole.js";
 export default {
   props: ["activityInfo"],
   components: {
@@ -542,11 +541,11 @@ export default {
   methods: {
     roleIdentity(activity) {
       this.userInfo = this.$store.getters.userInfo;
-      return userRoleJS.roleIdentify(activity.members, this.userInfo.userId);
+      return this.userRoleApi.roleIdentify(activity.members, this.userInfo.userId);
     },
     permissionIdentity(permission, role, operation) {
       if (permission == undefined)
-        permission = JSON.stringify(userRoleJS.getDefault());
+        permission = JSON.stringify(this.userRoleApi.getDefault());
       if (operation == "auto_join") {
         if (JSON.parse(permission).auto_join.visitor == "Yes") return true;
         else if (JSON.parse(permission).auto_join.visitor == "No") return false;
@@ -554,7 +553,7 @@ export default {
           return this.getParentPermission();
         }
       } else {
-        return userRoleJS.permissionIdentity(
+        return this.userRoleApi.permissionIdentity(
           JSON.parse(permission),
           role,
           operation

@@ -809,12 +809,12 @@ export default {
       // 更新协同文档
       for(var i = 0; i < this.stepToolsetsShow.length;i++){
         if(!this.toolIdList.contains(this.stepToolsetsShow[i].tid)){
-          this.operationApi.toolOperationRecord(this.activityInfo.aid, "add", this.userInfo.userId, this.stepToolsetsShow[i]);
+          this.operationApi.toolOperationRecord(this.activityInfo.aid, "", "add", this.userInfo.userId, this.stepToolsetsShow[i]);
         }
       }
       for(var i = 0; i < this.stepToolsShow.length;i++){
         if(!this.toolIdList.contains(this.stepToolsShow[i].tid)){
-          this.operationApi.toolOperationRecord(this.activityInfo.aid, "remove", this.userInfo.userId, this.stepToolsShow[i]);
+          this.operationApi.toolOperationRecord(this.activityInfo.aid, "", "remove", this.userInfo.userId, this.stepToolsShow[i]);
         }
       }
 

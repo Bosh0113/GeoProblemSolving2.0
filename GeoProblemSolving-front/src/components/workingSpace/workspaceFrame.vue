@@ -226,7 +226,6 @@
   </div>
 </template>
 <script>
-import * as userRoleJS from "@/api/userRole.js";
 import typeChoose from "./activity/typeChoose.vue";
 import singleActivity from "./activity/singleActivity.vue";
 import multiActivity from "./activity/multiActivity.vue";
@@ -261,7 +260,7 @@ export default {
         parent: "",
         creator: "",
         level: -1,
-        permission: JSON.stringify(userRoleJS.getDefault()),
+        permission: JSON.stringify(this.userRoleApi.getDefault()),
         type: "Activity_Default",
         purpose: "Multi-purpose",
       },
@@ -314,6 +313,7 @@ export default {
   },
   mounted() {
     this.locateActivity();
+    window.addEventListener("resize", this.reSize);
 
     Array.prototype.contains = function (obj) {
       var i = this.length;
@@ -333,10 +333,11 @@ export default {
   },
   methods: {
     roleIdentity(activity) {
-      return userRoleJS.roleIdentify(activity.members, this.userInfo.userId);
+      return this.userRoleApi.roleIdentify(activity.members, this.userInfo.userId);
     },
     permissionIdentity(permission, role, operation) {
-      if(permission == undefined) permission = JSON.stringify(userRoleJS.getDefault());
+      if (permission == undefined)
+        permission = JSON.stringify(this.userRoleApi.getDefault());
       if (operation == "observe") {
         if (JSON.parse(permission).observe.visitor == "Yes") return true;
         else if (JSON.parse(permission).observe.visitor == "No") return false;
@@ -350,7 +351,7 @@ export default {
           return this.getParentPermission();
         }
       } else {
-        return userRoleJS.permissionIdentity(
+        return this.userRoleApi.permissionIdentity(
           JSON.parse(permission),
           role,
           operation
@@ -442,6 +443,17 @@ export default {
       document.getElementById("ActivityTree").style.width = 250 + "px";
       document.getElementById("ActivityContent").style.width =
         window.innerWidth - 260 + "px";
+    },
+    reSize() {
+      if (this.treeFold) {
+        document.getElementById("ActivityTree").style.width = 0;
+        document.getElementById("ActivityContent").style.width =
+          window.innerWidth - 10 + "px";
+      } else {
+        document.getElementById("ActivityTree").style.width = 250 + "px";
+        document.getElementById("ActivityContent").style.width =
+          window.innerWidth - 260 + "px";
+      }
     },
     locateActivity() {
       let content = this.getURLParameter("content");
@@ -798,7 +810,7 @@ export default {
         });
     },
     applyJoinActivity() {
-      let managers = userRoleJS.getMemberByRole(this.slctActivity, "manager");
+      let managers = this.userRoleApi.getMemberByRole(this.slctActivity, "manager");
       for (var i = 0; i < managers.length; i++) {
         let notice = {
           recipientId: managers[i],
@@ -825,7 +837,7 @@ export default {
         .then((result) => {
           if (result.data == "Success") {
             parent.vm.$emit("sendNotice", notice.recipientId);
-            this.$Notice.info({desc: "Send application successfully."})
+            this.$Notice.info({ desc: "Send application successfully." });
             this.applyJoinActivityModal = false;
           } else {
             this.$Message.error("Notice fail.");
@@ -848,8 +860,11 @@ export default {
         .delete(url)
         .then((res) => {
           if (res.data.code == 0) {
-            
-            this.operationApi.activityRecord("remove", this.userInfo.userId, this.slctActivity);
+            this.operationApi.activityRecord(
+              "remove",
+              this.userInfo.userId,
+              this.slctActivity
+            );
 
             parent.location.href =
               "/GeoProblemSolving/projectInfo/" +
@@ -872,7 +887,7 @@ export default {
 <style scoped>
 .foldTreeBtn {
   padding: 5px 8px 6px;
-  height: calc(100vh - 10px);
+  height: calc(100vh);
   margin-right: 5px;
   border: 0px;
 }
@@ -880,7 +895,7 @@ export default {
 .activityCard {
   margin-right: 5px;
   width: 250px;
-  height: calc(100vh - 10px);
+  height: calc(100vh);
   overflow-y: auto;
   border: 0;
 }
@@ -891,7 +906,7 @@ export default {
 
 .workspaceCard {
   width: calc(100vw - 260px);
-  height: calc(100vh - 10px);
+  height: calc(100vh);
   background-color: white;
   border: 0;
   overflow-x: auto;

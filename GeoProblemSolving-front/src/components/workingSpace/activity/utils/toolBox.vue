@@ -181,7 +181,6 @@
 import manageTools from "@/components/tools/toolToStepModal";
 import Avatar from "vue-avatar";
 import { get, del, post, put } from "@/axios";
-import * as userRoleJS from "@/api/userRole.js";
 export default {
   props: ["activityInfo"],
   components: {
@@ -246,13 +245,13 @@ export default {
   },
   methods: {
     roleIdentity() {
-      this.userRole = userRoleJS.roleIdentify(
+      this.userRole = this.userRoleApi.roleIdentify(
         this.activityInfo.members,
         this.userInfo.userId
       );
     },
     permissionIdentity(permission, role, operation) {
-      return userRoleJS.permissionIdentity(
+      return this.userRoleApi.permissionIdentity(
         JSON.parse(permission),
         role,
         operation

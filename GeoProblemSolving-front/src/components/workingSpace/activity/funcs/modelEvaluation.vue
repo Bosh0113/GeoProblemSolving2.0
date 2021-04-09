@@ -23,7 +23,7 @@
 <script>
 import resList from "../utils/resList.vue";
 import toolBox from "../utils/toolBox.vue";
-import actions from "../utils/actionContainer.vue";
+import actions from "../utils/taskflow/actionContainer.vue";
 export default {
   props: ["activityInfo"],
   components: {

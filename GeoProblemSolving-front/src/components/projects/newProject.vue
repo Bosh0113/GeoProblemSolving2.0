@@ -201,7 +201,6 @@ h1 {
   </div>
 </template>
 <script>
-import * as userRoleJS from "./../../api/userRole.js";
 export default {
   beforeRouteEnter: (to, from, next) => {
     next((vm) => {
@@ -296,7 +295,7 @@ export default {
   },
   methods: {
     createProject(name) {
-      let permission = userRoleJS.getDefault();
+      let permission = this.userRoleApi.getDefault();
 
       this.$refs[name].validate((valid) => {
         if (valid) {
