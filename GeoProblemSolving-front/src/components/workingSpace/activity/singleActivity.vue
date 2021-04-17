@@ -122,7 +122,7 @@
       v-model="memberRoleModal"
       width="400px"
       title="Set the role of this member"
-      @on-ok="updateActivity()"
+      @on-ok="updateUserRole()"
       ok-text="Ok"
       cancel-text="Cancel"
     >
@@ -248,10 +248,14 @@ export default {
   },
   methods: {
     roleIdentity(activity) {
-      return this.userRoleApi.roleIdentify(activity.members, this.userInfo.userId);
+      return this.userRoleApi.roleIdentify(
+        activity.members,
+        this.userInfo.userId
+      );
     },
     permissionIdentity(permission, role, operation) {
-      if(permission == undefined) permission = JSON.stringify(this.userRoleApi.getDefault());
+      if (permission == undefined)
+        permission = JSON.stringify(this.userRoleApi.getDefault());
       if (operation == "auto_join") {
         if (JSON.parse(permission).auto_join.visitor == "Yes") return true;
         else if (JSON.parse(permission).auto_join.visitor == "No") return false;
@@ -345,6 +349,14 @@ export default {
           .then((res) => {
             if (res.data.code == 0) {
               this.participants.push(user);
+              // update actvitiy doc
+              this.operationApi.participantUpdate(
+                this.activityInfo.aid,
+                "invite",
+                user.userId,
+                user.name,
+                user.role
+              );
               //notice
               let notice = {
                 recipientId: user.userId,
@@ -371,6 +383,81 @@ export default {
             throw err;
           });
       }
+    },
+    updateUserRole() {
+      let member = this.slctRoleMember;
+      let activity = this.activityInfo;
+      let role = this.roleSelected;
+
+      // get url
+      let url = "";
+      if (activity.level == 0) {
+        url =
+          "/GeoProblemSolving/project/" +
+          activity.aid +
+          "/user?userId=" +
+          member.userId +
+          "&role=" +
+          role;
+      } else if (activity.level == 1) {
+        url =
+          "/GeoProblemSolving/subproject/" +
+          activity.aid +
+          "/user?userId=" +
+          member.userId +
+          "&role=" +
+          role;
+      } else if (activity.level > 1) {
+        url =
+          "/GeoProblemSolving/activity/" +
+          activity.aid +
+          "/user?userId=" +
+          member.userId +
+          "&role=" +
+          role;
+      } else {
+        return;
+      }
+
+      this.axios
+        .put(url)
+        .then((res) => {
+          if (res.data.code == 0) {
+            this.$Notice.info({ desc: "Change the member role successfully" });
+            this.operationApi.participantUpdate(
+              this.activityInfo.aid,
+              "role",
+              member.userId,
+              member.name,
+              member.role
+            );
+            this.getParticipants();
+
+            //notice
+            let notice = {
+              recipientId: member.userId,
+              type: "notice",
+              content: {
+                title: "Role changed",
+                description:
+                  "Your role in the activity: " +
+                  activity.name +
+                  ", project: " +
+                  this.projectInfo.name +
+                  " has changed to " +
+                  role +
+                  ".",
+                approve: "unknow",
+              },
+            };
+            this.sendNotice(notice);
+          } else {
+            console.log(res.data.msg);
+          }
+        })
+        .catch((err) => {
+          throw err;
+        });
     },
     selectMember(member) {
       if (operation == "delete") {
@@ -406,6 +493,14 @@ export default {
         .delete(url)
         .then((res) => {
           if (res.data.code == 0) {
+            this.operationApi.participantUpdate(
+              this.activityInfo.aid,
+              "remove",
+              member.userId,
+              member.name,
+              member.role
+            );
+
             let index = this.participants.indexOf(member);
             this.participants.splice(index, 1);
             //notice
@@ -457,16 +552,20 @@ export default {
         .delete(url)
         .then((res) => {
           if (res.data.code == 0) {
-            parent.location.href =
-              "/GeoProblemSolving/projectInfo/" +
-              this.projectInfo.aid +
-              "?content=workspace&aid=" +
-              activity.parent +
-              "&level=" +
-              (activity.level - 1).toString();
+            // update activity doc
+            this.operationApi.participantUpdate(
+              activity.aid,
+              "remove",
+              member.userId,
+              "",
+              ""
+            );
 
             //notice
-            let managers = this.userRoleApi.getMemberByRole(activity, "manager");
+            let managers = this.userRoleApi.getMemberByRole(
+              activity,
+              "manager"
+            );
             for (var i = 0; i < managers.length; i++) {
               let notice = {
                 recipientId: managers[i],
@@ -484,6 +583,14 @@ export default {
                 },
               };
               this.sendNotice(activity, notice);
+
+              parent.location.href =
+                "/GeoProblemSolving/projectInfo/" +
+                this.projectInfo.aid +
+                "?content=workspace&aid=" +
+                activity.parent +
+                "&level=" +
+                (activity.level - 1).toString();
             }
           } else {
             console.log(res.data.msg);

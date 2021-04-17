@@ -45,7 +45,10 @@
         ></manage-tools>
       </div>
       <vue-scroll :ops="ops" style="max-height: calc(100vh - 200px)">
-        <div v-if="toolList.length < 1" style="text-align: center">
+        <div
+          v-if="toolList != undefined && toolList.length < 1"
+          style="text-align: center"
+        >
           <h2 style="color: #808695">No tools</h2>
           <small style="color: #dcdee2"
             >*Click the button on the top right to add tools.</small
@@ -59,7 +62,7 @@
         >
           <Card
             style="margin: 5px; height: 50px; width: 50px"
-            v-show="toolsetLevel > 0" 
+            v-show="toolsetLevel > 0"
             title="Back to last level"
             ><Icon
               type="md-arrow-back"
@@ -69,7 +72,7 @@
               @click="back2LastLevel()"
           /></Card>
           <Card
-            style="background-color: #d3f1b1; margin: 5px"
+            style="padding-top: 5px; background-color: #d3f1b1; margin: 5px"
             v-if="tool.isToolset"
           >
             <div
@@ -88,12 +91,22 @@
                   style="margin-bottom: 6px"
                   v-else
                 ></avatar>
-                <div slot="content">
+                <div
+                  slot="content"
+                  v-if="
+                    tool.description !== '' ||
+                    (tool.tags != undefined && tool.tags.length > 0)
+                  "
+                >
                   <span>{{ tool.description }}</span>
-                  <br v-if="tool.tag.length > 0" />
-                  <span>
-                    <i>{{ tool.tag.join(" | ") }}</i>
-                  </span>
+                  <template
+                    v-if="tool.tags != undefined && tool.tags.length > 0"
+                  >
+                    <br />
+                    <span>
+                      <i>{{ tool.tags.join(" | ") }}</i>
+                    </span>
+                  </template>
                 </div>
               </Tooltip>
               <h4
@@ -109,7 +122,9 @@
               </h4>
             </div>
           </Card>
-          <Card style="background-color: ghostwhite; margin: 5px">
+          <Card
+            style="padding-top: 5px; background-color: ghostwhite; margin: 5px"
+          >
             <div
               style="text-align: center; cursor: pointer"
               @click="useTool(tool)"
@@ -126,12 +141,22 @@
                   style="margin-bottom: 6px"
                   v-else
                 ></avatar>
-                <div slot="content">
+                <div
+                  slot="content"
+                  v-if="
+                    tool.description !== '' ||
+                    (tool.tags != undefined && tool.tags.length > 0)
+                  "
+                >
                   <span>{{ tool.description }}</span>
-                  <br v-if="tool.tag.length > 0" />
-                  <span>
-                    <i>{{ tool.tag.join(" | ") }}</i>
-                  </span>
+                  <template
+                    v-if="tool.tags != undefined && tool.tags.length > 0"
+                  >
+                    <br />
+                    <span>
+                      <i>{{ tool.tags.join(" | ") }}</i>
+                    </span>
+                  </template>
                 </div>
               </Tooltip>
               <h4
@@ -270,7 +295,7 @@ export default {
     stepToolListChanged(tools, toolsets) {
       this.toolIdList = tools;
       this.toolIdList.push.apply(this.toolIdList, toolsets);
-      this.getAllTools();
+      this.getToolInfos();
     },
     // showTools(toolsetInfo) {
     //   this.toolsetToolList = toolsetInfo.toolList;
@@ -318,21 +343,27 @@ export default {
       var toolURL = toolInfo.toolUrl;
       var toolContent = `<iframe src="${toolURL}?userName=${this.userInfo.name}&userID=${this.userInfo.userId}&groupID=${this.activityInfo.aid}" style="width: 100%; height:100%;" frameborder="0"></iframe>`;
 
-      var demoPanelTimer = null;
       var panel = jsPanel.create({
         theme: "success",
-        headerTitle: toolInfo.toolName,
-        footerToolbar: '<p style="height:10px"></p>',
+        footerToolbar: `<p></p>`,
         contentSize: "800 400",
+        id: toolInfo.tid,
+        headerTitle: toolInfo.toolName,
         content: toolContent,
-        disableOnMaximized: true,
+        container: "div#drawflow",
+        data: { user: this.userInfo, aid: this.activityInfo.aid, taskId: "" },
         dragit: {
           containment: 5,
         },
         closeOnEscape: true,
-        onclosed: function (panel, status, closedByUser) {
-          window.clearTimeout(demoPanelTimer);
-        },
+        disableOnMaximized: true,
+        onbeforeclose: function () {
+            if (this.options.data.taskId !== "") {
+              return true;
+            } else {
+              return confirm("This operation has not been bind to the task. Close panel immediately?");
+            }
+          }
       });
       // panel.resizeit("disable");
       $(".jsPanel-content").css("font-size", "0");

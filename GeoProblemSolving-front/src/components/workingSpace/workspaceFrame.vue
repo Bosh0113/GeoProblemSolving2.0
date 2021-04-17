@@ -214,9 +214,9 @@
     <Modal
       v-model="activityDeleteModal"
       title="Delete the current activity"
-      @on-ok="delActivity"
-      ok-text="Yes"
-      cancel-text="Think again..."
+      @on-cancel="delActivity"
+      ok-text="Think again..."
+      cancel-text="Yes"
     >
       <h3>Do you really want to delete this activity?</h3>
       <h3 style="color: red; margin-top: 10px">
@@ -333,7 +333,10 @@ export default {
   },
   methods: {
     roleIdentity(activity) {
-      return this.userRoleApi.roleIdentify(activity.members, this.userInfo.userId);
+      return this.userRoleApi.roleIdentify(
+        activity.members,
+        this.userInfo.userId
+      );
     },
     permissionIdentity(permission, role, operation) {
       if (permission == undefined)
@@ -459,7 +462,6 @@ export default {
       let content = this.getURLParameter("content");
       let aid = this.getURLParameter("aid");
       let level = this.getURLParameter("level");
-      this.operationApi.getActivityDoc(aid);
 
       let url = "";
       if (aid == undefined || level == undefined) {
@@ -666,6 +668,12 @@ export default {
       this.setContent(this.slctActivity);
     },
     setContent(activity) {
+      // load activity doc
+      let result = this.operationApi.getActivityDoc(activity.aid);
+      if (result === "empty") {
+        this.operationApi.rebuildActivityDoc(activity);
+      }
+
       if (
         this.roleIdentity(activity) == "visitor" &&
         !this.permissionIdentity(
@@ -718,6 +726,11 @@ export default {
                 this.editActivityForm.pathway = [];
               }
             }
+            // update activity doc
+            this.operationApi.activityUpdate("type", this.editActivityForm);
+          } else {
+            // update activity doc
+            this.operationApi.activityUpdate("other", this.editActivityForm);
           }
           // url
           let url = "";
@@ -810,7 +823,10 @@ export default {
         });
     },
     applyJoinActivity() {
-      let managers = this.userRoleApi.getMemberByRole(this.slctActivity, "manager");
+      let managers = this.userRoleApi.getMemberByRole(
+        this.slctActivity,
+        "manager"
+      );
       for (var i = 0; i < managers.length; i++) {
         let notice = {
           recipientId: managers[i],
@@ -865,6 +881,7 @@ export default {
               this.userInfo.userId,
               this.slctActivity
             );
+            this.operationApi.deleteActivityDoc(this.slctActivity.aid);
 
             parent.location.href =
               "/GeoProblemSolving/projectInfo/" +

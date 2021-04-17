@@ -34,7 +34,7 @@ public class ActivityDocServiceImpl implements ActivityDocService {
         try {
             // confirm
             Optional result = activityDocRepository.findById(aid);
-            if (!result.isPresent()) return ResultUtils.error(-1, "Fail: activity does not exist.");
+            if (!result.isPresent()) return ResultUtils.error(-1, "Fail: activity document does not exist.");
             ActivityDoc activityDoc = (ActivityDoc) result.get();
 
             return ResultUtils.success(activityDoc.getDocument());
@@ -48,7 +48,7 @@ public class ActivityDocServiceImpl implements ActivityDocService {
         try {
             // confirm
             Optional result = activityDocRepository.findById(aid);
-            if (!result.isPresent()) return ResultUtils.error(-1, "Fail: activity does not exist.");
+            if (!result.isPresent()) return ResultUtils.error(-1, "Fail: activity document does not exist.");
             activityDocRepository.deleteById(aid);
 
             return ResultUtils.success("Success");
@@ -62,7 +62,7 @@ public class ActivityDocServiceImpl implements ActivityDocService {
         try {
             // confirm
             Optional result = activityDocRepository.findById(aid);
-            if (!result.isPresent()) return ResultUtils.error(-1, "Fail: activity does not exist.");
+            if (!result.isPresent()) return ResultUtils.error(-1, "Fail: activity document does not exist.");
 
             ActivityDoc activityDoc = (ActivityDoc) result.get();
             activityDoc.setDocument(document);

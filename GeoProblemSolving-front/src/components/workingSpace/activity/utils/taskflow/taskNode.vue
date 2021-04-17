@@ -1,5 +1,37 @@
 <template>
   <div class="card-devices">
+    <div class="drawflow-node-title" v-if="type == 'operation'">
+      <div class="content" v-if="temOperation.type === 'communication'">        
+          <!-- <span class="behavior">Communication</span>          
+          <div class="participant">
+            <span style="margin-right: 5px">People: </span>
+            <avatar
+              v-for="person in temOperation.operators"
+              :key="person.id"
+              class="person"
+              :username="person.name"
+              :size="16"
+              :rounded="true"
+              :title="person.name"
+            />
+          </div> -->
+      </div>
+      <div class="content" v-else-if="temOperation.type === 'geo-analysis'">
+          <!-- <span class="behavior">Geo-analysis by using the {{temOperation.tool.name}} tool</span>          
+          <div class="participant">
+            <span style="margin-right: 5px">People: </span>
+            <avatar
+              v-for="person in temOperation.operators"
+              :key="person.id"
+              class="person"
+              :username="person.name"
+              :size="16"
+              :rounded="true"
+              :title="person.name"
+            />
+          </div> -->
+      </div>
+    </div>
     <div class="drawflow-node-title" v-if="type == 'task'">
       <h3>{{ name }}</h3>
     </div>
@@ -19,7 +51,7 @@
       <div v-else-if="type == 'task' && unfold" style="cursor: default">
         <Timeline style="padding: 10px; height: 350px">
           <vue-scroll :ops="scrollOps">
-            <!-- <TimelineItem v-for="record in operationRecords" :key="record.id">
+            <TimelineItem v-for="record in operationRecords" :key="record.id">
               <p class="time">{{ record.time }}</p>
               <div class="content" v-if="record.type === 'resource'">
                 Resource operation:
@@ -169,18 +201,20 @@
                   <div class="participant">
                     <span style="margin-right: 5px">People: </span>
                     <avatar
+                      v-for="person in record.operators"
+                      :key="person.id"
                       class="person"
-                      :username="record.operator"
+                      :username="person.name"
                       :size="16"
                       :rounded="true"
-                      :title="record.operator"
+                      :title="person.name"
                     />
                   </div>
                 </div>
               </div>
               <Divider />
-            </TimelineItem> -->
-            <TimelineItem>
+            </TimelineItem>
+            <!-- <TimelineItem>
               <p class="time">2021-1-1 20:00:00</p>
               <div class="content">
                 Resource <span class="behavior">upload</span>
@@ -303,7 +337,7 @@
                 </div>
               </div>
               <Divider />
-            </TimelineItem>
+            </TimelineItem> -->
           </vue-scroll>
         </Timeline>
         <div
@@ -338,6 +372,7 @@ export default {
       },
       unfold: false,
       operationRecords: [],
+      temOperation: {},
       // 资源avatar 图片路径
       dataUrl: require("@/assets/images/data.png"),
       modelUrl: require("@/assets/images/model.png"),
@@ -351,62 +386,100 @@ export default {
       chatUrl: require("@/assets/images/chat.png"),
     };
   },
+  mounted(){
+    if(this.type == 'operation'){
+      this.operationInit();
+    }
+  },
   methods: {
+    operationInit(){
+      let operation = operations[0];
+      if (operation.type === "communication") {
+          // participants
+          let participants = [];
+          for (var j = 0; j < operation.operators.length; j++) {
+            let personInfo = this.operationApi.getMemberInfo(
+              operation.operators[j]
+            );
+            participants.push(personInfo);
+          }
+          operation.operators = participants;
+        } else if (operation.type === "geo-analysis") {
+          // geo-analysis
+          let toolInfo = this.operationApi.getResInfo(operation.toolRef);
+          operation.tool = toolInfo;
+          // participants
+          let participants = [];
+          for (var j = 0; j < operation.operators.length; j++) {
+            let operatorInfo = this.operationApi.getMemberInfo(
+              operation.operators[j]
+            );
+            participants.push(operatorInfo);
+          }
+          operation.operators = participants;
+        }
+        this.temOperation = operation;
+    },
     operationShow() {
       this.unfold = true;
-    //   for (var i = 0; i < this.operations.length; i++) {
-    //     let operation = this.operationApi.getOperationInfo(this.operations[i]);
-    //     if (operation.type === "resource") {
-    //       // resource 
-    //       let resInfo = this.operationApi.getResInfo(operation.resRef);
-    //       operation.resource = resInfo;
-    //       let operatorInfo = this.operationApi.getMemberInfo(
-    //         operation.operator
-    //       );
-    //       operation.operator = operatorInfo;
-    //     } else if (operation.type === "tool") {
-    //       // tool
-    //       let toolInfo = this.operationApi.getResInfo(operation.toolRef);
-    //       operation.tool = toolInfo;
-    //       let operatorInfo = this.operationApi.getMemberInfo(
-    //         operation.operator
-    //       );
-    //       operation.operator = operatorInfo;
-    //     } else if (operation.type === "communication") {
-    //       // communication
-    //       let toolInfo = this.operationApi.getResInfo(operation.toolRef);
-    //       operation.tool = toolInfo;
-    //       let resInfo = this.operationApi.getResInfo(operation.resRef);
-    //       operation.resource = resInfo;
-    //       // participants
-    //       let participants = [];
-    //       for (var j = 0; j < operation.operators.length; j++) {
-    //         let personInfo = this.operationApi.getMemberInfo(
-    //           operation.operators[j]
-    //         );
-    //         participants.push(personInfo);
-    //       }
-    //       operation.operators = participants;
-    //     } else if (operation.type === "geo-analysis") {
-    //       // geo-analysis
-    //       let toolInfo = this.operationApi.getResInfo(operation.toolRef);
-    //       operation.tool = toolInfo;
-    //       let operatorInfo = this.operationApi.getMemberInfo(
-    //         operation.operator
-    //       );
-    //       operation.operator = operatorInfo;
-    //       // results
-    //       let results = [];
-    //       for (var j = 0; j < operation.resources.outputs.length; j++) {
-    //         let resInfo = this.operationApi.getResInfo(
-    //           operation.resources.outputs[j]
-    //         );
-    //         results.push(resInfo);
-    //       }
-    //       operation.resources.outputs = results;
-    //     }
-    //     this.operationRecords.push(operation);
-    //   }
+      for (var i = 0; i < this.operations.length; i++) {
+        let operation = this.operationApi.getOperationInfo(this.operations[i]);
+        if (operation.type === "resource") {
+          // resource
+          let resInfo = this.operationApi.getResInfo(operation.resRef);
+          operation.resource = resInfo;
+          let operatorInfo = this.operationApi.getMemberInfo(
+            operation.operator
+          );
+          operation.operator = operatorInfo;
+        } else if (operation.type === "tool") {
+          // tool
+          let toolInfo = this.operationApi.getResInfo(operation.toolRef);
+          operation.tool = toolInfo;
+          let operatorInfo = this.operationApi.getMemberInfo(
+            operation.operator
+          );
+          operation.operator = operatorInfo;
+        } else if (operation.type === "communication") {
+          // communication
+          let toolInfo = this.operationApi.getResInfo(operation.toolRef);
+          operation.tool = toolInfo;
+          let resInfo = this.operationApi.getResInfo(operation.resRef);
+          operation.resource = resInfo;
+          // participants
+          let participants = [];
+          for (var j = 0; j < operation.operators.length; j++) {
+            let personInfo = this.operationApi.getMemberInfo(
+              operation.operators[j]
+            );
+            participants.push(personInfo);
+          }
+          operation.operators = participants;
+        } else if (operation.type === "geo-analysis") {
+          // geo-analysis
+          let toolInfo = this.operationApi.getResInfo(operation.toolRef);
+          operation.tool = toolInfo;
+          // participants
+          let participants = [];
+          for (var j = 0; j < operation.operators.length; j++) {
+            let operatorInfo = this.operationApi.getMemberInfo(
+              operation.operators[j]
+            );
+            participants.push(operatorInfo);
+          }
+          operation.operators = participants;
+          // results
+          let results = [];
+          for (var j = 0; j < operation.resources.outputs.length; j++) {
+            let resInfo = this.operationApi.getResInfo(
+              operation.resources.outputs[j]
+            );
+            results.push(resInfo);
+          }
+          operation.resources.outputs = results;
+        }
+        this.operationRecords.push(operation);
+      }
     },
   },
 };

@@ -5,9 +5,11 @@ import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.io.Serializable;
+
 @Data
 @Document(collection = "ActivityDocs")
-public class ActivityDoc {
+public class ActivityDoc implements Serializable {
 
     /**
      * aid: activity id

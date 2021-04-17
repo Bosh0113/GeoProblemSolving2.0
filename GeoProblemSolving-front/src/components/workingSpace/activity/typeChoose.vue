@@ -124,6 +124,7 @@ export default {
         "Geographical simulation",
         "Data analysis",
         "Decision making",
+        "Others",
       ],
       purpose: "",
     };

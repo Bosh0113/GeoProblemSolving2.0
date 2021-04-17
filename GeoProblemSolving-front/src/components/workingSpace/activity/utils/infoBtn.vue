@@ -6,6 +6,8 @@
       v-model="infoModal"
       width="900px"
       title="Activity information"
+      ok-text="OK"
+      cancel-text="Cancel"
     >
       <div style="padding: 5px 10px">
         <div style="width: 70%; float: left; padding: 20px">
@@ -166,10 +168,7 @@
               style="float: right; margin: 5px 10px 0 0; cursor: pointer"
             />
           </div>
-          <vue-scroll
-            :ops="scrollOps"
-            style="margin-top: 10px; height: 420px"
-          >
+          <vue-scroll :ops="scrollOps" style="margin-top: 10px; height: 420px">
             <Card
               style="margin: 5px 0"
               :padding="5"
@@ -244,7 +243,7 @@
           </vue-scroll>
         </div>
       </div>
-    </Modal>       
+    </Modal>
     <Modal
       v-model="inviteModal"
       width="660px"
@@ -279,7 +278,7 @@
       v-model="memberRoleModal"
       width="400px"
       title="Set the role of this member"
-      @on-ok="updateActivity()"
+      @on-ok="updateUserRole()"
       ok-text="Ok"
       cancel-text="Cancel"
     >
@@ -376,7 +375,7 @@ export default {
       roleSelected: "",
       // leave
       quitActivityModal: false,
-      
+
       listStyle: { width: "280px", height: "360px" },
     };
   },
@@ -385,12 +384,16 @@ export default {
     this.getParticipants();
   },
   mounted() {},
-  methods: {      
+  methods: {
     roleIdentity(activity) {
-      return this.userRoleApi.roleIdentify(activity.members, this.userInfo.userId);
+      return this.userRoleApi.roleIdentify(
+        activity.members,
+        this.userInfo.userId
+      );
     },
     permissionIdentity(permission, role, operation) {
-      if(permission == undefined) permission = JSON.stringify(this.userRoleApi.getDefault());
+      if (permission == undefined)
+        permission = JSON.stringify(this.userRoleApi.getDefault());
       if (operation == "auto_join") {
         if (JSON.parse(permission).auto_join.visitor == "Yes") return true;
         else if (JSON.parse(permission).auto_join.visitor == "No") return false;
@@ -532,6 +535,15 @@ export default {
               this.participants.push(user);
               this.$Notice.info({ desc: "Invite member successfully" });
 
+              // update activity doc
+              this.operationApi.participantUpdate(
+                activity.aid,
+                "invite",
+                user.userId,
+                user.name,
+                user.role
+              );
+
               //notice
               let notice = {
                 recipientId: user.userId,
@@ -558,6 +570,82 @@ export default {
             throw err;
           });
       }
+    },
+    updateUserRole() {
+      let member = this.slctRoleMember;
+      let activity = this.activityInfo;
+      let role = this.roleSelected;
+
+      // get url
+      let url = "";
+      if (activity.level == 0) {
+        url =
+          "/GeoProblemSolving/project/" +
+          activity.aid +
+          "/user?userId=" +
+          member.userId +
+          "&role=" +
+          role;
+      } else if (activity.level == 1) {
+        url =
+          "/GeoProblemSolving/subproject/" +
+          activity.aid +
+          "/user?userId=" +
+          member.userId +
+          "&role=" +
+          role;
+      } else if (activity.level > 1) {
+        url =
+          "/GeoProblemSolving/activity/" +
+          activity.aid +
+          "/user?userId=" +
+          member.userId +
+          "&role=" +
+          role;
+      } else {
+        return;
+      }
+
+      this.axios
+        .put(url)
+        .then((res) => {
+          if (res.data.code == 0) {
+            this.$Notice.info({ desc: "Change the member role successfully" });
+            // update activity doc
+            this.operationApi.participantUpdate(
+              activity.aid,
+              "role",
+              member.userId,
+              member.name,
+              member.role
+            );
+            this.getParticipants();
+
+            //notice
+            let notice = {
+              recipientId: member.userId,
+              type: "notice",
+              content: {
+                title: "Role changed",
+                description:
+                  "Your role in the activity: " +
+                  activity.name +
+                  ", project: " +
+                  this.projectInfo.name +
+                  " has changed to " +
+                  role +
+                  ".",
+                approve: "unknow",
+              },
+            };
+            this.sendNotice(notice);
+          } else {
+            console.log(res.data.msg);
+          }
+        })
+        .catch((err) => {
+          throw err;
+        });
     },
     selectMember(member, operation) {
       if (operation == "delete") {
@@ -593,6 +681,15 @@ export default {
         .delete(url)
         .then((res) => {
           if (res.data.code == 0) {
+            // update activity doc
+            this.operationApi.participantUpdate(
+              activity.aid,
+              "remove",
+              member.userId,
+              "",
+              ""
+            );
+
             let index = this.participants.indexOf(member);
             this.participants.splice(index, 1);
             this.$Notice.info({ desc: "Remove member successfully" });
@@ -646,16 +743,20 @@ export default {
         .delete(url)
         .then((res) => {
           if (res.data.code == 0) {
-            parent.location.href =
-              "/GeoProblemSolving/projectInfo/" +
-              this.projectInfo.aid +
-              "?content=workspace&aid=" +
-              activity.parent +
-              "&level=" +
-              (activity.level - 1).toString();
+            // update activity doc
+            this.operationApi.participantUpdate(
+              activity.aid,
+              "remove",
+              member.userId,
+              "",
+              ""
+            );
 
             //notice
-            let managers = this.userRoleApi.getMemberByRole(activity, "manager");
+            let managers = this.userRoleApi.getMemberByRole(
+              activity,
+              "manager"
+            );
             for (var i = 0; i < managers.length; i++) {
               let notice = {
                 recipientId: managers[i],
@@ -673,6 +774,14 @@ export default {
                 },
               };
               this.sendNotice(notice);
+
+              parent.location.href =
+                "/GeoProblemSolving/projectInfo/" +
+                this.projectInfo.aid +
+                "?content=workspace&aid=" +
+                activity.parent +
+                "&level=" +
+                (activity.level - 1).toString();
             }
           } else {
             console.log(res.data.msg);

@@ -584,11 +584,11 @@ export default {
       },
       deep: true,
     },
-    stepToolModal(val) {
-      if (!val) {
-        this.panel.close();
-      }
-    },
+    // stepToolModal(val) {
+    //   if (!val) {
+    //     this.panel.close();
+    //   }
+    // },
   },
   created() {},
   mounted() {
@@ -597,7 +597,10 @@ export default {
     Array.prototype.contains = function (obj) {
       var i = this.length;
       while (i--) {
-        if (this[i].id != undefined && this[i].id === obj) {
+        if (
+          (this[i].tid != undefined && this[i].tid === obj) ||
+          (this[i] != undefined && this[i] === obj)
+        ) {
           return true;
         }
       }
@@ -633,17 +636,25 @@ export default {
       this.filterShowListByType();
     },
     filterDuplicateTools() {
+      
+      this.stepToolsetsShow = [];
+      this.stepToolsShow = [];
+
       // public tools and toolsets
       let tools = [],
         toolsets = [];
-      for (var i = 0; i < this.publicTools.length; i++) {
-        if (this.publicTools[i].isToolset) {
+      for (var i = this.personalTools.length -1 ; i >= 0; i--) {
+        if (this.publicTools[i].isToolset != undefined && this.publicTools[i].isToolset) {
           if (!this.toolIdList.contains(this.publicTools[i].tid)) {
-            toolsets.push(this.publicTools[i]);
+            toolsets.push(this.publicTools[i]);            
+          } else {
+            this.stepToolsetsShow.push(this.publicTools[i]);
           }
         } else {
           if (!this.toolIdList.contains(this.publicTools[i].tid)) {
-            tools.push(this.publicTools[i]);
+            tools.push(this.publicTools[i]);            
+          } else {
+            this.stepToolsShow.push(this.publicTools[i]);
           }
         }
       }
@@ -653,14 +664,18 @@ export default {
       // personal tools and toolsets
       tools = [];
       toolsets = [];
-      for (var i = 0; i < this.personalTools.length; i++) {
-        if (this.personalTools[i].isToolset) {
+      for (var i = this.personalTools.length -1 ; i >= 0; i--) {
+        if (this.personalTools[i].isToolset != undefined && this.personalTools[i].isToolset) {
           if (!this.toolIdList.contains(this.personalTools[i].tid)) {
             toolsets.push(this.personalTools[i]);
+          } else {
+            this.stepToolsetsShow.push(this.personalTools[i]);
           }
         } else {
           if (!this.toolIdList.contains(this.personalTools[i].tid)) {
             tools.push(this.personalTools[i]);
+          } else {
+            this.stepToolsShow.push(this.personalTools[i]);
           }
         }
       }
@@ -672,17 +687,15 @@ export default {
       toolsets = [];
       for (var i = 0; i < this.toolList.length; i++) {
         if (this.toolList[i].isToolset) {
-          if (!this.toolIdList.contains(this.toolList[i].tid)) {
+          if (this.toolIdList.contains(this.toolList[i].tid)) {
             toolsets.push(this.toolList[i]);
           }
         } else {
-          if (!this.toolIdList.contains(this.toolList[i].tid)) {
+          if (this.toolIdList.contains(this.toolList[i].tid)) {
             tools.push(this.toolList[i]);
           }
         }
       }
-      this.$set(this, "stepToolsetsShow", toolsets);
-      this.$set(this, "stepToolsShow", tools);
     },
     filterShowListByType() {
       this.publicToolsetsShow = this.getFilterResult(this.publicToolsets);
@@ -805,16 +818,50 @@ export default {
       this.stepToolsShow.forEach((tool) => {
         newStepTools.push(tool.tid);
       });
-      
+
       // 更新协同文档
-      for(var i = 0; i < this.stepToolsetsShow.length;i++){
-        if(!this.toolIdList.contains(this.stepToolsetsShow[i].tid)){
-          this.operationApi.toolOperationRecord(this.activityInfo.aid, "", "add", this.userInfo.userId, this.stepToolsetsShow[i]);
+      // add
+      for (var i = 0; i < this.stepToolsetsShow.length; i++) {
+        if (!this.toolIdList.contains(this.stepToolsetsShow[i].tid)) {
+          this.operationApi.toolOperationRecord(
+            this.activityInfo.aid,
+            "",
+            "add",
+            this.userInfo.userId,
+            this.stepToolsetsShow[i]
+          );
         }
       }
-      for(var i = 0; i < this.stepToolsShow.length;i++){
-        if(!this.toolIdList.contains(this.stepToolsShow[i].tid)){
-          this.operationApi.toolOperationRecord(this.activityInfo.aid, "", "remove", this.userInfo.userId, this.stepToolsShow[i]);
+      for (var i = 0; i < this.stepToolsShow.length; i++) {
+        if (!this.toolIdList.contains(this.stepToolsShow[i].tid)) {
+          this.operationApi.toolOperationRecord(
+            this.activityInfo.aid,
+            "",
+            "add",
+            this.userInfo.userId,
+            this.stepToolsShow[i]
+          );
+        }
+      }
+      // remove
+      for (var i = 0; i < this.toolIdList.length; i++) {
+        if (!this.stepToolsetsShow.contains(this.toolIdList[i])) {
+          this.operationApi.toolOperationRecord(
+            this.activityInfo.aid,
+            "",
+            "remove",
+            this.userInfo.userId,
+            { tid: this.toolIdList[i] }
+          );
+        }
+        if (!this.stepToolsShow.contains(this.toolIdList[i])) {
+          this.operationApi.toolOperationRecord(
+            this.activityInfo.aid,
+            "",
+            "remove",
+            this.userInfo.userId,
+            { tid: this.toolIdList[i] }
+          );
         }
       }
 

@@ -97,7 +97,7 @@ public class ToolService  {
         try {
             List<ToolEntity> ToolEntities = new ArrayList<>();
             for(int i = 0; i < tools.length; i++){
-                Query query = Query.query(Criteria.where("id").is(tools[i]));
+                Query query = Query.query(Criteria.where("tid").is(tools[i]));
                 if (!mongoTemplate.find(query, ToolEntity.class).isEmpty()) {
                     ToolEntities.add(mongoTemplate.find(query, ToolEntity.class).get(0));
                 }
