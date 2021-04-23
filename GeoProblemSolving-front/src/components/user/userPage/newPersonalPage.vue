@@ -60,7 +60,7 @@
             </MenuItem>
 
 
-            <MenuItem name="resource" to="resource" class="sideItem">
+            <MenuItem name="resourceList" to="resourceList" class="sideItem">
               <Icon type="ios-cloud" size="25"/>
               <label>Resource</label>
             </MenuItem>
@@ -108,6 +108,7 @@
   import todoList from "../subPage/todoList";
   import Project from "../subPage/project";
   import tool from "../subPage/tool";
+  import resourceList from "../subPage/resourceList";
 
   export default {
     beforeRouteEnter: (to, from, next) => {
@@ -125,7 +126,8 @@
       notification,
       resource,
       "todo-list": todoList,
-      tool
+      tool,
+      resourceList
     },
     data() {
       return {

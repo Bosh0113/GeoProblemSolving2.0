@@ -1,16 +1,14 @@
 package cn.edu.njnu.geoproblemsolving.business.resource.service;
 
 import cn.edu.njnu.geoproblemsolving.business.resource.dao.IResourceDaoImpl;
-import cn.edu.njnu.geoproblemsolving.business.resource.entity.AddIResourceDTO;
-import cn.edu.njnu.geoproblemsolving.business.resource.entity.IResourceEntity;
-import cn.edu.njnu.geoproblemsolving.business.resource.entity.IUploadResult;
-import cn.edu.njnu.geoproblemsolving.business.resource.entity.ResourcePojo;
+import cn.edu.njnu.geoproblemsolving.business.resource.entity.*;
 import cn.edu.njnu.geoproblemsolving.business.resource.util.ResCovertUtil;
 import cn.edu.njnu.geoproblemsolving.business.resource.util.RestTemplateUtil;
 import cn.edu.njnu.geoproblemsolving.business.user.dao.IUserImpl;
 import cn.edu.njnu.geoproblemsolving.business.user.entity.User;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import cn.edu.njnu.geoproblemsolving.common.utils.ResultUtils;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.mongodb.client.result.UpdateResult;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
@@ -22,12 +20,17 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 import java.io.*;
@@ -39,6 +42,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.zip.ZipOutputStream;
 
 @Service
 public class IResourceServiceImpl implements IResourceService {
@@ -171,9 +175,9 @@ public class IResourceServiceImpl implements IResourceService {
                             userBaseJson.put("resources", resourceList);
                             JSONObject uploadToUserServerResult = httpUtil.setUserBase(userBaseUrl, userBaseJson);
 
-                            if ((int) uploadToUserServerResult.get("code") != 0) {
-                                uploadInfos.failed.add(part.getSubmittedFileName());
-                            }
+                            // if ((int) uploadToUserServerResult.get("code") != 0) {
+                            //     uploadInfos.failed.add(part.getSubmittedFileName());
+                            // }
 
                             //最后存入本地数据库中
                             IResourceEntity resDetails = resourceDao.saveResDetails(resourceEntity);
@@ -183,7 +187,7 @@ public class IResourceServiceImpl implements IResourceService {
                             // userDao.uploadUserRes(uploaderId, localUserResField);
                             // resourceDao.saveResDetail(localUserResField);
 
-                            uploadInfos.uploaded.add(resDetails);
+                            // uploadInfos.uploaded.add(resDetails);
                         } else {
                             uploadInfos.sizeOver.add(part.getSubmittedFileName());
                         }
@@ -279,11 +283,11 @@ public class IResourceServiceImpl implements IResourceService {
         for (int i = 0; i < sourceStoreIds.size(); i++) {
             String oid = sourceStoreIds.get(i);
             //删除本地数据库中的资源详情数据
-            String pathUrl = "http://"+dataRemoteIp+":8082/data/"+oid;
+            String pathUrl = "http://" + dataRemoteIp + ":8082/data/" + oid;
             String localResId = mongoTemplate.findOne(new Query(Criteria.where("pathURL").is(pathUrl)), IResourceEntity.class).getResourceId();
-            if (i == sourceStoreIds.size() -1){
+            if (i == sourceStoreIds.size() - 1) {
                 rids += localResId;
-            }else {
+            } else {
                 rids += localResId + ",";
             }
             resourceDao.delResByPathUrl(pathUrl);
@@ -400,7 +404,7 @@ public class IResourceServiceImpl implements IResourceService {
     }
 
     @Override
-    public ArrayList<ResourcePojo> getRes(ArrayList<String> rids) {
+    public ArrayList<ResourceEntity> getRes(ArrayList<String> rids) {
         return resourceDao.getRes(rids);
     }
 
@@ -476,5 +480,316 @@ public class IResourceServiceImpl implements IResourceService {
         } catch (Exception ex) {
             return ResultUtils.error(-2, ex.toString());
         }
+    }
+
+
+    /**
+     * @Author zhngzhng
+     * @Description
+     * @Date 2021/4/13
+     */
+
+    @Value("${dataContainer}")
+    String dataContainerIp;
+
+    @Value("${userServerLocation}")
+    String userServerIpAndPort;
+
+    @Override
+    public ArrayList<ResourceEntity> getAllResFromService(String userId) {
+        User user = userDao.findUserByIdOrEmail(userId);
+        String access_token = user.getTokenInfo().getAccess_token();
+        String getUrl = "http://" + userServerIpAndPort + "/auth/res";
+        RestTemplateUtil httpUtil = new RestTemplateUtil();
+        JSONObject resResult = httpUtil.getRequestToServer(getUrl, access_token).getBody();
+        int code = (int) resResult.get("code");
+        if (code != 0) {
+            return null;
+        } else {
+            ArrayList<ResourceEntity> resourceList = (ArrayList<ResourceEntity>) resResult.get("data");
+            return resourceList;
+        }
+    }
+
+    @Override
+    public String delRes(String userId, String rid) {
+        String access_token = userDao.findUserByIdOrEmail(userId).getTokenInfo().getAccess_token();
+        String url = "http://" + userServerIpAndPort + "/auth/res/" + rid;
+        RestTemplateUtil httpUtil = new RestTemplateUtil();
+        JSONObject delResult = httpUtil.deleteRequestToServer(url, access_token).getBody();
+        int code = (int) delResult.get("code");
+        if (code != 0) {
+            return "fail";
+        } else {
+            return "suc";
+        }
+    }
+
+    /**
+     * @param userId
+     * @param address
+     * @param rid
+     * @param paths
+     * @param isFolder
+     * true 为 file; false 为 folder
+     * @return
+     */
+    @Override
+    public Integer delResPath(String userId, String address, String rid, String paths, boolean isFolder) {
+        String delUserServerUrl = "";
+        if (paths.equals("")){
+            delUserServerUrl = "http://" + userServerIpAndPort + "/auth/res/" + rid;
+        }else {
+            delUserServerUrl = "http://" + userServerIpAndPort + "/auth/res/" + rid + "/" + paths;
+        }
+
+
+        String access_token = userDao.findUserByIdOrEmail(userId).getTokenInfo().getAccess_token();
+        RestTemplateUtil httpUtil = new RestTemplateUtil();
+        //第一步：先删除用户服务器中字段内容
+        JSONObject delUserServerResult =  httpUtil.deleteRequestToServer(delUserServerUrl, access_token).getBody();
+        Integer delUserServerCode = delUserServerResult.getInteger("code");
+        if (delUserServerCode != 0){
+            /*
+            -3 表示userServer的错误
+            -4 表示dataContainer的错误
+             */
+            return -3;
+        }
+        //第二步：用户服务器中内容删除成功，用返回的内容更新GSM用户字段
+        ArrayList<ResourceEntity> resArray = delUserServerResult.getObject("data", User.class).getResource();
+        Update update = new Update();
+        update.set("resource", resArray);
+        userDao.updateInfo(userId, update);
+        /*
+        第三步：删除数据容器中的资源实体,如果是文件夹就没必要
+        因为数据容器错误而导致的删除失败没必要进行回滚
+        这一步对用户是透明的
+         */
+        if (!isFolder){
+            String delDataInContainer  = "http://" + dataContainerIp + ":8082" + address;
+            JSONObject delEntityResult = httpUtil.delRequest(delDataInContainer);
+            Integer delEntityCode = delEntityResult.getInteger("code");
+            if (delEntityCode != 1){
+                return -4;
+            }
+        }
+        //完成删除
+        return 0;
+    }
+
+
+    @Override
+    public JSONObject createResService(String userId, ResourceEntity resource, String paths) {
+        String access_token = userDao.findUserByIdOrEmail(userId).getTokenInfo().getAccess_token();
+        resource.setUid(UUID.randomUUID().toString());
+        resource.setUploadTime(new Date());
+        // MultiValueMap<String, Object> resInfo = new LinkedMultiValueMap<>();
+        JSONObject resInfo = new JSONObject();
+        //创建文件夹
+        resInfo.put("uid", resource.getUid());
+        resInfo.put("uploadTime", resource.getUploadTime());
+        resInfo.put("name", resource.getName());
+        resInfo.put("folder", true);
+        // LinkedMultiValueMap<String, Object> folderInfo = JSONObject.parseObject(JSONObject.toJSONString(resource), LinkedMultiValueMap.class);
+        String url = "http://" + userServerIpAndPort + "/auth/res/" + paths;
+        RestTemplateUtil httpUtil = new RestTemplateUtil();
+        Object body = httpUtil.postRequestToServer(url, access_token, resInfo).getBody();
+        JSONObject createResult = JSONObject.parseObject(JSONObject.toJSONString(body), JSONObject.class);
+        int code = (int) createResult.get("code");
+        if (code != 0) {
+            return null;
+        } else {
+            return resInfo;
+        }
+    }
+
+    @Override
+    public String putResService(String userId, ResourceEntity res, String paths, Boolean isFolder) {
+        String access_token = userDao.findUserByIdOrEmail(userId).getTokenInfo().getAccess_token();
+        JSONObject resInfo = new JSONObject();
+        if (isFolder){
+            resInfo.put("uid", res.getUid());
+            resInfo.put("name", res.getName());
+        }else {
+            resInfo.put("uid", res.getUid());
+            resInfo.put("name", res.getName());
+            resInfo.put("type", res.getType());
+            resInfo.put("privacy", res.getPrivacy());
+            resInfo.put("description", res.getDescription());
+        }
+        //请求地址
+        String url = "";
+        if (paths.equals("")){
+            url = "http://" + userServerIpAndPort + "/auth/res";
+        }else {
+            url = "http://" + userServerIpAndPort + "/auth/res/" + paths;
+        }
+
+        RestTemplateUtil httpUtil = new RestTemplateUtil();
+        JSONObject putResult = httpUtil.putRequestToServer(url, access_token, resInfo).getBody();
+        int code =  putResult.getInteger("code");
+        if (code != 0) {
+            return "fail";
+        } else {
+            //更新成功，更新本地数据资源
+            ArrayList<ResourceEntity> putRes = putResult.getObject("data", User.class).getResource();
+            //这有问题,转过去转过来的会导致某些数据类型失去原有属性
+            // ArrayList<ResourceEntity> uploadedRes = JSONObject.parseObject(JSONObject.toJSONString(uploadedResJson), ArrayList.class);
+            Update update = new Update();
+            update.set("resource", putRes);
+            userDao.updateInfo(userId, update);
+            return "suc";
+        }
+    }
+
+    //上传文件
+    public Object upRemote(HttpServletRequest req) {
+        IUploadResult uploadInfos = new IUploadResult();
+        //记录上传状态
+        uploadInfos.failed = new ArrayList<>();
+        uploadInfos.sizeOver = new ArrayList<>();
+        uploadInfos.uploaded = new ArrayList<>();
+        try {
+            if (!ServletFileUpload.isMultipartContent(req)) {
+                System.out.println("File is not multimedia.");
+                return "Fail";
+            }
+            HttpSession session = req.getSession();
+            String userId = (String) session.getAttribute("userId");
+            String access_token = userDao.findUserByIdOrEmail(userId).getTokenInfo().getAccess_token();
+
+            Collection<Part> parts = req.getParts();
+            int fileNum = parts.size() - 4;
+            //post payLoad存储，使用LinkedMultiValueMap<String, Object>key/value形式进行存储
+            LinkedMultiValueMap<String, Object> valueMap = new LinkedMultiValueMap<>();
+            //restTemplate工具类
+            RestTemplateUtil httpUtil = new RestTemplateUtil();
+            for (Part part : parts) {
+                try {
+                    if (part.getName().equals("file")) {
+                        //用于标记文件上传进度
+                        fileNum--;
+                        if (part.getSize() < 1024 * 1024 * 1024) {
+                            //将数据上传到数据容器
+                            String file = part.getSubmittedFileName();
+                            String temp[] = file.split("\\.");
+                            String fileName = temp[0];
+                            String suffix = "." + temp[1];
+
+                            File fileTemp = File.createTempFile(UUID.randomUUID().toString(), suffix);//创建临时文件
+                            FileUtils.copyInputStreamToFile(part.getInputStream(), fileTemp);
+                            // MultipartFile multipartFile = new MockMultipartFile(ContentType.APPLICATION_OCTET_STREAM.toString(), part.getInputStream());
+                            FileSystemResource multipartFile = new FileSystemResource(fileTemp);      //临时文件
+
+                            valueMap.add("datafile", multipartFile);
+                            valueMap.add("name", fileName);
+                            String uploadRemoteUrl = "http://" + dataContainerIp + ":8082/data";
+                            //向dataContainer传输数据
+                            JSONObject uploadRemoteResult = httpUtil.postRequestMap(uploadRemoteUrl, valueMap).getBody();
+                            Integer uploadResultInfo = uploadRemoteResult.getInteger("code");
+                            String dataIdInContainer = uploadRemoteResult.getJSONObject("data").getString("id");
+
+                            if (!uploadResultInfo.equals(1)) {
+                                uploadInfos.failed.add(fileName);
+                                valueMap.clear();
+                                continue;
+                            }
+                            //成功将资源上传到数据容器中
+                            // 接下来将资源基本信息写入本地数据库及用户服务器
+                            ResourceEntity res = new ResourceEntity();
+                            res.setUid(UUID.randomUUID().toString());
+                            res.setName(fileName);
+                            res.setSuffix(suffix);
+                            res.setUploadTime(new Date());
+                            res.setFileSize(part.getSize());
+                            res.setPrivacy(req.getParameter("privacy"));
+                            res.setType(req.getParameter("type"));
+                            res.setDescription(req.getParameter("description"));
+                            res.setFolder(false);
+                            res.setUserUpload(true);
+                            String address = "/data/" + dataIdInContainer;
+                            res.setAddress(address);
+
+                            String paths = req.getParameter("paths");
+                            String url = "http://" + userServerIpAndPort + "/auth/res/" + paths;
+                            JSONObject resJson = JSONObject.parseObject(JSONObject.toJSONString(res));
+                            JSONObject uploadResult = httpUtil.postRequestToServer(url, access_token, resJson).getBody();
+                            Integer code = uploadResult.getInteger("code");
+                            if (code != 0) {
+                                //用户服务器更新失败，回滚上传操作
+                                String delUrl = "http://" + dataContainerIp + ":8082" + address;
+                                httpUtil.delRequest(delUrl);
+                                uploadInfos.failed.add(part.getSubmittedFileName());
+                                continue;
+                            }
+                            uploadInfos.uploaded.add(res);
+                            //更新本地用户
+                            if (fileNum != 0) {
+                                continue;
+                            }
+                            //最后一个上传完成后，一次性更新用户
+                            ArrayList<ResourceEntity> uploadedRes = uploadResult.getObject("data", User.class).getResource();
+                            //这有问题,转过去转过来的会导致某些数据类型失去原有属性
+                            // ArrayList<ResourceEntity> uploadedRes = JSONObject.parseObject(JSONObject.toJSONString(uploadedResJson), ArrayList.class);
+                            Update update = new Update();
+                            update.set("resource", uploadedRes);
+                            userDao.updateInfo(userId, update);
+                        } else {
+                            uploadInfos.sizeOver.add(part.getSubmittedFileName());
+                        }
+                    }
+                } catch (Exception e) {
+                    uploadInfos.failed.add(part.getSubmittedFileName());
+                }
+            }
+            return uploadInfos;
+
+        } catch (Exception e) {
+            return "Fail";
+        }
+    }
+
+    @Override
+    public ArrayList<ResourceEntity> getResPath(String userId, String paths) {
+        String access_token = userDao.findUserByIdOrEmail(userId).getTokenInfo().getAccess_token();
+        String url = "http://" + userServerIpAndPort + "/auth/res/" + paths;
+        RestTemplateUtil httpUtil = new RestTemplateUtil();
+        JSONObject getResult = httpUtil.getRequestToServer(url, access_token).getBody();
+        if (getResult.getInteger("code") != 0){
+            return null;
+        }
+        //探索空文件夹
+        ArrayList<ResourceEntity> res = getResult.getObject("data", ArrayList.class);
+        return res;
+    }
+
+    @Override
+    public String copyFromProject2Center(String userId, ResourceEntity copiedFile) {
+        //实际上只是将数据添加到用户数据库中
+        String access_token = userDao.findUserByIdOrEmail(userId).getTokenInfo().getAccess_token();
+        String url = "http://" + userServerIpAndPort + "/auth/res/0";
+        RestTemplateUtil httpUntil = new RestTemplateUtil();
+        JSONObject copiedFilJson = JSONObject.parseObject(JSONObject.toJSONString(copiedFile));
+        JSONObject copiedResultJson = httpUntil.postRequestToServer(url, access_token, copiedFilJson).getBody();
+        int code = copiedResultJson.getInteger("code");
+        if (code != 0){
+            return "fail";
+        }
+        ArrayList<ResourceEntity> resList = copiedResultJson.getObject("data", User.class).getResource();
+        //更新本地用户资源
+        Update update = new Update();
+        update.set("resource", resList);
+        userDao.updateInfo(userId, update);
+        return "suc";
+    }
+
+    @Override
+    public JSONArray getAllFileList(String userId) {
+        String access_token = userDao.findUserByIdOrEmail(userId).getTokenInfo().getAccess_token();
+        String url = "http://" + userServerIpAndPort + "/auth/res/file/all";
+        RestTemplateUtil httpUtil = new RestTemplateUtil();
+        JSONObject getAllResult = httpUtil.getRequestToServer(url, access_token).getBody();
+        return getAllResult.getJSONArray("data");
     }
 }

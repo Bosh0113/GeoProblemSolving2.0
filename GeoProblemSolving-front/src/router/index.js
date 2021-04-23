@@ -39,6 +39,12 @@ const routes = [
             name: "resource",
             component: resolve => require(["@/components/user/subPage/resource"], resolve),
           },
+          //新的resource 页面，含文件夹结构
+          {
+            path: "resourceList",
+            name: "resourceList",
+            component: resolve => require(["@/components/user/subPage/resourceList"], resolve)
+          },
           {
             path: "notification",
             name: "notification",

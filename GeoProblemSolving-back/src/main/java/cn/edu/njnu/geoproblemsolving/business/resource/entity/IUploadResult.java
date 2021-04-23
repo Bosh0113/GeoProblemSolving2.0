@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 @Data
 public class IUploadResult {
-    public ArrayList<IResourceEntity> uploaded;
+    public ArrayList<ResourceEntity> uploaded;
     public ArrayList<String> failed;
     public ArrayList<String> sizeOver;
 }

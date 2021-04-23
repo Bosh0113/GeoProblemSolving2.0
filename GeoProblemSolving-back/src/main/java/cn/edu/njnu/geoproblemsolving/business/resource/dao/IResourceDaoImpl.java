@@ -1,8 +1,7 @@
 package cn.edu.njnu.geoproblemsolving.business.resource.dao;
 
-import cn.edu.njnu.geoproblemsolving.Entity.Resources.ResourceEntity;
+import cn.edu.njnu.geoproblemsolving.business.resource.entity.ResourceEntity;
 import cn.edu.njnu.geoproblemsolving.business.resource.entity.IResourceEntity;
-import cn.edu.njnu.geoproblemsolving.business.resource.entity.ResourcePojo;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import cn.edu.njnu.geoproblemsolving.common.utils.ResultUtils;
 import com.alibaba.fastjson.JSONObject;
@@ -139,19 +138,19 @@ public class IResourceDaoImpl implements IResourceDao {
      */
 
     @Override
-    public ArrayList<ResourcePojo> getRes(ArrayList<String> rids) {
-        ArrayList<ResourcePojo> resourcePojos = new ArrayList<>();
+    public ArrayList<ResourceEntity> getRes(ArrayList<String> rids) {
+        ArrayList<ResourceEntity> resourcePojos = new ArrayList<>();
         for (String rid: rids){
             Query query = new Query(Criteria.where("uid").is(rid));
-            ResourcePojo resourcePojo = mongoTemplate.findOne(query, ResourcePojo.class);
+            ResourceEntity resourcePojo = mongoTemplate.findOne(query, ResourceEntity.class);
             resourcePojos.add(resourcePojo);
         }
         return resourcePojos;
     }
 
     @Override
-    public JsonResult saveResDetail(ResourcePojo resourcePojo) {
-        ResourcePojo resource = mongoTemplate.save(resourcePojo);
+    public JsonResult saveResDetail(ResourceEntity resourcePojo) {
+        ResourceEntity resource = mongoTemplate.save(resourcePojo);
         return ResultUtils.success(resource);
     }
 

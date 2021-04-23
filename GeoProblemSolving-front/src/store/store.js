@@ -14,12 +14,13 @@ export default new Vuex.Store({
         },
         projectImg: '',
         activityTree:[],
-        IP_Port: window.location.host,
+        // IP_Port: window.location.host,
         //用于当前选择的页面内容
         // IP_Port:"172.21.213.185:8080",
         // IP_Port:"localhost:8080",
         // IP_Port:"172.21.212.72:8082",
         // IP_Port:"94.191.49.160:8080",
+        IP_Port:"221.226.60.2:8082",
     },
     getters: {
         userState: state => {

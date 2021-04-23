@@ -9,6 +9,9 @@ import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import cn.edu.njnu.geoproblemsolving.common.utils.ResultUtils;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -41,7 +44,13 @@ public class ModelTaskService {
         RestTemplate restTemplate = new RestTemplate();
         String urlStr = "http://geomodeling.njnu.edu.cn/computableModel/getInfo/" + doi; ////Step0:根据MD5获取可用的任务服务器
 
-        ResponseEntity<JSONObject> jsonObjectResponseEntity = restTemplate.getForEntity(urlStr, JSONObject.class);//虚拟http请求
+        //我是Chrome
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36");
+        HttpEntity<JSONObject> httpEntity = new HttpEntity<>(headers);
+        ResponseEntity<JSONObject> jsonObjectResponseEntity = restTemplate.exchange(urlStr, HttpMethod.GET, httpEntity, JSONObject.class);
+
+//        ResponseEntity<JSONObject> jsonObjectResponseEntity = restTemplate.getForEntity(urlStr, JSONObject.class);//虚拟http请求
         if (!jsonObjectResponseEntity.getStatusCode().is2xxSuccessful()) {
             throw new MyException(ResultEnum.ERROR);
         }
@@ -100,9 +109,9 @@ public class ModelTaskService {
         return result;
     }
 
-    public Object getAllService(String asc,String page) {
+    public Object getAllService(String asc, String page) {
         RestTemplate restTemplate = new RestTemplate();
-        String urlStr = "http://223.2.41.253:8080/GeoModeling/loadDeployedModel?asc="+asc+"&page="+page+"&size=10"; ////Step0:根据MD5获取可用的任务服务器
+        String urlStr = "http://223.2.41.253:8080/GeoModeling/loadDeployedModel?asc=" + asc + "&page=" + page + "&size=10"; ////Step0:根据MD5获取可用的任务服务器
 
         ResponseEntity<JSONObject> jsonObjectResponseEntity = restTemplate.getForEntity(urlStr, JSONObject.class);//虚拟http请求
         if (!jsonObjectResponseEntity.getStatusCode().is2xxSuccessful()) {

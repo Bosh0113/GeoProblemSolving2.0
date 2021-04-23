@@ -27,12 +27,12 @@
                 </div>
               </ListItem>
 
-              <ListItem>
-                <span class="uTitle">Email</span>
-                <div class="uAlign">
-                  <span class="uContent">{{userInfo.email}}</span>
-                </div>
-              </ListItem>
+<!--              <ListItem>-->
+<!--                <span class="uTitle">Email</span>-->
+<!--                <div class="uAlign">-->
+<!--                  <span class="uContent">{{userInfo.email}}</span>-->
+<!--                </div>-->
+<!--              </ListItem>-->
               <ListItem>
                 <span class="uTitle">Title</span>
                 <div class="uAlign">
@@ -66,7 +66,7 @@
               <ListItem>
                 <span class="uTitle">State/Province</span>
                 <div class="uAlign">
-                  <span class="uContent">{{userInfo.privacy}}</span>
+                  <span class="uContent">{{userInfo.province}}</span>
                 </div>
               </ListItem>
               <ListItem>
@@ -77,7 +77,7 @@
               </ListItem>
             </List>
             <div style="margin-top: 30px;text-align: right">
-              <Button  @click="showEditUserInfoModal" type="info" style="margin-right: 20px">Edit Information</Button>
+              <Button @click="showEditUserInfoModal" type="info" style="margin-right: 20px">Edit Information</Button>
               <Button @click="showResetPwdModal" type="info">Change Password</Button>
             </div>
           </Card>
@@ -108,10 +108,10 @@
         <!--          <div style="margin-top: 20px">Email: <span style="margin-left: 10px;font-size: 15px">{{userInfo.email}}</span></div>-->
         <!--          <div style="margin-top: 20px">Organizations: <span style="margin-left: 10px;font-size: 15px">{{myOrganizations}}</span></div>-->
         <!--          <hr/>-->
-<!--                  <Button @click="showEditUserInfoModal">Edit Information</Button>-->
-<!--                  <br/>-->
-<!--                  <Button @click="showResetPwdModal">Change Password</Button>-->
-<!--                </Card>-->
+        <!--                  <Button @click="showEditUserInfoModal">Edit Information</Button>-->
+        <!--                  <br/>-->
+        <!--                  <Button @click="showResetPwdModal">Change Password</Button>-->
+        <!--                </Card>-->
       </Col>
       <!-- 两个卡片 -->
     </Row>
@@ -173,6 +173,10 @@
 
           <FormItem label="Country">
             <Input v-model="userInfoFormItems.country" placeholder="Country"> </Input>
+          </FormItem>
+
+          <FormItem label="Province">
+            <Input v-model="userInfoFormItems.province" placeholder="province"> </Input>
           </FormItem>
 
           <FormItem label="City">
@@ -257,12 +261,15 @@
         //编辑的内容
         userInfoFormItems: {
           // avatar: "",
+          //用于 localUser
+          userId: "",
           name: "",
           title: "",
           organizations: [],
           domain: [],
           phone: "",
           country: "",
+          province: "",
           city: "",
           homepage: "",
           introduction: "",
@@ -368,6 +375,7 @@
       },
       initInfo: function () {
         this.userInfo = this.$store.getters.userInfo;
+        this.userInfoFormItems.userId = this.userInfo.userId;
         if (this.userInfo.organizations == null) {
           this.userInfo.organizations = [];
         }
@@ -380,23 +388,31 @@
         this.userInfoFormItems = this.userInfo;
       },
       updateUserInfo: function () {
-        let formData = new URLSearchParams();
-        formData.append("userId", this.$store.getters.userId);
-        formData.append("name", this.userInfoFormItems.name);
-        formData.append("title", this.userInfoFormItems.title);
-        formData.append("organizations", this.userInfoFormItems.organizations);
-        formData.append("domain", this.userInfoFormItems.domain);
-        formData.append("phone", this.userInfoFormItems.phone);
-        formData.append("country", this.userInfoFormItems.country);
-        formData.append("city", this.userInfoFormItems.city);
-        formData.append("introduction", this.userInfoFormItems.introduction);
-        formData.append("homepage", this.userInfoFormItems.homepage);
+        let avatarBase64 = "";
+        let updateInfo = {
+          "userId": this.$store.getters.userId,
+          "avatar": avatarBase64,
+          "name": this.userInfoFormItems.name,
+          "title": this.userInfoFormItems.title,
+          "organizations": this.userInfoFormItems.organizations,
+          "domain": this.userInfoFormItems.domain,
+          "phone":  this.userInfoFormItems.phone,
+          "city": this.userInfoFormItems.city,
+          "province": this.userInfoFormItems.province,
+          "homepage": this.userInfoFormItems.homepage,
+          "introduction": this.userInfoFormItems.introduction
+        };
         this.$axios
-          .post("/GeoProblemSolving/user/update", formData)
+          .put("/GeoProblemSolving/user", updateInfo)
           .then(res => {
-            this.userInfo = this.userInfoFormItems;
-            this.editUserInfoModal = false;
-            this.$Notice.success({title: "Update Success."})
+            if (res.data.code == 0){
+              this.userInfo = this.userInfoFormItems;
+              this.editUserInfoModal = false;
+              //更新成功是否需要将新的内容返回给前端？
+              this.$Notice.success({title: "Update Success."})
+            }else {
+              this.$Notice.error({title: "Update Failed."})
+            }
           })
           .catch(err => {
 
@@ -406,13 +422,13 @@
         this.resetPasswordModal = true;
       },
       resetPwd: function () {
-        let md5_newPwd = md5(this.resetPwdFormItems.newPwd);
-        let md5_oldPwd = md5(this.resetPwdFormItems.oldPwd);
-        let paramUrl = "email=" + this.userInfo.email + "&oldPwd=" + md5_oldPwd + "&newPwd=" + md5_newPwd;
+
+        let encodeNewPwd = md5(this.resetPwdFormItems.newPwd);
+        let encodeOldPwd = md5(this.resetPwdFormItems.oldPwd);
         this.axios
-          .get("/GeoProblemSolving/user/newPassword?" + paramUrl)
+          .get("/GeoProblemSolving/user/resetPwd/" + this.userInfo.email + "/" + encodeOldPwd + "/" + encodeNewPwd)
           .then(res => {
-            if (res.data == 1) {
+            if (res.data.code == 0) {
               this.resetPasswordModal = false;
               this.$Notice.success({
                 title: "Reset password success."
@@ -447,9 +463,9 @@
         }
         return orgTemp;
       },
-      myDomain: function(){
+      myDomain: function () {
         let domainTemp = "";
-        if (this.userInfo.domain != null){
+        if (this.userInfo.domain != null) {
           for (let i = 0; i < this.userInfo.domain.length; i++) {
             domainTemp += this.userInfo.domain[i] + "  ";
           }
@@ -492,14 +508,17 @@
     display: flex;
     justify-content: center;
   }
+
   .uTitle {
     padding-right: 20px;
     font-family: 'Roboto Light';
     color: #999999
   }
+
   .uContent {
     color: #333333;
   }
+
   .uAlign {
     position: absolute;
     left: 100px;

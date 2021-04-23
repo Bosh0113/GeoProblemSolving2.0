@@ -319,7 +319,9 @@ export default {
       return this.$store.getters.userName;
     },
     avatar() {
-      return this.$store.getters.avatar;
+      //修改
+      let avatarUrl = "http://localhost:8088/userServer" + this.$store.getters.avatar;
+      return avatarUrl;
     },
     headerBgColor() {
       return this.$route.name === "Home" ? "none" : "";
