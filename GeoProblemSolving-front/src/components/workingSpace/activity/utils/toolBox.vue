@@ -234,6 +234,7 @@ export default {
       panelList: [],
       jupyterModal: false,
       selectedTool: {},
+      operationStore: false,
       // openToolModal: false,
     };
   },
@@ -340,14 +341,15 @@ export default {
     },
     openToolByPanel(toolInfo) {
       // var toolURL = window.location.origin + `${toolInfo.toolUrl}`;
-      var toolURL = toolInfo.toolUrl;
-      var toolContent = `<iframe src="${toolURL}?userName=${this.userInfo.name}&userID=${this.userInfo.userId}&groupID=${this.activityInfo.aid}" style="width: 100%; height:100%;" frameborder="0"></iframe>`;
+      // var toolURL = toolInfo.toolUrl;
+      // var toolContent = `<iframe src="${toolURL}?userName=${this.userInfo.name}&userID=${this.userInfo.userId}&groupID=${this.activityInfo.aid}" style="width: 100%; height:100%;" frameborder="0"></iframe>`;
+      var toolContent = `<iframe src="${toolInfo.toolUrl}" id="${toolInfo.tid}" style="width: 100%; height:100%;" frameborder="0"></iframe>`;
 
       var panel = jsPanel.create({
         theme: "success",
         footerToolbar: `<p></p>`,
         contentSize: "800 400",
-        id: toolInfo.tid,
+        id: toolInfo.toolName,
         headerTitle: toolInfo.toolName,
         content: toolContent,
         container: "div#drawflow",
@@ -358,17 +360,32 @@ export default {
         closeOnEscape: true,
         disableOnMaximized: true,
         onbeforeclose: function () {
-            if (this.options.data.taskId !== "") {
+            if (this.operationStore) {
               return true;
             } else {
               return confirm("This operation has not been bind to the task. Close panel immediately?");
             }
           }
       });
-      // panel.resizeit("disable");
       $(".jsPanel-content").css("font-size", "0");
       this.panelList.push(panel);
       this.$emit("toolPanel", panel);
+
+      // 设置iframe 父子页面消息传输处理
+      window.addEventListener("message", this.toolMsgHandle, false);
+      let activityId = this.activityInfo.aid;
+      let userInfo = this.userInfo;
+      let iFrame = document.getElementById(toolInfo.tid);
+      //iframe加载完毕后再发送消息，否则子页面接收不到message
+      iFrame.onload = function () {
+          //iframe加载完立即发送一条消息
+          iFrame.contentWindow.postMessage({"user": userInfo, "aid": activityId, type:"activity"}, "*");
+      }
+
+    },
+    toolMsgHandle(event){
+      console.log(event);
+      this.operationStore = true;
     },
     openToolNewpage(toolInfo) {
       // this.openToolModal = false;

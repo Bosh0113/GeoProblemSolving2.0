@@ -21,32 +21,44 @@ export default {
           },
         },
       },
+      taskList: [],
+      relaions: [],
+      operations: [],
     };
   },
   computed: {
-    tempOperations () {
-      return this.$store.state.tempOperations
+    tempOperations() {
+      return this.$store.state.tempOperations;
     },
-    activityTasks () {
-      return this.$store.state.activityTasks
+    activityTasks() {
+      return this.$store.state.activityTasks;
     },
-    taskDependencies () {
-      return this.$store.state.taskDependencies
+    taskDependencies() {
+      return this.$store.state.taskDependencies;
     },
   },
-  watch:{
-    tempOperations(){
+  watch: {
+    tempOperations() {
       this.loadOperationNode();
     },
-    activityTasks () {
+    activityTasks() {
       this.generateTaskNode();
       this.addConnections();
     },
-    taskDependencies(){
+    taskDependencies() {
       this.addConnections();
-    }
+    },
   },
   mounted() {
+    this.taskList = this.operationApi.getTaskList();
+    this.$store.commit("setActivityTasks", this.taskList);
+
+    this.relaions = this.operationApi.getTaksDependencies();
+    this.$store.commit("setTaskDependencies", this.relaions);
+
+    this.operations = this.operationApi.getTempOperations();
+    this.$store.commit("setTempOperations", this.operations);
+
     const id = document.getElementById("drawflow");
     this.editor = new Drawflow(id, Vue);
     this.initActionFlow();
@@ -61,7 +73,7 @@ export default {
       this.loadOperationNode();
 
       // will be deleted
-      
+
       // let props = {
       //   type: "operation",
       //   taskId: 1,
@@ -111,20 +123,17 @@ export default {
       // this.editor.addConnection(2, 3, 'output_1', 'input_1')
     },
     generateTaskNode() {
-      let taskList = this.operationApi.getTaskList();
-      this.$store.commit("setActivityTasks", taskList);
-
       let todo = 0,
         doing = 0,
         done = 0;
-      for (var i = 0; i < taskList.length; i++) {
-        let nodeId = taskList[i].taskId;
-        let nodeName = taskList[i].name;
+      for (var i = 0; i < this.taskList.length; i++) {
+        let nodeId = this.taskList[i].taskId;
+        let nodeName = this.taskList[i].name;
         let pos_x = 0;
         let pos_y = 0;
 
         // position
-        let time = taskList[i].time.split(" - ");
+        let time = this.taskList[i].time.split(" - ");
         let startTime = new Date(time[0]);
         let endTime = new Date(time[1]);
         let today = new Date();
@@ -146,7 +155,7 @@ export default {
           type: "task",
           taskId: nodeId,
           name: nodeName,
-          operations: taskList[i].operations,
+          operations: this.taskList[i].operations,
         };
         let data = {};
         this.editor.registerNode("TaskNode", TaskNode, props, {});
@@ -164,19 +173,16 @@ export default {
       }
     },
     addConnections() {
-      let relaions = this.operationApi.getTaksDependencies();
-      this.$store.commit("setTaskDependencies", relaions);
-
-      for (var i = 0; i < relaions.length; i++) {
+      for (var i = 0; i < this.relaions.length; i++) {
         // output
-        let fromId = this.editor.getNodesFromName(relaions[i].from)[0];
+        let fromId = this.editor.getNodesFromName(this.relaions[i].from)[0];
         let fromNode = this.editor.getNodeFromId(fromId);
         if (JSON.stringify(fromNode.outputs) === "{}") {
           this.editor.addNodeOutput(fromId);
         }
 
         //input
-        let toId = this.editor.getNodesFromName(relaions[i].to)[0];
+        let toId = this.editor.getNodesFromName(this.relaions[i].to)[0];
         let toNode = this.editor.getNodeFromId(toId);
         if (JSON.stringify(toNode.inputs) === "{}") {
           this.editor.addNodeInput(toId);
@@ -187,12 +193,9 @@ export default {
       }
     },
     loadOperationNode() {
-      let tempOperations = this.operationApi.getTempOperations();
-      this.$store.commit("setTempOperations", tempOperations);
-
-      for (var i = 0; i < tempOperations.length; i++) {
+      for (var i = 0; i < this.operations.length; i++) {
         // position
-        let pos_x = 50 + 270*i;
+        let pos_x = 50 + 270 * i;
         let pos_y = 15;
 
         // generate node
@@ -200,12 +203,12 @@ export default {
           type: "operation",
           taskId: "",
           name: "",
-          operations: [tempOperations[i]],
+          operations: [this.operations[i]],
         };
         let data = {};
         this.editor.registerNode("TaskNode", TaskNode, props, {});
         this.editor.addNode(
-          tempOperations[i].id,
+          this.operations[i].id,
           0,
           0,
           pos_x,

@@ -1,0 +1,210 @@
+.collab-tool-head {
+    height: 40px;
+    width: calc(100vw);
+    background-color: #393a3c;
+}
+.head-logo {
+    height: 40px;
+    background-image: url(./img/OGMS.png);
+    background-size: auto 35px !important;
+    background-repeat: no-repeat;
+    margin-left: 10px;
+}
+.collab-tool-sidebar{
+    height: calc(100vh - 40px);
+    width: 250px;
+    background-color: #d8d8d8;
+    position: absolute;
+    top: 40px;
+    left: 0;
+}
+.nav {
+    width: 46px;
+    height: calc(100vh - 40px);
+    background-color: #48494a;
+}
+.nav-item .btn {
+    border-radius: 0; 
+    height: 60px;
+}
+.nav-item .btn-dark {
+    background-color: #48494a;
+    border-color: #48494a;;
+}
+.nav-item .btn-dark:hover {
+    color: #fff;
+    background-color: #898c90;
+    border-color: #898c90;;
+}
+.nav-item .btn-dark:not(:disabled):not(.disabled).active, .btn-dark:not(:disabled):not(.disabled):active, .show>.btn-dark.dropdown-toggle {
+    color: #fff;
+    background-color: #a2a2a2;
+    border-color: #a2a2a2;;
+}
+.nav-content {
+    width: 204px;
+    height: calc(100vh - 40px);
+    position: absolute;
+    left: 46px;
+    top: 0;
+}
+.sidebar-content {
+    height: 100%;
+    width: 100%;
+    padding: 10px 10px;
+    overflow: auto;
+}
+.scrollbar::-webkit-scrollbar {
+    /*滚动条整体样式*/
+    width : 8px;  /*高宽分别对应横竖滚动条的尺寸*/
+    height: 1px;
+    }
+.scrollbar::-webkit-scrollbar-thumb {
+    /*滚动条里面小方块*/
+    border-radius   : 8px;
+    background-color: #a5a0a0;
+    background-image: -webkit-linear-gradient(
+        45deg,
+        rgba(255, 255, 255, 0.2) 25%,
+        transparent 25%,
+        transparent 50%,
+        rgba(255, 255, 255, 0.2) 50%,
+        rgba(255, 255, 255, 0.2) 75%,
+        transparent 75%,
+        transparent
+    );
+}
+.scrollbar::-webkit-scrollbar-track {
+    /*滚动条里面轨道*/
+    box-shadow   : inset 0 0 5px rgba(0, 0, 0, 0.2);
+    background   : #ededed;
+    border-radius: 10px;
+}
+.sidebar-content .card {
+    flex-direction: row;
+}
+.participants{
+    height: 45px;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+.participant-avatar {
+    margin-left: 3px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+.participant-info {
+    margin-left: 5px;
+}
+.resource-search {
+    margin-bottom: 15px;
+}
+.resource-input {
+    width: 70%;
+    margin-right: 5px;
+}
+.resource-control {
+    height: 27px;
+    background-color: white;
+    padding: 2px 0 0 5px;
+    margin-bottom: 3px;
+    border-radius: .25rem;
+    font-size: 14px;
+}
+.resource-control-btn {
+    cursor: pointer;
+    float: right;
+    margin: 0 10px;
+}
+.resource-list {
+    height: calc(100vh - 180px);
+    padding: 5px;
+    background-color: white;
+    border-radius: .25rem;
+    overflow: auto;
+}
+.resource {
+    height: 28px;
+    cursor: pointer;
+    margin-bottom: 5px;
+}
+.resource-list .card {
+    border: 0px solid rgba(0,0,0,.125);
+}
+.resource .form-check-input {
+    position: inherit;
+    margin: 7px 5px 0 5px;
+}
+.res-icon {
+    height: 20px;
+    margin-top: 3px;
+}
+.res-name {
+    margin-left: 2px;
+    font-size: 14px;
+    margin-top: 2px;
+}
+.resource-load {
+    margin-top: 10px;
+    text-align: center;
+}
+.collab-tool-content{ 
+    height: calc(100vh - 40px);
+    width: calc(100vw - 250px);
+    background-color: lightblue;
+    position: absolute;
+    left: 250px;
+    top: 40px;
+}
+.sync-state {
+    height: 40px;
+    padding: 6px 10px;
+    margin-bottom: 5px;
+    font-size: 14px;
+}
+.operation-control {
+    height: 100px;
+    margin-bottom: 5px;
+    padding: 5px 10px;
+    background-color: white;
+    border-radius: .25rem;
+    font-size: 14px;
+}
+.operation-apply {
+    display: flex;
+    padding: 0;
+}
+.operation-apply .btn-sm {
+    padding: 0 .5rem;    
+    padding-bottom: 4px;
+    margin-left: 40px;
+    border: 1px solid lightgray;
+}
+.operator {
+    height: 30px;
+    padding: 8px 0;
+} 
+.operation-waiting {
+    height: 30px;
+    padding: 8px 0;
+}
+.operation-list {
+    height: calc(100vh - 300px);
+    padding: 5px;
+    font-size: 14px;
+    background-color: white;
+    border-radius: .25rem;
+    overflow: auto;
+}
+.operation-item {
+    height: 40px;
+    width: 100%;
+    border: 1px solid lightgray;
+    border-radius: .25rem;
+    margin-bottom: 5px;
+}
+.operation-bind {
+    margin-top: 10px;
+    text-align: center;
+}

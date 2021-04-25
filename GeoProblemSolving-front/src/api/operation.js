@@ -627,7 +627,7 @@ export function taskUpdate(aid, behavior, taskInfo) {
         Task.setAttribute("id", taskInfo.taskId);
         Task.setAttribute("name", taskInfo.name);
         Task.setAttribute("purpose", taskInfo.description);
-        Task.setAttribute("timerange", taskInfo.startTime.Format("yyyy-MM-dd hh:mm:ss") + " - " + taskInfo.endTime.Format("yyyy-MM-dd hh:mm:ss"));
+        Task.setAttribute("timerange", taskInfo.startTime.Format("yyyy-MM-dd hh:mm") + " - " + taskInfo.endTime.Format("yyyy-MM-dd hh:mm"));
         Task.setAttribute("state", "available");
         TaskList.appendChild(Task);
     } else if (behavior === "remove") {
@@ -650,7 +650,7 @@ export function taskUpdate(aid, behavior, taskInfo) {
         let Task = xmlDoc.getElementById(taskInfo.taskId);
         Task.setAttribute("name", taskInfo.name);
         Task.setAttribute("purpose", taskInfo.description);
-        Task.setAttribute("timerange", taskInfo.startTime.Format("yyyy-MM-dd hh:mm:ss") + " - " + taskInfo.endTime.Format("yyyy-MM-dd hh:mm:ss"));
+        Task.setAttribute("timerange", taskInfo.startTime.Format("yyyy-MM-dd hh:mm") + " - " + taskInfo.endTime.Format("yyyy-MM-dd hh:mm"));
     }
 
     saveActivityDoc(aid);
