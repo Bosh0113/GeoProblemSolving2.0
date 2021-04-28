@@ -320,7 +320,7 @@ export default {
     },
     avatar() {
       //修改
-      let avatarUrl = "http://localhost:8088/userServer" + this.$store.getters.avatar;
+      let avatarUrl = "http://172.21.212.103:8088/userServer" + this.$store.getters.avatar;
       return avatarUrl;
     },
     headerBgColor() {

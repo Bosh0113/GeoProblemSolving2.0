@@ -69,4 +69,6 @@ public interface IResourceService {
 
     JSONArray getAllFileList(String userId);
 
+    Object searchResService(String userId, String key, String value);
+
 }

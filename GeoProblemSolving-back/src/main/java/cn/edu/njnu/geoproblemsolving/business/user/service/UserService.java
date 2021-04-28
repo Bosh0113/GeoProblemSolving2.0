@@ -39,9 +39,9 @@ public interface UserService {
 
     JsonResult resetPwdByOldPwd(String email, String oldPwd, String newPwd);
 
-    JsonResult loginAndAcquireInfo(String email, String password);
+    JsonResult loginAndAcquireInfo(String email, String password, String ipAddress);
 
-    JsonResult updateUserInfo(Map<String, Object> user);
+    JsonResult updateUserInfo(JSONObject userInfo);
 
     void logout(String userId);
 

@@ -561,21 +561,23 @@ public class IResourceServiceImpl implements IResourceService {
         Update update = new Update();
         update.set("resource", resArray);
         userDao.updateInfo(userId, update);
+        //完成删除
+        return 0;
         /*
+        只删除引用，不用删除资源实体
         第三步：删除数据容器中的资源实体,如果是文件夹就没必要
         因为数据容器错误而导致的删除失败没必要进行回滚
         这一步对用户是透明的
          */
-        if (!isFolder){
-            String delDataInContainer  = "http://" + dataContainerIp + ":8082" + address;
-            JSONObject delEntityResult = httpUtil.delRequest(delDataInContainer);
-            Integer delEntityCode = delEntityResult.getInteger("code");
-            if (delEntityCode != 1){
-                return -4;
-            }
-        }
-        //完成删除
-        return 0;
+        // if (!isFolder){
+        //     String delDataInContainer  = "http://" + dataContainerIp + ":8082" + address;
+        //     JSONObject delEntityResult = httpUtil.delRequest(delDataInContainer);
+        //     Integer delEntityCode = delEntityResult.getInteger("code");
+        //     if (delEntityCode != 1){
+        //         return -4;
+        //     }
+        // }
+
     }
 
 
@@ -702,13 +704,13 @@ public class IResourceServiceImpl implements IResourceService {
                             res.setName(fileName);
                             res.setSuffix(suffix);
                             res.setUploadTime(new Date());
-                            res.setFileSize(part.getSize());
+                            res.setFileSize("123");
                             res.setPrivacy(req.getParameter("privacy"));
                             res.setType(req.getParameter("type"));
                             res.setDescription(req.getParameter("description"));
                             res.setFolder(false);
                             res.setUserUpload(true);
-                            String address = "/data/" + dataIdInContainer;
+                            String address = "http://" + dataContainerIp + ":8082" + "/data/" + dataIdInContainer;
                             res.setAddress(address);
 
                             String paths = req.getParameter("paths");
@@ -791,5 +793,11 @@ public class IResourceServiceImpl implements IResourceService {
         RestTemplateUtil httpUtil = new RestTemplateUtil();
         JSONObject getAllResult = httpUtil.getRequestToServer(url, access_token).getBody();
         return getAllResult.getJSONArray("data");
+    }
+
+    //
+    @Override
+    public Object searchResService(String userId, String key, String value) {
+        return null;
     }
 }

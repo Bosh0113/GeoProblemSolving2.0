@@ -149,8 +149,8 @@
                             <menu-item name="personal" style="width:100px">
                                 <dropdown @on-click="changeSelect" placement="bottom-start">
                                     <a href="/GeoProblemSolving/newPersonalPage/overView">
-                                        <img v-if="userInfoNav.avatar!=''&&userInfoNav.avatar!=undefined&&userInfoNav.avatar!=null" :title="userInfoNav.name"
-                                             :src="userInfoNav.avatar" style="width:40px;height:40px;vertical-align:middle;">
+                                        <img v-if="avatarUrl!=''&&avatarUrl!=undefined&&avatarUrl!=null" :title="userInfoNav.name"
+                                             :src="avatarUrl" style="width:40px;height:40px;vertical-align:middle;">
                                         <avatar :username="userInfoNav.name" :size="40" style="margin-top:10px" :title="userInfoNav.name" v-else></avatar>
                                     </a>
                                     <dropdown-menu slot="list">
@@ -224,6 +224,7 @@
                     userInfoNav: {
                         name: ""
                     },
+                    avatarUrl: undefined,
                     useMenuCSS: true
                 }
             },
@@ -234,6 +235,7 @@
                 identifyUser(){
                     if(this.userInfo.userState){
                         this.userInfoNav = this.userInfo;
+                        this.avatarUrl =  "http://172.21.212.103:8088/userServer" + this.userInfoNav.avatar;
                         this.setTimer();
                         this.initWebSocket();
                         this.getUnreadNoticeCount();

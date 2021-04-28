@@ -81,12 +81,13 @@
                 placement="left"
                 class="fileBtn"
               >
-                <Button
-                  @click="shareModalShow"
-                  shape="circle"
-                  icon="ios-copy"
-                  class="fileBtnHoverOrange"
-                ></Button>
+<!--                资源分享，后面再来理吧-->
+<!--                <Button-->
+<!--                  @click="shareModalShow"-->
+<!--                  shape="circle"-->
+<!--                  icon="ios-copy"-->
+<!--                  class="fileBtnHoverOrange"-->
+<!--                ></Button>-->
               </Tooltip>
             </div>
           </div>
@@ -159,7 +160,8 @@
                 >
                 <span class="fileItemSize">{{(file.fileSize /1024)>1?parseInt(file.fileSize /1024):1 }} kb</span>
                 <span style="width: 20%; margin-right: 5%">{{
-                  file.uploadTime.substring(0, 10)
+                  // file.uploadTime.substring(0, 10)
+                  file.uploadTime
                 }}</span>
 
                 <!--                使用资源-->
@@ -422,6 +424,30 @@
         >
       </div>
     </Modal>
+
+<!--    <Modal v-model="shareModal" width="800" title="Share Project">-->
+<!--      <Form>-->
+<!--        <FormItem>-->
+<!--          <div>Share "{{selectedResName}}" to Project</div>-->
+<!--          &lt;!&ndash;          <Select v-model="shareResFormItems.select">&ndash;&gt;-->
+<!--          &lt;!&ndash;            <Option value="selectProject">Share "{{selectedResName}}" to Project</Option>&ndash;&gt;-->
+<!--          &lt;!&ndash;            <Option value="selectUser">Share "{{selectedResName}}" to User</Option>&ndash;&gt;-->
+<!--          &lt;!&ndash;          </Select>&ndash;&gt;-->
+<!--        </FormItem>-->
+<!--        <FormItem v-if="shareResFormItems.select == 'selectProject'">-->
+<!--          <Select v-model="shareResFormItems.sharedProjectId" placeholder="Select Project">-->
+<!--            <Option v-for="item in userProject" :value="item.aid" :key="item.aid">{{ item.name }}</Option>-->
+<!--          </Select>-->
+<!--        </FormItem>-->
+<!--        <FormItem v-if="shareResFormItems.select == 'selectUser'">-->
+<!--          <Input v-model="shareResFormItems.sharedUserEmail" placeholder="Enter email address"></Input>-->
+<!--        </FormItem>-->
+<!--      </Form>-->
+<!--      <div slot="footer">-->
+<!--        <Button type="warning" @click="shareModal = false">Cancel</Button>-->
+<!--        <Button type="success" @click="shareResources">Share</Button>-->
+<!--      </div>-->
+<!--    </Modal>-->
   </div>
 </template>
 
@@ -584,6 +610,8 @@
           },
         ],
         switchIndex: 0,
+        //shareRes相关
+        shareModal: false,
       }
     },
     methods: {
@@ -1010,7 +1038,7 @@
         }
       },
       fileDownload: function (fileInfo) {
-        window.open("http://221.226.60.2:8082" + fileInfo.address);
+        window.open(fileInfo.address);
       },
       download: function (blobUrl) {
         const a = document.createElement("a");

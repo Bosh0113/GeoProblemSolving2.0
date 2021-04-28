@@ -233,6 +233,7 @@
   import Avatar from "vue-avatar";
   import md5 from "js-md5";
   import VueTagsInput from "@johmun/vue-tags-input";
+  import image2Base64 from 'image-to-base64/browser'
 
   export default {
     name: "userInfo",
@@ -389,9 +390,10 @@
       },
       updateUserInfo: function () {
         let avatarBase64 = "";
+        //在上传图片的时候使用 imageToBase64.js 转换为base64 即可
+        // "avatar": avatarBase64,
         let updateInfo = {
           "userId": this.$store.getters.userId,
-          "avatar": avatarBase64,
           "name": this.userInfoFormItems.name,
           "title": this.userInfoFormItems.title,
           "organizations": this.userInfoFormItems.organizations,
@@ -402,6 +404,7 @@
           "homepage": this.userInfoFormItems.homepage,
           "introduction": this.userInfoFormItems.introduction
         };
+        // image2Base64("https://whatever-image/").then(res=>{res})
         this.$axios
           .put("/GeoProblemSolving/user", updateInfo)
           .then(res => {
@@ -422,7 +425,6 @@
         this.resetPasswordModal = true;
       },
       resetPwd: function () {
-
         let encodeNewPwd = md5(this.resetPwdFormItems.newPwd);
         let encodeOldPwd = md5(this.resetPwdFormItems.oldPwd);
         this.axios

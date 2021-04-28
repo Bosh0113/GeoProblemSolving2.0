@@ -19,6 +19,7 @@ public class ModelTaskController {
         return ResultUtils.success(modelTaskService.getComputeModel(doi));
     }
 
+    //第一步，从 mdl 中返回 invoke 页面所需要数据
     @RequestMapping(value = "/ModelBehavior/{doi}", method = RequestMethod.GET)
     public JsonResult getConvertModelBehavior(@PathVariable("doi") String doi) {
         return modelTaskService.getConvertComputeModel(doi);
@@ -60,6 +61,7 @@ public class ModelTaskController {
 //    }
 
 
+    //调用
     @RequestMapping(value = "/invoke", method = RequestMethod.POST)
     JsonResult invoke(@RequestBody JSONObject obj) {
         return ResultUtils.success(modelTaskService.invoke(obj));

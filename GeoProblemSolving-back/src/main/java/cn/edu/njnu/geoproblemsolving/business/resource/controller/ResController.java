@@ -1,8 +1,6 @@
 package cn.edu.njnu.geoproblemsolving.business.resource.controller;
 
-import cn.edu.njnu.geoproblemsolving.Dao.Resource.ResourceDaoImpl;
 import cn.edu.njnu.geoproblemsolving.business.resource.entity.ResourceEntity;
-import cn.edu.njnu.geoproblemsolving.business.resource.service.IResourceService;
 import cn.edu.njnu.geoproblemsolving.business.resource.service.IResourceServiceImpl;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import cn.edu.njnu.geoproblemsolving.common.utils.ResultUtils;
@@ -10,10 +8,8 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 
@@ -56,6 +52,16 @@ public class ResController {
         return ResultUtils.success(getResResult);
     }
 
+    /**
+     * 资源删除
+     * 只需要删除资源引用
+     * 不用删除资源实体
+     * 让所有实体全部存放在数据容器中
+     * 数据也是重要资源
+     * @param rid
+     * @param req
+     * @return
+     */
     @RequestMapping(value = "/{rid}", method = RequestMethod.DELETE)
     public JsonResult delResById(@PathVariable String rid, HttpServletRequest req) {
         String userId = (String) req.getSession().getAttribute("userId");
@@ -153,6 +159,13 @@ public class ResController {
         return ResultUtils.success(createResult);
     }
 
+    /**
+     * 上传资源
+     * req form-data包括
+     * file, description, type, privacy, paths
+     * @param req
+     * @return
+     */
     @RequestMapping(value = "/upload", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
     public Object creatFolderOrUploadData(HttpServletRequest req) {
         return resService.upRemote(req);
@@ -206,6 +219,8 @@ public class ResController {
         JSONArray allFileList = resService.getAllFileList(userId);
         return ResultUtils.success(allFileList);
     }
+
+
 
 
 }

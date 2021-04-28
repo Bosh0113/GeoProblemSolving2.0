@@ -108,7 +108,8 @@ public class IUserController {
     public JsonResult login(@PathVariable("email") String email,
                             @PathVariable("password") String password,
                             HttpServletRequest request) {
-        JsonResult loginResult = userService.loginAndAcquireInfo(email, password);
+        String ipAddr = userService.getIpAddr(request);
+        JsonResult loginResult = userService.loginAndAcquireInfo(email, password, ipAddr);
         if (loginResult.getCode() != 0) {
             return loginResult;
         }
@@ -143,7 +144,7 @@ public class IUserController {
      * @return
      */
     @RequestMapping(produces = "application/json;charset=UTF-8", method = RequestMethod.PUT)
-    public JsonResult updateUserInfo(@RequestBody Map<String, Object> user){
+    public JsonResult updateUserInfo(@RequestBody JSONObject user){
         //此处 user 必须将其的userId 带过来
         return userService.updateUserInfo(user);
     }

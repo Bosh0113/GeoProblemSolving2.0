@@ -31,7 +31,7 @@ public class ResourceEntity {
     private String privacy;
     private String thumbnail;
     private String editToolInfo;
-    private Long fileSize;
+    private String fileSize;
     //存储父资源的 uuid
     private String parent;
     private String md5;
@@ -43,8 +43,8 @@ public class ResourceEntity {
     private ArrayList<ResourceEntity> children;
 
     //GSM 部分字段
-    String uploadId;
-    String uploadName;
+    String uploaderId;
+    String uploaderName;
     /*
     所绑定的项目id
     在当前资源设计中

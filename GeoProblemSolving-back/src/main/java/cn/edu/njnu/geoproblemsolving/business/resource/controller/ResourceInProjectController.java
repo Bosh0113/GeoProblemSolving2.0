@@ -105,7 +105,7 @@ public class ResourceInProjectController {
 
 
     @RequestMapping(value = "/file/{aid}/{paths}", method = RequestMethod.PUT)
-    public Object putFile(@RequestBody ResourceEntity putRes,
+    public JsonResult putFile(@RequestBody ResourceEntity putRes,
                           @PathVariable String aid,
                           @PathVariable ArrayList<String> paths) {
         String putResult = resService.putResourceByPath(aid, putRes, paths);
@@ -150,6 +150,21 @@ public class ResourceInProjectController {
         List<ResourceEntity> shareResult = resService.resourceToProject(userId, aid, uids, paths);
         if (shareResult != null){
             return ResultUtils.success(shareResult);
+        }
+        return ResultUtils.error(-2, "fail");
+    }
+
+    @RequestMapping(value = "/file/{aid}/{key}/{value}", method = RequestMethod.GET)
+    public JsonResult searchResource(@PathVariable String aid, @PathVariable String key, @PathVariable String value){
+        ArrayList<ResourceEntity> res = resService.searchRes(aid, key, value);
+        return ResultUtils.success(res);
+    }
+
+    @RequestMapping(value = "/file/bind/{aid}", method = RequestMethod.POST)
+    public JsonResult bindProject(@RequestBody ResourceEntity modelOutput, @PathVariable String aid){
+        String bindResult = resService.bindResToProject(modelOutput, aid);
+        if (bindResult.equals("suc")){
+            return ResultUtils.success();
         }
         return ResultUtils.error(-2, "fail");
     }

@@ -1341,7 +1341,7 @@
           });
       },
       fileDownload(fileInfo) {
-        window.open("http://221.226.60.2:8082" + fileInfo.address);
+        window.open(fileInfo.address);
       },
       fileEditModelShow(fileInfo) {
         this.putFileInfo = fileInfo;

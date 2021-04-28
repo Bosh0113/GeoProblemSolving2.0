@@ -1,7 +1,7 @@
 package cn.edu.njnu.geoproblemsolving.business.modeltask.modelContainer;
 
+import com.alibaba.fastjson.JSONObject;
 import lombok.Data;
-import org.json.JSONObject;
 
 import java.util.Set;
 
@@ -15,6 +15,7 @@ import java.util.Set;
  **/
 @Data
 public class InvokeInfo {
+    String invokeId;
     //调用者id
     String invokeUserId;
     //上传的文件信息，包含 event&dataId 两个部分

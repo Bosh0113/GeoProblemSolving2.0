@@ -19,6 +19,8 @@ import com.mongodb.client.result.UpdateResult;
 import jdk.nashorn.internal.runtime.regexp.joni.WarnCallback;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.BeanWrapper;
+import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -31,6 +33,9 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
+import java.beans.PropertyDescriptor;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.*;
 
 
@@ -257,7 +262,7 @@ public class UserServiceImpl implements UserService {
      * @return
      */
     @Override
-    public JsonResult loginAndAcquireInfo(String email, String password) {
+    public JsonResult loginAndAcquireInfo(String email, String password, String ipAddress) {
         // password 模式获取token
         // User user = userDao.findByUserEmail(email);
         LinkedMultiValueMap<String, String> paramMap = new LinkedMultiValueMap<>();
@@ -289,7 +294,7 @@ public class UserServiceImpl implements UserService {
             headers.add("Authorization", "Bearer " + access_token);
             //httpEntity = httpHeader + httpBody,当然也可以只有其中一部分
             HttpEntity<Object> httpEntity = new HttpEntity<>(headers);
-            String getInfoUri = "http://" + userServerIpAndPort + "/auth/login/127.0.0.1";
+            String getInfoUri = "http://" + userServerIpAndPort + "/auth/login/" + ipAddress;
             //Url, RequestType, RequestContent, ResponseDataType
             //是否能用 User 接收返回结果？
             ResponseEntity<JSONObject> userJson = restTemplate.exchange(getInfoUri, HttpMethod.GET, httpEntity, JSONObject.class);
@@ -299,15 +304,82 @@ public class UserServiceImpl implements UserService {
             }
             //转换成为了 localUser
             User loginUser = JSON.parseObject(JSON.toJSONString(userJson.getBody().get("data")), User.class);
-            //登录的时候获取到可变的数据
-            loginUser.setTokenInfo(userToken);
-            userDao.saveUser(loginUser);
+            //获取对象空字段字段名
+            String[] nullPropertyNames = getNullPropertyNames(loginUser);
+            //本地的用户
+            User localUser = userDao.findUserByIdOrEmail(email);
+            /*
+            如果本地无此用户，则直接将userServer 返回用户存入
+            如果有此用户，则将获取到的字段信息复制到本地用户中
+             */
+            if (localUser == null){
+                localUser = new User();
+            }
+            localUser.setTokenInfo(userToken);
+            BeanUtils.copyProperties(loginUser, localUser, nullPropertyNames);
+            userDao.saveUser(localUser);
+
             UserVo userVo = new UserVo();
-            BeanUtils.copyProperties(loginUser ,userVo);
+            BeanUtils.copyProperties(localUser ,userVo);
             return ResultUtils.success(userVo);
         }catch (Exception e){
             return ResultUtils.error(-2, "Email or Password was not found.");
         }
+    }
+
+    //获取空字段名
+    private String[] getNullPropertyNames(Object source) {
+        final BeanWrapper src = new BeanWrapperImpl(source);
+        PropertyDescriptor[] pds = src.getPropertyDescriptors();
+
+        Set<String> emptyNames = new HashSet<>();
+        for (PropertyDescriptor pd : pds) {
+            Object propertyValue = src.getPropertyValue(pd.getName());
+            if (propertyValue == null) {
+                emptyNames.add(pd.getName());
+            }
+        }
+        String[] result = new String[emptyNames.size()];
+        return emptyNames.toArray(result);
+    }
+
+    //获取请求 ip 地址
+    public String getIpAddr(HttpServletRequest request) {
+        String ipAddress = null;
+        try {
+            ipAddress = request.getHeader("x-forwarded-for");
+            if (ipAddress == null || ipAddress.length() == 0 || "unknown".equalsIgnoreCase(ipAddress)) {
+                ipAddress = request.getHeader("Proxy-Client-IP");
+            }
+            if (ipAddress == null || ipAddress.length() == 0 || "unknown".equalsIgnoreCase(ipAddress)) {
+                ipAddress = request.getHeader("WL-Proxy-Client-IP");
+            }
+            if (ipAddress == null || ipAddress.length() == 0 || "unknown".equalsIgnoreCase(ipAddress)) {
+                ipAddress = request.getRemoteAddr();
+                if (ipAddress.equals("127.0.0.1")) {
+                    // 根据网卡取本机配置的IP
+                    InetAddress inet = null;
+                    try {
+                        inet = InetAddress.getLocalHost();
+                    } catch (UnknownHostException e) {
+                        e.printStackTrace();
+                    }
+                    ipAddress = inet.getHostAddress();
+                }
+            }
+            // 对于通过多个代理的情况，第一个IP为客户端真实IP,多个IP按照','分割
+            if (ipAddress != null && ipAddress.length() > 15) { // "***.***.***.***".length()
+                // = 15
+                if (ipAddress.indexOf(",") > 0) {
+                    ipAddress = ipAddress.substring(0, ipAddress.indexOf(","));
+                }
+            }
+        } catch (Exception e) {
+            ipAddress = "";
+        }
+        // ipAddress = this.getRequest().getRemoteAddr();
+
+        return ipAddress;
     }
 
     /**
@@ -336,37 +408,40 @@ public class UserServiceImpl implements UserService {
 
     /**
      * 更新用户信息
-     * @param user
+     * @param userInfo
      * @return
      */
     @Override
-    public JsonResult updateUserInfo(Map<String, Object> user) {
+    public JsonResult updateUserInfo(JSONObject userInfo) {
+        String userId = userInfo.getString("userId");
         //取出 token
-        String userId = (String) user.get("userId");
         User localUser = userDao.findUserByIdOrEmail(userId);
+        //不存在用户不存在情况，除非故意捣乱
         if (localUser == null){
             return ResultUtils.error(-2, "The user does not exist.");
         }
-        TokenInfo tokenInfo = localUser.getTokenInfo();
-        String access_token = tokenInfo.getAccess_token();
+        String access_token = localUser.getTokenInfo().getAccess_token();
 
         // 更新用户服务器中的用户字段
         String updateUrl = "http://" + userServerIpAndPort + "/auth/update";
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", "Bearer " + access_token);
-        HttpEntity<Object> httpEntity = new HttpEntity<>(user, headers);
+        RestTemplateUtil httpUtil = new RestTemplateUtil();
+
         try {
-            ResponseEntity<JsonResult> responseEntity = restTemplate.exchange(updateUrl, HttpMethod.POST, httpEntity, JsonResult.class);
-            JsonResult remoteUpdateResult = responseEntity.getBody();
-            if (remoteUpdateResult.getCode() != 0){ return remoteUpdateResult;}
+            JSONObject updateResultJson = httpUtil.postRequestToServer(updateUrl, access_token, userInfo).getBody();
+            if (updateResultJson.getInteger("code") != 0){
+                return ResultUtils.error(-2, "update fail");
+            }
             //用户服务器更新成功，更新本地用户
-            ICommonUtil commonUtil = new ICommonUtil();
-            Update update = commonUtil.setUpdate(user);
-            return ResultUtils.success(userDao.updateInfo(userId, update));
+            User serverUser = updateResultJson.getObject("data", User.class);
+            String[] nullPropertyNames = getNullPropertyNames(serverUser);
+            BeanUtils.copyProperties(serverUser, localUser, nullPropertyNames);
+            userDao.saveUser(localUser);
+            return ResultUtils.success();
         }catch (Exception e){
             return ResultUtils.error(-2, "Failed to update user information.");
         }
     }
+
 
     @Override
     public void logout(String userId) {

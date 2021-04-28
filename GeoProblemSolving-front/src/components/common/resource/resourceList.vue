@@ -119,19 +119,32 @@ export default {
 
   methods: {
     async init() {
-      await this.getPrivateResources();
-      await this.getPublicResources();
+      // await this.getPrivateResources();
+      // await this.getPublicResources();
+      await this.getResources();
     },
     async getPrivateResources() {
-      let data = await get(
-        `/GeoProblemSolving/resource/${this.pageParams.userId}?type=data`
-      );
+      // let data = await get(
+      //   `/GeoProblemSolving/resource/${this.pageParams.userId}?type=data`
+      // );
+      let data  = await get(`/GeoProblemSolving/rip/file/e270ea98-2372-4736-a550-805c827de72f` +  `/type/data`);
       // data.forEach(e => (e.isSelect = "false"));
-      this.privateData = data;
+      // this.privateData = data;
     },
     async getPublicResources() {
-      let data = await get(`/GeoProblemSolving/resource?privacy=public`);
+      // let data = await get(`/GeoProblemSolving/resource?privacy=public`);
+      let data  = await get(`/GeoProblemSolving/rip/file/e270ea98-2372-4736-a550-805c827de72f` + `/privacy/public`)
       this.publicData = data;
+    },
+    async getResources(){
+      let data = await  get(`/GeoProblemSolving/res/file/all`)
+      for(let i = 0; i < data.length; i++){
+        if (data[i].privacy == "private"){
+          this.privateData.push(data[i])
+        }else {
+          this.publicData.push(data[i]);
+        }
+      }
     },
     handleCurrentChange(val) {
       this.selectData = val;
@@ -148,7 +161,8 @@ export default {
       let formData = new FormData();
       formData.append("file", file);
       formData.append("type", "data");
-      formData.append("uploaderId", this.pageParams.userId);
+      //默认将上传的资源到根目录下
+      formData.append("paths", "0");
 
       let flag = this.switchValue ? "private" : "public";
       // console.log(flag);
@@ -156,9 +170,10 @@ export default {
       formData.append("privacy", flag);
 
       let { data } = await this.axios.post(
-        `/GeoProblemSolving/resource/upload`,
+        `/GeoProblemSolving/res/upload`,
         formData
       );
+
       if (flag == "private") {
         await this.getPrivateResources();
       } else {
@@ -167,6 +182,7 @@ export default {
     },
 
     submit() {
+      console.log(this.selectData)
       this.$emit("selectData", this.selectData);
     }
   },

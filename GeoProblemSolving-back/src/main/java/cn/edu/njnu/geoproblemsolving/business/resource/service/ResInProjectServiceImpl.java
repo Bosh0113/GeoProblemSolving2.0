@@ -8,6 +8,7 @@ import cn.edu.njnu.geoproblemsolving.business.user.dao.IUserImpl;
 import cn.edu.njnu.geoproblemsolving.business.user.entity.User;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.Lists;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.BeanUtils;
@@ -55,8 +56,8 @@ public class ResInProjectServiceImpl implements ResourceInProjectService {
         folder.setFolder(true);
         folder.setUploadTime(new Date());
         folder.setChildren(new ArrayList<>());
-        folder.setUploadId(userId);
-        folder.setUploadName(creator.getName());
+        folder.setUploaderId(userId);
+        folder.setUploaderName(creator.getName());
         folder.setActivityId(aid);
 
         JSONObject folderJson = new JSONObject();
@@ -162,16 +163,16 @@ public class ResInProjectServiceImpl implements ResourceInProjectService {
                             res.setName(fileName);
                             res.setSuffix(suffix);
                             res.setUploadTime(new Date());
-                            res.setFileSize(part.getSize());
+                            res.setFileSize("123");
                             res.setPrivacy(req.getParameter("privacy"));
                             res.setType(req.getParameter("type"));
                             res.setDescription(req.getParameter("description"));
                             res.setFolder(false);
                             res.setUserUpload(true);
-                            String address = "/data/" + dataIdInContainer;
+                            String address = "http://" + dataContainerIp + ":8082" + "/data/" + dataIdInContainer;
                             res.setAddress(address);
-                            res.setUploadId(userId);
-                            res.setUploadName(uploadName);
+                            res.setUploaderId(userId);
+                            res.setUploaderName(uploadName);
                             res.setActivityId(aid);
 
                             uploadInfos.uploaded.add(res);
@@ -257,7 +258,6 @@ public class ResInProjectServiceImpl implements ResourceInProjectService {
         ArrayList<ResourceEntity> resInProjectList = (ArrayList<ResourceEntity>) resDao.queryByAid(aid);
         String rootResUid = paths.get(paths.size() - 1);
         ArrayList<ResourceEntity> putResList = dResource(resInProjectList, uids, paths);
-        int index = 0;
         Query query = new Query(Criteria.where("uid").is(rootResUid));
         Update update = new Update();
 
@@ -268,7 +268,6 @@ public class ResInProjectServiceImpl implements ResourceInProjectService {
                 break;
             }
         }
-        // ArrayList<ResourceEntity> putResList = dRes(resInProjectList, uids.get(0), paths);
 
         return resDao.updateRes(query, update);
     }
@@ -350,9 +349,9 @@ public class ResInProjectServiceImpl implements ResourceInProjectService {
         ArrayList<ResourceEntity> putResList = pResourceByPath(rootResList, putRes, paths);
         Query query = new Query(Criteria.where("uid").is(rootResUid));
         Update update = new Update();
-        for (int i = 0; i < putResList.size(); i++){
+        for (int i = 0; i < putResList.size(); i++) {
             ResourceEntity item = putResList.get(i);
-            if (item.getUid().equals(rootResUid)){
+            if (item.getUid().equals(rootResUid)) {
                 update.set("children", item.getChildren());
                 break;
             }
@@ -446,7 +445,7 @@ public class ResInProjectServiceImpl implements ResourceInProjectService {
         }
         return resList;
     }
-    
+
     /*
     资源直接分享到项目根文件夹中
     * @Author zhngzhng
@@ -456,6 +455,7 @@ public class ResInProjectServiceImpl implements ResourceInProjectService {
     */
     @Value("${userServerLocation}")
     String userServerLocation;
+
     @Override
     public ArrayList<ResourceEntity> resourceToProject(String userId, String aid, String uids, ArrayList<String> paths) {
         User sharer = userDao.findUserByIdOrEmail(userId);
@@ -474,21 +474,21 @@ public class ResInProjectServiceImpl implements ResourceInProjectService {
             ArrayList<ResourceEntity> resList = new ArrayList<>();
 
             ArrayList<String> path = new ArrayList<>();
-            for (Object item: pathArray){
+            for (Object item : pathArray) {
                 path.add(item.toString());
             }
             //将获取到的资源转换为 gsm 的资源，并将其存入对应的项目中
-            for (Object item: fileList){
+            for (Object item : fileList) {
                 ResourceEntity resourceEntity = JSONObject.parseObject(JSONObject.toJSONString(item), ResourceEntity.class);
                 resourceEntity.setActivityId(aid);
-                resourceEntity.setUploadName(sharerName);
-                resourceEntity.setUploadId(userId);
-                if (path.size() == 1 && path.get(0).equals("0")){
+                resourceEntity.setUploaderId(sharerName);
+                resourceEntity.setUploaderName(userId);
+                if (path.size() == 1 && path.get(0).equals("0")) {
                     resDao.addResource(resourceEntity);
                 }
                 resList.add(resourceEntity);
             }
-            if (path.size() == 1 && path.get(0).equals("0")){
+            if (path.size() == 1 && path.get(0).equals("0")) {
                 return resList;
             }
             String rootResUid = path.get(path.size() - 1);
@@ -496,16 +496,78 @@ public class ResInProjectServiceImpl implements ResourceInProjectService {
             List<ResourceEntity> putResList = aRes(rootResList, path, resList, "0");
             Query query = new Query(Criteria.where("uid").is(rootResUid));
             Update update = new Update();
-            for (ResourceEntity item: putResList){
-                if (item.getUid().equals(rootResUid)){
+            for (ResourceEntity item : putResList) {
+                if (item.getUid().equals(rootResUid)) {
                     update.set("children", item.getChildren());
                     break;
                 }
             }
             resDao.updateRes(query, update);
             return resList;
-        }catch (Exception e){
+        } catch (Exception e) {
             return null;
         }
+    }
+
+    @Override
+    public ArrayList<ResourceEntity> searchRes(String aid, String key, String value) {
+        List<ResourceEntity> projectRes = resDao.queryByAid(aid);
+        ArrayList<ResourceEntity> returnRes = Lists.newArrayList();
+        if (key.equals("type")){
+            //通过 type 进行查询
+            return sResByType(value, projectRes, returnRes);
+        }else if (key.equals("privacy")){
+            //通过 privacy 进行查询
+            return sResByPrivacy(value, projectRes, returnRes);
+
+        }
+        return null;
+    }
+
+    private ArrayList<ResourceEntity> sResByType(String type, List<ResourceEntity> projectRes, ArrayList<ResourceEntity> choseRes) {
+        for (int i = 0; i < projectRes.size(); i++) {
+            ResourceEntity res = projectRes.get(i);
+            if (res.getFolder()){
+                sResByType(type, res.getChildren(), choseRes);
+            }else {
+                if (res.getType().equals(type)){
+                    choseRes.add(res);
+                }
+            }
+        }
+        return choseRes;
+    }
+
+    private ArrayList<ResourceEntity> sResByPrivacy(String privacy, List<ResourceEntity> projectRes, ArrayList<ResourceEntity> choseRes) {
+        for (int i = 0; i < projectRes.size(); i++) {
+            ResourceEntity res = projectRes.get(i);
+            if (res.getFolder()){
+                sResByType(privacy, res.getChildren(), choseRes);
+            }else {
+                if (res.getPrivacy().equals(privacy)){
+                    choseRes.add(res);
+                }
+            }
+        }
+        return choseRes;
+    }
+
+    @Override
+    public String bindResToProject(ResourceEntity res, String aid) {
+        res.setUid(UUID.randomUUID().toString());
+        res.setUploadTime(new Date());
+        String fullName = res.getName();
+        String name = fullName.split("\\.")[0];
+        String suffix = "." + fullName.split("\\.")[1];
+        res.setSuffix(suffix);
+        res.setActivityId(aid);
+        res.setUserUpload(false);
+        res.setName(name);
+        ResourceEntity addResource = resDao.addResource(res);
+        if (addResource == null){
+            return "fail";
+        }
+        //直接存储
+        return "suc";
     }
 }
