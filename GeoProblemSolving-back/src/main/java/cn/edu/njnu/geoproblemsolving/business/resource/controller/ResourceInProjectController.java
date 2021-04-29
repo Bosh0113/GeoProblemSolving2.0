@@ -169,6 +169,18 @@ public class ResourceInProjectController {
         return ResultUtils.error(-2, "fail");
     }
 
+    /**
+     * 返回 activity 中所有文件
+     * 包括 privacy 及 public 内容
+     * @param aid
+     * @return
+     */
+    @RequestMapping(value = "/file/all/{aid}", method = RequestMethod.GET)
+    public JsonResult getAllFileInProject(@PathVariable String aid){
+        ArrayList<ResourceEntity> allFileInProject = resService.getAllFileInProject(aid);
+        return ResultUtils.success(allFileInProject);
+    }
+
 
 
 

@@ -27,5 +27,8 @@ public interface ResourceInProjectService {
 
     Object bindResToProject(ResourceEntity res, String aid);
 
+    //资源权限控制
+    Object getAllFileInProject(String aid);
+
 
 }

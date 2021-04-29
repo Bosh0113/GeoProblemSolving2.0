@@ -28,6 +28,7 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 import java.beans.PropertyDescriptor;
 import java.io.File;
+import java.text.DecimalFormat;
 import java.util.*;
 
 /**
@@ -158,12 +159,19 @@ public class ResInProjectServiceImpl implements ResourceInProjectService {
                             }
                             //成功将资源上传到数据容器中
                             // 接下来将资源存入GSM数据库中
+                            String fileSize;
+                            DecimalFormat df = new DecimalFormat("##0.00");
+                            if (part.getSize() > 1024 * 1024) {
+                                fileSize = df.format((float) part.getSize() / (float) (1024 * 1024)) + "MB";
+                            } else {
+                                fileSize = df.format((float) part.getSize() / (float) (1024)) + "KB";
+                            }
                             ResourceEntity res = new ResourceEntity();
                             res.setUid(UUID.randomUUID().toString());
                             res.setName(fileName);
                             res.setSuffix(suffix);
                             res.setUploadTime(new Date());
-                            res.setFileSize("123");
+                            res.setFileSize(fileSize);
                             res.setPrivacy(req.getParameter("privacy"));
                             res.setType(req.getParameter("type"));
                             res.setDescription(req.getParameter("description"));
@@ -481,8 +489,8 @@ public class ResInProjectServiceImpl implements ResourceInProjectService {
             for (Object item : fileList) {
                 ResourceEntity resourceEntity = JSONObject.parseObject(JSONObject.toJSONString(item), ResourceEntity.class);
                 resourceEntity.setActivityId(aid);
-                resourceEntity.setUploaderId(sharerName);
-                resourceEntity.setUploaderName(userId);
+                resourceEntity.setUploaderId(userId);
+                resourceEntity.setUploaderName(sharerName);
                 if (path.size() == 1 && path.get(0).equals("0")) {
                     resDao.addResource(resourceEntity);
                 }
@@ -513,10 +521,10 @@ public class ResInProjectServiceImpl implements ResourceInProjectService {
     public ArrayList<ResourceEntity> searchRes(String aid, String key, String value) {
         List<ResourceEntity> projectRes = resDao.queryByAid(aid);
         ArrayList<ResourceEntity> returnRes = Lists.newArrayList();
-        if (key.equals("type")){
+        if (key.equals("type")) {
             //通过 type 进行查询
             return sResByType(value, projectRes, returnRes);
-        }else if (key.equals("privacy")){
+        } else if (key.equals("privacy")) {
             //通过 privacy 进行查询
             return sResByPrivacy(value, projectRes, returnRes);
 
@@ -527,10 +535,10 @@ public class ResInProjectServiceImpl implements ResourceInProjectService {
     private ArrayList<ResourceEntity> sResByType(String type, List<ResourceEntity> projectRes, ArrayList<ResourceEntity> choseRes) {
         for (int i = 0; i < projectRes.size(); i++) {
             ResourceEntity res = projectRes.get(i);
-            if (res.getFolder()){
+            if (res.getFolder()) {
                 sResByType(type, res.getChildren(), choseRes);
-            }else {
-                if (res.getType().equals(type)){
+            } else {
+                if (res.getType().equals(type)) {
                     choseRes.add(res);
                 }
             }
@@ -541,10 +549,10 @@ public class ResInProjectServiceImpl implements ResourceInProjectService {
     private ArrayList<ResourceEntity> sResByPrivacy(String privacy, List<ResourceEntity> projectRes, ArrayList<ResourceEntity> choseRes) {
         for (int i = 0; i < projectRes.size(); i++) {
             ResourceEntity res = projectRes.get(i);
-            if (res.getFolder()){
+            if (res.getFolder()) {
                 sResByType(privacy, res.getChildren(), choseRes);
-            }else {
-                if (res.getPrivacy().equals(privacy)){
+            } else {
+                if (res.getPrivacy().equals(privacy)) {
                     choseRes.add(res);
                 }
             }
@@ -558,16 +566,36 @@ public class ResInProjectServiceImpl implements ResourceInProjectService {
         res.setUploadTime(new Date());
         String fullName = res.getName();
         String name = fullName.split("\\.")[0];
-        String suffix = "." + fullName.split("\\.")[1];
+        String suffix = fullName.split("\\.")[1];
         res.setSuffix(suffix);
         res.setActivityId(aid);
         res.setUserUpload(false);
         res.setName(name);
         ResourceEntity addResource = resDao.addResource(res);
-        if (addResource == null){
+        if (addResource == null) {
             return "fail";
         }
         //直接存储
         return "suc";
+    }
+
+    @Override
+    public ArrayList<ResourceEntity> getAllFileInProject(String aid) {
+        List<ResourceEntity> resList = resDao.queryByAid(aid);
+        ArrayList<ResourceEntity> fileList = Lists.newArrayList();
+        ArrayList<ResourceEntity> fileInProjectList = gallFileInProject(resList, fileList);
+        return fileInProjectList;
+    }
+
+    private ArrayList<ResourceEntity> gallFileInProject(List<ResourceEntity> resInProject, ArrayList<ResourceEntity> fileList) {
+        for (int i = 0; i < resInProject.size(); i++) {
+            ResourceEntity res = resInProject.get(i);
+            if (res.getFolder()){
+                gallFileInProject(res.getChildren(), fileList);
+            }else {
+                fileList.add(res);
+            }
+        }
+        return fileList;
     }
 }
