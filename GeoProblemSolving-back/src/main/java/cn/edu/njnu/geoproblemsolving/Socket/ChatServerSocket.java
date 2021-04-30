@@ -200,7 +200,6 @@ public class ChatServerSocket {
                 if(relateConceptSet.equals("")) {
                     server.getValue().getBasicRemote().sendText(relateConceptSet);
                 }
-
             }
         } else {
             //私聊
