@@ -40,7 +40,7 @@ public class MsgSocketServer {
 
     @OnClose
     public void onClose(@PathParam("aid") String aid, Session session) throws IOException {
-        collaborationService.collaborationClose(aid, session);
+        collaborationService.communicationClose(aid, session);
     }
 
     @OnError

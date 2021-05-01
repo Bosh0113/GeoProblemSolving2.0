@@ -22,6 +22,7 @@ public class CollaborationBehavior {
     @Autowired
     IUserDao iUserDao;
 
+    /**common**/
     public CollaborationUser getMemberInfo(String userId, Session session) {
 
         JsonResult userInfo = iUserDao.getUserInfo("userId", userId);
@@ -49,16 +50,6 @@ public class CollaborationBehavior {
         }
     }
 
-    public void sendMessageCache(ArrayList<ChatMsg> msgRecords, Session session) {
-        try {
-            JSONObject messageObject = new JSONObject();
-            messageObject.put("type", "message-cache");
-            messageObject.put("content", msgRecords);
-            session.getBasicRemote().sendText(messageObject.toString());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
     public void sendParticipantsInfo(ArrayList<CollaborationUser> participants, CollaborationUser user, String behavior) {
         try {
@@ -79,6 +70,18 @@ public class CollaborationBehavior {
         }
     }
 
+
+    /**Message**/
+    public void sendMessageCache(ArrayList<ChatMsg> msgRecords, Session session) {
+        try {
+            JSONObject messageObject = new JSONObject();
+            messageObject.put("type", "message-cache");
+            messageObject.put("content", msgRecords);
+            session.getBasicRemote().sendText(messageObject.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     public void transferMessage(ArrayList<CollaborationUser> participants, String sender, List<String> receivers, String message) {
         try {
@@ -109,6 +112,13 @@ public class CollaborationBehavior {
         }
     }
 
+    // 将聊天记录按时段存储
+    public void msgCacheStore(ArrayList<ChatMsg> msgRecords) {
+
+    }
+
+
+    /**operation**/
     public void transferOperation(ArrayList<CollaborationUser> participants, String sender, List<String> receivers, String behavior, String object) {
         try {
             JSONObject messageObject = new JSONObject();
@@ -139,8 +149,26 @@ public class CollaborationBehavior {
         }
     }
 
+    public void operationRefuse(ArrayList<CollaborationUser> participants, String sender) {
+        try {
+            JSONObject messageObject = new JSONObject();
+            messageObject.put("type", "operation");
+            messageObject.put("behavior", "Refuse");
+
+            // send message
+            for (CollaborationUser user : participants) {
+                if (user.getUserId().equals(sender)) {
+                    user.getSession().getBasicRemote().sendText(messageObject.toString());
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     /**
      * 发送协同模式
+     *
      * @param participants
      * @param mode
      */
@@ -160,6 +188,7 @@ public class CollaborationBehavior {
 
     /**
      * 发送控制信息
+     *
      * @param participants
      * @param queue
      * @param user
@@ -171,14 +200,14 @@ public class CollaborationBehavior {
             messageObject.put("type", "message");
             messageObject.put("behavior", behavior);
 
-            if(behavior.equals("apply")) {
+            if (behavior.equals("apply")) {
                 messageObject.put("sender", user);
                 messageObject.put("waiting", queue.size());
                 // send message
                 for (CollaborationUser participant : participants) {
-                        participant.getSession().getBasicRemote().sendText(messageObject.toString());
+                    participant.getSession().getBasicRemote().sendText(messageObject.toString());
                 }
-            } else if(behavior.equals("stop")) {
+            } else if (behavior.equals("stop")) {
                 messageObject.put("operator", user);
                 // send message
                 for (CollaborationUser participant : participants) {
@@ -196,9 +225,6 @@ public class CollaborationBehavior {
         }
     }
 
-    public void cacheStore(ArrayList<ChatMsg> msgRecords){
-
-    }
 }
 
 

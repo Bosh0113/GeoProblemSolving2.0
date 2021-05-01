@@ -3,23 +3,21 @@ package cn.edu.njnu.geoproblemsolving.business.collaboration.entity;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 
-import java.util.List;
+import java.util.ArrayList;
 
 /**
  * @Author mzy
  * @Date 2021/4
- * @Description 文本聊天信息实体
+ * @Description 计算记录
  */
 @Data
-public class ChatMsg {
+public class ComputeMsg {
+
+    private String toolId;
 
     private String aid;
 
-    private String sender;
-
-    private List<String> receiver;
-
-    private String content;
+    private ArrayList<CollaborationUser> receivers;
 
     private String time;
 }

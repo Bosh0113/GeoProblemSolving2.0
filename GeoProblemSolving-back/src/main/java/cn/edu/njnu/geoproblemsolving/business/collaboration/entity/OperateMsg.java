@@ -8,13 +8,10 @@ import java.util.List;
 /**
  * @Author mzy
  * @Date 2021/4
- * @Description 文本聊天信息实体
+ * @Description
  */
 @Data
 public class OperateMsg {
-
-    @Id
-    private String msgId;
 
     private String toolId;
 
