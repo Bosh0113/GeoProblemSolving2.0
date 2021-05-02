@@ -25,6 +25,7 @@
     "gantt-elastic-header": "^0.1.11",
     "highlight": "^0.2.4",
     "highlight.js": "^9.15.10",
+    "image-to-base64": "^2.2.0",
     "iview": "^3.5.3",
     "jquery": "^3.1.1",
     "js-md5": "^0.7.3",

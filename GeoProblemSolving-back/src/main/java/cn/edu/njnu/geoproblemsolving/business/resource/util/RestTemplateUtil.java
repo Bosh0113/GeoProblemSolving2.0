@@ -1,13 +1,13 @@
 package cn.edu.njnu.geoproblemsolving.business.resource.util;
 
-import cn.edu.njnu.geoproblemsolving.business.user.StaticParams;
+import cn.edu.njnu.geoproblemsolving.business.resource.entity.ResourceEntity;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import com.alibaba.fastjson.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Arrays;
@@ -60,15 +60,15 @@ public class RestTemplateUtil {
     ==========================================用户服务器资源相关操作========================================================
      */
 
-    /**
-     * 上传资源
-     * @param userServerUrl
-     * @param userBaseJson
-     * @return
-     */
+    // /**
+    //  * 上传资源
+    //  * @param userServerUrl
+    //  * @param userBaseJson
+    //  * @return
+    //  */
     public JSONObject setUserBase(String userServerUrl, JSONObject userBaseJson) {
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", "Bearer " + StaticParams.access_token);
+        // headers.add("Authorization", "Bearer " + StaticParams.access_token);
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<JSONObject> httpEntity = new HttpEntity<>(userBaseJson, headers);
         ResponseEntity<String> response = restTemplate.exchange(userServerUrl, HttpMethod.POST, httpEntity, String.class);
@@ -76,10 +76,10 @@ public class RestTemplateUtil {
         JSONObject uploadToUserServer = JSONObject.parseObject(resultStr);
         return uploadToUserServer;
     }
-
+    //
     public JSONObject delUserBaseResource(String delUserBaseResUrl){
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", "Bearer " + StaticParams.access_token);
+        // headers.add("Authorization", "Bearer " + StaticParams.access_token);
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<JSONObject> httpEntity = new HttpEntity<>(headers);
         ResponseEntity<String> response = restTemplate.exchange(delUserBaseResUrl, HttpMethod.DELETE, httpEntity, String.class);
@@ -101,8 +101,57 @@ public class RestTemplateUtil {
 
     }
 
+
+
     /*
     ====================================================================================================================
      */
 
+    public ResponseEntity<JSONObject> getRequestToServer(String url, String access_token){
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + access_token);
+        HttpEntity<Object> httpEntity = new HttpEntity<>(headers);
+        return restTemplate.exchange(url, HttpMethod.GET, httpEntity, JSONObject.class);
+    }
+
+    //post
+    public ResponseEntity<JSONObject> postRequestToServer(String url, String access_token, JSONObject payload){
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + access_token);
+        headers.add("Content-Type", "application/json;charset=utf-8");
+        HttpEntity<JSONObject> httpEntity = new HttpEntity<>(payload, headers);
+        return restTemplate.exchange(url, HttpMethod.POST, httpEntity, JSONObject.class);
+    }
+
+    //post form-data 形式数据
+    public ResponseEntity<JSONObject> postRequestMap(String url, LinkedMultiValueMap<String, Object> payload){
+        HttpHeaders headers = new HttpHeaders();
+        HttpEntity<LinkedMultiValueMap<String, Object>> reqInfo = new HttpEntity<>(payload, headers);
+        return restTemplate.exchange(url, HttpMethod.POST, reqInfo, JSONObject.class);
+    }
+
+    public ResponseEntity<JSONObject> putRequestToServer(String url, String access_token, JSONObject payload){
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + access_token);
+        HttpEntity<JSONObject> httpEntity = new HttpEntity<>(payload, headers);
+        return restTemplate.exchange(url, HttpMethod.PUT, httpEntity, JSONObject.class);
+    }
+
+    public ResponseEntity<JSONObject> deleteRequestToServer(String url, String access_token){
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + access_token);
+        HttpEntity<LinkedMultiValueMap<String, Object>> httpEntity = new HttpEntity<>(headers);
+        return restTemplate.exchange(url, HttpMethod.DELETE, httpEntity, JSONObject.class);
+    }
+
+    public JSONObject delRequest(String url){
+        HttpHeaders headers = new HttpHeaders();
+        HttpEntity<Object> httpEntity = new HttpEntity<>(headers);
+        return restTemplate.exchange(url, HttpMethod.DELETE, httpEntity, JSONObject.class).getBody();
+    }
+
+
+    /*
+    Model Container http request
+     */
 }

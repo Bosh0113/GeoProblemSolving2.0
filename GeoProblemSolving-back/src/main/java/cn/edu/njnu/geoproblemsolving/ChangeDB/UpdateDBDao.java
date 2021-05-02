@@ -9,7 +9,6 @@ import cn.edu.njnu.geoproblemsolving.business.activity.entity.Subproject;
 import cn.edu.njnu.geoproblemsolving.business.activity.enums.ActivityType;
 import cn.edu.njnu.geoproblemsolving.business.activity.enums.ProjectCategory;
 import cn.edu.njnu.geoproblemsolving.business.activity.enums.ProjectPrivacy;
-import cn.edu.njnu.geoproblemsolving.business.user.StaticParams;
 import cn.edu.njnu.geoproblemsolving.business.user.entity.User;
 import cn.edu.njnu.geoproblemsolving.business.user.enums.UserTitle;
 import com.alibaba.fastjson.JSONArray;
@@ -349,7 +348,7 @@ public class UpdateDBDao {
                 // password 加密处理
                 String oldpw = oldUser.getPassword();
                 String password = DigestUtils.md5DigestAsHex(oldpw.getBytes());
-                user.setPassword(password);
+                // user.setPassword(password);
 
                 RestTemplate restTemplate = new RestTemplate();
                 String updateUrl  = "http://106.14.78.235/AuthServer/user/tempAdd";

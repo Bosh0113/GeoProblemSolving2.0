@@ -1,3 +1,4 @@
+<!--模型 调用页面-->
 <template>
   <div class="main">
     <!-- <el-button @click="getAllRecords">getAllRecords</el-button>
@@ -18,14 +19,14 @@
       >
         <i class="el-icon-setting"></i>&nbsp;Invoke
       </el-button>
-      <el-button
-        type="warning"
-        @click="bindAll"
-        v-if="record.status == 2"
-        style="float: right; width: 160px; margin-right: 20px"
-      >
-        <i class="el-icon-paperclip"></i>&nbsp;Bind all outputs
-      </el-button>
+<!--      <el-button-->
+<!--        type="warning"-->
+<!--        @click="bindAll"-->
+<!--        v-if="record.status == 2"-->
+<!--        style="float: right; width: 160px; margin-right: 20px"-->
+<!--      >-->
+<!--        <i class="el-icon-paperclip"></i>&nbsp;Bind all outputs-->
+<!--      </el-button>-->
       <!-- </el-col>
       <el-col :span="1" :offset="1" class="save-btn"> -->
 
@@ -187,6 +188,7 @@
           </div>
         </div>
 
+<!--        output 相关-->
         <div class="_params-group">
           <el-row v-if="outEventList(state).length !== 0" class="stateTitle"
             >Output</el-row
@@ -312,7 +314,10 @@ export default {
       },
       // status: true,
       record: {},
-      // page info
+      /*
+       page info,
+       pageId 为 activityId
+       */
       pageParams: { pageId: "", userId: "", userName: "" },
       userInfo: {},
       bindFileName: "",
@@ -562,7 +567,8 @@ export default {
     },
 
     download(event) {
-      window.open(event.url);
+      let url = event.url.split("?")[0];
+      window.open(url);
     },
 
     urlToBlob(the_url, callback) {
@@ -588,21 +594,21 @@ export default {
     },
 
     async bind(event) {
-      // console.log(event);
+      console.log(event);
       // await this.dataURItoBlob(event);
-
+      let address  = event.url.split("?")[0];
       let json = {
         name: event.urlName,
         description: event.description,
         type: "data",
-        fileSize: "",
-        pathURL: event.url,
+        userUpload: false,
+        address: address,
         uploaderId: this.pageParams.userId,
         uploaderName: this.pageParams.userName,
-        privacy: "private",
+        privacy: "private"
       };
 
-      let data = await post("/GeoProblemSolving/resource/bind", json);
+      let data = await post("/GeoProblemSolving/rip/file/bind/" + this.pageParams.pageId, json);
       event.bind = true;
       this.$forceUpdate();
       this.$message({
@@ -652,6 +658,7 @@ export default {
     },
 
     initLoading() {
+      this.activityId = window.location.href.substring(window.location.href.indexOf("groupID=") + 8);
       this.fullscreenLoading = this.$loading({
         lock: true,
         text: "Initialization",
@@ -697,7 +704,7 @@ export default {
       this.$set(
         this.stateList[stateIndex].Event[eventIndex],
         "url",
-        val.pathURL
+        val.address
       );
       this.$set(
         this.stateList[stateIndex].Event[eventIndex],

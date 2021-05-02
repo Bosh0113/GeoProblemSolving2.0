@@ -1,7 +1,7 @@
 package cn.edu.njnu.geoproblemsolving.business.resource.dao;
 
+import cn.edu.njnu.geoproblemsolving.business.resource.entity.ResourceEntity;
 import cn.edu.njnu.geoproblemsolving.business.resource.entity.IResourceEntity;
-import cn.edu.njnu.geoproblemsolving.business.resource.entity.ResourcePojo;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import com.mongodb.client.result.UpdateResult;
 import org.springframework.data.mongodb.core.query.Update;
@@ -31,9 +31,9 @@ public interface IResourceDao {
     /*
     =================zhengzhong Resource's latest version===============================================================
      */
-    ArrayList<ResourcePojo> getRes(ArrayList<String> rids);
+    ArrayList<ResourceEntity> getRes(ArrayList<String> rids);
 
-    JsonResult saveResDetail(ResourcePojo resourcePojo);
+    JsonResult saveResDetail(ResourceEntity resourcePojo);
 
     IResourceEntity findById(String rid);
 
@@ -42,5 +42,6 @@ public interface IResourceDao {
     ====================================================================================================================
      */
 
-    // Object delResByIds(ArrayList<String> resIds);
+    // 2021/4/20
+
 }

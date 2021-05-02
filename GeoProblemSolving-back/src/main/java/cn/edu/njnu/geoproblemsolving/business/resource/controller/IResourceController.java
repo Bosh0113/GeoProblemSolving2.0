@@ -3,7 +3,7 @@ package cn.edu.njnu.geoproblemsolving.business.resource.controller;
 import cn.edu.njnu.geoproblemsolving.Dao.Resource.ResourceDaoImpl;
 import cn.edu.njnu.geoproblemsolving.business.resource.entity.AddIResourceDTO;
 import cn.edu.njnu.geoproblemsolving.business.resource.entity.IResourceEntity;
-import cn.edu.njnu.geoproblemsolving.business.resource.entity.ResourcePojo;
+import cn.edu.njnu.geoproblemsolving.business.resource.entity.ResourceEntity;
 import cn.edu.njnu.geoproblemsolving.business.resource.service.IResourceServiceImpl;
 import cn.edu.njnu.geoproblemsolving.business.user.service.Impl.UserServiceImpl;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
@@ -85,7 +85,7 @@ public class IResourceController {
     public JsonResult shareRes(@RequestParam("email") String email, @RequestParam("rids") ArrayList<String> rids){
         //发邮件，省略通知这一步，直接加入用户 user resources 字段中。
         //先从 collection resource 中找到这些资源，然后到给传过去
-        ArrayList<ResourcePojo> res = IResourceService.getRes(rids);
+        ArrayList<ResourceEntity> res = IResourceService.getRes(rids);
         return userService.uploadResourceField(email, res);
     }
 

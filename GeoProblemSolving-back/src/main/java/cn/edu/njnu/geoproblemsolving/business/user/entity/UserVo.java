@@ -1,33 +1,30 @@
 package cn.edu.njnu.geoproblemsolving.business.user.entity;
 
-import cn.edu.njnu.geoproblemsolving.business.resource.entity.ResourceEntity;
 import cn.edu.njnu.geoproblemsolving.business.resource.entity.ResourcePojo;
 import cn.edu.njnu.geoproblemsolving.business.user.enums.UserTitle;
+import com.alibaba.fastjson.JSONArray;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.ArrayList;
 import java.util.Date;
 
+/**
+ * @ClassName UserVo
+ * @Description Todo
+ * @Author zhngzhng
+ * @Date 2021/4/6
+ **/
 @Data
-@Document(collection = "User")
-@NoArgsConstructor
 @AllArgsConstructor
-public class User {
+@NoArgsConstructor
 
-    /**
-     * Necessary
-     */
-    @Id
-    private String userId;  //UUID
+public class UserVo {
+    private String userId;
     private String name;
-    //平台上用户无需有password
-    private String password;    //MD5
-    private String email;   //used for registration
+    private String email;
 
     /**
      * User server
@@ -36,16 +33,14 @@ public class User {
     private String phone;
     private UserTitle title;
     private String country;
-    private String province;    // County / State / Province
+    private String province;
     private String city;
     private String homepage;
     private String introduction;
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
-    private Date createdTime;
     private ArrayList<String> organizations;
     private ArrayList<String> domain;
-    private ArrayList<String> loginIp;
-    private ArrayList<ResourceEntity> resource;
+    //资源不需要放在 session 里面
+    // private ArrayList<ResourcePojo> resource;
 
     /**
      * Unique
@@ -53,7 +48,4 @@ public class User {
      */
     private ArrayList<String> joinedProjects;
     private ArrayList<String> createdProjects;
-
-    //存储令牌相关内容
-    TokenInfo tokenInfo;
 }

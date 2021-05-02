@@ -39,17 +39,19 @@
       @row-click="handleCurrentChange"
       @row-dblclick="handleCurrentChangeSubmit"
     >
-      <el-table-column prop="name" label="Name" sortable width="200">
+      <el-table-column prop="name" label="Name" sortable width="200" :show-overflow-tooltip="true">
       </el-table-column>
 
-      <el-table-column prop="description" label="Description" width="269">
+      <el-table-column prop="description" label="Description" width="209" :show-overflow-tooltip="true">
       </el-table-column
       ><el-table-column prop="type" label="Type" width="80"> </el-table-column>
       <el-table-column prop="privacy" label="Privacy" width="80">
       </el-table-column>
-      <el-table-column prop="uploaderName" label="Provider" width="150">
+      <el-table-column prop="origin" label="Origin" width="120">
       </el-table-column>
-      <el-table-column prop="uploadTime" label="Upload time" width="180">
+      <el-table-column prop="uploaderName" label="Provider" width="120">
+      </el-table-column>
+      <el-table-column prop="uploadTime" label="Upload time" width="150">
       </el-table-column>
     </el-table>
     <div v-if="Object.keys(selectData).length === 0">
@@ -119,19 +121,53 @@ export default {
 
   methods: {
     async init() {
-      await this.getPrivateResources();
-      await this.getPublicResources();
+      // await this.getPrivateResources();
+      // await this.getPublicResources();
+      // await this.getResources();
+
+      await this.getUserResources();
+      await this.getProjectResources();
+
     },
-    async getPrivateResources() {
-      let data = await get(
-        `/GeoProblemSolving/resource/${this.pageParams.userId}?type=data`
-      );
-      // data.forEach(e => (e.isSelect = "false"));
-      this.privateData = data;
+    // async getPrivateResources() {
+    //   // let data = await get(
+    //   //   `/GeoProblemSolving/resource/${this.pageParams.userId}?type=data`
+    //   // );
+    //   let data  = await get(`/GeoProblemSolving/rip/file/e270ea98-2372-4736-a550-805c827de72f` +  `/type/data`);
+    //   // data.forEach(e => (e.isSelect = "false"));
+    //   // this.privateData = data;
+    // },
+    // async getPublicResources() {
+    //   console.log(this.pageParams)
+    //   // let data = await get(`/GeoProblemSolving/resource?privacy=public`);
+    //   let data  = await get(`/GeoProblemSolving/rip/file/` + this.pageParams.pageId +`/privacy/public`)
+    //   this.publicData = data;
+    // },
+    async getUserResources(){
+      //个人空间中资源
+      let dataInUserSpace = await  get(`/GeoProblemSolving/res/file/all`)
+      let userInfo = JSON.parse(sessionStorage.userInfo);
+      for(let i = 0; i < dataInUserSpace.length; i++){
+        dataInUserSpace[i].uploaderName = userInfo.name;
+        dataInUserSpace[i].origin = "Personal Space";
+        if (dataInUserSpace[i].privacy == "private"){
+          this.privateData.push(dataInUserSpace[i])
+        }else {
+          this.publicData.push(dataInUserSpace[i]);
+        }
+      }
     },
-    async getPublicResources() {
-      let data = await get(`/GeoProblemSolving/resource?privacy=public`);
-      this.publicData = data;
+    async getProjectResources(){
+      //项目中资源
+      let dataInProject = await get(`/GeoProblemSolving/rip/file/all/` + this.pageParams.pageId);
+      for(let i = 0; i < dataInProject.length; i++){
+        dataInProject[i].origin = "Project";
+        if (dataInProject[i].privacy == "private"){
+          this.privateData.push(dataInProject[i])
+        }else {
+          this.publicData.push(dataInProject[i]);
+        }
+      }
     },
     handleCurrentChange(val) {
       this.selectData = val;
@@ -148,25 +184,27 @@ export default {
       let formData = new FormData();
       formData.append("file", file);
       formData.append("type", "data");
-      formData.append("uploaderId", this.pageParams.userId);
+      //默认将上传的资源到根目录下
+      formData.append("paths", "0");
 
       let flag = this.switchValue ? "private" : "public";
       // console.log(flag);
 
       formData.append("privacy", flag);
+      formData.append("description", "");
 
       let { data } = await this.axios.post(
-        `/GeoProblemSolving/resource/upload`,
+        `/GeoProblemSolving/res/upload`,
         formData
       );
-      if (flag == "private") {
-        await this.getPrivateResources();
-      } else {
-        await this.getPublicResources();
-      }
+      this.privateData = [];
+      this.publicData = [];
+      this.getUserResources();
+      this.getProjectResources();
     },
 
     submit() {
+      console.log(this.selectData)
       this.$emit("selectData", this.selectData);
     }
   },

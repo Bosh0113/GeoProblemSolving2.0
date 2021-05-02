@@ -122,4 +122,10 @@ public class ToolService  {
         }
     }
 
+    //=================================zhngzhng====================================
+    public ToolEntity getToolById(String toolId){
+        Query query = new Query(Criteria.where("tid").is(toolId));
+        return mongoTemplate.findOne(query, ToolEntity.class);
+    }
+
 }

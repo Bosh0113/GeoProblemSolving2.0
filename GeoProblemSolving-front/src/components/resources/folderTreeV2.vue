@@ -4,28 +4,23 @@
     padding: 5px;
     margin: 3px;
   }
-
   .resourceTitle {
     font-size: 18px;
     height: 20px;
     line-height: 20px;
   }
-
   .resourceBtnDiv {
     display: flex;
     align-items: center;
     height: 20px;
     padding: 5px;
   }
-
   .fileBtn {
     margin: 0px 3px;
   }
-
   .itemIcon {
     margin-right: 5px;
   }
-
   .fileItemName {
     width: 35%;
     margin-right: 5%;
@@ -36,7 +31,6 @@
     cursor: pointer;
     overflow: hidden;
   }
-
   .fileItemSize {
     width: 10%;
     margin-right: 5%;
@@ -46,11 +40,9 @@
     white-space: nowrap;
     height: 16px;
   }
-
   .demo-spin-icon-load {
     animation: ani-demo-spin 1s linear infinite;
   }
-
   @keyframes ani-demo-spin {
     from {
       transform: rotate(0deg);
@@ -62,20 +54,17 @@
       transform: rotate(360deg);
     }
   }
-
   .demo-spin-col {
     height: 100px;
     position: relative;
     /* border: 1px solid #eee; */
   }
-
   .personalFileLabel {
     width: 250px;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
   }
-
   .personalFileDes {
     display: inline-block;
     margin: 0 5px;
@@ -84,32 +73,26 @@
     white-space: nowrap;
     text-overflow: ellipsis;
   }
-
   .fileBtnHoverBlue:hover {
     background-color: #2db7f5;
     color: white;
   }
-
   .fileBtnHoverGreen:hover {
     background-color: #19be6b;
     color: white;
   }
-
   .fileBtnHoverOrange:hover {
     background-color: #ff9900;
     color: white;
   }
-
   .fileBtnHoverRed:hover {
     background-color: #ed4014;
     color: white;
   }
-
   .fileBtnHoverGray:hover {
     background-color: #808695;
     color: white;
   }
-
   .demo-spin-icon-load {
     animation: ani-demo-spin 1s linear infinite;
   }
@@ -134,41 +117,37 @@
               style="min-width: 60px"
               v-show="currentFolder.files.length > 0"
             >
-              <!--              indeterminate 表示有选中内容
-                                checkAll则是全选
-              -->
               <Checkbox
                 :indeterminate="indeterminate"
                 :value="checkAll"
                 @click.prevent.native="handleCheckAll"
                 v-show="currentFolder.files.length > 0"
                 style="align-items: center"
-              >All files
-              </Checkbox
+              >All files</Checkbox
               >
             </div>
             <div style="margin-left: 3px">
-              <Breadcrumb>
+              <Breadcrumb >
                 <BreadcrumbItem
                   v-for="(folder, index) in folderStack"
-                  :key="folder.uid"
+                  :key="folder.folderId"
                   @click.native="switchFolder(folder, index)"
                   style="cursor: pointer"
                 >
-                  <span v-if="folder.uid == activityInfo.aid"
+                  <span v-if="folder.folderId == activityInfo.aid"
                   ><Icon type="md-folder" style="color: #2d8cf0"
                   /></span>
-                  <span v-else style="color: #2d8cf0">{{ folder.name }}</span>
+                  <span v-else style="color: #2d8cf0">{{ folder.folderName }}</span>
                 </BreadcrumbItem>
               </Breadcrumb>
             </div>
-            <Divider type="vertical" style="margin-left: 20px"/>
+            <Divider type="vertical" style="margin-left: 20px" />
             <div style="flex: 1; margin-left: 10px">
               <Tooltip content="Back" placement="bottom" class="fileBtn">
                 <Icon type="md-arrow-round-back" @click="backforeFolder" style="cursor:pointer; color: #08ab2b"/>
               </Tooltip>
               <Tooltip content="New folder" placement="bottom" class="fileBtn">
-                <Icon type="ios-folder" @click="addFolderModalShow" style="cursor:pointer; color: #f9c245"/>
+                <Icon type="ios-folder"  @click="addFolderModalShow" style="cursor:pointer; color: #f9c245"/>
               </Tooltip>
             </div>
             <div style="align-items: flex-end" v-if="userRole != 'Visitor'">
@@ -217,21 +196,21 @@
         >
           <vue-scroll :ops="ops" :style="{ height: contentHeight + 'px' }">
             <Card
-              v-for="(folder, index) in currentFolder.folders"
-              :key="index"
+              v-for="folder in currentFolder.folders"
+              :key="folder.index"
               :padding="5"
             >
               <div>
-                <Icon type="ios-folder-open" class="itemIcon" size="25"/>
+                <Icon type="ios-folder-open" class="itemIcon" size="25" />
                 <a
-                  @click="enterFolder(folder)"
+                  @click="enterFolder(folder.uid)"
                   class="fileItemName"
                   :title="folder.name"
                 >{{ folder.name }}</a
                 >
 
                 <!--                文件夹结构-->
-                <div style="float: right">
+                <div style="float: right" >
                   <Button
                     @click="renameFolderModalShow(folder)"
                     class="fileBtnHoverBlue"
@@ -262,11 +241,11 @@
             >
               <Card
                 v-for="file in currentFolder.files"
-                :key="file.uid"
+                :key="file.index"
                 :padding="5"
               >
-                <Checkbox :label="file.address">&nbsp;</Checkbox>
-                <Icon type="ios-document-outline" class="itemIcon" size="25"/>
+                <Checkbox :label="file.pathURL">&nbsp;</Checkbox>
+                <Icon type="ios-document-outline" class="itemIcon" size="25" />
                 <span
                   @click="getFileInfo(file)"
                   class="fileItemName"
@@ -279,16 +258,16 @@
                 }}</span>
 
                 <!--                使用资源-->
-                <div style="float: right" v-if="permissionIdentity(activityInfo.permission, userRole, 'use_resource')">
-<!--                  <Button-->
-<!--                    @click="filePreview(file)"-->
-<!--                    shape="circle"-->
-<!--                    icon="md-eye"-->
-<!--                    title="Preview"-->
-<!--                    size="small"-->
-<!--                    class="fileBtnHoverGreen"-->
-<!--                    type="text"-->
-<!--                  ></Button>-->
+                <div style="float: right"  v-if="permissionIdentity(activityInfo.permission, userRole, 'use_resource')">
+                  <Button
+                    @click="filePreview(file)"
+                    shape="circle"
+                    icon="md-eye"
+                    title="Preview"
+                    size="small"
+                    class="fileBtnHoverGreen"
+                    type="text"
+                  ></Button>
                   <Button
                     @click="fileDownload(file)"
                     shape="circle"
@@ -298,7 +277,6 @@
                     class="fileBtnHoverGray"
                     type="text"
                   ></Button>
-                  <!--                  复制到个人空间-->
                   <Button
                     @click="showCopyFileModel(file)"
                     shape="circle"
@@ -310,7 +288,7 @@
                   ></Button>
 
                   <!--                  管理资源-->
-                  <template v-if="permissionIdentity(activityInfo.permission, userRole, 'manage_resource')">
+                  <template  v-if="permissionIdentity(activityInfo.permission, userRole, 'manage_resource')">
                     <Button
                       @click="fileEditModelShow(file)"
                       shape="circle"
@@ -365,8 +343,7 @@
       <div slot="footer">
         <Button @click="renameFolderModal = false">Cancel</Button>
         <Button type="success" @click="renameFolder('renameValidate')"
-        >Rename
-        </Button
+        >Rename</Button
         >
       </div>
     </Modal>
@@ -458,8 +435,7 @@
       <div slot="footer">
         <Button @click="uploadModal = false">Cancel</Button>
         <Button type="success" @click="folderUpload('uploadValidate')"
-        >Upload
-        </Button
+        >Upload</Button
         >
       </div>
     </Modal>
@@ -495,15 +471,15 @@
           <CheckboxGroup v-model="selectedFilesToShare">
             <Card dis-hover v-for="file in userResourceList" :key="file.index">
               <Checkbox
-                :label="file.uid"
+                :label="file.resourceId"
                 class="personalFileLabel"
                 :title="file.name"
-                v-if="canBeShare(file.uid)"
+                v-if="canBeShare(file.resourceId)"
               >
                 <strong>{{ file.name }}</strong>
               </Checkbox>
               <Checkbox
-                :label="file.uid"
+                :label="file.resourceId"
                 class="personalFileLabel"
                 :title="file.name"
                 disabled
@@ -526,14 +502,12 @@
       </div>
       <div slot="footer" style="display: inline-block">
         <i-button type="primary" @click="shareFile()" style="float: right"
-        >Submit
-        </i-button
+        >Submit</i-button
         >
         <i-button
           @click="closeshareModel()"
           style="float: right; margin-right: 15px"
-        >Cancel
-        </i-button
+        >Cancel</i-button
         >
       </div>
     </Modal>
@@ -573,8 +547,7 @@
       <div slot="footer">
         <Button @click="editFileModel = false">Cancel</Button>
         <Button type="success" @click="editFileInfo('editFileValidate')"
-        >Submit
-        </Button
+        >Submit</Button
         >
       </div>
     </Modal>
@@ -595,6 +568,7 @@
   </div>
 </template>
 <script>
+  import * as userRoleJS from "./../../api/userRole.js";
   export default {
     props: ["activityInfo"],
     data() {
@@ -603,11 +577,9 @@
         userRole: "visitor",
         currentFolder: {
           folders: [],
-          files: []
+          files: [],
         },
-        pathStr: "",
-        folderStack: [{uid: 0, name: "Home"}],
-        folderIdStack: [],
+        folderStack: [],
         newFolderModal: false,
         setFolderName: "",
         newValidate: {
@@ -658,7 +630,7 @@
           ],
           description: [
             {
-              required: false,
+              required: true,
               message: "file description cannot be empty",
               trigger: "blur",
             },
@@ -687,7 +659,7 @@
           ],
           description: [
             {
-              required: false,
+              required: true,
               message: "file description cannot be empty",
               trigger: "blur",
             },
@@ -730,131 +702,79 @@
         copyFileModal: false,
         copyFilePrivacy: "private",
         selectedFile: {},
-        delCount: 0,
-        putFileInfo: {}
       };
     },
     mounted() {
       this.initSize();
-      this.getResList();
       this.roleIdentity();
+      this.enterFolder(this.activityInfo.aid);
       window.addEventListener("resize", this.initSize);
     },
     beforeDestroy: function () {
       window.removeEventListener("resize", this.initSize);
     },
     methods: {
-      getResList: function () {
-        this.axios
-          .get("/GeoProblemSolving/rip/" + this.activityInfo.aid + "/0")
-          .then(res => {
-            if (res.data == "Offline") {
-              confirm("You are offline, please login again.")
-            } else if (res.data.code == 0) {
-              let rootRes = res.data.data;
-              this.resToCurrentFolder(rootRes);
-              this.indeterminate = false;
-              this.checkAll = false;
-            }
-          })
-          .catch()
-      },
       initSize() {
-        this.contentHeight = window.innerHeight - 230;
+        this.contentHeight = window.innerHeight - 350;
       },
       roleIdentity() {
-        this.userRole = this.userRoleApi.roleIdentify(
+        this.userRole = userRoleJS.roleIdentify(
           this.activityInfo.members,
           this.userInfo.userId
         );
       },
       permissionIdentity(permission, role,operation) {
-        return this.userRoleApi.permissionIdentity(
+        return userRoleJS.permissionIdentity(
           JSON.parse(permission),
           role,
           operation
         );
       },
-      //工具方法，资源list填充currentFolder
-      resToCurrentFolder: function (rootRes) {
-        this.currentFolder.folders = [];
-        this.currentFolder.files = [];
-        for (let i = 0; i < rootRes.length; i++) {
-          if (rootRes[i].folder) {
-            this.currentFolder.folders.push(rootRes[i]);
-          } else {
-            this.currentFolder.files.push(rootRes[i]);
-          }
-        }
-        console.log(this.currentFolder.files)
-      },
-      enterFolder(currentFolder) {
+      enterFolder(currentFolderId) {
         this.chooseFilesArray = [];
         this.checkAll = false;
         this.indeterminate = false;
-        this.folderIdStack.unshift(currentFolder.uid);
-        this.changeFolder(currentFolder, "enter");
+        this.changeFolder(currentFolderId, "enter");
       },
       backforeFolder() {
         this.chooseFilesArray = [];
         this.checkAll = false;
         this.indeterminate = false;
-        this.folderIdStack.splice(0, 1);
-        if (this.folderStack.length != 1) {
-          //folderStack 倒数第二个就是其的父文件夹
-          this.changeFolder(this.folderStack[this.folderStack.length - 2], "back");
+        if (this.currentFolder.parentId != "") {
+          this.changeFolder(this.currentFolder.parentId, "back");
         } else {
           this.$Message.warning("This is the root folder.");
         }
       },
       switchFolder(folder, index) {
-        this.delCount = this.folderStack.length - index - 1;
-        this.folderIdStack.splice(0, this.delCount);
-        this.changeFolder(folder, "switch");
-      },
-      changeFolder(folder, operationType) {
-        let temp = this.folderIdStack;
-        if (temp.length == 0) {
-          temp = ["0"];
+        let popTimes = this.folderStack.length - index - 1;
+        for (let i = 0; i < popTimes; i++) {
+          this.folderStack.pop();
         }
-        console.log("paths: " + temp.toString());
-        this.axios.get("/GeoProblemSolving/rip/" + this.activityInfo.aid + "/" + temp.toString())
-          .then(res => {
+        this.changeFolder(folder.folderId, "switch");
+      },
+      changeFolder(folderId, type) {
+        this.axios
+          .get("/GeoProblemSolving/folder/inquiry" + "?folderId=" + folderId)
+          .then((res) => {
             if (res.data == "Offline") {
-              confirm("You are offline, please login again.")
-            } else if (res.data.code == 0) {
-              let folderInfo = res.data.data;
-              this.resToCurrentFolder(folderInfo);
-              if (operationType == "enter") {
-                this.folderStack.push({uid: folder.uid, name: folder.name});
-                console.log(this.currentFolder)
-              } else if (operationType == "back") {
+              this.$store.commit("userLogout");
+              this.$router.push({ name: "Login" });
+            } else if (res.data != "Fail") {
+              var folderInfo = res.data;
+              this.currentFolder = res.data;
+              if (type == "enter") {
+                this.folderStack.push(folderInfo);
+              } else if (type == "back") {
                 this.folderStack.pop();
-              } else if (operationType == "switch") {
-                for (let i = 0; i < this.delCount; i++) {
-                  this.folderStack.pop();
-                }
               }
             } else {
-              this.$Message.warning("Get folder info fail.")
+              this.$Message.warning("Get folder info fail.");
             }
           })
-          .catch(err => {
+          .catch((err) => {
             this.$Message.warning("Get folder info fail.");
-          })
-      },
-      //工具方法，将 pathUid 转换为字符串
-      reversePathToStr: function (pathIdArray) {
-        let pathStrTemp = "";
-        for (let i = 0; i < pathIdArray.length; i++) {
-          if (i != pathIdArray.length - 1) {
-            pathStrTemp += pathIdArray[i] + ",";
-          } else {
-            pathStrTemp += pathIdArray[i];
-          }
-        }
-        this.pathStr = pathStrTemp;
-        console.log("reversePathToStr: " + this.pathStr)
+          });
       },
       getFileInfo(file) {
         this.selectedFileData = [
@@ -876,7 +796,7 @@
           },
           {
             key: "Uploader",
-            value: file.uploadName,
+            value: file.uploaderName,
           },
           {
             key: "Upload Time",
@@ -889,54 +809,56 @@
         this.newValidate.setName = "";
         this.newFolderModal = true;
       },
-      addFolder: function (name) {
-        this.$refs[name].validate(valid => {
+      addFolder(name) {
+        this.$refs[name].validate((valid) => {
           if (valid) {
-            let pathArray = this.folderIdStack;
-            if (pathArray.length == 0) {
-              pathArray = ["0"];
-            }
-            let formData = new FormData();
-            formData.append("folderName", this.newValidate.setName);
-            formData.append("paths", pathArray.toString());
-            formData.append("aid", this.activityInfo.aid);
+            var parentId = this.currentFolder.folderId;
+            var newFolderName = this.newValidate.setName;
             this.axios
-              .post("/GeoProblemSolving/rip/folder", formData)
-              .then(res => {
+              .post(
+                "/GeoProblemSolving/folder/new" +
+                "?folderName=" +
+                newFolderName +
+                "&parentId=" +
+                parentId +
+                "&scopeId=" +
+                this.activityInfo.aid
+              )
+              .then((res) => {
                 if (res.data == "Offline") {
-                  confirm("You are offline, please login again.");
-                } else if (res.data.code == 0) {
-                  this.currentFolder.folders.push(res.data.data);
+                  this.$store.commit("userLogout");
+                  this.$router.push({ name: "Login" });
+                } else if (res.data != "Fail") {
+                  this.currentFolder.folders.push(res.data);
                   this.newFolderModal = false;
                 } else {
                   this.$Message.warning("New folder fail.");
                 }
               })
-              .catch(err => {
+              .catch((err) => {
                 this.$Message.warning("New folder fail.");
-              })
+              });
           }
         });
       },
       deleteFolder(folder) {
         if (confirm("Are you sure to delete this folder?")) {
-          let folderId = folder.uid;
-          let temp = this.folderIdStack;
-          if (temp.length == 0) {
-            //重新开辟内存空间的temp,如果直接使用push的话，地址还是指向原数据的地址
-            temp = ["0"];
-          }
-          let formData = new FormData();
-          formData.append("uids", folderId);
-          formData.append("aid", this.activityInfo.aid);
-          formData.append("paths", temp.toString());
-          this.axios.post("/GeoProblemSolving/rip/del", formData)
-            .then(res => {
+          var folderId = folder.uid;
+          var parentId = this.currentFolder.folderId;
+          this.axios
+            .get(
+              "/GeoProblemSolving/folder/removeFolder" +
+              "?folderId=" +
+              folderId +
+              "&parentId=" +
+              parentId
+            )
+            .then((res) => {
               if (res.data == "Offline") {
-                confirm("You are offline, please login again.");
-              } else if (res.data.code == 0) {
-                //删除用于显示的数据中对应的内容
-                for (let i = 0; i < this.currentFolder.folders.length; i++) {
+                this.$store.commit("userLogout");
+                this.$router.push({ name: "Login" });
+              } else if (res.data != "Fail") {
+                for (var i = 0; i < this.currentFolder.folders.length; i++) {
                   if (this.currentFolder.folders[i].uid == folderId) {
                     this.currentFolder.folders.splice(i, 1);
                     break;
@@ -946,9 +868,9 @@
                 this.$Message.warning("Delete folder fail.");
               }
             })
-            .catch(err => {
+            .catch((err) => {
               this.$Message.warning("Delete folder fail.");
-            })
+            });
         }
       },
       renameFolderModalShow(folder) {
@@ -959,28 +881,27 @@
       renameFolder(name) {
         this.$refs[name].validate((valid) => {
           if (valid) {
-            let aid = this.activityInfo.aid;
-            let folderId = this.renameForeInfo.uid;
-            let newFolderName = this.renameValidate.newName;
-            let temp = this.folderIdStack;
-            if (temp.length == 0) {
-              temp = ["0"];
-            }
-            let formData = new FormData();
-            formData.append("aid", aid);
-            formData.append("folderId", folderId);
-            formData.append("newFolderName", newFolderName);
-            formData.append("paths", temp.toString());
+            var parentId = this.currentFolder.folderId;
+            var folderId = this.renameForeInfo.uid;
+            var newName = this.renameValidate.newName;
             this.axios
-              .put("/GeoProblemSolving/rip/folder", formData)
+              .get(
+                "/GeoProblemSolving/folder/renameFolder" +
+                "?newName=" +
+                newName +
+                "&folderId=" +
+                folderId +
+                "&parentId=" +
+                parentId
+              )
               .then((res) => {
                 if (res.data == "Offline") {
                   this.$store.commit("userLogout");
-                  this.$router.push({name: "Login"});
-                } else if (res.data.code == 0) {
-                  let newNameFolder = {
+                  this.$router.push({ name: "Login" });
+                } else if (res.data != "Fail") {
+                  var newNameFolder = {
                     uid: folderId,
-                    name: newFolderName,
+                    name: newName,
                   };
                   for (var i = 0; i < this.currentFolder.folders.length; i++) {
                     if (this.currentFolder.folders[i].uid == folderId) {
@@ -1003,7 +924,7 @@
         this.uploadValidate = {
           privacy: "private",
           type: "data",
-          description: ""
+          description: "",
         };
         this.toUploadFiles = [];
         this.uploadModal = true;
@@ -1037,25 +958,21 @@
       folderUpload(name) {
         this.$refs[name].validate((valid) => {
           if (valid) {
-            let uploadFiles = this.toUploadFiles;
+            var uploadFiles = this.toUploadFiles;
             if (uploadFiles.length > 0) {
               this.uploadModal = false;
-              let formData = new FormData();
-              for (let i = 0; i < uploadFiles.length; i++) {
+              var formData = new FormData();
+              for (var i = 0; i < uploadFiles.length; i++) {
                 formData.append("file", uploadFiles[i]);
-              }
-              let temp = this.folderIdStack;
-              if (temp.length == 0) {
-                temp = ["0"];
               }
               formData.append("description", this.uploadValidate.description);
               formData.append("type", this.uploadValidate.type);
+              formData.append("uploaderId", this.userInfo.userId);
               formData.append("privacy", this.uploadValidate.privacy);
-              formData.append("aid", this.activityInfo.aid);
-              formData.append("paths", temp.toString());
+              formData.append("folderId", this.currentFolder.folderId);
               this.progressModalShow = true;
               this.axios({
-                url: "/GeoProblemSolving/rip/file/upload",
+                url: "/GeoProblemSolving/folder/uploadToFolder",
                 method: "post",
                 onUploadProgress: (progressEvent) => {
                   this.uploadProgress =
@@ -1105,7 +1022,7 @@
         });
       },
       filePreview(fileInfo) {
-        let name = fileInfo.name + fileInfo.suffix;
+        let name = fileInfo.name;
         if (/\.(doc|docx|xls|xlsx|ppt|pptx)$/.test(name.toLowerCase())) {
           this.$Modal.confirm({
             title: "Note",
@@ -1119,7 +1036,7 @@
                 "http://view.officeapps.live.com/op/view.aspx?src=" +
                 "http://" +
                 this.$store.state.IP_Port +
-                fileInfo.address;
+                fileInfo.pathURL;
               var toolURL =
                 "<iframe src=" +
                 url +
@@ -1150,7 +1067,7 @@
           if (this.panel != null) {
             this.panel.close();
           }
-          var url = "http://" + this.$store.state.IP_Port + fileInfo.address;
+          var url = "http://" + this.$store.state.IP_Port + fileInfo.pathURL;
           var toolURL =
             "<video src=" +
             url +
@@ -1176,7 +1093,7 @@
           if (this.panel != null) {
             this.panel.close();
           }
-          var url = "http://" + this.$store.state.IP_Port + fileInfo.address;
+          var url = "http://" + this.$store.state.IP_Port + fileInfo.pathURL;
           var toolURL =
             "<iframe src=" +
             url +
@@ -1207,25 +1124,24 @@
         }
       },
       fileDelete(fileInfo) {
-        if (confirm("Are you sure to delete ?")) {
-          let fileId = fileInfo.uid;
-          let temp = this.folderIdStack;
-          if (temp.length == 0) {
-            temp = ["0"];
-          }
-          let formData = new FormData();
-          formData.append("uids", fileId);
-          formData.append("aid", this.activityInfo.aid);
-          formData.append("paths", temp.toString());
-
+        if (confirm("Are you sure to delete this file?")) {
+          var folderId = this.currentFolder.folderId;
+          var fileId = fileInfo.resourceId;
           this.axios
-            .post("/GeoProblemSolving/rip/del", formData)
-            .then(res => {
+            .get(
+              "/GeoProblemSolving/folder/removeFile" +
+              "?folderId=" +
+              folderId +
+              "&fileId=" +
+              fileId
+            )
+            .then((res) => {
               if (res.data == "Offline") {
-                confirm("You are offline, please login again.");
-              } else if (res.data.code == 0) {
-                for (let i = 0; i < this.currentFolder.files.length; i++) {
-                  if (this.currentFolder.files[i].uid == fileId) {
+                this.$store.commit("userLogout");
+                this.$router.push({ name: "Login" });
+              } else if (res.data != "Fail") {
+                for (var i = 0; i < this.currentFolder.files.length; i++) {
+                  if (this.currentFolder.files[i].resourceId == fileId) {
                     this.currentFolder.files.splice(i, 1);
                     break;
                   }
@@ -1234,9 +1150,9 @@
                 this.$Message.warning("Delete file fail.");
               }
             })
-            .catch(err => {
+            .catch((err) => {
               this.$Message.warning("Delete file fail.");
-            })
+            });
         }
       },
       download(blobUrl) {
@@ -1256,7 +1172,7 @@
         this.indeterminate = false;
         if (this.checkAll) {
           this.currentFolder.files.forEach((item) => {
-            this.chooseFilesArray.push(item.address);
+            this.chooseFilesArray.push(item["pathURL"]);
           });
         } else {
           this.chooseFilesArray = [];
@@ -1275,26 +1191,43 @@
         }
       },
       downloadSelectFile() {
-        let chooseFileUrls = this.chooseFilesArray;
-        console.log(this.chooseFilesArray)
-        let temp = [];
-        if (chooseFileUrls.length != 0) {
-          for (let i = 0; i < chooseFileUrls.length; i++) {
-            temp.push(chooseFileUrls[i].split("/data/")[1]);
-          }
-          window.open("http://221.226.60.2:8082/batchData?oids=" + temp.toString())
+        let choosefileUrls = this.chooseFilesArray.toString();
+        if (choosefileUrls != "") {
+          this.$Spin.show();
+          this.axios({
+            method: "post",
+            url:
+              "/GeoProblemSolving/resource/packageZIP?fileURLs=" + choosefileUrls,
+            responseType: "blob",
+          })
+            .then((res) => {
+              if (res.status == 200) {
+                this.$Spin.hide();
+                const blobUrl = window.URL.createObjectURL(res.data);
+                if (blobUrl != "") {
+                  this.download(blobUrl);
+                }
+              }
+            })
+            .catch((err) => {});
+        } else {
+          alert("you don't choose any file!");
         }
       },
       shareModalShow() {
-        this.shareModal = true;
         this.axios
-          .get("/GeoProblemSolving/res/file/all")
+          .get(
+            "/GeoProblemSolving/resource/inquiry" +
+            "?key=uploaderId" +
+            "&value=" +
+            this.$store.getters.userId
+          )
           .then((res) => {
             if (res.data == "Offline") {
               this.$store.commit("userLogout");
-              this.$router.push({name: "Login"});
+              this.$router.push({ name: "Login" });
             } else if (res.data != "None" && res.data != "Fail") {
-              this.userResourceList = res.data.data;
+              this.userResourceList = res.data;
               this.shareModal = true;
             } else if (res.data == "None") {
               this.userResourceList = [];
@@ -1308,41 +1241,47 @@
         this.shareModal = false;
       },
       shareFile() {
-        let addFileList = this.selectedFilesToShare;
-        let tempPath = this.folderIdStack;
-        if (tempPath.length == 0){
-          tempPath = ["0"];
-        }
+        var addFileList = this.selectedFilesToShare;
+        var addFileListStr = addFileList.toString();
         this.axios
-          .get("/GeoProblemSolving/rip/shareToProject/"
-            + this.activityInfo.aid + "/" +
-            addFileList.toString() + "/" +
-            tempPath.toString())
+          .get(
+            "/GeoProblemSolving/folder/shareToFolder" +
+            "?addFileList=" +
+            addFileListStr +
+            "&folderId=" +
+            this.currentFolder.folderId
+          )
           .then((res) => {
             this.shareModal = false;
             if (res.data == "Offline") {
               this.$store.commit("userLogout");
-              this.$router.push({name: "Login"});
-            } else if (res.data.code == 0) {
-              let sharedFile = res.data.data;
-              for (let i = 0; i < sharedFile.length; i++){
-                this.currentFolder.files.push(sharedFile[i]);
-              }
-              this.$Message.success("Shared file success!")
+              this.$router.push({ name: "Login" });
+            } else if (res.data != "Fail") {
+              var addFileInfoList = this.userResourceList.filter((file) => {
+                for (var i = 0; i < addFileList.length; i++) {
+                  if (file.resourceId == addFileList[i]) {
+                    return true;
+                  }
+                }
+                return false;
+              });
+              var foreFiles = Object.assign([], this.currentFolder.files);
+              this.currentFolder.files = foreFiles.concat(addFileInfoList);
               this.selectedFilesToShare = [];
+              this.shareModal = false;
             } else {
-              this.$Message.error("Shared file fail!");
+              console.log(res.data);
             }
           })
           .catch((err) => {
-            this.$Message.error("Shared file fail!");
+            console.log(err.data);
           });
       },
       fileDownload(fileInfo) {
-        window.open(fileInfo.address);
+        window.open(fileInfo.pathURL);
       },
       fileEditModelShow(fileInfo) {
-        this.putFileInfo = fileInfo;
+        this.renameForeInfo = fileInfo;
         this.editFileValidate.name = fileInfo.name;
         this.editFileValidate.type = fileInfo.type;
         this.editFileValidate.description = fileInfo.description;
@@ -1351,50 +1290,53 @@
       editFileInfo(name) {
         this.$refs[name].validate((valid) => {
           if (valid) {
-            let formData = new FormData();
-            let putResInfo = {
-              uid: this.putFileInfo.uid,
-              name: this.editFileValidate.name,
-              type: this.editFileValidate.type,
-              description: this.editFileValidate.description
-            }
-            let temp = this.folderIdStack;
-            if (temp.length == 0) {
-              temp = ["0"];
-            }
+            var folderId = this.currentFolder.folderId;
+            var fileId = this.renameForeInfo.resourceId;
             this.axios
-              .put("/GeoProblemSolving/rip/file/" + this.activityInfo.aid + "/" + temp.toString(), putResInfo)
+              .get(
+                "/GeoProblemSolving/folder/editFile" +
+                "?fileId=" +
+                fileId +
+                "&folderId=" +
+                folderId +
+                "&name=" +
+                this.editFileValidate.name +
+                "&type=" +
+                this.editFileValidate.type +
+                "&description=" +
+                this.editFileValidate.description
+              )
               .then((res) => {
                 this.editFileModel = false;
                 if (res.data == "Offline") {
                   this.$store.commit("userLogout");
-                  this.$router.push({name: "Login"});
-                } else if (res.data.code == 0) {
-                  this.putFileInfo.name = this.editFileValidate.name;
-                  this.putFileInfo.type = this.editFileValidate.type;
-                  this.putFileInfo.description = this.editFileValidate.description;
+                  this.$router.push({ name: "Login" });
+                } else if (res.data != "Fail") {
+                  var newFileInfo = Object.assign({}, this.renameForeInfo);
+                  newFileInfo.name = this.editFileValidate.name;
+                  newFileInfo.type = this.editFileValidate.type;
+                  newFileInfo.description = this.editFileValidate.description;
                   for (var i = 0; i < this.currentFolder.files.length; i++) {
-                    if (this.currentFolder.files[i].resourceId == this.putFileInfo.uid) {
-                      this.currentFolder.files.splice(i, 1, this.putFileInfo);
+                    if (this.currentFolder.files[i].resourceId == fileId) {
+                      this.currentFolder.files.splice(i, 1, newFileInfo);
                       break;
                     }
                   }
                 } else {
-                  this.$Message.warning("Update fail.");
+                  this.$Message.warning("Rename fail.");
                 }
               })
               .catch((err) => {
-                this.$Message.warning("Update fail.");
+                this.$Message.warning("Rename fail.");
               });
             this.renameFolderModal = false;
           }
         });
       },
       canBeShare(fileId) {
-        //判断项目中是否由此文件，如果有，则不能共享
-        let result = true;
-        for (let i = 0; i < this.currentFolder.files.length; i++) {
-          if (this.currentFolder.files[i].uid == fileId) {
+        var result = true;
+        for (var i = 0; i < this.currentFolder.files.length; i++) {
+          if (this.currentFolder.files[i].resourceId == fileId) {
             result = false;
           }
         }
@@ -1407,16 +1349,29 @@
       },
       copyFileToCenter() {
         this.$Spin.show();
-        this.selectedFile.privacy = this.copyFilePrivacy;
         this.axios
-          .post("/GeoProblemSolving/res/file/copyToCenter", this.selectedFile)
+          .get(
+            "/GeoProblemSolving/folder/copyToCenter" +
+            "?resourceId=" +
+            this.selectedFile.resourceId +
+            "&userId=" +
+            this.$store.getters.userId +
+            "&privacy=" +
+            this.copyFilePrivacy +
+            "&type=" +
+            this.selectedFile.type +
+            "&name=" +
+            this.selectedFile.name +
+            "&description=" +
+            this.selectedFile.description
+          )
           .then((res) => {
             this.$Spin.hide();
             this.copyFileModal = false;
-            if (res.data.code == 0) {
+            if (res.data == "Success") {
               this.$Message.success("Copy file success.");
             } else {
-              this.$Message.warning(res.data.data);
+              this.$Message.warning(res.data);
             }
           })
           .catch((err) => {

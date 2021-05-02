@@ -1,7 +1,6 @@
 package cn.edu.njnu.geoproblemsolving.business.user.service;
 
-import cn.edu.njnu.geoproblemsolving.business.user.StaticParams;
-import cn.edu.njnu.geoproblemsolving.business.user.entity.User;
+
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,10 +25,9 @@ public class TokenTask {
     String client_id;
     @Value("${client_secret}")
     String client_secret;
-    @Value("${authServerIp}")
-    String authIp;
-    @Value("${resServerIp}")
-    String resIp;
+
+    @Value("$userServerLocation")
+    String userServerIpAndPort;
 
     /**
      * oauth2 密码模式获取token
@@ -38,22 +36,23 @@ public class TokenTask {
      * @return
      */
     public JSONObject getTokenUsePwd(String email, String pwd){
-        LinkedMultiValueMap<String, String> paramMap = new LinkedMultiValueMap<>();
-        paramMap.add("client_id", client_id);
-        paramMap.add("client_secret", client_secret);
-        paramMap.add("username", email);
-        paramMap.add("password", pwd);
-        paramMap.add("scope", "all");
-        paramMap.add("grant_type", "password");
-        String authUri = "http://"+ authIp + "/AuthServer/oauth/token";
+        // LinkedMultiValueMap<String, String> paramMap = new LinkedMultiValueMap<>();
+        // paramMap.add("client_id", client_id);
+        // paramMap.add("client_secret", client_secret);
+        // paramMap.add("username", email);
+        // paramMap.add("password", pwd);
+        // paramMap.add("scope", "all");
+        // paramMap.add("grant_type", "password");
+        // String authUri = "http://"+ userServerIpAndPort + "/oauth/token";
         //添加错误处理机制,成功后返回是JSONString,失败的话不是。
-        try {
-            JSONObject tokenResult = restTemplate.postForObject(authUri, paramMap, JSONObject.class);
-            return tokenResult;
-        }catch (Exception e){
-            System.out.println("Exception: " + e.toString());
-            return null;
-        }
+        // try {
+        //     JSONObject tokenResult = restTemplate.postForObject(authUri, paramMap, JSONObject.class);
+        //     return tokenResult;
+        // }catch (Exception e){
+        //     System.out.println("Exception: " + e.toString());
+        //     return null;
+        // }
+        return null;
     }
 
     /**
@@ -62,15 +61,16 @@ public class TokenTask {
      * @return
      */
     public JSONObject getUserFromResServer(String access_token){
-        HttpHeaders headers = new HttpHeaders();
-        StaticParams.access_token = access_token;
-        headers.add("Authorization", "Bearer "+ access_token);
-        //httpEntity = httpHeader + httpBody,当然也可以只有其中一部分
-        HttpEntity<Object> httpEntity = new HttpEntity<>(headers);
-        String resUserUri = "http://" + resIp + "/ResServer/user/getInfo";
-        //Url, RequestType, RequestContent, ResponseDataType
-        ResponseEntity<JSONObject> userJson = restTemplate.exchange(resUserUri, HttpMethod.GET, httpEntity, JSONObject.class);
-        return userJson.getBody();
+        // HttpHeaders headers = new HttpHeaders();
+        // StaticParams.access_token = access_token;
+        // headers.add("Authorization", "Bearer "+ access_token);
+        // //httpEntity = httpHeader + httpBody,当然也可以只有其中一部分
+        // HttpEntity<Object> httpEntity = new HttpEntity<>(headers);
+        // String resUserUri = "http://" + userServerIpAndPort + "/ResServer/user/getInfo";
+        // //Url, RequestType, RequestContent, ResponseDataType
+        // ResponseEntity<JSONObject> userJson = restTemplate.exchange(resUserUri, HttpMethod.GET, httpEntity, JSONObject.class);
+        // return userJson.getBody();
+        return null;
     }
 
 

@@ -25,14 +25,14 @@
               ></Input>
             </FormItem>
 
-            <FormItem label="Verification" prop="oldPwd">
+            <FormItem label="Verification" prop="code">
               <Poptip
                 placement="top-start"
                 content="Old password or verification code in your the feedback email to modify the password."
                 width="300px"
               >
                 <Input
-                  v-model="formValidate.oldPwd"
+                  v-model="formValidate.code"
                   placeholder="Please enter old password or the verification code"
                   style="width: 300px"
                 ></Input>
@@ -94,7 +94,7 @@
         confirmPassword: "",
         formValidate: {
           email: "",
-          oldPwd: "",
+          code: "",
           newPassword: "",
           confirmPassword: "",
           // 密码类型,
@@ -112,7 +112,7 @@
               trigger: "blur"
             }
           ],
-          oldPwd: [
+          code: [
             {
               required: true,
               message: "Input your old password or verification code",
@@ -156,16 +156,14 @@
       //     .catch(err => {});
       // },
       resetPwd() {
-        var md5_newPwd =  md5(this.formValidate.newPassword);
-        var md5_oldPwd = md5(this.formValidate.oldPwd);
-        var paramUrl = "email=" + this.formValidate.email + "&oldPwd=" + md5_oldPwd + "&newPwd=" + md5_newPwd;
+        var encodePwd =  md5(this.formValidate.newPassword);
         this.axios
-          .get("/GeoProblemSolving/user/newPassword?" + paramUrl)
+          .get("/GeoProblemSolving/user/changePwd/" + this.formValidate.email + "/" + this.formValidate.code + "/" + encodePwd)
           .then(res => {
-            if (res.data == 1){
+            if (res.data.code == 0){
               this.$router.replace({name: "Login"})
             }else {
-              this.$Message.info("Old password error")
+              this.$Message.info("Verification code error.")
             }
           })
           .catch(err => {

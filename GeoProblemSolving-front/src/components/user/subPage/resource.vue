@@ -589,9 +589,9 @@
           let oids = "";
           for (let i = 0; i < selectedRes.length; i++) {
             if (i != selectedRes.length - 1) {
-              oids += selectedRes[i].pathURL.split("/resource/")[1] + ",";
+              oids += selectedRes[i].pathURL.split("/data/")[1] + ",";
             } else {
-              oids += selectedRes[i].pathURL.split("/resource/")[1]
+              oids += selectedRes[i].pathURL.split("/data/")[1]
             }
           }
           let downloadBatchUrl = "http://221.226.60.2:8082/batchData?oids=" + oids;

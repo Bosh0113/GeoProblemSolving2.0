@@ -153,7 +153,7 @@
                         placeholder="Plase enter your title"
                         :class="{ InputStyle: inputstyle }"
                       >
-                        <Option value="Professor">Professor</Option>
+                        <Option value="Prof">Professor</Option>
                         <Option value="Dr">Dr</Option>
                         <Option value="Miss">Miss</Option>
                         <Option value="Mr">Mr</Option>
@@ -167,7 +167,7 @@
                     <FormItem label="Country / Region " prop="country">
                       <Input
                         v-model="registerForm.country"
-                        placeholder="Plase enter your country"
+                        placeholder="Please enter your country"
                         :class="{ InputStyle: inputstyle }"
                       ></Input>
                     </FormItem>
@@ -361,9 +361,9 @@ export default {
           this.axios
             .post("/GeoProblemSolving/user", userData)
             .then((res) => {
-              console.log(res.data.code);
               if (res.data.code == -3) {
-                this.$Message.success("This email has been registered!");
+                this.$Message.error("This email has been registered!");
+                this.registerForm.email = "";
               } else if (res.data.code == 0) {
                 this.$Message.success("Register successfully!");
                 this.$router.replace({ name: "Login" });
@@ -394,7 +394,8 @@ export default {
       var reader = new FileReader();
       reader.readAsDataURL(file);
       reader.onload = (e) => {
-        // 读取到的图片base64 数据编码 将此编码字符串传给后台即可
+        //正巧后台也是使用的base64 hah
+        // 读取到的图片base64 数据编码 将此编码字符串传给后台即可,
         imgcode = e.target.result;
 
         this.$store.commit("uploadAvatar", imgcode);

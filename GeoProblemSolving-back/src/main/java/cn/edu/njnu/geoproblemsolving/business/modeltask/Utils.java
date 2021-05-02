@@ -3,11 +3,16 @@ package cn.edu.njnu.geoproblemsolving.business.modeltask;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.UUID;
 
 public class Utils {
+    @Autowired
+    RestTemplate restTemplate;
+
     public static JSONObject convertMdl(JSONObject data) {
 
         JSONObject jsonObject = JSON.parseObject(JSONObject.toJSONString(data.getJSONObject("mdlJson")));
@@ -70,4 +75,6 @@ public class Utils {
             data.put("convertMdlJson",jsonStates);
             return data;
     }
+
+
 }

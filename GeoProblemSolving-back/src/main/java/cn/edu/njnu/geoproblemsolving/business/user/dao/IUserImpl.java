@@ -1,30 +1,28 @@
 package cn.edu.njnu.geoproblemsolving.business.user.dao;
 
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Project;
+import cn.edu.njnu.geoproblemsolving.business.resource.entity.ResourceEntity;
 import cn.edu.njnu.geoproblemsolving.business.resource.entity.ResourcePojo;
 import cn.edu.njnu.geoproblemsolving.business.user.dto.InquiryUserDto;
 import cn.edu.njnu.geoproblemsolving.business.user.entity.User;
-import cn.edu.njnu.geoproblemsolving.business.user.entity.UserDto;
+import cn.edu.njnu.geoproblemsolving.business.user.entity.UserVo;
 import cn.edu.njnu.geoproblemsolving.business.user.util.ICommonUtil;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import cn.edu.njnu.geoproblemsolving.common.utils.ResultUtils;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.mongodb.client.result.UpdateResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
-import org.springframework.http.*;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 @Repository
 public class IUserImpl implements IUserDao {
@@ -76,7 +74,7 @@ public class IUserImpl implements IUserDao {
         String organizations = remoteUser.get("organizations").toString();
         remoteUser.remove("organizations");
         remoteUser.put("organization", organizations);
-        UserDto localUser = JSONObject.toJavaObject(remoteUser, UserDto.class);
+        UserVo localUser = JSONObject.toJavaObject(remoteUser, UserVo.class);
         try {
             mongoTemplate.save(localUser);
         } catch (Exception e) {
@@ -127,40 +125,28 @@ public class IUserImpl implements IUserDao {
 
     @Override
     public JsonResult addUserInfo(JSONObject jsonObject) {
-        try {
-            RestTemplate restTemplate = new RestTemplate();
-//            LinkedMultiValueMap<String, Object> valueMap = new LinkedMultiValueMap<>();
-//            for (Map.Entry entry : jsonObject.entrySet()){
-//                String filedName =  (String)entry.getKey();
-//                valueMap.add(filedName, entry.getValue());
-//            }
-            String url = "http://" + authServerIp + "/AuthServer/user/add";
-            HttpHeaders httpHeaders = new HttpHeaders();
-            MediaType mediaType = MediaType.parseMediaType("application/json;charset=UTF-8");
-            httpHeaders.setContentType(mediaType);
-            HttpEntity<Object> httpEntity = new HttpEntity<>(jsonObject.toString(), httpHeaders);
-            ResponseEntity<JSONObject> registerResult = restTemplate.exchange(url, HttpMethod.POST, httpEntity, JSONObject.class);
-            int resCode = (int) registerResult.getBody().get("code");
-            if (resCode == 0) {
-                User user = registerResult.getBody().getJSONObject("data").toJavaObject(User.class);
-                return ResultUtils.success(mongoTemplate.save(user));
-            } else if (resCode == -3) {
-                return ResultUtils.error(-3, "Fail: user already exists in the database.");
-            } else {
-                return ResultUtils.error(-2, (String) registerResult.getBody().get("msg"));
-            }
-
-            // Confirm
-//            User user = JSONObject.toJavaObject(jsonObject, User.class);
-//            Query query = new Query(Criteria.where("userId").is(user.getUserId()));
-//            User user1 = mongoTemplate.findOne(query, User.class);
-//            if(user1 != null) return ResultUtils.error(-3, "Fail: user already exists in the database.");
-
-//            return ResultUtils.success(mongoTemplate.save(user));
-
-        } catch (Exception ex) {
-            return ResultUtils.error(-2, "Fail: Exception");
-        }
+        // try {
+        //     RestTemplate restTemplate = new RestTemplate();
+        //     String url = "http://" + authServerIp + "/AuthServer/user/add";
+        //     HttpHeaders httpHeaders = new HttpHeaders();
+        //     MediaType mediaType = MediaType.parseMediaType("application/json;charset=UTF-8");
+        //     httpHeaders.setContentType(mediaType);
+        //     HttpEntity<Object> httpEntity = new HttpEntity<>(jsonObject.toString(), httpHeaders);
+        //     ResponseEntity<JSONObject> registerResult = restTemplate.exchange(url, HttpMethod.POST, httpEntity, JSONObject.class);
+        //     int resCode = (int) registerResult.getBody().get("code");
+        //     if (resCode == 0) {
+        //         User user = registerResult.getBody().getJSONObject("data").toJavaObject(User.class);
+        //         return ResultUtils.success(mongoTemplate.save(user));
+        //     } else if (resCode == -3) {
+        //         return ResultUtils.error(-3, "Fail: user already exists in the database.");
+        //     } else {
+        //         return ResultUtils.error(-2, (String) registerResult.getBody().get("msg"));
+        //     }
+        //
+        // } catch (Exception ex) {
+        //     return ResultUtils.error(-2, "Fail: Exception");
+        // }
+        return null;
     }
 
     @Override
@@ -169,14 +155,14 @@ public class IUserImpl implements IUserDao {
     }
 
     @Override
-    public JsonResult uploadUserRes(String uploaderId, ResourcePojo res) {
+    public JsonResult uploadUserRes(String uploaderId, ResourceEntity res) {
         Query query = new Query(Criteria.where("userId").is(uploaderId));
         Update update = new Update();
         try {
             User user = mongoTemplate.findOne(query, User.class);
-            ArrayList<ResourcePojo> resources = user.getResources();
+            ArrayList<ResourceEntity> resources = user.getResource();
             if (resources == null) {
-                resources = new ArrayList<ResourcePojo>();
+                resources = new ArrayList<ResourceEntity>();
             }
             resources.add(res);
             update.set("resources", resources);
@@ -192,7 +178,7 @@ public class IUserImpl implements IUserDao {
         Query query = new Query(Criteria.where("userId").is(userId));
         User user = mongoTemplate.findOne(query, User.class);
         try {
-            ArrayList<ResourcePojo> resources = user.getResources();
+            ArrayList<ResourceEntity> resources = user.getResource();
             //ArrayList 的动态删除
             ArrayList<Integer> indexArray = new ArrayList<>();
             for (int i = 0; i < rids.length; i++) {
@@ -220,18 +206,18 @@ public class IUserImpl implements IUserDao {
     }
 
     @Override
-    public JsonResult sharedUserRes(String email, ArrayList<ResourcePojo> res) {
+    public JsonResult sharedUserRes(String email, ArrayList<ResourceEntity> res) {
         Query query = new Query(Criteria.where("email").is(email));
         User user = mongoTemplate.findOne(query, User.class);
         if (user == null) {
             return ResultUtils.error(-3, "No such user, please check if the email is correct.");
         }
-        ArrayList<ResourcePojo> resources = user.getResources();
+        ArrayList<ResourceEntity> resources = user.getResource();
         if (resources == null) {
-            resources = new ArrayList<ResourcePojo>();
+            resources = new ArrayList<ResourceEntity>();
         }
-        for (ResourcePojo resourcePojo : res) {
-            resources.add(resourcePojo);
+        for (ResourceEntity resourceEntity : res) {
+            resources.add(resourceEntity);
         }
         Update update = new Update();
         update.set("resources", resources);
@@ -277,5 +263,67 @@ public class IUserImpl implements IUserDao {
             return ResultUtils.error(-2, "Fail");
         }
 
+    }
+
+
+
+    //============================================================
+    //
+    // @Override
+    // public JsonResult saveUser(User user) {
+    //     try {
+    //         user.setPassword("");
+    //         return ResultUtils.success(mongoTemplate.save(user));
+    //     }catch (MongoException e){
+    //         return ResultUtils.error(-2, e.toString());
+    //     }
+    // }
+    //
+    // @Override
+    // public JsonResult updateInfo(String id, Update update) {
+    //     return null;
+    // }
+    //
+    // @Override
+    // public JsonResult findUserByIdOrEmail(String filed) {
+    //     try {
+    //         Criteria criteria = new Criteria().orOperator(Criteria.where("userId").is(filed),
+    //                 Criteria.where("email").is(filed));
+    //         Query query = new Query(criteria);
+    //         User user = mongoTemplate.findOne(query, User.class);
+    //         if (user == null){
+    //             return ResultUtils.error(-3, "No Object");
+    //         }
+    //         return ResultUtils.success(user);
+    //     }catch (MongoException e){
+    //         return ResultUtils.error(-2, e.toString());
+    //     }
+    // }
+
+
+    @Override
+    public JsonResult saveUser(User user) {
+        return ResultUtils.success(mongoTemplate.save(user));
+    }
+
+    /*
+    id 为 userId
+     */
+    @Override
+    public User updateInfo(String userId, Update update) {
+        Query query = new Query(Criteria.where("userId").is(userId));
+        UpdateResult updateResult = mongoTemplate.upsert(query, update, User.class);
+        if (updateResult.getMatchedCount() != 1){
+            return null;
+        }
+        return findUserByIdOrEmail(userId);
+    }
+
+    @Override
+    public User findUserByIdOrEmail(String filed) {
+        Criteria criteria = new Criteria().orOperator(Criteria.where("email").is(filed),
+                Criteria.where("userId").is(filed));
+        Query query = new Query(criteria);
+        return mongoTemplate.findOne(query, User.class);
     }
 }
