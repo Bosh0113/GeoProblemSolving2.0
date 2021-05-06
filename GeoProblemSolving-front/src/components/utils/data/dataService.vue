@@ -403,14 +403,17 @@ export default {
         name: event.name,
         description: event.description,
         type: "data",
-        fileSize: "",
-        pathURL: event.url,
+        userUpload: false,
+        address: event.url,
         uploaderId: this.pageParams.userId,
         uploaderName: this.pageParams.userName,
         privacy: "private"
       };
 
-      let data = await post("/GeoProblemSolving/resource/bind", json);
+
+      let data = await post("/GeoProblemSolving/rip/file/bind/" + this.pageParams.pageId, json);
+
+      // let data = await post("/GeoProblemSolving/resource/bind", json);
       event.bind = true;
       this.$forceUpdate();
       this.$message({
