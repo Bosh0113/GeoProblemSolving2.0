@@ -98,11 +98,11 @@
   </div>
 </template>
 <script>
-import minimap from "../../../../static/js/Control.MiniMap.min.js";
-import pm from "../../../../static/js/leaflet.pm.min.js";
-import * as socketApi from "./../../../api/socket.js";
-import imIcon from "../../../../static/Images/import.png";
-import exIcon from "../../../../static/Images/export.png";
+import minimap from "@static/js/Control.MiniMap.min.js";
+import pm from "@static/js/leaflet.pm.min.js";
+import * as socketApi from "@/api/socket.js";
+import imIcon from "@static/Images/import.png";
+import exIcon from "@static/Images/export.png";
 //leaflet
 import L from "leaflet";
 import shp from "shpjs";
@@ -156,6 +156,8 @@ export default {
   },
   mounted() {
     window.addEventListener("resize", this.initSize);
+    // window.addEventListener("message", this.getStepInfo, false);
+    
     this.initSize();
     this.getStepInfo();
     this.getUserInfo();
@@ -166,6 +168,7 @@ export default {
     this.initControl();
     this.startWebSocket();
     this.listenDraw();
+
   },
   beforeDestroy() {
     window.removeEventListener("resize", this.initSize);
@@ -185,6 +188,9 @@ export default {
       this.windowHeight = window.innerHeight;
       this.windowWidth = window.innerWidth - 60;
     },
+    // getStepInfo(event) {
+    //   console.log(event.data);
+    // },
     getStepInfo() {
       if (
         this.$route.params.groupID == undefined ||

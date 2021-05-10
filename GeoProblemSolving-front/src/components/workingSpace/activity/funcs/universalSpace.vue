@@ -1,29 +1,50 @@
 <template>
   <div>
-    <Collapse simple v-model="unfold">
-      <Panel name="tool">
-        Toolbox
-        <tool-box slot="content" :activityInfo="activityInfo"></tool-box>
-      </Panel>
-      <Panel name="data">
-        Resource list
-        <res-list slot="content" :activityInfo="activityInfo"></res-list>
-      </Panel>
-    </Collapse>
+    <div
+      style="
+        width: 100%;
+        height: calc(100vh - 115px);
+        float: left
+      "
+    >
+      <action-container
+        slot="content"
+        :activityInfo="activityInfo"
+      ></action-container>
+    </div>
+    <div style="position: absolute; top: 5px; left: 10px; z-index: 10">
+      <info-btn :activityInfo="activityInfo"></info-btn>
+    </div>
+    <div style="width: 280px; border: 1px solid lightgray; position: absolute; top: 5px; right: 10px; z-index: 10">
+      <Collapse simple v-model="unfold" class="panel">
+        <Panel name="tool">
+          Toolbox
+          <tool-box slot="content" :activityInfo="activityInfo"></tool-box>
+        </Panel>
+        <Panel name="data">
+          Resource list
+          <res-list slot="content" :activityInfo="activityInfo"></res-list>
+        </Panel>
+      </Collapse>
+    </div>
   </div>
 </template>
 <script>
-import resList from "../utils/resList.vue";
-import toolBox from "../utils/toolBox.vue";
+import resList from "../utils/resList";
+import toolBox from "../utils/toolBox";
+import actionContainer from "../utils/taskflow/actionContainer";
+import infoBtn from "../utils/infoBtn";
 export default {
   props: ["activityInfo"],
   components: {
     resList,
     toolBox,
+    actionContainer,
+    infoBtn
   },
   data() {
     return {
-      unfold: ["tool", "data"],
+      unfold: [],
     };
   },
   mounted() {},
@@ -40,5 +61,8 @@ export default {
 }
 .activityTab >>> .ivu-tabs-bar {
   margin-bottom: 8px;
+}
+.panel >>> .ivu-collapse-content {
+  padding: 0 5px;
 }
 </style>

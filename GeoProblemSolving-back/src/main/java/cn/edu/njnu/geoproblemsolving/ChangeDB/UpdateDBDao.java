@@ -237,14 +237,14 @@ public class UpdateDBDao {
                     members = parent.get(0).getMembers();
                     activity.setMembers(members);
                     // tools and toolsets
-                    ArrayList<String> toolList = step.getToolList();
-                    ArrayList<String> toolsetList = step.getToolsetList();
-                    if (toolList != null) {
-                        activity.setToolList(toolList);
-                    }
-                    if (toolsetList != null) {
-                        activity.setToolsetList(toolsetList);
-                    }
+//                    ArrayList<String> toolList = step.getToolList();
+//                    ArrayList<String> toolsetList = step.getToolsetList();
+//                    if (toolList != null) {
+//                        activity.setToolList(toolList);
+//                    }
+//                    if (toolsetList != null) {
+//                        activity.setToolsetList(toolsetList);
+//                    }
 
                     mongoTemplate.save(activity);
                 } else if (projectId != null && !projectId.equals("")) {
@@ -268,14 +268,14 @@ public class UpdateDBDao {
                     members = parent.get(0).getMembers();
                     subproject.setMembers(members);
                     // tools and toolsets
-                    ArrayList<String> toolList = step.getToolList();
-                    ArrayList<String> toolsetList = step.getToolsetList();
-                    if (toolList != null) {
-                        subproject.setToolList(toolList);
-                    }
-                    if (toolsetList != null) {
-                        subproject.setToolsetList(toolsetList);
-                    }
+//                    ArrayList<String> toolList = step.getToolList();
+//                    ArrayList<String> toolsetList = step.getToolsetList();
+//                    if (toolList != null) {
+//                        subproject.setToolList(toolList);
+//                    }
+//                    if (toolsetList != null) {
+//                        subproject.setToolsetList(toolsetList);
+//                    }
 
                     mongoTemplate.save(subproject);
                 } else {

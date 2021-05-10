@@ -23,35 +23,43 @@ public class ToolController {
 
     @RequestMapping(value = "/create", produces = {"application/json;charset=UTF-8"},method = RequestMethod.POST)
     public JsonResult createTool(@RequestBody AddToolEntityDTO add){
-      return ResultUtils.success(toolService.createTool(add));
+      return toolService.createTool(add);
     }
 
 
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
     public JsonResult deleteTool(@RequestParam("tid") String tid){
-        toolService.deleteByTid(tid);
-        return ResultUtils.success();
+        return toolService.deleteByTid(tid);
     }
 
     @RequestMapping(value = "/update/{tid}", produces = {"application/json;charset=UTF-8"},method = RequestMethod.POST)
     public JsonResult updateTool(@PathVariable("tid") String tid,@RequestBody UpdateToolEntityDTO updateToolEntityDTO){
-        return ResultUtils.success(toolService.updateTool(tid,updateToolEntityDTO));
+        return toolService.updateTool(tid,updateToolEntityDTO);
     }
 
+    /**
+     * @Deprecated 统一使用资源那边的接口
+     * @param request
+     * @return
+     */
     @RequestMapping(value = "/picture", method = RequestMethod.POST)
     public JsonResult uploadPicture(HttpServletRequest request) {
-        return ResultUtils.success(toolService.uploadPicture(request));
+        return toolService.uploadPicture(request);
     }
 
-
     @RequestMapping(value = "/inquiry", method = RequestMethod.GET)
-    public Object readTool(@RequestParam("key") String key,@RequestParam("value") String value){
-        return ResultUtils.success(toolService.readTool(key,value));
+    public JsonResult readTool(@RequestParam("key") String key,@RequestParam("value") String value){
+        return toolService.readTool(key,value);
+    }
+
+    @RequestMapping(value = "/all", method = RequestMethod.POST)
+    public JsonResult readTools(@RequestBody String[] tools){
+        return toolService.readTools(tools);
     }
 
     @RequestMapping(value = "/findByProvider/{provider}", method = RequestMethod.GET)
     public JsonResult readAllProject(@PathVariable("provider") String provider) {
-        return ResultUtils.success(toolService.findAllByProvider(provider));
+        return toolService.findAllByProvider(provider);
     }
 
 }

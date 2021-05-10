@@ -579,7 +579,6 @@
           </div>
         </div>
       </transition>
-
       <transition name="right">
         <div class="searchPanel" v-show="searchPanelShow">
           <div class="searchHeader">
@@ -645,9 +644,8 @@
   </Row>
 </template>
 <script>
-import * as socketApi from "./../../../api/socket.js";
+import * as socketApi from "@/api/socket.js";
 import Avatar from "vue-avatar";
-
 export default {
   components: {
     Avatar,

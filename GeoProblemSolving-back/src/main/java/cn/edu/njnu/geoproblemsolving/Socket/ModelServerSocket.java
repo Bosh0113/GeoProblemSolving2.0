@@ -1,9 +1,9 @@
 package cn.edu.njnu.geoproblemsolving.Socket;
 
 import cn.edu.njnu.geoproblemsolving.Config.MyEndPointConfigure;
-import cn.edu.njnu.geoproblemsolving.business.chatroom.chatmessage.ChatMessageRecordsService;
-import cn.edu.njnu.geoproblemsolving.business.chatroom.chatmessage.dto.AddChatMessageRecordsDTO;
-import cn.edu.njnu.geoproblemsolving.business.chatroom.hydrologicalconcept.AnsjSegService;
+import cn.edu.njnu.geoproblemsolving.business.tool.chatroom.chatmessage.ChatMessageRecordsService;
+import cn.edu.njnu.geoproblemsolving.business.tool.chatroom.chatmessage.dto.AddChatMessageRecordsDTO;
+import cn.edu.njnu.geoproblemsolving.business.tool.chatroom.hydrologicalconcept.AnsjSegService;
 import cn.edu.njnu.geoproblemsolving.business.user.dao.IUserDao;
 import cn.edu.njnu.geoproblemsolving.business.user.dto.InquiryUserDto;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;

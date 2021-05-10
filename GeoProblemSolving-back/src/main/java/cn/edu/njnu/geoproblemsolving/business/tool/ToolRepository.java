@@ -14,8 +14,12 @@ import java.util.Optional;
  */
 public interface ToolRepository extends MongoRepository<ToolEntity,String> {
     Optional<ToolEntity> findFirstByTid(String tid);
+
     List<ToolEntity> findAllByProvider(String provider);
+
     Optional<ToolEntity> findFirstByToolNameAndProvider(String toolName,String providerId);
+
     void deleteByTid(String id);
+
     List<ToolEntity> findAllByTid(String tid);
 }

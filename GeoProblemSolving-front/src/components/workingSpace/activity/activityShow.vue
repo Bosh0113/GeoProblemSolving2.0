@@ -397,7 +397,7 @@
       v-model="memberRoleModal"
       width="400px"
       title="Set the role of this member"
-      @on-ok="updateActivity()"
+      @on-ok="updateUserRole()"
       ok-text="Ok"
       cancel-text="Cancel"
     >
@@ -550,9 +550,7 @@
   </div>
 </template>
 <script>
-import * as userRoleJS from "./../../../api/userRole.js";
-import { get, del, post, put } from "../../../axios";
-import * as socketApi from "./../../../api/socket.js";
+import { get, del, post, put } from "@/axios";
 import Avatar from "vue-avatar";
 export default {
   components: {
@@ -601,7 +599,7 @@ export default {
         parent: "",
         creator: "",
         level: -1,
-        permission: JSON.stringify(userRoleJS.getDefault()),
+        permission: JSON.stringify(this.userRoleApi.getDefault()),
         type: "Activity_Default",
         purpose: "Multi-purpose",
       },
@@ -651,10 +649,14 @@ export default {
   mounted() {},
   methods: {
     roleIdentity(activity) {
-      return userRoleJS.roleIdentify(activity.members, this.userInfo.userId);
+      return this.userRoleApi.roleIdentify(
+        activity.members,
+        this.userInfo.userId
+      );
     },
     permissionIdentity(permission, role, operation) {
-      if(permission == undefined) permission = JSON.stringify(userRoleJS.getDefault());
+      if (permission == undefined)
+        permission = JSON.stringify(this.userRoleApi.getDefault());
       if (operation == "auto_join") {
         if (JSON.parse(permission).auto_join.visitor == "Yes") return true;
         else if (JSON.parse(permission).auto_join.visitor == "No") return false;
@@ -662,7 +664,7 @@ export default {
           return this.getParentPermission();
         }
       } else {
-        return userRoleJS.permissionIdentity(
+        return this.userRoleApi.permissionIdentity(
           JSON.parse(permission),
           role,
           operation
@@ -670,7 +672,7 @@ export default {
       }
     },
     roleCompare(role1, role2) {
-      return userRoleJS.roleCompare(role1, role2);
+      return this.userRoleApi.roleCompare(role1, role2);
     },
     async getParentPermission() {
       let url = "";
@@ -755,6 +757,16 @@ export default {
             .post(url, this.activityForm)
             .then((res) => {
               if (res.data.code == 0) {
+                this.operationApi.activityRecord(
+                  "create",
+                  this.userInfo.userId,
+                  res.data.data
+                );
+                this.operationApi.activityDocInit(
+                  res.data.data,
+                  this.userInfo.userId
+                );
+
                 parent.location.href =
                   "/GeoProblemSolving/projectInfo/" +
                   this.projectInfo.aid +
@@ -837,7 +849,7 @@ export default {
         });
     },
     applyJoinActivity(activity) {
-      let managers = userRoleJS.getMemberByRole(
+      let managers = this.userRoleApi.getMemberByRole(
         this.appliedActivity,
         "manager"
       );
@@ -859,7 +871,7 @@ export default {
             approve: "unknow",
           },
         };
-        this.sendNotice(this.appliedActivity, notice);
+        this.sendNotice(notice);
       }
       this.applyJoinActivityModal = false;
     },
@@ -939,6 +951,13 @@ export default {
           .then((res) => {
             if (res.data.code == 0) {
               this.participants.push(user);
+              this.operationApi.participantUpdate(
+                this.activityInfo.aid,
+                "invite",
+                user.userId,
+                user.name,
+                user.role
+              );
               this.$Notice.info({ desc: "Invite member successfully" });
 
               //notice
@@ -958,7 +977,7 @@ export default {
                   approve: "unknow",
                 },
               };
-              this.sendNotice(activity, notice);
+              this.sendNotice(notice);
             } else {
               console.log(res.data.msg);
             }
@@ -1002,6 +1021,13 @@ export default {
         .delete(url)
         .then((res) => {
           if (res.data.code == 0) {
+            this.operationApi.participantUpdate(
+              this.activityInfo.aid,
+              "remove",
+              member.userId,
+              member.name,
+              member.role
+            );
             let index = this.participants.indexOf(member);
             this.participants.splice(index, 1);
             this.$Notice.info({ desc: "Remove member successfully" });
@@ -1021,7 +1047,7 @@ export default {
                 approve: "unknow",
               },
             };
-            this.sendNotice(activity, notice);
+            this.sendNotice(notice);
           } else {
             console.log(res.data.msg);
           }
@@ -1030,7 +1056,7 @@ export default {
           throw err;
         });
     },
-    updateActivity() {
+    updateUserRole() {
       let member = this.slctRoleMember;
       let activity = this.activityInfo;
       let role = this.roleSelected;
@@ -1070,6 +1096,13 @@ export default {
         .then((res) => {
           if (res.data.code == 0) {
             this.$Notice.info({ desc: "Change the member role successfully" });
+            this.operationApi.participantUpdate(
+              this.activityInfo.aid,
+              "role",
+              member.userId,
+              member.name,
+              member.role
+            );
             this.getParticipants();
 
             //notice
@@ -1089,7 +1122,7 @@ export default {
                 approve: "unknow",
               },
             };
-            this.sendNotice(activity, notice);
+            this.sendNotice(notice);
           } else {
             console.log(res.data.msg);
           }
@@ -1123,16 +1156,20 @@ export default {
         .delete(url)
         .then((res) => {
           if (res.data.code == 0) {
-            parent.location.href =
-              "/GeoProblemSolving/projectInfo/" +
-              this.projectInfo.aid +
-              "?content=workspace&aid=" +
-              activity.parent +
-              "&level=" +
-              (activity.level - 1).toString();
+            // update activity doc
+            this.operationApi.participantUpdate(
+              activity.aid,
+              "remove",
+              member.userId,
+              "",
+              ""
+            );
 
             //notice
-            let managers = userRoleJS.getMemberByRole(activity, "manager");
+            let managers = this.userRoleApi.getMemberByRole(
+              activity,
+              "manager"
+            );
             for (var i = 0; i < managers.length; i++) {
               let notice = {
                 recipientId: managers[i],
@@ -1149,7 +1186,15 @@ export default {
                   approve: "unknow",
                 },
               };
-              this.sendNotice(activity, notice);
+              this.sendNotice(notice);
+
+              parent.location.href =
+                "/GeoProblemSolving/projectInfo/" +
+                this.projectInfo.aid +
+                "?content=workspace&aid=" +
+                activity.parent +
+                "&level=" +
+                (activity.level - 1).toString();
             }
           } else {
             console.log(res.data.msg);
@@ -1159,7 +1204,7 @@ export default {
           throw err;
         });
     },
-    sendNotice(activity, notice) {
+    sendNotice(notice) {
       this.axios
         .post("/GeoProblemSolving/notice/save", notice)
         .then((result) => {

@@ -595,8 +595,6 @@
   </div>
 </template>
 <script>
-  import * as userRoleJS from "./../../api/userRole.js";
-
   export default {
     props: ["activityInfo"],
     data() {
@@ -765,13 +763,13 @@
         this.contentHeight = window.innerHeight - 230;
       },
       roleIdentity() {
-        this.userRole = userRoleJS.roleIdentify(
+        this.userRole = this.userRoleApi.roleIdentify(
           this.activityInfo.members,
           this.userInfo.userId
         );
       },
-      permissionIdentity(permission, role, operation) {
-        return userRoleJS.permissionIdentity(
+      permissionIdentity(permission, role,operation) {
+        return this.userRoleApi.permissionIdentity(
           JSON.parse(permission),
           role,
           operation

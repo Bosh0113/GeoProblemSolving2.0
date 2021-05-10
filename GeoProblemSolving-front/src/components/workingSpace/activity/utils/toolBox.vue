@@ -28,7 +28,7 @@
   <div>
     <Card dis-hover class="toolCard">
       <div slot="title">
-        <h4>Toolsets and tools</h4>
+        <h4>Tools</h4>
       </div>
       <div
         slot="extra"
@@ -38,65 +38,17 @@
       >
         <manage-tools
           :activity-info="activityInfo"
+          :tool-list="toolList"
           @updateStepTools="stepToolListChanged"
-          :key="toolModal"
           title="Manage toolsets and tools"
           style="margin-top: -10px"
         ></manage-tools>
       </div>
       <vue-scroll :ops="ops" style="max-height: calc(100vh - 200px)">
-        <div v-if="toolsetList.length < 1" style="text-align: center">
-          <h2 style="color: #808695">No toolsets</h2>
-          <small style="color: #dcdee2"
-            >*Click the button on the top right to add toolsets.</small
-          >
-        </div>
         <div
-          v-for="toolset in toolsetList"
-          :key="toolset.index"
-          style="margin-top: 15px; width: 130px; display: inline-block"
-          v-else
+          v-if="toolList != undefined && toolList.length < 1"
+          style="text-align: center"
         >
-          <Card
-            style="
-              background-color: #3f51b530;
-              cursor: pointer;
-              margin: 0 5px 10px 5px;
-            "
-          >
-            <div style="text-align: center" @click="showTools(toolset)">
-              <Tooltip placement="bottom" max-width="600">
-                <img
-                  :src="toolset.toolsetImg"
-                  v-if="toolset.toolsetImg != ''"
-                  style="height: 100%; max-height: 50px"
-                />
-                <avatar
-                  :username="toolset.toolsetName"
-                  :size="50"
-                  style="margin-bottom: 6px"
-                  v-else
-                ></avatar>
-                <div slot="content">
-                  <span>{{ toolset.description }}</span>
-                  <br v-if="toolset.categoryTag.length > 0" />
-                  <p>
-                    <i>{{ toolset.categoryTag.join(",") }}</i>
-                  </p>
-                </div>
-              </Tooltip>
-              <h4
-                :title="toolset.toolsetName"
-                style="width: 75px"
-                class="ellipsis"
-              >
-                {{ toolset.toolsetName }}
-              </h4>
-            </div>
-          </Card>
-        </div>
-        <Divider style="margin: 10px 0" />
-        <div v-if="toolList.length < 1" style="text-align: center">
           <h2 style="color: #808695">No tools</h2>
           <small style="color: #dcdee2"
             >*Click the button on the top right to add tools.</small
@@ -105,10 +57,74 @@
         <div
           v-for="tool in toolList"
           :key="tool.index"
-          style="margin-top: 15px; width: 130px; display: inline-block"
+          style="width: 100px; display: inline-block"
           v-else
         >
-          <Card style="background-color: ghostwhite; margin: 0 5px 10px 5px">
+          <Card
+            style="margin: 5px; height: 50px; width: 50px"
+            v-show="toolsetLevel > 0"
+            title="Back to last level"
+            ><Icon
+              type="md-arrow-back"
+              size="30"
+              style="text-align: center; margin-top: 10px"
+              color="#5089b8"
+              @click="back2LastLevel()"
+          /></Card>
+          <Card
+            style="padding-top: 5px; background-color: #d3f1b1; margin: 5px"
+            v-if="tool.isToolset"
+          >
+            <div
+              style="text-align: center; cursor: pointer"
+              @click="expandTool(tool)"
+            >
+              <Tooltip placement="bottom" max-width="600">
+                <img
+                  :src="tool.toolImg"
+                  v-if="tool.toolImg != ''"
+                  style="height: 100%; max-height: 50px"
+                />
+                <avatar
+                  :username="tool.toolName"
+                  :size="50"
+                  style="margin-bottom: 6px"
+                  v-else
+                ></avatar>
+                <div
+                  slot="content"
+                  v-if="
+                    tool.description !== '' ||
+                    (tool.tags != undefined && tool.tags.length > 0)
+                  "
+                >
+                  <span>{{ tool.description }}</span>
+                  <template
+                    v-if="tool.tags != undefined && tool.tags.length > 0"
+                  >
+                    <br />
+                    <span>
+                      <i>{{ tool.tags.join(" | ") }}</i>
+                    </span>
+                  </template>
+                </div>
+              </Tooltip>
+              <h4
+                :title="tool.toolName"
+                style="
+                  display: block;
+                  overflow: hidden;
+                  white-space: nowrap;
+                  text-overflow: ellipsis;
+                "
+              >
+                {{ tool.toolName }}
+              </h4>
+            </div>
+          </Card>
+          <Card
+            style="padding-top: 5px; background-color: ghostwhite; margin: 5px"
+          >
             <div
               style="text-align: center; cursor: pointer"
               @click="useTool(tool)"
@@ -125,19 +141,28 @@
                   style="margin-bottom: 6px"
                   v-else
                 ></avatar>
-                <div slot="content">
+                <div
+                  slot="content"
+                  v-if="
+                    tool.description !== '' ||
+                    (tool.tags != undefined && tool.tags.length > 0)
+                  "
+                >
                   <span>{{ tool.description }}</span>
-                  <br v-if="tool.categoryTag.length > 0" />
-                  <span>
-                    <i>{{ tool.categoryTag.join(",") }}</i>
-                  </span>
+                  <template
+                    v-if="tool.tags != undefined && tool.tags.length > 0"
+                  >
+                    <br />
+                    <span>
+                      <i>{{ tool.tags.join(" | ") }}</i>
+                    </span>
+                  </template>
                 </div>
               </Tooltip>
               <h4
                 :title="tool.toolName"
                 style="
                   display: block;
-                  width: 90px;
                   overflow: hidden;
                   white-space: nowrap;
                   text-overflow: ellipsis;
@@ -151,85 +176,6 @@
       </vue-scroll>
     </Card>
     <Modal
-      v-model="showToolsetToolsModal"
-      width="432"
-      title="Tools in the toolset"
-      :closable="false"
-    >
-      <div style="height: 350px" v-if="toolsetToolList.length > 0">
-        <vue-scroll :ops="ops">
-          <Row>
-            <Col
-              span="8"
-              v-for="tool in toolsetToolList"
-              :key="tool.index"
-              style="margin-top: 15px"
-            >
-              <Card
-                style="background-color: ghostwhite; margin: 0 5px 10px 5px"
-              >
-                <div
-                  style="text-align: center; cursor: pointer"
-                  @click="useTool(tool)"
-                >
-                  <Tooltip placement="bottom" max-width="600">
-                    <img
-                      :src="tool.toolImg"
-                      v-if="tool.toolImg != ''"
-                      style="height: 100%; max-height: 50px"
-                    />
-                    <avatar
-                      :username="tool.toolName"
-                      :size="50"
-                      style="margin-bottom: 6px"
-                      v-else
-                    ></avatar>
-                    <div slot="content">
-                      <span>{{ tool.description }}</span>
-                      <br v-if="tool.categoryTag.length > 0" />
-                      <span>
-                        <i>{{ tool.categoryTag.join(",") }}</i>
-                      </span>
-                    </div>
-                  </Tooltip>
-                  <h4
-                    :title="tool.toolName"
-                    style="
-                      display: block;
-                      width: 90px;
-                      overflow: hidden;
-                      white-space: nowrap;
-                      text-overflow: ellipsis;
-                    "
-                  >
-                    {{ tool.toolName }}
-                  </h4>
-                </div>
-              </Card>
-            </Col>
-          </Row>
-        </vue-scroll>
-      </div>
-      <div style="height: 200px" v-else>
-        <div style="text-align: center; height: 200px; position: relative">
-          <div
-            style="
-              position: absolute;
-              top: 0;
-              bottom: 0;
-              left: 0;
-              right: 0;
-              margin: auto;
-              height: fit-content;
-            "
-          >
-            <h1>No tools in this toolset.</h1>
-          </div>
-        </div>
-      </div>
-      <div slot="footer"></div>
-    </Modal>
-    <Modal
       v-model="jupyterModal"
       title="Open a jupyter notebook environment"
       @on-ok="checkJupyterUser"
@@ -240,27 +186,26 @@
         Note: Jupyter notebooks will be accessed by all members in this project.
       </h3>
     </Modal>
-    <Modal v-model="openToolModal" title="Open tool">
+    <!-- <Modal v-model="openToolModal" title="Open tool">
       <h2>How would you like to open this tool?</h2>
       <small style="color: #ff9900"
-        >*Some tools are not supported to be used in window.</small
+        >*Some tools are not supported to be used in page.</small
       >
       <div slot="footer" style="text-align: center">
-        <Button @click="openToolInWindow" type="primary" style="margin: 0 15px"
-          >This window</Button
+        <Button @click="openTool" type="primary" style="margin: 0 15px"
+          >This page</Button
         >
-        <Button @click="openToolNewWindow" style="margin: 0 15px"
-          >New window</Button
+        <Button @click="openToolNewpage" style="margin: 0 15px"
+          >New page</Button
         >
       </div>
-    </Modal>
+    </Modal> -->
   </div>
 </template>
 <script>
-import manageTools from "./../../../tools/toolToStepModal";
+import manageTools from "@/components/tools/toolToStepModal";
 import Avatar from "vue-avatar";
-import { get, del, post, put } from "../../../../axios";
-import * as userRoleJS from "./../../../../api/userRole.js";
+import { get, del, post, put } from "@/axios";
 export default {
   props: ["activityInfo"],
   components: {
@@ -282,15 +227,15 @@ export default {
       },
       userInfo: this.$store.getters.userInfo,
       userRole: "visitor",
+      toolIdList: [],
       toolList: [],
-      toolsetList: [],
-      toolModal: 0,
-      toolsetToolList: [],
-      showToolsetToolsModal: false,
+      toolsetLevel: 0,
+      lastLevelList: [],
       panelList: [],
       jupyterModal: false,
       selectedTool: {},
-      openToolModal: false,
+      operationStore: false,
+      // openToolModal: false,
     };
   },
   created() {
@@ -298,7 +243,6 @@ export default {
   },
   mounted() {
     this.getAllTools();
-
     Date.prototype.Format = function (fmt) {
       var o = {
         "M+": this.getMonth() + 1, //月份
@@ -327,126 +271,57 @@ export default {
   },
   methods: {
     roleIdentity() {
-      this.userRole = userRoleJS.roleIdentify(
+      this.userRole = this.userRoleApi.roleIdentify(
         this.activityInfo.members,
         this.userInfo.userId
       );
     },
     permissionIdentity(permission, role, operation) {
-      return userRoleJS.permissionIdentity(
+      return this.userRoleApi.permissionIdentity(
         JSON.parse(permission),
         role,
         operation
       );
     },
     getAllTools() {
-      // console.log(this.activityInfo)
-      if (this.activityInfo.toolList != undefined) {
-        this.getToolInfos(this.activityInfo.toolList);
-      }
-      if (this.activityInfo.toolsetList != undefined) {
-        this.getToolsetInfos(this.activityInfo.toolsetList);
+      this.toolIdList = this.operationApi.getToollist();
+      if (this.toolIdList != undefined && this.toolIdList.length !== 0) {
+        this.getToolInfos();
       }
     },
-
-    async getToolInfos(toolIds) {
-      var toolsCount = toolIds.length;
-      var flagCount = toolsCount;
-      var ToolInfos = [];
-      for (var i = 0; i < toolsCount; i++) {
-        let data = await get(
-          `/GeoProblemSolving/tool/inquiry?key=tid&value=${toolIds[i]}`
-        );
-        ToolInfos.push(data[0]);
-        if (--flagCount < 1) {
-          var sortTools = [];
-          for (var j = 0; j < toolsCount; j++) {
-            for (var k = 0; k < toolsCount; k++) {
-              if (toolIds[j] == ToolInfos[k].tid) {
-                sortTools.push(ToolInfos[k]);
-                break;
-              }
-            }
-          }
-          this.$set(this, "toolList", sortTools);
-        }
-      }
-    },
-    getToolsetInfos(toolsetIds) {
-      var toolsetsCount = toolsetIds.length;
-      var flagCount = toolsetsCount;
-      var toolsetInfos = [];
-      for (var i = 0; i < toolsetsCount; i++) {
-        this.axios
-          .get(
-            "/GeoProblemSolving/toolset/inquiry" +
-              "?key=" +
-              "tsId" +
-              "&value=" +
-              toolsetIds[i]
-          )
-          .then((res) => {
-            if (res.data == "Offline") {
-              this.$store.commit("userLogout");
-              this.$router.push({ name: "Login" });
-            } else if (res.data === "Fail") {
-              this.$Notice.error({ desc: "Loading toolsets fail." });
-            } else if (res.data === "None") {
-              // this.$Notice.error({ desc: "There is no existing toolset" });
-            } else {
-              toolsetInfos.push(res.data[0]);
-              if (--flagCount < 1) {
-                var sortToolsets = [];
-                for (var j = 0; j < toolsetsCount; j++) {
-                  for (var k = 0; k < toolsetsCount; k++) {
-                    if (toolsetIds[j] == toolsetInfos[k].tsId) {
-                      sortToolsets.push(toolsetInfos[k]);
-                      break;
-                    }
-                  }
-                }
-                this.$set(this, "toolsetList", sortToolsets);
-              }
-            }
-          })
-          .catch((err) => {
-            throw err;
-          });
-      }
+    async getToolInfos() {
+      let data = await post("/GeoProblemSolving/tool/all", this.toolIdList);
+      this.$set(this, "toolList", data);
     },
     stepToolListChanged(tools, toolsets) {
-      this.activityInfo.toolList = tools;
-      this.activityInfo.toolsetList = toolsets;
-      this.toolModal++;
-      this.getAllTools(tools, toolsets);
+      this.toolIdList = tools;
+      this.toolIdList.push.apply(this.toolIdList, toolsets);
+      this.getToolInfos();
     },
-    showTools(toolsetInfo) {
-      this.toolsetToolList = toolsetInfo.toolList;
-      this.showToolsetToolsModal = true;
-    },
-    addHistoryEvent(scopeId, record) {
-      // let form = {};
-      // form["description"] = JSON.stringify(record);
-      // form["scopeId"] = scopeId;
-      // form["eventType"] = "step";
-      // form["userId"] = this.$store.getters.userId;
-      // this.axios
-      //   .post("/GeoProblemSolving/history/save", form)
-      //   .then((res) => {
-      //     console.log(res.data);
-      //   })
-      //   .catch((err) => {
-      //     console.log(err.data);
-      //   });
-    },
+    // showTools(toolsetInfo) {
+    //   this.toolsetToolList = toolsetInfo.toolList;
+    //   this.showToolsetToolsModal = true;
+    // },
     useTool(toolInfo) {
       this.selectedTool = toolInfo;
-      this.openToolModal = true;
+      this.openTool();
+      // this.openToolModal = true;
     },
-    openToolInWindow() {
+    back2LastLevel() {
+      this.toolList = Object.assign([], this.lastLevelList);
+      this.toolsetLevel--;
+    },
+    expandTool(toolset) {
+      this.lastLevelList = Object.assign([], this.toolList);
+      this.toolIdList = toolset.toolList;
+      this.getToolInfos();
+      this.toolsetLevel++;
+    },
+    openTool() {
       var toolInfo = this.selectedTool;
-      this.openToolModal = false;
-      // 记录信息
+      // this.openToolModal = false;
+
+      // record
       let toolRecords = {
         type: "tools",
         time: new Date().Format("yyyy-MM-dd HH:mm:ss"),
@@ -455,50 +330,65 @@ export default {
         toolType: toolInfo.toolName,
       };
       this.$emit("toolBehavior", toolRecords);
-      // this.addHistoryEvent(this.activityInfo.aid, toolRecords);
 
-      if (toolInfo.toolName == "Jupyter notebook") {
-        this.jupyterModal = true;
-        return;
+      if (toolInfo.scope == "outer") {
+        this.openToolNewpage(toolInfo);
+      } else if (toolInfo.scope == "inner") {
+        this.openToolByPanel(toolInfo);
+      } else {
+        this.openToolByPanel(toolInfo);
       }
-
+    },
+    openToolByPanel(toolInfo) {
       // var toolURL = window.location.origin + `${toolInfo.toolUrl}`;
-      var toolURL = toolInfo.toolUrl;
-      var toolContent = `<iframe src="${toolURL}?userName=${this.userInfo.name}&userID=${this.userInfo.userId}&groupID=${this.activityInfo.aid}" style="width: 100%; height:100%;" frameborder="0"></iframe>`;
+      // var toolURL = toolInfo.toolUrl;
+      // var toolContent = `<iframe src="${toolURL}?userName=${this.userInfo.name}&userID=${this.userInfo.userId}&groupID=${this.activityInfo.aid}" style="width: 100%; height:100%;" frameborder="0"></iframe>`;
+      var toolContent = `<iframe src="${toolInfo.toolUrl}" id="${toolInfo.tid}" style="width: 100%; height:100%;" frameborder="0"></iframe>`;
 
-      var demoPanelTimer = null;
       var panel = jsPanel.create({
         theme: "success",
-        headerTitle: toolInfo.toolName,
-        footerToolbar: '<p style="height:10px"></p>',
+        footerToolbar: `<p></p>`,
         contentSize: "800 400",
+        id: toolInfo.toolName,
+        headerTitle: toolInfo.toolName,
         content: toolContent,
-        disableOnMaximized: true,
+        container: "div#drawflow",
+        data: { user: this.userInfo, aid: this.activityInfo.aid, taskId: "" },
         dragit: {
           containment: 5,
         },
         closeOnEscape: true,
-        onclosed: function (panel, status, closedByUser) {
-          window.clearTimeout(demoPanelTimer);
-        },
+        disableOnMaximized: true,
+        onbeforeclose: function () {
+            if (this.operationStore) {
+              return true;
+            } else {
+              return confirm("This operation has not been bind to the task. Close panel immediately?");
+            }
+          }
       });
-      // panel.resizeit("disable");
       $(".jsPanel-content").css("font-size", "0");
       this.panelList.push(panel);
       this.$emit("toolPanel", panel);
+
+      // 设置iframe 父子页面消息传输处理
+      window.addEventListener("message", this.toolMsgHandle, false);
+      let activityId = this.activityInfo.aid;
+      let userInfo = this.userInfo;
+      let iFrame = document.getElementById(toolInfo.tid);
+      //iframe加载完毕后再发送消息，否则子页面接收不到message
+      iFrame.onload = function () {
+          //iframe加载完立即发送一条消息
+          iFrame.contentWindow.postMessage({"user": userInfo, "aid": activityId, type:"activity"}, "*");
+      }
+
     },
-    openToolNewWindow() {
-      var toolInfo = this.selectedTool;
-      this.openToolModal = false;
-      // 记录信息
-      let toolRecords = {
-        type: "tools",
-        time: new Date().Format("yyyy-MM-dd HH:mm:ss"),
-        who: this.userInfo.userName,
-        content: "used a tool",
-        toolType: toolInfo.toolName,
-      };
-      this.$emit("toolBehavior", toolRecords);
+    toolMsgHandle(event){
+      console.log(event);
+      this.operationStore = true;
+    },
+    openToolNewpage(toolInfo) {
+      // this.openToolModal = false;
 
       if (toolInfo.toolName == "Jupyter notebook") {
         this.jupyterModal = true;
@@ -513,6 +403,8 @@ export default {
       };
       var toolURL = window.location.origin + `${toolInfo.toolUrl}`;
       window["pageParams"] = params;
+
+      // open
       window.open(toolURL);
     },
     checkJupyterUser() {

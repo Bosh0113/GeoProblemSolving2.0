@@ -231,12 +231,12 @@ canvas {
 </template>
 <script>
 import { Photoshop } from "vue-color";
-import * as socketApi from "./../../../api/socket.js";
+import * as socketApi from "@/api/socket.js";
 import toolStyle from "./toolStyle";
 export default {
   components: {
     PhotoshopPicker: Photoshop,
-    toolStyle
+    toolStyle,
   },
   data() {
     return {

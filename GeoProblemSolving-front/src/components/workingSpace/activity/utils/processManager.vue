@@ -148,7 +148,6 @@
 // import "driver.js/dist/driver.min.css";
 import echarts from "echarts";
 // import Driver from "driver.js";
-import * as userRoleJS from "./../../../../api/userRole.js";
 export default {
   props: ["activityInfo", "childActivities"],
   data() {
@@ -220,7 +219,7 @@ export default {
     this.btnEnable();
     this.roleIdentity();
   },
-  beforeRouteLeave(to, from, next) {
+  beforeRouteLeave(next) {
     next();
   },
   beforeDestroy: function () {},
@@ -229,13 +228,13 @@ export default {
       window.addEventListener("resize", this.updateStepchart);
     },
     roleIdentity() {
-      this.userRole = userRoleJS.roleIdentify(
+      this.userRole = this.userRoleApi.roleIdentify(
         this.activityInfo.members,
         this.userInfo.userId
       );
     },
     permissionIdentity(permission, operation) {
-      return userRoleJS.permissionIdentity(
+      return this.userRoleApi.permissionIdentity(
         JSON.parse(permission),
         this.userRole,
         operation
@@ -847,6 +846,8 @@ export default {
               parent.location.href = "/GeoProblemSolving/login";
             }
           } else if (res.data.code == 0) {
+            this.operationApi.processRecord(this.activityInfo.aid, "link", this.userInfo.userId, begin, end); 
+
             this.$Notice.info({
               desc: "Link activities successfully!",
             });
@@ -920,6 +921,7 @@ export default {
               parent.location.href = "/GeoProblemSolving/login";
             }
           } else if (res.data.code == 0) {
+            this.operationApi.processRecord(this.activityInfo.aid, "break", this.userInfo.userId, begin, end);
             this.$Notice.info({
               desc: "Seperate activities successfully!",
             });

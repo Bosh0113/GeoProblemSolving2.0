@@ -9,7 +9,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
 
 @Data
 @Document(collection = "Activities")
@@ -76,12 +75,8 @@ public class Activity implements Serializable {
     private String createdTime;
     private String activeTime;
 
-    /**
-     * MIMI
-     */
-    List<String> toolsetList;
-    List<String> toolList;
-
-
+    // // Temp
+    // private List<String> toolList;
+    // private List<String> toolsetList;
 }
 

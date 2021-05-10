@@ -132,9 +132,8 @@
   </div>
 </template>
 <script>
-import * as userRoleJS from "./../../../api/userRole.js";
-import { get, del, post, put } from "../../../axios";
-import * as socketApi from "./../../../api/socket.js";
+import { get, del, post, put } from "@/axios";
+import * as socketApi from "@/api/socket.js";
 import Avatar from "vue-avatar";
 export default {
   components: {
@@ -163,10 +162,10 @@ export default {
   mounted() {},
   methods: {
     roleIdentity(activity) {
-      return userRoleJS.roleIdentify(activity.members, this.userInfo.userId);
+      return this.userRoleApi.roleIdentify(activity.members, this.userInfo.userId);
     },
     permissionIdentity(permission, role, operation) {
-      return userRoleJS.permissionIdentity(
+      return this.userRoleApi.permissionIdentity(
         JSON.parse(permission),
         role,
         operation

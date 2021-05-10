@@ -18,9 +18,6 @@
       <MenuItem name="Resources">
         <Icon type="ios-albums" />Resource
       </MenuItem>
-      <!-- <MenuItem name="Discussion">
-        <Icon type="ios-people" />Discussion
-      </MenuItem> -->
     </Menu>
     <div v-show="activeMenu=='Introduction'">
       <activity-show :activityInfo="activityInfo" :nameConfirm="nameConfirm"></activity-show>
@@ -37,8 +34,10 @@
     </div>
     <div v-show="activeMenu=='Activities'">
       <process-manager :activityInfo="activityInfo" :childActivities="childActivities" ></process-manager>
-    </div>
-    <div v-show="activeMenu=='Discussion'"></div>
+    </div>  
+    <mini-chatroom
+      :activityInfo="activityInfo"
+    ></mini-chatroom>
   </div>
 </template>
 <script>
@@ -46,6 +45,7 @@ import activityShow from "./activityShow.vue";
 import folderTree from "../../resources/folderTree";
 import taskManager from "./utils/taskManger.vue";
 import processManager from "./utils/processManager.vue";
+import miniChatroom from "./utils/miniChatroom";
 
 export default {
   props: ["activityInfo", "userInfo","childActivities","nameConfirm"],
@@ -54,6 +54,7 @@ export default {
     folderTree,
     taskManager,
     processManager,
+    miniChatroom
   },
   data() {
     return {

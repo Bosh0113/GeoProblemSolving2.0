@@ -34,14 +34,14 @@
   </Row>
 </template>
 <script>
-import * as socketApi from "./../../../../api/socket.js";
-import csv from "../../../../../static/js/jquery.csv.min.js";
-import jexcel from "../../../../../static/js/jquery.jexcel.js";
+import * as socketApi from "@/api/socket.js";
+import csv from "@static/js/jquery.csv.min.js";
+import jexcel from "@static/js/jquery.jexcel.js";
 import XLSX from "xlsx";
 import echarts from "echarts";
 import toolStyle from "../toolStyle";
 import "echarts/extension/bmap/bmap";
-import { MP } from "../../../../../static/js/baidu-map.js";
+import { MP } from "@static/js/baidu-map.js";
 export default {
   components: { toolStyle },
   data() {

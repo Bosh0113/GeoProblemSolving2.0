@@ -288,7 +288,7 @@
   </Row>
 </template>
 <script>
-import * as socketApi from "./../../../../../api/socket.js";
+import * as socketApi from "@/api/socket.js";
 import toolModal from "@/components/common/tools/toolModal";
 import chatMember from "@/components/common/card/chat/chatMember";
 import chatManager from "@/components/common/card/chat/chatManager";

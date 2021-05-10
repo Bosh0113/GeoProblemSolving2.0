@@ -109,7 +109,7 @@
       </Col>
     </Row>
     <!--    Modal 对话框部分 -->
-    <Modal v-model="createToolModal" title="Create Tool" width="800">
+    <Modal v-model="createToolModal" title="Create tool" width="800">
       <template-general
         @generalInfo="getGeneralInfo"
         :step="currentStep"
@@ -370,13 +370,13 @@
           });
       },
       nextStep: function () {
-        if (this.currentStep != 1) {
-          this.currentStep += 1;
+        if (this.currentStep == 0) {
+          this.currentStep = 1;
         }
       },
       previousStep: function () {
-        if (this.currentStep != 0) {
-          this.currentStep -= 1;
+        if (this.currentStep == 1) {
+          this.currentStep = 0;
         }
       },
       createTool: async function () {
@@ -385,6 +385,7 @@
         let data = await post("/GeoProblemSolving/tool/create", createToolForm);
         // 判断返回值，进行下一步操作
         this.createToolModal = false;
+        this.editToolInfo = {};
         //Notice 与 Message 的区别
         this.toolInfo = {};
         if (data.privacy == "Public") {
@@ -447,6 +448,7 @@
           .then((res) => {
             this.$Notice.success({title: "Update successfully."});
             this.currentStep = 0;
+            this.editToolInfo = {};
             this.editToolModal = false;
           })
           .catch((err) => {

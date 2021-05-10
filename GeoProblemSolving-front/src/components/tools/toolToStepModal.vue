@@ -41,7 +41,12 @@
 </style>
 <template>
   <div>
-    <Button shape="circle" icon="md-cog" @click="stepToolModalShow"></Button>
+    <Button
+      shape="circle"
+      icon="md-cog"
+      @click="stepToolModalShow"
+      size="small"
+    ></Button>
     <Modal
       v-model="stepToolModal"
       title="Manage toolset and tools"
@@ -78,21 +83,18 @@
             </Menu>
           </div>
           <Card dis-hover style="margin-left: 80px">
-            <h2 slot="title" style="padding-top: 5px; color: #2d8cf099">
+            <h3 slot="title" style="padding-top: 5px; color: #2d8cf099">
               {{ listTitle() }}
-            </h2>
-            <div slot="extra" style="width: 210px">
+            </h3>
+            <div slot="extra" style="width: 210px; margin-top: -5px">
               <Select
                 v-model="typeSelected"
                 @on-change="typeChanged"
                 style="width: 160px"
               >
-                <Option
-                  v-for="item in typeOptions"
-                  :key="item.index"
-                  :value="item"
-                  >{{ item }}</Option
-                >
+                <Option v-for="item in typeOptions" :key="item" :value="item">{{
+                  item
+                }}</Option>
               </Select>
               <i-switch v-model="isPublic">
                 <Icon type="logo-dropbox" slot="open" title="Public"></Icon>
@@ -113,37 +115,48 @@
                     <Col
                       span="8"
                       v-for="toolset in publicToolsetsShow"
-                      :key="toolset.index"
+                      :key="toolset.toolName"
                     >
                       <Card
                         style="
                           background-color: ghostwhite;
                           margin: 0 5px 10px 5px;
+                          height: 110px;
                         "
                       >
-                        <div style="text-align: center">
+                        <div style="text-align: center; overflow: hidden">
                           <Tooltip placement="bottom" max-width="600">
                             <img
-                              :src="toolset.toolsetImg"
-                              v-if="toolset.toolsetImg != ''"
+                              :src="toolset.toolImg"
+                              v-if="
+                                toolset.toolImg != undefined &&
+                                toolset.toolImg != ''
+                              "
                               style="height: 100%; max-height: 50px"
                             />
                             <avatar
-                              :username="toolset.toolsetName"
+                              :username="toolset.toolName"
                               :size="50"
                               style="margin-bottom: 6px"
                               v-else
                             ></avatar>
                             <div slot="content">
                               <span>{{ toolset.description }}</span>
-                              <br v-if="toolset.categoryTag.length > 0" />
-                              <p>
-                                <i>{{ toolset.categoryTag.join("|") }}</i>
-                              </p>
+                              <template
+                                v-if="
+                                  toolset.tags != undefined &&
+                                  toolset.tags.length > 0
+                                "
+                              >
+                                <br />
+                                <p>
+                                  <i>{{ toolset.tags.join("|") }}</i>
+                                </p>
+                              </template>
                             </div>
                           </Tooltip>
                           <h4
-                            :title="toolset.toolsetName"
+                            :title="toolset.toolName"
                             style="
                               display: block;
                               width: 90px;
@@ -152,7 +165,7 @@
                               text-overflow: ellipsis;
                             "
                           >
-                            {{ toolset.toolsetName }}
+                            {{ toolset.toolName }}
                           </h4>
                         </div>
                       </Card>
@@ -175,41 +188,52 @@
                     <Col
                       span="8"
                       v-for="toolset in personalToolsetsShow"
-                      :key="toolset.index"
+                      :key="toolset.toolName"
                     >
                       <Card
                         style="
                           background-color: #faebd794;
                           margin: 0 5px 10px 5px;
+                          height: 110px;
                         "
                       >
-                        <div style="text-align: center">
+                        <div style="text-align: center; overflow: hidden">
                           <Tooltip placement="bottom" max-width="600">
                             <img
-                              :src="toolset.toolsetImg"
-                              v-if="toolset.toolsetImg != ''"
+                              :src="toolset.toolImg"
+                              v-if="
+                                toolset.toolImg != undefined &&
+                                toolset.toolImg != ''
+                              "
                               style="height: 100%; max-height: 50px"
                             />
                             <avatar
-                              :username="toolset.toolsetName"
+                              :username="toolset.toolName"
                               :size="50"
                               style="margin-bottom: 6px"
                               v-else
                             ></avatar>
                             <div slot="content">
                               <span>{{ toolset.description }}</span>
-                              <br v-if="toolset.categoryTag.length > 0" />
-                              <p>
-                                <i>{{ toolset.categoryTag.join("|") }}</i>
-                              </p>
+                              <template
+                                v-if="
+                                  toolset.tags != undefined &&
+                                  toolset.tags.length > 0
+                                "
+                              >
+                                <br />
+                                <p>
+                                  <i>{{ toolset.tags.join("|") }}</i>
+                                </p>
+                              </template>
                             </div>
                           </Tooltip>
                           <h4
-                            :title="toolset.toolsetName"
+                            :title="toolset.toolName"
                             style="width: 90px"
                             class="ellipsis"
                           >
-                            {{ toolset.toolsetName }}
+                            {{ toolset.toolName }}
                           </h4>
                         </div>
                       </Card>
@@ -232,21 +256,26 @@
                     <Col
                       span="8"
                       v-for="tool in publicToolsShow"
-                      :key="tool.index"
+                      :key="tool.toolName"
                     >
                       <Card
                         style="
                           background-color: ghostwhite;
                           margin: 0 5px 10px 5px;
                           cursor: pointer;
+                          height: 110px;
                         "
                       >
-                        <div style="text-align: center" @click="showTool(tool)">
+                        <div
+                          style="text-align: center; overflow: hidden"
+                          @click="showTool(tool)"
+                        >
                           <Tooltip placement="bottom" max-width="600">
                             <img
                               :src="tool.toolImg"
-                              v-if="tool.toolImg != ''"
-                              style="height: 100%; max-height: 50px"
+                              v-if="
+                                tool.toolImg != undefined && tool.toolImg != ''
+                              "
                             />
                             <avatar
                               :username="tool.toolName"
@@ -256,10 +285,16 @@
                             ></avatar>
                             <div slot="content">
                               <span>{{ tool.description }}</span>
-                              <br v-if="tool.categoryTag.length > 0" />
-                              <span>
-                                <i>{{ tool.categoryTag.join("|") }}</i>
-                              </span>
+                              <template
+                                v-if="
+                                  tool.tags != undefined && tool.tags.length > 0
+                                "
+                              >
+                                <br />
+                                <span>
+                                  <i>{{ tool.tags.join("|") }}</i>
+                                </span></template
+                              >
                             </div>
                           </Tooltip>
                           <h4
@@ -295,20 +330,26 @@
                     <Col
                       span="8"
                       v-for="tool in personalToolsShow"
-                      :key="tool.index"
+                      :key="tool.toolName"
                     >
                       <Card
                         style="
                           background-color: #faebd794;
                           margin: 0 5px 10px 5px;
                           cursor: pointer;
+                          height: 110px;
                         "
                       >
-                        <div style="text-align: center" @click="showTool(tool)">
+                        <div
+                          style="text-align: center; overflow: hidden"
+                          @click="showTool(tool)"
+                        >
                           <Tooltip placement="bottom" max-width="600">
                             <img
                               :src="tool.toolImg"
-                              v-if="tool.toolImg != ''"
+                              v-if="
+                                tool.toolImg != undefined && tool.toolImg != ''
+                              "
                               style="height: 100%; max-height: 50px"
                             />
                             <avatar
@@ -319,10 +360,16 @@
                             ></avatar>
                             <div slot="content">
                               <span>{{ tool.description }}</span>
-                              <br v-if="tool.categoryTag.length > 0" />
-                              <span>
-                                <i>{{ tool.categoryTag.join("|") }}</i>
-                              </span>
+                              <template
+                                v-if="
+                                  tool.tags != undefined && tool.tags.length > 0
+                                "
+                              >
+                                <br />
+                                <span>
+                                  <i>{{ tool.tags.join("|") }}</i>
+                                </span>
+                              </template>
                             </div>
                           </Tooltip>
                           <h4
@@ -344,20 +391,20 @@
         <Col span="8">
           <div style="padding: 0 5px; margin-left: 15px">
             <Card dis-hover>
-              <h2
+              <h3
                 slot="title"
                 style="padding-top: 5px"
                 v-if="showMenuItem == 'allToolsets'"
               >
-                Toolsets in step
-              </h2>
-              <h2
+                Toolsets in this activity
+              </h3>
+              <h3
                 slot="title"
                 style="padding-top: 5px"
                 v-if="showMenuItem == 'allTools'"
               >
-                Tools in step
-              </h2>
+                Tools in this activity
+              </h3>
               <div style="height: 400px" v-if="showMenuItem == 'allToolsets'">
                 <vue-scroll :ops="ops" style="height: 400px">
                   <draggable
@@ -369,7 +416,7 @@
                   >
                     <Card
                       v-for="(toolset, index) in stepToolsetsShow"
-                      :key="toolset.index"
+                      :key="toolset.toolName"
                       class="stepItems"
                       style="margin: 0 0 5px 0"
                     >
@@ -378,8 +425,8 @@
                           class="ellipsis"
                           type="text"
                           style="width: 140px; padding: 0"
-                          @click="showInfo(toolset, toolset.toolsetName)"
-                          >{{ toolset.toolsetName }}</Button
+                          @click="showInfo(toolset)"
+                          >{{ toolset.toolName }}</Button
                         >
                         <Button
                           shape="circle"
@@ -405,7 +452,7 @@
                   >
                     <Card
                       v-for="(tool, index) in stepToolsShow"
-                      :key="tool.index"
+                      :key="tool.toolName"
                       class="stepItems"
                       style="margin: 0 0 5px 0"
                     >
@@ -414,7 +461,7 @@
                           class="ellipsis"
                           type="text"
                           style="width: 140px; padding: 0"
-                          @click="showInfo(tool, tool.toolName)"
+                          @click="showInfo(tool)"
                           >{{ tool.toolName }}</Button
                         >
                         <Button
@@ -457,13 +504,13 @@
               <td>Description</td>
               <td>{{ itemInfo.description }}</td>
             </tr>
-            <tr>
+            <tr v-if="itemInfo.tags != undefined">
               <td>Tags</td>
               <td>{{ itemInfo.tags.join(",") }}</td>
             </tr>
-            <tr>
+            <tr v-if="itemInfo.recommendation != undefined">
               <td>Step</td>
-              <td>{{ itemInfo.recomStep.join(",") }}</td>
+              <td>{{ itemInfo.recommendation.join(",") }}</td>
             </tr>
           </tbody>
         </table>
@@ -480,38 +527,21 @@ import Avatar from "vue-avatar";
 import draggable from "vuedraggable";
 import { get, del, post, put } from "../../axios";
 export default {
-  props: ["activityInfo"],
+  props: ["activityInfo", "toolList"],
   components: {
     draggable,
     Avatar,
   },
-  watch: {
-    activityInfo: {
-      handler(val) {
-        this.init();
-      },
-      deep: true,
-    },
-    stepToolModal(val) {
-      if (!val) {
-        this.panel.close();
-      }
-    },
-  },
-  created() {
-    this.init();
-  },
-  mounted() {
-    this.resizeContent();
-  },
   data() {
     return {
-      stepId: "",
-      stepToolsetIds: [],
-      stepToolIds: [],
+      ops: {
+        bar: {
+          background: "#808695",
+        },
+      },
+      toolIdList: [],
       stepToolsShow: [],
       stepToolsetsShow: [],
-      contentHeight: "",
       userInfo: this.$store.getters.userInfo,
       showMenuItem: "allToolsets",
       publicToolsets: [],
@@ -524,15 +554,10 @@ export default {
       personalToolsShow: [],
       stepToolModal: false,
       isPublic: true,
-      ops: {
-        bar: {
-          background: "#808695",
-        },
-      },
       typeSelected: "All",
       typeOptions: [
         "All",
-        "General step",
+        "General",
         "Context definition & resource collection",
         "Data processing",
         "Data visualization",
@@ -541,46 +566,48 @@ export default {
         "Geographical simulation",
         "Data analysis",
         "Decision making",
-        "Others",
       ],
       infoModal: false,
       itemInfo: {
         name: "",
         description: "",
         tags: [],
-        recomStep: [],
+        recommendation: [],
       },
       panel: null,
     };
   },
-  methods: {
-    resizeContent() {
-      if (window.innerHeight > 675) {
-        this.contentHeight = window.innerHeight - 120;
-      } else {
-        this.contentHeight = 555;
-      }
-      window.onresize = () => {
-        return (() => {
-          this.resizeContent();
-        })();
-      };
+  watch: {
+    activityInfo: {
+      handler(val) {
+        this.init();
+      },
+      deep: true,
     },
-    init() {
-      console.log(this.activityInfo);
-      this.stepId = this.activityInfo.aid;
-      this.stepToolsetIds = this.activityInfo.toolsetList;
-      this.stepToolIds = this.activityInfo.toolList;
-    },
-    getAllListInfo() {
-      this.getPublicToolsets();
-      this.getPersonalToolsets();
-      this.getPublicTools();
+    // stepToolModal(val) {
+    //   if (!val) {
+    //     this.panel.close();
+    //   }
+    // },
+  },
+  created() {},
+  mounted() {
+    this.toolIdList = this.operationApi.getToollist();
 
-      this.getPersonalTools();
-      this.getStepToolsets();
-      this.getStepTools();
-    },
+    Array.prototype.contains = function (obj) {
+      var i = this.length;
+      while (i--) {
+        if (
+          (this[i].tid != undefined && this[i].tid === obj) ||
+          (this[i] != undefined && this[i] === obj)
+        ) {
+          return true;
+        }
+      }
+      return false;
+    };
+  },
+  methods: {
     stepToolModalShow() {
       this.getAllListInfo();
       this.typeSelected = "All";
@@ -588,11 +615,129 @@ export default {
       this.isPublic = true;
       this.stepToolModal = true;
     },
-    showInfo(item, name) {
-      this.itemInfo.name = name;
+    getAllListInfo() {
+      this.getPublicTools();
+      this.getPersonalTools();
+
+      this.filterDuplicateTools();
+    },
+    async getPublicTools() {
+      let data = await get(
+        "/GeoProblemSolving/tool/inquiry?key=privacy&value=Public"
+      );
+      this.$set(this, "publicTools", data);
+      this.filterShowListByType();
+    },
+    async getPersonalTools() {
+      let data = await get(
+        `/GeoProblemSolving/tool/findByProvider/${this.userInfo.userId}`
+      );
+      this.$set(this, "personalTools", data);
+      this.filterShowListByType();
+    },
+    filterDuplicateTools() {
+      
+      this.stepToolsetsShow = [];
+      this.stepToolsShow = [];
+
+      // public tools and toolsets
+      let tools = [],
+        toolsets = [];
+      for (var i = this.personalTools.length -1 ; i >= 0; i--) {
+        if (this.publicTools[i].isToolset != undefined && this.publicTools[i].isToolset) {
+          if (!this.toolIdList.contains(this.publicTools[i].tid)) {
+            toolsets.push(this.publicTools[i]);            
+          } else {
+            this.stepToolsetsShow.push(this.publicTools[i]);
+          }
+        } else {
+          if (!this.toolIdList.contains(this.publicTools[i].tid)) {
+            tools.push(this.publicTools[i]);            
+          } else {
+            this.stepToolsShow.push(this.publicTools[i]);
+          }
+        }
+      }
+      this.publicTools = tools;
+      this.publicToolsets = toolsets;
+
+      // personal tools and toolsets
+      tools = [];
+      toolsets = [];
+      for (var i = this.personalTools.length -1 ; i >= 0; i--) {
+        if (this.personalTools[i].isToolset != undefined && this.personalTools[i].isToolset) {
+          if (!this.toolIdList.contains(this.personalTools[i].tid)) {
+            toolsets.push(this.personalTools[i]);
+          } else {
+            this.stepToolsetsShow.push(this.personalTools[i]);
+          }
+        } else {
+          if (!this.toolIdList.contains(this.personalTools[i].tid)) {
+            tools.push(this.personalTools[i]);
+          } else {
+            this.stepToolsShow.push(this.personalTools[i]);
+          }
+        }
+      }
+      this.personalTools = tools;
+      this.personalToolsets = toolsets;
+
+      // tools and toolsets in the current activity
+      tools = [];
+      toolsets = [];
+      for (var i = 0; i < this.toolList.length; i++) {
+        if (this.toolList[i].isToolset) {
+          if (this.toolIdList.contains(this.toolList[i].tid)) {
+            toolsets.push(this.toolList[i]);
+          }
+        } else {
+          if (this.toolIdList.contains(this.toolList[i].tid)) {
+            tools.push(this.toolList[i]);
+          }
+        }
+      }
+    },
+    filterShowListByType() {
+      this.publicToolsetsShow = this.getFilterResult(this.publicToolsets);
+      this.personalToolsetsShow = this.getFilterResult(this.personalToolsets);
+      this.publicToolsShow = this.getFilterResult(this.publicTools);
+      this.personalToolsShow = this.getFilterResult(this.personalTools);
+    },
+    getFilterResult(foreList) {
+      let selectedType = this.typeSelected;
+      let resultList = foreList.filter(function (item) {
+        switch (selectedType) {
+          case "All": {
+            return item;
+          }
+          case "General":
+          case "Context definition & resource collection":
+          case "Data processing":
+          case "Data visualization":
+          case "Geo-analysis model construction":
+          case "Model effectiveness evaluation":
+          case "Geographical simulation":
+          case "Data analysis":
+          case "Decision making": {
+            if (item.recommendation != undefined) {
+              let stepTypes = item.recommendation;
+              for (var i = 0; i < stepTypes.length; i++) {
+                if (stepTypes[i] == selectedType) {
+                  return item;
+                }
+              }
+            }
+            break;
+          }
+        }
+      });
+      return resultList;
+    },
+    showInfo(item) {
+      this.itemInfo.name = item.name;
       this.itemInfo.description = item.description;
-      this.itemInfo.tags = item.categoryTag;
-      this.itemInfo.recomStep = item.recomStep;
+      this.itemInfo.tags = item.tags;
+      this.itemInfo.recommendation = item.recommendation;
       this.infoModal = true;
     },
     listTitle() {
@@ -606,278 +751,20 @@ export default {
         return "Personal tools";
       }
     },
-    getPublicToolsets() {
-      this.axios
-        .get(
-          "/GeoProblemSolving/toolset/inquiry" +
-            "?key=" +
-            "privacy" +
-            "&value=" +
-            "Public"
-        )
-        .then((res) => {
-          if (res.data == "Offline") {
-            this.$store.commit("userLogout");
-            this.$router.push({ name: "Login" });
-          } else if (res.data === "Fail") {
-            this.$Notice.error({ desc: "Loading toolsets fail." });
-          } else if (res.data === "None") {
-            // this.$Notice.error({ desc: "There is no existing toolset" });
-          } else {
-            this.$set(this, "publicToolsets", res.data);
-          }
-        })
-        .catch((err) => {
-          throw err;
-        });
-    },
-    getPersonalToolsets() {
-      this.axios
-        .get(
-          "/GeoProblemSolving/toolset/inquiryAll" +
-            "?provider=" +
-            this.userInfo.userId
-        )
-        .then((res) => {
-          if (res.data == "Offline") {
-            this.$store.commit("userLogout");
-            this.$router.push({ name: "Login" });
-          } else if (res.data === "Fail") {
-            this.$Notice.error({ desc: "Loading toolsets fail." });
-          } else if (res.data === "None") {
-            // this.$Notice.error({ desc: "There is no existing toolset" });
-          } else {
-            this.$set(this, "personalToolsets", res.data);
-            this.filterDuplicateToolsets();
-            this.filterShowListByType();
-          }
-        })
-        .catch((err) => {
-          throw err;
-        });
-    },
-    getStepToolsets() {
-      if (this.stepToolsetIds == null || this.stepToolsetIds == undefined) {
-        this.stepToolsetIds = [];
-      }
-
-      var stepToolsetIds = this.stepToolsetIds;
-      var toolsetsCount = this.stepToolsetIds.length;
-      var flagCount = toolsetsCount;
-      var stepToolsetInfos = [];
-      for (var i = 0; i < toolsetsCount; i++) {
-        this.axios
-          .get(
-            "/GeoProblemSolving/toolset/inquiry" +
-              "?key=" +
-              "tsId" +
-              "&value=" +
-              stepToolsetIds[i]
-          )
-          .then((res) => {
-            if (res.data == "Offline") {
-              this.$store.commit("userLogout");
-              this.$router.push({ name: "Login" });
-            } else if (res.data === "Fail") {
-              this.$Notice.error({ desc: "Loading toolsets fail." });
-            } else if (res.data === "None") {
-              // this.$Notice.error({ desc: "There is no existing toolset" });
-            } else {
-              stepToolsetInfos.push(res.data[0]);
-              if (--flagCount < 1) {
-                var sortToolsets = [];
-                for (var j = 0; j < toolsetsCount; j++) {
-                  for (var k = 0; k < toolsetsCount; k++) {
-                    if (stepToolsetIds[j] == stepToolsetInfos[k].tsId) {
-                      sortToolsets.push(stepToolsetInfos[k]);
-                      break;
-                    }
-                  }
-                }
-                this.$set(this, "stepToolsetsShow", sortToolsets);
-                this.filterDuplicateToolsets();
-                this.filterShowListByType();
-              }
-            }
-          })
-          .catch((err) => {
-            throw err;
-          });
-      }
-    },
-    async getPublicTools() {
-      let data = await get(
-        "/GeoProblemSolving/tool/inquiry?key=privacy&value=Public"
-      );
-      console.log(data);
-      this.$set(this, "publicTools", data);
-      this.filterDuplicateTools();
-      this.filterShowListByType();
-    },
-
-    async getPersonalTools() {
-      let data = await get(
-        `/GeoProblemSolving/tool/findByProvider/${this.userInfo.userId}`
-      );
-      this.$set(this, "personalTools", data);
-      this.filterDuplicateTools();
-      this.filterShowListByType();
-    },
-
-    async getStepTools() {
-      if (this.stepToolIds == null || this.stepToolIds == undefined) {
-        this.stepToolIds = [];
-      }
-
-      var stepToolIds = this.stepToolIds;
-      var toolsCount = this.stepToolIds.length;
-      var flagCount = toolsCount;
-      var stepToolInfos = [];
-      for (var i = 0; i < toolsCount; i++) {
-        let data = await get(
-          `/GeoProblemSolving/tool/inquiry?key=tid&value=${stepToolIds[i]}`
-        );
-        console.log(data);
-        stepToolInfos.push(data[0]);
-        if (--flagCount < 1) {
-          var sortTools = [];
-          for (var j = 0; j < toolsCount; j++) {
-            for (var k = 0; k < toolsCount; k++) {
-              if (stepToolIds[j] == stepToolInfos[k].tid) {
-                sortTools.push(stepToolInfos[k]);
-                break;
-              }
-            }
-          }
-          this.$set(this, "stepToolsShow", sortTools);
-          this.filterDuplicateTools();
-          this.filterShowListByType();
-        }
-      }
-    },
-    changeMenuItem(name) {
-      if (name == "diyTools") {
-        this.stepToolModal = false;
-        top.location.href = "/GeoProblemSolving/toolsCenter";
-      }
-      this.showMenuItem = name;
-    },
     typeChanged(type) {
       this.typeSelected = type;
       this.filterShowListByType();
     },
-    filterDuplicateToolsets() {
-      var tempPublicToolsets = [];
-      for (var i = 0; i < this.publicToolsets.length; i++) {
-        var exist = false;
-        for (var j = 0; j < this.stepToolsetsShow.length; j++) {
-          if (this.publicToolsets[i].tsId == this.stepToolsetsShow[j].tsId) {
-            exist = true;
-            break;
-          }
-        }
-        if (!exist) {
-          tempPublicToolsets.push(this.publicToolsets[i]);
-        }
-      }
-      this.publicToolsets = tempPublicToolsets;
-      var tempPersonalToolsets = [];
-      for (var i = 0; i < this.personalToolsets.length; i++) {
-        var exist = false;
-        for (var j = 0; j < this.stepToolsetsShow.length; j++) {
-          if (this.personalToolsets[i].tsId == this.stepToolsetsShow[j].tsId) {
-            exist = true;
-            continue;
-          }
-        }
-        if (!exist) {
-          tempPersonalToolsets.push(this.personalToolsets[i]);
-        }
-      }
-      this.personalToolsets = tempPersonalToolsets;
-    },
-    filterDuplicateTools() {
-      var tempPublicTools = [];
-      for (var i = 0; i < this.publicTools.length; i++) {
-        var exist = false;
-        for (var j = 0; j < this.stepToolsShow.length; j++) {
-          if (this.publicTools[i].tid == this.stepToolsShow[j].tid) {
-            exist = true;
-            break;
-          }
-        }
-        if (!exist) {
-          tempPublicTools.push(this.publicTools[i]);
-        }
-      }
-      this.publicTools = tempPublicTools;
-      var tempPersonalTools = [];
-      for (var i = 0; i < this.personalTools.length; i++) {
-        var exist = false;
-        for (var j = 0; j < this.stepToolsShow.length; j++) {
-          if (this.personalTools[i].tid == this.stepToolsShow[j].tid) {
-            exist = true;
-            continue;
-          }
-        }
-        if (!exist) {
-          tempPersonalTools.push(this.personalTools[i]);
-        }
-      }
-      this.personalTools = tempPersonalTools;
-    },
-    filterShowListByType() {
-      this.publicToolsetsShow = this.getFilterResult(this.publicToolsets);
-      this.personalToolsetsShow = this.getFilterResult(this.personalToolsets);
-      this.publicToolsShow = this.getFilterResult(this.publicTools);
-      this.personalToolsShow = this.getFilterResult(this.personalTools);
-    },
-    getFilterResult(foreList) {
-      var selectedType = this.typeSelected;
-      var resultList = foreList.filter(function (item) {
-        switch (selectedType) {
-          case "All": {
-            return item;
-            break;
-          }
-          case "General step":
-          case "Context definition & resource collection":
-          case "Data processing":
-          case "Data visualization":
-          case "Geo-analysis model construction":
-          case "Model effectiveness evaluation":
-          case "Geographical simulation":
-          case "Data analysis":
-          case "Decision making": {
-            var stepTypes = item.recomStep;
-            for (var i = 0; i < stepTypes.length; i++) {
-              if (stepTypes[i] == selectedType) {
-                return item;
-                break;
-              }
-            }
-            break;
-          }
-          case "Others": {
-            if (item.recomStep.length < 1) {
-              return item;
-            }
-            break;
-          }
-        }
-      });
-      return resultList;
-    },
     addToolsettoStep(evt) {
       var addedToolsetId = this.stepToolsetsShow[evt.newDraggableIndex].tsId;
       for (var i = 0; i < this.publicToolsets.length; i++) {
-        if (this.publicToolsets[i].tsId == addedToolsetId) {
+        if (this.publicToolsets[i].tid == addedToolsetId) {
           this.publicToolsets.splice(i, 1);
           break;
         }
       }
       for (var i = 0; i < this.personalToolsets.length; i++) {
-        if (this.personalToolsets[i].tsId == addedToolsetId) {
+        if (this.personalToolsets[i].tid == addedToolsetId) {
           this.personalToolsets.splice(i, 1);
           break;
         }
@@ -897,7 +784,6 @@ export default {
     },
     addTooltoStep(evt) {
       var addedToolId = this.stepToolsShow[evt.newDraggableIndex].tid;
-      console.log(addedToolId);
       for (var i = 0; i < this.publicTools.length; i++) {
         if (this.publicTools[i].tid == addedToolId) {
           this.publicTools.splice(i, 1);
@@ -923,106 +809,74 @@ export default {
       }
       this.filterShowListByType();
     },
-
     confirmSetting() {
-      var newStepToolsets = [];
-      var newStepTools = [];
+      let newStepToolsets = [];
+      let newStepTools = [];
       this.stepToolsetsShow.forEach((toolset) => {
-        newStepToolsets.push(toolset.tsId);
+        newStepToolsets.push(toolset.tid);
       });
       this.stepToolsShow.forEach((tool) => {
         newStepTools.push(tool.tid);
       });
-      // let obj = new URLSearchParams();
-      // obj.append("aid", this.activityInfo.aid);
-      // obj.append("toolsetList", newStepToolsets);
-      // obj.append("toolList", newStepTools);
-      let object = {
-        toolsetList: newStepToolsets,
-        toolList: newStepTools,
-      };
 
-      console.log(this.activityInfo);
-      let flag = "";
-      if (this.activityInfo.level == 0) {
-        flag = "project";
-      } else if (this.activityInfo.level == 1) {
-        flag = "subproject";
-      } else if (this.activityInfo.level > 1) {
-        flag = "activity";
+      // 更新协同文档
+      // add
+      for (var i = 0; i < this.stepToolsetsShow.length; i++) {
+        if (!this.toolIdList.contains(this.stepToolsetsShow[i].tid)) {
+          this.operationApi.toolOperationRecord(
+            this.activityInfo.aid,
+            "",
+            "add",
+            this.userInfo.userId,
+            this.stepToolsetsShow[i]
+          );
+        }
       }
-      this.axios
-        .put(`/GeoProblemSolving/${flag}/${this.activityInfo.aid}`, object)
-        .then((res) => {
-          if (res.data == "Offline") {
-            this.$store.commit("userLogout");
-            this.$router.push({ name: "Login" });
-          } else if (res.data === "Fail") {
-            this.$Notice.error({ desc: "Loading tool fail." });
-          } else if (res.data === "None") {
-            // this.$Notice.error({ desc: "There is no existing tool" });
-          } else {
-            //此处要更新父组件的列表
-            console.log(res.data);
-            this.$emit("updateStepTools", newStepTools, newStepToolsets);
-            this.stepToolModal = false;
-          }
-        })
-        .catch((err) => {
-          throw err;
-        });
+      for (var i = 0; i < this.stepToolsShow.length; i++) {
+        if (!this.toolIdList.contains(this.stepToolsShow[i].tid)) {
+          this.operationApi.toolOperationRecord(
+            this.activityInfo.aid,
+            "",
+            "add",
+            this.userInfo.userId,
+            this.stepToolsShow[i]
+          );
+        }
+      }
+      // remove
+      for (var i = 0; i < this.toolIdList.length; i++) {
+        if (!this.stepToolsetsShow.contains(this.toolIdList[i])) {
+          this.operationApi.toolOperationRecord(
+            this.activityInfo.aid,
+            "",
+            "remove",
+            this.userInfo.userId,
+            { tid: this.toolIdList[i] }
+          );
+        }
+        if (!this.stepToolsShow.contains(this.toolIdList[i])) {
+          this.operationApi.toolOperationRecord(
+            this.activityInfo.aid,
+            "",
+            "remove",
+            this.userInfo.userId,
+            { tid: this.toolIdList[i] }
+          );
+        }
+      }
+
+      //此处要更新父组件的列表
+      this.$emit("updateStepTools", newStepTools, newStepToolsets);
+      this.stepToolModal = false;
     },
-    showTool(toolInfo) {
-      // this.axios
-      //   .post("/GeoProblemSolving/user/state")
-      //   .then(res => {
-      //     if (!res.data) {
-      //       this.$store.commit("userLogout");
-      //       this.$router.push({ name: "Login" });
-      //     } else {
-      //       let toolURL =
-      //         '<iframe src="' +
-      //         toolInfo.toolUrl +
-      //         "?userName=" +
-      //         this.userInfo.userName +
-      //         "&userID=" +
-      //         this.userInfo.userId +
-      //         "&groupID=" +
-      //         "e2b02056-82c9-4dda-8916-17fb66a21634" +
-      //         '" style="width: 100%;height:100%;"></iframe>';
-      //       var demoPanelTimer = null;
-      //       if (this.panel != null) {
-      //         this.panel.close();
-      //       }
-      //       this.panel = jsPanel.create({
-      //         theme: "success",
-      //         headerTitle: toolInfo.toolName,
-      //         footerToolbar: '<p style="height:10px"></p>',
-      //         contentSize: "1200 600",
-      //         content: toolURL,
-      //         disableOnMaximized: true,
-      //         dragit: {
-      //           containment: 5
-      //         },
-      //         id: "demoPanel",
-      //         onclosed: function(panel, status, closedByUser) {
-      //           window.clearTimeout(demoPanelTimer);
-      //         },
-      //         callback: function() {
-      //           var that = this;
-      //           demoPanelTimer = window.setInterval(function() {
-      //             that.style.zIndex = "9999";
-      //           }, 1);
-      //         }
-      //       });
-      //       // panel.resizeit("disable");
-      //       $(".jsPanel-content").css("font-size", "0");
-      //     }
-      //   })
-      //   .catch(err => {
-      //     console.log("Get user info fail.");
-      //   });
+    changeMenuItem(name) {
+      if (name == "diyTools") {
+        this.stepToolModal = false;
+        parent.location.href = "/GeoProblemSolving/newPersonalPage/tool";
+      }
+      this.showMenuItem = name;
     },
+    showTool(toolInfo) {},
   },
 };
 </script>

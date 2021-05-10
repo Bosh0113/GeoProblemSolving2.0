@@ -170,8 +170,8 @@
     >
       <h3>How would you like to open the tool?</h3>
       <div slot="footer" style="text-align:center">
-        <Button @click="openToolInWindow" type="primary" style="margin:0 15px">This window</Button>
-        <Button @click="openToolNewWindow" style="margin:0 15px">New window</Button>
+        <Button @click="openToolInWindow" type="primary" style="margin:0 15px">This page</Button>
+        <Button @click="openToolNewWindow" style="margin:0 15px">New page</Button>
       </div>
     </Modal>
   </div>

@@ -1,6 +1,6 @@
 package cn.edu.njnu.geoproblemsolving.business.activity.dto;
 
-import cn.edu.njnu.geoproblemsolving.Dto.ToDomainConverter;
+import cn.edu.njnu.geoproblemsolving.common.utils.ToDomainConverter;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Project;
 import cn.edu.njnu.geoproblemsolving.business.activity.enums.ActivityType;
 import cn.edu.njnu.geoproblemsolving.business.activity.enums.ProjectCategory;
