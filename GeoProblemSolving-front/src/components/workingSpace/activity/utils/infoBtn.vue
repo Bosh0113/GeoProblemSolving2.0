@@ -215,7 +215,7 @@
                   <div class="memberImg" style="position: relative">
                     <img
                       v-if="member.avatar != '' && member.avatar != undefined"
-                      :src="member.avatar"
+                      :src="avatar"
                       style="width: 40px; height: 40px"
                     />
                     <avatar
@@ -378,6 +378,12 @@ export default {
 
       listStyle: { width: "280px", height: "360px" },
     };
+  },
+  computed: {    
+    avatar() {
+      let avatarUrl = this.$store.state.UserServer + this.$store.getters.avatar;
+      return avatarUrl;
+    },
   },
   created() {
     this.userRole = this.roleIdentity(this.activityInfo);

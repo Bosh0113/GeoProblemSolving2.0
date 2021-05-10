@@ -288,7 +288,6 @@
   </Row>
 </template>
 <script>
-import * as socketApi from "@/api/socket.js";
 import toolModal from "@/components/common/tools/toolModal";
 import chatMember from "@/components/common/card/chat/chatMember";
 import chatManager from "@/components/common/card/chat/chatManager";
@@ -392,26 +391,40 @@ export default {
       this.panelHeight = window.innerHeight;
       this.panelWidth = window.innerWidth;
     },
-
+    // startWebSocket() {
+    //   this.socketApi.initWebSocket("MsgServer/" + this.activityInfo.aid);
+    //   let send_msg = {
+    //     type: "test",
+    //     sender: this.$store.getters.userId,
+    //     receivers: [this.$store.getters.userId],
+    //   };
+    //   this.socketApi.sendSock(send_msg, this.getSocketConnect);
+    // },
     send() {
+      let myDate = new Date().Format("yyyy-MM-dd HH:mm:ss");
+      let current_time = myDate.toLocaleString(); //获取日期与时间
       // 消息不为空
-      console.log(this.sendToMemberId);
-      if (this.message !== "") {
+      if (this.message.match(/^[ ]*$/)) {
         this.send_msg = {
           type: "message",
-          srcUserName: this.userName,
-          srcUserId: this.userId,
-          targetUserId: this.sendToMemberId,
+          sender: this.$store.getters.userId,
           content: this.message,
-          toolConcepts: this.toolConceptsShow,
+          time: current_time,
+          // toolConcepts: this.toolConceptsShow,
         };
         if (this.socketApi.getSocketInfo().linked) {
-          this.msglist.push(this.send_msg);
-          this.msgRecords.push(this.send_msg);
+          // this.msgRecords.push(this.send_msg);
           this.socketApi.sendSock(this.send_msg, this.getSocketConnect); //连接后台onopen方法
+
+          this.send_msg["status"] = "sending";
+          this.send_msg["sender"] = {
+            userId: this.$store.getters.userId,
+            name: this.$store.getters.userName,
+          };
+          this.msglist.push(this.send_msg);
         } else {
           let chatMsg = {
-            type: "notice",
+            type: "members",
             content: "You are disconnecting with others.",
           };
           this.msglist.push(chatMsg);
@@ -500,18 +513,97 @@ export default {
     },
 
     getSocketConnect(data) {
-      let chatMsg = data; //data传回onopen方法里的值
+      let chatMsg = data;
       if (chatMsg.type === "members") {
-        this.judgeonlineParticipant(chatMsg);
+        if (chatMsg.behavior == "on") {
+          chatMsg["content"] = chatMsg.activeUser.name + " join the meeting.";
+          this.receivedChatMsgs.push(chatMsg);
+        } else if (chatMsg.behavior == "off") {
+          chatMsg["content"] = chatMsg.activeUser.name + " stop the meeting.";
+          this.receivedChatMsgs.push(chatMsg);
+        }
+      } else if (data.type === "message") {
+        //判断消息的发出者
+        if (chatMsg.content != "") {
+          let msgCheck = false; // 更新消息状态
+
+          for (let i = 0; i < this.allChatMsgs.length; i++) {
+            let time = new Date(this.allChatMsgs[i].time);
+            let current = new Date();
+            let threshold = 1000 * 60 * 3;
+            if (this.allChatMsgs[i].time == chatMsg.time) {
+              this.allChatMsgs[i].status = "done";
+              msgCheck = true;
+            } else if (
+              (this.allChatMsgs[i].status =
+                "sending" && current - time > threshold)
+            ) {
+              this.allChatMsgs[i].status = "failed";
+            }
+          }
+
+          if (!msgCheck) {
+            this.receivedChatMsgs.push(chatMsg);
+          }
+        }
+      } else if (chatMsg.type == "message-cache") {
+        for (let i = 0; i < chatMsg.content.length; i++) {
+          if (chatMsg.content[i] != "") {
+            this.receivedChatMsgs.push(chatMsg.content[i]);
+          }
+        }
+      } else if (chatMsg.type == "test") {
+        chatMsg["type"] = "members";
+        chatMsg["content"] = "You have joined the meeting.";
+        this.receivedChatMsgs.push(chatMsg);
+      }
+    },
+    getSocketConnect(data) {
+      this.receivedChatMsgs = [];
+      let chatMsg = data; //data传回onopen方法里的值
+
+      if (chatMsg.type === "members") {
+        // this.judgeonlineParticipant(chatMsg);
+        if (chatMsg.behavior == "on") {
+          chatMsg["content"] = chatMsg.activeUser.name + " join the meeting.";
+          this.receivedChatMsgs.push(chatMsg);
+        } else if (chatMsg.behavior == "off") {
+          chatMsg["content"] = chatMsg.activeUser.name + " stop the meeting.";
+          this.receivedChatMsgs.push(chatMsg);
+        }
       } else if (
         chatMsg.type === "message" ||
         chatMsg.type === "message_pic" ||
         chatMsg.type === "message_tool"
       ) {
+        //判断消息的发出者
+        if (chatMsg.content != "") {
+          let msgCheck = false; // 更新消息状态
+
+          for (let i = 0; i < this.allChatMsgs.length; i++) {
+            let time = new Date(this.allChatMsgs[i].time);
+            let current = new Date();
+            let threshold = 1000 * 60 * 3;
+            if (this.allChatMsgs[i].time == chatMsg.time) {
+              this.allChatMsgs[i].status = "done";
+              msgCheck = true;
+            } else if (
+              (this.allChatMsgs[i].status =
+                "sending" && current - time > threshold)
+            ) {
+              this.allChatMsgs[i].status = "failed";
+            }
+          }
+
+          if (!msgCheck) {
+            this.receivedChatMsgs.push(chatMsg);
+          }
+          
+          // this.msgRecords.push(chatMsg);
+          // this.sendNotify(chatMsg);
+        }
         if (chatMsg.content != "") {
           this.msglist.push(chatMsg);
-          this.msgRecords.push(chatMsg);
-          this.sendNotify(chatMsg);
 
           if (chatMsg.frequency != "" || chatMsg.frequency != undefined) {
             this.msgConcepts = chatMsg.frequency;

@@ -1,6 +1,9 @@
 package cn.edu.njnu.geoproblemsolving.business.collaboration.utils;
 
 import cn.edu.njnu.geoproblemsolving.business.collaboration.entity.ChatMsg;
+import cn.edu.njnu.geoproblemsolving.business.collaboration.entity.MsgRecords;
+import cn.edu.njnu.geoproblemsolving.business.collaboration.repository.MsgRecordsRepository;
+import cn.edu.njnu.geoproblemsolving.business.collaboration.service.MsgRecordsService;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.utils.CollaborationConfig;
 import cn.edu.njnu.geoproblemsolving.business.user.dao.IUserDao;
 import cn.edu.njnu.geoproblemsolving.business.user.dto.InquiryUserDto;
@@ -11,9 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.websocket.Session;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 
 @Service
@@ -21,6 +23,9 @@ public class CollaborationBehavior {
 
     @Autowired
     IUserDao iUserDao;
+
+    @Autowired
+    MsgRecordsService msgRecordsService;
 
     /**common**/
     public CollaborationUser getMemberInfo(String userId, Session session) {
@@ -51,19 +56,21 @@ public class CollaborationBehavior {
     }
 
 
-    public void sendParticipantsInfo(ArrayList<CollaborationUser> participants, CollaborationUser user, String behavior) {
+    public void sendParticipantsInfo(HashMap<String, CollaborationUser> participants, CollaborationUser user, String behavior) {
         try {
+            if(user == null) return;
+
             JSONObject messageObject = new JSONObject();
             messageObject.put("type", "members");
             messageObject.put("participants", participants);
 
-            for (CollaborationUser participant : participants) {
-
-                if (!participant.getUserId().equals(user.getUserId())) {
+            for (Map.Entry<String, CollaborationUser> participant : participants.entrySet()) {
+                CollaborationUser receiver = participant.getValue();
+                if (!receiver.getUserId().equals(user.getUserId())) {
                     messageObject.put("behavior", behavior);
                     messageObject.put("activeUser", user);
                 }
-                participant.getSession().getBasicRemote().sendText(messageObject.toString());
+                receiver.getSession().getBasicRemote().sendText(messageObject.toString());
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -83,26 +90,27 @@ public class CollaborationBehavior {
         }
     }
 
-    public void transferMessage(ArrayList<CollaborationUser> participants, String sender, List<String> receivers, String message) {
+    public void transferMessage(String type, HashMap<String, CollaborationUser> participants, CollaborationUser sender, List<String> receivers, String message, String time) {
         try {
             JSONObject messageObject = new JSONObject();
-            messageObject.put("type", "operation");
+            messageObject.put("type", type);
             messageObject.put("sender", sender);
             messageObject.put("content", message);
+            messageObject.put("time", time);
 
             if (receivers.size() == 0) {
                 messageObject.put("receivers", "");
                 // send message
-                for (CollaborationUser user : participants) {
-                    user.getSession().getBasicRemote().sendText(messageObject.toString());
+                for (Map.Entry<String, CollaborationUser> user : participants.entrySet()) {
+                    user.getValue().getSession().getBasicRemote().sendText(messageObject.toString());
                 }
             } else {
                 messageObject.put("receivers", receivers);
                 // send message
-                for (String receiever : receivers) {
-                    for (CollaborationUser user : participants) {
-                        if (user.getUserId().equals(receiever)) {
-                            user.getSession().getBasicRemote().sendText(messageObject.toString());
+                for (String receiver : receivers) {
+                    for (Map.Entry<String, CollaborationUser> user : participants.entrySet()) {
+                        if (user.getValue().getUserId().equals(receiver)) {
+                            user.getValue().getSession().getBasicRemote().sendText(messageObject.toString());
                         }
                     }
                 }
@@ -113,13 +121,15 @@ public class CollaborationBehavior {
     }
 
     // 将聊天记录按时段存储
-    public void msgCacheStore(ArrayList<ChatMsg> msgRecords) {
-
+    public void msgCacheStore(String aid, ArrayList<ChatMsg> records) {
+        if(records != null &&records.size() > 0) {
+            msgRecordsService.msgRecordsCreate(aid, records);
+        }
     }
 
 
     /**operation**/
-    public void transferOperation(ArrayList<CollaborationUser> participants, String sender, List<String> receivers, String behavior, String object) {
+    public void transferOperation(HashMap<String, CollaborationUser> participants, String sender, List<String> receivers, String behavior, String object) {
         try {
             JSONObject messageObject = new JSONObject();
             messageObject.put("type", "operation");
@@ -130,16 +140,16 @@ public class CollaborationBehavior {
             if (receivers.size() == 0) {
                 messageObject.put("receivers", "");
                 // send message
-                for (CollaborationUser user : participants) {
-                    user.getSession().getBasicRemote().sendText(messageObject.toString());
+                for (Map.Entry<String, CollaborationUser> user : participants.entrySet()) {
+                    user.getValue().getSession().getBasicRemote().sendText(messageObject.toString());
                 }
             } else {
                 messageObject.put("receivers", receivers);
                 // send message
                 for (String receiever : receivers) {
-                    for (CollaborationUser user : participants) {
-                        if (user.getUserId().equals(receiever)) {
-                            user.getSession().getBasicRemote().sendText(messageObject.toString());
+                    for (Map.Entry<String, CollaborationUser> user : participants.entrySet()) {
+                        if (user.getValue().getUserId().equals(receiever)) {
+                            user.getValue().getSession().getBasicRemote().sendText(messageObject.toString());
                         }
                     }
                 }
@@ -149,16 +159,16 @@ public class CollaborationBehavior {
         }
     }
 
-    public void operationRefuse(ArrayList<CollaborationUser> participants, String sender) {
+    public void operationRefuse(HashMap<String, CollaborationUser> participants, String sender) {
         try {
             JSONObject messageObject = new JSONObject();
             messageObject.put("type", "operation");
             messageObject.put("behavior", "Refuse");
 
             // send message
-            for (CollaborationUser user : participants) {
-                if (user.getUserId().equals(sender)) {
-                    user.getSession().getBasicRemote().sendText(messageObject.toString());
+            for (Map.Entry<String, CollaborationUser> user : participants.entrySet()) {
+                if (user.getValue().getUserId().equals(sender)) {
+                    user.getValue().getSession().getBasicRemote().sendText(messageObject.toString());
                 }
             }
         } catch (Exception e) {
@@ -172,14 +182,14 @@ public class CollaborationBehavior {
      * @param participants
      * @param mode
      */
-    public void sendModeType(ArrayList<CollaborationUser> participants, String mode) {
+    public void sendModeType(HashMap<String, CollaborationUser> participants, String mode) {
         try {
-            for (CollaborationUser participant : participants) {
+            for (Map.Entry<String, CollaborationUser> participant : participants.entrySet()) {
                 JSONObject messageObject = new JSONObject();
                 messageObject.put("type", "mode");
                 messageObject.put("content", mode);
 
-                participant.getSession().getBasicRemote().sendText(messageObject.toString());
+                participant.getValue().getSession().getBasicRemote().sendText(messageObject.toString());
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -194,7 +204,7 @@ public class CollaborationBehavior {
      * @param user
      * @param behavior
      */
-    public void sendControlInfo(ArrayList<CollaborationUser> participants, List<String> queue, String user, String behavior) {
+    public void sendControlInfo(HashMap<String, CollaborationUser> participants, List<String> queue, String user, String behavior) {
         try {
             JSONObject messageObject = new JSONObject();
             messageObject.put("type", "message");
@@ -204,17 +214,17 @@ public class CollaborationBehavior {
                 messageObject.put("sender", user);
                 messageObject.put("waiting", queue.size());
                 // send message
-                for (CollaborationUser participant : participants) {
-                    participant.getSession().getBasicRemote().sendText(messageObject.toString());
+                for (Map.Entry<String,CollaborationUser> participant : participants.entrySet()) {
+                    participant.getValue().getSession().getBasicRemote().sendText(messageObject.toString());
                 }
             } else if (behavior.equals("stop")) {
                 messageObject.put("operator", user);
                 // send message
-                for (CollaborationUser participant : participants) {
+                for (Map.Entry<String,CollaborationUser> participant : participants.entrySet()) {
                     for (int i = 0; i < queue.size(); i++) {
-                        if (queue.get(i).equals(participant.getUserId())) {
+                        if (queue.get(i).equals(participant.getValue().getUserId())) {
                             messageObject.put("waiting", i);
-                            participant.getSession().getBasicRemote().sendText(messageObject.toString());
+                            participant.getValue().getSession().getBasicRemote().sendText(messageObject.toString());
                             break;
                         }
                     }

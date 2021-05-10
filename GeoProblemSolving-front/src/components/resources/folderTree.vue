@@ -1118,7 +1118,7 @@
               var url =
                 "http://view.officeapps.live.com/op/view.aspx?src=" +
                 "http://" +
-                this.$store.state.IP_Port +
+                this.$store.state.DataServer +
                 fileInfo.address;
               var toolURL =
                 "<iframe src=" +
@@ -1150,7 +1150,7 @@
           if (this.panel != null) {
             this.panel.close();
           }
-          var url = "http://" + this.$store.state.IP_Port + fileInfo.address;
+          var url = "http://" + this.$store.state.DataServer + fileInfo.address;
           var toolURL =
             "<video src=" +
             url +
@@ -1176,7 +1176,7 @@
           if (this.panel != null) {
             this.panel.close();
           }
-          var url = "http://" + this.$store.state.IP_Port + fileInfo.address;
+          var url = "http://" + this.$store.state.DataServer + fileInfo.address;
           var toolURL =
             "<iframe src=" +
             url +

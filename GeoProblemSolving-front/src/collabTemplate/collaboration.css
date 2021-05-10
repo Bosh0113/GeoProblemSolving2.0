@@ -198,7 +198,6 @@
     overflow: auto;
 }
 .operation-item {
-    height: 40px;
     width: 100%;
     border: 1px solid lightgray;
     border-radius: .25rem;
@@ -207,4 +206,21 @@
 .operation-bind {
     margin-top: 10px;
     text-align: center;
+    overflow: hidden;
+}
+.operation-title {
+    height: 30px;
+    padding: 5px 0  0 5px;
+    background-color: #fffaeb;
+}
+.operation-divider {
+    height: 0;
+    margin: 1px 0;
+    overflow: hidden;
+    border-top: 1px solid #e9ecef;
+}
+.operation-content {
+    max-height: 60px;
+    padding: 5px;
+    overflow: hidden;
 }

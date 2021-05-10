@@ -4,10 +4,9 @@ import cn.edu.njnu.geoproblemsolving.business.collaboration.entity.Collaboration
 import cn.edu.njnu.geoproblemsolving.business.collaboration.enums.CollaborationMode;
 import lombok.Data;
 
-import javax.websocket.Session;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Queue;
 
 /**
  * @ author: mzy
@@ -30,7 +29,7 @@ public class CollaborationConfig {
     private CollaborationMode mode;
     private String operator;
     private List<String> applyQueue;
-    private ArrayList<CollaborationUser> participants;
+    private HashMap<String, CollaborationUser> participants;
 
     public CollaborationConfig(String aid){
         this.aid = aid;

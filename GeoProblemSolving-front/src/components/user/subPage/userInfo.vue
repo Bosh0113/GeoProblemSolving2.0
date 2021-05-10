@@ -1,7 +1,7 @@
 <template>
   <div>
     <Row>
-      <Col span="8" offset="8">
+      <Col span="12" offset="6">
         <div style="text-align: center;font-family: 'Roboto Light'">
           <h2>Personal Information</h2>
           <span style="font-size: 14px;font-family: 'Roboto Light'">Basic information you use in Geo-problem solving platform</span>
@@ -233,7 +233,7 @@
   import Avatar from "vue-avatar";
   import md5 from "js-md5";
   import VueTagsInput from "@johmun/vue-tags-input";
-  import image2Base64 from 'image-to-base64/browser'
+  // import image2Base64 from 'image-to-base64/browser'
 
   export default {
     name: "userInfo",

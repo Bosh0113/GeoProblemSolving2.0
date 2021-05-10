@@ -1,7 +1,7 @@
 <template>
   <div>
     <Row>
-      <Col span="20" >
+      <Col span="22" offset="1">
         <Card dis-hover>
           <CheckboxGroup v-model="selectedNoticeType" style="display: inline-block">
             <Checkbox label="noticeList">

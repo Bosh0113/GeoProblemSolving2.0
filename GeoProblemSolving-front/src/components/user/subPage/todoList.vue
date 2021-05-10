@@ -2,7 +2,7 @@
   <div>
     <!--  Fiter  -->
     <Row>
-      <Col span="20">
+      <Col span="22" offset="1">
         <Card>
           <CheckboxGroup v-model="selectedTaskType">
             <Checkbox label="Doing">
@@ -23,10 +23,6 @@
             </Checkbox>
           </CheckboxGroup>
         </Card>
-      </Col>
-    </Row>
-    <Row>
-      <Col span="20">
         <Card dis-hover>
           <!--         新建任务   -->
           <div>

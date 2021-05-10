@@ -37,25 +37,22 @@
 <template>
   <div>
     <Row>
-      <Col span="20">
+      <Col span="22" offset="1">
         <!--    Filter and Storage  -->
-        <Row>
-          <Card>
-            <CheckboxGroup v-model="selectedProjectType" style="margin-left: 3.5%">
-              <Checkbox label="joinedProject" checked="checked">
-                <span>Joined by me</span>
-                <span class="badge">{{joinedProjectsList.length}}</span>
-              </Checkbox>
-              <Checkbox label="createdProject">
-                <span>Created by me</span>
-                <span class="badge">{{createdProjectList.length}}</span>
-              </Checkbox>
-            </CheckboxGroup>
-          </Card>
-        </Row>
+        <Card>
+          <CheckboxGroup v-model="selectedProjectType" style="margin-left: 3.5%">
+            <Checkbox label="joinedProject" checked="checked">
+              <span>Joined by me</span>
+              <span class="badge">{{joinedProjectsList.length}}</span>
+            </Checkbox>
+            <Checkbox label="createdProject">
+              <span>Created by me</span>
+              <span class="badge">{{createdProjectList.length}}</span>
+            </Checkbox>
+          </CheckboxGroup>
+        </Card>
 
         <!--    project content     -->
-        <Row>
           <div
             :style="{height: contentHeight-140+'px'}"
             style=" padding: 5px; border: #dcdee2 solid 1px;"
@@ -186,7 +183,6 @@
               </div>
             </vue-scroll>
           </div>
-        </Row>
       </Col>
 
       <!--    Event History-->

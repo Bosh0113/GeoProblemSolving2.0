@@ -1,7 +1,7 @@
 <template>
   <div>
     <Row>
-      <Col span="5" offset="6">
+      <Col span="6" offset="5">
         <Card class="customCard">
           <p slot="title">Project</p>
           <div slot="extra">
@@ -13,7 +13,7 @@
 
         </Card>
       </Col>
-      <Col span="5" offset="2">
+      <Col span="6" offset="2">
         <Card class="customCard">
           <p slot="title">Resource</p>
           <div slot="extra">
@@ -27,7 +27,7 @@
     </Row>
 
     <Row style="margin-top: 50px">
-      <Col span="5" offset="6">
+      <Col span="6" offset="5">
         <Card class="customCard">
           <p slot="title">Tool</p>
           <div slot="extra">
@@ -38,7 +38,7 @@
           <span>You can manage tool created by yourself</span>
         </Card>
       </Col>
-      <Col span="5" offset="2">
+      <Col span="6" offset="2">
         <Card class="customCard">
           <p slot="title">Todo List</p>
           <div slot="extra">
@@ -52,7 +52,7 @@
     </Row>
 
     <Row style="margin-top: 50px">
-      <Col span="5" offset="6">
+      <Col span="6" offset="5">
         <Card class="customCard">
           <p slot="title">My Account</p>
           <div slot="extra">
@@ -63,7 +63,7 @@
           <span>You can manage tool created by yourself</span>
         </Card>
       </Col>
-      <Col span="5" offset="2">
+      <Col span="6" offset="2">
         <Card class="customCard">
           <p slot="title">Message</p>
           <div slot="extra">
