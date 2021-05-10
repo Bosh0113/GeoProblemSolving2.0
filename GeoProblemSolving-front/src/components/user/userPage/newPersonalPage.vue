@@ -44,9 +44,8 @@
   }
 </style>
 <template>
-  <div>
-    <Row>
-      <Col span="3">
+  <div style="display: flex">
+      <div style="width:200px">
         <Menu style="height: calc(100vh - 120px);z-index: 2;" width="auto" :active-name="$route.name">
           <MenuGroup>
             <MenuItem name="overView" to="overView" class="sideItem">
@@ -89,12 +88,11 @@
             </MenuItem>
           </MenuGroup>
         </Menu>
-      </Col>
+      </div>
 
-      <Col span="19" offset="1">
+      <div style="width: calc(100vw - 200px)">
         <router-view style="margin-top: 60px"></router-view>
-      </Col>
-    </Row>
+      </div>
 
   </div>
 

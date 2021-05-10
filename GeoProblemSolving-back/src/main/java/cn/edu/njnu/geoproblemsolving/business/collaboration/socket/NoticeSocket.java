@@ -1,4 +1,4 @@
-package cn.edu.njnu.geoproblemsolving.Socket;
+package cn.edu.njnu.geoproblemsolving.business.collaboration.socket;
 
 import cn.edu.njnu.geoproblemsolving.Config.GetHttpSessionConfigurator;
 import org.springframework.stereotype.Component;

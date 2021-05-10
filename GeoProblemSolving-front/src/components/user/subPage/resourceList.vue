@@ -1165,6 +1165,9 @@
 </script>
 
 <style scoped>
+  .fileSpace{
+    padding: 0 20px;
+  }
   .folderContent {
     overflow-y: auto;
     padding: 5px;

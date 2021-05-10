@@ -28,7 +28,7 @@ public class MsgSocketServer {
     }
 
     /**
-     * message content: type消息类型（members, message, test）, sender发送者, receivers接收者, content消息内容, participants在线参与者
+     * message content: type消息类型（members, message, test, message-cache）, sender发送者, receivers接收者, content消息内容, participants在线参与者, time时间
      * @param aid
      * @param message
      * @throws IOException

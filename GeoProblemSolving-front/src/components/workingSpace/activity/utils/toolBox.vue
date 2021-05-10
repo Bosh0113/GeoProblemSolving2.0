@@ -379,7 +379,7 @@ export default {
       //iframe加载完毕后再发送消息，否则子页面接收不到message
       iFrame.onload = function () {
           //iframe加载完立即发送一条消息
-          iFrame.contentWindow.postMessage({"user": userInfo, "aid": activityId, type:"activity"}, "*");
+          iFrame.contentWindow.postMessage({"user": userInfo, "aid": activityId, "tid":toolInfo.tid, type:"activity"}, "*");
       }
 
     },

@@ -72,24 +72,26 @@ public class CollaborationService {
             CollaborationUser collaborationUser = collaborationBehavior.getMemberInfo(userId, session);
 
             // current participants
-            ArrayList<CollaborationUser> participants;
+            HashMap<String, CollaborationUser> participants;
             if (collaborationConfig.getParticipants() == null) {
-                participants = new ArrayList<>();
+                participants = new HashMap<>();
             } else {
                 participants = collaborationConfig.getParticipants();
             }
-            participants.add(collaborationUser);
+            participants.put(userId, collaborationUser);
             collaborationConfig.setParticipants(participants);
             groups.put(groupKey, collaborationConfig);
 
             // 发布缓存信息
-            if(participants.size() > 1 && communicationCache.getCache(groupKey).size() > 0) {
-                collaborationBehavior.sendMessageCache(communicationCache.getCache(groupKey), session);
+            if(participants.size() > 1) {
+                if(communicationCache.getCache(groupKey) != null && communicationCache.getCache(groupKey).size() > 0){
+                    collaborationBehavior.sendMessageCache(communicationCache.getCache(groupKey), session);
+                }
                 // 通知新成员上线，发布新的成员列表
                 collaborationBehavior.sendParticipantsInfo(collaborationConfig.getParticipants(), collaborationUser, "on");
             }
         } catch (Exception e) {
-            e.printStackTrace();;
+            e.printStackTrace();
         }
     }
 
@@ -108,13 +110,13 @@ public class CollaborationService {
             CollaborationUser collaborationUser = collaborationBehavior.getMemberInfo(userId, session);
 
             // current participants
-            ArrayList<CollaborationUser> participants;
+            HashMap<String, CollaborationUser> participants;
             if (collaborationConfig.getParticipants() == null) {
-                participants = new ArrayList<>();
+                participants = new HashMap<>();
             } else {
                 participants = collaborationConfig.getParticipants();
             }
-            participants.add(collaborationUser);
+            participants.put(userId, collaborationUser);
             collaborationConfig.setParticipants(participants);
             groups.put(groupKey, collaborationConfig);
 
@@ -135,21 +137,33 @@ public class CollaborationService {
 
             JSONObject messageObject = JSONObject.parseObject(message);
             String messageType = messageObject.getString("type");
-            String sender = messageObject.getString("sender");
-            List<String> receivers = messageObject.getJSONArray("receivers").toJavaList(String.class);
-            if(receivers == null) receivers = new ArrayList<>();
+            if(messageType.equals("ping")) return;
+
+            String user = messageObject.getString("sender");
+            CollaborationUser sender =  collaborationBehavior.getMemberInfo(user, null);
+
+            String time = messageObject.getString("time");
+
+            List<String> receivers = null;
+            try {
+                receivers = messageObject.getJSONArray("receivers").toJavaList(String.class);
+            } catch (NullPointerException ex){
+                receivers = new ArrayList<>();
+            }
 
             switch (messageType) {
                 case "test": {
                     collaborationConfig.setMode(CollaborationMode.Free);
                     groups.put(groupKey, collaborationConfig);
 
-                    collaborationBehavior.transferMessage(collaborationConfig.getParticipants(), sender, receivers, "test");
+                    collaborationBehavior.transferMessage(messageType, collaborationConfig.getParticipants(), sender, receivers, "test", time);
                     break;
                 }
-                case "message": {
+                case "message":
+                case "message_pic":
+                case "message_tool":{
                     String text = messageObject.getString("content");
-                    collaborationBehavior.transferMessage(collaborationConfig.getParticipants(), sender, receivers, text);
+                    collaborationBehavior.transferMessage(messageType, collaborationConfig.getParticipants(), sender, receivers, text, time);
 
                     Boolean toolConcepts = messageObject.getBoolean("toolConcepts");
                     String relateConceptSet = "";
@@ -158,7 +172,7 @@ public class CollaborationService {
                         relateConceptSet = ansjSegService.elasticSearch(result);
                     }
                     if (relateConceptSet.equals("")) {
-                        collaborationBehavior.transferMessage(collaborationConfig.getParticipants(), sender, receivers, relateConceptSet);
+                        collaborationBehavior.transferMessage(messageType, collaborationConfig.getParticipants(), sender, receivers, relateConceptSet, time);
                     }
 
                     // 添加消息至缓存
@@ -270,7 +284,6 @@ public class CollaborationService {
                         collaborationBehavior.transferOperation(collaborationConfig.getParticipants(), sender, receivers, behavior, object);
                     }
 
-
                     break;
                 }
                 case "computation":{
@@ -299,27 +312,28 @@ public class CollaborationService {
     public void communicationClose(String groupKey, Session session) {
         try {
             collaborationConfig = groups.get(groupKey);
+            HashMap<String, CollaborationUser> participants = collaborationConfig.getParticipants();
             // remove people
             CollaborationUser collaborationUser = null;
-            for (CollaborationUser user : collaborationConfig.getParticipants()) {
-                if (user.getSession().equals(session)) {
-                    collaborationUser = user;
-                    ArrayList<CollaborationUser> participants = collaborationConfig.getParticipants();
-                    participants.remove(collaborationUser);
+            for (Map.Entry<String, CollaborationUser> user : participants.entrySet()) {
+                if (user.getValue().getSession().equals(session)) {
+                    collaborationUser = user.getValue();
+
+                    participants.remove(user.getKey());
                     collaborationConfig.setParticipants(participants);
                     groups.put(groupKey, collaborationConfig);
                     break;
                 }
             }
 
-            // 通知成员退出，发布新的成员列表
-            collaborationBehavior.sendParticipantsInfo(collaborationConfig.getParticipants(), collaborationUser, "off");
-
-            // 通讯结束，持久化存储，清除缓存
-            if (groups.get(groupKey).getParticipants().size() < 1) {
-                collaborationBehavior.msgCacheStore(communicationCache.getCache(groupKey));
+            if (collaborationConfig.getParticipants().size() < 1) {
+                // 通讯结束，持久化存储，清除缓存
+                collaborationBehavior.msgCacheStore(groupKey, communicationCache.getCache(groupKey));
                 groups.remove(groupKey);
                 communicationCache.removeCache(groupKey);
+            } else {
+                // 通知成员退出，发布新的成员列表
+                collaborationBehavior.sendParticipantsInfo(collaborationConfig.getParticipants(), collaborationUser, "off");
             }
         }catch (Exception ex){
             ex.printStackTrace();
@@ -330,13 +344,14 @@ public class CollaborationService {
     public void operationClose(String groupKey, Session session) {
         try {
             collaborationConfig = groups.get(groupKey);
+            HashMap<String, CollaborationUser> participants = collaborationConfig.getParticipants();
             // remove people
             CollaborationUser collaborationUser = null;
-            for (CollaborationUser user : collaborationConfig.getParticipants()) {
-                if (user.getSession().equals(session)) {
-                    collaborationUser = user;
-                    ArrayList<CollaborationUser> participants = collaborationConfig.getParticipants();
-                    participants.remove(collaborationUser);
+            for (Map.Entry<String, CollaborationUser> user : participants.entrySet()) {
+                if (user.getValue().getSession().equals(session)) {
+                    collaborationUser = user.getValue();
+
+                    participants.remove(user.getKey());
                     collaborationConfig.setParticipants(participants);
                     groups.put(groupKey, collaborationConfig);
                     break;

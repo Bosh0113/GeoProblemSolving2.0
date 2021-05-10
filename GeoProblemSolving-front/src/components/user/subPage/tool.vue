@@ -1,7 +1,7 @@
 <template>
   <div>
     <Row>
-      <Col span="20">
+      <Col span="22" offset="1">
         <!--  Filter 包括 Created by me, Shared with me(项目中内容)，public, privacy-->
         <Row>
           <Card>

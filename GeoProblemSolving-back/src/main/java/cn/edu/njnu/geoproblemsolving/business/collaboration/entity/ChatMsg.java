@@ -15,7 +15,7 @@ public class ChatMsg {
 
     private String aid;
 
-    private String sender;
+    private CollaborationUser sender;
 
     private List<String> receiver;
 
