@@ -30,6 +30,10 @@ public class EmailDaoImpl implements IEmailDao{
             Properties props=new Properties();
             props.setProperty("mail.transport.protocol", "smtp");  // 使用的协议，javaMail规范要求
             props.setProperty("mail.smtp.host", myEmailSMTPHost);  // 发件人邮箱的SMTP服务器的地址
+            props.setProperty("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+            props.setProperty("mail.smtp.port", "587");
+            props.setProperty("mail.smtp.socketFactory.port", "587");
+            props.setProperty("mail.smtp.socketFactory.fallback", "false");
             props.setProperty("mail.smtp.auth", "true");           // 需要认证的请求
 
             // 2、根据配置创建会话，用于邮件和服务器交互
@@ -87,10 +91,10 @@ public class EmailDaoImpl implements IEmailDao{
         message.setFrom(new InternetAddress(sendMail,"OpenGMS","utf-8"));
 
         // 3  收件人，可以增加多个收件人，抄送，密送
-//        String[] recipients=receiveMail.split(",");
-//        for (String recipient : recipients) {
-            message.setRecipient(MimeMessage.RecipientType.TO, new InternetAddress(receiveMail,"Recipient","utf-8"));
-//        }
+        String[] recipients=receiveMail.split(",");
+        for (String recipient : recipients) {
+            message.setRecipient(MimeMessage.RecipientType.TO, new InternetAddress(recipient,"Recipient","utf-8"));
+        }
 //        // 增加收件人
 //        message.addRecipient(MimeMessage.RecipientType.TO, new InternetAddress("xuheng_z@126.com", "USER_DD", "UTF-8"));
 //        // Cc: 抄送（可选）

@@ -16,7 +16,6 @@ h1 {
   width: 20%;
   margin-right: 40%;
   margin-left: 40%;
-  margin-top: 10%;
 }
 #editor {
   /* position:fixed; */
@@ -90,31 +89,30 @@ h1 {
     <h1>New Project</h1>
     <div>
       <Form ref="formInline" :model="formInline" :rules="newProjectRule" class="projectForm">
-      <!-- 选择类别 -->
-      <FormItem prop="category" label="Category" :label-width="100">
+        <!-- 选择类别 -->
+        <FormItem prop="category" label="Category" :label-width="100">
           <RadioGroup v-model="formInline.category" style="width:80%">
-            <Radio label="Terrestrial">Terrestrial System</Radio>
-            <Radio label="Coastal">Coastal System</Radio>
-            <Radio label="Marine">Marine System</Radio>
-            <Radio label="Climate">Climate System</Radio>
-            <Radio label="Ecological">Ecological System</Radio>
-            <Radio label="Geological">Geological System</Radio>
-            <Radio label="Human">Human-Activity</Radio>
-            <Radio label="GISRS">GIS & RS</Radio>
-            <Radio label="General">General</Radio>
+            <Radio label="Investigational">Investigational project</Radio>
+            <Radio label="Intercomparable">Intercomparable project</Radio>
+            <Radio label="Reproducible">Reproducible project</Radio>
+            <Radio label="Educational">Educational project</Radio>
           </RadioGroup>
-      </FormItem>
-      <FormItem prop="title" label="Title" :label-width="100">
-          <Input v-model="formInline.title" placeholder="Enter Title (less than 60 characters)..."/>
-      </FormItem>
-      <FormItem prop="description" label="Description" :label-width="100">
+        </FormItem>
+        <FormItem prop="name" label="Name" :label-width="100">
+          <Input
+            v-model="formInline.name"
+            placeholder="Enter name of the project(less than 60 characters)..."
+          />
+        </FormItem>
+        <FormItem prop="description" label="Description" :label-width="100">
           <Input
             v-model="formInline.description"
-            placeholder="Enter a brief introduction (less than 180 characters)..."
+            type="textarea"
+            placeholder="Enter a description about this project..."
           />
-      </FormItem>
-      <FormItem prop="privacy" label="Privacy" :label-width="100">
-          <RadioGroup v-model="formInline.privacy" style="width:80%;margin-left:10px" >
+        </FormItem>
+        <FormItem prop="privacy" label="Privacy" :label-width="100">
+          <RadioGroup v-model="formInline.privacy" style="width:80%;margin-left:10px">
             <Radio
               label="Public"
               title="Other users can find the group and see who has membership."
@@ -125,9 +123,8 @@ h1 {
             ></Radio>
             <Radio label="Private" title="Other users can not find this group."></Radio>
           </RadioGroup>
-
-      </FormItem>
-      <FormItem prop="tag" label="Tag" :label-width="100">
+        </FormItem>
+        <FormItem prop="tag" label="Tag" :label-width="100">
           <Input
             v-model="inputTag"
             placeholder="Enter some tag to introduce the project"
@@ -151,165 +148,189 @@ h1 {
             >{{item}}</Tag>
           </div>
           <div>
-            <span>Example:</span>
-            <Tag style="cursor:default">water</Tag>
-            <Tag style="cursor:default">pollution problem</Tag>
-            <Tag style="cursor:default">smoggy day</Tag>
+            <span>Or select:</span>
+            <Tag style="cursor:pointer" @click.native="addTag('Terrestrial')">Terrestrial</Tag>
+            <Tag style="cursor:pointer" @click.native="addTag('Coastal')">Coastal</Tag>
+            <Tag style="cursor:pointer" @click.native="addTag('Marine')">Marine</Tag>
+            <Tag style="cursor:pointer" @click.native="addTag('Climate')">Climate</Tag>
+            <Tag style="cursor:pointer" @click.native="addTag('Ecological')">Ecological</Tag>
+            <Tag style="cursor:pointer" @click.native="addTag('Geological')">Geological</Tag>
+            <Tag style="cursor:pointer" @click.native="addTag('Human')">Human</Tag>
+            <Tag style="cursor:pointer" @click.native="addTag('GIS & RS')">GIS & RS</Tag>
+            <Tag style="cursor:pointer" @click.native="addTag('General')">General</Tag>
           </div>
-      </FormItem>
-      <FormItem prop="image" label="Image" :label-width="100">
-        <div class="inline_style">
-          <div class="demo-upload-list" v-if="img!=''">
-            <template>
-              <img v-bind:src="img">
-              <div class="demo-upload-list-cover">
-                <Icon type="ios-eye-outline" @click.native="handleView()"></Icon>
-                <Icon type="ios-trash-outline" @click.native="handleRemove()"></Icon>
-              </div>
-            </template>
+        </FormItem>
+        <FormItem prop="image" label="Image" :label-width="100">
+          <div class="inline_style">
+            <div class="demo-upload-list" v-if="img!=''">
+              <template>
+                <img v-bind:src="img" />
+                <div class="demo-upload-list-cover">
+                  <Icon type="ios-eye-outline" @click.native="handleView()"></Icon>
+                  <Icon type="ios-trash-outline" @click.native="handleRemove()"></Icon>
+                </div>
+              </template>
+            </div>
+            <div class="uploadBox">
+              <Icon type="ios-camera" size="20" style="position:absolute;margin:18px;"></Icon>
+              <input
+                id="choosePicture"
+                @change="uploadPhoto($event)"
+                type="file"
+                class="uploadAvatar"
+                accept="image/*"
+              />
+            </div>
+            <br />
+            <Modal title="View Image" v-model="visible">
+              <img :src="img" v-if="visible" style="width: 100%" />
+            </Modal>
           </div>
-          <div class="uploadBox">
-            <Icon type="ios-camera" size="20" style="position:absolute;margin:18px;"></Icon>
-            <input id="choosePicture" @change="uploadPhoto($event)" type="file" class="uploadAvatar" accept="image/*">
+        </FormItem>
+        <FormItem>
+          <div class="inline_style">
+            <Button
+              type="success"
+              @click="createProject('formInline')"
+              class="create"
+            >Create</Button>
           </div>
-          <br>
-          <Modal title="View Image" v-model="visible">
-            <img :src="img" v-if="visible" style="width: 100%">
-          </Modal>
-        </div>
-      </FormItem>
-      <FormItem prop="introduction" label="Introduction" :label-width="100">
-        <div class="inline_style">
-            <Input v-model="formInline.introduction" type="textarea" placeholder="Enter detailed introduction about this problem..." style="height:100%;width:100%"/>
-        </div>
-      </FormItem>
-      <FormItem>
-        <div class="inline_style">
-          <Button type="success" @click='createProject("formInline")' class="create" :disabled="clickForbidden">Create</Button>
-        </div>
-      </FormItem>
-    </Form>
+        </FormItem>
+      </Form>
     </div>
-
   </div>
 </template>
 <script>
 export default {
   beforeRouteEnter: (to, from, next) => {
-    next(vm=>{
+    next((vm) => {
       $.ajax({
         url: "/GeoProblemSolving/user/state",
         type: "POST",
         async: false,
         success: function (data) {
-            if (!data) {
-              vm.$store.commit("userLogout");
-              vm.$router.push({ name: "Login" });
-            }
+          if (!data) {
+            vm.$store.commit("userLogout");
+            var pageUrl = window.location.href;
+            this.axios
+              .get("/GeoProblemSolving/user/login?pageUrl="+pageUrl)
+              .then(res=>{
+                window.location.href = res.data;
+              })
+          }
         },
         error: function (err) {
-            console.log("Get user state fail.");
-        }
+          console.log("Get user state fail.");
+        },
       });
     });
   },
   data() {
     return {
-      // 控制按钮禁用的
-      clickForbidden:false,
       formInline: {
-        title: "",
+        name: "",
         category: "",
-        introduction: "",
         privacy: "Public",
         description: "",
         //tag列表
-        tagList: []
+        tagList: [],
       },
       newProjectRule: {
-        title: [
+        name: [
           {
             required: true,
-            message: "The title cannot be empty and no more than 60 characters",
+            message: "The name cannot be empty and no more than 60 characters",
             trigger: "blur",
-            max: 60
-          }
+            max: 60,
+          },
         ],
         category: [
           {
             required: true,
             message: "Please select category",
-            trigger: "change"
-          }
+            trigger: "change",
+          },
         ],
         privacy: [
           {
             required: true,
             message: "Please select privacy",
-            trigger: "change"
-          }
+            trigger: "change",
+          },
         ],
-        introduction:[
-          {
-            required: false,
-            message: "give a detailed introduction about this project",
-            trigger: "blur"
-          }
-        ],
-        description:[
+        description: [
           {
             required: true,
-            message: "The description cannot be empty and no more than 360 characters",
+            message:
+              "The description cannot be empty and no more than 360 characters",
             trigger: "blur",
-            max: 360
-          }
-        ]
+            max: 360,
+          },
+        ],
       },
       //用来存储输入的单个标签变量
       inputTag: "",
       visible: false,
       //表示图片
       img: "",
-      pictureUrl:"",
-      createProjectId: ""
+      pictureUrl: "",
+      createProjectInfo: {},
     };
   },
+  created() {
+    // 加入判断，如果未登录自动跳转登录页面
+    if (!this.$store.getters.userState) {
+      this.$router.push({ name: "Login" });
+    }
 
+    Array.prototype.contains = function (obj) {
+      var i = this.length;
+      while (i--) {
+        if (this[i] != undefined && this[i] === obj) {
+          return true;
+        }
+      }
+      return false;
+    };
+  },
   methods: {
     createProject(name) {
-      this.$refs[name].validate(valid => {
-        if(valid){
-          this.clickForbidden = true;
-          let createProjectForm = {};
-          createProjectForm["category"] = this.formInline.category;
-          createProjectForm["title"] = this.formInline.title;
-          createProjectForm["tag"] = this.formInline.tagList.toString();
-          createProjectForm["privacy"] = this.formInline.privacy;
-          createProjectForm["picture"] = this.pictureUrl;
-          createProjectForm["introduction"] = this.formInline.introduction;
-          createProjectForm["description"] = this.formInline.description;
-          createProjectForm["managerId"] = this.$store.getters.userId;
+      let permission = this.userRoleApi.getDefault();
+
+      this.$refs[name].validate((valid) => {
+        if (valid) {
+          let createProjectForm = {
+            category: this.formInline.category,
+            name: this.formInline.name,
+            tag: this.formInline.tagList.toString(),
+            privacy: this.formInline.privacy,
+            picture: this.pictureUrl,
+            type: "Activity_Default",
+            description: this.formInline.description,
+            type: "Activity_Default",
+            // creator: "5d1c51e5020a3e3ad80b717e",
+            creator: this.$store.getters.userId,
+            permission: JSON.stringify(permission),
+            level: 0
+          };
 
           this.axios
-            .post("/GeoProblemSolving/project/create", createProjectForm)
-            .then(res => {
-              if(res.data == "Offline"){
+            .post("/GeoProblemSolving/project", createProjectForm)
+            .then((res) => {
+              if (res.data == "Offline") {
                 this.$store.commit("userLogout");
                 this.$router.push({ name: "Login" });
-              }
-              else if (res.data === "Fail") {
-                this.$Message.error("Create project fail.");
+              } else if (res.data.code != 0) {
+                this.$Message.error(res.data.msg);
               } else {
-                this.createProjectId = res.data;
-                this.addHistoryEvent(this.createProjectId);
-                window.location.href="/GeoProblemSolving/projectDetail/"+this.createProjectId;
+                this.createProjectInfo = res.data.data;
+                this.addHistoryEvent(this.createProjectInfo.aid);
               }
             })
-            .catch(err => {
-              console.log(err);
+            .catch((err) => {
+              throw err;
             });
-        }else{
-
+        } else {
         }
       });
     },
@@ -321,24 +342,27 @@ export default {
         " created a " +
         this.formInline.category +
         " project named " +
-        this.formInline.title;
+        this.formInline.name;
       form["description"] = description;
       form["scopeId"] = scopeId;
       form["eventType"] = "project";
       form["userId"] = this.$store.getters.userId;
       this.axios
         .post("/GeoProblemSolving/history/save", form)
-        .then(res => {
+        .then((res) => {
           if (res.data === "Success") {
-            // this.$router.push({ name: "Project" });
+            window.location.href =
+              "/GeoProblemSolving/projectInfo/" + scopeId;
+          } else {
+            confirm("Created project fail.");
           }
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err.data);
         });
     },
     addTag(tag) {
-      if(tag!=""){
+      if (tag != "" && !this.formInline.tagList.contains(tag)) {
         this.formInline.tagList.push(tag);
         this.inputTag = "";
       }
@@ -354,27 +378,25 @@ export default {
       if (filesize > 2101440) {
         // 图片大于2MB
         this.$Message.error("size > 2MB");
-      }
-      else{
+      } else {
         var reader = new FileReader();
         reader.readAsDataURL(file);
-        reader.onload = e => {
+        reader.onload = (e) => {
           // 读取到的图片base64 数据编码 将此编码字符串传给后台即可
           let formData = new FormData();
           formData.append("picture", file);
           this.axios
-          .post("/GeoProblemSolving/project/picture", formData)
-          .then(res=>{
-            if(res.data!="Fail"){
-              this.pictureUrl=res.data;
-              this.img = e.target.result;
-              $('#choosePicture').val('');
-            }
-            else{
-              this.$Message.error("upload picture Fail!");
-            }
-          })
-          .catch();
+            .post("/GeoProblemSolving/resource/projectPic", formData)
+            .then((res) => {
+              if (res.data != "Fail") {
+                this.pictureUrl = res.data;
+                this.img = e.target.result;
+                $("#choosePicture").val("");
+              } else {
+                this.$Message.error("upload picture Fail!");
+              }
+            })
+            .catch();
         };
       }
     },
@@ -383,14 +405,8 @@ export default {
     },
     handleRemove() {
       this.img = "";
-      this.pictureUrl="";
-    }
+      this.pictureUrl = "";
+    },
   },
-  created() {
-    // 加入判断，如果未登录自动跳转登录页面
-    if (!this.$store.getters.userState) {
-      this.$router.push({ name: "Login" });
-    };
-  }
 };
 </script>

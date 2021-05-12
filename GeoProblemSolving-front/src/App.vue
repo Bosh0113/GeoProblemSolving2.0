@@ -1,6 +1,8 @@
 <template>
-  <div id="app">
-    <router-view/>
+  <div id="app" style="">
+     
+            
+    <router-view />
   </div>
 </template>
 <style scoped>

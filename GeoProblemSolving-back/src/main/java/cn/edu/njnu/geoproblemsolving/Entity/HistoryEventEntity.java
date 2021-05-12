@@ -10,14 +10,14 @@ public class HistoryEventEntity {
     private String description;
     private String userId;
     private String eventType;
-    private String createTime;
+    private String createdTime;
 
     public void setUserId(String userId) {
         this.userId = userId;
     }
 
     public void setCreateTime(String createTime) {
-        this.createTime = createTime;
+        this.createdTime = createTime;
     }
 
     public void setDescription(String description) {
@@ -37,7 +37,7 @@ public class HistoryEventEntity {
     }
 
     public String getCreateTime() {
-        return createTime;
+        return createdTime;
     }
 
     public String getDescription() {

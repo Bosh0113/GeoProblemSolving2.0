@@ -1,20 +1,23 @@
 <!DOCTYPE html>
 <html lang="zh-cmn-Hans" xmlns:th=http://www.thymeleaf.org>
 <head >
+    <meta http-equiv="pragma" content="no-cache">
+    <meta http-equiv="cache-control" content="no-cache">
+    <meta http-equiv="expires" content="0">
     <title>Geo-Problem Solving</title>
     <link rel="shortcut icon" href="/GeoProblemSolving/static/favicon.ico">
     <meta http-equiv="Content-Type" content=" charset=UTF-8" />
     <meta name="description" content="Participatory|GeoProblem Solving|GIS">
     <meta name="keywords" content="Participatory|GeoProblem Solving|GIS">
     <meta name="author" content="OpenGMS">
-    <script src="https://unpkg.com/vue@2.6.10/dist/vue.min.js"></script>
-    <script src="https://unpkg.com/jquery@3.4.1/dist/jquery.js"></script>
-    <script src="https://unpkg.com/ionicons@4.5.10-1/dist/ionicons.js"></script>
-    <link href="https://unpkg.com/ionicons@4.5.10-1/dist/css/ionicons.min.css" rel="stylesheet">
-    <link href="https://unpkg.com/iview@3.4.2/dist/styles/iview.css" rel="stylesheet">
-    <script src="https://unpkg.com/iview@3.4.2/dist/iview.js"></script>
-    <script src="https://unpkg.com/vue-avatar@2.1.7/dist/vue-avatar.min.js"></script>
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="/GeoProblemSolving/js/vue.min.js"></script>
+    <script src="/GeoProblemSolving/js/jquery.js"></script>
+    <script src="/GeoProblemSolving/js/ionicons/ionicons.js"></script>
+    <link href="/GeoProblemSolving/js/ionicons/css/ionicons.min.css" rel="stylesheet">
+    <link href="/GeoProblemSolving/css/iview.css" rel="stylesheet">
+    <script src="/GeoProblemSolving/js/iview.js"></script>
+    <script src="/GeoProblemSolving/js/vue-avatar.min.js"></script>
+    <script src="/GeoProblemSolving/js/axios.min.js"></script>
 
     <style >
         .home-screen {
@@ -26,7 +29,7 @@
             min-height: 100%;
         }
         .home-screen .bg {
-            background-image: url("static/Images/new/bg.jpg");
+            background-image: url("Images/new/bg.jpg");
             background-size: cover;
             position: absolute;
             width: 100%;
@@ -128,19 +131,19 @@
             right: 0;
         }
         .tools .tools-container .card .img-map {
-            background-image: url("static/Images/new/map.jpg");
+            background-image: url("Images/new/map.jpg");
         }
         .tools .tools-container .card .img-chart {
-            background-image: url("static/Images/new/chart.jpg");
+            background-image: url("Images/new/chart.jpg");
         }
         .tools .tools-container .card .img-video {
-            background-image: url("static/Images/new/video.jpg");
+            background-image: url("Images/new/video.jpg");
         }
         .tools .tools-container .card .img-edit {
-            background-image: url("static/Images/new/edit.jpg");
+            background-image: url("Images/new/edit.jpg");
         }
         .tools .tools-container .card .img-todo {
-            background-image: url("static/Images/new/notes.jpg");
+            background-image: url("Images/new/notes.jpg");
         }
         .tools .tools-container .card .card-title {
             display: block;
@@ -177,13 +180,13 @@
             background-size: cover;
         }
         .cases .case-content .case-item .img1 {
-            background-image: url("static/Images/new/planet.jpg");
+            background-image: url("Images/new/planet.jpg");
         }
         .cases .case-content .case-item .img2 {
-            background-image: url("static/Images/new/fire.jpg");
+            background-image: url("Images/new/fire.jpg");
         }
         .cases .case-content .case-item .img3 {
-            background-image: url("static/Images/new/leaft1.jpg");
+            background-image: url("Images/new/leaft1.jpg");
         }
         .cases .case-content .case-item .mask .bg {
             position: absolute;
@@ -290,7 +293,7 @@
 
 <body>
 <div id="vueBody" v-cloak style="min-width: 1100px">
-    <child-navigation ref="navigationEl" active-type="home"></child-navigation>
+    <child-navigation ref="navigationEl" active-type="home" :user-info="userInfo"></child-navigation>
     <div class="home-screen" >
         <div class="bg" ></div>
         <div class="mask"></div>
@@ -298,7 +301,7 @@
             <div>
                 <span class="title">Solving complex geo-problems? Collaboration.</span>
                 <span class="sub-title">Build Projects | Assemble Participants | Communicate Ideas | Explore Solutions</span>
-                <span class="desc">The platform is full of vitality, where resesrchers can exchange their views, collide their thoughts,<br />and establish their collabarations.</span>
+                <span class="desc">The platform is full of vitality, where researchers can exchange their views, collide their thoughts,<br />and establish their collaboration.</span>
                 <i-button class="home-start-btn" @click="start">Try it now</i-button>
             </div>
         </div>
@@ -363,7 +366,7 @@
                         <div class="bg"></div>
                         <div class="case-text">
                             <Icon type="md-leaf" ></Icon>
-                            <div>Leaf</div>
+                            <div>Forest</div>
                         </div>
                     </div>
                 </i-col>
@@ -376,13 +379,13 @@
                 <i-col class="card" span="4">
                     <span class="bg img-map"></span>
                     <span class="card-title">Map</span>
-                    <span class="card-desc">The fastest tools for visualizing geospatial data</span>
+                    <span class="card-desc">The tool for visualizing geospatial data</span>
                 <a href="#">Learn More</a>
                 </i-col>
                 <i-col class="card"span="4">
                     <span class="bg img-chart"></span>
                     <span class="card-title">Chart</span>
-                    <span class="card-desc">Give a deeper understanding of your table data</span>
+                    <span class="card-desc">Give a deeper understanding for table data</span>
                     <a href="#">Learn More</a>
                 </i-col>
 
@@ -403,7 +406,7 @@
                 <i-col class="card" span="4">
                     <span class="bg img-todo"></span>
                     <span class="card-title">TODO</span>
-                    <span class="card-desc">Life goes on, needs to keep moving forward.</span>
+                    <span class="card-desc">Research goes on and needs to keep moving forward.</span>
                     <a href="#">Learn More</a>
                 </i-col>
 
@@ -420,6 +423,31 @@
         el: '#vueBody',
         data:{
             userInfo:[],
+        },
+        created(){
+            var userInfo = {
+                userState: false,
+                name: 'Visitor',
+                userId: '',
+                avatar: ''
+            };
+            sessionStorage.setItem('userInfo', JSON.stringify(userInfo));
+            $.ajax({
+                url: "/GeoProblemSolving/user/state",
+                type: "POST",
+                async: false,
+                success: data=> {
+                    if (data) {
+                        data.userState = true;
+                        sessionStorage.setItem('userInfo', JSON.stringify(data));
+                    } else {
+                        console.log("Not logged in");
+                    }
+                },
+                error: function (err) {
+                    console.log("Get user info fail.");
+                }
+            });
         },
         mounted() {
             this.userInfo = JSON.parse(sessionStorage.getItem("userInfo"));

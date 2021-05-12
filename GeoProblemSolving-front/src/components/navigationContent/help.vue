@@ -30,17 +30,21 @@ export default {
       titleList: [
         "Home page",
         "Projects page",
+        "Project information",
+        "Personal page",
+        "Personal projects",
+        "Notifications center",
         "Project detail page",
-        "Subproject list",
-        "Subproject home page",
-        "Subproject resources",
-        "Subproject task page"
+        "Project resources",
+        "Project subprojects",
+        "Subproject detail page",
+        "Subproject tasks"
       ]
     };
   },
   methods: {
     getHelpImg() {
-      for (var i = 1; i < 8; i++) {
+      for (var i = 1; i < 12; i++) {
         var imgUrl = require("@/assets/images/Help/" + "help" + i + ".png");
         this.imageList.push(imgUrl);
       }

@@ -157,7 +157,7 @@ Actions.prototype.init = function()
     this.addAction('UpdateTask', function()
     {
     	if(window.taskID==null||window.taskID==="undefined"||window.taskID===""){
-    		confirm("Save task, please!");
+			confirm("Please save the task!");
 		}
 		else {
             var dataJSON=new Object();

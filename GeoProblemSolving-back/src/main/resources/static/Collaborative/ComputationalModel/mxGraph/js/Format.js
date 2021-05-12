@@ -458,7 +458,7 @@ Format.prototype.refresh = function()
 		var labelName = {
 			start:"Start",
 			end:"End",
-			modelitem:"Model",
+			modelitem:"CModel",
 			dataitem:"Data",
 			condition:"Condition",
             operation:"Operation"

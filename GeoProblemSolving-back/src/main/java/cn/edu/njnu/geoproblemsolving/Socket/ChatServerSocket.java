@@ -1,77 +1,73 @@
 package cn.edu.njnu.geoproblemsolving.Socket;
 
-import cn.edu.njnu.geoproblemsolving.Config.GetHttpSessionConfigurator;
 import cn.edu.njnu.geoproblemsolving.Config.MyEndPointConfigure;
-import cn.edu.njnu.geoproblemsolving.Dao.MessageRecords.MessageRecordsDaoImpl;
-import cn.edu.njnu.geoproblemsolving.Dao.MessageRecords.MessageRecordsDaoImpl;
-import cn.edu.njnu.geoproblemsolving.Entity.MessageRecordsEntity;
+
+import cn.edu.njnu.geoproblemsolving.business.tool.chatroom.chatmessage.ChatMessageRecordsService;
+import cn.edu.njnu.geoproblemsolving.business.tool.chatroom.chatmessage.dto.AddChatMessageRecordsDTO;
+import cn.edu.njnu.geoproblemsolving.business.tool.chatroom.hydrologicalconcept.AnsjSegService;
+import cn.edu.njnu.geoproblemsolving.business.user.dao.IUserDao;
+import cn.edu.njnu.geoproblemsolving.business.user.dto.InquiryUserDto;
+import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import com.alibaba.fastjson.JSONObject;
-import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
 
-import cn.edu.njnu.geoproblemsolving.Entity.UserEntity;
-import org.apache.log4j.Logger;
-
-import javax.mail.Message;
 import javax.servlet.http.HttpSession;
 import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArraySet;
 
-import static cn.edu.njnu.geoproblemsolving.Socket.VedioSocket.*;
-
+/**
+ * @Author     ：Zhiyi
+ * @Date       ：2020/12/15 12:21
+ * @modified By：
+ * @version:     1.0.0
+ */
 @Component
 @ServerEndpoint(value = "/ChatServer/{roomId}", configurator = MyEndPointConfigure.class)
 public class ChatServerSocket {
 
-    private static final Map<String,Map<String,Session>> rooms=new ConcurrentHashMap<>();//在线用户
-    private static JSONObject messageJson=new JSONObject();
+    private static final Map<String, Map<String, Session>> rooms = new ConcurrentHashMap<>();//在线用户
+    private static JSONObject messageJson = new JSONObject();
     private static ArrayList<String> messagesArray = new ArrayList<>(); //信息缓存，用来发给新加入者
-
-    private static int onlineCount = 0; //静态变量，用来记录当前在线连接数。应该把它设计成线程安全的。
-   // private static CopyOnWriteArraySet<ChatServerSocket> webSocketSet = new CopyOnWriteArraySet<ChatServerSocket>();
-    private Session session;    //与某个客户端的连接会话，需要通过它来给客户端发送数据
-    private HttpSession httpSession;    //request的session
-    private String userid;      //用户名
-    private static List list = new ArrayList<>();   //在线列表,记录用户名称
-    private static Map routetab = new HashMap<>();  //用户名和websocket的session绑定的路由表
-
+    private static JSONObject members = new JSONObject();       // 在线成员
 
     @Autowired
     MongoTemplate mongoTemplate;
 
+    @Autowired
+    ChatMessageRecordsService chatMessageRecordsService;
+
+    @Autowired
+    AnsjSegService ansjSegService;
+
+    @Autowired
+    IUserDao iUserDao;
+
     @OnOpen
-    public void onOpen(@PathParam("roomId") String roomId, Session session,EndpointConfig config)
-    {
-//        this.session = session;
-//        addOnlineCount();//在线数加1;
-//        this.httpSession = (HttpSession) config.getUserProperties().get(HttpSession.class.getName());
-//        this.userid=(String) httpSession.getAttribute("userId");    //获取当前用户
-//        list.add(userid);  //将用户名加入在线列表
-//        routetab.put(userid, session);   //将用户名和session绑定到路由表
-//        String message = getMessage( userid ,"notice",  list,getOnlineCount());
+    public void onOpen(@PathParam("roomId") String roomId, Session session, EndpointConfig config) throws IOException {
+        HttpSession httpSession = (HttpSession) config.getUserProperties().get(HttpSession.class.getName());
+        String userId = httpSession.getAttribute("userId").toString();
+        String userName = ((HttpSession) config.getUserProperties().get(HttpSession.class.getName())).getAttribute("name").toString();
 
-        HttpSession httpSession=(HttpSession) config.getUserProperties().get(HttpSession.class.getName());
 
-        if (!rooms.containsKey(roomId)){
-            Map<String,Session> room=new ConcurrentHashMap<>();
+//        JsonResult userInfo =  iUserDao.getUserInfo("userId",userId);
+//        String userAvatar = ((InquiryUserDto)userInfo.getData()).getAvatar();
+
+        //判断会话是否存在
+        if (rooms.containsKey(roomId)) {
+            rooms.get(roomId).put(userId, session);
+        } else {
+            Map<String, Session> room = new ConcurrentHashMap<>();
             room.put(httpSession.getAttribute("userId").toString(), session);
-            rooms.put(roomId,room);
+            rooms.put(roomId, room);
         }
-        else {
-            rooms.get(roomId).put(httpSession.getAttribute("userId").toString(), session);
-        }
-        //broadcast(roomId,message);     //广播
-        broadcastMembersToRoom(roomId);
 
         if (messageJson.containsKey(roomId)) {
             try {
@@ -80,142 +76,167 @@ public class ChatServerSocket {
                 e.printStackTrace();
             }
         }
-    }
-    //接收消息后所调用的方法
-    @OnMessage
-    public void onMessage(@PathParam("roomId") String roomId, String message, Session session)
-    {
-        JSONObject messageObject = JSONObject.parseObject(message);
-        String messageType = messageObject.getString("type");
-        if (messageType.equals("message")) {
-            broadcastMessageToRoom(roomId, message, session);
-            // 添加消息至缓存
-            messagesArray.add(message);
-            messageJson.put(roomId, messagesArray.toString());
-            // 将历史消息进行存储
-            try {
-                MessageRecordsDaoImpl messageRecordsDao = new MessageRecordsDaoImpl(mongoTemplate);
-                MessageRecordsEntity messageRecordsEntity = new MessageRecordsEntity();
-                messageRecordsEntity.setRoomId(roomId);
-                messageRecordsEntity.setUserId(messageObject.getString("fromid"));
-                messageRecordsEntity.setContent(message);
-                messageRecordsEntity.setType("message");
-                messageRecordsDao.saveMessageRecords(messageRecordsEntity);
-            }
-            catch (Exception ex) {
-                throw ex;
-            }
-        }
+
+        //用户信息
+        JSONObject user = new JSONObject();
+        user.put("userId", userId);
+        user.put("userName", userName);
+//        user.put("userAvatar", userAvatar);
+        members.put(session.getId(), user);
+
+        broadcastMembersToRoom(roomId);
+        broadcastOnOffToRoom(roomId, userId, userName, "on");
     }
 
+
     @OnClose
-    public void onClose(@PathParam("roomId") String roomId, Session session)
-    {
-        subOnlineCount();           //在线数减1
-        list.remove(userid);        //从在线列表移除这个用户
-        routetab.remove(userid);
+    public void onClose(@PathParam("roomId") String roomId, Session session) throws IOException {
         for (Map.Entry<String, Session> server : rooms.get(roomId).entrySet()) {
             if (server.getValue().equals(session)) {
                 rooms.get(roomId).remove(server.getKey());
                 break;
             }
         }
-        String message = getMessage( userid ,"notice", list , getOnlineCount());
-        broadcast(roomId,message);         //广播
-        broadcastMembersToRoom(roomId);
-        //最后一个人退出后清理消息缓存
-        if(rooms.get(roomId).size()<1){
+        String userId = members.getJSONObject(session.getId()).getString("userId");
+        String userName = members.getJSONObject(session.getId()).getString("userName");
+        broadcastOnOffToRoom(roomId, userId, userName, "off");
+        members.remove(session.getId());
+
+        // 最后一个人退出后清理消息缓存
+        if (rooms.get(roomId).size() < 1) {
             messagesArray.clear();
             messageJson.put(roomId, messagesArray.toString());
         }
     }
+
     @OnError
-    public void onError(@PathParam("roomId") String roomId, Session session,Throwable error)
-    {
-        for (Map.Entry<String, Session> server : rooms.get(roomId).entrySet()) {
-            if (server.getValue().equals(session)) {
-                rooms.get(roomId).remove(server.getKey());
-                break;
-            }
-        }
-        broadcastMembersToRoom(roomId);
+    public void onError(@PathParam("roomId") Throwable error) {
+        System.out.println("发生错误");
+        error.printStackTrace();
     }
 
     //用户列表
-    private void broadcastMembersToRoom(String roomId){
-        ArrayList<String> members = new ArrayList<>();
+    private void broadcastMembersToRoom(String roomId) {
+        ArrayList<Object> memberList = new ArrayList<>();
         for (Map.Entry<String, Session> server : rooms.get(roomId).entrySet()) {
-            members.add(server.getKey());
+            JSONObject json = new JSONObject();
+            JsonResult userInfo =  iUserDao.getUserInfo("userId",server.getKey());
+            String userName = ((InquiryUserDto)userInfo.getData()).getName();
+            json.put("userId",server.getKey());
+            json.put("userName", userName);
+            memberList.add(json);
         }
         JSONObject messageObject = new JSONObject();
         messageObject.put("type", "members");
-        messageObject.put("message", members.toString());
+        messageObject.put("content", memberList);
+
         String message = messageObject.toString();
         for (Map.Entry<String, Session> server : rooms.get(roomId).entrySet()) {
             try {
                 server.getValue().getBasicRemote().sendText(message);
-
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
 
-    //消息
-    private void broadcastMessageToRoom(String roomId,String message, Session session){
+    public void broadcastOnOffToRoom(String roomId, String userId, String userName, String behavior) throws IOException {
+        JSONObject messageObject = new JSONObject();
+        messageObject.put("type", "notice");
+        messageObject.put("behavior", behavior);
+        messageObject.put("srcUserId", userId);
+        if (behavior.equals("on")) {
+            messageObject.put("content", userName + " enter this room");
+        } else if (behavior.equals("off")) {
+            messageObject.put("content", userName + " leave this room");
+        }
+
+        String message = messageObject.toString();
+
         for (Map.Entry<String, Session> server : rooms.get(roomId).entrySet()) {
-            if (!session.equals(server.getValue())) {
-                try {
+            if (!userId.equals(server.getKey())) {
+                server.getValue().getBasicRemote().sendText(message);
+            }
+        }
+    }
+
+    //接收消息后所调用的方法
+    @OnMessage
+    public void onMessage(@PathParam("roomId") String roomId, String message, Session session) throws IOException {
+        JSONObject messageObject = JSONObject.parseObject(message);
+        String messageType = messageObject.getString("type");
+        if (messageType.equals("message")) {
+            broadcastMessageToRoom(roomId, message);
+
+            // 添加消息至缓存
+            messagesArray.add(message);
+            messageJson.put(roomId, messagesArray.toString());
+        } else if (messageType.equals("message_pic") || messageType.equals("message_tool")) {
+            broadcastMessageToRoom(roomId, message);
+        }
+    }
+
+
+    private void broadcastMessageToRoom(String roomId, String message) throws IOException {
+        JSONObject messageObject = JSONObject.parseObject(message);
+        String srcUserId = messageObject.getString("srcUserId");
+        String targetUserId = messageObject.getString("targetUserId");
+        String content = messageObject.getString("content");
+        Boolean toolConcepts = messageObject.getBoolean("toolConcepts");
+
+        if(toolConcepts == null) toolConcepts = false;
+        String relateConceptSet = "";
+        if(toolConcepts) {
+            String result = ansjSegService.processInfo(content);
+            relateConceptSet = ansjSegService.elasticSearch(result);
+        }
+
+        //群聊
+        if (srcUserId.equals(targetUserId)) {
+            for (Map.Entry<String, Session> server : rooms.get(roomId).entrySet()) {
+                if (!srcUserId.equals(server.getKey())) {
                     server.getValue().getBasicRemote().sendText(message);
-                } catch (Exception e) {
-                    e.printStackTrace();
+                }
+                if(relateConceptSet.equals("")) {
+                    server.getValue().getBasicRemote().sendText(relateConceptSet);
+                }
+            }
+        } else {
+            //私聊
+            for (Map.Entry<String, Session> server : rooms.get(roomId).entrySet()) {
+                if (targetUserId.equals((server.getKey()))) {
+                    server.getValue().getBasicRemote().sendText(message);
+                }
+                if(relateConceptSet.equals("")) {
+                    server.getValue().getBasicRemote().sendText(relateConceptSet);
                 }
             }
         }
+        saveMessage(roomId, message);
     }
 
 
-    public void broadcast(String roomId,String message){
-//        for(ChatServerSocket chat: webSocketSet){
-//            try {
-//                chat.session.getBasicRemote().sendText(message);
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//                continue;
-//            }
-//        }
-        for (Map.Entry<String, Session> server : rooms.get(roomId).entrySet()) {
-            try {
-                server.getValue().getBasicRemote().sendText(message);
-            } catch (Exception e) {
-                e.printStackTrace();
-                continue;
-            }
-        }
+    public void saveMessage(String roomId, String message) {
+        JSONObject messageObject = JSONObject.parseObject(message);
+        String type = messageObject.getString("type");
+        String targetUserId = messageObject.getString("targetUserId");
+        String targetUserName = messageObject.getString("targetUserName");
+        String srcUserId = messageObject.getString("srcUserId");
+        String srcUserName = messageObject.getString("srcUserName");
+        String content = messageObject.getString("content");
 
+        // 添加消息至缓存
+        messagesArray.add(message);
+        messageJson.put(roomId, messagesArray.toString());
 
+        AddChatMessageRecordsDTO addChatMessageRecordsDTO = new AddChatMessageRecordsDTO();
+        addChatMessageRecordsDTO.setSrcUserId(srcUserId);
+        addChatMessageRecordsDTO.setSrcUserName(srcUserName);
+        addChatMessageRecordsDTO.setTargetUserId(targetUserId);
+        addChatMessageRecordsDTO.setContent(content);
+        addChatMessageRecordsDTO.setType(type);
+        addChatMessageRecordsDTO.setMessageId(UUID.randomUUID().toString());
+        addChatMessageRecordsDTO.setRoomId(roomId);
+        chatMessageRecordsService.insert(addChatMessageRecordsDTO);
     }
-
-    public String getMessage(String message, String type, List list,Integer number){
-        JSONObject member = new JSONObject();
-        member.put("message", message);
-        member.put("type", type);
-        member.put("list", list);
-        member.put("number", number);
-        return member.toString();
-    }
-
-    public  int getOnlineCount() {
-        return onlineCount;
-    }
-
-    public  void addOnlineCount() {
-        ChatServerSocket.onlineCount++;
-    }
-
-    public  void subOnlineCount() {
-        ChatServerSocket.onlineCount--;
-    }
-
-
 }

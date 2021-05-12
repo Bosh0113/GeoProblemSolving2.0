@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="./css/bootstrap.min.css">
+    <link rel="stylesheet" href="./css/font-awesome.css">
+    <style>
+        body,html{
+            height:100%;width:100%
+        }
+    </style>
+</head>
+<body>
+<div id="main" style="overflow-y: hidden">
+  <div style="display:flex">
+    <div class="MemberPanel" style="width:200px;background-color:lightgray;">
+      <h4 style="text-align:center;font-weight:bold">Members</h4>
+        <div class="membersPanel">
+          <ul id="memberList" style="padding:5px;list-style:none;">
+
+          </ul>
+      </div>
+    </div>
+    <div class="myVideo" style="margin-left:30px;width:30%;height:100%" id="videoPart">
+      <div style="text-align:center">Me</div>
+      <div style="display:flex;justify-content:center;align-items:center">
+        <video id="vedio-box1" autoplay="autoplay" src="" controls="controls" style="margin-top:20px;width:400px;height:400px">
+          video 1
+        </video>
+      </div>
+    <div style="display:flex;justify-content:center;margin-top:10px;">
+        <button type="button" class="btn btn-success btn-lg" id="send-request" style="width:60px;height:60px;border-radius:50%;margin-right:10px" title="Send request">
+            <span class="glyphicon glyphicon-facetime-video" style="margin-top:6px"></span>
+        </button>
+        <button type="button" class="btn btn-danger btn-lg" id="send-cancel" style="display: none;float:right;width:60px;height:60px;border-radius:50%" title="Quit">
+            <span class="glyphicon glyphicon-off" style="margin-top:6px"></span>
+        </button>
+    </div>
+        <div style="width:60%;margin-left:20%;margin-right:20%">
+            <input id="ipt-console" style="width: 100%;height: 40px;overflow-y: auto;margin-top:20px;">
+        </div>
+    </div>
+    <div class="otherVideo" style="margin-left:30px;width:50%;height:100%" id="videoPart2">
+      <div style="text-align:center" id="videoMember">Others</div>
+      <div style="display:flex;justify-content:center;align-items:center">
+        <video id="vedio-box2" autoplay="autoplay" src="" controls="controls" style="margin-top:20px;width:450px;height:450px">
+          video 2
+        </video>
+      </div>
+    <div style="display:flex;justify-content:center;margin-top:10px;">
+        <button type="button" class="btn btn-success btn-lg" id="send-response" style="display: none;width:60px;height:60px;border-radius:50%;margin-right:10px" title="accept">
+            <span class="glyphicon glyphicon-earphone" style="margin-top:6px"></span>
+        </button>                
+        <button type="button" class="btn btn-danger btn-lg" style="display: none;width:60px;height:60px;border-radius:50%;margin-right:10px" id="send-reject" title="reject">
+            <span class="glyphicon glyphicon-ban-circle" style="margin-top:6px"></span>
+        </button>
+        <button type="button" class="btn btn-danger btn-lg" style="display: none;width:60px;height:60px;border-radius:50%" id="send-hangup" title="hang up">
+            <span class="glyphicon glyphicon-phone-alt" style="margin-top:6px"></span>
+        </button>
+    </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript" src="./js/jquery-3.3.1.js"></script>
+<script type="text/javascript" src="./js/bootstrap.min.js"></script>
+<script type="text/javascript" src="./js/jquery.cookie.js" charset="UTF-8"></script>
+<script type="text/javascript" src="./js/jquery.qrcode.min.js"></script>
+<script type="text/javascript" src="./js/vedioChat.js"></script>
+<script>
+  $(document).ready(function(){
+    $("#sidebarTree").height(window.innerHeight);
+    $("#videoPart").height(window.innerHeight);
+    $("#videoPart2").height(window.innerHeight);
+  })
+</script>
+</body>
+</html>

@@ -8,25 +8,30 @@ export default new Vuex.Store({
         //data
         userInfo: {
             userState: false,
-            userName: 'visitor',
+            name: 'Visitor',
             userId: '',
             avatar: '',
         },
         projectImg: '',
-        project: {},
-        subProject: {},
+        activityTree:[],
+        tempOperations: [],
+        activityTasks: [],
+        taskDependencies: [],
         IP_Port: window.location.host,
+        //用于当前选择的页面内容
         // IP_Port:"172.21.213.185:8080",
         // IP_Port:"localhost:8080",
         // IP_Port:"172.21.212.72:8082",
         // IP_Port:"94.191.49.160:8080",
+        DataServer:"221.226.60.2:8082", // 数据容器
+        UserServer: "http://172.21.212.103:8088/userServer",
     },
     getters: {
         userState: state => {
             return state.userInfo.userState;
         },
         userName: state => {
-            return state.userInfo.userName;
+            return state.userInfo.name;
         },
         userId: state => {
             return state.userInfo.userId;
@@ -37,12 +42,15 @@ export default new Vuex.Store({
         userInfo: state => {
             return state.userInfo;
         },
-        project: state => {
-            return state.project;
-        },
-        subProject: state => {
-            return state.subProject;
-        }
+        // activityTree: state => {
+        //     return state.activityTree;
+        // },
+        // tempOperations: state => {
+        //     return state.tempOperations;
+        // },
+        // activityTasks: state => {
+        //     return state.activityTasks;
+        // }
     },
     mutations: {
         getUserInfo: state => {
@@ -73,7 +81,7 @@ export default new Vuex.Store({
         userLogout: (state) => {
             state.userInfo = {
                 userState: false,
-                userName: 'visitor',
+                name: 'Visitor',
                 userId: '',
                 avatar: '',
             };
@@ -87,11 +95,62 @@ export default new Vuex.Store({
         setUserInfo: (state, userInfo) => {
             state.userInfo = userInfo;
         },
-        setProjectInfo: (state, project) => {
-            state.project = project;
+        setActivityTree: (state, activityTree) => {
+            Vue.set(state, "activityTree", activityTree);
         },
-        setSubProjectInfo: (state, subProject) => {
-            state.subProject = subProject;
+        setTempOperations: (state, operations) => {
+            Vue.set(state, "tempOperations", operations);
+        },
+        setActivityTasks: (state, tasks) => {
+            Vue.set(state, "activityTasks", tasks);
+        },
+        setTaskDependencies: (state, links) => {
+            Vue.set(state, "taskDependencies", links);
+        },
+        updateTempOperations: (state, behavior, operation) => {
+            if(behavior === "add"){
+                state.tempOperations.push(operation);
+            } else if(behavior === "remove"){
+                for(var i = 0; i < state.tempOperations.length; i++){
+                    if(state.tempOperations[i].id === operation.id){
+                        state.tempOperations.splice(i, 1);
+                    }
+                }
+            } else if(behavior === "update"){
+                for(var i = 0; i < state.tempOperations.length; i++){
+                    for(var i = 0; i < state.tempOperations.length; i++){
+                        if(state.tempOperations[i].id === operation.id){
+                            state.tempOperations[i] = operation;
+                        }
+                    }
+                }
+            }
+        },
+        updateActivityTasks: (state, behavior,task) => {
+            if(behavior === "add"){
+                state.activityTasks.push(task);
+            } else if(behavior === "remove"){
+                for(var i = 0; i < state.activityTasks.length; i++){
+                    if(state.activityTasks[i].taskId === task.taskId){
+                        state.activityTasks.splice(i, 1);
+                    }
+                }
+            } else if(behavior === "update"){
+                for(var i = 0; i < state.activityTasks.length; i++){
+                    if(state.activityTasks[i].taskId === task.taskId){
+                        state.activityTasks[i] = task;
+                    }
+                }
+            }
+        },
+        updateTaskDependencies: (state, behavior, link) => {
+            if(behavior === "add"){
+                state.taskDependencies.push(link);
+            } else if(behavior === "remove"){
+                
+            } else if(behavior === "update"){
+
+            }
         }
-    },
+    }
 })

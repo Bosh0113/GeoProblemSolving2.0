@@ -37,7 +37,7 @@
         background: #f7f7f7;
     }
 
-    .taskName {
+    .name {
         display: inline-block;
         overflow: hidden;
         white-space: nowrap;
@@ -58,108 +58,153 @@
                 <template v-if="!chartSwitch">
                     <Row type="flex" justify="space-around">
                         <i-col span="7">
-                        <Card :padding="0" :border="false">
-                            <h3 slot="title">Todo</h3>
-                            <i-button slot="extra" type="default" class="createTaskBtn" style="margin-top:-8px" @click="createTaskModalShow()" v-show="isManager()">Add</i-button>
-                            <vue-scroll :ops="ops" :style="{height:contentHeight-80+'px'}">
-                                <draggable :disabled="taskItemDraggable()" class="taskList" element="ul" :options="{group:'task'}" v-model="taskTodo" :style="{height:contentHeight-80+'px'}"
-                                    @start="setMoveCount()" @update="updateMoveTask(taskTodo,'todo')" @add="addMoveTask(taskTodo,'todo')"
-                                    @remove="removeMoveTask(taskTodo,'todo')">
-                                    <Card v-for="(item,index) in taskTodo" :key="index" :padding="3" style="margin:5px">
-                                        <div>
+                            <Card :padding="0" :border="false">
+                                <h3 slot="title">Todo</h3>
+                                <i-button slot="extra" type="default" class="createTaskBtn" style="margin-top:-8px"
+                                          @click="createTaskModalShow()"
+                                          v-if="taskPermissionIdentity(projectInfo.permission, userRole, 'create_task')">Add
+                                </i-button>
+                                <vue-scroll :ops="ops" :style="{height:contentHeight-80+'px'}">
+                                    <draggable :disabled="!taskPermissionIdentity(projectInfo.permission, userRole,'manage_task')" class="taskList" element="ul"
+                                               :options="{group:'task'}" v-model="taskTodo"
+                                               :style="{height:contentHeight-80+'px'}"
+                                               @start="setMoveCount()" @update="updateMoveTask(taskTodo,'todo')"
+                                               @add="addMoveTask(taskTodo,'todo')"
+                                               @remove="removeMoveTask(taskTodo,'todo')">
+                                        <Card v-for="(item,index) in taskTodo" :key="index" :padding="3"
+                                              style="margin:5px">
+                                            <div>
                                             <span style="float:left;padding:0 2.5px">
-                                                <Icon type="ios-list" color="gray" :size="20" ></Icon>
+                                                <Icon type="ios-list" color="gray" :size="20"></Icon>
                                             </span>
-                                            <span style="padding:5px">
-                                                <strong style="color:#57a3f3" class="taskName" :title="item.taskName">{{item.taskName}}</strong>
+                                                <span style="padding:5px">
+                                                <strong style="color:#57a3f3" class="name" :title="item.name">{{item.name}}</strong>
                                             </span>
-                                            <div style="float:right">
-                                                <Rate :disabled="!isManager()" v-model="item.importance" :count="1" clearable title="Importance" @on-change="changeImportance(item)"
-                                                ></Rate>
-                                                <span title="Edit" v-if="isManager()">
-                                                    <Icon type="ios-create" color="gray" :size="20" style="cursor:pointer" @click="editOneTask(index, taskTodo)" ></Icon>
-                                                </span>
-                                                <span v-if="isManager()" style="margin-left:5px;margin-right:3px;cursor: pointer;color:gray;" title="Delete" @click="taskRemoveAssure(index,taskTodo)">
-                                                    <Icon type="ios-trash" :size="20" color="gray" ></Icon>
-                                                </span>
+                                                <div style="float:right">
+                                                    <Rate :disabled="!(taskPermissionIdentity(projectInfo.permission, userRole,'manage_task') || userInfo.userId == item.creatorId)"
+                                                          v-model="item.importance" :count="1" clearable
+                                                          title="Importance" @on-change="changeImportance(item)"
+                                                    ></Rate>
+                                                    <template v-if="taskPermissionIdentity(projectInfo.permission, userRole, 'manage_task') || userInfo.userId == item.creatorId">
+                                                        <span title="Edit">
+                                                            <Icon type="ios-create" color="gray" :size="20"
+                                                                  style="cursor:pointer"
+                                                                  @click="editOneTask(index, taskTodo)"></Icon>
+                                                        </span>
+                                                        <span style="margin-left:5px;margin-right:3px;cursor: pointer;color:gray;"
+                                                              title="Delete" @click="taskRemoveAssure(index,taskTodo)">
+                                                            <Icon type="ios-trash" :size="20" color="gray"></Icon>
+                                                        </span>
+                                                    </template>
+                                                </div>
+                                                <p style="word-break:break-word;padding:5px;cursor:pointer"
+                                                   @click="showTask(index, taskTodo)">{{item.description}}</p>
+                                                <div style="display:flex;justify-content:flex-end">
+                                                    <Tag color="default" style="cursor:default">{{item.creatorName}}
+                                                    </Tag>
+                                                </div>
                                             </div>
-                                            <p style="word-break:break-word;padding:5px;cursor:pointer" @click="showTask(index, taskTodo)">{{item.description}}</p>
-                                            <div style="display:flex;justify-content:flex-end">
-                                                <Tag color="default" style="cursor:default">{{item.creatorName}}</Tag>
-                                            </div>
-                                        </div>
-                                    </Card>
-                                </draggable>
-                            </vue-scroll>
-                        </Card>
+                                        </Card>
+                                        <Spin size="large" fix v-if="todoLoading"></Spin>
+                                    </draggable>
+                                </vue-scroll>
+                            </Card>
                         </i-col>
                         <i-col span="7">
-                        <Card :padding="0" :border="false">
-                            <h3 slot="title">Doing</h3>
-                            <vue-scroll :ops="ops" :style="{height:contentHeight-80+'px'}">
-                                <draggable :disabled="taskItemDraggable()" class="taskList" element="ul" :options="{group:'task'}" v-model="taskDoing" :style="{height:contentHeight-80+'px'}"
-                                    @start="setMoveCount()" @update="updateMoveTask(taskDoing,'doing')" @add="addMoveTask(taskDoing,'doing')"
-                                    @remove="removeMoveTask(taskDoing,'doing')">
-                                    <Card v-for="(item,index)  in taskDoing" :key="index" :padding="3" style="margin:5px">
-                                        <div>
+                            <Card :padding="0" :border="false">
+                                <h3 slot="title">Doing</h3>
+                                <vue-scroll :ops="ops" :style="{height:contentHeight-80+'px'}">
+                                    <draggable :disabled="!taskPermissionIdentity(projectInfo.permission, userRole,'manage_task')" class="taskList" element="ul"
+                                               :options="{group:'task'}" v-model="taskDoing"
+                                               :style="{height:contentHeight-80+'px'}"
+                                               @start="setMoveCount()" @update="updateMoveTask(taskDoing,'doing')"
+                                               @add="addMoveTask(taskDoing,'doing')"
+                                               @remove="removeMoveTask(taskDoing,'doing')">
+                                        <Card v-for="(item,index)  in taskDoing" :key="index" :padding="3"
+                                              style="margin:5px">
+                                            <div>
                                             <span style="float:left;padding:0 2.5px">
-                                                <Icon type="ios-information-circle-outline" color="gray" :size="20" ></Icon>
+                                                <Icon type="ios-information-circle-outline" color="gray"
+                                                      :size="20"></Icon>
                                             </span>
-                                            <span style="padding:5px">
-                                                <strong style="color:#57a3f3" class="taskName" :title="item.taskName">{{item.taskName}}</strong>
+                                                <span style="padding:5px">
+                                                <strong style="color:#57a3f3" class="name" :title="item.name">{{item.name}}</strong>
                                             </span>
-                                            <div style="float:right">
-                                                <Rate :disabled="!isManager()" v-model="item.importance" :count="1" clearable title="Importance" @on-change="changeImportance(item)" ></Rate>
-                                                <span title="Edit" v-if="isManager()">
-                                                    <Icon type="ios-create" color="gray" :size="20" style="cursor:pointer" @click="editOneTask(index,taskDoing)" ></Icon>
-                                                </span>
-                                                <span v-if="isManager()" style="margin-left:5px;margin-right:3px;cursor: pointer;color:gray;" title="Delete" @click="taskRemoveAssure(index,taskDoing)">
-                                                    <Icon type="ios-trash" :size="20" color="gray" ></Icon>
-                                                </span>
+                                                <div style="float:right">
+                                                    <Rate :disabled="!(taskPermissionIdentity(projectInfo.permission, userRole, 'manage_task') || userInfo.userId == item.creatorId)"
+                                                          v-model="item.importance" :count="1" clearable
+                                                          title="Importance" @on-change="changeImportance(item)"></Rate>
+                                                    <template v-if="taskPermissionIdentity(projectInfo.permission, userRole, 'manage_task') || userInfo.userId == item.creatorId">
+                                                    <span title="Edit">
+                                                        <Icon type="ios-create" color="gray" :size="20"
+                                                              style="cursor:pointer"
+                                                              @click="editOneTask(index,taskDoing)"></Icon>
+                                                    </span>
+                                                        <span style="margin-left:5px;margin-right:3px;cursor: pointer;color:gray;"
+                                                              title="Delete" @click="taskRemoveAssure(index,taskDoing)">
+                                                        <Icon type="ios-trash" :size="20" color="gray"></Icon>
+                                                    </span>
+                                                    </template>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <p style="word-break:break-word;padding:5px;cursor:pointer" @click="showTask(index,taskDoing)">{{item.description}}</p>
-                                        <div style="display:flex;justify-content:flex-end">
-                                            <Tag color="default" style="cursor:default">{{item.managerName}}</Tag>
-                                        </div>
-                                    </Card>
-                                </draggable>
-                            </vue-scroll>
-                        </Card>
-                        </i-col>
-                        <i-col span="7">
-                        <Card :padding="0" :border="false">
-                            <h3 slot="title">Done</h3>
-                            <vue-scroll :ops="ops" :style="{height:contentHeight-80+'px'}">
-                                <draggable :disabled="taskItemDraggable()" class="taskList" element="ul" :options="{group:'task'}" v-model="taskDone" :style="{height:contentHeight-80+'px'}"
-                                    @start="setMoveCount()" @update="updateMoveTask(taskDone,'done')" @add="addMoveTask(taskDone,'done')"
-                                    @remove="removeMoveTask(taskDone,'done')">
-                                    <Card v-for="(item,index) in taskDone" :key="index" :padding="3" style="margin:5px">
-                                        <div>
-                                            <span style="float:left;padding:0 2.5px">
-                                                <Icon type="md-checkmark-circle-outline" ></Icon>
-                                            </span>
-                                            <span style="padding:5px">
-                                                <strong style="color:#57a3f3" class="taskName" :title="item.taskName">{{item.taskName}}</strong>
-                                            </span>
-                                            <div style="float:right">
-                                                <Rate :disabled="!isManager()" v-model="item.importance" :count="1" clearable title="Importance" @on-change="changeImportance(item)" ></Rate>
-                                                <span title="Edit" v-if="isManager()">
-                                                    <Icon type="ios-create" color="gray" :size="20" style="cursor:pointer" @click="editOneTask(index,taskDone)"></Icon>
-                                                </span>
-                                                <span v-if="isManager()" style="margin-left:5px;margin-right:3px;cursor: pointer;color:gray;" title="Delete" @click="taskRemoveAssure(index,taskDone)">
-                                                    <Icon type="ios-trash" :size="20" color="gray"></Icon>
-                                                </span>
-                                            </div>
-                                            <p style="word-break:break-word;padding:5px;cursor:pointer" @click="showTask(index,taskDone)">{{item.description}}</p>
+                                            <p style="word-break:break-word;padding:5px;cursor:pointer"
+                                               @click="showTask(index,taskDoing)">{{item.description}}</p>
                                             <div style="display:flex;justify-content:flex-end">
                                                 <Tag color="default" style="cursor:default">{{item.managerName}}</Tag>
                                             </div>
-                                        </div>
-                                    </Card>
-                                </draggable>
-                            </vue-scroll>
-                        </Card>
+                                        </Card>
+                                        <Spin size="large" fix v-if="doingLoading"></Spin>
+                                    </draggable>
+                                </vue-scroll>
+                            </Card>
+                        </i-col>
+                        <i-col span="7">
+                            <Card :padding="0" :border="false">
+                                <h3 slot="title">Done</h3>
+                                <vue-scroll :ops="ops" :style="{height:contentHeight-80+'px'}">
+                                    <draggable :disabled="!taskPermissionIdentity(projectInfo.permission, userRole,'manage_task')" class="taskList" element="ul"
+                                               :options="{group:'task'}" v-model="taskDone"
+                                               :style="{height:contentHeight-80+'px'}"
+                                               @start="setMoveCount()" @update="updateMoveTask(taskDone,'done')"
+                                               @add="addMoveTask(taskDone,'done')"
+                                               @remove="removeMoveTask(taskDone,'done')">
+                                        <Card v-for="(item,index) in taskDone" :key="index" :padding="3"
+                                              style="margin:5px">
+                                            <div>
+                                            <span style="float:left;padding:0 2.5px">
+                                                <Icon type="md-checkmark-circle-outline"></Icon>
+                                            </span>
+                                                <span style="padding:5px">
+                                                <strong style="color:#57a3f3" class="name" :title="item.name">{{item.name}}</strong>
+                                            </span>
+                                                <div style="float:right">
+                                                    <Rate :disabled="!(taskPermissionIdentity(projectInfo.permission, userRole, 'manage_task') || userInfo.userId == item.creatorId)"
+                                                          v-model="item.importance" :count="1" clearable
+                                                          title="Importance" @on-change="changeImportance(item)"></Rate>
+                                                    <template v-if="taskPermissionIdentity(projectInfo.permission, userRole, 'manage_task') || userInfo.userId == item.creatorId">
+                                                    <span title="Edit">
+                                                        <Icon type="ios-create" color="gray" :size="20"
+                                                              style="cursor:pointer"
+                                                              @click="editOneTask(index,taskDone)"></Icon>
+                                                    </span>
+                                                        <span style="margin-left:5px;margin-right:3px;cursor: pointer;color:gray;"
+                                                              title="Delete" @click="taskRemoveAssure(index,taskDone)">
+                                                        <Icon type="ios-trash" :size="20" color="gray"></Icon>
+                                                    </span>
+                                                    </template>
+                                                </div>
+                                                <p style="word-break:break-word;padding:5px;cursor:pointer"
+                                                   @click="showTask(index,taskDone)">{{item.description}}</p>
+                                                <div style="display:flex;justify-content:flex-end">
+                                                    <Tag color="default" style="cursor:default">{{item.managerName}}
+                                                    </Tag>
+                                                </div>
+                                            </div>
+                                        </Card>
+                                        <Spin size="large" fix v-if="doneLoading"></Spin>
+                                    </draggable>
+                                </vue-scroll>
+                            </Card>
                         </i-col>
                     </Row>
                 </template>
@@ -171,25 +216,30 @@
             </div>
             <!-- </i-col> -->
         </Row>
-        <Modal v-model="taskDeleteModal" title="Delete Task" @on-ok="taskRemove()" ok-text="Assure" cancel-text="Cancel">
+        <Modal v-model="taskDeleteModal" title="Delete Task" @on-ok="taskRemove()" ok-text="OK" cancel-text="Cancel">
             <p>Do yout want to delete this task?</p>
         </Modal>
         <Modal v-model="createTaskModal" title="Create Task" width="800px" :closable="false">
-            <i-form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="100" style="margin-left: 30px">
-                <Form-item label="Name" prop="taskName">
-                    <i-input v-model="formValidate.taskName" placeholder="Fill in the name of task..." style="width: 560px" />
+            <i-form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="100"
+                    style="margin-left: 30px">
+                <Form-item label="Name" prop="name">
+                    <i-input v-model="formValidate.name" placeholder="Fill in the name of task..."
+                             style="width: 560px"/>
                 </Form-item>
                 <Form-item label="Description" prop="description">
-                    <i-input v-model="formValidate.description" type="textarea" placeholder="Fill in the description of task..." style="width: 560px"
-                        :autosize="{minRows: 6}" />
+                    <i-input v-model="formValidate.description" type="textarea"
+                             placeholder="Fill in the description of task..." style="width: 560px"
+                             :autosize="{minRows: 6}"/>
                 </Form-item>
                 <Form-item label="Start time" prop="startTime">
-                    <date-picker v-model="formValidate.startTime" type="datetime" format="yyyy-MM-dd HH:mm:ss" placeholder="Select start time..."
-                        style="width: 560px"></date-picker>
+                    <date-picker v-model="formValidate.startTime" type="datetime" format="yyyy-MM-dd HH:mm:ss"
+                                 placeholder="Select start time..."
+                                 style="width: 560px"></date-picker>
                 </Form-item>
                 <Form-item label="End time" prop="endTime">
-                    <date-picker v-model="formValidate.endTime" type="datetime" format="yyyy-MM-dd HH:mm:ss" placeholder="Select end time..."
-                        style="width: 560px"></date-picker>
+                    <date-picker v-model="formValidate.endTime" type="datetime" format="yyyy-MM-dd HH:mm:ss"
+                                 placeholder="Select end time..."
+                                 style="width: 560px"></date-picker>
                 </Form-item>
                 <Form-item label prop="importance">
                     <Checkbox v-model="formValidate.importanceCheck">Important Task</Checkbox>
@@ -200,23 +250,29 @@
                 <i-button type="primary" @click="createTask('formValidate')">Create</i-button>
             </div>
         </Modal>
-        <Modal v-model="editTaskModal" title="Edit Task" @on-ok="updateTask('formValidate')" ok-text="Ok" cancel-text="Cancel" width="800px"
-            :closable="false">
-            <i-form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="100" style="margin-left: 30px">
-                <Form-item label="Name" prop="taskName">
-                    <i-input v-model="formValidate.taskName" placeholder="Fill in the name of task..." style="width: 560px" />
+        <Modal v-model="editTaskModal" title="Edit Task" @on-ok="updateTask('formValidate')" ok-text="Ok"
+               cancel-text="Cancel" width="800px"
+               :closable="false">
+            <i-form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="100"
+                    style="margin-left: 30px">
+                <Form-item label="Name" prop="name">
+                    <i-input v-model="formValidate.name" placeholder="Fill in the name of task..."
+                             style="width: 560px"/>
                 </Form-item>
                 <Form-item label="Description" prop="description">
-                    <i-input v-model="formValidate.description" type="textarea" placeholder="Fill in the description of task..." style="width:560px"
-                        :autosize="{minRows: 6}" />
+                    <i-input v-model="formValidate.description" type="textarea"
+                             placeholder="Fill in the description of task..." style="width:560px"
+                             :autosize="{minRows: 6}"/>
                 </Form-item>
                 <Form-item label="Start time" prop="startTime">
-                    <date-picker v-model="formValidate.startTime" type="datetime" format="yyyy-MM-dd HH:mm:ss" placeholder="Select start time..."
-                        style="width: 560px"></date-picker>
+                    <date-picker v-model="formValidate.startTime" type="datetime" format="yyyy-MM-dd HH:mm:ss"
+                                 placeholder="Select start time..."
+                                 style="width: 560px"></date-picker>
                 </Form-item>
                 <Form-item label="End time" prop="endTime">
-                    <date-picker v-model="formValidate.endTime" type="datetime" format="yyyy-MM-dd HH:mm:ss" placeholder="Select end time..."
-                        style="width: 560px"></date-picker>
+                    <date-picker v-model="formValidate.endTime" type="datetime" format="yyyy-MM-dd HH:mm:ss"
+                                 placeholder="Select end time..."
+                                 style="width: 560px"></date-picker>
                 </Form-item>
                 <Form-item label prop="importance">
                     <Checkbox v-model="formValidate.importanceCheck">Important Task</Checkbox>
@@ -230,36 +286,45 @@
         <Modal v-model="taskDetailModal" title="Task Detail" width="800px">
             <div class="taskFormItem">
                 <span style="width:15%">Task name</span>
-                <i-input style="width: 600px" :placeholder="this.taskPlaceHolder.name" v-model="taskInfo.taskName" readonly />
+                <i-input style="width: 600px" :placeholder="this.taskPlaceHolder.name" v-model="taskInfo.name"
+                         readonly/>
             </div>
             <div class="taskFormItem">
                 <span style="width:15%">Description</span>
-                <i-input style="width: 600px" :placeholder="this.taskPlaceHolder.description" type="textarea" :rows="4" v-model="taskInfo.description"
-                    :autosize="{minRows: 6}" readonly />
+                <i-input style="width: 600px" :placeholder="this.taskPlaceHolder.description" type="textarea" :rows="4"
+                         v-model="taskInfo.description"
+                         :autosize="{minRows: 6}" readonly/>
             </div>
             <div class="taskFormItem">
                 <span style="width:15%">Start time</span>
-                <date-picker type="datetime" format="yyyy-MM-dd HH:mm:ss" :placeholder="this.taskPlaceHolder.startTime" style="width: 600px"
-                    v-model="taskInfo.startTime" readonly></date-picker>
+                <date-picker type="datetime" format="yyyy-MM-dd HH:mm:ss" :placeholder="this.taskPlaceHolder.startTime"
+                             style="width: 600px"
+                             v-model="taskInfo.startTime" readonly></date-picker>
             </div>
             <div class="taskFormItem" style="margin-bottom:10px">
                 <span style="width:15%">End time</span>
-                <date-picker type="datetime" format="yyyy-MM-dd HH:mm:ss" :placeholder="this.taskPlaceHolder.endTime" style="width: 600px"
-                    v-model="taskInfo.endTime" readonly></date-picker>
+                <date-picker type="datetime" format="yyyy-MM-dd HH:mm:ss" :placeholder="this.taskPlaceHolder.endTime"
+                             style="width: 600px"
+                             v-model="taskInfo.endTime" readonly></date-picker>
             </div>
             <div slot="footer"></div>
         </Modal>
     </div>
 </template>
 <script th:fragment="task-js">
+
+    //父子组件传参，从projectDetail组件，将projectInfo以及userRole传过来。
     Vue.component('child-task', {
         template: '#taskComponent',
         props: ["projectInfo", "userRole"], //子项目管理者Manager，项目管理者PManager,成员Member
         data() {
             return {
-                userInfo:{
+                todoLoading: true,
+                doingLoading: true,
+                doneLoading: true,
+                userInfo: {
                     userState: false,
-                    userName: 'visitor',
+                    name: 'visitor',
                     userId: '',
                     avatar: '',
                 },
@@ -314,23 +379,23 @@
                     content: ""
                 },
                 formValidate: {
-                    taskName: "",
+                    name: "",
                     description: "",
                     startTime: "",
                     endTime: "",
                     importanceCheck: false
                 },
                 ruleValidate: {
-                    taskName: [
-                        { required: true, message: "Please enter name...", trigger: "blur" }
+                    name: [
+                        {required: true, message: "Please enter name...", trigger: "blur"}
                     ],
                     description: [
-                        { required: true, message: "Please select type...", trigger: "blur" }
+                        {required: true, message: "Please select type...", trigger: "blur"}
                     ],
-                    startTime: [{ required: true, type: "date", trigger: "blur" }],
-                    endTime: [{ required: true, type: "date", trigger: "blur" }]
+                    startTime: [{required: true, type: "date", trigger: "blur"}],
+                    endTime: [{required: true, type: "date", trigger: "blur"}]
                 },
-                contentHeight: "",
+                contentHeight: 0,
                 chartSwitch: false, // 切换至甘特图
                 // gantt 图
                 ganttTasks: [
@@ -421,8 +486,19 @@
             window.removeEventListener("resize", this.initSize);
         },
         methods: {
+            taskPermissionIdentity(permission, role, operation){
+                return permissionIdentity(
+                    JSON.parse(permission),
+                    role,
+                    operation
+                );
+            },
             initSize() {
-                this.contentHeight = window.innerHeight - 210;
+                if (window.innerHeight > 735) {
+                    this.contentHeight = window.innerHeight - 236;
+                } else {
+                    this.contentHeight = 499;
+                }
             },
             closeStepSocket() {
                 if (this.projectSocket != null) {
@@ -435,8 +511,8 @@
                     this.projectSocket = null;
                 }
 
-                let roomId = this.projectInfo.projectId + "task";
-                var projectSocketURL = "ws://" + window.location.host + "/GeoProblemSolving/Module/" + roomId;
+                let roomId = this.projectInfo.aid + "task";
+                var projectSocketURL = `${window.location.protocol === 'https:' ? 'wss://' : 'ws://'}` + window.location.host + "/GeoProblemSolving/Module/" + roomId;
                 if (window.location.host == "localhost:8080") {
                     projectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + roomId;
                 }
@@ -498,11 +574,12 @@
             ok() {
                 this.$Message.info("Clicked ok");
             },
-            cancel() { },
+            cancel() {
+            },
             //创建任务
             createTaskModalShow() {
                 let taskDefult = {
-                    taskName: "",
+                    name: "",
                     description: "",
                     startTime: "",
                     endTime: "",
@@ -516,15 +593,16 @@
                 this.$refs[name].validate(valid => {
                     if (valid) {
                         let taskForm = {};
-                        taskForm["taskName"] = this.formValidate.taskName;
+                        taskForm["name"] = this.formValidate.name;
+                        taskForm["name"] = this.formValidate.name;
                         taskForm["description"] = this.formValidate.description;
                         taskForm["startTime"] = new Date(this.formValidate.startTime);
                         taskForm["endTime"] = new Date(this.formValidate.endTime);
                         taskForm["creatorId"] = this.userInfo.userId;
-                        taskForm["creatorName"] = this.userInfo.userName;
-                        taskForm["managerName"] = this.userInfo.userName;
+                        taskForm["creatorName"] = this.userInfo.name;
+                        taskForm["managerName"] = this.userInfo.name;
                         taskForm["importance"] = this.formValidate.importanceCheck ? 1 : 0;
-                        taskForm["subProjectId"] = this.projectInfo.projectId;  //此处subProjectId是由于后台当初设计只考虑设在子项目，此处当作scopeId使用即可。
+                        taskForm["aid"] = this.projectInfo.aid;
                         taskForm["state"] = "todo";
                         taskForm["order"] = this.taskTodo.length;
                         axios
@@ -535,7 +613,7 @@
                                 } else if (res.data != "Fail") {
                                     // 任务更新socket
                                     this.socketMsg.whoid = this.userInfo.userId;
-                                    this.socketMsg.who = this.userInfo.userName;
+                                    this.socketMsg.who = this.userInfo.name;
                                     this.socketMsg.type = "tasks";
                                     this.socketMsg.content = "created a new task.";
                                     this.socketMsg.time = new Date().toLocaleString();
@@ -544,7 +622,8 @@
                                     this.sendMessage(this.socketMsg);
                                 }
                             })
-                            .catch(err => { });
+                            .catch(err => {
+                            });
                     } else {
                         this.$Message.error("Please enter the necessary information!");
                     }
@@ -564,7 +643,7 @@
                             confirm("You are offline, please login again.");
                         } else if (res.data != "None" && res.data != "Fail") {
                             this.socketMsg.whoid = this.userInfo.userId;
-                            this.socketMsg.who = this.userInfo.userName;
+                            this.socketMsg.who = this.userInfo.name;
                             this.socketMsg.type = "tasks";
                             this.socketMsg.content = "Changed the importance of one task.";
                             this.socketMsg.time = new Date().toLocaleString();
@@ -666,7 +745,7 @@
                     if (valid) {
                         let taskForm = new URLSearchParams();
                         taskForm.append("taskId", this.formValidate.taskId);
-                        taskForm.append("taskName", this.formValidate.taskName);
+                        taskForm.append("name", this.formValidate.name);
                         taskForm.append("description", this.formValidate.description);
                         taskForm.append("startTime", new Date(this.formValidate.startTime));
                         taskForm.append("endTime", new Date(this.formValidate.endTime));
@@ -680,7 +759,7 @@
                                 } else if (res.data != "None" && res.data != "Fail") {
                                     this.updateTaskList(res.data); // 只更新单个任务
                                     this.socketMsg.whoid = this.userInfo.userId;
-                                    this.socketMsg.who = this.userInfo.userName;
+                                    this.socketMsg.who = this.userInfo.name;
                                     this.socketMsg.type = "tasks";
                                     this.socketMsg.content = "edited a new task.";
                                     this.socketMsg.time = new Date().toLocaleString();
@@ -708,10 +787,12 @@
                 axios
                     .get(
                         "/GeoProblemSolving/task/inquiryTodo?" +
-                        "subProjectId=" +
-                        this.projectInfo.projectId
+                        "aid=" +
+                        this.projectInfo.aid
                     )
                     .then(res => {
+                        // this.todoLoading=false;
+                        this.$set(this, "todoLoading", false);
                         if (res.data != "None" && res.data != "Fail") {
                             this.$set(this, "taskTodo", res.data);
                         } else {
@@ -719,6 +800,7 @@
                         }
                     })
                     .catch(err => {
+                        this.$set(this, "todoLoading", false);
                         console.log(err.data);
                     });
             },
@@ -726,10 +808,12 @@
                 axios
                     .get(
                         "/GeoProblemSolving/task/inquiryDoing?" +
-                        "subProjectId=" +
-                        this.projectInfo.projectId
+                        "aid=" +
+                        this.projectInfo.aid
                     )
                     .then(res => {
+                        // this.doingLoading=false;
+                        this.$set(this, "doingLoading", false);
                         if (res.data != "None" && res.data != "Fail") {
                             this.$set(this, "taskDoing", res.data);
                         } else {
@@ -737,6 +821,7 @@
                         }
                     })
                     .catch(err => {
+                        this.$set(this, "doingLoading", false);
                         console.log(err.data);
                     });
             },
@@ -744,10 +829,12 @@
                 axios
                     .get(
                         "/GeoProblemSolving/task/inquiryDone?" +
-                        "subProjectId=" +
-                        this.projectInfo.projectId
+                        "aid=" +
+                        this.projectInfo.aid
                     )
                     .then(res => {
+                        // this.doneLoading=false;
+                        this.$set(this, "doneLoading", false);
                         if (res.data != "None" && res.data != "Fail") {
                             this.$set(this, "taskDone", res.data);
                         } else {
@@ -755,6 +842,7 @@
                         }
                     })
                     .catch(err => {
+                        this.$set(this, "doneLoading", false);
                         console.log(err.data);
                     });
             },
@@ -774,8 +862,8 @@
                 this.taskOrderUpdate(taskList, type);
             },
             taskOrderUpdate(taskList, type) {
-                if (this.userRole != "Visitor") {
-                    let thisUserName = this.userInfo.userName;
+                if (this.userRole != "Visitor" && this.userRole != "Token") {
+                    let thisUserName = this.userInfo.name;
                     let stateChangeIndex = 0;
                     let count = taskList.length;
                     for (let i = 0; i < taskList.length; i++) {
@@ -833,7 +921,7 @@
             endMove() {
                 // 任务更新socket
                 this.socketMsg.whoid = this.userInfo.userId;
-                this.socketMsg.who = this.userInfo.userName;
+                this.socketMsg.who = this.userInfo.name;
                 this.socketMsg.type = "tasks";
                 this.socketMsg.content = "changed the task schedule.";
                 this.socketMsg.time = new Date().toLocaleString();
@@ -856,7 +944,7 @@
                             this.taskList.splice(this.selectTaskIndex, 1);
                             // 任务更新socket
                             this.socketMsg.whoid = this.userInfo.userId;
-                            this.socketMsg.who = this.userInfo.userName;
+                            this.socketMsg.who = this.userInfo.name;
                             this.socketMsg.type = "tasks";
                             this.socketMsg.content = "removed a task.";
                             this.socketMsg.time = new Date().toLocaleString();
@@ -869,20 +957,18 @@
                         this.$Message.error("Fail!");
                     });
             },
-            isManager() {
-                if (this.userRole == 'Manager' || this.userRole == 'PManager') {
+            isMmember(members) {
+                let isMember = false;
+                for (let i = 0; i < members.length; i++) {
+                    if (members[i].userId === this.userInfo.userId) {
+                        isMember = true;
+                        break;
+                    }
+                }
+                if (isMember) {
                     return true;
-                }
-                else {
+                } else {
                     return false;
-                }
-            },
-            taskItemDraggable() {
-                if (this.userRole == 'Manager' || this.userRole == 'PManager' || this.userRole == 'Member') {
-                    return false;
-                }
-                else {
-                    return true;
                 }
             },
             initGantt() {
@@ -890,7 +976,7 @@
                 for (let i = 0; i < this.taskDoing.length; i++) {
                     let gantttask = {
                         id: i + 1,
-                        name: this.taskDoing[i].taskName,
+                        name: this.taskDoing[i].name,
                         user: this.taskDoing[i].managerName,
                         start: new Date(this.taskDoing[i].startTime),
                         end: new Date(this.taskDoing[i].endTime),
@@ -907,7 +993,7 @@
                 for (let i = 0; i < this.taskTodo.length; i++) {
                     let gantttask = {
                         id: this.taskDoing.length + i + 1,
-                        name: this.taskTodo[i].taskName,
+                        name: this.taskTodo[i].name,
                         user: this.taskTodo[i].creatorName,
                         start: new Date(this.taskTodo[i].startTime),
                         end: new Date(this.taskTodo[i].endTime),
@@ -924,7 +1010,7 @@
                 for (let i = 0; i < this.taskDone.length; i++) {
                     let gantttask = {
                         id: this.taskDoing.length + this.taskTodo.length + i + 1,
-                        name: this.taskDone[i].taskName,
+                        name: this.taskDone[i].name,
                         user: this.taskDone[i].creatorName,
                         start: new Date(this.taskDone[i].startTime),
                         end: new Date(this.taskDone[i].endTime),

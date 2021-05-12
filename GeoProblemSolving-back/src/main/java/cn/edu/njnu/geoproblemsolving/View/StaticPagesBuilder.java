@@ -1,86 +1,56 @@
 package cn.edu.njnu.geoproblemsolving.View;
-import cn.edu.njnu.geoproblemsolving.Entity.ProjectEntity;
+
+import cn.edu.njnu.geoproblemsolving.business.activity.entity.Project;
 import com.alibaba.fastjson.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.util.List;
 
 @Component
 public class StaticPagesBuilder {
 
-    private final MongoTemplate mongoTemplate;
-
-    @Autowired
-    public StaticPagesBuilder(MongoTemplate mongoTemplate) {
-        this.mongoTemplate = mongoTemplate;
-    }
-
-    public void projectDetailPageBuilder(String projectId) {
+    public void projectDetailPageBuilder(Project project) throws IOException {
         ClassLoaderTemplateResolver resolver = new ClassLoaderTemplateResolver();
-        resolver.setPrefix("templates/");//模板所在目录，相对于当前classloader的classpath。
-        resolver.setSuffix(".html");//模板文件后缀
+        resolver.setPrefix("templates/");   //模板所在目录，相对于当前classloader的classpath。
+        resolver.setSuffix(".html");        //模板文件后缀
         TemplateEngine templateEngine = new TemplateEngine();
         templateEngine.setTemplateResolver(resolver);
 
         Context context = new Context();
-        Query queryProjectInfo = new Query(Criteria.where("projectId").is(projectId));
-        ProjectEntity projectEntity = mongoTemplate.findOne(queryProjectInfo, ProjectEntity.class);
-        context.setVariable("projectInfo", projectEntity);
+        context.setVariable("projectInfo", project);
         context.setVariable("activeName", "projects");
 
         //渲染模板
         String servicePath = getServicePath();
-        String htmlPath = servicePath+"/staticPage/project";
+        String htmlPath = servicePath + "/staticPage/project";
         File temp = new File(htmlPath);
         if (!temp.exists()) {
             temp.mkdirs();
         }
-        String htmlFile = htmlPath+"/"+projectId+".html";
-        try{
-            if(projectEntity!=null){
-                OutputStreamWriter write = new OutputStreamWriter(new FileOutputStream(htmlFile),"UTF-8");
-                templateEngine.process("projectDetail", context,write);
-                write.flush();
-                write.close();
-            }
-        }catch (Exception ignored){}
+        String htmlFile = htmlPath + "/" + project.getAid() + ".html";
+        try {
+            OutputStreamWriter write = new OutputStreamWriter(new FileOutputStream(htmlFile), "UTF-8");
+            templateEngine.process("projectDetail", context, write);
+            write.flush();
+            write.close();
+        } catch (Exception ex) {
+            throw ex;
+        }
     }
 
-    public void projectListPageBuilder() {
+    public void projectListPageBuilder(JSONObject projects) {
         ClassLoaderTemplateResolver resolver = new ClassLoaderTemplateResolver();
         resolver.setPrefix("templates/");//模板所在目录，相对于当前classloader的classpath。
         resolver.setSuffix(".html");//模板文件后缀
         TemplateEngine templateEngine = new TemplateEngine();
         templateEngine.setTemplateResolver(resolver);
 
-        int pageSize = 18;
-        Pageable pageable = PageRequest.of(0,pageSize);
-        Criteria criteriaPublic = Criteria.where("privacy").is("Public");
-        Criteria criteriaDiscoverable = Criteria.where("privacy").is("Discoverable");
-        Query query = new Query(new Criteria().orOperator(criteriaDiscoverable, criteriaPublic)).with(pageable);
-        List<ProjectEntity> projects = mongoTemplate.find(query, ProjectEntity.class);
-        long count = mongoTemplate.count(query,ProjectEntity.class);
-        int totalPage = (int)Math.ceil((double) count/(double) pageSize);
-        JSONObject result = new JSONObject();
-        result.fluentPut("totalPage",totalPage);
-        result.fluentPut("count",count);
-        result.fluentPut("projectList",projects);
-
         Context context = new Context();
-        context.setVariable("projectsInfo", result);
+        context.setVariable("projectsInfo", projects);
 
         //渲染模板
         String servicePath = getServicePath();
@@ -91,7 +61,7 @@ public class StaticPagesBuilder {
         }
         String htmlFile = htmlPath + "/projectList.html";
         try {
-            OutputStreamWriter write = new OutputStreamWriter(new FileOutputStream(htmlFile),"UTF-8");
+            OutputStreamWriter write = new OutputStreamWriter(new FileOutputStream(htmlFile), "UTF-8");
             templateEngine.process("projectList", context, write);
             write.flush();
             write.close();
@@ -123,10 +93,25 @@ public class StaticPagesBuilder {
         }
     }
 
-    private String getServicePath(){
-        String servicePath = System.getProperty("user.dir")+"/src/main/resources/templates";
+    public void projectDetailPageRemove(String aid) {
+        // 静态页面路径
+        String htmlPath = getServicePath() + "/staticPage/project";
+        File temp = new File(htmlPath);
+        if (!temp.exists()) {
+            temp.mkdirs();
+        }
+        String htmlFile = htmlPath + "/" + aid + ".html";
+        // 删除
+        File file = new File(htmlFile);
+        if (file.isFile()) {
+            file.delete();
+        }
+    }
+
+    private String getServicePath() {
+        String servicePath = System.getProperty("user.dir") + "/src/main/resources/templates";
 //        String servicePath = System.getProperty("user.dir")+"/src/main/webapp"; //部署使用
-        return servicePath.replaceAll("\\\\","/");
+        return servicePath.replaceAll("\\\\", "/");
     }
 }
 

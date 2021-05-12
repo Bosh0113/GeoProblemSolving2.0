@@ -2470,7 +2470,7 @@ Sidebar.prototype.createDragSource = function(elt, dropHandler, preview, cells, 
             if(value === "Integration"){
 				graph.stopEditing();
 				mouseDown.apply(this, arguments);
-            }else if(value==="Model"){
+            }else if(value==="CModel"){
 				graph.stopEditing();
                 if((bId==="DataItem")){
                     mouseDown.apply(this, arguments);

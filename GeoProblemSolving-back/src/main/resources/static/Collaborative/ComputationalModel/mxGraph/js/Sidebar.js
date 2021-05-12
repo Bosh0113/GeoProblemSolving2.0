@@ -2460,7 +2460,7 @@ Sidebar.prototype.createDragSource = function(elt, dropHandler, preview, cells, 
                     graph.stopEditing();
                     mouseDown.apply(this, arguments);
 				}
-			}else if(value==="Model"){
+			}else if(value==="CModel"){
                 if((bId==="DataItem")){
                     graph.stopEditing();
                     mouseDown.apply(this, arguments);
