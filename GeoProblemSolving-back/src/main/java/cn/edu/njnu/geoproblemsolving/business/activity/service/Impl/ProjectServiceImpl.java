@@ -67,7 +67,7 @@ public class ProjectServiceImpl implements ProjectService {
             Project project = (Project) optional.get();
 
             // Update active time
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             project.setActiveTime(dateFormat.format(new Date()));
             projectRepository.save(project);
 
@@ -148,7 +148,7 @@ public class ProjectServiceImpl implements ProjectService {
              */
             // Created time and active time
             Date date = new Date();
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             project.setCreatedTime(dateFormat.format(date));
             project.setActiveTime(dateFormat.format(date));
 
@@ -407,7 +407,7 @@ public class ProjectServiceImpl implements ProjectService {
             user.setJoinedProjects(joinedProjects);
 
             // Update active time
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             project.setActiveTime(dateFormat.format(new Date()));
 
             //save
@@ -454,7 +454,7 @@ public class ProjectServiceImpl implements ProjectService {
             project.setMembers(newMembers);
 
             // Update active time
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             project.setActiveTime(dateFormat.format(new Date()));
 
             projectRepository.save(project);

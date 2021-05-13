@@ -102,7 +102,7 @@ public class ActivityServiceImpl implements ActivityService {
     private void updateActiveTime(Activity activity) {
         // Update active time
         Date date = new Date();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         activity.setActiveTime(dateFormat.format(date));
 
         activityRepository.save(activity);
@@ -132,7 +132,7 @@ public class ActivityServiceImpl implements ActivityService {
 
             // created time
             Date date = new Date();
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             activity.setCreatedTime(dateFormat.format(date));
             activity.setActiveTime(dateFormat.format(date));
 
@@ -227,7 +227,7 @@ public class ActivityServiceImpl implements ActivityService {
             update.updateTo(activity);
 
             // Update active time
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             activity.setActiveTime(dateFormat.format(new Date()));
 
             return ResultUtils.success(activityRepository.save(activity));
@@ -486,7 +486,7 @@ public class ActivityServiceImpl implements ActivityService {
 
 
             // Update active time
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             current.setActiveTime(dateFormat.format(new Date()));
 
             protocolRepository.save(protocol);
@@ -626,7 +626,7 @@ public class ActivityServiceImpl implements ActivityService {
             activity.setMembers(members);
 
             // Update active time
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             activity.setActiveTime(dateFormat.format(new Date()));
 
             activityRepository.save(activity);
@@ -653,7 +653,7 @@ public class ActivityServiceImpl implements ActivityService {
             activity.setMembers(members);
 
             // Update active time
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             activity.setActiveTime(dateFormat.format(new Date()));
 
             activityRepository.save(activity);
@@ -692,7 +692,7 @@ public class ActivityServiceImpl implements ActivityService {
             activity.setMembers(newMembers);
 
             // Update active time
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             activity.setActiveTime(dateFormat.format(new Date()));
 
             activityRepository.save(activity);

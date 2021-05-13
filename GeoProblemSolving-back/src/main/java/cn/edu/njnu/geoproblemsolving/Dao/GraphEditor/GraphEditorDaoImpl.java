@@ -26,7 +26,7 @@ public class GraphEditorDaoImpl implements GraphEditorDao{
     public Object saveTask(GraphEditorEntity editorEntity){
         try {
             Date date=new Date();
-            SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             editorEntity.setTaskId(UUID.randomUUID().toString());
             editorEntity.setDate(dateFormat.format(date));
             mongoTemplate.save(editorEntity);
@@ -53,7 +53,7 @@ public class GraphEditorDaoImpl implements GraphEditorDao{
             CommonMethod method = new CommonMethod();
             Update update = method.setUpdate(request);
             Date date=new Date();
-            SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             update.set("date",dateFormat.format(date));
             mongoTemplate.updateFirst(query, update, GraphEditorEntity.class);
             return mongoTemplate.findOne(query, GraphEditorEntity.class);

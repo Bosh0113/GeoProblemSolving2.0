@@ -133,7 +133,7 @@ public class IResourceServiceImpl implements IResourceService {
                                 fileSize = df.format((float) part.getSize() / (float) (1024)) + "KB";
                             }
                             Date uploadDate = new Date();
-                            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+                            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                             String uploadTime = simpleDateFormat.format(uploadDate);
 
                             String uploaderId = (String) session.getAttribute("userId");
@@ -338,7 +338,7 @@ public class IResourceServiceImpl implements IResourceService {
         String resourceId = UUID.randomUUID().toString();
 
         Date uploadDate = new Date();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String uploadTime = simpleDateFormat.format(uploadDate);
 
         String fileSize = copyByUrl(add.getPathURL(), "123.txt", "D:\\test") + "byte";

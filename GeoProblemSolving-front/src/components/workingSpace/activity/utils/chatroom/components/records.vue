@@ -1,13 +1,13 @@
 <!-- records -->
 <template>
   <div class="record-contain">
-    <Row style="margin-left: 20px;">
+    <!-- <Row style="margin-left: 20px;">
       <Button type="info" ghost @click="getAll" class="btn">All</Button>
       <Button type="info" ghost @click="getPictures" class="btn"
         >Pictures</Button
       >
       <Button type="info" ghost @click="getTools" class="btn">Tools</Button>
-    </Row>
+    </Row> -->
 
     <Row>
       <DatePicker
@@ -45,12 +45,12 @@
             <Row style="margin-bottom:2.5px">
               <Row>
                 <div class="message_from">
-                  <div class="src" v-if="list.srcUserId == srcId">
-                    {{ list.srcUserName }}
+                  <div class="src" v-if="list.sender.userId == userId">
+                    {{ list.sender.name }}
                   </div>
-                  <div class="target" v-else>{{ list.srcUserName }}</div>
+                  <div class="target" v-else>{{ list.sender.name }}</div>
                 </div>
-                <div class="create_time">{{ list.createTime }}</div>
+                <div class="create_time">{{ list.time }}</div>
               </Row>
               <Row>
                 <template v-if="list.type === 'message_pic'" class="picOuter">
@@ -80,12 +80,12 @@
           <Row style="margin-bottom:2.5px">
             <Row>
               <div class="message_from">
-                <div class="src" v-if="list.srcUserId == srcId">
-                  {{ list.srcUserName }}
+                <div class="src" v-if="list.sender.userId == userId">
+                  {{ list.sender.name }}
                 </div>
-                <div class="target" v-else>{{ list.srcUserName }}</div>
+                <div class="target" v-else>{{ list.sender.name }}</div>
               </div>
-              <div class="create_time">{{ list.createTime }}</div>
+              <div class="create_time">{{ list.time }}</div>
             </Row>
             <Row>
               <template v-if="list.type === 'message_pic'" class="picOuter">
@@ -127,9 +127,6 @@ import { get, del, post, put } from "@/axios";
 import simplePublicCard from "@/components/common/card/simplePublicToolsCard";
 export default {
   props: {
-    showTab: {
-      type: Boolean
-    },
     groupId: {
       type: String
     },
@@ -150,8 +147,6 @@ export default {
       pageSize: 15, // 每页显示数量
       currentPageData: [], //当前页显示内容
       msg_guodu: [],
-      roomId: this.groupId,
-      srcId: this.userId,
       ops: {
         vueScroll: {},
         scrollPanel: {},
@@ -178,7 +173,7 @@ export default {
       queryType: "all",
 
       isOpenTool: true,
-      msgType: "All"
+      // msgType: "All"
     };
   },
   computed: {
@@ -190,32 +185,40 @@ export default {
     }
   },
   watch: {
-    msgType: {
-      handler(val) {
-        this.queryType = "all";
-        this.currentPage = 1;
-        this.currentPageData = [];
-        if (val == "All") {
-          this.loadMessageRecords();
-        } else {
-          this.loadMessageRecordsByType();
-        }
-      },
-      deep: true
-    }
+    // msgType: {
+    //   handler(val) {
+    //     this.queryType = "all";
+    //     this.currentPage = 1;
+    //     this.currentPageData = [];
+    //     if (val == "All") {
+    //       this.loadMessageRecords();
+    //     } else {
+    //       this.loadMessageRecordsByType();
+    //     }
+    //   },
+    //   deep: true
+    // }
+  },
+  created() {
+    this.getTotalCount();
+    this.loadMessageRecords();
+  },
+  mounted() {
+    this.initSize();
   },
   methods: {
-    getAll() {
-      this.msgType = "All";
-    },
+    // getAll() {
+    //   this.msgType = "All";
+    // },
 
-    getPictures() {
-      this.msgType = "message_pic";
-    },
+    // getPictures() {
+    //   this.msgType = "message_pic";
+    // },
 
-    getTools() {
-      this.msgType = "message_tool";
-    },
+    // getTools() {
+    //   this.msgType = "message_tool";
+    // },
+
     //查找total currentPage
     async getTotalCount() {
       let data = await get(`/GeoProblemSolving/chatmessage/totalCount`);
@@ -248,17 +251,23 @@ export default {
     async loadMessageRecords() {
       this.queryType = "all";
       let data = await get(
-        `/GeoProblemSolving/chatmessage/inquiryByPage/${this.roomId}/${this.currentPage}/${this.pageSize}`
+        `/GeoProblemSolving/chatmessage/inquiryByPage/${this.groupId}/${this.currentPage}/${this.pageSize}`
       );
-      this.currentPageData.push(...data);
+      this.currentPageData = [];
+      for(let i=0; i < data.length; i++){
+        let message = data[i];
+        let date = new Date(message.time);
+        message.time = date.Format("yyyy-MM-dd HH:mm:ss");
+        this.currentPageData.push(message);
+      }
     },
 
-    async loadMessageRecordsByType() {
-      let data = await get(
-        `/GeoProblemSolving/chatmessage/inquiryByType/${this.roomId}/${this.msgType}`
-      );
-      this.currentPageData.push(...data);
-    },
+    // async loadMessageRecordsByType() {
+    //   let data = await get(
+    //     `/GeoProblemSolving/chatmessage/inquiryByType/${this.groupId}/${this.msgType}`
+    //   );
+    //   this.currentPageData.push(...data);
+    // },
 
     //聊天记录分页,没有按日期查找，倒序排列
     // changeRecordPage(index) {
@@ -270,7 +279,7 @@ export default {
       this.msg_guodu = [];
       this.currentPageData = [];
       let data = await get(
-        `/GeoProblemSolving/chatmessage/contentLike/${this.roomId}/${val}/${this.currentPage}/${this.pageSize}`
+        `/GeoProblemSolving/chatmessage/contentLike/${this.groupId}/${val}/${this.currentPage}/${this.pageSize}`
       );
       this.msg_guodu.push(...data);
     },
@@ -286,7 +295,7 @@ export default {
         this.queryType = "date";
         this.currentPageData = [];
         let data = await get(
-          `/GeoProblemSolving/chatmessage/timeLike/${this.roomId}/${seledate}/${this.currentPage}/${this.pageSize}`
+          `/GeoProblemSolving/chatmessage/timeLike/${this.groupId}/${seledate}/${this.currentPage}/${this.pageSize}`
         );
         this.msg_guodu.push(...data);
       }
@@ -298,13 +307,6 @@ export default {
       this.panelHeight = window.innerHeight;
       console.log(this.panelHeight);
     }
-  },
-  created() {
-    this.getTotalCount();
-    this.loadMessageRecords();
-  },
-  mounted() {
-    this.initSize();
   }
 };
 </script>
@@ -346,14 +348,14 @@ export default {
 .message_from {
   float: left;
   width: 150px;
-  font-size: 14px;
+  font-size:13px
 }
 //col right
 .create_time {
   color: lightgray;
   float: left;
   width: 150px;
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .src {
@@ -363,12 +365,12 @@ export default {
   color: #2d8cf0;
   float: left;
   width: 300px;
-  font-size: 16px;
+  font-size: 13px;
 }
 
 .content {
   color: gray;
-  font-size: 14px;
+  font-size: 13px;
   word-wrap: break-word;
   width: 100%;
 }

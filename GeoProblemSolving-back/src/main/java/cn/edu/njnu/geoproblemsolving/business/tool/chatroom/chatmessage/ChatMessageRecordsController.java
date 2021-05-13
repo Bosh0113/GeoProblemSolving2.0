@@ -24,10 +24,10 @@ public class ChatMessageRecordsController {
     @Autowired
     MongoTemplate mongoTemplate;
 
-    @RequestMapping(value = "/inquiry", method = RequestMethod.GET)
-    public JsonResult inquiryMessageRecords(@RequestParam("type") String type, @RequestParam("roomId") String roomId) {
-        return ResultUtils.success(chatMessageRecordsService.inquiryTypeAndRoomId(type, roomId));
-    }
+//    @RequestMapping(value = "/inquiry", method = RequestMethod.GET)
+//    public JsonResult inquiryMessageRecords(@RequestParam("type") String type, @RequestParam("roomId") String roomId) {
+//        return ResultUtils.success(chatMessageRecordsService.inquiryTypeAndRoomId(type, roomId));
+//    }
 
     @RequestMapping(value = "/inquiryByPage/{roomId}/{page}/{size}", method = RequestMethod.GET)
     public JsonResult inquiryByPage(@PathVariable("roomId") String roomId, @PathVariable("page") int page, @PathVariable("size") int size) throws Exception {
@@ -49,8 +49,9 @@ public class ChatMessageRecordsController {
     public JsonResult inquiryByTimeLike(@PathVariable("roomId") String roomId, @PathVariable("key") String key, @PathVariable("page") int page, @PathVariable("size") int size)  throws ParseException {
         return ResultUtils.success(chatMessageRecordsService.findAllByTimeLikeAndRoomId(roomId,key, page, size));
     }
-    @RequestMapping(value = "/inquiryByType/{roomId}/{type}", method = RequestMethod.GET)
-    public JsonResult inquiryByTimeLike(@PathVariable("roomId") String roomId, @PathVariable("type") String type)  throws ParseException {
-        return ResultUtils.success(chatMessageRecordsService.findAllByTypeAndRoomId(roomId,type));
-    }
+
+//    @RequestMapping(value = "/inquiryByType/{roomId}/{type}", method = RequestMethod.GET)
+//    public JsonResult inquiryByTimeLike(@PathVariable("roomId") String roomId, @PathVariable("type") String type)  throws ParseException {
+//        return ResultUtils.success(chatMessageRecordsService.findAllByTypeAndRoomId(roomId,type));
+//    }
 }

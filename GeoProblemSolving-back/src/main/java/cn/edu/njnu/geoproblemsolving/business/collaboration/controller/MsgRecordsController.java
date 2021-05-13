@@ -13,8 +13,14 @@ public class MsgRecordsController {
     @Autowired
     MsgRecordsService msgRecordsService;
 
-    @RequestMapping(value = "/{aid}", method = RequestMethod.GET)
+    @RequestMapping(value = "/records/{aid}", method = RequestMethod.GET)
     public JsonResult inquiryMsgRecords(@PathVariable("aid") String aid){
         return msgRecordsService.findMsgRecords(aid);
     }
+
+    @RequestMapping(value = "/record/{recordId}", method = RequestMethod.GET)
+    public JsonResult inquiryMsgRecord(@PathVariable("recordId") String recordId){
+        return msgRecordsService.findChatRecord(recordId);
+    }
+
 }

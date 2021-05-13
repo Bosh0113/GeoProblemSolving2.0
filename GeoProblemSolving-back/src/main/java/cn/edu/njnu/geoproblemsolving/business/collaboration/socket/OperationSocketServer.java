@@ -1,28 +1,14 @@
 package cn.edu.njnu.geoproblemsolving.business.collaboration.socket;
 
 import cn.edu.njnu.geoproblemsolving.Config.MyEndPointConfigure;
-import cn.edu.njnu.geoproblemsolving.business.collaboration.cache.CommunicationCache;
-import cn.edu.njnu.geoproblemsolving.business.collaboration.entity.ChatMsg;
-import cn.edu.njnu.geoproblemsolving.business.collaboration.entity.CollaborationUser;
-import cn.edu.njnu.geoproblemsolving.business.collaboration.enums.CollaborationMode;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.service.CollaborationService;
-import cn.edu.njnu.geoproblemsolving.business.collaboration.utils.CollaborationBehavior;
-import cn.edu.njnu.geoproblemsolving.business.collaboration.utils.CollaborationConfig;
-import cn.edu.njnu.geoproblemsolving.business.tool.chatroom.chatmessage.ChatMessageRecordsService;
-import cn.edu.njnu.geoproblemsolving.business.tool.chatroom.chatmessage.dto.AddChatMessageRecordsDTO;
-import cn.edu.njnu.geoproblemsolving.business.tool.chatroom.hydrologicalconcept.AnsjSegService;
-import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpSession;
 import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @Author ：mzy

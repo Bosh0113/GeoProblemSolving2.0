@@ -23,7 +23,7 @@ public class NoticeSocket {
     {
         HttpSession httpSession=(HttpSession)config.getUserProperties().get(HttpSession.class.getName());
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String nowDate = dateFormat.format(new Date());
         System.out.println("Notice已连接："+"用户名-"+httpSession.getAttribute("userName") + "-----" + "连接时间："+ nowDate);
         this.session=session;
@@ -57,7 +57,7 @@ public class NoticeSocket {
                 break;
             }
         }
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String nowDate = dateFormat.format(new Date());
         System.out.println("有用户断开连接："+unConnectId + "-----" + "断开时间："+ nowDate);
         System.out.println("---------------------------------------------------------------------------");

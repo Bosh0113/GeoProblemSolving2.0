@@ -1,27 +1,11 @@
 <style scoped>
+.extendedPanel >>> .ivu-tabs-bar {
+  margin-bottom: 0;
+}
+
 .chatPanel {
   display: flex;
   width: 100%;
-}
-
-/* member部分样式 */
-.memberPanel {
-  width: 300px;
-  background-color: #ffffff;
-  box-shadow: 6px 0px 3px -5px #b9b9b9;
-}
-
-.participants {
-  height: auto;
-  margin-top: 10px;
-}
-
-.participants h4 {
-  padding: 10px;
-  font-size: 20px;
-  line-height: 20px;
-  text-align: center;
-  color: rgb(0, 0, 0);
 }
 
 .extendedPanel {
@@ -69,7 +53,6 @@
 .send_emoji {
   /* text-align: center; */
   width: 35px;
-  float: left;
   margin: 0 10px;
 }
 .send_emoji >>> #btn-emoji-default {
@@ -89,11 +72,9 @@
 .send_tool {
   /* text-align: center; */
   width: 25px;
-  float: left;
   margin: 7px 10px 0 0;
 }
-.send_send {
-  float: right;
+.send_people {
   margin-right: 2px;
 }
 .send_icon:hover {
@@ -127,23 +108,16 @@
   margin-right: 10px;
   font-weight: 600;
 }
+.chat-notice {
+  color: darkgreen;
+  width: 90%;
+  text-align: center;
+  margin: 10px 0;
+}
 </style>
 <template>
   <Row>
     <div class="chatPanel">
-      <!-- <div class="memberPanel">
-        <div class="participants">
-          <h4>Participants</h4>
-          <chat-manager :item="manager" @sendSingle="sendSingle"></chat-manager>
-          <div v-for="(participant, index) in member" :key="'online' + index">
-            <chat-member
-              :item="participant"
-              @sendSingle="sendSingle"
-            ></chat-member>
-          </div>
-        </div>
-      </div> -->
-
       <div class="contentPanel">
         <div
           class="contentBody"
@@ -151,7 +125,10 @@
           style="height: calc(100vh - 280px)"
         >
           <div v-for="(list, index) in msglist" :key="index">
-            <template v-if="list.srcUserId === $store.getters.userId">
+            <template v-if="list.type == 'members'">
+              <div class="chat-notice">{{ list.content }}</div>
+            </template>
+            <template v-else-if="list.sender.userId === $store.getters.userId">
               <bubble-right :message="list"></bubble-right>
             </template>
             <template v-else>
@@ -163,14 +140,15 @@
           <Row>
             <Col :span="24">
               <Row>
-                <Col :span="12">
+                <Col :span="14" style="display: flex;">
                   <div class="send_emoji">
                     <twemoji-picker
                       :emojiData="emojiDataAll"
                       :emojiGroups="emojiGroups"
                       :pickerHeight="300"
                       :pickerWidth="500"
-                      @emojiUnicodeAdded="addEmoj"
+                      @emojiUnicodeAdded="addEmoji"
+                      title="Emoji"
                     ></twemoji-picker>
                   </div>
                   <div class="send_tool">
@@ -178,10 +156,11 @@
                       type="md-time"
                       @click.native="showRecords()"
                       size="25"
+                      title="Messge records"
                       class="send_icon"
                     />
                   </div>
-                  <div class="send_tool">
+                  <div class="send_tool" title="Send image">
                     <Upload multiple :before-upload="beforeUploadPic" action>
                       <Icon type="md-image" size="25" class="send_icon" />
                     </Upload>
@@ -191,6 +170,7 @@
                       type="md-hammer"
                       size="25"
                       class="send_icon"
+                      title="Send tool"
                       @click.native="toolModalShow = true"
                     />
                   </div>
@@ -200,6 +180,7 @@
                       type="md-water"
                       size="25"
                       class="send_icon"
+                      title="Geographic concepts"
                       @click.native="showConcepts()"
                     />
                   </div>
@@ -207,26 +188,27 @@
                   <div class="send_tool">
                     <Icon
                       type="md-send"
-                      @click.native="send"
+                      @click.native="sendMsg"
+                      title="Send message"
                       size="25"
                       class="send_icon"
                     />
                   </div>
                 </Col>
-                <Col :span="12">
-                  <div class="send_send">
+                <Col :span="10" style="width: 250px;display: flex">
+                  <div class="send_people">
+                    <div class="sent_to_tip">Send to</div>
+                  </div>
+                  <div class="send_people">
                     <el-select v-model="sendToMemberId" class="select">
                       <el-option
-                        v-for="item in selectRoom"
+                        v-for="item in selectReceiver"
                         :value="item.userId"
-                        :label="item.userName"
+                        :label="item.name"
                         :key="item.userId"
-                        >{{ item.userName }}</el-option
+                        >{{ item.name }}</el-option
                       >
                     </el-select>
-                  </div>
-                  <div class="send_send">
-                    <div class="sent_to_tip">Send to</div>
                   </div>
                 </Col>
               </Row>
@@ -251,9 +233,8 @@
         <Tabs type="card">
           <TabPane label="Records">
             <records
-              :showTab="showTabs"
-              :groupId="groupId"
-              :userId="userId"
+              :groupId="activityInfo.aid"
+              :userId="$store.getters.userId"
               :panelHeight="panelHeight"
             ></records>
           </TabPane>
@@ -278,7 +259,7 @@
 
       <Modal v-model="toolModalShow" width="820" footer-hide>
         <tool-modal
-          :userId="userId"
+          :userId="$store.getters.userId"
           @selectedTools="sendTools"
           footer-hide
         ></tool-modal>
@@ -332,38 +313,29 @@ export default {
 
   data() {
     return {
-      extendedPanelShow: false,
-      extendedConceptsShow: false,
       message: "",
       msglist: [],
-      send_msg: [],
       panelHeight: 0,
       panelWidth: 0,
 
       windowStatus: "focus", //监听浏览器失焦事件
 
-      groupId: this.activityInfo.aid,
-      //memberpanel
-      manager: {},
-      member: [],
       //工具对话框
       toolModalShow: false,
       //语义概念库
+      extendedConceptsShow: false,
       toolConceptsShow: false,
       //user infomation
-      userId: this.$store.getters.userId,
-      userName: this.$store.getters.userName,
-      selectRoom: [
+      selectReceiver: [
         {
-          userName: this.$store.getters.userName,
-          userId: this.$store.getters.userId,
+          name: "All",
+          userId: "All",
         },
       ],
-      sendToMemberId: this.$store.getters.userId,
-      // onlineIds: [],
-      msgRecords: [],
-      msglist: [],
+      sendToMemberId: "All",
+      // msgRecords: [],
       //聊天记录
+      extendedPanelShow: false,
       showTabs: true,
       msgConcepts: [],
       msgConceptMap: [],
@@ -381,109 +353,89 @@ export default {
   methods: {
     async init() {
       this.initSize();
-      // console.log("user", this.userId);
-      this.startWebSocket(this.groupId);
+      this.startWebSocket();
     },
-
     initSize() {
       $("#app").css("min-width", "0");
       $("#app").css("min-height", "0");
       this.panelHeight = window.innerHeight;
       this.panelWidth = window.innerWidth;
     },
-    // startWebSocket() {
-    //   this.socketApi.initWebSocket("MsgServer/" + this.activityInfo.aid);
-    //   let send_msg = {
-    //     type: "test",
-    //     sender: this.$store.getters.userId,
-    //     receivers: [this.$store.getters.userId],
-    //   };
-    //   this.socketApi.sendSock(send_msg, this.getSocketConnect);
-    // },
-    send() {
-      let myDate = new Date().Format("yyyy-MM-dd HH:mm:ss");
-      let current_time = myDate.toLocaleString(); //获取日期与时间
+
+    startWebSocket() {
+      this.socketApi.initWebSocket("MsgServer/" + this.activityInfo.aid);
+      let send_msg = {
+        type: "test",
+        sender: this.$store.getters.userId,
+        receivers: [this.$store.getters.userId],
+        geoConcepts: false,
+      };
+      this.socketApi.sendSock(send_msg, this.getSocketConnect);
+    },
+
+    sendMsg() {
       // 消息不为空
-      if (this.message.match(/^[ ]*$/)) {
-        this.send_msg = {
+      if (!this.message.match(/^[ ]*$/)) {
+        let send_msg = {
           type: "message",
           sender: this.$store.getters.userId,
           content: this.message,
-          time: current_time,
-          // toolConcepts: this.toolConceptsShow,
+          geoConcepts: this.extendedConceptsShow,
         };
-        if (this.socketApi.getSocketInfo().linked) {
-          // this.msgRecords.push(this.send_msg);
-          this.socketApi.sendSock(this.send_msg, this.getSocketConnect); //连接后台onopen方法
-
-          this.send_msg["status"] = "sending";
-          this.send_msg["sender"] = {
-            userId: this.$store.getters.userId,
-            name: this.$store.getters.userName,
-          };
-          this.msglist.push(this.send_msg);
-        } else {
-          let chatMsg = {
-            type: "members",
-            content: "You are disconnecting with others.",
-          };
-          this.msglist.push(chatMsg);
-        }
+        this.send(send_msg);
       }
       this.message = "";
     },
-
     sendPic(messageUrl) {
-      this.send_msg = {
+      let send_msg = {
         type: "message_pic",
-        srcUserName: this.userName,
-        srcUserId: this.userId,
-        targetUserId: this.sendToMemberId,
+        sender: this.$store.getters.userId,
         content: messageUrl,
-        toolConcepts: this.toolConceptsShow,
+        geoConcepts: false,
       };
+      this.send(send_msg);
+    },
+    sendTools(tools) {
+      let send_msg;
+      tools.forEach((item) => {
+        send_msg = {
+          type: "message_tool",
+          sender: this.$store.getters.userId,
+          content: item,
+          geoConcepts: false,
+        };
+        this.send(send_msg);
+        this.toolModalShow = false;
+      });
+    },
+    send(message) {
+      // time
+      let myDate = new Date().Format("yyyy-MM-dd HH:mm:ss");
+      let current_time = myDate.toLocaleString(); //获取日期与时间
+      message["time"] = current_time;
+      // receiver
+      if (this.sendToMemberId !== "All") {
+        send_msg["receiver"] = [this.sendToMemberId];
+      }
+
+      // send
       if (this.socketApi.getSocketInfo().linked) {
-        this.msgRecords.push(this.send_msg);
-        this.socketApi.sendSock(this.send_msg, this.getSocketConnect); //连接后台onopen方法
-        this.msglist.push(this.send_msg);
+        this.socketApi.sendSock(message, this.getSocketConnect); //连接后台onopen方法
+
+        message["status"] = "sending";
+        message["sender"] = {
+          userId: this.$store.getters.userId,
+          name: this.$store.getters.userName,
+        };
+        this.msglist.push(message);
       } else {
         let chatMsg = {
-          type: "notice",
+          type: "members",
           content: "You are disconnecting with others.",
         };
         this.msglist.push(chatMsg);
       }
     },
-
-    sendTools(tools) {
-      tools.forEach((item) => {
-        this.send_msg = {
-          type: "message_tool",
-          srcUserName: this.userName,
-          srcUserId: this.userId,
-          targetUserId: this.sendToMemberId,
-          content: item,
-          toolConcepts: this.toolConceptsShow,
-        };
-        if (this.socketApi.getSocketInfo().linked) {
-          this.msglist.push(this.send_msg);
-          this.msgRecords.push(this.send_msg);
-          this.socketApi.sendSock(this.send_msg, this.getSocketConnect); //连接后台onopen方法
-        } else {
-          let chatMsg = {
-            type: "notice",
-            content: "You are disconnecting with others.",
-          };
-          this.msglist.push(chatMsg);
-        }
-        this.toolModalShow = false;
-      });
-    },
-
-    sendSingle(val) {
-      this.sendToMemberId = val.userId;
-    },
-
     async beforeUploadPic(file) {
       let formData = new FormData();
       formData.append("messPic", file);
@@ -494,83 +446,18 @@ export default {
       let messageUrl = `http://${window.location.host}${data.data.data}`;
       this.sendPic(messageUrl);
     },
-
-    startWebSocket(id) {
-      this.socketApi.initWebSocket(
-        "ChatServer/" + id,
-        this.$store.state.IP_Port
-      );
-      this.send_msg = {
-        type: "test",
-        srcUserName: "Test",
-        srcUserId: "test",
-        targetUserName: "test",
-        targetUserId: "test",
-        content: "Test",
-        toolConcepts: this.toolConceptsShow,
-      };
-      this.socketApi.sendSock(this.send_msg, this.getSocketConnect);
-    },
-
     getSocketConnect(data) {
-      let chatMsg = data;
-      if (chatMsg.type === "members") {
-        if (chatMsg.behavior == "on") {
-          chatMsg["content"] = chatMsg.activeUser.name + " join the meeting.";
-          this.receivedChatMsgs.push(chatMsg);
-        } else if (chatMsg.behavior == "off") {
-          chatMsg["content"] = chatMsg.activeUser.name + " stop the meeting.";
-          this.receivedChatMsgs.push(chatMsg);
-        }
-      } else if (data.type === "message") {
-        //判断消息的发出者
-        if (chatMsg.content != "") {
-          let msgCheck = false; // 更新消息状态
-
-          for (let i = 0; i < this.allChatMsgs.length; i++) {
-            let time = new Date(this.allChatMsgs[i].time);
-            let current = new Date();
-            let threshold = 1000 * 60 * 3;
-            if (this.allChatMsgs[i].time == chatMsg.time) {
-              this.allChatMsgs[i].status = "done";
-              msgCheck = true;
-            } else if (
-              (this.allChatMsgs[i].status =
-                "sending" && current - time > threshold)
-            ) {
-              this.allChatMsgs[i].status = "failed";
-            }
-          }
-
-          if (!msgCheck) {
-            this.receivedChatMsgs.push(chatMsg);
-          }
-        }
-      } else if (chatMsg.type == "message-cache") {
-        for (let i = 0; i < chatMsg.content.length; i++) {
-          if (chatMsg.content[i] != "") {
-            this.receivedChatMsgs.push(chatMsg.content[i]);
-          }
-        }
-      } else if (chatMsg.type == "test") {
-        chatMsg["type"] = "members";
-        chatMsg["content"] = "You have joined the meeting.";
-        this.receivedChatMsgs.push(chatMsg);
-      }
-    },
-    getSocketConnect(data) {
-      this.receivedChatMsgs = [];
       let chatMsg = data; //data传回onopen方法里的值
 
       if (chatMsg.type === "members") {
-        // this.judgeonlineParticipant(chatMsg);
         if (chatMsg.behavior == "on") {
           chatMsg["content"] = chatMsg.activeUser.name + " join the meeting.";
-          this.receivedChatMsgs.push(chatMsg);
+          this.msglist.push(chatMsg);
         } else if (chatMsg.behavior == "off") {
           chatMsg["content"] = chatMsg.activeUser.name + " stop the meeting.";
-          this.receivedChatMsgs.push(chatMsg);
+          this.msglist.push(chatMsg);
         }
+        this.updateParticipants(chatMsg.participants);
       } else if (
         chatMsg.type === "message" ||
         chatMsg.type === "message_pic" ||
@@ -580,79 +467,78 @@ export default {
         if (chatMsg.content != "") {
           let msgCheck = false; // 更新消息状态
 
-          for (let i = 0; i < this.allChatMsgs.length; i++) {
-            let time = new Date(this.allChatMsgs[i].time);
+          for (let i = 0; i < this.msglist.length; i++) {
+            let time = new Date(this.msglist[i].time);
             let current = new Date();
             let threshold = 1000 * 60 * 3;
-            if (this.allChatMsgs[i].time == chatMsg.time) {
-              this.allChatMsgs[i].status = "done";
+            if (this.msglist[i].time == chatMsg.time) {
+              this.msglist[i].status = "done";
               msgCheck = true;
             } else if (
-              (this.allChatMsgs[i].status =
-                "sending" && current - time > threshold)
+              (this.msglist[i].status = "sending" && current - time > threshold)
             ) {
-              this.allChatMsgs[i].status = "failed";
+              this.msglist[i].status = "failed";
             }
           }
 
           if (!msgCheck) {
-            this.receivedChatMsgs.push(chatMsg);
+            this.msglist.push(chatMsg);
+            this.sendNotify(chatMsg);
           }
-          
-          // this.msgRecords.push(chatMsg);
-          // this.sendNotify(chatMsg);
-        }
-        if (chatMsg.content != "") {
-          this.msglist.push(chatMsg);
 
-          if (chatMsg.frequency != "" || chatMsg.frequency != undefined) {
+          // geographic concepts
+          if (chatMsg.frequency != undefined && chatMsg.geoConcepts != "") {
             this.msgConcepts = chatMsg.frequency;
             this.msgConceptMap = chatMsg.conceptMap;
+            this.extendedConceptsShow = true;
           }
-
+        }
+      } else if (chatMsg.type == "message-store") {
+        // this.operationApi.communicationRecord(
+        //   this.activityInfo.aid,
+        //   "",
+        //   "",
+        //   chatMsg.recordId,
+        //   chatMsg.time,
+        //   chatMsg.participants
+        // );
+        chatMsg["type"] = "members";
+        chatMsg["content"] = "You have the only person in the meeting.";
+        this.msglist.push(chatMsg);
+      } else if (chatMsg.type == "message-cache") {
+        for (let i = 0; i < chatMsg.content.length; i++) {
+          if (chatMsg.content[i] != "") {
+            this.msglist.push(chatMsg.content[i]);
+          }
+        }
+      } else if (chatMsg.type === "concepts") {
+        if (
+          chatMsg.frequency != undefined &&
+          chatMsg.geoConcepts != undefined
+        ) {
+          this.msgConcepts = chatMsg.frequency;
+          this.msgConceptMap = chatMsg.conceptMap;
           this.extendedConceptsShow = true;
         }
-      } else if (chatMsg.type === "notice") {
-        // if (chatMsg.behavior != "") {
-        //   this.msglist.push(chatMsg);
-        // }
-        // this.judgeonlineParticipant(chatMsg);
-      } else if (chatMsg.type === "concepts") {
-        this.msgConcepts = chatMsg.frequency;
-        this.msgConceptMap = chatMsg.conceptMap;
-        this.extendedConceptsShow = true;
-      } else if (chatMsg.type == undefined && chatMsg.length > 0) {
-        for (let i = 0; i < chatMsg.length; i++) {
-          if (chatMsg[i].content != "") {
-            this.msglist.push(chatMsg[i]);
-            this.msgRecords.push(chatMsg[i]);
-          }
-        }
+      } else if (chatMsg.type == "test") {
+        chatMsg["type"] = "members";
+        chatMsg["content"] = "You have joined the meeting.";
+        this.msglist.push(chatMsg);
       }
     },
-
-    //判断在线的用户列表
-    judgeonlineParticipant({ content }) {
-      let onlineObj = content;
-      let manager = [];
-      let member = [];
-      manager = onlineObj.filter((par) => {
-        return par.userId == this.$store.getters.userId;
-      });
-      member = onlineObj.filter((par) => {
-        return par.userId != this.$store.getters.userId;
-      });
-      this.$set(this, "manager", manager[0]);
-      this.$set(this, "member", member);
-      this.getSelectRoom(manager[0], member);
-    },
-
-    getSelectRoom(manager, member) {
-      let item = Object.assign({}, manager);
-      this.$set(this, "sendToMemberId", item.userId); //init sendroom
-      this.selectRoom = [];
-      item.userName = "All";
-      this.selectRoom.push(item, ...member);
+    updateParticipants(participants) {
+      this.selectReceiver = [
+        {
+          name: "All",
+          userId: "All",
+        },
+      ];
+      for (let i = 0; i < participants.length; i++) {
+        let user = participants[i];
+        if (user.userId !== this.$store.getters.userId) {
+          this.selectReceiver.push(user);
+        }
+      }
     },
 
     showRecords() {
@@ -699,9 +585,9 @@ export default {
     sendNotify(msg) {
       if (this.windowStatus === "blur") {
         var notify = new Notification("You have got a new message", {
-          tag: msg.fromid + msg.time,
+          tag: msg.sender.userId + msg.time,
           icon: require("@/assets/images/OGMS2.png"), //通知的缩略图,
-          body: "from   " + msg.from, //通知的具体内容
+          body: "from   " + msg.sender.name, //通知的具体内容
           renotify: true,
         });
 
@@ -719,18 +605,18 @@ export default {
 
         //报错处理
         notify.onerror = function () {
-          console.log("error");
+          console.log("Error notice in chat tool message!");
         };
 
         //通知关闭
         notify.onclose = function () {
-          console.log("HTML5桌面消息关闭！！！");
+          console.log("Chat tool message notice is closed!");
         };
       }
     },
 
-    addEmoj(emoj) {
-      this.message = this.message + emoj;
+    addEmoji(emoji) {
+      this.message = this.message + emoji;
       // console.log(this.message);
     },
 
@@ -738,7 +624,7 @@ export default {
       if (event.keyCode == 13 && event.ctrlKey) {
         this.message += "\n"; //换行
       } else if (event.keyCode == 13) {
-        this.send(); //提交的执行函数
+        this.sendMsg(); //提交的执行函数
         event.preventDefault(); //禁止回车的默认换行
       }
     },

@@ -1,5 +1,6 @@
 package cn.edu.njnu.geoproblemsolving.business.collaboration.entity;
 
+import com.alibaba.fastjson.JSONObject;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 
@@ -18,4 +19,14 @@ public class CollaborationUser {
      * for communication
      */
     private Session session;
+
+    public JSONObject getUserInfo() {
+        JSONObject user = new JSONObject();
+        user.put("userId", userId);
+        user.put("name", name);
+        user.put("email", email);
+        user.put("avatar", avatar);
+
+        return user;
+    }
 }

@@ -28,7 +28,7 @@ public class BulletinDao implements IBulletinDaoImpl {
     public Object saveBulletin(BulletinEntity bulletinEntity) {
         try {
             Date date=new Date();
-            SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             bulletinEntity.setBulletinId(UUID.randomUUID().toString());
             bulletinEntity.setTime(dateFormat.format(date));
             mongoTemplate.save(bulletinEntity);

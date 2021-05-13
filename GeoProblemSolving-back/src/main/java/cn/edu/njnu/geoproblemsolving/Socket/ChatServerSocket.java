@@ -3,7 +3,6 @@ package cn.edu.njnu.geoproblemsolving.Socket;
 import cn.edu.njnu.geoproblemsolving.Config.MyEndPointConfigure;
 
 import cn.edu.njnu.geoproblemsolving.business.tool.chatroom.chatmessage.ChatMessageRecordsService;
-import cn.edu.njnu.geoproblemsolving.business.tool.chatroom.chatmessage.dto.AddChatMessageRecordsDTO;
 import cn.edu.njnu.geoproblemsolving.business.tool.chatroom.hydrologicalconcept.AnsjSegService;
 import cn.edu.njnu.geoproblemsolving.business.user.dao.IUserDao;
 import cn.edu.njnu.geoproblemsolving.business.user.dto.InquiryUserDto;
@@ -41,8 +40,8 @@ public class ChatServerSocket {
     @Autowired
     MongoTemplate mongoTemplate;
 
-    @Autowired
-    ChatMessageRecordsService chatMessageRecordsService;
+//    @Autowired
+//    ChatMessageRecordsService chatMessageRecordsService;
 
     @Autowired
     AnsjSegService ansjSegService;
@@ -182,11 +181,11 @@ public class ChatServerSocket {
         String srcUserId = messageObject.getString("srcUserId");
         String targetUserId = messageObject.getString("targetUserId");
         String content = messageObject.getString("content");
-        Boolean toolConcepts = messageObject.getBoolean("toolConcepts");
+        Boolean concepts = messageObject.getBoolean("geoConcepts");
 
-        if(toolConcepts == null) toolConcepts = false;
+        if(concepts == null) concepts = false;
         String relateConceptSet = "";
-        if(toolConcepts) {
+        if(concepts) {
             String result = ansjSegService.processInfo(content);
             relateConceptSet = ansjSegService.elasticSearch(result);
         }
@@ -229,14 +228,14 @@ public class ChatServerSocket {
         messagesArray.add(message);
         messageJson.put(roomId, messagesArray.toString());
 
-        AddChatMessageRecordsDTO addChatMessageRecordsDTO = new AddChatMessageRecordsDTO();
-        addChatMessageRecordsDTO.setSrcUserId(srcUserId);
-        addChatMessageRecordsDTO.setSrcUserName(srcUserName);
-        addChatMessageRecordsDTO.setTargetUserId(targetUserId);
-        addChatMessageRecordsDTO.setContent(content);
-        addChatMessageRecordsDTO.setType(type);
-        addChatMessageRecordsDTO.setMessageId(UUID.randomUUID().toString());
-        addChatMessageRecordsDTO.setRoomId(roomId);
-        chatMessageRecordsService.insert(addChatMessageRecordsDTO);
+//        AddChatMessageRecordsDTO addChatMessageRecordsDTO = new AddChatMessageRecordsDTO();
+//        addChatMessageRecordsDTO.setSrcUserId(srcUserId);
+//        addChatMessageRecordsDTO.setSrcUserName(srcUserName);
+//        addChatMessageRecordsDTO.setTargetUserId(targetUserId);
+//        addChatMessageRecordsDTO.setContent(content);
+//        addChatMessageRecordsDTO.setType(type);
+//        addChatMessageRecordsDTO.setMessageId(UUID.randomUUID().toString());
+//        addChatMessageRecordsDTO.setRoomId(roomId);
+//        chatMessageRecordsService.insert(addChatMessageRecordsDTO);
     }
 }

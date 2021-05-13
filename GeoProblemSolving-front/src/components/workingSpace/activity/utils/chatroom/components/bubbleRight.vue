@@ -2,20 +2,30 @@
 <template>
   <div class>
     <template>
-      <template v-if="list.type === 'notice'">
+      <template>
         <Row>
-          <div class="chat-notice">{{ list.content }}</div>
-        </Row>
-      </template>
-
-      <template v-else>
-        <Row>
-          <div style="float:right;">
-            <Row style="margin:8px 12px 0 0">
-              <div class="user_name">{{ list.srcUserName }}</div>
+          <div style="float: right">
+            <Row style="margin: 8px 12px 0 0">
+              <div class="user_name">{{ list.sender.name }}</div>
             </Row>
             <Row>
               <div class="chat-bubble-r chat-bubble-right">
+                <template>
+                  <Icon
+                    type="ios-pulse"
+                    color="red"
+                    v-show="list.status === 'sending'"
+                    title="Message sending"
+                    class="msg-status"
+                  />
+                  <Icon
+                    type="md-alert"
+                    color="red"
+                    v-show="list.status === 'failed'"
+                    title="Failed to send this message"
+                    class="msg-status"
+                  />
+                </template>
                 <template v-if="list.type === 'message_pic'" class="picOuter">
                   <img :src="list.content" class="send_pic" />
                 </template>
@@ -63,21 +73,21 @@ import toolPreview from "@/components/common/tools/toolPreview";
 export default {
   props: {
     message: {
-      type: Object
-    }
+      type: Object,
+    },
   },
 
   components: {
     simplePublicCard,
     toolModal,
-    toolPreview
+    toolPreview,
   },
 
   data() {
     return {
       list: this.message,
       isOpenTool: false,
-      selectTool: {}
+      selectTool: {},
     };
   },
   methods: {
@@ -88,8 +98,8 @@ export default {
     },
     closeToolPreview() {
       this.isOpenTool = false;
-    }
-  }
+    },
+  },
 };
 </script>
 

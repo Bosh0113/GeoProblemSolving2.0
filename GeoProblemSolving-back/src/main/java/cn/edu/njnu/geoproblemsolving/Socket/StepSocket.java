@@ -127,7 +127,7 @@ public class StepSocket {
 
     private void broadcastOnlineToModule(String stepId, String userId){
         Date date = new Date();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         JSONObject messageObject = new JSONObject();
         messageObject.put("type", "online");
         messageObject.put("userId",userId);
@@ -143,7 +143,7 @@ public class StepSocket {
     }
     private void broadcastOfflineToModule(String stepId, String userId){
         Date date = new Date();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         JSONObject messageObject = new JSONObject();
         messageObject.put("type", "offline");
         messageObject.put("userId",userId);

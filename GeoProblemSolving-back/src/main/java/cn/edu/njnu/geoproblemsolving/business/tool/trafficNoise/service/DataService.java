@@ -151,7 +151,7 @@ public class DataService {
                             fileSizeFormat = df.format((float) fileSize / (float) (1024)) + "KB";
                         }
                         Date uploadDate = new Date();
-                        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+                        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                         String uploadTime = simpleDateFormat.format(uploadDate);
 
 //                        TODO:注释部分
