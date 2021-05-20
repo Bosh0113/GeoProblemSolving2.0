@@ -50,7 +50,7 @@ public class CollaborationBehavior {
             JSONObject messageObject = new JSONObject();
             messageObject.put("type", "collaboration-init");
             messageObject.put("mode", config.getMode().toString());
-            messageObject.put("operator", config.getOperator());
+            messageObject.put("operator", getMemberInfo(config.getOperator(), null));
             messageObject.put("waiting", config.getApplyQueue().size());
             session.getBasicRemote().sendText(messageObject.toString());
         } catch (Exception e) {
@@ -267,27 +267,27 @@ public class CollaborationBehavior {
 
     /**
      * 发送控制信息
-     *
-     * @param participants
+     * @param config
      * @param queue
      * @param user
-     * @param behavior
+     * @param type
      */
-    public void sendControlInfo(HashMap<String, CollaborationUser> participants, List<String> queue, String user, String behavior) {
+    public void sendControlInfo(CollaborationConfig config, List<String> queue, String sender, String type) {
         try {
+            HashMap<String, CollaborationUser> participants = config.getParticipants();
             JSONObject messageObject = new JSONObject();
-            messageObject.put("type", "message");
-            messageObject.put("behavior", behavior);
+            messageObject.put("type", type);
 
-            if (behavior.equals("apply")) {
-                messageObject.put("sender", user);
+            if (type.equals("control-apply")) {
+                messageObject.put("sender", sender);
                 messageObject.put("waiting", queue.size());
+                messageObject.put("operator", config.getOperator());
                 // send message
                 for (Map.Entry<String, CollaborationUser> participant : participants.entrySet()) {
                     participant.getValue().getSession().getBasicRemote().sendText(messageObject.toString());
                 }
-            } else if (behavior.equals("stop")) {
-                messageObject.put("operator", user);
+            } else if (type.equals("control-stop")) {
+                messageObject.put("operator", config.getOperator());
                 // send message
                 for (Map.Entry<String, CollaborationUser> participant : participants.entrySet()) {
                     for (int i = 0; i < queue.size(); i++) {

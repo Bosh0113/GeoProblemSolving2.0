@@ -1,7 +1,22 @@
-.collab-tool-head {
+#collab-tool-head {
     height: 40px;
     width: calc(100vw);
     background-color: #393a3c;
+}
+#collab-tool-sidebar{
+    height: calc(100vh - 40px);
+    width: 250px;
+    background-color: #d8d8d8;
+    position: absolute;
+    top: 40px;
+    left: 0;
+}
+#collab-tool-content{ 
+    height: calc(100vh - 40px);
+    width: calc(100vw - 250px);
+    position: absolute;
+    left: 250px;
+    top: 40px;
 }
 .head-logo {
     height: 40px;
@@ -9,14 +24,6 @@
     background-size: auto 35px !important;
     background-repeat: no-repeat;
     margin-left: 10px;
-}
-.collab-tool-sidebar{
-    height: calc(100vh - 40px);
-    width: 250px;
-    background-color: #d8d8d8;
-    position: absolute;
-    top: 40px;
-    left: 0;
 }
 .nav {
     width: 46px;
@@ -148,14 +155,6 @@
 .resource-load {
     margin-top: 10px;
     text-align: center;
-}
-.collab-tool-content{ 
-    height: calc(100vh - 40px);
-    width: calc(100vw - 250px);
-    background-color: lightblue;
-    position: absolute;
-    left: 250px;
-    top: 40px;
 }
 .sync-state {
     height: 40px;

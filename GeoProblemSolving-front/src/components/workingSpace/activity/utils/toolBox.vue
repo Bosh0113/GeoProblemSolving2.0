@@ -373,13 +373,13 @@ export default {
 
       // 设置iframe 父子页面消息传输处理
       window.addEventListener("message", this.toolMsgHandle, false);
-      let activityId = this.activityInfo.aid;
+      let activity = this.activityInfo;
       let userInfo = this.userInfo;
       let iFrame = document.getElementById(toolInfo.tid);
       //iframe加载完毕后再发送消息，否则子页面接收不到message
       iFrame.onload = function () {
           //iframe加载完立即发送一条消息
-          iFrame.contentWindow.postMessage({"user": userInfo, "aid": activityId, "tid":toolInfo.tid, type:"activity"}, "*");
+          iFrame.contentWindow.postMessage({"user": userInfo, "activity": activity, "tid":toolInfo.tid, type:"activity"}, "*");
       }
 
     },

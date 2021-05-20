@@ -204,8 +204,13 @@ public class CollaborationService {
             JSONObject messageObject = JSONObject.parseObject(message);
             String messageType = messageObject.getString("type");
             String sender = messageObject.getString("sender");
-            List<String> receivers = messageObject.getJSONArray("receivers").toJavaList(String.class);
-            if(receivers == null) receivers = new ArrayList<>();
+
+            List<String> receivers = null;
+            try {
+                receivers = messageObject.getJSONArray("receivers").toJavaList(String.class);
+            } catch (NullPointerException ex){
+                receivers = new ArrayList<>();
+            }
 
             switch (messageType) {
                 case "test": {
@@ -218,21 +223,24 @@ public class CollaborationService {
                 case "mode": {
                     String mode = messageObject.getString("mode");
                     collaborationConfig.setMode(CollaborationMode.valueOf(mode));
+                    collaborationConfig.setOperator("");
+                    collaborationConfig.setApplyQueue(new ArrayList<>());
                     groups.put(groupKey, collaborationConfig);
 
                     collaborationBehavior.sendModeType(collaborationConfig.getParticipants(), mode);
                     break;
                 }
                 case "control-apply": {
-                    String ctrUser = messageObject.getString("operator");
                     List<String> applyQueue = collaborationConfig.getApplyQueue();
-
                     if(applyQueue == null) applyQueue = new ArrayList<>();
-                    applyQueue.add(ctrUser);
+                    if(applyQueue.size() == 0) {
+                        collaborationConfig.setOperator(sender);
+                    }
+                    applyQueue.add(sender);
                     collaborationConfig.setApplyQueue(applyQueue);
                     groups.put(groupKey, collaborationConfig);
 
-                    collaborationBehavior.sendControlInfo(collaborationConfig.getParticipants(), applyQueue,  ctrUser, "apply");
+                    collaborationBehavior.sendControlInfo(collaborationConfig, applyQueue,  sender, messageType);
                     break;
                 }
                 case "control-stop": {
@@ -248,11 +256,11 @@ public class CollaborationService {
                         }
                         groups.put(groupKey, collaborationConfig);
 
-                        collaborationBehavior.sendControlInfo(collaborationConfig.getParticipants(), applyQueue, ctrUser, "stop");
+                        collaborationBehavior.sendControlInfo(collaborationConfig, applyQueue, ctrUser, messageType);
                     } else if(collaborationConfig.getMode().equals(CollaborationMode.SemiFree_Occupy)){
                         collaborationConfig.setOperator("");
                         groups.put(groupKey, collaborationConfig);
-                        collaborationBehavior.sendControlInfo(collaborationConfig.getParticipants(), new ArrayList<>(), "", "stop");
+                        collaborationBehavior.sendControlInfo(collaborationConfig, new ArrayList<>(), "", messageType);
                     }
                     break;
                 }

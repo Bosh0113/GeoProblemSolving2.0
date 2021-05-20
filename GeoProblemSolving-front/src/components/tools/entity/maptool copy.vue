@@ -3,8 +3,6 @@
 @import "../../../../static/css/leaflet.pm.css";
 #map {
   float: right;
-  width: 100%;
-  height: 100%;
 }
 #import-data {
   background-color: white;
@@ -35,90 +33,74 @@
 </style>
 <template>
   <div>
-    <div id="collab-tool-head"></div>
-    <div id="collab-tool-sidebar"></div>
-    <div id="collab-tool-content">
-      <div
-        id="map"
-        class="map"
+    <toolStyle
+      :participants="participants"
+      :resources="resources"
+      v-on:resourceUrl="selecetResource"
+    ></toolStyle>
+    <div id="map" class="map" :style="{height:windowHeight+'px', width:windowWidth+'px'}">
+      <Modal
+        v-model="modalExport"
+        title="Export GeoJSON to resource center"
+        @on-ok="save2Resource('formValidate')"
       >
-        <Modal
-          v-model="modalExport"
-          title="Export GeoJSON to resource center"
-          @on-ok="save2Resource('formValidate')"
+        <Form
+          ref="formValidate"
+          :model="formValidate"
+          :rules="ruleValidate"
+          :label-width="80"
+          style="margin-left:20px"
         >
-          <Form
-            ref="formValidate"
-            :model="formValidate"
-            :rules="ruleValidate"
-            :label-width="80"
-            style="margin-left: 20px"
-          >
-            <FormItem label="Name" prop="fileName">
-              <Input
-                v-model="formValidate.fileName"
-                placeholder="*.json"
-                style="width: 350px"
-              />
-            </FormItem>
-            <FormItem label="Description" prop="fileDescription">
-              <Input
-                v-model="formValidate.fileDescription"
-                type="textarea"
-                placeholder="Enter something..."
-                style="width: 350px"
-              />
-            </FormItem>
-          </Form>
-          <p style="margin-left: 30px">
-            Download this data directly.
-            <Button
-              style="margin-left: 50px"
-              @click="downloadGeoJson('formValidate')"
-              >Download</Button
-            >
-          </p>
-        </Modal>
-        <Modal
-          v-model="modalImport"
-          title="Import GeoJSON data to resource center and show the data"
-          @on-ok="viewData"
-          ok-text="OK"
-          cancel-text="Cancel"
-        >
-          <Upload
-            type="drag"
-            :before-upload="handleUpload"
-            action="-"
-            accept=".json, .zip"
-          >
-            <div style="padding: 20px 0">
-              <Icon
-                type="ios-cloud-upload"
-                size="52"
-                style="color: #3399ff"
-              ></Icon>
-              <p>
-                Click or drag files here to upload(The file size must control in
-                <span style="color: red">1GB</span>)
-              </p>
-            </div>
-          </Upload>
-          <div v-show="showFile">
-            <span id="show-file">
-              <i class="ivu-icon ivu-icon-md-document"></i>
-              {{ uploadDataName }}
-            </span>
+          <FormItem label="Name" prop="fileName">
+            <Input v-model="formValidate.fileName" placeholder="*.json" style="width: 350px" />
+          </FormItem>
+          <FormItem label="Description" prop="fileDescription">
+            <Input
+              v-model="formValidate.fileDescription"
+              type="textarea"
+              placeholder="Enter something..."
+              style="width: 350px"
+            />
+          </FormItem>
+        </Form>
+        <p style="margin-left:30px">
+          Download this data directly.
+          <Button style="margin-left:50px" @click="downloadGeoJson('formValidate')">Download</Button>
+        </p>
+      </Modal>
+      <Modal
+        v-model="modalImport"
+        title="Import GeoJSON data to resource center and show the data"
+        @on-ok="viewData"
+        ok-text="OK"
+        cancel-text="Cancel"
+      >
+        <Upload type="drag" :before-upload="handleUpload" action="-" accept=".json, .zip">
+          <div style="padding: 20px 0">
+            <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
+            <p>
+              Click or drag files here to upload(The file size must control in
+              <span
+                style="color:red"
+              >1GB</span>)
+            </p>
           </div>
-          <br />
-        </Modal>
-      </div>
+        </Upload>
+        <div v-show="showFile">
+          <span id="show-file">
+            <i class="ivu-icon ivu-icon-md-document"></i>
+            {{uploadDataName}}
+          </span>
+        </div>
+        <br />
+      </Modal>
     </div>
   </div>
 </template>
 <script>
 import minimap from "@static/js/Control.MiniMap.min.js";
 import pm from "@static/js/leaflet.pm.min.js";
+import * as socketApi from "@/api/socket.js";
 import imIcon from "@static/Images/import.png";
 import exIcon from "@static/Images/export.png";
 //leaflet
@@ -132,7 +114,7 @@ delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: require("leaflet/dist/images/marker-icon-2x.png"),
   iconUrl: require("leaflet/dist/images/marker-icon.png"),
-  shadowUrl: require("leaflet/dist/images/marker-shadow.png"),
+  shadowUrl: require("leaflet/dist/images/marker-shadow.png")
 });
 export default {
   components: { toolStyle },
@@ -160,41 +142,40 @@ export default {
       userInfo: {},
       formValidate: {
         fileName: "",
-        fileDescription: "",
+        fileDescription: ""
       },
       ruleValidate: {
         fileName: [
-          { required: true, message: "Please select type...", trigger: "blur" },
+          { required: true, message: "Please select type...", trigger: "blur" }
         ],
         fileDescription: [
-          { required: false, message: "Drawing tool", trigger: "blur" },
-        ],
-      },
+          { required: false, message: "Drawing tool", trigger: "blur" }
+        ]
+      }
     };
   },
   mounted() {
     window.addEventListener("resize", this.initSize);
     // window.addEventListener("message", this.getStepInfo, false);
-
-    // 加载协同组件
-    loadCollabComponent();
-
+    
     this.initSize();
-    // this.getStepInfo();
+    this.getStepInfo();
     this.getUserInfo();
     this.getResources();
-    // this.startWebSocket();
+    this.startWebSocket();
     this.initMap();
     this.initLayer();
     this.initControl();
+    this.startWebSocket();
     this.listenDraw();
+
   },
   beforeDestroy() {
     window.removeEventListener("resize", this.initSize);
     this.socketApi.close();
   },
   beforeRouteEnter: (to, from, next) => {
-    next((vm) => {
+    next(vm => {
       if (!vm.$store.getters.userState || vm.$store.getters.userId == "") {
         vm.$router.push({ name: "Login" });
       }
@@ -204,6 +185,8 @@ export default {
     initSize() {
       $("#app").css("min-width", "0");
       $("#app").css("min-height", "0");
+      this.windowHeight = window.innerHeight;
+      this.windowWidth = window.innerWidth - 60;
     },
     // getStepInfo(event) {
     //   console.log(event.data);
@@ -244,16 +227,16 @@ export default {
         this.axios
           .get(
             "/GeoProblemSolving/user" +
-              "?key=userId" +
-              "&value=" +
+            "?key=userId" +
+            "&value=" +
               this.pageParams.userId
           )
-          .then((res) => {
+          .then(res => {
             if (res.data.code == 0) {
               this.$set(this, "userInfo", res.data.data);
             }
           })
-          .catch((err) => {});
+          .catch(err => {});
       }
     },
     initMap() {
@@ -279,7 +262,7 @@ export default {
       this.map = L.map("map", {
         crs: L.CRS.EPSG3857,
         center: L.latLng(32.07, 118.78),
-        zoom: 13,
+        zoom: 13
       });
     },
     initLayer() {
@@ -291,7 +274,7 @@ export default {
       var vectorMap = L.tileLayer(this.tdtVectorMap, {
         maxZoom: 20,
         attribution:
-          '&copy; <a href="http://map.tianditu.gov.cn/">tianditu</a> contributors',
+          '&copy; <a href="http://map.tianditu.gov.cn/">tianditu</a> contributors'
       });
       var vectorAno = L.tileLayer(this.tdtVectorAno, { maxZoom: 18 });
       var vector = L.layerGroup([vectorMap, vectorAno]);
@@ -299,7 +282,7 @@ export default {
       var satelliteMap = L.tileLayer(this.tdtImgMap, {
         maxZoom: 18,
         attribution:
-          '&copy; <a href="http://map.tianditu.gov.cn/">tianditu</a> contributors',
+          '&copy; <a href="http://map.tianditu.gov.cn/">tianditu</a> contributors'
       });
       var satelliteAno = L.tileLayer(this.tdtImgAno, { maxZoom: 18 });
       var satellite = L.layerGroup([satelliteMap, satelliteAno]);
@@ -307,7 +290,7 @@ export default {
       var terrainMap = L.tileLayer(this.tdtTerrMap, {
         maxZoom: 18,
         attribution:
-          '&copy; <a href="http://map.tianditu.gov.cn/">tianditu</a> contributors',
+          '&copy; <a href="http://map.tianditu.gov.cn/">tianditu</a> contributors'
       });
       var terrainAno = L.tileLayer(this.tdtTerrAno, { maxZoom: 18 });
       var terrain = L.layerGroup([terrainMap, terrainAno]);
@@ -315,7 +298,7 @@ export default {
       this.baseLayers = {
         "Vector map": vector,
         "Satellite map": satellite,
-        "Terrain map": terrain,
+        "Terrain map": terrain
         // "Google satellite map": googleSatellite
       };
       var overlayLayers = {};
@@ -325,7 +308,7 @@ export default {
       // 比例尺
       L.control
         .scale({
-          position: "bottomleft",
+          position: "bottomleft"
         })
         .addTo(this.map);
 
@@ -334,7 +317,7 @@ export default {
       var miniMap = new L.Control.MiniMap(normal, {
         toggleDisplay: true,
         minimized: false,
-        position: "bottomleft",
+        position: "bottomleft"
       }).addTo(this.map);
 
       // 绘图控件
@@ -348,7 +331,7 @@ export default {
         cutPolygon: false, // adds button to cut a hole in a polygon
         editMode: true, // adds button to toggle edit mode for all layers
         dragMode: false,
-        removalMode: true, // adds a button to remove layers
+        removalMode: true // adds a button to remove layers
       };
       this.map.pm.addControls(options);
 
@@ -359,11 +342,11 @@ export default {
       L.Control.Data = L.Control.extend({
         //在此定义参数
         options: {
-          position: "topright",
+          position: "topright"
         },
         //在此初始化
-        initialize: function (map) {},
-        onAdd: function (map) {
+        initialize: function(map) {},
+        onAdd: function(map) {
           this._container = L.DomUtil.create("div", "leaflet-exportData");
           this._container.style =
             "border:2px solid rgba(128,128,128,0.5);border-radius:6px";
@@ -392,7 +375,7 @@ export default {
         },
         _exportData() {
           var featuresSet = { type: "FeatureCollection", features: [] };
-          that.map.eachLayer(function (layer) {
+          that.map.eachLayer(function(layer) {
             try {
               var json = layer.toGeoJSON();
               if (json.type == "Feature") {
@@ -410,15 +393,15 @@ export default {
         },
         _importData() {
           that.modalImport = true;
-        },
+        }
       });
-      L.control.data = function () {
+      L.control.data = function() {
         return new L.Control.Data();
       };
       L.control.data().addTo(this.map);
     },
     downloadGeoJson(name) {
-      this.$refs[name].validate((valid) => {
+      this.$refs[name].validate(valid => {
         if (valid) {
           var reader = new FileReader();
           if (this.geojsonBlob != null) {
@@ -429,7 +412,7 @@ export default {
               filename = this.formValidate.fileName;
             }
             reader.readAsDataURL(this.geojsonBlob);
-            reader.onload = function (e) {
+            reader.onload = function(e) {
               var a = document.createElement("a");
               a.download = filename;
               a.href = e.target.result;
@@ -449,7 +432,7 @@ export default {
         return false;
       }
 
-      this.$refs[name].validate((valid) => {
+      this.$refs[name].validate(valid => {
         if (valid) {
           if (this.geojsonBlob != null) {
             // 完善文件信息
@@ -478,7 +461,7 @@ export default {
             formData.append("folderId", this.pageParams.pageId);
             this.axios
               .post("/GeoProblemSolving/folder/uploadToFolder", formData)
-              .then((res) => {
+              .then(res => {
                 if (
                   res.data.sizeOver.length > 0 ||
                   res.data.failed.length > 0 ||
@@ -491,7 +474,7 @@ export default {
 
                   this.$Notice.open({
                     title: "Save to resource center",
-                    desc: "Data saved successfully",
+                    desc: "Data saved successfully"
                     // duration: 0
                   });
 
@@ -500,7 +483,7 @@ export default {
                   let dataItem = {
                     name: filename,
                     description: "map tool data",
-                    pathURL: "/GeoProblemSolving/resource/upload/" + dataName,
+                    pathURL: "/GeoProblemSolving/resource/upload/" + dataName
                   };
                   this.resources.push(dataItem);
 
@@ -509,7 +492,7 @@ export default {
                     type: "resourcesSave",
                     name: filename,
                     description: "map tool data",
-                    pathURL: "/GeoProblemSolving/resource/upload/" + dataName,
+                    pathURL: "/GeoProblemSolving/resource/upload/" + dataName
                   };
                   this.socketApi.sendSock(
                     this.send_content,
@@ -519,11 +502,11 @@ export default {
                   // 初始化formValidation
                   this.formValidate = {
                     fileName: "",
-                    fileDescription: "",
+                    fileDescription: ""
                   };
                 }
               })
-              .catch((err) => {
+              .catch(err => {
                 console.log(err.data);
               });
           }
@@ -553,7 +536,7 @@ export default {
       formData.append("folderId", this.pageParams.pageId);
       this.axios
         .post("/GeoProblemSolving/folder/uploadToFolder", formData)
-        .then((res) => {
+        .then(res => {
           if (
             res.data.sizeOver.length > 0 ||
             res.data.failed.length > 0 ||
@@ -570,7 +553,7 @@ export default {
             let dataItem = {
               name: dataName,
               description: "map tool data",
-              pathURL: "/GeoProblemSolving/resource/upload/" + dataName,
+              pathURL: "/GeoProblemSolving/resource/upload/" + dataName
             };
             this.resources.push(dataItem);
 
@@ -579,12 +562,12 @@ export default {
               type: "resourcesUpdate",
               name: dataName,
               description: "map tool data",
-              pathURL: "/GeoProblemSolving/resource/upload/" + dataName,
+              pathURL: "/GeoProblemSolving/resource/upload/" + dataName
             };
             this.socketApi.sendSock(this.send_content, this.getSocketConnect);
           }
         })
-        .catch((err) => {
+        .catch(err => {
           console.log(err.data);
         });
       return false;
@@ -595,15 +578,15 @@ export default {
         var that = this;
         var xhr = new XMLHttpRequest();
         xhr.open("GET", this.dataUrl, true);
-        xhr.onload = function (e) {
+        xhr.onload = function(e) {
           if (this.status == 200) {
             var file = JSON.parse(this.response);
 
             let geoJsonLayer = L.geoJSON(file, {
-              style: function (feature) {
+              style: function(feature) {
                 return { color: "red" };
-              },
-            }).bindPopup(function (layer) {
+              }
+            }).bindPopup(function(layer) {
               return layer.feature.properties.description;
             });
             that.loadFeatures(geoJsonLayer);
@@ -615,12 +598,12 @@ export default {
       } else if (/\.(zip)$/.test(this.dataUrl.toLowerCase())) {
         try {
           var that = this;
-          shp(this.dataUrl).then(function (file) {
+          shp(this.dataUrl).then(function(file) {
             let geoJsonLayer = L.geoJSON(file, {
-              style: function (feature) {
+              style: function(feature) {
                 return { color: "orange" };
-              },
-            }).bindPopup(function (layer) {
+              }
+            }).bindPopup(function(layer) {
               return layer.feature.properties.description;
             });
             that.loadFeatures(geoJsonLayer);
@@ -635,17 +618,17 @@ export default {
       this.showFile = false;
     },
     loadFeatures(featureCollection) {
-      featureCollection.eachLayer((layer) => {
+      featureCollection.eachLayer(layer => {
         this.drawingLayerGroup.addLayer(layer);
       });
     },
     setEditListen() {
-      this.drawingLayerGroup.eachLayer((layer) => {
+      this.drawingLayerGroup.eachLayer(layer => {
         let _this = this;
-        layer.on("pm:edit", (e) => {
+        layer.on("pm:edit", e => {
           _this.send_content = {
             type: "edit",
-            layer: _this.drawingLayerGroup.toGeoJSON(),
+            layer: _this.drawingLayerGroup.toGeoJSON()
           };
           _this.socketApi.sendSock(_this.send_content, _this.getSocketConnect);
         });
@@ -658,34 +641,34 @@ export default {
       let isDoubleClick = false;
       let isLayerCtrlClick = false;
 
-      this.map.on("mousedown", (e) => {
+      this.map.on("mousedown", e => {
         isMouseDown = true;
       });
 
-      this.map.on("mouseup", (e) => {
+      this.map.on("mouseup", e => {
         isLayerCtrlClick = true;
       });
 
-      this.map.on("dblclick", (e) => {
+      this.map.on("dblclick", e => {
         isDoubleClick = true;
       });
 
       //缩放控件事件
       var element = document.querySelector("a.leaflet-control-zoom-in");
-      L.DomEvent.addListener(element, "click", function (e) {
+      L.DomEvent.addListener(element, "click", function(e) {
         isZoomControl = true;
       });
       element = document.querySelector("a.leaflet-control-zoom-out");
-      L.DomEvent.addListener(element, "click", function (e) {
+      L.DomEvent.addListener(element, "click", function(e) {
         isZoomControl = true;
       });
 
       // 图层控件
-      this.map.on("baselayerchange", (e) => {
+      this.map.on("baselayerchange", e => {
         if (isLayerCtrlClick) {
           this.send_content = {
             type: "overlay",
-            layer: e.name,
+            layer: e.name
           };
           this.socketApi.sendSock(this.send_content, this.getSocketConnect);
         }
@@ -693,11 +676,11 @@ export default {
       });
 
       //缩放事件 与 鼠标事件同时发生
-      this.map.on("zoomend", (e) => {
+      this.map.on("zoomend", e => {
         if (this.map.scrollWheelZoom || isZoomControl || isDoubleClick) {
           this.send_content = {
             type: "zoom",
-            zoom: this.map.getZoom(),
+            zoom: this.map.getZoom()
           };
           this.socketApi.sendSock(this.send_content, this.getSocketConnect);
           isZoomControl = false;
@@ -706,11 +689,11 @@ export default {
       });
 
       //地图拖拽事件
-      this.map.on("moveend", (e) => {
+      this.map.on("moveend", e => {
         if (isMouseDown) {
           this.send_content = {
             type: "move",
-            center: this.map.getCenter(),
+            center: this.map.getCenter()
           };
           this.socketApi.sendSock(this.send_content, this.getSocketConnect);
         }
@@ -718,7 +701,7 @@ export default {
       });
 
       // 裁剪事件
-      this.map.on("pm:cut", (e) => {
+      this.map.on("pm:cut", e => {
         // this.drawingLayerGroup.removeLayer(e.originalLayer);
         // this.drawingLayerGroup.addLayer(e.layer);
         // this.send_content={
@@ -730,21 +713,21 @@ export default {
 
       // 删除事件
       let _this = this;
-      this.map.on("pm:remove", (e) => {
+      this.map.on("pm:remove", e => {
         _this.drawingLayerGroup.removeLayer(e.layer);
         this.send_content = {
           type: "remove",
-          layer: _this.drawingLayerGroup.toGeoJSON(),
+          layer: _this.drawingLayerGroup.toGeoJSON()
         };
         this.socketApi.sendSock(this.send_content, this.getSocketConnect);
       });
 
-      this.map.on("pm:globaleditmodetoggled", (e) => {
+      this.map.on("pm:globaleditmodetoggled", e => {
         this.setEditListen();
       });
 
       // 画图事件
-      this.map.on("pm:create", (e) => {
+      this.map.on("pm:create", e => {
         this.map.removeLayer(e.layer);
         if (e.shape == "Circle") {
           this.traces = [];
@@ -754,14 +737,14 @@ export default {
           this.traces.push(radius);
 
           let drawingLayer = L.circle(points, {
-            radius: radius,
+            radius: radius
           });
           this.drawingLayerGroup.addLayer(drawingLayer);
 
           this.send_content = {
             type: "add",
             shape: e.shape,
-            layer: this.traces,
+            layer: this.traces
           };
         } else {
           this.drawingLayerGroup.addLayer(e.layer);
@@ -769,7 +752,7 @@ export default {
           this.send_content = {
             type: "add",
             shape: "Others",
-            layer: e.layer.toGeoJSON(),
+            layer: e.layer.toGeoJSON()
           };
         }
         this.socketApi.sendSock(this.send_content, this.getSocketConnect);
@@ -817,8 +800,8 @@ export default {
             this.drawingLayerGroup.clearLayers();
             let geoJson = socketMsg.layer;
             let geoJsonLayer = L.geoJSON(geoJson, {
-              style: function (feature) {},
-            }).bindPopup(function (layer) {
+              style: function(feature) {}
+            }).bindPopup(function(layer) {
               // return layer.feature.properties.description;
             });
             this.loadFeatures(geoJsonLayer);
@@ -828,8 +811,8 @@ export default {
             this.drawingLayerGroup.clearLayers();
             let geoJson = socketMsg.layer;
             let geoJsonLayer = L.geoJSON(geoJson, {
-              style: function (feature) {},
-            }).bindPopup(function (layer) {
+              style: function(feature) {}
+            }).bindPopup(function(layer) {
               // return layer.feature.properties.description;
             });
             this.loadFeatures(geoJsonLayer);
@@ -839,12 +822,12 @@ export default {
             let drawingLayer = null;
             if (socketMsg.shape == "Circle") {
               drawingLayer = L.circle(socketMsg.layer[0], {
-                radius: socketMsg.layer[1],
+                radius: socketMsg.layer[1]
               });
             } else {
               drawingLayer = L.geoJSON(socketMsg.layer, {
-                style: function (feature) {},
-              }).bindPopup(function (layer) {});
+                style: function(feature) {}
+              }).bindPopup(function(layer) {});
             }
             this.drawingLayerGroup.addLayer(drawingLayer);
             break;
@@ -865,22 +848,22 @@ export default {
             let dataItem = {
               name: socketMsg.name,
               description: socketMsg.description,
-              pathURL: socketMsg.pathURL,
+              pathURL: socketMsg.pathURL
             };
             this.resources.push(dataItem);
 
             var that = this;
             var xhr = new XMLHttpRequest();
             xhr.open("GET", socketMsg.pathURL, true);
-            xhr.onload = function (e) {
+            xhr.onload = function(e) {
               if (this.status == 200) {
                 var file = JSON.parse(this.response);
 
                 let geoJsonLayer = L.geoJSON(file, {
-                  style: function (feature) {
+                  style: function(feature) {
                     return { color: "green" };
-                  },
-                }).bindPopup(function (layer) {
+                  }
+                }).bindPopup(function(layer) {
                   return layer.feature.properties.description;
                 });
                 that.loadFeatures(geoJsonLayer);
@@ -898,7 +881,7 @@ export default {
             let dataItem = {
               name: socketMsg.name,
               description: socketMsg.description,
-              pathURL: socketMsg.pathURL,
+              pathURL: socketMsg.pathURL
             };
             this.resources.push(dataItem);
             break;
@@ -916,11 +899,11 @@ export default {
           this.axios
             .get(
               "/GeoProblemSolving/user" +
-                "?key=userId" +
-                "&value=" +
+            "?key=userId" +
+            "&value=" +
                 this.olParticipants[i]
             )
-            .then((res) => {
+            .then(res => {
               if (res.data.code == 0) {
                 that.participants.push(res.data.data);
               } else if (res.data == "None") {
@@ -947,11 +930,11 @@ export default {
           this.axios
             .get(
               "/GeoProblemSolving/user" +
-                "?key=userId" +
-                "&value=" +
+            "?key=userId" +
+            "&value=" +
                 this.olParticipants[userIndex]
             )
-            .then((res) => {
+            .then(res => {
               if (res.data.code == 0) {
                 that.participants.push(res.data.data);
                 if (userIndex != -1) {
@@ -990,7 +973,7 @@ export default {
       this.send_content = {
         type: "test",
         from: "Test",
-        content: "TestChat",
+        content: "TestChat"
       };
       this.socketApi.sendSock(this.send_content, this.getSocketConnect);
     },
@@ -1005,7 +988,7 @@ export default {
         .get(
           "/GeoProblemSolving/folder/inquiry?folderId=" + this.pageParams.pageId
         )
-        .then((res) => {
+        .then(res => {
           // 写渲染函数，取到所有资源
           if (res.data !== "None") {
             for (let i = 0; i < res.data.files.length; i++) {
@@ -1020,7 +1003,7 @@ export default {
             this.resources = [];
           }
         })
-        .catch((err) => {
+        .catch(err => {
           console.log(err.data);
         });
     },
@@ -1030,12 +1013,12 @@ export default {
       // 协同
       this.send_content = {
         type: "selectdata",
-        pathURL: this.dataUrl,
+        pathURL: this.dataUrl
       };
       this.socketApi.sendSock(this.send_content, this.getSocketConnect);
 
       this.viewData();
-    },
-  },
+    }
+  }
 };
 </script>

@@ -13,7 +13,7 @@
   font-size: 15px;
   font-weight: bold;
 }
-.container {
+.nav-container {
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -81,7 +81,7 @@ footer {
 }
 </style>
 <template>
-  <div class="container">
+  <div class="nav-container">
     <div style="position: fixed; z-index: 99">
       <header style="position: inherit; min-width: -webkit-fill-available">
         <img
