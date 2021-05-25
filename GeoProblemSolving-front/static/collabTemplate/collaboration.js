@@ -1,19 +1,30 @@
 /**
- * require jquery, jTemplates
+ * variable
  */
+// the loading status of the collaboration component
+var componentStatus = false;
+
+// basic information
 var toolId = "";
 var activityInfo = null;
+
+// user related
 var userInfo = null;
-var resources = null;
 var participants = null;
 var onlineMembers = null;
 var UserServer = "http://172.21.212.103:8088/userServer";
+
+// resource related**************************************************************************************************等待测试
+var resources = [];
+selectedResources = [];
+
+// operation related
 
 $(function () {
     // ready - event
     // create tags
     // ...
-    
+
 });
 
 ///////////
@@ -23,7 +34,7 @@ $(function () {
  * public method
  * init
  */
-function loadCollabComponent(){
+function loadCollabComponent() {
     $("#collab-tool-head").append(`<li class="head-logo"></li>`);
     $("#collab-tool-sidebar").append(
         `<ul class="nav flex-column">
@@ -136,16 +147,16 @@ function loadCollabComponent(){
                     <button class="btn btn-primary btn-sm">Bind to task</button>
                 </div>
             </div>
-        </div>`);  
-        
-        // events
-        addEvents();
+        </div>`);
+
+    // events
+    addEvents();
 }
 
 function addEvents() {
     // message    
     window.addEventListener("message", getActivityInfo, false);
-    
+
     $("#people-btn").on("click", function () {
         $("#people-btn").addClass("active");
         $("#resource-btn").removeClass("active");
@@ -176,29 +187,29 @@ function addEvents() {
     })
 
     $("#operation-apply").on("click", operationApply);
-    
+
     $("#operation-stop").on("click", operationStop);
-     
+
     $("#collaboration-switch").on("change", () => {
-       if($("#collaboration-switch").is(':checked')) {
+        if ($("#collaboration-switch").is(':checked')) {
             startCollaboration();
-       } else {
+        } else {
             socketClose();
-       }
+        }
     })
 
-    $("#collaboration-mode").on("change", function(){
+    $("#collaboration-mode").on("change", function () {
         let value = $("#collaboration-mode option:checked").val();
         syncCollabMode(value);
         setCollaborationMode(value);
     });
 }
 
-function showParticipants(){
-    for(let i = 0; i < participants.length; i++){
+function showParticipants() {
+    for (let i = 0; i < participants.length; i++) {
         let avatar = ""
-        if(participants[i].avatar == undefined || participants[i].avatar == ""){
-            avatar = "img/icon_avatar.png";
+        if (participants[i].avatar == undefined || participants[i].avatar == "") {
+            avatar = "/static/collabTemplate/img/icon_avatar.png";
         } else {
             avatar = UserServer + participants[i].avatar;
         }
@@ -210,41 +221,126 @@ function showParticipants(){
                                 </div>
                             </div>`
         $("#people-list").append(peopleElement);
-        if(participants[i].userId != userInfo.userId) {
-            $(`#${participants[i].userId}`).css("background-color", "lightgrey");  
+        if (participants[i].userId != userInfo.userId) {
+            $(`#${participants[i].userId}`).css("background-color", "lightgrey");
         }
-    }    
+    }
 }
 
-function addPerson(members){
-    for(let i = 0; i<members.length;i++){
-        $(`#${members[i].userId}`).css("background-color", "white");  
-    }    
+function personOnline(members) {
+    for (let i = 0; i < members.length; i++) {
+        $(`#${members[i].userId}`).css("background-color", "white");
+    }
 }
 
-function removePerson(member) {
-    $(`#${member.userId}`).css("background-color", "lightgrey");  
+function personOffline(member) {
+    $(`#${member.userId}`).css("background-color", "lightgrey");
+}
+
+function showResList() {
+    if (resources != undefined) {
+        for (let i = 0; i < resources.folders.length; i++) {
+            let folder = resources.folders[i];
+
+            let resElement = `<div class="card resource" title="${folder.name}">
+                                    <input class="form-check-input" type="checkbox" id="${folder.uid}" value="${i}">
+                                    <img src="/static/collabTemplate/mg/folder.png" class="res-icon" />
+                                    <div class="res-name">${folder.name}</div>
+                                </div>`
+            $("#resource-list").append(resElement);
+            $(`#${folder.uid}`).on("change", function () {
+                selectFile(folder);
+            });
+        }
+        for (let j = 0; j < resources.files.length; j++) {
+            let file = resources.files[j];
+            
+            let resElement = "";
+            switch (file.type) {
+                case "data" :{
+                    resElement = `<div class="card resource" title="${file.name}">
+                                    <input class="form-check-input" type="checkbox" id="${file.uid}" value="${j}">
+                                    <img src="/static/collabTemplate/img/data.png" class="res-icon" />
+                                    <div class="res-name">${file.name}</div>
+                                </div>`
+                    break;
+                }
+                case "model" :{
+                    resElement = `<div class="card resource" title="${file.name}">
+                                    <input class="form-check-input" type="checkbox" id="${file.uid}" value="${j}">
+                                    <img src="/static/collabTemplate/img/model.png" class="res-icon" />
+                                    <div class="res-name">${file.name}</div>
+                                </div>`
+                    break;
+                }
+                case "paper" :{
+                    resElement = `<div class="card resource" title="${file.name}">
+                                    <input class="form-check-input" type="checkbox" id="${file.uid}" value="${j}">
+                                    <img src="/static/collabTemplate/img/paper.png" class="res-icon" />
+                                    <div class="res-name">${file.name}</div>
+                                </div>`
+                    break;
+                }
+                case "document" :{
+                    resElement = `<div class="card resource" title="${file.name}">
+                                    <input class="form-check-input" type="checkbox" id="${file.uid}" value="${j}">
+                                    <img src="/static/collabTemplate/img/document.png" class="res-icon" />
+                                    <div class="res-name">${file.name}</div>
+                                </div>`
+                    break;
+                }
+                case "image" :{
+                    resElement = `<div class="card resource" title="${file.name}">
+                                    <input class="form-check-input" type="checkbox" id="${file.uid}" value="${j}">
+                                    <img src="/static/collabTemplate/img/image.png" class="res-icon" />
+                                    <div class="res-name">${file.name}</div>
+                                </div>`
+                    break;
+                }
+                case "video" :{
+                    resElement = `<div class="card resource" title="${file.name}">
+                                    <input class="form-check-input" type="checkbox" id="${file.uid}" value="${j}">
+                                    <img src="/static/collabTemplate/img/video.png" class="res-icon" />
+                                    <div class="res-name">${file.name}</div>
+                                </div>`
+                    break;
+                }
+                case "other" :{
+                    resElement = `<div class="card resource" title="${file.name}">
+                                    <input class="form-check-input" type="checkbox" id="${file.uid}" value="${j}">
+                                    <img src="/static/collabTemplate/img/otherfile.png" class="res-icon" />
+                                    <div class="res-name">${file.name}</div>
+                                </div>`
+                    break;
+                }
+            }
+            $("#resource-list").append(resElement);
+            $(`#${file.uid}`).on("change", function () {
+                selectFile(file);
+            });
+        }
+    }
 }
 
 function initCollaborationMode() {
-    for(let i = 0; i< participants.length; i++){
-        if(participants[i].userId === userInfo.userId && participants[i].role === "manager") {
+    for (let i = 0; i < participants.length; i++) {
+        if (participants[i].userId === userInfo.userId && participants[i].role === "manager") {
             $("#collaboration-mode").attr("disabled", false);
         }
     }
 }
 
-function setCollaborationMode(mode) {  
-    if(mode != undefined && mode !== ""){  
-        if(mode ===  "Free"){
+function setCollaborationMode(mode) {
+    if (mode != undefined && mode !== "") {
+        if (mode === "Free") {
             $(".operation-control-apply").hide();
             $(".operation-control-occupy").hide();
             $(".operation-list").css("height", "calc(100vh - 200px)");
-        } else if(mode ===  "SemiFree_Apply") {
+        } else if (mode === "SemiFree_Apply") {
             $(".operation-control-apply").show();
             $(".operation-control-occupy").hide();
             $(".operation-list").css("height", "calc(100vh - 305px)");
-        } else if(mode ===  "SemiFree_Occupy") {
+        } else if (mode === "SemiFree_Occupy") {
             $(".operation-control-apply").hide();
             $(".operation-control-occupy").show();
             $(".operation-list").css("height", "calc(100vh - 250px)");
@@ -253,15 +349,15 @@ function setCollaborationMode(mode) {
 }
 
 function setOperator(operator) {
-    if(operator != undefined) {
+    if (operator != undefined) {
         $("#operator-name").remove();
         $("#operator").append(`<span class="operator-name" id="operator-name">${operator.name}</span>`);
     }
 }
 
 function setWaitingLine(count) {
-    if(count != undefined) {
-        if(count > 0) {
+    if (count != undefined) {
+        if (count > 0) {
             $("#operation-waiting").empty();
             $("#operation-waiting").append(`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-lines-fill" viewBox="0 0 16 16" style="margin-top: -3px;">
                                                 <path d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-5 6s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H1zM11 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5zm.5 2.5a.5.5 0 0 0 0 1h4a.5.5 0 0 0 0-1h-4zm2 3a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1h-2zm0 3a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1h-2z"/>
@@ -274,7 +370,7 @@ function setWaitingLine(count) {
                                             </svg> 
                                             <span style="margin-left: 5px; color: #007bff;" title="Waiting for operation">Apply to operate</span>`);
         }
-    }    
+    }
 }
 
 ///////////
@@ -282,9 +378,12 @@ function setWaitingLine(count) {
 //////////
 function getActivityInfo(event) {
     if (event.data.type === "activity") {
+
         activityInfo = event.data.activity;
         userInfo = event.data.user;
         toolId = event.data.tid;
+
+        componentStatus = true;
 
         getParticipants();
         getResources();
@@ -300,6 +399,37 @@ function getActivityInfo(event) {
  */
 function getResources() {
 
+    $.ajax({
+        url: "/GeoProblemSolving/rip/" + activityInfo.aid + "/0",
+        type: "GET",
+        async: false,
+        success: function (result) {
+            if (result == "Offline") {
+                confirm("You are offline, please login.")
+            } else if (result.code == 0) {
+                let rootRes = result.data;
+                resources = resToCurrentFolder(rootRes);
+                showResList();
+            }
+        },
+        error: function (err) {
+            throw err;
+        }
+    });
+}
+function resToCurrentFolder(rootRes) {
+    let currentFolder = {
+        folders: [],
+        files: []
+    }
+    for (let i = 0; i < rootRes.length; i++) {
+        if (rootRes[i].folder) {
+            currentFolder.folders.push(rootRes[i]);
+        } else {
+            currentFolder.files.push(rootRes[i]);
+        }
+    }
+    return currentFolder;
 }
 
 /**
@@ -367,6 +497,26 @@ function operationStop() {
     websocketSend(message);
 }
 
+function selectFile(file) {
+    if ($(`#${file.uid}`).is(":checked")) {
+        selectedResources.push(file);
+    } else {
+        for (let i = 0; i < selectedResources.length; i++) {
+            if (selectedResources[i].uid == file.uid) {
+                selectedResources.splice(i, 1);
+            }
+        }
+    }
+}
+
+/**
+ * public method
+ * when resources changed
+ */
+function resourceChanged(resources) {
+
+}
+
 ///////////
 /// Socket
 //////////
@@ -388,7 +538,7 @@ function initWebSocket(aid, toolId) { //初始化websocket
         setTimer();
         websockLinked = true;
 
-        $("#collaboration-switch").attr('checked',true);
+        $("#collaboration-switch").attr('checked', true);
     }
     websock.onmessage = function (e) {
         websocketonmessage(e);
@@ -425,12 +575,12 @@ function websocketonmessage(e) {
     try {
         let data = JSON.parse(e.data);
         switch (data.type) {
-            case "members":{
+            case "members": {
                 if (data.behavior == "on") {
-                    addPerson(data.participants);
-                  } else if (data.behavior == "off") {
-                    removePerson(activeUser);
-                  }
+                    personOnline(data.participants);
+                } else if (data.behavior == "off") {
+                    personOffline(activeUser);
+                }
                 break;
             }
             case "collaboration-init": {
@@ -446,8 +596,8 @@ function websocketonmessage(e) {
                 break;
             }
             case "control-apply": {
-                if(data.operator === userInfo.userId) {
-                    $("#operation-apply").hide();    
+                if (data.operator === userInfo.userId) {
+                    $("#operation-apply").hide();
                     $("#operation-stop").show();
                 }
                 setOperator(data.operator);
@@ -455,8 +605,8 @@ function websocketonmessage(e) {
                 break;
             }
             case "control-stop": {
-                if(data.sender === userInfo.userId) {
-                    $("#operation-apply").show();    
+                if (data.sender === userInfo.userId) {
+                    $("#operation-apply").show();
                     $("#operation-stop").hide();
                 }
                 setOperator(data.operator);
@@ -464,20 +614,16 @@ function websocketonmessage(e) {
                 break;
             }
             case "operation": {
+                if (global_callback != null && global_callback != "" && global_callback != undefined) {
+                    global_callback(data);
+                }
                 break;
             }
             case "computation": {
                 break;
             }
             case "test": {
-                
-            }
 
-        }
-        
-        if (data.type != "ping") {
-            if (global_callback != null && global_callback != "" && global_callback != undefined) {
-                global_callback(data);
             }
         }
     } catch (err) { throw err };
@@ -489,13 +635,39 @@ function websocketSend(agentData) {
     websock.send(JSON.stringify(agentData));
 }
 
+/**
+ * public method
+ * collaboration end
+ */
 function socketClose() {
     websock.close();
 }
 
 /**
  * public method
- * send message
+ * send custom operation
+ */
+function sendCustomOperation(agentData, callback) {
+    global_callback = callback;
+    if (websock.readyState === websock.OPEN) {
+        // 若是ws开启状态
+        websocketSend(agentData)
+    } else if (websock.readyState === websock.CONNECTING) {
+        // 若是 正在开启状态，则等待1s后重新调用
+        setTimeout(function () {
+            sendSock(agentData, callback);
+        }, 1000);
+    } else {
+        // 若未开启 ，则等待1s后重新调用
+        setTimeout(function () {
+            sendSock(agentData, callback);
+        }, 1000);
+    }
+}
+
+/**
+ * public method
+ * send computation operation
  */
 function sendSock(agentData, callback) {
     global_callback = callback;
@@ -513,6 +685,10 @@ function sendSock(agentData, callback) {
             sendSock(agentData, callback);
         }, 1000);
     }
+}
+
+function sendComputionSock(data, params) {
+    
 }
 
 /**

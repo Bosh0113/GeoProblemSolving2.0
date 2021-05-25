@@ -160,7 +160,7 @@
                   @click="register"
                   class="loginBtn"
                   style="margin-left: 10px"
-                >Sign up
+                >Register
                 </Button
                 >
               </div>

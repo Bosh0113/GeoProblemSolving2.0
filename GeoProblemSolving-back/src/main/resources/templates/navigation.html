@@ -135,7 +135,7 @@
                                 <span style="font-size: 18px; font-weight: bold">Login</span>
                             </menu-item>
                             <menu-item name="register" to="/GeoProblemSolving/register">
-                                <span>Sign up</span>
+                                <span>Register</span>
                             </menu-item>
                         </i-menu>
 
@@ -154,7 +154,7 @@
                                         <avatar :username="userInfoNav.name" :size="40" style="margin-top:10px" :title="userInfoNav.name" v-else></avatar>
                                     </a>
                                     <dropdown-menu slot="list">
-                                        <dropdown-item name="logout">Log out</dropdown-item>
+                                        <dropdown-item name="logout">Logout</dropdown-item>
                                     </dropdown-menu>
                                 </dropdown>
                             </menu-item>
@@ -174,10 +174,10 @@
                             <Cell @click.native="turnToURL('/GeoProblemSolving/help')" class="menuItemCell">Help</Cell>
                             <Divider style="margin: 5px 0"></Divider>
                             <Cell v-show="!userInfoNav.userState" @click.native="turnToURL('/GeoProblemSolving/login')" class="menuItemCell">Login</Cell>
-                            <Cell v-show="!userInfoNav.userState" @click.native="turnToURL('/GeoProblemSolving/register')" class="menuItemCell">Sign up</Cell>
+                            <Cell v-show="!userInfoNav.userState" @click.native="turnToURL('/GeoProblemSolving/register')" class="menuItemCell">Register</Cell>
                             <Cell  v-show="userInfoNav.userState" @click.native="turnToURL('/GeoProblemSolving/newPersonalPage/notification')" class="menuItemCell">Notification</Cell>
                             <Cell  v-show="userInfoNav.userState" @click.native="toPersonalPage" class="menuItemCell">Personal Page</Cell>
-                            <Cell  v-show="userInfoNav.userState" @click.native="logout" class="menuItemCell">Log out</Cell>
+                            <Cell  v-show="userInfoNav.userState" @click.native="logout" class="menuItemCell">Logout</Cell>
                           </Cell-group>
                         </Dropdown-menu>
                     </Dropdown>

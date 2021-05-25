@@ -757,7 +757,9 @@
               this.checkAll = false;
             }
           })
-          .catch()
+          .catch(err => {
+            throw err;
+          })
       },
       initSize() {
         this.contentHeight = window.innerHeight - 230;
@@ -786,7 +788,7 @@
             this.currentFolder.files.push(rootRes[i]);
           }
         }
-        console.log(this.currentFolder.files)
+        // console.log(this.currentFolder.files)
       },
       enterFolder(currentFolder) {
         this.chooseFilesArray = [];
@@ -842,19 +844,6 @@
           .catch(err => {
             this.$Message.warning("Get folder info fail.");
           })
-      },
-      //工具方法，将 pathUid 转换为字符串
-      reversePathToStr: function (pathIdArray) {
-        let pathStrTemp = "";
-        for (let i = 0; i < pathIdArray.length; i++) {
-          if (i != pathIdArray.length - 1) {
-            pathStrTemp += pathIdArray[i] + ",";
-          } else {
-            pathStrTemp += pathIdArray[i];
-          }
-        }
-        this.pathStr = pathStrTemp;
-        console.log("reversePathToStr: " + this.pathStr)
       },
       getFileInfo(file) {
         this.selectedFileData = [

@@ -35,19 +35,19 @@
           @click="dataUploadModalShow"
           title="Upload resources"
         ></Button>
+        <Label style="margin-left: 20px">Select:</Label>
+        <Select
+          v-model="resouceModel"
+          size="small"
+          @on-change="changeResModel"
+          style="width: 150px; margin: 5px"
+        >
+          <Option value="resources">All resources</Option>
+          <Option value="data">Data</Option>
+          <Option value="materials">Other resources</Option>
+          <!-- <Option value="toolData">Results</Option> -->
+        </Select>
       </div>
-      <Label>Select:</Label>
-      <Select
-        v-model="resouceModel"
-        size="small"
-        @on-change="changeResModel"
-        style="width: 150px; margin: 5px 10px"
-      >
-        <Option value="resources">All resources</Option>
-        <Option value="data">Data</Option>
-        <Option value="materials">Other resources</Option>
-        <!-- <Option value="toolData">Results</Option> -->
-      </Select>
       <div style="display: flex; justify-content: space-between">
         <div style="width: 100%" v-if="dataListStyle">
           <Table
@@ -179,7 +179,7 @@
                     <img :src="item.thumbnail" height="42px" width="42px" />
                   </template>
                 </div>
-                <div style="float: left;">
+                <div style="float: left">
                   <div>
                     <div class="toolDataText" :title="item.name">
                       {{ item.name }}
@@ -205,7 +205,11 @@
                         size="small"
                         title="Download"
                         type="md-download"
-                        style="margin: 10px 5px 0 0; cursor:pointer; color: #515a6e"
+                        style="
+                          margin: 10px 5px 0 0;
+                          cursor: pointer;
+                          color: #515a6e;
+                        "
                       ></Icon>
                     </a>
                     <Icon
@@ -225,7 +229,7 @@
                       size="small"
                       title="Delete"
                       type="md-close"
-                      style="margin-top: 10px;cursor: pointer"
+                      style="margin-top: 10px; cursor: pointer"
                       @click="deleteResourceModalShow(item.resourceId)"
                     ></Icon>
                   </div>
@@ -448,11 +452,12 @@ export default {
       fileCountTimer: null,
       progressModalShow: false,
       uploadProgress: 0,
+      folderIdStack: [], //
       fileList: [], //showed resources
-      stepResList: [], //resources in the step
-      stepDataList: [], //data in the step
-      relatedResList: [], //related materials in the step
-      toolDataList: [], //data from tools in the step
+      activityResList: [], //resources in the activity
+      activityDataList: [], //data in the activity
+      relatedResList: [], //related materials in the activity
+      // toolDataList: [], //data from tools in the activity
       dataListStyle: false, // 数据列表展示样式
       // 资源avatar 图片路径
       dataUrl: require("@/assets/images/data.png"),
@@ -510,8 +515,6 @@ export default {
   mounted() {
     this.getResList();
 
-    $(".__view").css("width", "inherit");
-
     Date.prototype.Format = function (fmt) {
       var o = {
         "M+": this.getMonth() + 1, //月份
@@ -541,7 +544,10 @@ export default {
   methods: {
     roleIdentity(activity) {
       this.userInfo = this.$store.getters.userInfo;
-      return this.userRoleApi.roleIdentify(activity.members, this.userInfo.userId);
+      return this.userRoleApi.roleIdentify(
+        activity.members,
+        this.userInfo.userId
+      );
     },
     permissionIdentity(permission, role, operation) {
       if (permission == undefined)
@@ -561,38 +567,39 @@ export default {
       }
     },
     getResList() {
-      var list = [];
       if (this.activityInfo.aid != "" && this.activityInfo.aid != undefined) {
-        $.ajax({
-          url:
-            "/GeoProblemSolving/folder/inquiry" +
-            "?folderId=" +
-            this.activityInfo.aid,
-          type: "GET",
-          async: false,
-          success: (data) => {
-            if (data !== "None") {
-              list = data.files;
-            } else {
-              list = [];
+        this.axios
+          .get("/GeoProblemSolving/rip/" + this.activityInfo.aid + "/0")
+          .then((res) => {
+            if (res.data == "Offline") {
+              confirm("You are offline, please login again.");
+            } else if (res.data.code == 0) {
+              let list = res.data.data;
+              this.$set(this, "activityResList", list);
+              this.$set(this, "fileList", list);
+              //filte
+              this.filterData();
+              this.filterRelatedRes();
+              // this.filterToolData();
             }
-            this.$set(this, "stepResList", list);
-            this.$set(this, "fileList", list);
-            //filte
-            this.filterData();
-            // this.filterToolData();
-            this.filterRelatedRes();
-          },
-        });
+          })
+          .catch((err) => {
+            throw err;
+          });
       }
     },
     filterData() {
       var filterdata = this.fileList.filter((item) => {
         return item.type === "data";
       });
-      this.$set(this, "stepDataList", filterdata);
+      this.$set(this, "activityDataList", filterdata);
     },
-
+    filterRelatedRes() {
+      var filterdata = this.fileList.filter((item) => {
+        return item.type !== "data";
+      });
+      this.$set(this, "relatedResList", filterdata);
+    },
     // filterToolData() {
     //   var filterdata = this.fileList.filter((item) => {
     //     if (item.type.indexOf("toolData") != -1) {
@@ -601,18 +608,13 @@ export default {
     //   });
     //   this.$set(this, "toolDataList", filterdata);
     // },
-    filterRelatedRes() {
-      var filterdata = this.fileList.filter((item) => {
-        return item.type !== "data";
-      });
-      this.$set(this, "relatedResList", filterdata);
-    },
+
     changeResModel(value) {
       if (value == "resources") {
-        this.fileList = this.stepResList;
+        this.fileList = this.activityResList;
         this.showType = value;
       } else if (value == "data") {
-        this.fileList = this.stepDataList;
+        this.fileList = this.activityDataList;
         this.showType = value;
       } else if (value == "materials") {
         this.fileList = this.relatedResList;
@@ -665,12 +667,15 @@ export default {
             for (var i = 0; i < uploadFiles.length; i++) {
               formData.append("file", uploadFiles[i]);
             }
+            let temp = this.folderIdStack;
+            if (temp.length == 0) {
+              temp = ["0"];
+            }
             formData.append("description", this.uploadDataInfo.description);
             formData.append("type", this.uploadDataInfo.type);
-            formData.append("uploaderId", this.userInfo.userId);
             formData.append("privacy", this.uploadDataInfo.privacy);
-            formData.append("folderId", this.activityInfo.aid);
-
+            formData.append("aid", this.activityInfo.aid);
+            formData.append("paths", temp.toString());
             this.progressModalShow = true;
 
             if (
@@ -678,7 +683,7 @@ export default {
               this.activityInfo.aid != undefined
             ) {
               this.axios({
-                url: "/GeoProblemSolving/folder/uploadToFolder",
+                url: "/GeoProblemSolving/rip/file/upload",
                 method: "post",
                 onUploadProgress: (progressEvent) => {
                   this.uploadProgress =
@@ -691,6 +696,7 @@ export default {
                     var uploadedList = res.data.uploaded;
                     var failedList = res.data.failed;
                     var sizeOverList = res.data.sizeOver;
+
                     for (var i = 0; i < uploadedList.length; i++) {
                       this.fileList.push(uploadedList[i]);
 
@@ -698,9 +704,9 @@ export default {
                         this.showType == "data" ||
                         this.showType == "materials"
                       ) {
-                        this.stepResList.push(uploadedList[i]);
+                        this.activityResList.push(uploadedList[i]);
                       } else if (this.uploadDataInfo.type == "data") {
-                        this.stepDataList.push(uploadedList[i]);
+                        this.activityDataList.push(uploadedList[i]);
                       } else {
                         this.relatedResList.push(uploadedList[i]);
                       }
@@ -770,22 +776,21 @@ export default {
     },
     deleteResource() {
       if (this.deleteResourceId != "") {
+        let temp = this.folderIdStack;
+        if (temp.length == 0) {
+          //重新开辟内存空间的temp,如果直接使用push的话，地址还是指向原数据的地址
+          temp = ["0"];
+        }
+        let formData = new FormData();
+        formData.append("uids", this.deleteResourceId);
+        formData.append("aid", this.activityInfo.aid);
+        formData.append("paths", temp.toString());
         this.axios
-          .get(
-            "/GeoProblemSolving/folder/removeFile?" +
-              "fileId=" +
-              this.deleteResourceId +
-              "&folderId=" +
-              this.activityInfo.aid
-          )
+          .post("/GeoProblemSolving/rip/del", formData)
           .then((res) => {
-            if (res.data == "Fail") {
-              this.$Notice.error({
-                title: "Process result",
-                desc: "Delete fail",
-              });
-              // this.$Message.info("Failure");
-            } else {
+            if (res.data == "Offline") {
+              confirm("You are offline, please login again.");
+            } else if (res.data.code == 0) {
               this.$Notice.success({
                 title: "Process result",
                 desc: "Delete successfully",
@@ -816,17 +821,19 @@ export default {
               }
               // 同步删除其他数组内的资源
               if (this.showType == "data" || this.showType == "materials") {
-                for (var i = 0; i < this.stepResList.length; i++) {
-                  if (this.stepResList[i].resourceId == this.deleteResourceId) {
-                    this.stepResList.splice(i, 1);
+                for (var i = 0; i < this.activityResList.length; i++) {
+                  if (
+                    this.activityResList[i].resourceId == this.deleteResourceId
+                  ) {
+                    this.activityResList.splice(i, 1);
                   }
                 }
               } else if (deleteResType == "data") {
-                for (var i = 0; i < this.stepDataList.length; i++) {
+                for (var i = 0; i < this.activityDataList.length; i++) {
                   if (
-                    this.stepDataList[i].resourceId == this.deleteResourceId
+                    this.activityDataList[i].resourceId == this.deleteResourceId
                   ) {
-                    this.stepDataList.splice(i, 1);
+                    this.activityDataList.splice(i, 1);
                   }
                 }
               } else {
@@ -855,7 +862,7 @@ export default {
     //   let form = {};
     //   form["description"] = JSON.stringify(record);
     //   form["scopeId"] = scopeId;
-    //   form["eventType"] = "step";
+    //   form["eventType"] = "activity";
     //   form["userId"] = this.$store.getters.userId;
     //   this.axios
     //     .post("/GeoProblemSolving/history/save", form)
@@ -897,7 +904,7 @@ export default {
               "<iframe src=" +
               url +
               ' style="width: 100%;height:100%" frameborder="0"></iframe>';
-            var demoPanelTimer = null;
+            // var demoPanelTimer = null;
             this.panel = jsPanel.create({
               headerControls: {
                 smallify: "remove",
@@ -934,7 +941,7 @@ export default {
           "<video src=" +
           url +
           ' style="width: 100%;height:100%" controls></video>';
-        var demoPanelTimer = null;
+        // var demoPanelTimer = null;
         this.panel = jsPanel.create({
           headerControls: {
             smallify: "remove",
@@ -966,7 +973,7 @@ export default {
           "<iframe src=" +
           url +
           ' style="width: 100%;height:100%" frameborder="0" controls></iframe>';
-        var demoPanelTimer = null;
+        // var demoPanelTimer = null;
         this.panel = jsPanel.create({
           headerControls: {
             smallify: "remove",
@@ -1030,33 +1037,31 @@ export default {
       for (var i = 0; i < this.preActivities.length; i++) {
         let activityId = this.preActivities[i].aid;
         let activityName = this.preActivities[i].name;
-        let getResUrl =
-          "/GeoProblemSolving/folder/inquiry" + "?folderId=" + activityId;
-        $.ajax({
-          url: getResUrl,
-          type: "GET",
-          async: false,
-          success: function (data) {
-            if (data !== "Fail") {
-              selectedRes = data.files;
+
+        this.axios
+          .get("/GeoProblemSolving/rip/" + activityId + "/0")
+          .then((res) => {
+            if (res.data == "Offline") {
+              confirm("You are offline, please login again.");
+            } else if (res.data.code == 0) {
+              selectedRes = res.data.data;
               for (var j = 0; j < selectedRes.length; j++) {
                 mockData.push({
                   key: mockData.length.toString(),
                   name: selectedRes[j].name,
                   type: selectedRes[j].type,
-                  resourceId: selectedRes[j].resourceId,
+                  resourceId: selectedRes[j].uid,
                   source: activityName,
                 });
               }
             } else {
               selectedRes = [];
             }
-          },
-          error: function (err) {
+          })
+          .catch((err) => {
             selectedRes = [];
-            console.log("err!");
-          },
-        });
+            throw err;
+          });
       }
       return mockData;
     },
@@ -1091,30 +1096,37 @@ export default {
       for (var i = 0; i < selectResource.length; i++) {
         addFileList.push(selectResource[i].resourceId);
       }
-      let addFileListStr = addFileList.toString();
 
+      let tempPath = this.folderIdStack;
+      if (tempPath.length == 0) {
+        tempPath = ["0"];
+      }
       this.axios
         .get(
-          "/GeoProblemSolving/folder/shareToFolder" +
-            "?addFileList=" +
-            addFileListStr +
-            "&folderId=" +
-            this.activityInfo.aid
+          "/GeoProblemSolving/rip/shareToProject/" +
+            this.activityInfo.aid +
+            "/" +
+            addFileList.toString() +
+            "/" +
+            tempPath.toString()
         )
         .then((res) => {
+          this.shareModal = false;
           if (res.data == "Offline") {
             this.$store.commit("userLogout");
             this.$router.push({ name: "Login" });
-          } else if (res.data == "Fail") {
+          } else if (res.data.code == 0) {
+            this.getResList();
+          } else {
             this.$Message.error(
               "Failed to get resources from previous activities."
             );
-          } else {
-            this.getResList();
           }
         })
         .catch((err) => {
-          // console.log(err.data);
+          this.$Message.error(
+            "Failed to get resources from previous activities."
+          );
         });
     },
     dataVisualize() {},
@@ -1175,7 +1187,6 @@ export default {
 }
 #toolData {
   width: 100%;
-  border: 1px solid #dcdee2;
 }
 #toolDataHeader {
   font-size: 12px;

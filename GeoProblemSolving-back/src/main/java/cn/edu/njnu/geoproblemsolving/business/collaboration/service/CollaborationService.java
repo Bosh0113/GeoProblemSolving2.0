@@ -295,10 +295,6 @@ public class CollaborationService {
                     break;
                 }
                 case "computation":{
-                    // 调用模型容器或者数据容器执行计算任务（当计算完成时，需要向前端返回计算结果）
-                    //...
-                    //...
-
                     // 添加计算任务至缓存
                     ComputeMsg computeMsg = new ComputeMsg();
                     ArrayList<ComputeMsg> computeRecords = computeTasks.getCache(groupKey);
@@ -311,6 +307,11 @@ public class CollaborationService {
                     computeMsg.setTime(dateFormat.format(new Date()));
                     computeRecords.add(computeMsg);
                     computeTasks.putCache(groupKey, computeRecords);
+
+                    // 调用模型容器或者数据容器执行计算任务（当计算完成时，需要向前端返回计算结果）
+                    //...
+                    //...
+
                 }
             }
         } catch (Exception ex){

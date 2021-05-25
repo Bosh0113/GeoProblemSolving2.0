@@ -38,10 +38,7 @@
     <div id="collab-tool-head"></div>
     <div id="collab-tool-sidebar"></div>
     <div id="collab-tool-content">
-      <div
-        id="map"
-        class="map"
-      >
+      <div id="map" class="map">
         <Modal
           v-model="modalExport"
           title="Export GeoJSON to resource center"
@@ -125,7 +122,6 @@ import exIcon from "@static/Images/export.png";
 import L from "leaflet";
 import shp from "shpjs";
 import "leaflet/dist/leaflet.css";
-import toolStyle from "./toolStyle";
 // this part resolve an issue where the markers would not appear
 delete L.Icon.Default.prototype._getIconUrl;
 //请求带上cookie以防session丢失
@@ -135,9 +131,13 @@ L.Icon.Default.mergeOptions({
   shadowUrl: require("leaflet/dist/images/marker-shadow.png"),
 });
 export default {
-  components: { toolStyle },
   data() {
     return {
+      // basic info
+      activityInfo: {},
+      userInfo: {},
+      resources: [],
+      //
       windowHeight: window.innerHeight,
       windowWidth: window.innerWidth - 60,
       modalExport: false,
@@ -154,10 +154,7 @@ export default {
       drawingLayerGroup: null,
       participants: [],
       olParticipants: [],
-      resources: [],
       dataUrl: "",
-      pageParams: { pageId: "", userId: "", userName: "" },
-      userInfo: {},
       formValidate: {
         fileName: "",
         fileDescription: "",
@@ -173,25 +170,17 @@ export default {
     };
   },
   mounted() {
-    window.addEventListener("resize", this.initSize);
-    // window.addEventListener("message", this.getStepInfo, false);
-
     // 加载协同组件
     loadCollabComponent();
+    this.getStepInfo();
 
-    this.initSize();
-    // this.getStepInfo();
-    this.getUserInfo();
-    this.getResources();
-    // this.startWebSocket();
     this.initMap();
     this.initLayer();
     this.initControl();
     this.listenDraw();
   },
   beforeDestroy() {
-    window.removeEventListener("resize", this.initSize);
-    this.socketApi.close();
+    socketClose();
   },
   beforeRouteEnter: (to, from, next) => {
     next((vm) => {
@@ -201,59 +190,16 @@ export default {
     });
   },
   methods: {
-    initSize() {
-      $("#app").css("min-width", "0");
-      $("#app").css("min-height", "0");
-    },
-    // getStepInfo(event) {
-    //   console.log(event.data);
-    // },
     getStepInfo() {
-      if (
-        this.$route.params.groupID == undefined ||
-        this.$route.params.groupID == ""
-      ) {
-        var href = window.location.href;
-        var url = href.split("&");
-
-        for (var i = 0; i < url.length; i++) {
-          if (/groupID/.test(url[i])) {
-            this.pageParams.pageId = url[i].match(/groupID=(\S*)/)[1];
-            continue;
-          }
-
-          if (/userID/.test(url[i])) {
-            this.pageParams.userId = url[i].match(/userID=(\S*)/)[1];
-            continue;
-          }
-
-          if (/userName/.test(url[i])) {
-            this.pageParams.userName = url[i].match(/userName=(\S*)/)[1];
-            continue;
-          }
-        }
+      if (componentStatus) {
+        this.activityInfo = activityInfo;
+        this.userInfo = userInfo;
+        this.resources = resources;
       } else {
-        this.pageParams.pageId = this.$route.params.groupID;
-        this.pageParams.userId = this.$route.params.userID;
-        this.pageParams.userName = this.$route.params.userName;
-      }
-    },
-    getUserInfo() {
-      this.userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
-      if (this.userInfo == {}) {
-        this.axios
-          .get(
-            "/GeoProblemSolving/user" +
-              "?key=userId" +
-              "&value=" +
-              this.pageParams.userId
-          )
-          .then((res) => {
-            if (res.data.code == 0) {
-              this.$set(this, "userInfo", res.data.data);
-            }
-          })
-          .catch((err) => {});
+        let _this = this;
+        setTimeout(function () {
+          _this.getStepInfo();
+        }, 1000);
       }
     },
     initMap() {
@@ -444,10 +390,6 @@ export default {
       });
     },
     save2Resource(name) {
-      if (this.pageParams.pageId == undefined || this.pageParams.pageId == "") {
-        this.$Message.error("Lose the information of current step.");
-        return false;
-      }
 
       this.$refs[name].validate((valid) => {
         if (valid) {
@@ -475,7 +417,7 @@ export default {
             formData.append("type", "data");
             formData.append("uploaderId", this.userInfo.userId);
             formData.append("privacy", "private");
-            formData.append("folderId", this.pageParams.pageId);
+            formData.append("folderId", this.activityInfo.aid);
             this.axios
               .post("/GeoProblemSolving/folder/uploadToFolder", formData)
               .then((res) => {
@@ -511,10 +453,7 @@ export default {
                     description: "map tool data",
                     pathURL: "/GeoProblemSolving/resource/upload/" + dataName,
                   };
-                  this.socketApi.sendSock(
-                    this.send_content,
-                    this.getSocketConnect
-                  );
+                  sendCustomOperation(this.send_content, this.getSocketConnect);
 
                   // 初始化formValidation
                   this.formValidate = {
@@ -533,11 +472,6 @@ export default {
       });
     },
     handleUpload(file) {
-      if (this.pageParams.pageId == undefined || this.pageParams.pageId == "") {
-        this.$Message.error("Lose the information of current step.");
-        return false;
-      }
-
       if (!/\.(json|zip)$/.test(file.name.toLowerCase())) {
         this.$Message.error("Worry format");
         return false;
@@ -550,7 +484,7 @@ export default {
       formData.append("type", "data");
       formData.append("uploaderId", this.userInfo.userId);
       formData.append("privacy", "private");
-      formData.append("folderId", this.pageParams.pageId);
+      formData.append("folderId", this.activityInfo.aid);
       this.axios
         .post("/GeoProblemSolving/folder/uploadToFolder", formData)
         .then((res) => {
@@ -581,7 +515,7 @@ export default {
               description: "map tool data",
               pathURL: "/GeoProblemSolving/resource/upload/" + dataName,
             };
-            this.socketApi.sendSock(this.send_content, this.getSocketConnect);
+            sendCustomOperation(this.send_content, this.getSocketConnect);
           }
         })
         .catch((err) => {
@@ -647,7 +581,7 @@ export default {
             type: "edit",
             layer: _this.drawingLayerGroup.toGeoJSON(),
           };
-          _this.socketApi.sendSock(_this.send_content, _this.getSocketConnect);
+          sendCustomOperation(_this.send_content, _this.getSocketConnect);
         });
       });
     },
@@ -687,7 +621,7 @@ export default {
             type: "overlay",
             layer: e.name,
           };
-          this.socketApi.sendSock(this.send_content, this.getSocketConnect);
+          sendCustomOperation(this.send_content, this.getSocketConnect);
         }
         isLayerCtrlClick = false;
       });
@@ -699,7 +633,7 @@ export default {
             type: "zoom",
             zoom: this.map.getZoom(),
           };
-          this.socketApi.sendSock(this.send_content, this.getSocketConnect);
+          sendCustomOperation(this.send_content, this.getSocketConnect);
           isZoomControl = false;
           isDoubleClick = false;
         }
@@ -712,7 +646,7 @@ export default {
             type: "move",
             center: this.map.getCenter(),
           };
-          this.socketApi.sendSock(this.send_content, this.getSocketConnect);
+          sendCustomOperation(this.send_content, this.getSocketConnect);
         }
         isMouseDown = false;
       });
@@ -725,7 +659,7 @@ export default {
         //     type:"cut",
         //     layer: this.drawingLayerGroup.toGeoJSON()
         //   }
-        // this.socketApi.sendSock(this.send_content, this.getSocketConnect);
+        // sendCustomOperation(this.send_content, this.getSocketConnect);
       });
 
       // 删除事件
@@ -736,7 +670,7 @@ export default {
           type: "remove",
           layer: _this.drawingLayerGroup.toGeoJSON(),
         };
-        this.socketApi.sendSock(this.send_content, this.getSocketConnect);
+        sendCustomOperation(this.send_content, this.getSocketConnect);
       });
 
       this.map.on("pm:globaleditmodetoggled", (e) => {
@@ -772,7 +706,7 @@ export default {
             layer: e.layer.toGeoJSON(),
           };
         }
-        this.socketApi.sendSock(this.send_content, this.getSocketConnect);
+        sendCustomOperation(this.send_content, this.getSocketConnect);
       });
     },
     getSocketConnect(data) {
@@ -975,55 +909,6 @@ export default {
         }
       }
     },
-    startWebSocket() {
-      if (this.pageParams.pageId == undefined || this.pageParams.pageId == "") {
-        this.$Message.error("Lose the information of current step.");
-        return false;
-      }
-
-      let roomId = this.pageParams.pageId;
-      this.socketApi.initWebSocket(
-        "MapServer/" + roomId,
-        this.$store.state.IP_Port
-      );
-
-      this.send_content = {
-        type: "test",
-        from: "Test",
-        content: "TestChat",
-      };
-      this.socketApi.sendSock(this.send_content, this.getSocketConnect);
-    },
-    getResources() {
-      if (this.pageParams.pageId == undefined || this.pageParams.pageId == "") {
-        this.$Message.error("Lose the information of current step.");
-        return false;
-      }
-
-      this.resources = [];
-      this.axios
-        .get(
-          "/GeoProblemSolving/folder/inquiry?folderId=" + this.pageParams.pageId
-        )
-        .then((res) => {
-          // 写渲染函数，取到所有资源
-          if (res.data !== "None") {
-            for (let i = 0; i < res.data.files.length; i++) {
-              if (
-                res.data.files[i].type == "data" &&
-                /\.(json|zip)$/.test(res.data.files[i].name.toLowerCase())
-              ) {
-                this.resources.push(res.data.files[i]);
-              }
-            }
-          } else {
-            this.resources = [];
-          }
-        })
-        .catch((err) => {
-          console.log(err.data);
-        });
-    },
     selecetResource(url) {
       this.dataUrl = url;
 
@@ -1032,7 +917,7 @@ export default {
         type: "selectdata",
         pathURL: this.dataUrl,
       };
-      this.socketApi.sendSock(this.send_content, this.getSocketConnect);
+      sendCustomOperation(this.send_content, this.getSocketConnect);
 
       this.viewData();
     },
