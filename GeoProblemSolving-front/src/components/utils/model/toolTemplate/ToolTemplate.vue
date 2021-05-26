@@ -9,7 +9,6 @@
   right: 120px;
 }
 </style>
-</style>
 <template>
   <div>
     <Row>
@@ -21,7 +20,7 @@
           </div>
         </Row>
       </Col>
-     
+
     </Row>
   </div>
 </template>
@@ -92,6 +91,7 @@ export default {
 
     //uploadToolInfo
     async finish() {
+
       let data = await this.axios.post(
         `/GeoProblemSolving/tool/create`,
         this.toolInfo

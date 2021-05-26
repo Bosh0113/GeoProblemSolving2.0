@@ -334,7 +334,7 @@ export default {
 
       console.log(data);
       if (data.code == -1) {
-        console.log("off line");
+        console.log("offline");
         return;
       }
 
