@@ -2,9 +2,8 @@ package cn.edu.njnu.geoproblemsolving.business.collaboration.utils;
 
 import cn.edu.njnu.geoproblemsolving.business.collaboration.entity.ChatMsg;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.entity.MsgRecords;
-import cn.edu.njnu.geoproblemsolving.business.collaboration.repository.MsgRecordsRepository;
+import cn.edu.njnu.geoproblemsolving.business.collaboration.repository.ChatMsgRepository;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.service.MsgRecordsService;
-import cn.edu.njnu.geoproblemsolving.business.collaboration.utils.CollaborationConfig;
 import cn.edu.njnu.geoproblemsolving.business.user.dao.IUserDao;
 import cn.edu.njnu.geoproblemsolving.business.user.dto.InquiryUserDto;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.entity.CollaborationUser;
@@ -14,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.websocket.Session;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 
@@ -27,7 +25,12 @@ public class CollaborationBehavior {
     @Autowired
     MsgRecordsService msgRecordsService;
 
-    /**common**/
+    @Autowired
+    ChatMsgRepository chatMsgRepository;
+
+    /**
+     * common
+     **/
     public CollaborationUser getMemberInfo(String userId, Session session) {
 
         JsonResult userInfo = iUserDao.getUserInfo("userId", userId);
@@ -36,7 +39,7 @@ public class CollaborationBehavior {
         collaborationUser.setUserId(userId);
         collaborationUser.setName(((InquiryUserDto) userInfo.getData()).getName());
         collaborationUser.setEmail(((InquiryUserDto) userInfo.getData()).getEmail());
-        collaborationUser.setEmail(((InquiryUserDto) userInfo.getData()).getAvatar());
+        collaborationUser.setAvatar(((InquiryUserDto) userInfo.getData()).getAvatar());
         collaborationUser.setSession(session);
 
         return collaborationUser;
@@ -47,7 +50,7 @@ public class CollaborationBehavior {
             JSONObject messageObject = new JSONObject();
             messageObject.put("type", "collaboration-init");
             messageObject.put("mode", config.getMode().toString());
-            messageObject.put("operator", config.getOperator());
+            messageObject.put("operator", getMemberInfo(config.getOperator(), null));
             messageObject.put("waiting", config.getApplyQueue().size());
             session.getBasicRemote().sendText(messageObject.toString());
         } catch (Exception e) {
@@ -58,17 +61,22 @@ public class CollaborationBehavior {
 
     public void sendParticipantsInfo(HashMap<String, CollaborationUser> participants, CollaborationUser user, String behavior) {
         try {
-            if(user == null) return;
+            if (user == null) return;
 
             JSONObject messageObject = new JSONObject();
             messageObject.put("type", "members");
-            messageObject.put("participants", participants);
+
+            ArrayList members = new ArrayList();
+            for (Map.Entry<String, CollaborationUser> participant : participants.entrySet()) {
+                members.add(participant.getValue().getUserInfo());
+            }
+            messageObject.put("participants", members);
 
             for (Map.Entry<String, CollaborationUser> participant : participants.entrySet()) {
                 CollaborationUser receiver = participant.getValue();
                 if (!receiver.getUserId().equals(user.getUserId())) {
                     messageObject.put("behavior", behavior);
-                    messageObject.put("activeUser", user);
+                    messageObject.put("activeUser", user.getUserInfo());
                 }
                 receiver.getSession().getBasicRemote().sendText(messageObject.toString());
             }
@@ -78,7 +86,9 @@ public class CollaborationBehavior {
     }
 
 
-    /**Message**/
+    /**
+     * Message
+     **/
     public void sendMessageCache(ArrayList<ChatMsg> msgRecords, Session session) {
         try {
             JSONObject messageObject = new JSONObject();
@@ -94,7 +104,7 @@ public class CollaborationBehavior {
         try {
             JSONObject messageObject = new JSONObject();
             messageObject.put("type", type);
-            messageObject.put("sender", sender);
+            messageObject.put("sender", sender.getUserInfo());
             messageObject.put("content", message);
             messageObject.put("time", time);
 
@@ -120,15 +130,74 @@ public class CollaborationBehavior {
         }
     }
 
-    // 将聊天记录按时段存储
-    public void msgCacheStore(String aid, ArrayList<ChatMsg> records) {
-        if(records != null &&records.size() > 0) {
-            msgRecordsService.msgRecordsCreate(aid, records);
+    public void transferConceptMessage(HashMap<String, CollaborationUser> participants, CollaborationUser sender, List<String> receivers, String message, String time) {
+        try {
+            JSONObject messageObject = (JSONObject) JSONObject.parse(message);
+            messageObject.put("sender", sender.getUserInfo());
+            messageObject.put("time", time);
+
+            if (receivers.size() == 0) {
+                // send message
+                for (Map.Entry<String, CollaborationUser> user : participants.entrySet()) {
+                    user.getValue().getSession().getBasicRemote().sendText(messageObject.toString());
+                }
+            } else {
+                // send message
+                for (String receiver : receivers) {
+                    for (Map.Entry<String, CollaborationUser> user : participants.entrySet()) {
+                        if (user.getValue().getUserId().equals(receiver)) {
+                            user.getValue().getSession().getBasicRemote().sendText(messageObject.toString());
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
+    public void sendStoredMsgRecords(HashMap<String, CollaborationUser> participants, MsgRecords msgRecords) {
+        try {
 
-    /**operation**/
+            JSONObject messageObject = new JSONObject();
+            messageObject.put("type", "message-store");
+            messageObject.put("content", msgRecords);
+
+            for (Map.Entry<String, CollaborationUser> participant : participants.entrySet()) {
+                CollaborationUser receiver = participant.getValue();
+                receiver.getSession().getBasicRemote().sendText(messageObject.toString());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // 将聊天记录按时段存储
+    public MsgRecords msgCacheStore(String aid, ArrayList<ChatMsg> records) {
+        // save each message
+        ArrayList<String> msgList = new ArrayList<>();
+        ArrayList<String> memberIds= new ArrayList<>();
+        ArrayList<JSONObject> participants = new ArrayList<>();
+
+        for (ChatMsg message : records) {
+            msgList.add(message.getMessageId());
+
+            if (!memberIds.contains(message.getSender().getUserId())) {
+                memberIds.add(message.getSender().getUserId());
+                participants.add(message.getSender().getUserInfo());
+            }
+
+            chatMsgRepository.save(message);
+        }
+        // save message records
+        MsgRecords msgRecords =  (MsgRecords) msgRecordsService.msgRecordsCreate(aid, msgList, participants).getData();
+        return msgRecords;
+    }
+
+
+    /**
+     * operation
+     **/
     public void transferOperation(HashMap<String, CollaborationUser> participants, String sender, List<String> receivers, String behavior, String object) {
         try {
             JSONObject messageObject = new JSONObject();
@@ -198,29 +267,29 @@ public class CollaborationBehavior {
 
     /**
      * 发送控制信息
-     *
-     * @param participants
+     * @param config
      * @param queue
      * @param user
-     * @param behavior
+     * @param type
      */
-    public void sendControlInfo(HashMap<String, CollaborationUser> participants, List<String> queue, String user, String behavior) {
+    public void sendControlInfo(CollaborationConfig config, List<String> queue, String sender, String type) {
         try {
+            HashMap<String, CollaborationUser> participants = config.getParticipants();
             JSONObject messageObject = new JSONObject();
-            messageObject.put("type", "message");
-            messageObject.put("behavior", behavior);
+            messageObject.put("type", type);
 
-            if (behavior.equals("apply")) {
-                messageObject.put("sender", user);
+            if (type.equals("control-apply")) {
+                messageObject.put("sender", sender);
                 messageObject.put("waiting", queue.size());
+                messageObject.put("operator", config.getOperator());
                 // send message
-                for (Map.Entry<String,CollaborationUser> participant : participants.entrySet()) {
+                for (Map.Entry<String, CollaborationUser> participant : participants.entrySet()) {
                     participant.getValue().getSession().getBasicRemote().sendText(messageObject.toString());
                 }
-            } else if (behavior.equals("stop")) {
-                messageObject.put("operator", user);
+            } else if (type.equals("control-stop")) {
+                messageObject.put("operator", config.getOperator());
                 // send message
-                for (Map.Entry<String,CollaborationUser> participant : participants.entrySet()) {
+                for (Map.Entry<String, CollaborationUser> participant : participants.entrySet()) {
                     for (int i = 0; i < queue.size(); i++) {
                         if (queue.get(i).equals(participant.getValue().getUserId())) {
                             messageObject.put("waiting", i);

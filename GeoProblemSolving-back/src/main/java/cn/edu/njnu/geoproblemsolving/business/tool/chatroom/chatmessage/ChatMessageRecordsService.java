@@ -1,10 +1,7 @@
 package cn.edu.njnu.geoproblemsolving.business.tool.chatroom.chatmessage;
 
-
-
-import cn.edu.njnu.geoproblemsolving.business.tool.chatroom.chatmessage.dto.AddChatMessageRecordsDTO;
-import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
-import cn.edu.njnu.geoproblemsolving.common.utils.ResultUtils;
+import cn.edu.njnu.geoproblemsolving.business.collaboration.entity.ChatMsg;
+import cn.edu.njnu.geoproblemsolving.business.collaboration.repository.ChatMsgRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -23,56 +20,43 @@ import java.util.List;
 @Service
 public class ChatMessageRecordsService {
     @Autowired
-    ChatMessageRecordsRepository chatMessageRecordsRepository;
+    ChatMsgRepository chatMsgRepository;
 
-    public List<ChatMessageRecords> inquiryTypeAndRoomId(String type, String roomId) {
-        return chatMessageRecordsRepository.findAllByTypeAndRoomId(type, roomId);
-    }
+//    public List<MsgRecords> inquiryTypeAndRoomId(String type, String roomId) {
+//        return chatMessageRecordsRepository.findAllByTypeAndAid(type, roomId);
+//    }
 
-    public List<ChatMessageRecords> queryAllByRoomIdAndPage(int page, int size, String roomId) throws Exception {
-        Sort sort = Sort.by(Sort.Direction.DESC,"createTime");
-        PageRequest pageRequest =PageRequest.of(page - 1, size,sort);
-//        PageRequest pageRequest1 = new PageRequest();
+    public List<ChatMsg> queryAllByRoomIdAndPage(int page, int size, String roomId) throws Exception {
+        Sort sort = Sort.by(Sort.Direction.DESC,"time");
+        PageRequest pageRequest =PageRequest.of(page - 1, size, sort);
 
-        return chatMessageRecordsRepository.findAllByRoomId(roomId,pageRequest);
+        return chatMsgRepository.findAllByAid(roomId, pageRequest);
     }
 
     public long count() {
-        return chatMessageRecordsRepository.count();
+        return chatMsgRepository.count();
     }
 
 
-    public JsonResult insert(AddChatMessageRecordsDTO addChatMessageRecordsDTO) {
-        ChatMessageRecords chatMessageRecords = new ChatMessageRecords();
-        addChatMessageRecordsDTO.convertTo(chatMessageRecords);
-        return ResultUtils.success(chatMessageRecordsRepository.insert(chatMessageRecords));
-    }
-
-//    @SneakyThrows
-//    public JsonResult queryAllByRoomIdAndCreateTimeAndPage(String roomId, int page, int size, String createTime) {
-//        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyt-MM-dd");
-//        Date date = simpleDateFormat.parse(createTime);
-//        Sort sort = Sort.by(Sort.Direction.DESC,"createTime");
-//        PageRequest pageRequest =PageRequest.of(page - 1, size,sort);
-//        return ResultUtils.success(messageRecordsRepository.findAllByRoomIdAndCreateTime(roomId, createTime,pageRequest));
+//    public JsonResult insert(AddChatMessageRecordsDTO addChatMessageRecordsDTO) {
+//        ChatMessageRecords chatMessageRecords = new ChatMessageRecords();
+//        addChatMessageRecordsDTO.convertTo(chatMessageRecords);
+//        return ResultUtils.success(chatMessageRecordsRepository.insert(chatMessageRecords));
 //    }
 
-    public List<ChatMessageRecords> findAllByContentLikeAndRoomId(String roomId, String key, int page, int size) {
-        Sort sort = Sort.by(Sort.Direction.DESC,"createTime");
-        PageRequest pageRequest =PageRequest.of(page - 1, size,sort);
-        return chatMessageRecordsRepository.findByContentContainingAndRoomId(key,roomId);
+    public List<ChatMsg> findAllByContentLikeAndRoomId(String roomId, String key, int page, int size) {
+        return chatMsgRepository.findByContentContainingAndAid(key, roomId);
     }
-    public List<ChatMessageRecords> findAllByTimeLikeAndRoomId(String roomId, String key, int page, int size) throws ParseException {
-        Sort sort = Sort.by(Sort.Direction.DESC,"createTime");
-        PageRequest pageRequest =PageRequest.of(page - 1, size,sort);
+    public List<ChatMsg> findAllByTimeLikeAndRoomId(String roomId, String key, int page, int size) throws ParseException {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//注意月份是MM
         String start =key + " 00:00:00";
         String end =key + " 23:59:59";
         Date dateStart = simpleDateFormat.parse(start);
         Date dateEnd = simpleDateFormat.parse(end);
-        return chatMessageRecordsRepository.findByCreateTimeBetweenAndRoomId(dateStart,dateEnd,roomId);
+        return chatMsgRepository.findByTimeBetweenAndAid(dateStart,dateEnd,roomId);
     }
-    public List<ChatMessageRecords> findAllByTypeAndRoomId(String roomId, String type)  {
-        return chatMessageRecordsRepository.findAllByRoomIdAndType(roomId,type);
-    }
+
+//    public List<MsgRecords> findAllByTypeAndRoomId(String roomId, String type)  {
+//        return chatMessageRecordsRepository.findAllByRoomIdAndType(roomId,type);
+//    }
 }

@@ -2,7 +2,9 @@ package cn.edu.njnu.geoproblemsolving.business.collaboration.entity;
 
 import lombok.Data;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -11,7 +13,11 @@ import java.util.List;
  * @Description 文本聊天信息实体
  */
 @Data
+@Document(collection = "ChatMsg")
 public class ChatMsg {
+
+    @Id
+    private String messageId;
 
     private String aid;
 
@@ -21,5 +27,5 @@ public class ChatMsg {
 
     private String content;
 
-    private String time;
+    private Date time;
 }

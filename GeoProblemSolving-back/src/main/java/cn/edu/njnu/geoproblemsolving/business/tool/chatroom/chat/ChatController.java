@@ -28,6 +28,8 @@ import java.util.regex.Pattern;
 @RestController
 @RequestMapping("/chat")
 public class ChatController {
+
+
     @RequestMapping(value = "/picture", method = RequestMethod.POST)
     public JsonResult uploadPic(HttpServletRequest request) {
         return ResultUtils.success(uploadPicture(request));

@@ -8,5 +8,6 @@ import java.util.List;
 
 @RepositoryRestResource(path = "msgRecords")
 public interface MsgRecordsRepository extends MongoRepository<MsgRecords, String> {
+
     public List<MsgRecords> findByAid(String aid);
 }

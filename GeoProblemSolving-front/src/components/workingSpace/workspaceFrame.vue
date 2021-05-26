@@ -20,7 +20,7 @@
         slot="extra"
         type="ios-arrow-dropleft"
         size="20"
-        title="Fold the activity tree"
+        title="Collapse the activity tree"
         style="cursor: pointer"
         @click="foldTree"
       />

@@ -69,7 +69,7 @@
                 {{ this.unregisteredHint }}
                 <br />If you input your password here and click the
                 <strong style="font-weight: bold; color: blue"
-                  >Sign up and join</strong
+                  >Register and join</strong
                 >
                 button, your account would be created and you will join this
                 project.
@@ -93,7 +93,7 @@
               </Button>
               <Button type="default" @click="registerAndJoin()" v-else>
                 <span style="font-weight: bold; font-size: 1.2em"
-                  >Sign up and join</span
+                  >Register and join</span
                 >
               </Button>
             </div>

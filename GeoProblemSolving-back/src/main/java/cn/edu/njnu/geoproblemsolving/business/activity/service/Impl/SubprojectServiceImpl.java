@@ -53,7 +53,7 @@ public class SubprojectServiceImpl implements SubprojectService {
     private void updateActiveTime(Subproject subproject) {
         // Update active time
         Date date = new Date();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         subproject.setActiveTime(dateFormat.format(date));
 
         subprojectRepository.save(subproject);
@@ -63,7 +63,7 @@ public class SubprojectServiceImpl implements SubprojectService {
     public JsonResult createSubproject(Subproject subproject) {
         try {
             Date data = new Date();
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             String subprojectId = UUID.randomUUID().toString();
 
             // Created time
@@ -144,7 +144,7 @@ public class SubprojectServiceImpl implements SubprojectService {
             update.updateTo(subproject);
 
             // Update active time
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             subproject.setActiveTime(dateFormat.format(new Date()));
 
             return ResultUtils.success(subprojectRepository.save(subproject));
@@ -310,7 +310,7 @@ public class SubprojectServiceImpl implements SubprojectService {
             Subproject subproject = optional.get();
 
             //Update active time
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             subproject.setActiveTime(simpleDateFormat.format(new Date()));
             subprojectRepository.save(subproject);
 
@@ -347,7 +347,7 @@ public class SubprojectServiceImpl implements SubprojectService {
             subproject.setMembers(members);
 
             // Update active time
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             subproject.setActiveTime(dateFormat.format(new Date()));
 
             subprojectRepository.save(subproject);
@@ -386,7 +386,7 @@ public class SubprojectServiceImpl implements SubprojectService {
             subproject.setMembers(newMembers);
 
             // Update active time
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             subproject.setActiveTime(dateFormat.format(new Date()));
 
             subprojectRepository.save(subproject);
@@ -417,7 +417,7 @@ public class SubprojectServiceImpl implements SubprojectService {
             subproject.setMembers(members);
 
             // Update active time
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             subproject.setActiveTime(dateFormat.format(new Date()));
 
             subprojectRepository.save(subproject);

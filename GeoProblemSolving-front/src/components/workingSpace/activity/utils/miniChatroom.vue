@@ -49,11 +49,27 @@
                       </div>
                       <div class="user_detail">
                         <div class="u_img">
+                          <img
+                            v-if="
+                              item.sender.avatar != undefined &&
+                              item.sender.avatar != ''
+                            "
+                            :src="item.sender.avatar"
+                            :title="item.sender.name"
+                            class="user_img"
+                            style="
+                              width: 25px;
+                              height: 25px;
+                              vertical-align: middle;
+                              border-radius: 1em;
+                            "
+                          />
                           <avatar
                             class="user_img"
                             :username="item.sender.name"
                             :size="25"
                             :title="item.sender.name"
+                            v-else
                           ></avatar>
                         </div>
                       </div>
@@ -64,11 +80,27 @@
                         style="margin-left: 2.5%; margin-top: 5px"
                       >
                         <div class="u_img">
+                          <img
+                            v-if="
+                              item.sender.avatar != undefined &&
+                              item.sender.avatar != ''
+                            "
+                            :src="$store.state.UserServer + item.sender.avatar"
+                            :title="item.sender.name"
+                            class="user_img"
+                            style="
+                              width: 25px;
+                              height: 25px;
+                              vertical-align: middle;
+                              border-radius: 1em;
+                            "
+                          />
                           <avatar
                             class="user_img"
                             :username="item.sender.name"
                             :size="30"
                             :title="item.sender.name"
+                            v-else
                           ></avatar>
                         </div>
                       </div>
@@ -99,7 +131,15 @@
             </div>
           </div>
           <div class="message-records" v-show="recordsShow">
-            <div style="margin: 5px 0 0 5px; color: #5093f8">Records</div>
+            <div style="margin: 5px 0 0 5px; color: #5093f8">
+              Records
+              <span
+                style="float: right; margin-right: 10px; cursor: pointer"
+                v-if="!recordListShow"
+                @click="detailRecords('')"
+                ><Icon type="md-arrow-round-back"
+              /></span>
+            </div>
             <Divider size="small" />
             <vue-scroll :ops="scrollOps" style="height: 335px; margin-top: 5px">
               <template v-if="recordListShow">
@@ -109,21 +149,35 @@
                   <Card
                     class="records-item"
                     v-for="record in msgRecords"
-                    :key="record.messageId"
+                    :key="record.recordId"
                   >
                     <h4 style="margin-bottom: 5px">{{ record.createdTime }}</h4>
-                    <div
-                      class="message-text"
-                      v-for="(message, i) in record.records"
-                      :key="message.time"
-                    >
-                      <template v-if="i < 3">
-                        <span class="message-sender">{{
-                          message.sender.name
-                        }}</span
-                        >:
-                        <span>{{ message.content }}</span>
-                      </template>
+                    <div class="message-text">
+                      Participants:
+                      <span
+                        v-for="user in record.participants"
+                        :key="user.userId"
+                      >
+                        <img
+                          v-if="user.avatar != undefined && user.avatar != ''"
+                          :src="$store.state.UserServer + user.avatar"
+                          :title="user.name"
+                          style="
+                            width: 25px;
+                            height: 25px;
+                            vertical-align: middle;
+                            border-radius: 1em;
+                            margin-left: 5px;
+                          "
+                        />
+                        <avatar
+                          :username="user.name"
+                          :size="25"
+                          :title="user.name"
+                          style="margin-left: 5px;"
+                          v-else
+                        ></avatar>
+                      </span>
                     </div>
                     <div
                       style="
@@ -134,20 +188,66 @@
                         cursor: pointer;
                         margin: 5px -15px 0 -15px;
                       "
-                      @click="moreRecords(record.messageId)"
+                      @click="detailRecords(record.recordId)"
                     >
                       More...
                     </div>
                   </Card>
                 </template>
-                <template v-else><Card style="font-size: 12px; text-align: center" dis-hover>No records</Card></template>
+                <template v-else
+                  ><Card style="font-size: 12px; text-align: center" dis-hover
+                    >No records</Card
+                  ></template
+                >
               </template>
-              <Card v-else></Card>
+              <Card v-else>
+                <div
+                  v-for="(list, index) in msgRecordDatails"
+                  :key="index"
+                  class="record-item"
+                >
+                  <div style="margin-bottom: 2.5px; font-size: 12px">
+                    <div class="message-from-id">
+                      <div
+                        style="color: #37881f"
+                        v-if="list.sender.userId == $store.getters.userId"
+                      >
+                        {{ list.sender.name }}
+                      </div>
+                      <div class="message-from-name" v-else>
+                        {{ list.sender.name }}
+                      </div>
+                    </div>
+                    <div class="message-time">{{ list.time }}</div>
+                    <div>
+                      <template
+                        v-if="list.type === 'message_pic'"
+                        class="message-piture-border"
+                      >
+                        <img
+                          :src="list.content"
+                          class="message-piture-content"
+                        />
+                      </template>
+                      <template v-else-if="list.type === 'message_tool'">
+                        <simple-public-card
+                          :toolFrom="JSON.parse(list.content)"
+                          :isOpenTool="isOpenTool"
+                          class="tool-outer"
+                        ></simple-public-card>
+                      </template>
+                      <template v-else class="message-item-content">{{
+                        list.content
+                      }}</template>
+                    </div>
+                  </div>
+                </div>
+              </Card>
             </vue-scroll>
           </div>
         </TabPane>
         <Button
-          @click="openChatroom()"
+          @click="openChatRecords()"
           size="small"
           slot="extra"
           title="Message records"
@@ -174,6 +274,7 @@ export default {
           background: "lightgrey",
         },
       },
+      participants: [],
       msgType: "chats",
       unreadRecords: 0,
       unreadChats: 0,
@@ -186,7 +287,14 @@ export default {
       recordsShow: false,
       recordListShow: true,
       msgRecords: [],
+      msgRecordDatails: [],
     };
+  },
+  computed: {
+    avatar() {
+      let avatarUrl = this.$store.state.UserServer + this.$store.getters.avatar;
+      return avatarUrl;
+    },
   },
   watch: {},
   updated: function () {
@@ -205,6 +313,7 @@ export default {
   },
   mounted() {
     this.startWebSocket();
+    this.getParticipants();
 
     Date.prototype.Format = function (fmt) {
       var o = {
@@ -233,13 +342,22 @@ export default {
     };
   },
   methods: {
-    openChatroom() {
-      this.recordsShow = !this.recordsShow;
+    getParticipants() {
+      let url = "";
+      let activity = this.activityInfo;
+      if (activity.level == 0) {
+        url = "/GeoProblemSolving/project/" + activity.aid + "/user";
+      } else if (activity.level == 1) {
+        url = "/GeoProblemSolving/subproject/" + activity.aid + "/user";
+      } else if (activity.level > 1) {
+        url = "/GeoProblemSolving/activity/" + activity.aid + "/user";
+      }
+      //callback setTimeBack
       this.axios
-        .get("/GeoProblemSolving/msgRecords/" + this.activityInfo.aid)
+        .get(url)
         .then((res) => {
-          if (res.data.code === 0) {
-            this.$set(this, "msgRecords", res.data.data);
+          if (res.data.code == 0) {
+            this.participants = res.data.data.members;
           } else {
             console.log(res.data.msg);
           }
@@ -248,8 +366,57 @@ export default {
           throw err;
         });
     },
-    moreRecords() {
-
+    openChatRecords() {
+      if (this.recordsShow) {
+        this.recordsShow = false;
+      } else {
+        this.recordsShow = true;
+        this.axios
+          .get("/GeoProblemSolving/msgRecords/records/" + this.activityInfo.aid)
+          .then((res) => {
+            if (res.data.code === 0) {
+              this.msgRecords = [];
+              for(let i=0;i<res.data.data.length;i++){
+                let record = res.data.data[i];
+                let date = new Date(record.createdTime)
+                record.createdTime = date.Format("yyyy-MM-dd HH:mm:ss");
+                this.msgRecords.push(record);
+              }
+            } else {
+              console.log(res.data.msg);
+            }
+          })
+          .catch((err) => {
+            throw err;
+          });
+      }
+    },
+    detailRecords(recordId) {
+      if (this.recordListShow) {
+        this.recordListShow = false;
+        this.axios
+          .get("/GeoProblemSolving/msgRecords/record/" + recordId)
+          .then((res) => {
+            if (res.data.code === 0) {              
+              
+              this.msgRecordDatails = [];
+              for(let i=0;i<res.data.data.length;i++){
+                let message = res.data.data[i];
+                let date = new Date(message.time)
+                message.time = date.Format("yyyy-MM-dd HH:mm:ss");
+                this.msgRecordDatails.push(message);
+              }
+            } else {
+              console.log(res.data.msg);
+            }
+          })
+          .catch((err) => {
+            throw err;
+          });
+      } else {
+        this.recordListShow = true;
+        this.msgRecordDatails = [];
+      }
     },
     startWebSocket() {
       this.socketApi.initWebSocket("MsgServer/" + this.activityInfo.aid);
@@ -268,7 +435,7 @@ export default {
           chatMsg["content"] = chatMsg.activeUser.name + " join the meeting.";
           this.receivedChatMsgs.push(chatMsg);
         } else if (chatMsg.behavior == "off") {
-          chatMsg["content"] = chatMsg.activeUser.name + " stop the meeting.";
+          chatMsg["content"] = chatMsg.activeUser.name + " leave the room.";
           this.receivedChatMsgs.push(chatMsg);
         }
       } else if (data.type === "message") {
@@ -301,6 +468,18 @@ export default {
             this.receivedChatMsgs.push(chatMsg.content[i]);
           }
         }
+      } else if (chatMsg.type == "message-store") {
+        this.operationApi.communicationRecord(
+          this.activityInfo.aid,
+          "",
+          "",
+          chatMsg.recordId,
+          chatMsg.time,
+          chatMsg.participants
+        );
+        chatMsg["type"] = "members";
+        chatMsg["content"] = "You have the only person in the meeting.";
+        this.receivedChatMsgs.push(chatMsg);
       } else if (chatMsg.type == "test") {
         chatMsg["type"] = "members";
         chatMsg["content"] = "You have joined the meeting.";
@@ -327,6 +506,7 @@ export default {
           send_msg["sender"] = {
             userId: this.$store.getters.userId,
             name: this.$store.getters.userName,
+            avatar: this.$store.getters.avatar === "" ? "" : this.avatar,
           };
           this.allChatMsgs.push(send_msg);
         } else {
@@ -501,8 +681,39 @@ export default {
 }
 .message-text {
   font-size: 12px;
+  display: flex;
+  width: 290px;
 }
 .message-sender {
   color: #15b169;
+}
+.record-item {
+  padding: 5px 0;
+}
+.message-time {
+  color: lightgray;
+}
+.message-from-name {
+  color: #2d8cf0;
+  width: 300px;
+  font-size: 16px;
+}
+.message-piture-border {
+  max-height: 300px;
+  max-width: 400px;
+}
+.message-piture-content {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+}
+.tool-outer {
+  width: 120px;
+}
+.message-item-content {
+  color: gray;
+  word-wrap: break-word;
+  width: 100%;
 }
 </style>

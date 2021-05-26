@@ -51,7 +51,7 @@ public class ResourceDaoImpl implements IResourceDao {
                 return "Fail";
             }
             Date date = new Date();
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             String uploadTime = dateFormat.format(date);
 
             String servicePath = request.getSession().getServletContext().getRealPath("/");//获得绝对路径。
@@ -261,7 +261,7 @@ public class ResourceDaoImpl implements IResourceDao {
                                 User uploader = mongoTemplate.findOne(queryUser, User.class);
 
                                 Date date = new Date();
-                                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+                                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                                 String uploadTime = dateFormat.format(date);
 
                                 update.set("name", fileNames);

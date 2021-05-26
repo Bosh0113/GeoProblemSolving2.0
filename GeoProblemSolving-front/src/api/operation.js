@@ -245,6 +245,7 @@ export function getMemberInfo(pid) {
 
     let member = {}
     member["id"] = personNode.getAttribute("id");
+    member["email"] = personNode.getAttribute("email");
     member["name"] = personNode.getAttribute("name");
     member["role"] = personNode.getAttribute("role");
 
@@ -838,39 +839,57 @@ export function toolOperationRecord(aid, taskId, behavior, userId, toolInfo) {
     saveActivityDoc(aid);
 }
 
-export function communicationRecord(aid, taskId, toolId, resId, onlineMembers) {
+export function communicationRecord(activity, taskId, toolId, resId, time, onlineMembers) {
     if (xmlDoc === null) {
         alert("Failed to record operation. Please load activity document first!");
         return;
     }
 
-    //OperationRecords
+    let aid = activity.aid;
     let operationId = guid();
     let OperationRecords = xmlDoc.getElementsByTagName("OperationRecords")[0];
     if (OperationRecords == undefined) return;
 
-    let Operation = xmlDoc.createElement('Operation');
-    Operation.setAttribute("id", operationId);
-    Operation.setAttribute("type", "communication");
-    Operation.setAttribute("toolRef", toolId);
-    Operation.setAttribute("resRef", resId);
-    Operation.setAttribute("task", taskId);
-    Operation.setAttribute("time", new Date().Format("yyyy-MM-dd HH:mm:ss"));
-    for (var i = 0; i < onlineMembers.length; i++) {
-        let PersonRef = xmlDoc.createElement('PersonRef');
-        PersonRef.setAttribute("id", onlineMembers[i]);
-        Operation.appendChild(PersonRef);
-    }
-    OperationRecords.appendChild(Operation);
+    if(activity.type === "Activity_Group"){
 
-    // TaskList
-    let Task = xmlDoc.getElementById(taskId);
-    if (Task !== null) {
-        let OperationRef = xmlDoc.createElement('OperationRef');
+        let Operation = xmlDoc.createElement('Operation');
         Operation.setAttribute("id", operationId);
-        Task.appendChild(OperationRef);
-    }
+        Operation.setAttribute("type", "communication");
+        Operation.setAttribute("resRef", resId);
+        let date = new Date(time);
+        Operation.setAttribute("time", date.Format("yyyy-MM-dd HH:mm:ss"));
+        for (var i = 0; i < onlineMembers.length; i++) {
+            let PersonRef = xmlDoc.createElement('PersonRef');
+            PersonRef.setAttribute("id", onlineMembers[i]);
+            Operation.appendChild(PersonRef);
+        }
+        OperationRecords.appendChild(Operation);
 
+    } else if(activity.type === "Activity_Unit"){
+
+        let Operation = xmlDoc.createElement('Operation');
+        Operation.setAttribute("id", operationId);
+        Operation.setAttribute("type", "communication");
+        Operation.setAttribute("toolRef", toolId);
+        Operation.setAttribute("resRef", resId);
+        Operation.setAttribute("task", taskId);
+        let date = new Date(time);
+        Operation.setAttribute("time", date.Format("yyyy-MM-dd HH:mm:ss"));
+        for (var i = 0; i < onlineMembers.length; i++) {
+            let PersonRef = xmlDoc.createElement('PersonRef');
+            PersonRef.setAttribute("id", onlineMembers[i]);
+            Operation.appendChild(PersonRef);
+        }
+        OperationRecords.appendChild(Operation);
+
+        // TaskList
+        let Task = xmlDoc.getElementById(taskId);
+        if (Task !== null) {
+            let OperationRef = xmlDoc.createElement('OperationRef');
+            Operation.setAttribute("id", operationId);
+            Task.appendChild(OperationRef);
+        }
+    }
     saveActivityDoc(aid);
 }
 

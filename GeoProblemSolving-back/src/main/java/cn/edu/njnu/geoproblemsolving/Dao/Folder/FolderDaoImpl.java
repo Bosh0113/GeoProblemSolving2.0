@@ -301,7 +301,7 @@ public class FolderDaoImpl implements IFolderDao {
                 User user = mongoTemplate.findOne(queryUser, User.class);
                 resourceFile.setUploaderName(user.getName());
                 Date date = new Date();
-                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 String uploadTime = dateFormat.format(date);
                 resourceFile.setUploadTime(uploadTime);
                 mongoTemplate.save(resourceFile);

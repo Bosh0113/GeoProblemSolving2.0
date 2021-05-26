@@ -13,7 +13,7 @@
   font-size: 15px;
   font-weight: bold;
 }
-.container {
+.nav-container {
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -81,7 +81,7 @@ footer {
 }
 </style>
 <template>
-  <div class="container">
+  <div class="nav-container">
     <div style="position: fixed; z-index: 99">
       <header style="position: inherit; min-width: -webkit-fill-available">
         <img
@@ -136,7 +136,7 @@ footer {
                 <span>Login</span>
               </MenuItem>
               <MenuItem name="register">
-                <span>Sign up</span>
+                <span>Register</span>
               </MenuItem>
             </Menu>
             <Menu
@@ -172,7 +172,7 @@ footer {
                     />
                   </div>
                   <DropdownMenu slot="list">
-                    <DropdownItem name="logout">Log out</DropdownItem>
+                    <DropdownItem name="logout">Logout</DropdownItem>
                   </DropdownMenu>
                 </Dropdown>
               </MenuItem>
@@ -224,7 +224,7 @@ footer {
                   v-show="!userState"
                   @click.native="turnToURL('/GeoProblemSolving/register')"
                   class="menuItemCell"
-                  >Sign up</Cell
+                  >Register</Cell
                 >
                 <Cell
                   v-show="userState"
@@ -242,7 +242,7 @@ footer {
                   v-show="userState"
                   @click.native="logout"
                   class="menuItemCell"
-                  >Log out</Cell
+                  >Logout</Cell
                 >
               </CellGroup>
             </DropdownMenu>

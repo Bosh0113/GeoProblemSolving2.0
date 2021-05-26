@@ -1,17 +1,11 @@
 <!-- bubble-left green -->
 <template>
   <div class>
-    <template v-if="list.type === 'notice'">
-      <Row>
-        <div class="chat-notice">{{ list.content }}</div>
-      </Row>
-    </template>
-
-    <template v-else>
+    <template>
       <Row>
         <div style="float:left;">
           <Row style="margin:8px 0 0 12px">
-            <div class="user_name">{{ list.srcUserName }}</div>
+            <div class="user_name">{{ list.sender.name }}</div>
           </Row>
           <Row>
             <div class="chat-bubble-l chat-bubble-left">
@@ -168,13 +162,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-//send notice
-.chat-notice {
-  color: darkgreen;
-  width: 90%;
-  text-align: center;
-}
-
 //user
 .user_detail {
   height: 60px;

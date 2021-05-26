@@ -6,14 +6,13 @@ import cn.edu.njnu.geoproblemsolving.business.collaboration.cache.OperationQueue
 import cn.edu.njnu.geoproblemsolving.business.collaboration.entity.ChatMsg;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.entity.CollaborationUser;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.entity.ComputeMsg;
+import cn.edu.njnu.geoproblemsolving.business.collaboration.entity.MsgRecords;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.enums.CollaborationMode;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.utils.CollaborationBehavior;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.utils.CollaborationConfig;
 import cn.edu.njnu.geoproblemsolving.business.tool.chatroom.chatmessage.ChatMessageRecordsService;
 import cn.edu.njnu.geoproblemsolving.business.tool.chatroom.hydrologicalconcept.AnsjSegService;
 import cn.edu.njnu.geoproblemsolving.business.user.dao.IUserDao;
-import cn.edu.njnu.geoproblemsolving.business.user.dto.InquiryUserDto;
-import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -22,7 +21,7 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpSession;
 import javax.websocket.EndpointConfig;
 import javax.websocket.Session;
-import javax.websocket.server.PathParam;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -35,9 +34,6 @@ public class CollaborationService {
 
     @Autowired
     MongoTemplate mongoTemplate;
-
-    @Autowired
-    ChatMessageRecordsService chatMessageRecordsService;
 
     @Autowired
     AnsjSegService ansjSegService;
@@ -165,28 +161,32 @@ public class CollaborationService {
                     String text = messageObject.getString("content");
                     collaborationBehavior.transferMessage(messageType, collaborationConfig.getParticipants(), sender, receivers, text, time);
 
-                    Boolean toolConcepts = messageObject.getBoolean("toolConcepts");
+                    Boolean concepts = messageObject.getBoolean("geoConcepts");
                     String relateConceptSet = "";
-                    if (toolConcepts == null || !toolConcepts) {
+                    if (concepts != null && concepts) {
                         String result = ansjSegService.processInfo(text);
                         relateConceptSet = ansjSegService.elasticSearch(result);
                     }
-                    if (relateConceptSet.equals("")) {
-                        collaborationBehavior.transferMessage(messageType, collaborationConfig.getParticipants(), sender, receivers, relateConceptSet, time);
+                    if (!relateConceptSet.equals("")) {
+                        collaborationBehavior.transferConceptMessage(collaborationConfig.getParticipants(), sender, receivers, relateConceptSet, time);
                     }
 
                     // 添加消息至缓存
-                    ChatMsg chatMsg = new ChatMsg();
-                    ArrayList<ChatMsg> chatMsgRecords = communicationCache.getCache(groupKey);
-                    if (chatMsgRecords == null) chatMsgRecords = new ArrayList<>();
+                    if(collaborationConfig.getParticipants().size() > 1) {
+                        ChatMsg chatMsg = new ChatMsg();
+                        ArrayList<ChatMsg> chatMsgRecords = communicationCache.getCache(groupKey);
+                        if (chatMsgRecords == null) chatMsgRecords = new ArrayList<>();
 
-                    chatMsg.setAid(groupKey);
-                    chatMsg.setSender(sender);
-                    chatMsg.setReceiver(receivers);
-                    chatMsg.setContent(text);
-                    chatMsg.setTime(new Date().toString());
-                    chatMsgRecords.add(chatMsg);
-                    communicationCache.putCache(groupKey, chatMsgRecords);
+                        chatMsg.setMessageId(UUID.randomUUID().toString());
+                        chatMsg.setAid(groupKey);
+                        chatMsg.setSender(sender);
+                        chatMsg.setReceiver(receivers);
+                        chatMsg.setContent(text);
+                        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                        chatMsg.setTime(dateFormat.parse(time));
+                        chatMsgRecords.add(chatMsg);
+                        communicationCache.putCache(groupKey, chatMsgRecords);
+                    }
 
                     break;
                 }
@@ -204,8 +204,13 @@ public class CollaborationService {
             JSONObject messageObject = JSONObject.parseObject(message);
             String messageType = messageObject.getString("type");
             String sender = messageObject.getString("sender");
-            List<String> receivers = messageObject.getJSONArray("receivers").toJavaList(String.class);
-            if(receivers == null) receivers = new ArrayList<>();
+
+            List<String> receivers = null;
+            try {
+                receivers = messageObject.getJSONArray("receivers").toJavaList(String.class);
+            } catch (NullPointerException ex){
+                receivers = new ArrayList<>();
+            }
 
             switch (messageType) {
                 case "test": {
@@ -218,21 +223,24 @@ public class CollaborationService {
                 case "mode": {
                     String mode = messageObject.getString("mode");
                     collaborationConfig.setMode(CollaborationMode.valueOf(mode));
+                    collaborationConfig.setOperator("");
+                    collaborationConfig.setApplyQueue(new ArrayList<>());
                     groups.put(groupKey, collaborationConfig);
 
                     collaborationBehavior.sendModeType(collaborationConfig.getParticipants(), mode);
                     break;
                 }
                 case "control-apply": {
-                    String ctrUser = messageObject.getString("operator");
                     List<String> applyQueue = collaborationConfig.getApplyQueue();
-
                     if(applyQueue == null) applyQueue = new ArrayList<>();
-                    applyQueue.add(ctrUser);
+                    if(applyQueue.size() == 0) {
+                        collaborationConfig.setOperator(sender);
+                    }
+                    applyQueue.add(sender);
                     collaborationConfig.setApplyQueue(applyQueue);
                     groups.put(groupKey, collaborationConfig);
 
-                    collaborationBehavior.sendControlInfo(collaborationConfig.getParticipants(), applyQueue,  ctrUser, "apply");
+                    collaborationBehavior.sendControlInfo(collaborationConfig, applyQueue,  sender, messageType);
                     break;
                 }
                 case "control-stop": {
@@ -248,11 +256,11 @@ public class CollaborationService {
                         }
                         groups.put(groupKey, collaborationConfig);
 
-                        collaborationBehavior.sendControlInfo(collaborationConfig.getParticipants(), applyQueue, ctrUser, "stop");
+                        collaborationBehavior.sendControlInfo(collaborationConfig, applyQueue, ctrUser, messageType);
                     } else if(collaborationConfig.getMode().equals(CollaborationMode.SemiFree_Occupy)){
                         collaborationConfig.setOperator("");
                         groups.put(groupKey, collaborationConfig);
-                        collaborationBehavior.sendControlInfo(collaborationConfig.getParticipants(), new ArrayList<>(), "", "stop");
+                        collaborationBehavior.sendControlInfo(collaborationConfig, new ArrayList<>(), "", messageType);
                     }
                     break;
                 }
@@ -287,10 +295,6 @@ public class CollaborationService {
                     break;
                 }
                 case "computation":{
-                    // 调用模型容器或者数据容器执行计算任务（当计算完成时，需要向前端返回计算结果）
-                    //...
-                    //...
-
                     // 添加计算任务至缓存
                     ComputeMsg computeMsg = new ComputeMsg();
                     ArrayList<ComputeMsg> computeRecords = computeTasks.getCache(groupKey);
@@ -299,9 +303,15 @@ public class CollaborationService {
                     computeMsg.setAid(aid);
                     computeMsg.setToolId(toolId);
                     computeMsg.setReceivers(collaborationConfig.getParticipants());
-                    computeMsg.setTime(new Date().toString());
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    computeMsg.setTime(dateFormat.format(new Date()));
                     computeRecords.add(computeMsg);
                     computeTasks.putCache(groupKey, computeRecords);
+
+                    // 调用模型容器或者数据容器执行计算任务（当计算完成时，需要向前端返回计算结果）
+                    //...
+                    //...
+
                 }
             }
         } catch (Exception ex){
@@ -326,12 +336,21 @@ public class CollaborationService {
                 }
             }
 
-            if (collaborationConfig.getParticipants().size() < 1) {
-                // 通讯结束，持久化存储，清除缓存
-                collaborationBehavior.msgCacheStore(groupKey, communicationCache.getCache(groupKey));
+            if (collaborationConfig.getParticipants().size() == 1) {
+                // 持久化存储
+                if(communicationCache.getCache(groupKey) != null &&communicationCache.getCache(groupKey).size() > 0) {
+                    MsgRecords msgRecords = collaborationBehavior.msgCacheStore(groupKey, communicationCache.getCache(groupKey));
+                    collaborationBehavior.sendStoredMsgRecords(collaborationConfig.getParticipants(), msgRecords);
+                }
+                // 通知成员退出，发布新的成员列表
+                collaborationBehavior.sendParticipantsInfo(collaborationConfig.getParticipants(), collaborationUser, "off");
+
+            } else if(collaborationConfig.getParticipants().size() < 1) {
+                // 通讯结束，清除缓存
                 groups.remove(groupKey);
                 communicationCache.removeCache(groupKey);
-            } else {
+            }
+            else {
                 // 通知成员退出，发布新的成员列表
                 collaborationBehavior.sendParticipantsInfo(collaborationConfig.getParticipants(), collaborationUser, "off");
             }

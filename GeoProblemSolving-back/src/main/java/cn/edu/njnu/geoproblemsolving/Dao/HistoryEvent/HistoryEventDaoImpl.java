@@ -24,7 +24,7 @@ public class HistoryEventDaoImpl implements IHistoryEventDao {
     public String saveHistoryEvent(HistoryEventEntity historyEvent){
         try {
             Date date=new Date();
-            SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             historyEvent.setCreateTime(dateFormat.format(date));
             historyEvent.setHistoryId(UUID.randomUUID().toString());
             mongoTemplate.save(historyEvent);

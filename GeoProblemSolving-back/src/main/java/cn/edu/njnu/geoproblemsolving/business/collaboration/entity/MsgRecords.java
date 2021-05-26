@@ -1,21 +1,25 @@
 package cn.edu.njnu.geoproblemsolving.business.collaboration.entity;
 
+import com.alibaba.fastjson.JSONObject;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 @Data
-@Document(collection = "MsgRecords")
+@Document(collection = "MessageRecords")
 public class MsgRecords {
 
     @Id
-    private String messageId;
+    private String recordId;
 
     private String aid; //查询条件Id
 
-    private ArrayList<ChatMsg> records;
+    private ArrayList<String> records;
 
-    private String createdTime;
+    private ArrayList<JSONObject> participants;
+
+    private Date createdTime;
 }

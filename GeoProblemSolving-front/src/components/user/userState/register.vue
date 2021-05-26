@@ -118,7 +118,7 @@
           <Col :xs="{ span: 12, offset: 6 }" :lg="{ span: 12, offset: 6 }">
             <div class="registerForm">
               <Card>
-                <h2 slot="title" class="register_title">Sign up</h2>
+                <h2 slot="title" class="register_title">Register</h2>
                 <!-- 实现注册的样式 -->
                 <Form
                   ref="registerForm"
