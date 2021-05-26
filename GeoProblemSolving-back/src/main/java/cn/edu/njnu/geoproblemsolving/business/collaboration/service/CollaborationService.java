@@ -217,7 +217,7 @@ public class CollaborationService {
                     collaborationConfig.setMode(CollaborationMode.Free);
                     groups.put(groupKey, collaborationConfig);
 
-                    collaborationBehavior.transferOperation(collaborationConfig.getParticipants(), sender, receivers, "test", "test");
+                    collaborationBehavior.transferOperation(collaborationConfig.getParticipants(), messageType, sender, receivers, "test", "test");
                     break;
                 }
                 case "mode": {
@@ -264,6 +264,7 @@ public class CollaborationService {
                     }
                     break;
                 }
+                case "data":
                 case "operation": {
                     String behavior = messageObject.getString("behavior");
                     String object = messageObject.getString("object");
@@ -272,9 +273,9 @@ public class CollaborationService {
                     if(mode.equals(CollaborationMode.SemiFree_Apply)){
                         // 判断操作权限
                         if(collaborationConfig.getOperator().equals(sender)){
-                            collaborationBehavior.transferOperation(collaborationConfig.getParticipants(), sender, receivers, behavior, object);
+                            collaborationBehavior.transferOperation(collaborationConfig.getParticipants(), messageType, sender, receivers, behavior, object);
                         } else {
-                            collaborationBehavior.operationRefuse(collaborationConfig.getParticipants(), sender);
+                            collaborationBehavior.operationRefuse(collaborationConfig.getParticipants(), messageType, sender);
                         }
                     } else if(mode.equals(CollaborationMode.SemiFree_Occupy)){
                         // 抢占操作权
@@ -284,12 +285,12 @@ public class CollaborationService {
                         }
                         // 判断操作权限
                         if(collaborationConfig.getOperator().equals(sender)){
-                            collaborationBehavior.transferOperation(collaborationConfig.getParticipants(), sender, receivers, behavior, object);
+                            collaborationBehavior.transferOperation(collaborationConfig.getParticipants(), messageType, sender, receivers, behavior, object);
                         } else {
-                            collaborationBehavior.operationRefuse(collaborationConfig.getParticipants(), sender);
+                            collaborationBehavior.operationRefuse(collaborationConfig.getParticipants(), messageType, sender);
                         }
                     } else if(mode.equals(CollaborationMode.Free)){
-                        collaborationBehavior.transferOperation(collaborationConfig.getParticipants(), sender, receivers, behavior, object);
+                        collaborationBehavior.transferOperation(collaborationConfig.getParticipants(), messageType, sender, receivers, behavior, object);
                     }
 
                     break;

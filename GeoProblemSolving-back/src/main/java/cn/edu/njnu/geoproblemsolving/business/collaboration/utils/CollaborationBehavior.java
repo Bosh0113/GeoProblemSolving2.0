@@ -198,10 +198,10 @@ public class CollaborationBehavior {
     /**
      * operation
      **/
-    public void transferOperation(HashMap<String, CollaborationUser> participants, String sender, List<String> receivers, String behavior, String object) {
+    public void transferOperation(HashMap<String, CollaborationUser> participants, String type, String sender, List<String> receivers, String behavior, String object) {
         try {
             JSONObject messageObject = new JSONObject();
-            messageObject.put("type", "operation");
+            messageObject.put("type", type);
             messageObject.put("sender", sender);
             messageObject.put("behavior", behavior);
             messageObject.put("object", object);
@@ -228,10 +228,10 @@ public class CollaborationBehavior {
         }
     }
 
-    public void operationRefuse(HashMap<String, CollaborationUser> participants, String sender) {
+    public void operationRefuse(HashMap<String, CollaborationUser> participants, String type, String sender) {
         try {
             JSONObject messageObject = new JSONObject();
-            messageObject.put("type", "operation");
+            messageObject.put("type", type);
             messageObject.put("behavior", "Refuse");
 
             // send message
@@ -269,7 +269,7 @@ public class CollaborationBehavior {
      * 发送控制信息
      * @param config
      * @param queue
-     * @param user
+     * @param sender
      * @param type
      */
     public void sendControlInfo(CollaborationConfig config, List<String> queue, String sender, String type) {

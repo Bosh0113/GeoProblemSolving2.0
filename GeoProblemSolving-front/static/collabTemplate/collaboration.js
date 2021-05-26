@@ -14,11 +14,12 @@ var participants = null;
 var onlineMembers = null;
 var UserServer = "http://172.21.212.103:8088/userServer";
 
-// resource related**************************************************************************************************等待测试
+// resource related
 var resources = [];
 selectedResources = [];
 
 // operation related
+loadResChannel = null;
 
 $(function () {
     // ready - event
@@ -100,7 +101,7 @@ function loadCollabComponent() {
                 </div>
                 <div class="resource-list scrollbar" id="resource-list"></div>
                 <div class="resource-load">
-                    <button class="btn btn-primary btn-sm">Load resource</button>
+                    <button class="btn btn-primary btn-sm" id="resource-load">Load resource</button>
                 </div>
             </div>
             <div class="sidebar-content" id="operation-panel" style="display: none;">            
@@ -176,6 +177,11 @@ function addEvents() {
         $("#resource-panel").show();
         $("#operation-panel").hide();
     })
+    $("#resource-load").on("click", function () {
+        if (loadResChannel != undefined && typeof loadResChannel == "function") {
+            loadResChannel(selectedResources);
+        }
+    });
     $("#operation-btn").on("click", function () {
         $("#people-btn").removeClass("active");
         $("#resource-btn").removeClass("active");
@@ -240,86 +246,117 @@ function personOffline(member) {
 function showResList() {
     if (resources != undefined) {
         for (let i = 0; i < resources.folders.length; i++) {
-            let folder = resources.folders[i];
+            addfolder(resources.folders[i]);
+        }
+        for (let j = 0; j < resources.files.length; j++) {
+            addfile(resources.files[j]);            
+        }
+    }
+}
 
-            let resElement = `<div class="card resource" title="${folder.name}">
-                                    <input class="form-check-input" type="checkbox" id="${folder.uid}" value="${i}">
+function addfolder(folder) {
+    let resElement = `<div class="card resource" title="${folder.name}">
+                                    <input class="form-check-input" type="checkbox" id="${folder.uid}">
                                     <img src="/static/collabTemplate/mg/folder.png" class="res-icon" />
                                     <div class="res-name">${folder.name}</div>
                                 </div>`
-            $("#resource-list").append(resElement);
-            $(`#${folder.uid}`).on("change", function () {
-                selectFile(folder);
-            });
-        }
-        for (let j = 0; j < resources.files.length; j++) {
-            let file = resources.files[j];
-            
-            let resElement = "";
-            switch (file.type) {
-                case "data" :{
-                    resElement = `<div class="card resource" title="${file.name}">
-                                    <input class="form-check-input" type="checkbox" id="${file.uid}" value="${j}">
-                                    <img src="/static/collabTemplate/img/data.png" class="res-icon" />
-                                    <div class="res-name">${file.name}</div>
-                                </div>`
-                    break;
-                }
-                case "model" :{
-                    resElement = `<div class="card resource" title="${file.name}">
-                                    <input class="form-check-input" type="checkbox" id="${file.uid}" value="${j}">
-                                    <img src="/static/collabTemplate/img/model.png" class="res-icon" />
-                                    <div class="res-name">${file.name}</div>
-                                </div>`
-                    break;
-                }
-                case "paper" :{
-                    resElement = `<div class="card resource" title="${file.name}">
-                                    <input class="form-check-input" type="checkbox" id="${file.uid}" value="${j}">
-                                    <img src="/static/collabTemplate/img/paper.png" class="res-icon" />
-                                    <div class="res-name">${file.name}</div>
-                                </div>`
-                    break;
-                }
-                case "document" :{
-                    resElement = `<div class="card resource" title="${file.name}">
-                                    <input class="form-check-input" type="checkbox" id="${file.uid}" value="${j}">
-                                    <img src="/static/collabTemplate/img/document.png" class="res-icon" />
-                                    <div class="res-name">${file.name}</div>
-                                </div>`
-                    break;
-                }
-                case "image" :{
-                    resElement = `<div class="card resource" title="${file.name}">
-                                    <input class="form-check-input" type="checkbox" id="${file.uid}" value="${j}">
-                                    <img src="/static/collabTemplate/img/image.png" class="res-icon" />
-                                    <div class="res-name">${file.name}</div>
-                                </div>`
-                    break;
-                }
-                case "video" :{
-                    resElement = `<div class="card resource" title="${file.name}">
-                                    <input class="form-check-input" type="checkbox" id="${file.uid}" value="${j}">
-                                    <img src="/static/collabTemplate/img/video.png" class="res-icon" />
-                                    <div class="res-name">${file.name}</div>
-                                </div>`
-                    break;
-                }
-                case "other" :{
-                    resElement = `<div class="card resource" title="${file.name}">
-                                    <input class="form-check-input" type="checkbox" id="${file.uid}" value="${j}">
-                                    <img src="/static/collabTemplate/img/otherfile.png" class="res-icon" />
-                                    <div class="res-name">${file.name}</div>
-                                </div>`
-                    break;
-                }
+    $("#resource-list").append(resElement);
+    $(`#${folder.uid}`).on("change", function () {
+        selectFile(folder);
+
+        let message = {
+            type: "data",
+            sender: userInfo.userId,
+            behavior: "select",
+            content: {
+                uid: file.uid,
+                name: file.name,
+                description: file.description,
+                address: file.address,
             }
-            $("#resource-list").append(resElement);
-            $(`#${file.uid}`).on("change", function () {
-                selectFile(file);
-            });
+        }
+        websock.send(message);
+    });
+}
+
+function addfile(file) {
+    let resElement = "";
+    let fileName = file.name + file.suffix;
+    switch (file.type) {
+        case "data": {
+            resElement = `<div class="card resource" title="${fileName}">
+                            <input class="form-check-input" type="checkbox" id="${file.uid}" >
+                            <img src="/static/collabTemplate/img/data.png" class="res-icon" />
+                            <div class="res-name">${fileName}</div>
+                        </div>`
+            break;
+        }
+        case "model": {
+            resElement = `<div class="card resource" title="${fileName}">
+                            <input class="form-check-input" type="checkbox" id="${file.uid}" >
+                            <img src="/static/collabTemplate/img/model.png" class="res-icon" />
+                            <div class="res-name">${fileName}</div>
+                        </div>`
+            break;
+        }
+        case "paper": {
+            resElement = `<div class="card resource" title="${fileName}">
+                            <input class="form-check-input" type="checkbox" id="${file.uid}" >
+                            <img src="/static/collabTemplate/img/paper.png" class="res-icon" />
+                            <div class="res-name">${fileName}</div>
+                        </div>`
+            break;
+        }
+        case "document": {
+            resElement = `<div class="card resource" title="${fileName}">
+                            <input class="form-check-input" type="checkbox" id="${file.uid}">
+                            <img src="/static/collabTemplate/img/document.png" class="res-icon" />
+                            <div class="res-name">${fileName}</div>
+                        </div>`
+            break;
+        }
+        case "image": {
+            resElement = `<div class="card resource" title="${fileName}">
+                            <input class="form-check-input" type="checkbox" id="${file.uid}" >
+                            <img src="/static/collabTemplate/img/image.png" class="res-icon" />
+                            <div class="res-name">${fileName}</div>
+                        </div>`
+            break;
+        }
+        case "video": {
+            resElement = `<div class="card resource" title="${fileName}">
+                            <input class="form-check-input" type="checkbox" id="${file.uid}">
+                            <img src="/static/collabTemplate/img/video.png" class="res-icon" />
+                            <div class="res-name">${fileName}</div>
+                        </div>`
+            break;
+        }
+        case "other": {
+            resElement = `<div class="card resource" title="${fileName}">
+                            <input class="form-check-input" type="checkbox" id="${file.uid}">
+                            <img src="/static/collabTemplate/img/otherfile.png" class="res-icon" />
+                            <div class="res-name">${fileName}</div>
+                        </div>`
+            break;
         }
     }
+    $("#resource-list").append(resElement);
+    $(`#${file.uid}`).on("change", function () {
+        selectFile(file);
+
+        let message = {
+            type: "data",
+            sender: userInfo.userId,
+            behavior: "select",
+            content: {
+                uid: file.uid,
+                name: file.name,
+                description: file.description,
+                address: file.address,
+            }
+        }
+        websock.send(message);
+    });
 }
 
 function initCollaborationMode() {
@@ -390,7 +427,6 @@ function getActivityInfo(event) {
 
         // socket
         initWebSocket(activityInfo.aid, toolId);
-
     }
 }
 
@@ -431,6 +467,7 @@ function resToCurrentFolder(rootRes) {
     }
     return currentFolder;
 }
+
 
 /**
  * Joined members
@@ -509,11 +546,86 @@ function selectFile(file) {
     }
 }
 
+
+/**
+ * public method
+ * @param {*} uploadFiles 文件
+ * @param {*} description 描述
+ * @param {*} type 文件类型
+ * @param {*} privacy 获取权限
+ */
+function uploadResources(uploadFiles, description, type, privacy) {
+    var formData = new FormData();
+    for (var i = 0; i < uploadFiles.length; i++) {
+        formData.append("file", uploadFiles[i]);
+    }
+    formData.append("description", description);
+    formData.append("type", type);
+    formData.append("privacy", privacy);
+    formData.append("aid", activityInfo.aid);
+    formData.append("paths", ["0"].toString());
+
+    $.ajax({
+        url: "/GeoProblemSolving/rip/file/upload",
+        type: "POST",
+        data: formData,
+        mimeType: "multipart/form-data",
+        processData: false,
+        contentType: false,
+        cache: false,
+        async: true,
+        success: function (data) {
+            if (data != "Fail") {
+                let uploadedList = JSON.parse(data).uploaded;
+                resourceChanged(uploadedList, "upload")
+
+                for (let i = 0; i < uploadedList.length; i++) {
+                    let message = {
+                        type: "data",
+                        behavior: "upload",
+                        sender: userInfo.userId,
+                        content: {
+                            uid: uploadedList[i].uid,
+                            name: uploadedList[i].name,
+                            description: uploadedList[i].description,
+                            address: uploadedList[i].address,
+                        }
+                    }
+                    websocketSend(message);
+                }
+
+                return uploadedList;
+            } else {
+                alert("Upload fail.");
+            }
+        },
+        error: function (err) {
+            throw err;
+        }
+    });
+}
+
 /**
  * public method
  * when resources changed
  */
-function resourceChanged(resources) {
+function resourceChanged(resources, behavior) {
+    switch (behavior) {
+        case "upload": {
+            for(let i = 0; i < resources.length; i++) {
+                if(resources[i].folder) {
+                    addfolder(resources[i]);
+                } else {
+                    addfile(resources[i]);
+                }
+            }
+            break;
+        } 
+        case "delete": {
+            
+            break;
+        }
+    }
 
 }
 
@@ -521,9 +633,11 @@ function resourceChanged(resources) {
 /// Socket
 //////////
 var websock = null;
-var global_callback = null;
 var timer = null;
 var websockLinked = false;
+var operationChannel = null;
+var dataChannel = null;
+var computationChannel = null;
 
 function initWebSocket(aid, toolId) { //初始化websocket
     let IP_Port = window.location.host;
@@ -590,13 +704,15 @@ function websocketonmessage(e) {
                 break;
             }
             case "mode": {
-                setCollaborationMode(data.mode);
+                if (data.operator !== userInfo.userId) {
+                    setCollaborationMode(data.mode);
+                }
                 setOperator("");
                 setWaitingLine(0);
                 break;
             }
             case "control-apply": {
-                if (data.operator === userInfo.userId) {
+                if (data.operator !== userInfo.userId) {
                     $("#operation-apply").hide();
                     $("#operation-stop").show();
                 }
@@ -605,7 +721,7 @@ function websocketonmessage(e) {
                 break;
             }
             case "control-stop": {
-                if (data.sender === userInfo.userId) {
+                if (data.sender !== userInfo.userId) {
                     $("#operation-apply").show();
                     $("#operation-stop").hide();
                 }
@@ -614,8 +730,19 @@ function websocketonmessage(e) {
                 break;
             }
             case "operation": {
-                if (global_callback != null && global_callback != "" && global_callback != undefined) {
-                    global_callback(data);
+                if (operationChannel != undefined && typeof operationChannel == "function") {
+                    if (data.sender !== userInfo.userId) {
+                        operationChannel(data);
+                    }
+                }
+                break;
+            }
+            case "data": {
+                if (dataChannel != undefined && typeof dataChannel == "function") {
+                    if (data.sender !== userInfo.userId) {
+                        selectFile(data.content);
+                        dataChannel(data);
+                    }
                 }
                 break;
             }
@@ -648,7 +775,7 @@ function socketClose() {
  * send custom operation
  */
 function sendCustomOperation(agentData, callback) {
-    global_callback = callback;
+    operationChannel = callback;
     if (websock.readyState === websock.OPEN) {
         // 若是ws开启状态
         websocketSend(agentData)
@@ -667,10 +794,20 @@ function sendCustomOperation(agentData, callback) {
 
 /**
  * public method
+ * buid call back channel
+ */
+function buildSocketChannel(opeChannel, dataChannel, compChannel) {
+    operationChannel = opeChannel;
+    dataChannel = dataChannel;
+    computationChannel = compChannel;
+}
+
+/**
+ * public method
  * send computation operation
  */
 function sendSock(agentData, callback) {
-    global_callback = callback;
+    operationChannel = callback;
     if (websock.readyState === websock.OPEN) {
         // 若是ws开启状态
         websocketSend(agentData)
@@ -688,7 +825,7 @@ function sendSock(agentData, callback) {
 }
 
 function sendComputionSock(data, params) {
-    
+
 }
 
 /**
