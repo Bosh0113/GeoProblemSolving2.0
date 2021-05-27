@@ -594,7 +594,7 @@
               oids += selectedRes[i].pathURL.split("/data/")[1]
             }
           }
-          let downloadBatchUrl = "http://221.226.60.2:8082/batchData?oids=" + oids;
+          let downloadBatchUrl = `http://${this.$store.state.DataServer}/batchData?oids=` + oids;
           window.open(downloadBatchUrl)
         }
       },

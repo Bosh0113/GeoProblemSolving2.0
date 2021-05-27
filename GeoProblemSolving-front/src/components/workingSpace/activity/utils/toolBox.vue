@@ -57,7 +57,7 @@
         <div
           v-for="tool in toolList"
           :key="tool.index"
-          style="width: 100px; display: inline-block"
+          style="width: 99px; display: inline-block"
           v-else
         >
           <Card
@@ -72,7 +72,7 @@
               @click="back2LastLevel()"
           /></Card>
           <Card
-            style="padding-top: 5px; background-color: #d3f1b1; margin: 5px"
+            style="padding-top: 5px; background-color: #d3f1b1; margin-right: 5px"
             v-if="tool.isToolset"
           >
             <div
@@ -123,7 +123,7 @@
             </div>
           </Card>
           <Card
-            style="padding-top: 5px; background-color: ghostwhite; margin: 5px"
+            style="padding-top: 5px; background-color: ghostwhite; margin-right: 5px"
           >
             <div
               style="text-align: center; cursor: pointer"
