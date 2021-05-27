@@ -521,7 +521,7 @@ export default {
         `/GeoProblemSolving/dataContainer/uploadSingle`,
         uploadFileForm
       );
-      let resultId = `http://221.226.60.2:8082/data/${data}`;
+      let resultId = `http://${this.$store.state.DataServer}/data/${data}`;
       this.$set(this.stateList[stateIndex].Event[eventIndex], "url", resultId);
     },
 

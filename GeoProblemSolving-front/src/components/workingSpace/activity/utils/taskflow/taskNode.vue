@@ -388,7 +388,7 @@ export default {
   },
   mounted(){
     if(this.type == 'operation'){
-      this.operationInit();
+      // this.operationInit();
     }
   },
   methods: {

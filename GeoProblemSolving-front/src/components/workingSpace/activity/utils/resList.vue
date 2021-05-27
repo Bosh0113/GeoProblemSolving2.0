@@ -2,22 +2,44 @@
   <div>
     <Card class="resCard" dis-hover>
       <div slot="title">
-        <Icon
-          v-if="dataListStyle"
-          type="md-list"
-          size="24"
-          @click="dataListStyle = false"
-          title="Resources list style"
-          style="margin-right: 10px; cursor: pointer"
+        <Button
+          v-if="folderIdStack.length >= 1"
+          icon="md-arrow-round-back"
+          shape="circle"
+          size="small"
+          @click="backforeFolder"
+          title="Back to the parent folder"
+          style="cursor: pointer"
         />
-        <Icon
+        <Button
           v-else
-          type="md-apps"
-          size="24"
-          @click="dataListStyle = true"
-          title="Resources list style"
-          style="margin-right: 10px; cursor: pointer"
+          icon="md-arrow-round-back"
+          shape="circle"
+          size="small"
+          title="Back to the parent folder"
+          style="color: lightgray; cursor: default"
         />
+        <Label style="margin-left: 20px">Select:</Label>
+        <Select
+          v-model="resouceType"
+          size="small"
+          @on-change="changeResType"
+          style="width: 150px; margin: 5px"
+        >
+          <Option value="all">All resources</Option>
+          <Option value="data">Data</Option>
+          <Option value="others">Other resources</Option>
+          <!-- <Option value="toolData">Results</Option> -->
+        </Select>
+        <Button
+          v-if="userRole != 'Visitor'"
+          shape="circle"
+          size="small"
+          icon="md-cloud-outline"
+          @click="getPersonalRes()"
+          style="margin-right: 10px"
+          title="Get resources from your personal space"
+        ></Button>
         <Button
           v-if="userRole != 'Visitor'"
           shape="circle"
@@ -35,203 +57,63 @@
           @click="dataUploadModalShow"
           title="Upload resources"
         ></Button>
-        <Label style="margin-left: 20px">Select:</Label>
-        <Select
-          v-model="resouceModel"
-          size="small"
-          @on-change="changeResModel"
-          style="width: 150px; margin: 5px"
-        >
-          <Option value="resources">All resources</Option>
-          <Option value="data">Data</Option>
-          <Option value="materials">Other resources</Option>
-          <!-- <Option value="toolData">Results</Option> -->
-        </Select>
       </div>
       <div style="display: flex; justify-content: space-between">
-        <div style="width: 100%" v-if="dataListStyle">
-          <Table
-            :columns="tableColName"
-            :data="fileList"
-            class="table"
-            v-show="fileList != [] && fileList != 'None'"
-            height="400"
-            no-data-text="No resource"
-          >
-            <template slot-scope="{ row }" slot="name">
-              <strong>{{ row.name }}</strong>
-            </template>
-            <template slot-scope="{ row }" slot="action">
-              <Button
-                class="fileBtnHoverGreen"
-                size="small"
-                title="Check"
-                @click="checkData(row)"
-                icon="md-eye"
-                shape="circle"
-                type="text"
-              ></Button>
-              <template
-                v-if="
-                  permissionIdentity(
-                    activityInfo.permission,
-                    userRole,
-                    'use_resource'
-                  ) ||
-                  (permissionIdentity(
-                    activityInfo.permission,
-                    userRole,
-                    'upload_resource'
-                  ) &&
-                    item.uploaderId == userInfo.userId)
-                "
-              >
-                <a :href="row.pathURL" :download="row.name" title="Download">
-                  <Button
-                    class="fileBtnHoverBlue"
-                    size="small"
-                    shape="circle"
-                    type="text"
-                    icon="md-download"
-                    title="Download"
-                  ></Button>
-                </a>
-                <Button
-                  class="fileBtnHoverRed"
-                  size="small"
-                  shape="circle"
-                  type="text"
-                  icon="md-close"
-                  title="Remove"
-                  @click="deleteResourceModalShow(row.resourceId)"
-                ></Button>
-              </template>
-            </template>
-          </Table>
-        </div>
-        <div id="toolData" v-else>
-          <Card
-            style="width: 100px; height: 100px; float: left; margin: 5px"
-            v-if="fileList.length == 0"
-          >
+        <div style="width: 100%">
+          <Card class="res-content" v-if="fileList.length == 0">
             <div>There is no resource.</div>
           </Card>
           <vue-scroll :ops="ops" style="max-height: calc(100vh - 245px)" v-else>
+            <Card class="res-content"
+              ><Icon
+                type="ios-add"
+                size="80"
+                title="Create a new file folder"
+                @click="addFolderModalShow"
+            /></Card>
             <div v-for="(item, index) in fileList" :key="index">
-              <Card
-                style="width: 100px; height: 100px; float: left; margin: 5px"
-              >
-                <div style="margin-left: 15px">
+              <Card class="res-content">
+                <div
+                  class="res-content-image"
+                  v-if="item.folder"
+                  @click="enterFolder(item)"
+                >
+                  <img
+                    :src="folderUrl"
+                    height="42px"
+                    width="42px"
+                    title="Folder"
+                  />
+                </div>
+                <div class="res-content-image" @click="checkData(item)" v-else>
                   <template
                     v-if="item.thumbnail == '' || item.thumbnail == undefined"
                   >
                     <img
-                      v-if="item.type == 'data'"
-                      :src="dataUrl"
+                      :src="getImageUrl(item.type)"
                       height="42px"
                       width="42px"
-                      title="Data"
-                    />
-                    <img
-                      v-else-if="item.type == 'model'"
-                      :src="modelUrl"
-                      height="42px"
-                      width="42px"
-                      title="Model"
-                    />
-                    <img
-                      v-else-if="item.type == 'paper'"
-                      :src="paperUrl"
-                      height="42px"
-                      width="42px"
-                      title="Paper"
-                    />
-                    <img
-                      v-else-if="item.type == 'document'"
-                      :src="documentUrl"
-                      height="42px"
-                      width="42px"
-                      title="Document"
-                    />
-                    <img
-                      v-else-if="item.type == 'image'"
-                      :src="imageUrl"
-                      height="42px"
-                      width="42px"
-                      title="Image"
-                    />
-                    <img
-                      v-else-if="item.type == 'video'"
-                      :src="videoUrl"
-                      height="42px"
-                      width="42px"
-                      title="Video"
-                    />
-                    <img
-                      v-else-if="item.type == 'others'"
-                      :src="otherUrl"
-                      height="42px"
-                      width="42px"
-                      title="Others"
+                      :title="item.type"
                     />
                   </template>
                   <template v-else>
                     <img :src="item.thumbnail" height="42px" width="42px" />
                   </template>
                 </div>
-                <div style="float: left">
-                  <div>
-                    <div class="toolDataText" :title="item.name">
-                      {{ item.name }}
-                    </div>
+                <div>
+                  <div
+                    class="toolDataText"
+                    :title="item.name"
+                    v-if="item.folder"
+                  >
+                    {{ item.name }}
                   </div>
-                  <div>
-                    <Icon
-                      size="small"
-                      title="Check"
-                      type="md-eye"
-                      style="margin: 10px 5px 0 0; cursor: pointer"
-                      @click="checkData(item)"
-                    ></Icon>
-                    <a :href="item.pathURL" :download="item.name">
-                      <Icon
-                        v-if="
-                          permissionIdentity(
-                            activityInfo.permission,
-                            userRole,
-                            'use_resource'
-                          )
-                        "
-                        size="small"
-                        title="Download"
-                        type="md-download"
-                        style="
-                          margin: 10px 5px 0 0;
-                          cursor: pointer;
-                          color: #515a6e;
-                        "
-                      ></Icon>
-                    </a>
-                    <Icon
-                      v-if="
-                        permissionIdentity(
-                          activityInfo.permission,
-                          userRole,
-                          'manage_resource'
-                        ) ||
-                        (permissionIdentity(
-                          activityInfo.permission,
-                          userRole,
-                          'upload_resource'
-                        ) &&
-                          item.uploaderId == userInfo.userId)
-                      "
-                      size="small"
-                      title="Delete"
-                      type="md-close"
-                      style="margin-top: 10px; cursor: pointer"
-                      @click="deleteResourceModalShow(item.resourceId)"
-                    ></Icon>
+                  <div
+                    class="toolDataText"
+                    :title="item.name + item.suffix"
+                    v-else
+                  >
+                    {{ item.name + item.suffix }}
                   </div>
                 </div>
               </Card>
@@ -241,43 +123,134 @@
       </div>
     </Card>
     <Modal
-      v-model="checkDataModal"
-      title="Data Information"
-      width="600"
-      ok-text="Ok"
+      v-model="renameFolderModal"
+      title="Rename folder"
+      ok-text="Assure"
       cancel-text="Cancel"
     >
-      <Tabs>
-        <TabPane label="Information" name="metadata" icon="md-home">
-          <div style>
-            <div class="dataInfo">
-              <Label class="dataLabel">Name:</Label>
-              <span class="dataText">{{ selectData.name }}</span>
-            </div>
-            <div class="dataInfo">
-              <Label class="dataLabel">Type:</Label>
-              <span class="dataContent">{{ selectData.type }}</span>
-              <Label class="dataLabel">Provider:</Label>
-              <span class="dataContent">{{ selectData.uploaderName }}</span>
-            </div>
-            <div class="dataInfo">
-              <Label class="dataLabel">File size:</Label>
-              <span class="dataContent">{{ selectData.fileSize }}</span>
-              <Label class="dataLabel">Creation time:</Label>
-              <span class="dataContent">{{ selectData.uploadTime }}</span>
-            </div>
-            <div class="dataInfo">
-              <Label class="dataLabel">Description:</Label>
-              <span class="dataText">{{ selectData.description }}</span>
-            </div>
-          </div>
-        </TabPane>
-        <!-- <TabPane label="UDX Schema" name="udx" icon="md-browsers">
+      <Form
+        ref="renameValidate"
+        :model="renameValidate"
+        :rules="renameRuleValidate"
+        :label-width="80"
+      >
+        <FormItem label="New name" prop="newName">
+          <Input
+            v-model="renameValidate.newName"
+            :rows="4"
+            placeholder="Enter the name for folder..."
+          />
+        </FormItem>
+      </Form>
+      <div slot="footer">
+        <Button @click="renameFolderModal = false">Cancel</Button>
+        <Button type="success" @click="renameFolder('renameValidate')"
+          >Rename
+        </Button>
+      </div>
+    </Modal>
+    <Modal v-model="newFolderModal" title="New folder">
+      <Form
+        ref="newValidate"
+        :model="newValidate"
+        :rules="newRuleValidate"
+        :label-width="80"
+        @submit.native.prevent
+      >
+        <FormItem label="Set name" prop="setName">
+          <Input
+            v-model="newValidate.setName"
+            :rows="4"
+            placeholder="Enter the name for folder..."
+          />
+        </FormItem>
+      </Form>
+      <div slot="footer">
+        <Button @click="newFolderModal = false">Cancel</Button>
+        <Button type="success" @click="addFolder('newValidate')">New</Button>
+      </div>
+    </Modal>
+    <Modal
+      v-model="checkDataModal"
+      title="Data information"
+      width="600"
+      footer-hide
+    >
+      <!-- <Tabs>
+        <TabPane label="Information" name="metadata" icon="md-home"> -->
+      <div style>
+        <div class="dataInfo">
+          <Label class="dataLabel">Name:</Label>
+          <span class="dataText">{{
+            selectData.name + selectData.suffix
+          }}</span>
+        </div>
+        <div class="dataInfo">
+          <Label class="dataLabel">Type:</Label>
+          <span class="dataContent">{{ selectData.type }}</span>
+          <Label class="dataLabel">Provider:</Label>
+          <span class="dataContent">{{ selectData.uploaderName }}</span>
+        </div>
+        <div class="dataInfo">
+          <Label class="dataLabel">File size:</Label>
+          <span class="dataContent">{{ selectData.fileSize }}</span>
+          <Label class="dataLabel">Created time:</Label>
+          <span class="dataContent">{{ dateFormat(selectData.uploadTime) }}</span>
+        </div>
+        <div class="dataInfo">
+          <Label class="dataLabel">Description:</Label>
+          <span class="dataText">{{ selectData.description }}</span>
+        </div>
+      </div>
+      <!-- </TabPane>
+        <TabPane label="UDX Schema" name="udx" icon="md-browsers">
           <pre class="brush: html"></pre>
           <template>...</template>
-        </TabPane>-->
-      </Tabs>
+        </TabPane>
+      </Tabs> -->
       <br />
+      <div>
+        <a
+          :href="selectData.address"
+          :download="selectData.name + selectData.suffix"
+        >
+          <Button
+            v-if="
+              permissionIdentity(
+                activityInfo.permission,
+                userRole,
+                'use_resource'
+              )
+            "
+            type="info"
+            size="small"
+            title="Download"
+            icon="md-download"
+            style="margin: 10px 20px 0 0; cursor: pointer; width: 60px"
+          ></Button>
+        </a>
+        <Button
+          v-if="
+            permissionIdentity(
+              activityInfo.permission,
+              userRole,
+              'manage_resource'
+            ) ||
+            (permissionIdentity(
+              activityInfo.permission,
+              userRole,
+              'upload_resource'
+            ) &&
+              selectData.uploaderId == userInfo.userId)
+          "
+          size="small"
+          type="warning"
+          title="Delete"
+          icon="md-close"
+          style="margin: 10px 20px 0 0; cursor: pointer; width: 60px"
+          @click="deleteResourceModalShow(selectData.uid)"
+        ></Button>
+      </div>
       <!-- <Button style="margin-right:20px" @click="dataPreview(selectData)">Preview</Button>
       <Button style="margin-right:20px" @click="dataVisualize">Visualization</Button>-->
     </Modal>
@@ -358,7 +331,7 @@
           <li style="display: flex">
             File name:
             <span style="font-size: 10px; margin: 0 5px 0 5px"
-              >{{ list.name }} ( {{ list.fileSize }} )</span
+              >{{ list.name + list.suffix }} ( {{ list.fileSize }} )</span
             >
             <Icon
               type="ios-close"
@@ -388,7 +361,7 @@
     <Modal
       v-model="deleteResourceModal"
       @on-ok="deleteResource()"
-      ok-text="Assure"
+      ok-text="Delete"
       cancel-text="Cancel"
     >
       <h3>Do you really want to delete this resource?</h3>
@@ -411,7 +384,35 @@ export default {
       },
       userInfo: this.$store.getters.userInfo,
       userRole: this.roleIdentity(this.activityInfo),
-      resouceModel: "resources",
+      resouceType: "all",
+      // 文件夹
+      newFolderModal: false,
+      newValidate: {
+        setName: "",
+      },
+      newRuleValidate: {
+        setName: [
+          {
+            required: true,
+            message: "The name can't be null.",
+            trigger: "blur",
+          },
+        ],
+      },
+      renameForeInfo: {},
+      renameFolderModal: false,
+      renameValidate: {
+        newName: "",
+      },
+      renameRuleValidate: {
+        newName: [
+          {
+            required: true,
+            message: "The name can't be null.",
+            trigger: "blur",
+          },
+        ],
+      },
       //资源继承
       preActivities: [],
       existingResources: [],
@@ -452,7 +453,8 @@ export default {
       fileCountTimer: null,
       progressModalShow: false,
       uploadProgress: 0,
-      folderIdStack: [], //
+      folderStack: [{ uid: 0, name: "Home" }], //folder level
+      folderIdStack: [], // folder level
       fileList: [], //showed resources
       activityResList: [], //resources in the activity
       activityDataList: [], //data in the activity
@@ -467,8 +469,8 @@ export default {
       imageUrl: require("@/assets/images/image.png"),
       videoUrl: require("@/assets/images/video.png"),
       otherUrl: require("@/assets/images/otherfile.png"),
+      folderUrl: require("@/assets/images/folder.png"),
       //
-      showType: "resources",
       checkDataModal: false,
       tableColName: [
         {
@@ -566,6 +568,44 @@ export default {
         );
       }
     },
+    dateFormat(date) {
+      let time = new Date(date);
+      return time.Format("yyyy-MM-dd HH:mm:ss")
+    },
+    getImageUrl(type) {
+      let url;
+      switch (type) {
+        case 'data': {
+          url = this.dataUrl;
+          break;
+        }
+        case 'model': {
+          url = this.modelUrl;
+          break;
+        }
+        case 'paper': {
+          url = this.paperUrl;
+          break;
+        }
+        case 'document': {
+          url = this.documentUrl;
+          break;
+        }
+        case 'image': {
+          url = this.imageUrl;
+          break;
+        }
+        case 'video': {
+          url = this.videoUrl;
+          break;
+        }
+        case 'others': {
+          url = this.otherUrl;
+          break;
+        }
+      }
+      return url;
+    },
     getResList() {
       if (this.activityInfo.aid != "" && this.activityInfo.aid != undefined) {
         this.axios
@@ -576,11 +616,12 @@ export default {
             } else if (res.data.code == 0) {
               let list = res.data.data;
               this.$set(this, "activityResList", list);
-              this.$set(this, "fileList", list);
-              //filte
               this.filterData();
               this.filterRelatedRes();
               // this.filterToolData();
+
+              // show resources
+              this.$set(this, "fileList", list);
             }
           })
           .catch((err) => {
@@ -589,14 +630,14 @@ export default {
       }
     },
     filterData() {
-      var filterdata = this.fileList.filter((item) => {
-        return item.type === "data";
+      var filterdata = this.activityResList.filter((item) => {
+        return item.folder || item.type === "data";
       });
       this.$set(this, "activityDataList", filterdata);
     },
     filterRelatedRes() {
-      var filterdata = this.fileList.filter((item) => {
-        return item.type !== "data";
+      var filterdata = this.activityResList.filter((item) => {
+        return item.folder || item.type !== "data";
       });
       this.$set(this, "relatedResList", filterdata);
     },
@@ -609,19 +650,15 @@ export default {
     //   this.$set(this, "toolDataList", filterdata);
     // },
 
-    changeResModel(value) {
-      if (value == "resources") {
+    changeResType(value) {
+      if (value == "all") {
         this.fileList = this.activityResList;
-        this.showType = value;
       } else if (value == "data") {
         this.fileList = this.activityDataList;
-        this.showType = value;
-      } else if (value == "materials") {
+      } else if (value == "others") {
         this.fileList = this.relatedResList;
-        this.showType = value;
       } else if (value == "toolData") {
         // this.fileList = this.toolDataList;
-        // this.showType = value;
       }
     },
     gatherFile(file) {
@@ -700,14 +737,10 @@ export default {
                     for (var i = 0; i < uploadedList.length; i++) {
                       this.fileList.push(uploadedList[i]);
 
-                      if (
-                        this.showType == "data" ||
-                        this.showType == "materials"
-                      ) {
-                        this.activityResList.push(uploadedList[i]);
-                      } else if (this.uploadDataInfo.type == "data") {
+                      this.activityResList.push(uploadedList[i]);
+                      if (this.uploadDataInfo.type == "data") {
                         this.activityDataList.push(uploadedList[i]);
-                      } else {
+                      } else if (this.uploadDataInfo.type == "others") {
                         this.relatedResList.push(uploadedList[i]);
                       }
                     }
@@ -730,24 +763,6 @@ export default {
 
                     // 初始化上传数据列表
                     this.toUploadFiles = [];
-
-                    // 记录信息
-                    let filelist = "";
-                    for (let i = 0; i < uploadedList.length - 1; i++) {
-                      filelist += uploadedList[i].name + ", ";
-                    }
-                    filelist +=
-                      uploadedList[uploadedList.length - 1].name + ". ";
-                    let dataRecords = {
-                      type: "resource",
-                      time: new Date().Format("yyyy-MM-dd HH:mm:ss"),
-                      who: this.userInfo.userName,
-                      content: "upload data",
-                      file: filelist,
-                    };
-                    // 保存记录
-                    this.$emit("dataBehavior", dataRecords);
-                    // this.addHistoryEvent(this.activityInfo.aid, dataRecords);
                   } else {
                     this.$Message.warning("Upload fail.");
                   }
@@ -797,49 +812,38 @@ export default {
               });
 
               //从列表中删除
-              var deleteResType = "";
-              for (let i = 0; i < this.fileList.length; i++) {
-                if (this.fileList[i].resourceId == this.deleteResourceId) {
-                  // 记录信息
-                  try {
-                    let dataRecords = {
-                      type: "resource",
-                      time: new Date().Format("yyyy-MM-dd HH:mm:ss"),
-                      who: this.userInfo.userName,
-                      content: "delete data",
-                      file: this.fileList[i].name,
-                    };
-                    this.$emit("dataBehavior", dataRecords);
-                    // this.addHistoryEvent(this.activityInfo.aid, dataRecords);
-
-                    deleteResType = this.fileList[i].type;
-                    this.fileList.splice(i, 1);
-                  } catch (err) {
-                    throw err;
-                  }
+              let deleteResType = "";
+              // for (let i = 0; i < this.fileList.length; i++) {
+              //   if (this.fileList[i].uid == this.deleteResourceId) {
+              //     // 记录信息
+              //     try {
+              //       deleteResType = this.fileList[i].type;
+              //       this.fileList.splice(i, 1);
+              //     } catch (err) {
+              //       throw err;
+              //     }
+              //   }
+              // }
+              // 同步删除其他数组内的资源
+              for (var i = 0; i < this.activityResList.length; i++) {
+                if (
+                  this.activityResList[i].uid == this.deleteResourceId
+                ) {
+                  this.activityResList.splice(i, 1);
                 }
               }
-              // 同步删除其他数组内的资源
-              if (this.showType == "data" || this.showType == "materials") {
-                for (var i = 0; i < this.activityResList.length; i++) {
-                  if (
-                    this.activityResList[i].resourceId == this.deleteResourceId
-                  ) {
-                    this.activityResList.splice(i, 1);
-                  }
-                }
-              } else if (deleteResType == "data") {
+              if (deleteResType == "data") {
                 for (var i = 0; i < this.activityDataList.length; i++) {
                   if (
-                    this.activityDataList[i].resourceId == this.deleteResourceId
+                    this.activityDataList[i].uid == this.deleteResourceId
                   ) {
                     this.activityDataList.splice(i, 1);
                   }
                 }
-              } else {
+              } else if (deleteResType == "others") {
                 for (var i = 0; i < this.relatedResList.length; i++) {
                   if (
-                    this.relatedResList[i].resourceId == this.deleteResourceId
+                    this.relatedResList[i].uid == this.deleteResourceId
                   ) {
                     this.relatedResList.splice(i, 1);
                   }
@@ -847,7 +851,7 @@ export default {
               }
               // // 如果删除的是ToolData, 同步删除
               // for (var i = 0; i < this.toolDataList.length; i++) {
-              //   if (this.toolDataList[i].resourceId == this.deleteResourceId) {
+              //   if (this.toolDataList[i].uid == this.deleteResourceId) {
               //     this.toolDataList.splice(i, 1);
               //   }
               // }
@@ -895,12 +899,10 @@ export default {
             if (this.panel != null) {
               this.panel.close();
             }
-            var url =
-              "http://view.officeapps.live.com/op/view.aspx?src=" +
-              "http://" +
-              this.$store.state.IP_Port +
-              res.pathURL;
-            var toolURL =
+            let url =
+              "http://view.officeapps.live.com/op/view.aspx?src=" +              
+              res.address;
+            let toolURL =
               "<iframe src=" +
               url +
               ' style="width: 100%;height:100%" frameborder="0"></iframe>';
@@ -936,10 +938,9 @@ export default {
         if (this.panel != null) {
           this.panel.close();
         }
-        var url = "http://" + this.$store.state.IP_Port + res.pathURL;
         var toolURL =
           "<video src=" +
-          url +
+          res.address +
           ' style="width: 100%;height:100%" controls></video>';
         // var demoPanelTimer = null;
         this.panel = jsPanel.create({
@@ -968,10 +969,9 @@ export default {
         if (this.panel != null) {
           this.panel.close();
         }
-        var url = "http://" + this.$store.state.IP_Port + res.pathURL;
         var toolURL =
           "<iframe src=" +
-          url +
+          res.address +
           ' style="width: 100%;height:100%" frameborder="0" controls></iframe>';
         // var demoPanelTimer = null;
         this.panel = jsPanel.create({
@@ -1003,6 +1003,9 @@ export default {
         });
         return false;
       }
+    },
+    getPersonalRes() {
+
     },
     getPreviousRes() {
       // 获取可继承的资源
@@ -1050,7 +1053,7 @@ export default {
                   key: mockData.length.toString(),
                   name: selectedRes[j].name,
                   type: selectedRes[j].type,
-                  resourceId: selectedRes[j].uid,
+                  uid: selectedRes[j].uid,
                   source: activityName,
                 });
               }
@@ -1073,7 +1076,7 @@ export default {
             key: this.targetKeys[i],
             name: this.existingResources[this.targetKeys[i]].name,
             type: this.existingResources[this.targetKeys[i]].type,
-            resourceId: this.existingResources[this.targetKeys[i]].resourceId,
+            uid: this.existingResources[this.targetKeys[i]].uid,
             source: this.existingResources[this.targetKeys[i]].source,
           });
         }
@@ -1094,7 +1097,7 @@ export default {
       let selectResource = this.getTargetKeys();
       let addFileList = [];
       for (var i = 0; i < selectResource.length; i++) {
-        addFileList.push(selectResource[i].resourceId);
+        addFileList.push(selectResource[i].uid);
       }
 
       let tempPath = this.folderIdStack;
@@ -1129,14 +1132,195 @@ export default {
           );
         });
     },
+    enterFolder(currentFolder) {
+      this.folderIdStack.unshift(currentFolder.uid);
+      this.changeFolder(currentFolder, "enter");
+    },
+    backforeFolder() {
+      if (this.folderStack.length > 1) {
+        //folderStack 倒数第二个就是其的父文件夹
+        this.folderIdStack.splice(0, 1);
+        this.changeFolder(
+          this.folderStack[this.folderStack.length - 2],
+          "back"
+        );
+      } else {
+        this.$Message.warning("This is the root folder.");
+      }
+    },
+    changeFolder(folder, operationType) {
+      let temp = this.folderIdStack;
+      console.log(this.folderIdStack);
+      if (temp.length == 0) {
+        temp = ["0"];
+      }
+      this.axios
+        .get(
+          "/GeoProblemSolving/rip/" +
+            this.activityInfo.aid +
+            "/" +
+            temp.toString()
+        )
+        .then((res) => {
+          if (res.data == "Offline") {
+            confirm("You are offline, please login again.");
+          } else if (res.data.code == 0) {
+            let list = res.data.data;
+
+            this.$set(this, "activityResList", list);
+            this.filterData();
+            this.filterRelatedRes();
+            // this.filterToolData();
+
+            // show resources
+            this.$set(this, "fileList", list);
+
+            if (operationType == "enter") {
+              this.folderStack.push({ uid: folder.uid, name: folder.name });
+            } else if (operationType == "back") {
+              this.folderStack.pop();
+            }
+          } else {
+            this.$Message.warning("Get folder info fail.");
+          }
+        })
+        .catch((err) => {
+          this.$Message.warning("Get folder info fail.");
+        });
+    },
+    addFolderModalShow() {
+      this.newValidate.setName = "";
+      this.newFolderModal = true;
+    },
+    addFolder(name) {
+      this.$refs[name].validate((valid) => {
+        if (valid) {
+          let pathArray = this.folderIdStack;
+          if (pathArray.length == 0) {
+            pathArray = ["0"];
+          }
+          let formData = new FormData();
+          formData.append("folderName", this.newValidate.setName);
+          formData.append("paths", pathArray.toString());
+          formData.append("aid", this.activityInfo.aid);
+          this.axios
+            .post("/GeoProblemSolving/rip/folder", formData)
+            .then((res) => {
+              if (res.data == "Offline") {
+                confirm("You are offline, please login again.");
+              } else if (res.data.code == 0) {
+                this.activityResList.push(res.data.data);
+                this.activityDataList.push(res.data.data);
+                this.relatedResList.push(res.data.data);
+
+                this.newFolderModal = false;
+              } else {
+                this.$Message.warning("New folder fail.");
+              }
+            })
+            .catch((err) => {
+              this.$Message.warning("New folder fail.");
+            });
+        }
+      });
+    },
+    deleteFolder(folder) {
+      if (confirm("Are you sure to delete this folder?")) {
+        let folderId = folder.uid;
+        let temp = this.folderIdStack;
+        if (temp.length == 0) {
+          //重新开辟内存空间的temp,如果直接使用push的话，地址还是指向原数据的地址
+          temp = ["0"];
+        }
+        let formData = new FormData();
+        formData.append("uids", folderId);
+        formData.append("aid", this.activityInfo.aid);
+        formData.append("paths", temp.toString());
+        this.axios
+          .post("/GeoProblemSolving/rip/del", formData)
+          .then((res) => {
+            if (res.data == "Offline") {
+              confirm("You are offline, please login again.");
+            } else if (res.data.code == 0) {
+              //删除用于显示的数据中对应的内容
+              for (let i = 0; i < this.currentFolder.folders.length; i++) {
+                if (this.currentFolder.folders[i].uid == folderId) {
+                  this.currentFolder.folders.splice(i, 1);
+                  break;
+                }
+              }
+            } else {
+              this.$Message.warning("Delete folder fail.");
+            }
+          })
+          .catch((err) => {
+            this.$Message.warning("Delete folder fail.");
+          });
+      }
+    },
+    renameFolderModalShow(folder) {
+      this.renameForeInfo = folder;
+      this.renameValidate.newName = "";
+      this.renameFolderModal = true;
+    },
+    renameFolder(name) {
+      this.$refs[name].validate((valid) => {
+        if (valid) {
+          let aid = this.activityInfo.aid;
+          let folderId = this.renameForeInfo.uid;
+          let newFolderName = this.renameValidate.newName;
+          let temp = this.folderIdStack;
+          if (temp.length == 0) {
+            temp = ["0"];
+          }
+          let formData = new FormData();
+          formData.append("aid", aid);
+          formData.append("folderId", folderId);
+          formData.append("newFolderName", newFolderName);
+          formData.append("paths", temp.toString());
+          this.axios
+            .put("/GeoProblemSolving/rip/folder", formData)
+            .then((res) => {
+              if (res.data == "Offline") {
+                this.$store.commit("userLogout");
+                this.$router.push({ name: "Login" });
+              } else if (res.data.code == 0) {
+                let newNameFolder = {
+                  uid: folderId,
+                  name: newFolderName,
+                };
+                for (var i = 0; i < this.currentFolder.folders.length; i++) {
+                  if (this.currentFolder.folders[i].uid == folderId) {
+                    this.currentFolder.folders.splice(i, 1, newNameFolder);
+                    break;
+                  }
+                }
+              } else {
+                this.$Message.warning("Rename fail.");
+              }
+            })
+            .catch((err) => {
+              this.$Message.warning("Rename fail.");
+            });
+          this.renameFolderModal = false;
+        }
+      });
+    },
     dataVisualize() {},
   },
 };
 </script>
 <style scoped>
-.table table {
-  table-layout: auto;
-  width: 100% !important;
+.res-content {
+  width: 90px;
+  height: 85px;
+  float: left;
+  margin: 5px;
+  cursor: pointer;
+}
+.res-content-image {
+  margin-left: 18px;
+  padding-top: 5px;
 }
 .fileBtnHoverGreen:hover {
   background-color: #19be6b;
@@ -1178,15 +1362,14 @@ export default {
   color: dodgerblue;
 }
 .toolDataText {
+  font-size: 12px;
   width: 80px;
   word-break: break-word;
   /* display: inline-block; */
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
-}
-#toolData {
-  width: 100%;
+  text-align: center;
 }
 #toolDataHeader {
   font-size: 12px;
@@ -1200,5 +1383,8 @@ export default {
 }
 .resCard >>> .ivu-card-head {
   padding: 6px 16px;
+}
+.resCard >>> .ivu-card-body {
+  padding: 5px;
 }
 </style>

@@ -29,7 +29,7 @@ public class OperationSocketServer {
     }
 
     /**
-     * operation content 1: type消息类型（members, test, collaboration-init, mode, control-apply, control-stop, operation, computation）
+     * operation content 1: type消息类型（members, test, collaboration-init, mode, control-apply, control-stop, operation, computation,data）
      * operation content 2: sender发送者, receivers接收者, behavior行为, object操作对象, participants在线参与者, waiting等待人数, operator当前操作者, mode协同模式
      * @param toolId
      * @param aid

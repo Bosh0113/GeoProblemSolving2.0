@@ -104,7 +104,7 @@
           <div v-show="showFile">
             <span id="show-file">
               <i class="ivu-icon ivu-icon-md-document"></i>
-              {{ uploadDataName }}
+              {{ selectData.name }}
             </span>
           </div>
           <br />
@@ -149,12 +149,11 @@ export default {
       //geojson blob
       geojsonBlob: null,
       showFile: false,
-      uploadDataName: "",
       //存储绘制的图像layer
       drawingLayerGroup: null,
       participants: [],
       olParticipants: [],
-      dataUrl: "",
+      selectData: {},
       formValidate: {
         fileName: "",
         fileDescription: "",
@@ -420,7 +419,7 @@ export default {
             let file = uploadResources([fileOfBlob], description, "data", "private");
 
             this.showFile = true;
-            this.uploadDataName = filename;
+            this.selectData = file;
 
             if(file.length > 0){
               this.$Notice.open({
@@ -448,19 +447,17 @@ export default {
       let uploadedList = uploadResources(file, "Map tool data", "data", "private");
       if (uploadedList.length > 0) {
         this.showFile = true;
-        this.uploadDataName = uploadedList[0].name;
-        this.dataUrl =
-          "/GeoProblemSolving/resource/upload/" + this.uploadDataName;
+        this.selectData = uploadedList[0];
       }
 
       return false;
     },
     viewData() {
-      if (/\.(json)$/.test(this.dataUrl.toLowerCase())) {
+      if (/\.(json)$/.test(this.selectData.suffix.toLowerCase())) {
         //从url获取GeoJSON数据
         var that = this;
         var xhr = new XMLHttpRequest();
-        xhr.open("GET", this.dataUrl, true);
+        xhr.open("GET", this.selectData.address, true);
         xhr.onload = function (e) {
           if (this.status == 200) {
             var file = JSON.parse(this.response);
@@ -478,10 +475,10 @@ export default {
           }
         };
         xhr.send();
-      } else if (/\.(zip)$/.test(this.dataUrl.toLowerCase())) {
+      } else if (/\.(zip)$/.test(this.selectData.suffix.toLowerCase())) {
         try {
           var that = this;
-          shp(this.dataUrl).then(function (file) {
+          shp(this.selectData.address).then(function (file) {
             let geoJsonLayer = L.geoJSON(file, {
               style: function (feature) {
                 return { color: "orange" };
@@ -703,7 +700,7 @@ export default {
           }
           case "select": {
             for (let i = 0; i < selectedResources.length; i++) {
-              this.dataUrl = selectedResources[i].address;
+              this.selectData = selectedResources[i];
               this.viewData();
             }
             break;
@@ -790,7 +787,7 @@ export default {
     },
     loadResources(resList) {
       for (let i = 0; i < resList.length; i++) {
-        this.dataUrl = resList[i].address;
+        this.selectData = resList[i];
         this.viewData();
       }
     },

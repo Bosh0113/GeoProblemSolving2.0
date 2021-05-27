@@ -123,7 +123,7 @@
             </div>
           </Card>
           <Card
-            style="padding-top: 5px; background-color: ghostwhite; margin: 5px"
+            style="padding-top: 5px; background-color: ghostwhite; margin-right: 5px"
           >
             <div
               style="text-align: center; cursor: pointer"

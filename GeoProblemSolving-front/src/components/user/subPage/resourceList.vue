@@ -1056,7 +1056,7 @@
           for (let i = 0; i < chooseFileUrls.length; i++) {
             temp.push(chooseFileUrls[i].split("/data/")[1]);
           }
-          window.open("http://221.226.60.2:8082/batchData?oids=" + temp.toString())
+          window.open(`http://${this.$store.state.DataServer}/batchData?oids=` + temp.toString())
         }
         // if (chooseFileUrls != "") {
         //   this.$Spin.show();

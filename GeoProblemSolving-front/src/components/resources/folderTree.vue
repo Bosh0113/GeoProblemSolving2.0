@@ -537,7 +537,7 @@
         >
       </div>
     </Modal>
-    <Modal v-model="editFileModel" title="Edit file info">
+    <Modal v-model="editFileModel" title="Edit file information">
       <Form
         ref="editFileValidate"
         :model="editFileValidate"
@@ -609,7 +609,6 @@
         folderStack: [{uid: 0, name: "Home"}],
         folderIdStack: [],
         newFolderModal: false,
-        setFolderName: "",
         newValidate: {
           setName: "",
         },
@@ -827,6 +826,7 @@
             } else if (res.data.code == 0) {
               let folderInfo = res.data.data;
               this.resToCurrentFolder(folderInfo);
+
               if (operationType == "enter") {
                 this.folderStack.push({uid: folder.uid, name: folder.name});
                 console.log(this.currentFolder)
@@ -1265,13 +1265,13 @@
       },
       downloadSelectFile() {
         let chooseFileUrls = this.chooseFilesArray;
-        console.log(this.chooseFilesArray)
+        // console.log(this.chooseFilesArray)
         let temp = [];
         if (chooseFileUrls.length != 0) {
           for (let i = 0; i < chooseFileUrls.length; i++) {
             temp.push(chooseFileUrls[i].split("/data/")[1]);
           }
-          window.open("http://221.226.60.2:8082/batchData?oids=" + temp.toString())
+          window.open(`http://${this.$store.state.DataServer}/batchData?oids=` + temp.toString())
         }
       },
       shareModalShow() {

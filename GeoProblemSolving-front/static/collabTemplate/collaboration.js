@@ -104,7 +104,7 @@ function loadCollabComponent() {
                     <button class="btn btn-primary btn-sm" id="resource-load">Load resource</button>
                 </div>
             </div>
-            <div class="sidebar-content" id="operation-panel" style="display: none;">            
+            <div class="sidebar-content" id="operation-panel" style="display: none;">
                 <div class="sync-state card" style="height: 40px">
                     <div class="custom-control custom-switch" title="Enable collaboration">
                         <input type="checkbox" class="custom-control-input" id="collaboration-switch" style="cursor: pointer">
@@ -132,7 +132,7 @@ function loadCollabComponent() {
                     </div>
                     <div class="operation-waiting" id="operation-waiting"></div>
                 </div>
-                <div class="operation-control-occupy" style="display: none;">                    
+                <div class="operation-control-occupy" style="display: none;">
                     <div class="operator" id="operator">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-joystick" viewBox="0 0 16 16" style="margin-top: -3px; margin-right:5px">
                             <path d="M10 2a2 2 0 0 1-1.5 1.937v5.087c.863.083 1.5.377 1.5.726 0 .414-.895.75-2 .75s-2-.336-2-.75c0-.35.637-.643 1.5-.726V3.937A2 2 0 1 1 10 2z"/>
@@ -155,7 +155,7 @@ function loadCollabComponent() {
 }
 
 function addEvents() {
-    // message    
+    // message
     window.addEventListener("message", getActivityInfo, false);
 
     $("#people-btn").on("click", function () {
@@ -178,7 +178,7 @@ function addEvents() {
         $("#operation-panel").hide();
     })
     $("#resource-load").on("click", function () {
-        if(loadResChannel != undefined && typeof loadResChannel == "function"){
+        if (loadResChannel != undefined && typeof loadResChannel == "function") {
             loadResChannel(selectedResources);
         }
     });
@@ -246,113 +246,117 @@ function personOffline(member) {
 function showResList() {
     if (resources != undefined) {
         for (let i = 0; i < resources.folders.length; i++) {
-            let folder = resources.folders[i];
+            addfolder(resources.folders[i]);
+        }
+        for (let j = 0; j < resources.files.length; j++) {
+            addfile(resources.files[j]);
+        }
+    }
+}
 
-            let resElement = `<div class="card resource" title="${folder.name}">
-                                    <input class="form-check-input" type="checkbox" id="${folder.uid}" value="${i}">
+function addfolder(folder) {
+    let resElement = `<div class="card resource" title="${folder.name}">
+                                    <input class="form-check-input" type="checkbox" id="${folder.uid}">
                                     <img src="/static/collabTemplate/mg/folder.png" class="res-icon" />
                                     <div class="res-name">${folder.name}</div>
                                 </div>`
-            $("#resource-list").append(resElement);
-            $(`#${folder.uid}`).on("change", function () {
-                selectFile(folder);
+    $("#resource-list").append(resElement);
+    $(`#${folder.uid}`).on("change", function () {
+        selectFile(folder);
 
-                let message = {
-                    type: "data",
-                    sender: userInfo.userId,
-                    behavior: "select",
-                    content:{
-                        uid: file.uid,
-                        name: file.name,
-                        description: file.description,
-                        address: file.address,
-                    }
-                }
-                websock.send(message);
-            });
-        }
-        for (let j = 0; j < resources.files.length; j++) {
-            let file = resources.files[j];
-
-            let resElement = "";
-            let fileName = file.name + file.suffix;
-            switch (file.type) {
-                case "data": {
-                    resElement = `<div class="card resource" title="${fileName}">
-                                    <input class="form-check-input" type="checkbox" id="${file.uid}" value="${j}">
-                                    <img src="/static/collabTemplate/img/data.png" class="res-icon" />
-                                    <div class="res-name">${fileName}</div>
-                                </div>`
-                    break;
-                }
-                case "model": {
-                    resElement = `<div class="card resource" title="${fileName}">
-                                    <input class="form-check-input" type="checkbox" id="${file.uid}" value="${j}">
-                                    <img src="/static/collabTemplate/img/model.png" class="res-icon" />
-                                    <div class="res-name">${fileName}</div>
-                                </div>`
-                    break;
-                }
-                case "paper": {
-                    resElement = `<div class="card resource" title="${fileName}">
-                                    <input class="form-check-input" type="checkbox" id="${file.uid}" value="${j}">
-                                    <img src="/static/collabTemplate/img/paper.png" class="res-icon" />
-                                    <div class="res-name">${fileName}</div>
-                                </div>`
-                    break;
-                }
-                case "document": {
-                    resElement = `<div class="card resource" title="${fileName}">
-                                    <input class="form-check-input" type="checkbox" id="${file.uid}" value="${j}">
-                                    <img src="/static/collabTemplate/img/document.png" class="res-icon" />
-                                    <div class="res-name">${fileName}</div>
-                                </div>`
-                    break;
-                }
-                case "image": {
-                    resElement = `<div class="card resource" title="${fileName}">
-                                    <input class="form-check-input" type="checkbox" id="${file.uid}" value="${j}">
-                                    <img src="/static/collabTemplate/img/image.png" class="res-icon" />
-                                    <div class="res-name">${fileName}</div>
-                                </div>`
-                    break;
-                }
-                case "video": {
-                    resElement = `<div class="card resource" title="${fileName}">
-                                    <input class="form-check-input" type="checkbox" id="${file.uid}" value="${j}">
-                                    <img src="/static/collabTemplate/img/video.png" class="res-icon" />
-                                    <div class="res-name">${fileName}</div>
-                                </div>`
-                    break;
-                }
-                case "other": {
-                    resElement = `<div class="card resource" title="${fileName}">
-                                    <input class="form-check-input" type="checkbox" id="${file.uid}" value="${j}">
-                                    <img src="/static/collabTemplate/img/otherfile.png" class="res-icon" />
-                                    <div class="res-name">${fileName}</div>
-                                </div>`
-                    break;
-                }
+        let message = {
+            type: "data",
+            sender: userInfo.userId,
+            behavior: "select",
+            content: {
+                uid: file.uid,
+                name: file.name,
+                description: file.description,
+                address: file.address,
             }
-            $("#resource-list").append(resElement);
-            $(`#${file.uid}`).on("change", function () {
-                selectFile(file);
+        }
+        websock.send(message);
+    });
+}
 
-                let message = {
-                    type: "data",
-                    sender: userInfo.userId,
-                    behavior: "select",
-                    content:{
-                        uid: file.uid,
-                        name: file.name,
-                        description: file.description,
-                        address: file.address,
-                    }
-                }
-                websock.send(message);
-            });
+function addfile(file) {
+    let resElement = "";
+    let fileName = file.name + file.suffix;
+    switch (file.type) {
+        case "data": {
+            resElement = `<div class="card resource" title="${fileName}">
+                            <input class="form-check-input" type="checkbox" id="${file.uid}" >
+                            <img src="/static/collabTemplate/img/data.png" class="res-icon" />
+                            <div class="res-name">${fileName}</div>
+                        </div>`
+            break;
+        }
+        case "model": {
+            resElement = `<div class="card resource" title="${fileName}">
+                            <input class="form-check-input" type="checkbox" id="${file.uid}" >
+                            <img src="/static/collabTemplate/img/model.png" class="res-icon" />
+                            <div class="res-name">${fileName}</div>
+                        </div>`
+            break;
+        }
+        case "paper": {
+            resElement = `<div class="card resource" title="${fileName}">
+                            <input class="form-check-input" type="checkbox" id="${file.uid}" >
+                            <img src="/static/collabTemplate/img/paper.png" class="res-icon" />
+                            <div class="res-name">${fileName}</div>
+                        </div>`
+            break;
+        }
+        case "document": {
+            resElement = `<div class="card resource" title="${fileName}">
+                            <input class="form-check-input" type="checkbox" id="${file.uid}">
+                            <img src="/static/collabTemplate/img/document.png" class="res-icon" />
+                            <div class="res-name">${fileName}</div>
+                        </div>`
+            break;
+        }
+        case "image": {
+            resElement = `<div class="card resource" title="${fileName}">
+                            <input class="form-check-input" type="checkbox" id="${file.uid}" >
+                            <img src="/static/collabTemplate/img/image.png" class="res-icon" />
+                            <div class="res-name">${fileName}</div>
+                        </div>`
+            break;
+        }
+        case "video": {
+            resElement = `<div class="card resource" title="${fileName}">
+                            <input class="form-check-input" type="checkbox" id="${file.uid}">
+                            <img src="/static/collabTemplate/img/video.png" class="res-icon" />
+                            <div class="res-name">${fileName}</div>
+                        </div>`
+            break;
+        }
+        case "other": {
+            resElement = `<div class="card resource" title="${fileName}">
+                            <input class="form-check-input" type="checkbox" id="${file.uid}">
+                            <img src="/static/collabTemplate/img/otherfile.png" class="res-icon" />
+                            <div class="res-name">${fileName}</div>
+                        </div>`
+            break;
         }
     }
+    $("#resource-list").append(resElement);
+    $(`#${file.uid}`).on("change", function () {
+        selectFile(file);
+
+        let message = {
+            type: "data",
+            sender: userInfo.userId,
+            behavior: "select",
+            content: {
+                uid: file.uid,
+                name: file.name,
+                description: file.description,
+                address: file.address,
+            }
+        }
+        websock.send(message);
+    });
 }
 
 function initCollaborationMode() {
@@ -394,13 +398,13 @@ function setWaitingLine(count) {
             $("#operation-waiting").empty();
             $("#operation-waiting").append(`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-lines-fill" viewBox="0 0 16 16" style="margin-top: -3px;">
                                                 <path d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-5 6s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H1zM11 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5zm.5 2.5a.5.5 0 0 0 0 1h4a.5.5 0 0 0 0-1h-4zm2 3a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1h-2zm0 3a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1h-2z"/>
-                                            </svg> 
+                                            </svg>
                                             <span style="margin-left: 5px; color: #007bff;" title="Waiting for operation">${count} people are waiting</span>`);
         } else if (count == 0) {
             $("#operation-waiting").empty();
             $("#operation-waiting").append(`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-lines-fill" viewBox="0 0 16 16" style="margin-top: -3px;">
                                                 <path d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-5 6s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H1zM11 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5zm.5 2.5a.5.5 0 0 0 0 1h4a.5.5 0 0 0 0-1h-4zm2 3a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1h-2zm0 3a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1h-2z"/>
-                                            </svg> 
+                                            </svg>
                                             <span style="margin-left: 5px; color: #007bff;" title="Waiting for operation">Apply to operate</span>`);
         }
     }
@@ -550,7 +554,7 @@ function selectFile(file) {
  * @param {*} type 文件类型
  * @param {*} privacy 获取权限
  */
- function uploadResources(uploadFiles, description, type, privacy) {
+function uploadResources(uploadFiles, description, type, privacy) {
     var formData = new FormData();
     for (var i = 0; i < uploadFiles.length; i++) {
         formData.append("file", uploadFiles[i]);
@@ -572,10 +576,10 @@ function selectFile(file) {
         async: true,
         success: function (data) {
             if (data != "Fail") {
-                let uploadedList = data.uploaded;
+                let uploadedList = JSON.parse(data).uploaded;
                 resourceChanged(uploadedList, "upload")
 
-                for(let i = 0; i < uploadedList.length; i++){
+                for (let i = 0; i < uploadedList.length; i++) {
                     let message = {
                         type: "data",
                         behavior: "upload",
@@ -585,15 +589,15 @@ function selectFile(file) {
                             name: uploadedList[i].name,
                             description: uploadedList[i].description,
                             address: uploadedList[i].address,
-                          }
+                        }
                     }
                     websocketSend(message);
                 }
 
-                return uploadedList;                
-              } else {
+                return uploadedList;
+            } else {
                 alert("Upload fail.");
-              }
+            }
         },
         error: function (err) {
             throw err;
@@ -606,6 +610,22 @@ function selectFile(file) {
  * when resources changed
  */
 function resourceChanged(resources, behavior) {
+    switch (behavior) {
+        case "upload": {
+            for(let i = 0; i < resources.length; i++) {
+                if(resources[i].folder) {
+                    addfolder(resources[i]);
+                } else {
+                    addfile(resources[i]);
+                }
+            }
+            break;
+        }
+        case "delete": {
+
+            break;
+        }
+    }
 
 }
 
@@ -711,7 +731,7 @@ function websocketonmessage(e) {
             }
             case "operation": {
                 if (operationChannel != undefined && typeof operationChannel == "function") {
-                    if(data.sender !== userInfo.userId) {
+                    if (data.sender !== userInfo.userId) {
                         operationChannel(data);
                     }
                 }
@@ -719,7 +739,7 @@ function websocketonmessage(e) {
             }
             case "data": {
                 if (dataChannel != undefined && typeof dataChannel == "function") {
-                    if(data.sender !== userInfo.userId) {
+                    if (data.sender !== userInfo.userId) {
                         selectFile(data.content);
                         dataChannel(data);
                     }
@@ -776,11 +796,11 @@ function sendCustomOperation(agentData, callback) {
  * public method
  * buid call back channel
  */
- function buildSocketChannel(opeChannel, dataChannel, compChannel) {
+function buildSocketChannel(opeChannel, dataChannel, compChannel) {
     operationChannel = opeChannel;
     dataChannel = dataChannel;
     computationChannel = compChannel;
- }
+}
 
 /**
  * public method
