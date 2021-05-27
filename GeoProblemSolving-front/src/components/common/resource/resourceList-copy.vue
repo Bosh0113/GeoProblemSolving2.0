@@ -80,7 +80,7 @@
 <script>
 import { get, del, post, put, patch } from "@/axios";
 export default {
-  props: ["pageParams"],
+  props: ["activityResource"],
   components: {},
 
   watch: {
@@ -90,19 +90,6 @@ export default {
       },
       deep: true
     }
-    // switchValue: {
-    //   handler(val) {
-    //     console.log(val);
-    //     // this.selectData = {};
-    //     // this.handleCurrentChange("");
-    //     if (val) {
-    //       this.tableData = this.privateData;
-    //     } else {
-    //       this.tableData = this.publicData;
-    //     }
-    //   },
-    //   deep: true
-    // }
   },
 
   computed: {},

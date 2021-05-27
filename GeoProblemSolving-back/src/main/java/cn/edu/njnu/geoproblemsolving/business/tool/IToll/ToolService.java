@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.alibaba.fastjson.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.List;
 
 public interface ToolService {
@@ -29,7 +30,11 @@ public interface ToolService {
 
     List<Tool> getToolByProviderService(String provider);
 
+    Tool getToolByTid(String tid);
+
     Tool updateToolService(Tool putTool);
 
     long delToolService(String tid);
+
+    List<Tool> getToolByIds(ArrayList<String> ids);
 }

@@ -56,7 +56,7 @@
         </div>
         <div
           v-for="tool in toolList"
-          :key="tool.index"
+          :key="tool.tid"
           style="width: 100px; display: inline-block"
           v-else
         >
@@ -73,7 +73,7 @@
           /></Card>
           <Card
             style="padding-top: 5px; background-color: #d3f1b1; margin: 5px"
-            v-if="tool.isToolset"
+            v-if="tool.toolSet"
           >
             <div
               style="text-align: center; cursor: pointer"
@@ -132,7 +132,7 @@
               <Tooltip placement="bottom" max-width="600">
                 <img
                   :src="tool.toolImg"
-                  v-if="tool.toolImg != ''"
+                  v-if="tool.toolImg != '' && tool.toolImg != null"
                   style="height: 100%; max-height: 50px"
                 />
                 <avatar
@@ -290,7 +290,7 @@ export default {
       }
     },
     async getToolInfos() {
-      let data = await post("/GeoProblemSolving/tool/all", this.toolIdList);
+      let data = await get("/GeoProblemSolving/tool/all/" + this.toolIdList.toString())
       this.$set(this, "toolList", data);
     },
     stepToolListChanged(tools, toolsets) {
@@ -320,15 +320,16 @@ export default {
     openTool() {
       var toolInfo = this.selectedTool;
       // this.openToolModal = false;
-
+      console.log("userInfo", this.userInfo)
       // record
       let toolRecords = {
         type: "tools",
         time: new Date().Format("yyyy-MM-dd HH:mm:ss"),
-        who: this.userInfo.userName,
+        who: this.userInfo.name,
         content: "used a tool",
         toolType: toolInfo.toolName,
       };
+      console.log("toolRecords", toolRecords)
       this.$emit("toolBehavior", toolRecords);
 
       if (toolInfo.scope == "outer") {
@@ -343,7 +344,20 @@ export default {
       // var toolURL = window.location.origin + `${toolInfo.toolUrl}`;
       // var toolURL = toolInfo.toolUrl;
       // var toolContent = `<iframe src="${toolURL}?userName=${this.userInfo.name}&userID=${this.userInfo.userId}&groupID=${this.activityInfo.aid}" style="width: 100%; height:100%;" frameborder="0"></iframe>`;
-      var toolContent = `<iframe src="${toolInfo.toolUrl}" id="${toolInfo.tid}" style="width: 100%; height:100%;" frameborder="0"></iframe>`;
+
+      //判断tool的类型，三种 modelItem（模型容器提供计算能力）, dataMethod(数据容器提供计算能力), webTool(自行开发，如mapTool)
+      console.log("toolInfo", toolInfo)
+      let routerUrl = "/computeTool";
+      if (toolInfo.backendType == "webTool"){
+        routerUrl = toolInfo.toolUrl;
+      }
+      // else if (toolInfo.backendType == "modelItem"){
+      //   routerUrl = "/modelItem";
+      // }else if (toolInfo.backendType == "dataMethod"){
+      //   routerUrl = "/dataMethod"
+      // }
+      // var toolContent = `<iframe src="${toolInfo.toolUrl}" id="${toolInfo.tid}" style="width: 100%; height:100%;" frameborder="0"></iframe>`;
+      var toolContent = `<iframe src="${routerUrl}" id="${toolInfo.tid}" style="width: 100%; height:100%;" frameborder="0"></iframe>`;
 
       var panel = jsPanel.create({
         theme: "success",

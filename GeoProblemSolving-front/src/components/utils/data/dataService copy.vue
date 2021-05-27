@@ -279,7 +279,6 @@ export default {
         `/GeoProblemSolving/dataContainer/dataService/getData`,
         json
       );
-      console.log(data);
       this.dataService = data.Capability.data;
       //   this.dataServiceDetail = data;
     },

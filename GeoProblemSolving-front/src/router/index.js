@@ -219,6 +219,12 @@ const routes = [
       require(["@/components/tools/entity/mapTool"], resolve)
   },
   {
+    path: "/computeTool",
+    name: "computeTool",
+    component: resolve =>
+      require(["@/components/tools/entity/computeTool"], resolve)
+  },
+  {
     path: "/lineChart",
     name: "lineChart",
     component: resolve =>

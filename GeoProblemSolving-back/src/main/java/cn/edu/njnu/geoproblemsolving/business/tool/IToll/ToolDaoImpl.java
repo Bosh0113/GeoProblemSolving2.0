@@ -53,4 +53,5 @@ public class ToolDaoImpl implements ToolDao{
         BeanUtils.copyProperties(putTool, localTool, nullPropertyNames);
         return createTool(localTool);
     }
+
 }

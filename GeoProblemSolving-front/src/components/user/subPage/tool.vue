@@ -139,6 +139,7 @@
         <Button
           type="success"
           @click="createTool"
+          :loading="loading"
           v-show="this.currentStep == 1"
         >Create
         </Button>
@@ -294,6 +295,7 @@
         },
         sharedTool: {},
         contentHeight: "",
+        loading: false
       };
     },
     created() {
@@ -366,7 +368,7 @@
         // "/GeoProblemSolving/tool/findByProvider/" + this.$store.getters.userId
         this.$axios
           .get(
-            "/GeoProblemSolving/tool/" + this.$store.getters.userId
+            "/GeoProblemSolving/tool/provider/" + this.$store.getters.userId
           )
           .then((res) => {
             let tempTools = res.data.data;
@@ -394,9 +396,13 @@
       },
       createTool: async function () {
         let createToolForm = this.toolInfo;
+        this.loading = true;
+        setTimeout(()=>{
+          this.loading = false;
+        }, 2000)
         createToolForm["creator"] = this.$store.getters.userId;
         // let data = await post("/GeoProblemSolving/tool", createToolForm);
-        this.$axios.post("/GeoProblemSolving/tool", createToolForm)
+        this.axios.post("/GeoProblemSolving/tool", createToolForm)
           .then(res=>{
             // 判断返回值，进行下一步操作
             this.createToolModal = false;

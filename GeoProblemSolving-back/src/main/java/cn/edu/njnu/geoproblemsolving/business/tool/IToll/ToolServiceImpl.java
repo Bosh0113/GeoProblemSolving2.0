@@ -238,15 +238,26 @@ public class ToolServiceImpl implements ToolService {
                 tool.setDataMethodType(dataMethodType);
                 tool.setToken(serviceToken);
                 String encodeToken = URLEncoder.encode(serviceToken, "UTF-8");
+
+                //三种服务类型：Processing, Visualization, Data
+                String tempType = "Processing";
+                if (dataMethodType.equals("Visualization")){
+                    tempType = "Visualization";
+                }
                 //数据处理方法元数据
-                String metaUrl = "http://111.229.14.128:8898/capability?id="+ dataMethodId + "&type=" + dataMethodType + "&token=" + encodeToken;
+                String metaUrl = "http://111.229.14.128:8898/capability?id="+ dataMethodId + "&type=" + tempType + "&token=" + encodeToken;
                 HttpHeaders headers = new HttpHeaders();
                 headers.add("Content-Type","application/json");
                 HttpEntity httpEntity = new HttpEntity<>(headers);
                 ResponseEntity<JSONObject> jsonObjectResponseEntity = restTemplate.exchange(metaUrl, HttpMethod.GET, httpEntity, JSONObject.class);
                 if (jsonObjectResponseEntity.getStatusCode().is2xxSuccessful()){
                     JSONObject dataMethodMeta = jsonObjectResponseEntity.getBody();
-                    tool.setDataMethodMeta(dataMethodMeta);
+                    Integer code = dataMethodMeta.getInteger("code");
+                    if (code == 0){
+                        tool.setDataMethodMeta(dataMethodMeta.getJSONObject("capability"));
+                    }else {
+                        return null;
+                    }
                 }
                 // tool.setDataMethodMeta(dataMethodMeta);
 
@@ -289,5 +300,20 @@ public class ToolServiceImpl implements ToolService {
     @Override
     public long delToolService(String tid) {
         return toolDao.deleteById(tid);
+    }
+
+    @Override
+    public List<Tool> getToolByIds(ArrayList<String> ids) {
+        ArrayList<Tool> toolList = Lists.newArrayList();
+        for (String id: ids){
+            Tool toolById = toolDao.findToolById(id);
+            toolList.add(toolById);
+        }
+        return toolList;
+    }
+
+    @Override
+    public Tool getToolByTid(String tid) {
+        return toolDao.findToolById(tid);
     }
 }

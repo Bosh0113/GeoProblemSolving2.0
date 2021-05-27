@@ -192,9 +192,16 @@ export default {
   methods: {
     getStepInfo() {
       if (componentStatus) {
+        // 获取数据
         this.activityInfo = activityInfo;
         this.userInfo = userInfo;
         this.resources = resources;
+
+        // 绑定函数
+        operationChannel = this.getSocketOperation;
+        dataChannel = this.getSocketData;
+        computationChannel = this.getSocketComputation;
+        loadResChannel = this.loadResources;
       } else {
         let _this = this;
         setTimeout(function () {
@@ -390,7 +397,6 @@ export default {
       });
     },
     save2Resource(name) {
-
       this.$refs[name].validate((valid) => {
         if (valid) {
           if (this.geojsonBlob != null) {
@@ -403,68 +409,31 @@ export default {
             }
             let description = "";
             if (this.formValidate.fileDescription == "") {
-              description = "from Map tool";
+              description = "Map tool data";
             } else {
               description = this.formValidate.fileDescription;
             }
 
             var fileOfBlob = new File([this.geojsonBlob], filename);
 
-            //上传数据
-            let formData = new FormData();
-            formData.append("file", fileOfBlob);
-            formData.append("description", description);
-            formData.append("type", "data");
-            formData.append("uploaderId", this.userInfo.userId);
-            formData.append("privacy", "private");
-            formData.append("folderId", this.activityInfo.aid);
-            this.axios
-              .post("/GeoProblemSolving/folder/uploadToFolder", formData)
-              .then((res) => {
-                if (
-                  res.data.sizeOver.length > 0 ||
-                  res.data.failed.length > 0 ||
-                  res.data == "Offline"
-                ) {
-                  console.log(res.data);
-                } else if (res.data.uploaded.length > 0) {
-                  this.showFile = true;
-                  this.uploadDataName = filename;
+            // upload
+            let file = uploadResources([fileOfBlob], description, "data", "private");
 
-                  this.$Notice.open({
-                    title: "Save to resource center",
-                    desc: "Data saved successfully",
-                    // duration: 0
-                  });
+            this.showFile = true;
+            this.uploadDataName = filename;
 
-                  // 文件列表更新
-                  let dataName = res.data.uploaded[0].name;
-                  let dataItem = {
-                    name: filename,
-                    description: "map tool data",
-                    pathURL: "/GeoProblemSolving/resource/upload/" + dataName,
-                  };
-                  this.resources.push(dataItem);
-
-                  //文件列表协同
-                  this.send_content = {
-                    type: "resourcesSave",
-                    name: filename,
-                    description: "map tool data",
-                    pathURL: "/GeoProblemSolving/resource/upload/" + dataName,
-                  };
-                  sendCustomOperation(this.send_content, this.getSocketConnect);
-
-                  // 初始化formValidation
-                  this.formValidate = {
-                    fileName: "",
-                    fileDescription: "",
-                  };
-                }
-              })
-              .catch((err) => {
-                console.log(err.data);
+            if(file.length > 0){
+              this.$Notice.open({
+                title: "Save to resource center",
+                desc: "Data saved successfully!",
               });
+            }
+
+            // 初始化formValidation
+            this.formValidate = {
+              fileName: "",
+              fileDescription: "",
+            };
           }
         } else {
           this.$Message.error("Please enter the necessary information!");
@@ -476,51 +445,14 @@ export default {
         this.$Message.error("Worry format");
         return false;
       }
+      let uploadedList = uploadResources(file, "Map tool data", "data", "private");
+      if (uploadedList.length > 0) {
+        this.showFile = true;
+        this.uploadDataName = uploadedList[0].name;
+        this.dataUrl =
+          "/GeoProblemSolving/resource/upload/" + this.uploadDataName;
+      }
 
-      //上传数据
-      let formData = new FormData();
-      formData.append("file", file);
-      formData.append("description", "Map tool data");
-      formData.append("type", "data");
-      formData.append("uploaderId", this.userInfo.userId);
-      formData.append("privacy", "private");
-      formData.append("folderId", this.activityInfo.aid);
-      this.axios
-        .post("/GeoProblemSolving/folder/uploadToFolder", formData)
-        .then((res) => {
-          if (
-            res.data.sizeOver.length > 0 ||
-            res.data.failed.length > 0 ||
-            res.data == "Offline"
-          ) {
-            console.log(res.data);
-          } else if (res.data.uploaded.length > 0) {
-            this.showFile = true;
-            this.uploadDataName = file.name;
-
-            let dataName = res.data.uploaded[0].name;
-            this.dataUrl = "/GeoProblemSolving/resource/upload/" + dataName;
-
-            let dataItem = {
-              name: dataName,
-              description: "map tool data",
-              pathURL: "/GeoProblemSolving/resource/upload/" + dataName,
-            };
-            this.resources.push(dataItem);
-
-            //文件列表协同
-            this.send_content = {
-              type: "resourcesUpdate",
-              name: dataName,
-              description: "map tool data",
-              pathURL: "/GeoProblemSolving/resource/upload/" + dataName,
-            };
-            sendCustomOperation(this.send_content, this.getSocketConnect);
-          }
-        })
-        .catch((err) => {
-          console.log(err.data);
-        });
       return false;
     },
     viewData() {
@@ -578,10 +510,14 @@ export default {
         let _this = this;
         layer.on("pm:edit", (e) => {
           _this.send_content = {
-            type: "edit",
-            layer: _this.drawingLayerGroup.toGeoJSON(),
+            type: "operation",
+            sender: this.userInfo.userId,
+            behavior: "edit",
+            content: {
+              layer: _this.drawingLayerGroup.toGeoJSON(),
+            },
           };
-          sendCustomOperation(_this.send_content, _this.getSocketConnect);
+          sendCustomOperation(_this.send_content, _this.getSocketOperation);
         });
       });
     },
@@ -618,10 +554,14 @@ export default {
       this.map.on("baselayerchange", (e) => {
         if (isLayerCtrlClick) {
           this.send_content = {
-            type: "overlay",
-            layer: e.name,
+            type: "operation",
+            sender: this.userInfo.userId,
+            behavior: "overlay",
+            content: {
+              layer: e.name,
+            },
           };
-          sendCustomOperation(this.send_content, this.getSocketConnect);
+          sendCustomOperation(this.send_content, this.getSocketOperation);
         }
         isLayerCtrlClick = false;
       });
@@ -630,10 +570,14 @@ export default {
       this.map.on("zoomend", (e) => {
         if (this.map.scrollWheelZoom || isZoomControl || isDoubleClick) {
           this.send_content = {
-            type: "zoom",
-            zoom: this.map.getZoom(),
+            type: "operation",
+            sender: this.userInfo.userId,
+            behavior: "zoom",
+            content: {
+              zoom: this.map.getZoom(),
+            },
           };
-          sendCustomOperation(this.send_content, this.getSocketConnect);
+          sendCustomOperation(this.send_content, this.getSocketOperation);
           isZoomControl = false;
           isDoubleClick = false;
         }
@@ -643,10 +587,14 @@ export default {
       this.map.on("moveend", (e) => {
         if (isMouseDown) {
           this.send_content = {
-            type: "move",
-            center: this.map.getCenter(),
+            type: "operation",
+            sender: this.userInfo.userId,
+            behavior: "move",
+            content: {
+              center: this.map.getCenter(),
+            },
           };
-          sendCustomOperation(this.send_content, this.getSocketConnect);
+          sendCustomOperation(this.send_content, this.getSocketOperation);
         }
         isMouseDown = false;
       });
@@ -655,11 +603,15 @@ export default {
       this.map.on("pm:cut", (e) => {
         // this.drawingLayerGroup.removeLayer(e.originalLayer);
         // this.drawingLayerGroup.addLayer(e.layer);
-        // this.send_content={
-        //     type:"cut",
-        //     layer: this.drawingLayerGroup.toGeoJSON()
-        //   }
-        // sendCustomOperation(this.send_content, this.getSocketConnect);
+        // this.send_content = {
+        //   type: "operation",
+        //   sender: this.userInfo.userId,
+        //   behavior: "cut",
+        //   content: {
+        //     layer: this.drawingLayerGroup.toGeoJSON(),
+        //   },
+        // };
+        // sendCustomOperation(this.send_content, this.getSocketOperation);
       });
 
       // 删除事件
@@ -667,10 +619,14 @@ export default {
       this.map.on("pm:remove", (e) => {
         _this.drawingLayerGroup.removeLayer(e.layer);
         this.send_content = {
-          type: "remove",
-          layer: _this.drawingLayerGroup.toGeoJSON(),
+          type: "operation",
+          sender: this.userInfo.userId,
+          behavior: "remove",
+          content: {
+            layer: _this.drawingLayerGroup.toGeoJSON(),
+          },
         };
-        sendCustomOperation(this.send_content, this.getSocketConnect);
+        sendCustomOperation(this.send_content, this.getSocketOperation);
       });
 
       this.map.on("pm:globaleditmodetoggled", (e) => {
@@ -693,119 +649,41 @@ export default {
           this.drawingLayerGroup.addLayer(drawingLayer);
 
           this.send_content = {
-            type: "add",
-            shape: e.shape,
-            layer: this.traces,
+            type: "operation",
+            sender: this.userInfo.userId,
+            behavior: "add",
+            content: {
+              shape: e.shape,
+              layer: this.traces,
+            },
           };
         } else {
           this.drawingLayerGroup.addLayer(e.layer);
 
           this.send_content = {
-            type: "add",
-            shape: "Others",
-            layer: e.layer.toGeoJSON(),
+            type: "operation",
+            sender: this.userInfo.userId,
+            behavior: "add",
+            content: {
+              shape: "Others",
+              layer: e.layer.toGeoJSON(),
+            },
           };
         }
-        sendCustomOperation(this.send_content, this.getSocketConnect);
+        sendCustomOperation(this.send_content, this.getSocketOperation);
       });
     },
-    getSocketConnect(data) {
+    getSocketData() {
       let socketMsg = data;
-
-      if (socketMsg.type === "test") {
-        console.log(socketMsg.content);
-      } else if (socketMsg.type === "members") {
-        let members = data.message
-          .replace("[", "")
-          .replace("]", "")
-          .replace(/\s/g, "")
-          .split(",");
-        this.olParticipants = members;
-        this.olParticipantChange();
-      } else {
-        //判断消息的发出者
-
-        switch (socketMsg.type) {
-          case "zoom": {
-            this.map.setZoom(socketMsg.zoom);
-            break;
-          }
-          case "move": {
-            this.map.panTo(socketMsg.center);
-            break;
-          }
-          case "overlay": {
-            try {
-              this.map.removeLayer(this.baseLayers["Terrain map"]);
-            } catch (e) {}
-            try {
-              this.map.removeLayer(this.baseLayers["Satellite map"]);
-            } catch (e) {}
-            try {
-              this.map.removeLayer(this.baseLayers["Vector map"]);
-            } catch (e) {}
-            this.baseLayers[socketMsg.layer].addTo(this.map);
-            break;
-          }
-          case "remove": {
-            this.drawingLayerGroup.clearLayers();
-            let geoJson = socketMsg.layer;
-            let geoJsonLayer = L.geoJSON(geoJson, {
-              style: function (feature) {},
-            }).bindPopup(function (layer) {
-              // return layer.feature.properties.description;
-            });
-            this.loadFeatures(geoJsonLayer);
-            break;
-          }
-          case "edit": {
-            this.drawingLayerGroup.clearLayers();
-            let geoJson = socketMsg.layer;
-            let geoJsonLayer = L.geoJSON(geoJson, {
-              style: function (feature) {},
-            }).bindPopup(function (layer) {
-              // return layer.feature.properties.description;
-            });
-            this.loadFeatures(geoJsonLayer);
-            break;
-          }
-          case "add": {
-            let drawingLayer = null;
-            if (socketMsg.shape == "Circle") {
-              drawingLayer = L.circle(socketMsg.layer[0], {
-                radius: socketMsg.layer[1],
-              });
-            } else {
-              drawingLayer = L.geoJSON(socketMsg.layer, {
-                style: function (feature) {},
-              }).bindPopup(function (layer) {});
-            }
-            this.drawingLayerGroup.addLayer(drawingLayer);
-            break;
-          }
-          case "cut": {
-            // this.drawingLayerGroup.clearLayers();
-            // let geoJson = socketMsg.layer;
-            // let geoJsonLayer = L.geoJSON(geoJson, {
-            //   style: function (feature) {
-            //   }
-            // }).bindPopup(function (layer) {
-            //     return layer.feature.properties.description;
-            // });
-            // this.drawingLayerGroup.addLayer(geoJsonLayer);
-            // break;
-          }
-          case "resourcesUpdate": {
-            let dataItem = {
-              name: socketMsg.name,
-              description: socketMsg.description,
-              pathURL: socketMsg.pathURL,
-            };
+      if (socketMsg.type === "data") {
+        switch (socketMsg.behavior) {
+          case "update": {
+            let dataItem = socketMsg.content;
             this.resources.push(dataItem);
 
             var that = this;
             var xhr = new XMLHttpRequest();
-            xhr.open("GET", socketMsg.pathURL, true);
+            xhr.open("GET", socketMsg.content.address, true);
             xhr.onload = function (e) {
               if (this.status == 200) {
                 var file = JSON.parse(this.response);
@@ -823,103 +701,98 @@ export default {
             xhr.send();
             break;
           }
-          case "selectdata": {
-            this.dataUrl = socketMsg.pathURL;
-            this.viewData();
-            break;
-          }
-          case "resourcesSave": {
-            let dataItem = {
-              name: socketMsg.name,
-              description: socketMsg.description,
-              pathURL: socketMsg.pathURL,
-            };
-            this.resources.push(dataItem);
+          case "select": {
+            for (let i = 0; i < selectedResources.length; i++) {
+              this.dataUrl = selectedResources[i].address;
+              this.viewData();
+            }
             break;
           }
         }
       }
     },
-    olParticipantChange() {
-      let userIndex = -1;
-
-      // 自己刚上线，olParticipants空
-      if (this.participants.length == 0) {
-        var that = this;
-        for (let i = 0; i < this.olParticipants.length; i++) {
-          this.axios
-            .get(
-              "/GeoProblemSolving/user" +
-                "?key=userId" +
-                "&value=" +
-                this.olParticipants[i]
-            )
-            .then((res) => {
-              if (res.data.code == 0) {
-                that.participants.push(res.data.data);
-              } else if (res.data == "None") {
-              }
-            });
-        }
-      } else {
-        // members大于olParticipants，有人上线；小于olParticipants，离线
-        if (this.olParticipants.length > this.participants.length) {
-          for (var i = 0; i < this.olParticipants.length; i++) {
-            for (var j = 0; j < this.participants.length; j++) {
-              if (this.olParticipants[i] == this.participants[j].userId) {
-                break;
-              }
-            }
-            if (j == this.participants.length) {
-              userIndex = i;
-              break;
-            }
+    getSocketComputation() {},
+    getSocketOperation(data) {
+      let socketMsg = data;
+      if (socketMsg.type === "operation") {
+        switch (socketMsg.behavior) {
+          case "zoom": {
+            this.map.setZoom(socketMsg.content.zoom);
+            break;
           }
-
-          // 人员渲染
-          var that = this;
-          this.axios
-            .get(
-              "/GeoProblemSolving/user" +
-                "?key=userId" +
-                "&value=" +
-                this.olParticipants[userIndex]
-            )
-            .then((res) => {
-              if (res.data.code == 0) {
-                that.participants.push(res.data.data);
-                if (userIndex != -1) {
-                }
-              } else if (res.data == "None") {
-              }
-            });
-        } else if (this.olParticipants.length < this.participants.length) {
-          for (var i = 0; i < this.participants.length; i++) {
-            for (var j = 0; j < this.olParticipants.length; j++) {
-              if (this.participants[i].userId == this.olParticipants[j]) {
-                break;
-              }
-            }
-            if (j == this.olParticipants.length) {
-              userIndex = i;
-              break;
-            }
+          case "move": {
+            this.map.panTo(socketMsg.content.center);
+            break;
           }
-          this.participants.splice(userIndex, 1);
+          case "overlay": {
+            try {
+              this.map.removeLayer(this.baseLayers["Terrain map"]);
+            } catch (e) {}
+            try {
+              this.map.removeLayer(this.baseLayers["Satellite map"]);
+            } catch (e) {}
+            try {
+              this.map.removeLayer(this.baseLayers["Vector map"]);
+            } catch (e) {}
+            this.baseLayers[socketMsg.content.layer].addTo(this.map);
+            break;
+          }
+          case "remove": {
+            this.drawingLayerGroup.clearLayers();
+            let geoJson = socketMsg.content.layer;
+            let geoJsonLayer = L.geoJSON(geoJson, {
+              style: function (feature) {},
+            }).bindPopup(function (layer) {
+              // return layer.feature.properties.description;
+            });
+            this.loadFeatures(geoJsonLayer);
+            break;
+          }
+          case "edit": {
+            this.drawingLayerGroup.clearLayers();
+            let geoJson = socketMsg.content.layer;
+            let geoJsonLayer = L.geoJSON(geoJson, {
+              style: function (feature) {},
+            }).bindPopup(function (layer) {
+              // return layer.feature.properties.description;
+            });
+            this.loadFeatures(geoJsonLayer);
+            break;
+          }
+          case "add": {
+            let drawingLayer = null;
+            if (socketMsg.content.shape == "Circle") {
+              drawingLayer = L.circle(socketMsg.content.layer[0], {
+                radius: socketMsg.content.layer[1],
+              });
+            } else {
+              drawingLayer = L.geoJSON(socketMsg.content.layer, {
+                style: function (feature) {},
+              }).bindPopup(function (layer) {});
+            }
+            this.drawingLayerGroup.addLayer(drawingLayer);
+            break;
+          }
+          case "cut": {
+            // this.drawingLayerGroup.clearLayers();
+            // let geoJson = socketMsg.content.layer;
+            // let geoJsonLayer = L.geoJSON(geoJson, {
+            //   style: function (feature) {
+            //   }
+            // }).bindPopup(function (layer) {
+            //     return layer.feature.properties.description;
+            // });
+            // this.drawingLayerGroup.addLayer(geoJsonLayer);
+            // break;
+          }
         }
       }
     },
-    selecetResource(url) {
-      this.dataUrl = url;
-
-      // 协同
-      this.send_content = {
-        type: "selectdata",
-        pathURL: this.dataUrl,
-      };
-      sendCustomOperation(this.send_content, this.getSocketConnect);
-
-      this.viewData();
+    loadResources(resList) {
+      for (let i = 0; i < resList.length; i++) {
+        this.dataUrl = resList[i].address;
+        this.viewData();
+      }
     },
   },
 };

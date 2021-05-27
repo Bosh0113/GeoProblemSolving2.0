@@ -226,6 +226,7 @@
         </div>
       </el-col>
     </el-row>
+
     <el-dialog
       :visible.sync="selectDataDialogShow"
       width="1000px"
@@ -339,6 +340,7 @@ export default {
       }
 
       this.dataService = data.capability.data;
+      console.log("dataService", data);
       //   this.dataServiceDetail = data;
     },
 

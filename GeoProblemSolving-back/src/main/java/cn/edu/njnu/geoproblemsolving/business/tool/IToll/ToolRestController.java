@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -76,7 +77,16 @@ public class ToolRestController {
     public JsonResult createToolOrToolSet(@RequestBody JSONObject toolJson) throws UnsupportedEncodingException {
         Tool tool = toolService.createTool(toolJson);
         if (tool != null){
-            return ResultUtils.success(toolService.createTool(toolJson));
+            return ResultUtils.success(tool);
+        }
+        return ResultUtils.error(-2, "Fail");
+    }
+
+    @RequestMapping(value = "/{id}",method = RequestMethod.GET)
+    public JsonResult getToolByTid(@PathVariable String id){
+        Tool tool = toolService.getToolByTid(id);
+        if (tool != null){
+            return ResultUtils.success(tool);
         }
         return ResultUtils.error(-2, "Fail");
     }
@@ -97,10 +107,26 @@ public class ToolRestController {
     }
 
 
-    @RequestMapping(value = "/{providerId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/provider/{providerId}", method = RequestMethod.GET)
     public JsonResult queryToolByUserId(@PathVariable String providerId){
         return ResultUtils.success(toolService.getToolByProviderService(providerId));
     }
+
+    /**
+     * 返回工具列表
+     * @param ids
+     * @return
+     */
+    @RequestMapping(value = "/all/{ids}", method = RequestMethod.GET)
+    public JsonResult getToolListByToolIds(@PathVariable ArrayList<String> ids){
+        List<Tool> toolList = toolService.getToolByIds(ids);
+        return ResultUtils.success(toolList);
+    }
+
+
+
+
+
 
 
 }
