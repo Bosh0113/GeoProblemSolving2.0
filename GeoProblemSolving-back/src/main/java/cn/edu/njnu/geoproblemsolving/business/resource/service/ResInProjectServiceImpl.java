@@ -352,6 +352,7 @@ public class ResInProjectServiceImpl implements ResourceInProjectService {
             resDao.addResource(res);
             return "suc";
         }
+        
         ArrayList<ResourceEntity> rootResList = (ArrayList<ResourceEntity>) resDao.queryByAid(aid);
         String rootResUid = paths.get(paths.size() - 1);
         ArrayList<ResourceEntity> putResList = pResourceByPath(rootResList, putRes, paths);

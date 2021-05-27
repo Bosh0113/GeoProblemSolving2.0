@@ -795,8 +795,11 @@ svg {
 }
 .res-name {
     margin-left: 2px;
-    font-size: 14px;
+    font-size: 12px;
     margin-top: 2px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
 }
 .resource-load {
     margin-top: 10px;

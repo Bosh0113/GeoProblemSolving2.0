@@ -3,6 +3,7 @@
  */
 // the loading status of the collaboration component
 var componentStatus = false;
+var panelType = "people";
 
 // basic information
 var toolId = "";
@@ -15,11 +16,13 @@ var onlineMembers = null;
 var UserServer = "http://172.21.212.103:8088/userServer";
 
 // resource related
+var folderIdStack = [];
+var parentFolder = {};
 var resources = [];
-selectedResources = [];
+var selectedResources = [];
 
 // operation related
-loadResChannel = null;
+var loadResChannel = null;
 
 $(function () {
     // ready - event
@@ -82,14 +85,14 @@ function loadCollabComponent() {
                 </div>
                 <div class="resource-control">
                     Resource list
-                    <div class="resource-control-btn" title="Back">
+                    <div class="resource-control-btn" id="folder-back" title="Back to parent folder" style="display: none;">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                             class="bi bi-arrow-left" viewBox="0 0 16 16">
                             <path fill-rule="evenodd"
                                 d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z" />
                         </svg>
                     </div>
-                    <div class="resource-control-btn" title="Refresh">
+                    <div class="resource-control-btn" id="resource-update" title="Refresh">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                             class="bi bi-arrow-repeat" viewBox="0 0 16 16">
                             <path
@@ -159,41 +162,97 @@ function addEvents() {
     window.addEventListener("message", getActivityInfo, false);
 
     $("#people-btn").on("click", function () {
-        $("#people-btn").addClass("active");
-        $("#resource-btn").removeClass("active");
-        $("#operation-btn").removeClass("active");
 
-        $("#people-list").show();
-        $("#resource-panel").hide();
-        $("#operation-panel").hide();
+        if (panelType === "people") {
+            $(".nav-content").hide();
+            $("#collab-tool-sidebar").css("width", "46px");
+            $("#collab-tool-content").css("left", "46px");
+            $("#collab-tool-content").css("width", "calc(100vw - 46px)");
+            
+            $("#people-btn").removeClass("active");
+            panelType = "";
+        } else {
+            $("#collab-tool-sidebar").css("width", "250px");
+            $("#collab-tool-content").css("left", "250px");
+            $(".nav-content").show();
 
+            $("#people-btn").addClass("active");
+            $("#resource-btn").removeClass("active");
+            $("#operation-btn").removeClass("active");
+
+            $("#people-list").show();
+            $("#resource-panel").hide();
+            $("#operation-panel").hide();
+
+            $("#collab-tool-content").css("width", "calc(100vw - 250px)");
+            panelType = "people";
+        }
     })
     $("#resource-btn").on("click", function () {
-        $("#people-btn").removeClass("active");
-        $("#resource-btn").addClass("active");
-        $("#operation-btn").removeClass("active");
+        if (panelType === "resource") {
+            $(".nav-content").hide();
+            $("#collab-tool-sidebar").css("width", "46px");
+            $("#collab-tool-content").css("left", "46px");
+            $("#collab-tool-content").css("width", "calc(100vw - 46px)");
 
-        $("#people-list").hide();
-        $("#resource-panel").show();
-        $("#operation-panel").hide();
+            $("#resource-btn").removeClass("active");
+            panelType = "";
+        } else {
+            $("#collab-tool-sidebar").css("width", "250px");
+            $("#collab-tool-content").css("left", "250px");
+            $(".nav-content").show();
+
+            $("#people-btn").removeClass("active");
+            $("#resource-btn").addClass("active");
+            $("#operation-btn").removeClass("active");
+
+            $("#people-list").hide();
+            $("#resource-panel").show();
+            $("#operation-panel").hide();
+
+            $("#collab-tool-content").css("width", "calc(100vw - 250px)");
+            panelType = "resource";
+        }
     })
+    $("#operation-btn").on("click", function () {
+        if (panelType === "operation") {
+            $(".nav-content").hide();
+            $("#collab-tool-sidebar").css("width", "46px");
+            $("#collab-tool-content").css("left", "46px");
+            $("#collab-tool-content").css("width", "calc(100vw - 46px)");
+
+            $("#operation-btn").removeClass("active");
+            panelType = "";
+        } else {
+            $("#collab-tool-sidebar").css("width", "250px");
+            $("#collab-tool-content").css("left", "250px");
+            $(".nav-content").show();
+
+            $("#people-btn").removeClass("active");
+            $("#resource-btn").removeClass("active");
+            $("#operation-btn").addClass("active");
+
+            $("#people-list").hide();
+            $("#resource-panel").hide();
+            $("#operation-panel").show();
+
+            $("#collab-tool-content").css("width", "calc(100vw - 250px)");
+            panelType = "operation";
+
+        }
+    })
+
+    $("#folder-back").on("click", function () {
+        getFolderRes({}, "back");
+    });
+    $("#resource-update").on("click", getResources);
     $("#resource-load").on("click", function () {
         if (loadResChannel != undefined && typeof loadResChannel == "function") {
             loadResChannel(selectedResources);
         }
     });
-    $("#operation-btn").on("click", function () {
-        $("#people-btn").removeClass("active");
-        $("#resource-btn").removeClass("active");
-        $("#operation-btn").addClass("active");
-
-        $("#people-list").hide();
-        $("#resource-panel").hide();
-        $("#operation-panel").show();
-    })
 
     $("#operation-apply").on("click", operationApply);
-
     $("#operation-stop").on("click", operationStop);
 
     $("#collaboration-switch").on("change", () => {
@@ -244,12 +303,13 @@ function personOffline(member) {
 }
 
 function showResList() {
+    $("#resource-list").empty();
     if (resources != undefined) {
         for (let i = 0; i < resources.folders.length; i++) {
             addfolder(resources.folders[i]);
         }
         for (let j = 0; j < resources.files.length; j++) {
-            addfile(resources.files[j]);            
+            addfile(resources.files[j]);
         }
     }
 }
@@ -257,25 +317,16 @@ function showResList() {
 function addfolder(folder) {
     let resElement = `<div class="card resource" title="${folder.name}">
                                     <input class="form-check-input" type="checkbox" id="${folder.uid}">
-                                    <img src="/static/collabTemplate/mg/folder.png" class="res-icon" />
-                                    <div class="res-name">${folder.name}</div>
+                                    <img src="/static/collabTemplate/img/folder.png" class="folder-${folder.uid} res-icon"/>
+                                    <div class="folder-${folder.uid} res-name">${folder.name}</div>
                                 </div>`
     $("#resource-list").append(resElement);
+    $(`.folder-${folder.uid}`).on("click", function () {
+        getFolderRes(folder, "enter")
+
+    });
     $(`#${folder.uid}`).on("change", function () {
         selectFile(folder);
-
-        let message = {
-            type: "data",
-            sender: userInfo.userId,
-            behavior: "select",
-            content: {
-                uid: file.uid,
-                name: file.name,
-                description: file.description,
-                address: file.address,
-            }
-        }
-        websock.send(message);
     });
 }
 
@@ -343,19 +394,6 @@ function addfile(file) {
     $("#resource-list").append(resElement);
     $(`#${file.uid}`).on("change", function () {
         selectFile(file);
-
-        let message = {
-            type: "data",
-            sender: userInfo.userId,
-            behavior: "select",
-            content: {
-                uid: file.uid,
-                name: file.name,
-                description: file.description,
-                address: file.address,
-            }
-        }
-        websock.send(message);
     });
 }
 
@@ -434,6 +472,8 @@ function getActivityInfo(event) {
  * Resources
  */
 function getResources() {
+    folderIdStack = [];
+    $("#folder-back").hide();
 
     $.ajax({
         url: "/GeoProblemSolving/rip/" + activityInfo.aid + "/0",
@@ -452,6 +492,45 @@ function getResources() {
             throw err;
         }
     });
+}
+function getFolderRes(folder, behavior) {
+    if (behavior === "back" && folderIdStack.length > 1) {
+        folderIdStack.splice(0, 1);
+    } else if (behavior === "back" && folderIdStack.length === 1) {
+        $("#folder-back").hide();
+        folderIdStack.splice(0, 1);
+    } else if (behavior === "enter") {
+        $("#folder-back").show();
+        folderIdStack.unshift(folder.uid)
+    } else {
+        return;
+    }
+
+    let temp = folderIdStack;
+    if (temp.length == 0) {
+        temp = ["0"];
+    }
+    $.ajax({
+        url: "/GeoProblemSolving/rip/" +
+            activityInfo.aid +
+            "/" +
+            temp.toString(),
+        type: "GET",
+        async: false,
+        success: function (result) {
+            if (result == "Offline") {
+                confirm("You are offline, please login.")
+            } else if (result.code == 0) {
+                let rootRes = result.data;
+                resources = resToCurrentFolder(rootRes);
+                showResList();
+            }
+        },
+        error: function (err) {
+            throw err;
+        }
+    });
+
 }
 function resToCurrentFolder(rootRes) {
     let currentFolder = {
@@ -612,17 +691,17 @@ function uploadResources(uploadFiles, description, type, privacy) {
 function resourceChanged(resources, behavior) {
     switch (behavior) {
         case "upload": {
-            for(let i = 0; i < resources.length; i++) {
-                if(resources[i].folder) {
+            for (let i = 0; i < resources.length; i++) {
+                if (resources[i].folder) {
                     addfolder(resources[i]);
                 } else {
                     addfile(resources[i]);
                 }
             }
             break;
-        } 
+        }
         case "delete": {
-            
+
             break;
         }
     }

@@ -970,6 +970,7 @@
                   let newNameFolder = {
                     uid: folderId,
                     name: newFolderName,
+                    folder: true
                   };
                   for (var i = 0; i < this.currentFolder.folders.length; i++) {
                     if (this.currentFolder.folders[i].uid == folderId) {
