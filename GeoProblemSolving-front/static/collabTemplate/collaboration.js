@@ -448,6 +448,17 @@ function setWaitingLine(count) {
     }
 }
 
+function addOperations(user, operation) {
+    if(operation != undefined) {
+        let item = ` <div class="operation-item">
+                        <div class="operation-title">${user.name} ${operation.behavior} ${operation.type}</div>
+                        <div class="operation-divider"></div>
+                        <div class="operation-content">${user.name} ${operation.behavior} ${operation.type}</div>
+                    </div>`;
+        $("#operation-list").append(item);
+    }
+}
+
 ///////////
 /// Data
 //////////
@@ -466,6 +477,15 @@ function getActivityInfo(event) {
         // socket
         initWebSocket(activityInfo.aid, toolId);
     }
+}
+
+// post message to parent page
+function postIframeMsg(message, type) {
+    let data = {
+        type: type,
+        content: message
+    }
+    window.parent.postMessage(data,'*')
 }
 
 /**
@@ -670,7 +690,10 @@ function uploadResources(uploadFiles, description, type, privacy) {
                             address: uploadedList[i].address,
                         }
                     }
+                    // collaboration message
                     websocketSend(message);
+                    // record
+                    addOperations(userInfo, message);
                 }
 
                 return uploadedList;
@@ -821,6 +844,9 @@ function websocketonmessage(e) {
                     if (data.sender !== userInfo.userId) {
                         selectFile(data.content);
                         dataChannel(data);
+
+                        // record
+                        addOperations(message.sender, message);
                     }
                 }
                 break;
