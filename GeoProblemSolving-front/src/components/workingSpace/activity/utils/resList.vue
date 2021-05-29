@@ -416,7 +416,7 @@
           title="Delete"
           icon="md-close"
           style="margin: 10px 20px 0 0; cursor: pointer; width: 60px"
-          @click="deleteResourceModalShow(selectData.uid)"
+          @click="deleteResourceModalShow(selectData)"
         ></Button>
       </div>
       <!-- <Button style="margin-right:20px" @click="dataPreview(selectData)">Preview</Button>
@@ -528,7 +528,7 @@
     </Modal>
     <Modal
       v-model="deleteResourceModal"
-      @on-ok="deleteResource()"
+      @on-ok="removeResource()"
       ok-text="Delete"
       cancel-text="Cancel"
     >
@@ -667,7 +667,7 @@ export default {
       metaDataInfo: "",
       // 删除资源
       deleteResourceModal: false,
-      deleteResourceId: "",
+      deleteResource: {},
       // 共享
       shareModal: false,
       userResourceList: [],
@@ -957,9 +957,17 @@ export default {
                       this.activityResList.push(uploadedList[i]);
                       if (this.uploadDataInfo.type == "data") {
                         this.activityDataList.push(uploadedList[i]);
-                      } else if (this.uploadDataInfo.type == "others") {
+                      } else {
                         this.relatedResList.push(uploadedList[i]);
                       }
+
+                      this.operationApi.resOperationRecord(
+                        this.activityInfo.aid,
+                        "",
+                        "upload",
+                        this.userInfo.userId,
+                        uploadedList[i]
+                      );
                     }
                     if (sizeOverList.length > 0) {
                       this.$Notice.warning({
@@ -1002,19 +1010,19 @@ export default {
         }
       });
     },
-    deleteResourceModalShow(id) {
+    deleteResourceModalShow(resource) {
       this.deleteResourceModal = true;
-      this.deleteResourceId = id;
+      this.deleteResource = resource;
     },
-    deleteResource() {
-      if (this.deleteResourceId != "") {
+    removeResource() {
+      if (this.deleteResource.uid != "") {
         let temp = this.folderIdStack;
         if (temp.length == 0) {
           //重新开辟内存空间的temp,如果直接使用push的话，地址还是指向原数据的地址
           temp = ["0"];
         }
         let formData = new FormData();
-        formData.append("uids", this.deleteResourceId);
+        formData.append("uids", this.deleteResource.uid);
         formData.append("aid", this.activityInfo.aid);
         formData.append("paths", temp.toString());
         this.axios
@@ -1028,44 +1036,33 @@ export default {
                 desc: "Delete successfully",
               });
 
+              this.operationApi.resOperationRecord(
+                this.activityInfo.aid,
+                "",
+                "remove",
+                this.userInfo.userId,
+                this.deleteResource
+              );
+
               //从列表中删除
-              let deleteResType = "";
-              // for (let i = 0; i < this.fileList.length; i++) {
-              //   if (this.fileList[i].uid == this.deleteResourceId) {
-              //     // 记录信息
-              //     try {
-              //       deleteResType = this.fileList[i].type;
-              //       this.fileList.splice(i, 1);
-              //     } catch (err) {
-              //       throw err;
-              //     }
-              //   }
-              // }
-              // 同步删除其他数组内的资源
               for (var i = 0; i < this.activityResList.length; i++) {
-                if (this.activityResList[i].uid == this.deleteResourceId) {
+                if (this.activityResList[i].uid == this.deleteResource.uid) {
                   this.activityResList.splice(i, 1);
                 }
               }
-              if (deleteResType == "data") {
+              if (this.deleteResource.type == "data") {
                 for (var i = 0; i < this.activityDataList.length; i++) {
-                  if (this.activityDataList[i].uid == this.deleteResourceId) {
+                  if (this.activityDataList[i].uid == this.deleteResource.uid) {
                     this.activityDataList.splice(i, 1);
                   }
                 }
-              } else if (deleteResType == "others") {
+              } else {
                 for (var i = 0; i < this.relatedResList.length; i++) {
-                  if (this.relatedResList[i].uid == this.deleteResourceId) {
+                  if (this.relatedResList[i].uid == this.deleteResource.uid) {
                     this.relatedResList.splice(i, 1);
                   }
                 }
               }
-              // // 如果删除的是ToolData, 同步删除
-              // for (var i = 0; i < this.toolDataList.length; i++) {
-              //   if (this.toolDataList[i].uid == this.deleteResourceId) {
-              //     this.toolDataList.splice(i, 1);
-              //   }
-              // }
             }
           })
           .catch((err) => {
@@ -1313,6 +1310,17 @@ export default {
             this.$router.push({ name: "Login" });
           } else if (res.data.code == 0) {
             this.getResList();
+
+            let resList = res.data.data;
+            for (let i = 0; i < resList.length; i++) {
+              this.operationApi.resOperationRecord(
+                this.activityInfo.aid,
+                "",
+                "upload",
+                this.userInfo.userId,
+                resList[i]
+              );
+            }
           } else {
             this.$Message.error(
               "Failed to get resources from previous activities."
@@ -1405,6 +1413,14 @@ export default {
                 this.activityDataList.push(res.data.data);
                 this.relatedResList.push(res.data.data);
 
+                this.operationApi.resOperationRecord(
+                  this.activityInfo.aid,
+                  "",
+                  "upload",
+                  this.userInfo.userId,
+                  res.data.data
+                );
+
                 this.newFolderModal = false;
               } else {
                 this.$Message.warning("New folder fail.");
@@ -1454,6 +1470,14 @@ export default {
                   break;
                 }
               }
+
+              this.operationApi.resOperationRecord(
+                this.activityInfo.aid,
+                "",
+                "remove",
+                this.userInfo.userId,
+                folder
+              );
             } else {
               this.$Message.warning("Delete folder fail.");
             }
@@ -1515,6 +1539,14 @@ export default {
                     break;
                   }
                 }
+
+                this.operationApi.resOperationRecord(
+                  this.activityInfo.aid,
+                  "",
+                  "update",
+                  this.userInfo.userId,
+                  this.editForeInfo
+                );
               } else {
                 this.$Message.warning("Rename fail.");
               }
@@ -1584,6 +1616,14 @@ export default {
                     break;
                   }
                 }
+                
+                this.operationApi.resOperationRecord(
+                  this.activityInfo.aid,
+                  "",
+                  "update",
+                  this.userInfo.userId,
+                  this.selectFileInfo
+                );
               } else {
                 this.$Message.warning("Update fail.");
               }
@@ -1639,13 +1679,18 @@ export default {
 
             for (let i = 0; i < sharedFile.length; i++) {
               this.activityResList.push(sharedFile[i]);
-            }
-            for (let i = 0; i < sharedFile.length; i++) {
               this.activityResList.push(sharedFile[i]);
-            }
-            for (let i = 0; i < sharedFile.length; i++) {
               this.activityDataList.push(sharedFile[i]);
+
+              this.operationApi.resOperationRecord(
+                this.activityInfo.aid,
+                "",
+                "upload",
+                this.userInfo.userId,
+                resList[i]
+              );
             }
+            
             this.$Message.success("Shared file success!");
             this.selectedFilesToShare = [];
           } else {

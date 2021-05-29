@@ -44,7 +44,7 @@
           style="margin-top: -10px"
         ></manage-tools>
       </div>
-      <vue-scroll :ops="ops" style="max-height: calc(100vh - 200px)">
+      <vue-scroll :ops="ops" style="max-height: calc(100vh - 200px); padding-top: 5px">
         <div
           v-if="toolList != undefined && toolList.length < 1"
           style="text-align: center"
@@ -57,7 +57,7 @@
         <div
           v-for="tool in toolList"
           :key="tool.index"
-          style="width: 99px; display: inline-block"
+          style="width: 99px; display: inline-block;"
           v-else
         >
           <Card
@@ -238,6 +238,10 @@ export default {
       // openToolModal: false,
     };
   },
+  beforeDestroy() {
+    window.removeEventListener("message", this.toolMsgHandle, false);
+    window.removeEventListener("message", getActivityInfo, false);
+  },
   created() {
     this.roleIdentity();
   },
@@ -340,9 +344,7 @@ export default {
       }
     },
     openToolByPanel(toolInfo) {
-      // var toolURL = window.location.origin + `${toolInfo.toolUrl}`;
-      // var toolURL = toolInfo.toolUrl;
-      // var toolContent = `<iframe src="${toolURL}?userName=${this.userInfo.name}&userID=${this.userInfo.userId}&groupID=${this.activityInfo.aid}" style="width: 100%; height:100%;" frameborder="0"></iframe>`;
+      
       var toolContent = `<iframe src="${toolInfo.toolUrl}" id="${toolInfo.tid}" style="width: 100%; height:100%;" frameborder="0"></iframe>`;
 
       var panel = jsPanel.create({
@@ -381,10 +383,24 @@ export default {
           //iframe加载完立即发送一条消息
           iFrame.contentWindow.postMessage({"user": userInfo, "activity": activity, "tid":toolInfo.tid, type:"activity"}, "*");
       }
-
     },
     toolMsgHandle(event){
-      console.log(event);
+
+      let msgType = event.data.type;
+      switch (msgType) {
+        case "data" :{
+          break;
+        }
+        case "model" :{
+          break;
+        }
+        case "communication" :{
+          break;
+        }
+        case "computation" :{
+          break;
+        }
+      }
       this.operationStore = true;
     },
     openToolNewpage(toolInfo) {

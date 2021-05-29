@@ -45,8 +45,8 @@ public class ActivityDocController {
      * update activity document
      */
     @RequestMapping(method = RequestMethod.PUT)
-    public JsonResult updateAcitivityDoc(@RequestParam("aid") String aid, @RequestBody String document)
+    public JsonResult updateAcitivityDoc(@RequestBody  ActivityDoc activityDoc)
     {
-        return activityDocService.updateDocument(aid, document);
+        return activityDocService.updateDocument(activityDoc.getAid(), activityDoc.getDocument());
     }
 }

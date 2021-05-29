@@ -198,11 +198,11 @@ public class CollaborationBehavior {
     /**
      * operation
      **/
-    public void transferOperation(HashMap<String, CollaborationUser> participants, String type, String sender, List<String> receivers, String behavior, String object) {
+    public void transferOperation(HashMap<String, CollaborationUser> participants, String type, CollaborationUser sender, List<String> receivers, String behavior, String object) {
         try {
             JSONObject messageObject = new JSONObject();
             messageObject.put("type", type);
-            messageObject.put("sender", sender);
+            messageObject.put("sender", sender.getUserInfo());
             messageObject.put("behavior", behavior);
             messageObject.put("object", object);
 
@@ -272,14 +272,14 @@ public class CollaborationBehavior {
      * @param sender
      * @param type
      */
-    public void sendControlInfo(CollaborationConfig config, List<String> queue, String sender, String type) {
+    public void sendControlInfo(CollaborationConfig config, List<String> queue, CollaborationUser sender, String type) {
         try {
             HashMap<String, CollaborationUser> participants = config.getParticipants();
             JSONObject messageObject = new JSONObject();
             messageObject.put("type", type);
 
             if (type.equals("control-apply")) {
-                messageObject.put("sender", sender);
+                messageObject.put("sender", sender.getUserInfo());
                 messageObject.put("waiting", queue.size());
                 messageObject.put("operator", config.getOperator());
                 // send message
