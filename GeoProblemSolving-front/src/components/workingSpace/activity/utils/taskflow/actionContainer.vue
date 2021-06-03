@@ -39,13 +39,15 @@ export default {
   },
   watch: {
     tempOperations() {
+      this.clearAllOperations();
       this.loadOperationNode();
     },
     activityTasks() {
+      this.clearAllNodes();
       this.generateTaskNode();
-      this.addConnections();
     },
     taskDependencies() {
+      this.clearAllConnections();
       this.addConnections();
     },
   },
@@ -220,6 +222,27 @@ export default {
         );
       }
     },
+    clearAllNodes(){
+       for (var i = 0; i < this.taskList.length; i++) {
+         let nodeId = this.editor.getNodesFromName(this.taskList[i].taskId)[0];
+         this.editor.removeNodeId("node-"+ nodeId);
+       }
+    },
+    clearAllConnections(){
+       for (var i = 0; i < this.relaions.length; i++) {
+        let fromId = this.editor.getNodesFromName(this.relaions[i].from)[0];
+        let toId = this.editor.getNodesFromName(this.relaions[i].to)[0];
+
+        //connection
+        this.editor.removeSingleConnection(fromId, toId, "output_1", "input_1");
+       }
+    },
+    clearAllOperations(){
+       for (var i = 0; i < this.operations.length; i++) {
+         let nodeId = this.editor.getNodesFromName(this.operations[i].id)[0];
+         this.editor.removeNodeId("node-"+ nodeId);
+       }
+    }
   },
 };
 </script>

@@ -126,7 +126,7 @@ export default new Vuex.Store({
                 }
             }
         },
-        updateActivityTasks: (state, behavior,task) => {
+        updateActivityTasks: (state, behavior, task) => {
             if(behavior === "add"){
                 state.activityTasks.push(task);
             } else if(behavior === "remove"){

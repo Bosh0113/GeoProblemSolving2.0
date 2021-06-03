@@ -44,7 +44,10 @@
           style="margin-top: -10px"
         ></manage-tools>
       </div>
-      <vue-scroll :ops="ops" style="max-height: calc(100vh - 200px); padding-top: 5px">
+      <vue-scroll
+        :ops="ops"
+        style="max-height: calc(100vh - 200px); padding-top: 5px"
+      >
         <div
           v-if="toolList != undefined && toolList.length < 1"
           style="text-align: center"
@@ -57,7 +60,7 @@
         <div
           v-for="tool in toolList"
           :key="tool.index"
-          style="width: 99px; display: inline-block;"
+          style="width: 99px; display: inline-block"
           v-else
         >
           <Card
@@ -72,7 +75,11 @@
               @click="back2LastLevel()"
           /></Card>
           <Card
-            style="padding-top: 5px; background-color: #d3f1b1; margin-right: 5px"
+            style="
+              padding-top: 5px;
+              background-color: #d3f1b1;
+              margin-right: 5px;
+            "
             v-if="tool.isToolset"
           >
             <div
@@ -123,7 +130,11 @@
             </div>
           </Card>
           <Card
-            style="padding-top: 5px; background-color: ghostwhite; margin-right: 5px"
+            style="
+              padding-top: 5px;
+              background-color: ghostwhite;
+              margin-right: 5px;
+            "
           >
             <div
               style="text-align: center; cursor: pointer"
@@ -344,7 +355,6 @@ export default {
       }
     },
     openToolByPanel(toolInfo) {
-      
       var toolContent = `<iframe src="${toolInfo.toolUrl}" id="${toolInfo.tid}" style="width: 100%; height:100%;" frameborder="0"></iframe>`;
 
       var panel = jsPanel.create({
@@ -355,19 +365,20 @@ export default {
         headerTitle: toolInfo.toolName,
         content: toolContent,
         container: "div#drawflow",
-        data: { user: this.userInfo, aid: this.activityInfo.aid, taskId: "" },
         dragit: {
           containment: 5,
         },
         closeOnEscape: true,
         disableOnMaximized: true,
-        onbeforeclose: function () {
-            if (this.operationStore) {
-              return true;
-            } else {
-              return confirm("This operation has not been bind to the task. Close panel immediately?");
-            }
+        onbeforeclose:  () => {
+          if (this.operationStore) {
+            return true;
+          } else {
+            return confirm(
+              "This operation has not been bind to tasks. Close panel immediately?"
+            );
           }
+        },
       });
       $(".jsPanel-content").css("font-size", "0");
       this.panelList.push(panel);
@@ -377,31 +388,54 @@ export default {
       window.addEventListener("message", this.toolMsgHandle, false);
       let activity = this.activityInfo;
       let userInfo = this.userInfo;
+      let taskList = this.operationApi.getTaskList();
       let iFrame = document.getElementById(toolInfo.tid);
       //iframe加载完毕后再发送消息，否则子页面接收不到message
       iFrame.onload = function () {
-          //iframe加载完立即发送一条消息
-          iFrame.contentWindow.postMessage({"user": userInfo, "activity": activity, "tid":toolInfo.tid, type:"activity"}, "*");
-      }
+        //iframe加载完立即发送一条消息
+        iFrame.contentWindow.postMessage(
+          {
+            user: userInfo,
+            activity: activity,
+            tasks: taskList,
+            tid: toolInfo.tid,
+            type: "activity",
+          },
+          "*"
+        );
+      };
     },
-    toolMsgHandle(event){
+    toolMsgHandle(event) {
+      if (event.data.type === "task") {
 
-      let msgType = event.data.type;
-      switch (msgType) {
-        case "data" :{
-          break;
+        let operations = event.data.operations;
+        for (let i = 0; i < operations.length; i++) {
+
+          let operationType = operations[i].type;
+          switch (operationType) {
+            case "data": {
+              this.operationApi.resOperationRecord(
+                this.activityInfo.aid,
+                event.data.task,
+                operations[i].behavior,
+                this.userInfo.userId,
+                operations[i].content
+              );
+              break;
+            }
+            case "model": {
+              break;
+            }
+            case "communication": {
+              break;
+            }
+            case "computation": {
+              break;
+            }
+          }
         }
-        case "model" :{
-          break;
-        }
-        case "communication" :{
-          break;
-        }
-        case "computation" :{
-          break;
-        }
+        this.operationStore = true;
       }
-      this.operationStore = true;
     },
     openToolNewpage(toolInfo) {
       // this.openToolModal = false;

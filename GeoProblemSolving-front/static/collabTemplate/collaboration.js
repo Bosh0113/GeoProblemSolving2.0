@@ -23,6 +23,11 @@ var selectedResources = [];
 
 // operation related
 var loadResChannel = null;
+var selectedOperations = [];
+
+// task related
+var taskList = [];
+var selectedTask = "";
 
 $(function () {
     // ready - event
@@ -144,11 +149,30 @@ function loadCollabComponent() {
                     </div>
                 </div>
                 <div class="operation-list scrollbar">
-                    <span style="margin-left: 10px; font-size: 14px; font-weight:bold">Operations</span>
+                    <span style="margin-left: 10px; font-size: 14px; font-weight:bold">Current operations</span>
                     <div id="operation-list"></div>
                 </div>
                 <div class="operation-bind">
-                    <button class="btn btn-primary btn-sm">Bind to task</button>
+                    <button class="btn btn-primary btn-sm" id="bind-tasks" data-toggle="modal" data-target="#bind-tasks-modal">Bind to task</button>
+                    <div class="modal fade" id="bind-tasks-modal" tabindex="-1" role="dialog" aria-labelledby="bind-tasks-modal-title" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="bind-tasks-modal-title">Bind operations to tasks</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body" id="bind-tasks-modal-content">
+                                    <h3>There is no operations needed to bind to tasks.</h3>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <button type="button" class="btn btn-primary" id="bind-tasks-modal-ok">Bind</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>`);
@@ -168,7 +192,7 @@ function addEvents() {
             $("#collab-tool-sidebar").css("width", "46px");
             $("#collab-tool-content").css("left", "46px");
             $("#collab-tool-content").css("width", "calc(100vw - 46px)");
-            
+
             $("#people-btn").removeClass("active");
             panelType = "";
         } else {
@@ -254,6 +278,17 @@ function addEvents() {
 
     $("#operation-apply").on("click", operationApply);
     $("#operation-stop").on("click", operationStop);
+    $("#bind-tasks-modal-ok").on("click", function () {
+        if (selectedTask != undefined && selectedTask != "" && selectedTask != "Select one task") {
+            let data = {
+                "type": "task",
+                "operations": selectedOperations,
+                "task": selectedTask
+            }
+            postIframeMsg(data);
+            $('#bind-tasks-modal').modal('hide');
+        }
+    });
 
     $("#collaboration-switch").on("change", () => {
         if ($("#collaboration-switch").is(':checked')) {
@@ -261,7 +296,7 @@ function addEvents() {
         } else {
             socketClose();
         }
-    })
+    });
 
     $("#collaboration-mode").on("change", function () {
         let value = $("#collaboration-mode option:checked").val();
@@ -284,7 +319,7 @@ function showParticipants() {
                                     <div class="participant-info-name">${participants[i].name}</div>
                                     <div class="participant-info-role">${participants[i].role}</div>
                                 </div>
-                            </div>`
+                            </div>`;
         $("#people-list").append(peopleElement);
         if (participants[i].userId != userInfo.userId) {
             $(`#${participants[i].userId}`).css("background-color", "lightgrey");
@@ -316,10 +351,10 @@ function showResList() {
 
 function addfolder(folder) {
     let resElement = `<div class="card resource" title="${folder.name}">
-                                    <input class="form-check-input" type="checkbox" id="${folder.uid}">
-                                    <img src="/static/collabTemplate/img/folder.png" class="folder-${folder.uid} res-icon"/>
-                                    <div class="folder-${folder.uid} res-name">${folder.name}</div>
-                                </div>`
+                            <input class="form-check-input" type="checkbox" id="${folder.uid}">
+                            <img src="/static/collabTemplate/img/folder.png" class="folder-${folder.uid} res-icon"/>
+                            <div class="folder-${folder.uid} res-name">${folder.name}</div>
+                        </div>`
     $("#resource-list").append(resElement);
     $(`.folder-${folder.uid}`).on("click", function () {
         getFolderRes(folder, "enter")
@@ -449,13 +484,74 @@ function setWaitingLine(count) {
 }
 
 function addOperations(user, operation) {
-    if(operation != undefined) {
-        let item = ` <div class="operation-item">
-                        <div class="operation-title">${user.name} ${operation.behavior} ${operation.type}</div>
-                        <div class="operation-divider"></div>
-                        <div class="operation-content">${user.name} ${operation.behavior} ${operation.type}</div>
-                    </div>`;
-        $("#operation-list").append(item);
+    if (operation != undefined) {
+
+        switch (operation.type) {
+            case "data": {
+                if (operation.behavior === "upload") {
+                    let element = "";
+                    if (user.userId === userInfo.userId) {
+                        element = `<div class="operation-item">
+                                        <div class="operation-title">Data - upload
+                                            <input class="form-check-input operation-bind-check" type="checkbox" id="operation-${operation.content.uid}" title="Bind operations to the task">
+                                        </div>
+                                        <div class="operation-divider"></div>
+                                        <div class="operation-content" title="You uploaded the data - ${operation.content.name}">You uploaded the data - ${operation.content.name}</div>
+                                    </div>`;
+                    } else {
+                        element = `<div class="operation-item">
+                                        <div class="operation-title">Data - upload</div>
+                                        <div class="operation-divider"></div>
+                                        <div class="operation-content" title="${user.name} uploaded the data - ${operation.content.name}">${user.name} uploaded the data - ${operation.content.name}</div>
+                                    </div>`;
+                    }
+
+                    $("#operation-list").append(element);
+                    $(`#operation-${operation.content.uid}`).on("change", function () {
+                        selectOperations(operation);
+                    });
+
+                } else if (operation.behavior === "save") {
+                    let element = "";
+                    if (user.userId === userInfo.userId) {
+                        element = `<div class="operation-item">
+                                        <div class="operation-title">Data - save
+                                            <input class="form-check-input operation-bind-check" type="checkbox" id="operation-${operation.content.uid}" title="Bind operations to the task">
+                                        </div>
+                                        <div class="operation-divider"></div>
+                                        <div class="operation-content" title="You saved the data - ${operation.content.name}">You saved the data - ${operation.content.name}</div>
+                                    </div>`;
+                    } else {
+                        element = `<div class="operation-item">
+                                        <div class="operation-title">Data - save</div>
+                                        <div class="operation-divider"></div>
+                                        <div class="operation-content" title="${user.name} saved the data - ${operation.content.name}">${user.name} saved the data - ${operation.content.name}</div>
+                                    </div>`;
+                    }
+
+                    $("#operation-list").append(element);
+                    $(`#operation-${operation.content.uid}`).on("change", function () {
+                        selectOperations(operation);
+                    });
+                } else if (operation.behavior === "update") {
+
+                }
+                break;
+            }
+            case "chat": {
+                break;
+            }
+            case "model": {
+                if (operation.behavior === "build") {
+
+                } else if (operation.behavior === "execute") {
+
+                } else if (operation.behavior === "modify") {
+
+                }
+                break;
+            }
+        }
     }
 }
 
@@ -468,6 +564,7 @@ function getActivityInfo(event) {
         activityInfo = event.data.activity;
         userInfo = event.data.user;
         toolId = event.data.tid;
+        taskList = event.data.tasks;
 
         componentStatus = true;
 
@@ -480,12 +577,8 @@ function getActivityInfo(event) {
 }
 
 // post message to parent page
-function postIframeMsg(message, type) {
-    let data = {
-        type: type,
-        content: message
-    }
-    window.parent.postMessage(data,'*')
+function postIframeMsg(data) {
+    window.parent.postMessage(data, '*')
 }
 
 /**
@@ -645,6 +738,39 @@ function selectFile(file) {
     }
 }
 
+function selectOperations(operation) {
+    if ($(`#operation-${operation.content.uid}`).is(":checked")) {
+        selectedOperations.push(operation);
+    } else {
+        for (let i = 0; i < selectedOperations.length; i++) {
+            if (selectedOperations[i].content.uid == operation.content.uid) {
+                selectedOperations.splice(i, 1);
+            }
+        }
+    }
+    // 操作绑定模态框
+    $("#bind-tasks-modal-content").empty();
+    if (selectedOperations.length === 0) {
+        $("#bind-tasks-modal-content").append(`<h3>There is no operations needed to bind to tasks.</h3>`);
+
+    } else if (selectedOperations.length > 0) {
+        if (taskList.length === 0) {
+            $("#bind-tasks-modal-content").append(`<h3>There is no existing task.</h3>`);
+        } else if (taskList.length > 0) {
+            $("#bind-tasks-modal-content").append(`<select class="custom-select" id="task-list">
+                                                        <option selected>Select one task</option>
+                                                    </select>`);
+            for (let i = 0; i < taskList.length; i++) {
+                let elem = `<option value="${taskList[i].taskId}" title="${taskList[i].purpose}">${taskList[i].name}</option>`
+                $("#task-list").append(elem);
+            }
+            $("#task-list").on("change", function () {
+                selectedTask = $("#task-list option:checked").val();
+            });
+        }
+    }
+}
+
 
 /**
  * public method
@@ -664,6 +790,73 @@ function uploadResources(uploadFiles, description, type, privacy) {
     formData.append("aid", activityInfo.aid);
     formData.append("paths", ["0"].toString());
 
+    let uploadedList = fileUpload(formData);
+
+    resourceChanged(uploadedList, "upload")
+
+    for (let i = 0; i < uploadedList.length; i++) {
+        let message = {
+            type: "data",
+            behavior: "upload",
+            sender: userInfo.userId,
+            content: {
+                uid: uploadedList[i].uid,
+                name: uploadedList[i].name,
+                type: "data",
+                suffix: uploadedList[i].suffix,
+                provider: userInfo.userId,
+                description: uploadedList[i].description,
+                address: uploadedList[i].address,
+            }
+        }
+        // collaboration message
+        websocketSend(message);
+        // record
+        addOperations(userInfo, message);
+    }
+    return uploadedList;
+}
+
+function saveResources(uploadFiles, description, type, privacy) {
+    var formData = new FormData();
+    for (var i = 0; i < uploadFiles.length; i++) {
+        formData.append("file", uploadFiles[i]);
+    }
+    formData.append("description", description);
+    formData.append("type", type);
+    formData.append("privacy", privacy);
+    formData.append("aid", activityInfo.aid);
+    formData.append("paths", ["0"].toString());
+
+    let uploadedList = fileUpload(formData);
+    
+    resourceChanged(uploadedList, "save")
+
+    for (let i = 0; i < uploadedList.length; i++) {
+        let message = {
+            type: "data",
+            behavior: "save",
+            sender: userInfo.userId,
+            content: {
+                uid: uploadedList[i].uid,
+                name: uploadedList[i].name,
+                type: "data",
+                suffix: uploadedList[i].suffix,
+                provider: userInfo.userId,
+                description: uploadedList[i].description,
+                address: uploadedList[i].address,
+            }
+        }
+        // collaboration message
+        websocketSend(message);
+        // record
+        addOperations(userInfo, message);
+    }
+    return uploadedList;
+}
+
+function fileUpload(formData) {
+    let uploadedList = null;
     $.ajax({
         url: "/GeoProblemSolving/rip/file/upload",
         type: "POST",
@@ -672,31 +865,10 @@ function uploadResources(uploadFiles, description, type, privacy) {
         processData: false,
         contentType: false,
         cache: false,
-        async: true,
+        async: false,
         success: function (data) {
             if (data != "Fail") {
-                let uploadedList = JSON.parse(data).uploaded;
-                resourceChanged(uploadedList, "upload")
-
-                for (let i = 0; i < uploadedList.length; i++) {
-                    let message = {
-                        type: "data",
-                        behavior: "upload",
-                        sender: userInfo.userId,
-                        content: {
-                            uid: uploadedList[i].uid,
-                            name: uploadedList[i].name,
-                            description: uploadedList[i].description,
-                            address: uploadedList[i].address,
-                        }
-                    }
-                    // collaboration message
-                    websocketSend(message);
-                    // record
-                    addOperations(userInfo, message);
-                }
-
-                return uploadedList;
+                uploadedList = JSON.parse(data).uploaded;
             } else {
                 alert("Upload fail.");
             }
@@ -705,6 +877,7 @@ function uploadResources(uploadFiles, description, type, privacy) {
             throw err;
         }
     });
+    return uploadedList;
 }
 
 /**
@@ -713,7 +886,8 @@ function uploadResources(uploadFiles, description, type, privacy) {
  */
 function resourceChanged(resources, behavior) {
     switch (behavior) {
-        case "upload": {
+        case "upload":
+        case "save": {
             for (let i = 0; i < resources.length; i++) {
                 if (resources[i].folder) {
                     addfolder(resources[i]);

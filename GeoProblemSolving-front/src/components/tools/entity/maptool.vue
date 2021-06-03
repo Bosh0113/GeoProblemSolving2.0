@@ -416,10 +416,10 @@ export default {
             var fileOfBlob = new File([this.geojsonBlob], filename);
 
             // upload
-            let file = uploadResources([fileOfBlob], description, "data", "private");
+            let file = saveResources([fileOfBlob], description, "data", "private");
 
             this.showFile = true;
-            this.selectData = file;
+            this.selectData = file[0];
 
             if(file.length > 0){
               this.$Notice.open({

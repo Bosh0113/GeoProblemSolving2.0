@@ -1063,6 +1063,7 @@ export default {
                   }
                 }
               }
+              this.checkDataModal = false;
             }
           })
           .catch((err) => {
