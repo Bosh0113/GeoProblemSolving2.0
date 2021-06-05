@@ -375,7 +375,7 @@ export default {
             return true;
           } else {
             return confirm(
-              "This operation has not been bind to tasks. Close panel immediately?"
+              "Operations has not been bind to tasks. Close panel immediately?"
             );
           }
         },

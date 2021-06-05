@@ -1,43 +1,11 @@
 <template>
   <div class="card-devices">
-    <div class="drawflow-node-title" v-if="type == 'operation'">
-      <div class="content" v-if="temOperation.type === 'communication'">
-        <!-- <span class="behavior">Communication</span>          
-          <div class="participant">
-            <span style="margin-right: 5px">People: </span>
-            <avatar
-              v-for="person in temOperation.operators"
-              :key="person.id"
-              class="person"
-              :username="person.name"
-              :size="16"
-              :rounded="true"
-              :title="person.name"
-            />
-          </div> -->
-      </div>
-      <div class="content" v-else-if="temOperation.type === 'geo-analysis'">
-        <!-- <span class="behavior">Geo-analysis by using the {{temOperation.tool.name}} tool</span>          
-          <div class="participant">
-            <span style="margin-right: 5px">People: </span>
-            <avatar
-              v-for="person in temOperation.operators"
-              :key="person.id"
-              class="person"
-              :username="person.name"
-              :size="16"
-              :rounded="true"
-              :title="person.name"
-            />
-          </div> -->
-      </div>
-    </div>
-    <div class="drawflow-node-title" v-if="type == 'task'">
+    <div class="drawflow-node-title">
       <h3>{{ name }}</h3>
     </div>
     <div class="drawflow-node-body">
       <div
-        v-if="type == 'task' && !unfold"
+        v-if="!unfold"
         @click="operationShow"
         style="
           cursor: pointer;
@@ -48,7 +16,7 @@
       >
         See more <Icon type="md-more" size="20" />
       </div>
-      <div v-else-if="type == 'task' && unfold" style="cursor: default">
+      <div v-else-if="unfold" style="cursor: default">
         <Timeline style="padding: 10px; height: 350px">
           <vue-scroll :ops="scrollOps">
             <TimelineItem v-for="record in operationRecords" :key="record.id">
@@ -111,7 +79,6 @@
                   <span style="margin-right: 5px">People: </span>
                   <avatar
                     class="person"
-                      style="font-height:6px"
                     :username="record.operator.name"
                     :size="16"
                     :rounded="true"
@@ -137,7 +104,6 @@
                     <span style="margin-right: 5px">People: </span>
                     <avatar
                       class="person"
-                      style="font-height:6px"
                       :username="record.operator.name"
                       :size="16"
                       :rounded="true"
@@ -165,7 +131,6 @@
                       v-for="person in record.operators"
                       :key="person.id"
                       class="person"
-                      style="font-height:6px"
                       :username="person.name"
                       :size="16"
                       :rounded="true"
@@ -209,7 +174,6 @@
                       class="person"
                       :username="person.name"
                       :size="16"
-                      style="font-height:6px"
                       :rounded="true"
                       :title="person.name"
                     />
@@ -356,7 +320,6 @@
           Hide <Icon type="ios-arrow-up" size="20" style="margin-top: -2px" />
         </div>
       </div>
-      <div v-else-if="type == 'operation'" style="padding: 10px"></div>
     </div>
   </div>
 </template>
@@ -366,7 +329,7 @@ export default {
   components: {
     Avatar,
   },
-  props: ["type", "taskId", "name", "operations"],
+  props: ["taskId", "name", "operations"],
   data() {
     return {
       scrollOps: {
@@ -391,41 +354,12 @@ export default {
     };
   },
   mounted() {
-    if (this.type == "operation") {
-      this.operationInit();
-    }
   },
-  methods: {
-    operationInit() {
-      let operation = this.operations[0];
-      if (operation.type === "communication") {
-        // participants
-        let participants = [];
-        for (var j = 0; j < operation.operators.length; j++) {
-          let personInfo = this.operationApi.getMemberInfo(
-            operation.operators[j]
-          );
-          participants.push(personInfo);
-        }
-        operation.operators = participants;
-      } else if (operation.type === "geo-analysis") {
-        // geo-analysis
-        let toolInfo = this.operationApi.getResInfo(operation.toolRef);
-        operation.tool = toolInfo;
-        // participants
-        let participants = [];
-        for (var j = 0; j < operation.operators.length; j++) {
-          let operatorInfo = this.operationApi.getMemberInfo(
-            operation.operators[j]
-          );
-          participants.push(operatorInfo);
-        }
-        operation.operators = participants;
-      }
-      this.temOperation = operation;
-    },
+  methods: {    
     operationShow() {
       this.unfold = true;
+      this.operationRecords = [];
+      
       for (var i = 0; i < this.operations.length; i++) {
         let operation = this.operationApi.getOperationInfo(this.operations[i]);
         if (operation != undefined) {

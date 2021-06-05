@@ -219,7 +219,7 @@ export function getResInfo(resId) {
         return;
     }
 
-    let resNode = xmlDoc.getElementById(resId); 
+    let resNode = xmlDoc.getElementById(resId);
     if (resNode == null) return null;
 
     let resource = {}
@@ -495,6 +495,14 @@ export function getTempOperations() {
                 }
                 operation["resesRef"] = resources;
                 operation["operators"] = participants;
+            } else if (operationNode.getAttribute("type") === "resource") {
+
+                operation["behavior"] = operationNode.getAttribute("behavior");
+                operation["resRef"] = operationNode.getAttribute("resRef");
+                operation["operator"] = operationNode.getAttribute("operator");
+                operation["time"] = operationNode.getAttribute("time");
+            } else {
+                continue;
             }
             tempOperations.push(operation);
         }
@@ -649,7 +657,7 @@ export function taskUpdate(aid, behavior, taskInfo) {
     }
     let time1 = new Date(taskInfo.startTime);
     let time2 = new Date(taskInfo.endTime);
-    let timerange = time1.Format("yyyy-MM-dd hh:mm") + " - " + time2.Format("yyyy-MM-dd hh:mm");
+    let timerange = time1.Format("yyyy-MM-dd HH:mm:ss") + " - " + time2.Format("yyyy-MM-dd HH:mm:ss");
 
     // TaskList
     if (behavior === "create") {
@@ -699,50 +707,52 @@ export function taskUpdate(aid, behavior, taskInfo) {
 }
 
 
-export function taskDependencyRecord(aid, behavior, relationId, lasts, nexts) {
+export function taskDependencyRecord(aid, behavior, relationId, last, next) {
     if (xmlDoc === null) {
         alert("Failed to record operation. Please load activity document first!");
         return;
     }
 
+
     // TaskDependency
     if (behavior === "link") {
 
-        let Relation = xmlDoc.getElementById(relationId);
-        if (Relation !== null) {
-            Relation.setAttribute("name", "Task Dependency");
-            Relation.setAttribute("state", "used");
-            for (var i = 0; i < lasts.length; i++) {
-                let From = xmlDoc.createElement('From');
-                From.setAttribute("taskRef", lasts[i]);
-                Relation.appendChild(From);
-            }
-            for (var i = 0; i < nexts.length; i++) {
-                let To = xmlDoc.createElement('To');
-                To.setAttribute("taskRef", nexts[i]);
-                Relation.appendChild(To);
-            }
-        } else {
+        if (relationId === "") {
+            relationId = guid();
 
-            Relation = xmlDoc.createElement('Relation');
+            let Relation = xmlDoc.createElement('Relation');
             Relation.setAttribute("id", relationId);
             Relation.setAttribute("name", "Task Dependency");
             Relation.setAttribute("state", "used");
-            for (var i = 0; i < lasts.length; i++) {
-                let From = xmlDoc.createElement('From');
-                From.setAttribute("taskRef", lasts[i]);
-                Relation.appendChild(From);
-            }
-            for (var i = 0; i < nexts.length; i++) {
-                let To = xmlDoc.createElement('To');
-                To.setAttribute("taskRef", nexts[i]);
-                Relation.appendChild(To);
-            }
+
+            let From = xmlDoc.createElement('From');
+            From.setAttribute("taskRef", last);
+            Relation.appendChild(From);
+
+            let To = xmlDoc.createElement('To');
+            To.setAttribute("taskRef", next);
+            Relation.appendChild(To);
 
             let TaskDependency = xmlDoc.getElementsByTagName("TaskDependency")[0];
             if (TaskDependency == undefined) return;
             TaskDependency.appendChild(Relation);
 
+        } else {
+
+            let Relation = xmlDoc.getElementById(relationId);
+
+            if (Relation !== null) {
+                Relation.setAttribute("name", "Task Dependency");
+                Relation.setAttribute("state", "used");
+
+                let From = xmlDoc.createElement('From');
+                From.setAttribute("taskRef", last);
+                Relation.appendChild(From);
+
+                let To = xmlDoc.createElement('To');
+                To.setAttribute("taskRef", next);
+                Relation.appendChild(To);
+            }
         }
     } else if (behavior === "break") {
         let Relation = xmlDoc.getElementById(protocalId);
@@ -1193,7 +1203,7 @@ function clearTempOperations(aid) {
 
     let Operations = xmlDoc.getElementsByTagName("Operation");
     if (Operations == undefined) return [];
-    
+
     for (var i = Operations.length - 1; i >= 0; i--) {
 
         let operationNode = Operations[i];

@@ -1,0 +1,214 @@
+<template>
+  <div class="card-devices">
+    <div
+      class="content"
+      v-if="temOperation != undefined && temOperation.type === 'communication'"
+    >
+      <span class="behavior">Communication</span>
+      <div class="participant">
+        <span style="margin-right: 5px">People: </span>
+        <avatar
+          v-for="person in temOperation.operators"
+          :key="person.id"
+          class="person"
+          :username="person.name"
+          :size="16"
+          :rounded="true"
+          :title="person.name"
+        />
+      </div>
+    </div>
+    <div
+      class="content"
+      v-else-if="
+        temOperation != undefined && temOperation.type === 'geo-analysis'
+      "
+    >
+      <span class="behavior"
+        >Geo-analysis by using the {{ temOperation.tool.name }} tool</span
+      >
+      <div class="participant">
+        <span style="margin-right: 5px">People: </span>
+        <avatar
+          v-for="person in temOperation.operators"
+          :key="person.id"
+          class="person"
+          :username="person.name"
+          :size="16"
+          :rounded="true"
+          :title="person.name"
+        />
+      </div>
+    </div>
+    <div
+      class="content"
+      v-else-if="temOperation != undefined && temOperation.type === 'resource'"
+    >
+      <img
+        :src="dataUrl"
+        height="24px"
+        width="24px"
+        :title="temOperation.resource.name"
+        v-if="temOperation.resource.type == 'data'"
+      />
+      <img
+        :src="modelUrl"
+        height="24px"
+        width="24px"
+        :title="temOperation.resource.name"
+        v-else-if="temOperation.resource.type == 'model'"
+      />
+      <img
+        :src="documentUrl"
+        height="24px"
+        width="24px"
+        :title="temOperation.resource.name"
+        v-else-if="temOperation.resource.type == 'document'"
+      />
+      <img
+        :src="paperUrl"
+        height="24px"
+        width="24px"
+        :title="temOperation.resource.name"
+        v-else-if="temOperation.resource.type == 'paper'"
+      />
+      <img
+        :src="imageUrl"
+        height="24px"
+        width="24px"
+        :title="temOperation.resource.name"
+        v-else-if="temOperation.resource.type == 'iamge'"
+      />
+      <img
+        :src="videoUrl"
+        height="24px"
+        width="24px"
+        :title="temOperation.resource.name"
+        v-else-if="temOperation.resource.type == 'video'"
+      />
+      <img
+        :src="otherUrl"
+        height="24px"
+        width="24px"
+        :title="temOperation.resource.name"
+        v-else-if="temOperation.resource.type == 'others'"
+      />
+      <span class="behavior">Resource {{ temOperation.behavior }}</span>
+    </div>
+  </div>
+</template>
+<script>
+import Avatar from "vue-avatar";
+export default {
+  components: {
+    Avatar,
+  },
+  props: ["taskId", "name", "operation"],
+  data() {
+    return {
+      scrollOps: {
+        bar: {
+          background: "lightgrey",
+        },
+      },
+      unfold: false,
+      operationRecords: [],
+      temOperation: {},
+      // 资源avatar 图片路径
+      dataUrl: require("@/assets/images/data.png"),
+      modelUrl: require("@/assets/images/model.png"),
+      paperUrl: require("@/assets/images/paper.png"),
+      documentUrl: require("@/assets/images/document.png"),
+      imageUrl: require("@/assets/images/image.png"),
+      videoUrl: require("@/assets/images/video.png"),
+      otherUrl: require("@/assets/images/otherfile.png"),
+      // 工具avatar 图片路径
+      toolUrl: require("@/assets/images/toolbox.png"),
+      chatUrl: require("@/assets/images/chat.png"),
+    };
+  },
+  mounted() {
+    this.operationInit();
+  },
+  methods: {
+    operationInit() {
+      let operation = Object.assign({}, this.operation);
+      if (operation.type === "communication") {
+        // participants
+        let participants = [];
+        for (var j = 0; j < operation.operators.length; j++) {
+          let personInfo = this.operationApi.getMemberInfo(
+            operation.operators[j]
+          );
+          participants.push(personInfo);
+        }
+        operation.operators = participants;
+      } else if (operation.type === "geo-analysis") {
+        // geo-analysis
+        let toolInfo = this.operationApi.getResInfo(operation.toolRef);
+        operation.tool = toolInfo;
+        // participants
+        let participants = [];
+        for (var j = 0; j < operation.operators.length; j++) {
+          let operatorInfo = this.operationApi.getMemberInfo(
+            operation.operators[j]
+          );
+          participants.push(operatorInfo);
+        }
+        operation.operators = participants;
+      } else if (operation.type === "resource") {
+        // resource
+        let resInfo = this.operationApi.getResInfo(operation.resRef);
+        operation.resource = resInfo;
+        operation.operator = this.operationApi.getMemberInfo(
+          operation.operator
+        );
+      }
+      this.temOperation = operation;
+    },
+  },
+};
+</script>
+<style scoped>
+.time {
+  font-size: 14px;
+  font-weight: bold;
+}
+.content {
+  width: 200px;
+  word-break: break-word;
+  padding: 5px;
+}
+.behavior {
+  vertical-align: super;
+}
+.tool {
+  cursor: pointer;
+}
+.resource {
+  cursor: pointer;
+}
+.participant {
+  display: flex;
+  position: relative;
+}
+.participant .person {
+  margin-right: 5px;
+  cursor: pointer;
+}
+.ivu-divider-horizontal {
+  margin: 10px 0 0 0;
+}
+.drawflow-node-title {
+  height: 50px;
+  line-height: 50px;
+  background: #f7f7f7;
+  border-bottom: 1px solid #e9e9e9;
+  border-radius: 4px 4px 0px 0px;
+  padding-left: 15px;
+}
+.drawflow-node-body {
+  font-size: 14px;
+  color: #555555;
+}
+</style>
