@@ -275,7 +275,7 @@
                 >
                 <span class="fileItemSize">{{ file.fileSize }}</span>
                 <span style="width: 20%; margin-right: 5%">{{
-                  file.uploadTime.substring(0, 10)
+                  file.uploadTime
                 }}</span>
 
                 <!--                使用资源-->
@@ -391,6 +391,7 @@
         <Button type="success" @click="addFolder('newValidate')">New</Button>
       </div>
     </Modal>
+
     <Modal v-model="uploadModal" title="Upload file" width="600">
       <Form
         ref="uploadValidate"
@@ -875,6 +876,7 @@
         this.fileInfoModal = true;
       },
       addFolderModalShow() {
+        console.log("sfsdf")
         this.newValidate.setName = "";
         this.newFolderModal = true;
       },

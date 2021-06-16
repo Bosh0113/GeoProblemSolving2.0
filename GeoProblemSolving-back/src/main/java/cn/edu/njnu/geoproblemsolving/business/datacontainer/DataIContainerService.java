@@ -42,14 +42,14 @@ public class DataIContainerService {
     @Value("${dataContainer}")
     private String dataContainer;
 
-    public JSONObject addDataItem(File file){
+    public JSONObject addDataItem(File file) {
         FileSystemResource resource = new FileSystemResource(file);      //临时文件
         MultiValueMap<String, Object> form = new LinkedMultiValueMap<>();
         form.add("file", resource);
         RestTemplate restTemplate = new RestTemplate();
-        String urlStr = "http://" + dataContainer  + ":8081" + "/dataitem/addByStorage" ; ////Step0:根据MD5获取可用的任务服务器
+        String urlStr = "http://" + dataContainer + ":8081" + "/dataitem/addByStorage"; ////Step0:根据MD5获取可用的任务服务器
 
-        ResponseEntity<JSONObject> jsonObjectResponseEntity = restTemplate.postForEntity(urlStr,form, JSONObject.class);//虚拟http请求
+        ResponseEntity<JSONObject> jsonObjectResponseEntity = restTemplate.postForEntity(urlStr, form, JSONObject.class);//虚拟http请求
         if (!jsonObjectResponseEntity.getStatusCode().is2xxSuccessful()) {
             throw new MyException(ResultEnum.ERROR);
         }
@@ -61,9 +61,9 @@ public class DataIContainerService {
         RestTemplate restTemplate = new RestTemplate();
 //        String urlStr = "http://" + dataContainer + ":8082/data?uid=" + id;
         String urlStr = "http://" + dataContainer + ":8082/data/" + id;
-        ResponseEntity<byte []> response = restTemplate.exchange(urlStr, HttpMethod.GET,
+        ResponseEntity<byte[]> response = restTemplate.exchange(urlStr, HttpMethod.GET,
                 null, byte[].class);
-        return  response;
+        return response;
     }
 
     public String upload(File file, String userId, String userName) {
@@ -88,21 +88,21 @@ public class DataIContainerService {
         return urlResult;
     }
 
-    public Object getDataService(String id,String token,String type) {
+    public Object getDataService(String id, String token, String type) {
 
         RestTemplate restTemplate = new RestTemplate();
-        String urlStr = "http://111.229.14.128:8898/capability?id=" + id + "&type="+type+"&token="+ URLEncoder.encode(token);
+        String urlStr = "http://111.229.14.128:8898/capability?id=" + id + "&type=" + type + "&token=" + URLEncoder.encode(token);
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Type","application/json");
+        headers.add("Content-Type", "application/json");
         HttpEntity<MultiValueMap> requestEntity = new HttpEntity<MultiValueMap>(null, headers);
-        ResponseEntity<JSONObject> jsonObjectResponseEntity = restTemplate.exchange(urlStr,HttpMethod.GET, requestEntity, JSONObject.class);
+        ResponseEntity<JSONObject> jsonObjectResponseEntity = restTemplate.exchange(urlStr, HttpMethod.GET, requestEntity, JSONObject.class);
 
 //        ResponseEntity<String> jsonObjectResponseEntity = restTemplate.getForEntity(urlStr, String.class);
         if (!jsonObjectResponseEntity.getStatusCode().is2xxSuccessful()) {
             throw new MyException(ResultEnum.ERROR);
         }
 
-        JSONObject  result = jsonObjectResponseEntity.getBody();//获得上传数据的URL
+        JSONObject result = jsonObjectResponseEntity.getBody();//获得上传数据的URL
 //        cn.hutool.json.JSONObject object = XML.toJSONObject(result);
         //xml根节点
 //        String jsonData = object.get("returnsms").toString();
@@ -114,7 +114,6 @@ public class DataIContainerService {
     }
 
 
-
     @SneakyThrows
     public String invoke(JSONObject jsonObject) {
 
@@ -122,18 +121,18 @@ public class DataIContainerService {
         String urlStr = "http://111.229.14.128:8898/invokeUrlsDataPcs";
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Type","application/x-www-form-urlencoded");
+        headers.add("Content-Type", "application/x-www-form-urlencoded");
 
         MultiValueMap<String, String> requestBody = new LinkedMultiValueMap<>();
-        requestBody.add("token", URLEncoder.encode(jsonObject.getString("token"),"UTF-8"));
-        requestBody.add("pcsId",jsonObject.getString("pcsId"));
-        requestBody.add("urls",jsonObject.getString("urls"));
-        requestBody.add("params",jsonObject.getString("params"));
+        requestBody.add("token", URLEncoder.encode(jsonObject.getString("token"), "UTF-8"));
+        requestBody.add("pcsId", jsonObject.getString("pcsId"));
+        requestBody.add("urls", jsonObject.getString("urls"));
+        requestBody.add("params", jsonObject.getString("params"));
 
 
         HttpEntity<MultiValueMap> requestEntity = new HttpEntity<MultiValueMap>(requestBody, headers);
 
-        JSONObject result = restTemplate.postForObject(urlStr,requestEntity,JSONObject.class);
+        JSONObject result = restTemplate.postForObject(urlStr, requestEntity, JSONObject.class);
 
 
         String url = result.getString("url");
@@ -141,56 +140,64 @@ public class DataIContainerService {
         return url;
     }
 
-    public  Object change(Object object){
+    public Object change(Object object) {
         JSONObject json = (JSONObject) JSON.toJSON(object);
-       JSONObject method= ( json.getJSONObject("Capability")).getJSONObject("metaDetail").getJSONObject("Method");
+        JSONObject method = (json.getJSONObject("Capability")).getJSONObject("metaDetail").getJSONObject("Method");
         Object inputJson = method.getJSONObject("Input").get("Item");
         Object outputJson = method.getJSONObject("Output").get("Item");
         Object parameterJson = method.getJSONObject("Parameter").get("Item");
         JSONObject newJson = new JSONObject();
-        if(!(inputJson instanceof  JSONArray)){
+        if (!(inputJson instanceof JSONArray)) {
             List list = new ArrayList<>();
             list.add(inputJson);
-            newJson.put("inputs",list);
-        } else{
-            newJson.put("inputs",inputJson);
+            newJson.put("inputs", list);
+        } else {
+            newJson.put("inputs", inputJson);
         }
-        if(!(outputJson instanceof  JSONArray)){
+        if (!(outputJson instanceof JSONArray)) {
             List list = new ArrayList<>();
             list.add(outputJson);
-            newJson.put("outputs",list);
-        }else{
-            newJson.put("inputs",outputJson);
+            newJson.put("outputs", list);
+        } else {
+            newJson.put("inputs", outputJson);
         }
-        if(!(parameterJson instanceof  JSONArray)){
+        if (!(parameterJson instanceof JSONArray)) {
             List list = new ArrayList<>();
             list.add(parameterJson);
-            newJson.put("parameters",list);
-        }else{
-            newJson.put("inputs",parameterJson);
+            newJson.put("parameters", list);
+        } else {
+            newJson.put("inputs", parameterJson);
         }
-        newJson.put("date",json.getJSONObject("Capability").getString("date"));
-        newJson.put("name",json.getJSONObject("Capability").getString("name"));
-        newJson.put("description",method.getString("Description"));
+        newJson.put("date", json.getJSONObject("Capability").getString("date"));
+        newJson.put("name", json.getJSONObject("Capability").getString("name"));
+        newJson.put("description", method.getString("Description"));
 
-        return  newJson;
+        return newJson;
 
     }
 
     public JSONObject getRemoteData(String id, String token) {
         RestTemplate restTemplate = new RestTemplate();
-        String urlStr = "http://111.229.14.128:8898/files?id=" + id + "&token="+ URLEncoder.encode(token);
+        String urlStr = "http://111.229.14.128:8898/files?id=" + id + "&token=" + URLEncoder.encode(token);
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Type","application/json");
+        headers.add("Content-Type", "application/json");
         HttpEntity<MultiValueMap> requestEntity = new HttpEntity<MultiValueMap>(null, headers);
-        ResponseEntity<JSONObject> jsonObjectResponseEntity = restTemplate.exchange(urlStr,HttpMethod.GET, requestEntity, JSONObject.class);
+        ResponseEntity<JSONObject> jsonObjectResponseEntity = restTemplate.exchange(urlStr, HttpMethod.GET, requestEntity, JSONObject.class);
 
         if (!jsonObjectResponseEntity.getStatusCode().is2xxSuccessful()) {
             throw new MyException(ResultEnum.ERROR);
         }
 
-        JSONObject  result = jsonObjectResponseEntity.getBody();//获得上传数据的URL
+        JSONObject result = jsonObjectResponseEntity.getBody();//获得上传数据的URL
         return result;
 
+    }
+
+    public Integer initDataService(String token) {
+        //查看节点是否在线
+        RestTemplate restTemplate = new RestTemplate();
+        String urlStr = "http://111.229.14.128:8898/state?token=" + URLEncoder.encode(token);
+        JSONObject onlineStatus = restTemplate.getForObject(urlStr, JSONObject.class);
+        return onlineStatus.getInteger("code");
     }
 }

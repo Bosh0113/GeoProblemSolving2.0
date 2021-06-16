@@ -347,9 +347,13 @@ export default {
 
       //判断tool的类型，三种 modelItem（模型容器提供计算能力）, dataMethod(数据容器提供计算能力), webTool(自行开发，如mapTool)
       console.log("toolInfo", toolInfo)
-      let routerUrl = "/computeTool";
+      let routerUrl = "/computeModel";
       if (toolInfo.backendType == "webTool"){
         routerUrl = toolInfo.toolUrl;
+      }else if (toolInfo.backendType == "modelItem"){
+        routerUrl = "/computeModel";
+      }else if (toolInfo.backendType == "dataMethod"){
+        routerUrl = "/dataMethod";
       }
       // else if (toolInfo.backendType == "modelItem"){
       //   routerUrl = "/modelItem";
@@ -357,6 +361,7 @@ export default {
       //   routerUrl = "/dataMethod"
       // }
       // var toolContent = `<iframe src="${toolInfo.toolUrl}" id="${toolInfo.tid}" style="width: 100%; height:100%;" frameborder="0"></iframe>`;
+      console.log("routerUrl", routerUrl)
       var toolContent = `<iframe src="${routerUrl}" id="${toolInfo.tid}" style="width: 100%; height:100%;" frameborder="0"></iframe>`;
 
       var panel = jsPanel.create({

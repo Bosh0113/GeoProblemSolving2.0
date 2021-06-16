@@ -3,6 +3,7 @@ package cn.edu.njnu.geoproblemsolving.business.tool.IToll;
 import cn.edu.njnu.geoproblemsolving.Dao.Bulletin.IBulletinDaoImpl;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.compute.entity.ToolTestData;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.compute.util.CommonUtil;
+import cn.edu.njnu.geoproblemsolving.business.modeltask.Utils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.google.common.collect.Lists;
@@ -211,6 +212,8 @@ public class ToolServiceImpl implements ToolService {
                 String modelMd5 = backendService.getString("md5");
                 String author = backendService.getString("author");
                 JSONObject modelMdlJson = backendService.getJSONObject("mdlJson");
+                JSONObject stateAndDataSetJson = Utils.convertMdl(modelMd5, modelId, modelMdlJson);
+
                 String backendServiceName = backendService.getString("name");
                 //load test data 咋做的？
 
@@ -219,7 +222,7 @@ public class ToolServiceImpl implements ToolService {
                 tool.setComputableModelId(modelId);
                 tool.setComputableModelMd5(modelMd5);
                 tool.setBackendProvider(author);
-                tool.setMdlJson(modelMdlJson);
+                tool.setMdlJson(stateAndDataSetJson);
             }else if (backendType.equals("dataMethod")){
                 String backendProvider = backendService.getString("authorName");
                 JSONArray invokeServices = backendService.getJSONArray("invokeServices");

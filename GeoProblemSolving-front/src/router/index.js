@@ -218,11 +218,24 @@ const routes = [
     component: resolve =>
       require(["@/components/tools/entity/mapTool"], resolve)
   },
+  //改动
   {
     path: "/computeTool",
     name: "computeTool",
     component: resolve =>
       require(["@/components/tools/entity/computeTool"], resolve)
+  },
+  {
+    path: "/computeModel",
+    name: "computeModel",
+    component: resolve =>
+      require(["@/components/utils/model/Model-copy"], resolve)
+  },
+  {
+    path: "/dataMethod",
+    name: "dataMethod",
+    component: resolve =>
+      require(["@/components/utils/data/dataServiceCopy2"], resolve)
   },
   {
     path: "/lineChart",

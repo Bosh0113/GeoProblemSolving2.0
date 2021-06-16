@@ -295,7 +295,7 @@
           style="margin: 5px 0"
           :padding="5"
           v-for="member in participants"
-          :key="member.name"
+          :key="member.userId"
         >
           <div style="display: flex; align-items: center">
             <div
@@ -642,7 +642,7 @@ export default {
       listStyle: { width: "280px", height: "360px" },
     };
   },
-  computed: {    
+  computed: {
     avatar() {
       let avatarUrl = this.$store.state.UserServer + this.$store.getters.avatar;
       return avatarUrl;
@@ -711,6 +711,7 @@ export default {
           if (res.data.code == 0) {
             this.creatorInfo = res.data.data.creator;
             this.participants = res.data.data.members;
+            console.log("participants",res.data.data.members)
           } else {
             console.log(res.data.msg);
           }

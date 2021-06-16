@@ -900,7 +900,7 @@ export default {
               this.panel.close();
             }
             let url =
-              "http://view.officeapps.live.com/op/view.aspx?src=" +              
+              "http://view.officeapps.live.com/op/view.aspx?src=" +
               res.address;
             let toolURL =
               "<iframe src=" +

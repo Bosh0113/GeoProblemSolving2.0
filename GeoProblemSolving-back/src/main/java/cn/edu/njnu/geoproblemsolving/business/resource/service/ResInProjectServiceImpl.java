@@ -473,7 +473,7 @@ public class ResInProjectServiceImpl implements ResourceInProjectService {
         RestTemplateUtil httpUtil = new RestTemplateUtil();
         Object[] pathArray = paths.toArray();
         try {
-            //在用户服务器更具 uid 查询资源
+            //在用户服务器根据 uid 查询资源
             JSONObject getResult = httpUtil.getRequestToServer(url, access_token).getBody();
             assert getResult != null;
 
