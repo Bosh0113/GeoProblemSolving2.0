@@ -4,13 +4,28 @@
     <div id="background2"></div>
     <div id="backmask"></div>
     <div id="drawflow"></div>
-    <Button class="flow-btn" style="top: 100px" icon="ios-link" @click="linkTask"
+    <Button
+      class="flow-btn"
+      style="top: 100px"
+      icon="ios-link"
+      @click="linkTask"
       >Link tasks</Button
     >
-    <Button class="flow-btn" style="top: 140px" icon="md-add" @click="zoomin"
+    <Button
+      class="flow-btn"
+      style="top: 150px"
+      icon="ios-link-outline"
+      @click="unlinkTask"
+      >Remove links</Button
+    >
+    <Button class="flow-btn" style="top: 200px" icon="md-add" @click="zoomin"
       >Zoom in</Button
     >
-    <Button  class="flow-btn" style="top: 180px" icon="md-remove" @click="zoomout"
+    <Button
+      class="flow-btn"
+      style="top: 250px"
+      icon="md-remove"
+      @click="zoomout"
       >Zoom out</Button
     >
   </div>
@@ -37,6 +52,7 @@ export default {
       operations: [],
       // task link
       taskLinkBtn: false,
+      taskUnlinkBtn: false,
     };
   },
   computed: {
@@ -87,6 +103,7 @@ export default {
       this.loadOperationNode();
       this.addConnections();
 
+      // save connection
       this.editor.on("connectionCreated", (connection) => {
         if (this.taskLinkBtn) {
           let fromTaskId = this.editor.getNodeFromId(connection.output_id).name;
@@ -95,10 +112,27 @@ export default {
           this.operationApi.taskDependencyRecord(
             this.activityInfo.aid,
             "link",
-            "",
             fromTaskId,
             toTaskId
           );
+        }
+      });
+      // save connection remove
+      this.editor.on("connectionRemoved", (connection) => {
+        if(this.taskUnlinkBtn) {
+          if (confirm("Are you sure to remove this connection?")) {
+            let fromTaskId = this.editor.getNodeFromId(
+              connection.output_id
+            ).name;
+            let toTaskId = this.editor.getNodeFromId(connection.input_id).name;
+
+            this.operationApi.taskDependencyRecord(
+              this.activityInfo.aid,
+              "break",
+              fromTaskId,
+              toTaskId
+            );
+          }
         }
       });
     },
@@ -254,12 +288,21 @@ export default {
         this.taskLinkBtn = false;
       }
     },
+    unlinkTask() {
+      if (!this.taskUnlinkBtn) {
+        $(".drawflow .connection .main-path").css("stroke", "red");
+        this.taskUnlinkBtn = true;
+      } else {
+        $(".drawflow .connection .main-path").css("stroke", "#4682b4");
+        this.taskUnlinkBtn = false;
+      }
+    },
     zoomin() {
       this.editor.zoom_in();
     },
     zoomout() {
       this.editor.zoom_out();
-    }
+    },
   },
 };
 </script>
@@ -305,7 +348,8 @@ export default {
   background-color: #555555;
   color: white;
   z-index: 5;
-  width: 100px;
+  padding: 5px;
+  width: 110px;
 }
 </style>
 <style>

@@ -83,11 +83,10 @@ export function activityDocInit(activityInfo, user) {
     Participants.appendChild(Person);
     Activity.appendChild(Participants);
 
+    let ResourceCollection = xmlDoc.createElement('ResourceCollection');
+    Activity.appendChild(ResourceCollection);
 
     if (activityInfo.type === "Activity_Unit") {
-
-        let ResourceCollection = xmlDoc.createElement('ResourceCollection');
-        Activity.appendChild(ResourceCollection);
 
         let ToolBox = xmlDoc.createElement('ToolBox');
         Activity.appendChild(ToolBox);
@@ -144,10 +143,11 @@ export function rebuildActivityDoc(activityInfo) {
     }
     Activity.appendChild(Participants);
 
+    let ResourceCollection = xmlDoc.createElement('ResourceCollection');
+    Activity.appendChild(ResourceCollection);
+
     if (activityInfo.type === "Activity_Unit") {
 
-        let ResourceCollection = xmlDoc.createElement('ResourceCollection');
-        Activity.appendChild(ResourceCollection);
 
         let ToolBox = xmlDoc.createElement('ToolBox');
         Activity.appendChild(ToolBox);
@@ -229,6 +229,21 @@ export function getResInfo(resId) {
     resource["description"] = resNode.getAttribute("description");
     resource["provider"] = resNode.getAttribute("provider");
     resource["href"] = resNode.getAttribute("href");
+
+    //Metadata
+    let MetadataList = resNode.childNodes;
+    for(let i = 0; i < MetadataList.length; i++){
+        let type = MetadataList[i].getAttribute("type");
+        if(type === "scale") {
+            resource["scale"] = MetadataList[i].getAttribute("description");
+        } else if(type === "reference") {
+            resource["reference"] = MetadataList[i].getAttribute("description");
+        } else if(type === "unit") {
+            resource["unit"] = MetadataList[i].getAttribute("description");
+        }  else if(type === "concepts") {
+            resource["concepts"] = MetadataList[i].getAttribute("description");
+        }
+    }
 
     return resource;
 }
@@ -526,6 +541,7 @@ function saveActivityDoc(id) {
         dataType: "JSON",
         contentType: "application/json",
         data: JSON.stringify(jsonData),
+        async: false,
         success: function (result) {
             if (result.code === 0) {
                 return "success";
@@ -556,6 +572,7 @@ function updateActivityDoc(aid) {
         dataType: "JSON",
         contentType: "application/json",
         data: JSON.stringify(jsonData),
+        async: false,
         success: function (result) {
             if (result.code === 0) {
                 return "success";
@@ -595,10 +612,7 @@ export function activityUpdate(updateType, activityInfo) {
                 node = xmlDoc.getElementsByTagName('OperationRecords')[0];
                 xmlDoc.documentElement.removeChild(node);
 
-            } else if (xmlDoc.getElementsByTagName('ResourceCollection').length > 0) {
-
-                let node = xmlDoc.getElementsByTagName('ResourceCollection')[0];
-                xmlDoc.documentElement.removeChild(node);
+            } else if (xmlDoc.getElementsByTagName('ToolBox').length > 0) {
 
                 node = xmlDoc.getElementsByTagName('ToolBox')[0];
                 xmlDoc.documentElement.removeChild(node);
@@ -614,9 +628,6 @@ export function activityUpdate(updateType, activityInfo) {
             }
             // add
             if (activityInfo.type === "Activity_Unit") {
-
-                let ResourceCollection = xmlDoc.createElement('ResourceCollection');
-                Activity.appendChild(ResourceCollection);
 
                 let ToolBox = xmlDoc.createElement('ToolBox');
                 Activity.appendChild(ToolBox);
@@ -707,64 +718,45 @@ export function taskUpdate(aid, behavior, taskInfo) {
 }
 
 
-export function taskDependencyRecord(aid, behavior, relationId, last, next) {
+export function taskDependencyRecord(aid, behavior, last, next) {
     if (xmlDoc === null) {
         alert("Failed to record operation. Please load activity document first!");
         return;
     }
 
+    let relationId = last + next;
 
     // TaskDependency
     if (behavior === "link") {
 
-        if (relationId === "") {
-            relationId = guid();
+        let Relation = xmlDoc.createElement('Relation');
+        Relation.setAttribute("id", relationId);
+        Relation.setAttribute("name", "Task Dependency");
+        Relation.setAttribute("state", "used");
 
-            let Relation = xmlDoc.createElement('Relation');
-            Relation.setAttribute("id", relationId);
-            Relation.setAttribute("name", "Task Dependency");
-            Relation.setAttribute("state", "used");
+        let From = xmlDoc.createElement('From');
+        From.setAttribute("taskRef", last);
+        Relation.appendChild(From);
 
-            let From = xmlDoc.createElement('From');
-            From.setAttribute("taskRef", last);
-            Relation.appendChild(From);
+        let To = xmlDoc.createElement('To');
+        To.setAttribute("taskRef", next);
+        Relation.appendChild(To);
 
-            let To = xmlDoc.createElement('To');
-            To.setAttribute("taskRef", next);
-            Relation.appendChild(To);
+        let TaskDependency = xmlDoc.getElementsByTagName("TaskDependency")[0];
+        if (TaskDependency == undefined) return;
+        TaskDependency.appendChild(Relation);
 
-            let TaskDependency = xmlDoc.getElementsByTagName("TaskDependency")[0];
-            if (TaskDependency == undefined) return;
-            TaskDependency.appendChild(Relation);
-
-        } else {
-
-            let Relation = xmlDoc.getElementById(relationId);
-
-            if (Relation !== null) {
-                Relation.setAttribute("name", "Task Dependency");
-                Relation.setAttribute("state", "used");
-
-                let From = xmlDoc.createElement('From');
-                From.setAttribute("taskRef", last);
-                Relation.appendChild(From);
-
-                let To = xmlDoc.createElement('To');
-                To.setAttribute("taskRef", next);
-                Relation.appendChild(To);
-            }
-        }
     } else if (behavior === "break") {
-        let Relation = xmlDoc.getElementById(protocalId);
+        let Relation = xmlDoc.getElementById(relationId);
         if (Relation !== null) {
-            Relation.setAttribute("state", "removed");
+            Relation.parentNode.removeChild(Relation);
         }
     }
 
     updateActivityDoc(aid);
 }
 
-export function participantUpdate(aid, behavior, userId, name, role) {
+export function participantUpdate(aid, behavior, userId, name, role, domains) {
     if (xmlDoc === null) {
         alert("Failed to record operation. Please load activity document first!");
         return;
@@ -778,6 +770,11 @@ export function participantUpdate(aid, behavior, userId, name, role) {
             Person.setAttribute("name", name);
             Person.setAttribute("role", role);
             Person.setAttribute("state", "in");
+
+            let Domains = Person.childNodes;
+            for (let i = 0; i < Domains.length; i++) {
+                Person.removeChild(Domains[i]);
+            }
         } else {
 
             Person = xmlDoc.createElement('Person');
@@ -791,6 +788,13 @@ export function participantUpdate(aid, behavior, userId, name, role) {
             Participants.appendChild(Person);
         }
 
+        // add domains
+        for (let j = 0; j < domains.length; j++) {
+            let Domain = xmlDoc.createElement('Domain');
+            Domain.setAttribute("description", domains[j]);
+            Person.appendChild(Domain);
+        }
+
     } else if (behavior === "remove") {
         let Person = xmlDoc.getElementById(userId);
         if (Person !== null) {
@@ -801,13 +805,29 @@ export function participantUpdate(aid, behavior, userId, name, role) {
         if (Person !== null) {
             Person.setAttribute("role", role);
         }
+    } else if (behavior === "add-domain") {
+        for (let i = 0; i < domains.length; i++) {
+            let Domain = xmlDoc.createElement('Domain');
+            Domain.setAttribute("description", domains[i]);
+            Person.appendChild(Domain);
+        }
+    } else if (behavior === "remove-domain") {
+        let Domains = Person.childNodes;
+
+        for (let i = 0; i < domains.length; i++) {
+            for (let j = 0; j < Domains.length; j++) {
+                if (Domains[j].getAttribute("description") === domains[i]) {
+                    Person.removeChild(Domains[j]);
+                }
+            }
+        }
     }
 
     updateActivityDoc(aid);
 }
 
 // operation
-export function resOperationRecord(aid, taskId, behavior, userId, resInfo) {
+export function resOperationRecord(aid, taskId, behavior, userId, resInfo, metadata) {
     if (xmlDoc === null) {
         alert("Failed to record operation. Please load activity document first!");
         return;
@@ -826,6 +846,11 @@ export function resOperationRecord(aid, taskId, behavior, userId, resInfo) {
             Resource.setAttribute("href", resInfo.address);
             Resource.setAttribute("state", "accessible");
 
+            let MatedataList = Resource.childNodes;
+            for (let i = 0; i < MatedataList.length; i++) {
+                Resource.removeChild(MatedataList[i]);
+            }
+
         } else {
             Resource = xmlDoc.createElement('Resource');
             Resource.setAttribute("id", resInfo.uid);
@@ -840,6 +865,36 @@ export function resOperationRecord(aid, taskId, behavior, userId, resInfo) {
             let ResourceCollection = xmlDoc.getElementsByTagName("ResourceCollection")[0];
             if (ResourceCollection == undefined) return;
             ResourceCollection.appendChild(Resource);
+        }
+        // matedata
+        if (metadata != undefined && metadata != {}) {
+            if (metadata.scale != undefined) {
+                let Metadata = xmlDoc.createElement('Metadata');
+                Metadata.setAttribute("type", "scale");
+                Metadata.setAttribute("description", metadata.scale);
+                Resource.appendChild(Metadata);
+
+            }
+            if (metadata.reference != undefined) {
+                let Metadata = xmlDoc.createElement('Metadata');
+                Metadata.setAttribute("type", "reference");
+                Metadata.setAttribute("description", metadata.reference);
+                Resource.appendChild(Metadata);
+
+            }
+            if (metadata.unit != undefined) {
+                let Metadata = xmlDoc.createElement('Metadata');
+                Metadata.setAttribute("type", "unit");
+                Metadata.setAttribute("description", metadata.unit);
+                Resource.appendChild(Metadata);
+
+            }
+            if (metadata.concepts != undefined) {
+                let Metadata = xmlDoc.createElement('Metadata');
+                Metadata.setAttribute("type", "concepts");
+                Metadata.setAttribute("description", metadata.concepts);
+                Resource.appendChild(Metadata);
+            }
         }
     } else if (behavior === "update") {
         let Resource = xmlDoc.getElementById(resInfo.uid);
@@ -856,6 +911,29 @@ export function resOperationRecord(aid, taskId, behavior, userId, resInfo) {
         let Resource = xmlDoc.getElementById(resInfo.uid);
         if (Resource !== null) {
             Resource.setAttribute("state", "removed");
+        }
+    } else if (behavior === "update-metadata") {
+        if (metadata != undefined && metadata != {}) {
+            let MatedataList = Resource.childNodes;
+            for (let i = 0; i < MatedataList.length; i++) {
+                if (MatedataList[i].getAttribute("type") === "scale") {
+                    if (metadata.scale != undefined) {
+                        Metadata.setAttribute("description", metadata.scale);
+                    }
+                } else if (MatedataList[i].getAttribute("type") === "reference") {
+                    if (metadata.reference != undefined) {
+                        Metadata.setAttribute("description", metadata.reference);
+                    }
+                } else if (MatedataList[i].getAttribute("type") === "unit") {
+                    if (metadata.unit != undefined) {
+                        Metadata.setAttribute("description", metadata.unit);
+                    }
+                } else if (MatedataList[i].getAttribute("type") === "concepts") {
+                    if (metadata.concepts != undefined) {
+                        Metadata.setAttribute("description", metadata.concepts);
+                    }
+                }
+            }
         }
     }
 
@@ -1112,7 +1190,7 @@ export function activityRecord(behavior, userId, childInfo) {
     updateActivityDoc(childInfo.parent);
 }
 
-export function processRecord(aid, behavior, userId, last, next) {
+export function processRecord(aid, behavior, userId, last, next, protocalId) {
     if (xmlDoc === null) {
         alert("Failed to record operation. Please load activity document first!");
         return;

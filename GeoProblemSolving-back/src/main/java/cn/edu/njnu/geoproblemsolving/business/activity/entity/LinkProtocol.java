@@ -1,8 +1,7 @@
 package cn.edu.njnu.geoproblemsolving.business.activity.entity;
 
-import cn.edu.njnu.geoproblemsolving.business.activity.enums.ProtocolType;
-import cn.edu.njnu.geoproblemsolving.business.user.enums.RoleProtocol;
-import com.alibaba.fastjson.JSONObject;
+import cn.edu.njnu.geoproblemsolving.business.activity.enums.ResProtocol;
+import cn.edu.njnu.geoproblemsolving.business.activity.enums.RoleProtocol;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -17,27 +16,32 @@ public class LinkProtocol implements Serializable {
     private String pid;
 
     /**
-     * Behavior
-     * type of protocol: Siblings, Twins and Cousins
-     * last and next: contains aid and name (for Siblings)
-     */
-    private ProtocolType type;
-    private JSONObject last;
-    private JSONObject next;
-
-    /**
-     * Resources
-     * type of link resources
+     * @ Resources
+     * type of resource protocol
      * how to update: auto/manual
+     * type of resources
+     * format
+     * sematic (key words/tags)
+     * scale
+     * spatiotemporal reference
+     * unit
      */
-    private ArrayList<String> linkRes;
+    private ResProtocol resProtocol;
     private boolean autoUpdate;
+    private ArrayList<String> types;
+    private ArrayList<String> formats;
+    private ArrayList<String> concepts;
+    private ArrayList<String> scales;
+    private ArrayList<String> references;
+    private ArrayList<String> units;
 
     /**
-     * Participants
-     * type of user engagement
+     * @ Participants
+     * type of user protocol
      * the type of accept roles: manager, decision-maker, researcher, stakeholder, normal member(workers...), visitor(the public)
+     * domain of participants
      */
-    private RoleProtocol roles;
-    private ArrayList<String> acceptRoles;
+    private RoleProtocol roleProtocol;
+    private ArrayList<String> roles;
+    private ArrayList<String> domains;
 }

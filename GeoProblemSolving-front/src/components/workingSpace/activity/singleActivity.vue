@@ -355,7 +355,8 @@ export default {
                 "invite",
                 user.userId,
                 user.name,
-                user.role
+                user.role,
+                user.domain
               );
               //notice
               let notice = {
@@ -429,7 +430,8 @@ export default {
               "role",
               member.userId,
               member.name,
-              member.role
+              member.role,
+              user.domain
             );
             this.getParticipants();
 
@@ -498,7 +500,8 @@ export default {
               "remove",
               member.userId,
               member.name,
-              member.role
+              member.role,
+              user.domain
             );
 
             let index = this.participants.indexOf(member);
@@ -558,7 +561,8 @@ export default {
               "remove",
               member.userId,
               "",
-              ""
+              "",
+              []
             );
 
             //notice

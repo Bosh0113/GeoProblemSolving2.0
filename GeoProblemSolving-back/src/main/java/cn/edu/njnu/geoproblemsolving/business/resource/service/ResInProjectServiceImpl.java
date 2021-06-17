@@ -527,7 +527,6 @@ public class ResInProjectServiceImpl implements ResourceInProjectService {
         } else if (key.equals("privacy")) {
             //通过 privacy 进行查询
             return sResByPrivacy(value, projectRes, returnRes);
-
         }
         return null;
     }

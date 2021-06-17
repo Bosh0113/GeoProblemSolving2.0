@@ -24,7 +24,7 @@
               <div class="content" v-if="record.type === 'resource'">
                 Resource operation:
                 <span class="behavior">{{ record.behavior }}</span>
-                <div>
+                <div @click="checkRes(record.resource)" style="cursor: pointer">
                   <img
                     :src="dataUrl"
                     height="42px"
@@ -321,6 +321,29 @@
         </div>
       </div>
     </div>
+    <Modal
+      v-model="checkDataModal"
+      title="Data information"
+      width="600"
+      footer-hide
+    >
+      <div style>
+        <div class="dataInfo">
+          <Label class="dataLabel">Name:</Label>
+          <span class="dataText">{{
+            selectData.name
+          }}</span>
+        </div>
+        <div class="dataInfo">
+          <Label class="dataLabel">Type:</Label>
+          <span class="dataContent">{{ selectData.type }}</span>
+        </div>
+        <div class="dataInfo">
+          <Label class="dataLabel">Description:</Label>
+          <span class="dataText">{{ selectData.description }}</span>
+        </div>
+      </div>
+    </Modal>
   </div>
 </template>
 <script>
@@ -350,12 +373,14 @@ export default {
       otherUrl: require("@/assets/images/otherfile.png"),
       // 工具avatar 图片路径
       toolUrl: require("@/assets/images/toolbox.png"),
-      chatUrl: require("@/assets/images/chat.png"),
+      chatUrl: require("@/assets/images/chat.png"),      
+      checkDataModal: false,      
+      selectData: {},
     };
   },
   mounted() {
   },
-  methods: {    
+  methods: {
     operationShow() {
       this.unfold = true;
       this.operationRecords = [];
@@ -421,6 +446,14 @@ export default {
         }
       }
     },
+    checkRes(item) {
+      this.selectData = item;
+      this.checkDataModal = true;
+    },
+    dateFormat(date) {
+      let time = new Date(date);
+      return time.Format("yyyy-MM-dd HH:mm:ss");
+    },
   },
 };
 </script>
@@ -461,5 +494,27 @@ export default {
 .drawflow-node-body {
   font-size: 14px;
   color: #555555;
+}
+.dataInfo {
+  margin: 5px 0 5px 20px;
+}
+.dataLabel {
+  width: 90px;
+  display: inline-block;
+  font-size: 13px;
+  font-weight: bold;
+  vertical-align: top;
+  color: dodgerblue;
+}
+.dataContent {
+  width: 180px;
+  display: inline-block;
+  padding-left: 10px;
+}
+.dataText {
+  padding-left: 10px;
+  display: inline-block;
+  word-break: break-word;
+  width: 450px;
 }
 </style>

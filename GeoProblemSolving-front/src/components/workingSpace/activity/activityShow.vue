@@ -642,7 +642,7 @@ export default {
       listStyle: { width: "280px", height: "360px" },
     };
   },
-  computed: {    
+  computed: {
     avatar() {
       let avatarUrl = this.$store.state.UserServer + this.$store.getters.avatar;
       return avatarUrl;
@@ -962,7 +962,8 @@ export default {
                 "invite",
                 user.userId,
                 user.name,
-                user.role
+                user.role,
+                user.domain
               );
               this.$Notice.info({ desc: "Invite member successfully" });
 
@@ -1032,7 +1033,8 @@ export default {
               "remove",
               member.userId,
               member.name,
-              member.role
+              member.role,
+              user.domain
             );
             let index = this.participants.indexOf(member);
             this.participants.splice(index, 1);
@@ -1107,7 +1109,8 @@ export default {
               "role",
               member.userId,
               member.name,
-              member.role
+              member.role,
+              user.domain
             );
             this.getParticipants();
 
@@ -1168,7 +1171,8 @@ export default {
               "remove",
               member.userId,
               "",
-              ""
+              "",
+              []
             );
 
             //notice
