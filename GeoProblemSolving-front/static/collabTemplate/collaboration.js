@@ -1225,3 +1225,4 @@ function addfile(file) {
             linked: websockLinked
         }
     }
+}
