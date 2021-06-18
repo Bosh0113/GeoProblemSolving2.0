@@ -362,6 +362,19 @@ function addfolder(folder) {
     });
     $(`#${folder.uid}`).on("change", function () {
         selectFile(folder);
+
+        let message = {
+            type: "data",
+            sender: userInfo.userId,
+            behavior: "select",
+            content: {
+              uid: file.uid,
+              name: file.name,
+              description: file.description,
+              address: file.address,
+            }
+          }
+          websocketSend(message);
     });
 }
 
@@ -428,6 +441,19 @@ function addfile(file) {
             $("#resource-list").append(resElement);
             $(`#${file.uid}`).on("change", function () {
                 selectFile(file);
+
+                let message = {
+                    type: "data",
+                    sender: userInfo.userId,
+                    behavior: "select",
+                    content: {
+                      uid: file.uid,
+                      name: file.name,
+                      description: file.description,
+                      address: file.address,
+                    }
+                  }
+                  websocketSend(message);
             });
     }
 
@@ -1016,9 +1042,10 @@ function addfile(file) {
                 case "data": {
                     if (dataChannel != undefined && typeof dataChannel == "function") {
                         if (data.sender !== userInfo.userId) {
-                            selectFile(data.content);
+                            if (data.behavior == "select") {
+                                selectFile(data.content);
+                            }
                             dataChannel(data);
-
                             // record
                             addOperations(message.sender, message);
                         }

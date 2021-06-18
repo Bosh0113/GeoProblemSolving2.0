@@ -670,7 +670,7 @@ export default {
         sendCustomOperation(this.send_content, this.getSocketOperation);
       });
     },
-    getSocketData() {
+    getSocketData(data) {
       let socketMsg = data;
       if (socketMsg.type === "data") {
         switch (socketMsg.behavior) {
