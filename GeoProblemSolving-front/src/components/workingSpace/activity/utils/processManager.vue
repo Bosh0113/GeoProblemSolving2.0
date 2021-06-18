@@ -247,7 +247,6 @@
             <Select
               v-model="linkRoles"
               multiple
-              :max-tag-count="2"
               placeholder="Which roles of participants could join the next activity?"
             >
               <Option value="manager">Manager</Option>
@@ -298,12 +297,21 @@
         <template v-if="resProtocol === 'Constraints'">
           <div style="display: flex; margin-bottom: 15px">
             <div style="margin-top: 5px; width: 72px">Types:</div>
-            <vue-tags-input
-              class="res-protocol"
-              v-model="types_tag"
-              :tags="resProtocolForm.types"
-              @tags-changed="(newTags) => (resProtocolForm.types = newTags)"
-            />
+            <Select
+              v-model="resProtocolForm.types"
+              multiple
+              placeholder="Type of resources"
+              style="width: 267px"
+            >
+              <Option value="data">Data</Option>
+              <Option value="paper">Papers</Option>
+              <Option value="document">Documents</Option>
+              <Option value="model">Models</Option>
+              <Option value="image">Images</Option>
+              <Option value="video">Videos</Option>
+              <Option value="variable">Variables</Option>
+              <Option value="others">Others</Option>
+            </Select>
             <div style="margin-top: 5px; margin-left: 50px; width: 72px">
               Formats:
             </div>
@@ -383,12 +391,12 @@ export default {
       endNode: {},
       linkBuildModal: false,
 
-      roleProtocol: "",
+      roleProtocol: "None",
       linkRoles: [],
       domain_tag: "",
       linkDomains: [],
 
-      resProtocol: "",
+      resProtocol: "None",
       autoUpdate: false,
       types_tag: "",
       formats_tag: "",
@@ -1024,7 +1032,7 @@ export default {
       let protocol = {
         resProtocol: this.resProtocol,
         autoUpdate: this.autoUpdate,
-        types: this.filterTags(this.resProtocolForm.types),
+        types: this.resProtocolForm.types,
         formats: this.filterTags(this.resProtocolForm.formats),
         concepts: this.filterTags(this.resProtocolForm.concepts),
         scales: this.filterTags(this.resProtocolForm.scales),

@@ -232,15 +232,15 @@ export function getResInfo(resId) {
 
     //Metadata
     let MetadataList = resNode.childNodes;
-    for(let i = 0; i < MetadataList.length; i++){
+    for (let i = 0; i < MetadataList.length; i++) {
         let type = MetadataList[i].getAttribute("type");
-        if(type === "scale") {
+        if (type === "scale") {
             resource["scale"] = MetadataList[i].getAttribute("description");
-        } else if(type === "reference") {
+        } else if (type === "reference") {
             resource["reference"] = MetadataList[i].getAttribute("description");
-        } else if(type === "unit") {
+        } else if (type === "unit") {
             resource["unit"] = MetadataList[i].getAttribute("description");
-        }  else if(type === "concepts") {
+        } else if (type === "concepts") {
             resource["concepts"] = MetadataList[i].getAttribute("description");
         }
     }
@@ -1198,38 +1198,27 @@ export function processRecord(aid, behavior, userId, last, next, protocalId) {
 
     // ActivityDependencies
     let relationId = guid();
+
     if (behavior === "link") {
 
-        let Relation = xmlDoc.getElementById(protocalId);
-        if (Relation !== null) {
-            Relation.setAttribute("name", "ActivityDependency");
-            Relation.setAttribute("state", "used");
-            let From = xmlDoc.createElement('From');
-            From.setAttribute("childRef", last);
-            Relation.appendChild(From);
-            let To = xmlDoc.createElement('To');
-            To.setAttribute("childRef", next);
-            Relation.appendChild(To);
+        let Relation = xmlDoc.createElement('Relation');
+        Relation.setAttribute("id", relationId);
+        Relation.setAttribute("name", "ActivityDependency");
+        Relation.setAttribute("protocol", protocalId);
+        Relation.setAttribute("state", "used");
+        let From = xmlDoc.createElement('From');
+        From.setAttribute("childRef", last);
+        Relation.appendChild(From);
+        let To = xmlDoc.createElement('To');
+        To.setAttribute("childRef", next);
+        Relation.appendChild(To);
 
-        } else {
-            Relation = xmlDoc.createElement('Relation');
-            Relation.setAttribute("id", relationId);
-            Relation.setAttribute("name", "ActivityDependency");
-            Relation.setAttribute("state", "used");
-            let From = xmlDoc.createElement('From');
-            From.setAttribute("childRef", last);
-            Relation.appendChild(From);
-            let To = xmlDoc.createElement('To');
-            To.setAttribute("childRef", next);
-            Relation.appendChild(To);
-
-            let ActivityDependencies = xmlDoc.getElementsByTagName("ActivityDependencies")[0];
-            if (ActivityDependencies == undefined) return;
-            ActivityDependencies.appendChild(Relation);
-        }
+        let ActivityDependencies = xmlDoc.getElementsByTagName("ActivityDependencies")[0];
+        if (ActivityDependencies == undefined) return;
+        ActivityDependencies.appendChild(Relation);
 
     } else if (behavior === "break") {
-        let Relation = xmlDoc.getElementById(protocalId);
+        let Relation = xmlDoc.getElementById(relationId);
         if (Relation !== null) {
             Relation.setAttribute("state", "removed");
         }
