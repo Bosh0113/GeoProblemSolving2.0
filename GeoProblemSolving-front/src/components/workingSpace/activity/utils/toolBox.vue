@@ -305,7 +305,7 @@ export default {
       }
     },
     async getToolInfos() {
-      let data = await get("/GeoProblemSolving/tool/all/" + this.toolIdList.toString())
+      let data = await post("/GeoProblemSolving/tool/all", this.toolIdList);
       this.$set(this, "toolList", data);
     },
     stepToolListChanged(tools, toolsets) {
@@ -335,17 +335,6 @@ export default {
     openTool() {
       var toolInfo = this.selectedTool;
       // this.openToolModal = false;
-      console.log("userInfo", this.userInfo)
-      // record
-      let toolRecords = {
-        type: "tools",
-        time: new Date().Format("yyyy-MM-dd HH:mm:ss"),
-        who: this.userInfo.name,
-        content: "used a tool",
-        toolType: toolInfo.toolName,
-      };
-      console.log("toolRecords", toolRecords)
-      this.$emit("toolBehavior", toolRecords);
 
       if (toolInfo.scope == "outer") {
         this.openToolNewpage(toolInfo);
@@ -358,8 +347,7 @@ export default {
     openToolByPanel(toolInfo) {
       
       //判断tool的类型，三种 modelItem（模型容器提供计算能力）, dataMethod(数据容器提供计算能力), webTool(自行开发，如mapTool)
-      console.log("toolInfo", toolInfo)
-      let routerUrl = "/computeModel";
+      let routerUrl = toolInfo.toolUrl;
       if (toolInfo.backendType == "webTool"){
         routerUrl = toolInfo.toolUrl;
       }else if (toolInfo.backendType == "modelItem"){

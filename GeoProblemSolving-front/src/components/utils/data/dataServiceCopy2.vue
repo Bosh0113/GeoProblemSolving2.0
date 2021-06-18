@@ -418,7 +418,7 @@
         console.log("urlList", urls)
         console.log("paramList", paramList)
 
-        sendDataOperation(this.aid, this.id, this.dataToken, urls, paramList, this.getSocketComputation)
+        CollabSocket.sendDataOperation(this.aid, this.id, this.dataToken, urls, paramList, this.getSocketComputation)
 
 
         // let json = {

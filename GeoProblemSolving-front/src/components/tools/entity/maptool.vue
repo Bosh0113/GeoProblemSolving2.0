@@ -197,9 +197,7 @@ export default {
         this.resources = resources;
 
         // 绑定函数
-        operationChannel = this.getSocketOperation;
-        dataChannel = this.getSocketData;
-        computationChannel = this.getSocketComputation;
+        buildSocketChannel(this.getSocketOperation, this.getSocketData, this.getSocketComputation);
         loadResChannel = this.loadResources;
       } else {
         let _this = this;
@@ -514,7 +512,7 @@ export default {
               layer: _this.drawingLayerGroup.toGeoJSON(),
             },
           };
-          sendCustomOperation(_this.send_content, _this.getSocketOperation);
+          CollabSocket.sendCustomOperation(_this.send_content, _this.getSocketOperation);
         });
       });
     },
@@ -558,7 +556,7 @@ export default {
               layer: e.name,
             },
           };
-          sendCustomOperation(this.send_content, this.getSocketOperation);
+          CollabSocket.sendCustomOperation(this.send_content, this.getSocketOperation);
         }
         isLayerCtrlClick = false;
       });
@@ -574,7 +572,7 @@ export default {
               zoom: this.map.getZoom(),
             },
           };
-          sendCustomOperation(this.send_content, this.getSocketOperation);
+          CollabSocket.sendCustomOperation(this.send_content, this.getSocketOperation);
           isZoomControl = false;
           isDoubleClick = false;
         }
@@ -591,7 +589,7 @@ export default {
               center: this.map.getCenter(),
             },
           };
-          sendCustomOperation(this.send_content, this.getSocketOperation);
+          CollabSocket.sendCustomOperation(this.send_content, this.getSocketOperation);
         }
         isMouseDown = false;
       });
@@ -608,7 +606,7 @@ export default {
         //     layer: this.drawingLayerGroup.toGeoJSON(),
         //   },
         // };
-        // sendCustomOperation(this.send_content, this.getSocketOperation);
+        // CollabSocket.sendCustomOperation(this.send_content, this.getSocketOperation);
       });
 
       // 删除事件
@@ -623,7 +621,7 @@ export default {
             layer: _this.drawingLayerGroup.toGeoJSON(),
           },
         };
-        sendCustomOperation(this.send_content, this.getSocketOperation);
+        CollabSocket.sendCustomOperation(this.send_content, this.getSocketOperation);
       });
 
       this.map.on("pm:globaleditmodetoggled", (e) => {
@@ -667,7 +665,7 @@ export default {
             },
           };
         }
-        sendCustomOperation(this.send_content, this.getSocketOperation);
+        CollabSocket.sendCustomOperation(this.send_content, this.getSocketOperation);
       });
     },
     getSocketData(data) {
