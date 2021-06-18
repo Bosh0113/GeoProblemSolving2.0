@@ -195,7 +195,7 @@
 <!--                         =======zhengzhong=========                    -->
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpcore</artifactId>
+            <artifactId>httpclient</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
@@ -207,7 +207,23 @@
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
         </dependency>
-<!--        ===============================================================-->
+
+<!--        <dependency>-->
+<!--            <groupId>org.apache.httpcomponents</groupId>-->
+<!--            <artifactId>httpclient</artifactId>-->
+<!--            <version>4.5.13</version>-->
+<!--        </dependency>-->
+
+
+<!--        热部署，配合 websocket 真是难用 -->
+<!--        需要配置两个地方：1. 设置中开启自动编译； 2. ctrl+shift+alt+/,勾选compiler.automake.allow.when.app.running-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.boot</groupId>-->
+<!--            <artifactId>spring-boot-devtools</artifactId>-->
+<!--            <version>2.4.5</version>-->
+<!--        </dependency>-->
+
+        <!--        ===============================================================-->
 
         <!--AnsjSeg引入-->
         <dependency>
@@ -223,10 +239,16 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/src/main/resources/lib/mxgraph-all.jar</systemPath>
         </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.jetbrains</groupId>-->
+<!--            <artifactId>annotations</artifactId>-->
+<!--            <version>0.0.1-SNAPSHOT</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>21.0.1</version>
             <scope>compile</scope>
         </dependency>
 

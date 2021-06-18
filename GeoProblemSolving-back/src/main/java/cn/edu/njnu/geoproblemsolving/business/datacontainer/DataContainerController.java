@@ -7,6 +7,7 @@ import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -82,6 +83,18 @@ public class DataContainerController {
     @RequestMapping(value = "/invoke", method = RequestMethod.POST)
     public JsonResult invoke(@RequestBody JSONObject jsonObject) {
         return ResultUtils.success( dataIContainerService.invoke(jsonObject));
+    }
+
+    /*
+    数据方法初始化接口
+     */
+    @RequestMapping(value = "/{token}", method = RequestMethod.GET)
+    public JsonResult initDataService(@PathVariable String token){
+        Integer statusCode = dataIContainerService.initDataService(token);
+        if (statusCode != 0){
+            return ResultUtils.error(-2, "node offline");
+        }
+        return ResultUtils.success();
     }
 
 }

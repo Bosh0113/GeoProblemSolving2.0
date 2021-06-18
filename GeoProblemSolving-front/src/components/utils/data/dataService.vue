@@ -226,6 +226,7 @@
         </div>
       </el-col>
     </el-row>
+
     <el-dialog
       :visible.sync="selectDataDialogShow"
       width="1000px"
@@ -334,11 +335,12 @@ export default {
 
       console.log(data);
       if (data.code == -1) {
-        console.log("off line");
+        console.log("offline");
         return;
       }
 
       this.dataService = data.capability.data;
+      console.log("dataService", data);
       //   this.dataServiceDetail = data;
     },
 
@@ -403,14 +405,17 @@ export default {
         name: event.name,
         description: event.description,
         type: "data",
-        fileSize: "",
-        pathURL: event.url,
+        userUpload: false,
+        address: event.url,
         uploaderId: this.pageParams.userId,
         uploaderName: this.pageParams.userName,
         privacy: "private"
       };
 
-      let data = await post("/GeoProblemSolving/resource/bind", json);
+
+      let data = await post("/GeoProblemSolving/rip/file/bind/" + this.pageParams.pageId, json);
+
+      // let data = await post("/GeoProblemSolving/resource/bind", json);
       event.bind = true;
       this.$forceUpdate();
       this.$message({

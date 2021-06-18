@@ -112,18 +112,36 @@
             <Input v-model="selectedTool.toolName" disabled></Input>
           </FormItem>
 
-          <FormItem label="Url:" prop="toolUrl">
+          <FormItem label="Service Type">
+            <Input  v-if="selectedTool.backendType == 'modelItem'" value="Computable Model" disabled> </Input>
+            <Input v-if="selectedTool.backendType == 'dataMethod'" value="Data Method" disabled> </Input>
+            <Input v-if="selectedTool.backendType == 'webTool'" value="Web Tool" disabled> </Input>
+          </FormItem>
+
+          <FormItem v-if="selectedTool.backendType != 'webTool'" label="Service Name">
+            <Input  v-model="selectedTool.backendName" disabled> </Input>
+          </FormItem>
+
+          <FormItem v-else label="Url">
             <Input
               v-model="selectedTool.toolUrl"
               placeholder="Enter the url of your tool"
             />
-            <p style="font-style: italic">
-              If you copy the doi from Open Geographic Modeling System, please
-              enter the ... first
-            </p>
           </FormItem>
 
-          <FormItem label="Step:" prop="recomStep" :label-width="140">
+<!--          <FormItem label="Url:" prop="toolUrl">-->
+<!--            <Input-->
+<!--              v-model="selectedTool.toolUrl"-->
+<!--              placeholder="Enter the url of your tool"-->
+<!--            />-->
+<!--            <p style="font-style: italic">-->
+<!--              If you copy the doi from Open Geographic Modeling System, please-->
+<!--              enter the ... first-->
+<!--            </p>-->
+<!--          </FormItem>-->
+
+<!--          :label-width="140"-->
+          <FormItem label="Step:" prop="recomStep" >
             <Select
               v-model="selectedTool.recomStep"
               multiple
@@ -360,6 +378,7 @@ export default {
     selectTool: {
       handler(val) {
         this.selectedTool = val;
+        console.log("val", val)
       },
       deep: true,
     },

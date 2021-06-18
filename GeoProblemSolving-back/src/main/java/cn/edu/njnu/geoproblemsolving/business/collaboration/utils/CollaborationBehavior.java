@@ -1,6 +1,7 @@
 package cn.edu.njnu.geoproblemsolving.business.collaboration.utils;
 
 import cn.edu.njnu.geoproblemsolving.business.collaboration.entity.ChatMsg;
+import cn.edu.njnu.geoproblemsolving.business.collaboration.entity.ComputeMsg;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.entity.MsgRecords;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.repository.ChatMsgRepository;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.service.MsgRecordsService;
@@ -9,10 +10,12 @@ import cn.edu.njnu.geoproblemsolving.business.user.dto.InquiryUserDto;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.entity.CollaborationUser;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.websocket.Session;
+import java.io.IOException;
 import java.util.*;
 
 
@@ -301,6 +304,30 @@ public class CollaborationBehavior {
             }
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    /**
+     *
+     * @param participants  //当前的协同者
+     * @param oldReceivers //invoke时的协同者
+     * @param computeResult //计算结果
+     * @throws IOException
+     */
+    public void sendComputeResult(HashMap<String, CollaborationUser> participants, HashMap<String, CollaborationUser> oldReceivers, ComputeMsg computeResult) throws IOException {
+        ArrayList<String> oldReceiverStr = Lists.newArrayList();
+        for (Map.Entry<String, CollaborationUser> oldReceiver: oldReceivers.entrySet()){
+            oldReceiverStr.add(oldReceiver.getKey());
+        }
+        JSONObject messageObject = new JSONObject();
+        messageObject.put("type", "computation");
+        messageObject.put("computeOutputs", computeResult.getOutputs());
+        for (Map.Entry<String, CollaborationUser> participant: participants.entrySet()){
+            for (int i = 0; i < oldReceiverStr.size(); i++) {
+                if (oldReceiverStr.get(i).equals(participant.getValue().getUserId())){
+                    participant.getValue().getSession().getBasicRemote().sendText(messageObject.toString());
+                }
+            }
         }
     }
 

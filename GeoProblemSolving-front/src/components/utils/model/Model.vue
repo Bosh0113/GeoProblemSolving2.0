@@ -389,6 +389,7 @@ export default {
         data.mdlJson.ModelClass[0].Behavior[0].RelatedDatasets[0].DatasetItem;
       //预处理过程 STEP0
       this.stateList = data.convertMdlJson;
+      console.log(this.stateList)
     },
 
     async initTask() {

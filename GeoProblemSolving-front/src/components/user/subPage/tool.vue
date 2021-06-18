@@ -36,8 +36,20 @@
               style="height: inherit;min-height: fit-content;"
             >
               <vue-scroll :ops="ops">
+                <Card :bordered="false" v-if="userToolCount.length == 0">
+                  <div style="display:flex;justify-content:center">
+                    <Icon type="md-alert" size="40" color="gray"/>
+                  </div>
+                  <br/>
+                  <div style="display:flex;justify-content:center">
+                    <h3
+                      style="text-align:center;width:80%"
+                    >Sorry, you don't have any tools.</h3>
+                  </div>
+                </Card>
+
                 <Row>
-<!--                  每一排 4 个-->
+                  <!--                  每一排 4 个-->
                   <Col
                     span="6"
                     v-for="(tool,index) in userToolCount"
@@ -76,12 +88,12 @@
                             @click="delTool(tool.tid, tool.privacy, index, tool.toolName)"
                           />
                         </div>
-<!--                       内容    -->
-                        <div @click="toToolPage(tool.toolUrl)" style="cursor: pointer;">
+                        <!--                       内容    -->
+                        <div @click="toToolPage(tool)" style="cursor: pointer;">
                           <div style="algin:left;">
                             <img
                               :src="tool.toolImg"
-                              v-if="tool.toolImg!=''"
+                              v-if="tool.toolImg!='' && tool.toolImg!=null"
                               style="height:100%;max-height:50px;width: 50%"
                             />
                             <avatar
@@ -127,6 +139,7 @@
         <Button
           type="success"
           @click="createTool"
+          :loading="loading"
           v-show="this.currentStep == 1"
         >Create
         </Button>
@@ -141,10 +154,10 @@
             >Share "{{ this.sharedTool.toolName }}" to Project
             </Option
             >
-<!--            <Option value="selectUser"-->
-<!--            >Share "{{ this.sharedTool.toolName }}" to User-->
-<!--            </Option-->
-<!--            >-->
+            <!--            <Option value="selectUser"-->
+            <!--            >Share "{{ this.sharedTool.toolName }}" to User-->
+            <!--            </Option-->
+            <!--            >-->
           </Select>
         </FormItem>
         <FormItem v-if="formItem.select == 'selectProject'">
@@ -282,6 +295,7 @@
         },
         sharedTool: {},
         contentHeight: "",
+        loading: false
       };
     },
     created() {
@@ -309,9 +323,9 @@
         let userInfo = this.$store.getters.userInfo;
         if (userInfo.createdProjects != null) {
           for (let i = 0; i < userInfo.createdProjects.length; i++) {
-            if (userInfo.joinedProjects != null){
+            if (userInfo.joinedProjects != null) {
               projectIds += userInfo.createdProjects[i] + ",";
-            }else if (userInfo.joinedProjects == null){
+            } else if (userInfo.joinedProjects == null) {
               if (i != userInfo.createdProjects.length - 1) {
                 projectIds += userInfo.createdProjects[i] + ",";
               } else {
@@ -343,6 +357,7 @@
       },
       //与TemplateGeneral 双向绑定，子组件向夫组件传值使用方法
       getEditInfo: function (form) {
+        console.log("editToolInfo", form)
         this.editToolInfo = form;
       },
       editTool: function (item) {
@@ -350,13 +365,13 @@
         this.editToolInfo = item;
       },
       getPersonalTools: function () {
+        // "/GeoProblemSolving/tool/findByProvider/" + this.$store.getters.userId
         this.$axios
           .get(
-            "/GeoProblemSolving/tool/findByProvider/" + this.$store.getters.userId
+            "/GeoProblemSolving/tool/provider/" + this.$store.getters.userId
           )
           .then((res) => {
             let tempTools = res.data.data;
-            console.log(tempTools)
             for (let i = 0; i < tempTools.length; i++) {
               if (tempTools[i].privacy == "Public") {
                 this.publicTools.push(tempTools[i]);
@@ -381,20 +396,48 @@
       },
       createTool: async function () {
         let createToolForm = this.toolInfo;
-        createToolForm["provider"] = this.$store.getters.userId;
-        let data = await post("/GeoProblemSolving/tool/create", createToolForm);
-        // 判断返回值，进行下一步操作
-        this.createToolModal = false;
-        this.editToolInfo = {};
-        //Notice 与 Message 的区别
-        this.toolInfo = {};
-        if (data.privacy == "Public") {
-          this.privateTools.push(data);
-        } else if (data.privacy == "Private") {
-          this.publicTools.push(data);
-        }
-        this.currentStep = 0;
-        this.$Notice.success({title: "Create successfully"});
+        this.loading = true;
+        setTimeout(()=>{
+          this.loading = false;
+        }, 2000)
+        createToolForm["creator"] = this.$store.getters.userId;
+        // let data = await post("/GeoProblemSolving/tool", createToolForm);
+        this.axios.post("/GeoProblemSolving/tool", createToolForm)
+          .then(res=>{
+            // 判断返回值，进行下一步操作
+            this.createToolModal = false;
+            this.editToolInfo = {};
+            this.toolInfo = {};
+            let toolData = res.data.data;
+            if (toolData != null){
+              if (toolData.privacy == "Public"){
+                this.publicTools.push(toolData);
+              }else if (toolData.privacy == "Private"){
+                this.privateTools.push(toolData);
+              }
+              this.currentStep = 0;
+              this.$Notice.success({title: "Create successfully"});
+            }else {
+              this.$Notice.error({title: "Crate failed", desc: "No Corresponding service"});
+            }
+          })
+          .catch(err=>{
+            this.$Notice.error({title: "Create failed"});
+          })
+        // //Notice 与 Message 的区别
+        // this.toolInfo = {};
+        // console.log("data", data)
+        // if (data != null){
+        //   if (data.privacy == "Public") {
+        //     this.privateTools.push(data);
+        //   } else if (data.privacy == "Private") {
+        //     this.publicTools.push(data);
+        //   }
+        //   this.currentStep = 0;
+        //   this.$Notice.success({title: "Create successfully"});
+        // }else {
+        // }
+
       },
       delTool: function (toolId, toolType, index, toolName) {
         this.confirmDelModal = true;
@@ -404,29 +447,25 @@
         this.delToolInfo.delToolName = toolName;
       },
       confirmDelTool: function () {
+        // "/GeoProblemSolving/tool/delete?tid=" + this.delToolInfo.delToolId
         this.$axios
           .delete(
-            "/GeoProblemSolving/tool/delete?tid=" + this.delToolInfo.delToolId
+            "/GeoProblemSolving/tool/" + this.delToolInfo.delToolId
           )
           .then((res) => {
             if (res.data.code == 0) {
               if (this.checkedType.length == 2) {
                 if (this.delToolInfo.delToolType == "Public") {
+                  console.log("publicDel", this.delToolInfo.delToolIndex)
                   this.publicTools.splice(this.delToolInfo.delToolIndex, 1);
                 } else if (this.delToolInfo.delToolType == "Private") {
-                  let num =
-                    this.delToolInfo.delToolIndex - this.publicTools.length;
+                  console.log("privateDel", this.delToolInfo.delToolIndex)
+                  let num = this.delToolInfo.delToolIndex - this.publicTools.length;
                   this.privateTools.splice(num, 1);
                 }
-              } else if (
-                this.checkedType.length == 1 &&
-                this.checkedType == "public"
-              ) {
+              } else if (this.checkedType.length == 1 && this.checkedType == "public") {
                 this.publicTools.splice(this.delToolInfo.delToolIndex, 1);
-              } else if (
-                this.checkedType.length == 1 &&
-                this.checkedType == "private"
-              ) {
+              } else if (this.checkedType.length == 1 && this.checkedType == "private") {
                 this.privateTools.splice(this.delToolInfo.delToolIndex, 1);
               }
               this.$Notice.success({title: "Delete Success."});
@@ -440,9 +479,11 @@
           });
       },
       commitEdit: function () {
+        // "/GeoProblemSolving/tool/update/" + this.editToolInfo.tid,
+        //   this.editToolInfo
         this.$axios
-          .post(
-            "/GeoProblemSolving/tool/update/" + this.editToolInfo.tid,
+          .put(
+            "/GeoProblemSolving/tool",
             this.editToolInfo
           )
           .then((res) => {
@@ -492,8 +533,27 @@
             this.$Message.error("Update Fail.Try again!");
           });
       },
-      toToolPage: function (toolUrl) {
-        window.open(toolUrl);
+      //需要改一下
+      toToolPage: function (tool) {
+        if (tool.backendType == "dataMethod") {
+          let type = "";
+          switch (tool.dataMethodType) {
+            case "process":
+              type = "Processing";
+              break;
+            case "":
+              break;
+            case "":
+              break;
+          }
+          let encodeToken = encodeURIComponent(tool.token);
+          window.open("/dataService/" + tool.dataMethodId + "/" + encodeToken + "/" + type)
+        } else if (tool.backendType == "modelItem") {
+          window.open("/modelItem/" + tool.computableModelMd5);
+        }else if (tool.backendType == "webTool"){
+          window.open()
+        }
+        console.log("toolPage", tool)
       }
     },
     computed: {
@@ -548,6 +608,7 @@
   .icon:hover {
     color: #2d8cf0;
   }
+
   .ellipsis {
     display: inline-block;
     overflow: hidden;
@@ -555,10 +616,11 @@
     white-space: nowrap;
     vertical-align: top;
   }
+
   .toolDes {
     height: 100px;
     line-height: 20px;
-    overflow : hidden;
+    overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;
     -webkit-line-clamp: 5;

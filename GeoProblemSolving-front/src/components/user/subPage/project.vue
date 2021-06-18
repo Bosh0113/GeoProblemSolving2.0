@@ -100,6 +100,7 @@
               <!--               项目内容显示        -->
               <div v-show="userProjectCount.length != 0">
                 <div
+                  v-if="selectedProjectType.indexOf('createdProject') != -1"
                   v-for="(mProject,index) in createdProjectList"
                   v-show="createdProjectList!='None'"
                   :key="'create'+index"
@@ -147,6 +148,7 @@
 
 
                 <div
+                  v-if="selectedProjectType.indexOf('joinedProject') != -1"
                   v-for="(item,Index) in joinedProjectsList"
                   :key="'join'+ Index"
                   v-show="joinedProjectsList!=[]"

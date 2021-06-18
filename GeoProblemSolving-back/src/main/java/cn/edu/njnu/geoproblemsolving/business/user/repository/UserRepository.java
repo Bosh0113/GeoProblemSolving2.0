@@ -6,6 +6,6 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 @RepositoryRestResource(path = "user")
 public interface UserRepository extends MongoRepository<User, String> {
-    public User findByEmail(String email);
+    User findByEmail(String email);
     User findByUserId(String userId);
 }
