@@ -107,48 +107,48 @@ export default new Vuex.Store({
         setTaskDependencies: (state, links) => {
             Vue.set(state, "taskDependencies", links);
         },
-        updateTempOperations: (state, behavior, operation) => {
-            if(behavior === "add"){
-                state.tempOperations.push(operation);
-            } else if(behavior === "remove"){
+        updateTempOperations: (state, data) => {
+            if(data.behavior === "add"){
+                state.tempOperations.push(data.operation);
+            } else if(data.behavior === "remove"){
                 for(var i = 0; i < state.tempOperations.length; i++){
-                    if(state.tempOperations[i].id === operation.id){
+                    if(state.tempOperations[i].id === data.operation.id){
                         state.tempOperations.splice(i, 1);
                     }
                 }
-            } else if(behavior === "update"){
+            } else if(data.behavior === "update"){
                 for(var i = 0; i < state.tempOperations.length; i++){
                     for(var i = 0; i < state.tempOperations.length; i++){
-                        if(state.tempOperations[i].id === operation.id){
-                            state.tempOperations[i] = operation;
+                        if(state.tempOperations[i].id === data.operation.id){
+                            state.tempOperations[i] = data.operation;
                         }
                     }
                 }
             }
         },
-        updateActivityTasks: (state, behavior, task) => {
-            if(behavior === "add"){
-                state.activityTasks.push(task);
-            } else if(behavior === "remove"){
+        updateActivityTasks: (state, data) => {
+            if(data.behavior === "add"){
+                state.activityTasks.push(data.task);
+            } else if(data.behavior === "remove"){
                 for(var i = 0; i < state.activityTasks.length; i++){
-                    if(state.activityTasks[i].taskId === task.taskId){
+                    if(state.activityTasks[i].taskId === data.task.taskId){
                         state.activityTasks.splice(i, 1);
                     }
                 }
-            } else if(behavior === "update"){
+            } else if(data.behavior === "update"){
                 for(var i = 0; i < state.activityTasks.length; i++){
-                    if(state.activityTasks[i].taskId === task.taskId){
-                        state.activityTasks[i] = task;
+                    if(state.activityTasks[i].taskId === data.task.taskId){
+                        state.activityTasks[i] = data.task;
                     }
                 }
             }
         },
-        updateTaskDependencies: (state, behavior, link) => {
-            if(behavior === "add"){
-                state.taskDependencies.push(link);
-            } else if(behavior === "remove"){
+        updateTaskDependencies: (state, data) => {
+            if(data.behavior === "add"){
+                state.taskDependencies.push(data.link);
+            } else if(data.behavior === "remove"){
                 
-            } else if(behavior === "update"){
+            } else if(data.behavior === "update"){
 
             }
         }

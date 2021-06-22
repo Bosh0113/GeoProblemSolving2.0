@@ -345,17 +345,16 @@ export default {
       }
     },
     openToolByPanel(toolInfo) {
-      
       //判断tool的类型，三种 modelItem（模型容器提供计算能力）, dataMethod(数据容器提供计算能力), webTool(自行开发，如mapTool)
       let routerUrl = toolInfo.toolUrl;
-      if (toolInfo.backendType == "webTool"){
+      if (toolInfo.backendType == "webTool") {
         routerUrl = toolInfo.toolUrl;
-      }else if (toolInfo.backendType == "modelItem"){
+      } else if (toolInfo.backendType == "modelItem") {
         routerUrl = "/computeModel";
-      }else if (toolInfo.backendType == "dataMethod"){
+      } else if (toolInfo.backendType == "dataMethod") {
         routerUrl = "/dataMethod";
       }
-      
+
       var toolContent = `<iframe src="${routerUrl}" id="${toolInfo.tid}" style="width: 100%; height:100%;" frameborder="0"></iframe>`;
 
       var panel = jsPanel.create({
@@ -371,7 +370,7 @@ export default {
         },
         closeOnEscape: true,
         disableOnMaximized: true,
-        onbeforeclose:  () => {
+        onbeforeclose: () => {
           if (this.operationStore) {
             return true;
           } else {
@@ -406,35 +405,82 @@ export default {
         );
       };
     },
+
     toolMsgHandle(event) {
       if (event.data.type === "task") {
-
         let operations = event.data.operations;
+        let behavior = event.data.behavior;
         for (let i = 0; i < operations.length; i++) {
-
           let operationType = operations[i].type;
           switch (operationType) {
-            case "data": {
-              this.operationApi.resOperationRecord(
-                this.activityInfo.aid,
-                event.data.task,
-                operations[i].behavior,
-                this.userInfo.userId,
-                operations[i].content
-              );
-              break;
-            }
-            case "model": {
+            case "resource": {
+              if (behavior === "record") {
+                this.operationApi.resOperationRecord(
+                  this.activityInfo.aid,
+                  operations[i].id,
+                  event.data.task,
+                  behavior,
+                  this.userInfo.userId,
+                  operations[i].content
+                );
+                this.$store.commit("updateTempOperations", {
+                  behavior: "add",
+                  operation: operations[i],
+                });
+              } else if (behavior === "bind") {
+                this.operationApi.bindTempOperation2Task(
+                  this.activityInfo.aid,
+                  operations[i].id,
+                  event.data.task
+                );
+                this.$store.commit("updateTempOperations", {
+                  behavior: "remove",
+                  operation: operations[i],
+                });
+              }
               break;
             }
             case "communication": {
               break;
             }
-            case "computation": {
+            case "geo-analysis": {
+              if (behavior === "record") {
+                this.operationApi.analysisRecord(
+                  this.activityInfo.aid,
+                  operations[i].id,
+                  event.data.task,
+                  this.userInfo.userId,
+                  operations[i].toolId,
+                  operations[i].purpose,
+                  operations[i].inputs,
+                  operations[i].outputs,
+                  operations[i].params,
+                  operations[i].participants
+                );
+              } else if (behavior === "bind") {
+                this.operationApi.bindTempOperation2Task(
+                  this.activityInfo.aid,
+                  operations[i].id,
+                  event.data.task
+                );
+              }
               break;
             }
           }
+
+          if (behavior === "record") {
+            this.$store.commit("updateTempOperations", {
+              behavior: "add",
+              task: operations[i],
+            });
+          } else if (behavior === "bind") {
+            this.$store.commit("updateTempOperations", {
+              behavior: "remove",
+              task: operations[i],
+            });
+          }
         }
+
         this.operationStore = true;
       }
     },

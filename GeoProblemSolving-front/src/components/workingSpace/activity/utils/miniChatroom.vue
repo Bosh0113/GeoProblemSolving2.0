@@ -473,6 +473,7 @@ export default {
           this.activityInfo.aid,
           "",
           "",
+          "",
           chatMsg.recordId,
           chatMsg.time,
           chatMsg.participants

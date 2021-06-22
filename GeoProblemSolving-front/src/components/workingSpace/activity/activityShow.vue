@@ -765,6 +765,7 @@ export default {
             .then((res) => {
               if (res.data.code == 0) {
                 this.operationApi.activityRecord(
+                  "",
                   "create",
                   this.userInfo.userId,
                   res.data.data

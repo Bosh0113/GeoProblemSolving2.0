@@ -488,7 +488,6 @@ export default {
     },
     updateStepchart() {
       // 重新渲染
-      this.selectedActivities = [];
       this.stepChart.dispose();
       this.stepChart = null;
       this.showSteps();
@@ -599,7 +598,6 @@ export default {
       this.updatePathway();
     },
     showSteps() {
-      this.selectedActivities = [];
       let option = {
         animationDurationUpdate: 500,
         animationEasingUpdate: "quinticInOut",
@@ -935,6 +933,7 @@ export default {
             }
           } else if (res.data.code == 0) {
             this.updateStepchart();
+            this.selectedActivities = [];
             // this.$Notice.info({
             //   desc: "Reshape pathway successfully!",
             // });
@@ -1023,6 +1022,7 @@ export default {
       // 重新渲染
       this.updateStepchart();
       // clear
+      this.selectedActivities = [];
       this.beginNode = {};
       this.endNode = {};
       this.clearProtocolSetting();
@@ -1087,6 +1087,7 @@ export default {
             let protocolId = res.data.data.pid;
             this.newLinkStore(this.beginNode.aid, this.endNode.aid, protocolId);
             // clear
+            this.selectedActivities = [];
             this.beginNode = {};
             this.endNode = {};
           } else {
@@ -1175,6 +1176,7 @@ export default {
           } else if (res.data.code == 0) {
             this.operationApi.processRecord(
               this.activityInfo.aid,
+              "",
               "link",
               this.userInfo.userId,
               begin,
@@ -1224,6 +1226,7 @@ export default {
       this.updateStepchart();
       // 更新pathway
       this.delLinkStore(this.beginNode.aid, this.endNode.aid);
+      this.selectedActivities = [];
       this.beginNode = {};
       this.endNode = {};
     },
@@ -1257,6 +1260,7 @@ export default {
           } else if (res.data.code == 0) {
             this.operationApi.processRecord(
               this.activityInfo.aid,
+              "",
               "break",
               this.userInfo.userId,
               begin,

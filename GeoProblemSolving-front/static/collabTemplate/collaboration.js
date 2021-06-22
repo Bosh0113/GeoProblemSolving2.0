@@ -1,3 +1,21 @@
+Array.prototype.contains = function (obj) {
+    var i = this.length;
+    while (i--) {
+      if (this[i] != undefined && this[i] === obj ||
+        this[i].userId != undefined && this[i].userId === obj) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+//guid
+function guid() {
+    function S4() {
+        return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+    }
+    return (S4() + S4() + "-" + S4() + "-4" + S4().substr(0, 3) + "-" + S4() + "-" + S4() + S4() + S4()).toLowerCase();
+}
 
 // basic information
 var toolId = "";
@@ -271,6 +289,7 @@ var taskList = [];
             if (selectedTask != undefined && selectedTask != "" && selectedTask != "Select one task") {
                 let data = {
                     "type": "task",
+                    "behavior": "bind",
                     "operations": selectedOperations,
                     "task": selectedTask
                 }
@@ -632,7 +651,7 @@ var taskList = [];
             // collaboration message
             CollabSocket.websocketSend(message);
             // record
-            addOperations(userInfo, message);
+            addOperations(userInfo, message, "origin");
         }
         return uploadedList;
     }
@@ -654,23 +673,30 @@ var taskList = [];
 
         for (let i = 0; i < uploadedList.length; i++) {
             let message = {
-                type: "data",
-                behavior: "save",
+                type: "geo-analysis",
+                purpose: "Data processing",
                 sender: userInfo.userId,
-                content: {
-                    uid: uploadedList[i].uid,
-                    name: uploadedList[i].name,
-                    type: "data",
-                    suffix: uploadedList[i].suffix,
-                    provider: userInfo.userId,
-                    description: uploadedList[i].description,
-                    address: uploadedList[i].address,
-                }
+                toolId: toolId,
+                inputs: [],
+                outputs: [
+                    {
+                        uid: uploadedList[i].uid,
+                        name: uploadedList[i].name,
+                        type: "data",
+                        suffix: uploadedList[i].suffix,
+                        provider: userInfo.userId,
+                        description: uploadedList[i].description,
+                        address: uploadedList[i].address,
+                    }
+                ],
+                params: [],
+                participants: participants
             }
+
             // collaboration message
             CollabSocket.websocketSend(message);
             // record
-            addOperations(userInfo, message);
+            addOperations(userInfo, message, "origin");
         }
         return uploadedList;
     }
@@ -787,7 +813,16 @@ var taskList = [];
         }
     }
 
-    function addOperations(user, operation) {
+    /**
+     * 给操作列表增加记录
+     * @param {*} user 
+     * @param {*} operation 
+     */
+    function addOperations(user, operation, from) {
+        // set operation id
+        let operationId = guid();
+        operation["id"] = operationId;
+
         if (operation != undefined) {
 
             switch (operation.type) {
@@ -797,7 +832,7 @@ var taskList = [];
                         if (user.userId === userInfo.userId) {
                             element = `<div class="operation-item">
                                         <div class="operation-title">Data - upload
-                                            <input class="form-check-input operation-bind-check" type="checkbox" id="operation-${operation.content.uid}" title="Bind operations to the task">
+                                            <input class="form-check-input operation-bind-check" type="checkbox" id="${operation.id}" title="Bind operations to the task">
                                         </div>
                                         <div class="operation-divider"></div>
                                         <div class="operation-content" title="You uploaded the data - ${operation.content.name}">You uploaded the data - ${operation.content.name}</div>
@@ -811,32 +846,11 @@ var taskList = [];
                         }
 
                         $("#operation-list").append(element);
-                        $(`#operation-${operation.content.uid}`).on("change", function () {
+                        $(`#${operation.id}`).on("change", function () {
                             selectOperations(operation);
                         });
 
-                    } else if (operation.behavior === "save") {
-                        let element = "";
-                        if (user.userId === userInfo.userId) {
-                            element = `<div class="operation-item">
-                                        <div class="operation-title">Data - save
-                                            <input class="form-check-input operation-bind-check" type="checkbox" id="operation-${operation.content.uid}" title="Bind operations to the task">
-                                        </div>
-                                        <div class="operation-divider"></div>
-                                        <div class="operation-content" title="You saved the data - ${operation.content.name}">You saved the data - ${operation.content.name}</div>
-                                    </div>`;
-                        } else {
-                            element = `<div class="operation-item">
-                                        <div class="operation-title">Data - save</div>
-                                        <div class="operation-divider"></div>
-                                        <div class="operation-content" title="${user.name} saved the data - ${operation.content.name}">${user.name} saved the data - ${operation.content.name}</div>
-                                    </div>`;
-                        }
 
-                        $("#operation-list").append(element);
-                        $(`#operation-${operation.content.uid}`).on("change", function () {
-                            selectOperations(operation);
-                        });
                     } else if (operation.behavior === "update") {
 
                     }
@@ -845,16 +859,47 @@ var taskList = [];
                 case "chat": {
                     break;
                 }
-                case "model": {
-                    if (operation.behavior === "build") {
+                case "geo-analysis": {
+                    
+                    if (operation.purpose === "Data processing") {
+                        let element = "";
+                        if (operation.participants.contains(userInfo.userId)) {
+                            element = `<div class="operation-item">
+                                        <div class="operation-title">Geoanalysis - processing
+                                            <input class="form-check-input operation-bind-check" type="checkbox" id="${operation.id}" title="Bind operations to the task">
+                                        </div>
+                                        <div class="operation-divider"></div>
+                                        <div class="operation-content" title="You were processing the data - ${operation.outputs[0].name}">You were processing the data - ${operation.outputs[0].name}.</div>
+                                    </div>`;
+                        } else {
+                            element = `<div class="operation-item">
+                                        <div class="operation-title">Geoanalysis - processing</div>
+                                        <div class="operation-divider"></div>
+                                        <div class="operation-content" title="The data - ${operation.content.name} were processing">The data - ${operation.content.name} were processing.</div>
+                                    </div>`;
+                        }
 
-                    } else if (operation.behavior === "execute") {
+                        $("#operation-list").append(element);
+                        $(`#${operation.id}`).on("change", function () {
+                            selectOperations(operation);
+                        });
+                    } else if (operation.purpose === "execute") {
 
-                    } else if (operation.behavior === "modify") {
+                    } else if (operation.purpose === "modify") {
 
                     }
                     break;
                 }
+            }
+
+            // save the temporary operation
+            if (from === "origin") {
+                postIframeMsg({
+                    "type": "task",
+                    "behavior": "record",
+                    "operations": [operation],
+                    "task": ""
+                });
             }
         }
     }
@@ -890,11 +935,11 @@ var taskList = [];
     }
 
     function selectOperations(operation) {
-        if ($(`#operation-${operation.content.uid}`).is(":checked")) {
+        if ($(`#${operation.id}`).is(":checked")) {
             selectedOperations.push(operation);
         } else {
             for (let i = 0; i < selectedOperations.length; i++) {
-                if (selectedOperations[i].content.uid == operation.content.uid) {
+                if (selectedOperations[i].id == operation.id) {
                     selectedOperations.splice(i, 1);
                 }
             }
@@ -1050,10 +1095,13 @@ var taskList = [];
                                 }
                                 dataChannel(data);
                                 // record
-                                addOperations(message.sender, message);
+                                addOperations(message.sender, message, "transfer");
                             }
                         }
                         break;
+                    }
+                    case "geo-analysis": {
+                        addOperations(message.sender, message, "transfer");
                     }
                     case "computation": {
                         if (computationChannel != undefined && typeof computationChannel == "function") {
@@ -1183,9 +1231,10 @@ var taskList = [];
 ///////////
 /// public methods
 //////////
-{/**
- * 加载协同模板组件
- */
+{
+    /**
+     * 加载协同模板组件
+     */
     function loadCollabComponent() {
         initComponent();
     }

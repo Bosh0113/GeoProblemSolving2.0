@@ -964,6 +964,7 @@ export default {
                       this.operationApi.resOperationRecord(
                         this.activityInfo.aid,
                         "",
+                        "",
                         "upload",
                         this.userInfo.userId,
                         uploadedList[i]
@@ -1038,6 +1039,7 @@ export default {
 
               this.operationApi.resOperationRecord(
                 this.activityInfo.aid,
+                "",
                 "",
                 "remove",
                 this.userInfo.userId,
@@ -1317,6 +1319,7 @@ export default {
               this.operationApi.resOperationRecord(
                 this.activityInfo.aid,
                 "",
+                "",
                 "upload",
                 this.userInfo.userId,
                 resList[i]
@@ -1417,6 +1420,7 @@ export default {
                 this.operationApi.resOperationRecord(
                   this.activityInfo.aid,
                   "",
+                  "",
                   "upload",
                   this.userInfo.userId,
                   res.data.data
@@ -1474,6 +1478,7 @@ export default {
 
               this.operationApi.resOperationRecord(
                 this.activityInfo.aid,
+                "",
                 "",
                 "remove",
                 this.userInfo.userId,
@@ -1544,6 +1549,7 @@ export default {
                 this.operationApi.resOperationRecord(
                   this.activityInfo.aid,
                   "",
+                  "",
                   "update",
                   this.userInfo.userId,
                   this.editForeInfo
@@ -1597,7 +1603,8 @@ export default {
               } else if (res.data.code == 0) {
                 this.selectFileInfo.name = this.editFileValidate.name;
                 this.selectFileInfo.type = this.editFileValidate.type;
-                this.selectFileInfo.description = this.editFileValidate.description;
+                this.selectFileInfo.description =
+                  this.editFileValidate.description;
 
                 for (var i = 0; i < this.activityResList.length; i++) {
                   if (this.activityResList[i].uid == this.selectFileInfo.uid) {
@@ -1617,9 +1624,10 @@ export default {
                     break;
                   }
                 }
-                
+
                 this.operationApi.resOperationRecord(
                   this.activityInfo.aid,
+                  "",
                   "",
                   "update",
                   this.userInfo.userId,
@@ -1686,12 +1694,13 @@ export default {
               this.operationApi.resOperationRecord(
                 this.activityInfo.aid,
                 "",
+                "",
                 "upload",
                 this.userInfo.userId,
                 resList[i]
               );
             }
-            
+
             this.$Message.success("Shared file success!");
             this.selectedFilesToShare = [];
           } else {

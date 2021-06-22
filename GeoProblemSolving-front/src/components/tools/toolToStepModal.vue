@@ -815,6 +815,7 @@ export default {
           this.operationApi.toolOperationRecord(
             this.activityInfo.aid,
             "",
+            "",
             "add",
             this.userInfo.userId,
             this.stepToolsetsShow[i]
@@ -826,6 +827,7 @@ export default {
 
           this.operationApi.toolOperationRecord(
             this.activityInfo.aid,
+            "",
             "",
             "add",
             this.userInfo.userId,

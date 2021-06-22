@@ -1194,7 +1194,10 @@ export default {
                   "create",
                   res.data
                 );
-                this.$store.commit("updateActivityTasks", "add", res.data);
+                this.$store.commit("updateActivityTasks", {
+                  behavior: "add",
+                  task: res.data,
+                });
 
                 this.createTaskModal = false;
               }
@@ -1342,7 +1345,10 @@ export default {
                   "update",
                   taskForm
                 );
-                this.$store.commit("updateActivityTasks", "update", res.data);
+                this.$store.commit("updateActivityTasks", {
+                  behavior: "update",
+                  task: res.data,
+                });
 
                 this.updateTaskList(res.data); // 只更新单个任务
                 this.editTaskModal = false;
@@ -1512,8 +1518,8 @@ export default {
               "remove",
               this.taskList
             );
-            this.$store.commit("updateActivityTasks", "remove", res.data);
-            
+            this.$store.commit("updateActivityTasks", {behavior: "remove", task: res.data});
+
             this.taskList.splice(this.selectTaskIndex, 1);
           } else {
             this.$Message.error("Fail!");

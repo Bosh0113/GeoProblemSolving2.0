@@ -8,7 +8,7 @@
       <div class="participant">
         <span style="margin-right: 5px">People: </span>
         <avatar
-          v-for="person in temOperation.operators"
+          v-for="person in temOperation.participants"
           :key="person.id"
           class="person"
           :username="person.name"
@@ -25,12 +25,12 @@
       "
     >
       <span class="behavior"
-        >Geo-analysis by using the {{ temOperation.tool.name }} tool</span
+        >Geo-analysis via the {{ temOperation.tool.name }}</span
       >
       <div class="participant">
         <span style="margin-right: 5px">People: </span>
         <avatar
-          v-for="person in temOperation.operators"
+          v-for="person in temOperation.participants"
           :key="person.id"
           class="person"
           :username="person.name"
@@ -140,25 +140,33 @@ export default {
           let personInfo = this.operationApi.getMemberInfo(
             operation.operators[j]
           );
+          if(personInfo == null) return;
           participants.push(personInfo);
         }
-        operation.operators = participants;
+        operation.participants = participants;
+
       } else if (operation.type === "geo-analysis") {
         // geo-analysis
-        let toolInfo = this.operationApi.getResInfo(operation.toolRef);
+        let toolInfo = this.operationApi.getToolInfo(operation.toolRef);
+        if(toolInfo == null) return;
         operation.tool = toolInfo;
+        
         // participants
         let participants = [];
-        for (var j = 0; j < operation.operators.length; j++) {
+        for (var j = 0; j < operation.personRef.length; j++) {
           let operatorInfo = this.operationApi.getMemberInfo(
-            operation.operators[j]
+            operation.personRef[j]
           );
+          if(operatorInfo == null) return;
           participants.push(operatorInfo);
         }
-        operation.operators = participants;
+        operation.participants = participants;
+
       } else if (operation.type === "resource") {
         // resource
         let resInfo = this.operationApi.getResInfo(operation.resRef);
+        if(resInfo == null) return;
+
         operation.resource = resInfo;
         operation.operator = this.operationApi.getMemberInfo(
           operation.operator
@@ -178,6 +186,7 @@ export default {
   width: 200px;
   word-break: break-word;
   padding: 5px;
+  font-size: 12px;
 }
 .behavior {
   vertical-align: super;
