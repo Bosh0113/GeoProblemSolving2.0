@@ -197,9 +197,7 @@ export default {
         this.resources = resources;
 
         // 绑定函数
-        operationChannel = this.getSocketOperation;
-        dataChannel = this.getSocketData;
-        computationChannel = this.getSocketComputation;
+        buildSocketChannel(this.getSocketOperation, this.getSocketData, this.getSocketComputation);
         loadResChannel = this.loadResources;
       } else {
         let _this = this;
@@ -416,10 +414,10 @@ export default {
             var fileOfBlob = new File([this.geojsonBlob], filename);
 
             // upload
-            let file = uploadResources([fileOfBlob], description, "data", "private");
+            let file = saveResources([fileOfBlob], description, "data", "private");
 
             this.showFile = true;
-            this.selectData = file;
+            this.selectData = file[0];
 
             if(file.length > 0){
               this.$Notice.open({
@@ -670,7 +668,7 @@ export default {
         sendCustomOperation(this.send_content, this.getSocketOperation);
       });
     },
-    getSocketData() {
+    getSocketData(data) {
       let socketMsg = data;
       if (socketMsg.type === "data") {
         switch (socketMsg.behavior) {

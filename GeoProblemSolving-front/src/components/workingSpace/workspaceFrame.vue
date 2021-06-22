@@ -877,6 +877,7 @@ export default {
         .then((res) => {
           if (res.data.code == 0) {
             this.operationApi.activityRecord(
+              "",
               "remove",
               this.userInfo.userId,
               this.slctActivity

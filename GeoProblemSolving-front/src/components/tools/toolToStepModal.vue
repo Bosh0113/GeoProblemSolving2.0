@@ -592,8 +592,6 @@ export default {
   },
   created() {},
   mounted() {
-    this.toolIdList = this.operationApi.getToollist();
-
     Array.prototype.contains = function (obj) {
       var i = this.length;
       while (i--) {
@@ -609,50 +607,52 @@ export default {
   },
   methods: {
     stepToolModalShow() {
+      this.toolIdList = this.operationApi.getToollist();
       this.getAllListInfo();
       this.typeSelected = "All";
       this.showMenuItem = "allToolsets";
       this.isPublic = true;
       this.stepToolModal = true;
     },
-    getAllListInfo() {
-      this.getPublicTools();
-      this.getPersonalTools();
+    async getAllListInfo() {
+      await this.getPublicTools();
+      await this.getPersonalTools();
 
       this.filterDuplicateTools();
+      this.filterShowListByType();
     },
     async getPublicTools() {
       let data = await get(
         "/GeoProblemSolving/tool/inquiry?key=privacy&value=Public"
       );
       this.$set(this, "publicTools", data);
-      this.filterShowListByType();
     },
     async getPersonalTools() {
       let data = await get(
         `/GeoProblemSolving/tool/findByProvider/${this.userInfo.userId}`
       );
       this.$set(this, "personalTools", data);
-      this.filterShowListByType();
     },
     filterDuplicateTools() {
-      
       this.stepToolsetsShow = [];
       this.stepToolsShow = [];
 
       // public tools and toolsets
       let tools = [],
         toolsets = [];
-      for (var i = this.personalTools.length -1 ; i >= 0; i--) {
-        if (this.publicTools[i].isToolset != undefined && this.publicTools[i].isToolset) {
+      for (var i = this.publicTools.length - 1; i >= 0; i--) {
+        if (
+          this.publicTools[i].isToolset != undefined &&
+          this.publicTools[i].isToolset
+        ) {
           if (!this.toolIdList.contains(this.publicTools[i].tid)) {
-            toolsets.push(this.publicTools[i]);            
+            toolsets.push(this.publicTools[i]);
           } else {
             this.stepToolsetsShow.push(this.publicTools[i]);
           }
         } else {
           if (!this.toolIdList.contains(this.publicTools[i].tid)) {
-            tools.push(this.publicTools[i]);            
+            tools.push(this.publicTools[i]);
           } else {
             this.stepToolsShow.push(this.publicTools[i]);
           }
@@ -664,8 +664,11 @@ export default {
       // personal tools and toolsets
       tools = [];
       toolsets = [];
-      for (var i = this.personalTools.length -1 ; i >= 0; i--) {
-        if (this.personalTools[i].isToolset != undefined && this.personalTools[i].isToolset) {
+      for (var i = this.personalTools.length - 1; i >= 0; i--) {
+        if (
+          this.personalTools[i].isToolset != undefined &&
+          this.personalTools[i].isToolset
+        ) {
           if (!this.toolIdList.contains(this.personalTools[i].tid)) {
             toolsets.push(this.personalTools[i]);
           } else {
@@ -681,21 +684,6 @@ export default {
       }
       this.personalTools = tools;
       this.personalToolsets = toolsets;
-
-      // tools and toolsets in the current activity
-      tools = [];
-      toolsets = [];
-      for (var i = 0; i < this.toolList.length; i++) {
-        if (this.toolList[i].isToolset) {
-          if (this.toolIdList.contains(this.toolList[i].tid)) {
-            toolsets.push(this.toolList[i]);
-          }
-        } else {
-          if (this.toolIdList.contains(this.toolList[i].tid)) {
-            tools.push(this.toolList[i]);
-          }
-        }
-      }
     },
     filterShowListByType() {
       this.publicToolsetsShow = this.getFilterResult(this.publicToolsets);
@@ -823,8 +811,10 @@ export default {
       // add
       for (var i = 0; i < this.stepToolsetsShow.length; i++) {
         if (!this.toolIdList.contains(this.stepToolsetsShow[i].tid)) {
+
           this.operationApi.toolOperationRecord(
             this.activityInfo.aid,
+            "",
             "",
             "add",
             this.userInfo.userId,
@@ -834,8 +824,10 @@ export default {
       }
       for (var i = 0; i < this.stepToolsShow.length; i++) {
         if (!this.toolIdList.contains(this.stepToolsShow[i].tid)) {
+
           this.operationApi.toolOperationRecord(
             this.activityInfo.aid,
+            "",
             "",
             "add",
             this.userInfo.userId,
@@ -845,16 +837,8 @@ export default {
       }
       // remove
       for (var i = 0; i < this.toolIdList.length; i++) {
-        if (!this.stepToolsetsShow.contains(this.toolIdList[i])) {
-          this.operationApi.toolOperationRecord(
-            this.activityInfo.aid,
-            "",
-            "remove",
-            this.userInfo.userId,
-            { tid: this.toolIdList[i] }
-          );
-        }
-        if (!this.stepToolsShow.contains(this.toolIdList[i])) {
+        if (!this.stepToolsetsShow.contains(this.toolIdList[i]) && !this.stepToolsShow.contains(this.toolIdList[i])) {
+
           this.operationApi.toolOperationRecord(
             this.activityInfo.aid,
             "",

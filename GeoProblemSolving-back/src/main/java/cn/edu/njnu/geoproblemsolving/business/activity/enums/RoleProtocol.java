@@ -1,4 +1,4 @@
-package cn.edu.njnu.geoproblemsolving.business.user.enums;
+package cn.edu.njnu.geoproblemsolving.business.activity.enums;
 
 import lombok.Getter;
 
@@ -8,6 +8,7 @@ import lombok.Getter;
  */
 @Getter
 public enum RoleProtocol {
-    SameRoles,
-    CustomRoles
+    None,
+    All,
+    Constraints,
 }

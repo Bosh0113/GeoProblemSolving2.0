@@ -1,4 +1,7 @@
 <style scoped>
+.link-protocol >>> .ivu-modal-body {
+  padding: 0 16px 16px 16px;
+}
 .btnHoverGray:hover {
   background-color: #808695;
   color: white;
@@ -9,6 +12,42 @@
   background-color: #f8f8f9;
   height: calc(100vh - 200px);
   width: calc(100vw - 400px);
+}
+.domain >>> .ti-input {
+  display: inline-block;
+  width: 655px;
+  height: 32px;
+  line-height: 1.5;
+  padding: 4px 7px;
+  font-size: 12px;
+  border: 1px solid #dcdee2;
+  border-radius: 4px;
+  color: #515a6e;
+  background-color: #fff;
+  background-image: none;
+  position: relative;
+  cursor: text;
+}
+.domain >>> input {
+  opacity: 0.5;
+}
+.res-protocol >>> .ti-input {
+  display: inline-block;
+  width: 267px;
+  height: 32px;
+  line-height: 1.5;
+  padding: 4px 7px;
+  font-size: 12px;
+  border: 1px solid #dcdee2;
+  border-radius: 4px;
+  color: #515a6e;
+  background-color: #fff;
+  background-image: none;
+  position: relative;
+  cursor: text;
+}
+.res-protocol >>> input {
+  opacity: 0.5;
 }
 </style>
 <template>
@@ -79,40 +118,53 @@
                 >Unlink</Button
               >
               <!--link-->
-              <Button
-                v-show="linkStep == 0"
-                type="info"
-                size="small"
-                @click="linkActivities()"
-                icon="md-link"
-                title="Start to link"
-                style="float: right; margin-left: 10px"
-                id="linkBegin"
-                >Start to link</Button
-              >
-              <Button
-                v-if="linkBtn"
-                v-show="linkStep == 1"
-                type="success"
-                size="small"
-                @click="linkActivities()"
-                icon="md-link"
-                title="Complete linking"
-                style="float: right; margin-left: 10px"
-                id="linkEnd"
-                >Complete linking</Button
-              >
-              <Button
-                v-else
-                v-show="linkStep == 1"
-                type="default"
-                size="small"
-                icon="md-link"
-                title="Complete linking"
-                style="float: right; margin-left: 10px; cursor: default"
-                id="linkEnd"
-                >Complete linking</Button
-              >
+              <template v-if="childActivities.length > 1">
+                <Button
+                  v-show="linkStep == 0"
+                  type="info"
+                  size="small"
+                  @click="linkActivities()"
+                  icon="md-link"
+                  title="Start to link"
+                  style="float: right; margin-left: 10px"
+                  id="linkBegin"
+                  >Start to link</Button
+                >
+                <Button
+                  v-if="linkBtn"
+                  v-show="linkStep == 1"
+                  type="success"
+                  size="small"
+                  @click="linkActivities()"
+                  icon="md-link"
+                  title="Complete linking"
+                  style="float: right; margin-left: 10px"
+                  id="linkEnd"
+                  >Complete linking</Button
+                >
+                <Button
+                  v-else
+                  v-show="linkStep == 1"
+                  type="default"
+                  size="small"
+                  icon="md-link"
+                  title="Complete linking"
+                  style="float: right; margin-left: 10px; cursor: default"
+                  id="linkEnd"
+                  >Complete linking</Button
+                >
+              </template>
+              <template v-else>
+                <Button
+                  type="default"
+                  size="small"
+                  icon="md-link"
+                  title="Start to link"
+                  style="float: right; margin-left: 10px; cursor: default"
+                  id="linkBegin"
+                  >Start to link</Button
+                >
+              </template>
             </template>
           </div>
           <div id="steps"></div>
@@ -142,13 +194,184 @@
         >
       </div>
     </Modal>
+    <Modal
+      class="link-protocol"
+      v-model="linkBuildModal"
+      title="Set link protocol"
+      width="800"
+      :styles="{ top: '30px' }"
+      @on-ok="buildLink"
+      @on-cancel="cancelLink"
+      ok-text="Link"
+      cancel-text="Cancel"
+    >
+      <Divider orientation="left">Acitivity link</Divider>
+      <div
+        v-if="selectedActivities != undefined && selectedActivities.length > 1"
+        style="margin: 0 20px"
+      >
+        <span style="margin-right: 60px">
+          <label>Start activity: </label>
+          <RadioGroup v-model="beginNode.name" @on-change="activityChange">
+            <Radio :label="selectedActivities[0].name"></Radio>
+            <Radio :label="selectedActivities[1].name"></Radio>
+          </RadioGroup>
+        </span>
+        <span>
+          <label>End activity: </label>
+          <RadioGroup v-model="endNode.name">
+            <Radio :label="selectedActivities[0].name" disabled></Radio>
+            <Radio :label="selectedActivities[1].name" disabled></Radio>
+          </RadioGroup>
+        </span>
+      </div>
+      <Divider orientation="left">Person link</Divider>
+      <div style="margin: 0 20px">
+        <div style="display: flex; margin-bottom: 15px">
+          <div style="margin-top: 5px; width: 150px">
+            Type of person protocol:
+          </div>
+          <Select
+            v-model="roleProtocol"
+            style="width: 200px"
+            placeholder="Select"
+          >
+            <Option value="None">None</Option>
+            <Option value="All">All</Option>
+            <Option value="Constraints">Constraints</Option>
+          </Select>
+        </div>
+        <template v-if="roleProtocol === 'Constraints'">
+          <div style="display: flex; margin-bottom: 15px">
+            <div style="margin-top: 5px; width: 80px">Role:</div>
+            <Select
+              v-model="linkRoles"
+              multiple
+              placeholder="Which roles of participants could join the next activity?"
+            >
+              <Option value="manager">Manager</Option>
+              <Divider style="margin: 5px 0"></Divider>
+              <Option value="core" disabled>Core team</Option>
+              <Option value="researcher">Researcher</Option>
+              <Option value="expert">Expert</Option>
+              <Option value="decision-maker">Decision-maker</Option>
+              <Option value="core-member">Core-member</Option>
+              <Divider style="margin: 5px 0"></Divider>
+              <Option value="ordinary" disabled>Ordinary team</Option>
+              <Option value="stakeholder">Stakeholder</Option>
+              <Option value="consultant">Consultant</Option>
+              <Option value="ordinary-member">Ordinary-member</Option>
+            </Select>
+          </div>
+          <div style="display: flex">
+            <div style="margin-top: 5px; width: 72px">Domains:</div>
+            <vue-tags-input
+              class="domain"
+              v-model="domain_tag"
+              :tags="linkDomains"
+              @tags-changed="(newTags) => (linkDomains = newTags)"
+            />
+          </div>
+        </template>
+      </div>
+      <Divider orientation="left">Resource link</Divider>
+      <div style="margin: 0 20px">
+        <div style="display: flex; margin-bottom: 15px">
+          <div style="width: 150px">Update automatically:</div>
+          <i-switch v-model="autoUpdate" />
+        </div>
+        <div style="display: flex; margin-bottom: 15px">
+          <div style="margin-top: 5px; width: 150px">
+            Type of resource protocol:
+          </div>
+          <Select
+            v-model="resProtocol"
+            style="width: 200px"
+            placeholder="Select"
+          >
+            <Option value="None">None</Option>
+            <Option value="All">All</Option>
+            <Option value="Constraints">Constraints</Option>
+          </Select>
+        </div>
+        <template v-if="resProtocol === 'Constraints'">
+          <div style="display: flex; margin-bottom: 15px">
+            <div style="margin-top: 5px; width: 72px">Types:</div>
+            <Select
+              v-model="resProtocolForm.types"
+              multiple
+              placeholder="Type of resources"
+              style="width: 267px"
+            >
+              <Option value="data">Data</Option>
+              <Option value="paper">Papers</Option>
+              <Option value="document">Documents</Option>
+              <Option value="model">Models</Option>
+              <Option value="image">Images</Option>
+              <Option value="video">Videos</Option>
+              <Option value="variable">Variables</Option>
+              <Option value="others">Others</Option>
+            </Select>
+            <div style="margin-top: 5px; margin-left: 50px; width: 72px">
+              Formats:
+            </div>
+            <vue-tags-input
+              class="res-protocol"
+              v-model="formats_tag"
+              :tags="resProtocolForm.formats"
+              @tags-changed="(newTags) => (resProtocolForm.formats = newTags)"
+            />
+          </div>
+          <div style="display: flex; margin-bottom: 15px">
+            <div style="margin-top: 5px; width: 72px">Scales:</div>
+            <vue-tags-input
+              class="res-protocol"
+              v-model="scales_tag"
+              :tags="resProtocolForm.scales"
+              @tags-changed="(newTags) => (resProtocolForm.scales = newTags)"
+            />
+            <div style="margin-top: 5px; margin-left: 50px; width: 72px">
+              References:
+            </div>
+            <vue-tags-input
+              class="res-protocol"
+              v-model="references_tag"
+              :tags="resProtocolForm.references"
+              @tags-changed="
+                (newTags) => (resProtocolForm.references = newTags)
+              "
+            />
+          </div>
+          <div style="display: flex; margin-bottom: 15px">
+            <div style="margin-top: 5px; width: 72px">Units:</div>
+            <vue-tags-input
+              class="res-protocol"
+              v-model="units_tag"
+              :tags="resProtocolForm.units"
+              @tags-changed="(newTags) => (resProtocolForm.units = newTags)"
+            />
+            <div style="margin-top: 5px; margin-left: 50px; width: 72px">
+              Concepts:
+            </div>
+            <vue-tags-input
+              class="res-protocol"
+              v-model="concepts_tag"
+              :tags="resProtocolForm.concepts"
+              @tags-changed="(newTags) => (resProtocolForm.concepts = newTags)"
+            />
+          </div>
+        </template>
+      </div>
+    </Modal>
   </Row>
 </template>
 <script>
 // import "driver.js/dist/driver.min.css";
 import echarts from "echarts";
+import VueTagsInput from "@johmun/vue-tags-input";
 // import Driver from "driver.js";
 export default {
+  components: { VueTagsInput },
   props: ["activityInfo", "childActivities"],
   data() {
     return {
@@ -166,6 +389,29 @@ export default {
       linkStep: 0,
       beginNode: {},
       endNode: {},
+      linkBuildModal: false,
+
+      roleProtocol: "None",
+      linkRoles: [],
+      domain_tag: "",
+      linkDomains: [],
+
+      resProtocol: "None",
+      autoUpdate: false,
+      types_tag: "",
+      formats_tag: "",
+      scales_tag: "",
+      references_tag: "",
+      units_tag: "",
+      concepts_tag: "",
+      resProtocolForm: {
+        types: [],
+        formats: [],
+        scales: [],
+        references: [],
+        units: [],
+        concepts: [],
+      },
       // 添加/编辑step
       stepInfo: {
         aid: "",
@@ -242,7 +488,6 @@ export default {
     },
     updateStepchart() {
       // 重新渲染
-      this.selectedActivities = [];
       this.stepChart.dispose();
       this.stepChart = null;
       this.showSteps();
@@ -353,7 +598,6 @@ export default {
       this.updatePathway();
     },
     showSteps() {
-      this.selectedActivities = [];
       let option = {
         animationDurationUpdate: 500,
         animationEasingUpdate: "quinticInOut",
@@ -689,6 +933,7 @@ export default {
             }
           } else if (res.data.code == 0) {
             this.updateStepchart();
+            this.selectedActivities = [];
             // this.$Notice.info({
             //   desc: "Reshape pathway successfully!",
             // });
@@ -752,23 +997,53 @@ export default {
       } else if (this.linkStep == 1) {
         if (this.selectedActivities.length == 2) {
           // operation
-          this.beginNode = this.selectedActivities[0];
-          this.endNode = this.selectedActivities[1];
-          this.buildLink();
+          this.beginNode = Object.assign({}, this.selectedActivities[0]);
+          this.endNode = Object.assign({}, this.selectedActivities[1]);
+          this.linkBuildModal = true;
           // record and end
           this.linkStep = 0;
         } else {
           this.$Notice.info({
             desc: "Please select two nodes and restart to link activities!",
           });
-          // init
-          this.linkStep = 0;
-          this.showSteps();
-          this.selectedActivities = [];
         }
       }
     },
+    activityChange(name) {
+      if (this.selectedActivities[0].name === name) {
+        this.beginNode = Object.assign({}, this.selectedActivities[0]);
+        this.endNode = Object.assign({}, this.selectedActivities[1]);
+      } else if (this.selectedActivities[0].name !== name) {
+        this.beginNode = Object.assign({}, this.selectedActivities[1]);
+        this.endNode = Object.assign({}, this.selectedActivities[0]);
+      }
+    },
+    cancelLink() {
+      // 重新渲染
+      this.updateStepchart();
+      // clear
+      this.selectedActivities = [];
+      this.beginNode = {};
+      this.endNode = {};
+      this.clearProtocolSetting();
+    },
     buildLink() {
+      // normalize protocol
+      let protocol = {
+        resProtocol: this.resProtocol,
+        autoUpdate: this.autoUpdate,
+        types: this.resProtocolForm.types,
+        formats: this.filterTags(this.resProtocolForm.formats),
+        concepts: this.filterTags(this.resProtocolForm.concepts),
+        scales: this.filterTags(this.resProtocolForm.scales),
+        references: this.filterTags(this.resProtocolForm.references),
+        units: this.filterTags(this.resProtocolForm.units),
+
+        roleProtocol: this.roleProtocol,
+        roles: this.linkRoles,
+        domains: this.filterTags(this.linkDomains),
+      };
+
       // The next-activities have been selected
       // 前后继承关系
       let lastnode = {
@@ -793,16 +1068,69 @@ export default {
           }
         }
       }
-      // 重新渲染
-      this.updateStepchart();
-      // 更新pathway
-      this.newLinkStore(this.beginNode.aid, this.endNode.aid);
-      this.beginNode = {};
-      this.endNode = {};
+
+      // save protocol
+      this.axios
+        .post("/GeoProblemSolving/protocol", protocol)
+        .then((res) => {
+          if (res.data == "Offline") {
+            if (this.activityInfo.level == 1) {
+              this.$store.commit("userLogout");
+              this.$router.push({ name: "Login" });
+            } else {
+              parent.location.href = "/GeoProblemSolving/login";
+            }
+          } else if (res.data.code == 0) {
+            // 重新渲染
+            this.updateStepchart();
+            // 更新pathway
+            let protocolId = res.data.data.pid;
+            this.newLinkStore(this.beginNode.aid, this.endNode.aid, protocolId);
+            // clear
+            this.selectedActivities = [];
+            this.beginNode = {};
+            this.endNode = {};
+          } else {
+            this.$Message.error("Fail to link activities.");
+            console.log(res.data.msg);
+          }
+        })
+        .catch((err) => {
+          throw err;
+        });
     },
-    newLinkStore(begin, end) {
+    clearProtocolSetting() {
+      this.roleProtocol = "";
+      this.linkRoles = [];
+      this.domain_tag = "";
+      this.linkDomains = [];
+
+      this.resProtocol = "";
+      this.autoUpdate = false;
+      this.types_tag = "";
+      this.formats_tag = "";
+      this.scales_tag = "";
+      this.references_tag = "";
+      this.units_tag = "";
+      this.concepts_tag = "";
+      this.resProtocolForm = {
+        types: [],
+        formats: [],
+        scales: [],
+        references: [],
+        units: [],
+        concepts: [],
+      };
+    },
+    filterTags(tags) {
+      let newtags = [];
+      for (let i = 0; i < tags.length; i++) {
+        newtags.push(tags[i].text);
+      }
+      return newtags;
+    },
+    newLinkStore(begin, end, pid) {
       let updateurl = "";
-      let pid = "test"; // 待完善...
       if (this.activityInfo.level == 0) {
         updateurl =
           "/GeoProblemSolving/project/link/" +
@@ -846,7 +1174,15 @@ export default {
               parent.location.href = "/GeoProblemSolving/login";
             }
           } else if (res.data.code == 0) {
-            this.operationApi.processRecord(this.activityInfo.aid, "link", this.userInfo.userId, begin, end); 
+            this.operationApi.processRecord(
+              this.activityInfo.aid,
+              "",
+              "link",
+              this.userInfo.userId,
+              begin,
+              end,
+              pid
+            );
 
             this.$Notice.info({
               desc: "Link activities successfully!",
@@ -890,6 +1226,7 @@ export default {
       this.updateStepchart();
       // 更新pathway
       this.delLinkStore(this.beginNode.aid, this.endNode.aid);
+      this.selectedActivities = [];
       this.beginNode = {};
       this.endNode = {};
     },
@@ -921,7 +1258,15 @@ export default {
               parent.location.href = "/GeoProblemSolving/login";
             }
           } else if (res.data.code == 0) {
-            this.operationApi.processRecord(this.activityInfo.aid, "break", this.userInfo.userId, begin, end);
+            this.operationApi.processRecord(
+              this.activityInfo.aid,
+              "",
+              "break",
+              this.userInfo.userId,
+              begin,
+              end,
+              ""
+            );
             this.$Notice.info({
               desc: "Seperate activities successfully!",
             });

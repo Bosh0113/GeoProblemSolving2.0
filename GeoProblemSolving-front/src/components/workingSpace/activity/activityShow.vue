@@ -765,6 +765,7 @@ export default {
             .then((res) => {
               if (res.data.code == 0) {
                 this.operationApi.activityRecord(
+                  "",
                   "create",
                   this.userInfo.userId,
                   res.data.data
@@ -963,7 +964,8 @@ export default {
                 "invite",
                 user.userId,
                 user.name,
-                user.role
+                user.role,
+                user.domain
               );
               this.$Notice.info({ desc: "Invite member successfully" });
 
@@ -1033,7 +1035,8 @@ export default {
               "remove",
               member.userId,
               member.name,
-              member.role
+              member.role,
+              user.domain
             );
             let index = this.participants.indexOf(member);
             this.participants.splice(index, 1);
@@ -1108,7 +1111,8 @@ export default {
               "role",
               member.userId,
               member.name,
-              member.role
+              member.role,
+              user.domain
             );
             this.getParticipants();
 
@@ -1169,7 +1173,8 @@ export default {
               "remove",
               member.userId,
               "",
-              ""
+              "",
+              []
             );
 
             //notice

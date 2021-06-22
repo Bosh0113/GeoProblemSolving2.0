@@ -229,7 +229,9 @@ public class CollaborationService {
 
             JSONObject messageObject = JSONObject.parseObject(message);
             String messageType = messageObject.getString("type");
-            String sender = messageObject.getString("sender");
+
+            String user = messageObject.getString("sender");
+            CollaborationUser sender =  collaborationBehavior.getMemberInfo(user, null);
 
             List<String> receivers = null;
             try {
@@ -258,11 +260,11 @@ public class CollaborationService {
                 }
                 case "control-apply": {
                     List<String> applyQueue = collaborationConfig.getApplyQueue();
-                    if (applyQueue == null) applyQueue = new ArrayList<>();
-                    if (applyQueue.size() == 0) {
-                        collaborationConfig.setOperator(sender);
+                    if(applyQueue == null) applyQueue = new ArrayList<>();
+                    if(applyQueue.size() == 0) {
+                        collaborationConfig.setOperator(sender.getUserId());
                     }
-                    applyQueue.add(sender);
+                    applyQueue.add(sender.getUserId());
                     collaborationConfig.setApplyQueue(applyQueue);
                     groups.put(groupKey, collaborationConfig);
 
@@ -282,11 +284,11 @@ public class CollaborationService {
                         }
                         groups.put(groupKey, collaborationConfig);
 
-                        collaborationBehavior.sendControlInfo(collaborationConfig, applyQueue, ctrUser, messageType);
-                    } else if (collaborationConfig.getMode().equals(CollaborationMode.SemiFree_Occupy)) {
+                        collaborationBehavior.sendControlInfo(collaborationConfig, applyQueue, collaborationBehavior.getMemberInfo(ctrUser, null), messageType);
+                    } else if(collaborationConfig.getMode().equals(CollaborationMode.SemiFree_Occupy)){
                         collaborationConfig.setOperator("");
                         groups.put(groupKey, collaborationConfig);
-                        collaborationBehavior.sendControlInfo(collaborationConfig, new ArrayList<>(), "", messageType);
+                        collaborationBehavior.sendControlInfo(collaborationConfig, new ArrayList<>(), null, messageType);
                     }
                     break;
                 }
@@ -298,22 +300,22 @@ public class CollaborationService {
                     CollaborationMode mode = collaborationConfig.getMode();
                     if (mode.equals(CollaborationMode.SemiFree_Apply)) {
                         // 判断操作权限
-                        if (collaborationConfig.getOperator().equals(sender)) {
+                        if(collaborationConfig.getOperator().equals(sender.getUserId())){
                             collaborationBehavior.transferOperation(collaborationConfig.getParticipants(), messageType, sender, receivers, behavior, object);
                         } else {
-                            collaborationBehavior.operationRefuse(collaborationConfig.getParticipants(), messageType, sender);
+                            collaborationBehavior.operationRefuse(collaborationConfig.getParticipants(), messageType, sender.getUserId());
                         }
                     } else if (mode.equals(CollaborationMode.SemiFree_Occupy)) {
                         // 抢占操作权
-                        if (collaborationConfig.getOperator().equals("")) {
-                            collaborationConfig.setOperator(sender);
+                        if(collaborationConfig.getOperator().equals("")){
+                            collaborationConfig.setOperator(sender.getUserId());
                             groups.put(groupKey, collaborationConfig);
                         }
                         // 判断操作权限
-                        if (collaborationConfig.getOperator().equals(sender)) {
+                        if(collaborationConfig.getOperator().equals(sender.getUserId())){
                             collaborationBehavior.transferOperation(collaborationConfig.getParticipants(), messageType, sender, receivers, behavior, object);
                         } else {
-                            collaborationBehavior.operationRefuse(collaborationConfig.getParticipants(), messageType, sender);
+                            collaborationBehavior.operationRefuse(collaborationConfig.getParticipants(), messageType, sender.getUserId());
                         }
                     } else if (mode.equals(CollaborationMode.Free)) {
                         collaborationBehavior.transferOperation(collaborationConfig.getParticipants(), messageType, sender, receivers, behavior, object);

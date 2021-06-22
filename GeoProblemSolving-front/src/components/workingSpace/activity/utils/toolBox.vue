@@ -44,7 +44,10 @@
           style="margin-top: -10px"
         ></manage-tools>
       </div>
-      <vue-scroll :ops="ops" style="max-height: calc(100vh - 200px)">
+      <vue-scroll
+        :ops="ops"
+        style="max-height: calc(100vh - 200px); padding-top: 5px"
+      >
         <div
           v-if="toolList != undefined && toolList.length < 1"
           style="text-align: center"
@@ -123,7 +126,11 @@
             </div>
           </Card>
           <Card
-            style="padding-top: 5px; background-color: ghostwhite; margin-right: 5px"
+            style="
+              padding-top: 5px;
+              background-color: ghostwhite;
+              margin-right: 5px;
+            "
           >
             <div
               style="text-align: center; cursor: pointer"
@@ -238,6 +245,10 @@ export default {
       // openToolModal: false,
     };
   },
+  beforeDestroy() {
+    window.removeEventListener("message", this.toolMsgHandle, false);
+    window.removeEventListener("message", getActivityInfo, false);
+  },
   created() {
     this.roleIdentity();
   },
@@ -320,17 +331,6 @@ export default {
     openTool() {
       var toolInfo = this.selectedTool;
       // this.openToolModal = false;
-      console.log("userInfo", this.userInfo)
-      // record
-      let toolRecords = {
-        type: "tools",
-        time: new Date().Format("yyyy-MM-dd HH:mm:ss"),
-        who: this.userInfo.name,
-        content: "used a tool",
-        toolType: toolInfo.toolName,
-      };
-      console.log("toolRecords", toolRecords)
-      this.$emit("toolBehavior", toolRecords);
 
       if (toolInfo.scope == "outer") {
         this.openToolNewpage(toolInfo);
@@ -341,26 +341,16 @@ export default {
       }
     },
     openToolByPanel(toolInfo) {
-      // var toolURL = window.location.origin + `${toolInfo.toolUrl}`;
-      // var toolURL = toolInfo.toolUrl;
-      // var toolContent = `<iframe src="${toolURL}?userName=${this.userInfo.name}&userID=${this.userInfo.userId}&groupID=${this.activityInfo.aid}" style="width: 100%; height:100%;" frameborder="0"></iframe>`;
-
       //判断tool的类型，三种 modelItem（模型容器提供计算能力）, dataMethod(数据容器提供计算能力), webTool(自行开发，如mapTool)
-      let routerUrl = "/computeModel";
-      if (toolInfo.backendType == "webTool"){
+      let routerUrl = toolInfo.toolUrl;
+      if (toolInfo.backendType == "webTool") {
         routerUrl = toolInfo.toolUrl;
-      }else if (toolInfo.backendType == "modelItem"){
+      } else if (toolInfo.backendType == "modelItem") {
         routerUrl = "/computeModel";
-      }else if (toolInfo.backendType == "dataMethod"){
+      } else if (toolInfo.backendType == "dataMethod") {
         routerUrl = "/dataMethod";
       }
-      // else if (toolInfo.backendType == "modelItem"){
-      //   routerUrl = "/modelItem";
-      // }else if (toolInfo.backendType == "dataMethod"){
-      //   routerUrl = "/dataMethod"
-      // }
-      // var toolContent = `<iframe src="${toolInfo.toolUrl}" id="${toolInfo.tid}" style="width: 100%; height:100%;" frameborder="0"></iframe>`;
-      console.log("routerUrl", routerUrl)
+
       var toolContent = `<iframe src="${routerUrl}" id="${toolInfo.tid}" style="width: 100%; height:100%;" frameborder="0"></iframe>`;
 
       var panel = jsPanel.create({
@@ -371,19 +361,20 @@ export default {
         headerTitle: toolInfo.toolName,
         content: toolContent,
         container: "div#drawflow",
-        data: { user: this.userInfo, aid: this.activityInfo.aid, taskId: "" },
         dragit: {
           containment: 5,
         },
         closeOnEscape: true,
         disableOnMaximized: true,
-        onbeforeclose: function () {
-            if (this.operationStore) {
-              return true;
-            } else {
-              return confirm("This operation has not been bind to the task. Close panel immediately?");
-            }
+        onbeforeclose: () => {
+          if (this.operationStore) {
+            return true;
+          } else {
+            return confirm(
+              "Operations has not been bind to tasks. Close panel immediately?"
+            );
           }
+        },
       });
       $(".jsPanel-content").css("font-size", "0");
       this.panelList.push(panel);
@@ -393,17 +384,101 @@ export default {
       window.addEventListener("message", this.toolMsgHandle, false);
       let activity = this.activityInfo;
       let userInfo = this.userInfo;
+      let taskList = this.operationApi.getTaskList();
       let iFrame = document.getElementById(toolInfo.tid);
       //iframe加载完毕后再发送消息，否则子页面接收不到message
       iFrame.onload = function () {
-          //iframe加载完立即发送一条消息
-          iFrame.contentWindow.postMessage({"user": userInfo, "activity": activity, "tid":toolInfo.tid, type:"activity"}, "*");
-      }
-
+        //iframe加载完立即发送一条消息
+        iFrame.contentWindow.postMessage(
+          {
+            user: userInfo,
+            activity: activity,
+            tasks: taskList,
+            tid: toolInfo.tid,
+            type: "activity",
+          },
+          "*"
+        );
+      };
     },
-    toolMsgHandle(event){
-      console.log(event);
-      this.operationStore = true;
+
+    toolMsgHandle(event) {
+      if (event.data.type === "task") {
+        let operations = event.data.operations;
+        let behavior = event.data.behavior;
+        for (let i = 0; i < operations.length; i++) {
+          let operationType = operations[i].type;
+          switch (operationType) {
+            case "resource": {
+              if (behavior === "record") {
+                this.operationApi.resOperationRecord(
+                  this.activityInfo.aid,
+                  operations[i].id,
+                  event.data.task,
+                  behavior,
+                  this.userInfo.userId,
+                  operations[i].content
+                );
+                this.$store.commit("updateTempOperations", {
+                  behavior: "add",
+                  operation: operations[i],
+                });
+              } else if (behavior === "bind") {
+                this.operationApi.bindTempOperation2Task(
+                  this.activityInfo.aid,
+                  operations[i].id,
+                  event.data.task
+                );
+                this.$store.commit("updateTempOperations", {
+                  behavior: "remove",
+                  operation: operations[i],
+                });
+              }
+              break;
+            }
+            case "communication": {
+              break;
+            }
+            case "geo-analysis": {
+              if (behavior === "record") {
+                this.operationApi.analysisRecord(
+                  this.activityInfo.aid,
+                  operations[i].id,
+                  event.data.task,
+                  this.userInfo.userId,
+                  operations[i].toolId,
+                  operations[i].purpose,
+                  operations[i].inputs,
+                  operations[i].outputs,
+                  operations[i].params,
+                  operations[i].participants
+                );
+              } else if (behavior === "bind") {
+                this.operationApi.bindTempOperation2Task(
+                  this.activityInfo.aid,
+                  operations[i].id,
+                  event.data.task
+                );
+              }
+              break;
+            }
+          }
+
+          if (behavior === "record") {
+            this.$store.commit("updateTempOperations", {
+              behavior: "add",
+              task: operations[i],
+            });
+          } else if (behavior === "bind") {
+            this.$store.commit("updateTempOperations", {
+              behavior: "remove",
+              task: operations[i],
+            });
+          }
+        }
+
+        this.operationStore = true;
+      }
     },
     openToolNewpage(toolInfo) {
       // this.openToolModal = false;

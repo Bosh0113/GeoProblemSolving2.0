@@ -4,12 +4,63 @@
     <div id="background2"></div>
     <div id="backmask"></div>
     <div id="drawflow"></div>
+    <Button
+      class="flow-btn"
+      style="top: 100px"
+      icon="ios-link"
+      @click="linkTask"
+      >Link tasks</Button
+    >
+    <Button
+      class="flow-btn"
+      style="top: 150px"
+      icon="ios-link-outline"
+      @click="unlinkTask"
+      >Remove links</Button
+    >
+    <Button class="flow-btn" style="top: 200px" icon="md-add" @click="zoomin"
+      >Zoom in</Button
+    >
+    <Button
+      class="flow-btn"
+      style="top: 250px"
+      icon="md-remove"
+      @click="zoomout"
+      >Zoom out</Button
+    >
+    <Modal
+      v-model="operationModal"
+      title="Bind operation to tasks"
+      @on-ok="operationBind"
+      ok-text="Bind to task"
+      cancel-text="Cancel"
+    >
+      <div>
+        <Label>Bind the operation to the task: </Label>
+        <Select v-model="selectedTask" style="width: 200px">
+          <Option
+            v-for="item in taskList"
+            :value="item.taskId"
+            :key="item.taskId"
+            >{{ item.name }}</Option
+          >
+        </Select>
+      </div>
+      <Divider></Divider>
+      <div>
+        <Button type="warning" @click="operationRemove"
+          >Remove this temporary operation</Button
+        >
+      </div>
+    </Modal>
   </div>
 </template>
 <script>
 import Vue from "vue";
 import TaskNode from "./taskNode";
+import OperationNode from "./operationNode";
 export default {
+  props: ["activityInfo"],
   components: {},
   data() {
     return {
@@ -24,40 +75,28 @@ export default {
       taskList: [],
       relaions: [],
       operations: [],
+      // task link
+      taskLinkBtn: false,
+      taskUnlinkBtn: false,
+      // temp operation
+      operationModal: false,
+      selectedTask: "",
+      slctOperationState: false,
+      selcetedOid: "",
+      selcetedOperation: {},
     };
   },
-  computed: {
-    tempOperations() {
-      return this.$store.state.tempOperations;
-    },
-    activityTasks() {
-      return this.$store.state.activityTasks;
-    },
-    taskDependencies() {
-      return this.$store.state.taskDependencies;
-    },
-  },
-  watch: {
-    tempOperations() {
-      this.loadOperationNode();
-    },
-    activityTasks() {
-      this.generateTaskNode();
-      this.addConnections();
-    },
-    taskDependencies() {
-      this.addConnections();
-    },
-  },
+  computed: {},
+  watch: {},
   mounted() {
     this.taskList = this.operationApi.getTaskList();
-    this.$store.commit("setActivityTasks", this.taskList);
+    // this.$store.commit("setActivityTasks", this.taskList);
 
     this.relaions = this.operationApi.getTaksDependencies();
-    this.$store.commit("setTaskDependencies", this.relaions);
+    // this.$store.commit("setTaskDependencies", this.relaions);
 
     this.operations = this.operationApi.getTempOperations();
-    this.$store.commit("setTempOperations", this.operations);
+    // this.$store.commit("setTempOperations", this.operations);
 
     const id = document.getElementById("drawflow");
     this.editor = new Drawflow(id, Vue);
@@ -69,58 +108,54 @@ export default {
       this.editor.start();
 
       this.generateTaskNode();
-      this.addConnections();
       this.loadOperationNode();
+      this.addConnections();
 
-      // will be deleted
+      let _this = this;
+      // save connection
+      this.editor.on("connectionCreated", (connection) => {
+        if (_this.taskLinkBtn) {
+          let fromTaskId = _this.editor.getNodeFromId(
+            connection.output_id
+          ).name;
+          let toTaskId = _this.editor.getNodeFromId(connection.input_id).name;
 
-      // let props = {
-      //   type: "operation",
-      //   taskId: 1,
-      //   name: "test1",
-      //   operations: [],
-      // };
-      // let data = {};
-      // this.editor.registerNode("TaskNode", TaskNode, props, {});
-      // this.editor.addNode(
-      //   "OperationId",
-      //   0,
-      //   0,
-      //   50,
-      //   15,
-      //   "operation-node",
-      //   data,
-      //   "TaskNode",
-      //   "vue"
-      // );
+          _this.operationApi.taskDependencyRecord(
+            _this.activityInfo.aid,
+            "link",
+            fromTaskId,
+            toTaskId
+          );
+        }
+      });
+      // save connection remove
+      this.editor.on("connectionRemoved", (connection) => {
+        if (_this.taskUnlinkBtn) {
+          if (confirm("Are you sure to remove this connection?")) {
+            let fromTaskId = _this.editor.getNodeFromId(
+              connection.output_id
+            ).name;
+            let toTaskId = _this.editor.getNodeFromId(connection.input_id).name;
 
-      // props = { type: "task", taskId: 2, name: "test2" };
-      // this.editor.registerNode("TaskNode", TaskNode, props, {});
-      // this.editor.addNode("Name2", 0, 1, 600, 150, "Class", data, "TaskNode", "vue");
-
-      // props = { type: "task", taskId: 3, name: "test3" };
-      // this.editor.registerNode("TaskNode", TaskNode, props, {});
-      // this.editor.addNode("Name3", 0, 1, 600, 150, "Class", data, "TaskNode", "vue");
-
-      // props = { type: "task", taskId: 4, name: "test4" };
-      // this.editor.registerNode("TaskNode", TaskNode, props, {});
-      // this.editor.addNode("Name4", 1, 1, 600, 150, "Class", data, "TaskNode", "vue");
-
-      // props = { type: "task", taskId: 5, name: "test5" };
-      // this.editor.registerNode("TaskNode", TaskNode, props, {});
-      // this.editor.addNode("Name5", 1, 1, 600, 150, "Class", data, "TaskNode", "vue");
-
-      // props = { type: "task", taskId: 6, name: "test6" };
-      // this.editor.registerNode("TaskNode", TaskNode, props, {});
-      // this.editor.addNode("Name6", 1, 1, 600, 150, "Class", data, "TaskNode", "vue");
-
-      // props = { type: "task", taskId: 7, name: "test7" };
-      // this.editor.registerNode("TaskNode", TaskNode, props, {});
-      // this.editor.addNode("Name7", 1, 0, 600, 150, "Class", data, "TaskNode", "vue");
-
-      // this.editor.addNodeInput(3);
-      // this.editor.addNodeOutput(2);
-      // this.editor.addConnection(2, 3, 'output_1', 'input_1')
+            _this.operationApi.taskDependencyRecord(
+              _this.activityInfo.aid,
+              "break",
+              fromTaskId,
+              toTaskId
+            );
+          }
+        }
+      });
+      // save connection remove
+      this.editor.on("nodeSelected", (id) => {
+        let oid = _this.editor.getNodeFromId(id).name;
+        let result = _this.operationApi.getOperationInfo(oid);
+        if (result != null) {
+          _this.slctOperationState = true;
+          _this.selcetedOid = oid;
+          _this.selcetedOperation = result;
+        }
+      });
     },
     generateTaskNode() {
       let todo = 0,
@@ -137,22 +172,21 @@ export default {
         let startTime = new Date(time[0]);
         let endTime = new Date(time[1]);
         let today = new Date();
-        if (endTime > startTime && today > endTime) {
+        if (today > endTime && today > startTime) {
           pos_x = 50;
           pos_y = 110 + done * 130;
           done++;
-        } else if (endTime > startTime && startTime > today) {
+        } else if (endTime > today && today > startTime) {
           pos_x = 450;
           pos_y = 110 + todo * 130;
           todo++;
-        } else if (endTime > today && today > startTime) {
+        } else if (endTime > today && startTime > today) {
           pos_x = 850;
           pos_y = 110 + doing * 130;
           doing++;
         }
         // add node
         let props = {
-          type: "task",
           taskId: nodeId,
           name: nodeName,
           operations: this.taskList[i].operations,
@@ -192,21 +226,32 @@ export default {
         this.editor.addConnection(fromId, toId, "output_1", "input_1");
       }
     },
+    addInputOutput() {
+      for (var i = 0; i < this.taskList.length; i++) {
+        let id = this.editor.getNodesFromName(this.taskList[i].taskId)[0];
+        let node = this.editor.getNodeFromId(id);
+        if (JSON.stringify(node.outputs) === "{}") {
+          this.editor.addNodeOutput(id);
+        }
+        if (JSON.stringify(node.inputs) === "{}") {
+          this.editor.addNodeInput(id);
+        }
+      }
+    },
     loadOperationNode() {
       for (var i = 0; i < this.operations.length; i++) {
         // position
-        let pos_x = 50 + 270 * i;
+        let pos_x = 50 + 220 * i;
         let pos_y = 15;
 
         // generate node
         let props = {
-          type: "operation",
           taskId: "",
           name: "",
-          operations: [this.operations[i]],
+          operation: this.operations[i],
         };
         let data = {};
-        this.editor.registerNode("TaskNode", TaskNode, props, {});
+        this.editor.registerNode("OperationNode", OperationNode, props, {});
         this.editor.addNode(
           this.operations[i].id,
           0,
@@ -215,10 +260,119 @@ export default {
           pos_y,
           "operation-node",
           data,
-          "TaskNode",
+          "OperationNode",
           "vue"
         );
+        let _this = this;
+        $(".operation-node").mouseup(function () {
+          if (_this.slctOperationState) {
+            _this.operationModal = true;
+            _this.slctOperationState = false;
+          }
+        });
       }
+    },
+    removeInputOutput() {
+      for (var i = 0; i < this.taskList.length; i++) {
+        let id = this.editor.getNodesFromName(this.taskList[i].taskId)[0];
+        let node = this.editor.getNodeFromId(id);
+        if (node.outputs.output_1.connections.length === 0) {
+          this.editor.removeNodeOutput(id, "output_1");
+        }
+        if (node.inputs.input_1.connections.length === 0) {
+          this.editor.removeNodeInput(id, "input_1");
+        }
+      }
+    },
+    clearAllNodes() {
+      for (var i = 0; i < this.taskList.length; i++) {
+        let nodeId = this.editor.getNodesFromName(this.taskList[i].taskId)[0];
+        this.editor.removeNodeId("node-" + nodeId);
+      }
+    },
+    clearAllConnections() {
+      for (var i = 0; i < this.relaions.length; i++) {
+        let fromId = this.editor.getNodesFromName(this.relaions[i].from)[0];
+        let toId = this.editor.getNodesFromName(this.relaions[i].to)[0];
+
+        //connection
+        this.editor.removeSingleConnection(fromId, toId, "output_1", "input_1");
+      }
+    },
+    clearAllOperations() {
+      for (var i = 0; i < this.operations.length; i++) {
+        let nodeId = this.editor.getNodesFromName(this.operations[i].id)[0];
+        this.editor.removeNodeId("node-" + nodeId);
+      }
+    },
+    updateActivityTasks() {
+      this.taskList = this.operationApi.getTaskList();
+
+      this.clearAllConnections();
+      this.clearAllNodes();
+      this.generateTaskNode();
+    },
+    updateTaskDependencies() {
+      this.relaions = this.operationApi.getTaksDependencies();
+      
+      this.addConnections();
+    },
+    updateTempOperations() {
+      this.operations = this.operationApi.getTempOperations();
+      
+      this.clearAllOperations();
+      this.loadOperationNode();
+    },
+    linkTask() {
+      if (!this.taskLinkBtn) {
+        this.addInputOutput();
+
+        this.taskLinkBtn = true;
+      } else {
+        this.removeInputOutput();
+
+        this.taskLinkBtn = false;
+      }
+    },
+    unlinkTask() {
+      if (!this.taskUnlinkBtn) {
+        $(".drawflow .connection .main-path").css("stroke", "red");
+        this.taskUnlinkBtn = true;
+      } else {
+        $(".drawflow .connection .main-path").css("stroke", "#4682b4");
+        this.taskUnlinkBtn = false;
+      }
+    },
+    zoomin() {
+      this.editor.zoom_in();
+    },
+    zoomout() {
+      this.editor.zoom_out();
+    },
+    operationBind() {
+      this.operationModal = false;
+      this.operationApi.bindTempOperation2Task(
+        this.activityInfo.aid,
+        this.selcetedOid,
+        this.selectedTask
+      );
+      this.$store.commit("updateTempOperations", {
+        behavior: "remove",
+        operation: this.selcetedOperation,
+      });
+      this.updateTempOperations();
+    },
+    operationRemove() {
+      this.operationModal = false;
+      this.operationApi.deleteOperation(
+        this.activityInfo.aid,
+        this.selcetedOid
+      );
+      this.$store.commit("updateTempOperations", {
+        behavior: "remove",
+        operation: this.selcetedOperation,
+      });
+      this.updateTempOperations();
     },
   },
 };
@@ -258,6 +412,15 @@ export default {
   background: var(--dfBackgroundColor);
   background-size: var(--dfBackgroundSize) var(--dfBackgroundSize);
   background-image: var(--dfBackgroundImage);
+}
+.flow-btn {
+  position: absolute;
+  right: 10px;
+  background-color: #555555;
+  color: white;
+  z-index: 5;
+  padding: 5px;
+  width: 110px;
 }
 </style>
 <style>
@@ -315,7 +478,7 @@ export default {
   --dfInputHoverBorderColor: rgba(78, 169, 255, 1);
   --dfInputHoverBorderRadius: 50px;
 
-  --dfOutputBackgroundColor: #ffffff;
+  --dfOutputBackgroundColor: #999999;
   --dfOutputBorderSize: 2px;
   --dfOutputBorderColor: #000000;
   --dfOutputBorderRadius: 50px;
@@ -387,6 +550,10 @@ export default {
   box-shadow: var(--dfNodeBoxShadowHL) var(--dfNodeBoxShadowVL)
     var(--dfNodeBoxShadowBR) var(--dfNodeBoxShadowS) var(--dfNodeBoxShadowColor);
   padding: 0px;
+}
+
+.operation-node {
+  width: 200px !important;
 }
 
 .drawflow .drawflow-node:hover {

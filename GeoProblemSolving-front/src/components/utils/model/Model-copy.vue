@@ -504,7 +504,7 @@
         // );
         // let invokeResultId = data;
         // aid, serviceId, serviceLocation, computeModel, userName, inputs, outputs, callback
-        sendModelOperation(
+        CollabSocket.sendModelOperation(
           this.aid,
           this.invokeInfo.serviceId,
           this.invokeInfo.serviceIp,

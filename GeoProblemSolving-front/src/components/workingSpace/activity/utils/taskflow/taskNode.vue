@@ -1,43 +1,11 @@
 <template>
   <div class="card-devices">
-    <div class="drawflow-node-title" v-if="type == 'operation'">
-      <div class="content" v-if="temOperation.type === 'communication'">        
-          <!-- <span class="behavior">Communication</span>          
-          <div class="participant">
-            <span style="margin-right: 5px">People: </span>
-            <avatar
-              v-for="person in temOperation.operators"
-              :key="person.id"
-              class="person"
-              :username="person.name"
-              :size="16"
-              :rounded="true"
-              :title="person.name"
-            />
-          </div> -->
-      </div>
-      <div class="content" v-else-if="temOperation.type === 'geo-analysis'">
-          <!-- <span class="behavior">Geo-analysis by using the {{temOperation.tool.name}} tool</span>          
-          <div class="participant">
-            <span style="margin-right: 5px">People: </span>
-            <avatar
-              v-for="person in temOperation.operators"
-              :key="person.id"
-              class="person"
-              :username="person.name"
-              :size="16"
-              :rounded="true"
-              :title="person.name"
-            />
-          </div> -->
-      </div>
-    </div>
-    <div class="drawflow-node-title" v-if="type == 'task'">
+    <div class="drawflow-node-title">
       <h3>{{ name }}</h3>
     </div>
     <div class="drawflow-node-body">
       <div
-        v-if="type == 'task' && !unfold"
+        v-if="!unfold"
         @click="operationShow"
         style="
           cursor: pointer;
@@ -48,7 +16,7 @@
       >
         See more <Icon type="md-more" size="20" />
       </div>
-      <div v-else-if="type == 'task' && unfold" style="cursor: default">
+      <div v-else-if="unfold" style="cursor: default">
         <Timeline style="padding: 10px; height: 350px">
           <vue-scroll :ops="scrollOps">
             <TimelineItem v-for="record in operationRecords" :key="record.id">
@@ -56,7 +24,7 @@
               <div class="content" v-if="record.type === 'resource'">
                 Resource operation:
                 <span class="behavior">{{ record.behavior }}</span>
-                <div>
+                <div @click="checkRes(record.resource)" style="cursor: pointer">
                   <img
                     :src="dataUrl"
                     height="42px"
@@ -352,8 +320,30 @@
           Hide <Icon type="ios-arrow-up" size="20" style="margin-top: -2px" />
         </div>
       </div>
-      <div v-else-if="type == 'operation'" style="padding: 10px"></div>
     </div>
+    <Modal
+      v-model="checkDataModal"
+      title="Data information"
+      width="600"
+      footer-hide
+    >
+      <div style>
+        <div class="dataInfo">
+          <Label class="dataLabel">Name:</Label>
+          <span class="dataText">{{
+            selectData.name
+          }}</span>
+        </div>
+        <div class="dataInfo">
+          <Label class="dataLabel">Type:</Label>
+          <span class="dataContent">{{ selectData.type }}</span>
+        </div>
+        <div class="dataInfo">
+          <Label class="dataLabel">Description:</Label>
+          <span class="dataText">{{ selectData.description }}</span>
+        </div>
+      </div>
+    </Modal>
   </div>
 </template>
 <script>
@@ -362,7 +352,7 @@ export default {
   components: {
     Avatar,
   },
-  props: ["type", "taskId", "name", "operations"],
+  props: ["taskId", "name", "operations"],
   data() {
     return {
       scrollOps: {
@@ -383,103 +373,86 @@ export default {
       otherUrl: require("@/assets/images/otherfile.png"),
       // 工具avatar 图片路径
       toolUrl: require("@/assets/images/toolbox.png"),
-      chatUrl: require("@/assets/images/chat.png"),
+      chatUrl: require("@/assets/images/chat.png"),      
+      checkDataModal: false,      
+      selectData: {},
     };
   },
-  mounted(){
-    if(this.type == 'operation'){
-      // this.operationInit();
-    }
+  mounted() {
   },
   methods: {
-    operationInit(){
-      let operation = operations[0];
-      if (operation.type === "communication") {
-          // participants
-          let participants = [];
-          for (var j = 0; j < operation.operators.length; j++) {
-            let personInfo = this.operationApi.getMemberInfo(
-              operation.operators[j]
-            );
-            participants.push(personInfo);
-          }
-          operation.operators = participants;
-        } else if (operation.type === "geo-analysis") {
-          // geo-analysis
-          let toolInfo = this.operationApi.getResInfo(operation.toolRef);
-          operation.tool = toolInfo;
-          // participants
-          let participants = [];
-          for (var j = 0; j < operation.operators.length; j++) {
-            let operatorInfo = this.operationApi.getMemberInfo(
-              operation.operators[j]
-            );
-            participants.push(operatorInfo);
-          }
-          operation.operators = participants;
-        }
-        this.temOperation = operation;
-    },
     operationShow() {
       this.unfold = true;
+      this.operationRecords = [];
+      
       for (var i = 0; i < this.operations.length; i++) {
         let operation = this.operationApi.getOperationInfo(this.operations[i]);
-        if (operation.type === "resource") {
-          // resource
-          let resInfo = this.operationApi.getResInfo(operation.resRef);
-          operation.resource = resInfo;
-          let operatorInfo = this.operationApi.getMemberInfo(
-            operation.operator
-          );
-          operation.operator = operatorInfo;
-        } else if (operation.type === "tool") {
-          // tool
-          let toolInfo = this.operationApi.getResInfo(operation.toolRef);
-          operation.tool = toolInfo;
-          let operatorInfo = this.operationApi.getMemberInfo(
-            operation.operator
-          );
-          operation.operator = operatorInfo;
-        } else if (operation.type === "communication") {
-          // communication
-          let toolInfo = this.operationApi.getResInfo(operation.toolRef);
-          operation.tool = toolInfo;
-          let resInfo = this.operationApi.getResInfo(operation.resRef);
-          operation.resource = resInfo;
-          // participants
-          let participants = [];
-          for (var j = 0; j < operation.operators.length; j++) {
-            let personInfo = this.operationApi.getMemberInfo(
-              operation.operators[j]
-            );
-            participants.push(personInfo);
-          }
-          operation.operators = participants;
-        } else if (operation.type === "geo-analysis") {
-          // geo-analysis
-          let toolInfo = this.operationApi.getResInfo(operation.toolRef);
-          operation.tool = toolInfo;
-          // participants
-          let participants = [];
-          for (var j = 0; j < operation.operators.length; j++) {
+        if (operation != undefined) {
+          if (operation.type === "resource") {
+            // resource
+            let resInfo = this.operationApi.getResInfo(operation.resRef);
+            operation.resource = resInfo;
             let operatorInfo = this.operationApi.getMemberInfo(
-              operation.operators[j]
+              operation.operator
             );
-            participants.push(operatorInfo);
-          }
-          operation.operators = participants;
-          // results
-          let results = [];
-          for (var j = 0; j < operation.resources.outputs.length; j++) {
-            let resInfo = this.operationApi.getResInfo(
-              operation.resources.outputs[j]
+            operation.operator = operatorInfo;
+          } else if (operation.type === "tool") {
+            // tool
+            let toolInfo = this.operationApi.getResInfo(operation.toolRef);
+            operation.tool = toolInfo;
+            let operatorInfo = this.operationApi.getMemberInfo(
+              operation.operator
             );
-            results.push(resInfo);
+            operation.operator = operatorInfo;
+          } else if (operation.type === "communication") {
+            // communication
+            let toolInfo = this.operationApi.getResInfo(operation.toolRef);
+            operation.tool = toolInfo;
+            let resInfo = this.operationApi.getResInfo(operation.resRef);
+            operation.resource = resInfo;
+            // participants
+            let participants = [];
+            for (var j = 0; j < operation.operators.length; j++) {
+              let personInfo = this.operationApi.getMemberInfo(
+                operation.operators[j]
+              );
+              participants.push(personInfo);
+            }
+            operation.operators = participants;
+          } else if (operation.type === "geo-analysis") {
+            // geo-analysis
+            let toolInfo = this.operationApi.getResInfo(operation.toolRef);
+            operation.tool = toolInfo;
+            // participants
+            let participants = [];
+            for (var j = 0; j < operation.operators.length; j++) {
+              let operatorInfo = this.operationApi.getMemberInfo(
+                operation.operators[j]
+              );
+              participants.push(operatorInfo);
+            }
+            operation.operators = participants;
+            // results
+            let results = [];
+            for (var j = 0; j < operation.resources.outputs.length; j++) {
+              let resInfo = this.operationApi.getResInfo(
+                operation.resources.outputs[j]
+              );
+              results.push(resInfo);
+            }
+            operation.resources.outputs = results;
           }
-          operation.resources.outputs = results;
+          this.operationRecords.push(operation);
         }
-        this.operationRecords.push(operation);
       }
+    },
+    checkRes(item) {
+      this.selectData = item;
+      this.checkDataModal = true;
+    },
+    dateFormat(date) {
+      let time = new Date(date);
+      return time.Format("yyyy-MM-dd HH:mm:ss");
     },
   },
 };
@@ -521,5 +494,27 @@ export default {
 .drawflow-node-body {
   font-size: 14px;
   color: #555555;
+}
+.dataInfo {
+  margin: 5px 0 5px 20px;
+}
+.dataLabel {
+  width: 90px;
+  display: inline-block;
+  font-size: 13px;
+  font-weight: bold;
+  vertical-align: top;
+  color: dodgerblue;
+}
+.dataContent {
+  width: 180px;
+  display: inline-block;
+  padding-left: 10px;
+}
+.dataText {
+  padding-left: 10px;
+  display: inline-block;
+  word-break: break-word;
+  width: 450px;
 }
 </style>
