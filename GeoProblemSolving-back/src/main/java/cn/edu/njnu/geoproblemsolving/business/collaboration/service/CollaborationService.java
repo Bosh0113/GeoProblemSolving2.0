@@ -479,6 +479,7 @@ public class CollaborationService {
                             resourceEntity.setType("data");
                             resourceEntity.setPrivacy("public");
                             resourceEntity.setActivityId(aid);
+                            resourceEntity.setFolder(false);
                             //已经将数据存入资源中心
                             ripDao.addResource(resourceEntity);
                         }
@@ -533,6 +534,7 @@ public class CollaborationService {
                                     outputEntity.setSuffix(suffix);
                                     outputEntity.setAddress(outputUrl);
                                     outputEntity.setActivityId(aid);
+                                    outputEntity.setFolder(false);
                                     ripDao.addResource(outputEntity);
                                 }
                             }

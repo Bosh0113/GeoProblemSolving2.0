@@ -836,12 +836,12 @@ function sendModelOperation(aid, serviceMd5, serviceIp, servicePort, inputs, out
     websocketSend(invokeForm);
   } else if (websock.readyState === websock.CONNECTING) {
     setTimeout(function () {
-      sendComputeOperation(aid, serviceId, serviceIp, servicePort, inputs, outputs, callback);
+      sendModelOperation(aid, serviceId, serviceIp, servicePort, inputs, outputs, callback);
     }, 1000)
   } else {
     //未开启，等待 1s
     setTimeout(function () {
-      sendComputeOperation(aid, serviceId, serviceIp, servicePort, inputs, outputs, callback);
+      sendModelOperation(aid, serviceId, serviceIp, servicePort, inputs, outputs, callback);
     }, 1000)
   }
 }

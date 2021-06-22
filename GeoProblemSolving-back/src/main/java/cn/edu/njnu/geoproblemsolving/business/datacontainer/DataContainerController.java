@@ -80,10 +80,14 @@ public class DataContainerController {
         return ResultUtils.success( dataIContainerService.getRemoteData(id,token));
     }
 
+
+
     @RequestMapping(value = "/invoke", method = RequestMethod.POST)
     public JsonResult invoke(@RequestBody JSONObject jsonObject) {
         return ResultUtils.success( dataIContainerService.invoke(jsonObject));
     }
+
+
 
     /*
     数据方法初始化接口

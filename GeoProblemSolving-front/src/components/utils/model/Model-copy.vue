@@ -248,7 +248,7 @@
 
 <script>
   import file from "./../dataTemplate/File";
-  import resourceList from "@/components/common/resource/resourceList";
+  import resourceList from "../../common/resource/resourceList-copy";
   import {get, del, post, put, patch} from "@/axios";
   import ResourceList from "../../common/resource/resourceList.vue";
 

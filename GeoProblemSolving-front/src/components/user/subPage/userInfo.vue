@@ -157,7 +157,7 @@
             <!--        vue-tags-input -->
           </FormItem>
 
-          <FormItem label="Subject Areas">
+          <FormItem label="Domain">
             <vue-tags-input
               class="organization"
               v-model="domains"
@@ -525,6 +525,6 @@
     position: absolute;
     left: 100px;
     text-align: left;
-    width: 200px
+    width: 500px
   }
 </style>

@@ -346,7 +346,6 @@ export default {
       // var toolContent = `<iframe src="${toolURL}?userName=${this.userInfo.name}&userID=${this.userInfo.userId}&groupID=${this.activityInfo.aid}" style="width: 100%; height:100%;" frameborder="0"></iframe>`;
 
       //判断tool的类型，三种 modelItem（模型容器提供计算能力）, dataMethod(数据容器提供计算能力), webTool(自行开发，如mapTool)
-      console.log("toolInfo", toolInfo)
       let routerUrl = "/computeModel";
       if (toolInfo.backendType == "webTool"){
         routerUrl = toolInfo.toolUrl;

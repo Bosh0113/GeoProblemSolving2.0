@@ -219,12 +219,12 @@ const routes = [
       require(["@/components/tools/entity/mapTool"], resolve)
   },
   //改动
-  {
-    path: "/computeTool",
-    name: "computeTool",
-    component: resolve =>
-      require(["@/components/tools/entity/computeTool"], resolve)
-  },
+  // {
+  //   path: "/computeTool",
+  //   name: "computeTool",
+  //   component: resolve =>
+  //     require(["@/components/tools/entity/computeTool"], resolve)
+  // },
   {
     path: "/computeModel",
     name: "computeModel",

@@ -266,7 +266,7 @@
 
 <script>
   import {get, post} from "@/axios";
-  import resourceList from "@/components/common/resource/resourceList";
+  import resourceList from "../../common/resource/resourceList-copy";
 
   export default {
     components: {
