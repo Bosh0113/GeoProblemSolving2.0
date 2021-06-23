@@ -82,21 +82,67 @@ export default {
       operationModal: false,
       selectedTask: "",
       slctOperationState: false,
+      slctNodeId: "",
       selcetedOid: "",
       selcetedOperation: {},
+      // task states
+      todo: 0,
+      doing: 0,
+      done: 0,
     };
   },
-  computed: {},
-  watch: {},
+  computed: {
+    activityTasks() {
+      return this.$store.state.activityTaskChange;
+    },
+    tempOperations() {
+      return this.$store.state.tempOperationChange;
+    },
+  },
+  watch: {
+    activityTasks(newVal, oldVal) {
+      if (newVal.length > 0) {
+
+        for (let i = 0; i < newVal.length; i++) {
+          let data = newVal[i];
+
+          if (data.behavior === "add") {
+            this.generateTaskNode(data.task);
+          } else if (data.behavior === "remove") {
+            this.removeTaskNode(data.task);
+          } else if (data.behavior === "update") {
+            this.removeTaskNode(data.task);
+            this.generateTaskNode(data.task);
+          }
+        }
+
+        this.$store.commit("clearActivityTasks");
+      }
+    },
+    tempOperations(newVal, oldVal) {
+      if (newVal.length > 0) {
+
+        for (let i = 0; i < newVal.length; i++) {
+          let data = newVal[i];
+
+          if (data.behavior === "add") {
+            this.loadOperationNode(data.operation);
+          } else if (data.behavior === "remove") {
+            this.removeOperationNode(data.operation);
+          } else if (data.behavior === "update") {
+            this.removeOperationNode(data.operation);
+            this.loadOperationNode(data.operation);
+          }
+        }
+
+        this.$store.commit("clearTempOperations");
+      }
+    },
+  },
   mounted() {
     this.taskList = this.operationApi.getTaskList();
-    // this.$store.commit("setActivityTasks", this.taskList);
-
     this.relaions = this.operationApi.getTaksDependencies();
-    // this.$store.commit("setTaskDependencies", this.relaions);
-
     this.operations = this.operationApi.getTempOperations();
-    // this.$store.commit("setTempOperations", this.operations);
 
     const id = document.getElementById("drawflow");
     this.editor = new Drawflow(id, Vue);
@@ -107,8 +153,8 @@ export default {
       this.editor.drawflow = this.operationFlow;
       this.editor.start();
 
-      this.generateTaskNode();
-      this.loadOperationNode();
+      this.generateAllTaskNodes();
+      this.loadAllOperationNodes();
       this.addConnections();
 
       let _this = this;
@@ -151,16 +197,15 @@ export default {
         let oid = _this.editor.getNodeFromId(id).name;
         let result = _this.operationApi.getOperationInfo(oid);
         if (result != null) {
+          _this.slctNodeId = id;
           _this.slctOperationState = true;
           _this.selcetedOid = oid;
           _this.selcetedOperation = result;
         }
       });
     },
-    generateTaskNode() {
-      let todo = 0,
-        doing = 0,
-        done = 0;
+    generateAllTaskNodes() {
+      (this.todo = 0), (this.doing = 0), (this.done = 0);
       for (var i = 0; i < this.taskList.length; i++) {
         let nodeId = this.taskList[i].taskId;
         let nodeName = this.taskList[i].name;
@@ -168,28 +213,26 @@ export default {
         let pos_y = 0;
 
         // position
-        let time = this.taskList[i].time.split(" - ");
-        let startTime = new Date(time[0]);
-        let endTime = new Date(time[1]);
+        let startTime = new Date(this.taskList[i].startTime);
+        let endTime = new Date(this.taskList[i].endTime);
         let today = new Date();
         if (today > endTime && today > startTime) {
           pos_x = 50;
-          pos_y = 110 + done * 130;
-          done++;
+          pos_y = 110 + this.done * 130;
+          this.done++;
         } else if (endTime > today && today > startTime) {
           pos_x = 450;
-          pos_y = 110 + todo * 130;
-          todo++;
+          pos_y = 110 + this.todo * 130;
+          this.todo++;
         } else if (endTime > today && startTime > today) {
           pos_x = 850;
-          pos_y = 110 + doing * 130;
-          doing++;
+          pos_y = 110 + this.doing * 130;
+          this.doing++;
         }
         // add node
         let props = {
           taskId: nodeId,
           name: nodeName,
-          operations: this.taskList[i].operations,
         };
         let data = {};
         this.editor.registerNode("TaskNode", TaskNode, props, {});
@@ -204,6 +247,56 @@ export default {
           "TaskNode",
           "vue"
         );
+      }
+    },
+    generateTaskNode(task) {
+      let nodeId = task.taskId;
+      let nodeName = task.name;
+      let pos_x = 0;
+      let pos_y = 0;
+
+      // position
+      let startTime = new Date(task.startTime);
+      let endTime = new Date(task.endTime);
+      let today = new Date();
+      if (today > endTime && today > startTime) {
+        pos_x = 50;
+        pos_y = 110 + this.done * 130;
+        this.done++;
+      } else if (endTime > today && today > startTime) {
+        pos_x = 450;
+        pos_y = 110 + this.todo * 130;
+        this.todo++;
+      } else if (endTime > today && startTime > today) {
+        pos_x = 850;
+        pos_y = 110 + this.doing * 130;
+        this.doing++;
+      }
+      // add node
+      let props = {
+        taskId: nodeId,
+        name: nodeName,
+      };
+      let data = {};
+      this.editor.registerNode("TaskNode", TaskNode, props, {});
+      this.editor.addNode(
+        nodeId,
+        0,
+        0,
+        pos_x,
+        pos_y,
+        "task-node",
+        data,
+        "TaskNode",
+        "vue"
+      );
+
+      this.taskList.push(task);
+    },
+    removeTaskNode(task) {
+      let nodeId = this.editor.getNodesFromName(task.taskId)[0];
+      if (nodeId != undefined) {
+        this.editor.removeNodeId("node-" + nodeId);
       }
     },
     addConnections() {
@@ -238,7 +331,7 @@ export default {
         }
       }
     },
-    loadOperationNode() {
+    loadAllOperationNodes() {
       for (var i = 0; i < this.operations.length; i++) {
         // position
         let pos_x = 50 + 220 * i;
@@ -272,6 +365,46 @@ export default {
         });
       }
     },
+    loadOperationNode(operation) {
+      // position
+      let pos_x = 50 + 220 * this.operations.length - 1;
+      let pos_y = 15;
+
+      // generate node
+      let props = {
+        taskId: "",
+        name: "",
+        operation: operation,
+      };
+      let data = {};
+      this.editor.registerNode("OperationNode", OperationNode, props, {});
+      this.editor.addNode(
+        operation.id,
+        0,
+        0,
+        pos_x,
+        pos_y,
+        "operation-node",
+        data,
+        "OperationNode",
+        "vue"
+      );
+      let _this = this;
+      $(".operation-node").mouseup(function () {
+        if (_this.slctOperationState) {
+          _this.operationModal = true;
+          _this.slctOperationState = false;
+        }
+      });
+
+      this.operations.push(operation);
+    },
+    removeOperationNode(operation) {
+      let nodeId = this.editor.getNodesFromName(operation.id)[0];
+      if (nodeId != undefined) {
+        this.editor.removeNodeId("node-" + nodeId);
+      }
+    },
     removeInputOutput() {
       for (var i = 0; i < this.taskList.length; i++) {
         let id = this.editor.getNodesFromName(this.taskList[i].taskId)[0];
@@ -283,45 +416,6 @@ export default {
           this.editor.removeNodeInput(id, "input_1");
         }
       }
-    },
-    clearAllNodes() {
-      for (var i = 0; i < this.taskList.length; i++) {
-        let nodeId = this.editor.getNodesFromName(this.taskList[i].taskId)[0];
-        this.editor.removeNodeId("node-" + nodeId);
-      }
-    },
-    clearAllConnections() {
-      for (var i = 0; i < this.relaions.length; i++) {
-        let fromId = this.editor.getNodesFromName(this.relaions[i].from)[0];
-        let toId = this.editor.getNodesFromName(this.relaions[i].to)[0];
-
-        //connection
-        this.editor.removeSingleConnection(fromId, toId, "output_1", "input_1");
-      }
-    },
-    clearAllOperations() {
-      for (var i = 0; i < this.operations.length; i++) {
-        let nodeId = this.editor.getNodesFromName(this.operations[i].id)[0];
-        this.editor.removeNodeId("node-" + nodeId);
-      }
-    },
-    updateActivityTasks() {
-      this.taskList = this.operationApi.getTaskList();
-
-      this.clearAllConnections();
-      this.clearAllNodes();
-      this.generateTaskNode();
-    },
-    updateTaskDependencies() {
-      this.relaions = this.operationApi.getTaksDependencies();
-      
-      this.addConnections();
-    },
-    updateTempOperations() {
-      this.operations = this.operationApi.getTempOperations();
-      
-      this.clearAllOperations();
-      this.loadOperationNode();
     },
     linkTask() {
       if (!this.taskLinkBtn) {
@@ -360,7 +454,6 @@ export default {
         behavior: "remove",
         operation: this.selcetedOperation,
       });
-      this.updateTempOperations();
     },
     operationRemove() {
       this.operationModal = false;
@@ -372,7 +465,6 @@ export default {
         behavior: "remove",
         operation: this.selcetedOperation,
       });
-      this.updateTempOperations();
     },
   },
 };

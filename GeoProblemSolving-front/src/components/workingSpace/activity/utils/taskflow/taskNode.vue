@@ -128,7 +128,7 @@
                   <div class="participant">
                     <span style="margin-right: 5px">People: </span>
                     <avatar
-                      v-for="person in record.operators"
+                      v-for="person in record.personRef"
                       :key="person.id"
                       class="person"
                       :username="person.name"
@@ -156,8 +156,8 @@
                       style="height: 36px; margin-top: -30px"
                     />
                     <img
-                      v-for="result in record.resources.outputs"
-                      :key="result.name"
+                      v-for="result in record.resRef.outputs"
+                      :key="result.uid"
                       :src="dataUrl"
                       height="36px"
                       width="36px"
@@ -169,7 +169,7 @@
                   <div class="participant">
                     <span style="margin-right: 5px">People: </span>
                     <avatar
-                      v-for="person in record.operators"
+                      v-for="person in record.personRef"
                       :key="person.id"
                       class="person"
                       :username="person.name"
@@ -352,7 +352,7 @@ export default {
   components: {
     Avatar,
   },
-  props: ["taskId", "name", "operations"],
+  props: ["taskId", "name"],
   data() {
     return {
       scrollOps: {
@@ -362,6 +362,7 @@ export default {
       },
       unfold: false,
       operationRecords: [],
+      operations: [],
       temOperation: {},
       // 资源avatar 图片路径
       dataUrl: require("@/assets/images/data.png"),
@@ -384,9 +385,11 @@ export default {
     operationShow() {
       this.unfold = true;
       this.operationRecords = [];
-      
-      for (var i = 0; i < this.operations.length; i++) {
-        let operation = this.operationApi.getOperationInfo(this.operations[i]);
+      let taskInfo = this.operationApi.getTaskInfo(this.taskId);
+      let operations = taskInfo.operations;
+
+      for (var i = 0; i < operations.length; i++) {
+        let operation = this.operationApi.getOperationInfo(operations[i]);
         if (operation != undefined) {
           if (operation.type === "resource") {
             // resource
@@ -398,40 +401,42 @@ export default {
             operation.operator = operatorInfo;
           } else if (operation.type === "tool") {
             // tool
-            let toolInfo = this.operationApi.getResInfo(operation.toolRef);
+            let toolInfo = this.operationApi.getToolInfo(operation.toolRef);
             operation.tool = toolInfo;
             let operatorInfo = this.operationApi.getMemberInfo(
               operation.operator
             );
             operation.operator = operatorInfo;
+
           } else if (operation.type === "communication") {
             // communication
-            let toolInfo = this.operationApi.getResInfo(operation.toolRef);
+            let toolInfo = this.operationApi.getToolInfo(operation.toolRef);
             operation.tool = toolInfo;
             let resInfo = this.operationApi.getResInfo(operation.resRef);
             operation.resource = resInfo;
             // participants
             let participants = [];
-            for (var j = 0; j < operation.operators.length; j++) {
+            for (var j = 0; j < operation.personRef.length; j++) {
               let personInfo = this.operationApi.getMemberInfo(
-                operation.operators[j]
+                operation.personRef[j]
               );
               participants.push(personInfo);
             }
-            operation.operators = participants;
+            operation.personRef = participants;
+
           } else if (operation.type === "geo-analysis") {
             // geo-analysis
-            let toolInfo = this.operationApi.getResInfo(operation.toolRef);
+            let toolInfo = this.operationApi.getToolInfo(operation.toolRef);
             operation.tool = toolInfo;
             // participants
             let participants = [];
-            for (var j = 0; j < operation.operators.length; j++) {
+            for (var j = 0; j < operation.personRef.length; j++) {
               let operatorInfo = this.operationApi.getMemberInfo(
-                operation.operators[j]
+                operation.personRef[j]
               );
               participants.push(operatorInfo);
             }
-            operation.operators = participants;
+            operation.personRef = participants;
             // results
             let results = [];
             for (var j = 0; j < operation.resources.outputs.length; j++) {

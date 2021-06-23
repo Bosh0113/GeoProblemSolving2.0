@@ -456,7 +456,7 @@ var taskList = [];
             selectFile(folder);
 
             let message = {
-                type: "data",
+                type: "resource",
                 sender: userInfo.userId,
                 behavior: "select",
                 content: {
@@ -536,7 +536,7 @@ var taskList = [];
             selectFile(file);
 
             let message = {
-                type: "data",
+                type: "resource",
                 sender: userInfo.userId,
                 behavior: "select",
                 content: {
@@ -635,7 +635,7 @@ var taskList = [];
 
         for (let i = 0; i < uploadedList.length; i++) {
             let message = {
-                type: "data",
+                type: "resource",
                 behavior: "upload",
                 sender: userInfo.userId,
                 content: {
@@ -826,7 +826,7 @@ var taskList = [];
         if (operation != undefined) {
 
             switch (operation.type) {
-                case "data": {
+                case "resource": {
                     if (operation.behavior === "upload") {
                         let element = "";
                         if (user.userId === userInfo.userId) {
@@ -856,7 +856,7 @@ var taskList = [];
                     }
                     break;
                 }
-                case "chat": {
+                case "communication": {
                     break;
                 }
                 case "geo-analysis": {
@@ -1087,7 +1087,7 @@ var taskList = [];
                         }
                         break;
                     }
-                    case "data": {
+                    case "resource": {
                         if (dataChannel != undefined && typeof dataChannel == "function") {
                             if (data.sender !== userInfo.userId) {
                                 if (data.behavior == "select") {

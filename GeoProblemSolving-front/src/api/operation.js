@@ -136,7 +136,7 @@ export function rebuildActivityDoc(activityInfo) {
     for (var i = 0; i < activityInfo.members.length; i++) {
         let Person = xmlDoc.createElement('Person');
         Person.setAttribute("id", activityInfo.members[i].userId);
-        Person.setAttribute("name", activityInfo.members[i].userId);
+        Person.setAttribute("name", activityInfo.members[i].name);
         Person.setAttribute("role", "");
         Person.setAttribute("state", "in");
         Participants.appendChild(Person);
@@ -325,7 +325,7 @@ export function getOperationInfo(oid) {
             let person = operationNode.childNodes[j].getAttribute("idRef");
             participants.push(person);
         }
-        operation["PersonRef"] = participants;
+        operation["personRef"] = participants;
 
     } else if (operationNode.getAttribute("type") === "geo-analysis") {
 
@@ -333,13 +333,14 @@ export function getOperationInfo(oid) {
         operation["operator"] = operationNode.getAttribute("operator");
         operation["time"] = operationNode.getAttribute("time");
 
-        // resources
+        // resources        
         let resources = {
             inputs: [],
             outputs: [],
             params: []
         };
         let participants = [];
+
         for (var j = 0; j < operationNode.childNodes.length; j++) {
             let children = operationNode.childNodes[j];
             if (children.getAttribute("type") === "input") {
@@ -359,6 +360,31 @@ export function getOperationInfo(oid) {
     return operation;
 }
 
+export function getTaskInfo(taskId) {
+    if (xmlDoc === null) {
+        alert("Failed to record operation. Please load activity document first!");
+        return;
+    }
+
+    let taskDoc = xmlDoc.getElementById(taskId);
+    if (taskDoc == undefined || taskDoc.localName != "Task") return null;
+
+    let time = taskDoc.getAttribute("timerange").split(" - ");
+    let taskInfo = {
+        taskId: taskDoc.getAttribute("id"),
+        name: taskDoc.getAttribute("name"),
+        purpose: taskDoc.getAttribute("purpose"),
+        startTime: time[0],
+        endTime: time[1],
+        operations: []
+    }
+    let operations = taskDoc.childNodes;
+    for (var i = 0; i < operations.length; i++) {
+        taskInfo.operations.push(operations[i].getAttribute("idRef"));
+    }
+    return taskInfo;
+}
+
 export function getTaskList() {
     if (xmlDoc === null) {
         alert("Failed to record operation. Please load activity document first!");
@@ -370,11 +396,14 @@ export function getTaskList() {
 
     let tasks = [];
     for (var i = 0; i < taskDoc.length; i++) {
+        let time = taskDoc[i].getAttribute("timerange").split(" - ");
+
         let taskInfo = {
             taskId: taskDoc[i].getAttribute("id"),
             name: taskDoc[i].getAttribute("name"),
             purpose: taskDoc[i].getAttribute("purpose"),
-            time: taskDoc[i].getAttribute("timerange"),
+            startTime: time[0],
+            endTime: time[1],
             operations: []
         }
         let operations = taskDoc[i].childNodes;
@@ -482,7 +511,7 @@ export function getTempOperations() {
                     let person = operationNode.childNodes[j].getAttribute("idRef");
                     participants.push(person);
                 }
-                operation["PersonRef"] = participants;
+                operation["personRef"] = participants;
 
             } else if (operationNode.getAttribute("type") === "geo-analysis") {
 
@@ -497,6 +526,7 @@ export function getTempOperations() {
                     params: []
                 };
                 let participants = [];
+
                 for (var j = 0; j < operationNode.childNodes.length; j++) {
                     let children = operationNode.childNodes[j];
                     if (children.getAttribute("type") === "input") {
@@ -512,7 +542,7 @@ export function getTempOperations() {
                 operation["resesRef"] = resources;
                 operation["personRef"] = participants;
             } else if (operationNode.getAttribute("type") === "resource") {
-
+    
                 operation["behavior"] = operationNode.getAttribute("behavior");
                 operation["resRef"] = operationNode.getAttribute("resRef");
                 operation["operator"] = operationNode.getAttribute("operator");
@@ -1139,7 +1169,7 @@ export function analysisRecord(aid, oid, taskId, userId, toolId, purpose, inputs
     // save output data
     let ResourceCollection = xmlDoc.getElementsByTagName("ResourceCollection")[0];
     if (ResourceCollection == undefined) return;
-    
+
     for (var i = 0; i < outputs.length; i++) {
         let Resource = xmlDoc.createElement('Resource');
         Resource.setAttribute("id", outputs[i].uid);
@@ -1174,19 +1204,19 @@ export function analysisRecord(aid, oid, taskId, userId, toolId, purpose, inputs
     Operation.setAttribute("time", new Date().Format("yyyy-MM-dd HH:mm:ss"));
     for (var i = 0; i < inputs.length; i++) {
         let ResRef = xmlDoc.createElement('ResRef');
-        ResRef.setAttribute("idRef", inputs[i]);
+        ResRef.setAttribute("idRef", inputs[i].uid);
         ResRef.setAttribute("type", "input");
         Operation.appendChild(ResRef);
     }
     for (var i = 0; i < outputs.length; i++) {
         let ResRef = xmlDoc.createElement('ResRef');
-        ResRef.setAttribute("idRef", outputs[i]);
+        ResRef.setAttribute("idRef", outputs[i].uid);
         ResRef.setAttribute("type", "output");
         Operation.appendChild(ResRef);
     }
     for (var i = 0; i < params.length; i++) {
         let ResRef = xmlDoc.createElement('ResRef');
-        ResRef.setAttribute("idRef", params[i]);
+        ResRef.setAttribute("idRef", params[i].uid);
         ResRef.setAttribute("type", "param");
         Operation.appendChild(ResRef);
     }

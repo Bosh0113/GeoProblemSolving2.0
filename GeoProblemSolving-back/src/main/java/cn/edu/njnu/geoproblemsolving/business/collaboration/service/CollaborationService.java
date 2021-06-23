@@ -292,7 +292,7 @@ public class CollaborationService {
                     }
                     break;
                 }
-                case "data":
+                case "resource":
                 case "operation": {
                     String behavior = messageObject.getString("behavior");
                     String object = messageObject.getString("object");
