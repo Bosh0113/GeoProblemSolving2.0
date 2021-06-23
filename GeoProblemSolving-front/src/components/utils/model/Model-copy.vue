@@ -246,6 +246,7 @@
   </div>
 </template>
 
+<!--工具->模型-->
 <script>
   import file from "./../dataTemplate/File";
   import resourceList from "../../common/resource/resourceList-copy";
@@ -340,8 +341,9 @@
           this.activityResource = resources;
           this.userId = userInfo.userId;
           this.aid = activityInfo.aid;
-          //绑定函数
-          // computationChannel = this.getSocketComputation();
+
+          // 绑定函数
+          buildSocketChannel(null, null, this.getSocketComputation);
 
         }else {
           //避免this指向问题
@@ -366,6 +368,7 @@
         if (data != undefined && data != null){
           this.getStateEventOut(data.computeOutputs)
         }
+
       },
 
 
@@ -504,14 +507,13 @@
         // );
         // let invokeResultId = data;
         // aid, serviceId, serviceLocation, computeModel, userName, inputs, outputs, callback
-        CollabSocket.sendModelOperation(
+        sendModelOperation(
           this.aid,
           this.invokeInfo.serviceId,
           this.invokeInfo.serviceIp,
           this.invokeInfo.servicePort,
           this.invokeInfo.inputs,
-          this.invokeInfo.outputs,
-          this.getSocketComputation
+          this.invokeInfo.outputs
         );
         // refreshForm["ip"] = this.invokeForm.ip;
         // refreshForm["port"] = this.invokeForm.port;

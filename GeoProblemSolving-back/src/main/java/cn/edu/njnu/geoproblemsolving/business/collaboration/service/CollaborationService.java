@@ -230,6 +230,10 @@ public class CollaborationService {
             JSONObject messageObject = JSONObject.parseObject(message);
             String messageType = messageObject.getString("type");
 
+            if (messageType.equals("ping")){
+                return;
+            }
+
             String user = messageObject.getString("sender");
             CollaborationUser sender =  collaborationBehavior.getMemberInfo(user, null);
 
