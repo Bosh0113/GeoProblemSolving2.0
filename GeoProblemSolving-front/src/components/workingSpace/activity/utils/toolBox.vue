@@ -467,12 +467,12 @@ export default {
           if (behavior === "record") {
             this.$store.commit("updateTempOperations", {
               behavior: "add",
-              task: operations[i],
+              operation: operations[i],
             });
           } else if (behavior === "bind") {
             this.$store.commit("updateTempOperations", {
               behavior: "remove",
-              task: operations[i],
+              operation: operations[i],
             });
           }
         }

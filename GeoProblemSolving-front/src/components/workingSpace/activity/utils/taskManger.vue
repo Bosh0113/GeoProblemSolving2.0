@@ -1347,7 +1347,7 @@ export default {
                 );
                 this.$store.commit("updateActivityTasks", {
                   behavior: "update",
-                  task: res.data,
+                  task: taskForm,
                 });
 
                 this.updateTaskList(res.data); // 只更新单个任务
@@ -1516,9 +1516,9 @@ export default {
             this.operationApi.taskUpdate(
               this.activityInfo.aid,
               "remove",
-              this.taskList
+              this.taskList[this.selectTaskIndex]
             );
-            this.$store.commit("updateActivityTasks", {behavior: "remove", task: res.data});
+            this.$store.commit("updateActivityTasks", {behavior: "remove", task: this.taskList[this.selectTaskIndex]});
 
             this.taskList.splice(this.selectTaskIndex, 1);
           } else {

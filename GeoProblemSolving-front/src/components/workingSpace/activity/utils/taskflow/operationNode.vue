@@ -132,7 +132,7 @@ export default {
   },
   methods: {
     operationInit() {
-      let operation = Object.assign({}, this.operation);
+      let operation = this.operationApi.getOperationInfo(this.operation.id);
       if (operation.type === "communication") {
         // participants
         let participants = [];

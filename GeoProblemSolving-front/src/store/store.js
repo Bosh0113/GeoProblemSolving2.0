@@ -13,10 +13,9 @@ export default new Vuex.Store({
             avatar: '',
         },
         projectImg: '',
-        activityTree:[],
-        tempOperations: [],
-        activityTasks: [],
-        taskDependencies: [],
+        // activityTree:[],
+        tempOperationChange: [],
+        activityTaskChange: [],
         IP_Port: window.location.host,
         //用于当前选择的页面内容
         // IP_Port:"172.21.213.185:8080",
@@ -45,12 +44,12 @@ export default new Vuex.Store({
         // activityTree: state => {
         //     return state.activityTree;
         // },
-        // tempOperations: state => {
-        //     return state.tempOperations;
-        // },
-        // activityTasks: state => {
-        //     return state.activityTasks;
-        // }
+        tempOperationChange: state => {
+            return state.tempOperationChange;
+        },
+        activityTaskChange: state => {
+            return state.activityTaskChange;
+        }
     },
     mutations: {
         getUserInfo: state => {
@@ -95,62 +94,20 @@ export default new Vuex.Store({
         setUserInfo: (state, userInfo) => {
             state.userInfo = userInfo;
         },
-        setActivityTree: (state, activityTree) => {
-            Vue.set(state, "activityTree", activityTree);
+        // setActivityTree: (state, activityTree) => {
+        //     Vue.set(state, "activityTree", activityTree);
+        // },
+        clearTempOperations: (state) => {
+            Vue.set(state, "tempOperationChange", []);
         },
-        setTempOperations: (state, operations) => {
-            Vue.set(state, "tempOperations", operations);
-        },
-        setActivityTasks: (state, tasks) => {
-            Vue.set(state, "activityTasks", tasks);
-        },
-        setTaskDependencies: (state, links) => {
-            Vue.set(state, "taskDependencies", links);
+        clearActivityTasks: (state) => {
+            Vue.set(state, "activityTaskChange", []);
         },
         updateTempOperations: (state, data) => {
-            if(data.behavior === "add"){
-                state.tempOperations.push(data.operation);
-            } else if(data.behavior === "remove"){
-                for(var i = 0; i < state.tempOperations.length; i++){
-                    if(state.tempOperations[i].id === data.operation.id){
-                        state.tempOperations.splice(i, 1);
-                    }
-                }
-            } else if(data.behavior === "update"){
-                for(var i = 0; i < state.tempOperations.length; i++){
-                    for(var i = 0; i < state.tempOperations.length; i++){
-                        if(state.tempOperations[i].id === data.operation.id){
-                            state.tempOperations[i] = data.operation;
-                        }
-                    }
-                }
-            }
+            state.tempOperationChange.push(data);
         },
         updateActivityTasks: (state, data) => {
-            if(data.behavior === "add"){
-                state.activityTasks.push(data.task);
-            } else if(data.behavior === "remove"){
-                for(var i = 0; i < state.activityTasks.length; i++){
-                    if(state.activityTasks[i].taskId === data.task.taskId){
-                        state.activityTasks.splice(i, 1);
-                    }
-                }
-            } else if(data.behavior === "update"){
-                for(var i = 0; i < state.activityTasks.length; i++){
-                    if(state.activityTasks[i].taskId === data.task.taskId){
-                        state.activityTasks[i] = data.task;
-                    }
-                }
-            }
+            state.activityTaskChange.push(data);
         },
-        updateTaskDependencies: (state, data) => {
-            if(data.behavior === "add"){
-                state.taskDependencies.push(data.link);
-            } else if(data.behavior === "remove"){
-                
-            } else if(data.behavior === "update"){
-
-            }
-        }
     }
 })
