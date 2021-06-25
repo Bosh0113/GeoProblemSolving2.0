@@ -65,12 +65,12 @@ Toolbar.prototype.init = function()
 		this.addDropDownArrow(formatMenu, 'geSprite-formatpanel', 38, 50, -4, -3, 36, -8);
 		this.addSeparator();
 	}
-	//ReadTask
-	if (sw >= 320)
-	{
-		var elts = this.addItems(['OpenTask']);
-		elts[0].setAttribute('title', 'Load Task');
-	}
+	// //ReadTask
+	// if (sw >= 320)
+	// {
+	// 	var elts = this.addItems(['OpenTask']);
+	// 	elts[0].setAttribute('title', 'Load Task');
+	// }
 	//SaveTask
     if (sw >= 320)
     {
@@ -847,7 +847,7 @@ Toolbar.prototype.addClickHandler = function(elt, funct)
 		{
 			if (elt.enabled)
 			{
-				funct(evt);
+				// funct(evt);
 			}
 			
 			mxEvent.consume(evt);

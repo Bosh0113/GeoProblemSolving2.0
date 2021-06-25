@@ -508,9 +508,9 @@ export default {
             type: "operation",
             sender: this.userInfo.userId,
             behavior: "edit",
-            content: {
+            content: JSON.stringify({
               layer: _this.drawingLayerGroup.toGeoJSON(),
-            },
+            }),
           };
           sendCustomOperation(_this.send_content, _this.getSocketOperation);
         });
@@ -552,9 +552,9 @@ export default {
             type: "operation",
             sender: this.userInfo.userId,
             behavior: "overlay",
-            content: {
+            content: JSON.stringify({
               layer: e.name,
-            },
+            }),
           };
           sendCustomOperation(this.send_content, this.getSocketOperation);
         }
@@ -568,9 +568,9 @@ export default {
             type: "operation",
             sender: this.userInfo.userId,
             behavior: "zoom",
-            content: {
+            content: JSON.stringify({
               zoom: this.map.getZoom(),
-            },
+            }),
           };
           sendCustomOperation(this.send_content, this.getSocketOperation);
           isZoomControl = false;
@@ -585,9 +585,9 @@ export default {
             type: "operation",
             sender: this.userInfo.userId,
             behavior: "move",
-            content: {
+            content: JSON.stringify({
               center: this.map.getCenter(),
-            },
+            }),
           };
           sendCustomOperation(this.send_content, this.getSocketOperation);
         }
@@ -602,9 +602,9 @@ export default {
         //   type: "operation",
         //   sender: this.userInfo.userId,
         //   behavior: "cut",
-        //   content: {
+        //   content: JSON.stringify({
         //     layer: this.drawingLayerGroup.toGeoJSON(),
-        //   },
+        //   }),
         // };
         // sendCustomOperation(this.send_content, this.getSocketOperation);
       });
@@ -617,9 +617,9 @@ export default {
           type: "operation",
           sender: this.userInfo.userId,
           behavior: "remove",
-          content: {
+          content: JSON.stringify({
             layer: _this.drawingLayerGroup.toGeoJSON(),
-          },
+          }),
         };
         sendCustomOperation(this.send_content, this.getSocketOperation);
       });
@@ -647,10 +647,10 @@ export default {
             type: "operation",
             sender: this.userInfo.userId,
             behavior: "add",
-            content: {
+            content: JSON.stringify({
               shape: e.shape,
               layer: this.traces,
-            },
+            }),
           };
         } else {
           this.drawingLayerGroup.addLayer(e.layer);
@@ -659,10 +659,10 @@ export default {
             type: "operation",
             sender: this.userInfo.userId,
             behavior: "add",
-            content: {
+            content: JSON.stringify({
               shape: "Others",
               layer: e.layer.toGeoJSON(),
-            },
+            }),
           };
         }
         sendCustomOperation(this.send_content, this.getSocketOperation);
@@ -670,15 +670,15 @@ export default {
     },
     getSocketData(data) {
       let socketMsg = data;
-      if (socketMsg.type === "data") {
+      if (socketMsg.type === "resource") {
         switch (socketMsg.behavior) {
           case "update": {
-            let dataItem = socketMsg.content;
+            let dataItem = JSON.parse(socketMsg.content);
             this.resources.push(dataItem);
 
             var that = this;
             var xhr = new XMLHttpRequest();
-            xhr.open("GET", socketMsg.content.address, true);
+            xhr.open("GET", dataItem.address, true);
             xhr.onload = function (e) {
               if (this.status == 200) {
                 var file = JSON.parse(this.response);
@@ -708,15 +708,15 @@ export default {
     },
     getSocketComputation() {},
     getSocketOperation(data) {
-      let socketMsg = data;
-      if (socketMsg.type === "operation") {
-        switch (socketMsg.behavior) {
+      let content = JSON.parse(data.content);
+      if (data.type === "operation") {
+        switch (data.behavior) {
           case "zoom": {
-            this.map.setZoom(socketMsg.content.zoom);
+            this.map.setZoom(content.zoom);
             break;
           }
           case "move": {
-            this.map.panTo(socketMsg.content.center);
+            this.map.panTo(content.center);
             break;
           }
           case "overlay": {
@@ -729,12 +729,12 @@ export default {
             try {
               this.map.removeLayer(this.baseLayers["Vector map"]);
             } catch (e) {}
-            this.baseLayers[socketMsg.content.layer].addTo(this.map);
+            this.baseLayers[content.layer].addTo(this.map);
             break;
           }
           case "remove": {
             this.drawingLayerGroup.clearLayers();
-            let geoJson = socketMsg.content.layer;
+            let geoJson = content.layer;
             let geoJsonLayer = L.geoJSON(geoJson, {
               style: function (feature) {},
             }).bindPopup(function (layer) {
@@ -745,7 +745,7 @@ export default {
           }
           case "edit": {
             this.drawingLayerGroup.clearLayers();
-            let geoJson = socketMsg.content.layer;
+            let geoJson = content.layer;
             let geoJsonLayer = L.geoJSON(geoJson, {
               style: function (feature) {},
             }).bindPopup(function (layer) {
@@ -756,12 +756,12 @@ export default {
           }
           case "add": {
             let drawingLayer = null;
-            if (socketMsg.content.shape == "Circle") {
-              drawingLayer = L.circle(socketMsg.content.layer[0], {
-                radius: socketMsg.content.layer[1],
+            if (content.shape == "Circle") {
+              drawingLayer = L.circle(content.layer[0], {
+                radius: content.layer[1],
               });
             } else {
-              drawingLayer = L.geoJSON(socketMsg.content.layer, {
+              drawingLayer = L.geoJSON(content.layer, {
                 style: function (feature) {},
               }).bindPopup(function (layer) {});
             }
@@ -770,7 +770,7 @@ export default {
           }
           case "cut": {
             // this.drawingLayerGroup.clearLayers();
-            // let geoJson = socketMsg.content.layer;
+            // let geoJson = content.layer;
             // let geoJsonLayer = L.geoJSON(geoJson, {
             //   style: function (feature) {
             //   }

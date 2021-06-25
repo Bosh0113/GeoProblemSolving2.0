@@ -230,9 +230,7 @@ public class CollaborationService {
             JSONObject messageObject = JSONObject.parseObject(message);
             String messageType = messageObject.getString("type");
 
-            if (messageType.equals("ping")){
-                return;
-            }
+            if (messageType.equals("ping")) return;
 
             String user = messageObject.getString("sender");
             CollaborationUser sender =  collaborationBehavior.getMemberInfo(user, null);
@@ -299,7 +297,7 @@ public class CollaborationService {
                 case "resource":
                 case "operation": {
                     String behavior = messageObject.getString("behavior");
-                    String object = messageObject.getString("object");
+                    String object = messageObject.getString("content");
                     // 操作权限判断，冲突判断
                     CollaborationMode mode = collaborationConfig.getMode();
                     if (mode.equals(CollaborationMode.SemiFree_Apply)) {

@@ -60,7 +60,7 @@
         <div
           v-for="tool in toolList"
           :key="tool.tid"
-          style="width: 100px; display: inline-block"
+          style="width: 99px; display: inline-block"
           v-else
         >
           <Card

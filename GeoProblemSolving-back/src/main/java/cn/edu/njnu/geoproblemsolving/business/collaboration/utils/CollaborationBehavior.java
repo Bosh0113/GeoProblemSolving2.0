@@ -207,7 +207,7 @@ public class CollaborationBehavior {
             messageObject.put("type", type);
             messageObject.put("sender", sender.getUserInfo());
             messageObject.put("behavior", behavior);
-            messageObject.put("object", object);
+            messageObject.put("content", object);
 
             if (receivers.size() == 0) {
                 messageObject.put("receivers", "");

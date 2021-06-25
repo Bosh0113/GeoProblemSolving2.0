@@ -522,7 +522,7 @@ var taskList = [];
                         </div>`
                 break;
             }
-            case "other": {
+            case "others": {
                 resElement = `<div class="card resource" title="${fileName}">
                             <input class="form-check-input" type="checkbox" id="${file.uid}">
                             <img src="/static/collabTemplate/img/otherfile.png" class="res-icon" />
@@ -1002,22 +1002,27 @@ var taskList = [];
                 this.setTimer();
                 this.websockLinked = true;
 
+                this.websocketSend({
+                    type: "test",
+                    sender: userInfo.userId
+                });
+
                 $("#collaboration-switch").attr('checked', true);
             }
             this.websock.onmessage = (e) => {
-                websocketonmessage(e);
+                this.websocketonmessage(e);
                 this.websockLinked = true;
             }
             this.websock.onclose = (e) => {
                 console.log("Connection closed (" + e.code + ")");
-                removeTimer();
+                this.removeTimer();
                 this.websockLinked = false;
             }
 
             //连接发生错误的回调方法
             this.websock.onerror = () => {
                 console.log("WebSocket error!");
-                removeTimer();
+                this.removeTimer();
                 this.websockLinked = false;
             }
 
@@ -1307,6 +1312,6 @@ var taskList = [];
     * get socket status
     */
     function getSocketInfo() {
-        return socketInfo()
+        return CollabSocket.socketInfo();
     }
 }

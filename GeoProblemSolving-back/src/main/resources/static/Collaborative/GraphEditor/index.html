@@ -1,360 +1,209 @@
-<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=5,IE=9" ><![endif]-->
+<!--[if IE]>
+<meta http-equiv="X-UA-Compatible" content="IE=5,IE=9"><![endif]-->
 <!DOCTYPE html>
 <html>
 <head>
     <title>Grapheditor</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link rel="stylesheet" type="text/css" href="styles/grapheditor.css">
-	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-	<script src="cdn_js/jquery.js"></script>
-	<!-- import Vue.js -->
-	<script src="cdn_js/vue.min.js"></script>
-	<!-- import stylesheet -->
-	<link rel="stylesheet" href="cdn_css/iview.css">
-	<!-- import iView -->
-	<script src="cdn_js/iview.min.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <script src="cdn_js/jquery.js"></script>
+    <!-- import Vue.js -->
+    <script src="cdn_js/vue.min.js"></script>
+    <!-- import stylesheet -->
+    <link rel="stylesheet" href="cdn_css/iview.css">
+    <!-- import iView -->
+    <script src="cdn_js/iview.min.js"></script>
     <!-- import vuescroll -->
     <script src="cdn_js/vuescroll.js"></script>
-    <link rel="stylesheet" href="cdn_css/vuescroll.css" type="text/css" />
+    <link rel="stylesheet" href="cdn_css/vuescroll.css" type="text/css"/>
     <!-- import axios -->
     <script src="cdn_js/axios.min.js"></script>
-	
-	<script type="text/javascript">
-		// Parses URL parameters. Supported parameters are:
-		// - lang=xy: Specifies the language of the user interface.
-		// - touch=1: Enables a touch-style user interface.
-		// - storage=local: Enables HTML5 local storage.
-		// - chrome=0: Chromeless mode.
-		var urlParams = (function(url)
-		{
-			var result = new Object();
-			var idx = url.lastIndexOf('?');
-	
-			if (idx > 0)
-			{
-				var params = url.substring(idx + 1).split('&');
-				
-				for (var i = 0; i < params.length; i++)
-				{
-					idx = params[i].indexOf('=');
-					
-					if (idx > 0)
-					{
-						result[params[i].substring(0, idx)] = params[i].substring(idx + 1);
-					}
-				}
-			}
-			
-			return result;
-		})(window.location.href);
-	
-		// Default resources are included in grapheditor resources
-		mxLoadResources = false;
-	</script>
-	<script type="text/javascript" src="js/Init.js"></script>
-	<script type="text/javascript" src="deflate/pako.min.js"></script>
-	<script type="text/javascript" src="deflate/base64.js"></script>
-	<script type="text/javascript" src="jscolor/jscolor.js"></script>
-	<script type="text/javascript" src="sanitizer/sanitizer.min.js"></script>
-	<script type="text/javascript" src="js/mxClient.js"></script>
-	<script type="text/javascript" src="js/EditorUi.js"></script>
-	<script type="text/javascript" src="js/Editor.js"></script>
-	<script type="text/javascript" src="js/Sidebar.js"></script>
-	<script type="text/javascript" src="js/Graph.js"></script>
-	<script type="text/javascript" src="js/Format.js"></script>
-	<script type="text/javascript" src="js/Shapes.js"></script>
-	<script type="text/javascript" src="js/Actions.js"></script>
-	<script type="text/javascript" src="js/Menus.js"></script>
-	<script type="text/javascript" src="js/Toolbar.js"></script>
-	<script type="text/javascript" src="js/Dialogs.js"></script>
-	<style>
-		.fileBtnHoverRed:hover {
-			background-color: #ed4014;
-			color: white;
-		}
-	</style>
+    <!-- collaboration -->
+    <link rel="stylesheet" href="../../collabTemplate/collaboration.css">
+    <script src="../../collabTemplate/js/bootstrap.js"></script>
+    <script src="../../collabTemplate/collaboration.js"></script>
+
+    <script type="text/javascript">
+        // Parses URL parameters. Supported parameters are:
+        // - lang=xy: Specifies the language of the user interface.
+        // - touch=1: Enables a touch-style user interface.
+        // - storage=local: Enables HTML5 local storage.
+        // - chrome=0: Chromeless mode.
+        var urlParams = (function (url) {
+            var result = new Object();
+            var idx = url.lastIndexOf('?');
+
+            if (idx > 0) {
+                var params = url.substring(idx + 1).split('&');
+
+                for (var i = 0; i < params.length; i++) {
+                    idx = params[i].indexOf('=');
+
+                    if (idx > 0) {
+                        result[params[i].substring(0, idx)] = params[i].substring(idx + 1);
+                    }
+                }
+            }
+
+            return result;
+        })(window.location.href);
+
+        // Default resources are included in grapheditor resources
+        mxLoadResources = false;
+    </script>
+    <script type="text/javascript" src="js/Init.js"></script>
+    <script type="text/javascript" src="deflate/pako.min.js"></script>
+    <script type="text/javascript" src="deflate/base64.js"></script>
+    <script type="text/javascript" src="jscolor/jscolor.js"></script>
+    <script type="text/javascript" src="sanitizer/sanitizer.min.js"></script>
+    <script type="text/javascript" src="js/mxClient.js"></script>
+    <script type="text/javascript" src="js/EditorUi.js"></script>
+    <script type="text/javascript" src="js/Editor.js"></script>
+    <script type="text/javascript" src="js/Sidebar.js"></script>
+    <script type="text/javascript" src="js/Graph.js"></script>
+    <script type="text/javascript" src="js/Format.js"></script>
+    <script type="text/javascript" src="js/Shapes.js"></script>
+    <script type="text/javascript" src="js/Actions.js"></script>
+    <script type="text/javascript" src="js/Menus.js"></script>
+    <script type="text/javascript" src="js/Toolbar.js"></script>
+    <script type="text/javascript" src="js/Dialogs.js"></script>
+    <style>
+        .fileBtnHoverRed:hover {
+            background-color: #ed4014;
+            color: white;
+        }
+    </style>
 </head>
 <body class="geEditor">
 
-	<script>
-		window.taskInfo = {
-			taskId:"",
-			title:"",
-			description:""
-		};
-	</script>
-	<div id="openTaskDiv">
-		<Modal
-			v-model="openTaskModal"
-			title="Open task"
-			:styles="{top: '20px'}">
-			<div style="height: 400px;">
-				<vue-scroll :ops="scrollOps">
-					<Radio-group v-model="selectTaskId" size="small">
-						<div v-for="taskItem in taskList" :key="taskItem.index" style="margin-bottom: 5px">
-							<Card>
-								<div slot="title">
-									<Radio :label="taskItem.taskId">
-										<h3 style="display: inline-block">
-											{{taskItem.title}}
-										</h3>
-									</Radio>
-								</div>
-								<div slot="extra">
-									<i-button
-										@click="deleteTask(taskItem.taskId)"
-										class="fileBtnHoverRed"
-										shape="circle"
-										icon="ios-trash"
-										title="Delete"
-										size="small"
-										style="margin-left:5px"
-										type="text"
-									></i-button>
-								</div>
-								<div style="word-break: break-word;">
-									{{taskItem.description}}
-								</div>
-								<div>
-									<Icon type="md-clock" :size="15"></Icon>
-									<small>{{taskItem.date}}</small>
-								</div>
-							</Card>
-						</div>
-					</Radio-group>
-				</vue-scroll>
-			</div>
-			<div slot="footer">
-				<i-button @click="loadTask" type="primary">Load</i-button>
-			</div>
-		</Modal>
-	</div>
-	<script>
-		window.openTaskVM = new Vue({
-			el: "#openTaskDiv",
-			data(){
-				return{
-					openTaskModal:false,
-					taskList:[],
-					selectTaskId:"",
-					scrollOps: {
-						bar: {
-						background: "#808080",
-						keepShow: true,
-						size: "8px"
-						},
-						rail: {
-						background: "#d7d7d7",
-						opacity: 0.8,
-						size: "10px"
-						}
-					},
-				}
-			},
-			methods:{
-				showModal(){
-					this.taskList = [];
-					//发送请求
-					var url = "/GeoProblemSolving/graphEditor/inquiry";
-					if(window.location.port == "5500"){
-						url = "http://localhost:8081/GeoProblemSolving/graphEditor/inquiry";
-					}
-                    axios
-					.get(url+
-					"?scopeId="+pageParams.pageId)
-					.then(res => {
-						if(res.data!="Fail"){
-							this.taskList = res.data;
-							this.selectTaskId=res.data[0].taskId;
-							this.openTaskModal=true;
-						}
-						else{
-							console.log("Inquiry tasks fail.");
-						}
-					})
-					.catch(err => {
-						console.log("Inquiry tasks fail.");
-					});
-				},
-				deleteTask(taskId){
-					//发送请求
-					var url = "/GeoProblemSolving/graphEditor/delete";
-					if(window.location.port == "5500"){
-						url = "http://localhost:8081/GeoProblemSolving/graphEditor/delete";
-					}
-                    axios
-					.get(url+
-					"?taskId="+taskId)
-					.then(res => {
-						if(res.data!="Fail"){
-							for(let i=0;i<this.taskList.length;i++){
-								if(this.taskList[i].taskId==taskId){
-									this.taskList.splice(i, 1);
-									break;
-								}
-							}
-						}
-						else{
-							console.log("Delect task fail.");
-						}
-					})
-					.catch(err => {
-						console.log("Delect task fail.");
-					});
-				},
-				loadTask(){
-					var selectedTask = {};
-					for(let i=0;i<this.taskList.length;i++){
-						if(this.taskList[i].taskId==this.selectTaskId){
-							selectedTask = this.taskList[i];
-							break;
-						}
-					}
-					window.taskInfo = {
-						taskId:selectedTask.taskId,
-						title:selectedTask.title,
-						description:selectedTask.description
-					};
-					setGraphXML(selectedTask.graphXML);
-					this.openTaskModal=false;
-				}
-			}
-		});
-	</script>
+<div id="collab-tool-head"></div>
+<div id="collab-tool-sidebar"></div>
+<div id="collab-tool-content">
+    <script>
+        window.taskInfo = {
+            taskId: "",
+            title: "",
+            description: ""
+        };
+    </script>
+    <div id="saveTaskDiv">
+        <Modal
+                v-model="saveTaskModal"
+                title="Save task">
+            <div>
+                <h5>Title:</h5>
+                <i-input v-model="taskInfo.title" placeholder="Enter task title..."></i-input>
+                <h5>Description:</h5>
+                <i-input v-model="taskInfo.description" type="textarea"
+                         placeholder="Enter task description..."></i-input>
+            </div>
+            <div slot="footer">
+                <i-button @click="saveTask" type="primary">Save</i-button>
+            </div>
+        </Modal>
+    </div>
+    <script>
+        window.saveTaskVM = new Vue({
+            el: "#saveTaskDiv",
+            data() {
+                return {
+                    saveTaskModal: false,
+                    taskInfo: {
+                        title: "",
+                        description: ""
+                    },
+                }
+            },
+            methods: {
+                showModal() {
+                    this.taskInfo = {
+                        title: "",
+                        description: ""
+                    }
+                    this.saveTaskModal = true;
+                },
+                saveTask() {
+                    let graphXML = getGraphXML();
+                    let taskBlob = new Blob([graphXML],{type:"text/plain;charset=utf-8"});
+                    var fileOfBlob = new File([taskBlob], this.taskInfo.title+".xml");
+                    saveResources([fileOfBlob], this.taskInfo.description,  "others", "private");
+                    this.saveTaskModal=false;
+                }
+            }
+        });
+    </script>
 
-	<div id="saveTaskDiv">
-		<Modal
-			v-model="saveTaskModal"
-			title="Save task">
-			<div>
-				<h5>Title:</h5>
-				<i-input v-model="taskInfo.title" placeholder="Enter task title..."></i-input>
-				<h5>Description:</h5>
-				<i-input v-model="taskInfo.description" type="textarea" placeholder="Enter task description..."></i-input>
-			</div>
-			<div slot="footer">
-				<i-button @click="saveTask" type="primary">Save</i-button>
-			</div>
-		</Modal>
-	</div>
-	<script>
-		window.saveTaskVM = new Vue({
-			el: "#saveTaskDiv",
-			data(){
-				return{
-					saveTaskModal:false,
-					taskInfo:{
-						title:"",
-						description:""
-					},
-				}
-			},
-			methods:{
-				showModal(){
-					this.taskInfo={
-						title:"",
-						description:""
-					}
-					this.saveTaskModal=true;
-				},
-				saveTask(){
-					var taskInfoData = {
-						scopeId:pageParams.pageId,
-						title:this.taskInfo.title,
-						description:this.taskInfo.description,
-						graphXML:getGraphXML()
-					}
-					//发送请求
-					var url = "/GeoProblemSolving/graphEditor/save";
-					if(window.location.port == "5500"){
-						url = "http://localhost:8081/GeoProblemSolving/graphEditor/save";
-					}
+    <div id="updateTaskDiv">
+        <Modal
+                v-model="updateTaskModal"
+                title="Update task">
+            <div>
+                <h5>Title:</h5>
+                <i-input v-model="taskInfo.title" placeholder="Enter task title..."></i-input>
+                <h5>Description:</h5>
+                <i-input v-model="taskInfo.description" type="textarea"
+                         placeholder="Enter task description..."></i-input>
+            </div>
+            <div slot="footer">
+                <i-button @click="updateTask" type="primary">Update</i-button>
+            </div>
+        </Modal>
+    </div>
+    <script>
+        window.updateTaskVM = new Vue({
+            el: "#updateTaskDiv",
+            data() {
+                return {
+                    updateTaskModal: false,
+                    taskInfo: {
+                        title: "",
+                        description: ""
+                    },
+                }
+            },
+            methods: {
+                showModal() {
+                    this.taskInfo = window.taskInfo;
+                    this.updateTaskModal = true;
+                },
+                updateTask() {
+                    let taskInfoData = new URLSearchParams();
+                    taskInfoData.append("taskId", this.taskInfo.taskId);
+                    taskInfoData.append("title", this.taskInfo.title);
+                    taskInfoData.append("description", this.taskInfo.description);
+                    taskInfoData.append("graphXML", getGraphXML());
+                    //发送请求
+                    var url = "/GeoProblemSolving/graphEditor/update";
+                    if (window.location.port == "5500") {
+                        url = "http://localhost:8081/GeoProblemSolving/graphEditor/update";
+                    }
                     axios
-                        .post(url,taskInfoData)
+                        .post(url, taskInfoData)
                         .then(res => {
-							if(res.data!="Fail"){
-								window.taskInfo = {
-									taskId:res.data.taskId,
-									title:taskInfoData.title,
-									description:taskInfoData.description
-								};
-								this.saveTaskModal=false;
-							}
-							else{
-								console.log("Save task fail.");
-							}
+                            if (res.data != "Fail") {
+                                window.taskInfo.title = this.taskInfo.title;
+                                window.taskInfo.description = this.taskInfo.description;
+                                this.updateTaskModal = false;
+                            } else {
+                                console.log("Update task fail.");
+                            }
                         })
                         .catch(err => {
-							console.log("Save task fail.");
+                            console.log("Update task fail.");
                         });
-				}
-			}
-		});
-	</script>
+                }
+            }
+        });
+    </script>
 
-	<div id="updateTaskDiv">
-		<Modal
-			v-model="updateTaskModal"
-			title="Update task">
-			<div>
-				<h5>Title:</h5>
-				<i-input v-model="taskInfo.title" placeholder="Enter task title..."></i-input>
-				<h5>Description:</h5>
-				<i-input v-model="taskInfo.description" type="textarea" placeholder="Enter task description..."></i-input>
-			</div>
-			<div slot="footer">
-				<i-button @click="updateTask" type="primary">Update</i-button>
-			</div>
-		</Modal>
-	</div>
-	<script>
-		window.updateTaskVM = new Vue({
-			el: "#updateTaskDiv",
-			data(){
-				return{
-					updateTaskModal:false,
-					taskInfo:{
-						title:"",
-						description:""
-					},
-				}
-			},
-			methods:{
-				showModal(){
-					this.taskInfo=window.taskInfo;
-					this.updateTaskModal=true;
-				},
-				updateTask(){
-					let taskInfoData = new URLSearchParams();
-					taskInfoData.append("taskId", this.taskInfo.taskId);
-					taskInfoData.append("title", this.taskInfo.title);
-					taskInfoData.append("description", this.taskInfo.description);
-					taskInfoData.append("graphXML", getGraphXML());
-					//发送请求
-					var url = "/GeoProblemSolving/graphEditor/update";
-					if(window.location.port == "5500"){
-						url = "http://localhost:8081/GeoProblemSolving/graphEditor/update";
-					}
-                    axios
-                        .post(url,taskInfoData)
-                        .then(res => {
-							if(res.data!="Fail"){
-								window.taskInfo.title = this.taskInfo.title;
-								window.taskInfo.description = this.taskInfo.description;
-								this.updateTaskModal=false;
-							}
-							else{
-								console.log("Update task fail.");
-							}
-                        })
-                        .catch(err => {
-							console.log("Update task fail.");
-                        });
-				}
-			}
-		});
-	</script>
-<script type="text/javascript" src="js/Collaboration.js"></script>
+    <script type="text/javascript">
+        // 加载协同组件
+        loadCollabComponent();
+    </script>
+
+    <script type="text/javascript" src="js/Operation.js"></script>
+</div>
 </body>
 </html>
