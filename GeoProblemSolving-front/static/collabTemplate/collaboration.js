@@ -708,6 +708,31 @@ var taskList = [];
         return uploadedList;
     }
 
+    function fileUpload(formData) {
+        let uploadedList = null;
+        $.ajax({
+            url: "/GeoProblemSolving/rip/file/upload",
+            type: "POST",
+            data: formData,
+            mimeType: "multipart/form-data",
+            processData: false,
+            contentType: false,
+            cache: false,
+            async: false,
+            success: function (data) {
+                if (data != "Fail") {
+                    uploadedList = JSON.parse(data).uploaded;
+                } else {
+                    alert("Upload fail.");
+                }
+            },
+            error: function (err) {
+                throw err;
+            }
+        });
+        return uploadedList;
+    }
+
     function resaveFile(file, info) {
 
         var formData = new FormData();
@@ -742,31 +767,6 @@ var taskList = [];
     }
 
     function deleteResource() { }
-
-    function fileUpload(formData) {
-        let uploadedList = null;
-        $.ajax({
-            url: "/GeoProblemSolving/rip/file/upload",
-            type: "POST",
-            data: formData,
-            mimeType: "multipart/form-data",
-            processData: false,
-            contentType: false,
-            cache: false,
-            async: false,
-            success: function (data) {
-                if (data != "Fail") {
-                    uploadedList = JSON.parse(data).uploaded;
-                } else {
-                    alert("Upload fail.");
-                }
-            },
-            error: function (err) {
-                throw err;
-            }
-        });
-        return uploadedList;
-    }
 
     /**
      * when resources changed
@@ -835,192 +835,191 @@ var taskList = [];
             }
         }
     }
-}
 
-function setOperator(operator) {
-    if (collabMode !== "Free" && operator != userInfo.userId) {
-        $("#edit-mask").show();
-    } else {
-        $("#edit-mask").hide();
+    function setOperator(operator) {
+        if (collabMode !== "Free" && operator != userInfo.userId) {
+            $("#edit-mask").show();
+        } else {
+            $("#edit-mask").hide();
+        }
+
+        if (operator != undefined) {
+            $("#operator-name").remove();
+            $("#operator").append(`<span class="operator-name" id="operator-name">${operator.name}</span>`);
+        }
     }
 
-    if (operator != undefined) {
-        $("#operator-name").remove();
-        $("#operator").append(`<span class="operator-name" id="operator-name">${operator.name}</span>`);
-    }
-}
-
-function setWaitingLine(count) {
-    if (count != undefined) {
-        if (count > 0) {
-            $("#operation-waiting").empty();
-            $("#operation-waiting").append(`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-lines-fill" viewBox="0 0 16 16" style="margin-top: -3px;">
+    function setWaitingLine(count) {
+        if (count != undefined) {
+            if (count > 0) {
+                $("#operation-waiting").empty();
+                $("#operation-waiting").append(`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-lines-fill" viewBox="0 0 16 16" style="margin-top: -3px;">
                                                 <path d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-5 6s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H1zM11 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5zm.5 2.5a.5.5 0 0 0 0 1h4a.5.5 0 0 0 0-1h-4zm2 3a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1h-2zm0 3a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1h-2z"/>
                                             </svg>
                                             <span style="margin-left: 5px; color: #007bff;" title="Waiting for operation">${count} people are waiting</span>`);
-        } else if (count == 0) {
-            $("#operation-waiting").empty();
-            $("#operation-waiting").append(`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-lines-fill" viewBox="0 0 16 16" style="margin-top: -3px;">
+            } else if (count == 0) {
+                $("#operation-waiting").empty();
+                $("#operation-waiting").append(`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-lines-fill" viewBox="0 0 16 16" style="margin-top: -3px;">
                                                 <path d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-5 6s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H1zM11 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5zm.5 2.5a.5.5 0 0 0 0 1h4a.5.5 0 0 0 0-1h-4zm2 3a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1h-2zm0 3a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1h-2z"/>
                                             </svg>
                                             <span style="margin-left: 5px; color: #007bff;" title="Waiting for operation">Apply to operate</span>`);
+            }
         }
     }
-}
 
-/**
- * 给操作列表增加记录
- * @param {*} user
- * @param {*} operation
- */
-function addOperations(user, operation, from) {
-    // set operation id
-    let operationId = guid();
-    operation["id"] = operationId;
+    /**
+     * 给操作列表增加记录
+     * @param {*} user
+     * @param {*} operation
+     */
+    function addOperations(user, operation, from) {
+        // set operation id
+        let operationId = guid();
+        operation["id"] = operationId;
 
-    if (operation != undefined) {
+        if (operation != undefined) {
 
-        switch (operation.type) {
-            case "resource": {
-                if (operation.behavior === "upload") {
-                    let element = "";
-                    if (user.userId === userInfo.userId) {
-                        element = `<div class="operation-item">
+            switch (operation.type) {
+                case "resource": {
+                    if (operation.behavior === "upload") {
+                        let element = "";
+                        if (user.userId === userInfo.userId) {
+                            element = `<div class="operation-item">
                                         <div class="operation-title">Data - upload
                                             <input class="form-check-input operation-bind-check" type="checkbox" id="${operation.id}" title="Bind operations to the task">
                                         </div>
                                         <div class="operation-divider"></div>
                                         <div class="operation-content" title="You uploaded the data - ${operation.content.name}">You uploaded the data - ${operation.content.name}</div>
                                     </div>`;
-                    } else {
-                        element = `<div class="operation-item">
+                        } else {
+                            element = `<div class="operation-item">
                                         <div class="operation-title">Data - upload</div>
                                         <div class="operation-divider"></div>
                                         <div class="operation-content" title="${user.name} uploaded the data - ${operation.content.name}">${user.name} uploaded the data - ${operation.content.name}</div>
                                     </div>`;
+                        }
+
+                        $("#operation-list").append(element);
+                        $(`#${operation.id}`).on("change", function () {
+                            selectOperations(operation);
+                        });
+
+
+                    } else if (operation.behavior === "update") {
+
                     }
-
-                    $("#operation-list").append(element);
-                    $(`#${operation.id}`).on("change", function () {
-                        selectOperations(operation);
-                    });
-
-
-                } else if (operation.behavior === "update") {
-
+                    break;
                 }
-                break;
-            }
-            case "communication": {
-                break;
-            }
-            case "geo-analysis": {
+                case "communication": {
+                    break;
+                }
+                case "geo-analysis": {
 
-                if (operation.purpose === "Data processing") {
-                    let element = "";
-                    if (operation.participants.contains(userInfo.userId)) {
-                        element = `<div class="operation-item">
+                    if (operation.purpose === "Data processing") {
+                        let element = "";
+                        if (operation.participants.contains(userInfo.userId)) {
+                            element = `<div class="operation-item">
                                         <div class="operation-title">Geoanalysis - processing
                                             <input class="form-check-input operation-bind-check" type="checkbox" id="${operation.id}" title="Bind operations to the task">
                                         </div>
                                         <div class="operation-divider"></div>
                                         <div class="operation-content" title="You were processing the data - ${operation.outputs[0].name}">You were processing the data - ${operation.outputs[0].name}.</div>
                                     </div>`;
-                    } else {
-                        element = `<div class="operation-item">
+                        } else {
+                            element = `<div class="operation-item">
                                         <div class="operation-title">Geoanalysis - processing</div>
                                         <div class="operation-divider"></div>
                                         <div class="operation-content" title="The data - ${operation.content.name} were processing">The data - ${operation.content.name} were processing.</div>
                                     </div>`;
+                        }
+
+                        $("#operation-list").append(element);
+                        $(`#${operation.id}`).on("change", function () {
+                            selectOperations(operation);
+                        });
+                    } else if (operation.purpose === "execute") {
+
+                    } else if (operation.purpose === "modify") {
+
                     }
-
-                    $("#operation-list").append(element);
-                    $(`#${operation.id}`).on("change", function () {
-                        selectOperations(operation);
-                    });
-                } else if (operation.purpose === "execute") {
-
-                } else if (operation.purpose === "modify") {
-
+                    break;
                 }
-                break;
             }
-        }
 
-        // save the temporary operation
-        if (from === "origin") {
-            postIframeMsg({
-                "type": "task",
-                "behavior": "record",
-                "operations": [operation],
-                "task": ""
-            });
-        }
-    }
-}
-
-// Synchronize
-function startCollaboration() {
-    CollabSocket.initWebSocket(activityInfo.aid, toolId);
-}
-
-function syncCollabMode(mode) {
-    let message = {
-        type: "mode",
-        sender: userInfo.userId,
-        content: mode
-    }
-    CollabSocket.websocketSend(message);
-}
-
-function operationApply() {
-    let message = {
-        type: "control-apply",
-        sender: userInfo.userId,
-    }
-    CollabSocket.websocketSend(message);
-}
-
-function operationStop() {
-    let message = {
-        type: "control-stop",
-        sender: userInfo.userId,
-    }
-    CollabSocket.websocketSend(message);
-}
-
-function selectOperations(operation) {
-    if ($(`#${operation.id}`).is(":checked")) {
-        selectedOperations.push(operation);
-    } else {
-        for (let i = 0; i < selectedOperations.length; i++) {
-            if (selectedOperations[i].id == operation.id) {
-                selectedOperations.splice(i, 1);
+            // save the temporary operation
+            if (from === "origin") {
+                postIframeMsg({
+                    "type": "task",
+                    "behavior": "record",
+                    "operations": [operation],
+                    "task": ""
+                });
             }
         }
     }
-    // 操作绑定模态框
-    $("#bind-tasks-modal-content").empty();
-    if (selectedOperations.length === 0) {
-        $("#bind-tasks-modal-content").append(`<h3>There is no operations needed to bind to tasks.</h3>`);
 
-    } else if (selectedOperations.length > 0) {
-        if (taskList.length === 0) {
-            $("#bind-tasks-modal-content").append(`<h3>There is no existing task.</h3>`);
-        } else if (taskList.length > 0) {
-            $("#bind-tasks-modal-content").append(`<select class="custom-select" id="task-list">
+    // Synchronize
+    function startCollaboration() {
+        CollabSocket.initWebSocket(activityInfo.aid, toolId);
+    }
+
+    function syncCollabMode(mode) {
+        let message = {
+            type: "mode",
+            sender: userInfo.userId,
+            content: mode
+        }
+        CollabSocket.websocketSend(message);
+    }
+
+    function operationApply() {
+        let message = {
+            type: "control-apply",
+            sender: userInfo.userId,
+        }
+        CollabSocket.websocketSend(message);
+    }
+
+    function operationStop() {
+        let message = {
+            type: "control-stop",
+            sender: userInfo.userId,
+        }
+        CollabSocket.websocketSend(message);
+    }
+
+    function selectOperations(operation) {
+        if ($(`#${operation.id}`).is(":checked")) {
+            selectedOperations.push(operation);
+        } else {
+            for (let i = 0; i < selectedOperations.length; i++) {
+                if (selectedOperations[i].id == operation.id) {
+                    selectedOperations.splice(i, 1);
+                }
+            }
+        }
+        // 操作绑定模态框
+        $("#bind-tasks-modal-content").empty();
+        if (selectedOperations.length === 0) {
+            $("#bind-tasks-modal-content").append(`<h3>There is no operations needed to bind to tasks.</h3>`);
+
+        } else if (selectedOperations.length > 0) {
+            if (taskList.length === 0) {
+                $("#bind-tasks-modal-content").append(`<h3>There is no existing task.</h3>`);
+            } else if (taskList.length > 0) {
+                $("#bind-tasks-modal-content").append(`<select class="custom-select" id="task-list">
                                                             <option selected>Select one task</option>
                                                         </select>`);
-            for (let i = 0; i < taskList.length; i++) {
-                let elem = `<option value="${taskList[i].taskId}" title="${taskList[i].purpose}">${taskList[i].name}</option>`
-                $("#task-list").append(elem);
+                for (let i = 0; i < taskList.length; i++) {
+                    let elem = `<option value="${taskList[i].taskId}" title="${taskList[i].purpose}">${taskList[i].name}</option>`
+                    $("#task-list").append(elem);
+                }
+                $("#task-list").on("change", function () {
+                    selectedTask = $("#task-list option:checked").val();
+                });
             }
-            $("#task-list").on("change", function () {
-                selectedTask = $("#task-list option:checked").val();
-            });
         }
     }
-}
 
 }
 
@@ -1415,6 +1414,15 @@ function selectOperations(operation) {
         resaveFile(file, info)
     }
 
+
+    /**
+     * 活动socket转态信息
+     * get socket status
+     */
+    function getSocketInfo() {
+        return CollabSocket.socketInfo();
+    }
+
     /**
      * 自定义操作回调函数
      * send custom operations
@@ -1464,16 +1472,7 @@ function selectOperations(operation) {
         CollabSocket.initSocketChannel(opeChannel, dataChannel, compChannel);
     }
 
-
-    /**
-     * 活动socket转态信息
-     * get socket status
-     */
-    function getSocketInfo() {
-        return CollabSocket.socketInfo();
-    }
-
-    //
+    // 
     function selectDataOperation(value) {
         CollabSocket.receiveDataInputDataOperation(value);
     }
