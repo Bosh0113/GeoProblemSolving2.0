@@ -386,10 +386,10 @@ export default {
           let formData = new FormData();
           formData.append("picture", file);
           this.axios
-            .post("/GeoProblemSolving/resource/projectPic", formData)
+            .post("/GeoProblemSolving/res/image", formData)
             .then((res) => {
-              if (res.data != "Fail") {
-                this.pictureUrl = res.data;
+              if (res.data.code == 0) {
+                this.pictureUrl = res.data.data;
                 this.img = e.target.result;
                 $("#choosePicture").val("");
               } else {

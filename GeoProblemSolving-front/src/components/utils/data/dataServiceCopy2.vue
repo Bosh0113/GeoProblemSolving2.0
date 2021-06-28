@@ -60,7 +60,7 @@
             </div>
             <el-divider class="stateTitleDivider"></el-divider>
             <div
-              v-for="(input, index) in dataService.metaDetail.input"
+              v-for="(input, index) in inputData"
               :key="index"
               class="event"
             >
@@ -95,7 +95,7 @@
                         icon="el-icon-close"
                         size="mini"
                         circle
-                        @click="remove(input)"
+                        @click="remove(input, index)"
                       ></el-button>
                     </div>
                   </div>
@@ -121,7 +121,7 @@
             </div>
             <el-divider class="stateTitleDivider"></el-divider>
             <div
-              v-for="(parameter, index) in dataService.metaDetail.parameter"
+              v-for="(parameter, index) in inputParameter"
               :key="index"
               class="event"
             >
@@ -139,6 +139,8 @@
                     style="width:200px"
                     v-model="parameter.value"
                     placeholder="Enter the parameter"
+                    @focus="sendInputTyping"
+                    @change="sendInputParams"
                   ></el-input>
                 </el-col>
               </el-row>
@@ -161,9 +163,9 @@
                 <span class="event_name" :title="output.name">{{
                   output.name
                 }}</span>
-<!--                  <p class="event_desc" :title="output.description">-->
-<!--                    {{ output.description }}-->
-<!--                  </p>-->
+                  <!--                  <p class="event_desc" :title="output.description">-->
+                  <!--                    {{ output.description }}-->
+                  <!--                  </p>-->
                 </el-col>
                 <div>
                   <div class="_btn-group" v-if="type == 'Processing'">
@@ -264,9 +266,11 @@
   </div>
 </template>
 
+<!--数据方法调用-->
 <script>
   import {get, post} from "@/axios";
   import resourceList from "../../common/resource/resourceList-copy";
+  import multiActivity from "../../workingSpace/activity/multiActivity";
 
   export default {
     components: {
@@ -281,6 +285,8 @@
 
         dataService: {},
         dataServiceDetail: {},
+
+        outputData: [],
         record: {},
         selectDataDialogShow: false,
         url: "",
@@ -290,7 +296,6 @@
         */
         pageParams: {pageId: "", userId: "", userName: ""},
         inputIndex: "",
-        input2: "",
         showMask: false,
         zoomOutPicDialogShow: false,
         zoomUrl: "",
@@ -299,11 +304,14 @@
         //zhngzhng
         toolId: "",
         aid: "",
-        toolInfo: {}
+        toolInfo: {},
+        inputData: [],
+        inputParameter: []
       };
     },
     mounted() {
       this.toolId = window.frameElement.id;
+      //初始化协同模板 collaboration.loadCollabComponent -> initComponent
       loadCollabComponent();
       this.initTool();
     },
@@ -333,6 +341,8 @@
           this.pageParams.userName = userInfo.name;
           console.log(this.pageParams)
 
+          // 绑定函数
+          buildSocketChannel(this.getSocketOperation, null, this.getSocketComputation);
         } else {
           setTimeout(() => {
             this.getStepInfo();
@@ -348,7 +358,6 @@
         this.$axios.get("/GeoProblemSolving/tool/" + this.toolId)
           .then(res => {
             if (res.data.code == 0) {
-              // this.$set(this, "toolInfo", res.data.data);
               /*
               获取到 toolInfo 读取token,查看服务是否在线
                */
@@ -364,6 +373,9 @@
                     this.dataToken = tool.token;
                     this.type = tool.dataMethodType;
                     this.dataService = tool.dataMethodMeta.data;
+                    this.inputData = tool.dataMethodMeta.data.metaDetail.input;
+                    this.outputData = tool.dataMethodMeta.data.metaDetail.output;
+                    this.inputParameter = tool.dataMethodMeta.data.metaDetail.parameter;
                   } else {
                     this.$Notice.error({title: "Fail", desc: "Loading tool fail, Node offline."});
                   }
@@ -385,7 +397,7 @@
         };
         let {id} = await post(`/GeoProblemSolving/dataContainer/remote`, json);
         let remoteDataList = id;
-        let inputList = this.dataService.metaDetail.input;
+        let inputList = this.inputData;
 
         inputList.forEach(input => {
           console.log(remoteDataList);
@@ -400,9 +412,9 @@
       },
 
       async invokeTest() {
-        let inputs = this.dataService.metaDetail.input;
+        let inputs = this.inputData;
         let urls = {};
-        inputs.forEach((input)=>{
+        inputs.forEach((input) => {
           urls[input.name] = input.url
         })
 
@@ -418,7 +430,7 @@
         console.log("urlList", urls)
         console.log("paramList", paramList)
 
-        CollabSocket.sendDataOperation(this.aid, this.id, this.dataToken, urls, paramList, this.getSocketComputation)
+        sendDataOperation(this.aid, this.id, this.dataToken, urls, paramList)
 
 
         // let json = {
@@ -436,17 +448,35 @@
       },
       // webSocket 回调函数
       getSocketComputation: function (data) {
-        console.log(this.dataService.metaDetail.outputs)
-        let outputs =  data.computeOutputs;
-        let output = {};
-        let keys = Object.keys(outputs);
-        let values = Object.values(outputs);
-        for (let i = 0; i < keys.length-1; i++){
-          // this.dataService.metaDetail.output[0].url = data;
-          this.$set(this.dataService.metaDetail.output[i], "url", values[i]);
-          // this.dataService.metaDetail.output[i].url = values[i];
+        console.log(data)
+        if (data.behavior == "data") {
+          this.inputData = data.content.inputs;
+        } else if (data.behavior == "message") {
+          alert(data.content)
+          // console.log(this.dataService.metaDetail.outputs)
+          // let outputs =  data.computeOutputs;
+          // let output = {};
+          // let keys = Object.keys(outputs);
+          // let values = Object.values(outputs);
+          // for (let i = 0; i < keys.length; i++){
+          //   this.outputData[i].url = values[i];
+          //   let event = this.outputData[i];
+          //   this.$set(this.outputData, i, event);
+          //   // this.$set(this.outputData[i], "url", values[i]);
+          //   // this.dataService.metaDetail.output[i].url = values[i];
+          // }
+          // console.log(this.dataService.metaDetail.output)
         }
-        console.log(this.dataService.metaDetail.output)
+      },
+
+      getSocketOperation: function (data) {
+        if (data.behavior == "message") {
+          alert(data.content)
+        } else if (data.behavior == "data") {
+          let content = JSON.parse(data.content);
+          console.log("getSocketOperation", content)
+          this.inputData = content.inputs;
+        }
       },
 
       async bind(event) {
@@ -480,18 +510,26 @@
       },
 
       selectData(val) {
+        console.log("selectData", val)
+        //从resourceList传过来
         let index = this.inputIndex;
         this.dataService.metaDetail.input[index].url = val.address;
         this.dataService.metaDetail.input[index].urlName = val.name;
         this.selectDataDialogShow = false;
+
+        this.inputData = this.dataService.metaDetail.input;
+        console.log(" this.inputData", this.inputData)
+        //  直接将selectData 发过去就可以
+        selectDataOperation(this.inputData);
       },
 
       download(event) {
         window.open(event.url);
       },
-      remove(event) {
-        event.url == "";
+      remove(event, index) {
+        event.url = "";
         event.urlName = "";
+        this.$set(this.inputData, index, event);
       },
       maskVisible() {
         this.showMask = true;
@@ -502,7 +540,18 @@
       zoomOutPicDialog(url) {
         this.zoomUrl = url;
         this.zoomOutPicDialogShow = true;
+      },
+
+      /*
+      协同相关操作, 现在我是工具开发者，应该是面向说明文档（协同模板）来写工具
+       */
+      sendInputTyping: function () {
+        sendTypingInfo();
+      },
+      sendInputParams: function () {
+        sendInputParams();
       }
+
     },
 
   };

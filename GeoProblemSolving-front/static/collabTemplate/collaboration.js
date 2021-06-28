@@ -14,6 +14,7 @@ function guid() {
     function S4() {
         return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
     }
+
     return (S4() + S4() + "-" + S4() + "-4" + S4().substr(0, 3) + "-" + S4() + "-" + S4() + S4() + S4()).toLowerCase();
 }
 
@@ -190,6 +191,7 @@ var taskList = [];
 
     function addEvents() {
         // message
+        // The event occurs when a message is received through the event source
         window.addEventListener("message", getActivityInfo, false);
 
         $("#people-btn").on("click", function () {
@@ -419,6 +421,7 @@ var taskList = [];
                     let rootRes = result.data;
                     resources = resToCurrentFolder(rootRes);
                     showResList();
+
                 }
             },
             error: function (err) {
@@ -523,15 +526,15 @@ var taskList = [];
             }
             case "others": {
                 resElement = `<div class="card resource" title="${fileName}">
-                            <input class="form-check-input" type="checkbox" id="${file.uid}">
-                            <img src="/static/collabTemplate/img/otherfile.png" class="res-icon" />
-                            <div class="res-name">${fileName}</div>
-                        </div>`
+                    <input class="form-check-input" type="checkbox" id="${file.uid}">
+                        <img src="/static/collabTemplate/img/otherfile.png" class="res-icon" />
+                        <div class="res-name">${fileName}</div>
+                        </>`
                 break;
             }
         }
         $("#resource-list").append(resElement);
-        $(`#${file.uid}`).on("change", function () {
+        $(`#${file.uid} `).on("change", function () {
             selectFile(file);
 
             let message = {
@@ -588,6 +591,7 @@ var taskList = [];
         });
 
     }
+
     function resToCurrentFolder(rootRes) {
         let currentFolder = {
             folders: [],
@@ -606,7 +610,7 @@ var taskList = [];
 
     // resource related operations
     function selectFile(file) {
-        if ($(`#${file.uid}`).is(":checked")) {
+        if ($(`#${file.uid} `).is(":checked")) {
             selectedResources.push(file);
         } else {
             for (let i = 0; i < selectedResources.length; i++) {
@@ -704,6 +708,41 @@ var taskList = [];
         return uploadedList;
     }
 
+    function resaveFile(file, info) {
+
+        var formData = new FormData();
+        formData.append("file", file);
+        formData.append("resInfo", info);
+
+        let temp = folderIdStack;
+        if (temp.length == 0) {
+            temp = ["0"];
+        }
+        let paths = temp.toString();
+
+        $.ajax({
+            url: `/ GeoProblemSolving / rip / file / ${activityInfo.aid} /${paths}`,
+            type: "POST",
+            data: formData,
+            mimeType: "multipart/form-data",
+            processData: false,
+            contentType: false,
+            cache: false,
+            async: false,
+            success: function (data) {
+                if (data.code !== 0) {
+                    return "fail";
+                }
+            },
+            error: function (err) {
+                throw err;
+            }
+        });
+        return "success";
+    }
+
+    function deleteResource() { }
+
     function fileUpload(formData) {
         let uploadedList = null;
         $.ajax({
@@ -728,41 +767,6 @@ var taskList = [];
         });
         return uploadedList;
     }
-
-    function resaveFile(file, info) {
-
-        var formData = new FormData();
-        formData.append("file", file);
-        formData.append("resInfo", info);
-
-        let temp = folderIdStack;
-        if (temp.length == 0) {
-            temp = ["0"];
-        }
-        let paths = temp.toString();
-
-        $.ajax({
-            url: `/GeoProblemSolving/rip/file/${activityInfo.aid}/${paths}`,
-            type: "POST",
-            data: formData,
-            mimeType: "multipart/form-data",
-            processData: false,
-            contentType: false,
-            cache: false,
-            async: false,
-            success: function (data) {
-                if (data.code !== 0) {
-                    return "fail";
-                }
-            },
-            error: function (err) {
-                throw err;
-            }
-        });
-        return "success";
-    }
-
-    function deleteResource() { }
 
     /**
      * when resources changed
@@ -831,191 +835,192 @@ var taskList = [];
             }
         }
     }
+}
 
-    function setOperator(operator) {
-        if (collabMode !== "Free" && operator != userInfo.userId) {
-            $("#edit-mask").show();
-        } else {
-            $("#edit-mask").hide();
-        }
-
-        if (operator != undefined) {
-            $("#operator-name").remove();
-            $("#operator").append(`<span class="operator-name" id="operator-name">${operator.name}</span>`);
-        }
+function setOperator(operator) {
+    if (collabMode !== "Free" && operator != userInfo.userId) {
+        $("#edit-mask").show();
+    } else {
+        $("#edit-mask").hide();
     }
 
-    function setWaitingLine(count) {
-        if (count != undefined) {
-            if (count > 0) {
-                $("#operation-waiting").empty();
-                $("#operation-waiting").append(`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-lines-fill" viewBox="0 0 16 16" style="margin-top: -3px;">
+    if (operator != undefined) {
+        $("#operator-name").remove();
+        $("#operator").append(`<span class="operator-name" id="operator-name">${operator.name}</span>`);
+    }
+}
+
+function setWaitingLine(count) {
+    if (count != undefined) {
+        if (count > 0) {
+            $("#operation-waiting").empty();
+            $("#operation-waiting").append(`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-lines-fill" viewBox="0 0 16 16" style="margin-top: -3px;">
                                                 <path d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-5 6s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H1zM11 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5zm.5 2.5a.5.5 0 0 0 0 1h4a.5.5 0 0 0 0-1h-4zm2 3a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1h-2zm0 3a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1h-2z"/>
                                             </svg>
                                             <span style="margin-left: 5px; color: #007bff;" title="Waiting for operation">${count} people are waiting</span>`);
-            } else if (count == 0) {
-                $("#operation-waiting").empty();
-                $("#operation-waiting").append(`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-lines-fill" viewBox="0 0 16 16" style="margin-top: -3px;">
+        } else if (count == 0) {
+            $("#operation-waiting").empty();
+            $("#operation-waiting").append(`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-lines-fill" viewBox="0 0 16 16" style="margin-top: -3px;">
                                                 <path d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-5 6s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H1zM11 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5zm.5 2.5a.5.5 0 0 0 0 1h4a.5.5 0 0 0 0-1h-4zm2 3a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1h-2zm0 3a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1h-2z"/>
                                             </svg>
                                             <span style="margin-left: 5px; color: #007bff;" title="Waiting for operation">Apply to operate</span>`);
-            }
         }
     }
+}
 
-    /**
-     * 给操作列表增加记录
-     * @param {*} user
-     * @param {*} operation
-     */
-    function addOperations(user, operation, from) {
-        // set operation id
-        let operationId = guid();
-        operation["id"] = operationId;
+/**
+ * 给操作列表增加记录
+ * @param {*} user
+ * @param {*} operation
+ */
+function addOperations(user, operation, from) {
+    // set operation id
+    let operationId = guid();
+    operation["id"] = operationId;
 
-        if (operation != undefined) {
+    if (operation != undefined) {
 
-            switch (operation.type) {
-                case "resource": {
-                    if (operation.behavior === "upload") {
-                        let element = "";
-                        if (user.userId === userInfo.userId) {
-                            element = `<div class="operation-item">
+        switch (operation.type) {
+            case "resource": {
+                if (operation.behavior === "upload") {
+                    let element = "";
+                    if (user.userId === userInfo.userId) {
+                        element = `<div class="operation-item">
                                         <div class="operation-title">Data - upload
                                             <input class="form-check-input operation-bind-check" type="checkbox" id="${operation.id}" title="Bind operations to the task">
                                         </div>
                                         <div class="operation-divider"></div>
                                         <div class="operation-content" title="You uploaded the data - ${operation.content.name}">You uploaded the data - ${operation.content.name}</div>
                                     </div>`;
-                        } else {
-                            element = `<div class="operation-item">
+                    } else {
+                        element = `<div class="operation-item">
                                         <div class="operation-title">Data - upload</div>
                                         <div class="operation-divider"></div>
                                         <div class="operation-content" title="${user.name} uploaded the data - ${operation.content.name}">${user.name} uploaded the data - ${operation.content.name}</div>
                                     </div>`;
-                        }
-
-                        $("#operation-list").append(element);
-                        $(`#${operation.id}`).on("change", function () {
-                            selectOperations(operation);
-                        });
-
-
-                    } else if (operation.behavior === "update") {
-
                     }
-                    break;
-                }
-                case "communication": {
-                    break;
-                }
-                case "geo-analysis": {
 
-                    if (operation.purpose === "Data processing") {
-                        let element = "";
-                        if (operation.participants.contains(userInfo.userId)) {
-                            element = `<div class="operation-item">
+                    $("#operation-list").append(element);
+                    $(`#${operation.id}`).on("change", function () {
+                        selectOperations(operation);
+                    });
+
+
+                } else if (operation.behavior === "update") {
+
+                }
+                break;
+            }
+            case "communication": {
+                break;
+            }
+            case "geo-analysis": {
+
+                if (operation.purpose === "Data processing") {
+                    let element = "";
+                    if (operation.participants.contains(userInfo.userId)) {
+                        element = `<div class="operation-item">
                                         <div class="operation-title">Geoanalysis - processing
                                             <input class="form-check-input operation-bind-check" type="checkbox" id="${operation.id}" title="Bind operations to the task">
                                         </div>
                                         <div class="operation-divider"></div>
                                         <div class="operation-content" title="You were processing the data - ${operation.outputs[0].name}">You were processing the data - ${operation.outputs[0].name}.</div>
                                     </div>`;
-                        } else {
-                            element = `<div class="operation-item">
+                    } else {
+                        element = `<div class="operation-item">
                                         <div class="operation-title">Geoanalysis - processing</div>
                                         <div class="operation-divider"></div>
                                         <div class="operation-content" title="The data - ${operation.content.name} were processing">The data - ${operation.content.name} were processing.</div>
                                     </div>`;
-                        }
-
-                        $("#operation-list").append(element);
-                        $(`#${operation.id}`).on("change", function () {
-                            selectOperations(operation);
-                        });
-                    } else if (operation.purpose === "execute") {
-
-                    } else if (operation.purpose === "modify") {
-
                     }
-                    break;
+
+                    $("#operation-list").append(element);
+                    $(`#${operation.id}`).on("change", function () {
+                        selectOperations(operation);
+                    });
+                } else if (operation.purpose === "execute") {
+
+                } else if (operation.purpose === "modify") {
+
                 }
-            }
-
-            // save the temporary operation
-            if (from === "origin") {
-                postIframeMsg({
-                    "type": "task",
-                    "behavior": "record",
-                    "operations": [operation],
-                    "task": ""
-                });
+                break;
             }
         }
-    }
 
-    // Synchronize
-    function startCollaboration() {
-        CollabSocket.initWebSocket(activityInfo.aid, toolId);
-    }
-
-    function syncCollabMode(mode) {
-        let message = {
-            type: "mode",
-            sender: userInfo.userId,
-            content: mode
+        // save the temporary operation
+        if (from === "origin") {
+            postIframeMsg({
+                "type": "task",
+                "behavior": "record",
+                "operations": [operation],
+                "task": ""
+            });
         }
-        CollabSocket.websocketSend(message);
     }
+}
 
-    function operationApply() {
-        let message = {
-            type: "control-apply",
-            sender: userInfo.userId,
-        }
-        CollabSocket.websocketSend(message);
+// Synchronize
+function startCollaboration() {
+    CollabSocket.initWebSocket(activityInfo.aid, toolId);
+}
+
+function syncCollabMode(mode) {
+    let message = {
+        type: "mode",
+        sender: userInfo.userId,
+        content: mode
     }
+    CollabSocket.websocketSend(message);
+}
 
-    function operationStop() {
-        let message = {
-            type: "control-stop",
-            sender: userInfo.userId,
-        }
-        CollabSocket.websocketSend(message);
+function operationApply() {
+    let message = {
+        type: "control-apply",
+        sender: userInfo.userId,
     }
+    CollabSocket.websocketSend(message);
+}
 
-    function selectOperations(operation) {
-        if ($(`#${operation.id}`).is(":checked")) {
-            selectedOperations.push(operation);
-        } else {
-            for (let i = 0; i < selectedOperations.length; i++) {
-                if (selectedOperations[i].id == operation.id) {
-                    selectedOperations.splice(i, 1);
-                }
+function operationStop() {
+    let message = {
+        type: "control-stop",
+        sender: userInfo.userId,
+    }
+    CollabSocket.websocketSend(message);
+}
+
+function selectOperations(operation) {
+    if ($(`#${operation.id}`).is(":checked")) {
+        selectedOperations.push(operation);
+    } else {
+        for (let i = 0; i < selectedOperations.length; i++) {
+            if (selectedOperations[i].id == operation.id) {
+                selectedOperations.splice(i, 1);
             }
         }
-        // 操作绑定模态框
-        $("#bind-tasks-modal-content").empty();
-        if (selectedOperations.length === 0) {
-            $("#bind-tasks-modal-content").append(`<h3>There is no operations needed to bind to tasks.</h3>`);
+    }
+    // 操作绑定模态框
+    $("#bind-tasks-modal-content").empty();
+    if (selectedOperations.length === 0) {
+        $("#bind-tasks-modal-content").append(`<h3>There is no operations needed to bind to tasks.</h3>`);
 
-        } else if (selectedOperations.length > 0) {
-            if (taskList.length === 0) {
-                $("#bind-tasks-modal-content").append(`<h3>There is no existing task.</h3>`);
-            } else if (taskList.length > 0) {
-                $("#bind-tasks-modal-content").append(`<select class="custom-select" id="task-list">
+    } else if (selectedOperations.length > 0) {
+        if (taskList.length === 0) {
+            $("#bind-tasks-modal-content").append(`<h3>There is no existing task.</h3>`);
+        } else if (taskList.length > 0) {
+            $("#bind-tasks-modal-content").append(`<select class="custom-select" id="task-list">
                                                             <option selected>Select one task</option>
                                                         </select>`);
-                for (let i = 0; i < taskList.length; i++) {
-                    let elem = `<option value="${taskList[i].taskId}" title="${taskList[i].purpose}">${taskList[i].name}</option>`
-                    $("#task-list").append(elem);
-                }
-                $("#task-list").on("change", function () {
-                    selectedTask = $("#task-list option:checked").val();
-                });
+            for (let i = 0; i < taskList.length; i++) {
+                let elem = `<option value="${taskList[i].taskId}" title="${taskList[i].purpose}">${taskList[i].name}</option>`
+                $("#task-list").append(elem);
             }
+            $("#task-list").on("change", function () {
+                selectedTask = $("#task-list option:checked").val();
+            });
         }
     }
+}
 
 }
 
@@ -1186,20 +1191,20 @@ var taskList = [];
             this.websock.close();
         },
 
-        reciveCustomOperations: function (agentData, callback) {
-            operationChannel = callback;
+        reciveCustomOperations: function (agentData) {
+            // operationChannel = callback;
             if (this.websock.readyState === this.websock.OPEN) {
                 // 若是ws开启状态
                 this.websocketSend(agentData)
             } else if (this.websock.readyState === this.websock.CONNECTING) {
                 // 若是 正在开启状态，则等待1s后重新调用
                 setTimeout(function () {
-                    this.reciveCustomOperations(agentData, callback);
+                    this.reciveCustomOperations(agentData);
                 }, 1000);
             } else {
                 // 若未开启 ，则等待1s后重新调用
                 setTimeout(function () {
-                    this.reciveCustomOperations(agentData, callback);
+                    this.reciveCustomOperations(agentData);
                 }, 1000);
             }
         },
@@ -1212,7 +1217,7 @@ var taskList = [];
         为此
         为了简化代码
         没必要将两类工具 Invoke 强行拧在一起
-
+    
         面向开发者定制开发工具
         若他在定制工具中使用到了通用工具
         如果要进行自定义的话
@@ -1224,8 +1229,8 @@ var taskList = [];
         如：dataService 时 servicePort 置空
         serviceIp 为 Token
          */
-        reciveModelOperation: function (aid, serviceMd5, serviceIp, servicePort, inputs, outputs, callback) {
-            computationChannel = callback;
+        reciveModelOperation: function (aid, serviceMd5, serviceIp, servicePort, inputs, outputs) {
+            // computationChannel = callback;
             //若是数据方法的话，则直接将部分参数置空即可
             let invokeForm = {
                 serviceMd5: serviceMd5,
@@ -1234,51 +1239,132 @@ var taskList = [];
                 computeAbleModel: true,
                 type: "computation",
                 inputs: inputs,
-                outputs: outputs
+                outputs: outputs,
+                sender: userInfo.userId
             };
             console.log("invokeForm", invokeForm)
             if (this.websock.readyState === this.websock.OPEN) {
                 this.websocketSend(invokeForm);
             } else if (this.websock.readyState === this.websock.CONNECTING) {
                 setTimeout(function () {
-                    this.reciveModelOperation(aid, serviceId, serviceIp, servicePort, inputs, outputs, callback);
+                    this.reciveModelOperation(aid, serviceId, serviceIp, servicePort, inputs, outputs);
                 }, 1000)
             } else {
                 //未开启，等待 1s
                 setTimeout(function () {
-                    this.reciveModelOperation(aid, serviceId, serviceIp, servicePort, inputs, outputs, callback);
+                    this.reciveModelOperation(aid, serviceId, serviceIp, servicePort, inputs, outputs);
                 }, 1000)
             }
         },
 
-        reciveDataOperation: function (aid, serviceId, serviceToken, inputs, params, callback) {
-            computationChannel = callback;
+        receiveDataComputation: function (aid, serviceId, serviceToken, inputs, params) {
+            // computationChannel = callback;
             let invokeMsg = {
                 type: "computation",
                 tid: serviceId,
                 token: serviceToken,
                 urls: inputs,
                 params: params,
-                computeAbleModel: false
+                computeAbleModel: false,
+                sender: userInfo.userId
             };
             if (this.websock.readyState === this.websock.OPEN) {
                 this.websocketSend(invokeMsg);
             } else if (this.websock.readyState === this.websock.CONNECTING) {
                 setTimeout(function () {
-                    this.reciveDataOperation(aid, serviceId, serviceToken, inputs, params, callback);
+                    this.receiveDataComputation(aid, serviceId, serviceToken, inputs, params);
                 }, 1000)
             } else {
                 setTimeout(function () {
-                    this.reciveDataOperation(aid, serviceId, serviceToken, inputs, params, callback);
+                    this.receiveDataComputation(aid, serviceId, serviceToken, inputs, params);
                 }, 1000)
             }
         },
+
+        /*
+        协同工具输入或输出协同显示
+        输入某个文件或参数
+        都是对mdl 文档的修改
+        先采用每次都全部更新
+        vue 视图更新总是会刷新的
+        msg.content 用于存储传输内容
+         */
+        //协同工具---正在输入提示
+        receiveTypingOperation: function () {
+            let typingMsg = {
+                type: "operation",
+                behavior: "message",
+                content: userInfo.name + " is typing.",
+                sender: userInfo.userId
+            };
+            if (this.websock.readyState === this.websock.OPEN) {
+                this.websocketSend(typingMsg);
+            } else if (this.websock.readyState === this.websock.CONNECTING) {
+                setTimeout(function () {
+                    this.receiveTypingOperation();
+                }, 1000)
+            } else {
+                setTimeout(function () {
+                    this.receiveTypingOperation();
+                }, 1000)
+            }
+        },
+        //协同工具---输入文件
+        receiveDataInputDataOperation: function (inputMdl) {
+            console.log(inputMdl)
+            let msg = {
+                type: "operation",
+                behavior: "data",
+                content: {
+                    inputs: inputMdl
+                },
+                sender: userInfo.userId
+            };
+            if (this.websock.readyState === this.websock.OPEN) {
+                this.websocketSend(msg);
+            } else if (this.websock.readyState === this.websock.CONNECTING) {
+                setTimeout(function () {
+                    this.receiveDataInputDataOperation(inputs);
+                }, 1000)
+            } else {
+                setTimeout(function () {
+                    this.receiveDataInputDataOperation(inputs);
+                }, 1000)
+            }
+        },
+        /*
+        协同工具---输入参数
+         */
+        receiveParamsOperation: function (inputParams) {
+            let paramsMsg = {
+                type: "operation",
+                behavior: "params",
+                content: {
+                    inputs: inputParams
+                },
+                sender: userInfo.userId
+            };
+
+            if (this.websock.readyState === this.websock.OPEN) {
+                this.websocketSend(paramsMsg);
+            } else if (this.websock.readyState === this.websock.CONNECTING) {
+                setTimeout(function () {
+                    this.receiveParamsOperation(inputParams);
+                }, 1000)
+            } else {
+                setTimeout(function () {
+                    this.receiveParamsOperation(inputParams);
+                }, 1000)
+            }
+        },
+
 
         socketInfo: function () {
             return {
                 linked: this.websockLinked
             }
         }
+
     }
 }
 
@@ -1307,14 +1393,14 @@ var taskList = [];
     }
 
     /**
-    * save as new files 
-    * 另存为
-    * @param {*} uploadFiles
-    * @param {*} description
-    * @param {*} type
-    * @param {*} privacy
-    * @returns
-    */
+        * save as new files 
+        * 另存为
+        * @param {*} uploadFiles
+        * @param {*} description
+        * @param {*} type
+        * @param {*} privacy
+        * @returns
+        */
     function saveResources(uploadFiles, description, type, privacy, thumbnail) {
         saveResList(uploadFiles, description, type, privacy, thumbnail);
     }
@@ -1333,16 +1419,27 @@ var taskList = [];
      * 自定义操作回调函数
      * send custom operations
      */
-    function sendCustomOperation(agentData, callback) {
-        CollabSocket.reciveCustomOperations(agentData, callback);
+    function sendCustomOperation(agentData) {
+        CollabSocket.reciveCustomOperations(agentData);
     }
 
     /**
      * 模型计算操作回调函数
      * send custom operations
      */
-    function sendModelOperation(aid, serviceMd5, serviceIp, servicePort, inputs, outputs, callback) {
-        CollabSocket.reciveModelOperation(aid, serviceMd5, serviceIp, servicePort, inputs, outputs, callback);
+    function sendModelOperation(aid, serviceMd5, serviceIp, servicePort, inputs, outputs) {
+        CollabSocket.reciveModelOperation(aid, serviceMd5, serviceIp, servicePort, inputs, outputs);
+    }
+
+    function sendSelectDataOperation() {
+    }
+
+    function sendTypingInfo() {
+        CollabSocket.receiveTypingOperation();
+    }
+
+    function sendInputParams(inputParams) {
+        CollabSocket.receiveParamsOperation(inputParams);
     }
 
     /**
@@ -1354,24 +1451,30 @@ var taskList = [];
      * @param inputs
      * @param params
      * @param callback
-    */
-    function sendDataOperation(aid, serviceId, serviceToken, inputs, params, callback) {
-        CollabSocket.reciveDataOperation(aid, serviceId, serviceToken, inputs, params, callback);
+     */
+    function sendDataOperation(aid, serviceId, serviceToken, inputs, params) {
+        CollabSocket.receiveDataComputation(aid, serviceId, serviceToken, inputs, params);
     }
 
     /**
      * 建立协同数据通道
      * build call back channel
-    */
+     */
     function buildSocketChannel(opeChannel, dataChannel, compChannel) {
         CollabSocket.initSocketChannel(opeChannel, dataChannel, compChannel);
     }
 
+
     /**
-    * 活动socket转态信息
-    * get socket status
-    */
+     * 活动socket转态信息
+     * get socket status
+     */
     function getSocketInfo() {
         return CollabSocket.socketInfo();
+    }
+
+    //
+    function selectDataOperation(value) {
+        CollabSocket.receiveDataInputDataOperation(value);
     }
 }

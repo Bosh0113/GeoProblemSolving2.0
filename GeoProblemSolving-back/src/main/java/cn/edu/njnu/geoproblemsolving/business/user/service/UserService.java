@@ -51,5 +51,8 @@ public interface UserService {
 
     // User registerService(User user);
 
+    //上传头像，返回头像链接，前端给base64
+    Object uploadAvatar(String email, String baseStr);
+
 
 }

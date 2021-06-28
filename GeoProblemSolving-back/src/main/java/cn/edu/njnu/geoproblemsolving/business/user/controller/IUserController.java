@@ -7,9 +7,11 @@ import cn.edu.njnu.geoproblemsolving.business.user.service.Impl.UserServiceImpl;
 import cn.edu.njnu.geoproblemsolving.business.user.service.TokenTask;
 import cn.edu.njnu.geoproblemsolving.business.user.util.ICommonUtil;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
+import cn.edu.njnu.geoproblemsolving.common.utils.ResultUtils;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.http.HttpRequest;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -163,6 +165,16 @@ public class IUserController {
         session.invalidate();
     }
 
-
+    @RequestMapping(value = "/avatar", method = RequestMethod.POST)
+    public JsonResult sendAvatar(HttpServletRequest req){
+        String email = (String)req.getSession().getAttribute("email");
+        String baseStr = (String)req.getAttribute("avatarStr");
+        String uploadResult = userService.uploadAvatar(email, baseStr);
+        if (uploadResult.equals("fail")){
+            return ResultUtils.error(-2, "fail");
+        }else{
+            return ResultUtils.success(uploadResult);
+        }
+    }
 
 }

@@ -527,7 +527,7 @@ export default {
               layer: _this.drawingLayerGroup.toGeoJSON(),
             }),
           };
-          sendCustomOperation(_this.send_content, _this.getSocketOperation);
+          sendCustomOperation(_this.send_content);
         });
       });
     },
@@ -571,7 +571,7 @@ export default {
               layer: e.name,
             }),
           };
-          sendCustomOperation(this.send_content, this.getSocketOperation);
+          sendCustomOperation(this.send_content);
         }
         isLayerCtrlClick = false;
       });
@@ -587,7 +587,7 @@ export default {
               zoom: this.map.getZoom(),
             }),
           };
-          sendCustomOperation(this.send_content, this.getSocketOperation);
+          sendCustomOperation(this.send_content);
           isZoomControl = false;
           isDoubleClick = false;
         }
@@ -604,7 +604,7 @@ export default {
               center: this.map.getCenter(),
             }),
           };
-          sendCustomOperation(this.send_content, this.getSocketOperation);
+          sendCustomOperation(this.send_content);
         }
         isMouseDown = false;
       });
@@ -621,7 +621,7 @@ export default {
         //     layer: this.drawingLayerGroup.toGeoJSON(),
         //   }),
         // };
-        // sendCustomOperation(this.send_content, this.getSocketOperation);
+        // sendCustomOperation(this.send_content);
       });
 
       // 删除事件
@@ -636,7 +636,7 @@ export default {
             layer: _this.drawingLayerGroup.toGeoJSON(),
           }),
         };
-        sendCustomOperation(this.send_content, this.getSocketOperation);
+        sendCustomOperation(this.send_content);
       });
 
       this.map.on("pm:globaleditmodetoggled", (e) => {
@@ -680,7 +680,7 @@ export default {
             }),
           };
         }
-        sendCustomOperation(this.send_content, this.getSocketOperation);
+        sendCustomOperation(this.send_content);
       });
     },
     getSocketData(data) {

@@ -295,6 +295,7 @@ public class CollaborationService {
                     break;
                 }
                 case "resource":
+                //    operation content字段用于存储需要转发的信息，统一使用String
                 case "operation": {
                     String behavior = messageObject.getString("behavior");
                     String object = messageObject.getString("content");

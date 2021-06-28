@@ -442,6 +442,29 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Override
+    public String uploadAvatar(String email, String baseStr) {
+        User localUser = userDao.findUserByIdOrEmail(email);
+        if (localUser == null){
+            return "fail";
+        }
+        String access_token = localUser.getTokenInfo().getAccess_token();
+        String updateUrl = "http://" + userServerIpAndPort + "/auth/update";
+        RestTemplateUtil httpUtil = new RestTemplateUtil();
+        JSONObject payloadJson = new JSONObject();
+        payloadJson.put("avatar", baseStr);
+        try {
+            JSONObject updateResultJson = httpUtil.postRequestToServer(updateUrl, access_token, payloadJson).getBody();
+            if (updateResultJson.getInteger("code") != 0){
+                return "fail";
+            }
+            User serverUser = updateResultJson.getObject("data", User.class);
+            String avatar = serverUser.getAvatar();
+            return avatar;
+        }catch (Exception e){
+            return "fail";
+        }
+    }
 
     @Override
     public void logout(String userId) {

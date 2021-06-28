@@ -221,6 +221,10 @@ public class ResController {
     }
 
 
-
+    @RequestMapping(value = "/image", method = RequestMethod.POST)
+    public JsonResult uploadPicture(HttpServletRequest request) {
+        JsonResult result = resService.uploadImage(request);
+        return result;
+    }
 
 }
