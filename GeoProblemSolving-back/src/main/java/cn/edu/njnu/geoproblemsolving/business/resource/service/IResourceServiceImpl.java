@@ -28,6 +28,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.util.ResourceUtils;
+import sun.misc.BASE64Decoder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -362,11 +364,7 @@ public class IResourceServiceImpl implements IResourceService {
     @Override
     public JsonResult uploadImage(HttpServletRequest request) {
         try {
-            InetAddress address = InetAddress.getLocalHost();
-            String ip = address.getHostAddress();
-            String servicePath = request.getSession().getServletContext().getRealPath("/");
             String pathURL = "Fail";
-            String reqPath = request.getRequestURL().toString();
             String newFileName = "";
 
             // Confirm
@@ -375,25 +373,28 @@ public class IResourceServiceImpl implements IResourceService {
                 return ResultUtils.error(-2, "File is not multimedia.");
             }
 
+            //新建存储文件夹
+            File path = new File(ResourceUtils.getURL("classpath:").getPath());
+            if (!path.exists()) {
+                path = new File("");
+            }
+            File imgLocation = new File(path.getAbsolutePath(), "static/images/res");
+            if (!imgLocation.exists()) {
+                imgLocation.mkdirs();
+            }
+
             Collection<Part> parts = request.getParts();
             for (Part part : parts) {
                 if (part.getName().equals("picture")) {
                     String filePath = part.getSubmittedFileName();
-                    String folderPath = servicePath + "resource/images";
-
+                    String folderPath = imgLocation.getPath();
 
                     JsonResult storeResult = fileStore(part, filePath, folderPath);
                     if (storeResult.getCode() == 0)
                         newFileName = storeResult.getData().toString();
                     else
                         return storeResult;
-                    pathURL = reqPath.replaceAll("localhost", ip) + "/" + newFileName;
-                    String regexGetUrl = "(/GeoProblemSolving[\\S]*)";
-                    Pattern regexPattern = Pattern.compile(regexGetUrl);
-                    Matcher matcher = regexPattern.matcher(pathURL);
-                    if (matcher.find()) {
-                        pathURL = matcher.group(1);
-                    }
+                    pathURL = "/GeoProblemSolving/images/res/" + newFileName;
                     break;
                 }
             }

@@ -297,9 +297,10 @@ public class CollaborationService {
                     break;
                 }
                 case "resource":
+                //    operation content字段用于存储需要转发的信息，统一使用String
                 case "operation": {
                     String behavior = messageObject.getString("behavior");
-                    String object = messageObject.getString("object");
+                    String object = messageObject.getString("content");
                     // 操作权限判断，冲突判断
                     CollaborationMode mode = collaborationConfig.getMode();
                     if (mode.equals(CollaborationMode.SemiFree_Apply)) {

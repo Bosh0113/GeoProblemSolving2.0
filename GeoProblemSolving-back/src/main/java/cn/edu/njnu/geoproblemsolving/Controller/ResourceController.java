@@ -57,9 +57,9 @@ public class ResourceController {
         resourceDao.packageToZip(request,response);
     }
 
-//    @RequestMapping(value = "/projectPic", method = RequestMethod.POST)
-//    public String uploadPicture(HttpServletRequest request) {
-//        ResourceDaoImpl resourceDao = new ResourceDaoImpl(mongoTemplate);
-//        return resourceDao.uploadProjectPic(request);
-//    }
+   @RequestMapping(value = "/projectPic", method = RequestMethod.POST)
+   public String uploadPicture(HttpServletRequest request) {
+       ResourceDaoImpl resourceDao = new ResourceDaoImpl(mongoTemplate);
+       return resourceDao.uploadProjectPic(request);
+   }
 }

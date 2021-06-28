@@ -80,7 +80,7 @@
 <script>
 import { get, del, post, put, patch } from "@/axios";
 export default {
-  props: ["activityResource"],
+  props: ["pageParams"],
   components: {},
 
   watch: {
@@ -173,9 +173,9 @@ export default {
     },
 
     submit() {
-      console.log(this.selectData)
       this.$emit("selectData", this.selectData);
-    }
+    },
+
   },
 
   mounted() {

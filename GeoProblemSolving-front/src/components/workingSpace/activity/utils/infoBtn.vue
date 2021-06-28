@@ -173,7 +173,7 @@
               style="margin: 5px 0"
               :padding="5"
               v-for="member in participants"
-              :key="member.name"
+              :key="member.userId"
             >
               <div style="display: flex; align-items: center">
                 <div

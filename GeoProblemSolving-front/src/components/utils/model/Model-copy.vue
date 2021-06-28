@@ -67,7 +67,11 @@
                         ></el-table-column>
                         <el-table-column label="Value">
                           <template slot-scope="scope">
-                            <el-input v-model="scope.row.value"></el-input>
+                            <el-input
+                              v-model="scope.row.value"
+                              @focus="sendInputTyping"
+                              @change="sendInputParams"
+                            ></el-input>
                           </template>
                         </el-table-column>
                       </el-table>
@@ -343,7 +347,7 @@
           this.aid = activityInfo.aid;
 
           // 绑定函数
-          buildSocketChannel(null, null, this.getSocketComputation);
+          buildSocketChannel(this.getSocketOperation, null, this.getSocketComputation);
 
         }else {
           //避免this指向问题
@@ -352,6 +356,10 @@
             _this.getStepInfo();
           }, 1000)
         }
+      },
+
+      getSocketOperation: function(data){
+        console.log(data)
       },
 
       initLoading: function () {
@@ -693,6 +701,14 @@
           spinner: "el-icon-loading",
           background: "rgba(0, 0, 0, 0.7)",
         });
+      },
+
+
+      sendInputTyping: function () {
+        sendTypingInfo();
+      },
+      sendInputParams: function () {
+        sendInputParams();
       },
 
 
