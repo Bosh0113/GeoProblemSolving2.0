@@ -1,6 +1,5 @@
 package cn.edu.njnu.geoproblemsolving.business.resource.controller;
 
-import cn.edu.njnu.geoproblemsolving.Dao.Resource.ResourceDaoImpl;
 import cn.edu.njnu.geoproblemsolving.business.resource.entity.AddIResourceDTO;
 import cn.edu.njnu.geoproblemsolving.business.resource.entity.IResourceEntity;
 import cn.edu.njnu.geoproblemsolving.business.resource.entity.ResourceEntity;

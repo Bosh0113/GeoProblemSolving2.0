@@ -1,13 +1,13 @@
 Array.prototype.contains = function (obj) {
     var i = this.length;
     while (i--) {
-      if (this[i] != undefined && this[i] === obj ||
-        this[i].userId != undefined && this[i].userId === obj) {
-        return true;
-      }
+        if (this[i] != undefined && this[i] === obj ||
+            this[i].userId != undefined && this[i].userId === obj) {
+            return true;
+        }
     }
     return false;
-  };
+};
 
 //guid
 function guid() {
@@ -25,7 +25,7 @@ var taskList = [];
 
 
 ///////////
-/// init
+/// init/page
 //////////
 {
     // the loading status of the collaboration component
@@ -399,7 +399,6 @@ var taskList = [];
 {
     // resource related
     var folderIdStack = [];
-    var parentFolder = {};
     var resources = [];
     var selectedResources = [];
     var loadResChannel = null;
@@ -656,7 +655,7 @@ var taskList = [];
         return uploadedList;
     }
 
-    function saveResList(uploadFiles, description, type, privacy) {
+    function saveResList(uploadFiles, description, type, privacy, thumbnail) {
         var formData = new FormData();
         for (var i = 0; i < uploadFiles.length; i++) {
             formData.append("file", uploadFiles[i]);
@@ -664,8 +663,10 @@ var taskList = [];
         formData.append("description", description);
         formData.append("type", type);
         formData.append("privacy", privacy);
+        formData.append("thumbnail", thumbnail);
         formData.append("aid", activityInfo.aid);
         formData.append("paths", ["0"].toString());
+        formData.append("editToolInfo", toolId);
 
         let uploadedList = fileUpload(formData);
 
@@ -687,6 +688,8 @@ var taskList = [];
                         provider: userInfo.userId,
                         description: uploadedList[i].description,
                         address: uploadedList[i].address,
+                        thumbnail: uploadedList[i].thumbnail,
+                        editToolInfo: toolId
                     }
                 ],
                 params: [],
@@ -726,6 +729,41 @@ var taskList = [];
         return uploadedList;
     }
 
+    function resaveFile(file, info) {
+
+        var formData = new FormData();
+        formData.append("file", file);
+        formData.append("resInfo", info);
+
+        let temp = folderIdStack;
+        if (temp.length == 0) {
+            temp = ["0"];
+        }
+        let paths = temp.toString();
+
+        $.ajax({
+            url: `/GeoProblemSolving/rip/file/${activityInfo.aid}/${paths}`,
+            type: "POST",
+            data: formData,
+            mimeType: "multipart/form-data",
+            processData: false,
+            contentType: false,
+            cache: false,
+            async: false,
+            success: function (data) {
+                if (data.code !== 0) {
+                    return "fail";
+                }
+            },
+            error: function (err) {
+                throw err;
+            }
+        });
+        return "success";
+    }
+
+    function deleteResource() { }
+
     /**
      * when resources changed
      */
@@ -761,6 +799,9 @@ var taskList = [];
     // task related
     var selectedTask = "";
 
+    // collaboration mode
+    var collabMode = "Free";
+
     // style
     function initCollaborationMode() {
         for (let i = 0; i < participants.length; i++) {
@@ -776,19 +817,28 @@ var taskList = [];
                 $(".operation-control-apply").hide();
                 $(".operation-control-occupy").hide();
                 $(".operation-list").css("height", "calc(100vh - 200px)");
+                collabMode = "Free";
             } else if (mode === "SemiFree_Apply") {
                 $(".operation-control-apply").show();
                 $(".operation-control-occupy").hide();
                 $(".operation-list").css("height", "calc(100vh - 305px)");
+                collabMode = "SemiFree_Apply";
             } else if (mode === "SemiFree_Occupy") {
                 $(".operation-control-apply").hide();
                 $(".operation-control-occupy").show();
                 $(".operation-list").css("height", "calc(100vh - 250px)");
+                collabMode = "SemiFree_Occupy";
             }
         }
     }
 
     function setOperator(operator) {
+        if (collabMode !== "Free" && operator != userInfo.userId) {
+            $("#edit-mask").show();
+        } else {
+            $("#edit-mask").hide();
+        }
+
         if (operator != undefined) {
             $("#operator-name").remove();
             $("#operator").append(`<span class="operator-name" id="operator-name">${operator.name}</span>`);
@@ -1257,16 +1307,26 @@ var taskList = [];
     }
 
     /**
-    * save files
-    * 保存
+    * save as new files 
+    * 另存为
     * @param {*} uploadFiles
     * @param {*} description
     * @param {*} type
     * @param {*} privacy
     * @returns
     */
-    function saveResources(uploadFiles, description, type, privacy) {
-        saveResList(uploadFiles, description, type, privacy);
+    function saveResources(uploadFiles, description, type, privacy, thumbnail) {
+        saveResList(uploadFiles, description, type, privacy, thumbnail);
+    }
+
+    /**
+     * save file
+     * 保存
+     * @param {*} file 
+     * @param {*} info 
+     */
+    function resaveResource(file, info) {
+        resaveFile(file, info)
     }
 
     /**

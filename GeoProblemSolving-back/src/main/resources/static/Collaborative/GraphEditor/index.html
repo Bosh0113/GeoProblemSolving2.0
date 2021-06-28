@@ -81,6 +81,8 @@
 <div id="collab-tool-head"></div>
 <div id="collab-tool-sidebar"></div>
 <div id="collab-tool-content">
+    <div id="edit-mask" title="The other participant is operating."></div>
+
     <script>
         window.taskInfo = {
             taskId: "",
@@ -126,10 +128,10 @@
                 },
                 saveTask() {
                     let graphXML = getGraphXML();
-                    let taskBlob = new Blob([graphXML],{type:"text/plain;charset=utf-8"});
-                    var fileOfBlob = new File([taskBlob], this.taskInfo.title+".xml");
-                    saveResources([fileOfBlob], this.taskInfo.description,  "others", "private");
-                    this.saveTaskModal=false;
+                    let taskBlob = new Blob([graphXML], {type: "text/plain;charset=utf-8"});
+                    var fileOfBlob = new File([taskBlob], this.taskInfo.title + ".xml");
+                    saveResources([fileOfBlob], this.taskInfo.description, "others", "private");
+                    this.saveTaskModal = false;
                 }
             }
         });

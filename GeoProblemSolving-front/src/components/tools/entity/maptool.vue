@@ -38,6 +38,8 @@
     <div id="collab-tool-head"></div>
     <div id="collab-tool-sidebar"></div>
     <div id="collab-tool-content">
+      <div id="edit-mask" title="The other participant is operating."></div>
+
       <div id="map" class="map">
         <Modal
           v-model="modalExport"
@@ -178,9 +180,7 @@ export default {
     this.initControl();
     this.listenDraw();
   },
-  beforeDestroy() {
-    socketClose();
-  },
+  beforeDestroy() {},
   beforeRouteEnter: (to, from, next) => {
     next((vm) => {
       if (!vm.$store.getters.userState || vm.$store.getters.userId == "") {
@@ -197,7 +197,11 @@ export default {
         this.resources = resources;
 
         // 绑定函数
-        buildSocketChannel(this.getSocketOperation, this.getSocketData, this.getSocketComputation);
+        buildSocketChannel(
+          this.getSocketOperation,
+          this.getSocketData,
+          this.getSocketComputation
+        );
         loadResChannel = this.loadResources;
       } else {
         let _this = this;
@@ -414,12 +418,18 @@ export default {
             var fileOfBlob = new File([this.geojsonBlob], filename);
 
             // upload
-            let file = saveResources([fileOfBlob], description, "data", "private");
+            let file = saveResources(
+              [fileOfBlob],
+              description,
+              "data",
+              "private",
+              ""
+            );
 
             this.showFile = true;
             this.selectData = file[0];
 
-            if(file.length > 0){
+            if (file.length > 0) {
               this.$Notice.open({
                 title: "Save to resource center",
                 desc: "Data saved successfully!",
@@ -442,7 +452,12 @@ export default {
         this.$Message.error("Worry format");
         return false;
       }
-      let uploadedList = uploadResources(file, "Map tool data", "data", "private");
+      let uploadedList = uploadResources(
+        file,
+        "Map tool data",
+        "data",
+        "private"
+      );
       if (uploadedList.length > 0) {
         this.showFile = true;
         this.selectData = uploadedList[0];
