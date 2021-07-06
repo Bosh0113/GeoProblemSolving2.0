@@ -679,7 +679,6 @@ svg {
     margin-left: 10px;
 }
 .nav {
-    width: 46px;
     height: calc(100vh - 40px);
     background-color: #48494a;
 }

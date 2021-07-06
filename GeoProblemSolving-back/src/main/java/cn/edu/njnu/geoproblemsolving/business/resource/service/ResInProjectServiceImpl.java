@@ -121,8 +121,14 @@ public class ResInProjectServiceImpl implements ResourceInProjectService {
 
             Collection<Part> parts = req.getParts();
             //多个肯定是在同一个文件夹的可以直接存入
-            //4分别代表:privacy, type, description aid, paths
-            int fileNum = parts.size() - 5;
+            //确定request 中的文件数量
+            int fileNum = 0;
+            for (Part part : parts) {
+                if (part.getName().equals("file")) {
+                    fileNum++;
+                }
+            }
+
             //post payLoad存储，使用LinkedMultiValueMap<String, Object>key/value形式进行存储
             LinkedMultiValueMap<String, Object> valueMap = new LinkedMultiValueMap<>();
             //restTemplate工具类
@@ -182,6 +188,15 @@ public class ResInProjectServiceImpl implements ResourceInProjectService {
                             res.setUploaderId(userId);
                             res.setUploaderName(uploadName);
                             res.setActivityId(aid);
+                            try {
+                                String thumbnail = req.getParameter("thumbnail");
+                                String editToolInfo = req.getParameter("editToolInfo");
+                                res.setThumbnail(thumbnail);
+                                res.setEditToolInfo(editToolInfo);
+                            }
+                            catch (Exception ex){
+
+                            }
 
                             uploadInfos.uploaded.add(res);
                             //如果不是最后一个，则进入下一次循环

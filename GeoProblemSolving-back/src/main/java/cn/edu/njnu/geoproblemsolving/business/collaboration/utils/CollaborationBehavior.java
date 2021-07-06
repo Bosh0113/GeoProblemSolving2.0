@@ -38,14 +38,18 @@ public class CollaborationBehavior {
 
         JsonResult userInfo = iUserDao.getUserInfo("userId", userId);
 
-        CollaborationUser collaborationUser = new CollaborationUser();
-        collaborationUser.setUserId(userId);
-        collaborationUser.setName(((InquiryUserDto) userInfo.getData()).getName());
-        collaborationUser.setEmail(((InquiryUserDto) userInfo.getData()).getEmail());
-        collaborationUser.setAvatar(((InquiryUserDto) userInfo.getData()).getAvatar());
-        collaborationUser.setSession(session);
+        if(userInfo.getCode() == 0) {
+            CollaborationUser collaborationUser = new CollaborationUser();
+            collaborationUser.setUserId(userId);
+            collaborationUser.setName(((InquiryUserDto) userInfo.getData()).getName());
+            collaborationUser.setEmail(((InquiryUserDto) userInfo.getData()).getEmail());
+            collaborationUser.setAvatar(((InquiryUserDto) userInfo.getData()).getAvatar());
+            collaborationUser.setSession(session);
 
-        return collaborationUser;
+            return collaborationUser;
+        } else {
+            return null;
+        }
     }
 
     public void sendCollaborationStatus(CollaborationConfig config, Session session) {

@@ -14,6 +14,7 @@ function guid() {
     function S4() {
         return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
     }
+
     return (S4() + S4() + "-" + S4() + "-4" + S4().substr(0, 3) + "-" + S4() + "-" + S4() + S4() + S4()).toLowerCase();
 }
 
@@ -35,7 +36,7 @@ var taskList = [];
     function initComponent() {
         $("#collab-tool-head").append(`<li class="head-logo"></li>`);
         $("#collab-tool-sidebar").append(
-            `<ul class="nav flex-column">
+            `<ul class="nav flex-column" style="width: 46px">
             <li class="nav-item">
                 <button type="button" class="btn btn-dark active" id="people-btn" title="People">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
@@ -170,6 +171,11 @@ var taskList = [];
         addEvents();
     }
 
+    function initBasicComponent() {
+        
+        window.addEventListener("message", getActivityInfo, false);
+    }
+
     function getActivityInfo(event) {
         if (event.data.type === "activity") {
 
@@ -190,6 +196,7 @@ var taskList = [];
 
     function addEvents() {
         // message
+        // The event occurs when a message is received through the event source
         window.addEventListener("message", getActivityInfo, false);
 
         $("#people-btn").on("click", function () {
@@ -276,7 +283,9 @@ var taskList = [];
         $("#folder-back").on("click", function () {
             getFolderRes({}, "back");
         });
-        $("#resource-update").on("click", getResources);
+        $("#resource-update").on("click", function() {
+            getResources();
+        });
         $("#resource-load").on("click", function () {
             if (loadResChannel != undefined && typeof loadResChannel == "function") {
                 loadResChannel(selectedResources);
@@ -405,11 +414,16 @@ var taskList = [];
 
     //data
     function getResources() {
-        folderIdStack = [];
-        $("#folder-back").hide();
+        let temp = folderIdStack;
+        if (temp.length == 0) {
+            temp = ["0"];
+            $("#folder-back").hide();
+        }
+        let paths = temp.toString();
+
 
         $.ajax({
-            url: "/GeoProblemSolving/rip/" + activityInfo.aid + "/0",
+            url: "/GeoProblemSolving/rip/" + activityInfo.aid + "/" + paths,
             type: "GET",
             async: false,
             success: function (result) {
@@ -419,6 +433,7 @@ var taskList = [];
                     let rootRes = result.data;
                     resources = resToCurrentFolder(rootRes);
                     showResList();
+
                 }
             },
             error: function (err) {
@@ -523,15 +538,15 @@ var taskList = [];
             }
             case "others": {
                 resElement = `<div class="card resource" title="${fileName}">
-                            <input class="form-check-input" type="checkbox" id="${file.uid}">
-                            <img src="/static/collabTemplate/img/otherfile.png" class="res-icon" />
-                            <div class="res-name">${fileName}</div>
-                        </div>`
+                    <input class="form-check-input" type="checkbox" id="${file.uid}">
+                        <img src="/static/collabTemplate/img/otherfile.png" class="res-icon" />
+                        <div class="res-name">${fileName}</div>
+                        </>`
                 break;
             }
         }
         $("#resource-list").append(resElement);
-        $(`#${file.uid}`).on("change", function () {
+        $(`#${file.uid} `).on("change", function () {
             selectFile(file);
 
             let message = {
@@ -588,6 +603,7 @@ var taskList = [];
         });
 
     }
+
     function resToCurrentFolder(rootRes) {
         let currentFolder = {
             folders: [],
@@ -606,7 +622,7 @@ var taskList = [];
 
     // resource related operations
     function selectFile(file) {
-        if ($(`#${file.uid}`).is(":checked")) {
+        if ($(`#${file.uid} `).is(":checked")) {
             selectedResources.push(file);
         } else {
             for (let i = 0; i < selectedResources.length; i++) {
@@ -618,6 +634,13 @@ var taskList = [];
     }
 
     function uploadResList(uploadFiles, description, type, privacy) {
+        
+        let temp = folderIdStack;
+        if (temp.length == 0) {
+            temp = ["0"];
+        }
+        let paths = temp.toString();
+
         var formData = new FormData();
         for (var i = 0; i < uploadFiles.length; i++) {
             formData.append("file", uploadFiles[i]);
@@ -626,7 +649,7 @@ var taskList = [];
         formData.append("type", type);
         formData.append("privacy", privacy);
         formData.append("aid", activityInfo.aid);
-        formData.append("paths", ["0"].toString());
+        formData.append("paths", paths);
 
         let uploadedList = fileUpload(formData);
 
@@ -656,6 +679,13 @@ var taskList = [];
     }
 
     function saveResList(uploadFiles, description, type, privacy, thumbnail) {
+        
+        let temp = folderIdStack;
+        if (temp.length == 0) {
+            temp = ["0"];
+        }
+        let paths = temp.toString();
+
         var formData = new FormData();
         for (var i = 0; i < uploadFiles.length; i++) {
             formData.append("file", uploadFiles[i]);
@@ -665,7 +695,7 @@ var taskList = [];
         formData.append("privacy", privacy);
         formData.append("thumbnail", thumbnail);
         formData.append("aid", activityInfo.aid);
-        formData.append("paths", ["0"].toString());
+        formData.append("paths", paths);
         formData.append("editToolInfo", toolId);
 
         let uploadedList = fileUpload(formData);
@@ -742,7 +772,7 @@ var taskList = [];
         let paths = temp.toString();
 
         $.ajax({
-            url: `/GeoProblemSolving/rip/file/${activityInfo.aid}/${paths}`,
+            url: `/ GeoProblemSolving / rip / file / ${activityInfo.aid} /${paths}`,
             type: "POST",
             data: formData,
             mimeType: "multipart/form-data",
@@ -1186,20 +1216,20 @@ var taskList = [];
             this.websock.close();
         },
 
-        reciveCustomOperations: function (agentData, callback) {
-            operationChannel = callback;
+        reciveCustomOperations: function (agentData) {
+            // operationChannel = callback;
             if (this.websock.readyState === this.websock.OPEN) {
                 // 若是ws开启状态
                 this.websocketSend(agentData)
             } else if (this.websock.readyState === this.websock.CONNECTING) {
                 // 若是 正在开启状态，则等待1s后重新调用
                 setTimeout(function () {
-                    this.reciveCustomOperations(agentData, callback);
+                    this.reciveCustomOperations(agentData);
                 }, 1000);
             } else {
                 // 若未开启 ，则等待1s后重新调用
                 setTimeout(function () {
-                    this.reciveCustomOperations(agentData, callback);
+                    this.reciveCustomOperations(agentData);
                 }, 1000);
             }
         },
@@ -1212,7 +1242,7 @@ var taskList = [];
         为此
         为了简化代码
         没必要将两类工具 Invoke 强行拧在一起
-
+    
         面向开发者定制开发工具
         若他在定制工具中使用到了通用工具
         如果要进行自定义的话
@@ -1224,8 +1254,8 @@ var taskList = [];
         如：dataService 时 servicePort 置空
         serviceIp 为 Token
          */
-        reciveModelOperation: function (aid, serviceMd5, serviceIp, servicePort, inputs, outputs, callback) {
-            computationChannel = callback;
+        reciveModelOperation: function (aid, serviceMd5, serviceIp, servicePort, inputs, outputs) {
+            // computationChannel = callback;
             //若是数据方法的话，则直接将部分参数置空即可
             let invokeForm = {
                 serviceMd5: serviceMd5,
@@ -1234,51 +1264,132 @@ var taskList = [];
                 computeAbleModel: true,
                 type: "computation",
                 inputs: inputs,
-                outputs: outputs
+                outputs: outputs,
+                sender: userInfo.userId
             };
             console.log("invokeForm", invokeForm)
             if (this.websock.readyState === this.websock.OPEN) {
                 this.websocketSend(invokeForm);
             } else if (this.websock.readyState === this.websock.CONNECTING) {
                 setTimeout(function () {
-                    this.reciveModelOperation(aid, serviceId, serviceIp, servicePort, inputs, outputs, callback);
+                    this.reciveModelOperation(aid, serviceId, serviceIp, servicePort, inputs, outputs);
                 }, 1000)
             } else {
                 //未开启，等待 1s
                 setTimeout(function () {
-                    this.reciveModelOperation(aid, serviceId, serviceIp, servicePort, inputs, outputs, callback);
+                    this.reciveModelOperation(aid, serviceId, serviceIp, servicePort, inputs, outputs);
                 }, 1000)
             }
         },
 
-        reciveDataOperation: function (aid, serviceId, serviceToken, inputs, params, callback) {
-            computationChannel = callback;
+        receiveDataComputation: function (aid, serviceId, serviceToken, inputs, params) {
+            // computationChannel = callback;
             let invokeMsg = {
                 type: "computation",
                 tid: serviceId,
                 token: serviceToken,
                 urls: inputs,
                 params: params,
-                computeAbleModel: false
+                computeAbleModel: false,
+                sender: userInfo.userId
             };
             if (this.websock.readyState === this.websock.OPEN) {
                 this.websocketSend(invokeMsg);
             } else if (this.websock.readyState === this.websock.CONNECTING) {
                 setTimeout(function () {
-                    this.reciveDataOperation(aid, serviceId, serviceToken, inputs, params, callback);
+                    this.receiveDataComputation(aid, serviceId, serviceToken, inputs, params);
                 }, 1000)
             } else {
                 setTimeout(function () {
-                    this.reciveDataOperation(aid, serviceId, serviceToken, inputs, params, callback);
+                    this.receiveDataComputation(aid, serviceId, serviceToken, inputs, params);
                 }, 1000)
             }
         },
+
+        /*
+        协同工具输入或输出协同显示
+        输入某个文件或参数
+        都是对mdl 文档的修改
+        先采用每次都全部更新
+        vue 视图更新总是会刷新的
+        msg.content 用于存储传输内容
+         */
+        //协同工具---正在输入提示
+        receiveTypingOperation: function () {
+            let typingMsg = {
+                type: "operation",
+                behavior: "message",
+                content: userInfo.name + " is typing.",
+                sender: userInfo.userId
+            };
+            if (this.websock.readyState === this.websock.OPEN) {
+                this.websocketSend(typingMsg);
+            } else if (this.websock.readyState === this.websock.CONNECTING) {
+                setTimeout(function () {
+                    this.receiveTypingOperation();
+                }, 1000)
+            } else {
+                setTimeout(function () {
+                    this.receiveTypingOperation();
+                }, 1000)
+            }
+        },
+        //协同工具---输入文件
+        receiveDataInputDataOperation: function (inputMdl) {
+            console.log(inputMdl)
+            let msg = {
+                type: "operation",
+                behavior: "data",
+                content: {
+                    inputs: inputMdl
+                },
+                sender: userInfo.userId
+            };
+            if (this.websock.readyState === this.websock.OPEN) {
+                this.websocketSend(msg);
+            } else if (this.websock.readyState === this.websock.CONNECTING) {
+                setTimeout(function () {
+                    this.receiveDataInputDataOperation(inputs);
+                }, 1000)
+            } else {
+                setTimeout(function () {
+                    this.receiveDataInputDataOperation(inputs);
+                }, 1000)
+            }
+        },
+        /*
+        协同工具---输入参数
+         */
+        receiveParamsOperation: function (inputParams) {
+            let paramsMsg = {
+                type: "operation",
+                behavior: "params",
+                content: {
+                    inputs: inputParams
+                },
+                sender: userInfo.userId
+            };
+
+            if (this.websock.readyState === this.websock.OPEN) {
+                this.websocketSend(paramsMsg);
+            } else if (this.websock.readyState === this.websock.CONNECTING) {
+                setTimeout(function () {
+                    this.receiveParamsOperation(inputParams);
+                }, 1000)
+            } else {
+                setTimeout(function () {
+                    this.receiveParamsOperation(inputParams);
+                }, 1000)
+            }
+        },
+
 
         socketInfo: function () {
             return {
                 linked: this.websockLinked
             }
         }
+
     }
 }
 
@@ -1295,6 +1406,30 @@ var taskList = [];
     }
 
     /**
+     * 使用组件基础功能：获取基本信息;协同功能
+     */
+    function basicCollabComponent() {
+        initBasicComponent();
+    }
+
+    /**
+     * 按文件夹，获取最新的资源
+     * @param {*} paths
+     */
+    function refreshResources() {
+        getResources();
+    }
+
+    /**
+     * 切换文件夹
+     * @param {*} folder
+     * @param {*} behavior
+     */
+    function switchFolder(folder, behavior) {
+        getFolderRes(folder, behavior);
+    }
+
+    /**
      * upload files
      * 上传
      * @param {*} uploadFiles 文件
@@ -1303,7 +1438,7 @@ var taskList = [];
      * @param {*} privacy 获取权限
      */
     function uploadResources(uploadFiles, description, type, privacy) {
-        uploadResList(uploadFiles, description, type, privacy);
+        return uploadResList(uploadFiles, description, type, privacy);
     }
 
     /**
@@ -1316,7 +1451,7 @@ var taskList = [];
      * @returns
      */
     function saveResources(uploadFiles, description, type, privacy, thumbnail) {
-        saveResList(uploadFiles, description, type, privacy, thumbnail);
+        return saveResList(uploadFiles, description, type, privacy, thumbnail);
     }
 
     /**
@@ -1326,23 +1461,43 @@ var taskList = [];
      * @param {*} info
      */
     function resaveResource(file, info) {
-        resaveFile(file, info)
+        return resaveFile(file, info)
+    }
+
+
+    /**
+     * 活动socket转态信息
+     * get socket status
+     */
+    function getSocketInfo() {
+        return CollabSocket.socketInfo();
     }
 
     /**
      * 自定义操作回调函数
      * send custom operations
      */
-    function sendCustomOperation(agentData, callback) {
-        CollabSocket.reciveCustomOperations(agentData, callback);
+    function sendCustomOperation(agentData) {
+        CollabSocket.reciveCustomOperations(agentData);
     }
 
     /**
      * 模型计算操作回调函数
      * send custom operations
      */
-    function sendModelOperation(aid, serviceMd5, serviceIp, servicePort, inputs, outputs, callback) {
-        CollabSocket.reciveModelOperation(aid, serviceMd5, serviceIp, servicePort, inputs, outputs, callback);
+    function sendModelOperation(aid, serviceMd5, serviceIp, servicePort, inputs, outputs) {
+        CollabSocket.reciveModelOperation(aid, serviceMd5, serviceIp, servicePort, inputs, outputs);
+    }
+
+    function sendSelectDataOperation() {
+    }
+
+    function sendTypingInfo() {
+        CollabSocket.receiveTypingOperation();
+    }
+
+    function sendInputParams(inputParams) {
+        CollabSocket.receiveParamsOperation(inputParams);
     }
 
     /**
@@ -1355,8 +1510,8 @@ var taskList = [];
      * @param params
      * @param callback
      */
-    function sendDataOperation(aid, serviceId, serviceToken, inputs, params, callback) {
-        CollabSocket.reciveDataOperation(aid, serviceId, serviceToken, inputs, params, callback);
+    function sendDataOperation(aid, serviceId, serviceToken, inputs, params) {
+        CollabSocket.receiveDataComputation(aid, serviceId, serviceToken, inputs, params);
     }
 
     /**
@@ -1367,11 +1522,8 @@ var taskList = [];
         CollabSocket.initSocketChannel(opeChannel, dataChannel, compChannel);
     }
 
-    /**
-     * 活动socket转态信息
-     * get socket status
-     */
-    function getSocketInfo() {
-        return CollabSocket.socketInfo();
+    // 
+    function selectDataOperation(value) {
+        CollabSocket.receiveDataInputDataOperation(value);
     }
 }

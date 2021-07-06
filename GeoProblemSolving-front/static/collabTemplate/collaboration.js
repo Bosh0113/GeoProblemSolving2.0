@@ -171,6 +171,11 @@ var taskList = [];
         addEvents();
     }
 
+    function initBasicComponent() {
+        
+        window.addEventListener("message", getActivityInfo, false);
+    }
+
     function getActivityInfo(event) {
         if (event.data.type === "activity") {
 
@@ -278,7 +283,9 @@ var taskList = [];
         $("#folder-back").on("click", function () {
             getFolderRes({}, "back");
         });
-        $("#resource-update").on("click", getResources);
+        $("#resource-update").on("click", function() {
+            getResources();
+        });
         $("#resource-load").on("click", function () {
             if (loadResChannel != undefined && typeof loadResChannel == "function") {
                 loadResChannel(selectedResources);
@@ -407,11 +414,16 @@ var taskList = [];
 
     //data
     function getResources() {
-        folderIdStack = [];
-        $("#folder-back").hide();
+        let temp = folderIdStack;
+        if (temp.length == 0) {
+            temp = ["0"];
+            $("#folder-back").hide();
+        }
+        let paths = temp.toString();
+
 
         $.ajax({
-            url: "/GeoProblemSolving/rip/" + activityInfo.aid + "/0",
+            url: "/GeoProblemSolving/rip/" + activityInfo.aid + "/" + paths,
             type: "GET",
             async: false,
             success: function (result) {
@@ -622,6 +634,13 @@ var taskList = [];
     }
 
     function uploadResList(uploadFiles, description, type, privacy) {
+        
+        let temp = folderIdStack;
+        if (temp.length == 0) {
+            temp = ["0"];
+        }
+        let paths = temp.toString();
+
         var formData = new FormData();
         for (var i = 0; i < uploadFiles.length; i++) {
             formData.append("file", uploadFiles[i]);
@@ -630,7 +649,7 @@ var taskList = [];
         formData.append("type", type);
         formData.append("privacy", privacy);
         formData.append("aid", activityInfo.aid);
-        formData.append("paths", ["0"].toString());
+        formData.append("paths", paths);
 
         let uploadedList = fileUpload(formData);
 
@@ -660,6 +679,13 @@ var taskList = [];
     }
 
     function saveResList(uploadFiles, description, type, privacy, thumbnail) {
+        
+        let temp = folderIdStack;
+        if (temp.length == 0) {
+            temp = ["0"];
+        }
+        let paths = temp.toString();
+
         var formData = new FormData();
         for (var i = 0; i < uploadFiles.length; i++) {
             formData.append("file", uploadFiles[i]);
@@ -669,7 +695,7 @@ var taskList = [];
         formData.append("privacy", privacy);
         formData.append("thumbnail", thumbnail);
         formData.append("aid", activityInfo.aid);
-        formData.append("paths", ["0"].toString());
+        formData.append("paths", paths);
         formData.append("editToolInfo", toolId);
 
         let uploadedList = fileUpload(formData);
@@ -1380,6 +1406,30 @@ var taskList = [];
     }
 
     /**
+     * 使用组件基础功能：获取基本信息;协同功能
+     */
+    function basicCollabComponent() {
+        initBasicComponent();
+    }
+
+    /**
+     * 按文件夹，获取最新的资源
+     * @param {*} paths 
+     */
+    function refreshResources() {
+        getResources();
+    }
+
+    /**
+     * 切换文件夹
+     * @param {*} folder 
+     * @param {*} behavior 
+     */
+    function switchFolder(folder, behavior) {
+        getFolderRes(folder, behavior);
+    }
+
+    /**
      * upload files
      * 上传
      * @param {*} uploadFiles 文件
@@ -1388,7 +1438,7 @@ var taskList = [];
      * @param {*} privacy 获取权限
      */
     function uploadResources(uploadFiles, description, type, privacy) {
-        uploadResList(uploadFiles, description, type, privacy);
+        return uploadResList(uploadFiles, description, type, privacy);
     }
 
     /**
@@ -1401,7 +1451,7 @@ var taskList = [];
         * @returns
         */
     function saveResources(uploadFiles, description, type, privacy, thumbnail) {
-        saveResList(uploadFiles, description, type, privacy, thumbnail);
+        return saveResList(uploadFiles, description, type, privacy, thumbnail);
     }
 
     /**
@@ -1411,7 +1461,7 @@ var taskList = [];
      * @param {*} info 
      */
     function resaveResource(file, info) {
-        resaveFile(file, info)
+        return resaveFile(file, info)
     }
 
 
