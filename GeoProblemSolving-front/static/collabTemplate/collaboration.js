@@ -1238,22 +1238,28 @@ var taskList = [];
     msg.content 用于存储传输内容
      */
     //协同工具---正在输入提示
-    receiveTypingOperation: function () {
+    receiveTypingOperation: function (index, inOrOut) {
+      //inputNum 表示DOM 元素编号
+      //importer 表示正在输入的用户
       let typingMsg = {
         type: "operation",
         behavior: "message",
-        content: userInfo.name + " is typing.",
+        content: {
+          "inputNum": index,
+          "importer": userInfo.name,
+          "inOrOut": inOrOut
+        },
         sender: userInfo.userId
       };
       if (this.websock.readyState === this.websock.OPEN) {
         this.websocketSend(typingMsg);
       } else if (this.websock.readyState === this.websock.CONNECTING) {
         setTimeout(function () {
-          this.receiveTypingOperation();
+          this.receiveTypingOperation(index, inOrOut);
         }, 1000)
       } else {
         setTimeout(function () {
-          this.receiveTypingOperation();
+          this.receiveTypingOperation(index, inOrOut);
         }, 1000)
       }
     },
@@ -1372,8 +1378,8 @@ var taskList = [];
   function sendSelectDataOperation() {
   }
 
-  function sendTypingInfo() {
-    CollabSocket.receiveTypingOperation();
+  function sendTypingInfo(index, inOrOut) {
+    CollabSocket.receiveTypingOperation(index, inOrOut);
   }
 
   function sendInputParams(inputParams) {

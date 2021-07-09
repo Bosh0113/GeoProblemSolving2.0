@@ -5,7 +5,7 @@ import cn.edu.njnu.geoproblemsolving.business.collaboration.entity.ComputeMsg;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.entity.MsgRecords;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.repository.ChatMsgRepository;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.service.MsgRecordsService;
-import cn.edu.njnu.geoproblemsolving.business.user.dao.IUserDao;
+import cn.edu.njnu.geoproblemsolving.business.user.dao.UserDao;
 import cn.edu.njnu.geoproblemsolving.business.user.dto.InquiryUserDto;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.entity.CollaborationUser;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
@@ -23,7 +23,7 @@ import java.util.*;
 public class CollaborationBehavior {
 
     @Autowired
-    IUserDao iUserDao;
+    UserDao iUserDao;
 
     @Autowired
     MsgRecordsService msgRecordsService;
@@ -38,7 +38,12 @@ public class CollaborationBehavior {
 
         JsonResult userInfo = iUserDao.getUserInfo("userId", userId);
 
+
         CollaborationUser collaborationUser = new CollaborationUser();
+
+        if (userInfo.getCode() != 0){
+            return collaborationUser;
+        }
         collaborationUser.setUserId(userId);
         collaborationUser.setName(((InquiryUserDto) userInfo.getData()).getName());
         collaborationUser.setEmail(((InquiryUserDto) userInfo.getData()).getEmail());
@@ -80,8 +85,10 @@ public class CollaborationBehavior {
                 if (!receiver.getUserId().equals(user.getUserId())) {
                     messageObject.put("behavior", behavior);
                     messageObject.put("activeUser", user.getUserInfo());
+                    receiver.getSession().getBasicRemote().sendText(messageObject.toString());
                 }
-                receiver.getSession().getBasicRemote().sendText(messageObject.toString());
+                //没必要发给自己
+                // receiver.getSession().getBasicRemote().sendText(messageObject.toString());
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -328,6 +335,21 @@ public class CollaborationBehavior {
                     participant.getValue().getSession().getBasicRemote().sendText(messageObject.toString());
                 }
             }
+        }
+    }
+
+    public void sendTasKAssignment(HashMap<String, CollaborationUser> participants, CollaborationUser sender, JSONObject msgJson) throws IOException {
+        try {
+
+            for (Map.Entry<String, CollaborationUser> participant: participants.entrySet()){
+                //发送者的就不需要 webSocket 进行广播通知，在页面上有相应的处理逻辑
+                if (participant.getValue().getUserId().equals(sender.getUserId())){
+                    continue;
+                }
+                participant.getValue().getSession().getBasicRemote().sendText(msgJson.toString());
+            }
+        } catch (Exception ex) {
+            throw ex;
         }
     }
 

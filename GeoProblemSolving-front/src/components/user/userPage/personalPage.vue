@@ -387,6 +387,9 @@ body {
                           :autosize="{minRows: 2,maxRows: 5}"
                         ></Input>
                       </FormItem>
+
+
+
                       <FormItem label="Avatar" prop="avatar">
                         <div>
                           <div class="demo-upload-list" v-if="personalInfoItem.avatar!=''&& personalInfoItem.avatar != null  && personalInfoItem.avatar != undefined">
@@ -402,7 +405,6 @@ body {
                             <Icon
                               type="ios-camera"
                               size="20"
-                              style="position:absolute;margin:18px;"
                             ></Icon>
                             <input
                               id="choosePicture"
@@ -411,6 +413,7 @@ body {
                               class="uploadAvatar"
                             />
                           </div>
+                              style="position:absolute;margin:18px;"
                           <Modal title="View Image" v-model="visible">
                             <img :src="personalInfoItem.avatar" v-if="visible" style="width: 100%" />
                           </Modal>

@@ -337,8 +337,35 @@
                                 .post(url)
                                 .then((res) => {
                                     if (res.data.code == 0) {
-                                        this.$Message.info("Join the project successfuly");
-                                        window.location.href = "/GeoProblemSolving/projectInfo/" + this.applyProjectInfo.projectId;
+                                        this.$Message.info("Join the project successfully");
+                                        window.location.href = "/GeoProblemSolving/projectInfo/" + this.applyProjectInfo.aid;
+                                        let managerId = "";
+                                        this.applyProjectInfo.members.forEach(item=>{
+                                            if (item.role == "manager"){
+                                                managerId = item.userId;
+                                            }
+                                        })
+                                        //直接加入的Notice
+                                        let notice = {};
+                                        notice["recipientId"] = managerId;
+                                        notice["type"] = "notice";
+                                        notice["content"] = {
+                                            title: "Join Project",
+                                            description:
+                                                this.userInfo.name + " join project: " + this.applyProjectInfo.name
+                                        };
+                                        axios
+                                            .post("/GeoProblemSolving/notice/save", notice)
+                                            .then(res => {
+                                                if (res.data == "Success") {
+                                                    this.$emit("sendnotice", {"type": "Notice", "receiver": managerId});
+                                                }
+                                            })
+                                            .catch(err => {
+                                                console.log("失败原因：" + err.data);
+                                            });
+
+
                                     } else if (res.data.code == -3) {
                                         this.$Notice.info({
                                                 desc:
@@ -411,7 +438,7 @@
                                                     desc:
                                                         "The project manager will process your apply in time,you can get a notification later to tell you the result."
                                                 });
-                                                this.$emit("sendNotice", managerId);
+                                                this.$emit("sendnotice", {"type": "Notice", "receiver": managerId});
                                                 this.haveApplied = true;
                                             } else {
                                                 this.$Notice.open({

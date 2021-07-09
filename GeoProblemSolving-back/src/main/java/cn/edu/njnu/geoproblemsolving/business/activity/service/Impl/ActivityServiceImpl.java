@@ -4,13 +4,13 @@ import cn.edu.njnu.geoproblemsolving.Dao.Folder.FolderDaoImpl;
 import cn.edu.njnu.geoproblemsolving.business.activity.dto.UpdateActivityDTO;
 import cn.edu.njnu.geoproblemsolving.business.activity.enums.ActivityType;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ProjectRepository;
+import cn.edu.njnu.geoproblemsolving.business.user.entity.UserEntity;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.LinkProtocol;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Subproject;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.SubprojectRepository;
 import cn.edu.njnu.geoproblemsolving.business.activity.service.ActivityService;
-import cn.edu.njnu.geoproblemsolving.business.user.entity.User;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityRepository;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ProtocolRepository;
 import cn.edu.njnu.geoproblemsolving.business.user.repository.UserRepository;
@@ -53,13 +53,13 @@ public class ActivityServiceImpl implements ActivityService {
         this.projectRepository = projectRepository;
     }
 
-    private User findByUserId(String userId) {
+    private UserEntity findByUserId(String userId) {
         Optional optional = userRepository.findById(userId);
         if (optional.isPresent()) {
             Object user = optional.get();
-            return (User) user;
+            return (UserEntity) user;
         } else {
-            return new User();
+            return new UserEntity();
         }
     }
 
@@ -337,7 +337,7 @@ public class ActivityServiceImpl implements ActivityService {
 
             // creator
             JSONObject participants = new JSONObject();
-            User creator = findByUserId(activity.getCreator());
+            UserEntity creator = findByUserId(activity.getCreator());
             participants.put("creator", creator);
 
             // members
@@ -346,7 +346,7 @@ public class ActivityServiceImpl implements ActivityService {
             JSONArray memberInfos = new JSONArray();
             for (Object member : members) {
                 String userId = (String) ((HashMap) member).get("userId");
-                User user = findByUserId(userId);
+                UserEntity user = findByUserId(userId);
                 JSONObject userInfo = new JSONObject();
                 userInfo.put("userId", userId);
                 userInfo.put("role", ((HashMap) member).get("role"));
@@ -606,7 +606,7 @@ public class ActivityServiceImpl implements ActivityService {
             // confirm
             Activity activity = findActivityById(aid);
             if (activity == null) return ResultUtils.error(-1, "Fail: activity does not exist.");
-            User user = findByUserId(userId);
+            UserEntity user = findByUserId(userId);
             if (user == null) return ResultUtils.error(-1, "Fail: user does not exist.");
 
             // add user info to subproject

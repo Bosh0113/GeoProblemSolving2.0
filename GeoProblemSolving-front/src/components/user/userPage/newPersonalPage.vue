@@ -91,7 +91,11 @@
       </div>
 
       <div style="width: calc(100vw - 200px)">
-        <router-view style="margin-top: 60px"></router-view>
+        <router-view
+          style="margin-top: 60px"
+          v-on="$listeners"
+          v-bind="$attrs"
+        ></router-view>
       </div>
 
   </div>
@@ -102,7 +106,6 @@
   import projectVue from "../subPage/project.vue";
   import ToWork from "../../projects/toWork";
   import notification from "../subPage/notification";
-  import resource from "../subPage/resource";
   import todoList from "../subPage/todoList";
   import Project from "../subPage/project";
   import tool from "../subPage/tool";
@@ -122,7 +125,6 @@
       ToWork,
       projectVue,
       notification,
-      resource,
       "todo-list": todoList,
       tool,
       resourceList

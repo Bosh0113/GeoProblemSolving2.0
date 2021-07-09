@@ -184,7 +184,7 @@
       },
       initTodoList: function () {
         this.axios
-          .get("/GeoProblemSolving/pTask/" + this.$store.getters.userId)
+          .get("/GeoProblemSolving/user/todo/" + this.$store.getters.userId)
           .then(res => {
             let doingListTemp = [];
             let doneListTemp = [];
@@ -217,7 +217,7 @@
         this.newTask.userId = this.$store.getters.userId;
         if (this.newTask.content !== "") {
           this.axios
-            .post("/GeoProblemSolving/pTask", this.newTask)
+            .post("/GeoProblemSolving/user/todo", this.newTask)
             .then(res => {
               console.log(res);
               if (res.data.code == 0) {
@@ -245,7 +245,7 @@
           changeType = 2;
         }
         this.axios
-          .put("/GeoProblemSolving/pTask", item)
+          .put("/GeoProblemSolving/user/todo", item)
           .then(res => {
             if (res.data.code == 0) {
               //
@@ -271,7 +271,7 @@
           this.importanceNum--;
         }
         this.axios
-          .put("/GeoProblemSolving/pTask", item)
+          .put("/GeoProblemSolving/user/todo", item)
           .then(res => {
             if (res.data.code == 0) {
               if (state == "doing" && item.importance == 1) {
@@ -287,7 +287,7 @@
       },
       delTask: function (ptId, index, state) {
         this.axios
-          .delete("/GeoProblemSolving/pTask/" + ptId)
+          .delete("/GeoProblemSolving/user/todo/" + ptId)
           .then(res => {
             if (res.data.code == 0) {
               if (state == "doing") {

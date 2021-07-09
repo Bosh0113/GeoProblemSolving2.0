@@ -97,8 +97,8 @@ var defaultPermission = {
 
 // Identify user roles
 function roleIdentify(members, userId) {
-    var role = "visitor";
-    for (var i = 0; i < members.length; i++) {
+    let role = "visitor";
+    for (let i = 0; i < members.length; i++) {
         if (members[i].userId == userId) {
             role = members[i].role;
             break;

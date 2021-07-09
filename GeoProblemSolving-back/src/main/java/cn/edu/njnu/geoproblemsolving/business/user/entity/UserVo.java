@@ -1,6 +1,5 @@
 package cn.edu.njnu.geoproblemsolving.business.user.entity;
 
-import cn.edu.njnu.geoproblemsolving.business.resource.entity.ResourcePojo;
 import cn.edu.njnu.geoproblemsolving.business.user.enums.UserTitle;
 import com.alibaba.fastjson.JSONArray;
 import lombok.AllArgsConstructor;
@@ -13,7 +12,7 @@ import java.util.Date;
 
 /**
  * @ClassName UserVo
- * @Description Todo
+ * @Description viewObject 前端使用
  * @Author zhngzhng
  * @Date 2021/4/6
  **/
@@ -27,7 +26,7 @@ public class UserVo {
     private String email;
 
     /**
-     * User server
+     * UserEntity server
      */
     private String avatar;
     private String phone;

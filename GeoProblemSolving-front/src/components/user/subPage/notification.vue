@@ -39,9 +39,9 @@
                 <div v-if="selectNoteNum!=0">
                   <!--
                   未读消息(分三种 notice, reply, apply)
-                  notice: 只有已读按钮
-                  reply: 只有回复按钮
-                  apply: 有同意与拒绝按钮
+                  notice: 只有已读按钮 不需要更新对象
+                  reply: 只有回复按钮  不需要更新对方
+                  apply: 有同意与拒绝按钮 需要实时更新对象通知数量
                      -->
                   <div
                     v-if="readOrUnread.includes('unRead')"
@@ -159,6 +159,7 @@
       this.resizeContent();
     },
     computed: {
+
       unReadCount: function () {
         let unReadNum = 0;
         if (this.selectedNoticeType.includes("noticeList")) {
@@ -476,7 +477,7 @@
                 .post("/GeoProblemSolving/notice/save", replyNotice)
                 .then((result) => {
                   if (result.data == "Success") {
-                    this.$emit("sendNotice", apply.content.userId);
+                    this.$emit("sendNotice", {"type": "Notice", "receiver": apply.content.userId });
                     let resultEmailBody = {};
                     resultEmailBody["recipient"] = apply.content.userEmail;
                     resultEmailBody["mailTitle"] = "Join project result";
@@ -495,6 +496,7 @@
                             desc:
                               "The process result email has been sent,if he/she doesn't online,the email will remind the joiner in time.",
                           });
+                          this.$emit("sendNotice", apply.content.userId);
                         } else {
                           this.$Notice.error({
                             title: "Email send fail",

@@ -50,6 +50,8 @@
               <span class="badge">{{createdProjectList.length}}</span>
             </Checkbox>
           </CheckboxGroup>
+
+          <Button slot="extra" type="primary" to="/newProject">Establish a project</Button>
         </Card>
 
         <!--    project content     -->
@@ -59,7 +61,7 @@
           >
             <vue-scroll :ops="ops">
               <Card :bordered="false"
-                    v-if="createdProjectList.length == 0 && selectedProjectType.includes('createdProject')">
+                    v-if="createdProjectList.length == 0 && selectedProjectType.includes('createdProject') && joinedProjectsList.length == 0">
                 <div style="display:flex;justify-content:center">
                   <Icon type="md-alert" size="40" color="gray"/>
                 </div>
@@ -122,7 +124,7 @@
                           type="default"
                           slot="extra"
                           style="margin:0 0 0 5px"
-                          @click.stop="deleteProjectModalShow(mProject.aid, mProject.name)"
+                          @click.stop="deleteProjectModalShow(mProject.aid, mProject.name, mProject.members)"
                           icon="md-close"
                           title="remove"
                         ></Button>
@@ -279,6 +281,7 @@
         projectMemberList: [],
         deleteProjectId: "",
         delProjectName: "",
+        delProjectMembers: [],
         currentProject: {},
         userEventList: [],
         selectedProjectType: ['joinedProject', 'createdProject'],
@@ -334,14 +337,7 @@
         let userInfo = this.$store.getters.userInfo;
 
         if (userInfo.createdProjects != null) {
-          let createdProjectIds = "";
-          for (let i = 0; i < userInfo.createdProjects.length; i++) {
-            if (i != userInfo.createdProjects.length - 1) {
-              createdProjectIds += userInfo.createdProjects[i] + ","
-            } else {
-              createdProjectIds += userInfo.createdProjects[i]
-            }
-          }
+          let createdProjectIds = userInfo.createdProjects.toString();
           // project/getProjects?aids=  用户获取项目
           this.$axios.get("/GeoProblemSolving/project/getProjects?aids=" + createdProjectIds)
             .then(res => {
@@ -354,14 +350,7 @@
         }
 
         if (userInfo.joinedProjects != null) {
-          let joinedProjectIds = "";
-          for (let i = 0; i < userInfo.joinedProjects.length; i++) {
-            if (i != userInfo.joinedProjects.length - 1) {
-              joinedProjectIds += userInfo.joinedProjects[i] + ","
-            } else {
-              joinedProjectIds += userInfo.joinedProjects[i]
-            }
-          }
+          let joinedProjectIds = userInfo.joinedProjects.toString();
           //projectIds 获取所有项目详情
           this.$axios.get("/GeoProblemSolving/project/getProjects?aids=" + joinedProjectIds)
             .then(res => {
@@ -373,9 +362,10 @@
             })
         }
       },
-      deleteProjectModalShow(pid, pName) {
+      deleteProjectModalShow(pid, pName, pMembers) {
         this.deleteProjectId = pid;
         this.delProjectName = pName;
+        this.delProjectMembers = pMembers;
         this.deleteProjectModal = true;
       },
       deleteProject() {
@@ -390,8 +380,6 @@
                 this.$store.commit("userLogout");
                 this.$router.push({name: "Login"});
               } else if (res.data.data == "Success") {
-                // var newManageProjects = [];
-                // var oldManageProjects = this.createdProjectList;
                 if (this.createdProjectList != null){
                   for (let i=0; i < this.createdProjectList.length; i++){
                     if (this.deleteProjectId == this.createdProjectList[i].aid){
@@ -399,7 +387,32 @@
                       break;
                     }
                   }
+                //  项目删除成功，需要给每一个成员都发送通知
+                  let notice = {};
+                  notice["type"] = "notice";
+                  notice["content"] = {
+                    title: "Project Deleted",
+                    description:
+                      this.currentProject.title + " has been deleted by manager " + this.$store.getters.userName + " !"
+                  };
+
+
+                  this.delProjectMembers.forEach((item)=>{
+                    notice["recipientId"] = item.userId;
+                    this.axios
+                      .post("/GeoProblemSolving/notice/save", notice)
+                      .then(res => {
+                        if (res.data == "Success") {
+                          this.$emit("sendNotice", {"type": "Notice", "receiver": item.userId});
+                        }
+                      })
+                      .catch(err => {
+                        console.log("失败原因：" + err.data);
+                      });
+                  })
                 }
+                //更改store中的信息
+                this.$store.commit("updateProject", this.deleteProjectId);
                 this.$Notice.success({title: "Delete Success."})
               } else {
                 this.$Notice.error({
@@ -511,7 +524,7 @@
               this.$Notice.success({title: "Quit Success"})
               this.removeQuitProject(quitProjectId);
               let notice = {};
-              let recipientId = this.currentProject.members[0].userId;
+              // let recipientId = this.currentProject.members[0].userId;
               notice["recipientId"] = creatorId;
               notice["type"] = "notice";
               notice["content"] = {
@@ -527,7 +540,8 @@
                 .post("/GeoProblemSolving/notice/save", notice)
                 .then(res => {
                   if (res.data == "Success") {
-                    this.$emit("sendNotice", recipientId);
+                    //调用父组件（Navigation.vue）websocket推送信息给对象
+                    this.$emit("sendNotice", {"type": "Notice", "receiver": creatorId});
                   }
                 })
                 .catch(err => {

@@ -9,8 +9,20 @@
         <div>
           <Card>
             <div slot="title">
-              <Icon type="ios-contact" size="20"/>
-              About {{userInfo.name}}
+              <img
+                :src="avatarUrl"
+                v-if="avatarUrl != null && avatarUrl != '' && avatarUrl != undefined"
+                :title="userInfo.name"
+                style="width:40px;height:40px;vertical-align:middle;"
+              />
+              <avatar
+                :username="userInfo.name"
+                :size="40"
+                style="margin-top:10px"
+                :title="userInfo.name"
+                v-else
+              />
+              <span>&ensp;&ensp; About {{userInfo.name}}</span>
             </div>
             <List>
               <ListItem>
@@ -27,12 +39,6 @@
                 </div>
               </ListItem>
 
-<!--              <ListItem>-->
-<!--                <span class="uTitle">Email</span>-->
-<!--                <div class="uAlign">-->
-<!--                  <span class="uContent">{{userInfo.email}}</span>-->
-<!--                </div>-->
-<!--              </ListItem>-->
               <ListItem>
                 <span class="uTitle">Title</span>
                 <div class="uAlign">
@@ -82,36 +88,6 @@
             </div>
           </Card>
         </div>
-        <!--        <div style="margin: 0 auto">-->
-        <!--          <img-->
-        <!--            v-bind:src="userInfo.avatar"-->
-        <!--            v-if="userInfo.avatar!=''&&userInfo.avatar!=undefined&&userInfo.avatar!=null"-->
-        <!--            :title="userInfo.name"-->
-        <!--            style="width:40px;height:40px;vertical-align:middle;"-->
-        <!--          />-->
-        <!--          <avatar-->
-        <!--            :username="userInfo.name"-->
-        <!--            :size="40"-->
-        <!--            style="margin-top:10px"-->
-        <!--            :title="userInfo.name"-->
-        <!--            v-else-->
-        <!--          />-->
-        <!--          <div>-->
-        <!--            <span style="font-size: 18px">Welcome,</span>-->
-        <!--            <span style="color: #0056b3; font-size: 18px">{{userInfo.name}}</span>-->
-        <!--          </div>-->
-        <!--        </div>-->
-
-        <!--        <Card>-->
-        <!--          <p slot="title">Personal Information</p>-->
-        <!--          <div>Name: <span style="margin-left: 10px;font-size: 15px">{{userInfo.name}}</span></div>-->
-        <!--          <div style="margin-top: 20px">Email: <span style="margin-left: 10px;font-size: 15px">{{userInfo.email}}</span></div>-->
-        <!--          <div style="margin-top: 20px">Organizations: <span style="margin-left: 10px;font-size: 15px">{{myOrganizations}}</span></div>-->
-        <!--          <hr/>-->
-        <!--                  <Button @click="showEditUserInfoModal">Edit Information</Button>-->
-        <!--                  <br/>-->
-        <!--                  <Button @click="showResetPwdModal">Change Password</Button>-->
-        <!--                </Card>-->
       </Col>
       <!-- 两个卡片 -->
     </Row>
@@ -121,7 +97,7 @@
       v-model="editUserInfoModal"
       width="600"
     >
-      <!--   头像显示, 点击上传 -->
+
       <div style="margin-top: 25px">
         <Form
           :model="userInfoFormItems"
@@ -194,6 +170,38 @@
               :autosize="{minRows: 2, maxRows: 5}"
               placeholder="Description"></Input>
           </FormItem>
+
+          <FormItem label="Avatar">
+            <div>
+              <div class="demo-upload-list" v-if="avatarUrl!=''&& avatarUrl != null  && avatarUrl != undefined">
+                <template>
+                  <img v-bind:src="avatarUrl" class="avatarImage" />
+                  <div class="demo-upload-list-cover">
+                    <Icon type="ios-eye-outline" @click.native="handleView()"></Icon>
+                  </div>
+                </template>
+              </div>
+
+              <div class="uploadBox">
+                <Icon
+                  type="ios-camera"
+                  size="20"
+                  style="position:absolute;margin:18px;"
+                ></Icon>
+                <input
+                  id="choosePicture"
+                  @change="uploadPhoto($event)"
+                  type="file"
+                  class="uploadAvatar"
+                />
+              </div>
+
+              <Modal title="View Image" v-model="visible">
+                <img :src="avatarUrl" v-if="visible" style="width: 100%" />
+              </Modal>
+            </div>
+          </FormItem>
+
         </Form>
       </div>
       <div slot="footer">
@@ -254,6 +262,8 @@
       return {
         editUserInfoModal: false,
         resetPasswordModal: false,
+        avatar: null,
+        visible: false,
         //显示的内容
         userInfo: {},
         //tags
@@ -274,6 +284,7 @@
           city: "",
           homepage: "",
           introduction: "",
+          avatar: ""
         },
         userFormRuleValidate: {
           name: [
@@ -359,9 +370,38 @@
     mounted() {
     },
     methods: {
+      selectImg: function(){
+        document.getElementById("choosePicture").click();
+      },
+      uploadPhoto(e) {
+        // 利用fileReader对象获取file
+        let file = e.target.files[0];
+        let filesize = file.size;
+        let filename = file.name;
+        let imgcode = "";
+        // 2,621,440   2M
+        if (filesize > 1024*1024) {
+          // 图片大于2MB
+          this.$Message.error("size > 1MB");
+        } else {
+          var reader = new FileReader();
+          reader.readAsDataURL(file);
+          reader.onload = e => {
+            // 读取到的图片base64 数据编码 将此编码字符串传给后台即可
+            imgcode = e.target.result;
+            this.avatar = imgcode;
+            $("#choosePicture").val("");
+          };
+        }
+      },
+      handleView() {
+        this.visible = true;
+      },
+      handleRemove() {
+        this.userInfoFormItems.avatar = "";
+      },
       orgTags: function (tags) {
         let orgs = [];
-        console.log(tags)
         for (let i = 0; i < tags.length; i++) {
           orgs.push(tags[i].text);
         }
@@ -376,7 +416,6 @@
       },
       initInfo: function () {
         this.userInfo = this.$store.getters.userInfo;
-        this.userInfoFormItems.userId = this.userInfo.userId;
         if (this.userInfo.organizations == null) {
           this.userInfo.organizations = [];
         }
@@ -389,7 +428,7 @@
         this.userInfoFormItems = this.userInfo;
       },
       updateUserInfo: function () {
-        let avatarBase64 = "";
+
         //在上传图片的时候使用 imageToBase64.js 转换为base64 即可
         // "avatar": avatarBase64,
         let updateInfo = {
@@ -398,22 +437,31 @@
           "title": this.userInfoFormItems.title,
           "organizations": this.userInfoFormItems.organizations,
           "domain": this.userInfoFormItems.domain,
-          "phone":  this.userInfoFormItems.phone,
+          "phone": this.userInfoFormItems.phone,
           "city": this.userInfoFormItems.city,
           "province": this.userInfoFormItems.province,
           "homepage": this.userInfoFormItems.homepage,
           "introduction": this.userInfoFormItems.introduction
         };
-        // image2Base64("https://whatever-image/").then(res=>{res})
+        let avatarBase64 = this.avatar;
+        if (avatarBase64.indexOf("base64") != -1){
+          updateInfo["avatar"] = avatarBase64;
+        }
+
         this.$axios
           .put("/GeoProblemSolving/user", updateInfo)
           .then(res => {
-            if (res.data.code == 0){
-              this.userInfo = this.userInfoFormItems;
+            if (res.data.code == 0) {
+              // this.userInfo = this.userInfoFormItems;
               this.editUserInfoModal = false;
+
+              if (this.avatar != res.data.data){
+                this.avatar = res.data.data;
+                this.$emit("changeAvatar", this.avatar)
+              }
               //更新成功是否需要将新的内容返回给前端？
               this.$Notice.success({title: "Update Success."})
-            }else {
+            } else {
               this.$Notice.error({title: "Update Failed."})
             }
           })
@@ -455,6 +503,7 @@
       },
 
     },
+
     computed: {
       myOrganizations: function () {
         let orgTemp = "";
@@ -480,6 +529,20 @@
           tempOrgs.push(this.organizationTags[i].text);
         }
         return this.userInfoFormItems.organizations;
+      },
+      avatarUrl: function () {
+        if (this.avatar != undefined && this.avatar != null && this.avatar != '' && this.avatar.indexOf("base64") != -1){
+          return this.avatar;
+        }
+        let temp = this.userInfo.avatar;
+        if (this.avatar != undefined && this.avatar != null && this.avatar != '' && this.avatar.indexOf("/avatar/") != -1) {
+          this.avatar = this.$store.getters.userServer + this.avatar;
+        } else if (temp != undefined & temp != null && temp != ''){
+          this.avatar  = this.$store.getters.userServer + temp;
+        }else {
+          this.avatar = '';
+        }
+        return this.avatar;
       }
     }
   }
@@ -526,5 +589,69 @@
     left: 100px;
     text-align: left;
     width: 500px
+  }
+
+  .selectImg:hover {
+    background-color: rgba(5, 192, 255, 0.55);
+    cursor: pointer;
+    box-shadow: 1px 2px 5px rgb(0 0 0 / 30%) !important;
+    border-radius: 100%;
+  }
+
+  .demo-upload-list {
+    display: inline-block;
+    width: 60px;
+    height: 60px;
+    text-align: center;
+    line-height: 60px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    overflow: hidden;
+    background: #fff;
+    position: relative;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+    margin-right: 4px;
+  }
+  .avatarImage {
+    width: 100%;
+    height: 100%;
+  }
+  .demo-upload-list-cover {
+    display: none;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.6);
+  }
+  .demo-upload-list:hover .demo-upload-list-cover {
+    display: block;
+  }
+  .demo-upload-list-cover i {
+    color: #fff;
+    font-size: 20px;
+    cursor: pointer;
+    margin: 0 2px;
+  }
+  .uploadAvatar {
+    position: relative;
+    width: 58px;
+    height: 58px;
+    top: 0;
+    left: 0;
+    outline: none;
+    background-color: transparent;
+    opacity: 0;
+  }
+  .uploadBox {
+    display: inline-block;
+    width: 58px;
+    height: 58px;
+    line-height: 58px;
+    overflow: hidden;
+    border-width: 0.75px;
+    border-style: dashed;
+    border-color: lightslategray;
   }
 </style>

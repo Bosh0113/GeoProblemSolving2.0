@@ -29,6 +29,7 @@ public class ResourceEntity {
     private Boolean userUpload;
     //个人空间内的文件夹不存在 privacy
     private String privacy;
+    //缩略图路径
     private String thumbnail;
     private String editToolInfo;
     private String fileSize;

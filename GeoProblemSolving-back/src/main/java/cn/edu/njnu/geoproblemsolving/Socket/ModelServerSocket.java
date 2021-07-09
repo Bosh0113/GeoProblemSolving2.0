@@ -1,9 +1,8 @@
 package cn.edu.njnu.geoproblemsolving.Socket;
 
 import cn.edu.njnu.geoproblemsolving.Config.MyEndPointConfigure;
-import cn.edu.njnu.geoproblemsolving.business.tool.chatroom.chatmessage.ChatMessageRecordsService;
 import cn.edu.njnu.geoproblemsolving.business.tool.chatroom.hydrologicalconcept.AnsjSegService;
-import cn.edu.njnu.geoproblemsolving.business.user.dao.IUserDao;
+import cn.edu.njnu.geoproblemsolving.business.user.dao.UserDao;
 import cn.edu.njnu.geoproblemsolving.business.user.dto.InquiryUserDto;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import com.alibaba.fastjson.JSONObject;
@@ -18,7 +17,6 @@ import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -46,7 +44,7 @@ public class ModelServerSocket {
     AnsjSegService ansjSegService;
 
     @Autowired
-    IUserDao iUserDao;
+    UserDao iUserDao;
 
     @OnOpen
     public void onOpen(@PathParam("roomId") String roomId, Session session, EndpointConfig config) throws IOException {

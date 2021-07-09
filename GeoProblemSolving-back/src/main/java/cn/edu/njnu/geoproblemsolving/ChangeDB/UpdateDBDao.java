@@ -1,15 +1,11 @@
 package cn.edu.njnu.geoproblemsolving.ChangeDB;
 
-import cn.edu.njnu.geoproblemsolving.Entity.ModelTools.CModel.ComputableModelEntity;
-import cn.edu.njnu.geoproblemsolving.Entity.Resources.FolderEntity;
-import cn.edu.njnu.geoproblemsolving.Entity.Resources.ResourceEntity;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Project;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Subproject;
 import cn.edu.njnu.geoproblemsolving.business.activity.enums.ActivityType;
 import cn.edu.njnu.geoproblemsolving.business.activity.enums.ProjectCategory;
 import cn.edu.njnu.geoproblemsolving.business.activity.enums.ProjectPrivacy;
-import cn.edu.njnu.geoproblemsolving.business.user.entity.User;
 import cn.edu.njnu.geoproblemsolving.business.user.enums.UserTitle;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -17,18 +13,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.DigestUtils;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-import sun.security.provider.MD5;
 
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -312,10 +300,10 @@ public class UpdateDBDao {
     }
 
     public String userUpdate() {
-        List<UserEntity> users = mongoTemplate.findAll(UserEntity.class);
-        for (UserEntity oldUser : users) {
+        List<cn.edu.njnu.geoproblemsolving.ChangeDB.UserEntity> users = mongoTemplate.findAll(cn.edu.njnu.geoproblemsolving.ChangeDB.UserEntity.class);
+        for (cn.edu.njnu.geoproblemsolving.ChangeDB.UserEntity oldUser : users) {
             try {
-                User user = new User();
+                cn.edu.njnu.geoproblemsolving.business.user.entity.UserEntity user = new cn.edu.njnu.geoproblemsolving.business.user.entity.UserEntity();
 
                 user.setUserId(oldUser.getUserId());
                 user.setName(oldUser.getUserName());
@@ -352,7 +340,7 @@ public class UpdateDBDao {
 
                 RestTemplate restTemplate = new RestTemplate();
                 String updateUrl  = "http://106.14.78.235/AuthServer/user/tempAdd";
-                restTemplate.postForEntity(updateUrl, user, User.class);
+                restTemplate.postForEntity(updateUrl, user, cn.edu.njnu.geoproblemsolving.business.user.entity.UserEntity.class);
 
 
 //                // 存本地
@@ -375,7 +363,7 @@ public class UpdateDBDao {
 //
 //                // email 重复注册用户处理
 //                Query query = Query.query(Criteria.where("email").is(oldUser.getEmail()));
-//                List<User> userCollection = mongoTemplate.find(query, User.class);
+//                List<UserEntity> userCollection = mongoTemplate.find(query, UserEntity.class);
 //                if (!userCollection.isEmpty()) {
 //                    mongoTemplate.remove(userCollection);
 //                }
