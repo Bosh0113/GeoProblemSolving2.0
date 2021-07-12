@@ -7,7 +7,8 @@
 EditorUi = function(editor, container, lightbox)
 {
 	mxEventSource.call(this);
-	
+	container = $("#collab-tool-content")[0];
+
 	this.destroyFunctions = [];
 	this.editor = editor || new Editor();
 	this.container = container || document.body;

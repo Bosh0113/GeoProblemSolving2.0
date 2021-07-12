@@ -104,7 +104,7 @@
 
 <script>
   import projectVue from "../subPage/project.vue";
-  import ToWork from "../../projects/toWork";
+  // import ToWork from "../../projects/toWork";
   import notification from "../subPage/notification";
   import todoList from "../subPage/todoList";
   import Project from "../subPage/project";
@@ -122,7 +122,7 @@
     name: "newPersonalPage",
     components: {
       Project,
-      ToWork,
+      // ToWork,
       projectVue,
       notification,
       "todo-list": todoList,
