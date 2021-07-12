@@ -875,7 +875,6 @@
                         if (data) {
                             data.userState = true;
                             sessionStorage.setItem('userInfo', JSON.stringify(data));
-                            this.roleIdentity();
                         } else {
                             console.log("Not logged in");
                             if (this.userRole != "Token") {
@@ -894,7 +893,7 @@
                 if (window.location.host == "localhost:8080") {
                     this.ipPort = 'http://localhost:8080';
                 }
-
+                this.roleIdentity();
                 this.getParticipants();
             },
             mounted() {
@@ -1285,7 +1284,6 @@
                         ".";
                 },
                 invite(name) {
-                    //不需要站内信
                     this.$refs[name].validate(valid => {
                         if (valid) {
                             var emailFormBody = {};
@@ -1362,7 +1360,6 @@
                                     title: "Result",
                                     desc: "The person is not the member of this project."
                                 });
-
                             } else if (res.data.code === 0) {
                                 this.$Notice.success({
                                     title: "Result",
