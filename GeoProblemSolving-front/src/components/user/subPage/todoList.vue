@@ -1,52 +1,70 @@
 <template>
   <div>
+    <div id="header" style="margin-top: 2%;">
+      <h1 style="text-align:center;">Todo List</h1>
+      <h3 style="margin:1%;text-align:center;">You can manage your todo list here</h3>
+    </div>
     <!--  Fiter  -->
     <Row>
-      <Col span="22" offset="1">
-        <Card>
-          <CheckboxGroup v-model="selectedTaskType">
-            <Checkbox label="Doing">
-              <span>Doing</span>
-              <span class="badge">{{doingList.length}}</span>
-            </Checkbox>
-            <Checkbox label="Done">
-              <span>Done</span>
-              <span class="badge">{{doneList.length}}</span>
-            </Checkbox>
-<!--            <Checkbox label="Assigned">-->
-<!--              <span>Assigned to you</span>-->
-<!--              <span class="badge">10</span>-->
-<!--            </Checkbox>-->
-            <Checkbox label="Importance" :disabled="true">
-              <span>Importance</span>
-              <span class="badge">{{importanceNum}}</span>
-            </Checkbox>
-          </CheckboxGroup>
-        </Card>
+      <Col span="22" offset="1" >
         <Card dis-hover>
-          <!--         新建任务   -->
-          <div>
-            <DatePicker
-              type="date"
-              style="position: absolute;top: 18px; right: 50px; z-index: 3"
-              class="customDatePicker custom"
-              title="select endTime"
-              @on-change="handleChange"
-            >
-            </DatePicker>
-            <Input
-              v-model="newTask.content"
-              prefix="ios-radio-button-off"
-              placeholder="Add Todo"
-              size="large"
-              @on-enter="addTask()"
-              style="display: inline-block;"
-              class="customIcon"
-            />
+          <p slot="title" style="height: 30px;">
+            <CheckboxGroup v-model="selectedTaskType" style="margin-left: 3.5%;margin-top: 5px;">
+              <Checkbox label="Doing">
+                <span>Doing</span>
+                <span class="badge">{{doingList.length}}</span>
+              </Checkbox>
+              <Checkbox label="Done">
+                <span>Done</span>
+                <span class="badge">{{doneList.length}}</span>
+              </Checkbox>
+              <!--            <Checkbox label="Assigned">-->
+              <!--              <span>Assigned to you</span>-->
+              <!--              <span class="badge">10</span>-->
+              <!--            </Checkbox>-->
+              <Checkbox label="Importance" :disabled="true">
+                 <span>Importance</span>
+                 <span class="badge">{{importanceNum}}</span>
+              </Checkbox>
+            </CheckboxGroup>
+          </p>
+          <div slot="extra">
+            <!--         新建任务   -->
+              <div style="position: relative;">
+                <DatePicker
+                  type="date"
+                  style="position: absolute;right: 5px;  top: 2px; z-index: 3"
+                  class="customDatePicker custom"
+                  title="select endTime"
+                  @on-change="handleChange"
+                >
+                </DatePicker>
+                <Input
+                  v-model="newTask.content"
+                  prefix="ios-radio-button-off"
+                  placeholder="Add Todo"
+                  size="large"
+                  @on-enter="addTask()"
+                  style="display: inline-block;"
+                  class="customIcon"
+                />
+                <!-- 拓展input框长度，借助slot="extra"的增长实现，通过透明的icon图标，增加 extra长度-->
+                <Icon type="ios-trash-outline" color="transparent"
+                      size="25"
+                /><Icon type="ios-trash-outline" color="transparent"
+                      size="25"
+                /><Icon type="ios-trash-outline" color="transparent"
+                      size="25"
+                /><Icon type="ios-trash-outline" color="transparent"
+                      size="25"
+                /><Icon type="ios-trash-outline" color="transparent"
+                      size="25"
+                />
+            </div>
           </div>
 
 
-          <!--      未完成            -->
+          <!--        未完成      -->
           <div>
             <Card
               dis-hover
@@ -135,6 +153,7 @@
 
             </Card>
           </div>
+
         </Card>
       </Col>
     </Row>

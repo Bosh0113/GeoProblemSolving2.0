@@ -1,34 +1,38 @@
 <template>
   <div>
+    <div id="header" style="margin-top: 2%;">
+      <h1 style="text-align:center;">Tool</h1>
+      <h3 style="margin:1%;text-align:center;">You can manage your tools here</h3>
+    </div>
     <Row>
       <Col span="22" offset="1">
-        <!--  Filter 包括 Created by me, Shared with me(项目中内容)，public, privacy-->
         <Row>
-          <Card>
-            <CheckboxGroup v-model="checkedType">
-              <Checkbox label="public">
-                <label>Public</label>
-                <label class="badge">{{ publicTools.length }}</label>
-              </Checkbox>
-              <Checkbox label="private">
-                <label>Privacy</label>
-                <label class="badge">{{ privateTools.length }}</label>
-              </Checkbox>
-            </CheckboxGroup>
-          </Card>
-        </Row>
-        <!--  具体显示区，图标加 缩略图 + 名字的显示方案; 先把created tool 拉过来；添加 shared 接口-->
-        <Row>
-          <Card>
-            <p slot="title">Tools</p>
+          <Card dis-hover>
+            <p slot="title" style="height: 30px;">
+              <!--  Filter 包括 Created by me, Shared with me(项目中内容)，public, privacy-->
+                <CheckboxGroup v-model="checkedType" style="margin-left: 3.5%;margin-top: 5px;">
+                  <Checkbox label="public">
+                    <label>Public</label>
+                    <label class="badge">{{ publicTools.length }}</label>
+                  </Checkbox>
+                  <Checkbox label="private">
+                    <label>Privacy</label>
+                    <label class="badge">{{ privateTools.length }}</label>
+                  </Checkbox>
+                </CheckboxGroup>
+            </p>
+            <!--  具体显示区，图标加 缩略图 + 名字的显示方案; 先把created tool 拉过来；添加 shared 接口-->
             <div slot="extra">
               <!--              添加一个模态显示判断 -->
               <Button
                 shape="circle"
-                icon="ios-add-circle-outline"
+                icon="md-add"
                 @click="createToolModal = true"
               >Create tool
               </Button>
+              <Icon type="ios-trash-outline" color="transparent"
+                    size="25"
+              />
             </div>
             <!--            工具显示内容  -->
             <div
@@ -36,7 +40,7 @@
               style="height: inherit;min-height: fit-content;"
             >
               <vue-scroll :ops="ops">
-                <Card :bordered="false" v-if="userToolCount.length == 0">
+                <Card :bordered="false" v-if="userToolCount.length == 0" dis-hover>
                   <div style="display:flex;justify-content:center">
                     <Icon type="md-alert" size="40" color="gray"/>
                   </div>

@@ -1,8 +1,12 @@
 <template>
   <div>
+    <div id="header" style="margin-top: 2%;">
+      <h1 style="text-align:center;">Resource</h1>
+      <h3 style="margin:1%;text-align:center;">You can manage your resources here</h3>
+    </div>
     <Row>
-      <Col span="20">
-        <Card dis-hover>
+      <Col span="22" offset="1">
+      <!--  <Card dis-hover>
           <CheckboxGroup v-model="checkedType">
             <Checkbox label="public">
               <span>Public</span>
@@ -13,12 +17,22 @@
               <span class="badge">{{privateResList.length}}</span>
             </Checkbox>
           </CheckboxGroup>
-        </Card>
-
+        </Card> -->
         <div>
           <Card dis-hover>
-            <p slot="title">Resource List</p>
-            <div slot="extra">
+            <p slot="title" style="height: 30px;">
+              <CheckboxGroup v-model="checkedType" style="margin-left: 3.5%;margin-top: 5px;">
+                <Checkbox label="public">
+                  <span>Public</span>
+                  <span class="badge">{{publicResList.length}}</span>
+                </Checkbox>
+                <Checkbox label="private">
+                  <span>Private</span>
+                  <span class="badge">{{privateResList.length}}</span>
+                </Checkbox>
+              </CheckboxGroup>
+            </p>
+            <div slot="extra" >
               <Icon type="md-cloud-upload"
                     size="25"
                     @click="showUploadModal"
@@ -39,6 +53,9 @@
                     style="cursor: pointer"
                     title="Delete"
                     @click="confirmDelModal = true"
+              />
+              <Icon type="ios-trash-outline" color="transparent"
+                    size="25"
               />
             </div>
 

@@ -36,6 +36,10 @@
 </style>
 <template>
   <div>
+    <div id="header" style="margin-top: 2%;">
+      <h1 style="text-align:center;">Projects</h1>
+      <h3 style="margin:1%;text-align:center;">You can manage projects you join or create here</h3>
+    </div>
     <Row>
       <Col span="22" offset="1">
         <!--    Filter and Storage  -->
@@ -594,4 +598,3 @@
     }
   }
 </script>
-

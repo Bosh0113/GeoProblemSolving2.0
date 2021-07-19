@@ -4,12 +4,12 @@
       <Col span="12" offset="6">
         <div style="text-align: center;font-family: 'Roboto Light'">
           <h2>Personal Information</h2>
-          <span style="font-size: 14px;font-family: 'Roboto Light'">Basic information you use in Geo-problem solving platform</span>
+          <span style="font-size: 14px;font-family: 'Roboto Light';">Basic information you use in Geo-problem solving platform</span>
         </div>
         <div>
           <Card>
             <div slot="title">
-              <Icon type="ios-contact" size="20"/>
+              <Icon type="ios-contact" size="25"/>
               About {{userInfo.name}}
             </div>
             <List>

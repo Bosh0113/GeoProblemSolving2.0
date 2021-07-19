@@ -83,7 +83,8 @@
             </MenuItem>
 
             <MenuItem name="notification" to="notification" class="sideItem">
-              <Icon type="ios-list" size="25"/>
+              <!-- <Icon type="ios-list" size="25"/> -->
+              <Icon type="ios-mail-open-outline" size="25" />
               <label>Message</label>
             </MenuItem>
           </MenuGroup>
@@ -91,7 +92,7 @@
       </div>
 
       <div style="width: calc(100vw - 200px)">
-        <router-view style="margin-top: 60px"></router-view>
+        <router-view style="margin-top: 1%"></router-view>
       </div>
 
   </div>
@@ -149,4 +150,3 @@
     }
   }
 </script>
-
