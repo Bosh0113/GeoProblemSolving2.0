@@ -5,7 +5,7 @@ import cn.edu.njnu.geoproblemsolving.business.collaboration.entity.ComputeMsg;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.entity.MsgRecords;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.repository.ChatMsgRepository;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.service.MsgRecordsService;
-//import cn.edu.njnu.geoproblemsolving.business.user.dao.IUserDao;
+import cn.edu.njnu.geoproblemsolving.business.user.dao.UserDao;
 import cn.edu.njnu.geoproblemsolving.business.user.dto.InquiryUserDto;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.entity.CollaborationUser;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;

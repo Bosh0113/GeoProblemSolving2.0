@@ -11,20 +11,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
 public interface UserService {
-
-    UserEntity findUser(String userId);
-
-    Object updataUserInfo(UserEntity user);
-
-    Object register(UserEntity user);
-
-    String changePassword(String email, String password);
-
-    Object login(String email, String password);
-
-    Object resetPwd(String email, String oldPwd, String newPwd);
-
-
     //2021.03.31第二次改写，流程及逻辑都更加合理
     JsonResult registerService(UserEntity user);
 

@@ -28,8 +28,6 @@ import java.util.Comparator;
 public class UserDaoImpl implements UserDao {
     @Autowired
     MongoTemplate mongoTemplate;
-    @Value("${authServerIp}")
-    String authServerIp;
 
     @Override
     public UserEntity findUserById(String userId) {
@@ -121,32 +119,6 @@ public class UserDaoImpl implements UserDao {
         } catch (Exception ex) {
             return ResultUtils.error(-2, "Fail: Exception");
         }
-    }
-
-    @Override
-    public JsonResult addUserInfo(JSONObject jsonObject) {
-        // try {
-        //     RestTemplate restTemplate = new RestTemplate();
-        //     String url = "http://" + authServerIp + "/AuthServer/user/add";
-        //     HttpHeaders httpHeaders = new HttpHeaders();
-        //     MediaType mediaType = MediaType.parseMediaType("application/json;charset=UTF-8");
-        //     httpHeaders.setContentType(mediaType);
-        //     HttpEntity<Object> httpEntity = new HttpEntity<>(jsonObject.toString(), httpHeaders);
-        //     ResponseEntity<JSONObject> registerResult = restTemplate.exchange(url, HttpMethod.POST, httpEntity, JSONObject.class);
-        //     int resCode = (int) registerResult.getBody().get("code");
-        //     if (resCode == 0) {
-        //         UserEntity user = registerResult.getBody().getJSONObject("data").toJavaObject(UserEntity.class);
-        //         return ResultUtils.success(mongoTemplate.save(user));
-        //     } else if (resCode == -3) {
-        //         return ResultUtils.error(-3, "Fail: user already exists in the database.");
-        //     } else {
-        //         return ResultUtils.error(-2, (String) registerResult.getBody().get("msg"));
-        //     }
-        //
-        // } catch (Exception ex) {
-        //     return ResultUtils.error(-2, "Fail: Exception");
-        // }
-        return null;
     }
 
     @Override

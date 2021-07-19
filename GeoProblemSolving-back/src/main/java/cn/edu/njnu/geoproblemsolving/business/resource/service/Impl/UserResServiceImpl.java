@@ -36,17 +36,12 @@ public class UserResServiceImpl implements UserResService {
 
     @Value("${dataContainer}")
     String dataRemoteIp;
-    @Value("${resServerIp}")
-    String remoteResIp;
 
     private final MongoTemplate mongoTemplate;
 
     public UserResServiceImpl(MongoTemplate mongoTemplate) {
         this.mongoTemplate = mongoTemplate;
     }
-
-    @Value("${resServerIp}")
-    String userResServer;
 
     /**
      * 单文件下载

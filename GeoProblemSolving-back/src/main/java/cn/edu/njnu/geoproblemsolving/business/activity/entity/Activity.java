@@ -42,14 +42,6 @@ public class Activity implements Serializable {
     private ActivityType type;
 
     /**
-     * The horizontal relationships:
-     * last, next (list of aid and protocolId)
-     * protocol: definition of relationship
-     */
-    private JSONArray last;
-    private JSONArray next;
-
-    /**
      * The vertical relationships:
      * parent, child (list of aid)
      * pathway: the relationships of child activities: []: independent activities; [{},{}]: dependent activities
@@ -75,6 +67,15 @@ public class Activity implements Serializable {
     private String createdTime;
     private String activeTime;
 
+
+    /**
+     * The horizontal relationships:
+     * last, next (list of aid and protocolId)
+     * protocol: definition of relationship
+     */
+    private JSONArray last;
+    private JSONArray next;
+    private String protocolId;
     // // Temp
     // private List<String> toolList;
     // private List<String> toolsetList;

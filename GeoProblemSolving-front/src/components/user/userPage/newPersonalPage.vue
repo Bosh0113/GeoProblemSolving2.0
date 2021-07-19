@@ -58,8 +58,7 @@
               <label>Project</label>
             </MenuItem>
 
-
-            <MenuItem name="resourceList" to="resourceList" class="sideItem">
+            <MenuItem name="resourceList" to="resource" class="sideItem">
               <Icon type="ios-cloud" size="25"/>
               <label>Resource</label>
             </MenuItem>

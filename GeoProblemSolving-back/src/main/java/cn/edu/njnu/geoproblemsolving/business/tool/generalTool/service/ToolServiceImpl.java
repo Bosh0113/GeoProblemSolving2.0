@@ -246,7 +246,7 @@ public class ToolServiceImpl implements ToolService {
                     tempType = "Visualization";
                 }
                 //数据处理方法元数据
-                String metaUrl = "http://111.229.14.128:8898/capability?id="+ dataMethodId + "&type=" + tempType + "&token=" + encodeToken;
+                String metaUrl = "http://"+ proxyServerLocation +"/capability?id="+ dataMethodId + "&type=" + tempType + "&token=" + encodeToken;
                 HttpHeaders headers = new HttpHeaders();
                 headers.add("Content-Type","application/json");
                 HttpEntity httpEntity = new HttpEntity<>(headers);
@@ -264,7 +264,7 @@ public class ToolServiceImpl implements ToolService {
 
                 //从数据容器读取测试数据直接存入工具库中
                 ArrayList<ToolTestData> toolTestDatas = new ArrayList<>();
-                String url = "http://111.229.14.128:8898/files?id=" + dataMethodId + "&token=" + encodeToken;
+                String url = "http://"+ proxyServerLocation +"/files?id=" + dataMethodId + "&token=" + encodeToken;
                 JSONObject testDataJson = restTemplate.getForEntity(url, JSONObject.class).getBody();
                 JSONArray testIds = testDataJson.getJSONArray("id");
                 for (int i = 0; i<testIds.size(); i++){
@@ -301,6 +301,11 @@ public class ToolServiceImpl implements ToolService {
     @Override
     public long delToolService(String tid) {
         return toolDao.deleteById(tid);
+    }
+
+    @Override
+    public String emptyProviderService(String tid) {
+        return toolDao.emptyProvider(tid);
     }
 
     @Override

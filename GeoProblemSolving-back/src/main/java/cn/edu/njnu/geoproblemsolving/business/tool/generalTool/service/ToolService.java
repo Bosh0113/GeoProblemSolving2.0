@@ -37,4 +37,6 @@ public interface ToolService {
     long delToolService(String tid);
 
     List<Tool> getToolByIds(ArrayList<String> ids);
+
+    Object emptyProviderService(String tid);
 }

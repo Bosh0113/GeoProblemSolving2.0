@@ -31,8 +31,9 @@ public class DataService {
     @Value("${dataContainer}")
     String dataRemoteIp;
 
-    @Value("${resServerIp}")
-    String userResServer;
+    //老版本用户服务器资源部分
+    // @Value("${resServerIp}")
+    // String userResServer;
 
     // @Autowired
     // IResourceDaoImpl resourceDao;
