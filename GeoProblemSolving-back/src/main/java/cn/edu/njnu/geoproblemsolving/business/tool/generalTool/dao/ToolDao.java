@@ -13,6 +13,8 @@ public interface ToolDao {
 
     long deleteById(String toolId);
 
+    Object emptyProvider(String tid);
+
     Tool updateTool(Tool putTool, String[] nullPropertyNames);
 
 }

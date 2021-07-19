@@ -329,7 +329,7 @@ export default {
       this.toolsetLevel++;
     },
     openTool() {
-      var toolInfo = this.selectedTool;
+      let toolInfo = this.selectedTool;
       // this.openToolModal = false;
 
       if (toolInfo.scope == "outer") {
@@ -346,9 +346,9 @@ export default {
       if (toolInfo.backendType == "webTool") {
         routerUrl = toolInfo.toolUrl;
       } else if (toolInfo.backendType == "modelItem") {
-        routerUrl = "/computeModel";
+        routerUrl = "/GeoProblemSolving/computeModel";
       } else if (toolInfo.backendType == "dataMethod") {
-        routerUrl = "/dataMethod";
+        routerUrl = "/GeoProblemSolving/dataMethod";
       }
 
       var toolContent = `<iframe src="${routerUrl}" id="${toolInfo.tid}" style="width: 100%; height:100%;" frameborder="0"></iframe>`;

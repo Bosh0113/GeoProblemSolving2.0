@@ -842,6 +842,7 @@ export default {
           this.operationApi.toolOperationRecord(
             this.activityInfo.aid,
             "",
+            "",
             "remove",
             this.userInfo.userId,
             { tid: this.toolIdList[i] }

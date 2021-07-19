@@ -99,8 +99,14 @@ public class ToolRestController {
 
     @RequestMapping(value = "/{tid}", method = RequestMethod.DELETE)
     public JsonResult delTool(@PathVariable String tid){
-        long delNum = toolService.delToolService(tid);
-        if (delNum == 1){
+        // long delNum = toolService.delToolService(tid);
+        // if (delNum == 1){
+        //     return ResultUtils.success();
+        // }else {
+        //     return ResultUtils.error(-2, "Fail");
+        // }
+        String delResult = toolService.emptyProviderService(tid);
+        if (delResult.equals("suc")){
             return ResultUtils.success();
         }else {
             return ResultUtils.error(-2, "Fail");

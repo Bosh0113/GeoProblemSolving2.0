@@ -3,11 +3,13 @@ package cn.edu.njnu.geoproblemsolving.business.tool.generalTool.dao.impl;
 import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.dao.ToolDao;
 import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.entity.Tool;
 import com.mongodb.client.result.DeleteResult;
+import com.mongodb.client.result.UpdateResult;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -45,6 +47,18 @@ public class ToolDaoImpl implements ToolDao {
         Query query = new Query(Criteria.where("tid").is(toolId));
         DeleteResult deleteResult = mongoTemplate.remove(query, Tool.class);
         return deleteResult.getDeletedCount();
+    }
+
+    @Override
+    public String emptyProvider(String tid) {
+        Query query = new Query(Criteria.where("tid").is(tid));
+        Tool tool = mongoTemplate.findOne(query, Tool.class);
+        if (tool == null){
+            return "fail";
+        }
+        tool.setProvider("");
+        mongoTemplate.save(tool);
+        return "suc";
     }
 
     @Override

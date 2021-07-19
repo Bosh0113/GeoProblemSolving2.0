@@ -24,6 +24,9 @@ export default new Vuex.Store({
     // IP_Port:"172.21.212.72:8082",
     // IP_Port:"94.191.49.160:8080",
     DataServer: "221.226.60.2:8082", // 数据容器
+    //外网版本用户服务器
+    // UserServer: "http://94.191.49.160:8080/userServer",
+    //测试用用户服务器
     UserServer: "http://172.21.212.103:8088/userServer",
   },
   getters: {

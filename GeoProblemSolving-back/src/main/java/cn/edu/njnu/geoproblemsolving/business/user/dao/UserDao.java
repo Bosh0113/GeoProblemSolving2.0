@@ -24,8 +24,6 @@ public interface UserDao {
 
     JsonResult getUserInfo(String key, String value);
 
-    JsonResult addUserInfo(JSONObject user);
-
     UserEntity findByUserEmail(String email);
 
 
