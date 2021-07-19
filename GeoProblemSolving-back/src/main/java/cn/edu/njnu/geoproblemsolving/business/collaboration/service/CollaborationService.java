@@ -79,8 +79,8 @@ public class CollaborationService {
             }
 
             // current sender
-            String userId = ((HttpSession) config.getUserProperties().get(HttpSession.class.getName())).getAttribute("userId").toString();
-            CollaborationUser collaborationUser = collaborationBehavior.getMemberInfo(userId, session);
+//            String userId = ((HttpSession) config.getUserProperties().get(HttpSession.class.getName())).getAttribute("userId").toString();
+//            CollaborationUser collaborationUser = collaborationBehavior.getMemberInfo(userId, session);
 
             // current participants
             HashMap<String, CollaborationUser> participants;

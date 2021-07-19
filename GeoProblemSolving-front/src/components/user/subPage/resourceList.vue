@@ -1,8 +1,10 @@
 <template>
   <div class="fileSpace">
-     <Card :padding="1">
-      <Tabs :animated="false" >
-        <TabPane label="My Resources" class="resourceTabPane">
+    <div id="header" style="margin-top: 2%;">
+      <h1 style="text-align:center;">Resouce</h1>
+      <h3 style="margin:1%;text-align:center;">You can manage your resource here</h3>
+    </div>
+     <Card :padding="1">       
            <Card :padding="1">
 
                 <!-- 内容 -->
@@ -443,11 +445,7 @@
           <!--        <Button type="warning" @click="shareModal = false">Cancel</Button>-->
           <!--        <Button type="success" @click="shareResources">Share</Button>-->
           <!--      </div>-->
-          <!--    </Modal>-->
-
-        </TabPane>
-        <TabPane label="Resources List" class="resourceTabPane">标签三的内容</TabPane>
-      </Tabs>
+          <!--    </Modal>-->     
     </Card>
   </div>
 </template>

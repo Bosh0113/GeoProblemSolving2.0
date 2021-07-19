@@ -24,7 +24,7 @@
             <big>Resource</big>
            </p>
           <div slot="extra">
-            <router-link to="resource">
+            <router-link to="resourceList">
               <Icon type="ios-arrow-dropright" size="25" color="deepskyblue" style="cursor:pointer;"/>
             </router-link>
           </div>

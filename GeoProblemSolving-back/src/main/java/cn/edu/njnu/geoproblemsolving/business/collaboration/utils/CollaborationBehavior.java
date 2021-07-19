@@ -5,7 +5,7 @@ import cn.edu.njnu.geoproblemsolving.business.collaboration.entity.ComputeMsg;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.entity.MsgRecords;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.repository.ChatMsgRepository;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.service.MsgRecordsService;
-import cn.edu.njnu.geoproblemsolving.business.user.dao.IUserDao;
+//import cn.edu.njnu.geoproblemsolving.business.user.dao.IUserDao;
 import cn.edu.njnu.geoproblemsolving.business.user.dto.InquiryUserDto;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.entity.CollaborationUser;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
@@ -22,8 +22,8 @@ import java.util.*;
 @Service
 public class CollaborationBehavior {
 
-    @Autowired
-    UserDao iUserDao;
+//    @Autowired
+//    UserDao iUserDao;
 
     @Autowired
     MsgRecordsService msgRecordsService;
@@ -34,24 +34,24 @@ public class CollaborationBehavior {
     /**
      * common
      **/
-    public CollaborationUser getMemberInfo(String userId, Session session) {
-
-        JsonResult userInfo = iUserDao.getUserInfo("userId", userId);
-
-
-        CollaborationUser collaborationUser = new CollaborationUser();
-
-        if (userInfo.getCode() != 0){
-            return collaborationUser;
-        }
-        collaborationUser.setUserId(userId);
-        collaborationUser.setName(((InquiryUserDto) userInfo.getData()).getName());
-        collaborationUser.setEmail(((InquiryUserDto) userInfo.getData()).getEmail());
-        collaborationUser.setAvatar(((InquiryUserDto) userInfo.getData()).getAvatar());
-        collaborationUser.setSession(session);
-
-        return collaborationUser;
-    }
+//    public CollaborationUser getMemberInfo(String userId, Session session) {
+//
+////        JsonResult userInfo = iUserDao.getUserInfo("userId", userId);
+//
+//
+//        CollaborationUser collaborationUser = new CollaborationUser();
+//
+//        if (userInfo.getCode() != 0){
+//            return collaborationUser;
+//        }
+//        collaborationUser.setUserId(userId);
+//        collaborationUser.setName(((InquiryUserDto) userInfo.getData()).getName());
+//        collaborationUser.setEmail(((InquiryUserDto) userInfo.getData()).getEmail());
+//        collaborationUser.setAvatar(((InquiryUserDto) userInfo.getData()).getAvatar());
+//        collaborationUser.setSession(session);
+//
+//        return collaborationUser;
+//    }
 
     public void sendCollaborationStatus(CollaborationConfig config, Session session) {
         try {

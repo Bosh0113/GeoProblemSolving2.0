@@ -400,7 +400,12 @@ public class UserResServiceImpl implements UserResService {
             String access_token = userDao.findUserByIdOrEmail(userId).getTokenInfo().getAccess_token();
 
             Collection<Part> parts = req.getParts();
-            int fileNum = parts.size() - 4;
+            int fileNum = 0;
+            for (Part part: parts){
+                if (part.getName().equals("file")){
+                    fileNum++;
+                }
+            }
             //post payLoad存储，使用LinkedMultiValueMap<String, Object>key/value形式进行存储
             LinkedMultiValueMap<String, Object> valueMap = new LinkedMultiValueMap<>();
             //restTemplate工具类
