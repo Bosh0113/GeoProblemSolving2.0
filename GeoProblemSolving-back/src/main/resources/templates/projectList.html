@@ -179,7 +179,7 @@
                     </div>
                 </div>
                 <div class="pro-content">
-                    <tab-content class="tab-content" :project-list="tabPageData" @sendNotice="sendMessage"
+                    <tab-content class="tab-content" :project-list="tabPageData" @sendnotice="sendMessage"
                                  :key="freshEle"></tab-content>
                 </div>
             </i-col>
@@ -436,8 +436,9 @@
                         window.location.href = "/GeoProblemSolving/newProject"
                     }
                 },
-                sendMessage(recipientId) {
-                    this.$refs.navigationEl.sendMessage(recipientId);
+                sendMessage(data) {
+                    //父子组件传值，然后使用refs调用导航栏中内容
+                    this.$refs.navigationEl.sendMessage(data);
                 }
             }
         })

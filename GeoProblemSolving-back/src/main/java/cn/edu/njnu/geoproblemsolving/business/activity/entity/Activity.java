@@ -28,7 +28,7 @@ public class Activity implements Serializable {
     private String purpose;
 
     /**
-     * User
+     * UserEntity
      * creator contains: userId,
      * members contains: userId, role
      * role: (Leader) manager // (Technique) researcher, expert(e.g. engineer), decision-maker, core-member(students, workers...) // (Awareness) stakeholder, consultant, ordinary-member // visitor(the public)

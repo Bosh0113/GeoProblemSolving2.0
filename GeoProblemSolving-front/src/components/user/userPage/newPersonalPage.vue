@@ -92,7 +92,11 @@
       </div>
 
       <div style="width: calc(100vw - 200px)">
-        <router-view style="margin-top: 1%"></router-view>
+        <router-view
+          style="margin-top: 1%"
+          v-on="$listeners"
+          v-bind="$attrs"
+        ></router-view>
       </div>
 
   </div>
@@ -101,9 +105,8 @@
 
 <script>
   import projectVue from "../subPage/project.vue";
-  import ToWork from "../../projects/toWork";
+  // import ToWork from "../../projects/toWork";
   import notification from "../subPage/notification";
-  import resource from "../subPage/resource";
   import todoList from "../subPage/todoList";
   import Project from "../subPage/project";
   import tool from "../subPage/tool";
@@ -120,10 +123,9 @@
     name: "newPersonalPage",
     components: {
       Project,
-      ToWork,
+      // ToWork,
       projectVue,
       notification,
-      resource,
       "todo-list": todoList,
       tool,
       resourceList

@@ -1,7 +1,6 @@
 package cn.edu.njnu.geoproblemsolving.business.user.entity;
 
 import cn.edu.njnu.geoproblemsolving.Entity.Resources.ResourceEntity;
-import cn.edu.njnu.geoproblemsolving.business.resource.entity.ResourcePojo;
 import cn.edu.njnu.geoproblemsolving.business.user.enums.UserTitle;
 import lombok.AllArgsConstructor;
 import lombok.Data;

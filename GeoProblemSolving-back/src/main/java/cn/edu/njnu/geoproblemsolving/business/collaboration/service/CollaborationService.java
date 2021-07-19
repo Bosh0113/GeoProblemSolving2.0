@@ -10,34 +10,23 @@ import cn.edu.njnu.geoproblemsolving.business.collaboration.entity.MsgRecords;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.enums.CollaborationMode;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.utils.CollaborationBehavior;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.utils.CollaborationConfig;
-import cn.edu.njnu.geoproblemsolving.business.resource.dao.IIResourceDaoImpl;
+import cn.edu.njnu.geoproblemsolving.business.resource.dao.ActivityResDaoImpl;
 import cn.edu.njnu.geoproblemsolving.business.resource.entity.ResourceEntity;
 import cn.edu.njnu.geoproblemsolving.business.tool.chatroom.hydrologicalconcept.AnsjSegService;
-import cn.edu.njnu.geoproblemsolving.business.user.dao.IUserDao;
-import com.alibaba.fastjson.JSON;
+import cn.edu.njnu.geoproblemsolving.business.user.dao.UserDao;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.*;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpSession;
 import javax.websocket.EndpointConfig;
 import javax.websocket.Session;
-import javax.xml.crypto.Data;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -50,7 +39,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 public class CollaborationService {
 
     @Autowired
-    IUserDao iUserDao;
+    UserDao iUserDao;
 
     @Autowired
     MongoTemplate mongoTemplate;
@@ -71,7 +60,7 @@ public class CollaborationService {
     ComputeTasks computeTasks;
 
     @Autowired
-    IIResourceDaoImpl ripDao;
+    ActivityResDaoImpl ripDao;
 
     @Value("${managerServerIpAndPort}")
     String mangeServiceLocation;
@@ -245,6 +234,8 @@ public class CollaborationService {
             switch (messageType) {
                 case "test": {
                     collaborationConfig.setMode(CollaborationMode.Free);
+                    collaborationConfig.setOperator("");
+                    collaborationConfig.setApplyQueue(new ArrayList<>());
                     groups.put(groupKey, collaborationConfig);
 
                     collaborationBehavior.transferOperation(collaborationConfig.getParticipants(), messageType, sender, receivers, "test", "test");
@@ -501,14 +492,21 @@ public class CollaborationService {
                         String token = messageObject.getString("token");
                         String serviceId = messageObject.getString("tid");
                         JSONObject urls = messageObject.getJSONObject("urls");
-
-                        // JSONArray params = messageObject.getJSONArray("params");
+                        String params = messageObject.getString("params");
+                        JSONArray paramsArray = new JSONArray();
+                        if (!params.equals("")){
+                            String[] split = params.split(",");
+                            for (String param: split){
+                                paramsArray.add(param);
+                            }
+                        }
 
                         String dataMethodUrl = "http://111.229.14.128:8898/invokeUrlsDataPcsWithKey";
                         JSONObject invokeJson = new JSONObject();
                         invokeJson.put("token", URLEncoder.encode(token));
                         invokeJson.put("pcsId", serviceId);
                         invokeJson.put("urls", urls);
+                        invokeJson.put("params", paramsArray);
                         HttpEntity<JSONObject> httpEntity = new HttpEntity<>(invokeJson);
                         //新开线程处理
                         Callable<JSONObject> dataComputeCallable = ()->{
@@ -550,7 +548,12 @@ public class CollaborationService {
                         }
 
                     }
-
+                    break;
+                }
+                case "task":{
+                    //做消息转发
+                    HashMap<String, CollaborationUser> participants = collaborationConfig.getParticipants();
+                    collaborationBehavior.sendTasKAssignment(participants, sender, messageObject);
                 }
             }
         } catch (Exception ex) {

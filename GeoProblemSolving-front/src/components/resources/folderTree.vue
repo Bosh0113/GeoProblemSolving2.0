@@ -801,9 +801,9 @@
         this.chooseFilesArray = [];
         this.checkAll = false;
         this.indeterminate = false;
-        this.folderIdStack.splice(0, 1);
         if (this.folderStack.length != 1) {
           //folderStack 倒数第二个就是其的父文件夹
+          this.folderIdStack.splice(0, 1);
           this.changeFolder(this.folderStack[this.folderStack.length - 2], "back");
         } else {
           this.$Message.warning("This is the root folder.");
@@ -876,7 +876,6 @@
         this.fileInfoModal = true;
       },
       addFolderModalShow() {
-        console.log("sfsdf")
         this.newValidate.setName = "";
         this.newFolderModal = true;
       },
@@ -1354,8 +1353,9 @@
             if (temp.length == 0) {
               temp = ["0"];
             }
+            formData.append("resInfo", JSON.stringify(putResInfo))
             this.axios
-              .put("/GeoProblemSolving/rip/file/" + this.activityInfo.aid + "/" + temp.toString(), putResInfo)
+              .put("/GeoProblemSolving/rip/file/" + this.activityInfo.aid + "/" + temp.toString(), formData)
               .then((res) => {
                 this.editFileModel = false;
                 if (res.data == "Offline") {

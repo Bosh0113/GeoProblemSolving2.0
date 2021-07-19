@@ -57,20 +57,24 @@
             <div id="taskContainer" :style="{height:contentHeight+'px'}">
                 <template v-if="!chartSwitch">
                     <Row type="flex" justify="space-around">
+                        <!--                        task to-->
                         <i-col span="7">
                             <Card :padding="0" :border="false">
                                 <h3 slot="title">Todo</h3>
                                 <i-button slot="extra" type="default" class="createTaskBtn" style="margin-top:-8px"
                                           @click="createTaskModalShow()"
-                                          v-if="taskPermissionIdentity(projectInfo.permission, userRole, 'create_task')">Add
+                                          v-if="taskPermissionIdentity(projectInfo.permission, userRole, 'create_task')">
+                                    Add
                                 </i-button>
                                 <vue-scroll :ops="ops" :style="{height:contentHeight-80+'px'}">
-                                    <draggable :disabled="!taskPermissionIdentity(projectInfo.permission, userRole,'manage_task')" class="taskList" element="ul"
-                                               :options="{group:'task'}" v-model="taskTodo"
-                                               :style="{height:contentHeight-80+'px'}"
-                                               @start="setMoveCount()" @update="updateMoveTask(taskTodo,'todo')"
-                                               @add="addMoveTask(taskTodo,'todo')"
-                                               @remove="removeMoveTask(taskTodo,'todo')">
+                                    <draggable
+                                            :disabled="!taskPermissionIdentity(projectInfo.permission, userRole,'manage_task')"
+                                            class="taskList" element="ul"
+                                            :options="{group:'task'}" v-model="taskTodo"
+                                            :style="{height:contentHeight-80+'px'}"
+                                            @start="setMoveCount()" @update="updateMoveTask(taskTodo,'todo')"
+                                            @add="addMoveTask(taskTodo,'todo')"
+                                            @remove="removeMoveTask(taskTodo,'todo')">
                                         <Card v-for="(item,index) in taskTodo" :key="index" :padding="3"
                                               style="margin:5px">
                                             <div>
@@ -78,14 +82,16 @@
                                                 <Icon type="ios-list" color="gray" :size="20"></Icon>
                                             </span>
                                                 <span style="padding:5px">
-                                                <strong style="color:#57a3f3" class="name" :title="item.name">{{item.name}}</strong>
+                                                <strong style="color:#57a3f3" class="name"
+                                                        :title="item.name">{{item.name}}</strong>
                                             </span>
                                                 <div style="float:right">
                                                     <Rate :disabled="!(taskPermissionIdentity(projectInfo.permission, userRole,'manage_task') || userInfo.userId == item.creatorId)"
                                                           v-model="item.importance" :count="1" clearable
                                                           title="Importance" @on-change="changeImportance(item)"
                                                     ></Rate>
-                                                    <template v-if="taskPermissionIdentity(projectInfo.permission, userRole, 'manage_task') || userInfo.userId == item.creatorId">
+                                                    <template
+                                                            v-if="taskPermissionIdentity(projectInfo.permission, userRole, 'manage_task') || userInfo.userId == item.creatorId">
                                                         <span title="Edit">
                                                             <Icon type="ios-create" color="gray" :size="20"
                                                                   style="cursor:pointer"
@@ -110,16 +116,19 @@
                                 </vue-scroll>
                             </Card>
                         </i-col>
+                        <!--                        task doing-->
                         <i-col span="7">
                             <Card :padding="0" :border="false">
                                 <h3 slot="title">Doing</h3>
                                 <vue-scroll :ops="ops" :style="{height:contentHeight-80+'px'}">
-                                    <draggable :disabled="!taskPermissionIdentity(projectInfo.permission, userRole,'manage_task')" class="taskList" element="ul"
-                                               :options="{group:'task'}" v-model="taskDoing"
-                                               :style="{height:contentHeight-80+'px'}"
-                                               @start="setMoveCount()" @update="updateMoveTask(taskDoing,'doing')"
-                                               @add="addMoveTask(taskDoing,'doing')"
-                                               @remove="removeMoveTask(taskDoing,'doing')">
+                                    <draggable
+                                            :disabled="!taskPermissionIdentity(projectInfo.permission, userRole,'manage_task')"
+                                            class="taskList" element="ul"
+                                            :options="{group:'task'}" v-model="taskDoing"
+                                            :style="{height:contentHeight-80+'px'}"
+                                            @start="setMoveCount()" @update="updateMoveTask(taskDoing,'doing')"
+                                            @add="addMoveTask(taskDoing,'doing')"
+                                            @remove="removeMoveTask(taskDoing,'doing')">
                                         <Card v-for="(item,index)  in taskDoing" :key="index" :padding="3"
                                               style="margin:5px">
                                             <div>
@@ -128,13 +137,15 @@
                                                       :size="20"></Icon>
                                             </span>
                                                 <span style="padding:5px">
-                                                <strong style="color:#57a3f3" class="name" :title="item.name">{{item.name}}</strong>
+                                                <strong style="color:#57a3f3" class="name"
+                                                        :title="item.name">{{item.name}}</strong>
                                             </span>
                                                 <div style="float:right">
                                                     <Rate :disabled="!(taskPermissionIdentity(projectInfo.permission, userRole, 'manage_task') || userInfo.userId == item.creatorId)"
                                                           v-model="item.importance" :count="1" clearable
                                                           title="Importance" @on-change="changeImportance(item)"></Rate>
-                                                    <template v-if="taskPermissionIdentity(projectInfo.permission, userRole, 'manage_task') || userInfo.userId == item.creatorId">
+                                                    <template
+                                                            v-if="taskPermissionIdentity(projectInfo.permission, userRole, 'manage_task') || userInfo.userId == item.creatorId">
                                                     <span title="Edit">
                                                         <Icon type="ios-create" color="gray" :size="20"
                                                               style="cursor:pointer"
@@ -158,16 +169,19 @@
                                 </vue-scroll>
                             </Card>
                         </i-col>
+                        <!--                        task done-->
                         <i-col span="7">
                             <Card :padding="0" :border="false">
                                 <h3 slot="title">Done</h3>
                                 <vue-scroll :ops="ops" :style="{height:contentHeight-80+'px'}">
-                                    <draggable :disabled="!taskPermissionIdentity(projectInfo.permission, userRole,'manage_task')" class="taskList" element="ul"
-                                               :options="{group:'task'}" v-model="taskDone"
-                                               :style="{height:contentHeight-80+'px'}"
-                                               @start="setMoveCount()" @update="updateMoveTask(taskDone,'done')"
-                                               @add="addMoveTask(taskDone,'done')"
-                                               @remove="removeMoveTask(taskDone,'done')">
+                                    <draggable
+                                            :disabled="!taskPermissionIdentity(projectInfo.permission, userRole,'manage_task')"
+                                            class="taskList" element="ul"
+                                            :options="{group:'task'}" v-model="taskDone"
+                                            :style="{height:contentHeight-80+'px'}"
+                                            @start="setMoveCount()" @update="updateMoveTask(taskDone,'done')"
+                                            @add="addMoveTask(taskDone,'done')"
+                                            @remove="removeMoveTask(taskDone,'done')">
                                         <Card v-for="(item,index) in taskDone" :key="index" :padding="3"
                                               style="margin:5px">
                                             <div>
@@ -175,13 +189,15 @@
                                                 <Icon type="md-checkmark-circle-outline"></Icon>
                                             </span>
                                                 <span style="padding:5px">
-                                                <strong style="color:#57a3f3" class="name" :title="item.name">{{item.name}}</strong>
+                                                <strong style="color:#57a3f3" class="name"
+                                                        :title="item.name">{{item.name}}</strong>
                                             </span>
                                                 <div style="float:right">
                                                     <Rate :disabled="!(taskPermissionIdentity(projectInfo.permission, userRole, 'manage_task') || userInfo.userId == item.creatorId)"
                                                           v-model="item.importance" :count="1" clearable
                                                           title="Importance" @on-change="changeImportance(item)"></Rate>
-                                                    <template v-if="taskPermissionIdentity(projectInfo.permission, userRole, 'manage_task') || userInfo.userId == item.creatorId">
+                                                    <template
+                                                            v-if="taskPermissionIdentity(projectInfo.permission, userRole, 'manage_task') || userInfo.userId == item.creatorId">
                                                     <span title="Edit">
                                                         <Icon type="ios-create" color="gray" :size="20"
                                                               style="cursor:pointer"
@@ -466,7 +482,11 @@
                             }
                         ]
                     }
-                }
+                },
+                editTaskState: "",
+                taskSocket: null,
+                removeTaskState: "",
+                taskParticipants: []
             };
         },
         created() {
@@ -474,11 +494,13 @@
             this.userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
         },
         mounted() {
+            this.intWebSocket();
             this.inquiryTask();
             // this.getProjectInfo();
             window.addEventListener("resize", this.initSize);
         },
         beforeRouteLeave(to, from, next) {
+            this.taskSocket.close();
             this.removeTimer();
             next();
         },
@@ -486,7 +508,7 @@
             window.removeEventListener("resize", this.initSize);
         },
         methods: {
-            taskPermissionIdentity(permission, role, operation){
+            taskPermissionIdentity(permission, role, operation) {
                 return permissionIdentity(
                     JSON.parse(permission),
                     role,
@@ -500,77 +522,170 @@
                     this.contentHeight = 499;
                 }
             },
-            closeStepSocket() {
-                if (this.projectSocket != null) {
-                    this.removeTimer();
-                    this.projectSocket.close();
-                }
-            },
-            openStepSocket() {
-                if (this.projectSocket != null) {
-                    this.projectSocket = null;
-                }
-
-                let roomId = this.projectInfo.aid + "task";
-                var projectSocketURL = `${window.location.protocol === 'https:' ? 'wss://' : 'ws://'}` + window.location.host + "/GeoProblemSolving/Module/" + roomId;
+            //webSocket 相关内容
+            intWebSocket: function () {
+                this.taskSocket = null;
+                let taskSocketURL = `${window.location.protocol === 'https:' ? 'wss://' : 'ws://'}` + window.location.host + "/GeoProblemSolving/OperationServer/task/" + this.projectInfo.aid;
                 if (window.location.host == "localhost:8080") {
-                    projectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + roomId;
+                    taskSocketURL = "ws://localhost:8081/GeoProblemSolving/OperationServer/task/" + this.projectInfo.aid;
                 }
-                this.projectSocket = new WebSocket(projectSocketURL);
-                this.projectSocket.onopen = this.onOpen;
-                this.projectSocket.onmessage = this.onMessage;
-                this.projectSocket.onclose = this.onClose;
-                this.projectSocket.onerror = this.onError;
-                this.setTimer();
+                //实例化webSocket，然后绑定方法
+                this.taskSocket = new WebSocket(taskSocketURL);
+                this.taskSocket.onopen = this.onOpen;
+                this.taskSocket.onmessage = this.onMessage;
+                this.taskSocket.onclose = this.onClose;
+                this.taskSocket.onerror = this.onError;
             },
-            onOpen() {
-                console.log("StepSocket连接成功！");
+            onOpen: function() {
+                this.sendMessage({"type": "test"})
+                console.log("Connection successfully.");
             },
-            // 更新人员，更新数据，更新records
-            onMessage(e) {
+            onMessage: function(e) {
                 let messageJson = JSON.parse(e.data);
-                let record = {
-                    type: "",
-                    time: "",
-                    who: "",
-                    content: ""
-                };
+                let behavior = messageJson.behavior;
+                let content = messageJson.content;
+                if (messageJson.type == "members"){
+                    if (behavior == "on"){
+                        let joiner = messageJson.activeUser;
+                        this.$Notice.success({title: "Join",desc: joiner.name + " join."});
+                    }else if(behavior == "off"){
+                        let joiner = messageJson.activeUser;
+                        this.$Notice.info({title: "Exit",desc: joiner.name + " exit."});
+                    }
+                }else if (messageJson.type == "task"){
+                    if(behavior == "create"){
+                        let task = content.newTask;
+                        this.taskTodo.push(task);
+                    } else if (behavior == "importance") {
+                        let taskState = content.state;
+                        let taskId = content.taskId;
+                        let importance = content.importance;
+                        switch (taskState) {
+                            case "todo":
+                                this.taskTodo.forEach(item => {
+                                    if (item.taskId == taskId) {
+                                        item.importance = importance;
+                                    }
+                                })
+                                break;
+                            case "doing":
+                                this.taskDoing.forEach(item => {
+                                    if (item.taskId == taskId) {
+                                        item.importance = importance;
+                                    }
+                                })
+                                break;
+                            case "done":
+                                this.taskDone.forEach(item => {
+                                    if (item.taskId == taskId) {
+                                        item.importance = importance;
+                                    }
+                                })
+                                break;
+                        }
+                    } else if (behavior == "updateTask") {
+                        let taskState = content.state;
+                        let putTask = content.editedTask;
+                        let taskId = putTask.taskId;
+                        switch (taskState) {
+                            case "todo":
+                                this.taskTodo.forEach(item => {
+                                    if (item.taskId == taskId) {
+                                        Object.assign(item, putTask);
+                                    }
+                                })
+                                break;
+                            case "doing":
+                                this.taskDoing.forEach(item => {
+                                    if (item.taskId == taskId) {
+                                        Object.assign(item, putTask);
+                                    }
+                                })
+                                break;
+                            case "done":
+                                this.taskDone.forEach(item => {
+                                    if (item.taskId == taskId) {
+                                        Object.assign(item, putTask);
+                                    }
+                                })
+                                break;
+                        }
+                    } else if (behavior == "order") {
+                        let taskState = content.state;
+                        let taskList = content.taskList;
+                        switch (taskState) {
+                            case "todo":
+                                this.$set(this, "taskTodo", taskList);
+                                break;
+                            case "doing":
+                                this.$set(this, "taskDoing", taskList);
+                                break;
+                            case "done":
+                                this.$set(this, "taskDone", taskList);
+                                break;
+                        }
+                    }else if (behavior == "remove"){
+                        let taskState = content.state;
+                        let index = content.removeIndex;
+                        switch (taskState) {
+                            case "todo":
+                                this.taskTodo.splice(index, 1);
+                                break;
+                            case "doing":
+                                this.taskDoing.splice(index, 1);
+                                break;
+                            case "done":
+                                this.taskDone.splice(index, 1);
+                                break;
+                        }
+                    }
+                }
 
+
+                // let record = {
+                //     type: "",
+                //     time: "",
+                //     who: "",
+                //     content: ""
+                // };
                 // 任务记录
-                if (messageJson.type == "tasks") {
-                    this.inquiryTask();
+                // if (messageJson.type == "tasks") {
+                //     this.inquiryTask();
+                // }
+            },
+            onClose: function(e) {
+                this.removeTimer();
+                console.log("WebSocket disconnected");
+            },
+            onError: function(e) {
+                this.removeTimer();
+                console.log("WebSocket throw a exception and has disconnected. Exception: " + e.toString());
+            },
+            sendMessage: function (agentData) {
+                agentData.sender = this.userInfo.userId;
+                if (this.taskSocket != null) {
+                    this.taskSocket.send(JSON.stringify(agentData));
                 }
             },
-            onClose(e) {
-                this.removeTimer();
-                console.log("StepSocket连接断开！");
-            },
-            onError(e) {
-                this.removeTimer();
-                console.log("StepSocket连接错误！");
-            },
+            //ping
             setTimer() {
-                var that = this;
+                let that = this;
                 this.timer = setInterval(() => {
-                    var messageJson = {};
+                    let messageJson = {};
                     messageJson["type"] = "ping";
                     messageJson["message"] = "ping";
                     if (
-                        that.projectSocket != null &&
-                        that.projectSocket != undefined
+                        that.taskSocket != null &&
+                        that.taskSocket != undefined
                     ) {
-                        that.projectSocket.send(JSON.stringify(messageJson));
+                        that.taskSocket.send(JSON.stringify(messageJson));
                     }
                 }, 20000);
             },
             removeTimer() {
                 clearInterval(this.timer);
             },
-            sendMessage(message) {
-                if (this.projectSocket != null) {
-                    this.projectSocket.send(JSON.stringify(message));
-                }
-            },
+
             ok() {
                 this.$Message.info("Clicked ok");
             },
@@ -612,14 +727,17 @@
                                     confirm("You are offline, please login again.");
                                 } else if (res.data != "Fail") {
                                     // 任务更新socket
-                                    this.socketMsg.whoid = this.userInfo.userId;
-                                    this.socketMsg.who = this.userInfo.name;
-                                    this.socketMsg.type = "tasks";
-                                    this.socketMsg.content = "created a new task.";
-                                    this.socketMsg.time = new Date().toLocaleString();
                                     this.addNewTask(res.data);
                                     this.createTaskModal = false;
-                                    this.sendMessage(this.socketMsg);
+                                    let task = res.data;
+                                    //
+                                    let sockMsg = {};
+                                    sockMsg["type"] = "task";
+                                    sockMsg["behavior"] = "create";
+                                    sockMsg["content"] = {
+                                        "newTask": task,
+                                    };
+                                    this.sendMessage(sockMsg);
                                 }
                             })
                             .catch(err => {
@@ -642,12 +760,16 @@
                         if (res.data == "Offline") {
                             confirm("You are offline, please login again.");
                         } else if (res.data != "None" && res.data != "Fail") {
-                            this.socketMsg.whoid = this.userInfo.userId;
-                            this.socketMsg.who = this.userInfo.name;
-                            this.socketMsg.type = "tasks";
-                            this.socketMsg.content = "Changed the importance of one task.";
-                            this.socketMsg.time = new Date().toLocaleString();
-                            this.sendMessage(this.socketMsg);
+                            let sockMsg = {};
+                            sockMsg["type"] = "task";
+                            sockMsg["behavior"] = "importance";
+                            sockMsg["content"] = {
+                                "taskId": task.taskId,
+                                "state": task.state,
+                                "importance": task.importance
+                            };
+
+                            this.sendMessage(sockMsg);
                         } else {
                             this.$Message.error("Fail!");
                         }
@@ -673,6 +795,7 @@
                             taskInfoRes.importanceCheck = taskInfoRes.importance ? true : false;
                             this.$set(this, "formValidate", taskInfoRes);
                             this.editTaskModal = true;
+                            this.editTaskState = taskInfoRes.state;
                         } else {
                             this.$Message.error("Fail!");
                         }
@@ -709,7 +832,7 @@
                 switch (taskObject.state) {
                     case "todo": {
                         let taskList = this.taskTodo;
-                        for (var i = 0; i < taskList.length; i++) {
+                        for (let i = 0; i < taskList.length; i++) {
                             if (taskList[i].taskId == taskObject.taskId) {
                                 this.$set(this.taskTodo, i, taskObject);
                                 break;
@@ -719,7 +842,7 @@
                     }
                     case "doing": {
                         let taskList = this.taskDoing;
-                        for (var i = 0; i < taskList.length; i++) {
+                        for (let i = 0; i < taskList.length; i++) {
                             if (taskList[i].taskId == taskObject.taskId) {
                                 this.$set(this.taskDoing, i, taskObject);
                                 break;
@@ -729,7 +852,7 @@
                     }
                     case "done": {
                         let taskList = this.taskDone;
-                        for (var i = 0; i < taskList.length; i++) {
+                        for (let i = 0; i < taskList.length; i++) {
                             if (taskList[i].taskId == taskObject.taskId) {
                                 this.$set(this.taskDone, i, taskObject);
                                 break;
@@ -758,13 +881,16 @@
                                     confirm("You are offline, please login again.");
                                 } else if (res.data != "None" && res.data != "Fail") {
                                     this.updateTaskList(res.data); // 只更新单个任务
-                                    this.socketMsg.whoid = this.userInfo.userId;
-                                    this.socketMsg.who = this.userInfo.name;
-                                    this.socketMsg.type = "tasks";
-                                    this.socketMsg.content = "edited a new task.";
-                                    this.socketMsg.time = new Date().toLocaleString();
-                                    this.editTaskModal = false;
-                                    this.sendMessage(this.socketMsg);
+
+                                    let sockMsg = {};
+                                    sockMsg["type"] = "task";
+                                    sockMsg["behavior"] = "updateTask";
+                                    sockMsg["content"] = {
+                                        "state": this.editTaskState,
+                                        "editedTask": taskForm
+                                    };
+
+                                    this.sendMessage(sockMsg);
                                 } else {
                                     this.$Message.error("Fail!");
                                 }
@@ -862,13 +988,16 @@
                 this.taskOrderUpdate(taskList, type);
             },
             taskOrderUpdate(taskList, type) {
+                //变了过后的序列
                 if (this.userRole != "Visitor" && this.userRole != "Token") {
                     let thisUserName = this.userInfo.name;
                     let stateChangeIndex = 0;
                     let count = taskList.length;
                     for (let i = 0; i < taskList.length; i++) {
                         let thisTask = taskList[i];
+                        //order或state不相等则位置发生变化
                         if (thisTask.order != i || thisTask.state != type) {
+                            //state不相等，状态发生变化
                             if (thisTask.state != type) {
                                 stateChangeIndex = i;
                                 let taskUpdateObj = new URLSearchParams();
@@ -884,16 +1013,18 @@
                                             confirm("You are offline, please login again.");
                                         } else if (res.data != "Fail") {
                                             //更新数组
+                                            taskList[stateChangeIndex].order = stateChangeIndex;
                                             taskList[stateChangeIndex].managerName = thisUserName;
-                                            if (this.MoveCount == 0 && count == 1) {
-                                                this.endMove();
-                                            }
+                                            // if (this.MoveCount == 0 && count == 1) {
+                                            //     this.endMove();
+                                            // }
                                         }
                                     })
                                     .catch(err => {
                                         console.log(err.data);
                                     });
                             } else {
+                                //状态不变，顺序发生变化
                                 let taskUpdateObj = new URLSearchParams();
                                 taskUpdateObj.append("taskId", taskList[i]["taskId"]);
                                 taskUpdateObj.append("order", i);
@@ -905,9 +1036,11 @@
                                         if (res.data == "Offline") {
                                             confirm("You are offline, please login again.");
                                         } else if (res.data != "Fail") {
-                                            if (this.MoveCount == 0 && count == 1) {
-                                                this.endMove();
-                                            }
+                                            //更新顺序i
+                                            taskList[i].order = i;
+                                            // if (this.MoveCount == 0 && count == 1) {
+                                            //     this.endMove();
+                                            // }
                                         }
                                     })
                                     .catch(err => {
@@ -916,6 +1049,16 @@
                             }
                         }
                     }
+
+                    let sockMsg = {};
+                    sockMsg["type"] = "task";
+                    sockMsg["behavior"] = "order";
+                    sockMsg["content"] = {
+                        "state": type,
+                        "taskList": taskList
+                    };
+                    this.sendMessage(sockMsg);
+
                 }
             },
             endMove() {
@@ -925,11 +1068,12 @@
                 this.socketMsg.type = "tasks";
                 this.socketMsg.content = "changed the task schedule.";
                 this.socketMsg.time = new Date().toLocaleString();
-                this.sendMessage(this.socketMsg);
+                // this.sendMessage(this.socketMsg);
             },
             taskRemoveAssure(index, taskList) {
                 this.taskDeleteModal = true;
                 this.selectTaskIndex = index;
+                this.removeTaskState = taskList[index].state;
                 this.taskList = taskList;
             },
             taskRemove() {
@@ -942,13 +1086,15 @@
                     .then(res => {
                         if (res.data == "Success") {
                             this.taskList.splice(this.selectTaskIndex, 1);
-                            // 任务更新socket
-                            this.socketMsg.whoid = this.userInfo.userId;
-                            this.socketMsg.who = this.userInfo.name;
-                            this.socketMsg.type = "tasks";
-                            this.socketMsg.content = "removed a task.";
-                            this.socketMsg.time = new Date().toLocaleString();
-                            this.sendMessage(this.socketMsg);
+
+                            let sockMsg = {};
+                            sockMsg["type"] = "task";
+                            sockMsg["behavior"] = "remove";
+                            sockMsg["content"] = {
+                                "state": this.removeTaskState,
+                                "removeIndex": this.selectTaskIndex
+                            };
+                            this.sendMessage(sockMsg);
                         } else {
                             this.$Message.error("Fail!");
                         }
@@ -957,7 +1103,7 @@
                         this.$Message.error("Fail!");
                     });
             },
-            isMmember(members) {
+            isMember(members) {
                 let isMember = false;
                 for (let i = 0; i < members.length; i++) {
                     if (members[i].userId === this.userInfo.userId) {

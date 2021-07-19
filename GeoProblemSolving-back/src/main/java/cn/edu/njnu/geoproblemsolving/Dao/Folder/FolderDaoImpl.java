@@ -6,7 +6,7 @@ import cn.edu.njnu.geoproblemsolving.Entity.Resources.FolderEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.Resources.FolderItem;
 import cn.edu.njnu.geoproblemsolving.Entity.Resources.UploadResult;
 import cn.edu.njnu.geoproblemsolving.Entity.Resources.ResourceEntity;
-import cn.edu.njnu.geoproblemsolving.business.user.entity.User;
+import cn.edu.njnu.geoproblemsolving.business.user.entity.UserEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -298,7 +298,7 @@ public class FolderDaoImpl implements IFolderDao {
                 resourceFile.setName(name);
                 resourceFile.setDescription(description);
                 Query queryUser = new Query(Criteria.where("userId").is(userId));
-                User user = mongoTemplate.findOne(queryUser, User.class);
+                UserEntity user = mongoTemplate.findOne(queryUser, UserEntity.class);
                 resourceFile.setUploaderName(user.getName());
                 Date date = new Date();
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

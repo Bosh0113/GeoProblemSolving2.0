@@ -171,6 +171,11 @@ var taskList = [];
         addEvents();
     }
 
+    function initBasicComponent() {
+
+        window.addEventListener("message", getActivityInfo, false);
+    }
+
     function getActivityInfo(event) {
         if (event.data.type === "activity") {
 
@@ -278,7 +283,9 @@ var taskList = [];
         $("#folder-back").on("click", function () {
             getFolderRes({}, "back");
         });
-        $("#resource-update").on("click", getResources);
+        $("#resource-update").on("click", function() {
+            getResources();
+        });
         $("#resource-load").on("click", function () {
             if (loadResChannel != undefined && typeof loadResChannel == "function") {
                 loadResChannel(selectedResources);
@@ -407,11 +414,16 @@ var taskList = [];
 
     //data
     function getResources() {
-        folderIdStack = [];
-        $("#folder-back").hide();
+        let temp = folderIdStack;
+        if (temp.length == 0) {
+            temp = ["0"];
+            $("#folder-back").hide();
+        }
+        let paths = temp.toString();
+
 
         $.ajax({
-            url: "/GeoProblemSolving/rip/" + activityInfo.aid + "/0",
+            url: "/GeoProblemSolving/rip/" + activityInfo.aid + "/" + paths,
             type: "GET",
             async: false,
             success: function (result) {
@@ -622,6 +634,13 @@ var taskList = [];
     }
 
     function uploadResList(uploadFiles, description, type, privacy) {
+
+        let temp = folderIdStack;
+        if (temp.length == 0) {
+            temp = ["0"];
+        }
+        let paths = temp.toString();
+
         var formData = new FormData();
         for (var i = 0; i < uploadFiles.length; i++) {
             formData.append("file", uploadFiles[i]);
@@ -630,7 +649,7 @@ var taskList = [];
         formData.append("type", type);
         formData.append("privacy", privacy);
         formData.append("aid", activityInfo.aid);
-        formData.append("paths", ["0"].toString());
+        formData.append("paths", paths);
 
         let uploadedList = fileUpload(formData);
 
@@ -660,6 +679,13 @@ var taskList = [];
     }
 
     function saveResList(uploadFiles, description, type, privacy, thumbnail) {
+
+        let temp = folderIdStack;
+        if (temp.length == 0) {
+            temp = ["0"];
+        }
+        let paths = temp.toString();
+
         var formData = new FormData();
         for (var i = 0; i < uploadFiles.length; i++) {
             formData.append("file", uploadFiles[i]);
@@ -669,7 +695,7 @@ var taskList = [];
         formData.append("privacy", privacy);
         formData.append("thumbnail", thumbnail);
         formData.append("aid", activityInfo.aid);
-        formData.append("paths", ["0"].toString());
+        formData.append("paths", paths);
         formData.append("editToolInfo", toolId);
 
         let uploadedList = fileUpload(formData);
@@ -1216,7 +1242,7 @@ var taskList = [];
         为此
         为了简化代码
         没必要将两类工具 Invoke 强行拧在一起
-    
+
         面向开发者定制开发工具
         若他在定制工具中使用到了通用工具
         如果要进行自定义的话
@@ -1280,69 +1306,75 @@ var taskList = [];
             }
         },
 
-        /*
-        协同工具输入或输出协同显示
-        输入某个文件或参数
-        都是对mdl 文档的修改
-        先采用每次都全部更新
-        vue 视图更新总是会刷新的
-        msg.content 用于存储传输内容
-         */
-        //协同工具---正在输入提示
-        receiveTypingOperation: function () {
-            let typingMsg = {
-                type: "operation",
-                behavior: "message",
-                content: userInfo.name + " is typing.",
-                sender: userInfo.userId
-            };
-            if (this.websock.readyState === this.websock.OPEN) {
-                this.websocketSend(typingMsg);
-            } else if (this.websock.readyState === this.websock.CONNECTING) {
-                setTimeout(function () {
-                    this.receiveTypingOperation();
-                }, 1000)
-            } else {
-                setTimeout(function () {
-                    this.receiveTypingOperation();
-                }, 1000)
-            }
+    /*
+    协同工具输入或输出协同显示
+    输入某个文件或参数
+    都是对mdl 文档的修改
+    先采用每次都全部更新
+    vue 视图更新总是会刷新的
+    msg.content 用于存储传输内容
+     */
+    //协同工具---正在输入提示
+    receiveTypingOperation: function (index, inOrOut) {
+      //inputNum 表示DOM 元素编号
+      //importer 表示正在输入的用户
+      let typingMsg = {
+        type: "operation",
+        behavior: "message",
+        content: {
+          "inputNum": index,
+          "importer": userInfo.name,
+          "inOrOut": inOrOut
         },
-        //协同工具---输入文件
-        receiveDataInputDataOperation: function (inputMdl) {
-            console.log(inputMdl)
-            let msg = {
-                type: "operation",
-                behavior: "data",
-                content: {
-                    inputs: inputMdl
-                },
-                sender: userInfo.userId
-            };
-            if (this.websock.readyState === this.websock.OPEN) {
-                this.websocketSend(msg);
-            } else if (this.websock.readyState === this.websock.CONNECTING) {
-                setTimeout(function () {
-                    this.receiveDataInputDataOperation(inputs);
-                }, 1000)
-            } else {
-                setTimeout(function () {
-                    this.receiveDataInputDataOperation(inputs);
-                }, 1000)
-            }
+        sender: userInfo.userId
+      };
+      if (this.websock.readyState === this.websock.OPEN) {
+        this.websocketSend(typingMsg);
+      } else if (this.websock.readyState === this.websock.CONNECTING) {
+        setTimeout(function () {
+          this.receiveTypingOperation(index, inOrOut);
+        }, 1000)
+      } else {
+        setTimeout(function () {
+          this.receiveTypingOperation(index, inOrOut);
+        }, 1000)
+      }
+    },
+    //协同工具---输入文件
+    receiveDataInputDataOperation: function (inputMdl) {
+      console.log(inputMdl)
+      let msg = {
+        type: "operation",
+        behavior: "data",
+        content: {
+          inputs: inputMdl
         },
-        /*
-        协同工具---输入参数
-         */
-        receiveParamsOperation: function (inputParams) {
-            let paramsMsg = {
-                type: "operation",
-                behavior: "params",
-                content: {
-                    inputs: inputParams
-                },
-                sender: userInfo.userId
-            };
+        sender: userInfo.userId
+      };
+      if (this.websock.readyState === this.websock.OPEN) {
+        this.websocketSend(msg);
+      } else if (this.websock.readyState === this.websock.CONNECTING) {
+        setTimeout(function () {
+          this.receiveDataInputDataOperation(inputs);
+        }, 1000)
+      } else {
+        setTimeout(function () {
+          this.receiveDataInputDataOperation(inputs);
+        }, 1000)
+      }
+    },
+    /*
+    协同工具---输入参数
+     */
+    receiveParamsOperation: function (inputParams) {
+      let paramsMsg = {
+        type: "operation",
+        behavior: "params",
+        content: {
+          inputs: inputParams
+        },
+        sender: userInfo.userId
+      };
 
             if (this.websock.readyState === this.websock.OPEN) {
                 this.websocketSend(paramsMsg);
@@ -1380,6 +1412,30 @@ var taskList = [];
     }
 
     /**
+     * 使用组件基础功能：获取基本信息;协同功能
+     */
+    function basicCollabComponent() {
+        initBasicComponent();
+    }
+
+    /**
+     * 按文件夹，获取最新的资源
+     * @param {*} paths
+     */
+    function refreshResources() {
+        getResources();
+    }
+
+    /**
+     * 切换文件夹
+     * @param {*} folder
+     * @param {*} behavior
+     */
+    function switchFolder(folder, behavior) {
+        getFolderRes(folder, behavior);
+    }
+
+    /**
      * upload files
      * 上传
      * @param {*} uploadFiles 文件
@@ -1388,11 +1444,11 @@ var taskList = [];
      * @param {*} privacy 获取权限
      */
     function uploadResources(uploadFiles, description, type, privacy) {
-        uploadResList(uploadFiles, description, type, privacy);
+        return uploadResList(uploadFiles, description, type, privacy);
     }
 
     /**
-        * save as new files 
+        * save as new files
         * 另存为
         * @param {*} uploadFiles
         * @param {*} description
@@ -1401,17 +1457,17 @@ var taskList = [];
         * @returns
         */
     function saveResources(uploadFiles, description, type, privacy, thumbnail) {
-        saveResList(uploadFiles, description, type, privacy, thumbnail);
+        return saveResList(uploadFiles, description, type, privacy, thumbnail);
     }
 
     /**
      * save file
      * 保存
-     * @param {*} file 
-     * @param {*} info 
+     * @param {*} file
+     * @param {*} info
      */
     function resaveResource(file, info) {
-        resaveFile(file, info)
+        return resaveFile(file, info)
     }
 
 
@@ -1442,9 +1498,9 @@ var taskList = [];
     function sendSelectDataOperation() {
     }
 
-    function sendTypingInfo() {
-        CollabSocket.receiveTypingOperation();
-    }
+  function sendTypingInfo(index, inOrOut) {
+    CollabSocket.receiveTypingOperation(index, inOrOut);
+  }
 
     function sendInputParams(inputParams) {
         CollabSocket.receiveParamsOperation(inputParams);
@@ -1472,8 +1528,17 @@ var taskList = [];
         CollabSocket.initSocketChannel(opeChannel, dataChannel, compChannel);
     }
 
-    // 
-    function selectDataOperation(value) {
-        CollabSocket.receiveDataInputDataOperation(value);
-    }
+
+  /**
+   * 活动socket转态信息
+   * get socket status
+   */
+  function getSocketInfo() {
+    return CollabSocket.socketInfo();
+  }
+
+//
+  function selectDataOperation(value) {
+    CollabSocket.receiveDataInputDataOperation(value);
+  }
 }

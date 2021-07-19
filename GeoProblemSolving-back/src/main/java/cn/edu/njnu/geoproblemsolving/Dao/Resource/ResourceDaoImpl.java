@@ -3,7 +3,7 @@ package cn.edu.njnu.geoproblemsolving.Dao.Resource;
 import cn.edu.njnu.geoproblemsolving.Dao.Method.CommonMethod;
 import cn.edu.njnu.geoproblemsolving.Entity.Resources.UploadResult;
 import cn.edu.njnu.geoproblemsolving.Entity.Resources.ResourceEntity;
-import cn.edu.njnu.geoproblemsolving.business.user.entity.User;
+import cn.edu.njnu.geoproblemsolving.business.user.entity.UserEntity;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -124,7 +124,7 @@ public class ResourceDaoImpl implements IResourceDao {
                             resourceEntity.setResourceId(resourceId);
 
                             Query queryUser = Query.query(Criteria.where("userId").is(request.getParameter("uploaderId")));
-                            User uploader = mongoTemplate.findOne(queryUser, User.class);
+                            UserEntity uploader = mongoTemplate.findOne(queryUser, UserEntity.class);
 
                             resourceEntity.setName(fileNames);
                             resourceEntity.setDescription(request.getParameter("description"));
@@ -258,7 +258,7 @@ public class ResourceDaoImpl implements IResourceDao {
                                 }
 
                                 Query queryUser = Query.query(Criteria.where("userId").is(request.getParameter("uploaderId")));
-                                User uploader = mongoTemplate.findOne(queryUser, User.class);
+                                UserEntity uploader = mongoTemplate.findOne(queryUser, UserEntity.class);
 
                                 Date date = new Date();
                                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

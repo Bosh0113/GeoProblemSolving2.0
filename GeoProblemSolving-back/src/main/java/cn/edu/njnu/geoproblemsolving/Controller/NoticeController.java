@@ -2,8 +2,8 @@ package cn.edu.njnu.geoproblemsolving.Controller;
 
 import cn.edu.njnu.geoproblemsolving.Dao.Notice.NoticeDaoImpl;
 import cn.edu.njnu.geoproblemsolving.Entity.NoticeEntity;
-import cn.edu.njnu.geoproblemsolving.business.user.dao.IUserImpl;
-import cn.edu.njnu.geoproblemsolving.business.user.entity.User;
+import cn.edu.njnu.geoproblemsolving.business.user.dao.Impl.UserDaoImpl;
+import cn.edu.njnu.geoproblemsolving.business.user.entity.UserEntity;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -31,8 +31,8 @@ public class NoticeController {
     public String sendNotice(@RequestBody JSONObject noticeJson){
         String recipientEmail = noticeJson.getString("recipient");
         JSONObject content = noticeJson.getJSONObject("content");
-        IUserImpl userDao = new IUserImpl();
-        User noticedUser = mongoTemplate.findOne(new Query(Criteria.where("email").is(recipientEmail)), User.class);
+        UserDaoImpl userDao = new UserDaoImpl();
+        UserEntity noticedUser = mongoTemplate.findOne(new Query(Criteria.where("email").is(recipientEmail)), UserEntity.class);
         String recipientId = noticedUser.getUserId();
         NoticeEntity noticeEntity = new NoticeEntity();
         noticeEntity.setRecipientId(recipientId);

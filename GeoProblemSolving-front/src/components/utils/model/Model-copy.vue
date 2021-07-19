@@ -69,8 +69,8 @@
                           <template slot-scope="scope">
                             <el-input
                               v-model="scope.row.value"
-                              @focus="sendInputTyping"
-                              @change="sendInputParams"
+                              @focus="sendInputTyping(inEventIndex, 'in')"
+                              @change="sendInputParams(inEventIndex)"
                             ></el-input>
                           </template>
                         </el-table-column>
@@ -250,7 +250,6 @@
   </div>
 </template>
 
-<!--工具->模型-->
 <script>
   import file from "./../dataTemplate/File";
   import resourceList from "../../common/resource/resourceList-copy";

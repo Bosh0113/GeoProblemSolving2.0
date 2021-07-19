@@ -7,18 +7,17 @@ import cn.edu.njnu.geoproblemsolving.business.activity.dto.UpdateActivityDTO;
 import cn.edu.njnu.geoproblemsolving.business.activity.dto.UpdateProjectDTO;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Subproject;
 import cn.edu.njnu.geoproblemsolving.business.activity.enums.ActivityType;
+import cn.edu.njnu.geoproblemsolving.business.user.entity.UserEntity;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Project;
 import cn.edu.njnu.geoproblemsolving.Entity.EmailEntity;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityRepository;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.SubprojectRepository;
-import cn.edu.njnu.geoproblemsolving.business.user.entity.User;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ProjectRepository;
 import cn.edu.njnu.geoproblemsolving.business.activity.service.ProjectService;
 import cn.edu.njnu.geoproblemsolving.business.user.repository.UserRepository;
 import cn.edu.njnu.geoproblemsolving.common.utils.ResultUtils;
-import cn.hutool.system.UserInfo;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -49,13 +48,13 @@ public class ProjectServiceImpl implements ProjectService {
         this.folderDao = folderDao;
     }
 
-    private User findByUserId(String userId) {
+    private UserEntity findByUserId(String userId) {
         Optional optional = userRepository.findById(userId);
         if (optional.isPresent()) {
             Object user = optional.get();
-            return (User) user;
+            return (UserEntity) user;
         } else {
-            return new User();
+            return new UserEntity();
         }
     }
 
@@ -181,7 +180,7 @@ public class ProjectServiceImpl implements ProjectService {
              * Update user info
              */
             // Update user information
-            User user = findByUserId(creator.getString("userId"));
+            UserEntity user = findByUserId(creator.getString("userId"));
             if (user == null) return ResultUtils.error(-1, "Fail: user does not exist");
 
             ArrayList<String> createdProjects = user.getCreatedProjects();
@@ -268,7 +267,7 @@ public class ProjectServiceImpl implements ProjectService {
 
             // created project
             String userId = project.getCreator();
-            User user = findByUserId(userId);
+            UserEntity user = findByUserId(userId);
             if (user == null) return ResultUtils.error(-1, "Fail: user does not exist");
             ArrayList<String> projectIds = user.getCreatedProjects();
             projectIds.removeIf(projectId -> projectId.equals(aid));
@@ -342,7 +341,7 @@ public class ProjectServiceImpl implements ProjectService {
             Project project = (Project) optional.get();
 
             JSONObject participants = new JSONObject();
-            User creator = findByUserId(project.getCreator());
+            UserEntity creator = findByUserId(project.getCreator());
             participants.put("creator", creator);
 
             JSONArray members = project.getMembers();
@@ -350,7 +349,7 @@ public class ProjectServiceImpl implements ProjectService {
             JSONArray memberInfos = new JSONArray();
             for (Object member : members) {
                 String userId = (String) ((HashMap) member).get("userId");
-                User user = findByUserId(userId);
+                UserEntity user = findByUserId(userId);
                 JSONObject userInfo = new JSONObject();
                 userInfo.put("userId", userId);
                 userInfo.put("role", ((HashMap) member).get("role"));
@@ -372,7 +371,7 @@ public class ProjectServiceImpl implements ProjectService {
     public JsonResult joinProject(String aid, String userId) {
         try {
             // confirm
-            User user = findByUserId(userId);
+            UserEntity user = findByUserId(userId);
             if (user == null) return ResultUtils.error(-1, "Fail: user does not exist");
             Optional optional = projectRepository.findById(aid);
             if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: project does not exist");
@@ -427,7 +426,7 @@ public class ProjectServiceImpl implements ProjectService {
     public JsonResult updateMemberRole(String aid, String userId, String role) {
         try {
             // check
-            User user = findByUserId(userId);
+            UserEntity user = findByUserId(userId);
             if (user == null) return ResultUtils.error(-1, "Fail: user does not exist");
 
             Optional optional = projectRepository.findById(aid);
@@ -469,7 +468,7 @@ public class ProjectServiceImpl implements ProjectService {
     public JsonResult quitProject(String aid, String userId) {
         try {
             // check
-            User user = findByUserId(userId);
+            UserEntity user = findByUserId(userId);
             if (user == null) return ResultUtils.error(-1, "Fail: user does not exist");
 
             Optional optional = projectRepository.findById(aid);
@@ -506,9 +505,9 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public JsonResult invitedParticipants(String aid, String email, String password) {
         try {
-            User user = userRepository.findByEmail(email);
+            UserEntity user = userRepository.findByEmail(email);
             if (user == null) {
-                user = new User();
+                user = new UserEntity();
                 user.setUserId(UUID.randomUUID().toString());
                 user.setEmail(email);
                 user.setPassword(password);
@@ -540,7 +539,7 @@ public class ProjectServiceImpl implements ProjectService {
                 if (((HashMap) member).get("role").equals("manager")) {
                     String userId = ((JSONObject) member).getString("userId");
 
-                    User user = findByUserId(userId);
+                    UserEntity user = findByUserId(userId);
                     if (user == null) return ResultUtils.error(-1, "Fail: user does not exist");
                     addresses += user.getEmail();
                     addresses += ",";

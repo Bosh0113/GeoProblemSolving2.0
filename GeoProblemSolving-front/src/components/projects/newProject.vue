@@ -324,6 +324,10 @@ export default {
                 this.$Message.error(res.data.msg);
               } else {
                 this.createProjectInfo = res.data.data;
+                this.operationApi.activityDocInit(
+                  res.data.data,
+                  this.$store.getters.userId
+                );
                 this.addHistoryEvent(this.createProjectInfo.aid);
               }
             })
@@ -375,6 +379,7 @@ export default {
       var file = e.target.files[0];
       var filesize = file.size;
       // 2,621,440   2M
+
       if (filesize > 2101440) {
         // 图片大于2MB
         this.$Message.error("size > 2MB");

@@ -40,7 +40,7 @@ public class AbseirSocket {
 
         JSONObject userJson = new JSONObject();
         userJson.put("userId", httpSession.getAttribute("userId").toString());
-        userJson.put("userName", httpSession.getAttribute("userName").toString());
+        userJson.put("userName", httpSession.getAttribute("name").toString());
         members.put(this.session.getId(), userJson);
         publicMembers(groupID, "members");//公布新的在线数组和演示者
 

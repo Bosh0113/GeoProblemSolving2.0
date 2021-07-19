@@ -171,7 +171,7 @@ public class ProjectController {
 
         if(result.getCode() == 0) {
             staticPagesBuilder.projectDetailPageBuilder((Project) result.getData());
-            staticPagesBuilder.projectListPageBuilder(projectService.findProjectsByPage(0, 18));
+            staticPagesBuilder.projectListPageBuilder(projectService.findProjectsByPage(1, 18));
         }
         return result;
     }
@@ -186,9 +186,9 @@ public class ProjectController {
     @RequestMapping(value = "/{aid}/user", method = RequestMethod.DELETE)
     public JsonResult quitProject(@PathVariable("aid") String aid, @RequestParam("userId") String userId) throws IOException {
         JsonResult result = projectService.quitProject(aid, userId);
-
         if(result.getCode() == 0) {
-            staticPagesBuilder.projectDetailPageBuilder((Project) result.getData());
+            JsonResult project = projectService.findProject(aid);
+            staticPagesBuilder.projectDetailPageBuilder((Project) project.getData());
             staticPagesBuilder.projectListPageBuilder(projectService.findProjectsByPage(0, 18));
         }
         return result;

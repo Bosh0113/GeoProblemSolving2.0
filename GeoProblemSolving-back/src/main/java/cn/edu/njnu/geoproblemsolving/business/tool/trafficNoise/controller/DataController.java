@@ -16,6 +16,11 @@ import java.util.Collection;
 
 
 /**
+ * 2021/7/1
+ * Xinchang 定制的交通噪声工具
+ */
+
+/**
  * @ClassName DataController
  * @Description
  * @Author Xinchang Wang
@@ -35,8 +40,8 @@ public class DataController {
         return dataService.saveTempRLS90Data(req, userId, tempId);
     }
 
-    @RequestMapping(value = "/uploadRLS90Data/{userId}/{tempId}", method = RequestMethod.GET)
-    public Object uploadRLS90Data(@PathVariable("userId") String userId,@PathVariable("tempId") String tempId, HttpServletRequest req) {
-        return dataService.uploadRLS90Data(userId, tempId, req);
-    }
+    // @RequestMapping(value = "/uploadRLS90Data/{userId}/{tempId}", method = RequestMethod.GET)
+    // public Object uploadRLS90Data(@PathVariable("userId") String userId,@PathVariable("tempId") String tempId, HttpServletRequest req) {
+    //     return dataService.uploadRLS90Data(userId, tempId, req);
+    // }
 }

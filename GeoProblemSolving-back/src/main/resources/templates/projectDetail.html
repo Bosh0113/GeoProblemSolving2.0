@@ -249,6 +249,8 @@
 </head>
 
 <body id="pageBody">
+<!--静态页面，整个项目页面在此组装，navigation(navigation.html),overview, introduction, taskAssignment(taskManager.html), workspace, resources(folderTree.html)-->
+<!--projectList, 由navigation, tabContent组成-->
 <div id="projectDetailPage" v-cloak>
     <child-navigation ref="navigationEl" active-type="projects" :user-info="userInfo"></child-navigation>
     <template>
@@ -1118,9 +1120,6 @@
                         })()
                     }
                 },
-                sendNotice(recipientId) {
-                    this.$refs.navigationEl.sendMessage(recipientId);
-                },
                 changeMenuItem(name) {
                     this.activeMenu = name;
                     var tokenParam = '';
@@ -1366,12 +1365,37 @@
                                     title: "Result",
                                     desc: "The member has been removed from the project."
                                 });
-                                for (var i = 0; i < this.projectInfo.members.length; i++) {
-                                    if (this.projectInfo.members[i].userId == this.removeMemberId) {
-                                        this.projectInfo.members.splice(i, 1);
-                                        break;
+                                for (let i = 0; i < this.participants.length; i++){
+                                    if (this.participants[i].userId == this.removeMemberId){
+                                        this.participants.splice(i, 1);
                                     }
                                 }
+                                //被T出项目，发送站内信
+                                let notice = {};
+                                notice["recipientId"] = this.removeMemberId;
+                                notice["type"] = "notice";
+                                notice["content"] = {
+                                    title: "Project Deleted",
+                                    description:
+                                        "you has been removed from this project: " + this.projectInfo.name
+                                };
+                                axios
+                                    .post("/GeoProblemSolving/notice/save", notice)
+                                    .then(res => {
+                                        if (res.data == "Success") {
+                                            this.$refs.navigationEl.sendMessage({"type": "Notice", "receiver": this.removeMemberId});
+                                        }
+                                    })
+                                    .catch(err => {
+                                        console.log("失败原因：" + err.data);
+                                    });
+
+                                // for (var i = 0; i < this.projectInfo.members.length; i++) {
+                                //     if (this.projectInfo.members[i].userId == this.removeMemberId) {
+                                //         this.projectInfo.members.splice(i, 1);
+                                //         break;
+                                //     }
+                                // }
                             }
                         })
                         .catch(err => {
@@ -1483,7 +1507,8 @@
                                                         desc:
                                                             "The application has been sent to managers of the project."
                                                     });
-                                                    this.$emit("sendNotice", managerId);
+                                                    this.$refs.navigationEl.sendMessage({"type": "Notice", "receiver": managerId});
+
                                                     this.haveApplied = true;
                                                 } else {
                                                     this.$Notice.open({
