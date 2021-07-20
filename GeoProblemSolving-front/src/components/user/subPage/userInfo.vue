@@ -1,33 +1,37 @@
 <template>
   <div>
+    <div id="userPic" style="margin-top: 30px;text-align: center;">
+      <!-- 用户上传照片作为头像 图片显示失败 -->
+     <!-- <img
+        :src="avatarUrl"
+        v-if="avatarUrl != null && avatarUrl != '' && avatarUrl != undefined"
+        :title="userInfo.name"
+        v-else
+        style="vertical-align:middle;"
+      /> -->
+      <avatar
+        :username="userInfo.name"
+        :size="80"
+        style="margin-top:10px;margin-left: 47%;"
+        :title="userInfo.name"
+
+      />
+      <p style="margin-bottom: 20px;"></p>
+      <h1 style="display: inline-block;">Welcome,</h1>
+      <h1 style="color: #2d8cf0;display: inline-block;" v-show="userInfoFormItems.title!=''">{{userInfoFormItems.title}}. </h1>
+      <h1 style="color: #2d8cf0;display: inline-block;">{{userInfo.name}}</h1>
+      <p style="margin-bottom: 20px;"></p>
+    </div>
     <Row>
-      <Col span="12" offset="6">
-        <div style="text-align: center;font-family: 'Roboto Light'">
-          <h2>Personal Information</h2>
-          <span style="font-size: 14px;font-family: 'Roboto Light';">Basic information you use in Geo-problem solving platform</span>
-        </div>
+      <Col span="10" offset="2">
+        <!-- <div id="title">
+          <h1 style="text-align: center;margin-top: 10px;">Personal Information</h1>
+          <h3 style="text-align: center;margin-bottom: 10px;">Basic information you use in Geo-problem solving platform</h3>
+        </div> -->
         <div>
-          <Card>
-            <div slot="title">
-              <img
-                :src="avatarUrl"
-                v-if="avatarUrl != null && avatarUrl != '' && avatarUrl != undefined"
-                :title="userInfo.name"
-                style="width:40px;height:40px;vertical-align:middle;"
-              />
-              <avatar
-                :username="userInfo.name"
-                :size="40"
-                style="margin-top:10px"
-                :title="userInfo.name"
-                v-else
-              />
-              <span> 
-                <Icon type="ios-contact" size="25"/>
-                About {{userInfo.name}}
-              </span>
-            </div>
-            <List>
+          <Card style="height: 450px;"  class="userInfoCard">
+            <h2>Personal Infomation</h2>
+            <List style="margin-top: 3%;">
               <ListItem>
                 <span class="uTitle">Name</span>
                 <div class="uAlign">
@@ -41,13 +45,18 @@
                   <span class="uContent">{{userInfo.email}}</span>
                 </div>
               </ListItem>
-
               <ListItem>
+                <span class="uTitle">Phone</span>
+                <div class="uAlign">
+                  <span class="uContent">{{userInfo.phone}}</span>
+                </div>
+              </ListItem>
+             <!-- <ListItem>
                 <span class="uTitle">Title</span>
                 <div class="uAlign">
                   <span class="uContent">{{userInfo.title}}</span>
                 </div>
-              </ListItem>
+              </ListItem> -->
               <ListItem>
                 <span class="uTitle">Organizations</span>
                 <div class="uAlign">
@@ -60,39 +69,68 @@
                   <span class="uContent">{{myDomain}}</span>
                 </div>
               </ListItem>
-              <ListItem>
-                <span class="uTitle">Phone</span>
-                <div class="uAlign">
-                  <span class="uContent">{{userInfo.phone}}</span>
-                </div>
-              </ListItem>
+
               <ListItem>
                 <span class="uTitle">Country</span>
                 <div class="uAlign">
                   <span class="uContent">{{userInfo.country}}</span>
                 </div>
               </ListItem>
-              <ListItem>
+             <ListItem >
                 <span class="uTitle">State/Province</span>
                 <div class="uAlign">
                   <span class="uContent">{{userInfo.province}}</span>
                 </div>
               </ListItem>
-              <ListItem>
+              <ListItem >
                 <span class="uTitle">City</span>
                 <div class="uAlign">
                   <span class="uContent">{{userInfo.city}}</span>
                 </div>
               </ListItem>
             </List>
-            <div style="margin-top: 30px;text-align: right">
-              <Button @click="showEditUserInfoModal" type="info" style="margin-right: 20px">Edit Information</Button>
-              <Button @click="showResetPwdModal" type="info">Change Password</Button>
+
+          </Card>
+        </div>
+      </Col>
+      <!-- 两个卡片-->
+      <Col span="10" offset="1">
+        <!-- <div id="title">
+          <h1 style="text-align: center;margin-top: 10px;">Personal Information</h1>
+          <h3 style="text-align: center;margin-bottom: 10px;">Basic information you use in Geo-problem solving platform</h3>
+        </div> -->
+        <div>
+          <Card style="height: 450px;" class="userInfoCard">
+            <div >
+              <h2>&nbsp;</h2>
+              <!-- <h1>setting</h1> -->
+              <list style="margin-top: 3%;">
+                <ListItem >
+                  <span class="uTitle">Homepage</span>
+                  <div class="uAlign">
+                    <a :href="'http://'+userInfo.homepage">
+                      <span class="uContent">{{userInfo.homepage}}</span>
+                    </a>
+                  </div>
+                </ListItem>
+                <ListItem style="height: 200px;">
+                  <span class="uTitle">Introduction</span>
+                  <div class="uAlignIntro">
+                    <span class="uContent" >{{userInfo.introduction}}</span>
+                  </div>
+                </ListItem>
+                <ListItem >
+                  <div style="margin-left: 10%;">
+                    <Button @click="showEditUserInfoModal" type="info" style="margin-top: 10%;width: 300%;">Edit Information</Button>
+                    <br>
+                    <Button @click="showResetPwdModal" type="info" style="margin-top: 10%;width: 300%;background-color: #2bbbad;">Change Password</Button>
+                  </div>
+                </ListItem>
+              </list>
             </div>
           </Card>
         </div>
       </Col>
-      <!-- 两个卡片 -->
     </Row>
 
 
@@ -263,6 +301,7 @@
         }
       }
       return {
+        contentHeight:"",
         editUserInfoModal: false,
         resetPasswordModal: false,
         avatar: null,
@@ -373,6 +412,18 @@
     mounted() {
     },
     methods: {
+      resizeContent() {
+        if (window.innerHeight > 675) {
+          this.contentHeight = window.innerHeight - 120;
+        } else {
+          this.contentHeight = 555;
+        }
+        window.onresize = () => {
+          return (() => {
+            this.resizeContent();
+          })();
+        };
+      },
       selectImg: function(){
         document.getElementById("choosePicture").click();
       },
@@ -552,6 +603,13 @@
 </script>
 
 <style scoped>
+  .userInfoCard{
+    background-color: white;
+    border-radius: 3px;
+    border:1px solid #dadce0;
+    box-shadow:  0 3.2px 7.2px 0 rgb(0 0 0 / 13%), 0 0.6px 1.8px 0 rgb(0 0 0 / 11%);
+  }
+
   .organization >>> .ti-input {
     display: inline-block;
     width: 469px;
@@ -585,13 +643,22 @@
 
   .uContent {
     color: #333333;
+    margin-left: 20%;
   }
 
   .uAlign {
     position: absolute;
     left: 100px;
     text-align: left;
-    width: 500px
+    width: 400px
+  }
+
+  .uAlignIntro {
+    position: relative;
+    display:table-cell;
+    vertical-align: middle;
+    text-align: left;
+
   }
 
   .selectImg:hover {

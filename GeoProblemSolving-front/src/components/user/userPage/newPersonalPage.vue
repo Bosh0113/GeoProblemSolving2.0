@@ -1,4 +1,8 @@
 <style scoped>
+  .personalPage{
+    background-color:#fff;
+  }
+
   .sideItem {
     height: 58px;
     border: 2px solid transparent;
@@ -44,7 +48,7 @@
   }
 </style>
 <template>
-  <div style="display: flex">
+  <div style="display: flex" class="personalPage">
       <div style="width:200px">
         <Menu style="height: calc(100vh - 120px);z-index: 2;" width="auto" :active-name="$route.name">
           <MenuGroup>
@@ -82,8 +86,7 @@
             </MenuItem>
 
             <MenuItem name="notification" to="notification" class="sideItem">
-              <!-- <Icon type="ios-list" size="25"/> -->
-              <Icon type="ios-mail-open-outline" size="25" />
+              <Icon type="ios-mail-open-outline" size="25"/>
               <label>Message</label>
             </MenuItem>
           </MenuGroup>
@@ -92,7 +95,7 @@
 
       <div style="width: calc(100vw - 200px)">
         <router-view
-          style="margin-top: 1%"
+          style="margin-top: 10px"
           v-on="$listeners"
           v-bind="$attrs"
         ></router-view>

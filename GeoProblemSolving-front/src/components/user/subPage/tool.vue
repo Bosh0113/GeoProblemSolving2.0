@@ -1,27 +1,29 @@
 <template>
   <div>
-    <div id="header" style="margin-top: 2%;">
-      <h1 style="text-align:center;">Tool</h1>
-      <h3 style="margin:1%;text-align:center;">You can manage your tools here</h3>
+    <div id="title">
+      <h1 style="text-align: center;margin-top: 10px;">Tool</h1>
+      <h3 style="text-align: center;margin-bottom: 10px;">you can manage your tools here</h3>
     </div>
     <Row>
       <Col span="22" offset="1">
+        <!--  Filter 包括 Created by me, Shared with me(项目中内容)，public, privacy-->
+        <!--  下移  -->
+        <!--  具体显示区，图标加 缩略图 + 名字的显示方案; 先把created tool 拉过来；添加 shared 接口-->
         <Row>
           <Card dis-hover>
-            <p slot="title" style="height: 30px;">
-              <!--  Filter 包括 Created by me, Shared with me(项目中内容)，public, privacy-->
-                <CheckboxGroup v-model="checkedType" style="margin-left: 3.5%;margin-top: 5px;">
-                  <Checkbox label="public">
-                    <label>Public</label>
-                    <label class="badge">{{ publicTools.length }}</label>
-                  </Checkbox>
-                  <Checkbox label="private">
-                    <label>Privacy</label>
-                    <label class="badge">{{ privateTools.length }}</label>
-                  </Checkbox>
-                </CheckboxGroup>
+            <p slot="title">
+              <CheckboxGroup v-model="checkedType" style="margin-left: 3.5%">
+                <Checkbox label="public">
+                  <label>Public</label>
+                  <label class="badge">{{ publicTools.length }}</label>
+                </Checkbox>
+                <Checkbox label="private">
+                  <label>Privacy</label>
+                  <label class="badge">{{ privateTools.length }}</label>
+                </Checkbox>
+              </CheckboxGroup>
+
             </p>
-            <!--  具体显示区，图标加 缩略图 + 名字的显示方案; 先把created tool 拉过来；添加 shared 接口-->
             <div slot="extra">
               <!--              添加一个模态显示判断 -->
               <Button
@@ -60,7 +62,7 @@
                     :key="index"
                   >
                     <div style="margin:0 5px 15px 5px">
-                      <Card>
+                      <Card class="toolCard">
                         <p
                           slot="title"
                           class="ellipsis"
@@ -590,6 +592,13 @@
 </script>
 
 <style scoped>
+  .toolCard{
+    background-color: white;
+    border-radius: 3px;
+    border:1px solid #dadce0;
+    box-shadow:  0 3.2px 7.2px 0 rgb(0 0 0 / 13%), 0 0.6px 1.8px 0 rgb(0 0 0 / 11%);
+  }
+  
   .badge {
     display: inline-block;
     min-width: 10px;

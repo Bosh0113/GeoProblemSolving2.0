@@ -1,4 +1,11 @@
 <style scoped>
+  .projectCard{
+    background-color: white;
+    border-radius: 3px;
+    border:1px solid #dadce0;
+    box-shadow:  0 3.2px 7.2px 0 rgb(0 0 0 / 13%), 0 0.6px 1.8px 0 rgb(0 0 0 / 11%);
+  }
+  
   .historyLine >>> .ivu-card-head {
     border-bottom-color: white;
     padding: 4px 6px;
@@ -36,14 +43,14 @@
 </style>
 <template>
   <div>
-    <div id="header" style="margin-top: 2%;">
-      <h1 style="text-align:center;">Projects</h1>
-      <h3 style="margin:1%;text-align:center;">You can manage projects you join or create here</h3>
+    <div id="title">
+      <h1 style="text-align: center;margin-top: 10px;">Project</h1>
+      <h3 style="text-align: center;margin-bottom: 10px;">you can manage projects you create and join here</h3>
     </div>
     <Row>
       <Col span="22" offset="1">
         <!--    Filter and Storage  -->
-        <Card>
+        <Card dis-hover class="customCard">
           <CheckboxGroup v-model="selectedProjectType" style="margin-left: 3.5%">
             <Checkbox label="joinedProject" checked="checked">
               <span>Joined by me</span>
@@ -56,7 +63,7 @@
           </CheckboxGroup>
 
           <Button slot="extra" type="primary" to="/newProject">Establish a project</Button>
-        </Card>
+        </Card class="customCard">
 
         <!--    project content     -->
           <div
@@ -113,7 +120,7 @@
                 >
                   <Col span="7" style="margin-left: 3.5%">
                     <div class="projectItem" @click="goSingleProject(mProject)">
-                      <Card style="height:320px;margin-top:20px;">
+                      <Card style="height:320px;margin-top:20px;" class="projectCard">
                         <p slot="title" class="projectsTitle">{{mProject.name}}</p>
                         <Button
                           class="authorBtn"
@@ -136,11 +143,11 @@
                         <!--  @click.stop="deleteProjectModalShow(mProject.projectId)" -->
                         <!-- 表头结束 -->
                         <!--              200px  -->
-                        <p
-                          style="height:200px;"
-                        >
+                        <p style="height:200px;" >
                           <span style="font-weight: bold;">Description</span>
-                          <vue-scroll :ops="ops" style="text-indent:2em;word-break:break-word;white-space: pre-line;">{{mProject.description}}</vue-scroll>
+                          <vue-scroll :ops="ops" style="text-indent:2em;word-break:break-word;white-space: pre-line;">
+                            {{mProject.description}}
+                          </vue-scroll>
                         </p>
                         <br/>
                         <div>
@@ -161,7 +168,7 @@
                 >
                   <Col span="7" style="margin-left: 3.5%">
                     <div @click="goSingleProject(item)" class="projectItem">
-                      <Card style="height:320px;margin-top:20px;">
+                      <Card style="height:320px;margin-top:20px;" class="projectCard">
                         <p
                           slot="title"
                           class="projectsTitle"

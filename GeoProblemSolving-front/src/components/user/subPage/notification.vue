@@ -1,9 +1,13 @@
 <template>
   <div>
+    <div id="title">
+      <h1 style="text-align: center;margin-top: 10px;">Message</h1>
+      <h3 style="text-align: center;margin-bottom: 10px;">You can view and process your messages here</h3>
+    </div>
     <Row>
       <Col span="22" offset="1">
         <Card dis-hover>
-          <CheckboxGroup v-model="selectedNoticeType" style="display: inline-block">
+          <CheckboxGroup v-model="selectedNoticeType" style="display: inline-block;margin-left: 3.5%">
             <Checkbox label="noticeList">
               <span>Notice</span>
               <span class="badge">{{readNoticeList.length + unreadNoticeList.length}}</span>
@@ -17,7 +21,9 @@
               <span class="badge">{{readApplyList.length + unreadApplyList.length}}</span>
             </Checkbox>
           </CheckboxGroup>
-          <span style="margin: 0 20px"></span>
+
+          <Divider type="vertical" style="margin-left: 20px"/>
+          <span style="margin: 0 10px"></span>
           <CheckboxGroup v-model="readOrUnread" style="display: inline-block">
             <Checkbox label="read">
               <span>Read</span>
@@ -33,7 +39,7 @@
         <!--  通知详情 -->
         <div>
           <Card dis-hover>
-            <h3 slot="title">Notification Detail</h3>
+            <!-- <h3 slot="title">Notification Detail</h3> -->
             <div :style="{height: contentHeight-230+'px'}">
               <vue-scroll :ops="ops">
                 <div v-if="selectNoteNum!=0">
@@ -111,7 +117,7 @@
 
                 <!--          无通知消息  -->
                 <div v-else>
-                  <Card>
+                  <Card dis-hover>
                     <h1 style="color: darkgray; text-align: center;">No Notifications</h1>
                   </Card>
 
