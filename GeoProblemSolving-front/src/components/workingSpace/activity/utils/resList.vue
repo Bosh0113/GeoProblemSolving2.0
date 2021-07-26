@@ -381,8 +381,6 @@
         <a
           :href="selectData.address"
           :download="selectData.name + selectData.suffix"
-        >
-          <Button
             v-if="
               permissionIdentity(
                 activityInfo.permission,
@@ -390,6 +388,8 @@
                 'use_resource'
               )
             "
+        >
+          <Button
             type="info"
             size="small"
             title="Download"

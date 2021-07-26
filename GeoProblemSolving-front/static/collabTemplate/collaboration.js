@@ -1156,7 +1156,7 @@ var taskList = [];
                         break;
                     }
                     case "control-stop": {
-                        if (data.sender !== userInfo.userId) {
+                        if (data.sender.userId !== userInfo.userId) {
                             $("#operation-apply").show();
                             $("#operation-stop").hide();
                         }
@@ -1166,7 +1166,7 @@ var taskList = [];
                     }
                     case "operation": {
                         if (operationChannel != undefined && typeof operationChannel == "function") {
-                            if (data.sender !== userInfo.userId) {
+                            if (data.sender.userId !== userInfo.userId) {
                                 operationChannel(data);
                             }
                         }
@@ -1174,7 +1174,7 @@ var taskList = [];
                     }
                     case "resource": {
                         if (dataChannel != undefined && typeof dataChannel == "function") {
-                            if (data.sender !== userInfo.userId) {
+                            if (data.sender.userId !== userInfo.userId) {
                                 if (data.behavior == "select") {
                                     selectFile(data.content);
                                 }

@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Traffic Noise Theme</title>
+    <link rel="icon" href="./img/favicon.ico" type="image/x-icon" />
+    <link rel="shortcut icon" href="./img/favicon.ico" type="image/x-icon" />
+    <link href="css/bootstrap/bootstrap.css" rel="stylesheet">
+    <link href="css/fontawesome/font-awesome.css" rel="stylesheet">
+    <link href="css/navbar.css" rel="stylesheet">
+    <link href="css/modelItemGroup.css" rel="stylesheet">
+</head>
+
+<body class="scrollbar">
+    <!--start 导航条-->
+    <div class="head navbar-static-top">
+        <nav class="navbar navbar-default pcnav" role="navigation">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="navbar-header">
+                            <button id="phoneBtn" type="button" class="navbar-toggle" data-toggle="collapse"
+                                data-target="javascript:void(0)mycollapse">
+                                <span class="sr-only">切换导航</span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                            </button>
+                            <a href="http://geomodeling.njnu.edu.cn" class="navbar-brand">
+                            </a>
+                        </div>
+                        <div class="collapse navbar-collapse">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </div>
+    <!--end 导航条-->
+    <div class="clearfix"></div>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="row">
+                    <div class="col-sm-2">
+                        <div class="logoPanel">
+                            <img style="border-radius: 50%;margin: 40px 0 35px 10px" src="img/model/traffic.jpg" />
+                            <h2 style="text-align: center;">Traffic Noise</h2>
+                        </div>
+                        <div class="navbarPanel">
+                            <ul class="navigation">
+                                <li>
+                                    <a class="navName" href="javascript:void(0)" index=0>
+                                        <i class="fa fa-info-circle fa-fw"></i>
+                                        <span>Theme info</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="navName" href="javascript:void(0)" index=0>
+                                        <i class="fa fa-th-large fa-fw"></i>
+                                        <span>Models</span>
+                                        <!--<i class="fa fa-chevron-right pull-right arrow"></i>-->
+                                    </a>
+                                    <ul class="subNavbar">
+                                        <li>
+                                            <a href="javascript:void(0)" index=1>RLS90</a>
+                                        </li>
+                                        <li>
+                                            <a href="javascript:void(0)" index=2>CoRTN</a>
+                                        </li>
+                                        <li>
+                                            <a href="javascript:void(0)" index=3>TRANEX</a>
+                                        </li>
+                                        <li>
+                                            <a href="javascript:void(0)" index=4>Others</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <a class="navName" href="javascript:void(0)" index=0>
+                                        <i class="fa fa-database fa-fw"></i>
+                                        <span>Data</span>
+                                        <!--<i class="fa fa-chevron-right pull-right arrow"></i>-->
+                                    </a>
+                                    <ul class="subNavbar">
+                                        <li>
+                                            <a href="javascript:void(0)" index=5>Shapefiles</a>
+                                        </li>
+                                        <li>
+                                            <a href="javascript:void(0)" index=6>Raster</a>
+                                        </li>
+                                        <li>
+                                            <a href="javascript:void(0)" index=7>Others</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <a class="navName" href="javascript:void(0)" index=8>
+                                        <i class="fa fa-cubes fa-fw"></i>
+                                        <span>Applications</span>
+                                        <!--<i class="fa fa-chevron-right pull-right arrow"></i>-->
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-sm-10">
+                        <div class="infoPanel container-fluid" id="BasicInfoPanel">
+                            <div class="title text-center">
+                                <h3>
+                                    <span>Theme Info</span>
+                                </h3>
+                            </div>
+                            <!--Contents-->
+                            <div class="info">
+                                <p>
+                                    Traffic noise pollution problem is increasingly emerging with the rapid development
+                                    of
+                                    urban traffic.Researchers have paid close attention to the health effects of traffic
+                                    noise. Traffic noise can have various adverse health effects,and most of them are
+                                    extra-auditory effects. The main aspects include that traffic noise can affect the
+                                    cardiovascular system,which is verified by the evidence that exposure to traffic
+                                    noise
+                                    significantly increases the risk for cardiovascular diseases,such as high blood
+                                    pressure,myocardial infarction,coronary heart disease,and so on. In addition,traffic
+                                    noise can induce adverse effects on nervous system,leading to the increasing levels
+                                    of
+                                    anxiety,noise annoyance,and occurrence of insomnia. Furthermore,traffic noise is
+                                    significantly associated with adverse pregnant outcomes,and can affect the endocrine
+                                    system and digestive system<sup>[1]</sup>.
+                                </p>
+                                <p>
+                                    There are many models of traffic noise,such as TRANEX（Traffic Noise Exposure
+                                    Model)，CoRTN(Calculation of Road Traffic Noise),FHWA and so on.Different models
+                                    apply to
+                                    different environments and conditions.For example,the FHWA is suitable for highway
+                                    with
+                                    stable and smooth speed,and traffic in tunnels is excluded from TRANEX.Most models
+                                    are a
+                                    combination of basic noise level and correction,here are the brief of several
+                                    models:
+                                </p>
+                                <br>
+                                <ul style="width: 97%">
+                                    <!--RLS90-->
+                                    <div>
+                                        <li style="font-weight: bold">RLS90</li>
+                                        <p>
+                                            The RLS90 is an improved version of the RLS81 released by the German
+                                            ministry of transport,including noise source and propagation part.
+                                            The noise source part is not based on the noise produced by individual
+                                            vehicles, but is established through traffic flow and other road
+                                            information.The model requires road information such as vehicle flow,
+                                            proportion of large vehicles, width, slope, material, etc.
+                                        </p>
+                                    </div>
+                                    <!--CoRTN-->
+                                    <div>
+                                        <li style="font-weight: bold">CoRTN (Calculation of Road Traffic Noise)</li>
+                                        <p>
+                                            The result of CoRTN is a combination of basic noise level and correction.The
+                                            corrections of CoRTN inclode traffic speed and the percentage of heavy
+                                            vehicles,the gradient of a road section,road surface,the slant distance
+                                            between
+                                            the road (source) and receptor,shielding (i.e. barriers) between a road
+                                            (source)
+                                            and receptor,ground cover attenuation,the angle of view of the road and
+                                            reflections from buildings on the opposite side of the facade<sup>[2]</sup>.
+                                        </p>
+                                        <div style="text-align: center">
+                                            <img style="width: 40%" src="img/model/CoRTN.jpg">
+                                            <p style="text-align: center;text-indent: 0">Fig.1. The Brief of CoRTN</p>
+                                        </div>
+                                    </div>
+                                    <!--TRANEX-->
+                                    <div>
+                                        <li style="font-weight: bold">TRANEX（Traffic Noise Exposure Model)</li>
+                                        <p>TRANEX is a modification of CoRTN,the principle of TRANEX is similar to
+                                            CoRTN,here are the workflow of TRANEX: </p>
+                                        <div style="text-align: center">
+                                            <img style="width: 40%" src="img/model/TRANEX.jpg">
+                                            <p style="text-align: center;text-indent: 0">Fig.2. The Workflow of
+                                                TRANEX<sup>[2]</sup>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </ul>
+                                <hr>
+                                <!--References-->
+                                <div class="ref">
+                                    <h4>References:</h4>
+                                    <p>
+                                        [1] Jing Huang,Bin Guo,Xinbiao Guo.Research progress in health impact of traffic
+                                        noise[J].Journal of Peking University(Health Sciences),2015,47(3):555-558.
+                                    </p>
+                                    <p>
+                                        [2] John Gulliver,David Morley,Danielle Vienneau,Federico Fabbri,Margaret
+                                        Bell,Paul
+                                        Goodman,Sean Beevers,David Dajnak,Frank J Kelly,Daniela Fecht. Development of an
+                                        open-source road traffic noise model for exposure assessment[J]. Environmental
+                                        Modelling and Software,2015,74.
+                                    </p>
+
+                                </div>
+                            </div>
+                        </div>
+                        <!---->
+                        <!--RLS90 index=1-->
+                        <!---->
+                        <div class="infoPanel container-fluid modelPanel">
+                            <div class="title text-center">
+                                <h3>
+                                    <span>RLS90</span>
+                                </h3>
+                            </div>
+                            <!--RLS90-->
+                            <div class="info">
+                                <li style="font-weight: bold">RLS90</li>
+                                <p>
+                                    The RLS90 is an improved version of the RLS81 released by the German
+                                    ministry of transport,including noise source and propagation part.
+                                    The noise source part is not based on the noise produced by individual
+                                    vehicles, but is established through traffic flow and other road
+                                    information.The model requires road information such as vehicle flow,
+                                    proportion of large vehicles, width, slope, material, etc.
+                                </p>
+                            </div>
+                            <hr>
+                            <div class="info clearfix">
+                                <h4 style="font-weight: bold">
+                                    Applications
+                                </h4>
+                                <div class="row">
+                                    <div class="col-sm-2">
+                                        <div class="modelThumbnail">
+                                            <a href="./trafficNoise.html" target="_blank">
+                                                <div class="picPanel">
+                                                    <img src="img/model/thumb.png">
+                                                </div>
+                                                <div class="modelDetail"></div>
+                                            </a>
+                                            <ul class="modelNav clearfix">
+                                                <li class="pull-left">
+                                                    <a href="./trafficNoise.html" target="_blank">
+                                                        <i class="fa fa-tasks"></i>
+                                                    </a>
+                                                </li>
+                                                <li class="pull-right" title="PitRemove">
+                                                    Web RLS90
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="modelThumbnailTitle">
+                                            <p>Web RLS90</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!---->
+                        <!--CoRTN index=2-->
+                        <!---->
+                        <div class="infoPanel container-fluid modelPanel">
+                            <div class="title text-center">
+                                <h3>
+                                    <span>CoRTN</span>
+                                </h3>
+                            </div>
+                            <!--CoRTN-->
+                            <div>
+                                <li style="font-weight: bold">CoRTN (Calculation of Road Traffic Noise)</li>
+                                <p>
+                                    The result of CoRTN is a combination of basic noise level and correction.The
+                                    corrections of CoRTN inclode traffic speed and the percentage of heavy
+                                    vehicles,the gradient of a road section,road surface,the slant distance
+                                    between
+                                    the road (source) and receptor,shielding (i.e. barriers) between a road
+                                    (source)
+                                    and receptor,ground cover attenuation,the angle of view of the road and
+                                    reflections from buildings on the opposite side of the facade.
+                                </p>
+                                <div style="text-align: center">
+                                    <img style="width: 40%" src="img/model/CoRTN.jpg">
+                                    <p style="text-align: center;text-indent: 0">Fig. The Brief of CoRTN</p>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="info clearfix">
+                                <h4 style="font-weight: bold">
+                                    Applications
+                                </h4>
+                                <div class="row">
+                                    <div class="col-sm-2">
+                                        <div class="modelThumbnail">
+                                            <a href="" target="_blank">
+                                                <div class="picPanel">
+                                                    <img src="img/model/thumb.png">
+                                                </div>
+                                                <div class="modelDetail"></div>
+                                            </a>
+                                            <ul class="modelNav clearfix">
+                                                <li class="pull-left">
+                                                    <a href="" target="_blank">
+                                                        <i class="fa fa-tasks"></i>
+                                                    </a>
+                                                </li>
+                                                <li class="pull-right" title="PitRemove">
+                                                    Web CoRTN
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="modelThumbnailTitle">
+                                            <p>Web CoRTN</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--Model TRANEX index=3-->
+                        <div class="infoPanel container-fluid modelPanel">
+                            <div class="title text-center">
+                                <h3>
+                                    <span>TRANEX</span>
+                                </h3>
+                            </div>
+                            <!--TRANEX-->
+                            <div>
+                                <li style="font-weight: bold">TRANEX（Traffic Noise Exposure Model)</li>
+                                <p>TRANEX is a modification of CoRTN,the principle of TRANEX is similar to
+                                    CoRTN,here are the workflow of TRANEX: </p>
+                                <div style="text-align: center">
+                                    <img style="width: 40%" src="img/model/TRANEX.jpg">
+                                    <p style="text-align: center;text-indent: 0">Fig. The Workflow of
+                                        TRANEX
+                                    </p>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="info clearfix">
+                                <h4 style="font-weight: bold">
+                                    Applications
+                                </h4>
+                                <div class="row">
+                                    <div class="col-sm-2">
+                                        <div class="modelThumbnail">
+                                            <a href="" target="_blank">
+                                                <div class="picPanel">
+                                                    <img src="img/model/thumb.png">
+                                                </div>
+                                                <div class="modelDetail"></div>
+                                            </a>
+                                            <ul class="modelNav clearfix">
+                                                <li class="pull-left">
+                                                    <a href="" target="_blank">
+                                                        <i class="fa fa-tasks"></i>
+                                                    </a>
+                                                </li>
+                                                <li class="pull-right" title="PitRemove">
+                                                    Web TRANEX
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="modelThumbnailTitle">
+                                            <p>Web TRANEX</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--Others index=4-->
+                        <div class="infoPanel container-fluid modelPanel">
+                            <div class="title text-center">
+                                <h3>
+                                    <span>Others</span>
+                                </h3>
+                            </div>
+                            <div class="info clearfix">
+                                <div class="row">
+                                    <div class="col-sm-2">
+                                        <div class="modelThumbnail">
+                                            <a href="" target="_blank">
+                                                <div class="picPanel">
+                                                    <img src="img/model/thumb.png">
+                                                </div>
+                                                <div class="modelDetail"></div>
+                                            </a>
+                                            <ul class="modelNav clearfix">
+                                                <li class="pull-left">
+                                                    <a href="" target="_blank">
+                                                        <i class="fa fa-tasks"></i>
+                                                    </a>
+                                                </li>
+                                                <li class="pull-right" title="PitRemove">
+                                                    Others Model
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="modelThumbnailTitle">
+                                            <p>Others Model</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--Shapes index=5-->
+                        <div class="infoPanel container-fluid modelPanel">
+                            <div class="title text-center">
+                                <h3>
+                                    <span>Shapefiles</span>
+                                </h3>
+                            </div>
+                            <div class="info">
+                                <p>The shapefile format is a popular geospatial vector data format for geographic
+                                    information system (GIS) software. It is developed and regulated by Esri as a
+                                    (mostly) open specification for data interoperability among Esri and other GIS
+                                    software products.<sup>[1]</sup>The shapefile format can spatially describe vector
+                                    features:
+                                    points, lines, and polygons, representing, for example, water wells, rivers, and
+                                    lakes. Each item usually has attributes that describe it, such as name or
+                                    temperature.<sup>[2]</sup>
+                                </p>
+                                <p>
+                                    The shapefile format is a digital vector storage format for storing geometric
+                                    location and associated attribute information. This format lacks the capacity to
+                                    store topological information. The shapefile format was introduced with ArcView GIS
+                                    version 2 in the early 1990s. It is now possible to read and write geographical
+                                    datasets using the shapefile format with a wide variety of software.<sup>[2]</sup>
+                                </p>
+                            </div>
+                            <hr>
+                            <div class="info clearfix">
+                                <div>
+                                    <h4>Demo Data</h4>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-2">
+                                        <div class="modelThumbnail">
+                                            <a href="./roadCenterLineDemo.html" target="blank">
+                                                <div class="picPanel">
+                                                    <img src="img/model/Road.jpg">
+                                                </div>
+                                                <div class="modelDetail"></div>
+                                            </a>
+                                            <ul class="modelNav clearfix">
+                                                <li class="pull-left">
+                                                    <a href="./data/demo/RoadCenterLine_demo.zip">
+                                                        <i class="fa fa-download"></i>
+                                                    </a>
+                                                </li>
+                                                <li class="pull-right" title="Shapefiles of Road Center Line">
+                                                    Shapefiles of Road Center Line
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="modelThumbnailTitle">
+                                            <p title="Shapefiles of Road Center Line">Shapefiles of Road Center Line
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <div class="modelThumbnail">
+                                                <a href="./buildingDemo.html" target="blank">
+                                                <div class="picPanel">
+                                                    <img src="img/model/Building.jpg">
+                                                </div>
+                                                <div class="modelDetail"></div>
+                                            </a>
+                                            <ul class="modelNav clearfix">
+                                                <li class="pull-left">
+                                                    <a href="./data/demo/Building_demo.zip">
+                                                        <i class="fa fa-download"></i>
+                                                    </a>
+                                                </li>
+                                                <li class="pull-right" title="Shapefiles of Building">
+                                                    Shapefiles of Building
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="modelThumbnailTitle">
+                                            <p title="Shapefiles of Building">Shapefiles of Building</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <div class="modelThumbnail">
+                                                <a href="./barrierDemo.html" target="blank">
+                                                <div class="picPanel">
+                                                    <img src="img/model/Barrier.jpg">
+                                                </div>
+                                                <div class="modelDetail"></div>
+                                            </a>
+                                            <ul class="modelNav clearfix">
+                                                <li class="pull-left">
+                                                    <a href="./data/demo/Barrier_demo.zip">
+                                                        <i class="fa fa-download"></i>
+                                                    </a>
+                                                </li>
+                                                <li class="pull-right" title="Shapefiles of Barrier">
+                                                    Shapefiles of Barrier
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="modelThumbnailTitle">
+                                            <p title="Shapefiles of Barrier">Shapefiles of Barrier</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr>
+                            <!--References-->
+                            <div class="ref">
+                                <h4>References:</h4>
+                                <p>
+                                    [1] ESRI (July 1998). "ESRI Shapefile Technical Description" (PDF). Retrieved
+                                    2007-07-04.
+                                </p>
+                                <p>
+                                    [2]
+                                    Shapefile.[G/OL].Wikipedia,2019-2-24(2019-3-10).https://en.wikipedia.org/wiki/Shapefile
+                                </p>
+                            </div>
+                        </div>
+                        <!--Raster index=6-->
+                        <div class="infoPanel container-fluid modelPanel">
+                            <div class="title text-center">
+                                <h3>
+                                    <span>Raster</span>
+                                </h3>
+                            </div>
+                            <div class="info">
+                                <p>The raster format is a popular digital raster graphic data format for geographic
+                                    information system (GIS) software,including GeoTIFF,Grid,etc.
+                                </p>
+                                <p>
+                                    GeoTIFF is a public domain metadata standard which allows georeferencing information
+                                    to be embedded within a TIFF file. The potential additional information includes map
+                                    projection, coordinate systems, ellipsoids, datums, and everything else necessary to
+                                    establish the exact spatial reference for the file. The GeoTIFF format is fully
+                                    compliant with TIFF 6.0, so software incapable of reading and interpreting the
+                                    specialized metadata will still be able to open a GeoTIFF format
+                                    file.<sup>[1][2]</sup>
+                                </p>
+                            </div>
+                            <hr>
+                            <div class="info clearfix">
+                                <div>
+                                    <h4>Demo Data</h4>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-2">
+                                        <div class="modelThumbnail">
+                                            <a href="javascript:void(0)">
+                                                <div class="picPanel">
+                                                    <img src="img/model/Road.jpg">
+                                                </div>
+                                                <div class="modelDetail"></div>
+                                            </a>
+                                            <ul class="modelNav clearfix">
+                                                <li class="pull-left">
+                                                    <a href="javascript:void(0)">
+                                                        <i class="fa fa-download"></i>
+                                                    </a>
+                                                </li>
+                                                <li class="pull-right" title="Raster Files of Road Center Line">
+                                                    Raster Files of Road Center Line
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="modelThumbnailTitle">
+                                            <p title="Raster Files of Road Center Line">Raster Files of Road Center Line
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <div class="modelThumbnail">
+                                            <a href="javascript:void(0)">
+                                                <div class="picPanel">
+                                                    <img src="img/model/Building.jpg">
+                                                </div>
+                                                <div class="modelDetail"></div>
+                                            </a>
+                                            <ul class="modelNav clearfix">
+                                                <li class="pull-left">
+                                                    <a href="javascript:void(0)">
+                                                        <i class="fa fa-download"></i>
+                                                    </a>
+                                                </li>
+                                                <li class="pull-right" title="Raster Files of Building">
+                                                    Raster Files of Building
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="modelThumbnailTitle">
+                                            <p title="Raster Files of Building">Raster Files of Building</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <div class="modelThumbnail">
+                                            <a href="javascript:void(0)">
+                                                <div class="picPanel">
+                                                    <img src="img/model/Barrier.jpg">
+                                                </div>
+                                                <div class="modelDetail"></div>
+                                            </a>
+                                            <ul class="modelNav clearfix">
+                                                <li class="pull-left">
+                                                    <a href="javascript:void(0)">
+                                                        <i class="fa fa-download"></i>
+                                                    </a>
+                                                </li>
+                                                <li class="pull-right" title="Raster Files of Barrier">
+                                                    Raster Files of Barrier
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="modelThumbnailTitle">
+                                            <p title="Raster Files of Barrier">Raster Files of Barrier</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr>
+                            <!--References-->
+                            <div class="ref">
+                                <h4>References:</h4>
+                                <p>
+                                    [1] Sk. Sazid Mahammad, R. Ramakrishnan, GeoTIFF - A standard image file format for
+                                    GIS applications. Retrieved on 2017-02-01.
+                                </p>
+                                <p>
+                                    [2]
+                                    GeoTIFF.[G/OL].Wikipedia,2019-1-11(2019-3-10).https://en.wikipedia.org/wiki/GeoTIFF
+                                </p>
+                            </div>
+                        </div>
+                        <!--Others index=7-->
+                        <div class="infoPanel container-fluid modelPanel">
+                            <div class="title text-center">
+                                <h3>
+                                    <span>Others</span>
+                                </h3>
+                            </div>
+                            <div class="info clearfix">
+                                <div class="row">
+                                    <div class="col-sm-2">
+                                        <div class="modelThumbnail">
+                                            <a href="javascript:void(0)">
+                                                <div class="picPanel">
+                                                    <img src="img/model/Road.jpg">
+                                                </div>
+                                                <div class="modelDetail"></div>
+                                            </a>
+                                            <ul class="modelNav clearfix">
+                                                <li class="pull-left">
+                                                    <a href="javascript:void(0)">
+                                                        <i class="fa fa-download"></i>
+                                                    </a>
+                                                </li>
+                                                <li class="pull-right" title="Others Files of Road Center Line">
+                                                    Others Files of Road Center Line
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="modelThumbnailTitle">
+                                            <p title="Others Files of Road Center Line">Others Files of Road Center Line
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <div class="modelThumbnail">
+                                            <a href="javascript:void(0)">
+                                                <div class="picPanel">
+                                                    <img src="img/model/Building.jpg">
+                                                </div>
+                                                <div class="modelDetail"></div>
+                                            </a>
+                                            <ul class="modelNav clearfix">
+                                                <li class="pull-left">
+                                                    <a href="javascript:void(0)">
+                                                        <i class="fa fa-download"></i>
+                                                    </a>
+                                                </li>
+                                                <li class="pull-right" title="Others Files of Building">
+                                                    Others Files of Building
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="modelThumbnailTitle">
+                                            <p title="Others Files of Building">Others Files of Building</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <div class="modelThumbnail">
+                                            <a href="javascript:void(0)">
+                                                <div class="picPanel">
+                                                    <img src="img/model/Barrier.jpg">
+                                                </div>
+                                                <div class="modelDetail"></div>
+                                            </a>
+                                            <ul class="modelNav clearfix">
+                                                <li class="pull-left">
+                                                    <a href="javascript:void(0)">
+                                                        <i class="fa fa-download"></i>
+                                                    </a>
+                                                </li>
+                                                <li class="pull-right" title="Others Files of Barrier">
+                                                    Others Files of Barrier
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="modelThumbnailTitle">
+                                            <p title="Others Files of Barrier">Others Files of Barrier</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--Applications index=8-->
+                        <div class="infoPanel container-fluid applicationPanel">
+                            <div class="title text-center">
+                                <h3>
+                                    <span>Applications</span>
+                                </h3>
+                            </div>
+                            <div class="info clearfix">
+                                <div class="row">
+                                    <!-- RLS90 -->
+                                    <div class="col-sm-2">
+                                        <div class="modelThumbnail">
+                                            <a href="./trafficNoise.html" target="_blank">
+                                                <div class="picPanel">
+                                                    <img src="img/model/thumb.png">
+                                                </div>
+                                                <div class="modelDetail"></div>
+                                            </a>
+                                            <ul class="modelNav clearfix">
+                                                <li class="pull-left">
+                                                    <a href="./trafficNoise.html" target="_blank">
+                                                        <i class="fa fa-tasks"></i>
+                                                    </a>
+                                                </li>
+                                                <li class="pull-right" title="PitRemove">
+                                                    Web RLS90
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="modelThumbnailTitle">
+                                            <p>Web RLS90</p>
+                                        </div>
+                                    </div>
+                                    <!-- CoRTN -->
+                                    <div class="col-sm-2">
+                                        <div class="modelThumbnail">
+                                            <a href="" target="_blank">
+                                                <div class="picPanel">
+                                                    <img src="img/model/thumb.png">
+                                                </div>
+                                                <div class="modelDetail"></div>
+                                            </a>
+                                            <ul class="modelNav clearfix">
+                                                <li class="pull-left">
+                                                    <a href="" target="_blank">
+                                                        <i class="fa fa-tasks"></i>
+                                                    </a>
+                                                </li>
+                                                <li class="pull-right" title="PitRemove">
+                                                    Web CoRTN
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="modelThumbnailTitle">
+                                            <p>Web CoRTN</p>
+                                        </div>
+                                    </div>
+                                    <!-- TRANEX -->
+                                    <div class="col-sm-2">
+                                        <div class="modelThumbnail">
+                                            <a href="" target="_blank">
+                                                <div class="picPanel">
+                                                    <img src="img/model/thumb.png">
+                                                </div>
+                                                <div class="modelDetail"></div>
+                                            </a>
+                                            <ul class="modelNav clearfix">
+                                                <li class="pull-left">
+                                                    <a href="" target="_blank">
+                                                        <i class="fa fa-tasks"></i>
+                                                    </a>
+                                                </li>
+                                                <li class="pull-right" title="PitRemove">
+                                                    Web TRANEX
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="modelThumbnailTitle">
+                                            <p>Web TRANEX</p>
+                                        </div>
+                                    </div>
+                                    <!-- Others -->
+                                    <div class="col-sm-2">
+                                        <div class="modelThumbnail">
+                                            <a href="" target="_blank">
+                                                <div class="picPanel">
+                                                    <img src="img/model/thumb.png">
+                                                </div>
+                                                <div class="modelDetail"></div>
+                                            </a>
+                                            <ul class="modelNav clearfix">
+                                                <li class="pull-left">
+                                                    <a href="" target="_blank">
+                                                        <i class="fa fa-tasks"></i>
+                                                    </a>
+                                                </li>
+                                                <li class="pull-right" title="PitRemove">
+                                                    Others Model1
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="modelThumbnailTitle">
+                                            <p>Others Model1</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <div class="modelThumbnail">
+                                            <a href="" target="_blank">
+                                                <div class="picPanel">
+                                                    <img src="img/model/thumb.png">
+                                                </div>
+                                                <div class="modelDetail"></div>
+                                            </a>
+                                            <ul class="modelNav clearfix">
+                                                <li class="pull-left">
+                                                    <a href="" target="_blank">
+                                                        <i class="fa fa-tasks"></i>
+                                                    </a>
+                                                </li>
+                                                <li class="pull-right" title="PitRemove">
+                                                    Others Model2
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="modelThumbnailTitle">
+                                            <p>Others Model2</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+<script src="js/jquery/jquery-3.3.1.min.js"></script>
+<script src="js/modelItemGroup.js"></script>
+
+</html>

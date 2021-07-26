@@ -25,7 +25,7 @@ public class NoticeSocket {
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String nowDate = dateFormat.format(new Date());
-        System.out.println("Notice已连接："+"用户名-"+httpSession.getAttribute("userName") + "-----" + "连接时间："+ nowDate);
+        System.out.println("Notice已连接："+"用户名-"+httpSession.getAttribute("name") + "-----" + "连接时间："+ nowDate);
         this.session=session;
         servers.put(httpSession.getAttribute("userId").toString(),this);
     }

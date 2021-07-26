@@ -28,8 +28,8 @@ import java.util.Comparator;
 public class IUserImpl implements IUserDao {
     @Autowired
     MongoTemplate mongoTemplate;
-    @Value("${authServerIp}")
-    String authServerIp;
+//    @Value("${authServerIp}")
+//    String authServerIp;
 
     @Override
     public User findUserById(String userId) {
