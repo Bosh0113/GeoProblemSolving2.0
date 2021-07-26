@@ -3,6 +3,7 @@ package cn.edu.njnu.geoproblemsolving.business.resource.util;
 import cn.edu.njnu.geoproblemsolving.business.resource.entity.ResourceEntity;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import com.alibaba.fastjson.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import java.util.Arrays;
 public class RestTemplateUtil {
     // @Autowired
     // RestTemplate restTemplate;
+
     RestTemplate restTemplate = new RestTemplate();
 
     /**

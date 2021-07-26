@@ -28,7 +28,7 @@
   height: 40px !important;
 }
 </style>
-
+<!--Resources中心-->
 <template>
   <Row>
     <Col span="23" offset="1">

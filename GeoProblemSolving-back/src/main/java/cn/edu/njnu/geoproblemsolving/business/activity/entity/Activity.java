@@ -28,7 +28,7 @@ public class Activity implements Serializable {
     private String purpose;
 
     /**
-     * User
+     * UserEntity
      * creator contains: userId,
      * members contains: userId, role
      * role: (Leader) manager // (Technique) researcher, expert(e.g. engineer), decision-maker, core-member(students, workers...) // (Awareness) stakeholder, consultant, ordinary-member // visitor(the public)
@@ -40,14 +40,6 @@ public class Activity implements Serializable {
      * The type of activity
      */
     private ActivityType type;
-
-    /**
-     * The horizontal relationships:
-     * last, next (list of aid and protocolId)
-     * protocol: definition of relationship
-     */
-    private JSONArray last;
-    private JSONArray next;
 
     /**
      * The vertical relationships:
@@ -75,6 +67,15 @@ public class Activity implements Serializable {
     private String createdTime;
     private String activeTime;
 
+
+    /**
+     * The horizontal relationships:
+     * last, next (list of aid and protocolId)
+     * protocol: definition of relationship
+     */
+    private JSONArray last;
+    private JSONArray next;
+    private String protocolId;
     // // Temp
     // private List<String> toolList;
     // private List<String> toolsetList;

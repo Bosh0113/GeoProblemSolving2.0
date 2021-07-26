@@ -34,15 +34,10 @@ const routes = [
             name: "overView",
             component: resolve => require(["@/components/user/subPage/overView"], resolve),
           },
+          //新的resource 页面，含文件夹结构
           {
             path: "resource",
             name: "resource",
-            component: resolve => require(["@/components/user/subPage/resource"], resolve),
-          },
-          //新的resource 页面，含文件夹结构
-          {
-            path: "resourceList",
-            name: "resourceList",
             component: resolve => require(["@/components/user/subPage/resourceList"], resolve)
           },
           {
@@ -74,7 +69,7 @@ const routes = [
         ]
       },
       {
-        path: "newproject",
+        path: "newProject",
         name: "NewProject",
         component: resolve =>
           require(["@/components/projects/newProject"], resolve)
@@ -194,12 +189,13 @@ const routes = [
       }
     ]
   },
-  {
-    path: "/dataService/:id/:token/:type",
-    name: "dataService",
-    component: resolve =>
-      require(["@/components/utils/data/dataService"], resolve)
-  },
+  //之前的工具页面
+  // {
+  //   path: "/dataService/:id/:token/:type",
+  //   name: "dataService",
+  //   component: resolve =>
+  //     require(["@/components/utils/data/dataService"], resolve)
+  // },
   {
     path: "/chat",
     name: "chatUtil",
@@ -235,7 +231,7 @@ const routes = [
     path: "/dataMethod",
     name: "dataMethod",
     component: resolve =>
-      require(["@/components/utils/data/dataServiceCopy2"], resolve)
+      require(["@/components/utils/data/dataService"], resolve)
   },
   {
     path: "/lineChart",

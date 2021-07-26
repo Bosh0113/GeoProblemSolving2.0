@@ -1,3 +1,4 @@
+<!--resource Center页面-->
 <style scoped>
 .selector {
   width: 250px;

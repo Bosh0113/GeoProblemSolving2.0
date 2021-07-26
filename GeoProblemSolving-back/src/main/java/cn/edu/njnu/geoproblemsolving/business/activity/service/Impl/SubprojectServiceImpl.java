@@ -5,10 +5,10 @@ import cn.edu.njnu.geoproblemsolving.business.activity.dto.UpdateActivityDTO;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
 import cn.edu.njnu.geoproblemsolving.business.activity.enums.ActivityType;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityRepository;
+import cn.edu.njnu.geoproblemsolving.business.user.entity.UserEntity;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Project;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Subproject;
-import cn.edu.njnu.geoproblemsolving.business.user.entity.User;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ProjectRepository;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.SubprojectRepository;
 import cn.edu.njnu.geoproblemsolving.business.activity.service.SubprojectService;
@@ -40,13 +40,13 @@ public class SubprojectServiceImpl implements SubprojectService {
         this.folderDao = folderDao;
     }
 
-    private User findByUserId(String userId) {
+    private UserEntity findByUserId(String userId) {
         Optional optional = userRepository.findById(userId);
         if (optional.isPresent()) {
             Object user = optional.get();
-            return (User) user;
+            return (UserEntity) user;
         } else {
-            return new User();
+            return new UserEntity();
         }
     }
 
@@ -236,7 +236,7 @@ public class SubprojectServiceImpl implements SubprojectService {
 
             // creator
             JSONObject participants = new JSONObject();
-            User creator = findByUserId(subproject.getCreator());
+            UserEntity creator = findByUserId(subproject.getCreator());
             participants.put("creator", creator);
 
             // members
@@ -245,7 +245,7 @@ public class SubprojectServiceImpl implements SubprojectService {
             JSONArray memberInfos = new JSONArray();
             for (Object member : members) {
                 String userId = (String) ((HashMap) member).get("userId");
-                User user = findByUserId(userId);
+                UserEntity user = findByUserId(userId);
                 JSONObject userInfo = new JSONObject();
                 userInfo.put("userId", userId);
                 userInfo.put("role", ((HashMap) member).get("role"));
@@ -326,7 +326,7 @@ public class SubprojectServiceImpl implements SubprojectService {
             // confirm
             Optional optional = subprojectRepository.findById(aid);
             if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: subproject does not exist.");
-            User user = findByUserId(userId);
+            UserEntity user = findByUserId(userId);
             if (user == null) return ResultUtils.error(-1, "Fail: user does not exist.");
 
             // add user info to subproject

@@ -51,7 +51,7 @@ function sendSock(agentData, callback) {
     global_callback = callback;
     if (websock.readyState === websock.OPEN) {
         // 若是ws开启状态
-        websocketsend(agentData)
+        websocketsend(agentData);
     } else if (websock.readyState === websock.CONNECTING) {
         // 若是 正在开启状态，则等待1s后重新调用
         setTimeout(function () {
@@ -64,6 +64,8 @@ function sendSock(agentData, callback) {
         }, 1000);
     }
 }
+
+//
 
 //数据接收
 function websocketonmessage(e) {

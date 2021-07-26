@@ -1,6 +1,7 @@
 package cn.edu.njnu.geoproblemsolving.business.collaboration.socket;
 
 import cn.edu.njnu.geoproblemsolving.Config.GetHttpSessionConfigurator;
+import com.alibaba.fastjson.JSONObject;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpSession;
@@ -27,17 +28,21 @@ public class NoticeSocket {
         String nowDate = dateFormat.format(new Date());
         System.out.println("Notice已连接："+"用户名-"+httpSession.getAttribute("name") + "-----" + "连接时间："+ nowDate);
         this.session=session;
-        servers.put(httpSession.getAttribute("userId").toString(),this);
+        servers.put(httpSession.getAttribute("userId").toString(), this);
     }
     //接收消息后所调用的方法
     @OnMessage
     public void onMessage(String message)
     {
         try {
-            if(!message.equals("ping")){
+            JSONObject messageJson = JSONObject.parseObject(message);
+            if(!messageJson.getString("type").equals("ping")){
                 for(Map.Entry<String,NoticeSocket> server:servers.entrySet()){
-                    if(server.getKey().equals(message)){
-                        servers.get(message).session.getBasicRemote().sendText("Notice");
+                    if(server.getKey().equals(messageJson.getString("receiver"))){
+                        JSONObject noticeRes = new JSONObject();
+                        noticeRes.put("type", messageJson.getString("type"));
+                        noticeRes.put("msg", "Notice");
+                        servers.get(server.getKey()).session.getBasicRemote().sendText(noticeRes.toString());
                         break;
                     }
                 }

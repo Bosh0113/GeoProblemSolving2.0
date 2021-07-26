@@ -24,7 +24,7 @@ public class InquiryUserDto {
     private String email;   //used for registration
 
     /**
-     * User server
+     * UserEntity server
      */
     private String avatar;
     private String phone;

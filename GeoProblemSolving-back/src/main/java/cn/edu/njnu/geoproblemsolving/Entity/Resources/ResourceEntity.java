@@ -1,9 +1,10 @@
 package cn.edu.njnu.geoproblemsolving.Entity.Resources;
 
-import com.alibaba.fastjson.JSONObject;
+import lombok.Data;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "Resource")
+@Data
 public class ResourceEntity {
 
     private String resourceId;
@@ -18,100 +19,4 @@ public class ResourceEntity {
     private String privacy;     //public/private
     private String thumbnail; //缩略图地址
     private String editToolInfo;
-
-    public void setPrivacy(String privacy) {
-        this.privacy = privacy;
-    }
-
-    public void setUploaderName(String uploaderName) {
-        this.uploaderName = uploaderName;
-    }
-
-    public void setUploadTime(String uploadTime) {
-        this.uploadTime = uploadTime;
-    }
-
-    public void setFileSize(String fileSize) {
-        this.fileSize = fileSize;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setPathURL(String pathURL) {
-        this.pathURL = pathURL;
-    }
-
-    public void setResourceId(String resourceId) {
-        this.resourceId = resourceId;
-    }
-
-    public void setUploaderId(String uploaderId) {
-        this.uploaderId = uploaderId;
-    }
-
-    public void setThumbnail(String thumbnail) {
-        this.thumbnail = thumbnail;
-    }
-
-    public void setEditToolInfo(String editToolInfo) {
-        this.editToolInfo = editToolInfo;
-    }
-
-    public String getUploadTime() {
-        return uploadTime;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getPathURL() {
-        return pathURL;
-    }
-
-    public String getResourceId() {
-        return resourceId;
-    }
-
-    public String getUploaderId() {
-        return uploaderId;
-    }
-
-    public String getFileSize() {
-        return fileSize;
-    }
-
-    public String getUploaderName() {
-        return uploaderName;
-    }
-
-    public String getPrivacy() {
-        return privacy;
-    }
-
-    public String getThumbnail() {
-        return thumbnail;
-    }
-
-    public String getEditToolInfo() {
-        return editToolInfo;
-    }
 }

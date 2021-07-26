@@ -1,84 +1,97 @@
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-#logo {
-  position: absolute;
-  width: 129px;
-  height: 40px;
-  z-index: 1;
-  margin-top: 5px;
-  margin-left: 2.5%;
-  cursor: pointer;
-}
-.header span {
-  font-size: 15px;
-  font-weight: bold;
-}
-.nav-container {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-header {
-  height: 60px;
-  top: 0;
-  z-index: 99;
-  position: absolute;
-  width: 100%;
-  flex: 0 0 auto;
-  position: absolute;
-  min-width: 1200px;
-}
-.content {
-  /* flex: 1 0 auto; */
-  margin-top: 60px;
-}
-footer {
-  background-color: #515a6e;
-  height: 60px;
-  width: 100%;
-  bottom: 0;
-  flex: 0 0 auto;
-}
-.userState {
-  position: absolute;
-  width: 15%;
-  top: 0px;
-  z-index: 1;
-  display: inline-block;
-  min-width: fit-content;
-}
-.navPart {
-  width: 85%;
-  display: inline-block;
-}
-.menuItem a {
-  font-size: 1.2em;
-  font-weight: bold;
-  color: rgba(255, 255, 255, 1);
-}
-.userImg {
-  width: 40px;
-  height: 40px;
-  vertical-align: middle;
-}
-.footerTop {
-  text-align: center;
-  color: white;
-  font-weight: bold;
-  margin-top: 10px;
-}
-.footerBottom {
-  text-align: center;
-  color: white;
-  font-size: 0.8em;
-}
-.menuItemCell {
-  font-weight: 900;
-}
-.menuItemCell:hover {
-  background-color: #808695;
-  color: white;
-}
+  #logo {
+    position: absolute;
+    width: 129px;
+    height: 40px;
+    z-index: 1;
+    margin-top: 5px;
+    margin-left: 2.5%;
+    cursor: pointer;
+  }
+
+  .header span {
+    font-size: 15px;
+    font-weight: bold;
+  }
+
+  .nav-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  header {
+    height: 60px;
+    top: 0;
+    z-index: 99;
+    position: absolute;
+    width: 100%;
+    flex: 0 0 auto;
+    position: absolute;
+    min-width: 1200px;
+  }
+
+  .content {
+    /* flex: 1 0 auto; */
+    margin-top: 60px;
+  }
+
+  footer {
+    background-color: #515a6e;
+    height: 60px;
+    width: 100%;
+    bottom: 0;
+    flex: 0 0 auto;
+  }
+
+  .userState {
+    position: absolute;
+    width: 15%;
+    top: 0px;
+    z-index: 1;
+    display: inline-block;
+    min-width: fit-content;
+  }
+
+  .navPart {
+    width: 85%;
+    display: inline-block;
+  }
+
+  .menuItem a {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: rgba(255, 255, 255, 1);
+  }
+
+  .userImg {
+    width: 40px;
+    height: 40px;
+    vertical-align: middle;
+  }
+
+  .footerTop {
+    text-align: center;
+    color: white;
+    font-weight: bold;
+    margin-top: 10px;
+  }
+
+  .footerBottom {
+    text-align: center;
+    color: white;
+    font-size: 0.8em;
+  }
+
+  .menuItemCell {
+    font-weight: 900;
+  }
+
+  .menuItemCell:hover {
+    background-color: #808695;
+    color: white;
+  }
 </style>
 <template>
   <div class="nav-container">
@@ -179,6 +192,8 @@ footer {
             </Menu>
           </div>
         </div>
+
+
         <div v-else>
           <Menu mode="horizontal" theme="dark" style="z-index: 0"></Menu>
           <Dropdown style="position: fixed; top: 10px; right: 20px">
@@ -191,58 +206,68 @@ footer {
                 <Cell
                   @click.native="turnToURL('/GeoProblemSolving/home')"
                   class="menuItemCell"
-                  >Home</Cell
+                >Home
+                </Cell
                 >
                 <Cell
                   @click.native="turnToURL('/GeoProblemSolving/projectList')"
                   class="menuItemCell"
-                  >Projects</Cell
+                >Projects
+                </Cell
                 >
                 <Cell
                   @click.native="turnToURL('/GeoProblemSolving/publicResource')"
                   class="menuItemCell"
-                  >Resources</Cell
+                >Resources
+                </Cell
                 >
                 <Cell
                   @click.native="turnToURL('/GeoProblemSolving/toolsCenter')"
                   class="menuItemCell"
-                  >Tools</Cell
+                >Tools
+                </Cell
                 >
                 <Cell
                   @click.native="turnToURL('/GeoProblemSolving/help')"
                   class="menuItemCell"
-                  >Help</Cell
+                >Help
+                </Cell
                 >
-                <Divider style="margin: 5px 0" />
+                <Divider style="margin: 5px 0"/>
                 <Cell
                   v-show="!userState"
                   @click.native="login"
                   class="menuItemCell"
-                  >Login</Cell
+                >Login
+                </Cell
                 >
                 <Cell
                   v-show="!userState"
                   @click.native="turnToURL('/GeoProblemSolving/register')"
                   class="menuItemCell"
-                  >Register</Cell
+                >Register
+                </Cell
                 >
                 <Cell
                   v-show="userState"
-                  @click.native="turnToURL('/GeoProblemSolving/notifications')"
+                  @click.native="turnToURL('/GeoProblemSolving/notification')"
                   class="menuItemCell"
-                  >Notification</Cell
+                >Notification
+                </Cell
                 >
                 <Cell
                   v-show="userState"
                   @click.native="toPersonalPage"
                   class="menuItemCell"
-                  >Personal Page</Cell
+                >Personal Page
+                </Cell
                 >
                 <Cell
                   v-show="userState"
                   @click.native="logout"
                   class="menuItemCell"
-                  >Logout</Cell
+                >Logout
+                </Cell
                 >
               </CellGroup>
             </DropdownMenu>
@@ -253,7 +278,8 @@ footer {
     <div class="content" :style="{ minHeight: contentHeight }">
       <router-view
         @sendNotice="sendMessage"
-        @readNotification="readNotification"
+        @readNotification="readNotificationNum"
+        @changeAvatar="changeAvatarUrl"
       ></router-view>
     </div>
     <footer>
@@ -267,265 +293,240 @@ footer {
   </div>
 </template>
 <script>
-import Avatar from "vue-avatar";
-import { get, del, post, put } from "../axios";
-export default {
-  name: "HelloWorld",
-  data() {
-    return {
-      activeMenu: "",
-      //消息机制
-      noticeSocket: null,
-      unreadNoticeCount: 0,
-      timer: null,
-      contentHeight: window.innerHeight - 120 + "px",
-      useMenuCSS: false,
-    };
-  },
-  watch: {
-    "$route.name": function (newVal, oldVal) {
-      this.setMenuTitle(newVal);
+  import Avatar from "vue-avatar";
+  import {get, del, post, put} from "../axios";
+  import * as socketApi from "../api/socket"
+
+  export default {
+    name: "HelloWorld",
+    data() {
+      return {
+        activeMenu: "",
+        //消息机制
+        noticeSocket: null,
+        unreadNoticeCount: 0,
+        timer: null,
+        contentHeight: window.innerHeight - 120 + "px",
+        useMenuCSS: false,
+        avatarUrl: ''
+      };
     },
-  },
-  created() {
-    this.setMenuTitle(this.$route.name);
-    var that = this;
-    var timer = window.setInterval(function () {
-      if (that.$store.getters.userState) {
-        that.linkSocket();
-        window.clearInterval(timer);
-      }
-    }, 10);
-  },
-  mounted() {
-    // this.linkSocket();
-    this.reSize();
-    window.addEventListener("resize", this.reSize);
-  },
-  beforeDestroy: function () {
-    window.removeEventListener("resize", this.reSize);
-  },
-  updated() {
-    $(".userState sup").css("margin-top", "20px");
-  },
-  components: {
-    Avatar,
-  },
-  computed: {
-    userState() {
-      return this.$store.getters.userState;
+    watch: {
+      "$route.name": function (newVal, oldVal) {
+        this.setMenuTitle(newVal);
+      },
     },
-    userName() {
-      return this.$store.getters.userName;
-    },
-    avatar() {
-      //修改
-      let avatarUrl = this.$store.state.UserServer + this.$store.getters.avatar;
-      return avatarUrl;
-    },
-    headerBgColor() {
-      return this.$route.name === "Home" ? "none" : "";
-    },
-  },
-  methods: {
-    turnToURL(url) {
-      window.location.href = url;
-    },
-    linkSocket() {
-      if (this.$store.getters.userState) {
-        this.setTimer();
-        this.initWebSocket();
-        this.getUnreadNoticeCount();
-      }
-    },
-    setMenuTitle(newVal) {
-      switch (newVal) {
-        case "PublicResource": {
-          this.activeMenu = "resources";
-          break;
+    created() {
+      this.setMenuTitle(this.$route.name);
+      var that = this;
+      var timer = window.setInterval(function () {
+        if (that.$store.getters.userState) {
+          that.linkSocket();
+          window.clearInterval(timer);
         }
-        case "toolsCenter": {
-          this.activeMenu = "toolsCenter";
-          break;
-        }
-        case "Help": {
-          this.activeMenu = "help";
-          break;
-        }
-        case "Login": {
-          this.activeMenu = "login";
-          break;
-        }
-        case "Register": {
-          this.activeMenu = "register";
-          break;
-        }
-        default:
-          this.activeMenu = "";
-      }
+      }, 10);
     },
-    reSize() {
-      if (window.innerHeight > 675) {
-        this.contentHeight = window.innerHeight - 120 + "px";
-      } else {
-        this.contentHeight = 675 - 120 + "px";
-      }
-      if (window.innerWidth < 1200) {
-        this.useMenuCSS = false;
-      } else {
-        this.useMenuCSS = true;
-      }
+    mounted() {
+      this.linkSocket();
+      this.reSize();
+      window.addEventListener("resize", this.reSize);
     },
-    turnContent(name) {
-      if (name === "home") {
+    beforeDestroy: function () {
+      window.removeEventListener("resize", this.reSize);
+    },
+    updated() {
+      $(".userState sup").css("margin-top", "20px");
+    },
+    components: {
+      Avatar,
+    },
+    computed: {
+      userState() {
+        return this.$store.getters.userState;
+      },
+      userName() {
+        return this.$store.getters.userName;
+      },
+      avatar() {
+        let avatarStr = this.$store.getters.avatar;
+        if (this.avatarUrl.indexOf("/avatar/") != -1){
+          let imgId = this.avatarUrl.split("/avatar/");
+          return this.$store.state.UserServer + "/avatar/" + imgId[1];
+        }
+        if (avatarStr != '' && avatarStr != undefined && avatarStr != null) {
+          this.avatarUrl = this.$store.state.UserServer + this.$store.getters.avatar;
+        }
+        return this.avatarUrl;
+      },
+      headerBgColor() {
+        return this.$route.name === "Home" ? "none" : "";
+      },
+    },
+    methods: {
+      turnToURL(url) {
+        window.location.href = url;
+      },
+      linkSocket() {
+        if (this.$store.getters.userState) {
+          this.initWebSocket();
+          this.getUnreadNoticeCount();
+        }
+      },
+      setMenuTitle(newVal) {
+        switch (newVal) {
+          case "PublicResource": {
+            this.activeMenu = "resources";
+            break;
+          }
+          case "toolsCenter": {
+            this.activeMenu = "toolsCenter";
+            break;
+          }
+          case "Help": {
+            this.activeMenu = "help";
+            break;
+          }
+          case "Login": {
+            this.activeMenu = "login";
+            break;
+          }
+          case "Register": {
+            this.activeMenu = "register";
+            break;
+          }
+          default:
+            this.activeMenu = "";
+        }
+      },
+      reSize() {
+        if (window.innerHeight > 675) {
+          this.contentHeight = window.innerHeight - 120 + "px";
+        } else {
+          this.contentHeight = 675 - 120 + "px";
+        }
+        if (window.innerWidth < 1200) {
+          this.useMenuCSS = false;
+        } else {
+          this.useMenuCSS = true;
+        }
+      },
+      turnContent(name) {
+        if (name === "home") {
+          window.location.href = "/GeoProblemSolving/home";
+        } else if (name == "projects") {
+          window.location.href = "/GeoProblemSolving/projectList";
+        } else if (name == "resources") {
+          this.$router.replace({name: "PublicResource"});
+        } else if (name == "toolsCenter") {
+          this.$router.replace({name: "toolsCenter"});
+        } else if (name == "community") {
+          this.$router.replace({name: "Community"});
+        } else if (name == "help") {
+          this.$router.replace({name: "Help"});
+        }
+      },
+      goHome() {
         window.location.href = "/GeoProblemSolving/home";
-      } else if (name == "projects") {
-        window.location.href = "/GeoProblemSolving/projectList";
-      } else if (name == "resources") {
-        this.$router.replace({ name: "PublicResource" });
-      } else if (name == "toolsCenter") {
-        this.$router.replace({ name: "toolsCenter" });
-      } else if (name == "community") {
-        this.$router.replace({ name: "Community" });
-      } else if (name == "help") {
-        this.$router.replace({ name: "Help" });
-      }
-    },
-    goHome() {
-      window.location.href = "/GeoProblemSolving/home";
-    },
-    login() {
-      var pageUrl = window.location.href;
-      this.axios
-        .get("/GeoProblemSolving/user/login?pageUrl=" + pageUrl)
-        .then((res) => {
-          window.location.href = res.data;
-        });
-    },
-    unlogin(name) {
-      if (name === "login") {
-        this.$router.push({ name: "Login" });
-        // var pageUrl = window.location.href;
-        // this.axios
-        //   .get("/GeoProblemSolving/user/login?pageUrl="+pageUrl)
-        //   .then(res=>{
-        //     window.location.href = res.data;
-        //   })
-      } else if (name == "register") {
-        this.$router.push({ name: "Register" });
-      }
-    },
-    logged(name) {
-      if (name === "notification") {
-        this.$router.push({ name: "notification" });
-      } else if (name === "personal") {
-      }
-    },
-    toPersonalPage() {
-      this.$router.push({ name: "overView"});
-      // this.$router.push({ name: "PersonalPage" });
-    },
-    // 获取到通知的数量
-    getUnreadNoticeCount() {
-      this.unreadNoticeCount = 0;
-      //get请求发送的是用户id
-      this.axios
-        .get(
-          "/GeoProblemSolving/notice/inquiry" +
+      },
+      login() {
+        var pageUrl = window.location.href;
+        this.axios
+          .get("/GeoProblemSolving/user/login?pageUrl=" + pageUrl)
+          .then((res) => {
+            window.location.href = res.data;
+          });
+      },
+      unlogin(name) {
+        if (name === "login") {
+          this.$router.push({name: "Login"});
+          // var pageUrl = window.location.href;
+          // this.axios
+          //   .get("/GeoProblemSolving/user/login?pageUrl="+pageUrl)
+          //   .then(res=>{
+          //     window.location.href = res.data;
+          //   })
+        } else if (name == "register") {
+          this.$router.push({name: "Register"});
+        }
+      },
+      logged(name) {
+        if (name === "notification") {
+          this.$router.push({name: "notification"});
+        } else if (name === "personal") {
+        }
+      },
+      toPersonalPage() {
+        this.$router.push({name: "overView"});
+        // this.$router.push({ name: "PersonalPage" });
+      },
+      // 获取到通知的数量
+      getUnreadNoticeCount() {
+        this.unreadNoticeCount = 0;
+        //get请求发送的是用户id
+        this.axios
+          .get(
+            "/GeoProblemSolving/notice/inquiry" +
             "?key=recipientId" +
             "&value=" +
             this.$store.getters.userId
-        )
-        .then((res) => {
-          let noticeList = res.data;
-          let unreadCount = 0;
-          for (let i = 0; i < noticeList.length; i++) {
-            if (noticeList[i].state === "unread") {
-              unreadCount++;
-              continue;
+          )
+          .then((res) => {
+            let noticeList = res.data;
+            let unreadCount = 0;
+            for (let i = 0; i < noticeList.length; i++) {
+              if (noticeList[i].state === "unread") {
+                unreadCount++;
+                continue;
+              }
             }
-          }
-          this.$set(this, "unreadNoticeCount", unreadCount);
-        })
-        .catch((err) => {
-          console.log("失败的原因是" + err.data);
-        });
-    },
-    initWebSocket() {
-      if (this.noticeSocket != null) {
-        this.noticeSocket = null;
-      }
-      var noticeSocketURL =
-        `${window.location.protocol === "https:" ? "wss://" : "ws://"}` +
-        window.location.host +
-        "/GeoProblemSolving/NoticeSocket";
-      if (this.$store.state.IP_Port == "localhost:8080") {
-        noticeSocketURL = "ws://localhost:8081/GeoProblemSolving/NoticeSocket";
-      }
-      this.noticeSocket = new WebSocket(noticeSocketURL);
-      this.noticeSocket.onopen = this.onOpen;
-      this.noticeSocket.onmessage = this.onMessage;
-      this.noticeSocket.onclose = this.onClose;
-      this.noticeSocket.onerror = this.onError;
-    },
-    onOpen() {
-      // console.log("NoticeSocket连接成功！");
-    },
-    onMessage(e) {
-      if (e.data == "Notice") {
-        let newCount = this.unreadNoticeCount + 1;
-        this.$set(this, "unreadNoticeCount", newCount);
+            this.$set(this, "unreadNoticeCount", unreadCount);
+          })
+          .catch((err) => {
+            console.log("失败的原因是" + err.data);
+          });
+      },
+      initWebSocket() {
+        socketApi.initWebSocket("/NoticeSocket");
+        socketApi.sendSock({"type": "ping"}, this.getSocketMessage)
+      },
+      onOpen() {
+        // console.log("NoticeSocket连接成功！");
+      },
+      sendMessage: function (data) {
+        socketApi.sendSock(data, this.getSocketMessage);
+      },
+      getSocketMessage(data) {
+        this.unreadNoticeCount++;
         this.$Message.info("You have a new notice!");
-      } else {
-        console.log(e.data);
-      }
-    },
-    onClose(e) {
-      this.removeTimer();
-      // console.log("NoticeSocket连接断开！");
-    },
-    onError(e) {
-      this.removeTimer();
-      // console.log("NoticeSocket连接错误！");
-    },
-    sendMessage(recipientId) {
-      this.noticeSocket.send(recipientId);
-    },
-    setTimer() {
-      var that = this;
-      this.timer = setInterval(() => {
-        if (that.noticeSocket != null && that.noticeSocket != undefined) {
-          that.noticeSocket.send("ping");
+        console.log(data)
+      },
+      readNotificationNum() {
+        let newCount = this.unreadNoticeCount;
+        if (newCount > 0) {
+          this.unreadNoticeCount = newCount - 1;
         }
-      }, 20000);
+      },
+      changeSelect(name) {
+        if (name == "logout") {
+          this.logout();
+        }
+      },
+      changeAvatarUrl: function(url){
+        this.avatarUrl = url;
+      },
+      logout() {
+        this.axios
+          .get("/GeoProblemSolving/user/logout")
+          .then((res) => {
+            this.$store.commit("userLogout");
+            sessionStorage.removeItem("userInfo");
+            window.location.href = "/GeoProblemSolving/home";
+            socketApi.close();
+          })
+          .catch((err) => {
+            confirm("logout fail!");
+          });
+      },
     },
-    removeTimer() {
-      clearInterval(this.timer);
-    },
-    readNotification() {
-      let newCount = this.unreadNoticeCount;
-      if (newCount > 0) {
-        this.unreadNoticeCount = newCount - 1;
-      }
-    },
-    changeSelect(name) {
-      if (name == "logout") {
-        this.logout();
-      }
-    },
-    logout() {
-      this.axios
-        .get("/GeoProblemSolving/user/logout")
-        .then((res) => {
-          this.$store.commit("userLogout");
-          sessionStorage.removeItem("userInfo");
-          this.noticeSocket.close();
-          window.location.href = "/GeoProblemSolving/home";
-        })
-        .catch((err) => {
-          confirm("logout fail!");
-        });
-    },
-  },
-};
+  };
 </script>

@@ -5,10 +5,13 @@ import cn.edu.njnu.geoproblemsolving.business.collaboration.service.Collaboratio
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpSession;
 import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * @Author ：mzy
@@ -26,6 +29,12 @@ public class OperationSocketServer {
     public void onOpen(@PathParam("toolId") String toolId, @PathParam("aid") String aid, Session session, EndpointConfig config) throws IOException {
         String groupKey = toolId + aid;
         collaborationService.operationStart(groupKey, session, config);
+
+        HttpSession httpSession = ((HttpSession) config.getUserProperties().get(HttpSession.class.getName()));
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String nowDate = dateFormat.format(new Date());
+        System.out.println("Operation已连接："+"用户名-"+httpSession.getAttribute("name") + "-----" + "连接时间："+ nowDate);
+
     }
 
     /**

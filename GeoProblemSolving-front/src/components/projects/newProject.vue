@@ -124,6 +124,13 @@ h1 {
             <Radio label="Private" title="Other users can not find this group."></Radio>
           </RadioGroup>
         </FormItem>
+        <FormItem prop="scope" label="Scope" :label-width="100">
+          <Select v-model="formInline.scope" style="width:80%;margin-left:10px">
+            <Option value="inner" key="0">inner</Option>
+            <Option value="outer" key="1">outer</Option>
+          </Select>
+        </FormItem>
+
         <FormItem prop="tag" label="Tag" :label-width="100">
           <Input
             v-model="inputTag"
@@ -230,6 +237,7 @@ export default {
       formInline: {
         name: "",
         category: "",
+        scope: "inner",
         privacy: "Public",
         description: "",
         //tag列表
@@ -305,9 +313,9 @@ export default {
             tag: this.formInline.tagList.toString(),
             privacy: this.formInline.privacy,
             picture: this.pictureUrl,
+            scope: this.formInline.scope,
             type: "Activity_Default",
             description: this.formInline.description,
-            type: "Activity_Default",
             // creator: "5d1c51e5020a3e3ad80b717e",
             creator: this.$store.getters.userId,
             permission: JSON.stringify(permission),
@@ -324,6 +332,10 @@ export default {
                 this.$Message.error(res.data.msg);
               } else {
                 this.createProjectInfo = res.data.data;
+                this.operationApi.activityDocInit(
+                  res.data.data,
+                  this.$store.getters.userId
+                );
                 this.addHistoryEvent(this.createProjectInfo.aid);
               }
             })
@@ -375,6 +387,7 @@ export default {
       var file = e.target.files[0];
       var filesize = file.size;
       // 2,621,440   2M
+
       if (filesize > 2101440) {
         // 图片大于2MB
         this.$Message.error("size > 2MB");
