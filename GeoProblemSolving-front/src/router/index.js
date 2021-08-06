@@ -36,8 +36,8 @@ const routes = [
           },
           //新的resource 页面，含文件夹结构
           {
-            path: "resource",
-            name: "resource",
+            path: "resourceList",
+            name: "resourceList",
             component: resolve => require(["@/components/user/subPage/resourceList"], resolve)
           },
           {

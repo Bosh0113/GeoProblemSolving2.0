@@ -6,228 +6,236 @@
     </div>
     <Row>
       <Col span="22" offset="1">
-        <Card :padding="1" dis-hover style="height: 550px;">
-              <div
-                slot="extra"
-                class="resourceBtnDiv"
-              ></div>
-              <!-- 内容 -->
-              <div class="folderContent">
-                <Card v-if="folderStack.length > 0" :padding="5" dis-hover>
-                  <div style="display: flex; align-items: center">
-                    <!--        all file 显示，如果file>0则显示 -->
-                    <div
-                      style="min-width: 60px"
-                      v-show="currentFolder.files.length > 0"
-                    >
-                      <Checkbox
-                        :indeterminate="indeterminate"
-                        :value="checkAll"
-                        @click.prevent.native="handleCheckAll"
+        <div>
+          <Card :padding="1" dis-hover style="height: calc(100vh - 210px);" class="customCard">
+                <!-- <div
+                  slot="extra"
+                  class="resourceBtnDiv"
+                ></div> -->
+                <!-- 内容 -->
+                <div class="folderContent">
+                  <Card v-if="folderStack.length > 0" :padding="5" dis-hover>
+                    <div style="display: flex; align-items: center">
+                      <!--        all file 显示，如果file>0则显示 -->
+                      <div
+                        style="min-width: 60px"
                         v-show="currentFolder.files.length > 0"
-                        style="align-items: center"
-                      >All files
-                      </Checkbox
                       >
-                    </div>
-                    <!--            面包屑显示 -->
-                    <div style="margin-left: 3px">
-                      <Breadcrumb>
-                        <BreadcrumbItem
-                          v-for="(folder, index) in folderStack"
-                          :key="folder.uid"
-                          style="cursor: pointer"
-                          @click.native="switchFolder(folder, index)"
-                        >
-                          <span style="color: #2d8cf0">{{ folder.name }}</span>
-                        </BreadcrumbItem>
-                      </Breadcrumb>
-                    </div>
-                    <Divider type="vertical" style="margin-left: 20px"/>
-                    <!--           返回及新建文件夹  -->
-                    <div style="flex: 1; margin-left: 10px">
-                      <Tooltip content="Back" placement="bottom" class="fileBtn">
-                        <Icon type="md-arrow-round-back" @click="backforeFolder" style="cursor:pointer; color: #08ab2b" size="20"/>
-                      </Tooltip>
-                      <Tooltip content="New folder" placement="bottom" class="fileBtn">
-                        <Icon type="ios-folder" @click="addFolderModalShow" style="cursor:pointer; color: #f9c245" size="20"/>
-                      </Tooltip>
-                    </div>
-                    <!--            上传及下载内容 -->
-                    <div style="align-items: flex-end">
-                      <Tooltip content="Download" placement="bottom" class="fileBtn">
-                        <Button
-                          @click="downloadSelectFile"
+                        <Checkbox
+                          :indeterminate="indeterminate"
+                          :value="checkAll"
+                          @click.prevent.native="handleCheckAll"
                           v-show="currentFolder.files.length > 0"
-                          shape="circle"
-                          icon="md-cloud-download"
-                          class="fileBtnHoverGray"
-                        ></Button>
-                      </Tooltip>
-                      <Tooltip content="Upload files" placement="bottom" class="fileBtn">
-                        <Button
-                          @click="uploadModalShow"
-                          shape="circle"
-                          icon="md-cloud-upload"
-                          class="fileBtnHoverGreen"
-                        ></Button>
-                      </Tooltip>
-        <!--              资源共享-->
-
-                      <Tooltip
-                        content="Share personal files"
-                        placement="left"
-                        class="fileBtn"
-                      >
-        <!--                资源分享，后面再来理吧-->
-        <!--                <Button-->
-        <!--                  @click="shareModalShow"-->
-        <!--                  shape="circle"-->
-        <!--                  icon="ios-copy"-->
-        <!--                  class="fileBtnHoverOrange"-->
-        <!--                ></Button>-->
-                      </Tooltip>
-                    </div>
-                  </div>
-                </Card>
-
-                <!--        资源显示区-->
-                <div
-                  v-if="
-                    currentFolder.folders.length > 0 || currentFolder.files.length > 0
-                  "
-                >
-                  <vue-scroll :ops="ops" :style="{ height: contentHeight + 'px' }">
-                    <!--            folder 内容 -->
-                    <Card
-                      v-for="folder in currentFolder.folders"
-                      :key="folder.uid"
-                      :padding="5"
-                    >
-                      <div>
-                        <Icon type="ios-folder-open" class="itemIcon" size="25"/>
-                        <a
-                          @click="enterFolder(folder)"
-                          class="fileItemName"
-                          :title="folder.name"
-                        >{{ folder.name }}</a
+                          style="align-items: center"
+                        ><strong> All files</strong>
+                        </Checkbox
                         >
-
-                        <!--            -->
-                        <div style="float: right">
-                          <Button
-                            @click="renameFolderModalShow(folder)"
-                            class="fileBtnHoverBlue"
-                            shape="circle"
-                            icon="ios-create"
-                            title="Rename"
-                            size="small"
-                            type="text"
-                          ></Button>
-                          <Button
-                            @click="deleteFolder(folder)"
-                            class="fileBtnHoverRed"
-                            shape="circle"
-                            icon="ios-trash"
-                            title="Delete"
-                            size="small"
-                            style="margin-left: 5px"
-                            type="text"
-                          ></Button>
-                        </div>
                       </div>
-                    </Card>
-
-                    <!--            文件内容  -->
-                    <CheckboxGroup
-                      v-model="chooseFilesArray"
-                      @on-change="checkAllGroupChange"
-                    >
-                      <Card
-                        v-for="file in currentFolder.files"
-                        :key="file.uid"
-                        :padding="5"
-                        dis-hover
-                      >
-                        <Checkbox :label="file.address">&nbsp;</Checkbox>
-                        <Icon type="ios-document-outline" class="itemIcon" size="25"/>
-                        <span
-                          @click="getFileInfo(file)"
-                          class="fileItemName"
-                          :title="file.name"
-                        >{{ file.name }}</span
-                        >
-                        <span class="fileItemSize">{{file.fileSize}}</span>
-                        <!-- <span style="width: 20%; margin-left: 20%; ">
-                          {{
-                          // file.uploadTime
-                          file.uploadTime.substring(0, 10)}}
-                        </span> -->
-
-                        <!--                使用资源-->
-                        <div style="float: right">
-                          <!--                  <Button-->
-                          <!--                    @click="filePreview(file)"-->
-                          <!--                    shape="circle"-->
-                          <!--                    icon="md-eye"-->
-                          <!--                    title="Preview"-->
-                          <!--                    size="small"-->
-                          <!--                    class="fileBtnHoverGreen"-->
-                          <!--                    type="text"-->
-                          <!--                  ></Button>-->
+                      <!--            面包屑显示 -->
+                      <div style="margin-left: 3px">
+                        <Breadcrumb>
+                          <BreadcrumbItem
+                            v-for="(folder, index) in folderStack"
+                            :key="folder.uid"
+                            style="cursor: pointer"
+                            @click.native="switchFolder(folder, index)"
+                          >
+                            <span style="color: #2d8cf0">{{ folder.name }}</span>
+                          </BreadcrumbItem>
+                        </Breadcrumb>
+                      </div>
+                      <Divider type="vertical" style="margin-left: 20px"/>
+                      <!--           返回及新建文件夹  -->
+                      <div style="flex: 1; margin-left: 10px">
+                        <Tooltip content="Back" placement="bottom" class="fileBtn">
+                          <Icon type="md-arrow-round-back" @click="backforeFolder" style="cursor:pointer; color: #08ab2b" size="20"/>
+                        </Tooltip>
+                        <Tooltip content="New folder" placement="bottom" class="fileBtn">
+                          <Icon type="ios-folder" @click="addFolderModalShow" style="cursor:pointer; color: #f9c245" size="20"/>
+                        </Tooltip>
+                      </div>
+                      <!--            上传及下载内容 -->
+                      <div style="align-items: flex-end">
+                        <Tooltip content="Download" placement="bottom" class="fileBtn">
                           <Button
-                            @click="fileDownload(file)"
+                            @click="downloadSelectFile"
+                            v-show="currentFolder.files.length > 0"
                             shape="circle"
-                            icon="ios-cloud-download"
-                            title="Download"
-                            size="small"
+                            icon="md-cloud-download"
                             class="fileBtnHoverGray"
-                            type="text"
                           ></Button>
-                          <!--                  <Button-->
-                          <!--                    @click="showCopyFileModel(file)"-->
-                          <!--                    shape="circle"-->
-                          <!--                    icon="ios-share-alt"-->
-                          <!--                    title="Copy to personal center"-->
-                          <!--                    size="small"-->
-                          <!--                    class="fileBtnHoverOrange"-->
-                          <!--                    type="text"-->
-                          <!--                  ></Button>-->
+                        </Tooltip>
+                        <Tooltip content="Upload files" placement="bottom" class="fileBtn">
+                          <Button
+                            @click="uploadModalShow"
+                            shape="circle"
+                            icon="md-cloud-upload"
+                            class="fileBtnHoverGreen"
+                          ></Button>
+                        </Tooltip>
+          <!--              资源共享-->
 
-                          <!--                  管理资源-->
-                          <template>
+                        <Tooltip
+                          content="Share personal files"
+                          placement="left"
+                          class="fileBtn"
+                        >
+          <!--                资源分享，后面再来理吧-->
+          <!--                <Button-->
+          <!--                  @click="shareModalShow"-->
+          <!--                  shape="circle"-->
+          <!--                  icon="ios-copy"-->
+          <!--                  class="fileBtnHoverOrange"-->
+          <!--                ></Button>-->
+                        </Tooltip>
+                      </div>
+                    </div>
+                  </Card>
+
+                  <!--        资源显示区-->
+                  <div
+                    v-if="
+                      currentFolder.folders.length > 0 || currentFolder.files.length > 0
+                    "
+                  >
+                    <vue-scroll :ops="ops" :style="{ height: contentHeight + 'px' }">
+                      <!--            folder 内容 -->
+                      <Card
+                        v-for="folder in currentFolder.folders"
+                        :key="folder.uid"
+                        :padding="5"
+                      >
+                        <div>
+                          <Icon type="ios-folder-open" class="itemIcon" size="25"/>
+                          <a
+                            @click="enterFolder(folder)"
+                            class="fileItemName"
+                            :title="folder.name"
+                          >{{ folder.name }}</a
+                          >
+
+                          <!--            -->
+                          <div style="float: right">
                             <Button
-                              @click="fileEditModelShow(file)"
-                              shape="circle"
-                              icon="md-create"
-                              title="Edit info"
-                              size="small"
+                              @click="renameFolderModalShow(folder)"
                               class="fileBtnHoverBlue"
+                              shape="circle"
+                              icon="ios-create"
+                              title="Rename"
+                              size="small"
                               type="text"
                             ></Button>
                             <Button
-                              @click="resDelete(file)"
+                              @click="deleteFolder(folder)"
+                              class="fileBtnHoverRed"
                               shape="circle"
                               icon="ios-trash"
-                              title="Remove"
+                              title="Delete"
                               size="small"
-                              class="fileBtnHoverRed"
+                              style="margin-left: 5px"
                               type="text"
                             ></Button>
-                          </template>
+                          </div>
                         </div>
                       </Card>
-                    </CheckboxGroup>
-                  </vue-scroll>
-                </div>
-                <div v-else style="text-align: center">
-                  <div style="color: lightgray; font-size: 2em; font-weight: bold">
-                    No file or folder
+
+                      <!--            文件内容  -->
+                      <CheckboxGroup
+                        v-model="chooseFilesArray"
+                        @on-change="checkAllGroupChange"
+                      >
+                        <Card
+                          v-for="file in currentFolder.files"
+                          :key="file.uid"
+                          :padding="5"
+                          dis-hover
+                        >
+                          <Checkbox :label="file.address">&nbsp;</Checkbox>
+                          <Icon v-if="file.type === 'data'" type="ios-document-outline" class="itemIcon" size="25"/>
+                          <Icon v-else-if="file.type === 'image'" type="ios-image-outline" class="itemIcon" size="25"/>
+                          <Icon v-else-if="file.type === 'paper'" type="ios-paper-outline" class="itemIcon" size="25"/>
+                          <Icon v-else-if="file.type === 'document'" type="ios-albums-outline" class="itemIcon" size="25"/>
+                          <Icon v-else-if="file.type === 'model'" type="ios-construct-outline" class="itemIcon" size="25"/>
+                          <Icon v-else-if="file.type === 'video'" type="ios-videocam-outline" class="itemIcon" size="25"/>
+                          <Icon v-else type="ios-create-outline" class="itemIcon" size="25"/>
+                          <span
+                            @click="getFileInfo(file)"
+                            class="fileItemName"
+                            :title="file.name"
+                          >{{ file.name }}</span
+                          >
+                          <span v-if="useFileItemSize" class="fileItemSize">{{file.fileSize}}</span>
+                          <!-- <span style="width: 20%; margin-left: 20%; ">
+                            {{
+                            // file.uploadTime
+                            file.uploadTime.substring(0, 10)}}
+                          </span> -->
+
+                          <!--                使用资源-->
+                          <div style="float: right">
+                            <!--                  <Button-->
+                            <!--                    @click="filePreview(file)"-->
+                            <!--                    shape="circle"-->
+                            <!--                    icon="md-eye"-->
+                            <!--                    title="Preview"-->
+                            <!--                    size="small"-->
+                            <!--                    class="fileBtnHoverGreen"-->
+                            <!--                    type="text"-->
+                            <!--                  ></Button>-->
+                            <Button
+                              @click="fileDownload(file)"
+                              shape="circle"
+                              icon="ios-cloud-download"
+                              title="Download"
+                              size="small"
+                              class="fileBtnHoverGray"
+                              type="text"
+                            ></Button>
+                            <!--                  <Button-->
+                            <!--                    @click="showCopyFileModel(file)"-->
+                            <!--                    shape="circle"-->
+                            <!--                    icon="ios-share-alt"-->
+                            <!--                    title="Copy to personal center"-->
+                            <!--                    size="small"-->
+                            <!--                    class="fileBtnHoverOrange"-->
+                            <!--                    type="text"-->
+                            <!--                  ></Button>-->
+
+                            <!--                  管理资源-->
+                            <template>
+                              <Button
+                                @click="fileEditModelShow(file)"
+                                shape="circle"
+                                icon="md-create"
+                                title="Edit info"
+                                size="small"
+                                class="fileBtnHoverBlue"
+                                type="text"
+                              ></Button>
+                              <Button
+                                @click="resDelete(file)"
+                                shape="circle"
+                                icon="ios-trash"
+                                title="Remove"
+                                size="small"
+                                class="fileBtnHoverRed"
+                                type="text"
+                              ></Button>
+                            </template>
+                          </div>
+                        </Card>
+                      </CheckboxGroup>
+                    </vue-scroll>
+                  </div>
+                  <div v-else style="text-align: center">
+                    <div style="color: lightgray; font-size: 2em; font-weight: bold">
+                      No file or folder
+                    </div>
                   </div>
                 </div>
-              </div>
-            </Card>
+              </Card>
 
+        </div>
       </Col>
     </Row>
 
@@ -450,7 +458,7 @@
           <!--        <Button type="warning" @click="shareModal = false">Cancel</Button>-->
           <!--        <Button type="success" @click="shareResources">Share</Button>-->
           <!--      </div>-->
-          <!--    </Modal>-->     
+          <!--    </Modal>-->
     </Card>
   </div>
 </template>
@@ -467,7 +475,8 @@
           userId: '',
           avatar: '',
         },
-        contentHeight: 100,
+        useFileItemSize: true,
+        contentHeight: '',
         //用于面包屑显示
         folderStack: [
           //默认路径
@@ -628,6 +637,18 @@
         this.switchIndex = index;
         this.changeFolder(folder.uid, "switch");
       },
+      reSize() {
+        // if (window.innerHeight > 675) {
+        //   this.contentHeight = window.innerHeight - 120 + "px";
+        // } else {
+        //   this.contentHeight = 675 - 120 + "px";
+        // }
+        if (window.innerWidth < 800) {
+          this.useFileItemSize = false;
+        } else {
+          this.useFileItemSize = true;
+        }
+      },
       getResList: function () {
         this.axios
           .get("/GeoProblemSolving/res")
@@ -709,14 +730,23 @@
             key: "Upload Time",
             value: file.uploadTime,
           },
+          {
+            key: "Path",
+            value: file.path,
+          }
         ];
         this.fileInfoModal = true;
       },
       resizeContent: function () {
-        if (window.innerHeight > 735) {
-          this.contentHeight = window.innerHeight - 350;
+        // if (window.innerHeight > 675) {
+        //   this.contentHeight = window.innerHeight - 120 + "px";
+        // } else {
+        //   this.contentHeight = 555px;
+        // }
+        if (window.innerHeight > 675) {
+          this.contentHeight = window.innerHeight - 120 + "px";
         } else {
-          this.contentHeight = 390;
+          this.contentHeight = 675 - 120 + "px";
         }
       },
       //工具方法，将 pathUid 转换为字符串
@@ -1163,12 +1193,21 @@
       this.userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
       this.getResList();
       window.addEventListener("resize", this.resizeContent);
+      this.reSize();
+      window.addEventListener("resize", this.reSize);
+    },
+    beforeDestroy: function () {
+      window.removeEventListener("resize", this.reSize);
     },
     computed: {},
   }
 </script>
 
 <style scoped>
+  .customCard{
+    opacity: 0.95;
+  }
+
   .fileSpace{
     padding: 0 20px;
   }

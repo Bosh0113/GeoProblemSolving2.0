@@ -29,7 +29,7 @@
             <big>Resource</big>
           </p>
           <div slot="extra">
-            <router-link to="resource">
+            <router-link to="resourceList">
               <!-- <Icon type="ios-arrow-dropright" size="20" color="blue" style="cursor:pointer;"/> -->
               <Button shape="circle" icon="ios-arrow-forward" class="ovBtnHoverGray"></Button>
             </router-link>
@@ -39,7 +39,7 @@
       </Col>
     </Row>
 
-    <Row style="margin-top: 50px">
+    <Row style="margin-top: 40px">
       <Col span="9" offset="2">
         <Card class="customCard">
           <p slot="title">
@@ -72,7 +72,7 @@
       </Col>
     </Row>
 
-    <Row style="margin-top: 50px">
+    <Row style="margin-top: 40px">
       <Col span="9" offset="2">
         <Card class="customCard">
           <p slot="title">
@@ -121,10 +121,12 @@
 <style scoped>
   .customCard {
     /*width: 335px;*/
+    height: 130px;
     background-color: white;
     border-radius: 3px;
     border:1px solid #dadce0;
     box-shadow:  0 3.2px 7.2px 0 rgb(0 0 0 / 13%), 0 0.6px 1.8px 0 rgb(0 0 0 / 11%);
+    opacity: 0.99;
   }
 
 

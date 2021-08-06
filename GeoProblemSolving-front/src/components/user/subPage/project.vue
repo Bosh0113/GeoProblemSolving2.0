@@ -5,7 +5,12 @@
     border:1px solid #dadce0;
     box-shadow:  0 3.2px 7.2px 0 rgb(0 0 0 / 13%), 0 0.6px 1.8px 0 rgb(0 0 0 / 11%);
   }
-  
+
+  .customCard{
+    background-color:white;
+    opacity: 0.95;
+  }
+
   .historyLine >>> .ivu-card-head {
     border-bottom-color: white;
     padding: 4px 6px;
@@ -43,237 +48,476 @@
 </style>
 <template>
   <div>
-    <div id="title">
-      <h1 style="text-align: center;margin-top: 10px;">Project</h1>
-      <h3 style="text-align: center;margin-bottom: 10px;">you can manage projects you create and join here</h3>
-    </div>
-    <Row>
-      <Col span="22" offset="1">
-        <!--    Filter and Storage  -->
-        <Card dis-hover class="customCard">
-          <CheckboxGroup v-model="selectedProjectType" style="margin-left: 3.5%">
-            <Checkbox label="joinedProject" checked="checked">
-              <span>Joined by me</span>
-              <span class="badge">{{joinedProjectsList.length}}</span>
-            </Checkbox>
-            <Checkbox label="createdProject">
-              <span>Created by me</span>
-              <span class="badge">{{createdProjectList.length}}</span>
-            </Checkbox>
-          </CheckboxGroup>
-
-          <Button slot="extra" type="primary" to="/newProject">Establish a project</Button>
-        </Card class="customCard">
-
-        <!--    project content     -->
-          <div
-            :style="{height: contentHeight-140+'px'}"
-            style=" padding: 5px; border: #dcdee2 solid 1px;"
-          >
-            <vue-scroll :ops="ops">
-              <Card :bordered="false"
-                    v-if="createdProjectList.length == 0 && selectedProjectType.includes('createdProject') && joinedProjectsList.length == 0">
-                <div style="display:flex;justify-content:center">
-                  <Icon type="md-alert" size="40" color="gray"/>
-                </div>
-                <br/>
-                <div style="display:flex;justify-content:center">
-                  <h3
-                    style="text-align:center;width:80%"
-                  >Sorry, you didn't create any projects.</h3>
-                </div>
-              </Card>
-
-              <Card :bordered="false"
-                    v-if="joinedProjectsList.length == 0 && selectedProjectType.includes('joinedProject') && selectedProjectType.length == 1">
-                <div style="display:flex;justify-content:center">
-                  <Icon type="md-alert" size="40" color="gray"/>
-                </div>
-                <br/>
-                <div style="display:flex;justify-content:center">
-                  <h3
-                    style="text-align:center;width:80%"
-                  >Sorry, you didn't participate in any projects.</h3>
-                </div>
-              </Card>
-
-              <Card :bordered="false" v-if="selectedProjectType.length == 0">
-                <div style="display:flex;justify-content:center">
-                  <Icon type="md-alert" size="40" color="gray"/>
-                </div>
-                <br/>
-                <div style="display:flex;justify-content:center">
-                  <h3
-                    style="text-align:center;width:80%"
-                  >Sorry, There are not any projects.</h3>
-                </div>
-              </Card>
-
-
-              <!--               项目内容显示        -->
-              <div v-show="userProjectCount.length != 0">
-                <div
-                  v-if="selectedProjectType.indexOf('createdProject') != -1"
-                  v-for="(mProject,index) in createdProjectList"
-                  v-show="createdProjectList!='None'"
-                  :key="'create'+index"
-                >
-                  <Col span="7" style="margin-left: 3.5%">
-                    <div class="projectItem" @click="goSingleProject(mProject)">
-                      <Card style="height:320px;margin-top:20px;" class="projectCard">
-                        <p slot="title" class="projectsTitle">{{mProject.name}}</p>
-                        <Button
-                          class="authorBtn"
-                          type="default"
-                          slot="extra"
-                          title="Privilege change"
-                          @click.stop="authorizeModalShow(mProject.aid)"
-                          icon="md-happy"
-                        ></Button>
-                        <Button
-                          class="deleteBtn"
-                          type="default"
-                          slot="extra"
-                          style="margin:0 0 0 5px"
-                          @click.stop="deleteProjectModalShow(mProject.aid, mProject.name, mProject.members)"
-                          icon="md-close"
-                          title="remove"
-                        ></Button>
-
-                        <!--  @click.stop="deleteProjectModalShow(mProject.projectId)" -->
-                        <!-- 表头结束 -->
-                        <!--              200px  -->
-                        <p style="height:200px;" >
-                          <span style="font-weight: bold;">Description</span>
-                          <vue-scroll :ops="ops" style="text-indent:2em;word-break:break-word;white-space: pre-line;">
-                            {{mProject.description}}
-                          </vue-scroll>
-                        </p>
-                        <br/>
-                        <div>
-                          <span style="float:left">CreateTime:</span>
-                          <span style="float:right">{{mProject.createdTime}}</span>
-                        </div>
-                      </Card>
-                    </div>
-                  </Col>
-                </div>
-
-
-                <div
-                  v-if="selectedProjectType.indexOf('joinedProject') != -1"
-                  v-for="(item,Index) in joinedProjectsList"
-                  :key="'join'+ Index"
-                  v-show="joinedProjectsList!=[]"
-                >
-                  <Col span="7" style="margin-left: 3.5%">
-                    <div @click="goSingleProject(item)" class="projectItem">
-                      <Card style="height:320px;margin-top:20px;" class="projectCard">
-                        <p
-                          slot="title"
-                          class="projectsTitle"
-                        >{{item.name}}</p>
-<!--                        @click.stop="quitModalShow(item)"-->
-                        <Button
-                          class="fileBtnHoverRed"
-                          slot="extra"
-                          @click.stop="quitModalShow(item)"
-                        >Quit
-                        </Button>
-                        <p
-                          style="height:200px;"
-                        >
-                          <span style="font-weight: bold">Description</span>
-                          <vue-scroll :ops="ops" style="text-indent:2em;word-break:break-word;white-space: pre-line;">{{item.description}}</vue-scroll>
-                        </p>
-                        <br/>
-                        <div style="height:40px">
-                          <span style="float:left">CreateTime:</span>
-                          <span style="float:right">{{item.createdTime}}</span>
-                        </div>
-                      </Card>
-                    </div>
-                  </Col>
-                </div>
-              </div>
-            </vue-scroll>
+    <div v-if="useProjectCSS">
+      <div id="title">
+            <h1 style="text-align: center;margin-top: 10px;">Project</h1>
+            <h3 style="text-align: center;margin-bottom: 10px;">you can manage projects you create and join here</h3>
           </div>
-      </Col>
+          <Row>
+            <Col span="22" offset="1">
+              <!--    Filter and Storage  -->
+              <Card dis-hover class="customCard">
+                <CheckboxGroup v-model="selectedProjectType" style="margin-left: 3.5%">
+                  <Checkbox label="joinedProject" checked="checked">
+                    <span>Joined by me</span>
+                    <span class="badge">{{joinedProjectsList.length}}</span>
+                  </Checkbox>
+                  <Checkbox label="createdProject">
+                    <span>Created by me</span>
+                    <span class="badge">{{createdProjectList.length}}</span>
+                  </Checkbox>
+                </CheckboxGroup>
+                <Button slot="extra" type="primary" to="/newProject">Establish a project</Button>
+              </Card >
 
-      <!--    Event History-->
-<!--      <Col span="4">-->
-<!--        <Card dis-hover class="historyLine">-->
-<!--          <p slot="title">Event line</p>-->
-<!--          <div class="timeLineStyle">-->
-<!--            <vue-scroll :ops="ops">-->
-<!--              <Timeline>-->
-<!--                <div v-if="userEventList.length==0">-->
-<!--                  <div style="display:flex;justify-content:center">-->
-<!--                    <Icon type="md-alert" size="40" color="gray"/>-->
-<!--                  </div>-->
-<!--                  <br/>-->
-<!--                  <div style="display:flex;justify-content:center">-->
-<!--                    <h3-->
-<!--                      style="text-align:center;width:80%"-->
-<!--                    >Sorry, there are no events now.</h3>-->
-<!--                  </div>-->
-<!--                </div>-->
-<!--                <TimelineItem-->
-<!--                  v-for="(item,index) in userEventList"-->
-<!--                  :key="index"-->
-<!--                  v-show="userEventList.length>0"-->
-<!--                >-->
-<!--                  <strong>-->
-<!--                    <p class="time">{{item.createTime}}</p>-->
-<!--                  </strong>-->
-<!--                  <p class="content">{{item.description}}</p>-->
-<!--                </TimelineItem>-->
-<!--              </Timeline>-->
-<!--            </vue-scroll>-->
-<!--          </div>-->
-<!--        </Card>-->
-<!--      </Col>-->
+              <!--    project content     -->
+                <div
+                  :style="{height: contentHeight-140+'px'}"
+                  style=" padding: 5px; border: #dcdee2 solid 1px;"
+                  class="customCard"
+                >
+                  <vue-scroll :ops="ops">
+                    <Card :bordered="false"
+                          v-if="createdProjectList.length == 0 && selectedProjectType.includes('createdProject') && joinedProjectsList.length == 0">
+                      <div style="display:flex;justify-content:center">
+                        <Icon type="md-alert" size="40" color="gray"/>
+                      </div>
+                      <br/>
+                      <div style="display:flex;justify-content:center">
+                        <h3
+                          style="text-align:center;width:80%"
+                        >Sorry, you didn't create any projects.</h3>
+                      </div>
+                    </Card>
 
-      <!--      模态框     -->
-      <Modal
-        v-model="deleteProjectModal"
-        @on-ok="deleteProject"
-        @on-cancel
-        ok-text="Assure"
-        cancel-text="Cancel"
-      >
-        <p style="font-family: 'Roboto Light';">Do you really want to delete: <strong>{{delProjectName}}</strong>?</p>
-      </Modal>
+                    <Card :bordered="false"
+                          v-if="joinedProjectsList.length == 0 && selectedProjectType.includes('joinedProject') && selectedProjectType.length == 1">
+                      <div style="display:flex;justify-content:center">
+                        <Icon type="md-alert" size="40" color="gray"/>
+                      </div>
+                      <br/>
+                      <div style="display:flex;justify-content:center">
+                        <h3
+                          style="text-align:center;width:80%"
+                        >Sorry, you didn't participate in any projects.</h3>
+                      </div>
+                    </Card>
 
-      <Modal
-        title="Quit Project"
-        v-model="quitModal"
-        @on-ok="quitProject()"
-        @on-cancel
-        ok-text="Ok"
-        cancel-text="Cancel"
-      >
-        <p>Once you exit the project: <strong>{{currentProject.name}}</strong> ,you will not be able to participate in the collaborative process, confirm the exit?</p>
-      </Modal>
+                    <Card :bordered="false" v-if="selectedProjectType.length == 0">
+                      <div style="display:flex;justify-content:center">
+                        <Icon type="md-alert" size="40" color="gray"/>
+                      </div>
+                      <br/>
+                      <div style="display:flex;justify-content:center">
+                        <h3
+                          style="text-align:center;width:80%"
+                        >Sorry, There are not any projects.</h3>
+                      </div>
+                    </Card>
 
-<!--      <Modal-->
-<!--        v-model="authorizeProjectModal"-->
-<!--        @on-ok="authorize()"-->
-<!--        ok-text="Assure"-->
-<!--        cancel-text="Cancel"-->
-<!--      >-->
-<!--        <p style="slot">Hand the project to others</p>-->
-<!--        <div>-->
-<!--          <RadioGroup v-model="selectManagerId">-->
-<!--            <Radio v-for="member in projectMemberList" :key="member.index" :label="member.userId">-->
-<!--              <span>{{member.userName}}</span>-->
-<!--            </Radio>-->
-<!--          </RadioGroup>-->
-<!--          &lt;!&ndash; 用radio将用户表示出来 &ndash;&gt;-->
-<!--          &lt;!&ndash; <tag v-for="(member,index) in projectMemberList" @click="choose(index)" :key="member.index">{{member.userName}}</tag> &ndash;&gt;-->
-<!--        </div>-->
-<!--      </Modal>-->
-    </Row>
+
+                    <!--               项目内容显示        -->
+                    <div v-show="userProjectCount.length != 0">
+                      <div
+                        v-if="selectedProjectType.indexOf('createdProject') != -1"
+                        v-for="(mProject,index) in createdProjectList"
+                        v-show="createdProjectList!='None'"
+                        :key="'create'+index"
+                      >
+                        <Col span="7" style="margin-left: 3.5%">
+                          <div class="projectItem" @click="goSingleProject(mProject)">
+                            <Card style="height:320px;margin-top:20px;" class="projectCard">
+                              <p slot="title" class="projectsTitle">{{mProject.name}}</p>
+                              <Button
+                                class="authorBtn"
+                                type="default"
+                                slot="extra"
+                                title="Privilege change"
+                                @click.stop="authorizeModalShow(mProject.aid)"
+                                icon="md-happy"
+                              ></Button>
+                              <Button
+                                class="deleteBtn"
+                                type="default"
+                                slot="extra"
+                                style="margin:0 0 0 5px"
+                                @click.stop="deleteProjectModalShow(mProject.aid, mProject.name, mProject.members)"
+                                icon="md-close"
+                                title="remove"
+                              ></Button>
+
+                              <!--  @click.stop="deleteProjectModalShow(mProject.projectId)" -->
+                              <!-- 表头结束 -->
+                              <!--              200px  -->
+                              <p style="height:200px;" >
+                                <span style="font-weight: bold;">Description</span>
+                                <vue-scroll :ops="ops" style="text-indent:2em;word-break:break-word;white-space: pre-line;">
+                                  {{mProject.description}}
+                                </vue-scroll>
+                              </p>
+                              <br/>
+                              <div>
+                                <span style="float:left">CreateTime:</span>
+                                <span style="float:right">{{mProject.createdTime}}</span>
+                              </div>
+                            </Card>
+                          </div>
+                        </Col>
+                      </div>
+
+
+                      <div
+                        v-if="selectedProjectType.indexOf('joinedProject') != -1"
+                        v-for="(item,Index) in joinedProjectsList"
+                        :key="'join'+ Index"
+                        v-show="joinedProjectsList!=[]"
+                      >
+                        <Col span="7" style="margin-left: 3.5%">
+                          <div @click="goSingleProject(item)" class="projectItem">
+                            <Card style="height:320px;margin-top:20px;" class="projectCard">
+                              <p
+                                slot="title"
+                                class="projectsTitle"
+                              >{{item.name}}</p>
+      <!--                        @click.stop="quitModalShow(item)"-->
+                              <Button
+                                class="fileBtnHoverRed"
+                                slot="extra"
+                                @click.stop="quitModalShow(item)"
+                              >Quit
+                              </Button>
+                              <p
+                                style="height:200px;"
+                              >
+                                <span style="font-weight: bold">Description</span>
+                                <vue-scroll :ops="ops" style="text-indent:2em;word-break:break-word;white-space: pre-line;">{{item.description}}</vue-scroll>
+                              </p>
+                              <br/>
+                              <div style="height:40px">
+                                <span style="float:left">CreateTime:</span>
+                                <span style="float:right">{{item.createdTime}}</span>
+                              </div>
+                            </Card>
+                          </div>
+                        </Col>
+                      </div>
+                    </div>
+                  </vue-scroll>
+                </div>
+            </Col>
+
+            <!--    Event History-->
+      <!--      <Col span="4">-->
+      <!--        <Card dis-hover class="historyLine">-->
+      <!--          <p slot="title">Event line</p>-->
+      <!--          <div class="timeLineStyle">-->
+      <!--            <vue-scroll :ops="ops">-->
+      <!--              <Timeline>-->
+      <!--                <div v-if="userEventList.length==0">-->
+      <!--                  <div style="display:flex;justify-content:center">-->
+      <!--                    <Icon type="md-alert" size="40" color="gray"/>-->
+      <!--                  </div>-->
+      <!--                  <br/>-->
+      <!--                  <div style="display:flex;justify-content:center">-->
+      <!--                    <h3-->
+      <!--                      style="text-align:center;width:80%"-->
+      <!--                    >Sorry, there are no events now.</h3>-->
+      <!--                  </div>-->
+      <!--                </div>-->
+      <!--                <TimelineItem-->
+      <!--                  v-for="(item,index) in userEventList"-->
+      <!--                  :key="index"-->
+      <!--                  v-show="userEventList.length>0"-->
+      <!--                >-->
+      <!--                  <strong>-->
+      <!--                    <p class="time">{{item.createTime}}</p>-->
+      <!--                  </strong>-->
+      <!--                  <p class="content">{{item.description}}</p>-->
+      <!--                </TimelineItem>-->
+      <!--              </Timeline>-->
+      <!--            </vue-scroll>-->
+      <!--          </div>-->
+      <!--        </Card>-->
+      <!--      </Col>-->
+
+            <!--      模态框     -->
+            <Modal
+              v-model="deleteProjectModal"
+              @on-ok="deleteProject"
+              @on-cancel
+              ok-text="Assure"
+              cancel-text="Cancel"
+            >
+              <p style="font-family: 'Roboto Light';">Do you really want to delete: <strong>{{delProjectName}}</strong>?</p>
+            </Modal>
+
+            <Modal
+              title="Quit Project"
+              v-model="quitModal"
+              @on-ok="quitProject()"
+              @on-cancel
+              ok-text="Ok"
+              cancel-text="Cancel"
+            >
+              <p>Once you exit the project: <strong>{{currentProject.name}}</strong> ,you will not be able to participate in the collaborative process, confirm the exit?</p>
+            </Modal>
+
+      <!--      <Modal-->
+      <!--        v-model="authorizeProjectModal"-->
+      <!--        @on-ok="authorize()"-->
+      <!--        ok-text="Assure"-->
+      <!--        cancel-text="Cancel"-->
+      <!--      >-->
+      <!--        <p style="slot">Hand the project to others</p>-->
+      <!--        <div>-->
+      <!--          <RadioGroup v-model="selectManagerId">-->
+      <!--            <Radio v-for="member in projectMemberList" :key="member.index" :label="member.userId">-->
+      <!--              <span>{{member.userName}}</span>-->
+      <!--            </Radio>-->
+      <!--          </RadioGroup>-->
+      <!--          &lt;!&ndash; 用radio将用户表示出来 &ndash;&gt;-->
+      <!--          &lt;!&ndash; <tag v-for="(member,index) in projectMemberList" @click="choose(index)" :key="member.index">{{member.userName}}</tag> &ndash;&gt;-->
+      <!--        </div>-->
+      <!--      </Modal>-->
+          </Row>
+    </div>
+
+    <!-- v-else -->
+    <div v-else>
+      <div id="title">
+            <h1 style="text-align: center;margin-top: 10px;">Project</h1>
+            <h3 style="text-align: center;margin-bottom: 10px;">you can manage projects you create and join here</h3>
+          </div>
+          <Row>
+            <Col span="22" offset="1">
+              <!--    Filter and Storage  -->
+              <Card dis-hover class="customCard">
+                <CheckboxGroup v-model="selectedProjectType" style="margin-left: 3.5%">
+                  <Checkbox label="joinedProject" checked="checked" title="Joined by me">
+                    <!-- <span>Joined by me</span> -->
+                    <span class="badge">{{joinedProjectsList.length}}</span>
+                  </Checkbox>
+                  <Checkbox label="createdProject" title="Created by me">
+                    <!-- <span>Created by me</span> -->
+                    <span class="badge">{{createdProjectList.length}}</span>
+                  </Checkbox>
+                </CheckboxGroup>
+
+                <Button slot="extra" type="primary" to="/newProject">Establish a project</Button>
+              </Card>
+
+              <!--    project content     -->
+                <div
+                  :style="{height: contentHeight-140+'px'}"
+                  style=" padding: 5px; border: #dcdee2 solid 1px;"
+                  class="customCard"
+                >
+                  <vue-scroll :ops="ops">
+                    <Card :bordered="false" dis-hover
+                          v-if="createdProjectList.length == 0 && selectedProjectType.includes('createdProject') && joinedProjectsList.length == 0">
+                      <div style="display:flex;justify-content:center">
+                        <Icon type="md-alert" size="40" color="gray"/>
+                      </div>
+                      <br/>
+                      <div style="display:flex;justify-content:center">
+                        <h3
+                          style="text-align:center;width:80%"
+                        >Sorry, you didn't create any projects.</h3>
+                      </div>
+                    </Card>
+
+                    <Card :bordered="false" dis-hover
+                          v-if="joinedProjectsList.length == 0 && selectedProjectType.includes('joinedProject') && selectedProjectType.length == 1">
+                      <div style="display:flex;justify-content:center">
+                        <Icon type="md-alert" size="40" color="gray"/>
+                      </div>
+                      <br/>
+                      <div style="display:flex;justify-content:center">
+                        <h3
+                          style="text-align:center;width:80%"
+                        >Sorry, you didn't participate in any projects.</h3>
+                      </div>
+                    </Card>
+
+                    <Card :bordered="false" dis-hover v-if="selectedProjectType.length == 0">
+                      <div style="display:flex;justify-content:center">
+                        <Icon type="md-alert" size="40" color="gray"/>
+                      </div>
+                      <br/>
+                      <div style="display:flex;justify-content:center">
+                        <h3
+                          style="text-align:center;width:80%"
+                        >Sorry, There are not any projects.</h3>
+                      </div>
+                    </Card>
+
+
+                    <!--               项目内容显示        -->
+                    <div v-show="userProjectCount.length != 0">
+                      <div
+                        v-if="selectedProjectType.indexOf('createdProject') != -1"
+                        v-for="(mProject,index) in createdProjectList"
+                        v-show="createdProjectList!='None'"
+                        :key="'create'+index"
+                      >
+                        <Col span="10" style="margin-left: 3.5%">
+                          <div class="projectItem" @click="goSingleProject(mProject)">
+                            <Card style="height:320px;margin-top:20px;" class="projectCard">
+                              <p slot="title" class="projectsTitle">{{mProject.name}}</p>
+                              <Button
+                                class="authorBtn"
+                                type="default"
+                                slot="extra"
+                                title="Privilege change"
+                                @click.stop="authorizeModalShow(mProject.aid)"
+                                icon="md-happy"
+                              ></Button>
+                              <Button
+                                class="deleteBtn"
+                                type="default"
+                                slot="extra"
+                                style="margin:0 0 0 5px"
+                                @click.stop="deleteProjectModalShow(mProject.aid, mProject.name, mProject.members)"
+                                icon="md-close"
+                                title="remove"
+                              ></Button>
+
+                              <!--  @click.stop="deleteProjectModalShow(mProject.projectId)" -->
+                              <!-- 表头结束 -->
+                              <!--              200px  -->
+                              <p style="height:200px;" >
+                                <span style="font-weight: bold;">Description</span>
+                                <vue-scroll :ops="ops" style="text-indent:2em;word-break:break-word;white-space: pre-line;">
+                                  {{mProject.description}}
+                                </vue-scroll>
+                              </p>
+                              <br/>
+                              <div>
+                                <span style="float:left">CreateTime:</span>
+                                <span style="float:right">{{mProject.createdTime}}</span>
+                              </div>
+                            </Card>
+                          </div>
+                        </Col>
+                      </div>
+
+
+                      <div
+                        v-if="selectedProjectType.indexOf('joinedProject') != -1"
+                        v-for="(item,Index) in joinedProjectsList"
+                        :key="'join'+ Index"
+                        v-show="joinedProjectsList!=[]"
+                      >
+                        <Col span="10" style="margin-left: 3.5%">
+                          <div @click="goSingleProject(item)" class="projectItem">
+                            <Card style="height:320px;margin-top:20px;" class="projectCard">
+                              <p
+                                slot="title"
+                                class="projectsTitle"
+                              >{{item.name}}</p>
+      <!--                        @click.stop="quitModalShow(item)"-->
+                              <Button
+                                class="fileBtnHoverRed"
+                                slot="extra"
+                                @click.stop="quitModalShow(item)"
+                              >Quit
+                              </Button>
+                              <p
+                                style="height:200px;"
+                              >
+                                <span style="font-weight: bold">Description</span>
+                                <vue-scroll :ops="ops" style="text-indent:2em;word-break:break-word;white-space: pre-line;">{{item.description}}</vue-scroll>
+                              </p>
+                              <br/>
+                              <div style="height:40px">
+                                <span style="float:left">CreateTime:</span>
+                                <span style="float:right">{{item.createdTime}}</span>
+                              </div>
+                            </Card>
+                          </div>
+                        </Col>
+                      </div>
+                    </div>
+                  </vue-scroll>
+                </div>
+            </Col>
+
+            <!--    Event History-->
+      <!--      <Col span="4">-->
+      <!--        <Card dis-hover class="historyLine">-->
+      <!--          <p slot="title">Event line</p>-->
+      <!--          <div class="timeLineStyle">-->
+      <!--            <vue-scroll :ops="ops">-->
+      <!--              <Timeline>-->
+      <!--                <div v-if="userEventList.length==0">-->
+      <!--                  <div style="display:flex;justify-content:center">-->
+      <!--                    <Icon type="md-alert" size="40" color="gray"/>-->
+      <!--                  </div>-->
+      <!--                  <br/>-->
+      <!--                  <div style="display:flex;justify-content:center">-->
+      <!--                    <h3-->
+      <!--                      style="text-align:center;width:80%"-->
+      <!--                    >Sorry, there are no events now.</h3>-->
+      <!--                  </div>-->
+      <!--                </div>-->
+      <!--                <TimelineItem-->
+      <!--                  v-for="(item,index) in userEventList"-->
+      <!--                  :key="index"-->
+      <!--                  v-show="userEventList.length>0"-->
+      <!--                >-->
+      <!--                  <strong>-->
+      <!--                    <p class="time">{{item.createTime}}</p>-->
+      <!--                  </strong>-->
+      <!--                  <p class="content">{{item.description}}</p>-->
+      <!--                </TimelineItem>-->
+      <!--              </Timeline>-->
+      <!--            </vue-scroll>-->
+      <!--          </div>-->
+      <!--        </Card>-->
+      <!--      </Col>-->
+
+            <!--      模态框     -->
+            <Modal
+              v-model="deleteProjectModal"
+              @on-ok="deleteProject"
+              @on-cancel
+              ok-text="Assure"
+              cancel-text="Cancel"
+            >
+              <p style="font-family: 'Roboto Light';">Do you really want to delete: <strong>{{delProjectName}}</strong>?</p>
+            </Modal>
+
+            <Modal
+              title="Quit Project"
+              v-model="quitModal"
+              @on-ok="quitProject()"
+              @on-cancel
+              ok-text="Ok"
+              cancel-text="Cancel"
+            >
+              <p>Once you exit the project: <strong>{{currentProject.name}}</strong> ,you will not be able to participate in the collaborative process, confirm the exit?</p>
+            </Modal>
+
+      <!--      <Modal-->
+      <!--        v-model="authorizeProjectModal"-->
+      <!--        @on-ok="authorize()"-->
+      <!--        ok-text="Assure"-->
+      <!--        cancel-text="Cancel"-->
+      <!--      >-->
+      <!--        <p style="slot">Hand the project to others</p>-->
+      <!--        <div>-->
+      <!--          <RadioGroup v-model="selectManagerId">-->
+      <!--            <Radio v-for="member in projectMemberList" :key="member.index" :label="member.userId">-->
+      <!--              <span>{{member.userName}}</span>-->
+      <!--            </Radio>-->
+      <!--          </RadioGroup>-->
+      <!--          &lt;!&ndash; 用radio将用户表示出来 &ndash;&gt;-->
+      <!--          &lt;!&ndash; <tag v-for="(member,index) in projectMemberList" @click="choose(index)" :key="member.index">{{member.userName}}</tag> &ndash;&gt;-->
+      <!--        </div>-->
+      <!--      </Modal>-->
+          </Row>
+
+    </div>
   </div>
 </template>
 
@@ -289,6 +533,7 @@
         userProjectList: [],
         deleteProjectModal: false,
         quitModal: false,
+        useProjectCSS: true,
         projectMemberList: [],
         deleteProjectId: "",
         delProjectName: "",
@@ -310,6 +555,11 @@
       this.getUserProject();
       // this.readPersonalEvent();
       this.resizeContent();
+      this.reSize();
+      window.addEventListener("resize", this.reSize);
+    },
+    beforeDestroy: function () {
+      window.removeEventListener("resize", this.reSize);
     },
     computed: {
       userProjectCount: function () {
@@ -343,6 +593,18 @@
             this.resizeContent();
           })();
         };
+      },
+      reSize() {
+        // if (window.innerHeight > 675) {
+        //   this.contentHeight = window.innerHeight - 120 + "px";
+        // } else {
+        //   this.contentHeight = 675 - 120 + "px";
+        // }
+        if (window.innerWidth < 1050) {
+          this.useProjectCSS = false;
+        } else {
+          this.useProjectCSS = true;
+        }
       },
       getUserProject: function () {
         let userInfo = this.$store.getters.userInfo;
@@ -404,7 +666,7 @@
                   notice["content"] = {
                     title: "Project Deleted",
                     description:
-                      this.currentProject.title + " has been deleted by manager " + this.$store.getters.userName + " !"
+                      this.delProjectName + " has been deleted by manager " + this.$store.getters.userName + " !"
                   };
 
 

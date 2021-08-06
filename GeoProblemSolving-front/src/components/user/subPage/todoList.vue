@@ -6,27 +6,27 @@
     </div>
     <Row>
       <Col span="22" offset="1">
-        <Card dis-hover style="position: relative;">
-          <CheckboxGroup v-model="selectedTaskType" style="margin-left: 3.5%">
-            <Checkbox label="Doing">
-              <span>Doing</span>
+        <Card dis-hover style="position: relative;" class="customCard">
+          <CheckboxGroup v-model="selectedTaskType" style="margin-left: 1%">
+            <Checkbox label="Doing" title="Doing">
+              <span >Doing</span>
               <span class="badge">{{doingList.length}}</span>
             </Checkbox>
-            <Checkbox label="Done">
-              <span>Done</span>
+            <Checkbox label="Done" title="Done">
+              <span >Done</span>
               <span class="badge">{{doneList.length}}</span>
             </Checkbox>
 <!--            <Checkbox label="Assigned">-->
 <!--              <span>Assigned to you</span>-->
 <!--              <span class="badge">10</span>-->
 <!--            </Checkbox>-->
-            <Checkbox label="Importance" :disabled="true">
-              <span>Importance</span>
+            <Checkbox label="Importance" :disabled="true" title="Importance">
+              <span >Importance</span>
               <span class="badge">{{importanceNum}}</span>
             </Checkbox>
           </CheckboxGroup>
           <!--         新建任务   -->
-          <div>
+          <div v-if="useTodoListCSS">
             <DatePicker
               type="date"
               style="position: absolute;top: 20%; right: 4%; z-index: 3"
@@ -46,8 +46,28 @@
             />
           </div>
         </Card>
+        <!-- v-else -->
+        <Card v-if="!useTodoListCSS" style="position: relative;" class="customCard">
+          <DatePicker
+            type="date"
+            style="position: absolute;right: 5%;top: 25%; z-index: 3;"
+            class="customDatePicker custom"
+            title="select endTime"
+            @on-change="handleChange"
+          >
+          </DatePicker>
+          <Input
+            v-model="newTask.content"
+            prefix="ios-radio-button-off"
+            placeholder="Add Todo"
+            size="large"
+            @on-enter="addTask()"
+            style="display: inline-block;"
+            class="customIcon"
+          />
+        </Card>
 
-        <Card dis-hover>
+        <Card dis-hover style="margin-bottom: 10px;" class="customCard">
           <!--      未完成            -->
           <div>
             <Card
@@ -98,7 +118,7 @@
                         {{item.content}}
                       </label>
                       <label
-                        style="float: right;" title="End Time"
+                        style="float: right;" title="End Time" v-if="useTodoListCSS"
                       >Deadline：{{item.endTime}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
                     </Card>
                   </div>
@@ -186,6 +206,7 @@
         doingList: [],
         selectedTodoData: [],
         importanceNum: 0,
+        useTodoListCSS: true,
         newTask: {
           userId: "",
           content: "",
@@ -218,6 +239,8 @@
     mounted() {
       this.initTodoList();
       this.resizeContent();
+      this.reSize();
+      window.addEventListener("resize", this.reSize);
     },
     methods: {
       resizeContent() {
@@ -231,6 +254,18 @@
             this.resizeContent();
           })();
         };
+      },
+      reSize() {
+        // if (window.innerHeight > 675) {
+        //   this.contentHeight = window.innerHeight - 120 + "px";
+        // } else {
+        //   this.contentHeight = 675 - 120 + "px";
+        // }
+        if (window.innerWidth < 1000) {
+          this.useTodoListCSS = false;
+        } else {
+          this.useTodoListCSS = true;
+        }
       },
       //点选文件信息显示
       getTodoInfo(file) {
@@ -341,6 +376,7 @@
           .catch(err => {
             this.$Message.error("Change task state Fail.")
           })
+        // this.initTodoList();
 
       },
       changeImportance: function (item, index, state) {
@@ -364,6 +400,7 @@
             }
           })
           .catch()
+          // this.initTodoList();
       },
       delTask: function (ptId, index, state) {
         this.axios
@@ -416,6 +453,10 @@
 </script>
 
 <style scoped>
+  .customCard{
+    opacity: 0.95;
+  }
+  
   .todoCard{
     background-color: white;
     border-radius: 3px;
