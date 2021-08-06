@@ -7,7 +7,7 @@
     <Row>
       <Col span="22" offset="1">
         <Card dis-hover>
-          <CheckboxGroup v-model="selectedNoticeType" style="display: inline-block;margin-left: 3.5%">
+          <CheckboxGroup v-model="selectedNoticeType" style="display: inline-block;margin-left: 1%">
             <Checkbox label="noticeList">
               <span>Notice</span>
               <span class="badge">{{readNoticeList.length + unreadNoticeList.length}}</span>
@@ -38,7 +38,7 @@
         </Card>
         <!--  通知详情 -->
         <div>
-          <Card dis-hover>
+          <Card dis-hover class="customCard">
             <!-- <h3 slot="title">Notification Detail</h3> -->
             <div :style="{height: contentHeight-230+'px'}">
               <vue-scroll :ops="ops">
@@ -58,14 +58,16 @@
                     <div
                       v-if="item.type=='apply'"
                     >
-                      <Card>
+                      <Card style="position: relative;">
                         <Badge dot>
                           <h4 style="font-size: 15px">{{item.content.title}}</h4>
                         </Badge>
                         <br/>
                         <p style="font-weight: 400; font-size: 17px">{{item.content.description}}</p>
                         <small style="font-size: 13px">{{item.createTime}}</small>
-                        <Icon type="md-close" class="applyBtn" style="color: #ff9900" @click="refuseApply(item)"/>
+                        <!-- <button type="button"  class="applyBtn" style="color: #ff9900;position: absolute;top: 30px;right: 10%;" @click="refuseApply(item)">refuse</button>
+                        <button type="button"  class="applyBtn" style="color: #47cb89;position: absolute;top: 30px;right: 3%;" @click="approveApply(item)">approve</button> -->
+                        <Icon type="md-close" class="applyBtn" style="color: #ff9900;" @click="refuseApply(item)"/>
                         <Icon type="md-checkmark" class="applyBtn" style="color: #47cb89" @click="approveApply(item)"/>
                       </Card>
                     </div>
@@ -117,7 +119,7 @@
 
                 <!--          无通知消息  -->
                 <div v-else>
-                  <Card dis-hover>
+                  <Card dis-hover style="border:transparent">
                     <h1 style="color: darkgray; text-align: center;">No Notifications</h1>
                   </Card>
 
@@ -580,6 +582,10 @@
 </script>
 
 <style scoped>
+  .customCard{
+    opacity: 0.95;
+  }
+
   .badge {
     display: inline-block;
     min-width: 10px;
@@ -612,5 +618,6 @@
     float: right;
     margin: 0 10px;
     cursor: pointer;
+    size: 25px;
   }
 </style>
