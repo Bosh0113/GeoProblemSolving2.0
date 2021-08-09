@@ -172,7 +172,7 @@ var taskList = [];
     }
 
     function initBasicComponent() {
-        
+
         window.addEventListener("message", getActivityInfo, false);
     }
 
@@ -283,7 +283,7 @@ var taskList = [];
         $("#folder-back").on("click", function () {
             getFolderRes({}, "back");
         });
-        $("#resource-update").on("click", function() {
+        $("#resource-update").on("click", function () {
             getResources();
         });
         $("#resource-load").on("click", function () {
@@ -634,7 +634,7 @@ var taskList = [];
     }
 
     function uploadResList(uploadFiles, description, type, privacy) {
-        
+
         let temp = folderIdStack;
         if (temp.length == 0) {
             temp = ["0"];
@@ -679,7 +679,7 @@ var taskList = [];
     }
 
     function saveResList(uploadFiles, description, type, privacy, thumbnail) {
-        
+
         let temp = folderIdStack;
         if (temp.length == 0) {
             temp = ["0"];
@@ -1242,7 +1242,7 @@ var taskList = [];
         为此
         为了简化代码
         没必要将两类工具 Invoke 强行拧在一起
-    
+
         面向开发者定制开发工具
         若他在定制工具中使用到了通用工具
         如果要进行自定义的话
@@ -1315,22 +1315,28 @@ var taskList = [];
         msg.content 用于存储传输内容
          */
         //协同工具---正在输入提示
-        receiveTypingOperation: function () {
+        receiveTypingOperation: function (index, inOrOut) {
+            //inputNum 表示DOM 元素编号
+            //importer 表示正在输入的用户
             let typingMsg = {
                 type: "operation",
                 behavior: "message",
-                content: userInfo.name + " is typing.",
+                content: {
+                    "inputNum": index,
+                    "importer": userInfo.name,
+                    "inOrOut": inOrOut
+                },
                 sender: userInfo.userId
             };
             if (this.websock.readyState === this.websock.OPEN) {
                 this.websocketSend(typingMsg);
             } else if (this.websock.readyState === this.websock.CONNECTING) {
                 setTimeout(function () {
-                    this.receiveTypingOperation();
+                    this.receiveTypingOperation(index, inOrOut);
                 }, 1000)
             } else {
                 setTimeout(function () {
-                    this.receiveTypingOperation();
+                    this.receiveTypingOperation(index, inOrOut);
                 }, 1000)
             }
         },
@@ -1379,6 +1385,20 @@ var taskList = [];
             } else {
                 setTimeout(function () {
                     this.receiveParamsOperation(inputParams);
+                }, 1000)
+            }
+        },
+
+        reciveElementChangeOperation(paramsMsg) {
+            if (this.websock.readyState === this.websock.OPEN) {
+                this.websocketSend(paramsMsg);
+            } else if (this.websock.readyState === this.websock.CONNECTING) {
+                setTimeout(function () {
+                    this.reciveElementChangeOperation(inputParams);
+                }, 1000)
+            } else {
+                setTimeout(function () {
+                    this.reciveElementChangeOperation(inputParams);
                 }, 1000)
             }
         },
@@ -1464,7 +1484,6 @@ var taskList = [];
         return resaveFile(file, info)
     }
 
-
     /**
      * 活动socket转态信息
      * get socket status
@@ -1492,8 +1511,32 @@ var taskList = [];
     function sendSelectDataOperation() {
     }
 
-    function sendTypingInfo() {
-        CollabSocket.receiveTypingOperation();
+    function sendTypingInfo(index, inOrOut) {
+        CollabSocket.receiveTypingOperation(index, inOrOut);
+    }
+
+    /**
+     * Collaboratively input parameters
+     * 参数协同输入方法
+     * @param domId
+     * @param inputType
+     * @param style
+     * @param value
+     * @param attributes
+     */
+    function sendElementChangeOperation(elemId, behavior, value, style, attributes) {
+        var change = {
+                type: "operation",
+                behavior: behavior,
+                content: {
+                    id: elemId,
+                    value: value,
+                    style: style,
+                    attributes: attributes
+                },
+                sender: userInfo.userId
+        }
+        CollabSocket.reciveElementChangeOperation(change);
     }
 
     function sendInputParams(inputParams) {
@@ -1522,7 +1565,7 @@ var taskList = [];
         CollabSocket.initSocketChannel(opeChannel, dataChannel, compChannel);
     }
 
-    // 
+    //
     function selectDataOperation(value) {
         CollabSocket.receiveDataInputDataOperation(value);
     }

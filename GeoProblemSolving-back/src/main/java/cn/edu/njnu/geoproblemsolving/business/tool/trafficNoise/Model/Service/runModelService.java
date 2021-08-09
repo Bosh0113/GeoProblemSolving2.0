@@ -27,7 +27,7 @@ public class runModelService {
  */
     public static void genShpZipFile(String destFilePath, String srcFilePath, String shpfileName) throws IOException {
         //生成shpfile压缩包文件的UDX配置文件 *.udxcfg
-        String tempFilePath = Thread.currentThread().getContextClassLoader().getResource("").getPath() + "..\\..\\data\\temp\\configure.udxcfg";
+        String tempFilePath = Thread.currentThread().getContextClassLoader().getResource("").getPath() + "data\\temp\\configure.udxcfg";
         String allText = "";
 
         File templateFile = new File(tempFilePath);
@@ -88,7 +88,7 @@ public class runModelService {
            @value:值
      */
     public static void genHeightUdxData(String filePath, String value) throws IOException {
-        String tempFilePath = Thread.currentThread().getContextClassLoader().getResource("").getPath() + "..\\..\\data\\temp\\udx_xml_Height.xml";
+        String tempFilePath = Thread.currentThread().getContextClassLoader().getResource("").getPath() + "data\\temp\\udx_xml_Height.xml";
         String allText = "";
 
         File tempFile = new File(tempFilePath);
@@ -141,7 +141,7 @@ public class runModelService {
     }
 
     public static void genBoundBoxUdxData(String filePath, String value) throws IOException {
-        String tempFilePath = Thread.currentThread().getContextClassLoader().getResource("").getPath() + "..\\..\\data\\temp\\udx_xml_RegionBBox.xml";
+        String tempFilePath = Thread.currentThread().getContextClassLoader().getResource("").getPath() + "data\\temp\\udx_xml_RegionBBox.xml";
         String allText = "";
 
         File tempFile = new File(tempFilePath);
@@ -194,7 +194,7 @@ public class runModelService {
     }
 
     public static void genSamplingSizeUdxData(String filePath, String value) throws IOException {
-        String tempFilePath = Thread.currentThread().getContextClassLoader().getResource("").getPath() + "..\\..\\data\\temp\\udx_xml_SamplingSize.xml";
+        String tempFilePath = Thread.currentThread().getContextClassLoader().getResource("").getPath() + "data\\temp\\udx_xml_SamplingSize.xml";
         String allText = "";
 
         File tempFile = new File(tempFilePath);

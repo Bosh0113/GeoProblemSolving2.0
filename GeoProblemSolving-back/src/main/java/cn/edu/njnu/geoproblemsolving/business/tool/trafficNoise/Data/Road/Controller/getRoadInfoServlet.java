@@ -57,7 +57,6 @@ public class getRoadInfoServlet extends HttpServlet {
         Feature feature = layer.GetNextFeature();
         while (feature != null) {
             String featureID = feature.GetFieldAsString("OBJECTID");
-            System.out.println(featureID);
             if (reqID.equals(featureID)) {
                 respJson.put("length", feature.GetFieldAsDouble("Length"));
                 respJson.put("width", feature.GetFieldAsDouble("Width"));

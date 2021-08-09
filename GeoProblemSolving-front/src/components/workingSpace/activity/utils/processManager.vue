@@ -206,24 +206,269 @@
       cancel-text="Cancel"
     >
       <Divider orientation="left">Acitivity link</Divider>
-      <div
-        v-if="selectedActivities != undefined && selectedActivities.length > 1"
-        style="margin: 0 20px"
-      >
-        <span style="margin-right: 60px">
-          <label>Start activity: </label>
-          <RadioGroup v-model="beginNode.name" @on-change="activityChange">
-            <Radio :label="selectedActivities[0].name"></Radio>
-            <Radio :label="selectedActivities[1].name"></Radio>
+      <div v-if="selectedActivities.length >= 2" style="margin: 0 20px">
+        <div style="margin-bottom: 15px">
+          <label>Type of activity relations: </label>
+          <RadioGroup v-model="protocalType" @on-change="changeProtocalType">
+            <Radio label="Sequence" style="margin-left: 20px"></Radio>
+            <Radio label="Branch" style="margin-left: 20px"></Radio>
+            <Radio label="Merger" style="margin-left: 20px"></Radio>
+            <Radio label="Loop" style="margin-left: 20px"></Radio>
           </RadioGroup>
-        </span>
-        <span>
-          <label>End activity: </label>
-          <RadioGroup v-model="endNode.name">
-            <Radio :label="selectedActivities[0].name" disabled></Radio>
-            <Radio :label="selectedActivities[1].name" disabled></Radio>
-          </RadioGroup>
-        </span>
+        </div>
+        <!-- sequence -->
+        <div v-if="protocalType == 'Sequence'">
+          <template v-for="index in selectedActivities.length - 1">
+            <div :key="index" style="margin-bottom: 5px">
+              <span style="margin-right: 20px">
+                <label>Start activity: </label>
+                <Select
+                  v-if="index == 1"
+                  v-model="activityLinks[index - 1]"
+                  style="width: 200px"
+                  placeholder="Select activity"
+                  @on-change="activitySelect(index - 1)"
+                >
+                  <template v-for="item in otherNodes"
+                    ><Option
+                      :value="item.aid"
+                      :key="item.id"
+                      :class="item.aid"
+                      :disabled="item.selected != undefined && item.selected"
+                      >{{ item.name }}</Option
+                    >
+                  </template>
+                </Select>
+                <Select
+                  v-else
+                  v-model="activityLinks[index - 1]"
+                  style="width: 200px"
+                  placeholder="Select activity"
+                  disabled
+                >
+                  <template v-for="item in otherNodes"
+                    ><Option
+                      :value="item.aid"
+                      :key="item.id"
+                      :class="item.aid"
+                      >{{ item.name }}</Option
+                    >
+                  </template>
+                </Select>
+              </span>
+              <Icon type="md-arrow-forward" style="margin-right: 20px" />
+              <span>
+                <label>End activity: </label>
+                <Select
+                  v-model="activityLinks[index]"
+                  style="width: 200px"
+                  placeholder="Select activity"
+                  @on-change="activitySelect(index)"
+                >
+                  <template v-for="item in otherNodes">
+                    <Option
+                      :value="item.aid"
+                      :key="item.id"
+                      :class="item.aid"
+                      :disabled="item.selected != undefined && item.selected"
+                      >{{ item.name }}</Option
+                    >
+                  </template>
+                </Select>
+              </span>
+              <Icon type="md-arrow-forward" style="margin: 0 20px" />
+            </div>
+          </template>
+        </div>
+        <!-- branch -->
+        <div v-else-if="protocalType == 'Branch'" style="display: flex">
+          <div style="width: 275px">
+            <label>Start activity: </label>
+            <Select
+              v-model="activityLinks[0]"
+              style="width: 200px"
+              placeholder="Select activity"
+              @on-change="activitySelect(0)"
+            >
+              <template v-for="item in otherNodes"
+                ><Option
+                  :value="item.aid"
+                  :key="item.id"
+                  :class="item.aid"
+                  :disabled="item.selected != undefined && item.selected"
+                  >{{ item.name }}</Option
+                ></template
+              >
+            </Select>
+          </div>
+          <div style="width: 360px">
+            <template v-for="index in selectedActivities.length - 1">
+              <div :key="index" style="margin-bottom: 5px">
+                <Icon type="md-arrow-forward" style="margin: 0 20px" />
+                <label>End activity: </label>
+                <Select
+                  v-model="activityLinks[index]"
+                  style="width: 200px"
+                  placeholder="Select activity"
+                  @on-change="activitySelect(index)"
+                >
+                  <template v-for="item in otherNodes">
+                    <Option
+                      :value="item.aid"
+                      :key="item.id"
+                      :class="item.aid"
+                      :disabled="item.selected != undefined && item.selected"
+                      >{{ item.name }}</Option
+                    >
+                  </template>
+                </Select>
+              </div>
+            </template>
+          </div>
+        </div>
+        <!-- merger -->
+        <div v-else-if="protocalType == 'Merger'" style="display: flex">
+          <div style="width: 335px">
+            <template v-for="index in selectedActivities.length - 1">
+              <div :key="index" style="margin-bottom: 5px">
+                <label>Start activity: </label>
+                <Select
+                  v-model="activityLinks[index]"
+                  style="width: 200px"
+                  placeholder="Select activity"
+                  @on-change="activitySelect(index)"
+                >
+                  <template v-for="item in otherNodes">
+                    <Option
+                      :value="item.aid"
+                      :key="item.id"
+                      :class="item.aid"
+                      :disabled="item.selected != undefined && item.selected"
+                      >{{ item.name }}</Option
+                    >
+                  </template>
+                </Select>
+                <Icon type="md-arrow-forward" style="margin: 0 20px" />
+              </div>
+            </template>
+          </div>
+          <div style="width: 360px">
+            <label>End activity: </label>
+            <Select
+              v-model="activityLinks[0]"
+              style="width: 200px"
+              placeholder="Select activity"
+              @on-change="activitySelect(0)"
+            >
+              <template v-for="item in otherNodes"
+                ><Option
+                  :value="item.aid"
+                  :key="item.id"
+                  :class="item.aid"
+                  :disabled="item.selected != undefined && item.selected"
+                  >{{ item.name }}</Option
+                ></template
+              >
+            </Select>
+          </div>
+        </div>
+        <!-- loop -->
+        <div v-else-if="protocalType == 'Loop'">
+          <template v-for="index in selectedActivities.length - 1">
+            <div :key="index" style="margin-bottom: 5px">
+              <span style="margin-right: 20px">
+                <label>Start activity: </label>
+                <Select
+                  v-if="index == 1"
+                  v-model="activityLinks[index - 1]"
+                  style="width: 200px"
+                  placeholder="Select activity"
+                  @on-change="activitySelect(index - 1)"
+                >
+                  <template v-for="item in otherNodes"
+                    ><Option
+                      :value="item.aid"
+                      :key="item.id"
+                      :class="item.aid"
+                      :disabled="item.selected != undefined && item.selected"
+                      >{{ item.name }}</Option
+                    >
+                  </template>
+                </Select>
+                <Select
+                  v-else
+                  v-model="activityLinks[index - 1]"
+                  style="width: 200px"
+                  placeholder="Select activity"
+                  disabled
+                >
+                  <template v-for="item in otherNodes"
+                    ><Option
+                      :value="item.aid"
+                      :key="item.id"
+                      :class="item.aid"
+                      >{{ item.name }}</Option
+                    >
+                  </template>
+                </Select>
+              </span>
+              <Icon type="md-arrow-forward" style="margin-right: 20px" />
+              <span>
+                <label>End activity: </label>
+                <Select
+                  v-model="activityLinks[index]"
+                  style="width: 200px"
+                  placeholder="Select activity"
+                  @on-change="activitySelect(index)"
+                >
+                  <template v-for="item in otherNodes">
+                    <Option
+                      :value="item.aid"
+                      :key="item.id"
+                      :class="item.aid"
+                      :disabled="item.selected != undefined && item.selected"
+                      >{{ item.name }}</Option
+                    >
+                  </template>
+                </Select>
+              </span>
+              <Icon type="md-arrow-forward" style="margin: 0 20px" />
+            </div>
+          </template>
+          <div style="margin-bottom: 5px">
+            <span style="margin-right: 20px">
+              <label>Start activity: </label>
+              <Select
+                v-model="activityLinks[selectedActivities.length - 1]"
+                style="width: 200px"
+                placeholder="Select activity"
+                disabled
+              >
+                <template v-for="item in otherNodes"
+                  ><Option :value="item.aid" :key="item.id" :class="item.aid">{{
+                    item.name
+                  }}</Option>
+                </template>
+              </Select>
+            </span>
+            <Icon type="md-arrow-forward" style="margin-right: 20px" />
+            <span>
+              <label>End activity: </label>
+              <Select
+                v-model="activityLinks[0]"
+                style="width: 200px"
+                placeholder="Select activity"
+                disabled
+              >
+                <template v-for="item in otherNodes">
+                  <Option :value="item.aid" :key="item.id" :class="item.aid">{{
+                    item.name
+                  }}</Option>
+                </template>
+              </Select>
+            </span>
+          </div>
+        </div>
       </div>
       <Divider orientation="left">Person link</Divider>
       <div style="margin: 0 20px">
@@ -386,16 +631,28 @@ export default {
       removeLinkBtn: false,
       nodePositionBtn: false,
       //link
+      // relation
+      protocalType: "Sequence",
       linkStep: 0,
+      otherNodes: [],
+      activityLinks: [],
+      // linkRelations: [
+      //   {
+      //     start: "",
+      //     end: "",
+      //   },
+      // ],
+      // relationCount: 1,
+      // relationIndex: 0,
+      linkBuildModal: false,
       beginNode: {},
       endNode: {},
-      linkBuildModal: false,
-
+      // role
       roleProtocol: "None",
       linkRoles: [],
       domain_tag: "",
       linkDomains: [],
-
+      // resource
       resProtocol: "None",
       autoUpdate: false,
       types_tag: "",
@@ -506,17 +763,16 @@ export default {
           this.removeLinkBtn = false;
         } else if (this.selectedActivities.length == 1) {
           this.removeLinkBtn = false;
-        } else if (this.selectedActivities.length == 2) {
-          let activity1 = this.selectedActivities[0];
-          let activity2 = this.selectedActivities[1];
+        } else if (this.selectedActivities.length >= 2) {
           if (this.linkStep == 1) {
             this.removeLinkBtn = false;
-            if (activity1.next.contains(activity2)) {
-              this.linkBtn = false;
-            } else {
-              this.linkBtn = true;
-            }
-          } else if (this.linkStep == 0) {
+            this.linkBtn = true;
+          } else if (
+            this.linkStep == 0 &&
+            this.selectedActivities.length == 2
+          ) {
+            let activity1 = this.selectedActivities[0];
+            let activity2 = this.selectedActivities[1];
             this.linkBtn = false;
             if (activity1.next.contains(activity2)) {
               this.removeLinkBtn = true;
@@ -749,13 +1005,6 @@ export default {
               next: params.data.next,
               last: params.data.last,
             });
-
-            if (_this.selectedActivities.length > 2) {
-              option.series[0].data[
-                _this.selectedActivities[0].id
-              ].symbolSize = 45;
-              _this.selectedActivities.splice(0, 1);
-            }
           } else if (
             option.series[0].data[params.data.index].symbolSize == 60
           ) {
@@ -992,13 +1241,12 @@ export default {
         this.selectedActivities = [];
         this.linkStep = 1;
         this.$Notice.info({
-          desc: "Please select two nodes!",
+          desc: "Please select two nodes at least!",
         });
       } else if (this.linkStep == 1) {
-        if (this.selectedActivities.length == 2) {
+        if (this.selectedActivities.length >= 2) {
           // operation
-          this.beginNode = Object.assign({}, this.selectedActivities[0]);
-          this.endNode = Object.assign({}, this.selectedActivities[1]);
+          this.changeProtocalType();
           this.linkBuildModal = true;
           // record and end
           this.linkStep = 0;
@@ -1009,13 +1257,22 @@ export default {
         }
       }
     },
-    activityChange(name) {
-      if (this.selectedActivities[0].name === name) {
-        this.beginNode = Object.assign({}, this.selectedActivities[0]);
-        this.endNode = Object.assign({}, this.selectedActivities[1]);
-      } else if (this.selectedActivities[0].name !== name) {
-        this.beginNode = Object.assign({}, this.selectedActivities[1]);
-        this.endNode = Object.assign({}, this.selectedActivities[0]);
+    changeProtocalType() {
+      this.otherNodes = [];
+      // this.otherNodes = Object.assign([], this.selectedActivities);
+      this.otherNodes = JSON.parse(JSON.stringify(this.selectedActivities));
+
+      this.activityLinks = [];
+      for (let i = 0; i < this.selectedActivities.length; i++) {
+        this.activityLinks.push(0);
+      }
+    },
+    activitySelect(index) {
+      let slctActivityId = this.activityLinks[index];
+      for (let i = 0; i < this.otherNodes.length; i++) {
+        if (this.otherNodes[i].aid === slctActivityId) {
+          this.otherNodes[i]["selected"] = true;
+        }
       }
     },
     cancelLink() {
@@ -1026,78 +1283,149 @@ export default {
       this.beginNode = {};
       this.endNode = {};
       this.clearProtocolSetting();
+      this.activityLinks = [];
     },
-    buildLink() {
-      // normalize protocol
-      let protocol = {
-        resProtocol: this.resProtocol,
-        autoUpdate: this.autoUpdate,
-        types: this.resProtocolForm.types,
-        formats: this.filterTags(this.resProtocolForm.formats),
-        concepts: this.filterTags(this.resProtocolForm.concepts),
-        scales: this.filterTags(this.resProtocolForm.scales),
-        references: this.filterTags(this.resProtocolForm.references),
-        units: this.filterTags(this.resProtocolForm.units),
+    processUpdate() {
+      let relations = [];
+      // identify the relations
+      switch (this.protocalType) {
+        case "Sequence": {
+          for (let i = 0; i < this.activityLinks.length - 1; i++) {
+            let relation = {
+              last: this.activityLinks[i],
+              next: this.activityLinks[i + 1],
+            };
+            relations.push(relation);
+          }
+          break;
+        }
+        case "Branch": {
+          for (let i = 1; i < this.activityLinks.length; i++) {
+            let relation = {
+              last: this.activityLinks[0],
+              next: this.activityLinks[i],
+            };
+            relations.push(relation);
+          }
+          break;
+        }
+        case "Merger": {
+          for (let i = 1; i < this.activityLinks.length; i++) {
+            let relation = {
+              last: this.activityLinks[i],
+              next: this.activityLinks[0],
+            };
+            relations.push(relation);
+          }
+          break;
+        }
+        case "Loop": {
+          for (let i = 0; i < this.activityLinks.length - 1; i++) {
+            let relation = {
+              last: this.activityLinks[i],
+              next: this.activityLinks[i + 1],
+            };
+            relations.push(relation);
+          }
+          let relation = {
+            last: this.activityLinks[this.activityLinks.length - 1],
+            next: this.activityLinks[0],
+          };
+          relations.push(relation);
+          break;
+        }
+      }
+      //  update
+      for (let i = 0; i < relations.length; i++) {
+        let lastnode, nextnode;
 
-        roleProtocol: this.roleProtocol,
-        roles: this.linkRoles,
-        domains: this.filterTags(this.linkDomains),
-      };
-
-      // The next-activities have been selected
-      // 前后继承关系
-      let lastnode = {
-        name: this.beginNode.name,
-        id: this.beginNode.id,
-      };
-      let nextnode = {
-        name: this.endNode.name,
-        id: this.endNode.id,
-      };
-      for (var k = 0; k < this.processStructure.length; k++) {
-        // 后继节点
-        if (this.processStructure[k].aid == this.endNode.aid) {
-          if (!this.processStructure[k].last.contains(lastnode)) {
-            this.processStructure[k].last.push(lastnode);
+        for (let j = 0; j < this.selectedActivities.length; j++) {
+          if (this.selectedActivities[j].aid == relations[i].last) {
+            lastnode = {
+              name: this.selectedActivities[j].name,
+              id: this.selectedActivities[j].id,
+            };
+          }
+          if (this.selectedActivities[j].aid == relations[i].next) {
+            nextnode = {
+              name: this.selectedActivities[j].name,
+              id: this.selectedActivities[j].id,
+            };
           }
         }
-        // 前驱节点
-        if (this.processStructure[k].aid == this.beginNode.aid) {
-          if (!this.processStructure[k].next.contains(nextnode)) {
-            this.processStructure[k].next.push(nextnode);
+
+        for (let k = 0; k < this.processStructure.length; k++) {
+          // 后继节点
+          if (this.processStructure[k].aid == this.endNode.aid) {
+            if (!this.processStructure[k].last.contains(lastnode)) {
+              this.processStructure[k].last.push(lastnode);
+            }
+          }
+          // 前驱节点
+          if (this.processStructure[k].aid == this.beginNode.aid) {
+            if (!this.processStructure[k].next.contains(nextnode)) {
+              this.processStructure[k].next.push(nextnode);
+            }
           }
         }
       }
+    },
+    buildLink() {
+      //** front link */
+      this.processUpdate();
 
-      // save protocol
-      this.axios
-        .post("/GeoProblemSolving/protocol", protocol)
-        .then((res) => {
-          if (res.data == "Offline") {
-            if (this.activityInfo.level == 1) {
-              this.$store.commit("userLogout");
-              this.$router.push({ name: "Login" });
-            } else {
-              parent.location.href = "/GeoProblemSolving/login";
-            }
-          } else if (res.data.code == 0) {
-            // 重新渲染
-            this.updateStepchart();
-            // 更新pathway
-            let protocolId = res.data.data.pid;
-            this.newLinkStore(this.beginNode.aid, this.endNode.aid, protocolId);
-            // clear
-            this.selectedActivities = [];
-            this.beginNode = {};
-            this.endNode = {};
-          } else {
-            this.$Message.error("Fail to link activities.");
-            console.log(res.data.msg);
-          }
-        })
-        .catch((err) => {
-          throw err;
-        });
+      //*** save protocol */
+
+      //// normalize protocol
+      // let protocol = {
+      //   resProtocol: this.resProtocol,
+      //   autoUpdate: this.autoUpdate,
+      //   types: this.resProtocolForm.types,
+      //   formats: this.filterTags(this.resProtocolForm.formats),
+      //   concepts: this.filterTags(this.resProtocolForm.concepts),
+      //   scales: this.filterTags(this.resProtocolForm.scales),
+      //   references: this.filterTags(this.resProtocolForm.references),
+      //   units: this.filterTags(this.resProtocolForm.units),
+
+      //   roleProtocol: this.roleProtocol,
+      //   roles: this.linkRoles,
+      //   domains: this.filterTags(this.linkDomains),
+      // };
+
+      //// save protocol
+      // this.axios
+      //   .post("/GeoProblemSolving/protocol", protocol)
+      //   .then((res) => {
+      //     if (res.data == "Offline") {
+      //       if (this.activityInfo.level == 1) {
+      //         this.$store.commit("userLogout");
+      //         this.$router.push({ name: "Login" });
+      //       } else {
+      //         parent.location.href = "/GeoProblemSolving/login";
+      //       }
+      //     } else if (res.data.code == 0) {
+      //       // 重新渲染
+      //       this.updateStepchart();
+      //       // link in the activity document
+      //       let protocolId = res.data.data.pid;
+      //       this.newLinkStore(this.beginNode.aid, this.endNode.aid, protocolId);
+      //       // clear
+      //       this.selectedActivities = [];
+      //       this.beginNode = {};
+      //       this.endNode = {};
+      //     } else {
+      //       this.$Message.error("Fail to link activities.");
+      //       console.log(res.data.msg);
+      //     }
+      //   })
+      //   .catch((err) => {
+      //     throw err;
+      //   });
+
+      // if save protocol success, update the avtivity document
+      // link in the activity document
+      let protocolId = res.data.data.pid;
+      this.newLinkStore(this.beginNode.aid, this.endNode.aid, protocolId);
     },
     clearProtocolSetting() {
       this.roleProtocol = "";
@@ -1229,6 +1557,7 @@ export default {
       this.selectedActivities = [];
       this.beginNode = {};
       this.endNode = {};
+      this.removeLinkBtn = false;
     },
     delLinkStore(begin, end) {
       let updateurl = "";

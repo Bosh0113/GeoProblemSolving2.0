@@ -36,7 +36,7 @@ var taskList = [];
     function initComponent() {
         $("#collab-tool-head").append(`<li class="head-logo"></li>`);
         $("#collab-tool-sidebar").append(
-            `<ul class="nav flex-column">
+            `<ul class="nav flex-column" style="width: 46px">
             <li class="nav-item">
                 <button type="button" class="btn btn-dark active" id="people-btn" title="People">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
@@ -283,7 +283,7 @@ var taskList = [];
         $("#folder-back").on("click", function () {
             getFolderRes({}, "back");
         });
-        $("#resource-update").on("click", function() {
+        $("#resource-update").on("click", function () {
             getResources();
         });
         $("#resource-load").on("click", function () {
@@ -1306,75 +1306,75 @@ var taskList = [];
             }
         },
 
-    /*
-    协同工具输入或输出协同显示
-    输入某个文件或参数
-    都是对mdl 文档的修改
-    先采用每次都全部更新
-    vue 视图更新总是会刷新的
-    msg.content 用于存储传输内容
-     */
-    //协同工具---正在输入提示
-    receiveTypingOperation: function (index, inOrOut) {
-      //inputNum 表示DOM 元素编号
-      //importer 表示正在输入的用户
-      let typingMsg = {
-        type: "operation",
-        behavior: "message",
-        content: {
-          "inputNum": index,
-          "importer": userInfo.name,
-          "inOrOut": inOrOut
+        /*
+        协同工具输入或输出协同显示
+        输入某个文件或参数
+        都是对mdl 文档的修改
+        先采用每次都全部更新
+        vue 视图更新总是会刷新的
+        msg.content 用于存储传输内容
+         */
+        //协同工具---正在输入提示
+        receiveTypingOperation: function (index, inOrOut) {
+            //inputNum 表示DOM 元素编号
+            //importer 表示正在输入的用户
+            let typingMsg = {
+                type: "operation",
+                behavior: "message",
+                content: {
+                    "inputNum": index,
+                    "importer": userInfo.name,
+                    "inOrOut": inOrOut
+                },
+                sender: userInfo.userId
+            };
+            if (this.websock.readyState === this.websock.OPEN) {
+                this.websocketSend(typingMsg);
+            } else if (this.websock.readyState === this.websock.CONNECTING) {
+                setTimeout(function () {
+                    this.receiveTypingOperation(index, inOrOut);
+                }, 1000)
+            } else {
+                setTimeout(function () {
+                    this.receiveTypingOperation(index, inOrOut);
+                }, 1000)
+            }
         },
-        sender: userInfo.userId
-      };
-      if (this.websock.readyState === this.websock.OPEN) {
-        this.websocketSend(typingMsg);
-      } else if (this.websock.readyState === this.websock.CONNECTING) {
-        setTimeout(function () {
-          this.receiveTypingOperation(index, inOrOut);
-        }, 1000)
-      } else {
-        setTimeout(function () {
-          this.receiveTypingOperation(index, inOrOut);
-        }, 1000)
-      }
-    },
-    //协同工具---输入文件
-    receiveDataInputDataOperation: function (inputMdl) {
-      console.log(inputMdl)
-      let msg = {
-        type: "operation",
-        behavior: "data",
-        content: {
-          inputs: inputMdl
+        //协同工具---输入文件
+        receiveDataInputDataOperation: function (inputMdl) {
+            console.log(inputMdl)
+            let msg = {
+                type: "operation",
+                behavior: "data",
+                content: {
+                    inputs: inputMdl
+                },
+                sender: userInfo.userId
+            };
+            if (this.websock.readyState === this.websock.OPEN) {
+                this.websocketSend(msg);
+            } else if (this.websock.readyState === this.websock.CONNECTING) {
+                setTimeout(function () {
+                    this.receiveDataInputDataOperation(inputs);
+                }, 1000)
+            } else {
+                setTimeout(function () {
+                    this.receiveDataInputDataOperation(inputs);
+                }, 1000)
+            }
         },
-        sender: userInfo.userId
-      };
-      if (this.websock.readyState === this.websock.OPEN) {
-        this.websocketSend(msg);
-      } else if (this.websock.readyState === this.websock.CONNECTING) {
-        setTimeout(function () {
-          this.receiveDataInputDataOperation(inputs);
-        }, 1000)
-      } else {
-        setTimeout(function () {
-          this.receiveDataInputDataOperation(inputs);
-        }, 1000)
-      }
-    },
-    /*
-    协同工具---输入参数
-     */
-    receiveParamsOperation: function (inputParams) {
-      let paramsMsg = {
-        type: "operation",
-        behavior: "params",
-        content: {
-          inputs: inputParams
-        },
-        sender: userInfo.userId
-      };
+        /*
+        协同工具---输入参数
+         */
+        receiveParamsOperation: function (inputParams) {
+            let paramsMsg = {
+                type: "operation",
+                behavior: "params",
+                content: {
+                    inputs: inputParams
+                },
+                sender: userInfo.userId
+            };
 
             if (this.websock.readyState === this.websock.OPEN) {
                 this.websocketSend(paramsMsg);
@@ -1387,6 +1387,10 @@ var taskList = [];
                     this.receiveParamsOperation(inputParams);
                 }, 1000)
             }
+        },
+
+        reciveParametersOperation(domId, inputType, style, value, attributes) {
+
         },
 
 
@@ -1448,14 +1452,14 @@ var taskList = [];
     }
 
     /**
-        * save as new files
-        * 另存为
-        * @param {*} uploadFiles
-        * @param {*} description
-        * @param {*} type
-        * @param {*} privacy
-        * @returns
-        */
+     * save as new files
+     * 另存为
+     * @param {*} uploadFiles
+     * @param {*} description
+     * @param {*} type
+     * @param {*} privacy
+     * @returns
+     */
     function saveResources(uploadFiles, description, type, privacy, thumbnail) {
         return saveResList(uploadFiles, description, type, privacy, thumbnail);
     }
@@ -1469,7 +1473,6 @@ var taskList = [];
     function resaveResource(file, info) {
         return resaveFile(file, info)
     }
-
 
     /**
      * 活动socket转态信息
@@ -1498,9 +1501,22 @@ var taskList = [];
     function sendSelectDataOperation() {
     }
 
-  function sendTypingInfo(index, inOrOut) {
-    CollabSocket.receiveTypingOperation(index, inOrOut);
-  }
+    function sendTypingInfo(index, inOrOut) {
+        CollabSocket.receiveTypingOperation(index, inOrOut);
+    }
+
+    /**
+     * Collaboratively input parameters
+     * 参数协同输入方法
+     * @param domId
+     * @param inputType
+     * @param style
+     * @param value
+     * @param attributes
+     */
+    function sendInputParamsOperation(domId, inputType, style, value, attributes) {
+        CollabSocket.reciveParametersOperation(domId, inputType, style, value, attributes);
+    }
 
     function sendInputParams(inputParams) {
         CollabSocket.receiveParamsOperation(inputParams);
@@ -1528,17 +1544,8 @@ var taskList = [];
         CollabSocket.initSocketChannel(opeChannel, dataChannel, compChannel);
     }
 
-
-  /**
-   * 活动socket转态信息
-   * get socket status
-   */
-  function getSocketInfo() {
-    return CollabSocket.socketInfo();
-  }
-
-//
-  function selectDataOperation(value) {
-    CollabSocket.receiveDataInputDataOperation(value);
-  }
+    //
+    function selectDataOperation(value) {
+        CollabSocket.receiveDataInputDataOperation(value);
+    }
 }

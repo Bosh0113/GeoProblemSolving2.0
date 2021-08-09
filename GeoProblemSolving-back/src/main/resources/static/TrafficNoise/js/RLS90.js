@@ -121,10 +121,17 @@ window.parent.buildSocketChannel(
 );
 
 function getSocketOperation(data) {
+    var content;
+    try {
+        content = JSON.parse(data.content);
+    }
+    catch (e) {
+        content = data.content;
+    }
     if (data.type === "operation") {
         switch (data.behavior) {
             case "zoom": {
-                mymap.setZoom(data.content.zoom);
+                mymap.setZoom(content.zoom);
                 break;
             }
             case "mouse-click": {
@@ -134,32 +141,34 @@ function getSocketOperation(data) {
                 break;
             }
             case "data-import": {
-                var dataId = data.content.dataId;
-                var result = data.content.result;
-                var selectedDataType = data.content.featureType;
+                var result = content.result;
+                var selectedDataType = content.featureType;
 
                 mymap.setView([result.centerLat, result.centerLong], 15);
 
                 switch (selectedDataType) {
                     case "Road":
                         loadShapefile(roadCenterLayer, result.url);
-                        roadDataId = dataId;
+                        roadData = content.data;
+                        roadDataId = content.data.uid;
                         createRoad.presentID = result.roadMaxID + 1;
                         break;
                     case "Building":
                         loadShapefile(buildingLayer, result.url);
-                        buildingDataId = dataId;
+                        buildingData = content.data;
+                        buildingDataId = content.data.uid;
                         createBuilding.presentID = result.buildingMaxID + 1;
                         break;
                     case "Barrier":
                         loadShapefile(barrierLayer, result.url);
-                        barrierDataId = dataId;
+                        barrierData = content.data;
+                        barrierDataId = content.data.uid;
                         break;
                 }
                 break;
             }
             case "road-edit-start": {
-                var prop = data.content.propInfo;
+                var prop = content.propInfo;
                 roadCenterLayer.eachLayer((layer) => {
                     if(layer.feature.properties.OBJECTID == prop.OBJECTID) {
                         layer.setStyle({
@@ -171,7 +180,7 @@ function getSocketOperation(data) {
                 });
 
                 // 编辑框
-                var result = data.content.resultInfo;
+                var result = content.resultInfo;
                 $("#roadName").text(prop.NAME);
                 $("#roadID").text(prop.OBJECTID);
                 $("#roadLength").val(result.length.toFixed(2));
@@ -205,7 +214,7 @@ function getSocketOperation(data) {
                 break;
             }
             case "building-edit-start": {
-                var prop = data.content.propInfo;
+                var prop = content.propInfo;
                 buildingLayer.eachLayer((layer) => {
                     if(layer.feature.properties.OBJECTID == prop.OBJECTID) {
                         layer.setStyle({
@@ -217,7 +226,7 @@ function getSocketOperation(data) {
                     }
                 });
 
-                var result = data.content.resultInfo;
+                var result = content.resultInfo;
                 $("#buildingID").text(prop.OBJECTID);
                 $("#buildingStorey").val(result.Storey);
                 $("#buildingHeight").val(result.Height);
@@ -226,7 +235,7 @@ function getSocketOperation(data) {
                 break;
             }
             case "barrier-edit-start": {
-                var prop = data.content.propInfo;
+                var prop = content.propInfo;
                 barrierLayer.eachLayer((layer) => {
                     if(layer.feature.properties.OBJECTID == prop.OBJECTID) {
                         layer.setStyle({
@@ -237,7 +246,7 @@ function getSocketOperation(data) {
                     }
                 });
 
-                var result = data.content.resultInfo;
+                var result = content.resultInfo;
                 $("#barrierID").text(prop.OBJECTID);
                 $("#barrierLength").val(result.Length);
                 $("#barrierHeight").val(result.Height);
@@ -246,7 +255,7 @@ function getSocketOperation(data) {
                 break;
             }
             case "edit-end": {
-                if (data.content == 1) {
+                if (content == 1) {
                     alert("Set the feature property successfully.");
                 } else {
                     alert("Fail to set the property of this feature.");
@@ -263,7 +272,7 @@ function getSocketOperation(data) {
                     mymap.off("mousedown", selectROI.mousedown).off("mousemove", selectROI.mousemove).off("mouseup", selectROI.mouseup);
                 }
 
-                var layar = L.geoJSON(data.content.layer, {});
+                var layar = L.geoJSON(content.layer, {});
                 layar.addTo(selectROI.rlayer);
                 break;
             }
@@ -272,7 +281,7 @@ function getSocketOperation(data) {
                 break;
             }
             case "run-success": {
-                getModelState(data.content.userId, data.content.runningId);
+                getModelState(content.userId, content.runningId);
                 break;
             }
             case "clean": {
@@ -282,6 +291,38 @@ function getSocketOperation(data) {
 
                 noiseResultLayer.clearLayers();
                 $(".legend").hide();
+                break;
+            }
+            case "params-panel": {
+                // 如果是第一个或者最后一个，则会有disabled class，直接返回
+                // if (this.parent("span").hasClass("disabled")) {
+                //     return;
+                // }
+                // 将当前页面收起来
+                $(roadPage[currentPage]).slideUp();
+                // 获取点击对象的id
+                objId = content;
+                if (objId == "previousInfo") {
+                    currentPage--;
+                } else {
+                    currentPage++;
+                }
+
+                if (currentPage == 0) {
+                    $("#previousInfo").parent("span").addClass("disabled");
+                } else if (currentPage == 2) {
+                    $("#nextInfo").parent("span").addClass("disabled");
+                } else {
+                    $("#previousInfo").parent("span").removeClass("disabled");
+                    $("#nextInfo").parent("span").removeClass("disabled");
+                }
+                // 将目标页面滑下来
+                $(roadPage[currentPage]).slideDown();
+
+                break;
+            }
+            case "value-change": {
+                $("#"+ content.id).val(content.value);
                 break;
             }
         }
@@ -294,6 +335,10 @@ function getSocketData() {
 
 function getSocketComputation() {
 
+}
+
+function paramChanged(id, value) {
+    window.parent.sendElementChangeOperation(id, "value-change", value, "","");
 }
 
 var selectedData = {}
@@ -376,7 +421,7 @@ function importData() {
                     sender: userId,
                     behavior: "data-import",
                     content: {
-                        dataId: selectedData.uid,
+                        data: roadData,
                         featureType: selectedDataType,
                         result: result
                     },
@@ -818,7 +863,7 @@ function onRunModel() {
     $.ajax({
         // async:false,
         type: "post",
-        url: "/GeoProblemSolving/runModelServlet",
+        url: "/GeoProblemSolving/prepareModelData",
         data: {
             userId: userId,
             roadData: JSON.stringify(roadData),
@@ -848,11 +893,9 @@ function onRunModel() {
         success: function (resp) {
             var result = JSON.parse(resp);
             if (result.respCode == 1) {
-                runningId = result.resultId;
-                resultIdList.push(runningId);
-                state = setInterval(function () {
-                    getModelState(userId, runningId)
-                }, 2000);
+                // var
+
+                window.parent.sendModelOperation(aid, serviceMd5, serviceIp, servicePort, inputs, outputs);
 
                 window.parent.sendCustomOperation({
                     type: "operation",
@@ -1039,6 +1082,13 @@ function showInfo() {
     // 将目标页面滑下来
     $(roadPage[currentPage]).slideDown();
 
+    // collaboration
+    window.parent.sendCustomOperation({
+        type: "operation",
+        sender: userId,
+        behavior: "params-panel",
+        content: objId,
+    });
 }
 
 var roadConfig = {
