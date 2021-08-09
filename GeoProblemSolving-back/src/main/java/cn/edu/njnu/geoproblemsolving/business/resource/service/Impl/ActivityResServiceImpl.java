@@ -135,12 +135,13 @@ public class ActivityResServiceImpl implements ActivityResService {
             }
 
             //post payLoad存储，使用LinkedMultiValueMap<String, Object>key/value形式进行存储
-            LinkedMultiValueMap<String, Object> valueMap = new LinkedMultiValueMap<>();
+
             //restTemplate工具类
             RestTemplateUtil httpUtil = new RestTemplateUtil();
             for (Part part : parts) {
                 try {
                     if (part.getName().equals("file")) {
+                        LinkedMultiValueMap<String, Object> valueMap = new LinkedMultiValueMap<>();
                         //用于标记文件上传进度
                         fileNum--;
                         if (part.getSize() < 1024 * 1024 * 1024) {
@@ -742,5 +743,61 @@ public class ActivityResServiceImpl implements ActivityResService {
             }
         }
         return fileList;
+    }
+
+    /**
+     *
+     * 地理过程驱动
+     * @param aid
+     * @param uid
+     * @return
+     */
+    @Override
+    public ResourceEntity getFileById(String aid, String uid) {
+        List<ResourceEntity> resList = resDao.queryByAid(aid);
+        return gFileById(resList, uid);
+    }
+
+    private ResourceEntity gFileById(List<ResourceEntity> resList, String uid){
+        for (ResourceEntity res: resList){
+            if (!res.getFolder()){
+                if (res.getUid().equals(uid)){
+                    return res;
+                }
+            }else {
+                ArrayList<ResourceEntity> resChildren = res.getChildren();
+                ResourceEntity resourceEntity = gFileById(resChildren, uid);
+                if (resourceEntity != null){
+                    return resourceEntity;
+                }
+            }
+        }
+        return null;
+    }
+
+
+    @Override
+    public ArrayList<ResourceEntity> getFilesByIds(String aid, HashSet<String> uids){
+        List<ResourceEntity> resList = resDao.queryByAid(aid);
+        return gFilesByIds(resList, uids, new ArrayList<>());
+    }
+
+    private ArrayList<ResourceEntity> gFilesByIds(List<ResourceEntity> resList, HashSet<String> uids, ArrayList<ResourceEntity> queriedRes){
+        for (ResourceEntity res: resList){
+            if (!res.getFolder()){
+                if (uids.contains(res.getUid())){
+                    queriedRes.add(res);
+                }
+            }else {
+                gFilesByIds(res.getChildren(), uids, queriedRes);
+            }
+        }
+        return queriedRes;
+    }
+
+
+    @Override
+    public ResourceEntity getFlowFolder(String aid, String folderName) {
+        return resDao.queryByAidAndName(aid, folderName);
     }
 }

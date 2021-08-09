@@ -402,12 +402,13 @@ public class UserResServiceImpl implements UserResService {
                 }
             }
             //post payLoad存储，使用LinkedMultiValueMap<String, Object>key/value形式进行存储
-            LinkedMultiValueMap<String, Object> valueMap = new LinkedMultiValueMap<>();
+
             //restTemplate工具类
             RestTemplateUtil httpUtil = new RestTemplateUtil();
             for (Part part : parts) {
                 try {
                     if (part.getName().equals("file")) {
+                        LinkedMultiValueMap<String, Object> valueMap = new LinkedMultiValueMap<>();
                         //用于标记文件上传进度
                         fileNum--;
                         if (part.getSize() < 1024 * 1024 * 1024) {

@@ -8,6 +8,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public interface ActivityResService {
@@ -23,6 +24,8 @@ public interface ActivityResService {
 
     ArrayList<ResourceEntity> getAllRes(String aid, ArrayList<String> paths);
 
+    ResourceEntity getFileById(String aid, String uid);
+
     List<ResourceEntity> resourceToProject(String userId, String aid, String uids, ArrayList<String> paths);
 
     //按条件查询项目资源，在此方法进行分流
@@ -36,5 +39,9 @@ public interface ActivityResService {
     Object getAllFileInProject(String aid);
 
     JsonResult changeResEntity(String aid, String uid, ArrayList<String> paths, HttpServletRequest req) throws IOException, ServletException;
+
+    ResourceEntity getFlowFolder(String aid, String folderName);
+
+    ArrayList<ResourceEntity> getFilesByIds(String aid, HashSet<String> uids);
 
 }

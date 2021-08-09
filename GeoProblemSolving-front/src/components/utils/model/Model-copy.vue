@@ -338,8 +338,8 @@
     },
 
     methods: {
-      getStepInfo: function(){
-        if (componentStatus){
+      getStepInfo: function () {
+        if (componentStatus) {
           //从协同组件中获取需要的数据
           this.activityResource = resources;
           this.userId = userInfo.userId;
@@ -348,7 +348,7 @@
           // 绑定函数
           buildSocketChannel(this.getSocketOperation, null, this.getSocketComputation);
 
-        }else {
+        } else {
           //避免this指向问题
           let _this = this;
           setTimeout(function () {
@@ -357,7 +357,7 @@
         }
       },
 
-      getSocketOperation: function(data){
+      getSocketOperation: function (data) {
         console.log(data)
       },
 
@@ -370,9 +370,9 @@
         });
       },
 
-      getSocketComputation: function(data){
+      getSocketComputation: function (data) {
         console.log("socketComputation", data)
-        if (data != undefined && data != null){
+        if (data != undefined && data != null) {
           this.getStateEventOut(data.computeOutputs)
         }
 
@@ -434,21 +434,21 @@
       若有则生成 invoke 界面
       若无则 init failed
        */
-      initTask: function() {
+      initTask: function () {
         setTimeout(() => {
           this.axios.get("/GeoProblemSolving/modelTask/createTask/" + this.md5 + "/" + this.userId)
-            .then(res=>{
+            .then(res => {
               console.log("initTaskResponse", res.data)
-              if (res.data.code == 0){
-                let data2 =res.data.data;
+              if (res.data.code == 0) {
+                let data2 = res.data.data;
                 this.invokeInfo.serviceIp = data2.ip;
                 this.invokeInfo.servicePort = data2.port;
                 this.invokeInfo.serviceId = this.md5;
-              }else {
+              } else {
                 this.$Notice.error({title: "Tool initialization failed."})
               }
             })
-            .catch(err=>{
+            .catch(err => {
               this.$Notice.error({title: "Tool initialization failed."})
             })
         }, 1500)
@@ -466,6 +466,7 @@
             let detail = {};
             detail["statename"] = stateList[i].name;
             detail["event"] = events[j].name;
+            //文件
             if (events[j].type == "response") {
               if (events[j].hasOwnProperty("url")) {
                 detail["tag"] = events[j].name;
@@ -475,6 +476,7 @@
                 continue;
               }
             } else if (events[j].type == "noresponse") {
+              //参数
               let template = {};
               let outputTemplate = events[j].datasetItem;
               console.log(outputTemplate);
@@ -496,8 +498,8 @@
           }
         }
         //将链接与state 对应起来
-        this.invokeForm.inputs = input;
-        this.invokeForm.outputs = output;
+        // this.invokeForm.inputs = input;
+        // this.invokeForm.outputs = output;
         this.invokeInfo.inputs = input;
         this.invokeInfo.ouputs = output;
       },
@@ -589,7 +591,7 @@
       },
 
       //动态绑定 更新outputs部分
-      getStateEventOut: function(outputs) {
+      getStateEventOut: function (outputs) {
         console.log(outputs);
         let outList = this.stateList;
         outList.forEach((state, index) => {
