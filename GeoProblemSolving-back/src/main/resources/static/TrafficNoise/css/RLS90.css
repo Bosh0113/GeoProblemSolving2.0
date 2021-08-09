@@ -1,0 +1,170 @@
+.map{
+   width: 100%;
+        height: 100% - 60px;
+        position: absolute;
+        top: 0px;
+        bottom: 0px
+}
+
+.content {
+    width: 100%;
+    height: 100% - 60px;
+    position: absolute;
+    top: 0;
+    bottom: 0
+}
+
+.myModal {
+    width: 100%;
+    height: 100% - 60px;
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+    z-index: auto;
+}
+
+.loadBackground{
+    top:0;
+    left: 0;
+    position:absolute;
+    width:100%;
+    height:100%;
+    background-color: white;
+    opacity: 0.5;
+    z-index: 1000;
+}
+
+.info {
+    padding: 6px 8px;
+    font: 14px/16px Arial, Helvetica, sans-serif;
+    background: white;
+    background: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+}
+
+.info h4 {
+    margin: 0 0 5px;
+    color: #777;
+}
+
+.legend {
+    line-height: 18px;
+    color: #555;
+    display: none;
+}
+
+.legend i {
+    width: 18px;
+    height: 18px;
+    float: left;
+    margin-right: 8px;
+    opacity: 0.7;
+}
+
+.selectButton{
+    background: white;
+    border-radius: 5px;
+}
+
+.selectButton.Selected{
+    background: rgba(220, 220, 220);
+    border-radius: 5px;
+}
+
+.roadCig {
+    /* height: 28em; */
+    overflow-y: scroll
+}
+
+.roadCig::-webkit-scrollbar {
+    width: 0;
+    background: transparent;
+}
+
+/* 道路信息翻页按钮 */
+#pageTurning ul{
+    display:block;
+    text-align:right;
+    margin: 0
+}
+
+#pageTurning li{
+    display: inline-block;
+    background-color: #fff;border: 1px solid #ddd;
+    border-radius: 15px;
+}
+
+#pageTurning li a{
+    padding:5px 7px
+}
+
+#pageTurning li a:link{
+    text-decoration: none
+}
+#pageTurning li a:hover{
+    text-decoration: none
+}
+#pageTurning li a:active{
+    text-decoration: none
+}
+#pageTurning li a:visited{
+    text-decoration: none
+}
+
+/* 按钮中间的竖线--用一个空的div分隔 */
+#pageTurning li div{
+    display:inline;
+    border:0.8px solid #ddd
+}
+
+.disabled a{
+    cursor: not-allowed;
+}
+
+.disabled a:link{
+    color: #888888
+}
+
+
+.moadlHeaderLbl{
+    text-align: right;
+}
+
+.waitting{
+    top:0;
+    left: 0;
+    position:absolute;
+    width:100%;
+    height:100%;
+    background-color: white;
+    opacity: 0.5;
+    z-index: 1999;
+    display: none;
+}
+
+.waitting img{
+    margin:auto; 
+    display: block;
+}
+
+.operate{
+    background: white;
+    background: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+}
+
+.imgButton{
+    margin: 2px 0px 2px 0px;
+    width:30px;
+    height: 30px;
+    background-color: white;
+    background-size: cover !important;
+    border-radius: 5px;
+}
+
+.imgButton:hover{
+    border: rgb(200, 200, 200) solid 2px;
+    /* background-color: rgb(245, 245, 245) !important; */
+    box-shadow: 0 0 1px rgba(0, 0, 0, 0.3);
+} 

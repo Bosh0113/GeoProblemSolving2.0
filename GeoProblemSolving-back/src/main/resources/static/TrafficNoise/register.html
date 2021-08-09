@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Register</title>
+
+    <link rel="icon" href="./img/favicon.ico" type="image/x-icon" />
+    <link rel="shortcut icon" href="./img/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="./css/bootstrap/bootstrap.css" />
+</head>
+
+<style>
+    .registerLable {
+        text-align: right;
+        transform: translate(0, 30%)
+    }
+
+    .form-title {
+        color: #fff;
+        text-align: center;
+        font-size: 22px;
+        height: 50px;
+        vertical-align: middle;
+        line-height: 50px;
+    }
+
+    .register {
+        position: absolute;
+        width: 970px;
+        top: calc(50% - 265px);
+        left: calc(50% - 275px);
+    }
+
+    .register a:hover {
+        cursor: pointer;
+    }
+
+    .forgotPassword {
+        float: right;
+    }
+
+    .registerBtn {
+        width: 200px;
+        margin: 20px;
+        background-color: #00C0FF;
+        border-color: #00A8EC;
+    }
+
+    .formContainer {
+        background: #00C0FF;
+        border-radius: 5px
+    }
+
+    .formDiv {
+        background: white;
+        padding: 20px 0
+    }
+
+    @media (max-width: 992px) {
+        .register {
+            position: absolute;
+            width: 970px;
+            top: calc(50% - 265px);
+            left: calc(50% - 275px);
+        }
+    }
+
+    @media (max-width: 767px) {
+        .formDiv {
+            padding: 30px
+        }
+
+        .register {
+            position: absolute;
+            width: 360px;
+            /* top: calc(50% - 345px); */
+            left: calc(50% - 180px);
+        }
+    }
+
+    .background {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: #eaeef6;
+        background-image: url("./img/background/background.png");
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+
+    .register-body{
+        margin-bottom: 50px;
+    }
+
+    .form-group{
+        margin-bottom: 20px;
+    }
+
+    .message{
+        margin-bottom:0;
+    }
+
+    .help-block{
+        color: red;
+        padding-top: 5px;
+        margin: 0; 
+        display: none
+    }
+
+    .has-error input{
+        border-color: red !important
+    }
+
+    .has-error span{
+        color: red !important
+    }
+</style>
+
+<body>
+    <div class="background"></div>
+    <iframe name="hiddenFrame" style="display:none"></iframe>
+    <div id="register" class="register container">
+        <div class="col-sm-7 register-body">
+            <form action="" method="POST" role="form" class="formContainer" id="registerFrom" target="hiddenFrame">
+                <div class="form-title">
+                    Register
+                </div>
+                <div class="form-horizontal formDiv">
+                    <div class="form-group">
+                        <lable class="col-sm-offset-1 col-sm-2 control-lable registerLable"><span style="color:red">*
+                            </span>Email</lable>
+                        <div class="col-sm-7">
+                            <input id="email" type="email" class="form-control" placeholder="Email" required="required"
+                                title="Email">
+                            <span class="help-block" id="emailCheck">This email has been used!</span>
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <lable class="col-sm-3 control-lable registerLable"><span style="color:red">*
+                            </span>Password</lable>
+                        <div class="col-sm-7">
+                            <input id="password" type="password" class="form-control" placeholder="Password"
+                                required="required" title="Password">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <lable class="col-sm-3 control-lable registerLable" style="transform: translate(0, -10%);"><span style="color:red">*
+                            </span>Confirm Password</lable>
+                        <div class="col-sm-7">
+                            <input id="confirmPassword" type="password" class="form-control"
+                                placeholder="Confirm Password" required="required" title="Confirm Password">
+                            <span class="help-block" id="passwordCheck">Password and Confirm Password are inconsistent!</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <lable class="col-sm-offset-1 col-sm-2 control-lable registerLable"><span style="color:red">*
+                            </span>Name</lable>
+                        <div class="col-sm-7">
+                            <input id="name" type="text" class="form-control" placeholder="Name" required="required"
+                                title="Name">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <lable class="col-sm-offset-1 col-sm-2 control-lable registerLable"><span style="color:red">*
+                            </span>Gender</lable>
+                        <div class="radio col-sm-7">
+                            <label>
+                                <input id="male" type="radio" value="male" name="Gender" checked>
+                                Male
+                            </label>
+                            <label>
+                                <input id="famle" type="radio" value="famle" name="Gender">
+                                Famle
+                            </label>
+                        </div>
+                    </div>                   
+
+                    <div class="form-group">
+                        <lable class="col-sm-offset-1 col-sm-2 control-lable registerLable">Mobil Phone</lable>
+                        <div class="col-sm-7">
+                            <input id="mobilPhone" type="text" class="form-control" placeholder="Mobil Phone" title="Mobil Phone">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <lable class="col-sm-offset-1 col-sm-2 control-lable registerLable">Affiliation</lable>
+                        <div class="col-sm-7">
+                            <input id="affiliation" type="text" class="form-control" placeholder="Affiliation"
+                                title="Affiliation">
+                        </div>
+                    </div>
+
+
+                    
+
+
+
+
+                    <div style="text-align: center;">
+                        <button type="submit" class="btn btn-primary registerBtn">Register</button>
+                    </div>
+
+                    <div style="text-align: center;">
+                        <p style="color: #888888;">
+                            Already registered,
+                            <a href="/login.html">Login</a>
+                        </p>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+
+<script src="./js/jquery/jquery-3.3.1.min.js"></script>
+<script src="./js/jquery/jquery.form.js"></script>
+<script src="./js/bootstrap/bootstrap.min.js"></script>
+<script src="./js/jquery-ui/jquery-ui.min.js"></script>
+<script src="./js/register.js"></script>
+
+
+</html>

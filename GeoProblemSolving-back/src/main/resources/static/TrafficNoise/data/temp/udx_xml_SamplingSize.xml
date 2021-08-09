@@ -1,0 +1,3 @@
+<Dataset>
+  <XDO name="samplingSize" kernelType="int" value="$(samplingSizeValue)" />
+</Dataset>

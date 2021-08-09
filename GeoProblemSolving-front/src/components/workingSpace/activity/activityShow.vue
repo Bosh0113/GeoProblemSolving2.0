@@ -709,7 +709,6 @@ export default {
           if (res.data.code == 0) {
             this.creatorInfo = res.data.data.creator;
             this.participants = res.data.data.members;
-            console.log("participants",res.data.data.members)
           } else {
             console.log(res.data.msg);
           }
