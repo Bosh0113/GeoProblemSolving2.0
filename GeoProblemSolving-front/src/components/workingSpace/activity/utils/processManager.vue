@@ -228,6 +228,8 @@
                   style="width: 200px"
                   placeholder="Select activity"
                   @on-change="activitySelect(index - 1)"
+                  clearable
+                  @on-clear="activitySelectClear(index - 1)"
                 >
                   <template v-for="item in otherNodes"
                     ><Option
@@ -264,6 +266,8 @@
                   style="width: 200px"
                   placeholder="Select activity"
                   @on-change="activitySelect(index)"
+                  clearable
+                  @on-clear="activitySelectClear(index)"
                 >
                   <template v-for="item in otherNodes">
                     <Option
@@ -289,6 +293,8 @@
               style="width: 200px"
               placeholder="Select activity"
               @on-change="activitySelect(0)"
+              clearable
+              @on-clear="activitySelectClear(0)"
             >
               <template v-for="item in otherNodes"
                 ><Option
@@ -311,6 +317,8 @@
                   style="width: 200px"
                   placeholder="Select activity"
                   @on-change="activitySelect(index)"
+                  clearable
+                  @on-clear="activitySelectClear(index)"
                 >
                   <template v-for="item in otherNodes">
                     <Option
@@ -337,6 +345,8 @@
                   style="width: 200px"
                   placeholder="Select activity"
                   @on-change="activitySelect(index)"
+                  clearable
+                  @on-clear="activitySelectClear(index)"
                 >
                   <template v-for="item in otherNodes">
                     <Option
@@ -359,6 +369,8 @@
               style="width: 200px"
               placeholder="Select activity"
               @on-change="activitySelect(0)"
+              clearable
+              @on-clear="activitySelectClear(0)"
             >
               <template v-for="item in otherNodes"
                 ><Option
@@ -384,6 +396,8 @@
                   style="width: 200px"
                   placeholder="Select activity"
                   @on-change="activitySelect(index - 1)"
+                  clearable
+                  @on-clear="activitySelectClear(index - 1)"
                 >
                   <template v-for="item in otherNodes"
                     ><Option
@@ -420,6 +434,8 @@
                   style="width: 200px"
                   placeholder="Select activity"
                   @on-change="activitySelect(index)"
+                  clearable
+                  @on-clear="activitySelectClear(index)"
                 >
                   <template v-for="item in otherNodes">
                     <Option
@@ -1272,6 +1288,14 @@ export default {
       for (let i = 0; i < this.otherNodes.length; i++) {
         if (this.otherNodes[i].aid === slctActivityId) {
           this.otherNodes[i]["selected"] = true;
+        }
+      }
+    },
+    activitySelectClear(index) {
+      let slctActivityId = this.activityLinks[index];
+      for (let i = 0; i < this.otherNodes.length; i++) {
+        if (this.otherNodes[i].aid === slctActivityId) {
+          this.otherNodes[i]["selected"] = false;
         }
       }
     },

@@ -1,13 +1,16 @@
 package cn.edu.njnu.geoproblemsolving.business.tool.trafficNoise.Data.Dao;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 
 import java.io.*;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+import java.util.zip.ZipOutputStream;
 
 public class fileUtils {
     public static String downloadFileFromURL(String url, String dirLocation, String fileName) {
@@ -78,6 +81,43 @@ public class fileUtils {
         }
 
         return flag;
+    }
+
+    public static void zipFile(ArrayList<String> filePaths, String zipFilePath) throws IOException {
+        byte[] buf = new byte[1024];
+        File zipFile = new File(zipFilePath);
+        //zip文件不存在，则创建文件，用于压缩
+        if (!zipFile.exists())
+            zipFile.createNewFile();
+        try {
+            ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(zipFile));
+            for (int i = 0; i < filePaths.size(); i++) {
+                String relativePath = filePaths.get(i);
+                if (StringUtils.isEmpty(relativePath)) {
+                    continue;
+                }
+                File sourceFile = new File(relativePath);//绝对路径找到file
+                if (sourceFile == null || !sourceFile.exists()) {
+                    continue;
+                }
+
+                FileInputStream fis = new FileInputStream(sourceFile);
+                //保持目录结构
+                zos.putNextEntry(new ZipEntry(sourceFile.getName()));
+
+                //System.out.println("压缩当前文件："+sourceFile.getName());
+                int len;
+                while ((len = fis.read(buf)) > 0) {
+                    zos.write(buf, 0, len);
+                }
+                zos.closeEntry();
+                fis.close();
+            }
+            zos.close();
+            //System.out.println("压缩完成");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static void delFolder(String folderPath) {

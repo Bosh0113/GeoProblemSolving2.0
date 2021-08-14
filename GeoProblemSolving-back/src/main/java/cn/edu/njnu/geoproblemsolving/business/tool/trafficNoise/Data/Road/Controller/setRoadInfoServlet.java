@@ -1,9 +1,13 @@
 package cn.edu.njnu.geoproblemsolving.business.tool.trafficNoise.Data.Road.Controller;
 
+import cn.edu.njnu.geoproblemsolving.business.resource.util.RestTemplateUtil;
 import com.alibaba.fastjson.JSONObject;
 import org.gdal.ogr.DataSource;
 import org.gdal.ogr.Feature;
 import org.gdal.ogr.Layer;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -17,9 +21,11 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.UUID;
 
 import static cn.edu.njnu.geoproblemsolving.business.tool.trafficNoise.Data.Dao.prepareData.copyDbfFile;
 import static cn.edu.njnu.geoproblemsolving.business.tool.trafficNoise.Data.Dao.shapefileUtil.getDataSource;
+import static cn.edu.njnu.geoproblemsolving.business.tool.trafficNoise.Model.Service.runModelService.*;
 
 
 @RestController
@@ -29,6 +35,9 @@ import static cn.edu.njnu.geoproblemsolving.business.tool.trafficNoise.Data.Dao.
  */
 public class setRoadInfoServlet extends HttpServlet {
     final static String ROAD_FILE_NAME = "RoadCenterLine";
+
+    @Value("${dataContainer}")
+    String dataContainerIp;
 
     @RequestMapping(method = RequestMethod.POST)
     protected String doPost(@RequestBody String data, HttpServletRequest req) throws ServletException, IOException {
@@ -43,12 +52,12 @@ public class setRoadInfoServlet extends HttpServlet {
 
         JSONObject roadData = map.getJSONObject("roadData");
         String uid = roadData.getString("uid");
-        String name = roadData.getString("name");
+//        String name = roadData.getString("name");
 
         // 获取文件
         String zipUrl = "data" + File.separator + "TrafficNoise" + File.separator + uid + File.separator;
         String localDir = req.getServletContext().getRealPath("./") + zipUrl;
-        String roadFile = localDir + name + ".shp";
+        String roadFile = localDir + ROAD_FILE_NAME + ".shp";
 
 
         DataSource dSource = getDataSource(roadFile);
@@ -95,8 +104,12 @@ public class setRoadInfoServlet extends HttpServlet {
                 dSource.SyncToDisk();
                 dSource.delete();
 //                因为玄武盾原因，更改完属性后需要再复制一份为mdbf文件
-                copyDbfFile(localDir + name);
+                copyDbfFile(localDir + ROAD_FILE_NAME);
 
+                String temDir = localDir + "temp" + File.separator;
+                genShpZipFile(temDir, localDir, ROAD_FILE_NAME);
+
+                respJson.put("newAddress", File.separator + zipUrl + "temp" + File.separator + ROAD_FILE_NAME + ".zip");
                 respJson.put("respCode", 1);
                 respJson.put("msg", "success.");
                 break;

@@ -56,8 +56,8 @@ public class uploadBuildingServlet extends HttpServlet {
             fileUtils.downloadFileFromURL(address, localDir, name + suffix);
             fileUtils.upZipFile(localDir + name + suffix, localDir);
 
-            JSONObject dataInfo = prepareBuildingData(localDir + name);
-            copyDbfFile(localDir + name);
+            JSONObject dataInfo = prepareBuildingData(localDir + "Building");
+            copyDbfFile(localDir + "Building");
             if (dataInfo.size() > 0) {
                 respJson.put("respCode", 1);
                 double centerLong = dataInfo.getDouble("Lng");
@@ -66,7 +66,7 @@ public class uploadBuildingServlet extends HttpServlet {
                 respJson.put("buildingMaxId", buildingMaxId);
                 respJson.put("centerLong", centerLong);
                 respJson.put("centerLat", centerLat);
-                respJson.put("url", "\\GeoProblemSolving\\" + zipUrl + name);
+                respJson.put("url", "\\GeoProblemSolving\\" + zipUrl + "Building");
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());

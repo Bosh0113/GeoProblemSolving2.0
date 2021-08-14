@@ -124,8 +124,7 @@ function getSocketOperation(data) {
     var content;
     try {
         content = JSON.parse(data.content);
-    }
-    catch (e) {
+    } catch (e) {
         content = data.content;
     }
     if (data.type === "operation") {
@@ -170,7 +169,7 @@ function getSocketOperation(data) {
             case "road-edit-start": {
                 var prop = content.propInfo;
                 roadCenterLayer.eachLayer((layer) => {
-                    if(layer.feature.properties.OBJECTID == prop.OBJECTID) {
+                    if (layer.feature.properties.OBJECTID == prop.OBJECTID) {
                         layer.setStyle({
                             weight: 5,
                             dashArray: '',
@@ -216,7 +215,7 @@ function getSocketOperation(data) {
             case "building-edit-start": {
                 var prop = content.propInfo;
                 buildingLayer.eachLayer((layer) => {
-                    if(layer.feature.properties.OBJECTID == prop.OBJECTID) {
+                    if (layer.feature.properties.OBJECTID == prop.OBJECTID) {
                         layer.setStyle({
                             weight: 5,
                             color: '#666',
@@ -237,7 +236,7 @@ function getSocketOperation(data) {
             case "barrier-edit-start": {
                 var prop = content.propInfo;
                 barrierLayer.eachLayer((layer) => {
-                    if(layer.feature.properties.OBJECTID == prop.OBJECTID) {
+                    if (layer.feature.properties.OBJECTID == prop.OBJECTID) {
                         layer.setStyle({
                             weight: 5,
                             dashArray: '',
@@ -280,10 +279,10 @@ function getSocketOperation(data) {
                 // 通知模型正在运行
                 break;
             }
-            case "run-success": {
-                getModelState(content.userId, content.runningId);
-                break;
-            }
+            // case "run-success": {
+            //     getModelState(content.userId, content.runningId);
+            //     break;
+            // }
             case "clean": {
                 cancelAllState();
                 if (selectROI.ROI)
@@ -322,7 +321,7 @@ function getSocketOperation(data) {
                 break;
             }
             case "value-change": {
-                $("#"+ content.id).val(content.value);
+                $("#" + content.id).val(content.value);
                 break;
             }
         }
@@ -333,12 +332,26 @@ function getSocketData() {
 
 }
 
-function getSocketComputation() {
+function getSocketComputation(data) {
+    if (data != undefined && data != null) {
+        clearInterval(state);
+        state = null;
 
+        $("#brforeRunModal").modal("hide");
+        onSelectClick();
+        $("#mapid").css("cursor", "-webkit-grab");
+
+        data.computeOutputs.forEach((el) => {
+            if (el.statename == "NoiseRegion" && el.event == "Output_RegionNoise") {
+                loadResultTiff(el.url);
+            }
+        });
+        $("#waitting").hide();
+    }
 }
 
 function paramChanged(id, value) {
-    window.parent.sendElementChangeOperation(id, "value-change", value, "","");
+    window.parent.sendElementChangeOperation(id, "value-change", value, "", "");
 }
 
 var selectedData = {}
@@ -811,7 +824,7 @@ function onCleanClick() {
 function onBeforeRun() {
     cancelAllState();
 
-    if(!selectROI.isSelect) {
+    if (!selectROI.isSelect) {
         alert("Please select a computation area.");
         return;
     }
@@ -893,9 +906,54 @@ function onRunModel() {
         success: function (resp) {
             var result = JSON.parse(resp);
             if (result.respCode == 1) {
-                // var
+                //
+                let inputs = [];
+                inputs.push({
+                    statename: "LoadVariables",
+                    event: "InputRegionBBox",
+                    tag: "InputRegionBBox",
+                    url: result.regionBBox
+                });
+                inputs.push({
+                    statename: "LoadVariables",
+                    event: "InputRoadCenterLineData",
+                    tag: "InputRoadCenterLineData",
+                    url: roadData.address
+                });
+                inputs.push({
+                    statename: "LoadVariables",
+                    event: "InputBuildingData",
+                    tag: "InputBuildingData",
+                    url: buildingData.address
+                });
+                inputs.push({
+                    statename: "LoadVariables",
+                    event: "InputBarrierData",
+                    tag: "InputBarrierData",
+                    url: barrierData.address
+                });
+                inputs.push({
+                    statename: "LoadVariables",
+                    event: "InputHeightData",
+                    tag: "InputHeightData",
+                    url: result.height
+                });
+                inputs.push({
+                    statename: "LoadVariables",
+                    event: "InputSamplingSizeData",
+                    tag: "InputSamplingSizeData",
+                    url: result.samplingSize
+                });
+                let outputs = [{
+                    statename: "NoiseRegion",
+                    event: "Output_RegionNoise",
+                    template: {
+                        type: "none",
+                        value: "",
+                    }
+                }]
 
-                window.parent.sendModelOperation(aid, serviceMd5, serviceIp, servicePort, inputs, outputs);
+                window.parent.sendModelOperation(window.parent.activityInfo.aid, "33eabfc9fa8fad6c35c862c48c0c3349", "172.21.213.105", "8061", inputs, outputs);
 
                 window.parent.sendCustomOperation({
                     type: "operation",
@@ -945,15 +1003,15 @@ function getModelState(userId, runningId) {
                     loadResultTiff(runningId);
                     $("#waitting").hide();
 
-                    window.parent.sendCustomOperation({
-                        type: "operation",
-                        sender: userId,
-                        behavior: "run-success",
-                        content: {
-                            userId: userId,
-                            runningId: runningId
-                        },
-                    });
+                    // window.parent.sendCustomOperation({
+                    //     type: "operation",
+                    //     sender: userId,
+                    //     behavior: "run-success",
+                    //     content: {
+                    //         userId: userId,
+                    //         runningId: runningId
+                    //     },
+                    // });
                 }
             }
         },
@@ -1135,9 +1193,23 @@ function onSetRoadInfoClick() {
         success: function (data) {
             var result = JSON.parse(data);
             if (result.respCode == 1) {
-                alert("Set the property of road successfully.");
+                let path = "/GeoProblemSolving" + result.newAddress.replace(/\\/g,'/');
+                var xhr = new XMLHttpRequest();
+                xhr.open("GET", path, true);
+                xhr.responseType = "blob";
+                xhr.onload = function (e) {
+                    if (this.status == 200) {
+                        var file = this.response;
+                        var fileOfBlob = new File([file], roadData.name + roadData.suffix);
+                        let resultData = window.parent.resaveResource(fileOfBlob, {uid: roadData.uid});
+                        roadData.address = resultData.address;
+                        alert("Set the property of building successfully.");
+                    }
+                };
+                xhr.send();
+
             } else {
-                alert("Fail to Set the property of this road.");
+                alert("Fail to set the property of this road.");
             }
 
             // send message
@@ -1242,7 +1314,21 @@ function onSetBuildingInfoClick() {
         success: function (data) {
             var result = JSON.parse(data);
             if (result.respCode === 1) {
-                alert("Set the property of building successfully.");
+                let path = "/GeoProblemSolving" + result.newAddress.replace(/\\/g,'/');
+                var xhr = new XMLHttpRequest();
+                xhr.open("GET", path, true);
+                xhr.responseType = "blob";
+                xhr.onload = function (e) {
+                    if (this.status == 200) {
+                        var file = this.response;
+                        var fileOfBlob = new File([file], buildingData.name + buildingData.suffix);
+                        let resultData = window.parent.resaveResource(fileOfBlob, {uid: buildingData.uid});
+                        buildingData.address = resultData.address;
+                        alert("Set the property of building successfully.");
+                    }
+                };
+                xhr.send();
+
             } else {
                 alert("Fail to Set the property of this building.");
             }
@@ -1300,7 +1386,7 @@ function onBarrierClick(prop) {
                         content: {propInfo: prop, resultInfo: result},
                     });
                 } else {
-                    alert("Fail to Set the property of this road.");
+                    alert("Fail to set the property of this barrier.");
                 }
             },
             error: function (e) {
@@ -1334,7 +1420,20 @@ function onSetBarrierInfoClick() {
         success: function (data) {
             var result = JSON.parse(data);
             if (result.respCode == 1) {
-                alert("Set the property of building successfully.");
+                let path = "/GeoProblemSolving" + result.newAddress.replace(/\\/g,'/');
+                var xhr = new XMLHttpRequest();
+                xhr.open("GET", path, true);
+                xhr.responseType = "blob";
+                xhr.onload = function (e) {
+                    if (this.status == 200) {
+                        var file = this.response;
+                        var fileOfBlob = new File([file], barrierData.name + barrierData.suffix);
+                        let resultData = window.parent.resaveResource(fileOfBlob, {uid: barrierData.uid});
+                        barrierData.address = resultData.address;
+                        alert("Set the property of building successfully.");
+                    }
+                };
+                xhr.send();
             } else {
                 alert("Fail to Set the property of this building.");
             }
@@ -1700,9 +1799,9 @@ async function loadShapefile(layer, shapefilePath) {
     }
 }
 
-function loadResultTiff(id) {
+function loadResultTiff(resulUrl) {
     L.leafletGeotiff(
-        url = "./data/userData/" + userId + "/OutputData/" + id + "/NoiseResult.tif",
+        url = resulUrl,
         options = {
             band: 0,
             displayMin: 0,

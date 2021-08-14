@@ -37,12 +37,12 @@ public class getBarrierInfoServlet extends HttpServlet {
 
         JSONObject barrierData = (JSONObject) map.get("barrierData");
         String uid = barrierData.getString("uid");
-        String name = barrierData.getString("name");
+//        String name = barrierData.getString("name");
 
         // 获取文件
         String zipUrl = "data" + File.separator + "TrafficNoise" + File.separator + uid + File.separator;
         String localDir = req.getServletContext().getRealPath("./") + zipUrl;
-        String roadFile = localDir + name + ".shp";
+        String roadFile = localDir + BARRIER_FILE_NAME + ".shp";
 
         DataSource dSource = getDataSource(roadFile);
         if (dSource == null) {

@@ -378,7 +378,7 @@ public class ActivityResServiceImpl implements ActivityResService {
         Part file = req.getPart("file");
         JSONObject uploadRemoteResult = uploadFileToDataContainer(file);
         Integer uploadResultCode = uploadRemoteResult.getInteger("code");
-        if (uploadResultCode != 0){
+        if (uploadResultCode != 1){
             return ResultUtils.error(-2, "Failed uploading file");
         }
         String dataIdInContainer = uploadRemoteResult.getJSONObject("data").getString("id");
@@ -476,7 +476,7 @@ public class ActivityResServiceImpl implements ActivityResService {
             //上传文件
             JSONObject uploadResult = uploadFileToDataContainer(file);
             Integer code = uploadResult.getInteger("code");
-            if (code != 0){
+            if (code != 1){
                 return ResultUtils.error(-2, "Failed uploading file.");
             }
             uploadResult.getString("id");
@@ -501,14 +501,14 @@ public class ActivityResServiceImpl implements ActivityResService {
             String[] nullPropertyNames = getNullPropertyNames(putRes);
             BeanUtils.copyProperties(putRes, res, nullPropertyNames);
             resDao.addResource(res);
-            return ResultUtils.success();
+            return ResultUtils.success(putRes);
         }
         String rootResUid = paths.get(paths.size() - 1);
         ArrayList<ResourceEntity> putResList = pResourceByPath(rootResList, putRes, paths);
         //更新数据库
         String updateResult = updateResourceInDB(rootResUid, putResList);
         if (updateResult.equals("suc")){
-            return ResultUtils.success();
+            return ResultUtils.success(putRes);
         }
         return ResultUtils.error(-2, "Failed to update MongoDB.");
     }

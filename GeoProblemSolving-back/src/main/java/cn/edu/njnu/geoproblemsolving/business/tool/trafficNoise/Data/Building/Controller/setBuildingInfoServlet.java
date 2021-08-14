@@ -20,6 +20,7 @@ import java.io.PrintWriter;
 
 import static cn.edu.njnu.geoproblemsolving.business.tool.trafficNoise.Data.Dao.prepareData.copyDbfFile;
 import static cn.edu.njnu.geoproblemsolving.business.tool.trafficNoise.Data.Dao.shapefileUtil.getDataSource;
+import static cn.edu.njnu.geoproblemsolving.business.tool.trafficNoise.Model.Service.runModelService.genShpZipFile;
 
 @RestController
 @RequestMapping(value = "/setBuildingInfoServlet")
@@ -27,6 +28,7 @@ import static cn.edu.njnu.geoproblemsolving.business.tool.trafficNoise.Data.Dao.
     前台配置完BuildingConfig后传到后台，后台将前台选定参数写入shp文件
  */
 public class setBuildingInfoServlet extends HttpServlet {
+    final static String BUILDING_FILE_NAME = "Building";
 
     @RequestMapping(method = RequestMethod.POST)
     protected String doPost(@RequestBody String data, HttpServletRequest req) throws ServletException, IOException {
@@ -40,12 +42,12 @@ public class setBuildingInfoServlet extends HttpServlet {
 
         JSONObject buildingData = map.getJSONObject("buildingData");
         String uid = buildingData.getString("uid");
-        String name = buildingData.getString("name");
+//        String name = buildingData.getString("name");
 
         // 获取文件
         String zipUrl = "data" + File.separator + "TrafficNoise" + File.separator + uid + File.separator;
         String localDir = req.getServletContext().getRealPath("./") + zipUrl;
-        String buildingFile = localDir + name + ".shp";
+        String buildingFile = localDir + BUILDING_FILE_NAME + ".shp";
 
 
         DataSource dSource = getDataSource(buildingFile);
@@ -75,8 +77,12 @@ public class setBuildingInfoServlet extends HttpServlet {
                 dSource.SyncToDisk();
                 dSource.delete();
 //                因为玄武盾原因，更改完属性后需要再复制一份为mdbf文件
-                copyDbfFile(localDir + name);
+                copyDbfFile(localDir + BUILDING_FILE_NAME);
 
+                String temDir = localDir + "temp" + File.separator;
+                genShpZipFile(temDir, localDir, BUILDING_FILE_NAME);
+
+                respJson.put("newAddress", File.separator + zipUrl + "temp" + File.separator + BUILDING_FILE_NAME + ".zip");
                 respJson.put("respCode", 1);
                 respJson.put("msg", "success.");
                 break;

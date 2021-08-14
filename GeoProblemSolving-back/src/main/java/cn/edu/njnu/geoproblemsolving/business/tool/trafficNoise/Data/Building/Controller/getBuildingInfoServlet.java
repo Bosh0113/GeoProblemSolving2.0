@@ -36,12 +36,12 @@ public class getBuildingInfoServlet extends HttpServlet {
 
         JSONObject buildingData = (JSONObject) map.get("buildingData");
         String uid = buildingData.getString("uid");
-        String name = buildingData.getString("name");
+//        String name = buildingData.getString("name");
 
         // 获取文件
         String zipUrl = "data" + File.separator + "TrafficNoise" + File.separator + uid + File.separator;
         String localDir = req.getServletContext().getRealPath("./") + zipUrl;
-        String roadFile = localDir + name + ".shp";
+        String roadFile = localDir + BUILDING_FILE_NAME + ".shp";
 
         DataSource dSource = getDataSource(roadFile);
         if (dSource == null) {

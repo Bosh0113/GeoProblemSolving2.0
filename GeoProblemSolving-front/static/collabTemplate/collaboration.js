@@ -772,17 +772,26 @@ var taskList = [];
         let paths = temp.toString();
 
         $.ajax({
-            url: `/ GeoProblemSolving / rip / file / ${activityInfo.aid} /${paths}`,
-            type: "POST",
+            url: `/GeoProblemSolving/rip/file/${activityInfo.aid}/${paths}`,
+            type: "PUT",
             data: formData,
             mimeType: "multipart/form-data",
             processData: false,
             contentType: false,
             cache: false,
             async: false,
-            success: function (data) {
-                if (data.code !== 0) {
-                    return "fail";
+            success: function (data) {                
+                let result;
+                try {
+                    result = JSON.parse(data);
+                }
+                catch (e) {
+                    result = data;
+                }
+                if (result.code == 0) {
+                    resultData = result.data;
+                } else {
+                    resultData = "Error";
                 }
             },
             error: function (err) {
@@ -1471,7 +1480,7 @@ var taskList = [];
      * @param {*} info
      */
     function resaveResource(file, info) {
-        return resaveFile(file, info)
+        return resaveFile(file, JSON.stringify(info));
     }
 
     /**

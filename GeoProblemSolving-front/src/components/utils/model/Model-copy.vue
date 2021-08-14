@@ -590,7 +590,7 @@
 
       //动态绑定 更新outputs部分
       getStateEventOut: function(outputs) {
-        console.log(outputs);
+        // console.log(outputs);
         let outList = this.stateList;
         outList.forEach((state, index) => {
           state.Event.forEach((event, eventIndex) => {

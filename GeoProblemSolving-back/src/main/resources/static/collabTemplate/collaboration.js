@@ -761,7 +761,7 @@ var taskList = [];
 
     function resaveFile(file, info) {
 
-        var formData = new FormData();
+        let formData = new FormData();
         formData.append("file", file);
         formData.append("resInfo", info);
 
@@ -769,11 +769,12 @@ var taskList = [];
         if (temp.length == 0) {
             temp = ["0"];
         }
-        let paths = temp.toString();
+        let paths = temp.toString()
 
+        let result = null;
         $.ajax({
-            url: `/ GeoProblemSolving / rip / file / ${activityInfo.aid} /${paths}`,
-            type: "POST",
+            url: `/GeoProblemSolving/rip/file/${activityInfo.aid}/${paths}`,
+            type: "PUT",
             data: formData,
             mimeType: "multipart/form-data",
             processData: false,
@@ -781,15 +782,24 @@ var taskList = [];
             cache: false,
             async: false,
             success: function (data) {
-                if (data.code !== 0) {
-                    return "fail";
+                let result;
+                try {
+                    result = JSON.parse(data);
+                }
+                catch (e) {
+                    result = data;
+                }
+                if (result.code == 0) {
+                    resultData = result.data;
+                } else {
+                    resultData = "Error";
                 }
             },
             error: function (err) {
                 throw err;
             }
         });
-        return "success";
+        return resultData;
     }
 
     function deleteResource() { }
@@ -1481,7 +1491,7 @@ var taskList = [];
      * @param {*} info
      */
     function resaveResource(file, info) {
-        return resaveFile(file, info)
+        return resaveFile(file, JSON.stringify(info));
     }
 
     /**

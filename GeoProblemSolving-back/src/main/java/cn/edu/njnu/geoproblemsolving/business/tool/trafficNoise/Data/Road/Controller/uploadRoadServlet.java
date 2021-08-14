@@ -49,8 +49,8 @@ public class uploadRoadServlet extends HttpServlet {
             fileUtils.downloadFileFromURL(address, localDir, name + suffix);
             fileUtils.upZipFile(localDir + name + suffix, localDir);
 
-            JSONObject dataInfo = prepareRoadData(localDir + name);
-            copyDbfFile(localDir + name);
+            JSONObject dataInfo = prepareRoadData(localDir + "RoadCenterLine");
+            copyDbfFile(localDir + "RoadCenterLine");
             if (dataInfo.size() > 0) {
                 respJson.put("respCode", 1);
                 double centerLong = dataInfo.getDouble("Lng");
@@ -59,7 +59,7 @@ public class uploadRoadServlet extends HttpServlet {
                 respJson.put("roadMaxID", roadMaxID);
                 respJson.put("centerLong", centerLong);
                 respJson.put("centerLat", centerLat);
-                respJson.put("url", "\\GeoProblemSolving\\" + zipUrl + name);
+                respJson.put("url", "\\GeoProblemSolving\\" + zipUrl + "RoadCenterLine");
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());

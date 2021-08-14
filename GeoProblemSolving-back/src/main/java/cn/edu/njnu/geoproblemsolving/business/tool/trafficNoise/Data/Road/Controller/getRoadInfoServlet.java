@@ -24,6 +24,8 @@ import static cn.edu.njnu.geoproblemsolving.business.tool.trafficNoise.Data.Dao.
 @RequestMapping(value = "/getRoadInfoServlet")
 public class getRoadInfoServlet extends HttpServlet {
 
+    final static String ROAD_FILE_NAME = "RoadCenterLine";
+
     @RequestMapping(method = RequestMethod.POST)
     protected String doPost(@RequestBody String data, HttpServletRequest req) throws ServletException, IOException {
 
@@ -41,7 +43,7 @@ public class getRoadInfoServlet extends HttpServlet {
         // 获取文件
         String zipUrl = "data" + File.separator + "TrafficNoise" + File.separator + uid + File.separator;
         String localDir = req.getServletContext().getRealPath("./") + zipUrl;
-        String roadFile = localDir + name + ".shp";
+        String roadFile = localDir + ROAD_FILE_NAME + ".shp";
 
         DataSource dSource = getDataSource(roadFile);
         if (dSource == null) {

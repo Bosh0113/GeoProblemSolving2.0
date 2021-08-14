@@ -135,7 +135,7 @@ public class ActivityResController {
                               @PathVariable ArrayList<String> paths,
                               @RequestParam String resInfo,
                               HttpServletRequest req) throws IOException, ServletException {
-        return resService.putResourceByPath(aid, paths,resInfo, req);
+        return resService.putResourceByPath(aid, paths, resInfo, req);
     }
 
 
