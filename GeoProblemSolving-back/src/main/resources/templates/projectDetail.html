@@ -107,6 +107,12 @@
             color: white;
         }
 
+        .enterWorkspaceColor:hover {
+            background-color: #0b83e1;
+            color: white;
+            box-shadow:  0 3.2px 7.2px 0 rgb(0 0 0 / 13%), 0 0.6px 1.8px 0 rgb(0 0 0 / 11%);
+        }
+
         .overEllipsis {
             overflow: hidden;
             white-space: nowrap;
@@ -216,6 +222,10 @@
             color: white;
         }
 
+        .fileBtnHoverYellow:hover {
+            background-color: #f4a942;
+            color: white;
+        }
         .ivu-card-body {
             display: inherit;
         }
@@ -267,9 +277,9 @@
                     <menu-item name="task" class="projectMenuItem" style="padding: 14px">
                         <Icon type="md-calendar" title="Tasks" size="35" style="margin: 0 3px;"></Icon>
                     </menu-item>
-                    <menu-item name="workspace" class="projectMenuItem" style="padding: 14px">
-                        <Icon type="md-git-branch" title="Workspace" size="35" style="margin: 0 3px;"></Icon>
-                    </menu-item>
+<!--                    <menu-item name="workspace" class="projectMenuItem" style="padding: 14px">-->
+<!--                        <Icon type="md-git-branch" title="Workspace" size="35" style="margin: 0 3px;"></Icon>-->
+<!--                    </menu-item>-->
                     <menu-item name="resource" class="projectMenuItem" style="padding: 14px">
                         <Icon type="ios-folder" title="Resources" size="35" style="margin: 0 3px;"></Icon>
                     </menu-item>
@@ -512,6 +522,13 @@
                                                                 <span class="showCount">{{projectInfo.members.length}}</span>
                                                             </div>
                                                         </div>
+                                                        <div style="position: absolute;right: 15px;top: -65px;">
+                                                            <i-button class="enterWorkspaceColor"
+                                                                      @click="changeMenuItem('workspace')">
+                                                                <Icon type="md-git-branch" :size="25"></Icon>
+                                                                <strong>Enter Workspace</strong>
+                                                            </i-button>
+                                                        </div>
                                                     </div>
                                                 </i-col>
                                             </Row>
@@ -603,8 +620,14 @@
                                 </div>
                             </div>
                             <div slot="extra">
+                                <Tooltip content="Enter Workspace">
+                                    <i-button class="enterWorkspaceColor"
+                                              @click="changeMenuItem('workspace')">
+                                        <Icon type="md-git-branch" :size="20"></Icon>
+                                    </i-button>
+                                </Tooltip>
                                 <Tooltip content="Resources center" placement="left" class="fileBtn">
-                                    <i-button @click="goResourceCenter" class="fileBtnHoverBlue">
+                                    <i-button @click="goResourceCenter" class="fileBtnHoverYellow">
                                         <Icon type="ios-albums" size="20"></Icon>
                                     </i-button>
                                 </Tooltip>
@@ -632,6 +655,13 @@
                                 <div style="display:flex;align-items:center;justify-content:center;">
                                     <span class="project_title title_mw">{{projectInfo.name}}</span>
                                 </div>
+                            </div>
+                            <div slot="extra">
+                                <i-button class="enterWorkspaceColor"
+                                          @click="changeMenuItem('workspace')">
+                                    <Icon type="md-git-branch" :size="20"></Icon>
+                                    <strong>Enter Workspace</strong>
+                                </i-button>
                             </div>
                             <div :style="{height: contentPageCSS - 105 + 'px'}">
                                 <child-task
@@ -1121,15 +1151,24 @@
                     }
                 },
                 changeMenuItem(name) {
-                    this.activeMenu = name;
-                    var tokenParam = '';
-                    if (this.tokenStr != null) {
-                        tokenParam = "&token=" + this.tokenStr;
-                    }
-                    if (name == "workspace") {
-                        window.history.replaceState(null, null, this.workspaceUrl);
-                    } else {
+                    if(name == 'workspace') {
+                        if (this.userState == false) {
+                            window.location.href = "/GeoProblemSolving/login"
+                        } else {
+                            window.location.href = "/GeoProblemSolving/activityInfo/" + this.projectInfo.aid
+                        }
+                    }else{
+                        this.activeMenu = name;
+                        var tokenParam = '';
+                        if (this.tokenStr != null) {
+                            tokenParam = "&token=" + this.tokenStr;
+                        }
                         window.history.replaceState(null, null, '/GeoProblemSolving/projectInfo/' + this.projectInfo.aid + "?content=" + name + tokenParam);
+                        // if (name == "workspace") {
+                        //     window.history.replaceState(null, null, this.workspaceUrl);
+                        // } else {
+                        //     window.history.replaceState(null, null, '/GeoProblemSolving/projectInfo/' + this.projectInfo.aid + "?content=" + name + tokenParam);
+                        // }
                     }
                 },
                 memberListStr(members) {

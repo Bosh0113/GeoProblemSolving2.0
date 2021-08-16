@@ -14,7 +14,7 @@
         >
       </div>
       <Col id="taskPage" span="24">
-        <div id="taskContainer" :style="{ height: contentHeight + 'px' }">
+        <div id="taskContainer" :style="{ height: contentHeight - 120 + 'px' }">
           <template v-if="!chartSwitch">
             <Row type="flex" justify="space-around">
               <Col span="7">
@@ -37,7 +37,7 @@
                   >
                   <vue-scroll
                     :ops="ops"
-                    :style="{ height: contentHeight - 80 + 'px' }"
+                    :style="{ height: contentHeight - 180 + 'px' }"
                   >
                     <draggable
                       :disabled="
@@ -51,7 +51,7 @@
                       element="ul"
                       :options="{ group: 'task' }"
                       v-model="taskTodo"
-                      :style="{ height: contentHeight - 80 + 'px' }"
+                      :style="{ height: contentHeight - 180 + 'px' }"
                       @start="setMoveCount()"
                       @update="updateMoveTask(taskTodo, 'todo')"
                       @add="addMoveTask(taskTodo, 'todo')"
@@ -276,7 +276,7 @@
                   <h3 slot="title">Doing</h3>
                   <vue-scroll
                     :ops="ops"
-                    :style="{ height: contentHeight - 80 + 'px' }"
+                    :style="{ height: contentHeight - 180 + 'px' }"
                   >
                     <draggable
                       :disabled="
@@ -290,7 +290,7 @@
                       element="ul"
                       :options="{ group: 'task' }"
                       v-model="taskDoing"
-                      :style="{ height: contentHeight - 80 + 'px' }"
+                      :style="{ height: contentHeight - 180 + 'px' }"
                       @start="setMoveCount()"
                       @update="updateMoveTask(taskDoing, 'doing')"
                       @add="addMoveTask(taskDoing, 'doing')"
@@ -525,7 +525,7 @@
                   <h3 slot="title">Done</h3>
                   <vue-scroll
                     :ops="ops"
-                    :style="{ height: contentHeight - 80 + 'px' }"
+                    :style="{ height: contentHeight - 180 + 'px' }"
                   >
                     <draggable
                       :disabled="
@@ -539,7 +539,7 @@
                       element="ul"
                       :options="{ group: 'task' }"
                       v-model="taskDone"
-                      :style="{ height: contentHeight - 80 + 'px' }"
+                      :style="{ height: contentHeight - 180 + 'px' }"
                       @start="setMoveCount()"
                       @update="updateMoveTask(taskDone, 'done')"
                       @add="addMoveTask(taskDone, 'done')"
@@ -972,11 +972,15 @@ export default {
     dayjs,
     ganttElastic: GanttElastic,
   },
-  props: ["activityInfo", "childActivities"],
+  props: [
+    "activityInfo",
+    "childActivities",
+    "userInfo"
+  ],
   data() {
     return {
-      projectInfo: parent.vm.projectInfo,
-      userInfo: JSON.parse(sessionStorage.getItem("userInfo")),
+      projectInfo: {},
+      // userInfo: JSON.parse(sessionStorage.getItem("userInfo")),
       userRole: "visitor",
       todoLoading: true,
       doingLoading: true,

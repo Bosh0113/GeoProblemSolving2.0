@@ -1,5 +1,5 @@
 <template>
-  <div style="display: flex; background-color: #eee">
+  <div style="display: flex; background-color: #eee; height: calc(100vh - 130px)">
     <Button
       title="Activity tree"
       @click="unfoldTree"
@@ -14,7 +14,7 @@
     </Button>
 
     <!--  Activity List部分  -->
-    <Card dis-hover class="activityCard" id="ActivityTree">
+    <Card dis-hover class="activityCard" id="ActivityTree" style="height: calc(100vh - 130px)">
       <h3 slot="title">Activity list</h3>
       <Icon
         slot="extra"
@@ -24,7 +24,7 @@
         style="cursor: pointer"
         @click="foldTree"
       />
-      <vue-scroll :ops="scrollOps" style="height: calc(100vh - 70px)">
+      <vue-scroll :ops="scrollOps" >
         <div style="padding-right: 15px">
           <Tree :data="activityTree" :render="renderStyle"></Tree>
         </div>
@@ -32,7 +32,7 @@
     </Card>
 
     <!--    使用slot控制是否显示-->
-    <Card dis-hover class="workspaceCard" id="ActivityContent">
+    <Card dis-hover class="workspaceCard" id="ActivityContent" style="height: calc(100vh - 130px)">
       <h3 slot="title">
         <Breadcrumb style="display: inline-block" separator=">">
           <BreadcrumbItem v-for="name in cascader" :key="name"
@@ -95,6 +95,7 @@
       <single-activity
         v-else-if="contentType == 1"
         :activityInfo="slctActivity"
+        :userInfo="userInfo"
         :key="slctActivity.aid"
       ></single-activity>
       <multi-activity
@@ -104,10 +105,13 @@
         :childActivities="childActivities"
         :nameConfirm="nameConfirm"
         :key="slctActivity.aid"
+        v-on:enterChildActivity="enterChildActivity"
+        v-on:enterRootActivity="enterRootActivity"
       ></multi-activity>
       <activity-visitor
         v-else-if="contentType == 3"
         :activityInfo="slctActivity"
+        :userInfo="userInfo"
         :key="slctActivity.aid"
       ></activity-visitor>
     </Card>
@@ -214,14 +218,25 @@
     <Modal
       v-model="activityDeleteModal"
       title="Delete the current activity"
-      @on-cancel="delActivity"
-      ok-text="Think again..."
-      cancel-text="Yes"
     >
       <h3>Do you really want to delete this activity?</h3>
       <h3 style="color: red; margin-top: 10px">
         * The selected activity and its all child activities will be deleted!
       </h3>
+      <div slot="footer" style="display: inline-block">
+        <Button
+          type="primary"
+          @click="activityDeleteModal = false"
+          style="float: right"
+          >Think again...
+        </Button>
+        <Button
+
+          @click="delActivity"
+          style="float: right; margin-right: 15px"
+          >yes
+        </Button>
+      </div>
     </Modal>
   </div>
 </template>
@@ -249,11 +264,13 @@ export default {
       cascader: [],
       nameConfirm: [],
       activityTree: [],
-      projectInfo: parent.vm.projectInfo,
-      userInfo: JSON.parse(sessionStorage.getItem("userInfo")),
+      projectInfo: {},
+      userInfo: {},
       slctActivity: {},
+      rootActivity: {},
       childActivities: [],
       parentActivity: {},
+      grandchildren: [],
       editActivityForm: {
         name: "",
         description: "",
@@ -311,8 +328,12 @@ export default {
     });
     next();
   },
+  created() {
+    this.initInfo();
+  },
   mounted() {
-    this.locateActivity();
+    // this.initInfo();
+    // this.locateActivity();
     window.addEventListener("resize", this.reSize);
 
     Array.prototype.contains = function (obj) {
@@ -332,6 +353,32 @@ export default {
     };
   },
   methods: {
+    initInfo: function () {
+      let aid = this.getURLaid();
+      this.$axios.get("/GeoProblemSolving/project/getProjects?aids=" + aid)
+        .then(res => {
+          // this.$set(this, "projectInfo", res.data.data[0])
+          this.projectInfo = res.data.data[0];
+          this.getProjectInfo();
+        })
+        .catch(err => {
+          this.$Message.error("Loading project failed.")
+        })
+      this.userInfo = this.$store.getters.userInfo;
+      if (this.userInfo.organizations == null) {
+        this.userInfo.organizations = [];
+      }
+      if (this.userInfo.domain == null) {
+        this.userInfo.domain = [];
+      }
+    },
+    getURLaid:function(){
+      let url = window.location.href;
+      if(url.indexOf("/activityInfo/") != -1){
+        let urls = url.split("/activityInfo/");
+        return urls[1];
+      }
+    },
     roleIdentity(activity) {
       return this.userRoleApi.roleIdentify(
         activity.members,
@@ -381,13 +428,18 @@ export default {
         };
         on = {
           click: () => {
-            parent.location.href =
-              "/GeoProblemSolving/projectInfo/" +
-              this.projectInfo.aid +
-              "?content=workspace&aid=" +
-              data.aid +
-              "&level=" +
-              data.level;
+            //通过setContent函数判断child类型，跳转到不同的类型组件
+
+            //面包屑显示当前activity的位置
+            // this.updataCascader(data);
+            if(data.level == 0){
+              this.enterRootActivity();
+            } else {
+              this.slctActivity = data;
+              this.locateActivity();
+              this.setContent(this.slctActivity);
+              // this.$router.push("/activityInfo/" + data.aid);
+            }
           },
         };
       } else {
@@ -396,6 +448,14 @@ export default {
           backgroundColor: "lightblue",
           cursor: "default",
         };
+        // on = {
+        //   click: ()=> {
+        //     // this.slctActivity = this.rootActivity;
+        //     // this.setContent(this.slctActivity);
+        //     //面包屑显示当前activity的位置
+        //     this.updataCascader(data);
+        //   }
+        // }
       }
 
       return h(
@@ -435,6 +495,108 @@ export default {
         ]
       );
     },
+    enterChildActivity(activity){
+      //判断是否是新建child
+      let isNewChild = true;
+      for(let i = 0 ; i < this.nameConfirm.length ; i++){
+        if(this.nameConfirm[i] == activity.name){
+          isNewChild = false;
+        }
+      }
+      if( isNewChild == true){
+        //进入的是新活动，需要在activityTree中--临时--更新该newchild
+        this.addTempActivityTree(activity);
+        this.nameConfirm.push(activity.name);
+      }
+      //Activity_Group的introduction页面child activities跳转
+      // this.updataCascader(activity);
+      this.slctActivity = activity;
+      this.locateActivity();
+      this.setContent(this.slctActivity);
+    },
+    enterRootActivity(){
+      if(this.rootActivity != null && this.rootActivity != {}){
+        this.enterChildActivity(this.rootActivity);
+      }
+    },
+    updataCascader(data){
+      //假设目前只允许拥有一个root活动且最大只有三层，所以cascader[0]固定，data.lever最大为2
+      //利用data.level查出活动结构
+      if(data.level == 0){
+        let length = this.cascader.length;
+        this.cascader.splice(1,length-1);
+      } else if(data.level == 1){
+        let length = this.cascader.length;
+        this.cascader.splice(1,length-1);
+        this.cascader.push(data.name);
+      } else if(data.level == 2){
+        this.$axios.get("/GeoProblemSolving/subproject/" + data.parent +"/lineage")
+          .then((res) => {
+            if(res.data.code == 0){
+              let parentName ="";
+              let length = this.cascader.length;
+              this.cascader.splice(1,length-1);
+              parentName = res.data.data.ancestors[0].name;
+              this.cascader.push(parentName);
+              this.cascader.push(data.name);
+            }else{
+              console.log(res.data.msg);
+            }
+          }).catch((err) => {
+            throw err;
+          });
+      }
+    },
+    addTempActivityTree(data){
+      if(data.level == 1){
+        this.activityTree[0].children.push(data);
+      } else if(data.level > 1){
+        //根据data的parent找到data在activityTree中的插入位置
+        let positionNum = null;
+        for(let i = 0 ; i < this.activityTree[0].children.length ; i++){
+          if( data.parent == this.activityTree[0].children[i].aid ){
+            positionNum = i;
+          }
+        }
+        this.activityTree[0].children[positionNum].children.push(data);
+      }
+    },
+    delTempActivityTree(data){
+      //更新nameConfirm
+      let index = null;
+      for( let i = 0 ; i < this.nameConfirm.length ; i++){
+        if(this.nameConfirm[i] == data.name){
+          index = i;
+        }
+      }
+      this.nameConfirm.splice(index,1);
+      //更新ActivityTree
+      if(data.level == 1){
+        let indexLevel1 = null;
+        for( let i = 0; i < this.activityTree[0].children.length ; i++){
+          if(this.activityTree[0].children[i].name == data.name){
+            indexLevel1 = i;
+          }
+        }
+        this.activityTree[0].children.splice(indexLevel1,1);
+      } else if(data.level > 1){
+        //索引父活动
+        let indexParent = null;
+        for(let i = 0 ; i < this.activityTree[0].children.length ; i++){
+          if( data.parent == this.activityTree[0].children[i].aid ){
+            indexParent = i;
+          }
+        }
+        //索引子活动
+        let indexLevel2 = null;
+        for( let i = 0; i < this.activityTree[0].children[indexParent].children.length ; i++){
+          if(this.activityTree[0].children[indexParent].children[i].name == data.name){
+            indexLevel2 = i;
+          }
+        }
+        this.activityTree[0].children[indexParent].children.splice(indexLevel2,1);
+      }
+    },
     foldTree() {
       this.treeFold = true;
       document.getElementById("ActivityTree").style.width = 0;
@@ -459,35 +621,18 @@ export default {
       }
     },
     locateActivity() {
-      let content = this.getURLParameter("content");
-      let aid = this.getURLParameter("aid");
-      let level = this.getURLParameter("level");
+      // let content = this.getURLParameter("content");
+      // let aid = this.getURLParameter("aid");
+      // let level = this.getURLParameter("level");
 
-      let url = "";
-      if (aid == undefined || level == undefined) {
-        url =
-          "/GeoProblemSolving/projectInfo/" +
-          this.projectInfo.aid +
-          "?content=workspace";
-        this.getProjectInfo();
+      let level = this.slctActivity.level;
+      let aid = this.slctActivity.aid;
+      if (level > 1) {
+        this.getActivityBranch(aid);
+      } else if (level == 1) {
+        this.getSubprojectBranch(aid);
       } else {
-        url =
-          "/GeoProblemSolving/projectInfo/" +
-          this.projectInfo.aid +
-          "?content=workspace&aid=" +
-          aid +
-          "&level=" +
-          level;
-        if (level > 1) {
-          this.getActivityBranch(aid);
-        } else if (level == 1) {
-          this.getSubprojectBranch(aid);
-        } else {
-          this.getProjectInfo();
-        }
-      }
-      if (content == "workspace") {
-        parent.vm.workspaceUrl = url;
+        this.getProjectInfo();
       }
     },
     getURLParameter(name) {
@@ -503,7 +648,7 @@ export default {
       this.cascader = [this.projectInfo.name];
       this.activityTree = [];
       if (this.projectInfo.type == "Activity_Group") {
-        this.axios
+        this.$axios
           .get(
             "/GeoProblemSolving/project/" + this.projectInfo.aid + "/children"
           )
@@ -512,10 +657,34 @@ export default {
               let children = res.data.data;
               this.childActivities = children;
               this.nameConfirm = [];
-
               // 处理掉异常
               for (let i = 0; i < children.length; i++) {
-                children[i].children = [];
+                children[i].children = [];//清除child后只能显示两级level
+                // if(children[i].children != null && children[i].children.length > 0){
+                //   if (children[i].aid != "") {
+                //     this.$axios
+                //       .get(
+                //         "/GeoProblemSolving/subproject/" + children[i].aid +"/lineage"
+                //       )
+                //       .then((res) => {
+                //         if (res.data.code == 0) {
+                //           let grandchildren = res.data.data;
+                //           children[i].children = grandchildren.children;
+                //           for(let j = 0 ; j < children[i].children.length; j++){
+                //             this.nameConfirm.push(children[i].children[j].name);
+                //           }
+                //         } else {
+                //           console.log(res.data.msg);
+                //         }
+                //       })
+                //       .catch((err) => {
+                //         throw err;
+                //       });
+                //   }
+                //   // for(let j = 0 ; j < children[i].children.length; j++){
+                //   //   children[i].children[j] = this.getChildren(children[i].children[j]);
+                //   // }
+                // }
                 this.nameConfirm.push(children[i].name);
               }
 
@@ -527,6 +696,7 @@ export default {
               // update activity tree
               this.activityTree.push(root);
               this.slctActivity = root;
+              this.rootActivity = this.slctActivity;
               this.parentActivity = null;
               this.setContent(this.slctActivity);
             } else {
@@ -692,6 +862,8 @@ export default {
           this.contentType = 2;
         }
       }
+      // console.log(this.contentType)
+      // this.contentType = 3;
     },
     preEditting() {
       let children = [];
@@ -746,7 +918,7 @@ export default {
             .then((res) => {
               if (res.data.code == 0) {
                 this.$Notice.info({ title: "Result", desc: "Success!" });
-                // update activity tree
+                // updata slctActivity
                 this.slctActivity.name = this.editActivityForm.name;
                 this.slctActivity.description = this.editActivityForm.description;
                 this.slctActivity.type = this.editActivityForm.type;
@@ -754,6 +926,8 @@ export default {
                 // cascader
                 let index = this.cascader.length - 1;
                 this.$set(this.cascader, index, this.editActivityForm.name);
+                // update activity tree
+
                 // change content
                 this.setContent(this.slctActivity);
               } else {
@@ -769,6 +943,7 @@ export default {
       });
     },
     preApplication() {
+      //判断活动权限，如果无需申请许可，则直接加入；如果需要其他成员批准，则通过apply请求
       if (
         this.permissionIdentity(
           this.slctActivity.permission,
@@ -782,6 +957,7 @@ export default {
       }
     },
     joinActivity() {
+      //无需批准，直接加入
       let url = "";
       if (this.slctActivity.level == 1) {
         url =
@@ -789,7 +965,7 @@ export default {
           this.slctActivity.aid +
           "/user?userId=" +
           this.userInfo.userId;
-      } else if (this.slctActivity.levell > 1) {
+      } else if (this.slctActivity.level > 1) {
         url =
           "/GeoProblemSolving/activity/" +
           this.slctActivity.aid +
@@ -799,17 +975,12 @@ export default {
         return;
       }
 
-      this.axios
+      this.$axios
         .post(url)
         .then((res) => {
           if (res.data.code == 0) {
-            parent.location.href =
-              "/GeoProblemSolving/projectInfo/" +
-              this.projectInfo.aid +
-              "?content=workspace&aid=" +
-              this.slctActivity.aid +
-              "&level=" +
-              this.slctActivity.level;
+            this.$Notice.info({ title: "Join the activity", desc: "Success!" });
+            this.enterChildActivity(this.rootActivity);
           } else if (res.data.code == -3) {
             this.$Notice.info({
               desc: "You has already been a member of the activity.",
@@ -823,6 +994,7 @@ export default {
         });
     },
     applyJoinActivity() {
+      //需要获得manager批准 方可加入
       let managers = this.userRoleApi.getMemberByRole(
         this.slctActivity,
         "manager"
@@ -852,9 +1024,9 @@ export default {
         .post("/GeoProblemSolving/notice/save", notice)
         .then((result) => {
           if (result.data == "Success") {
-            parent.vm.$emit("sendNotice", notice.recipientId);
             this.$Notice.info({ desc: "Send application successfully." });
             this.applyJoinActivityModal = false;
+            this.$emit("sendNotice", notice.recipientId);
           } else {
             this.$Message.error("Notice fail.");
           }
@@ -872,10 +1044,11 @@ export default {
       } else if (this.slctActivity.level > 1) {
         url = "/GeoProblemSolving/activity?aid=" + aid;
       }
-      this.axios
+      this.$axios
         .delete(url)
         .then((res) => {
           if (res.data.code == 0) {
+            this.$Notice.info({ title: "Delete", desc: "Success!" });
             this.operationApi.activityRecord(
               "",
               "remove",
@@ -883,14 +1056,10 @@ export default {
               this.slctActivity
             );
             this.operationApi.deleteActivityDoc(this.slctActivity.aid);
-
-            parent.location.href =
-              "/GeoProblemSolving/projectInfo/" +
-              this.projectInfo.aid +
-              "?content=workspace&aid=" +
-              this.slctActivity.parent +
-              "&level=" +
-              (this.slctActivity.level - 1).toString();
+            this.activityDeleteModal = false;
+            //更新activityTree
+            this.delTempActivityTree(this.slctActivity);
+            this.enterRootActivity();
           } else {
             console.log(res.data.msg);
           }
@@ -905,7 +1074,6 @@ export default {
 <style scoped>
 .foldTreeBtn {
   padding: 5px 8px 6px;
-  height: calc(100vh);
   margin-right: 5px;
   border: 0px;
 }
@@ -913,7 +1081,6 @@ export default {
 .activityCard {
   margin-right: 5px;
   width: 250px;
-  height: calc(100vh);
   overflow-y: auto;
   border: 0;
 }
@@ -924,7 +1091,6 @@ export default {
 
 .workspaceCard {
   width: calc(100vw - 260px);
-  height: calc(100vh);
   background-color: white;
   border: 0;
   overflow-x: auto;

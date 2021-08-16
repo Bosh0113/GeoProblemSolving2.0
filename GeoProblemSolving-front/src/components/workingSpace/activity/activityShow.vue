@@ -3,7 +3,7 @@
   <div style="padding: 5px 10px">
     <div
       style="
-        height: calc(100vh - 110px);
+        height: calc(100vh - 250px);
         width: 75%;
         float: left;
         padding: 20px;
@@ -11,7 +11,7 @@
     >
       <vue-scroll
         :ops="scrollOps"
-        style="margin-top: 10px; height: calc(100vh - 165px)"
+        style="margin-top: 10px; height: calc(100vh - 280px)"
       >
         <div>
           <div>
@@ -64,7 +64,7 @@
                 style="margin-left: 10px; cursor: pointer; color: #2d8cf0"
                 @click="modifyPermission"
               >
-                <Icon type="ios-create" />
+                <Icon type="ios-create" :size="20" />
               </span>
             </div>
             <div style="margin: 10px 0">
@@ -289,7 +289,7 @@
       </div>
       <vue-scroll
         :ops="scrollOps"
-        style="margin-top: 10px; height: calc(100vh - 190px)"
+        style="margin-top: 10px; height: calc(100vh - 280px)"
       >
         <Card
           style="margin: 5px 0"
@@ -556,7 +556,11 @@ export default {
   components: {
     Avatar,
   },
-  props: ["activityInfo", "nameConfirm"],
+  props: [
+    "activityInfo",
+    "nameConfirm",
+    "userInfo"
+   ],
   data() {
     return {
       scrollOps: {
@@ -564,8 +568,8 @@ export default {
           background: "lightgrey",
         },
       },
-      projectInfo: parent.vm.projectInfo,
-      userInfo: JSON.parse(sessionStorage.getItem("userInfo")),
+      projectInfo: {},
+      // userInfo: {},
       userRole: "visitor",
       // Members
       creatorInfo: {},
@@ -738,12 +742,12 @@ export default {
       this.activityForm.parent = this.activityInfo.aid;
       this.activityForm.creator = this.userInfo.userId;
       this.activityForm.level = this.activityInfo.level + 1;
-
       this.createActivityModel = true;
     },
     createActivity(name) {
       this.$refs[name].validate((valid) => {
         if (valid) {
+          //检查是否已经存在
           for (let i = 0; i < this.nameConfirm.length; i++) {
             if (this.nameConfirm[i] == this.activityForm.name) {
               this.$Message.error("Repeated naming in the same project.");
@@ -773,13 +777,14 @@ export default {
                   this.userInfo.userId
                 );
 
-                parent.location.href =
-                  "/GeoProblemSolving/projectInfo/" +
-                  this.projectInfo.aid +
-                  "?content=workspace&aid=" +
-                  res.data.data.aid +
-                  "&level=" +
-                  res.data.data.level;
+                // parent.location.href =
+                //   "/GeoProblemSolving/projectInfo/" +
+                //   this.projectInfo.aid +
+                //   "?content=workspace&aid=" +
+                //   res.data.data.aid +
+                //   "&level=" +
+                //   res.data.data.level;
+                this.$emit('enterChildActivity', res.data.data);
               } else {
                 console.log(res.data.msg);
               }
@@ -792,16 +797,17 @@ export default {
       });
     },
     enterChildActivity(activity) {
-      if (this.roleIdentity(activity) == "visitor")
-        this.$Message.info("Please join this activity.");
-
-      parent.location.href =
-        "/GeoProblemSolving/projectInfo/" +
-        this.projectInfo.aid +
-        "?content=workspace&aid=" +
-        activity.aid +
-        "&level=" +
-        activity.level;
+      if (this.roleIdentity(activity) == "visitor"){
+         this.$Message.info("Please join this activity.");
+      }
+      // parent.location.href =
+      //   "/GeoProblemSolving/projectInfo/" +
+      //   this.projectInfo.aid +
+      //   "?content=workspace&aid=" +
+      //   activity.aid +
+      //   "&level=" +
+      //   activity.level;
+      this.$emit('enterChildActivity', activity);
     },
     preApplication(activity) {
       this.appliedActivity = activity;
@@ -1161,7 +1167,7 @@ export default {
         return;
       }
 
-      this.axios
+      this.$axios
         .delete(url)
         .then((res) => {
           if (res.data.code == 0) {
@@ -1174,7 +1180,9 @@ export default {
               "",
               []
             );
-
+            //
+            this.$Notice.info({ title: "Leave the activity", desc: "Success!" });
+            this.$emit('enterRootActivity');
             //notice
             let managers = this.userRoleApi.getMemberByRole(
               activity,
@@ -1197,14 +1205,6 @@ export default {
                 },
               };
               this.sendNotice(notice);
-
-              parent.location.href =
-                "/GeoProblemSolving/projectInfo/" +
-                this.projectInfo.aid +
-                "?content=workspace&aid=" +
-                activity.parent +
-                "&level=" +
-                (activity.level - 1).toString();
             }
           } else {
             console.log(res.data.msg);

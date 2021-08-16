@@ -6,7 +6,7 @@
     </div>
     <Row>
       <Col span="22" offset="1">
-        <Card dis-hover style="position: relative;" class="customCard">
+        <Card dis-hover style="position: relative; z-index: 3;" class="customCard">
           <CheckboxGroup v-model="selectedTaskType" style="margin-left: 1%">
             <Checkbox label="Doing" title="Doing">
               <span >Doing</span>
@@ -31,7 +31,7 @@
               type="date"
               style="position: absolute;top: 20%; right: 4%; z-index: 3"
               class="customDatePicker custom"
-              title="select endTime"
+              title="Select Endtime"
               @on-change="handleChange"
             >
             </DatePicker>
@@ -47,7 +47,7 @@
           </div>
         </Card>
         <!-- v-else -->
-        <Card v-if="!useTodoListCSS" style="position: relative;" class="customCard">
+        <Card dis-hover v-if="!useTodoListCSS" style="position: relative;z-index: 3;" class="customCard">
           <DatePicker
             type="date"
             style="position: absolute;right: 5%;top: 25%; z-index: 3;"
@@ -67,15 +67,15 @@
           />
         </Card>
 
-        <Card dis-hover style="margin-bottom: 10px;" class="customCard">
+        <Card dis-hover style="margin-bottom: 10px; z-index: 1;" class="customCard">
           <!--      未完成            -->
-          <div>
+          <div >
             <Card
               dis-hover
               v-if="selectedTaskType.includes('Doing')"
             >
               <p slot="title"><strong>Doing</strong></p>
-              <div :style="{height: contentHeight-contentHeightCompute-10+'px'}">
+              <div :style="{height: contentHeight-contentHeightCompute-60+'px'}">
                 <vue-scroll :ops="ops">
                   <div
                     v-for="(item, doingIndex) in doingList"
@@ -118,7 +118,7 @@
                         {{item.content}}
                       </label>
                       <label
-                        style="float: right;" title="End Time" v-if="useTodoListCSS"
+                        style="float: right;" title="End Time" v-if="useTodoListCSS && item.endTime != ''"
                       >Deadline：{{item.endTime}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
                     </Card>
                   </div>
@@ -135,7 +135,7 @@
             >
               <p slot="title"><strong>Done</strong></p>
               <!--            显示内容                -->
-              <div :style="{height: contentHeight-contentHeightCompute-10+'px'}">
+              <div :style="{height: contentHeight-contentHeightCompute-60+'px'}">
                 <vue-scroll :ops="ops">
                   <div
                     v-for="(item, doneIndex) in doneList"
@@ -201,7 +201,7 @@
     name: "todoList",
     data() {
       return {
-        selectedTaskType: ["Doing", "Done", "Importance"],
+        selectedTaskType: ["Doing",  "Importance"],
         doneList: [],
         doingList: [],
         selectedTodoData: [],
@@ -442,7 +442,7 @@
       contentHeightCompute: function () {
         let tempHeight = "";
         if (this.selectedTaskType.length == 2){
-          tempHeight = 230;
+          tempHeight = 380;
         }else if (this.selectedTaskType.length == 3){
           tempHeight = 600;
         }
@@ -456,7 +456,7 @@
   .customCard{
     opacity: 0.95;
   }
-  
+
   .todoCard{
     background-color: white;
     border-radius: 3px;

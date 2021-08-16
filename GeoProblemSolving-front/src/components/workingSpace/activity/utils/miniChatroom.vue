@@ -397,8 +397,8 @@ export default {
         this.axios
           .get("/GeoProblemSolving/msgRecords/record/" + recordId)
           .then((res) => {
-            if (res.data.code === 0) {              
-              
+            if (res.data.code === 0) {
+
               this.msgRecordDatails = [];
               for(let i=0;i<res.data.data.length;i++){
                 let message = res.data.data[i];
@@ -535,7 +535,7 @@ export default {
   z-index: 100;
   position: fixed;
   right: 30px;
-  bottom: 20px;
+  bottom: 70px;
   cursor: pointer;
   background-color: #fff;
 }
@@ -545,7 +545,7 @@ export default {
   height: 450px;
   position: fixed;
   right: 55px;
-  bottom: 35px;
+  bottom: 85px;
   background-color: #5093f8;
   padding: 5px;
 }

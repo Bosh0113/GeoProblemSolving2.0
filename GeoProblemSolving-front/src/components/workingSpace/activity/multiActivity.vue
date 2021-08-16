@@ -20,21 +20,27 @@
       </MenuItem>
     </Menu>
     <div v-show="activeMenu=='Introduction'">
-      <activity-show :activityInfo="activityInfo" :nameConfirm="nameConfirm"></activity-show>
+      <activity-show
+        :activityInfo="activityInfo"
+        :nameConfirm="nameConfirm"
+        :userInfo="userInfo"
+        v-on:enterChildActivity="enterChildActivity"
+        v-on:enterRootActivity="enterRootActivity"
+      ></activity-show>
     </div>
     <div v-show="activeMenu=='Resources'">
       <folder-tree
-        style="margin-top: 10px"
+        style="margin-top: 20px"
         :activityInfo="activityInfo"
         @toolPanel="listenToolPanel"
       ></folder-tree>
     </div>
     <div v-show="activeMenu=='Tasks'">
-      <task-manager :activityInfo="activityInfo" :childActivities="childActivities" ></task-manager>
+      <task-manager :activityInfo="activityInfo" :childActivities="childActivities" :userInfo="userInfo" ></task-manager>
     </div>
     <div v-show="activeMenu=='Activities'">
-      <process-manager :activityInfo="activityInfo" :childActivities="childActivities" ></process-manager>
-    </div>  
+      <process-manager :activityInfo="activityInfo" :childActivities="childActivities" :userInfo="userInfo" ></process-manager>
+    </div>
     <mini-chatroom
       :activityInfo="activityInfo"
     ></mini-chatroom>
@@ -48,7 +54,12 @@ import processManager from "./utils/processManager.vue";
 import miniChatroom from "./utils/miniChatroom";
 
 export default {
-  props: ["activityInfo", "userInfo","childActivities","nameConfirm"],
+  props: [
+      "activityInfo",
+      "userInfo",
+      "childActivities",
+      "nameConfirm"
+    ],
   components: {
     activityShow,
     folderTree,
@@ -62,8 +73,16 @@ export default {
       userRole: "visitor",
     };
   },
+  created(){
+  },
   mounted() {},
   methods: {
+    enterChildActivity(activity){
+      this.$emit('enterChildActivity', activity);
+    },
+    enterRootActivity(){
+      this.$emit('enterRootActivity');
+    },
     listenToolPanel(data) {
       this.panel = data;
     },

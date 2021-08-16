@@ -105,7 +105,7 @@
               <div class="memberImg" style="position: relative">
                 <img
                   v-if="member.avatar != undefined && member.avatar != ''"
-                  :src="member.avatar"
+                  :src="avatarUrl(member.avatar)"
                   style="width: 40px; height: 40px"
                 />
                 <avatar
@@ -139,7 +139,7 @@ export default {
   components: {
     Avatar,
   },
-  props: ["activityInfo"],
+  props: ["activityInfo","userInfo"],
   data() {
     return {
       scrollOps: {
@@ -147,8 +147,8 @@ export default {
           background: "lightgrey",
         },
       },
-      projectInfo: parent.vm.projectInfo,
-      userInfo: JSON.parse(sessionStorage.getItem("userInfo")),
+      projectInfo: {},
+      // userInfo: JSON.parse(sessionStorage.getItem("userInfo")),
       userRole: "visitor",
       // Members
       creatorInfo: {},
@@ -161,6 +161,10 @@ export default {
   },
   mounted() {},
   methods: {
+    avatarUrl(url) {
+      let avatarUrl = this.$store.state.UserServer + url;
+      return avatarUrl;
+    },
     roleIdentity(activity) {
       return this.userRoleApi.roleIdentify(activity.members, this.userInfo.userId);
     },

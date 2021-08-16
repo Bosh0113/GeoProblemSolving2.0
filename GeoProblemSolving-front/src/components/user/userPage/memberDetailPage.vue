@@ -7,27 +7,27 @@
             <div class="detailSidebar" :style="{ height: detailSidebarHeight }">
               <div class="user-img">
                 <img
-                  v-bind:src="userDetail.avatar"
-                  class="u_img"
-                  v-if="
-                    userDetail.avatar != '' &&
-                    userDetail.avatar != 'undefined' &&
-                    userDetail.avatar != 'null'
-                  "
-                />
-                <avatar
-                  style="width: 200px"
-                  class="avatarStyle"
-                  :username="userDetail.name"
-                  :size="200"
-                  :rounded="false"
-                  v-else
-                >
-                </avatar>
+                    :src= "avatarUrl(userDetail.avatar)"
+                    class="u_img"
+                    v-if="
+                      userDetail.avatar != '' &&
+                      userDetail.avatar != 'undefined' &&
+                      userDetail.avatar != 'null'
+                    "
+                  />
+                  <avatar
+                    style="width: 200px"
+                    class="avatarStyle"
+                    :username="userDetail.name"
+                    :size="200"
+                    :rounded="true"
+
+                  >
+                  </avatar>
               </div>
               <div
                 style="
-                  margin-top: 10px;
+                  margin-top: 5%;
                   border: 1px solid lightgray;
                   border-radius: 4px;
                   padding: 10px;
@@ -35,13 +35,13 @@
               >
                 <div class="single-info" :title="`Name: ` + userDetail.name">
                   <span class="profileInfo">
-                    <Icon type="ios-contact-outline" :size="20" />
+                    <Icon type="ios-contact-outline" :size="25" />
                     {{ userDetail.name }}
                   </span>
                 </div>
                 <div class="single-info" :title="`Email:  ` + userDetail.email">
                   <span class="profileInfo">
-                    <Icon type="ios-mail-outline" :size="20" />
+                    <Icon type="ios-mail-outline" :size="25" />
                     {{ userDetail.email }}
                   </span>
                 </div>
@@ -51,13 +51,13 @@
                   v-show="userDetail.phone != ''"
                 >
                   <span class="profileInfo">
-                    <Icon type="ios-call-outline" :size="20" />
+                    <Icon type="ios-call-outline" :size="25" />
                     {{ userDetail.phone }}
                   </span>
                 </div>
                 <div class="single-info" :title="`Title:  ` + userDetail.title">
                   <span class="profileInfo">
-                    <Icon type="ios-school-outline" :size="20" />
+                    <Icon type="ios-school-outline" :size="25" />
                     {{ userDetail.title }}
                   </span>
                 </div>
@@ -67,7 +67,7 @@
                   v-show="userDetail.country != ''"
                 >
                   <span class="profileInfo">
-                    <Icon type="ios-compass-outline" :size="20" />
+                    <Icon type="ios-compass-outline" :size="25" />
                     <span>{{ userDetail.country }}</span>
                   </span>
                 </div>
@@ -104,7 +104,7 @@
                 <div
                   class="single-info"
                   :title="`Home Page:  ` + userDetail.homepage"
-                  v-show="userDetail.homepage != ''"
+                  v-show="userDetail.homepage != '' && userDetail.homepage != 'null'"
                   style="
                     overflow: hidden;
                     white-space: nowrap;
@@ -112,8 +112,8 @@
                   "
                 >
                   <span class="profileInfo">
-                    <Icon type="md-link" :size="20" />
-                    {{ userDetail.homepage }}
+                    <Icon type="md-link" :size="25" />
+                    <a :href="'http://'+ userDetail.homepage">{{ userDetail.homepage }}</a>
                   </span>
                 </div>
                 <div
@@ -149,7 +149,7 @@
                     :md="{ span: 22, offset: 1 }"
                     :sm="{ span: 22, offset: 1 }"
                   >
-                    <Card>
+                    <Card dis-hover style="margin-top: 10px;" class="customCard">
                       <p slot="title">History line</p>
                       <div class="timeLineStyle">
                         <vue-scroll :ops="ops">
@@ -234,7 +234,7 @@
                           :md="{ span: 22, offset: 1 }"
                         >
                           <div>
-                            <Card style="height: 320px; margin-top: 20px">
+                            <Card style="height: 320px; margin-top: 20px" class="projectCard">
                               <p
                                 slot="title"
                                 style="height: 40x"
@@ -304,7 +304,7 @@
                           :md="{ span: 22, offset: 1 }"
                         >
                           <div>
-                            <Card style="height: 320px; margin-top: 20px">
+                            <Card style="height: 320px; margin-top: 20px" class="projectCard">
                               <p slot="title" class="projectsTitle">
                                 {{ mProject.name }}
                               </p>
@@ -367,9 +367,20 @@ export default {
       },
     };
   },
+  mounted() {
+    this.getUserProfile();
+    this.readPersonalEvent();
+    this.detailSidebarHeight = window.innerHeight - 60 + "px";
+  },
+  computed:{
+  },
   methods: {
+    avatarUrl(url) {
+      let avatarUrl = this.$store.state.UserServer + url;
+      return avatarUrl;
+    },
     getMemberDetail() {
-      this.axios
+      this.$axios
         .get(url, {
           params: {
             id: paramId,
@@ -379,7 +390,7 @@ export default {
         .catch(function (error) {});
     },
     getUserProfile() {
-      this.axios
+      this.$axios
         .get(
           "/GeoProblemSolving/user" +
             "?key=userId" +
@@ -389,16 +400,17 @@ export default {
         .then((res) => {
           if (res.data.code == 0) {
             this.userDetail = res.data.data;
+            console.log(this.userDetail)
             let joinedProjectsArray = this.userDetail.joinedProjects;
             if (
-              joinedProjectsArray != undefined &&
+              joinedProjectsArray != null &&
               joinedProjectsArray.length > 0
             ) {
               this.getJoinedProjectList(joinedProjectsArray);
             }
             let createdProjectsArray = this.userDetail.createdProjects;
             if (
-              joinedProjectsArray != undefined &&
+              createdProjectsArray != null &&
               createdProjectsArray.length > 0
             ) {
               this.getCreatedProjectList(createdProjectsArray);
@@ -410,7 +422,7 @@ export default {
         });
     },
     readPersonalEvent() {
-      this.axios
+      this.$axios
         .get(
           "/GeoProblemSolving/history/inquiry?" +
             "eventType=project" +
@@ -419,11 +431,13 @@ export default {
             this.$route.params.id
         )
         .then((res) => {
+          console.log(res)
           if (res.data == "Offline") {
             this.$store.commit("userLogout");
             this.$router.push({ name: "Login" });
           } else if (res.data != "None" && res.data != "Fail") {
             this.memberEventList = res.data;
+            console.log(this.memberEventList)
           }
         })
         .catch((err) => {
@@ -431,7 +445,7 @@ export default {
         });
     },
     getCreatedProjectList(projectIds) {
-      this.axios
+      this.$axios
         .get("/GeoProblemSolving/project/getProjects" + "?aids=" + projectIds)
         .then((res) => {
           if (res.data.code == 0) {
@@ -445,7 +459,7 @@ export default {
         });
     },
     getJoinedProjectList(projectIds) {
-      this.axios
+      this.$axios
         .get("/GeoProblemSolving/project/getProjects" + "?aids=" + projectIds)
         .then((res) => {
           if (res.data.code == 0) {
@@ -459,16 +473,19 @@ export default {
         });
     },
   },
-  mounted() {
-    this.getUserProfile();
-    this.readPersonalEvent();
-    this.detailSidebarHeight = window.innerHeight - 60 + "px";
-  },
 };
 </script>
 <style scoped>
+.projectCard{
+  background-color: white;
+  border-radius: 3px;
+  border:1px solid #dadce0;
+  box-shadow:  0 3.2px 7.2px 0 rgb(0 0 0 / 13%), 0 0.6px 1.8px 0 rgb(0 0 0 / 11%);
+}
+
 .detailSidebar {
   margin-right: 20px;
+  margin-top: 40px;
 }
 .rightContent {
   margin-top: 20px;
@@ -497,22 +514,28 @@ body {
 }
 .user-img {
   margin-top: 20px;
-  width: 100%;
-  max-height: 100%;
+  width:80%;
+  height: 30%;
   text-align: center;
-  background-color: #d3d3d333;
+  margin-left: 20px;
+  /* background-color: #d3d3d333; */
 }
 .u_img {
+  width: 200px;
+  height: 200px;
   max-width: 100%;
-  padding: 10px;
+  border-radius: 100%;
 }
 .avatarStyle {
   margin: 0 auto;
 }
 .single-info {
   padding: 5px;
-  height: 30px;
-  font-size: 12px;
+  height: 25px;
+  margin-bottom: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  color: slategrey;
   line-height: 15px;
 }
 
@@ -655,4 +678,3 @@ body {
   cursor: pointer;
 }
 </style>
-
