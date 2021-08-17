@@ -99,6 +99,16 @@
     background-color: transparent;
     opacity: 0;
   }
+  .uploadBox {
+    display: inline-block;
+    width: 58px;
+    height: 58px;
+    line-height: 58px;
+    overflow: hidden;
+    border-width: 0.75px;
+    border-style: dashed;
+    border-color: lightslategray;
+  }
 
   /* 结束 */
 </style>
@@ -255,9 +265,9 @@
             </div>
             <div>
               <span>Example:</span>
-              <Tag style="cursor:default">vector</Tag>
-              <Tag style="cursor:default">raster</Tag>
-              <Tag style="cursor:default">evaluation</Tag>
+              <Tag style="cursor:default" @click.native="addCreateToolTag('vector')">vector</Tag>
+              <Tag style="cursor:default" @click.native="addCreateToolTag('raster')">raster</Tag>
+              <Tag style="cursor:default" @click.native="addCreateToolTag('evaluation')">evaluation</Tag>
             </div>
           </FormItem>
 
@@ -270,9 +280,9 @@
 
           <FormItem label="Image:" prop="toolImg">
             <div class="inline_style">
-              <div class="demo-upload-list" v-if="toolInfo.toolImg != ''">
+              <div class="demo-upload-list" v-if="img != ''">
                 <template>
-                  <img :src="toolInfo.toolImg"/>
+                  <img :src="img"/>
                   <div class="demo-upload-list-cover">
                     <Icon
                       type="ios-eye-outline"
@@ -286,9 +296,10 @@
                 </template>
               </div>
               <div class="uploadBox">
-                <Upload
+                <!-- 使用iview插件 upload 上传图片 action：上传路径，必填-->
+                <!-- <Upload
                   ref="upload"
-                  :show-upload-list="false"
+                  :show-upload-list="true"
                   :format="['jpg', 'jpeg', 'png', 'gif']"
                   :max-size="2048"
                   :before-upload="handleBeforeUpload"
@@ -297,13 +308,21 @@
                   type="drag"
                 >
                   <div style="width: 58px;height:58px;line-height: 58px;">
-                    <Icon type="ios-camera" size="20"></Icon>
+                    <Icon type="ios-camera" size="25"></Icon>
                   </div>
-                </Upload>
+                </Upload> -->
+                <Icon type="ios-camera" size="20" style="position:absolute;margin:18px;"></Icon>
+                <input
+                  id="choosePicture"
+                  @change="uploadPhoto($event)"
+                  type="file"
+                  class="uploadAvatar"
+                  accept="image/*"
+                />
               </div>
               <Modal title="View Image" v-model="visible">
                 <img
-                  :src="toolInfo.toolImg"
+                  :src="img"
                   v-if="visible"
                   style="width: 100%"
                 />
@@ -320,6 +339,7 @@
     </Row>
   </div>
 </template>
+
 <script>
   import tinymce from "./../tinymce";
   import Avatar from "vue-avatar";
@@ -409,6 +429,8 @@
         currentStep: this.step,
         //返回的服务基本信息
         backendServices: [],
+        img: "",
+        pictureUrl: "",
       };
     },
 
@@ -510,17 +532,54 @@
         this.toolInfo.toolImg = data;
       },
 
+      uploadPhoto(e) {
+        // 利用fileReader对象获取file
+        var file = e.target.files[0];
+        var filesize = file.size;
+        // 2,621,440   2M
+
+        if (filesize > 2101440) {
+          // 图片大于2MB
+          this.$Message.error("size > 2MB");
+        } else {
+          var reader = new FileReader();
+          reader.readAsDataURL(file);
+          reader.onload = (e) => {
+            // 读取到的图片base64 数据编码 将此编码字符串传给后台即可
+            let formData = new FormData();
+            formData.append("toolImg", file);
+            this.axios
+              .post("/GeoProblemSolving/tool/picture", formData)
+              .then((res) => {
+                if (res.data.code == 0) {
+                  console.log(res);
+                  //上传图片返回的res.data.data为空
+                  this.pictureUrl = res.data.data;//null
+                  this.toolInfo.toolImg = this.pictureUrl;
+                  this.img = e.target.result;
+                  $("#choosePicture").val("");
+                } else {
+                  this.$Message.error("upload picture Fail!");
+                }
+              })
+              .catch();
+          };
+        }
+      },
 
       handleView() {
         this.visible = true;
       },
 
       handleRemove() {
-        this.toolInfo.toolImg = "";
+        this.img = "";
+        this.pictureUrl = "";
+        this.toolInfo.toolImg = this.pictureUrl;
       }
     },
 
     watch: {
+      //将toolInfo传出，子传父，在组件中通过定义属性传到父组件
       toolInfo: {
         handler(val) {
           this.$emit("generalInfo", this.toolInfo);

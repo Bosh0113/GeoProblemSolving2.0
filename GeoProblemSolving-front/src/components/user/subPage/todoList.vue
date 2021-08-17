@@ -1,36 +1,37 @@
 <template>
   <div>
-    <!--  Fiter  -->
+    <div id="title">
+      <h1 style="text-align: center;margin-top: 10px;">Todo List</h1>
+      <h3 style="text-align: center;margin-bottom: 10px;">you can manage your todo list here</h3>
+    </div>
     <Row>
       <Col span="22" offset="1">
-        <Card>
-          <CheckboxGroup v-model="selectedTaskType">
-            <Checkbox label="Doing">
-              <span>Doing</span>
+        <Card dis-hover style="position: relative; z-index: 3;" class="customCard">
+          <CheckboxGroup v-model="selectedTaskType" style="margin-left: 1%">
+            <Checkbox label="Doing" title="Doing">
+              <span >Doing</span>
               <span class="badge">{{doingList.length}}</span>
             </Checkbox>
-            <Checkbox label="Done">
-              <span>Done</span>
+            <Checkbox label="Done" title="Done">
+              <span >Done</span>
               <span class="badge">{{doneList.length}}</span>
             </Checkbox>
 <!--            <Checkbox label="Assigned">-->
 <!--              <span>Assigned to you</span>-->
 <!--              <span class="badge">10</span>-->
 <!--            </Checkbox>-->
-            <Checkbox label="Importance" :disabled="true">
-              <span>Importance</span>
+            <Checkbox label="Importance" :disabled="true" title="Importance">
+              <span >Importance</span>
               <span class="badge">{{importanceNum}}</span>
             </Checkbox>
           </CheckboxGroup>
-        </Card>
-        <Card dis-hover>
           <!--         新建任务   -->
-          <div>
+          <div v-if="useTodoListCSS">
             <DatePicker
               type="date"
-              style="position: absolute;top: 18px; right: 50px; z-index: 3"
+              style="position: absolute;top: 20%; right: 4%; z-index: 3"
               class="customDatePicker custom"
-              title="select endTime"
+              title="Select Endtime"
               @on-change="handleChange"
             >
             </DatePicker>
@@ -40,20 +41,41 @@
               placeholder="Add Todo"
               size="large"
               @on-enter="addTask()"
-              style="display: inline-block;"
+              style="display: inline-block;position: absolute;width: 35%;margin-left: 60%;top: 10px;"
               class="customIcon"
             />
           </div>
+        </Card>
+        <!-- v-else -->
+        <Card dis-hover v-if="!useTodoListCSS" style="position: relative;z-index: 3;" class="customCard">
+          <DatePicker
+            type="date"
+            style="position: absolute;right: 5%;top: 25%; z-index: 3;"
+            class="customDatePicker custom"
+            title="select endTime"
+            @on-change="handleChange"
+          >
+          </DatePicker>
+          <Input
+            v-model="newTask.content"
+            prefix="ios-radio-button-off"
+            placeholder="Add Todo"
+            size="large"
+            @on-enter="addTask()"
+            style="display: inline-block;"
+            class="customIcon"
+          />
+        </Card>
 
-
+        <Card dis-hover style="margin-bottom: 10px; z-index: 1;" class="customCard">
           <!--      未完成            -->
-          <div>
+          <div >
             <Card
               dis-hover
               v-if="selectedTaskType.includes('Doing')"
             >
-              <p slot="title">Doing</p>
-              <div :style="{height: contentHeight-contentHeightCompute+'px'}">
+              <p slot="title"><strong>Doing</strong></p>
+              <div :style="{height: contentHeight-contentHeightCompute-60+'px'}">
                 <vue-scroll :ops="ops">
                   <div
                     v-for="(item, doingIndex) in doingList"
@@ -61,6 +83,7 @@
                   >
                     <Card
                       class="customIcon"
+                      dis-hover
                     >
                       <Icon type="ios-radio-button-off"
                             size="20"
@@ -76,16 +99,27 @@
                       <Icon v-if="item.importance == 0"
                             size="20" type="ios-star-outline"
                             style="float: right;cursor: pointer;margin-right: 20px"
+                            title="Mark Important"
                             @click="changeImportance(item, doingIndex, 'doing')"
                       />
                       <Icon v-else size="20"
                             type="ios-star"
                             style="float: right;cursor:pointer;margin-right: 20px"
+                            title="Unmark"
                             @click="changeImportance(item, doingIndex, 'doing')"
                       />
+                      <!-- 考虑增加详情页 类似resource的详情页 -->
                       <label
                         style="margin-left: 10px;"
-                      >{{item.content}}</label>
+                        @click="getTodoInfo(item)"
+                        class="todoItemInfo"
+                        :title="item.content"
+                      >
+                        {{item.content}}
+                      </label>
+                      <label
+                        style="float: right;" title="End Time" v-if="useTodoListCSS && item.endTime != ''"
+                      >Deadline：{{item.endTime}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
                     </Card>
                   </div>
                 </vue-scroll>
@@ -99,15 +133,15 @@
               dis-hover
               v-if="selectedTaskType.includes('Done')"
             >
-              <p slot="title">Done</p>
+              <p slot="title"><strong>Done</strong></p>
               <!--            显示内容                -->
-              <div :style="{height: contentHeight-contentHeightCompute+'px'}">
+              <div :style="{height: contentHeight-contentHeightCompute-60+'px'}">
                 <vue-scroll :ops="ops">
                   <div
                     v-for="(item, doneIndex) in doneList"
                     :key="doneIndex"
                   >
-                    <Card class="customIcon">
+                    <Card class="customIcon" dis-hover>
                       <Icon type="ios-checkmark-circle-outline" size="20" style="line-height: .8; cursor: pointer"
                             @click="changeState(item, doneIndex)"/>
                       <Icon type="ios-close" size="31"
@@ -126,7 +160,14 @@
                             style="float: right;cursor: pointer;margin-right: 20px"
                             @click="changeImportance(item, doneIndex, 'done')"
                       />
-                      <label style="margin-left: 10px;">{{item.content}}</label>
+                      <label
+                        style="margin-left: 10px;"
+                        @click="getTodoInfo(item)"
+                        class="todoItemInfo"
+                        :title="item.content"
+                      >
+                        {{item.content}}
+                      </label>
                     </Card>
 
                   </div>
@@ -135,9 +176,23 @@
 
             </Card>
           </div>
+
         </Card>
       </Col>
     </Row>
+    <!--    点击文件显示内容-->
+    <Modal v-model="todoInfoModal" title="Todo Info">
+      <Table
+        :columns="selectedTodoColumns"
+        :data="selectedTodoData"
+        stripe
+        border
+        :show-header="false"
+      ></Table>
+      <div slot="footer">
+        <Button type="primary" @click="todoInfoModal = false">OK</Button>
+      </div>
+    </Modal>
   </div>
 </template>
 
@@ -146,10 +201,12 @@
     name: "todoList",
     data() {
       return {
-        selectedTaskType: ["Doing", "Done", "Importance"],
+        selectedTaskType: ["Doing",  "Importance"],
         doneList: [],
         doingList: [],
+        selectedTodoData: [],
         importanceNum: 0,
+        useTodoListCSS: true,
         newTask: {
           userId: "",
           content: "",
@@ -163,11 +220,27 @@
             background: "#808695"
           }
         },
+        //选择的todoInfo内容
+        todoInfoModal: false,
+        selectedTodoColumns: [
+          {
+            title: "key",
+            key: "key",
+            minWidth: 10,
+            width: 110,
+          },
+          {
+            title: "value",
+            key: "value",
+          },
+        ],
       }
     },
     mounted() {
       this.initTodoList();
       this.resizeContent();
+      this.reSize();
+      window.addEventListener("resize", this.reSize);
     },
     methods: {
       resizeContent() {
@@ -181,6 +254,48 @@
             this.resizeContent();
           })();
         };
+      },
+      reSize() {
+        // if (window.innerHeight > 675) {
+        //   this.contentHeight = window.innerHeight - 120 + "px";
+        // } else {
+        //   this.contentHeight = 675 - 120 + "px";
+        // }
+        if (window.innerWidth < 1000) {
+          this.useTodoListCSS = false;
+        } else {
+          this.useTodoListCSS = true;
+        }
+      },
+      //点选文件信息显示
+      getTodoInfo(file) {
+        this.selectedTodoData = [
+          {
+            key: "Todo Content",
+            value: file.content,
+          },
+          {
+            key: "End Time",
+            value: file.endTime,
+          },
+          {
+            key: "Important",
+            value: (file.importance==1?"yes":"no"),
+          },
+          {
+            key: "State",
+            value: file.state,
+          },
+          // {
+          //   key: "Uploader",
+          //   value: file.uploaderName,
+          // },
+          // {
+          //   key: "Upload Time",
+          //   value: file.uploadTime,
+          // },
+        ];
+        this.todoInfoModal = true;
       },
       initTodoList: function () {
         this.axios
@@ -261,6 +376,7 @@
           .catch(err => {
             this.$Message.error("Change task state Fail.")
           })
+        // this.initTodoList();
 
       },
       changeImportance: function (item, index, state) {
@@ -284,6 +400,7 @@
             }
           })
           .catch()
+          // this.initTodoList();
       },
       delTask: function (ptId, index, state) {
         this.axios
@@ -325,7 +442,7 @@
       contentHeightCompute: function () {
         let tempHeight = "";
         if (this.selectedTaskType.length == 2){
-          tempHeight = 230;
+          tempHeight = 380;
         }else if (this.selectedTaskType.length == 3){
           tempHeight = 600;
         }
@@ -336,6 +453,17 @@
 </script>
 
 <style scoped>
+  .customCard{
+    opacity: 0.95;
+  }
+
+  .todoCard{
+    background-color: white;
+    border-radius: 3px;
+    border:1px solid #dadce0;
+    box-shadow:  0 3.2px 7.2px 0 rgb(0 0 0 / 13%), 0 0.6px 1.8px 0 rgb(0 0 0 / 11%);
+  }
+
   .badge {
     display: inline-block;
     min-width: 10px;
@@ -349,6 +477,17 @@
     vertical-align: baseline;
     background-color: #999999;
     border-radius: 10px;
+  }
+
+ .todoItemInfo {
+    width: 35%;
+    margin-right: 5%;
+    display: inline-block;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: top;
+    cursor: pointer;
+    overflow: hidden;
   }
 
   .customCardHead >>> .ivu-card-head {

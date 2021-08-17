@@ -1,42 +1,47 @@
 <template>
   <div>
+    <div id="title">
+      <h1 style="text-align: center;margin-top: 10px;">Tool</h1>
+      <h3 style="text-align: center;margin-bottom: 10px;">you can manage your tools here</h3>
+    </div>
     <Row>
       <Col span="22" offset="1">
         <!--  Filter 包括 Created by me, Shared with me(项目中内容)，public, privacy-->
-        <Row>
-          <Card>
-            <CheckboxGroup v-model="checkedType">
-              <Checkbox label="public">
-                <label>Public</label>
-                <label class="badge">{{ publicTools.length }}</label>
-              </Checkbox>
-              <Checkbox label="private">
-                <label>Privacy</label>
-                <label class="badge">{{ privateTools.length }}</label>
-              </Checkbox>
-            </CheckboxGroup>
-          </Card>
-        </Row>
+        <!--  下移  -->
         <!--  具体显示区，图标加 缩略图 + 名字的显示方案; 先把created tool 拉过来；添加 shared 接口-->
         <Row>
-          <Card>
-            <p slot="title">Tools</p>
-            <div slot="extra">
-              <!--              添加一个模态显示判断 -->
-              <Button
-                shape="circle"
-                icon="ios-add-circle-outline"
-                @click="createToolModal = true"
-              >Create tool
-              </Button>
-            </div>
+          <Card dis-hover style="position: relative;" class="customCard">
+            <p slot="title">
+              <CheckboxGroup v-model="checkedType" style="margin-left: 1%">
+                <Checkbox label="public">
+                  <label>Public</label>
+                  <label class="badge">{{ publicTools.length }}</label>
+                </Checkbox>
+                <Checkbox label="private">
+                  <label>Privacy</label>
+                  <label class="badge">{{ privateTools.length }}</label>
+                </Checkbox>
+              </CheckboxGroup>
+
+            </p>
+            <!--              添加一个模态显示判断 -->
+            <Button
+              slot="extra"
+              type="primary"
+              icon="md-add"
+              @click="createToolModal = true"
+              style="display: inline-block;position: absolute;right: 20px;top: -4px;"
+            >Create tool
+            </Button>
+
+
             <!--            工具显示内容  -->
             <div
-              :style="{height: contentHeight-230+'px'}"
+              :style="{height: contentHeight-180+'px'}"
               style="height: inherit;min-height: fit-content;"
             >
               <vue-scroll :ops="ops">
-                <Card :bordered="false" v-if="userToolCount.length == 0">
+                <Card :bordered="false" v-if="userToolCount.length == 0" dis-hover>
                   <div style="display:flex;justify-content:center">
                     <Icon type="md-alert" size="40" color="gray"/>
                   </div>
@@ -48,72 +53,164 @@
                   </div>
                 </Card>
 
-                <Row>
-                  <!--                  每一排 4 个-->
-                  <Col
-                    span="6"
-                    v-for="(tool,index) in userToolCount"
-                    :key="index"
-                  >
-                    <div style="margin:0 5px 15px 5px">
-                      <Card>
-                        <p
-                          slot="title"
-                          class="ellipsis"
-                          style="width:50%;display:inline-block;"
-                          :title="tool.toolName"
-                        >{{tool.toolName}}</p>
-                        <div slot="extra">
-                          <Icon
-                            type="ios-settings"
-                            title="Edit"
-                            size="20"
-                            class="icon"
-                            @click="editTool(tool)"
-                            style="margin-right: 3px"
-                          />
-                          <Icon
-                            type="ios-share-alt"
-                            title="Share"
-                            size="20"
-                            class="icon"
-                            @click="shareTool(tool)"
-                            style="margin-right: 3px"
-                          />
-                          <Icon
-                            type="md-close"
-                            size="20"
-                            class="icon"
-                            title="Delete"
-                            @click="delTool(tool.tid, tool.privacy, index, tool.toolName)"
-                          />
-                        </div>
-                        <!--                       内容    -->
-                        <div @click="toToolPage(tool)" style="cursor: pointer;">
-                          <div style="algin:left;">
-                            <img
-                              :src="tool.toolImg"
-                              v-if="tool.toolImg!='' && tool.toolImg!=null"
-                              style="height:100%;max-height:50px;width: 50%"
-                            />
-                            <avatar
-                              :username="tool.toolName"
-                              :size="50"
-                              style="margin-bottom:6px;"
-                              v-else
-                            ></avatar>
-                          </div>
+                <div v-if="useToolCSS">
+                   <Row>
+                     <!--        每一排 1 个-->
+                     <Col
+                       span="24"
+                       v-for="(tool,index) in userToolCount"
+                       :key="index"
+                     >
+                       <div style="margin:0 5px 15px 5px">
+                         <Card class="toolCard">
+                           <div slot="title" class="toolCardHead">
+                             <p
+                               class="ellipsis"
+                               style="width:50%;display:inline-block;font-size: 16px;"
+                               :title="tool.toolName"
+                             >{{tool.toolName}}</p>
+                           </div>
+                           <div slot="extra">
+                             <Icon
+                               type="ios-settings"
+                               title="Edit"
+                               size="25"
+                               class="icon"
+                               @click="editTool(tool)"
+                               style="margin-right: 3px"
+                             />
+                             <Icon
+                               type="ios-share-alt"
+                               title="Share"
+                               size="25"
+                               class="icon"
+                               @click="shareTool(tool)"
+                               style="margin-right: 3px"
+                             />
+                             <Icon
+                               type="md-close"
+                               size="25"
+                               class="icon"
+                               title="Delete"
+                               @click="delTool(tool.tid, tool.privacy, index, tool.toolName)"
+                             />
+                           </div>
+                           <!--                       内容    -->
+                           <div @click="toToolPage(tool)" style="cursor: pointer;position: relative;">
+                             <div style="position: absolute;margin-top: 5px;">
+                               <img
+                                 :src="tool.toolImg"
+                                 v-if="tool.toolImg!='' && tool.toolImg!=null"
+                                 style="height:100%;max-height:50px;width: 50%"
+                               />
+                               <avatar
+                                 :username="tool.toolName"
+                                 :size="70"
+                                 style="margin-bottom:6px;"
+                                 v-else
+                               ></avatar>
+                             </div>
+                             <div style="margin-left: 10%;width: 85%;display: flex; align-items: center;height: 80px;">
+                               <p class="toolDes" >{{tool.description}}</p>
+                             </div>
+                           </div>
+                         </Card>
+                         <Card dis-hover class="toolCardFoot">
+                           <div class="toolTags">
+                             <div style="position: absolute;top: -5px;left: -10px;">
+                               <span class="toolTypeSpan">
+                                  {{tool.backendType}}
+                               </span>
+                               <span v-for="(tag,index) in tool.tags" class="toolTagSpan">
+                                 {{tool.tags[index]}}
+                               </span>
+                             </div>
+                           </div>
+                         </Card>
+                       </div>
+                     </Col>
+                   </Row>
+                </div>
 
-                          <div
-                            style="display: inline-block;vertical-align: top;height: 100%"
-                          >
-                            <p class="toolDes">{{tool.description}}</p>
+                <!-- v-else -->
+                <div v-else>
+                  <Row>
+                    <!--        每一排 1 个-->
+                    <Col
+                      span="24"
+                      v-for="(tool,index) in userToolCount"
+                      :key="index"
+                    >
+                      <div style="margin:0 5px 15px 5px">
+                        <Card class="toolCard">
+                          <p
+                            slot="title"
+                            class="ellipsis"
+                            style="width:50%;display:inline-block;"
+                            :title="tool.toolName"
+                          >{{tool.toolName}}</p>
+                          <div slot="extra">
+                            <Icon
+                              type="ios-settings"
+                              title="Edit"
+                              size="25"
+                              class="icon"
+                              @click="editTool(tool)"
+                              style="margin-right: 3px"
+                            />
+                            <Icon
+                              type="ios-share-alt"
+                              title="Share"
+                              size="25"
+                              class="icon"
+                              @click="shareTool(tool)"
+                              style="margin-right: 3px"
+                            />
+                            <Icon
+                              type="md-close"
+                              size="25"
+                              class="icon"
+                              title="Delete"
+                              @click="delTool(tool.tid, tool.privacy, index, tool.toolName)"
+                            />
                           </div>
-                        </div>
-                      </Card>
-                    </div>
-                  </Col>
-                </Row>
+                          <!--                       内容    -->
+                          <div @click="toToolPage(tool)" style="cursor: pointer;position: relative;">
+                            <div style="position: absolute;margin-top: 5px;">
+                              <img
+                                :src="tool.toolImg"
+                                v-if="tool.toolImg!='' && tool.toolImg!=null"
+                                style="height:100%;max-height:50px;width: 50%"
+                              />
+                              <avatar
+                                :username="tool.toolName"
+                                :size="70"
+                                style="margin-bottom:6px;"
+                                v-else
+                              ></avatar>
+                            </div>
+                            <div style="margin-left: 80px;width: 90%;display: flex; align-items: center;height: 80px;">
+                              <p class="toolDes" >{{tool.description}}</p>
+                            </div>
+                          </div>
+                        </Card>
+                        <Card dis-hover class="toolCardFoot">
+                          <div class="toolTags">
+                            <div style="position: absolute;top: -5px;left: -10px;">
+                              <span class="toolTypeSpan">
+                                 {{tool.backendType}}
+                              </span>
+                              <span v-for="(tag,index) in tool.tags" class="toolTagSpan">
+                                {{tool.tags[index]}}
+                              </span>
+                            </div>
+                          </div>
+                        </Card>
+                      </div>
+                    </Col>
+                  </Row>
+                </div>
+
               </vue-scroll>
             </div>
           </Card>
@@ -254,6 +351,7 @@
         createToolModal: false,
         editToolModal: false,
         confirmDelModal: false,
+        useToolCSS: true,
         personalTools: [],
         publicTools: [],
         privateTools: [],
@@ -304,6 +402,11 @@
     mounted() {
       this.getPersonalTools();
       this.resizeContent();
+      this.reSize();
+      window.addEventListener("resize", this.reSize);
+    },
+    beforeDestroy: function () {
+      window.removeEventListener("resize", this.reSize);
     },
     methods: {
       resizeContent() {
@@ -318,6 +421,20 @@
           })();
         };
       },
+      reSize() {
+        // if (window.innerHeight > 675) {
+        //   this.contentHeight = window.innerHeight - 120 + "px";
+        // } else {
+        //   this.contentHeight = 675 - 120 + "px";
+        // }
+        if (window.innerWidth < 950) {
+          this.useToolCSS = false;
+        } else {
+          this.useToolCSS = true;
+        }
+      },
+
+      //？？？？？why getUserProjects
       getUserProjects: function () {
         let projectIds = "";
         let userInfo = this.$store.getters.userInfo;
@@ -404,11 +521,13 @@
         // let data = await post("/GeoProblemSolving/tool", createToolForm);
         this.axios.post("/GeoProblemSolving/tool", createToolForm)
           .then(res=>{
-            // 判断返回值，进行下一步操作
+            // ？？？ 判断返回值，进行下一步操作
             this.createToolModal = false;
             this.editToolInfo = {};
             this.toolInfo = {};
             let toolData = res.data.data;
+            console.log(res)
+            console.log(toolData);
             if (toolData != null){
               if (toolData.privacy == "Public"){
                 this.publicTools.push(toolData);
@@ -586,6 +705,64 @@
 </script>
 
 <style scoped>
+  .customCard{
+    opacity: 0.95;
+  }
+
+  .toolCard{
+    background-color: white;
+    border-radius: 3px;
+    border:1px solid #dadce0;
+    border-bottom: transparent;
+    box-shadow:  0 0.6px 1.8px 0 rgb(0 0 0 / 11%);
+    height: 160px;
+  }
+
+  /* .toolCardHead{
+    height: 45px;
+    width: 100%;
+    border-bottom-style: none;
+    background-image: linear-gradient(to right, rgb(253, 249, 244) 0%, rgb(216, 244, 249) 100%);
+  } */
+
+  .toolCardFoot{
+    height: 40px;
+    background-color:rgba(232, 232, 232, 0.5);
+    border-radius: 3px;
+    border:1px solid #dadce0;
+    border-top: transparent;
+  }
+
+  .toolTags{
+    position: relative;
+  }
+
+  .toolTypeSpan{
+    background-color:#2db7f5 ;
+    color: white;
+    font-size: 15px;
+    font-weight: 700;
+    margin-left: 10px;
+    line-height: 1;
+    padding: 3px 7px;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 10px;
+  }
+
+  .toolTagSpan{
+    background-color:#95a0ba ;
+    color: white;
+    font-size: 15px;
+    font-weight: 700;
+    margin-left: 10px;
+    line-height: 1;
+    padding: 3px 7px;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 10px;
+  }
+
   .badge {
     display: inline-block;
     min-width: 10px;
@@ -618,8 +795,8 @@
   }
 
   .toolDes {
-    height: 100px;
-    line-height: 20px;
+    /* height: 100px; */
+    /* line-height: 20px; */
     overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;

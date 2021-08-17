@@ -36,8 +36,8 @@ const routes = [
           },
           //新的resource 页面，含文件夹结构
           {
-            path: "resource",
-            name: "resource",
+            path: "resourceList",
+            name: "resourceList",
             component: resolve => require(["@/components/user/subPage/resourceList"], resolve)
           },
           {
@@ -158,37 +158,44 @@ const routes = [
         name: "shareContainer",
         component: resolve =>
           require(["@/components/workingSpace/share/shareContainer"], resolve)
-      } //share
+      },//share
+      {
+        path: "/activityInfo/:projectId",
+        name: "workspaceContent",
+        component: resolve =>
+          require(["@/components/workingSpace/workspaceFrame.vue"], resolve),
+        children: [
+          {
+            path: "show",
+            name: "activityShow",
+            component: resolve =>
+              require(["@/components/workingSpace/activity/activityShow"], resolve)
+          },
+          {
+            path: "type",
+            name: "activityType",
+            component: resolve =>
+              require(["@/components/workingSpace/activity/typeChoose"], resolve)
+          },
+          {
+            path: "work",
+            name: "workSpace",
+            component: resolve =>
+              require([
+                "@/components/workingSpace/activity/singleActivity"
+              ], resolve)
+          },
+          {
+            path: "info",
+            name: "activityInfo",
+            component: resolve =>
+              require(["@/components/workingSpace/activity/multiActivity"], resolve)
+          }
+        ]
+      },
     ]
   },
-  {
-    path: "/activityInfo/:projectId",
-    name: "workspaceContent",
-    component: resolve =>
-      require(["@/components/workingSpace/workspaceFrame.vue"], resolve),
-    children: [
-      {
-        path: "type",
-        name: "activityType",
-        component: resolve =>
-          require(["@/components/workingSpace/activity/typeChoose"], resolve)
-      },
-      {
-        path: "work",
-        name: "workSpace",
-        component: resolve =>
-          require([
-            "@/components/workingSpace/activity/singleActivity"
-          ], resolve)
-      },
-      {
-        path: "info",
-        name: "activityInfo",
-        component: resolve =>
-          require(["@/components/workingSpace/activity/multiActivity"], resolve)
-      }
-    ]
-  },
+
   //之前的工具页面
   // {
   //   path: "/dataService/:id/:token/:type",

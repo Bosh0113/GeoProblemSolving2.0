@@ -29,7 +29,7 @@
         class="code-row-bg"
         style="margin-top: 20px"
       >
-        <Col span="9">
+        <Col span="10">
           <Card style="min-height: 350px">
             <div style="text-align: center; margin-top:10px">
               <img
@@ -40,7 +40,7 @@
             <div style="margin: 10px 0; text-align: center">
               <h3>Single-activity type</h3>
             </div>
-            <div style="padding: 0 5%; min-height: 85px">
+            <div style="padding: 0 5%; min-height: 85px; margin-left: 10%;">
               <ul>
                 <li>A individual workspaces</li>
                 <li>Start working directly</li>
@@ -55,9 +55,9 @@
             </div>
           </Card>
         </Col>
-        <Col span="9">
+        <Col span="10">
           <Card style="min-height: 350px">
-            <div style="text-align: center; margin-top:10px">
+            <div style="text-align: center; margin-top:10px;">
               <img
                 src="../../../assets/images/designWorkflow.png"
                 style="height: 150px"
@@ -66,7 +66,7 @@
             <div style="margin: 10px 0; text-align: center">
               <h3>Multi-acitivites type</h3>
             </div>
-            <div style="padding: 0 5%; min-height: 85px">
+            <div style="padding: 0 5%; min-height: 85px; margin-left: 10%;">
               <ul>
                 <li>Several activities for different purposes</li>
                 <li>Hierarchical activity management</li>
@@ -109,7 +109,10 @@
 </template>
 <script>
 export default {
-  props: ["activityInfo", "userInfo"],
+  props: [
+    "activityInfo",
+    "userInfo"
+  ],
   data() {
     return {
       selectType: "Activity_Default",
@@ -129,7 +132,7 @@ export default {
       purpose: "",
     };
   },
-  mounted() {
+  created() {
     this.currentRoleIdentity();
   },
   methods: {
@@ -140,7 +143,7 @@ export default {
       );
     },
     operationPermissionIdentity(permission, role, operation) {
-       return this.userRoleApi.permissionIdentity(
+      return this.userRoleApi.permissionIdentity(
         JSON.parse(permission),
         role,
         operation

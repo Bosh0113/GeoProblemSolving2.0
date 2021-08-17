@@ -55,7 +55,7 @@
     <Col span="24" style="margin-top: 20px">
       <div>
         <Row type="flex" justify="space-around">
-          <div style="width: 80%; height: 25px; text-align: center">
+          <div style="width: 80%; height: 25px; text-align: center; margin-left: 10%;">
             <span style="font-weight: bold; font-size: 16px"
               >Procedure of the current activity</span
             >
@@ -633,14 +633,18 @@ import VueTagsInput from "@johmun/vue-tags-input";
 // import Driver from "driver.js";
 export default {
   components: { VueTagsInput },
-  props: ["activityInfo", "childActivities"],
+  props: [
+    "activityInfo",
+    "childActivities",
+    "userInfo"
+  ],
   data() {
     return {
-      projectInfo: parent.vm.projectInfo,
+      projectInfo: {},
       // driver
       // driver: new Driver(),
       // user
-      userInfo: JSON.parse(sessionStorage.getItem("userInfo")),
+      // userInfo: JSON.parse(sessionStorage.getItem("userInfo")),
       userRole: "visitor",
       //button
       linkBtn: false,

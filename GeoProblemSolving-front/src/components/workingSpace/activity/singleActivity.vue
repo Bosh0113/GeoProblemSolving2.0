@@ -84,7 +84,7 @@
           </vue-scroll>
         </div>
         <div v-show="activeMenu == 'Task'">
-          <task-manager :activityInfo="activityInfo"></task-manager>
+          <task-manager :activityInfo="activityInfo" :userInfo="userInfo"></task-manager>
         </div>
       </div>
     </div>
@@ -197,7 +197,7 @@ import geoSimulation from "./funcs/geoSimulation.vue";
 import geoAnalysis from "./funcs/geoAnalysis.vue";
 import decisionMaking from "./funcs/decisionMaking.vue";
 export default {
-  props: ["activityInfo"],
+  props: ["activityInfo","userInfo"],
   components: {
     Avatar,
     // activityShow,
@@ -219,9 +219,9 @@ export default {
           background: "lightgrey",
         },
       },
-      projectInfo: parent.vm.projectInfo,
+      projectInfo: {},
       activeMenu: "Workspace",
-      userInfo: JSON.parse(sessionStorage.getItem("userInfo")),
+      // userInfo: JSON.parse(sessionStorage.getItem("userInfo")),
       userRole: "visitor",
       participants: [],
       // add
@@ -639,7 +639,7 @@ export default {
         url = "/GeoProblemSolving/activity/" + activity.aid + "/user";
       }
       //callback setTimeBack
-      this.axios
+      this.$axios
         .get(url)
         .then((res) => {
           if (res.data.code == 0) {

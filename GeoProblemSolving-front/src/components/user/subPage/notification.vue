@@ -1,9 +1,13 @@
 <template>
   <div>
+    <div id="title">
+      <h1 style="text-align: center;margin-top: 10px;">Message</h1>
+      <h3 style="text-align: center;margin-bottom: 10px;">You can view and process your messages here</h3>
+    </div>
     <Row>
       <Col span="22" offset="1">
         <Card dis-hover>
-          <CheckboxGroup v-model="selectedNoticeType" style="display: inline-block">
+          <CheckboxGroup v-model="selectedNoticeType" style="display: inline-block;margin-left: 1%">
             <Checkbox label="noticeList">
               <span>Notice</span>
               <span class="badge">{{readNoticeList.length + unreadNoticeList.length}}</span>
@@ -17,7 +21,9 @@
               <span class="badge">{{readApplyList.length + unreadApplyList.length}}</span>
             </Checkbox>
           </CheckboxGroup>
-          <span style="margin: 0 20px"></span>
+
+          <Divider type="vertical" style="margin-left: 20px"/>
+          <span style="margin: 0 10px"></span>
           <CheckboxGroup v-model="readOrUnread" style="display: inline-block">
             <Checkbox label="read">
               <span>Read</span>
@@ -32,8 +38,8 @@
         </Card>
         <!--  通知详情 -->
         <div>
-          <Card dis-hover>
-            <h3 slot="title">Notification Detail</h3>
+          <Card dis-hover class="customCard">
+            <!-- <h3 slot="title">Notification Detail</h3> -->
             <div :style="{height: contentHeight-230+'px'}">
               <vue-scroll :ops="ops">
                 <div v-if="selectNoteNum!=0">
@@ -52,14 +58,16 @@
                     <div
                       v-if="item.type=='apply'"
                     >
-                      <Card>
+                      <Card style="position: relative;">
                         <Badge dot>
-                          <h4 style="font-size: 15px">{{item.content.title}}</h4>
+                          <h4 style="font-size: 15px" @click="getNoticeInfo(item)">{{item.content.title}}</h4>
                         </Badge>
                         <br/>
                         <p style="font-weight: 400; font-size: 17px">{{item.content.description}}</p>
                         <small style="font-size: 13px">{{item.createTime}}</small>
-                        <Icon type="md-close" class="applyBtn" style="color: #ff9900" @click="refuseApply(item)"/>
+                        <!-- <button type="button"  class="applyBtn" style="color: #ff9900;position: absolute;top: 30px;right: 10%;" @click="refuseApply(item)">refuse</button>
+                        <button type="button"  class="applyBtn" style="color: #47cb89;position: absolute;top: 30px;right: 3%;" @click="approveApply(item)">approve</button> -->
+                        <Icon type="md-close" class="applyBtn" style="color: #ff9900;" @click="refuseApply(item)"/>
                         <Icon type="md-checkmark" class="applyBtn" style="color: #47cb89" @click="approveApply(item)"/>
                       </Card>
                     </div>
@@ -69,7 +77,7 @@
                     >
                       <Card>
                         <Badge dot>
-                          <h4 style="font-size: 15px">{{item.content.title}}</h4>
+                          <h4 style="font-size: 15px" @click="getNoticeInfo(item)">{{item.content.title}}</h4>
                         </Badge>
                         <br/>
                         <p style="font-weight: 400; font-size: 17px">{{item.content.description}}</p>
@@ -83,7 +91,7 @@
                     >
                       <Card>
                         <Badge dot>
-                          <h4 style="font-size: 15px">{{item.content.title}}</h4>
+                          <h4 style="font-size: 15px" @click="getNoticeInfo(item)">{{item.content.title}}</h4>
                         </Badge>
                         <br/>
                         <p style="font-weight: 400; font-size: 17px">{{item.content.description}}</p>
@@ -101,9 +109,12 @@
                   >
                     <Card>
                       <!--                  <h4 style="font-size: 13px">{{item.content.title}}</h4>-->
-                      <p slot="title">{{item.content.title}}</p>
-                      <p style="font-weight: 400; font-size: 15px">{{item.content.description}}</p>
-                      <small style="font-size: 11px">{{item.createTime}}</small>
+                      <Badge dot>
+                        <h4 style="font-size: 15px" @click="getReadNoticeInfo(item)">{{item.content.title}}</h4>
+                      </Badge>
+                      <br/>
+                      <p style="font-weight: 400; font-size: 17px">{{item.content.description}}</p>
+                      <small style="font-size: 13px">{{item.createTime}}</small>
                       <Icon slot="extra" type="md-close" class="applyBtn" style="color: #ed4014" @click="deleteNotice(item)" />
                     </Card>
                   </div>
@@ -111,7 +122,7 @@
 
                 <!--          无通知消息  -->
                 <div v-else>
-                  <Card>
+                  <Card dis-hover style="border:transparent">
                     <h1 style="color: darkgray; text-align: center;">No Notifications</h1>
                   </Card>
 
@@ -119,6 +130,37 @@
               </vue-scroll>
             </div>
 
+            <!-- 消息展示 -->
+            <Modal v-model="noticeInfoModal" title="Message Info">
+              <Table
+                :columns="selectedNoticeColumns"
+                :data="selectedNoticeData"
+                stripe
+                border
+                @on-row-click="tableRowClick"
+                :show-header="false"
+              ></Table>
+              <div slot="footer">
+                <Button v-if="slctMessage.type == 'apply'" type="warning" @click="refuseApply(slctMessage)">Reject</Button>
+                <Button v-if="slctMessage.type == 'apply'" type="success" @click="approveApply(slctMessage)">Agree</Button>
+                <Button v-if="slctMessage.type == 'notice'" type="success" @click="readNotice(slctMessage.noticeId)">Read</Button>
+                <Button type="primary" @click="noticeInfoModal = false">OK</Button>
+              </div>
+            </Modal>
+            <Modal v-model="readNoticeInfoModal" title="Message Info">
+              <Table
+                :columns="selectedReadNoticeColumns"
+                :data="selectedReadNoticeData"
+                stripe
+                border
+                @on-row-click="tableRowClick"
+                :show-header="false"
+              ></Table>
+              <div slot="footer">
+                <Button  type="error" @click="deleteNotice(slctMessage)">Delete</Button>
+                <Button type="primary" @click="readNoticeInfoModal = false">OK</Button>
+              </div>
+            </Modal>
 
           </Card>
         </div>
@@ -148,6 +190,35 @@
           }
         },
         contentHeight: "",
+        noticeInfoModal: false,
+        readNoticeInfoModal: false,
+        slctMessage: {},
+        selectedNoticeData: [],
+        selectedNoticeColumns: [
+          {
+            title: "key",
+            key: "key",
+            minWidth: 10,
+            width: 150,
+          },
+          {
+            title: "value",
+            key: "value",
+          },
+        ],
+        selectedReadNoticeData: [],
+        selectedReadNoticeColumns: [
+          {
+            title: "key",
+            key: "key",
+            minWidth: 10,
+            width: 150,
+          },
+          {
+            title: "value",
+            key: "value",
+          },
+        ],
         readOrUnread: ["unRead"],
         selectedNoticeType: ["noticeList", "replyList", "applyList"]
       }
@@ -238,6 +309,108 @@
           })();
         };
       },
+      tableRowClick(data){
+        //根据key判断类型，选择跳转用户界面或activity界面
+        if(data.key == "Messager" && data.aid != null){
+          this.$router.push("/memberPage/" + data.aid);
+        }else if (data.key == "Activity Name" && data.aid != null){
+          let url ="";
+          if (data.level == 0){
+            this.$router.push("/activityInfo/" + data.aid);
+          } else if (data.level == 1) {
+            url = "/GeoProblemSolving/subproject?aid=" + data.aid;
+          } else if (data.level > 1) {
+            url = "/GeoProblemSolving/activity?aid=" + data.aid;
+          }
+          if (url != ""){
+            this.$axios.get(url)
+              .then((res) => {
+                if (res.data == "Offline") {
+                  this.$store.commit("userLogout");
+                  this.$router.push({ name: "Login" });
+                }else if(res.data.code == 0){
+                  this.$router.push("/activityInfo/" + res.data.data.parent);
+                }
+              }).catch((err) => {
+                throw err;
+              });
+          }
+        }
+      },
+      //点选通知信息显示
+      getNoticeInfo(file) {
+        this.slctMessage = file;
+        this.selectedNoticeData = [
+          {
+            key: "Message Title",
+            value: file.content.title,
+          },
+          {
+            key: "Message Type",
+            value: file.type,
+          },
+          {
+            key: "Activity Name",
+            value: file.content.activityName,
+            aid: file.content.activityId,
+            level: file.content.activityLevel,
+          },
+          {
+            key: "Description",
+            value: file.content.description,
+          },
+          {
+            key: "Messager",
+            value: file.content.userName,
+            aid: file.content.userId
+          },
+          // {
+          //   key: "Uploader",
+          //   value: file.uploaderName,
+          // },
+          {
+            key: "Message Time",
+            value: file.createdTime,
+          },
+
+        ];
+        this.noticeInfoModal = true;
+      },
+      getReadNoticeInfo(file) {
+        this.slctMessage = file;
+        this.selectedReadNoticeData = [
+          {
+            key: "Message Title",
+            value: file.content.title,
+          },
+          {
+            key: "Message Type",
+            value: file.type,
+          },
+          {
+            key: "Activity Name",
+            value: file.content.activityName,
+          },
+          {
+            key: "Description",
+            value: file.content.description,
+          },
+          {
+            key: "Messager",
+            value: file.content.userName,
+          },
+          // {
+          //   key: "Uploader",
+          //   value: file.uploaderName,
+          // },
+          {
+            key: "Message Time",
+            value: file.createdTime,
+          },
+
+        ];
+        this.readNoticeInfoModal = true;
+      },
       loadNotifications() {
         this.axios
           .get(
@@ -313,6 +486,7 @@
               this.$store.commit("userLogout");
               this.$router.push({ name: "Login" });
             } else if (res.data == "Success") {
+              this.readNoticeInfoModal = false;
               this.$Message.success("delete notification success.");
               if (notice.state == "unread") {
                 this.$emit("readNotification");
@@ -367,6 +541,7 @@
               this.$store.commit("userLogout");
               this.$router.push({ name: "Login" });
             } else if (res.data == "Success") {
+              this.noticeInfoModal = false;
               this.$emit("readNotification");
               this.$store.commit("getUserInfo");
               this.loadNotifications();
@@ -411,6 +586,7 @@
               this.$store.commit("userLogout");
               this.$router.push({ name: "Login" });
             } else if (res.data == "Success") {
+              this.noticeInfoModal = false;
               this.$emit("readNotification");
               this.loadNotifications();
               let replyNotice = {};
@@ -456,6 +632,7 @@
               this.$store.commit("userLogout");
               this.$router.push({ name: "Login" });
             } else if (res.data == "Success") {
+              this.noticeInfoModal = false;
               this.$emit("readNotification");
               this.loadNotifications();
 
@@ -574,6 +751,10 @@
 </script>
 
 <style scoped>
+  .customCard{
+    opacity: 0.95;
+  }
+
   .badge {
     display: inline-block;
     min-width: 10px;
@@ -606,5 +787,6 @@
     float: right;
     margin: 0 10px;
     cursor: pointer;
+    size: 25px;
   }
 </style>

@@ -580,7 +580,7 @@ export default {
   watch: {
     activityInfo: {
       handler(val) {
-        this.init();
+        // this.init();
       },
       deep: true,
     },

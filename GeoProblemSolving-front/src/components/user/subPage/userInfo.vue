@@ -1,103 +1,243 @@
 <template>
   <div>
-    <Row>
-      <Col span="12" offset="6">
-        <div style="text-align: center;font-family: 'Roboto Light'">
-          <h2>Personal Information</h2>
-          <span style="font-size: 14px;font-family: 'Roboto Light'">Basic information you use in Geo-problem solving platform</span>
-        </div>
-        <div>
-          <Card>
-            <div slot="title">
-              <img
-                :src="avatarUrl"
-                v-if="avatarUrl != null && avatarUrl != '' && avatarUrl != undefined"
-                :title="userInfo.name"
-                style="width:40px;height:40px;vertical-align:middle;"
-              />
-              <avatar
-                :username="userInfo.name"
-                :size="40"
-                style="margin-top:10px"
-                :title="userInfo.name"
-                v-else
-              />
-              <span>&ensp;&ensp; About {{userInfo.name}}</span>
-            </div>
-            <List>
-              <ListItem>
-                <span class="uTitle">Name</span>
-                <div class="uAlign">
-                  <span class="uContent">{{userInfo.name}}</span>
-                </div>
-              </ListItem>
+    <div id="userPic" style="margin-top: 20px;text-align: center;">
+      <!-- 用户上传照片作为头像 图片显示失败 -->
+     <img
+        :src="avatarUrl"
+        v-if="avatarUrl != null && avatarUrl != '' && avatarUrl != undefined"
+        :title="userInfo.name"
+        style="vertical-align:middle;width: 80px;height: 80px;"
+      />
 
-              <ListItem>
-                <span class="uTitle">Email</span>
-                <div class="uAlign">
-                  <span class="uContent">{{userInfo.email}}</span>
-                </div>
-              </ListItem>
+      <!-- v-else -->
+      <avatar
+        :username="userInfo.name"
+        :size="80"
+        style="margin-top:10px;margin-left: 47%;"
+        :title="userInfo.name"
+        v-else
+      />
+      <p style="margin-bottom: 20px;"></p>
+      <h1 style="display: inline-block;">Welcome,</h1>
+      <h1 style="color: #2d8cf0;display: inline-block;" v-show="userInfo.title!=''">{{userInfo.title}}. </h1>
+      <h1 style="color: #2d8cf0;display: inline-block;">{{userInfo.name}}</h1>
+      <p style="margin-bottom: 20px;"></p>
+    </div>
+    <div v-if="useUserInfoCSS">
+      <Row>
+        <Col span="10" offset="2">
+          <!-- <div id="title">
+            <h1 style="text-align: center;margin-top: 10px;">Personal Information</h1>
+            <h3 style="text-align: center;margin-bottom: 10px;">Basic information you use in Geo-problem solving platform</h3>
+          </div> -->
+          <div>
+            <Card style="height:450px;margin-bottom: 10px;" class="userInfoCard">
+              <h2>Personal Information</h2>
+              <List style="margin-top: 3%;">
+                <ListItem>
+                  <span class="uTitle">Name</span>
+                  <div class="uAlign">
+                    <span class="uContent">{{userInfo.name}}</span>
+                  </div>
+                </ListItem>
 
-              <ListItem>
-                <span class="uTitle">Title</span>
-                <div class="uAlign">
-                  <span class="uContent">{{userInfo.title}}</span>
-                </div>
-              </ListItem>
-              <ListItem>
-                <span class="uTitle">Organizations</span>
-                <div class="uAlign">
-                  <span class="uContent">{{myOrganizations}}</span>
-                </div>
-              </ListItem>
-              <ListItem>
-                <span class="uTitle">Domain</span>
-                <div class="uAlign">
-                  <span class="uContent">{{myDomain}}</span>
-                </div>
-              </ListItem>
-              <ListItem>
-                <span class="uTitle">Phone</span>
-                <div class="uAlign">
-                  <span class="uContent">{{userInfo.phone}}</span>
-                </div>
-              </ListItem>
-              <ListItem>
-                <span class="uTitle">Country</span>
-                <div class="uAlign">
-                  <span class="uContent">{{userInfo.country}}</span>
-                </div>
-              </ListItem>
-              <ListItem>
-                <span class="uTitle">State/Province</span>
-                <div class="uAlign">
-                  <span class="uContent">{{userInfo.province}}</span>
-                </div>
-              </ListItem>
-              <ListItem>
-                <span class="uTitle">City</span>
-                <div class="uAlign">
-                  <span class="uContent">{{userInfo.city}}</span>
-                </div>
-              </ListItem>
-            </List>
-            <div style="margin-top: 30px;text-align: right">
-              <Button @click="showEditUserInfoModal" type="info" style="margin-right: 20px">Edit Information</Button>
-              <Button @click="showResetPwdModal" type="info">Change Password</Button>
-            </div>
-          </Card>
-        </div>
-      </Col>
-      <!-- 两个卡片 -->
-    </Row>
+                <ListItem>
+                  <span class="uTitle">Email</span>
+                  <div class="uAlign">
+                    <span class="uContent">{{userInfo.email}}</span>
+                  </div>
+                </ListItem>
+                <ListItem>
+                  <span class="uTitle">Phone</span>
+                  <div class="uAlign">
+                    <span class="uContent">{{userInfo.phone}}</span>
+                  </div>
+                </ListItem>
+               <!-- <ListItem>
+                  <span class="uTitle">Title</span>
+                  <div class="uAlign">
+                    <span class="uContent">{{userInfo.title}}</span>
+                  </div>
+                </ListItem> -->
+                <ListItem>
+                  <span class="uTitle">Organizations</span>
+                  <div class="uAlign">
+                    <span class="uContent">{{myOrganizations}}</span>
+                  </div>
+                </ListItem>
+                <ListItem>
+                  <span class="uTitle">Domain</span>
+                  <div class="uAlign">
+                    <span class="uContent">{{myDomain}}</span>
+                  </div>
+                </ListItem>
 
+                <ListItem>
+                  <span class="uTitle">Country</span>
+                  <div class="uAlign">
+                    <span class="uContent">{{userInfo.country}}</span>
+                  </div>
+                </ListItem>
+               <ListItem >
+                  <span class="uTitle">State/Province</span>
+                  <div class="uAlign">
+                    <span class="uContent">{{userInfo.province}}</span>
+                  </div>
+                </ListItem>
+                <ListItem >
+                  <span class="uTitle">City</span>
+                  <div class="uAlign">
+                    <span class="uContent">{{userInfo.city}}</span>
+                  </div>
+                </ListItem>
+              </List>
+
+            </Card>
+          </div>
+        </Col>
+
+        <!-- 两个卡片-->
+        <Col span="10">
+          <!-- <div id="title">
+            <h1 style="text-align: center;margin-top: 10px;">Personal Information</h1>
+            <h3 style="text-align: center;margin-bottom: 10px;">Basic information you use in Geo-problem solving platform</h3>
+          </div> -->
+          <div >
+            <Card style="margin-left: 5%;height:450px;" class="userInfoCard">
+              <div >
+                <h2>&nbsp;</h2>
+                <!-- <h1>setting</h1> -->
+                <list style="margin-top: 3%;">
+                  <ListItem >
+                    <span class="uTitle">Homepage</span>
+                    <div class="uAlign">
+                      <a :href="'http://'+userInfo.homepage">
+                        <span class="uContent">{{userInfo.homepage}}</span>
+                      </a>
+                    </div>
+                  </ListItem>
+                  <ListItem >
+                    <span class="uTitle">Introduction</span>
+                    <div class="uAlignIntro">
+                      <span class="uContentIntro" >{{userInfo.introduction}}</span>
+                    </div>
+                  </ListItem>
+                  <ListItem >
+                    <div></div>
+                  </ListItem>
+                </list>
+                <div>
+                  <Button @click="showEditUserInfoModal" type="info" style="width: 100%;">Edit Information</Button> <br>
+                  <Button @click="showResetPwdModal" type="info" style="margin-top: 10px;width: 100%;background-color: #2bbbad;">Change Password</Button>
+                </div>
+              </div>
+            </Card>
+          </div>
+        </Col>
+      </Row>
+
+    </div>
+
+    <!-- v-else -->
+    <div v-else>
+      <Row>
+        <Col span="22" offset="1">
+          <!-- <div id="title">
+            <h1 style="text-align: center;margin-top: 10px;">Personal Information</h1>
+            <h3 style="text-align: center;margin-bottom: 10px;">Basic information you use in Geo-problem solving platform</h3>
+          </div> -->
+          <div>
+            <Card class="userInfoCard" style="margin-bottom: 10px;">
+              <h2 style="text-align: left;">Personal Information</h2>
+              <List>
+                <ListItem>
+                  <span class="uTitle">Name</span>
+                  <div class="uAlign">
+                    <span class="uContentElse">{{userInfo.name}}</span>
+                  </div>
+                </ListItem>
+
+                <ListItem>
+                  <span class="uTitle">Email</span>
+                  <div class="uAlign">
+                    <span class="uContentElse">{{userInfo.email}}</span>
+                  </div>
+                </ListItem>
+                <ListItem>
+                  <span class="uTitle">Phone</span>
+                  <div class="uAlign">
+                    <span class="uContentElse">{{userInfo.phone}}</span>
+                  </div>
+                </ListItem>
+               <!-- <ListItem>
+                  <span class="uTitle">Title</span>
+                  <div class="uAlign">
+                    <span class="uContentElse">{{userInfo.title}}</span>
+                  </div>
+                </ListItem> -->
+                <ListItem>
+                  <span class="uTitle">Organizations</span>
+                  <div class="uAlign">
+                    <span class="uContentElse">{{myOrganizations}}</span>
+                  </div>
+                </ListItem>
+                <ListItem>
+                  <span class="uTitle">Domain</span>
+                  <div class="uAlign">
+                    <span class="uContentElse">{{myDomain}}</span>
+                  </div>
+                </ListItem>
+
+                <ListItem>
+                  <span class="uTitle">Country</span>
+                  <div class="uAlign">
+                    <span class="uContentElse">{{userInfo.country}}</span>
+                  </div>
+                </ListItem>
+               <ListItem >
+                  <span class="uTitle">State/Province</span>
+                  <div class="uAlign">
+                    <span class="uContentElse">{{userInfo.province}}</span>
+                  </div>
+                </ListItem>
+                <ListItem >
+                  <span class="uTitle">City</span>
+                  <div class="uAlign">
+                    <span class="uContentElse">{{userInfo.city}}</span>
+                  </div>
+                </ListItem>
+                <ListItem >
+                  <span class="uTitle">Homepage</span>
+                  <div class="uAlign">
+                    <a :href="'http://'+userInfo.homepage">
+                      <span class="uContentElse">{{userInfo.homepage}}</span>
+                    </a>
+                  </div>
+                </ListItem>
+                <ListItem style="height: 200px;">
+                  <span class="uTitle">Introduction</span>
+                  <div class="uAlignIntro">
+                    <span class="uContentIntroElse">{{userInfo.introduction}}</span>
+                  </div>
+                </ListItem>
+                <ListItem >
+                  <div></div>
+                </ListItem>
+              </List>
+              <div>
+                <Button @click="showEditUserInfoModal" type="info" style="width: 40%;margin-left: 5%;">Edit Information</Button>
+                <Button @click="showResetPwdModal" type="info" style="width: 40%;background-color: #2bbbad;margin-left: 2%;">Change Password</Button>
+              </div>
+            </Card>
+          </div>
+        </Col>
+      </Row>
+    </div>
 
     <Modal
       v-model="editUserInfoModal"
       width="600"
     >
-
       <div style="margin-top: 25px">
         <Form
           :model="userInfoFormItems"
@@ -173,11 +313,23 @@
 
           <FormItem label="Avatar">
             <div>
-              <div class="demo-upload-list" v-if="avatarUrl!=''&& avatarUrl != null  && avatarUrl != undefined">
+              <!-- 显示用户原始头像信息 -->
+              <div class="demo-upload-list" v-if="userInfoFormItems.avatar!=''&& userInfoFormItems.avatar != null  && userInfoFormItems.avatar != undefined && !reUpload ">
                 <template>
-                  <img v-bind:src="avatarUrl" class="avatarImage" />
+                  <img v-bind:src="avatarUrl" class="avatarImage"/>
                   <div class="demo-upload-list-cover">
                     <Icon type="ios-eye-outline" @click.native="handleView()"></Icon>
+                    <Icon type="ios-trash-outline" @click.native="handleRemove()"></Icon>
+                  </div>
+                </template>
+              </div>
+              <!-- 显示用户新上传的头像信息 -->
+              <div class="demo-upload-list" v-if="userInfoFormItems.avatar!=''&& userInfoFormItems.avatar != null  && userInfoFormItems.avatar != undefined && reUpload ">
+                <template>
+                  <img v-bind:src="userInfoFormItems.avatar" class="avatarImage"/>
+                  <div class="demo-upload-list-cover">
+                    <Icon type="ios-eye-outline" @click.native="handleView()"></Icon>
+                    <Icon type="ios-trash-outline" @click.native="handleRemove()"></Icon>
                   </div>
                 </template>
               </div>
@@ -196,8 +348,11 @@
                 />
               </div>
 
-              <Modal title="View Image" v-model="visible">
+              <Modal title="View Image" v-model="visible" v-if="!reUpload">
                 <img :src="avatarUrl" v-if="visible" style="width: 100%" />
+              </Modal>
+              <Modal title="View Image" v-model="visible" v-if="reUpload">
+                <img :src="userInfoFormItems.avatar" v-if="visible" style="width: 100%" />
               </Modal>
             </div>
           </FormItem>
@@ -260,10 +415,13 @@
         }
       }
       return {
+        contentHeight:"",
         editUserInfoModal: false,
         resetPasswordModal: false,
         avatar: null,
         visible: false,
+        useUserInfoCSS: true,
+        reUpload: false,
         //显示的内容
         userInfo: {},
         //tags
@@ -368,12 +526,42 @@
       this.initInfo();
     },
     mounted() {
+      this.reSize();
+      window.addEventListener("resize", this.reSize);
+    },
+    beforeDestroy: function () {
+      window.removeEventListener("resize", this.reSize);
     },
     methods: {
+      resizeContent() {
+        if (window.innerHeight > 675) {
+          this.contentHeight = window.innerHeight - 120;
+        } else {
+          this.contentHeight = 555;
+        }
+        window.onresize = () => {
+          return (() => {
+            this.resizeContent();
+          })();
+        };
+      },
+      reSize() {
+        // if (window.innerHeight > 675) {
+        //   this.contentHeight = window.innerHeight - 120 + "px";
+        // } else {
+        //   this.contentHeight = 675 - 120 + "px";
+        // }
+        if (window.innerWidth < 1200) {
+          this.useUserInfoCSS = false;
+        } else {
+          this.useUserInfoCSS = true;
+        }
+      },
       selectImg: function(){
         document.getElementById("choosePicture").click();
       },
       uploadPhoto(e) {
+        this.reUpload = true;
         // 利用fileReader对象获取file
         let file = e.target.files[0];
         let filesize = file.size;
@@ -389,7 +577,8 @@
           reader.onload = e => {
             // 读取到的图片base64 数据编码 将此编码字符串传给后台即可
             imgcode = e.target.result;
-            this.avatar = imgcode;
+            console.log(imgcode);
+            this.userInfoFormItems.avatar = imgcode;
             $("#choosePicture").val("");
           };
         }
@@ -422,13 +611,13 @@
         if (this.userInfo.domain == null) {
           this.userInfo.domain = [];
         }
+        // this.avatar = this.userInfo.avatar;
       },
       showEditUserInfoModal: function () {
         this.editUserInfoModal = true;
         this.userInfoFormItems = this.userInfo;
       },
       updateUserInfo: function () {
-
         //在上传图片的时候使用 imageToBase64.js 转换为base64 即可
         // "avatar": avatarBase64,
         let updateInfo = {
@@ -441,12 +630,14 @@
           "city": this.userInfoFormItems.city,
           "province": this.userInfoFormItems.province,
           "homepage": this.userInfoFormItems.homepage,
-          "introduction": this.userInfoFormItems.introduction
+          "introduction": this.userInfoFormItems.introduction,
+          "avatar": this.userInfoFormItems.avatar
         };
-        let avatarBase64 = this.avatar;
-        if (avatarBase64.indexOf("base64") != -1){
-          updateInfo["avatar"] = avatarBase64;
-        }
+        // let avatarBase64 = this.userInfoFormItems.avatar;
+        // if (avatarBase64.indexOf("base64") != -1){
+        //   updateInfo["avatar"] = avatarBase64;
+        // }
+        // console.log(this.userInfoFormItems.avatar);
 
         this.$axios
           .put("/GeoProblemSolving/user", updateInfo)
@@ -454,7 +645,7 @@
             if (res.data.code == 0) {
               // this.userInfo = this.userInfoFormItems;
               this.editUserInfoModal = false;
-
+              console.log(res)
               if (this.avatar != res.data.data){
                 this.avatar = res.data.data;
                 this.$emit("changeAvatar", this.avatar)
@@ -535,20 +726,34 @@
           return this.avatar;
         }
         let temp = this.userInfo.avatar;
+        console.log(temp);
         if (this.avatar != undefined && this.avatar != null && this.avatar != '' && this.avatar.indexOf("/avatar/") != -1) {
           this.avatar = this.$store.getters.userServer + this.avatar;
-        } else if (temp != undefined & temp != null && temp != ''){
+        } else if (temp != undefined & temp != null && temp != '' && temp.indexOf("/avatar/") != -1){
           this.avatar  = this.$store.getters.userServer + temp;
-        }else {
+        } else if (temp != undefined & temp != null && temp != '' && temp.indexOf("base64") != -1){
+          this.avatar = temp;
+        } else {
           this.avatar = '';
         }
         return this.avatar;
+      },
+      avatarUrlForm:function(){
+        return this.$store.getters.userServer + this.userInfoFormItems.avatar;
       }
     }
   }
 </script>
 
 <style scoped>
+  .userInfoCard{
+    background-color: white;
+    border-radius: 3px;
+    border:1px solid #dadce0;
+    box-shadow:  0 3.2px 7.2px 0 rgb(0 0 0 / 13%), 0 0.6px 1.8px 0 rgb(0 0 0 / 11%);
+    opacity: 0.95;
+  }
+
   .organization >>> .ti-input {
     display: inline-block;
     width: 469px;
@@ -577,18 +782,41 @@
   .uTitle {
     padding-right: 20px;
     font-family: 'Roboto Light';
-    color: #999999
+    color: #999999;
+    margin-left: 10%;
   }
 
   .uContent {
     color: #333333;
+    margin-left: 20%;
+  }
+
+  .uContentIntro{
+    color: #333333;
+    margin-left: 10%;
+  }
+
+  .uContentElse {
+    color: #333333;
+    margin-left: 40%;
+  }
+
+  .uContentIntroElse{
+    color: #333333;
+    margin-left: 10%;
   }
 
   .uAlign {
     position: absolute;
     left: 100px;
     text-align: left;
-    width: 500px
+    width: 400px
+  }
+
+  .uAlignIntro {
+    display:flex;
+    align-items: center;
+    height: 200px;
   }
 
   .selectImg:hover {
