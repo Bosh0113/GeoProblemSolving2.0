@@ -364,9 +364,23 @@ function selectData(dataType) {
     $("#dataType").text("Import " + dataType + " Data");
     $("#loadDataModal").modal("show");
 
+    if (dataType === "Result") {
+        $("#dataNote").text("Please select a GeoTiff (*.tif).");
+    } else {
+        $("#dataNote").text("Please select a Shapefile (*.zip).");
+    }
+
     var count = 0;
     for (var i = 0; i < resources.files.length; i++) {
-        if (resources.files[i].suffix === ".zip") {
+        if (dataType === "Result" && resources.files[i].suffix === ".tif") {
+            if (count == 0) {
+                $("#loadFile").append("<option selected value='" + i + "'>" + resources.files[i].name + resources.files[i].suffix + "</option>");
+                selectedData = resources.files[i];
+            } else {
+                $("#loadFile").append("<option value='" + i + "'>" + resources.files[i].name + resources.files[i].suffix + "</option>");
+            }
+            count++;
+        } else if (dataType !== "Result" && resources.files[i].suffix === ".zip") {
             if (count == 0) {
                 $("#loadFile").append("<option selected value='" + i + "'>" + resources.files[i].name + resources.files[i].suffix + "</option>");
                 selectedData = resources.files[i];
@@ -384,64 +398,69 @@ function selectData(dataType) {
 function importData() {
     if (selectedData == {} || selectedDataType == "") return;
 
-    if (selectedDataType === "Road") {
-        roadData = selectedData;
-    } else if (selectedDataType === "Building") {
-        buildingData = selectedData;
-    } else if (selectedDataType === "Barrier") {
-        barrierData = selectedData;
-    }
-
-    $.ajax({
-        type: "post",
-        url: "/GeoProblemSolving/upload" + selectedDataType + "Servlet",
-        data: JSON.stringify(selectedData),
-        processData: false,
-        contentType: 'application/json',
-        beforeSend: function () {
-            $("#waitting").show();
-        },
-        success: function (data) {
-            $("#waitting").hide();
-            // console.log(data);
-            var result = JSON.parse(data);
-            if (result.respCode == 1) {
-                $("#loadDataModal").modal("hide");
-
-                dataId = selectedData.uid;
-                mymap.setView([result.centerLat, result.centerLong], 15);
-
-                switch (selectedDataType) {
-                    case "Road":
-                        loadShapefile(roadCenterLayer, result.url);
-                        roadDataId = dataId;
-                        createRoad.presentID = result.roadMaxID + 1;
-                        break;
-                    case "Building":
-                        loadShapefile(buildingLayer, result.url);
-                        buildingDataId = dataId;
-                        createBuilding.presentID = result.buildingMaxID + 1;
-                        break;
-                    case "Barrier":
-                        loadShapefile(barrierLayer, result.url);
-                        barrierDataId = dataId;
-                        break;
-                }
-
-                // collaboration
-                window.parent.sendCustomOperation({
-                    type: "operation",
-                    sender: userId,
-                    behavior: "data-import",
-                    content: {
-                        data: roadData,
-                        featureType: selectedDataType,
-                        result: result
-                    },
-                });
-            }
+    if (selectedDataType === "Result") {
+        $("#loadDataModal").modal("hide");
+        loadResultTiff(selectedData.address);
+    } else {
+        if (selectedDataType === "Road") {
+            roadData = selectedData;
+        } else if (selectedDataType === "Building") {
+            buildingData = selectedData;
+        } else if (selectedDataType === "Barrier") {
+            barrierData = selectedData;
         }
-    });
+
+        $.ajax({
+            type: "post",
+            url: "/GeoProblemSolving/upload" + selectedDataType + "Servlet",
+            data: JSON.stringify(selectedData),
+            processData: false,
+            contentType: 'application/json',
+            beforeSend: function () {
+                $("#waitting").show();
+            },
+            success: function (data) {
+                $("#waitting").hide();
+                // console.log(data);
+                var result = JSON.parse(data);
+                if (result.respCode == 1) {
+                    $("#loadDataModal").modal("hide");
+
+                    dataId = selectedData.uid;
+                    mymap.setView([result.centerLat, result.centerLong], 15);
+
+                    switch (selectedDataType) {
+                        case "Road":
+                            loadShapefile(roadCenterLayer, result.url);
+                            roadDataId = dataId;
+                            createRoad.presentID = result.roadMaxID + 1;
+                            break;
+                        case "Building":
+                            loadShapefile(buildingLayer, result.url);
+                            buildingDataId = dataId;
+                            createBuilding.presentID = result.buildingMaxID + 1;
+                            break;
+                        case "Barrier":
+                            loadShapefile(barrierLayer, result.url);
+                            barrierDataId = dataId;
+                            break;
+                    }
+
+                    // collaboration
+                    window.parent.sendCustomOperation({
+                        type: "operation",
+                        sender: userId,
+                        behavior: "data-import",
+                        content: {
+                            data: roadData,
+                            featureType: selectedDataType,
+                            result: result
+                        },
+                    });
+                }
+            }
+        });
+    }
 }
 
 $("#loadDataModal").on("hidden.bs.modal", function () {
@@ -1000,7 +1019,7 @@ function getModelState(userId, runningId) {
                     onSelectClick();
                     $("#mapid").css("cursor", "-webkit-grab");
 
-                    loadResultTiff(runningId);
+                    // loadResultTiff(runningId);
                     $("#waitting").hide();
 
                     // window.parent.sendCustomOperation({
@@ -1193,7 +1212,7 @@ function onSetRoadInfoClick() {
         success: function (data) {
             var result = JSON.parse(data);
             if (result.respCode == 1) {
-                let path = "/GeoProblemSolving" + result.newAddress.replace(/\\/g,'/');
+                let path = "/GeoProblemSolving" + result.newAddress.replace(/\\/g, '/');
                 var xhr = new XMLHttpRequest();
                 xhr.open("GET", path, true);
                 xhr.responseType = "blob";
@@ -1314,7 +1333,7 @@ function onSetBuildingInfoClick() {
         success: function (data) {
             var result = JSON.parse(data);
             if (result.respCode === 1) {
-                let path = "/GeoProblemSolving" + result.newAddress.replace(/\\/g,'/');
+                let path = "/GeoProblemSolving" + result.newAddress.replace(/\\/g, '/');
                 var xhr = new XMLHttpRequest();
                 xhr.open("GET", path, true);
                 xhr.responseType = "blob";
@@ -1420,7 +1439,7 @@ function onSetBarrierInfoClick() {
         success: function (data) {
             var result = JSON.parse(data);
             if (result.respCode == 1) {
-                let path = "/GeoProblemSolving" + result.newAddress.replace(/\\/g,'/');
+                let path = "/GeoProblemSolving" + result.newAddress.replace(/\\/g, '/');
                 var xhr = new XMLHttpRequest();
                 xhr.open("GET", path, true);
                 xhr.responseType = "blob";
@@ -1888,9 +1907,9 @@ window.onpageshow = function (e) {
                     loadShapefile(barrierLayer, "./data/userData/" + userId + "/InputData/Barrier/" + barrierDataId + "/Barrier");
                 }
                 if (resultIdList.length) {
-                    resultIdList.forEach(function (item) {
-                        loadResultTiff(item);
-                    })
+                    // resultIdList.forEach(function (item) {
+                    //     loadResultTiff(item);
+                    // })
                 }
                 mymap.setView([result.centerLat, result.centerLong], result.currentZoom);
             } else {

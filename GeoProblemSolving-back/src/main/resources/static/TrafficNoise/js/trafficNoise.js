@@ -100,10 +100,6 @@ window.addEventListener('message', function (e) {
     }
 })
 
-// function onDemoClick() {
-//     $("#content-iframe").get(0).contentWindow.onDemoClick();
-// }
-
 function selectData(dataType) {
     $("#content-iframe").get(0).contentWindow.selectData(dataType);
 }

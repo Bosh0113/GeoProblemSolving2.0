@@ -434,4 +434,98 @@ public class prepareData {
         resultJSON.put("maxID",maxID>count?maxID:count);
         return resultJSON;
     }
+
+    public static JSONObject prepareResultData(String resultFilePath) throws IOException {
+        JSONObject resultJSON = new JSONObject();
+        double[] resultArr = new double[]{0.0,0.0};
+        ogr.RegisterAll();
+//        为了支持中文路径，请添加下面这句代码
+        gdal.SetConfigOption("GDAL_FILENAME_IS_UTF8", "YES");
+//		为了是属性表字段支持中文，请添加下面这句代码
+        gdal.SetConfigOption("SHAPE_ENCODING", "CP936");
+        gdal.SetConfigOption("SHAPE_RESTORE_SHX","YES");
+        Driver driver = ogr.GetDriverByName("ESRI shapefile");
+        if (driver == null)
+            return resultJSON;
+        DataSource dSource = driver.Open(resultFilePath + ".shp", 1);
+        if (dSource == null)
+            return resultJSON;
+        Layer layer = dSource.GetLayerByIndex(0);
+        if (layer == null)
+            return resultJSON;
+
+//        获得投影坐标
+        SpatialReference projection = layer.GetSpatialRef();
+//        获得地理坐标
+        SpatialReference latlng = projection.CloneGeogCS();
+//        新建投影坐标转地理坐标的坐标转换方法
+        CoordinateTransformation XY2Latlng = new CoordinateTransformation(projection,latlng);
+
+//        获得图层的范围，是投影坐标，需要转化为经纬度
+        double[] prjExtent = layer.GetExtent();
+
+        double[] latlngCenter = XY2Latlng.TransformPoint((prjExtent[0]+prjExtent[1])/2, (prjExtent[2]+prjExtent[3])/2);
+        resultJSON.put("Lng",latlngCenter[0]);
+        resultJSON.put("Lat",latlngCenter[1]);
+
+//        如果之前文件没有相应字段则创建
+        int hasLength, hasHeight, hasID;
+        hasHeight = hasLength = hasID = 1;
+
+//        OBJECTID
+        if (layer.FindFieldIndex("OBJECTID", 1) == -1) {
+            hasID = 0;
+            FieldDefn OBJECTID = new FieldDefn("OBJECTID", ogr.OFTInteger);
+            layer.CreateField(OBJECTID, 1);
+        }
+//        屏障长度
+        if (layer.FindFieldIndex("Length", 1) == -1) {
+            hasLength = 0;
+            FieldDefn length = new FieldDefn("Length", ogr.OFTReal);
+            length.SetPrecision(10);
+            layer.CreateField(length, 1);
+        }
+//        屏障高度
+        if (layer.FindFieldIndex("Height", 1) == -1) {
+            hasHeight = 0;
+            FieldDefn height = new FieldDefn("Height", ogr.OFTReal);
+            height.SetPrecision(10);
+            layer.CreateField(height, 1);
+        }
+
+        Feature feature = layer.GetNextFeature();
+        int count = 0;
+//        获取ID的最大值
+        int maxID = 0;
+        while (feature != null) {
+//            如果字段是刚添加或字段值还未设置，则初始化这个值
+            if (hasHeight == 0 || !feature.IsFieldSet("Height")) {
+                feature.SetField("Height", 2.5);
+            }
+            if (hasLength == 0 || !feature.IsFieldSet("Length")) {
+                DecimalFormat df = new DecimalFormat("#.000");
+                double length = Double.parseDouble(df.format(feature.GetGeometryRef().Length()));
+                feature.SetField("Length", length);
+            }
+            if (hasID == 0 || !feature.IsFieldSet("OBJECTID")) {
+                feature.SetField("OBJECTID", count);
+            }
+            else{
+                int featureID = feature.GetFieldAsInteger("OBJECTID");
+                maxID = featureID > maxID ? featureID : maxID;
+            }
+            count++;
+            layer.SetFeature(feature);
+            feature = layer.GetNextFeature();
+        }
+
+
+        layer.SyncToDisk();
+        layer.delete();
+        dSource.SyncToDisk();
+        dSource.delete();
+
+        resultJSON.put("maxID",maxID>count?maxID:count);
+        return resultJSON;
+    }
 }
