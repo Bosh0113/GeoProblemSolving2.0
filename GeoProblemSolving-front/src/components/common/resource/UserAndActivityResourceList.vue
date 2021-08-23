@@ -80,30 +80,7 @@
 <script>
 import { get, del, post, put, patch } from "@/axios";
 export default {
-  props: ["pageParams"],
   components: {},
-
-  watch: {
-    pageParams: {
-      async handler(val) {
-        // console.log(val);
-      },
-      deep: true
-    }
-    // switchValue: {
-    //   handler(val) {
-    //     console.log(val);
-    //     // this.selectData = {};
-    //     // this.handleCurrentChange("");
-    //     if (val) {
-    //       this.tableData = this.privateData;
-    //     } else {
-    //       this.tableData = this.publicData;
-    //     }
-    //   },
-    //   deep: true
-    // }
-  },
 
   computed: {},
 
@@ -141,7 +118,7 @@ export default {
     },
     async getProjectResources(){
       //项目中资源
-      let dataInProject = await get(`/GeoProblemSolving/rip/file/all/` + this.pageParams.aid);
+      let dataInProject = await get(`/GeoProblemSolving/rip/file/all/` + activityInfo.aid);
       for(let i = 0; i < dataInProject.length; i++){
         dataInProject[i].origin = "Project";
         if (dataInProject[i].privacy == "private"){
@@ -186,9 +163,9 @@ export default {
     },
 
     submit() {
-      console.log(this.selectData)
       this.$emit("selectData", this.selectData);
-    }
+    },
+
   },
 
   mounted() {

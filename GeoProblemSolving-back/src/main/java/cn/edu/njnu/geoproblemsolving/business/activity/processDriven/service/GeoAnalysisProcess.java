@@ -1,11 +1,11 @@
-package cn.edu.njnu.geoproblemsolving.business.activity.processDriven.setvice;
+package cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service;
 
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.entity.ActivityGraph;
-import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.entity.ActivityNode;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.entity.LinkRestriction;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 public interface GeoAnalysisProcess {
     ActivityGraph initActivityGraph(String rootAid);
@@ -18,7 +18,19 @@ public interface GeoAnalysisProcess {
      */
     HashMap<String, HashMap<String, LinkRestriction>> setLinkProtocol(String graphId, String type, ArrayList<String> nodeList, LinkRestriction linkRestriction);
 
-    ActivityNode createActivityNode(String aid);
+    HashMap<String, HashMap<String, LinkRestriction>> deleteEdge(String graphId, String startId, String endId);
+
+    HashMap<String, HashMap<String, LinkRestriction>> deleteEdges(String graphId, HashSet<String> nodeIdSet);
+
+    //判断该用户是否可以到此节点中
+    String checkUserIsApprovedService(String graphId, String nodeId, String userId);
+
+    //要不要用AOP方式切入到上传资源的函数中去
+    void resFlowAutoUpdate(String graphId, String nodeId, String uid);
+
+    void batchResFlowAutoUpdate(String graphId, String nodeId, HashMap<String, String> resTag);
+
+
     //协议已经变成了一系列的字符串
 
 

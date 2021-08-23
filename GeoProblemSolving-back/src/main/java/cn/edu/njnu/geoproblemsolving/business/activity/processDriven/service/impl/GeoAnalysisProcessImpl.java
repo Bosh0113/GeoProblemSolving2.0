@@ -1,4 +1,4 @@
-package cn.edu.njnu.geoproblemsolving.business.activity.processDriven.setvice.impl;
+package cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.impl;
 
 import cn.edu.njnu.geoproblemsolving.business.activity.dao.Impl.ActivityLinkProtocolDaoImpl;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
@@ -6,8 +6,10 @@ import cn.edu.njnu.geoproblemsolving.business.activity.enums.ResProtocol;
 import cn.edu.njnu.geoproblemsolving.business.activity.enums.RoleProtocol;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.entity.ActivityGraph;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.entity.ActivityNode;
-import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.setvice.GeoAnalysisProcess;
+import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.GeoAnalysisProcess;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.entity.LinkRestriction;
+import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.NodeService;
+import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.TagUtil;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityGraphRepository;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityNodeRepository;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityRepository;
@@ -17,9 +19,12 @@ import cn.edu.njnu.geoproblemsolving.business.resource.service.Impl.ActivityResS
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
+import org.aspectj.lang.annotation.Aspect;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import sun.nio.cs.ext.MacArabic;
 
 import java.util.*;
 
@@ -31,31 +36,33 @@ import java.util.*;
  * @Author zhngzhng
  * @Date 2021/7/21
  **/
+@Aspect
 @Service
 public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
-    private final ActivityLinkProtocolDaoImpl protocolDao;
+    @Autowired
+    ActivityLinkProtocolDaoImpl protocolDao;
 
-    private final RestTemplate restTemplate;
+    @Autowired
+    RestTemplate restTemplate;
 
-    private final ActivityRepository activityRepository;
+    @Autowired
+    ActivityRepository activityRepository;
 
-    private final ActivityGraphRepository graphRepository;
+    @Autowired
+    ActivityGraphRepository graphRepository;
 
-    private final ActivityResServiceImpl activityResService;
+    @Autowired
+    ActivityResServiceImpl activityResService;
 
-    private final ActivityNodeRepository nodeRepository;
+    @Autowired
+    ActivityNodeRepository nodeRepository;
 
-    private final ActivityResDaoImpl activityResDao;
+    @Autowired
+    ActivityResDaoImpl activityResDao;
 
-    public GeoAnalysisProcessImpl(ActivityRepository activityRepository, ActivityLinkProtocolDaoImpl protocolDao, ActivityGraphRepository graphRepository, RestTemplate restTemplate, ActivityResServiceImpl activityResService, ActivityNodeRepository nodeRepository, ActivityResDaoImpl activityResDao) {
-        this.activityRepository = activityRepository;
-        this.protocolDao = protocolDao;
-        this.graphRepository = graphRepository;
-        this.restTemplate = restTemplate;
-        this.activityResService = activityResService;
-        this.nodeRepository = nodeRepository;
-        this.activityResDao = activityResDao;
-    }
+    @Autowired
+    NodeService nodeService;
+
 
     @Value("${userServerLocation}")
     String userServer;
@@ -64,6 +71,8 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
      * 初始化 graph
      * 应用场景：
      * 将项目设定为 MultiActivity 时调用
+     * （不需要在设定项目的时候调用，这样徒增消耗）
+     * 在新建协议的时候检测是否有此图，无的话调用即可
      *
      * @param rootAid
      * @return
@@ -88,6 +97,7 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
      * 遍历图找到关联的节点
      * （由于关系的存在，可以简化操作，如1个分散为3个，可以直接先遍历分散点，完成上层的关联点的判断然后根据关系完成流动，但是这只是简化了）
      * (可能还并不使用)还可以使用关系进行简化存储，现在的邻接表存储的是0->(1,constraint) 可以简化为 => 0 ->
+     * todo 集合框架的传值的问题
      *
      * @param rootAid         协议所依附于的活动
      * @param type            协议的关系
@@ -98,18 +108,12 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
     @Override
     public HashMap<String, HashMap<String, LinkRestriction>> setLinkProtocol(String rootAid, String type, ArrayList<String> nodeIdList, LinkRestriction linkRestriction) {
         Optional<ActivityGraph> graphOptional = graphRepository.findById(rootAid);
-        ActivityGraph activityGraph;
-        if (!graphOptional.isPresent()) {
-            // 无此图则初始化即可，不用报错
-            activityGraph = initActivityGraph(rootAid);
-        } else {
-            activityGraph = graphOptional.get();
-        }
-        //Acquiring the graph's adjacency list.
+        ActivityGraph activityGraph = graphOptional.isPresent() ? graphOptional.get() : initActivityGraph(rootAid);
+        // Acquiring the graph's adjacency list.
         HashMap<String, HashMap<String, LinkRestriction>> adjacencyMap = activityGraph.getAdjacencyMap();
         // 生成协议
         HashMap<String, HashMap<String, LinkRestriction>> protocolByRelation = setProtocolByRelation(adjacencyMap, nodeIdList, type, linkRestriction);
-        //更新邻接表
+        // 更新邻接表
         adjacencyMap.putAll(protocolByRelation);
         activityGraph.setAdjacencyMap(adjacencyMap);
         graphRepository.save(activityGraph);
@@ -121,14 +125,10 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
         HashMap<String, HashMap<String, LinkRestriction>> relevantUpperNode = getRelevantUpperNode(adjacencyMap, nodeIdList);
         //完成关系内资源流动
         resFlowInProtocol(relevantUpperNode, type, nodeIdList, linkRestriction);
-        /*
-        关系下层资源流动
-        1. 关系下层邻接表
-        2. 资源流动
-         */
-        //在此不用多此一举增加构建关系内的邻接表
-        // HashMap<String, HashMap<String, LinkRestriction>> subgraphLinkList = setSubgraphLinkList(nodeIdList, type, linkRestriction);
-        // resFlowInProtocol(relevantUpperNode, type);
+        //关系下层资源流动
+        resFlowInLowerNode(rootAid, nodeIdList);
+
+        // 将添加后的图给用户
         return protocolByRelation;
     }
 
@@ -146,8 +146,8 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
         String keyNodeId = nodeIdList.get(0);
         //判断协议中节点是否存在，若不存在则新建
         for (String nodeId : nodeIdList) {
-            if (nodeIsPresent(nodeId) == null) {
-                createActivityNode(nodeId);
+            if (nodeService.nodeIsPresent(nodeId) == null) {
+                nodeService.createActivityNode(nodeId);
             }
         }
         //初始化终点数据结构
@@ -164,16 +164,15 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
         上述步骤被封装在 generateEdgeEndNode 中
         */
         switch (type) {
-            case "Convergence":
+            case "Merger":
                 for (int i = 1; i < nodeIdList.size(); i++) {
                     String startNodeId = nodeIdList.get(i);
                     //将终点放入起点的邻接表中
-                    endNodeAndRestriction.clear();
-                    endNodeAndRestriction = generateEdgeEndNode(adjacencyMap, startNodeId, keyNodeId, linkRestriction);
-                    linkProtocol.put(startNodeId, endNodeAndRestriction);
+                    HashMap<String, LinkRestriction> edgeEndNode = generateEdgeEndNode(adjacencyMap, startNodeId, keyNodeId, linkRestriction);
+                    linkProtocol.put(startNodeId, edgeEndNode);
                 }
                 break;
-            case "Dispersed":
+            case "Branch":
                 for (int i = 1; i < nodeIdList.size(); i++) {
                     String endNodeId = nodeIdList.get(i);
                     /*
@@ -194,26 +193,24 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
                 }
                 linkProtocol.put(keyNodeId, endNodeAndRestriction);
                 break;
-            case "loop":
+            case "Loop":
                 //单向循环模式
                 for (int i = 0; i < nodeIdList.size(); i++) {
                     String startNodeId = nodeIdList.get(i);
                     String endNodeId;
                     // 起点为最后列表中最后一个则起点为 keyNode
                     endNodeId = (i == nodeIdList.size() - 1) ? keyNodeId : nodeIdList.get(i + 1);
-                    endNodeAndRestriction.clear();
-                    endNodeAndRestriction = generateEdgeEndNode(adjacencyMap, startNodeId, endNodeId, linkRestriction);
-                    linkProtocol.put(startNodeId, endNodeAndRestriction);
+                    HashMap<String, LinkRestriction> edgeEndNode = generateEdgeEndNode(adjacencyMap, startNodeId, endNodeId, linkRestriction);
+                    linkProtocol.put(startNodeId, edgeEndNode);
                 }
                 break;
-            case "order":
+            case "Sequence":
                 //串联模式
                 for (int i = 0; i < nodeIdList.size() - 1; i++) {
                     String startNodeId = nodeIdList.get(i);
                     String endNodeId = nodeIdList.get(i + 1);
-                    endNodeAndRestriction.clear();
-                    endNodeAndRestriction = generateEdgeEndNode(adjacencyMap, startNodeId, endNodeId, linkRestriction);
-                    linkProtocol.put(startNodeId, endNodeAndRestriction);
+                    HashMap<String, LinkRestriction> edgeEndNode = generateEdgeEndNode(adjacencyMap, startNodeId, endNodeId, linkRestriction);
+                    linkProtocol.put(startNodeId, edgeEndNode);
                 }
                 break;
         }
@@ -231,28 +228,29 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
      * @return
      */
     private void resFlowInProtocol(HashMap<String, HashMap<String, LinkRestriction>> upperNodeLinkList, String type, ArrayList<String> nodeIds, LinkRestriction linkRestriction) {
-        //关系上层到关系连接点的流动
+        //关系上层到关系连接点的流动，内部包含活动层的更新
         for (Map.Entry<String, HashMap<String, LinkRestriction>> linkedEdge : upperNodeLinkList.entrySet()) {
-            String flowNodeId = linkedEdge.getKey();
-            HashMap<String, LinkRestriction> linkNodes = linkedEdge.getValue();
-            //获得起点中的资源
-            ActivityNode flowNode = nodeRepository.findById(flowNodeId).get();
-            HashMap<String, String> flowNodeResources = flowNode.getResources();
-            // 遍历节点
-            for (Map.Entry<String, LinkRestriction> endNodeItem : linkNodes.entrySet()) {
-                String endNodeId = endNodeItem.getKey();
+            //起终点是倒置的，所以起点是存储在 value 中的，有多个起点
+            String endNodeId = linkedEdge.getKey();
+            ActivityNode endNode = nodeRepository.findById(endNodeId).get();
+            HashMap<String, LinkRestriction> startNodeAndLinkRestriction = linkedEdge.getValue();
+            for (Map.Entry<String, LinkRestriction> endNodeItem : startNodeAndLinkRestriction.entrySet()) {
+                //获取流动的资源，并且判断那些资源可以通过限制
+                String startNodeId = endNodeItem.getKey();
                 LinkRestriction edgeRestriction = endNodeItem.getValue();
+                ActivityNode flowNode = nodeRepository.findById(startNodeId).get();
+                HashMap<String, String> flowNodeResources = flowNode.getResources();
                 HashSet<String> approvedRes = resFlowApprove(flowNodeResources, edgeRestriction);
-                // 无可流动的资源
+                //无可流动资源直接就不做处理了
                 if (approvedRes.size() == 0) continue;
-                HashMap<String, String> nodeResourceTagMap = addResourceToNode(flowNodeId, endNodeId, approvedRes);
-                ActivityNode endNode = nodeRepository.findById(endNodeId).get();
+                //将资源流动到节点中
+                HashMap<String, String> nodeResourceTagMap = addResourceToNode(startNodeId, endNodeId, approvedRes);
                 endNode.setResources(nodeResourceTagMap);
                 nodeRepository.save(endNode);
             }
         }
 
-        //内部的流动，有个可以省略的地方，协议内部的限制性条件是相同的
+        //内部的流动 协议内部的限制性条件是相同的
         String keyNodeId = nodeIds.get(0);
         ActivityNode keyNode = nodeRepository.findById(keyNodeId).get();
         HashMap<String, String> keyNodeResources = keyNode.getResources();
@@ -270,9 +268,7 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
                 break;
             case "Branch":
                 HashSet<String> approvedRes = resFlowApprove(keyNodeResources, linkRestriction);
-                if (approvedRes.size() == 0) {
-                    break;
-                }
+                if (approvedRes.size() == 0) break;
                 for (int i = 1; i < nodeIds.size(); i++) {
                     String endNodeId = nodeIds.get(i);
                     HashMap<String, String> endNodeResourceTagMap = addResourceToNode(keyNodeId, endNodeId, approvedRes);
@@ -293,7 +289,7 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
                 }
                 break;
             case "Sequence":
-                for (int i = 0; i < nodeIds.size() -1; i++) {
+                for (int i = 0; i < nodeIds.size() - 1; i++) {
                     String startId = nodeIds.get(i);
                     String endId = nodeIds.get(i + 1);
                     HashSet<String> flowApprove = resFlowApprove(startId, linkRestriction);
@@ -306,6 +302,79 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
         }
     }
 
+
+    /**
+     * 实现关系下层的流动
+     * <p>
+     * 1. 获取节点下层路径
+     * 2. 根据路径获取资源可到达的节点
+     * 3. 根据节点及资源可到达的节点将资源流动过去
+     *
+     * @param graphId
+     * @param nodeIdList 关系类型
+     * @return
+     */
+    private void resFlowInLowerNode(String graphId, ArrayList<String> nodeIdList) {
+        for (String nodeId : nodeIdList) {
+            //获取节点所有下层路径 todo 优化点：关系内存在下层关系的，会导致有很多无用路径
+            Stack<Stack<HashMap<String, LinkRestriction>>> relevantNodeRoute = getRelevantNodeRoute(graphId, nodeId);
+            //将此方法移植到深度遍历中，即可去掉重复
+            for (int i = relevantNodeRoute.size() - 1; i >= 0; i--) {
+                Stack<HashMap<String, LinkRestriction>> path = relevantNodeRoute.get(i);
+                //路径中的第一个节点，因为关系只能是一层，所以能用于判断第一个
+                HashMap<String, LinkRestriction> edgeOne = path.get(0);
+                //实际上就一个item，这个可能是在数据结构上可以优化的点；连续内存地址与不连续内存地址
+                for (String id : edgeOne.keySet()) {
+                    if (nodeIdList.contains(id)) {
+                        //说明该条路径第一个节点是关系内的，关系内资源流动已经完成，可以直接去掉
+                        //todo：为什么需要将关系内部与下部进行划分喃？直接放在一起不好吗？
+                        relevantNodeRoute.remove(i);
+                    }
+                }
+            }
+            if (relevantNodeRoute.size() == 0) return;
+            ActivityNode node = nodeRepository.findById(nodeId).get();
+            HashMap<String, String> resourceTagMap = node.getResources();
+            //获取当前节点中资源所能到达的节点
+            HashMap<String, HashSet<String>> resFlowNode = getFlowNode(relevantNodeRoute, resourceTagMap);
+            //将资源流动到各点中
+            resFlow(nodeId, resFlowNode);
+        }
+    }
+
+
+    /**
+     * 暂时取这个名字
+     * 资源的流动
+     *
+     * @param resNodeId   资源流出的节点，用于获取资源字段
+     * @param resFlowNode 由路径生成的每个资源可以流动到的节点
+     */
+    private void resFlow(String resNodeId, HashMap<String, HashSet<String>> resFlowNode) {
+        for (Map.Entry<String, HashSet<String>> item : resFlowNode.entrySet()) {
+            /*
+            1. 拿到资源字段
+            2. 根据路径依次存入activity
+            3. 存入节点
+             */
+            String resId = item.getKey();
+            HashSet<String> nodeId = item.getValue();
+            if (nodeId.isEmpty()) {
+                continue;
+            }
+            Iterator<String> iterator = nodeId.iterator();
+            //遍历这些节点将资源存入
+            while (iterator.hasNext()) {
+                String nextNodeId = iterator.next();
+                //将资源添加到对应的活动中，并返回节点的资源标签
+                HashMap<String, String> resTagMap = addResource(resNodeId, nextNodeId, resId);
+                //将标签更新到节点中
+                ActivityNode node = nodeRepository.findById(nextNodeId).get();
+                node.setResources(resTagMap);
+                nodeRepository.save(node);
+            }
+        }
+    }
 
     /**
      * 两个节点间的资源流动
@@ -359,9 +428,12 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
                 若有则该起点连接着该节点
                  */
                 if (endNodeList.containsKey(nodeId)) {
-                    LinkRestriction linkRestriction = endNodeList.get(nodeId);
                     // 获取起始节点的 NodeId, 并构造<start, Restriction>结构存入返回值中 <End, <Start, Restriction>>
                     String startNodeId = item.getKey();
+                    //去掉关系内部节点为上层节点的情况
+                    if (nodeList.contains(startNodeId)) continue;
+                    LinkRestriction linkRestriction = endNodeList.get(nodeId);
+
                     /*
                     若返回值中已经有以该节点为终点的边了，则将其取出，并将新边放进去
                      */
@@ -373,111 +445,6 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
             }
         }
         return relevantNode;
-    }
-
-    /**
-     * 关系下层资源的流动
-     * 麻烦一些，因为可能路径比较复杂，话又说回来，一个活动下子活动应该不会超过10个，10个的话无论我怎么连接，路径都很少，不存在非常慢的情况
-     * ，不过麻烦不在这个方法中，而是在遍历的时候
-     *
-     * @param adjacencyMap
-     * @return
-     */
-    private void resFlowLower(HashMap<String, HashMap<String, LinkRestriction>> adjacencyMap) {
-
-
-    }
-
-    /**
-     * 构建子图
-     * 单个关系内部，不考虑外部的连接
-     * 主要用于内部资源流动
-     *
-     * @param nodeIdList
-     * @param type
-     * @return
-     */
-    private HashMap<String, HashMap<String, LinkRestriction>> setSubgraphLinkList(ArrayList<String> nodeIdList, String type, LinkRestriction linkRestriction) {
-        HashMap<String, HashMap<String, LinkRestriction>> subgraphLinkList = new HashMap<>();
-        //判断节点是否存在，若无则新建
-        for (String nodeId : nodeIdList) {
-            if (nodeIsPresent(nodeId) == null) createActivityNode(nodeId);
-        }
-        String keyNodeId = nodeIdList.get(0);
-        HashMap<String, LinkRestriction> endNodeAndRestriction = new HashMap<>();
-        switch (type) {
-            case "Convergence":
-                //将终点放入，然后再成边
-                endNodeAndRestriction.put(keyNodeId, linkRestriction);
-                for (int i = 1; i < nodeIdList.size(); i++) {
-                    String startNodeId = nodeIdList.get(i);
-                    subgraphLinkList.put(startNodeId, endNodeAndRestriction);
-                }
-                break;
-            case "Dispersed":
-                // 构造终点，然后成边
-                for (int i = 1; i < nodeIdList.size(); i++) {
-                    String endNodeId = nodeIdList.get(i);
-                    endNodeAndRestriction.put(endNodeId, linkRestriction);
-                }
-                subgraphLinkList.put(keyNodeId, endNodeAndRestriction);
-                break;
-            case "loop":
-                //循环构建，最后一个节点的终点是第一个点
-                for (int i = 0; i < nodeIdList.size(); i++) {
-                    String startNodeId = nodeIdList.get(i);
-                    String endNodeId = (i == nodeIdList.size() - 1) ? nodeIdList.get(0) : nodeIdList.get(i + 1);
-                    //清除上一个节点邻接表
-                    endNodeAndRestriction.clear();
-                    //将终点存入map
-                    endNodeAndRestriction.put(endNodeId, linkRestriction);
-                    //将边添加到子图中
-                    subgraphLinkList.put(startNodeId, endNodeAndRestriction);
-                }
-                break;
-            case "order":
-                // i 为起点， i+1 为终点
-                for (int i = 0; i < nodeIdList.size() - 1; i++) {
-                    String startNodeId = nodeIdList.get(i);
-                    String endNodeId = nodeIdList.get(i + 1);
-                    endNodeAndRestriction.clear();
-                    endNodeAndRestriction.put(endNodeId, linkRestriction);
-                    subgraphLinkList.put(startNodeId, endNodeAndRestriction);
-                }
-                break;
-
-        }
-        return subgraphLinkList;
-    }
-
-    /**
-     * 合并两个子图
-     * 上层 中层（关系） 下层关系连接
-     * 只是部分的连接而已
-     * 主要用于资源流动
-     *
-     * @param sourceSubgraph
-     * @param targetSubgraph
-     * @return
-     */
-    private HashMap<String, HashMap<String, LinkRestriction>> mergeSubgraphToGraph(HashMap<String, HashMap<String, LinkRestriction>> sourceSubgraph, HashMap<String, HashMap<String, LinkRestriction>> targetSubgraph) {
-        if (sourceSubgraph == null) {
-            return targetSubgraph;
-        }
-        //
-        for (Map.Entry<String, HashMap<String, LinkRestriction>> edge : sourceSubgraph.entrySet()) {
-            String startNodeId = edge.getKey();
-            HashMap<String, LinkRestriction> endNodeLinkList = targetSubgraph.get(startNodeId);
-            HashMap<String, LinkRestriction> endNodeValue = edge.getValue();
-            if (endNodeLinkList != null) {
-                //不存在重复的边的情况,关系内与关系外的连接
-                endNodeLinkList.putAll(endNodeValue);
-                targetSubgraph.put(startNodeId, endNodeLinkList);
-                continue;
-            }
-            targetSubgraph.put(startNodeId, endNodeValue);
-        }
-        return targetSubgraph;
     }
 
     /**
@@ -499,26 +466,6 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
             }
         }
         return null;
-    }
-
-    /**
-     * 新建边，并将其存入图的链接表中
-     * <p>
-     * 方法中加入了重复边检测
-     * 由于该功能的存在在新建的时候
-     * 就非常灵活了，随便建
-     *
-     * @param start
-     * @param end
-     * @param linkRestriction
-     * @param adjacencyMap
-     * @return
-     */
-    private HashMap<String, HashMap<String, LinkRestriction>> addEdge(HashMap<String, HashMap<String, LinkRestriction>> adjacencyMap, String start, String end, LinkRestriction linkRestriction) {
-        //将终点加到该起点的邻接表中
-        HashMap<String, LinkRestriction> endNodeAndLinkRestriction = generateEdgeEndNode(adjacencyMap, start, end, linkRestriction);
-        adjacencyMap.put(start, endNodeAndLinkRestriction);
-        return adjacencyMap;
     }
 
     /**
@@ -561,44 +508,13 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
             //边已经存在，合并限制性条件
             newLinkRestriction = mergeLinkProperties(linkRestriction, oldRestriction);
         }
-        //判断是否起点是否连接多个点
-        HashMap<String, LinkRestriction> endNodeAndRestriction;
-        endNodeAndRestriction = adjacencyMap.get(start);
-        if (endNodeAndRestriction == null) {
-            //该节点未连接有边
-            endNodeAndRestriction = new HashMap<>();
-        }
+        /*
+        判断是否起点是否连接多个点
+         */
+        HashMap<String, LinkRestriction> endNodeAndRestriction = adjacencyMap.get(start) == null ? new HashMap<>() : adjacencyMap.get(start);
         endNodeAndRestriction.put(end, newLinkRestriction);
         return endNodeAndRestriction;
     }
-
-
-    /**
-     * 资源的流动函数
-     * <p>
-     * 当前关系称为中间层
-     * 还需要好几个函数
-     * 不必关心上层的流动，因为上层的流动已经在新建协议的时候完成了
-     * 只需要当前关系与可能当前关系作为连接点实现的上层与下层图的连接
-     * 需要两个函数：
-     * 1.获取与当前关系有联系的上层节点（关系中节点作为 endNode）
-     * 2.关系内流动处理
-     * 3.获取当前关系有联系的下层节点（关系中节点作为 startNode,应该是不多的）
-     * 4.下层节点的流动
-     * 只需要关注连接点
-     *
-     * @param adjacencyMap
-     * @param nodeId
-     * @return 返回是上层节点与下层节点 限制性条件在流动的时候再去拿吧
-     */
-    private ArrayList<String> checkThe(HashMap<String, HashMap<String, LinkRestriction>> adjacencyMap, String nodeId) {
-        // 先判断连通到哪一些节点
-        /*
-        获取上层节点
-         */
-        return null;
-    }
-
 
 
     /**
@@ -613,16 +529,17 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
      * @return 能流动的资源的id list,采用set, set 中元素不能重复
      */
     private HashSet<String> resFlowApprove(HashMap<String, String> activityResource, LinkRestriction linkRestriction) {
-        HashSet<String> approvedResIdList = new HashSet<>();
         ResProtocol resProtocol = linkRestriction.getResProtocol();
-        if (resProtocol.toString().equals("All")) return (HashSet<String>) activityResource.keySet();
-        if (resProtocol.toString().equals("None")) return new HashSet<>();
-        //这里需要修改
-        ArrayList<String> types = linkRestriction.getTypes();
+        if (activityResource.size() == 0 || resProtocol.toString().equals("None")) return new HashSet<>();
+        if (resProtocol.toString().equals("All"))
+            return JSONObject.parseObject(JSONObject.toJSONString(activityResource.keySet()), HashSet.class);
+        // TODO: 2021/8/13 资源验证部分内容代码 等确定下来再增加
+        HashSet<String> types = linkRestriction.getTypes();
+        HashSet<String> approvedResIdList = new HashSet<>();
         for (Map.Entry<String, String> res : activityResource.entrySet()) {
             String resId = res.getKey();
             String resTagStr = res.getValue();
-            HashMap<String, String> resTagMap = recoveryResTag(resTagStr);
+            HashMap<String, String> resTagMap = TagUtil.recoveryResTag(resTagStr);
             String type = resTagMap.get("type");
             if (types.contains(type)) {
                 approvedResIdList.add(resId);
@@ -637,14 +554,15 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
 
         HashSet<String> approvedResIdSet = new HashSet<>();
         ResProtocol resProtocol = linkRestriction.getResProtocol();
-        if (resProtocol.toString().equals("All")) return (HashSet<String>) activityResourceMap.keySet();
+        if (resProtocol.toString().equals("All"))
+            return JSONObject.parseObject(JSONObject.toJSONString(activityResourceMap.keySet()), HashSet.class);
         if (resProtocol.toString().equals("None")) return new HashSet<>();
         //这里需要修改
-        ArrayList<String> types = linkRestriction.getTypes();
+        HashSet<String> types = linkRestriction.getTypes();
         for (Map.Entry<String, String> res : activityResourceMap.entrySet()) {
             String resId = res.getKey();
             String resTagStr = res.getValue();
-            HashMap<String, String> resTagMap = recoveryResTag(resTagStr);
+            HashMap<String, String> resTagMap = TagUtil.recoveryResTag(resTagStr);
             String type = resTagMap.get("type");
             if (types.contains(type)) {
                 approvedResIdSet.add(resId);
@@ -662,10 +580,10 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
      * @return
      */
     private boolean resFlowApproveByTagStr(String tagStr, LinkRestriction linkRestriction) {
-        HashMap<String, String> tagMap = recoveryResTag(tagStr);
+        HashMap<String, String> tagMap = TagUtil.recoveryResTag(tagStr);
         String type = tagMap.get("type");
         String suffix = tagMap.get("suffix");
-        ArrayList<String> types = linkRestriction.getTypes();
+        HashSet<String> types = linkRestriction.getTypes();
         if (types.contains(type)) {
             return true;
         }
@@ -684,26 +602,26 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
         RoleProtocol roleProtocol = linkRestriction.getRoleProtocol();
         if (roleProtocol.toString().equals("All")) return (HashSet<String>) activityUser.keySet();
         if (roleProtocol.toString().equals("None")) return new HashSet<>();
-        ArrayList<String> roles = linkRestriction.getRoles();
-        ArrayList<String> organizations = linkRestriction.getOrganizations();
-        ArrayList<String> domains = linkRestriction.getDomains();
+        HashSet<String> roles = linkRestriction.getRoles();
+        HashSet<String> organizations = linkRestriction.getOrganizations();
+        HashSet<String> domains = linkRestriction.getDomains();
 
         for (Map.Entry<String, String> user : activityUser.entrySet()) {
             String userId = user.getKey();
             String userTagStr = user.getValue();
-            HashMap<String, ArrayList<String>> userTagMap = recoveryUserTag(userTagStr);
-            ArrayList<String> role = userTagMap.get("role");
-            if (checkTagContain(role, roles)) {
+            HashMap<String, HashSet<String>> userTagMap = TagUtil.recoveryUserTag(userTagStr);
+            HashSet<String> role = userTagMap.get("role");
+            if (TagUtil.checkTagContain(role, roles)) {
                 approvedUserIdList.add(userId);
                 continue;
             }
-            ArrayList<String> domain = userTagMap.get("domain");
-            if (checkTagContain(domain, domains)) {
+            HashSet<String> domain = userTagMap.get("domain");
+            if (TagUtil.checkTagContain(domain, domains)) {
                 approvedUserIdList.add(userId);
                 continue;
             }
-            ArrayList<String> org = userTagMap.get("org");
-            if (checkTagContain(org, organizations)) {
+            HashSet<String> org = userTagMap.get("org");
+            if (TagUtil.checkTagContain(org, organizations)) {
                 approvedUserIdList.add(userId);
                 continue;
             }
@@ -722,82 +640,29 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
      * @return
      */
     private boolean userFlowApprove(String tagStr, LinkRestriction linkRestriction) {
-        HashMap<String, ArrayList<String>> userTagMap = recoveryUserTag(tagStr);
-        ArrayList<String> role = userTagMap.get("role");
-        ArrayList<String> roles = linkRestriction.getRoles();
-        if (checkTagContain(roles, role)) {
+        //添加 All & None 情况的判断
+        String roleProtocol = linkRestriction.getRoleProtocol().toString();
+        if (roleProtocol.equals("All")) return true;
+        if (roleProtocol.equals("None")) return false;
+        HashMap<String, HashSet<String>> userTagMap = TagUtil.recoveryUserTag(tagStr);
+        HashSet<String> role = userTagMap.get("role");
+        HashSet<String> roles = linkRestriction.getRoles();
+        if (TagUtil.checkTagContain(roles, role)) {
             return true;
         }
-        ArrayList<String> domain = userTagMap.get("domain");
-        ArrayList<String> domains = linkRestriction.getDomains();
-        if (checkTagContain(domains, domain)) {
+        HashSet<String> domain = userTagMap.get("domain");
+        HashSet<String> domains = linkRestriction.getDomains();
+        if (TagUtil.checkTagContain(domains, domain)) {
             return true;
         }
-        ArrayList<String> org = userTagMap.get("org");
-        ArrayList<String> organizations = linkRestriction.getOrganizations();
-        if (checkTagContain(organizations, org)) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * 将构造的用户字符串还原
-     *
-     * @param userTagStr
-     * @return
-     */
-    private HashMap<String, ArrayList<String>> recoveryUserTag(String userTagStr) {
-        HashMap<String, ArrayList<String>> tagMap = new HashMap<>();
-        String[] tags = userTagStr.split("O517");
-        String roles = tags[0];
-        String domains = tags[1];
-        String organizations = tags[2];
-
-        String[] roleArray = roles.split("\\.");
-        String[] domainArray = domains.split("\\.");
-        String[] orgArray = organizations.split("\\.");
-
-        ArrayList<String> roleList = Lists.newArrayList(roleArray);
-        ArrayList<String> domainList = Lists.newArrayList(domainArray);
-        ArrayList<String> orgList = Lists.newArrayList(orgArray);
-
-        tagMap.put("role", roleList);
-        tagMap.put("domain", domainList);
-        tagMap.put("org", orgList);
-        return tagMap;
-    }
-
-
-    /**
-     * （资源）从标签字符串恢复层单个标签
-     *
-     * @param resTagStr
-     * @return
-     */
-    private HashMap<String, String> recoveryResTag(String resTagStr) {
-        HashMap<String, String> resTag = new HashMap<>();
-        String[] tagArray = resTagStr.split("O517");
-        resTag.put("type", tagArray[0]);
-        resTag.put("suffix", tagArray[1]);
-        return resTag;
-    }
-
-    /**
-     * 检查两个list中是否有重复项
-     *
-     * @param source
-     * @param target
-     * @return
-     */
-    private boolean checkTagContain(ArrayList source, ArrayList target) {
-        int originalSize = source.size();
-        source.removeAll(target);
-        if (originalSize != source.size()) {
+        HashSet<String> org = userTagMap.get("org");
+        HashSet<String> organizations = linkRestriction.getOrganizations();
+        if (TagUtil.checkTagContain(organizations, org)) {
             return true;
         }
         return false;
     }
+
 
     /**
      * 判断用户是否可以流动到此节点
@@ -830,51 +695,66 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
      * @param uid
      * @return
      */
-    private Object resFlowAutoUpdate(String nodeId, String graphId, String uid) {
-
-        return null;
+    @Override
+    public void resFlowAutoUpdate(String graphId, String nodeId, String uid) {
+        Stack<Stack<HashMap<String, LinkRestriction>>> relevantNodeRoute = getRelevantNodeRoute(graphId, nodeId);
+        //需要判断它是否接受 AutoUpdate
+        ResourceEntity file = activityResService.getFileById(nodeId, uid);
+        String resTags = TagUtil.setResourceTag(file);
+        HashMap<String, String> resTagMap = new HashMap<>();
+        resTagMap.put(uid, resTags);
+        HashMap<String, HashSet<String>> flowNode = getFlowNode(relevantNodeRoute, resTagMap);
+        resFlow(nodeId, flowNode);
     }
 
     /**
-     * 获取与此节点连通的节点及它的边
-     * 直接递归就可以
-     * 可以先看一下深度、广度搜索
+     * 自动更新
      *
-     * @param adjacencyMap
+     * @param graphId
      * @param nodeId
-     * @return
+     * @param resTag
      */
-    private HashMap<String, HashMap<String, LinkRestriction>> getConnectedNode(HashMap<String, HashMap<String, LinkRestriction>> adjacencyMap, String nodeId) {
-        HashMap<String, HashMap<String, LinkRestriction>> connectionLinkMap = new HashMap<>();
-
-        return connectionLinkMap;
+    @Override
+    public void batchResFlowAutoUpdate(String graphId, String nodeId, HashMap<String, String> resTag) {
+        Stack<Stack<HashMap<String, LinkRestriction>>> relevantNodeRoute = getRelevantNodeRoute(graphId, nodeId);
+        HashMap<String, HashSet<String>> flowNode = getFlowNode(relevantNodeRoute, resTag);
+        resFlow(nodeId, flowNode);
     }
 
-
-    /**
-     * 根据子图关系，构建邻接表
-     *
-     * @param nodeIdList
-     * @param type
-     * @return
+    /*
+    基于 WFS(width first search)
+    走不过的节点就直接放弃，这样效率会更高相较于DFS而言😊
+    然后直接返回能到达的nodeId，岂不是不亦乐乎😂
+    return-> key: resId, value: 资源能到达的节点
      */
-    private HashMap<String, HashMap<String, LinkRestriction>> createSubgraphByRelation(ArrayList<String> nodeIdList, String type, LinkRestriction linkRestriction) {
-        // return createSubgraphByRelation(nodeIdList, type, linkRestriction, null);
+    private HashMap<String, HashSet<String>> resAutoUpdate(String graphId, String nodeId, HashMap<String, String> resTag) {
+        Optional<ActivityGraph> byId = graphRepository.findById(graphId);
+        if (!byId.isPresent()) return null;
+        HashMap<String, HashMap<String, LinkRestriction>> adjacencyMap = byId.get().getAdjacencyMap();
+        HashMap<String, LinkRestriction> endNodeAndRestriction = adjacencyMap.get(nodeId);
+        HashMap<String, HashSet<String>> flowNode = new HashMap<>();
+        HashSet<HashMap<String, LinkRestriction>> endNodes;
+        while (true) {
+            for (Map.Entry<String, LinkRestriction> entry : endNodeAndRestriction.entrySet()){
+                LinkRestriction restriction = entry.getValue();
+                for (Map.Entry<String, String> item : resTag.entrySet()){
+
+                }
+
+            }
+            break;
+        }
+
         return null;
     }
 
+    private HashMap<String, HashSet<String>> rAutoUpdate(HashMap<String, LinkRestriction> linkRestriction,
+                                                         HashMap<String, String> resTag,
+                                                         HashMap<String, HashSet<String>> flowNode){
 
-    /**
-     * @param adjacencyMap 图的邻接表
-     * @param nodeList     子图节点列表
-     *                     似乎不用子图关系，干脆直接将关系内流动给整个拆分出来算了
-     * @return
-     */
-    private HashMap<String, HashMap<String, LinkRestriction>> getRelevantLowerNode(HashMap<String, HashMap<String, LinkRestriction>> adjacencyMap, ArrayList<String> nodeList) {
-        HashMap<String, HashMap<String, LinkRestriction>> lowerNodeAndRestriction = new HashMap<>();
-        return null;
+
+        return flowNode;
     }
-
 
     /**
      * 合并重复边的限制性条件
@@ -906,30 +786,30 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
             target.setRoleProtocol(RoleProtocol.valueOf(sourceRoleProtocol));
         } else if (targetRoleProtocol.equals("Constraints") && sourceRoleProtocol.equals("Constraints")) {
             //用户三个部分合并
-            ArrayList<String> sourceDomains = source.getDomains();
-            ArrayList<String> sourceRoles = source.getRoles();
-            ArrayList<String> sourceOrganizations = source.getOrganizations();
+            HashSet<String> sourceDomains = source.getDomains();
+            HashSet<String> sourceRoles = source.getRoles();
+            HashSet<String> sourceOrganizations = source.getOrganizations();
 
-            ArrayList<String> targetDomains = target.getDomains();
-            ArrayList<String> targetRoles = target.getRoles();
-            ArrayList<String> targetOrganizations = target.getOrganizations();
+            HashSet<String> targetDomains = target.getDomains();
+            HashSet<String> targetRoles = target.getRoles();
+            HashSet<String> targetOrganizations = target.getOrganizations();
 
-            ArrayList<String> domains = mergeStringList(sourceDomains, targetDomains);
-            ArrayList<String> roles = mergeStringList(sourceRoles, targetRoles);
-            ArrayList<String> organizations = mergeStringList(sourceOrganizations, targetOrganizations);
+            HashSet<String> domains = mergeStringList(sourceDomains, targetDomains);
+            HashSet<String> roles = mergeStringList(sourceRoles, targetRoles);
+            HashSet<String> organizations = mergeStringList(sourceOrganizations, targetOrganizations);
 
             //  资源部分限制条件合并
-            ArrayList<String> sourceFormats = source.getFormats();
-            ArrayList<String> sourceReferences = source.getReferences();
-            ArrayList<String> sourceScales = source.getScales();
+            HashSet<String> sourceFormats = source.getFormats();
+            HashSet<String> sourceReferences = source.getReferences();
+            HashSet<String> sourceScales = source.getScales();
 
-            ArrayList<String> targetFormats = target.getFormats();
-            ArrayList<String> targetReferences = target.getReferences();
-            ArrayList<String> targetScales = target.getScales();
+            HashSet<String> targetFormats = target.getFormats();
+            HashSet<String> targetReferences = target.getReferences();
+            HashSet<String> targetScales = target.getScales();
 
-            ArrayList<String> format = mergeStringList(sourceFormats, targetFormats);
-            ArrayList<String> references = mergeStringList(sourceReferences, targetReferences);
-            ArrayList<String> scales = mergeStringList(sourceScales, targetScales);
+            HashSet<String> format = mergeStringList(sourceFormats, targetFormats);
+            HashSet<String> references = mergeStringList(sourceReferences, targetReferences);
+            HashSet<String> scales = mergeStringList(sourceScales, targetScales);
 
             target.setDomains(domains);
             target.setRoles(roles);
@@ -949,12 +829,12 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
      * @param target
      * @return
      */
-    private ArrayList<String> mergeStringList(ArrayList<String> source, ArrayList<String> target) {
+    private HashSet<String> mergeStringList(HashSet<String> source, HashSet<String> target) {
         if (source == null) {
-            source = new ArrayList<>();
+            source = new HashSet<>();
         }
         if (target == null) {
-            target = new ArrayList<>();
+            target = new HashSet<>();
         }
         //去掉重复项
         target.removeAll(source);
@@ -963,156 +843,12 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
         return target;
     }
 
-    /**
-     * 通过 activityId 构造 Node user 部分内容
-     * <p>
-     * 注意 null 处理
-     * 被用于构造 activityNode
-     *
-     * @param aid
-     * @return
-     */
-    private HashMap<String, String> getActivityUserTag(String aid) {
-        //从活动中读取成员，然后去用户服务器拿成员的tag(domain, organization)
-        Optional<Activity> byId = activityRepository.findById(aid);
-        if (!byId.isPresent()) {
-            return null;
-        }
-        HashMap<String, String> userTag = new HashMap<>();
-        Activity activity = byId.get();
-        JSONArray members = activity.getMembers();
-        for (int i = 0; i < members.size(); i++) {
-            JSONObject member = (JSONObject) members.get(i);
-            String userId = member.getString("userId");
-            String role = member.getString("role");
-            //通过 userId 从用户服务器获取用户对应的字段内容(目前是 domain & organization)
-            String tagStr = setUserTag(userId, role);
-            userTag.put(userId, tagStr);
-        }
-        return userTag;
-    }
-
-    /**
-     * @param userId
-     * @param role
-     * @return 返回生成好的用户标签字符串
-     */
-    private String setUserTag(String userId, String role) {
-        HashMap<String, String> userTagMap = getUserTagByIdFromUserServer(userId);
-        String domain = userTagMap.get("domain");
-        String organization = userTagMap.get("organization");
-        return addFlagInTag(role, domain, organization);
-    }
-
-    /**
-     * 从用户服务器获取用户 tag
-     * 并将其转换为字符串
-     *
-     * @param userId
-     * @return
-     */
-    private HashMap<String, String> getUserTagByIdFromUserServer(String userId) {
-        String getTagUrl = "http://" + userServer + "/user/tag/" + userId;
-        JSONObject userTagJson = restTemplate.getForObject(getTagUrl, JSONObject.class);
-        JSONObject userTags = userTagJson.getJSONObject("data");
-        JSONArray domain = userTags.getJSONArray("domain");
-        String domainStr = jsonArrToString(domain, "#");
-        JSONArray organization = userTags.getJSONArray("organization");
-        String orgStr = jsonArrToString(organization, "#");
-        HashMap<String, String> userTagMap = new HashMap<>();
-        userTagMap.put("domain", domainStr);
-        userTagMap.put("organization", orgStr);
-        return userTagMap;
-    }
-
-    /**
-     * JSONArray 转字符串
-     *
-     * @param jsonArray
-     * @param splitSymbol 字符串分隔符
-     * @return
-     */
-    private String jsonArrToString(JSONArray jsonArray, String splitSymbol) {
-        String arrStr = "";
-        if (jsonArray != null) {
-            for (int i = 0; i < jsonArray.size(); i++) {
-                String item = (String) jsonArray.get(i);
-                if (i != jsonArray.size() - 1) {
-                    arrStr += item + splitSymbol;
-                } else {
-                    arrStr += item;
-                }
-            }
-        }
-
-        return arrStr;
-    }
-
-    /**
-     * 获取 activity 中文件的id，以及对应的标签内容
-     * 注意 null 的处理
-     *
-     * @param aid
-     * @return
-     */
-    private HashMap<String, String> getActivityResourceTag(String aid) {
-        //返回值不可能为 null
-        ArrayList<ResourceEntity> files = activityResService.getAllFileInProject(aid);
-        HashMap<String, String> fileTagMap = new HashMap<>();
-        //如 size=0 则会跳过此处
-        for (ResourceEntity file : files) {
-            //只流动 public 的资源
-            if (file.getPrivacy().equals("private")) {
-                continue;
-            }
-            String fileTagStr = setResourceTag(file);
-            String uid = file.getUid();
-            fileTagMap.put(uid, fileTagStr);
-        }
-        return fileTagMap;
-    }
-
-    /**
-     * 生成资源标签字符串
-     * 后续统一资源限定条件后，就在此处进行修改即可
-     * 正
-     *
-     * @param res
-     * @return 资源的标签字符串
-     */
-    private String setResourceTag(ResourceEntity res) {
-        String type = res.getType();
-        String suffix = res.getSuffix();
-        String resTagStr = addFlagInTag(type, suffix);
-        return resTagStr;
-    }
-
 // ======================节点层面上的操作结束===============================================================================
-
-    /**
-     * 通过 activityId 设置节点
-     * 在连接节点的时候调用
-     * 实际不必要在节点的
-     *
-     * @param aid
-     * @return
-     */
-    @Override
-    public ActivityNode createActivityNode(String aid) {
-        ActivityNode node = new ActivityNode();
-        node.setId(aid);
-        //获取该节点下用户与资源所包含的tag,value为id
-        HashMap<String, String> activityUserTag = getActivityUserTag(aid);
-        HashMap<String, String> activityResourceTag = getActivityResourceTag(aid);
-        node.setMembers(activityUserTag);
-        node.setResources(activityResourceTag);
-        return nodeRepository.save(node);
-    }
 
     /**
      * 更新节点
      * 只有更新用户或者资源
-     * 应用场景
+     * 应用场景 todo 完成转移---> NodeServer
      * 只要是活动资源或用户有所变化的时候都需要进行处理
      *
      * @param aid           节点 id
@@ -1128,14 +864,14 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
         ActivityNode node = nodeRepositoryById.get();
         if (!nodeRepositoryById.isPresent()) {
             //如果无此节点则新建此节点
-            node = createActivityNode(aid);
+            node = nodeService.createActivityNode(aid);
         }
         //不可能为空
         HashMap<String, String> members = node.getMembers();
 
         if (operationType.equals("insert")) {
             //无需判断原本有无此用户，map 数据结构决定后续 push 的会覆盖前面同key的值
-            String tagStr = setUserTag(userId, userRole);
+            String tagStr = nodeService.getUserTag(userId, userRole);
             members.put(userId, tagStr);
         } else if (operationType.equals("del")) {
             members.remove(userId);
@@ -1160,7 +896,7 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
      * 节点中资源变化的修改
      * 只针对节点层面的操作
      * 不处理活动层面的内容
-     * <p>
+     * <p> todo 完成转移---> NodeServer
      * 资源流动的处理真挺麻烦的
      *
      * @param aid               节点id
@@ -1177,7 +913,7 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
         ActivityNode node = nodeRepositoryById.get();
         if (!nodeRepositoryById.isPresent()) {
             //如果无此节点则新建此节点
-            node = createActivityNode(aid);
+            node = nodeService.createActivityNode(aid);
         }
         // 资源的流动，实际上是对 node 中 resource 字段的处理
         HashMap<String, String> resourceTagMap = node.getResources();
@@ -1188,7 +924,7 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
             附加在活动层面的操作放在更高层次一点的方法中
              */
             String uid = res.getUid();
-            String resTag = setResourceTag(res);
+            String resTag = TagUtil.setResourceTag(res);
             resourceTagMap.put(uid, resTag);
         } else if (operationType.equals("del")) {
             /*
@@ -1218,34 +954,15 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
         return resourceTagMap;
     }
 
-    /**
-     * 在节点中添加资源
-     * 因适用场景不同 重载了两个添加函数
-     * 1。本节点添加资源
-     * 从活动层往下走
-     * 2。流动到此节点的资源
-     *
-     * @param aid
-     * @param res
-     * @return
-     */
-    private HashMap<String, String> addResource(String aid, ResourceEntity res) {
-        /*
-        1. 添加到当前节点
-        2. 获得连通的节点
-        3. 遍历将资源流动过去
-         */
-        // HashMap<String, String> nodeRes = putActivityNodeResource(aid, res, "insert", null, null, null);
-        // getRelevantNode();
-        // addResource(aid);
-        return null;
-    }
 
     /**
      * 流动资源的添加
+     * 将资源添加到对应的活动中，并返回节点的资源标签列表
      * 资源是流动过去的
      * 所以也需要操作活动层的内容
-     * 先将资源存入活动层，然后再操作节点层的内容
+     * 完成将资源存入活动层
+     * 返回节点的资源标签
+     * todo 这不是节点层面操作，这是活动流动的内容
      *
      * @param startAid 资源来源
      * @param endAid   当前节点 id
@@ -1266,6 +983,8 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
             flowFolder.setName("Flowing Resources");
             flowFolder.setPrivacy("public");
             flowFolder.setParent("0");
+            flowFolder.setFolder(true);
+            flowFolder.setActivityId(endAid);
             flowFolder.setChildren(new ArrayList<>());
         }
         flowFolderId = flowFolder.getUid();
@@ -1292,14 +1011,14 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
      * @param endAid   接收资源的点
      * @param uids     流动资源的 id
      * @return 终点的资源map
+     * tips
+     * 重复资源去重处理，使用覆盖
      */
     private HashMap<String, String> addResourceToNode(String startAid, String endAid, HashSet<String> uids) {
         // uids 为空，直接将 endNode 的 resourceTagMap返回回来即可
         ActivityNode endNode = nodeRepository.findById(endAid).get();
         HashMap<String, String> endNodeResourcesTagMap = endNode.getResources();
-        if (uids.size() == 0) {
-            return endNodeResourcesTagMap;
-        }
+        if (uids.size() == 0) return endNodeResourcesTagMap;
         //更新活动层内容
         ArrayList<ResourceEntity> approvedFilesEntity = activityResService.getFilesByIds(startAid, uids);
         //获取流动资源文件夹，该文件夹位于项目的根目录，可以直接 query
@@ -1310,15 +1029,18 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
             flowFolder.setName("Flowing Resources");
             flowFolder.setPrivacy("public");
             flowFolder.setParent("0");
+            flowFolder.setFolder(true);
+            flowFolder.setActivityId(endAid);
             flowFolder.setChildren(new ArrayList<>());
         }
+        // 资源的parentId
         String flowFolderUid = flowFolder.getUid();
         ArrayList<ResourceEntity> flowFolderChildren = flowFolder.getChildren();
         if (flowFolderChildren == null) flowFolderChildren = new ArrayList<>();
-        //key 存 id, value 存对应的tag
+        // key 存 id, value 存对应的tag
         HashMap<String, String> flowResourceTagMap = new HashMap<>();
         ArrayList<String> flowFolderFileIds = new ArrayList<>();
-        //重复资源的处理
+        //重复资源的处理,本来就无流动资源所以就不必做处理
         for (ResourceEntity item : flowFolderChildren) {
             flowFolderFileIds.add(item.getUid());
         }
@@ -1328,7 +1050,7 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
             节约一个循环
             在这里获取用户资源的 resourceTagMap
              */
-            String resourceTag = setResourceTag(approvedFile);
+            String resourceTag = TagUtil.setResourceTag(approvedFile);
             flowResourceTagMap.put(uid, resourceTag);
 
             approvedFile.setParent(flowFolderUid);
@@ -1399,60 +1121,8 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
         return putActivityNodeUser(aid, userId, "ordinary-member", "insert", null, null);
     }
 
-    private HashMap<String, String> delUser(String aid, String userId) {
-
-        return null;
-    }
-
-    /**
-     * role 可能会变得相对较多
-     * 用户这个也是真的麻烦
-     * 用户在个人空间修改了自己的个人信息
-     * 还需要更新节点中的信息，omg 这里也是挺麻烦的
-     * 不过，可以写一个更新方法，当第一次使用到的时候set一下 user 即可
-     *
-     * @param aid
-     * @param putInfo
-     * @return
-     */
-    private HashMap<String, String> putUser(String aid, JSONObject putInfo) {
-
-        return null;
-    }
-
 
 // ======================节点层面上的操作结束===============================================================================
-
-    /**
-     * 给限定条件字符串添加分割标记
-     * 给每一类条件添加分割标记
-     * 每一类的分割标记 0(不是零)517
-     *
-     * @param strings
-     * @return
-     */
-    private String addFlagInTag(String... strings) {
-        String tagStr = "";
-        for (String tag : strings) {
-            tagStr += tag + "O517";
-        }
-        return tagStr;
-    }
-
-    /**
-     * 判断当前节点是否已经存在于图中
-     * 无的话则返回为空
-     *
-     * @param aid
-     * @return
-     */
-    private ActivityNode nodeIsPresent(String aid) {
-        Optional<ActivityNode> byId = nodeRepository.findById(aid);
-        if (byId.isPresent()) {
-            return byId.get();
-        }
-        return null;
-    }
 
     /**
      * 获取指定节点的所有下层路径，用于资源流动
@@ -1465,6 +1135,7 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
      * 2->[{4,c},{5,d}]
      * 还得添加一个资源流动函数
      * 返回能到达的节点列表
+     * DFS 算法
      *
      * @param graphId
      * @param nodeId
@@ -1472,10 +1143,7 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
      */
     private Stack<Stack<HashMap<String, LinkRestriction>>> getRelevantNodeRoute(String graphId, String nodeId) {
         Optional<ActivityGraph> byId = graphRepository.findById(graphId);
-        if (!byId.isPresent()) {
-            return null;
-        }
-        ActivityGraph activityGraph = byId.get();
+        ActivityGraph activityGraph = byId.isPresent() ? byId.get() : null;
         HashMap<String, HashMap<String, LinkRestriction>> adjacencyMap = activityGraph.getAdjacencyMap();
         /*
         将第一层拼接好后，然后再进去递归完后拼接，每一层都往endNode的hashMap中去存
@@ -1484,8 +1152,11 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
          */
         //初始化用于存储路径
         Stack<Stack<HashMap<String, LinkRestriction>>> pathStack = new Stack<>();
+        //用于存储遍历层次
         Stack<HashMap<String, LinkRestriction>> nodeStack = new Stack<>();
-        return depthFirstSearch(adjacencyMap, nodeId, nodeStack, pathStack);
+        //用于标记访问过的节点
+        ArrayList<String> visitedNode = new ArrayList<>();
+        return depthFirstSearch(adjacencyMap, nodeId, nodeStack, pathStack, visitedNode);
     }
 
 
@@ -1494,37 +1165,51 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
      *
      * @param adjacencyMap
      * @param startId
-     * @param pathStack
-     * @param path
+     * @param pathStackTemp 存储节点层次
+     * @param path          存储路径
      * @return 有多条路径 key路径
      * bug: 环的处理
      */
     private Stack<Stack<HashMap<String, LinkRestriction>>> depthFirstSearch(HashMap<String, HashMap<String, LinkRestriction>> adjacencyMap,
                                                                             String startId,
-                                                                            Stack<HashMap<String, LinkRestriction>> pathStack,
-                                                                            Stack<Stack<HashMap<String, LinkRestriction>>> path
+                                                                            Stack<HashMap<String, LinkRestriction>> pathStackTemp,
+                                                                            Stack<Stack<HashMap<String, LinkRestriction>>> path,
+                                                                            ArrayList<String> visitedNode
     ) {
         //起点不用管,有肯定就不为空
         HashMap<String, LinkRestriction> endNode = adjacencyMap.get(startId);
+        visitedNode.add(startId);
         if (endNode != null) {
+            //节点遍历完，都没下一步则走完了，退回上一层
             for (Map.Entry<String, LinkRestriction> item : endNode.entrySet()) {
                 String nextStartId = item.getKey();
+                if (visitedNode.contains(nextStartId)) continue;
                 LinkRestriction linkRestriction = item.getValue();
                 //到这一层了，入栈
                 HashMap<String, LinkRestriction> endNodeAndRestriction = new HashMap<>();
                 endNodeAndRestriction.put(nextStartId, linkRestriction);
-                pathStack.push(endNodeAndRestriction);
-
-                Stack<Stack<HashMap<String, LinkRestriction>>> stacks = depthFirstSearch(adjacencyMap, nextStartId, pathStack, path);
-                path = stacks;
+                //pathStack 是相互影响的，用于传值的 new, 用于存值的就
+                pathStackTemp.push(endNodeAndRestriction);
+                depthFirstSearch(adjacencyMap, nextStartId, pathStackTemp, path, visitedNode);
             }
         } else {
-            //到达遍历的终点
-            //返回上层,将这层节点出栈
-            pathStack.pop();
-            //将路径入库
+            /*
+            路径入库
+            达到一条路径的尽头
+            ps: 有个特殊情况，该即是尽头节点
+             */
+            if (pathStackTemp.size() == 0) return path;
+            Stack<HashMap<String, LinkRestriction>> pathStack = new Stack<>();
+            pathStack.addAll(pathStackTemp);
             path.push(pathStack);
         }
+        /*
+        完成遍历
+        返回上层，将此层节点出栈
+        ps: 当退回到出发节点的时候，nodeStack 为里面就没内容了，可以直接将path返回
+         */
+        if (pathStackTemp.size() == 0) return path;
+        pathStackTemp.pop();
         return path;
     }
 
@@ -1590,13 +1275,13 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
      * 获得可以流动的节点
      * <p>
      * 可优化
+     * todo 需要理一下,最后的问题
      *
      * @param paths
-     * @param linkRestriction
      * @param resApproveMap
      * @return
      */
-    private HashMap<String, HashSet<String>> getFlowNode(Stack<Stack<HashMap<String, LinkRestriction>>> paths, LinkRestriction linkRestriction, HashMap<String, String> resApproveMap) {
+    private HashMap<String, HashSet<String>> getFlowNode(Stack<Stack<HashMap<String, LinkRestriction>>> paths, HashMap<String, String> resApproveMap) {
         HashMap<String, HashSet<String>> flowNodeList = new HashMap<>();
         /*
         初始化资源可到达的数据结构，用于存储 key 为resId, value为可以到达的节点
@@ -1614,7 +1299,7 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
             flags += "T";
         }
         for (String resId : resIds) {
-            //初始化的时候当然是所有的资源都是yes状态
+            //初始化的时候当然是所有的资源都是yes状态, flowNodeList存储能达到的节点
             resId = flags + resId;
             flowNodeList.put(resId, new HashSet<>());
         }
@@ -1667,17 +1352,219 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
                     if (resFlowApproveByTagStr(resTagStr, edgeRestriction)) {
                         canFlowNodeSet.add(flowNodeId);
                     } else {
-                        //不能通过，将此路径标记替换为 F
+                        //不能通过，将此路径标记替换为 F todo 这里有点问题
                         flowNodeList.remove(resIdAndFlag);
                         StringBuilder builder = new StringBuilder();
-                        builder.append(tempFlags);
+                        builder.append(resIdAndFlag);
                         builder.replace(i, i + 1, "F");
                         flowNodeList.put(builder.toString(), canFlowNodeSet);
                     }
                 }
             }
         }
+        for (Map.Entry<String, HashSet<String>> item : flowNodeList.entrySet()) {
+            String key = item.getKey();
+            HashSet<String> value = item.getValue();
+            // 去除资源的路径标记
+            String resId = key.substring(pathNum);
+            flowNodeList.remove(key);
+            flowNodeList.put(resId, value);
+        }
         return flowNodeList;
+    }
+
+
+    /**
+     * 获取该节点上层的所有节点
+     *
+     * @param graphId
+     * @param nodeId
+     * @return
+     */
+    public Stack<Stack<HashMap<String, LinkRestriction>>> getUpperNodePath(String graphId, String nodeId) {
+        ActivityGraph activityGraph = graphRepository.findById(graphId).get();
+        HashMap<String, HashMap<String, LinkRestriction>> adjacencyMap = activityGraph.getAdjacencyMap();
+        Stack<Stack<HashMap<String, LinkRestriction>>> path = new Stack<>();
+        Stack<HashMap<String, LinkRestriction>> nodeStack = new Stack<>();
+        //初始化节点栈，用于解决循环问题
+        Stack<String> nodeIdStack = new Stack<>();
+        gUpperNodePath(adjacencyMap, nodeId, nodeIdStack, path, nodeStack);
+        return path;
+
+    }
+
+
+    private Stack<Stack<HashMap<String, LinkRestriction>>> gUpperNodePath(HashMap<String, HashMap<String, LinkRestriction>> adjacencyMap,
+                                                                          String nodeId,
+                                                                          Stack<String> nodeIdStack,
+                                                                          Stack<Stack<HashMap<String, LinkRestriction>>> path,
+                                                                          Stack<HashMap<String, LinkRestriction>> nodeStackTemp) {
+        //是否进入下一层的标记，如果能进入下一层则说明当前这一层不是该条路径的尽头，此机制还是有问题
+        boolean depthIndex = true;
+        //节点访问标记点
+        nodeIdStack.add(nodeId);
+        for (Map.Entry<String, HashMap<String, LinkRestriction>> edge : adjacencyMap.entrySet()) {
+            HashMap<String, LinkRestriction> edgeEndNode = edge.getValue();
+            if (edgeEndNode.containsKey(nodeId)) {
+                //终点列表中包含此节点，则说明这是一条可行的路径，则将此条边入栈
+                String startId = edge.getKey();
+                /*
+                这个机制有问题，应该使用路线节点栈中的内容来判断是否为循环
+                if (visitedNode.contains(startId)) continue;
+                节点访问机制会有一定问题
+                当两条路径尽头都为同一节点的时候，第二条路径就会因为尽头节点被第一条路径访问过了，而不能被放入路径中
+                使用节点栈来判断是否循环即可，环的问题需要处理一下
+                 */
+                if (nodeIdStack.contains(startId)) continue;
+                //获取这条边的限制性条件
+                LinkRestriction linkRestriction = edgeEndNode.get(nodeId);
+                HashMap<String, LinkRestriction> startNodeAndRestriction = new HashMap<>();
+                /*
+                可能会有问题，注意看 linkRestriction 的地址，可能会出现所有的 linkRestriction 都是一个的问题
+                没有问题，linkRestriction 在下一轮会指向另一个内存地址，然后被push到startNodeAndRestriction中
+                如果在重新指向之前，改的话就会影响到startNodeAndRestriction中的内容
+                 */
+                startNodeAndRestriction.put(startId, linkRestriction);
+                nodeStackTemp.push(startNodeAndRestriction);
+                //进入下一层,则说明这一层不是
+                depthIndex = false;
+                gUpperNodePath(adjacencyMap, startId, nodeIdStack, path, nodeStackTemp);
+            }
+        }
+        //所有连接表都走完了，这条路径到头了可以存起来了
+        //同名引用类型指向同一个地址
+        //
+        Stack<HashMap<String, LinkRestriction>> nodeStack = new Stack<>();
+        nodeStack.addAll(nodeStackTemp);
+        //无上层节点 or 回退到起始节点了
+        if (nodeStackTemp.size() == 0) return path;
+        if (depthIndex) path.push(nodeStack);
+        nodeStackTemp.pop();
+        nodeIdStack.pop();
+        return path;
+    }
+
+
+    /**
+     * 采用广度遍历方式，获取该用户上层节点路径中最近的可以流动过来的节点
+     *
+     * @param upperPath
+     * @param userId
+     * @return 为 null 则无法通过 有值则是最近可以流动过来的节点
+     */
+    public String cUserIsApprovedUsingWFS(Stack<Stack<HashMap<String, LinkRestriction>>> upperPath, String userId) {
+        Iterator<Stack<HashMap<String, LinkRestriction>>> pathIterator = upperPath.iterator();
+        if (upperPath.size() == 0) return null;
+        int longestPath = 0;
+        //用于标记深度
+        int depthIndex = 0;
+        while (true) {
+            //达到最深深度
+            if (depthIndex > longestPath) break;
+            //一个 iterator 游标到底后就没用了
+            //遍历每条路径
+            for (int i = 0; i < upperPath.size(); i++) {
+                Stack<HashMap<String, LinkRestriction>> path = upperPath.get(i);
+                //获取最长路径
+                longestPath = path.size() > longestPath ? path.size() : longestPath;
+                //当层数＞= size 的时候，则说明此条路径已经到达尽头
+                if (depthIndex >= path.size()) continue;
+                HashMap<String, LinkRestriction> edge = path.get(depthIndex);
+                /*
+                1. 取出起始节点及限制性条件
+                2. 判断是否有此用户，无的话就continue
+                3. 有此用户(拿到用户tag)，判断当前边能够走通, 不能走通就 over
+                4. 能走通就切路径，然后判断路径能否走通，不能走通 over, 能走通就
+                 */
+                String startId = "";
+                //将起始节点取出来
+                for (Map.Entry<String, LinkRestriction> item : edge.entrySet()) {
+                    startId = item.getKey();
+                }
+                ActivityNode node = nodeRepository.findById(startId).get();
+                HashMap<String, String> members = node.getMembers();
+                //该节点都没此用户可以切了
+                if (!members.containsKey(userId)) continue;
+                //该节点有此用户，则切一下路径 tips: depthIndex = 0 的情况
+                //能通过此路径则说明能行，不单单返回内容，将节点一并返回好了
+                if (cUserIsApprovedInPath(path.subList(0, depthIndex + 1), members.get(userId))) {
+                    return startId;
+                }
+            }
+            //进入下一层
+            depthIndex++;
+        }
+        return null;
+    }
+
+    //判断这个用户是否能通过这条路径,应该使用 pop 从最上层开始算起来
+    public boolean cUserIsApprovedInPath(List<HashMap<String, LinkRestriction>> pathNodeStack, String userTag) {
+        for (int i = pathNodeStack.size() - 1; i >= 0; i--) {
+            HashMap<String, LinkRestriction> edgeAndRestriction = pathNodeStack.get(i);
+            for (Map.Entry<String, LinkRestriction> item : edgeAndRestriction.entrySet()) {
+                LinkRestriction linkRestriction = item.getValue();
+                if (!userFlowApprove(userTag, linkRestriction)) return false;
+            }
+        }
+        //全部走通，则能走通
+        return true;
+    }
+
+
+    /**
+     * 判断这个此用户是否可以从其他地方流动到该节点
+     * 调用该接口的时机：Join this activity 的时候，如果可以就直接加入，不可以的话就申请
+     *
+     * @param graphId
+     * @param nodeId
+     * @param userId
+     * @return
+     */
+    public String checkUserIsApprovedService(String graphId, String nodeId, String userId) {
+        /*
+        1.查找 nodeId 的所有上层路径
+        2.采用广度遍历，查询是否能按照路径依次是否可以过去
+        3.如果能过去就添加就行了
+         */
+        Stack<Stack<HashMap<String, LinkRestriction>>> upperPath = getUpperNodePath(graphId, nodeId);
+        String flowId = cUserIsApprovedUsingWFS(upperPath, userId);
+        return flowId;
+    }
+
+
+    /**
+     * 删除单条边
+     *
+     * @param graphId
+     * @param startId
+     * @param endId
+     * @return
+     */
+    @Override
+    public HashMap<String, HashMap<String, LinkRestriction>> deleteEdge(String graphId, String startId, String endId) {
+        Optional<ActivityGraph> graphRepositoryById = graphRepository.findById(graphId);
+        if (!graphRepositoryById.isPresent()) {
+            return null;
+        }
+        ActivityGraph activityGraph = graphRepositoryById.get();
+        HashMap<String, HashMap<String, LinkRestriction>> adjacencyMap = activityGraph.getAdjacencyMap();
+        //adjacencyMap.get 出来的 item 和 adjacencyMap 中的一个地址，直接remove会影响到adjacencyMap中的内容
+        adjacencyMap.get(startId).remove(endId);
+        activityGraph.setAdjacencyMap(adjacencyMap);
+        return graphRepository.save(activityGraph).getAdjacencyMap();
+    }
+
+    /**
+     * 删除多条边
+     * 看前端如何设计吧
+     *
+     * @param graphId
+     * @param nodeIdSet
+     * @return
+     */
+    @Override
+    public HashMap<String, HashMap<String, LinkRestriction>> deleteEdges(String graphId, HashSet<String> nodeIdSet) {
+        return null;
     }
 
 }

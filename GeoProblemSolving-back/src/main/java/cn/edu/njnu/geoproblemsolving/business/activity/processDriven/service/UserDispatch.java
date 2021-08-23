@@ -1,9 +1,8 @@
-package cn.edu.njnu.geoproblemsolving.business.activity.processDriven.setvice;
+package cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service;
 
-import cn.edu.njnu.geoproblemsolving.business.user.entity.UserEntity;
 import com.alibaba.fastjson.JSONArray;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 
 public interface UserDispatch {
     // ArrayList<UserEntity> getRelationUser(ArrayList<String> aids);
@@ -12,5 +11,10 @@ public interface UserDispatch {
 
     Object updateActivityMember(String aid, JSONArray members);
 
+    Object getNodeUserTag(HashSet<String> nodeIds);
+
+    Object getUserTag(String userId);
+
+    boolean checkUserIsApproved(String graphId, String nodeId, String userId);
 
 }

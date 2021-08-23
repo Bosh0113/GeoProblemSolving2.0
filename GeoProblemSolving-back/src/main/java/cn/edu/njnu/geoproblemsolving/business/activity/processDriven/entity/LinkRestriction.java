@@ -5,6 +5,7 @@ import cn.edu.njnu.geoproblemsolving.business.activity.enums.RoleProtocol;
 import lombok.Data;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 /**
  * @ClassName LinkRestriction
@@ -25,14 +26,14 @@ public class LinkRestriction {
      * spatiotemporal reference
      * unit
      */
-    private ResProtocol resProtocol;
+    private ResProtocol resProtocol = ResProtocol.None;
     private boolean autoUpdate;
-    private ArrayList<String> types;
-    private ArrayList<String> formats;
-    private ArrayList<String> concepts;
-    private ArrayList<String> scales;
-    private ArrayList<String> references;
-    private ArrayList<String> units;
+    private HashSet<String> types;
+    private HashSet<String> formats;
+    private HashSet<String> concepts;
+    private HashSet<String> scales;
+    private HashSet<String> references;
+    private HashSet<String> units;
 
 
     /**
@@ -41,9 +42,9 @@ public class LinkRestriction {
      * the type of accept roles: manager, decision-maker, researcher, stakeholder, normal member(workers...), visitor(the public)
      * domain of participants
      */
-    private RoleProtocol roleProtocol;
-    private ArrayList<String> roles;
-    private ArrayList<String> domains;
-    private ArrayList<String> organizations;
+    private RoleProtocol roleProtocol = RoleProtocol.None;
+    private HashSet<String> roles;
+    private HashSet<String> domains;
+    private HashSet<String> organizations;
 
 }

@@ -438,19 +438,19 @@ public class UserResServiceImpl implements UserResService {
                             }
                             //成功将资源上传到数据容器中
                             // 接下来将资源基本信息写入本地数据库及用户服务器
-                            String fileSize;
-                            DecimalFormat df = new DecimalFormat("##0.00");
-                            if (part.getSize() > 1024 * 1024) {
-                                fileSize = df.format((float) part.getSize() / (float) (1024 * 1024)) + "MB";
-                            } else {
-                                fileSize = df.format((float) part.getSize() / (float) (1024)) + "KB";
-                            }
+                            // String fileSize;
+                            // DecimalFormat df = new DecimalFormat("##0.00");
+                            // if (part.getSize() > 1024 * 1024) {
+                            //     fileSize = df.format((float) part.getSize() / (float) (1024 * 1024)) + "MB";
+                            // } else {
+                            //     fileSize = df.format((float) part.getSize() / (float) (1024)) + "KB";
+                            // }
                             ResourceEntity res = new ResourceEntity();
                             res.setUid(UUID.randomUUID().toString());
                             res.setName(fileName);
                             res.setSuffix(suffix);
                             res.setUploadTime(new Date());
-                            res.setFileSize(fileSize);
+                            res.setFileSize(part.getSize());
                             res.setPrivacy(req.getParameter("privacy"));
                             res.setType(req.getParameter("type"));
                             res.setDescription(req.getParameter("description"));

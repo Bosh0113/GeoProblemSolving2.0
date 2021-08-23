@@ -239,9 +239,7 @@
         :close-on-click-modal="false"
         :destroy-on-close="true"
       >
-        <!--              :pageParams="pageParams"-->
         <resource-list
-          :pageParams="pageParams"
           @selectData="selectData"
         ></resource-list>
       </el-dialog>
@@ -251,10 +249,9 @@
 </template>
 
 <script>
-  import file from "./../dataTemplate/File";
-  import resourceList from "../../common/resource/resourceList-copy";
+  import file from "./dataTemplate/File";
+  import resourceList from "../common/resource/UserAndActivityResourceList";
   import {get, del, post, put, patch} from "@/axios";
-  import ResourceList from "../../common/resource/resourceList.vue";
 
   export default {
     components: {
@@ -266,9 +263,6 @@
       return {
         doi: this.$route.params.doi,
         modelIntroduction: {},
-        pageParams: {
-          aid: ""
-        },
         stateList: {},
         modelInstance: {},
         datasetItem: {},
@@ -371,7 +365,6 @@
       },
 
       getSocketComputation: function (data) {
-        console.log("socketComputation", data)
         if (data != undefined && data != null) {
           this.getStateEventOut(data.computeOutputs)
         }
@@ -407,27 +400,6 @@
         this.fullscreenLoading.close();
       },
 
-
-      getUserInfo() {
-        this.userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
-        if (this.userInfo == {}) {
-          this.axios
-            .get(
-              "/GeoProblemSolving/user" +
-              "?key=userId" +
-              "&value=" +
-              this.pageParams.userId
-            )
-            .then((res) => {
-              if (res.data.code == 0) {
-                this.$set(this, "userInfo", res.data).data;
-              }
-            })
-            .catch((err) => {
-            });
-        }
-      },
-
       /*
       初始化任务(mounted 阶段)
       获取是否有部署好的模型
@@ -436,7 +408,7 @@
        */
       initTask: function () {
         setTimeout(() => {
-          this.axios.get("/GeoProblemSolving/modelTask/createTask/" + this.md5 + "/" + this.userId)
+          this.axios.get("/GeoProblemSolving/modelTask/createTask/" + this.md5 + "/" + userInfo.userId)
             .then(res => {
               console.log("initTaskResponse", res.data)
               if (res.data.code == 0) {
@@ -640,8 +612,6 @@
       },
 
       async bind(event) {
-        console.log(event);
-        // await this.dataURItoBlob(event);
         let address = event.url.split("?")[0];
         let json = {
           name: event.urlName,
@@ -649,8 +619,8 @@
           type: "data",
           userUpload: false,
           address: address,
-          uploaderId: this.pageParams.userId,
-          uploaderName: this.pageParams.userName,
+          uploaderId: this.userId,
+          uploaderName: userInfo.name,
           privacy: "private"
         };
 
@@ -740,6 +710,7 @@
       // },
 
       selectData(val) {
+        let dataContainer = this.$store.state.DataServer;
         let stateIndex = this.stateList.findIndex(
           (state) => state.name == this.currentEvent.stateName
         );

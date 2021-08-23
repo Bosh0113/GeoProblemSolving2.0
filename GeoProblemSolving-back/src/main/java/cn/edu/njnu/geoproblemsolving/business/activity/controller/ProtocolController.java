@@ -1,12 +1,8 @@
 package cn.edu.njnu.geoproblemsolving.business.activity.controller;
 
-import cn.edu.njnu.geoproblemsolving.business.activity.dto.UpdateProtocolDTO;
-import cn.edu.njnu.geoproblemsolving.business.activity.entity.ActivityDoc;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.LinkProtocol;
-import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.setvice.impl.GeoAnalysisProcessImpl;
-import cn.edu.njnu.geoproblemsolving.business.activity.service.ActivityDocService;
+import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.impl.GeoAnalysisProcessImpl;
 import cn.edu.njnu.geoproblemsolving.business.activity.service.Impl.ProtocolServiceImpl;
-import cn.edu.njnu.geoproblemsolving.business.activity.service.ProtocolService;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import cn.edu.njnu.geoproblemsolving.common.utils.ResultUtils;
 import org.springframework.beans.factory.annotation.Autowired;

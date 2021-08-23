@@ -36,7 +36,7 @@ public interface ActivityResService {
     Object bindResToProject(ResourceEntity res, String aid);
 
     //资源权限控制
-    Object getAllFileInProject(String aid);
+    ArrayList<ResourceEntity> getAllFileInProject(String aid);
 
     JsonResult changeResEntity(String aid, String uid, ArrayList<String> paths, HttpServletRequest req) throws IOException, ServletException;
 

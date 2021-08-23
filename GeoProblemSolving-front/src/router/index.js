@@ -214,24 +214,17 @@ const routes = [
     component: resolve =>
       require(["@/components/tools/entity/mapTool"], resolve)
   },
-  //改动
-  // {
-  //   path: "/computeTool",
-  //   name: "computeTool",
-  //   component: resolve =>
-  //     require(["@/components/tools/entity/computeTool"], resolve)
-  // },
   {
     path: "/computeModel",
     name: "computeModel",
     component: resolve =>
-      require(["@/components/utils/model/Model-copy"], resolve)
+      require(["@/components/utils/ToolModel"], resolve)
   },
   {
     path: "/dataMethod",
     name: "dataMethod",
     component: resolve =>
-      require(["@/components/utils/data/dataService"], resolve)
+      require(["@/components/utils/ToolDataMethod"], resolve)
   },
   {
     path: "/lineChart",
@@ -322,11 +315,6 @@ const routes = [
     name: "tinymce",
     component: resolve =>
       require(["@/components/tools/entity/singleUtils/tinymce"], resolve)
-  },
-  {
-    path: "/modelItem/:doi",
-    name: "Model",
-    component: resolve => require(["@/components/utils/model/Model"], resolve)
   },
   {
     path: "/toolShow",
