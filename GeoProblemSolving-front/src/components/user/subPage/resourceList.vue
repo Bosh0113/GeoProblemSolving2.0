@@ -459,7 +459,7 @@
           <!--        <Button type="success" @click="shareResources">Share</Button>-->
           <!--      </div>-->
           <!--    </Modal>-->
-    </Card>
+    <!-- </Card> -->
   </div>
 </template>
 
