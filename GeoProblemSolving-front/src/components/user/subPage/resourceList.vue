@@ -654,11 +654,11 @@
           .get("/GeoProblemSolving/res")
           .then(res => {
             if (res.data == "Offline") {
-              confirm("You are offline, please login again.")
+              this.$store.commit("userLogout");
+              this.$router.push({ name: "Login" });
             } else if (res.data.code == 0) {
               let rootRes = res.data.data;
               this.resToCurrentFolder(rootRes);
-              console.log(this.currentFolder)
             }
           })
           .catch()
@@ -777,7 +777,8 @@
         this.axios.get("/GeoProblemSolving/res/" + this.pathStr)
           .then(res => {
             if (res.data == "Offline") {
-              confirm("You are offline, please login again.")
+              this.$store.commit("userLogout");
+              this.$router.push({ name: "Login" });
             } else if (res.data.code == 0) {
               let folderInfo = res.data.data;
               this.resToCurrentFolder(folderInfo);
@@ -844,7 +845,8 @@
               .post("/GeoProblemSolving/res/folder/" + this.pathStr, folderObj)
               .then(res => {
                 if (res.data == "Offline") {
-                  confirm("You are offline, please login again.");
+                  this.$store.commit("userLogout");
+                  this.$router.push({ name: "Login" });
                 } else if (res.data.code == 0) {
                   this.currentFolder.folders.push(res.data.data);
                   this.newFolderModal = false;
@@ -869,7 +871,8 @@
           this.axios.delete("/GeoProblemSolving/res/folder/" + folderId + "/" + temp.toString())
             .then(res => {
               if (res.data == "Offline") {
-                confirm("You are offline, please login again.");
+                this.$store.commit("userLogout");
+                this.$router.push({ name: "Login" });
               } else if (res.data.code == 0) {
                 //删除用于显示的数据中对应的内容
                 for (let i = 0; i < this.currentFolder.folders.length; i++) {
@@ -906,7 +909,8 @@
               .put("/GeoProblemSolving/res/folder", folderJson)
               .then(res => {
                 if (res.data == "Offline") {
-                  confirm("You are offline, please login again.");
+                  this.$store.commit("userLogout");
+                  this.$router.push({ name: "Login" });
                 } else if (res.data.code == "0") {
                   //更新成功，替换用于显示的数据 item
                   let newFolder = {
@@ -1054,7 +1058,8 @@
             .post("/GeoProblemSolving/res/del", delFileInfo)
             .then(res => {
               if (res.data == "Offline") {
-                confirm("You are offline, please login again.");
+                this.$store.commit("userLogout");
+                this.$router.push({ name: "Login" });
               } else if (res.data.code == "0") {
                 for (let i = 0; i < this.currentFolder.files.length; i++) {
                   if (this.currentFolder.files[i].uid == fileId) {
@@ -1135,7 +1140,8 @@
               .put("/GeoProblemSolving/res/" + this.pathStr, putResInfo)
               .then(res => {
                 if (res.data == "Offline") {
-                  confirm("You are offline, please login again.");
+                  this.$store.commit("userLogout");
+                  this.$router.push({ name: "Login" });
                 } else if (res.data.code == 0) {
                   this.putFileInfo.name = this.editFileValidate.name;
                   this.putFileInfo.privacy = this.editFileValidate.privacy;

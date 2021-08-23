@@ -534,14 +534,17 @@
     >
       <h3>Do you really want to delete this resource?</h3>
     </Modal>
+    <login-modal :tempLoginModal="tempLoginModal" @changeLoginModal="changeLoginModal"></login-modal>
   </div>
 </template>
 <script>
 import Avatar from "vue-avatar";
+import loginModal from "../../../user/userState/loginModal.vue"
 export default {
   props: ["activityInfo"],
   components: {
     Avatar,
+    loginModal,
   },
   data() {
     return {
@@ -553,6 +556,8 @@ export default {
       userInfo: this.$store.getters.userInfo,
       userRole: this.roleIdentity(this.activityInfo),
       resouceType: "all",
+      //恢复登录的模态框
+      tempLoginModal: false,
       // 文件夹
       newFolderModal: false,
       newValidate: {
@@ -787,6 +792,9 @@ export default {
         );
       }
     },
+    changeLoginModal(status){
+      this.tempLoginModal = status;
+    },
     dateFormat(date) {
       let time = new Date(date);
       return time.Format("yyyy-MM-dd HH:mm:ss");
@@ -831,7 +839,10 @@ export default {
           .get("/GeoProblemSolving/rip/" + this.activityInfo.aid + "/0")
           .then((res) => {
             if (res.data == "Offline") {
-              confirm("You are offline, please login again.");
+              // confirm("You are offline, please login again.");
+              this.$store.commit("userLogout");
+              this.$router.push({ name: "Login" });
+              // this.tempLoginModal = true;
             } else if (res.data.code == 0) {
               let list = res.data.data;
               this.$set(this, "activityResList", list);
@@ -1030,7 +1041,10 @@ export default {
           .post("/GeoProblemSolving/rip/del", formData)
           .then((res) => {
             if (res.data == "Offline") {
-              confirm("You are offline, please login again.");
+              // confirm("You are offline, please login again.");
+              this.$store.commit("userLogout");
+              // this.$router.push({ name: "Login" });
+              this.tempLoginModal = true;
             } else if (res.data.code == 0) {
               this.$Notice.success({
                 title: "Process result",
@@ -1238,7 +1252,10 @@ export default {
           .get("/GeoProblemSolving/rip/" + activityId + "/0")
           .then((res) => {
             if (res.data == "Offline") {
-              confirm("You are offline, please login again.");
+              // confirm("You are offline, please login again.");
+              this.$store.commit("userLogout");
+              // this.$router.push({ name: "Login" });
+              this.tempLoginModal = true;
             } else if (res.data.code == 0) {
               selectedRes = res.data.data;
               for (var j = 0; j < selectedRes.length; j++) {
@@ -1310,7 +1327,8 @@ export default {
           this.inheritResModal = false;
           if (res.data == "Offline") {
             this.$store.commit("userLogout");
-            this.$router.push({ name: "Login" });
+            // this.$router.push({ name: "Login" });
+            this.tempLoginModal = true;
           } else if (res.data.code == 0) {
             this.getResList();
 
@@ -1367,7 +1385,10 @@ export default {
         )
         .then((res) => {
           if (res.data == "Offline") {
-            confirm("You are offline, please login again.");
+            // confirm("You are offline, please login again.");
+            this.$store.commit("userLogout");
+            // this.$router.push({ name: "Login" });
+            this.tempLoginModal = true;
           } else if (res.data.code == 0) {
             let list = res.data.data;
 
@@ -1411,7 +1432,10 @@ export default {
             .post("/GeoProblemSolving/rip/folder", formData)
             .then((res) => {
               if (res.data == "Offline") {
-                confirm("You are offline, please login again.");
+                // confirm("You are offline, please login again.");
+                this.$store.commit("userLogout");
+                // this.$router.push({ name: "Login" });
+                this.tempLoginModal = true;
               } else if (res.data.code == 0) {
                 this.activityResList.push(res.data.data);
                 this.activityDataList.push(res.data.data);
@@ -1454,7 +1478,10 @@ export default {
           .post("/GeoProblemSolving/rip/del", formData)
           .then((res) => {
             if (res.data == "Offline") {
-              confirm("You are offline, please login again.");
+              // confirm("You are offline, please login again.");
+              this.$store.commit("userLogout");
+              // this.$router.push({ name: "Login" });
+              this.tempLoginModal = true;
             } else if (res.data.code == 0) {
               //删除用于显示的数据中对应的内容
               for (let i = 0; i < this.activityResList.length; i++) {
@@ -1519,7 +1546,8 @@ export default {
             .then((res) => {
               if (res.data == "Offline") {
                 this.$store.commit("userLogout");
-                this.$router.push({ name: "Login" });
+                // this.$router.push({ name: "Login" });
+                this.tempLoginModal = true;
               } else if (res.data.code == 0) {
                 let newNameFolder = {
                   uid: folderId,
@@ -1599,7 +1627,8 @@ export default {
               this.editFileModel = false;
               if (res.data == "Offline") {
                 this.$store.commit("userLogout");
-                this.$router.push({ name: "Login" });
+                // this.$router.push({ name: "Login" });
+                this.tempLoginModal = true;
               } else if (res.data.code == 0) {
                 this.selectFileInfo.name = this.editFileValidate.name;
                 this.selectFileInfo.type = this.editFileValidate.type;
@@ -1651,7 +1680,8 @@ export default {
         .then((res) => {
           if (res.data == "Offline") {
             this.$store.commit("userLogout");
-            this.$router.push({ name: "Login" });
+            // this.$router.push({ name: "Login" });
+            this.tempLoginModal = true;
           } else if (res.data != "None" && res.data != "Fail") {
             this.userResourceList = res.data.data;
             this.shareModal = true;
@@ -1682,7 +1712,8 @@ export default {
           this.shareModal = false;
           if (res.data == "Offline") {
             this.$store.commit("userLogout");
-            this.$router.push({ name: "Login" });
+            // this.$router.push({ name: "Login" });
+            this.tempLoginModal = true;
           } else if (res.data.code == 0) {
             let sharedFile = res.data.data;
 

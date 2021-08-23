@@ -636,15 +636,17 @@
         </template>
       </div>
     </Modal>
+    <login-modal :tempLoginModal="tempLoginModal" @changeLoginModal="changeLoginModal"></login-modal>
   </Row>
 </template>
 <script>
 // import "driver.js/dist/driver.min.css";
 import echarts from "echarts";
 import VueTagsInput from "@johmun/vue-tags-input";
+import loginModal from "../../../user/userState/loginModal.vue"
 // import Driver from "driver.js";
 export default {
-  components: { VueTagsInput },
+  components: { VueTagsInput,loginModal },
   props: [
     "activityInfo",
     "childActivities",
@@ -682,7 +684,10 @@ export default {
       linkBuildModal: false,
       beginNode: {},
       endNode: {},
-      // role
+      linkBuildModal: false,
+      //恢复登录的模态框
+      tempLoginModal: false,
+
       roleProtocol: "None",
       linkRoles: [],
       domain_tag: "",
@@ -781,6 +786,9 @@ export default {
         this.userRole,
         operation
       );
+    },
+    changeLoginModal(status){
+      this.tempLoginModal = status;
     },
     updateStepchart() {
       // 重新渲染
@@ -1213,12 +1221,16 @@ export default {
         .put(updateurl, data)
         .then((res) => {
           if (res.data == "Offline") {
-            if (this.activityInfo.level == 1) {
-              this.$store.commit("userLogout");
-              this.$router.push({ name: "Login" });
-            } else {
-              parent.location.href = "/GeoProblemSolving/login";
-            }
+            this.$store.commit("userLogout");
+            // this.$router.push({ name: "Login" });
+            this.tempLoginModal = true;
+            // if (this.activityInfo.level == 1) {
+            //   this.$store.commit("userLogout");
+            //   // this.$router.push({ name: "Login" });
+            //   this.tempLoginModal = true;
+            // } else {
+            //   parent.location.href = "/GeoProblemSolving/login";
+            // }
           } else if (res.data.code == 0) {
             this.updateStepchart();
             this.selectedActivities = [];
@@ -1457,12 +1469,16 @@ export default {
         .post("/GeoProblemSolving/activityDriven", protocolForm)
         .then((res) => {
           if (res.data == "Offline") {
-            if (this.activityInfo.level == 1) {
-              this.$store.commit("userLogout");
-              this.$router.push({ name: "Login" });
-            } else {
-              parent.location.href = "/GeoProblemSolving/login";
-            }
+            this.$store.commit("userLogout");
+            // this.$router.push({ name: "Login" });
+            this.tempLoginModal = true;
+            // if (this.activityInfo.level == 1) {
+            //   this.$store.commit("userLogout");
+            //   // this.$router.push({ name: "Login" });
+            //   this.tempLoginModal = true;
+            // } else {
+            //   parent.location.href = "/GeoProblemSolving/login";
+            // }
           } else if (res.data.code == 0) {
             // 重新渲染
             this.updateStepchart();
@@ -1555,12 +1571,16 @@ export default {
         .post(updateurl, data)
         .then((res) => {
           if (res.data == "Offline") {
-            if (this.activityInfo.level == 1) {
-              this.$store.commit("userLogout");
-              this.$router.push({ name: "Login" });
-            } else {
-              parent.location.href = "/GeoProblemSolving/login";
-            }
+            this.$store.commit("userLogout");
+            // this.$router.push({ name: "Login" });
+            this.tempLoginModal = true;
+            // if (this.activityInfo.level == 1) {
+            //   this.$store.commit("userLogout");
+            //   // this.$router.push({ name: "Login" });
+            //   this.tempLoginModal = true;
+            // } else {
+            //   parent.location.href = "/GeoProblemSolving/login";
+            // }
           } else if (res.data.code == 0) {
             this.operationApi.processRecord(
               this.activityInfo.aid,
@@ -1640,12 +1660,16 @@ export default {
         .post(updateurl, data)
         .then((res) => {
           if (res.data == "Offline") {
-            if (this.activityInfo.level == 1) {
-              this.$store.commit("userLogout");
-              this.$router.push({ name: "Login" });
-            } else {
-              parent.location.href = "/GeoProblemSolving/login";
-            }
+            this.$store.commit("userLogout");
+            // this.$router.push({ name: "Login" });
+            this.tempLoginModal = true;
+            // if (this.activityInfo.level == 1) {
+            //   this.$store.commit("userLogout");
+            //   // this.$router.push({ name: "Login" });
+            //   this.tempLoginModal = true;
+            // } else {
+            //   parent.location.href = "/GeoProblemSolving/login";
+            // }
           } else if (res.data.code == 0) {
             this.operationApi.processRecord(
               this.activityInfo.aid,

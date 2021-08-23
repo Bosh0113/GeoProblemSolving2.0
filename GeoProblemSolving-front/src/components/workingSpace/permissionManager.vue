@@ -653,15 +653,11 @@ export default {
       this.axios
         .put(url, this.activityInfo)
         .then((res) => {
-          this.resetProjectTypeModel = false;
+          this.resetProjectTypeModal = false;
           if (res.data == "Offline") {
             // parent.location.href = "/GeoProblemSolving/login";
-            var pageUrl = parent.location.href;
-            this.axios
-              .get("/GeoProblemSolving/user/login")
-              .then((res) => {
-                parent.location.href = res.data;
-              });
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
           } else if (res.data.code == 0) {
             this.$Notice.info({
               desc: "Update permission successfully. ",

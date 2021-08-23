@@ -1,5 +1,7 @@
 <template>
-  <div style="display: flex; background-color: #eee; height: calc(100vh - 130px)">
+  <div
+    style="display: flex; background-color: #eee; height: calc(100vh - 130px)"
+  >
     <Button
       title="Activity tree"
       @click="unfoldTree"
@@ -14,17 +16,32 @@
     </Button>
 
     <!--  Activity List部分  -->
-    <Card dis-hover class="activityCard" id="ActivityTree" style="height: calc(100vh - 130px)">
-      <h3 slot="title">Activity list</h3>
+    <Card
+      dis-hover
+      class="activityCard"
+      id="ActivityTree"
+      style="height: calc(100vh - 130px)"
+    >
+      <span slot="title" style="font-size: 18px; font-weight: 700"
+        >Activity list</span
+      >
+      <Icon
+        slot="title"
+        type="md-refresh"
+        size="18"
+        title="Refresh the activity tree"
+        style="cursor: pointer; margin-left: 6px"
+        @click="locateActivity"
+      />
       <Icon
         slot="extra"
         type="ios-arrow-dropleft"
-        size="20"
+        size="25"
         title="Collapse the activity tree"
         style="cursor: pointer"
         @click="foldTree"
       />
-      <vue-scroll :ops="scrollOps" >
+      <vue-scroll :ops="scrollOps">
         <div style="padding-right: 15px">
           <Tree :data="activityTree" :render="renderStyle"></Tree>
         </div>
@@ -32,7 +49,12 @@
     </Card>
 
     <!--    使用slot控制是否显示-->
-    <Card dis-hover class="workspaceCard" id="ActivityContent" style="height: calc(100vh - 130px)">
+    <Card
+      dis-hover
+      class="workspaceCard"
+      id="ActivityContent"
+      style="height: calc(100vh - 130px)"
+    >
       <h3 slot="title">
         <Breadcrumb style="display: inline-block" separator=">">
           <BreadcrumbItem v-for="name in cascader" :key="name"
@@ -102,6 +124,7 @@
         v-else-if="contentType == 2"
         :activityInfo="slctActivity"
         :userInfo="userInfo"
+        :projectInfo="projectInfo"
         :childActivities="childActivities"
         :nameConfirm="nameConfirm"
         :key="slctActivity.aid"
@@ -215,10 +238,7 @@
         </Button>
       </div>
     </Modal>
-    <Modal
-      v-model="activityDeleteModal"
-      title="Delete the current activity"
-    >
+    <Modal v-model="activityDeleteModal" title="Delete the current activity">
       <h3>Do you really want to delete this activity?</h3>
       <h3 style="color: red; margin-top: 10px">
         * The selected activity and its all child activities will be deleted!
@@ -230,14 +250,15 @@
           style="float: right"
           >Think again...
         </Button>
-        <Button
-
-          @click="delActivity"
-          style="float: right; margin-right: 15px"
+        <Button @click="delActivity" style="float: right; margin-right: 15px"
           >yes
         </Button>
       </div>
     </Modal>
+    <login-modal
+      :tempLoginModal="tempLoginModal"
+      @changeLoginModal="changeLoginModal"
+    ></login-modal>
   </div>
 </template>
 <script>
@@ -245,6 +266,7 @@ import typeChoose from "./activity/typeChoose.vue";
 import singleActivity from "./activity/singleActivity.vue";
 import multiActivity from "./activity/multiActivity.vue";
 import activityVisitor from "./activity/activityVisitor.vue";
+import loginModal from "../user/userState/loginModal.vue";
 
 export default {
   components: {
@@ -252,6 +274,7 @@ export default {
     singleActivity,
     multiActivity,
     activityVisitor,
+    loginModal,
   },
   data() {
     return {
@@ -270,7 +293,7 @@ export default {
       rootActivity: {},
       childActivities: [],
       parentActivity: {},
-      grandchildren: [],
+      // grandchildren: [],
       editActivityForm: {
         name: "",
         description: "",
@@ -302,6 +325,8 @@ export default {
       applyJoinForm: {
         reason: "",
       },
+      //恢复登录的模态框
+      tempLoginModal: false,
       activityEditModal: false,
       applyJoinActivityModal: false,
       activityDeleteModal: false,
@@ -354,17 +379,33 @@ export default {
   },
   methods: {
     initInfo: function () {
-      let aid = this.getURLaid();
-      this.$axios.get("/GeoProblemSolving/project/getProjects?aids=" + aid)
-        .then(res => {
-          // this.$set(this, "projectInfo", res.data.data[0])
-          this.projectInfo = res.data.data[0];
-          this.getProjectInfo();
-        })
-        .catch(err => {
-          this.$Message.error("Loading project failed.")
-        })
+      this.handleSpinShow(1000);
       this.userInfo = this.$store.getters.userInfo;
+      let urlInfo = this.getUrlInfo();
+      this.$axios
+        .get("/GeoProblemSolving/project/" + urlInfo.aid)
+        .then((res) => {
+          //offline model
+
+          if (res.data.code == 0) {
+            // this.$set(this, "projectInfo", res.data.data[0])
+            this.projectInfo = res.data.data;
+            if (urlInfo.search.level == 0 || urlInfo.search.level == null) {
+              this.getProjectInfo();
+            } else if (urlInfo.search.level == 1) {
+              //跳转到subproject
+              this.getSubprojectBranch(urlInfo.search.aid);
+            } else if (urlInfo.search.level > 1) {
+              //跳转到activity
+              this.getActivityBranch(urlInfo.search.aid);
+            }
+          } else {
+            console.log(res.data.msg);
+          }
+        })
+        .catch((err) => {
+          this.$Message.error("Loading project failed.");
+        });
       if (this.userInfo.organizations == null) {
         this.userInfo.organizations = [];
       }
@@ -372,12 +413,38 @@ export default {
         this.userInfo.domain = [];
       }
     },
-    getURLaid:function(){
+    handleSpinShow(time) {
+      this.$Spin.show();
+      setTimeout(() => {
+        this.$Spin.hide();
+      }, time);
+    },
+    getUrlInfo: function () {
       let url = window.location.href;
-      if(url.indexOf("/activityInfo/") != -1){
-        let urls = url.split("/activityInfo/");
-        return urls[1];
+      let result = {};
+      if (url.indexOf("/activityInfo/") != -1) {
+        let urlStr = url.split("/activityInfo/");
+        if (urlStr[1].indexOf("?") != -1) {
+          result.aid = urlStr[1].split("?")[0];
+        } else {
+          result.aid = urlStr[1];
+        }
       }
+      if (url.indexOf("?") != -1) {
+        let urls = url.split("?");
+        result.search = {};
+        result.search.content = this.getURLParameter("content", urls[1]);
+        result.search.aid = this.getURLParameter("aid", urls[1]);
+        result.search.level = this.getURLParameter("level", urls[1]);
+        return result;
+      } else {
+        result.search = {};
+        result.search.level = null;
+        return result;
+      }
+    },
+    changeLoginModal(status) {
+      this.tempLoginModal = status;
     },
     roleIdentity(activity) {
       return this.userRoleApi.roleIdentify(
@@ -428,18 +495,8 @@ export default {
         };
         on = {
           click: () => {
-            //通过setContent函数判断child类型，跳转到不同的类型组件
-
-            //面包屑显示当前activity的位置
-            // this.updataCascader(data);
-            if(data.level == 0){
-              this.enterRootActivity();
-            } else {
-              this.slctActivity = data;
-              this.locateActivity();
-              this.setContent(this.slctActivity);
-              // this.$router.push("/activityInfo/" + data.aid);
-            }
+            this.slctActivity = data;
+            this.locateActivity();
           },
         };
       } else {
@@ -448,16 +505,7 @@ export default {
           backgroundColor: "lightblue",
           cursor: "default",
         };
-        // on = {
-        //   click: ()=> {
-        //     // this.slctActivity = this.rootActivity;
-        //     // this.setContent(this.slctActivity);
-        //     //面包屑显示当前activity的位置
-        //     this.updataCascader(data);
-        //   }
-        // }
       }
-
       return h(
         "span",
         {
@@ -495,107 +543,13 @@ export default {
         ]
       );
     },
-    enterActivity(activity){
-      //判断是否是新建child
-      let isNewChild = true;
-      for(let i = 0 ; i < this.nameConfirm.length ; i++){
-        if(this.nameConfirm[i] == activity.name){
-          isNewChild = false;
-        }
-      }
-      if( isNewChild == true){
-        //进入的是新活动，需要在activityTree中--临时--更新该newchild
-        this.addTempActivityTree(activity);
-        this.nameConfirm.push(activity.name);
-      }
-      //Activity_Group的introduction页面child activities跳转
-      // this.updataCascader(activity);
+    enterChildActivity(activity) {
       this.slctActivity = activity;
       this.locateActivity();
-      this.setContent(this.slctActivity);
     },
-    enterRootActivity(){
-      if(this.rootActivity != null && this.rootActivity != {}){
-        this.enterActivity(this.rootActivity);
-      }
-    },
-    updataCascader(data){
-      //假设目前只允许拥有一个root活动且最大只有三层，所以cascader[0]固定，data.lever最大为2
-      //利用data.level查出活动结构
-      if(data.level == 0){
-        let length = this.cascader.length;
-        this.cascader.splice(1,length-1);
-      } else if(data.level == 1){
-        let length = this.cascader.length;
-        this.cascader.splice(1,length-1);
-        this.cascader.push(data.name);
-      } else if(data.level == 2){
-        this.$axios.get("/GeoProblemSolving/subproject/" + data.parent +"/lineage")
-          .then((res) => {
-            if(res.data.code == 0){
-              let parentName ="";
-              let length = this.cascader.length;
-              this.cascader.splice(1,length-1);
-              parentName = res.data.data.ancestors[0].name;
-              this.cascader.push(parentName);
-              this.cascader.push(data.name);
-            }else{
-              console.log(res.data.msg);
-            }
-          }).catch((err) => {
-            throw err;
-          });
-      }
-    },
-    addTempActivityTree(data){
-      if(data.level == 1){
-        this.activityTree[0].children.push(data);
-      } else if(data.level > 1){
-        //根据data的parent找到data在activityTree中的插入位置
-        let positionNum = null;
-        for(let i = 0 ; i < this.activityTree[0].children.length ; i++){
-          if( data.parent == this.activityTree[0].children[i].aid ){
-            positionNum = i;
-          }
-        }
-        this.activityTree[0].children[positionNum].children.push(data);
-      }
-    },
-    delTempActivityTree(data){
-      //更新nameConfirm
-      let index = null;
-      for( let i = 0 ; i < this.nameConfirm.length ; i++){
-        if(this.nameConfirm[i] == data.name){
-          index = i;
-        }
-      }
-      this.nameConfirm.splice(index,1);
-      //更新ActivityTree
-      if(data.level == 1){
-        let indexLevel1 = null;
-        for( let i = 0; i < this.activityTree[0].children.length ; i++){
-          if(this.activityTree[0].children[i].name == data.name){
-            indexLevel1 = i;
-          }
-        }
-        this.activityTree[0].children.splice(indexLevel1,1);
-      } else if(data.level > 1){
-        //索引父活动
-        let indexParent = null;
-        for(let i = 0 ; i < this.activityTree[0].children.length ; i++){
-          if( data.parent == this.activityTree[0].children[i].aid ){
-            indexParent = i;
-          }
-        }
-        //索引子活动
-        let indexLevel2 = null;
-        for( let i = 0; i < this.activityTree[0].children[indexParent].children.length ; i++){
-          if(this.activityTree[0].children[indexParent].children[i].name == data.name){
-            indexLevel2 = i;
-          }
-        }
-        this.activityTree[0].children[indexParent].children.splice(indexLevel2,1);
-      }
+    enterRootActivity() {
+      this.handleSpinShow(1000);
+      this.getProjectInfo();
     },
     foldTree() {
       this.treeFold = true;
@@ -632,12 +586,13 @@ export default {
       } else if (level == 1) {
         this.getSubprojectBranch(aid);
       } else {
+        this.handleSpinShow(1000);
         this.getProjectInfo();
       }
     },
-    getURLParameter(name) {
+    getURLParameter(name, url) {
       var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
-      var r = parent.location.search.substr(1).match(reg);
+      var r = url.substr(0).match(reg);
 
       if (r != null) {
         return unescape(r[2]);
@@ -653,38 +608,15 @@ export default {
             "/GeoProblemSolving/project/" + this.projectInfo.aid + "/children"
           )
           .then((res) => {
+            //offline model
+
             if (res.data.code == 0) {
               let children = res.data.data;
               this.childActivities = children;
               this.nameConfirm = [];
               // 处理掉异常
               for (let i = 0; i < children.length; i++) {
-                children[i].children = [];//清除child后只能显示两级level
-                // if(children[i].children != null && children[i].children.length > 0){
-                //   if (children[i].aid != "") {
-                //     this.$axios
-                //       .get(
-                //         "/GeoProblemSolving/subproject/" + children[i].aid +"/lineage"
-                //       )
-                //       .then((res) => {
-                //         if (res.data.code == 0) {
-                //           let grandchildren = res.data.data;
-                //           children[i].children = grandchildren.children;
-                //           for(let j = 0 ; j < children[i].children.length; j++){
-                //             this.nameConfirm.push(children[i].children[j].name);
-                //           }
-                //         } else {
-                //           console.log(res.data.msg);
-                //         }
-                //       })
-                //       .catch((err) => {
-                //         throw err;
-                //       });
-                //   }
-                //   // for(let j = 0 ; j < children[i].children.length; j++){
-                //   //   children[i].children[j] = this.getChildren(children[i].children[j]);
-                //   // }
-                // }
+                children[i].children = []; //清除child后只能显示两(三)级level
                 this.nameConfirm.push(children[i].name);
               }
 
@@ -696,7 +628,6 @@ export default {
               // update activity tree
               this.activityTree.push(root);
               this.slctActivity = root;
-              this.rootActivity = this.slctActivity;
               this.parentActivity = null;
               this.setContent(this.slctActivity);
             } else {
@@ -725,6 +656,7 @@ export default {
       this.axios
         .get(url)
         .then((res) => {
+          //offline model
           if (res.data.code == 0) {
             let branch = res.data.data;
             this.childActivities = branch.children;
@@ -752,10 +684,11 @@ export default {
       this.axios
         .get(url)
         .then((res) => {
+          //offline model
+
           if (res.data.code == 0) {
             let branch = res.data.data;
             this.childActivities = branch.children;
-
             this.buildActivityTree(
               branch.ancestors,
               branch.brothers,
@@ -838,6 +771,14 @@ export default {
       this.setContent(this.slctActivity);
     },
     setContent(activity) {
+      //更改当前页面的url，且不刷新页面
+      var originUrl = window.location.href;
+      var valiable = originUrl.split("?")[0];
+      window.history.pushState(
+        null,
+        null,
+        valiable + "?aid=" + activity.aid + "&level=" + activity.level + ""
+      );
       // load activity doc
       let result = this.operationApi.getActivityDoc(activity.aid);
       if (result === "empty") {
@@ -889,8 +830,7 @@ export default {
                 this.slctActivity.children.length > 0
               ) {
                 this.$Notice.info({
-                  desc:
-                    "Please make sure no child activity existing, before changing the type of current activity.",
+                  desc: "Please make sure no child activity existing, before changing the type of current activity.",
                 });
                 this.activityEditModal = false;
                 return;
@@ -916,13 +856,21 @@ export default {
           this.axios
             .put(url, this.editActivityForm)
             .then((res) => {
-              if (res.data.code == 0) {
+              //offline model
+
+              if (res.data == "Offline") {
+                this.$store.commit("userLogout");
+                // this.$router.push({ name: "Login" });
+                this.tempLoginModal = true;
+              } else if (res.data.code == 0) {
                 this.$Notice.info({ title: "Result", desc: "Success!" });
                 // updata slctActivity
                 this.slctActivity.name = this.editActivityForm.name;
-                this.slctActivity.description = this.editActivityForm.description;
+                this.slctActivity.description =
+                  this.editActivityForm.description;
                 this.slctActivity.type = this.editActivityForm.type;
                 this.slctActivity.purpose = this.editActivityForm.purpose;
+                this.activityEditModal = false;
                 // cascader
                 let index = this.cascader.length - 1;
                 this.$set(this.cascader, index, this.editActivityForm.name);
@@ -932,13 +880,12 @@ export default {
                 this.setContent(this.slctActivity);
               } else {
                 this.$Notice.info({ title: "Result", desc: res.data.msg });
+                this.activityEditModal = false;
               }
             })
             .catch((err) => {
               throw err;
             });
-
-          this.activityEditModal = false;
         }
       });
     },
@@ -978,7 +925,12 @@ export default {
       this.$axios
         .post(url)
         .then((res) => {
-          if (res.data.code == 0) {
+          //offline model
+          if (res.data == "Offline") {
+            this.$store.commit("userLogout");
+            // this.$router.push({ name: "Login" });
+            this.tempLoginModal = true;
+          } else if (res.data.code == 0) {
             this.$Notice.info({ title: "Join the activity", desc: "Success!" });
             this.enterActivity(this.rootActivity);
           } else if (res.data.code == -3) {
@@ -1023,7 +975,12 @@ export default {
       this.axios
         .post("/GeoProblemSolving/notice/save", notice)
         .then((result) => {
-          if (result.data == "Success") {
+          //offline model
+          if (res.data == "Offline") {
+            this.$store.commit("userLogout");
+            // this.$router.push({ name: "Login" });
+            this.tempLoginModal = true;
+          } else if (result.data == "Success") {
             this.$Notice.info({ desc: "Send application successfully." });
             this.applyJoinActivityModal = false;
             this.$emit("sendNotice", notice.recipientId);
@@ -1047,7 +1004,13 @@ export default {
       this.$axios
         .delete(url)
         .then((res) => {
-          if (res.data.code == 0) {
+          //offline model
+
+          if (res.data == "Offline") {
+            this.$store.commit("userLogout");
+            // this.$router.push({ name: "Login" });
+            this.tempLoginModal = true;
+          } else if (res.data.code == 0) {
             this.$Notice.info({ title: "Delete", desc: "Success!" });
             this.operationApi.activityRecord(
               "",
@@ -1058,7 +1021,7 @@ export default {
             this.operationApi.deleteActivityDoc(this.slctActivity.aid);
             this.activityDeleteModal = false;
             //更新activityTree
-            this.delTempActivityTree(this.slctActivity);
+            // this.delTempActivityTree(this.slctActivity);
             this.enterRootActivity();
           } else {
             console.log(res.data.msg);

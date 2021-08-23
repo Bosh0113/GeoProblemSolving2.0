@@ -354,7 +354,7 @@ export default {
           background: "lightgrey",
         },
       },
-      projectInfo: parent.vm.projectInfo,
+      projectInfo:{},
       userInfo: JSON.parse(sessionStorage.getItem("userInfo")),
       userRole: "visitor",
       // Members
@@ -387,6 +387,7 @@ export default {
   },
   created() {
     this.userRole = this.roleIdentity(this.activityInfo);
+    this.getProjectInfo();
     this.getParticipants();
   },
   mounted() {},
@@ -430,6 +431,29 @@ export default {
         let parent = await get(url);
         return parent.members.contains(this.userInfo);
       }
+    },
+    getProjectInfo(){
+      let url = window.location.href;
+      let result = {};
+      if(url.indexOf("/activityInfo/") != -1){
+        let urlStr = url.split("/activityInfo/");
+        if(urlStr[1].indexOf("?") != -1){
+          result.aid = urlStr[1].split("?")[0];
+        }else{
+          result.aid = urlStr[1];
+        }
+      }
+      this.$axios.get("/GeoProblemSolving/project/" + result.aid)
+        .then(res => {
+          if(res.data.code == 0){
+            this.projectInfo = res.data.data;
+          } else {
+            console.log(res.data.msg);
+          }
+        })
+        .catch(err => {
+          this.$Message.error("Loading project failed.")
+        })
     },
     getParticipants() {
       let url = "";
