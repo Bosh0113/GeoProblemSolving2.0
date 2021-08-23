@@ -560,11 +560,11 @@ export default {
         "General",
         "Context definition & resource collection",
         "Data processing",
+        "Data analysis",
         "Data visualization",
         "Geo-analysis model construction",
         "Model effectiveness evaluation",
         "Geographical simulation",
-        "Data analysis",
         "Decision making",
       ],
       infoModal: false,
@@ -701,11 +701,11 @@ export default {
           case "General":
           case "Context definition & resource collection":
           case "Data processing":
+          case "Data analysis":
           case "Data visualization":
           case "Geo-analysis model construction":
           case "Model effectiveness evaluation":
           case "Geographical simulation":
-          case "Data analysis":
           case "Decision making": {
             if (item.recommendation != undefined) {
               let stepTypes = item.recommendation;

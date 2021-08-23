@@ -15,7 +15,7 @@ import java.util.List;
 @Data
 public class UpdateProtocolDTO implements ToDomainConverter {
 
-
+    // 连接关系不能修改
     private String pid;
 
     private ArrayList<String> types;
@@ -27,5 +27,5 @@ public class UpdateProtocolDTO implements ToDomainConverter {
 
     private ArrayList<String> roles;
     private ArrayList<String> domains;
-
+    private ArrayList<String> organizations;
 }

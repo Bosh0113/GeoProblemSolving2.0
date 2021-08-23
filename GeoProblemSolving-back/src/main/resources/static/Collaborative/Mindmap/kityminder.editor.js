@@ -3782,7 +3782,7 @@ angular.module('kityminderEditor')
                                                 if (data.code == 0) {
                                                     var thumbnailPath = data.data;
 
-                                                    resaveResource(fileBlob, { thumbnail: thumbnailPath });
+                                                    resaveResource(fileBlob, {uid: map.uid, thumbnail: thumbnailPath });
 
                                                     // 初始化原始导图
                                                     originalMap = JSON.stringify(editor.minder.exportJson());

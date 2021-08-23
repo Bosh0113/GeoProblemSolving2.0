@@ -202,7 +202,7 @@ export default {
             this.tempLoginModal = true;
           } else if (res.data.code == 0) {
             if(res.data.data.level == 0){
-              parent.vm.projectInfo = res.data.data;
+              this.activityInfo = res.data.data;
             }
             this.$emit("typeChanged", this.selectType);
           } else {

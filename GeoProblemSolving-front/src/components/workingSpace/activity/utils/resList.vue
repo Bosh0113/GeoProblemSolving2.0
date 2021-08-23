@@ -381,8 +381,6 @@
         <a
           :href="selectData.address"
           :download="selectData.name + selectData.suffix"
-        >
-          <Button
             v-if="
               permissionIdentity(
                 activityInfo.permission,
@@ -390,6 +388,8 @@
                 'use_resource'
               )
             "
+        >
+          <Button
             type="info"
             size="small"
             title="Download"
@@ -499,7 +499,7 @@
           <li style="display: flex">
             File name:
             <span style="font-size: 10px; margin: 0 5px 0 5px"
-              >{{ list.name + list.suffix }} ( {{ list.fileSize }} )</span
+              >{{ list.name }} ( {{ list.fileSize }} )</span
             >
             <Icon
               type="ios-close"

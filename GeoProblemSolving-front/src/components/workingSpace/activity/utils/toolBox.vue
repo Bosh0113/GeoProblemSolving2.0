@@ -357,7 +357,7 @@ export default {
         theme: "success",
         footerToolbar: `<p></p>`,
         contentSize: "800 400",
-        id: toolInfo.toolName,
+        id: toolInfo.toolName.replace(/ /g, '-'),
         headerTitle: toolInfo.toolName,
         content: toolContent,
         container: "div#drawflow",

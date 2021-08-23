@@ -50,6 +50,7 @@ public class ToolServiceImpl implements ToolService {
     @Override
     public List<JSONObject> getComputeModelByUserEmail(String email, int page, int size) {
         HttpHeaders headers = new HttpHeaders();
+        headers.set("user-agent", "geoProblemSolving");
         HttpEntity<JSONObject> httpEntity = new HttpEntity<>(headers);
         String url = "http://" + portalIpAndPort + "/computableModel/searchDeployedModelByUser?page=" + page
                 + "&size="+ size +"&asc=-1&searchText=&userName=" + email;
@@ -65,7 +66,11 @@ public class ToolServiceImpl implements ToolService {
     @Override
     public List<JSONObject> getPublicComputeModel(int page, int size) {
         String url = "http://" + portalIpAndPort + "/computableModel/searchDeployedModel?page="+ page +"&size="+ size +"&asc=-1&searchText=";
-        JSONObject getResult = restTemplate.getForEntity(url, JSONObject.class).getBody();
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("user-agent", "geoProblemSolving");
+        HttpEntity<JSONObject> httpEntity = new HttpEntity<>(headers);
+        JSONObject getResult = restTemplate.exchange(url, HttpMethod.GET, httpEntity, JSONObject.class).getBody();
+        // JSONObject getResult = restTemplate.getForEntity(url, JSONObject.class).getBody();
         JSONArray jsonArray = getResult.getJSONObject("data").getJSONArray("content");
         if (jsonArray == null){
             return null;
@@ -76,25 +81,34 @@ public class ToolServiceImpl implements ToolService {
 
     @Override
     public JSONObject queryPublicComputeModelByName(String searchText, int page) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("user-agent", "geoProblemSolving");
+        HttpEntity<JSONObject> httpEntity = new HttpEntity<>(headers);
         String url = "http://" + portalIpAndPort + "/computableModel/searchDeployedModel?page=" + page
                 + "&size=20&asc=-1&searchText=" + searchText;
         //默认 pageSize = 20
-        JSONObject getResult = restTemplate.getForEntity(url, JSONObject.class).getBody();
+        JSONObject getResult = restTemplate.exchange(url, HttpMethod.GET, httpEntity, JSONObject.class).getBody();
+        // JSONObject getResult = restTemplate.getForEntity(url, JSONObject.class).getBody();
         return getResult.getJSONObject("data");
     }
 
     @Override
     public List<JSONObject> getDataMethodByUserEmail(String email, int page, int size) {
         //第一步通过通过email获取用户oid
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("user-agent", "geoProblemSolving");
+        HttpEntity<JSONObject> httpEntity = new HttpEntity<>(headers);
         String email2OidUrl = "http://" + portalIpAndPort + "/user/getOidByEmail?email=" + email;
-        Integer oid = restTemplate.getForEntity(email2OidUrl, JSONObject.class).getBody().getInteger("data");
+        Integer oid = restTemplate.exchange(email2OidUrl, HttpMethod.GET, httpEntity, JSONObject.class).getBody().getInteger("data");
+        // Integer oid = restTemplate.getForEntity(email2OidUrl, JSONObject.class).getBody().getInteger("data");
         //此用户从未在门户登录过，故门户无此用户
         if (oid == null) {
             return null;
         }
         String userDataMethodUrl = "http://" + portalIpAndPort + "/dataApplication/getApplication?userOid=" + oid +
                 "&page="+ page +"&pagesize="+ size +"&asc=-1&type=";
-        JSONObject getResult = restTemplate.getForEntity(userDataMethodUrl, JSONObject.class).getBody();
+        JSONObject getResult = restTemplate.exchange(userDataMethodUrl, HttpMethod.GET, httpEntity, JSONObject.class).getBody();
+        // JSONObject getResult = restTemplate.getForEntity(userDataMethodUrl, JSONObject.class).getBody();
         JSONObject publicModelJson = getResult.getJSONObject("data");
         if (publicModelJson.getBoolean("empty")){
             return null;
@@ -130,6 +144,7 @@ public class ToolServiceImpl implements ToolService {
         searchJson.put("page", page);
         searchJson.put("pageSize", size);
         HttpHeaders headers = new HttpHeaders();
+        headers.set("user-agent", "geoProblemSolving");
         HttpEntity<JSONObject> httpEntity = new HttpEntity<>(searchJson, headers);
         try {
             ResponseEntity<JSONObject> searchRes = restTemplate.exchange(url, HttpMethod.POST, httpEntity, JSONObject.class);

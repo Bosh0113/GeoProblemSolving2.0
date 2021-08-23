@@ -145,7 +145,7 @@
                 margin: 0 10px 10px 0;
                 cursor: pointer;
               "
-              @click.native="enterChildActivity(item)"
+              @click.native="enterActivity(item)"
             >
               <p slot="title" :title="item.name">{{ item.name }}</p>
               <div slot="extra" style="margin-top: -10px; margin-right: -5px">
@@ -783,7 +783,7 @@ export default {
                 //   res.data.data.aid +
                 //   "&level=" +
                 //   res.data.data.level;
-                this.$emit('enterChildActivity', res.data.data);
+                this.$emit('enterActivity', res.data.data);
               } else {
                 console.log(res.data.msg);
               }
@@ -795,7 +795,7 @@ export default {
         }
       });
     },
-    enterChildActivity(activity) {
+    enterActivity(activity) {
       if (this.roleIdentity(activity) == "visitor"){
          this.$Message.info("Please join this activity.");
       }
@@ -806,7 +806,7 @@ export default {
       //   activity.aid +
       //   "&level=" +
       //   activity.level;
-      this.$emit('enterChildActivity', activity);
+      this.$emit('enterActivity', activity);
     },
     preApplication(activity) {
       this.appliedActivity = activity;
@@ -1218,7 +1218,7 @@ export default {
         .post("/GeoProblemSolving/notice/save", notice)
         .then((result) => {
           if (result.data == "Success") {
-            parent.vm.$emit("sendNotice", notice.recipientId);
+            this.$emit("sendNotice", notice.recipientId);
             this.$Notice.info({ desc: "Send application successfully" });
           } else {
             this.$Notice.error({ desc: "Fail to send application" });

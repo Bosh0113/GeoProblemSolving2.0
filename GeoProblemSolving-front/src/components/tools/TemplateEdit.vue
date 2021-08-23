@@ -317,11 +317,11 @@ export default {
         "General step",
         "Context definition & resource collection",
         "Data processing",
+        "Data analysis",
         "Data visualization",
         "Geo-analysis model construction",
         "Model effectiveness evaluation",
         "Geographical simulation",
-        "Data analysis",
         "Decision making",
       ],
     };

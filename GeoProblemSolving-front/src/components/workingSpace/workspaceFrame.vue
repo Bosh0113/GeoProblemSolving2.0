@@ -1,5 +1,7 @@
 <template>
-  <div style="display: flex; background-color: #eee; height: calc(100vh - 130px)">
+  <div
+    style="display: flex; background-color: #eee; height: calc(100vh - 130px)"
+  >
     <Button
       title="Activity tree"
       @click="unfoldTree"
@@ -14,14 +16,21 @@
     </Button>
 
     <!--  Activity List部分  -->
-    <Card dis-hover class="activityCard" id="ActivityTree" style="height: calc(100vh - 130px)">
-      <span slot="title" style="font-size: 18px;font-weight: 700;">Activity list</span>
+    <Card
+      dis-hover
+      class="activityCard"
+      id="ActivityTree"
+      style="height: calc(100vh - 130px)"
+    >
+      <span slot="title" style="font-size: 18px; font-weight: 700"
+        >Activity list</span
+      >
       <Icon
         slot="title"
         type="md-refresh"
         size="18"
         title="Refresh the activity tree"
-        style="cursor: pointer;margin-left: 6px;"
+        style="cursor: pointer; margin-left: 6px"
         @click="locateActivity"
       />
       <Icon
@@ -32,7 +41,7 @@
         style="cursor: pointer"
         @click="foldTree"
       />
-      <vue-scroll :ops="scrollOps" >
+      <vue-scroll :ops="scrollOps">
         <div style="padding-right: 15px">
           <Tree :data="activityTree" :render="renderStyle"></Tree>
         </div>
@@ -40,7 +49,12 @@
     </Card>
 
     <!--    使用slot控制是否显示-->
-    <Card dis-hover class="workspaceCard" id="ActivityContent" style="height: calc(100vh - 130px)">
+    <Card
+      dis-hover
+      class="workspaceCard"
+      id="ActivityContent"
+      style="height: calc(100vh - 130px)"
+    >
       <h3 slot="title">
         <Breadcrumb style="display: inline-block" separator=">">
           <BreadcrumbItem v-for="name in cascader" :key="name"
@@ -114,7 +128,7 @@
         :childActivities="childActivities"
         :nameConfirm="nameConfirm"
         :key="slctActivity.aid"
-        v-on:enterChildActivity="enterChildActivity"
+        v-on:enterActivity="enterActivity"
         v-on:enterRootActivity="enterRootActivity"
       ></multi-activity>
       <activity-visitor
@@ -224,10 +238,7 @@
         </Button>
       </div>
     </Modal>
-    <Modal
-      v-model="activityDeleteModal"
-      title="Delete the current activity"
-    >
+    <Modal v-model="activityDeleteModal" title="Delete the current activity">
       <h3>Do you really want to delete this activity?</h3>
       <h3 style="color: red; margin-top: 10px">
         * The selected activity and its all child activities will be deleted!
@@ -239,15 +250,15 @@
           style="float: right"
           >Think again...
         </Button>
-        <Button
-
-          @click="delActivity"
-          style="float: right; margin-right: 15px"
+        <Button @click="delActivity" style="float: right; margin-right: 15px"
           >yes
         </Button>
       </div>
     </Modal>
-    <login-modal :tempLoginModal="tempLoginModal" @changeLoginModal="changeLoginModal"></login-modal>
+    <login-modal
+      :tempLoginModal="tempLoginModal"
+      @changeLoginModal="changeLoginModal"
+    ></login-modal>
   </div>
 </template>
 <script>
@@ -371,30 +382,30 @@ export default {
       this.handleSpinShow(1000);
       this.userInfo = this.$store.getters.userInfo;
       let urlInfo = this.getUrlInfo();
-      this.$axios.get("/GeoProblemSolving/project/" + urlInfo.aid)
-        .then(res => {
+      this.$axios
+        .get("/GeoProblemSolving/project/" + urlInfo.aid)
+        .then((res) => {
           //offline model
 
-          if(res.data.code == 0){
+          if (res.data.code == 0) {
             // this.$set(this, "projectInfo", res.data.data[0])
             this.projectInfo = res.data.data;
-            if(urlInfo.search.level == 0 || urlInfo.search.level == null){
+            if (urlInfo.search.level == 0 || urlInfo.search.level == null) {
               this.getProjectInfo();
-            } else if(urlInfo.search.level == 1){
+            } else if (urlInfo.search.level == 1) {
               //跳转到subproject
               this.getSubprojectBranch(urlInfo.search.aid);
-            } else if(urlInfo.search.level > 1){
+            } else if (urlInfo.search.level > 1) {
               //跳转到activity
               this.getActivityBranch(urlInfo.search.aid);
             }
           } else {
             console.log(res.data.msg);
           }
-
         })
-        .catch(err => {
-          this.$Message.error("Loading project failed.")
-        })
+        .catch((err) => {
+          this.$Message.error("Loading project failed.");
+        });
       if (this.userInfo.organizations == null) {
         this.userInfo.organizations = [];
       }
@@ -408,31 +419,31 @@ export default {
         this.$Spin.hide();
       }, time);
     },
-    getUrlInfo:function(){
+    getUrlInfo: function () {
       let url = window.location.href;
       let result = {};
-      if(url.indexOf("/activityInfo/") != -1){
+      if (url.indexOf("/activityInfo/") != -1) {
         let urlStr = url.split("/activityInfo/");
-        if(urlStr[1].indexOf("?") != -1){
+        if (urlStr[1].indexOf("?") != -1) {
           result.aid = urlStr[1].split("?")[0];
-        }else{
+        } else {
           result.aid = urlStr[1];
         }
       }
-      if(url.indexOf("?") != -1){
+      if (url.indexOf("?") != -1) {
         let urls = url.split("?");
         result.search = {};
-        result.search.content = this.getURLParameter("content",urls[1]);
-        result.search.aid = this.getURLParameter("aid",urls[1]);
-        result.search.level = this.getURLParameter("level",urls[1]);
+        result.search.content = this.getURLParameter("content", urls[1]);
+        result.search.aid = this.getURLParameter("aid", urls[1]);
+        result.search.level = this.getURLParameter("level", urls[1]);
         return result;
-      }else{
+      } else {
         result.search = {};
         result.search.level = null;
         return result;
       }
     },
-    changeLoginModal(status){
+    changeLoginModal(status) {
       this.tempLoginModal = status;
     },
     roleIdentity(activity) {
@@ -532,12 +543,11 @@ export default {
         ]
       );
     },
-    enterChildActivity(activity){
+    enterChildActivity(activity) {
       this.slctActivity = activity;
       this.locateActivity();
-
     },
-    enterRootActivity(){
+    enterRootActivity() {
       this.handleSpinShow(1000);
       this.getProjectInfo();
     },
@@ -580,7 +590,7 @@ export default {
         this.getProjectInfo();
       }
     },
-    getURLParameter(name,url) {
+    getURLParameter(name, url) {
       var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
       var r = url.substr(0).match(reg);
 
@@ -606,7 +616,7 @@ export default {
               this.nameConfirm = [];
               // 处理掉异常
               for (let i = 0; i < children.length; i++) {
-                children[i].children = [];//清除child后只能显示两(三)级level
+                children[i].children = []; //清除child后只能显示两(三)级level
                 this.nameConfirm.push(children[i].name);
               }
 
@@ -764,7 +774,11 @@ export default {
       //更改当前页面的url，且不刷新页面
       var originUrl = window.location.href;
       var valiable = originUrl.split("?")[0];
-      window.history.pushState(null, null, valiable+"?aid="+activity.aid+"&level="+activity.level+"");
+      window.history.pushState(
+        null,
+        null,
+        valiable + "?aid=" + activity.aid + "&level=" + activity.level + ""
+      );
       // load activity doc
       let result = this.operationApi.getActivityDoc(activity.aid);
       if (result === "empty") {
@@ -816,8 +830,7 @@ export default {
                 this.slctActivity.children.length > 0
               ) {
                 this.$Notice.info({
-                  desc:
-                    "Please make sure no child activity existing, before changing the type of current activity.",
+                  desc: "Please make sure no child activity existing, before changing the type of current activity.",
                 });
                 this.activityEditModal = false;
                 return;
@@ -849,11 +862,12 @@ export default {
                 this.$store.commit("userLogout");
                 // this.$router.push({ name: "Login" });
                 this.tempLoginModal = true;
-              }else if (res.data.code == 0) {
+              } else if (res.data.code == 0) {
                 this.$Notice.info({ title: "Result", desc: "Success!" });
                 // updata slctActivity
                 this.slctActivity.name = this.editActivityForm.name;
-                this.slctActivity.description = this.editActivityForm.description;
+                this.slctActivity.description =
+                  this.editActivityForm.description;
                 this.slctActivity.type = this.editActivityForm.type;
                 this.slctActivity.purpose = this.editActivityForm.purpose;
                 this.activityEditModal = false;
@@ -872,7 +886,6 @@ export default {
             .catch((err) => {
               throw err;
             });
-
         }
       });
     },
@@ -917,9 +930,9 @@ export default {
             this.$store.commit("userLogout");
             // this.$router.push({ name: "Login" });
             this.tempLoginModal = true;
-          }else if (res.data.code == 0) {
+          } else if (res.data.code == 0) {
             this.$Notice.info({ title: "Join the activity", desc: "Success!" });
-            this.enterChildActivity(this.rootActivity);
+            this.enterActivity(this.rootActivity);
           } else if (res.data.code == -3) {
             this.$Notice.info({
               desc: "You has already been a member of the activity.",
@@ -967,7 +980,7 @@ export default {
             this.$store.commit("userLogout");
             // this.$router.push({ name: "Login" });
             this.tempLoginModal = true;
-          }else if (result.data == "Success") {
+          } else if (result.data == "Success") {
             this.$Notice.info({ desc: "Send application successfully." });
             this.applyJoinActivityModal = false;
             this.$emit("sendNotice", notice.recipientId);
@@ -997,7 +1010,7 @@ export default {
             this.$store.commit("userLogout");
             // this.$router.push({ name: "Login" });
             this.tempLoginModal = true;
-          }else if (res.data.code == 0) {
+          } else if (res.data.code == 0) {
             this.$Notice.info({ title: "Delete", desc: "Success!" });
             this.operationApi.activityRecord(
               "",

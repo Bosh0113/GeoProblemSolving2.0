@@ -298,7 +298,7 @@
               });
           } else {
             this.$Message.error(
-              "If you don't have an account, you can register one."
+              "Invalid account or password."
             );
           }
         });

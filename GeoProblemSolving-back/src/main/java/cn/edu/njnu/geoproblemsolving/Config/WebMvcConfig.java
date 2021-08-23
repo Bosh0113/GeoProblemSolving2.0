@@ -11,10 +11,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry){
         registry.addInterceptor(new MyInterceptor())
                 .addPathPatterns(
-                        "/**"
+                       "/**"
                 )//拦截的请求
-                .excludePathPatterns("/user/**")
-                .excludePathPatterns("/**/*.jpeg")
-                .excludePathPatterns("/**/notice/**/");//不拦截的请求
+                .excludePathPatterns("/user/**");//不拦截的请求
     }
 }
