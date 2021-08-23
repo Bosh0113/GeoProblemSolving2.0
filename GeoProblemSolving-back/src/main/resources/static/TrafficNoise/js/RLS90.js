@@ -343,6 +343,44 @@ function getSocketComputation(data) {
 
         data.computeOutputs.forEach((el) => {
             if (el.statename == "NoiseRegion" && el.event == "Output_RegionNoise") {
+
+                var sampleSize = $("#sampleSize").val();
+                var northWestPoint = selectROI.ROI.getBounds().getNorthWest();
+                var southEastPoint = selectROI.ROI.getBounds().getSouthEast();
+                $("#mapid").css("cursor", "wait");
+                $.ajax({
+                    // async:false,
+                    type: "post",
+                    url: "/GeoProblemSolving/resultInterpolation",
+                    data: {
+                        userId: userId,
+                        resultData: el.url,
+                        maxLat: northWestPoint.lat,
+                        maxLon: southEastPoint.lng,
+                        minLat: southEastPoint.lat,
+                        minLon: northWestPoint.lng,
+                        sampleSize: sampleSize
+                    },
+                    dataType: "text",
+                    beforeSend: function () {
+                        $("#waitting").show();
+                    },
+                    success: function (resp) {
+                        var result = JSON.parse(resp);
+                        if (result.respCode == 1) {
+                            runningId = result.resultId;
+                            resultIdList.push(runningId);
+                            state = setInterval(getModelState, 2000);
+                        } else {
+                            console.log("error!");
+                        }
+                    },
+                    error: function (e) {
+                        $("#waitting").hide();
+                        $("#mapid").css("cursor", "-webkit-grab");
+                        console.log(e);
+                    }
+                });
                 loadResultTiff(el.url);
             }
         });
@@ -882,6 +920,7 @@ function closeConfig() {
 }
 
 // var resultBounds;
+// from manager server
 function onRunModel() {
     var sampleSize = $("#sampleSize").val();
     var height = $("#ROIHeight").val();
@@ -898,9 +937,9 @@ function onRunModel() {
         url: "/GeoProblemSolving/prepareModelData",
         data: {
             userId: userId,
-            roadData: JSON.stringify(roadData),
-            buildingData: JSON.stringify(buildingData),
-            barrierData: JSON.stringify(barrierData),
+            roadData: roadData.uid,
+            buildingData: buildingData.uid,
+            barrierData: barrierData.uid,
             top: upperLeftPoint[1],
             right: lowerRightPoint[0],
             bottom: lowerRightPoint[1],
@@ -925,7 +964,7 @@ function onRunModel() {
         success: function (resp) {
             var result = JSON.parse(resp);
             if (result.respCode == 1) {
-                //
+
                 let inputs = [];
                 inputs.push({
                     statename: "LoadVariables",
@@ -972,14 +1011,15 @@ function onRunModel() {
                     }
                 }]
 
-                window.parent.sendModelOperation(window.parent.activityInfo.aid, "33eabfc9fa8fad6c35c862c48c0c3349", "172.21.213.105", "8061", inputs, outputs);
-
                 window.parent.sendCustomOperation({
                     type: "operation",
                     sender: userId,
                     behavior: "run-start",
                     content: "run-start",
                 });
+
+                window.parent.sendModelOperation(window.parent.activityInfo.aid, "572c20572cb1a512cee896f06b419ed4", "172.21.213.105", "8061", inputs, outputs);
+
             } else {
                 $("#waitting").hide();
                 alert("Fail to get the simulation result!");
@@ -993,9 +1033,69 @@ function onRunModel() {
     });
 }
 
+// directly from model service container
+// function onRunModel() {
+//     var sampleSize = $("#sampleSize").val();
+//     var height = $("#ROIHeight").val();
+//     var northWestPoint = selectROI.ROI.getBounds().getNorthWest();
+//     var southEastPoint = selectROI.ROI.getBounds().getSouthEast();
+//     // console.log("1");
+//     $("#mapid").css("cursor", "wait");
+//     var upperLeftPoint = proj4("EPSG:4326", "EPSG:2437", [northWestPoint.lng, northWestPoint.lat]);
+//     var lowerRightPoint = proj4("EPSG:4326", "EPSG:2437", [southEastPoint.lng, southEastPoint.lat]);
+//     // resultBounds = [[lowerRightPoint[1],upperLeftPoint[0]],[upperLeftPoint[1],lowerRightPoint[0]]];
+//     $.ajax({
+//         // async:false,
+//         type: "post",
+//         url: "/GeoProblemSolving/runModelServlet",
+//         data: {
+//             userId: userId,
+//             roadData: roadData.uid,
+//             buildingData: buildingData.uid,
+//             barrierData: barrierData.uid,
+//             top: upperLeftPoint[1],
+//             right: lowerRightPoint[0],
+//             bottom: lowerRightPoint[1],
+//             left: upperLeftPoint[0],
+//             maxLat: northWestPoint.lat,
+//             maxLon: southEastPoint.lng,
+//             minLat: southEastPoint.lat,
+//             minLon: northWestPoint.lng,
+//             sampleSize: sampleSize,
+//             height: height
+//         },
+//         dataType: "text",
+//         beforeSend: function () {
+//             console.log({
+//                 maxLat: upperLeftPoint[1],
+//                 maxLon: lowerRightPoint[0],
+//                 minLat: lowerRightPoint[1],
+//                 minLon: upperLeftPoint[0]
+//             });
+//             $("#waitting").show();
+//         },
+//         success: function (resp) {
+//             var result = JSON.parse(resp);
+//             if (result.respCode == 1) {
+//                 runningId = result.resultId;
+//                 resultIdList.push(runningId);
+//                 state = setInterval(getModelState, 2000);
+//             }
+//             else {
+//                 console.log("error!");
+//             }
+//         },
+//         error: function (e) {
+//             $("#waitting").hide();
+//             $("#mapid").css("cursor", "-webkit-grab");
+//             console.log(e);
+//         }
+//     });
+// }
+
 var state;
 
-function getModelState(userId, runningId) {
+function getModelState() {
     $.ajax({
         type: "post",
         url: "/GeoProblemSolving/getModelState",
@@ -1019,7 +1119,7 @@ function getModelState(userId, runningId) {
                     onSelectClick();
                     $("#mapid").css("cursor", "-webkit-grab");
 
-                    // loadResultTiff(runningId);
+                    loadResultTiff(result.url);
                     $("#waitting").hide();
 
                     // window.parent.sendCustomOperation({
@@ -1908,7 +2008,7 @@ window.onpageshow = function (e) {
                 }
                 if (resultIdList.length) {
                     // resultIdList.forEach(function (item) {
-                    //     loadResultTiff(item);
+                    //     getModelState(userId, item)
                     // })
                 }
                 mymap.setView([result.centerLat, result.centerLong], result.currentZoom);

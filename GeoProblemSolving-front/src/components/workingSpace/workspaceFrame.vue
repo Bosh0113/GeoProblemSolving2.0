@@ -105,7 +105,7 @@
         :childActivities="childActivities"
         :nameConfirm="nameConfirm"
         :key="slctActivity.aid"
-        v-on:enterChildActivity="enterChildActivity"
+        v-on:enterActivity="enterActivity"
         v-on:enterRootActivity="enterRootActivity"
       ></multi-activity>
       <activity-visitor
@@ -495,7 +495,7 @@ export default {
         ]
       );
     },
-    enterChildActivity(activity){
+    enterActivity(activity){
       //判断是否是新建child
       let isNewChild = true;
       for(let i = 0 ; i < this.nameConfirm.length ; i++){
@@ -516,7 +516,7 @@ export default {
     },
     enterRootActivity(){
       if(this.rootActivity != null && this.rootActivity != {}){
-        this.enterChildActivity(this.rootActivity);
+        this.enterActivity(this.rootActivity);
       }
     },
     updataCascader(data){
@@ -980,7 +980,7 @@ export default {
         .then((res) => {
           if (res.data.code == 0) {
             this.$Notice.info({ title: "Join the activity", desc: "Success!" });
-            this.enterChildActivity(this.rootActivity);
+            this.enterActivity(this.rootActivity);
           } else if (res.data.code == -3) {
             this.$Notice.info({
               desc: "You has already been a member of the activity.",

@@ -1,8 +1,9 @@
 package cn.edu.njnu.geoproblemsolving.business.tool.trafficNoise.Model.Service;
 
 import java.io.*;
+import java.util.ArrayList;
 
-import static cn.edu.njnu.geoproblemsolving.business.tool.trafficNoise.Data.Dao.zipUtil.zipFile;
+import static cn.edu.njnu.geoproblemsolving.business.tool.trafficNoise.Data.Dao.fileUtils.*;
 
 public class prepareInputData {
     /*
@@ -49,16 +50,16 @@ public class prepareInputData {
         outputStream.write(stringBuffer.toString().getBytes("utf-8"));
         outputStream.close();
 
-        String sourceFilePath = "";
+        ArrayList<String> sourceFilePath = new ArrayList<>();
         String[] extensions = {".shp", ".dbf", ".prj", ".shx"};
         for (String extension : extensions) {
             File tempFile = new File(srcFilePath + "\\" + shpfileName + extension);
             if(!tempFile.exists()){
                 continue;
             }
-            sourceFilePath += tempFile.getCanonicalPath() + " ";
+            sourceFilePath.add(tempFile.getCanonicalPath());
         }
-        sourceFilePath += cfgFile.getCanonicalPath();
+        sourceFilePath.add(cfgFile.getCanonicalPath());
         new File(destFilePath).mkdirs();
         zipFile(sourceFilePath, destFilePath+"\\"+shpfileName+".zip");
 

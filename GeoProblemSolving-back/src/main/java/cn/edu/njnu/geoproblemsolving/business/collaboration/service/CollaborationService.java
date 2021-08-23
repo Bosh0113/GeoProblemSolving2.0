@@ -65,10 +65,11 @@ public class CollaborationService {
     @Value("${managerServerIpAndPort}")
     String mangeServiceLocation;
 
-    private CollaborationConfig collaborationConfig;
+//    private CollaborationConfig collaborationConfig;
     private static final Map<String, CollaborationConfig> groups = new ConcurrentHashMap<>(); // collaboration groups
 
     public void msgStart(String groupKey, Session session, EndpointConfig config) {
+        CollaborationConfig collaborationConfig;
         try {
             //判断会话是否存在
             if (groups.containsKey(groupKey)) {
@@ -107,6 +108,7 @@ public class CollaborationService {
     }
 
     public void operationStart(String groupKey, Session session, EndpointConfig config) {
+        CollaborationConfig collaborationConfig;
         try {
             //判断会话是否存在
             if (groups.containsKey(groupKey)) {
@@ -143,6 +145,7 @@ public class CollaborationService {
     }
 
     public void msgTransfer(String groupKey, String message) {
+        CollaborationConfig collaborationConfig;
         try {
             collaborationConfig = groups.get(groupKey);
 
@@ -212,6 +215,7 @@ public class CollaborationService {
     }
 
     public void operationTransfer(String toolId, String aid, String message) {
+        CollaborationConfig collaborationConfig;
         try {
             String groupKey = toolId + aid;
             collaborationConfig = groups.get(groupKey);
@@ -430,7 +434,7 @@ public class CollaborationService {
                                         resJson.put("outputs", outputs);
                                         resJson.put("tid", dataJson.getString("tid"));
                                     } else {
-                                        System.out.println(++index + refreshStatus);
+                                        System.out.println("Waiting for computation: "+ (++index) + "+++status: " + refreshStatus);
                                     }
 
                                 } while (refreshStatus != 2 && refreshStatus != -1);
@@ -464,13 +468,15 @@ public class CollaborationService {
                         for (int i = 0; i < sucOutputs.size(); i++) {
                             JSONObject outItem = sucOutputs.getJSONObject(i);
                             String address = outItem.getString("url").split("\\?")[0];
-                            String suffix = outItem.getString("suffix");
                             String fileName = outItem.getString("event");
+                            String suffix = outItem.getString("suffix");
                             ResourceEntity resourceEntity = new ResourceEntity();
                             resourceEntity.setUserUpload(false);
+                            resourceEntity.setSuffix("." + suffix);
                             resourceEntity.setUid(UUID.randomUUID().toString());
                             resourceEntity.setName(fileName);
                             resourceEntity.setAddress(address);
+                            resourceEntity.setDescription(fileName);
                             //这个需要确定
                             resourceEntity.setType("data");
                             resourceEntity.setPrivacy("public");
@@ -564,6 +570,7 @@ public class CollaborationService {
 
 
     public void communicationClose(String groupKey, Session session) {
+        CollaborationConfig collaborationConfig;
         try {
             collaborationConfig = groups.get(groupKey);
             HashMap<String, CollaborationUser> participants = collaborationConfig.getParticipants();
@@ -604,6 +611,7 @@ public class CollaborationService {
 
 
     public void operationClose(String groupKey, Session session) {
+        CollaborationConfig collaborationConfig;
         try {
             collaborationConfig = groups.get(groupKey);
             HashMap<String, CollaborationUser> participants = collaborationConfig.getParticipants();

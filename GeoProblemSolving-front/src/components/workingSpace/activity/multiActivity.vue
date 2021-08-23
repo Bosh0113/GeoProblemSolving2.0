@@ -24,7 +24,7 @@
         :activityInfo="activityInfo"
         :nameConfirm="nameConfirm"
         :userInfo="userInfo"
-        v-on:enterChildActivity="enterChildActivity"
+        v-on:enterActivity="enterActivity"
         v-on:enterRootActivity="enterRootActivity"
       ></activity-show>
     </div>
@@ -77,8 +77,8 @@ export default {
   },
   mounted() {},
   methods: {
-    enterChildActivity(activity){
-      this.$emit('enterChildActivity', activity);
+    enterActivity(activity){
+      this.$emit('enterActivity', activity);
     },
     enterRootActivity(){
       this.$emit('enterRootActivity');

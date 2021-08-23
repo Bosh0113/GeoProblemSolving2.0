@@ -26,9 +26,8 @@ public class getModelStateServlet extends HttpServlet {
         respJson.put("finished", "0");
         respJson.put("error", "0");
 
-        String userId = req.getParameter("userId");
         String runningId = req.getParameter("runningId");
-        String resultDir = req.getServletContext().getRealPath("./") + "data" + File.separator + "userData" + File.separator + userId + File.separator + "OutputData" + File.separator + runningId + File.separator;
+        String resultDir = req.getServletContext().getRealPath("./") + "data" + File.separator + "TrafficNoise" + File.separator + runningId + File.separator;
 
         File resultFile = new File(resultDir + "finished");
         File errorFile = new File(resultDir + "Error");
@@ -40,6 +39,8 @@ public class getModelStateServlet extends HttpServlet {
 
         if(resultFile.exists()){
             respJson.put("finished", "1");
+            respJson.put("error", "0");
+            respJson.put("url", "\\GeoProblemSolving\\" + "data" + File.separator + "TrafficNoise" + File.separator + runningId + File.separator + "NoiseResult.tif");
         }
 
         return respJson.toString();

@@ -1,5 +1,7 @@
 package cn.edu.njnu.geoproblemsolving.business.tool.trafficNoise.Model.Service;
 
+import org.springframework.util.ResourceUtils;
+
 import java.io.*;
 import java.util.ArrayList;
 
@@ -19,7 +21,7 @@ public class runModelService {
  */
     public static void genShpZipFile(String destFilePath, String srcFilePath, String shpfileName) throws IOException {
         //生成shpfile压缩包文件的UDX配置文件 *.udxcfg
-        String tempFilePath = Thread.currentThread().getContextClassLoader().getResource("").getPath() + "data\\temp\\configure.udxcfg";
+        String tempFilePath = ResourceUtils.getURL("classpath:").getPath() + "data\\temp\\configure.udxcfg";
         String allText = "";
 
         File templateFile = new File(tempFilePath);
