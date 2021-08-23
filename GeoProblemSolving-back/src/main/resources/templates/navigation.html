@@ -86,7 +86,6 @@
             text-align: center;
             color: white;
             font-weight: bold;
-            margin-top: 10px;
         }
 
         .footerBottom {
@@ -110,52 +109,52 @@
                 <img :src='window.location.origin+"/GeoProblemSolving/Images/OGMS.png"' id="logo" class="pic" @click="goHome" style="cursor:pointer;margin-left:5%">
                 <div v-if="useMenuCSS">
                     <div class="navPart">
-                        <i-menu class="header" mode="horizontal" theme="dark" @on-select="turnContent" :style="`z-index:0;background:headerBgColor`" width="auto"
+                        <i-menu class="header" mode="horizontal" theme="dark" :style="`z-index:0;background:headerBgColor`" width="auto"
                             :active-name="activeType">
-                            <menu-item name="home" class="menuItem" style="margin-left:35%">
+                            <menu-item name="home" class="menuItem" style="margin-left:35%" to="/GeoProblemSolving/home">
                                 <span>Home</span>
                             </menu-item>
-                            <menu-item name="projects" class="menuItem">
+                            <menu-item name="projects" class="menuItem" to="/GeoProblemSolving/projectList">
                                 <span>Projects</span>
                             </menu-item>
-                            <menu-item name="resources" class="menuItem">
+                            <menu-item name="resources" class="menuItem" to="/GeoProblemSolving/publicResource">
                                 <span>Resources</span>
                             </menu-item>
-                            <menu-item name="toolsCenter" class="menuItem">
-                                <span>Tools</span>
-                            </menu-item>
-                            <menu-item name="help" class="menuItem">
+<!--                            <menu-item name="toolsCenter" class="menuItem" to="/GeoProblemSolving/toolsCenter">-->
+<!--                                <span>Tools</span>-->
+<!--                            </menu-item>-->
+                            <menu-item name="help" class="menuItem" to="/GeoProblemSolving/help">
                                 <span>Help</span>
                             </menu-item>
                         </i-menu>
                     </div>
                     <div class="userState">
-                        <i-menu mode="horizontal" theme="dark" @on-select="unlogin" :style="`z-index:0;background:`+headerBgColor" v-show="!userInfoNav.userState||userInfoNav.userState==undefined"
+                        <i-menu mode="horizontal" theme="dark" :style="`z-index:0;background:`+headerBgColor" v-show="!userInfoNav.userState||userInfoNav.userState==undefined"
                             class="menuItem">
-                            <menu-item name="login">
-                                <span>Login</span>
+                            <menu-item name="login" to="/GeoProblemSolving/login" >
+                                <span style="font-size: 18px; font-weight: bold">Login</span>
                             </menu-item>
-                            <menu-item name="register">
-                                <span>Sign up</span>
+                            <menu-item name="register" to="/GeoProblemSolving/register">
+                                <span>Register</span>
                             </menu-item>
                         </i-menu>
 
-                        <i-menu mode="horizontal" theme="dark" @on-select="logged" :style="`z-index:0;background:`+headerBgColor" v-show="userInfoNav.userState"
+                        <i-menu mode="horizontal" theme="dark" :style="`z-index:0;background:`+headerBgColor" v-show="userInfoNav.userState"
                             class="menuItem">
-                            <menu-item name="notification">
+                            <menu-item name="notification" to="/GeoProblemSolving/newPersonalPage/notification">
                                 <Badge :count="unreadNoticeCount" id="noticeBadge">
                                     <Icon type="ios-notifications-outline" size="25"></Icon>
                                 </Badge>
                             </menu-item>
                             <menu-item name="personal" style="width:100px">
                                 <dropdown @on-click="changeSelect" placement="bottom-start">
-                                    <div @click="toPersonalPage">
-                                        <img v-if="userInfoNav.avatar!=''&&userInfoNav.avatar!=undefined&&userInfoNav.avatar!=null" :title="userInfoNav.userName"
-                                            :src="userInfoNav.avatar" style="width:40px;height:40px;vertical-align:middle;">
-                                        <avatar :username="userInfoNav.userName" :size="40" style="margin-top:10px" :title="userInfoNav.userName" v-else></avatar>
-                                    </div>
+                                    <a href="/GeoProblemSolving/newPersonalPage/overView">
+                                        <img v-if="avatarUrl!=''&&avatarUrl!=undefined&&avatarUrl!=null" :title="userInfoNav.name"
+                                             :src="avatarUrl" style="width:40px;height:40px;vertical-align:middle;">
+                                        <avatar :username="userInfoNav.name" :size="40" style="margin-top:10px" :title="userInfoNav.name" v-else></avatar>
+                                    </a>
                                     <dropdown-menu slot="list">
-                                        <dropdown-item name="logout">Log out</dropdown-item>
+                                        <dropdown-item name="logout">Logout</dropdown-item>
                                     </dropdown-menu>
                                 </dropdown>
                             </menu-item>
@@ -171,14 +170,14 @@
                             <Cell @click.native="turnToURL('/GeoProblemSolving/home')" class="menuItemCell">Home</Cell>
                             <Cell @click.native="turnToURL('/GeoProblemSolving/projectList')" class="menuItemCell">Projects</Cell>
                             <Cell @click.native="turnToURL('/GeoProblemSolving/publicResource')" class="menuItemCell">Resources</Cell>
-                            <Cell @click.native="turnToURL('/GeoProblemSolving/toolsCenter')" class="menuItemCell">Tools</Cell>
+<!--                            <Cell @click.native="turnToURL('/GeoProblemSolving/toolsCenter')" class="menuItemCell">Tools</Cell>-->
                             <Cell @click.native="turnToURL('/GeoProblemSolving/help')" class="menuItemCell">Help</Cell>
                             <Divider style="margin: 5px 0"></Divider>
                             <Cell v-show="!userInfoNav.userState" @click.native="turnToURL('/GeoProblemSolving/login')" class="menuItemCell">Login</Cell>
-                            <Cell v-show="!userInfoNav.userState" @click.native="turnToURL('/GeoProblemSolving/register')" class="menuItemCell">Sign up</Cell>
-                            <Cell  v-show="userInfoNav.userState" @click.native="turnToURL('/GeoProblemSolving/notifications')" class="menuItemCell">Notification</Cell>
+                            <Cell v-show="!userInfoNav.userState" @click.native="turnToURL('/GeoProblemSolving/register')" class="menuItemCell">Register</Cell>
+                            <Cell  v-show="userInfoNav.userState" @click.native="turnToURL('/GeoProblemSolving/newPersonalPage/notification')" class="menuItemCell">Notification</Cell>
                             <Cell  v-show="userInfoNav.userState" @click.native="toPersonalPage" class="menuItemCell">Personal Page</Cell>
-                            <Cell  v-show="userInfoNav.userState" @click.native="logout" class="menuItemCell">Log out</Cell>
+                            <Cell  v-show="userInfoNav.userState" @click.native="logout" class="menuItemCell">Logout</Cell>
                           </Cell-group>
                         </Dropdown-menu>
                     </Dropdown>
@@ -223,8 +222,9 @@
                     headerWidth: "",
                     //用户
                     userInfoNav: {
-                        userName: ""
+                        name: ""
                     },
+                    avatarUrl: undefined,
                     useMenuCSS: true
                 }
             },
@@ -235,6 +235,10 @@
                 identifyUser(){
                     if(this.userInfo.userState){
                         this.userInfoNav = this.userInfo;
+                        if (this.userInfoNav.avatar != null && this.userInfoNav.avatar != undefined && this.userInfoNav.avatar!= ''){
+                            this.avatarUrl =  "http://94.191.49.160:8080/userServer" + this.userInfoNav.avatar;
+                            // this.avatarUrl =  "http://172.21.212.103:8088/userServer" + this.userInfoNav.avatar;
+                        }
                         this.setTimer();
                         this.initWebSocket();
                         this.getUnreadNoticeCount();
@@ -247,39 +251,11 @@
                         this.useMenuCSS = true;
                     }
                 },
-                turnContent(name) {
-                    if (name === "home") {
-                        window.location.href = "/GeoProblemSolving/home"
-                    } else if (name == "projects") {
-                        window.location.href = "/GeoProblemSolving/projectList"
-                    } else if (name == "resources") {
-                        window.location.href = "/GeoProblemSolving/publicResource"
-                    } else if (name == "toolsCenter") {
-                        window.location.href = "/GeoProblemSolving/toolsCenter"
-                    } else if (name == "community") {
-                        window.location.href = "/GeoProblemSolving/community"
-                    } else if (name == "help") {
-                        window.location.href = "/GeoProblemSolving/help"
-                    }
-                },
                 goHome() {
                     window.location.href = "/GeoProblemSolving/home"
                 },
-                unlogin(name) {
-                    if (name === "login") {
-                        window.location.href = "/GeoProblemSolving/login"
-                    } else if (name == "register") {
-                        window.location.href = "/GeoProblemSolving/register"
-                    }
-                },
-                logged(name) {
-                    if (name === "notification") {
-                        window.location.href = "/GeoProblemSolving/notifications"
-                    } else if (name === "personal") {
-                    }
-                },
                 toPersonalPage() {
-                    window.location.href = "/GeoProblemSolving/personalPage"
+                    window.location.href = "/GeoProblemSolving/newPersonalPage/overView"
                 },
                 // 获取到通知的数量
                 getUnreadNoticeCount() {
@@ -311,8 +287,8 @@
                     if (this.noticeSocket != null) {
                         this.noticeSocket = null;
                     }
-                    var noticeSocketURL = "ws://" + window.location.host + "/GeoProblemSolving/NoticeSocket";
-                    if(window.location.host == "localhost:8080"){
+                    let noticeSocketURL = `${window.location.protocol === 'https:' ? 'wss://' : 'ws://'}` + window.location.host + "/GeoProblemSolving/NoticeSocket";
+                    if(window.location.host === "localhost:8080"){
                         noticeSocketURL = "ws://localhost:8081/GeoProblemSolving/NoticeSocket";
                     }
                     this.noticeSocket = new WebSocket(noticeSocketURL);
@@ -325,7 +301,8 @@
                     // console.log("NoticeSocket连接成功！");
                 },
                 onMessage(e) {
-                    if (e.data == "Notice") {
+                    let sockRes = JSON.parse(e.data);
+                    if (sockRes.type == "Notice") {
                         let newCount = this.unreadNoticeCount + 1;
                         this.$set(this, "unreadNoticeCount", newCount);
                         this.$Message.info("You have a new notice!");
@@ -341,14 +318,14 @@
                     this.removeTimer();
                     // console.log("NoticeSocket连接错误！");
                 },
-                sendMessage(recipientId) {
-                    this.noticeSocket.send(recipientId);
+                sendMessage(data) {
+                    this.noticeSocket.send(JSON.stringify(data));
                 },
                 setTimer() {
                     var that = this;
                     this.timer = setInterval(() => {
                         if (that.noticeSocket != null && that.noticeSocket != undefined) {
-                            that.noticeSocket.send("ping");
+                            that.noticeSocket.send(JSON.stringify({"type": "ping"}));
                         }
                     }, 20000);
                 },
@@ -370,7 +347,7 @@
                     axios
                         .get("/GeoProblemSolving/user/logout")
                         .then(res => {
-                            this.userInfoNav = { userName: "" };
+                            this.userInfoNav = { name: "" };
                             sessionStorage.removeItem("userInfo");
                             this.noticeSocket.close();
                             window.location.href = "/GeoProblemSolving/" + page;
@@ -391,7 +368,7 @@
             <h2 class="footerTop">
                 <i>Open Geographic Modeling and Simulation</i>
             </h2>
-            <p class="footerBottom">Copyright © 2013-2020 OpenGMS. All rights reserved.</p>
+            <p class="footerBottom">Copyright © 2011-2021 OpenGMS. All rights reserved.</p>
         </footer>
     </div>
 </body>

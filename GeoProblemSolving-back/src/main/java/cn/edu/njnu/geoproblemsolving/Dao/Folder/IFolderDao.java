@@ -3,7 +3,7 @@ package cn.edu.njnu.geoproblemsolving.Dao.Folder;
 import javax.servlet.http.HttpServletRequest;
 
 public interface IFolderDao {
-    Object newFolder(String folderName, String parentId,String scopeId);
+    Object createFolder(String folderName, String parentId,String scopeId);
     Object inquireFolder(String folderId);
     Object renameFolder(String newName, String folderId, String parentId);
     Object removeFolder(String folderId, String parentId);

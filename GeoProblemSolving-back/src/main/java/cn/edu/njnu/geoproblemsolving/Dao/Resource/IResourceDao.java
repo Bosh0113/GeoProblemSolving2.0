@@ -18,4 +18,6 @@ public interface IResourceDao {
     void getZipResource(HttpServletRequest request, HttpServletResponse response, String key, String value);
 
     void packageToZip(HttpServletRequest request,HttpServletResponse response);
+
+    String uploadProjectPic(HttpServletRequest request);
 }

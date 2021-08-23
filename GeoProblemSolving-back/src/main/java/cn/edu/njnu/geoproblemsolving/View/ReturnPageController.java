@@ -1,31 +1,42 @@
 package cn.edu.njnu.geoproblemsolving.View;
 
+import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
+import cn.edu.njnu.geoproblemsolving.business.activity.entity.Project;
+import cn.edu.njnu.geoproblemsolving.business.activity.service.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import javax.annotation.Resource;
 import java.io.File;
+import java.io.IOException;
 
 @Controller
 public class ReturnPageController {
-    @Resource
-    private MongoTemplate mongoTemplate;
 
-    @RequestMapping(value = "/projectDetail/{projectId}",method = RequestMethod.GET)
-    public String projectPage(@PathVariable String projectId){
+    private final ProjectService projectService;
+    private final StaticPagesBuilder staticPagesBuilder;
+
+    @Autowired
+    public ReturnPageController(ProjectService projectService, StaticPagesBuilder staticPagesBuilder) {
+        this.projectService = projectService;
+        this.staticPagesBuilder = staticPagesBuilder;
+    }
+
+    @RequestMapping(value = "/projectInfo/{aid}",method = RequestMethod.GET)
+    public String projectPage(@PathVariable String aid) throws IOException {
         //此请求根路径在templates文件夹，考虑隐藏后缀，用此方法请求。
         String servicePath = getServicePath();
-        File file = new File(servicePath+"/staticPage/project/"+projectId+".html");
+        File file = new File(servicePath+"/staticPage/project/"+aid+".html");
         if(!file.exists()){//不存在静态文件则生成
-            StaticPagesBuilder staticPagesBuilder = new StaticPagesBuilder(mongoTemplate);
-            staticPagesBuilder.projectDetailPageBuilder(projectId);
+            JsonResult project = projectService.findProject(aid);
+            if(project.getCode() == 0) {
+                staticPagesBuilder.projectDetailPageBuilder((Project) project.getData());
+            }
         }
-        return "/staticPage/project/"+projectId+".html";
+        return "/staticPage/project/"+aid+".html";
     }
 
     @RequestMapping(value = "/home",method = RequestMethod.GET)
@@ -34,7 +45,6 @@ public class ReturnPageController {
         String servicePath = getServicePath();
         File file = new File(servicePath+"/staticPage/home.html");
         if(!file.exists()){//不存在静态文件则生成
-            StaticPagesBuilder staticPagesBuilder = new StaticPagesBuilder(mongoTemplate);
             staticPagesBuilder.homePageBuilder();
         }
         return "/staticPage/home.html";
@@ -45,8 +55,7 @@ public class ReturnPageController {
         String servicePath = getServicePath();
         File file = new File(servicePath+"/staticPage/projectList.html");
         if(!file.exists()){//不存在静态文件则生成
-            StaticPagesBuilder staticPagesBuilder = new StaticPagesBuilder(mongoTemplate);
-            staticPagesBuilder.projectListPageBuilder();
+            staticPagesBuilder.projectListPageBuilder(projectService.findProjectsByPage(1,18));
         }
         return "/staticPage/projectList.html";
     }

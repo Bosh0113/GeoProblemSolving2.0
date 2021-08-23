@@ -138,6 +138,11 @@
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-rest</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
         </dependency>
 
@@ -166,7 +171,15 @@
             <artifactId>jjwt</artifactId>
             <version>0.9.0</version>
         </dependency>
-<!--        是否要删除-->
+
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20180130</version>
+        </dependency>
+
+
+        <!--        是否要删除-->
 <!--        <dependency>-->
 <!--            <groupId>cn.hutool</groupId>-->
 <!--            <artifactId>hutool-all</artifactId>-->
@@ -178,6 +191,74 @@
 <!--            <artifactId>dom4j</artifactId>-->
 <!--            <version>1.6.1</version>-->
 <!--        </dependency>-->
+<!--        ===============================================================-->
+<!--                         =======zhengzhong=========                    -->
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <version>RELEASE</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+        </dependency>
+
+<!--        <dependency>-->
+<!--            <groupId>org.apache.httpcomponents</groupId>-->
+<!--            <artifactId>httpclient</artifactId>-->
+<!--            <version>4.5.13</version>-->
+<!--        </dependency>-->
+
+
+<!--        热部署，配合 websocket 真是难用 -->
+<!--        需要配置两个地方：1. 设置中开启自动编译； 2. ctrl+shift+alt+/,勾选compiler.automake.allow.when.app.running-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.boot</groupId>-->
+<!--            <artifactId>spring-boot-devtools</artifactId>-->
+<!--            <version>2.4.5</version>-->
+<!--        </dependency>-->
+
+        <!--        ===============================================================-->
+
+        <!--AnsjSeg引入-->
+        <dependency>
+            <groupId>org.ansj</groupId>
+            <artifactId>ansj_seg</artifactId>
+            <version>5.1.1</version>
+        </dependency>
+        <!--AnsjSeg引入结束-->
+        <dependency>
+            <groupId>abc</groupId>
+            <artifactId>abc</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/src/main/resources/lib/mxgraph-all.jar</systemPath>
+        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.jetbrains</groupId>-->
+<!--            <artifactId>annotations</artifactId>-->
+<!--            <version>0.0.1-SNAPSHOT</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>21.0.1</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.GDAL</groupId>
+            <artifactId>GDAL-core</artifactId>
+            <version>2.0.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/src/main/resources/lib/gdal.jar</systemPath>
+        </dependency>
 
     </dependencies>
 

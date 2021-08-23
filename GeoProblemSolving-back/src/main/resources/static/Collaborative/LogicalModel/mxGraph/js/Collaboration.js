@@ -89,11 +89,11 @@ var userName=userInfo.userName;
             if (url.search(reg) != -1) {
                 localStorage.setItem("historyURL", url);
                 let groupID = url.match(reg)[1];
-                wsMxgraph = new WebSocket("ws://"+window.location.host+"/GeoProblemSolving/LogicalModel/" + groupID);
-                // wsMxgraph = new WebSocket("ws://localhost:8081/GeoProblemSolving/LogicalModel/" + groupID);
-                // wsMxgraph = new WebSocket("ws://172.21.212.72:8082/GeoProblemSolving/LogicalModel/" + groupID);
-                // wsMxgraph = new WebSocket("ws://94.191.49.160:8080/GeoProblemSolving/LogicalModel/" + groupID);
-                // wsMxgraph = new WebSocket("ws://172.21.213.185:8080/GeoProblemSolving/LogicalModel/" + groupID);
+                var  wsUrl = `${window.location.protocol === 'https:' ? 'wss://' : 'ws://'}`+window.location.host+"/GeoProblemSolving/LogicalModel/" + groupID;
+                if(window.location.host === "localhost:8080"){
+                    wsUrl = "ws://localhost:8081/GeoProblemSolving/LogicalModel/" + groupID;
+                }
+                wsMxgraph = new WebSocket(wsUrl);
             }
         }
         else {

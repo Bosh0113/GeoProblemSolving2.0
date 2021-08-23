@@ -15,11 +15,11 @@ public class ResourceController {
     @Resource
     private MongoTemplate mongoTemplate;
 
-    @RequestMapping(value = "/upload", method = RequestMethod.POST)
-    public Object uploadResource(HttpServletRequest request) {
-        ResourceDaoImpl resourceDao = new ResourceDaoImpl(mongoTemplate);
-        return resourceDao.saveResource(request);
-    }
+    // @RequestMapping(value = "/upload", method = RequestMethod.POST)
+    // public Object uploadResource(HttpServletRequest request) {
+    //     ResourceDaoImpl resourceDao = new ResourceDaoImpl(mongoTemplate);
+    //     return resourceDao.saveResource(request);
+    // }
 
     @RequestMapping(value = "/inquiry", method = RequestMethod.GET)
     public Object readResource(@RequestParam("key") String key, @RequestParam("value") String value) {
@@ -56,4 +56,10 @@ public class ResourceController {
         ResourceDaoImpl resourceDao = new ResourceDaoImpl(mongoTemplate);
         resourceDao.packageToZip(request,response);
     }
+
+   @RequestMapping(value = "/projectPic", method = RequestMethod.POST)
+   public String uploadPicture(HttpServletRequest request) {
+       ResourceDaoImpl resourceDao = new ResourceDaoImpl(mongoTemplate);
+       return resourceDao.uploadProjectPic(request);
+   }
 }

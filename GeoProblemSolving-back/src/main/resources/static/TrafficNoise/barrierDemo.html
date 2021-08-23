@@ -1,0 +1,87 @@
+<!doctype html>
+<html>
+<meta http-equiv="content-type" content="text/html" charset="utf-8">
+
+<head>
+    <title>Web RLS90</title>
+
+    <link rel="icon" href="./img/favicon.ico" type="image/x-icon" />
+    <link rel="shortcut icon" href="./img/favicon.ico" type="image/x-icon" />
+    
+    <link rel="stylesheet" href="./css/style.css" />
+    <link rel="stylesheet" href="./css/leaflet/leaflet.css" />
+    <link rel="stylesheet" href="./css/leaflet/leaflet.label.css" />
+
+</head>
+
+<body>
+    <div id="mapid" class="map">
+    </div>
+</body>
+
+<script src="./js/jquery/jquery-3.3.1.min.js"></script>
+<script src="./js/jquery/jquery.form.js"></script>
+<script src="./js/leaflet/leaflet-src.js"></script>
+<script src="./js/leaflet/proj4.js"></script>
+<script src="./js/leaflet/proj4leaflet.js"></script>
+<script src="./js/shp/shapefile@0.6.js"></script>
+
+<script>
+     var osm = L.tileLayer(
+        '//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        {
+            attribution: '© OpenStreetMap contributors',
+        }
+    );
+
+    var mymap = L.map('mapid', {
+        layers: osm,
+        zoom: 17,
+        center: [31.998231646287028, 118.72392654418947],
+    });
+
+    var barrierLayer = L.Proj.geoJson(null, {
+        style(feature) {
+            return {
+                "color": "#3300FF",
+                "weight": 6
+            }
+        }
+    }).addTo(mymap);
+
+   mymap.on("click", function(e){
+        console.log(e.latlng)
+    })
+
+    $(function () {
+        loadShapefile(barrierLayer, "./data/demo/Barrier");
+    });
+
+    proj4.defs("EPSG:2437", "+proj=tmerc +lat_0=0 +lon_0=120 +k=1 +x_0=500000 +y_0=0 +ellps=krass +towgs84=15.8,-154.4,-82.3,0,0,0,0 +units=m +no_defs");
+    async function loadShapefile(layer, shapefilePath) {
+        const source = await shapefile.open(shapefilePath + ".shp", null);
+        // 使用utf-8的方法解码属性表文件
+        // 玄武盾会拦截对dbf的请求，将其复制为mdbf
+        const property = await shapefile.openDbf(shapefilePath + ".mdbf", { encoding: 'utf-8' });
+        const response = await fetch(shapefilePath + ".prj");
+        const firstProj = await response.text();
+        while (true) {
+            const feature = await source.read();
+            const properties = await property.read();
+            if (feature.done) {
+                break;
+            };
+            let data = feature.value;
+            data.properties = properties.value;
+
+            data.crs = {
+                "type": "name",
+                "properties": { "name": "EPSG:2437" }
+            };
+                layer.addData(data);
+
+        }
+    }
+</script>
+
+</html>

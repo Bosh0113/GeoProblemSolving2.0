@@ -1,0 +1,3 @@
+<Dataset>
+  <XDO name="height" kernelType="real" value="$(heightValue)" />
+</Dataset>

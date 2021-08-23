@@ -1044,7 +1044,7 @@ Sidebar.prototype.addGeoIconPalette = function (expand)
 	var that = this;
 	$.ajax({
 		// url:"http://222.192.7.75:8066/GeoModeling/geoIcon",
-		url:"http://geomodeling.njnu.edu.cn/geoIcon/parentList",
+		url:"https://geomodeling.njnu.edu.cn/geoIcon/parentList",
 		type:"GET",
 		dataType:"json",
 		success:function(result){
@@ -1056,9 +1056,9 @@ Sidebar.prototype.addGeoIconPalette = function (expand)
                     console.log(title);
                     $.ajax({
                         // url:"http://222.192.7.75:8066/GeoModeling/geoIcon",
-						url:"http://geomodeling.njnu.edu.cn/geoIcon/list",
+						url:"https://geomodeling.njnu.edu.cn/geoIcon/list2?uid=" + pid,
                         type:"GET",
-                        data:{uid:pid,page:1,sortType:"name"},
+                        // data:{uid:pid,page:1,sortType:"name"},
                         dataType:"json",
                         success:function(icons){
 							icons = icons.data.geoIcons;
@@ -1068,7 +1068,7 @@ Sidebar.prototype.addGeoIconPalette = function (expand)
                                 var name = "";
                                 var id = icons[j].icon_id;
                                 // fns.push(that.createVertexTemplateEntry('image;html=1;labelBackgroundColor=#ffffff;image=' + "http://222.192.7.75:8066/GeoModeling/showIcon2Servlet?uid=" + id,
-                                fns.push(that.createVertexTemplateEntry('image;html=1;labelBackgroundColor=#ffffff;image=' + "http://geomodeling.njnu.edu.cn/GeoModeling/showIconServlet?uid=" + id,
+                                fns.push(that.createVertexTemplateEntry('image;html=1;labelBackgroundColor=#ffffff;image=' + "https://geomodeling.njnu.edu.cn/geoIcon/getImage?iconId=" + id,
                                     that.defaultImageWidth, that.defaultImageHeight, '', name, name != null, null, null));
                             }
                             that.addPaletteFunctions2(pid, title, false, fns);

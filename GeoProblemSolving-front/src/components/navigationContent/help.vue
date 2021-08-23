@@ -6,12 +6,12 @@ img {
 </style>
 <template>
   <div style="padding:40px">
-    <Card>
-      <div style="text-align:center">
+    <Card dis-hover>
+      <div style="text-align:center" >
         <h1>Get started quickly</h1>
       </div>
     </Card>
-    <Card v-for="(img,index) in imageList" :key="img.index" style="margin: 5px 0">
+    <Card v-for="(img,index) in imageList" :key="img.index" style="margin: 5px 0"  dis-hover>
       <h2 slot="title">{{titleList[index]}}</h2>
       <div>
         <img :src="img">
@@ -35,10 +35,10 @@ export default {
         "Personal projects",
         "Notifications center",
         "Project detail page",
-        "Project's resources",
-        "Project's subprojects",
-        "Subproject's detail page",
-        "Subproject's tasks"
+        "Project resources",
+        "Project subprojects",
+        "Subproject detail page",
+        "Subproject tasks"
       ]
     };
   },

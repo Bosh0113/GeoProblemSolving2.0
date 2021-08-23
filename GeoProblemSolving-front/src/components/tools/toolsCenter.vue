@@ -193,13 +193,13 @@
                 >
                   <Option v-for="item in typeOptions" :key="item.index" :value="item">{{ item }}</Option>
                 </Select>
-                <Button
-                  class="btnHoverGreen"
-                  shape="circle"
-                  icon="ios-add-circle-outline"
-                  @click="createToolModalShow()"
-                  v-show="userInfo.userState"
-                >Create tool</Button>
+<!--                <Button-->
+<!--                  class="btnHoverGreen"-->
+<!--                  shape="circle"-->
+<!--                  icon="ios-add-circle-outline"-->
+<!--                  @click="createToolModalShow()"-->
+<!--                  v-show="userInfo.userState"-->
+<!--                >Create tool</Button>-->
               </div>
               <div
                 v-if="showMenuItem=='publicTools'"
@@ -456,7 +456,7 @@
           <Select
             v-model="toolsetInfo.recomStep"
             multiple
-            placeholder="Select the recommended step of yout toolset"
+            placeholder="Select the recommended step of your toolset"
           >
             <Option v-for="item in stepList" :key="item.index" :value="item">{{ item }}</Option>
           </Select>
@@ -577,6 +577,7 @@
         <Button type="error" @click="removeTool()" class="create">Remove</Button>
       </div>
     </Modal>
+
     <Modal v-model="removeToolsetModal" title="Remove Toolset" width="400">
       <div style="text-align: center;">
         <h3>Are you sure to remove the toolset: {{selectedToolset.toolsetName}} ?</h3>
@@ -587,6 +588,7 @@
         <Button type="error" @click="removeToolset()" class="create">Remove</Button>
       </div>
     </Modal>
+
     <Modal v-model="addToToolsetModal" title="Add tool to toolsets" width="600">
       <div>
         <div style="display: inline-block;">
@@ -637,6 +639,7 @@
         <Button type="success" @click="addToolToToolsets()" class="create">OK</Button>
       </div>
     </Modal>
+
     <Modal v-model="toolsetInfoModal" title="Toolset's detail" width="600">
       <Row>
         <Col span="10">
@@ -721,6 +724,7 @@
         <Button type="primary" @click="toolsetInfoModal=false" class="create">OK</Button>
       </div>
     </Modal>
+
     <Modal v-model="editToolsetModal" title="Edit toolset" width="800">
       <Row>
         <Col span="16">
@@ -959,7 +963,7 @@ export default {
         "Geo-analysis model construction",
         "Model effectiveness evaluation",
         "Geographical simulation",
-        "Decision-making for management",
+        "Decision making",
         "Others"
       ],
       toolInfoRule: {
@@ -1001,7 +1005,7 @@ export default {
         "Geo-analysis model construction",
         "Model effectiveness evaluation",
         "Geographical simulation",
-        "Decision-making for management"
+        "Decision making"
       ],
       visible: false,
       //表示图片
@@ -1169,7 +1173,7 @@ export default {
           }
         })
         .catch(err => {
-          console.log(err);
+          throw err;
         });
     },
     getPublicToolsets() {
@@ -1195,7 +1199,7 @@ export default {
           }
         })
         .catch(err => {
-          console.log(err);
+          throw err;
         });
     },
     async getPublicTools() {
@@ -1426,7 +1430,7 @@ export default {
               }
             })
             .catch(err => {
-              console.log(err);
+              throw err;
             });
         } else {
         }
@@ -1647,7 +1651,7 @@ export default {
               }
             })
             .catch(err => {
-              console.log(err);
+              throw err;
             });
 
           var updateReq = {};

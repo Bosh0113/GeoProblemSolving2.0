@@ -1,0 +1,21 @@
+<DataInfo>
+    <User id=""/>
+    <Dataset>
+        <InputData>
+            <RoadCenterLine>
+            </RoadCenterLine>
+
+            <Building>
+            </Building>
+
+            <Barrier>
+            </Barrier>
+        </InputData>
+
+        <OutputData>
+        </OutputData>
+        
+        <PlanningData>
+        </PlanningData>
+    </Dataset>
+</DataInfo>

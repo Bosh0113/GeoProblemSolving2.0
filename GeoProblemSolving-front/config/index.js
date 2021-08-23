@@ -12,7 +12,7 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
       '/GeoProblemSolving': {
-        target: 'http://localhost:8081',       
+        target: 'http://localhost:8081',
         changeOrigin: true,
         pathRewrite: {
           '^/GeoProblemSolving': '/GeoProblemSolving'
@@ -27,7 +27,7 @@ module.exports = {
     errorOverlay: true,
     notifyOnErrors: true,
     poll: false, // https://webpack.js.org/configuration/dev-server/#devserver-watchoptions-
-    
+
 
     /**
      * Source Maps

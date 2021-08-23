@@ -107,11 +107,11 @@ $(document).ready(function() {
 
     var roomId = sessionStorage.getItem("moduleId");
     if (WebSocket) {
-        wsTModel = new WebSocket("ws://"+window.location.host+"/GeoProblemSolving/3DviewerServer/"+roomId);
-        // wsTModel = new WebSocket("ws://localhost:8081/GeoProblemSolving/3DviewerServer/"+roomId);
-        // wsTModel = new WebSocket("ws://172.21.212.72:8082/GeoProblemSolving/3DviewerServer/"+roomId);
-        // wsTModel = new WebSocket("ws://94.191.49.160:8080/GeoProblemSolving/3DviewerServer/"+roomId);
-        // wsTModel = new WebSocket("ws://172.21.213.185:8080/GeoProblemSolving/3DviewerServer/"+roomId);
+        var wsUrl = `${window.location.protocol === 'https:' ? 'wss://' : 'ws://'}` + window.location.host+"/GeoProblemSolving/3DviewerServer/"+roomId;
+        if(window.location.host === "localhost:8080"){
+            wsUrl = "ws://localhost:8081/GeoProblemSolving/3DviewerServer/"+roomId;
+        }
+        wsTModel = new WebSocket(wsUrl);
     }
     else {
         alert("浏览器不支持websocket！");

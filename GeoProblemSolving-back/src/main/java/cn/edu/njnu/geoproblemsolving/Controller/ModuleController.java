@@ -23,7 +23,7 @@ public class ModuleController {
         ModuleDaoImpl moduleDao=new ModuleDaoImpl(mongoTemplate);
         try {
             Date date=new Date();
-            SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             String moduleId=UUID.randomUUID().toString();
             module.setModuleId(moduleId);
             module.setCreateTime(dateFormat.format(date));

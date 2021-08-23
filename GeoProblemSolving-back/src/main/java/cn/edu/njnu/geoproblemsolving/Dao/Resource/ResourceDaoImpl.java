@@ -1,13 +1,10 @@
 package cn.edu.njnu.geoproblemsolving.Dao.Resource;
 
 import cn.edu.njnu.geoproblemsolving.Dao.Method.CommonMethod;
-import cn.edu.njnu.geoproblemsolving.Entity.Folder.UploadResult;
-import cn.edu.njnu.geoproblemsolving.Entity.ResourceEntity;
-import cn.edu.njnu.geoproblemsolving.Entity.UserEntity;
-import com.alibaba.fastjson.JSONObject;
-import org.apache.catalina.core.ApplicationPart;
+import cn.edu.njnu.geoproblemsolving.Entity.Resources.UploadResult;
+import cn.edu.njnu.geoproblemsolving.Entity.Resources.ResourceEntity;
+import cn.edu.njnu.geoproblemsolving.business.user.entity.UserEntity;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -21,7 +18,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 import java.io.*;
 import java.net.InetAddress;
-import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -55,7 +51,7 @@ public class ResourceDaoImpl implements IResourceDao {
                 return "Fail";
             }
             Date date = new Date();
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             String uploadTime = dateFormat.format(date);
 
             String servicePath = request.getSession().getServletContext().getRealPath("/");//获得绝对路径。
@@ -138,7 +134,7 @@ public class ResourceDaoImpl implements IResourceDao {
                             resourceEntity.setFileSize(fileSize);
                             resourceEntity.setPathURL(pathURL);
                             resourceEntity.setUploaderId(uploader.getUserId());
-                            resourceEntity.setUploaderName(uploader.getUserName());
+                            resourceEntity.setUploaderName(uploader.getName());
                             resourceEntity.setUploadTime(uploadTime);
                             resourceEntity.setEditToolInfo(request.getParameter("editToolInfo"));
                             mongoTemplate.save(resourceEntity);
@@ -265,14 +261,14 @@ public class ResourceDaoImpl implements IResourceDao {
                                 UserEntity uploader = mongoTemplate.findOne(queryUser, UserEntity.class);
 
                                 Date date = new Date();
-                                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+                                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                                 String uploadTime = dateFormat.format(date);
 
                                 update.set("name", fileNames);
                                 update.set("fileSize", fileSize);
                                 update.set("pathURL", pathURL);
                                 update.set("uploaderId", uploader.getUserId());
-                                update.set("uploaderName", uploader.getUserName());
+                                update.set("uploaderName", uploader.getName());
                                 update.set("uploadTime", uploadTime);
                                 update.set("thumbnail", thumbnailPath);
                                 update.set("editToolInfo", request.getParameter("editToolInfo"));
@@ -477,5 +473,65 @@ public class ResourceDaoImpl implements IResourceDao {
         String pathURL = "/GeoProblemSolving/resource/" + folderName + "/" + newFileTitle;
 
         return pathURL;
+    }
+
+    @Override
+    public String uploadProjectPic(HttpServletRequest request) {
+        try {
+            InetAddress address = InetAddress.getLocalHost();
+            String ip = address.getHostAddress();
+            String servicePath = request.getSession().getServletContext().getRealPath("/");
+            if (!ServletFileUpload.isMultipartContent(request)) {
+                System.out.println("File is not multimedia.");
+                return "Fail";
+            }
+            Collection<Part> parts = request.getParts();
+            String pathURL = "Fail";
+            for (Part part : parts) {
+                if (part.getName().equals("picture")) {
+                    String fileNames = part.getSubmittedFileName();
+                    String fileName = fileNames.substring(0, fileNames.lastIndexOf("."));
+                    String suffix = fileNames.substring(fileNames.lastIndexOf(".") + 1);
+                    String regexp = "[^A-Za-z_0-9\\u4E00-\\u9FA5]";
+                    String saveName = fileName.replaceAll(regexp, "");
+                    String folderPath = servicePath + "project/picture";
+                    File temp = new File(folderPath);
+                    if (!temp.exists()) {
+                        temp.mkdirs();
+                    }
+                    int randomNum = (int) (Math.random() * 10 + 1);
+                    for (int i = 0; i < 5; i++) {
+                        randomNum = randomNum * 10 + (int) (Math.random() * 10 + 1);
+                    }
+                    String newFileTitle = saveName + randomNum + "." + suffix;
+                    String localPath = temp + "/" + newFileTitle;
+                    System.out.println("图片上传到本地路径：" + localPath);
+                    File file = new File(localPath);
+                    FileOutputStream fileOutputStream = new FileOutputStream(file);
+                    InputStream inputStream = part.getInputStream();
+                    byte[] buffer = new byte[1024 * 1024];
+                    int byteRead;
+                    while ((byteRead = inputStream.read(buffer)) != -1) {
+                        fileOutputStream.write(buffer, 0, byteRead);
+                    }
+                    fileOutputStream.close();
+                    inputStream.close();
+
+                    String reqPath = request.getRequestURL().toString();
+                    pathURL = reqPath.replaceAll("localhost", ip) + "/" + newFileTitle;
+                    String regexGetUrl = "(/GeoProblemSolving[\\S]*)";
+                    Pattern regexPattern = Pattern.compile(regexGetUrl);
+                    Matcher matcher = regexPattern.matcher(pathURL);
+                    if (matcher.find()) {
+                        pathURL = matcher.group(1);
+                    }
+//                    System.out.println("图片的请求地址："+pathURL);
+                    break;
+                }
+            }
+            return pathURL;
+        } catch (Exception e) {
+            return "Fail";
+        }
     }
 }

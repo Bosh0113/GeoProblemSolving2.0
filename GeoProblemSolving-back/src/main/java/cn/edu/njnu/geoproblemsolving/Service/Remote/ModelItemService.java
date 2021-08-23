@@ -1,20 +1,15 @@
 package cn.edu.njnu.geoproblemsolving.Service.Remote;
 
-import cn.edu.njnu.geoproblemsolving.Dao.CModel.ModelItemDao;
 import cn.edu.njnu.geoproblemsolving.Dao.CModel.ToolRecordDaoImpl;
 import cn.edu.njnu.geoproblemsolving.Entity.ModelTools.ToolRecords.ToolRecordsEntity;
-import cn.edu.njnu.geoproblemsolving.Enums.ResultEnum;
-import cn.edu.njnu.geoproblemsolving.Exception.MyException;
+import cn.edu.njnu.geoproblemsolving.common.enums.ResultEnum;
+import cn.edu.njnu.geoproblemsolving.common.exception.MyException;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;

@@ -16,9 +16,9 @@ public class FolderController {
     private MongoTemplate mongoTemplate;
 
     @RequestMapping(value = "/new", produces = {"application/json;charset=UTF-8"}, method = RequestMethod.POST)
-    public Object newFolder(@RequestParam("folderName") String folderName, @RequestParam("parentId") String parentId, @RequestParam("scopeId") String scopeId){
+    public Object createFolder(@RequestParam("folderName") String folderName, @RequestParam("parentId") String parentId, @RequestParam("scopeId") String scopeId){
         FolderDaoImpl folderDao = new FolderDaoImpl(mongoTemplate);
-        return folderDao.newFolder(folderName,parentId,scopeId);
+        return folderDao.createFolder(folderName,parentId,scopeId);
     }
 
     @RequestMapping(value = "/inquiry", produces = {"application/json;charset=UTF-8"}, method = RequestMethod.GET)

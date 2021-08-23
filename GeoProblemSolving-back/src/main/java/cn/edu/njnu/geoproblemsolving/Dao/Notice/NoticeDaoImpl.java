@@ -26,10 +26,10 @@ public class NoticeDaoImpl implements INoticeDao{
     public String saveNotice(NoticeEntity notice){
         try {
             Date date=new Date();
-            SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             notice.setNoticeId(UUID.randomUUID().toString());
             notice.setState("unread");
-            notice.setCreateTime(dateFormat.format(date));
+            notice.setCreatedTime(dateFormat.format(date));
             mongoTemplate.save(notice);
             return "Success";
         }catch (Exception e){

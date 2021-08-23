@@ -7,7 +7,8 @@
 EditorUi = function(editor, container, lightbox)
 {
 	mxEventSource.call(this);
-	
+	container = $("#collab-tool-content")[0];
+
 	this.destroyFunctions = [];
 	this.editor = editor || new Editor();
 	this.container = container || document.body;
@@ -2949,10 +2950,10 @@ EditorUi.prototype.refresh = function(sizeDidChange)
 		this.menubarContainer.style.height = this.menubarHeight + 'px';
 		tmp += this.menubarHeight;
 	}
-	
+	tmp = 0;//改变顶部空余高度
 	if (this.toolbar != null)
 	{
-		this.toolbarContainer.style.top = this.menubarHeight + 'px';
+		this.toolbarContainer.style.top = tmp + 'px'; //改变顶部空余高度
 		this.toolbarContainer.style.height = this.toolbarHeight + 'px';
 		tmp += this.toolbarHeight;
 	}

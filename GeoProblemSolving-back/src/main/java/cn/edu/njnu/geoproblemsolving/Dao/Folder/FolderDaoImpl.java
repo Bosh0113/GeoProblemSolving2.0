@@ -2,11 +2,11 @@ package cn.edu.njnu.geoproblemsolving.Dao.Folder;
 
 import cn.edu.njnu.geoproblemsolving.Dao.Method.FileCopyThread;
 import cn.edu.njnu.geoproblemsolving.Dao.Resource.ResourceDaoImpl;
-import cn.edu.njnu.geoproblemsolving.Entity.Folder.FolderEntity;
-import cn.edu.njnu.geoproblemsolving.Entity.Folder.FolderItem;
-import cn.edu.njnu.geoproblemsolving.Entity.Folder.UploadResult;
-import cn.edu.njnu.geoproblemsolving.Entity.ResourceEntity;
-import cn.edu.njnu.geoproblemsolving.Entity.UserEntity;
+import cn.edu.njnu.geoproblemsolving.Entity.Resources.FolderEntity;
+import cn.edu.njnu.geoproblemsolving.Entity.Resources.FolderItem;
+import cn.edu.njnu.geoproblemsolving.Entity.Resources.UploadResult;
+import cn.edu.njnu.geoproblemsolving.Entity.Resources.ResourceEntity;
+import cn.edu.njnu.geoproblemsolving.business.user.entity.UserEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -35,27 +35,38 @@ public class FolderDaoImpl implements IFolderDao {
     }
 
     @Override
-    public Object newFolder(String folderName, String parentId, String scopeId) {
+    public Object createFolder(String folderName, String parentId, String scopeId) {
         try {
-            // decode
-            parentId = decode(parentId);
             FolderItem newFolderInfo = new FolderItem();
-            newFolderInfo.setName(folderName);
-            newFolderInfo.setUid(UUID.randomUUID().toString());
+            String folderId = "";
 
-            Query queryParent = new Query(Criteria.where("folderId").is(parentId));
-            FolderEntity parentFolder = mongoTemplate.findOne(queryParent, FolderEntity.class);
-            ArrayList<FolderItem> folderItems = parentFolder.getFolders();
-            folderItems.add(newFolderInfo);
-            Update updateParent = new Update();
-            updateParent.set("folders", folderItems);
-            mongoTemplate.updateFirst(queryParent, updateParent, FolderEntity.class);
+            if(parentId.equals("")) {
+                // 没有上级活动
+                folderId = scopeId;
+            }
+            else {
+                // 有上级活动
+                // decode
+                parentId = decode(parentId);
+
+                newFolderInfo.setName(folderName);
+                folderId = UUID.randomUUID().toString();
+                newFolderInfo.setUid(folderId);
+
+                Query queryParent = new Query(Criteria.where("folderId").is(parentId));
+                FolderEntity parentFolder = mongoTemplate.findOne(queryParent, FolderEntity.class);
+                ArrayList<FolderItem> folderItems = parentFolder.getFolders();
+                folderItems.add(newFolderInfo);
+                Update updateParent = new Update();
+                updateParent.set("folders", folderItems);
+                mongoTemplate.updateFirst(queryParent, updateParent, FolderEntity.class);
+            }
 
             FolderEntity newFolder = new FolderEntity();
             newFolder.setScopeId(scopeId);
             newFolder.setFiles(new ArrayList<>());
             newFolder.setFolders(new ArrayList<>());
-            newFolder.setFolderId(newFolderInfo.getUid());
+            newFolder.setFolderId(folderId);
             newFolder.setParentId(parentId);
             newFolder.setFolderName(folderName);
             mongoTemplate.save(newFolder);
@@ -145,7 +156,7 @@ public class FolderDaoImpl implements IFolderDao {
             if (resourceId == null) {
                 uploadResult = (UploadResult) resourceDao.saveResource(request);
             } else {
-                uploadResult = (UploadResult)resourceDao.updateResource(request);
+                uploadResult = (UploadResult) resourceDao.updateResource(request);
 
                 for(int i=0;i<files.size();i++){
                     if(files.get(i).getResourceId().equals(resourceId)){
@@ -287,10 +298,10 @@ public class FolderDaoImpl implements IFolderDao {
                 resourceFile.setName(name);
                 resourceFile.setDescription(description);
                 Query queryUser = new Query(Criteria.where("userId").is(userId));
-                UserEntity userEntity = mongoTemplate.findOne(queryUser, UserEntity.class);
-                resourceFile.setUploaderName(userEntity.getUserName());
+                UserEntity user = mongoTemplate.findOne(queryUser, UserEntity.class);
+                resourceFile.setUploaderName(user.getName());
                 Date date = new Date();
-                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 String uploadTime = dateFormat.format(date);
                 resourceFile.setUploadTime(uploadTime);
                 mongoTemplate.save(resourceFile);

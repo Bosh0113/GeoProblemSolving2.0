@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="https://www.thymeleaf.org">
+<html lang="zh-cmn-Hans" xmlns:th="https://www.thymeleaf.org">
 <head>
     <meta http-equiv="pragma" content="no-cache">
     <meta http-equiv="cache-control" content="no-cache">
     <meta http-equiv="expires" content="0">
     <link rel="shortcut icon" href="/GeoProblemSolving/static/favicon.ico">
-    <title th:text="${projectInfo.title}+' | Geo-ProblemSolving'"></title>
+    <title th:text="${projectInfo.name}+' | Geo-ProblemSolving'"></title>
     <meta http-equiv="Content-Type" content=" charset=UTF-8"/>
     <meta name="description" th:attr="content=${projectInfo.description}">
     <meta name="keywords" th:attr="content=${projectInfo.tag}">
@@ -29,6 +29,7 @@
     <script src="/GeoProblemSolving/jspanel/extensions/layout/jspanel.layout.js"></script>
     <script src="/GeoProblemSolving/jspanel/extensions/contextmenu/jspanel.contextmenu.js"></script>
     <script src="/GeoProblemSolving/jspanel/extensions/dock/jspanel.dock.js"></script>
+    <script src="/GeoProblemSolving/customize/userRole.js"></script>
     <script th:replace="navigation::commonHeader-css"></script>
     <script th:replace="navigation::commonHeader-html"></script>
     <script th:replace="navigation::commonHeader-js"></script>
@@ -70,18 +71,8 @@
         }
 
         .projectDescriptionContent {
-            height: 75px;
             overflow-y: auto;
-            text-indent: 2em;
-            padding: 0 5px;
-            word-break: break-word;
-        }
-
-        .projectIntroductionContent {
-            height: 110px;
-            overflow-y: auto;
-            text-indent: 2em;
-            padding: 0 5px;
+            padding: 10px 5px;
             word-break: break-word;
         }
 
@@ -114,6 +105,12 @@
         .changeInviteColor:hover {
             background-color: #19be6b;
             color: white;
+        }
+
+        .enterWorkspaceColor:hover {
+            background-color: #0b83e1;
+            color: white;
+            box-shadow:  0 3.2px 7.2px 0 rgb(0 0 0 / 13%), 0 0.6px 1.8px 0 rgb(0 0 0 / 11%);
         }
 
         .overEllipsis {
@@ -225,6 +222,10 @@
             color: white;
         }
 
+        .fileBtnHoverYellow:hover {
+            background-color: #f4a942;
+            color: white;
+        }
         .ivu-card-body {
             display: inherit;
         }
@@ -234,23 +235,23 @@
             color: white;
         }
 
-        .project_title{
-            font-size:1.5rem;
+        .project_title {
+            font-size: 1.5rem;
             color: rgba(214, 109, 0, 0.82);
-            display:contents;
-            overflow:hidden;
-            text-overflow:ellipsis;
-            white-space:nowrap;
+            display: contents;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
-        @media screen and (min-width:1300px){
-            .title_mw{
+        @media screen and (min-width: 1300px) {
+            .title_mw {
                 max-width: 600px;
             }
         }
 
-        @media screen and (max-width: 1299px){
-            .title_mw{
+        @media screen and (max-width: 1299px) {
+            .title_mw {
                 max-width: 350px;
             }
         }
@@ -258,48 +259,49 @@
 </head>
 
 <body id="pageBody">
+<!--静态页面，整个项目页面在此组装，navigation(navigation.html),overview, introduction, taskAssignment(taskManager.html), workspace, resources(folderTree.html)-->
+<!--projectList, 由navigation, tabContent组成-->
 <div id="projectDetailPage" v-cloak>
     <child-navigation ref="navigationEl" active-type="projects" :user-info="userInfo"></child-navigation>
     <template>
-        <div :style="{height: contentPageCSS}" style="margin-top: 60px;">
+        <div :style="{height: contentPageCSS + 'px'}" style="margin-top: 60px;">
             <div span="2" style="height: inherit;width: 90px;position: absolute;">
                 <i-menu :active-name="activeMenu" @on-select="changeMenuItem"
                         style="height: inherit;width: fit-content;z-index:98">
-                    <menu-item name="projectOverview" class="projectMenuItem">
-                        <Icon type="md-home" title="Overview" size="35"></Icon>
+                    <menu-item name="overview" class="projectMenuItem" style="padding: 14px">
+                        <Icon type="md-home" title="Overview" size="35" style="margin: 0 3px;"></Icon>
                     </menu-item>
-                    <menu-item name="projectDetail" class="projectMenuItem">
-                        <Icon type="ios-information-circle" title="Information" size="35"></Icon>
+                    <menu-item name="info" class="projectMenuItem" style="padding: 14px">
+                        <Icon type="ios-information-circle" title="Information" size="35" style="margin: 0 3px;"></Icon>
                     </menu-item>
-                    <menu-item name="tasks" class="projectMenuItem">
-                        <Icon type="md-calendar" title="Tasks" size="35"></Icon>
+                    <menu-item name="task" class="projectMenuItem" style="padding: 14px">
+                        <Icon type="md-calendar" title="Tasks" size="35" style="margin: 0 3px;"></Icon>
                     </menu-item>
-                    <menu-item name="subProjects" class="projectMenuItem">
-                        <Icon type="md-git-branch" title="Workspace" size="35"></Icon>
-                    </menu-item>
-                    <menu-item name="resources" class="projectMenuItem">
-                        <Icon type="ios-folder" title="Resources" size="35"></Icon>
+<!--                    <menu-item name="workspace" class="projectMenuItem" style="padding: 14px">-->
+<!--                        <Icon type="md-git-branch" title="Workspace" size="35" style="margin: 0 3px;"></Icon>-->
+<!--                    </menu-item>-->
+                    <menu-item name="resource" class="projectMenuItem" style="padding: 14px">
+                        <Icon type="ios-folder" title="Resources" size="35" style="margin: 0 3px;"></Icon>
                     </menu-item>
                 </i-menu>
             </div>
-            <div style="margin-left: 90px;height: inherit;min-height: fit-content;">
-                <div v-show="activeMenu=='projectOverview'" style="height: inherit;min-height: fit-content;">
-                    <div style="background:#eee;padding: 10px;height: inherit;min-height: fit-content;">
+            <div style="margin-left: 70px;height: inherit;min-height: fit-content;">
+                <div v-show="activeMenu=='overview'" :style="{height: contentPageCSS + 'px'}">
+                    <div style="background:#eee;padding: 10px;">
                         <Card :bordered="false" dis-hover
                               style="height: -webkit-fill-available; flex-flow: column;min-height: fit-content;">
                             <div slot="title">
-                                <!--                                <h1 class="projectMenuItemTitle">Overview </h1>-->
                                 <div style="margin-left:20px;top: 15px; position:absolute;left:50px;">
                                     <strong style="font-size:1.5rem;">Project</strong>
                                     <Divider type="vertical"></Divider>
                                     <strong style="font-size:1rem;">Overview</strong>
                                 </div>
                                 <div style="display:flex;align-items:center;justify-content:center;">
-                                    <span class="project_title title_mw">{{projectInfo.title}}</span>
+                                    <span class="project_title title_mw">{{projectInfo.name}}</span>
                                 </div>
                             </div>
                             <div slot="extra">
-                                <div v-if="!managerIdentity(projectInfo.managerId)&&!memberIdentity(projectInfo.members)">
+                                <div v-if="userRole == 'visitor'">
                                     <i-button
                                             type="success"
                                             @click="joinApplyModalShow()"
@@ -308,118 +310,120 @@
                                     </i-button>
                                 </div>
                             </div>
-                            <Row style="margin-left:60px">
-                                <i-col span="10" offset="1">
-                                    <div style="margin:20px">
-                                        <Card style="width:100%;height:10%">
-                                            <div style="text-align:center;margin-bottom:15px;font-weight:bold;font-size:26px"
-                                            >Introduction
-                                            </div>
-                                            <div style="text-align:center; width:40%; float:left">
-                                                <img src="/GeoProblemSolving/Images/info.png"/>
-                                            </div>
-                                            <div style="width:60%; float:left; min-height: 90px">
-                                                <ul>
-                                                    <li>The description of this project</li>
-                                                    <li>The introduction of this project</li>
-                                                    <li>Some details about this project</li>
-                                                    <li>The participant list of this project</li>
-                                                </ul>
-                                            </div>
-                                            <div style="text-align:center">
-                                                <h3>
-                                                    <a @click="gotoIntroduction()">Click to check it</a>
-                                                </h3>
-                                            </div>
-                                        </Card>
-                                    </div>
-                                </i-col>
-                                <i-col span="10" offset="1">
-                                    <div style="margin:20px">
-                                        <Card style="width:100%">
-                                            <div style="text-align:center;margin-bottom:15px;font-weight:bold;font-size:26px"
-                                            >Task assignment
-                                            </div>
-                                            <div style="text-align:center; width:40%; float:left">
-                                                <img src="/GeoProblemSolving/Images/tasks.png"/>
-                                            </div>
-                                            <div style="width:60%; float:left; min-height: 90px">
-                                                <ul>
-                                                    <li>"To do" list: tasks that need to be done</li>
-                                                    <li>"Doing" list: tasks that are being done</li>
-                                                    <li>"Done" list: tasks that have been done</li>
-                                                    <li>Task schedule for solving geo-problems</li>
-                                                </ul>
-                                            </div>
-                                            <div style="text-align:center">
-                                                <h3>
-                                                    <a @click="gotoTaskassignment()">Click to check it</a>
-                                                </h3>
-                                            </div>
-                                        </Card>
-                                    </div>
-                                </i-col>
-                                <i-col span="10" offset="1">
-                                    <div style="margin:20px">
-                                        <Card style="width:100%">
-                                            <div style="text-align:center;margin-bottom:15px;font-weight:bold;font-size:26px"
-                                            >Workspace
-                                            </div>
-                                            <div style="text-align:center; width:40%; float:left">
-                                                <img src="/GeoProblemSolving/Images/steps.jpg"/>
-                                            </div>
-                                            <div style="width:60%; float:left; min-height: 90px">
-                                                <ul>
-                                                    <li>Create a subproject with iterative step</li>
-                                                    <li>Create a step directly</li>
-                                                    <li>Start to work with other participants directly</li>
-                                                </ul>
-                                            </div>
-                                            <div style="text-align:center">
-                                                <h3>
-                                                    <a @click="gotoWorking()">Click to check it</a>
-                                                </h3>
-                                            </div>
-                                        </Card>
-                                    </div>
-                                </i-col>
-                                <i-col span="10" offset="1">
-                                    <div style="margin:20px">
-                                        <Card style="width:100%">
-                                            <div style="text-align:center;margin-bottom:15px;font-weight:bold;font-size:26px"
-                                            >Resources
-                                            </div>
-                                            <div style="text-align:center; width:40%; float:left">
-                                                <img src="/GeoProblemSolving/Images/data.png"/>
-                                            </div>
-                                            <div style="width:60%; float:left; min-height: 90px">
-                                                <ul>
-                                                    <li>Collect different types of resources</li>
-                                                    <li>Support context understanding</li>
-                                                    <li>Support data processing</li>
-                                                    <li>Support modeling and analysis</li>
-                                                </ul>
-                                            </div>
-                                            <div style="text-align:center">
-                                                <h3>
-                                                    <a @click="gotoResource()">Click to check it</a>
-                                                </h3>
-                                            </div>
-                                        </Card>
-                                    </div>
-                                </i-col>
-                                <i-col span="24">
-                                    <div style="text-align: center">
-                                        <span style="margin:25px 0; font-size:24px">Project</span>
-                                        <span style="margin: 0px 10px; font-size: 14px;"> is created for dealing with geo-problems in a participatory manner. </span>
-                                    </div>
-                                </i-col>
+                            <Row style="margin-left:60px" :style="{height: contentPageCSS - 105 + 'px'}">
+                                <vue-scroll :ops="scrollOps">
+                                    <i-col span="10" offset="1">
+                                        <div style="margin:20px">
+                                            <Card style="width:100%;height:10%">
+                                                <div style="text-align:center;margin-bottom:15px;font-weight:bold;font-size:26px"
+                                                >Introduction
+                                                </div>
+                                                <div style="text-align:center; width:40%; float:left">
+                                                    <img src="/GeoProblemSolving/Images/info.png"/>
+                                                </div>
+                                                <div style="width:60%; float:left; min-height: 90px">
+                                                    <ul>
+                                                        <li>The description of this project</li>
+                                                        <li>The introduction of this project</li>
+                                                        <li>Some details about this project</li>
+                                                        <li>The participant list of this project</li>
+                                                    </ul>
+                                                </div>
+                                                <div style="text-align:center">
+                                                    <h3>
+                                                        <a @click="changeMenuItem('info')">Click to check it</a>
+                                                    </h3>
+                                                </div>
+                                            </Card>
+                                        </div>
+                                    </i-col>
+                                    <i-col span="10" offset="1">
+                                        <div style="margin:20px">
+                                            <Card style="width:100%">
+                                                <div style="text-align:center;margin-bottom:15px;font-weight:bold;font-size:26px"
+                                                >Task assignment
+                                                </div>
+                                                <div style="text-align:center; width:40%; float:left">
+                                                    <img src="/GeoProblemSolving/Images/tasks.png"/>
+                                                </div>
+                                                <div style="width:60%; float:left; min-height: 90px">
+                                                    <ul>
+                                                        <li>"To do" list: tasks that need to be done</li>
+                                                        <li>"Doing" list: tasks that are being done</li>
+                                                        <li>"Done" list: tasks that have been done</li>
+                                                        <li>Task schedule for solving geo-problems</li>
+                                                    </ul>
+                                                </div>
+                                                <div style="text-align:center">
+                                                    <h3>
+                                                        <a @click="changeMenuItem('task')">Click to check it</a>
+                                                    </h3>
+                                                </div>
+                                            </Card>
+                                        </div>
+                                    </i-col>
+                                    <i-col span="10" offset="1">
+                                        <div style="margin:20px">
+                                            <Card style="width:100%">
+                                                <div style="text-align:center;margin-bottom:15px;font-weight:bold;font-size:26px"
+                                                >Workspace
+                                                </div>
+                                                <div style="text-align:center; width:40%; float:left">
+                                                    <img src="/GeoProblemSolving/Images/steps.jpg"/>
+                                                </div>
+                                                <div style="width:60%; float:left; min-height: 90px">
+                                                    <ul>
+                                                        <li>Create a subproject with iterative step</li>
+                                                        <li>Create a step directly</li>
+                                                        <li>Start to work with other participants directly</li>
+                                                    </ul>
+                                                </div>
+                                                <div style="text-align:center">
+                                                    <h3>
+                                                        <a @click="changeMenuItem('workspace')">Click to check it</a>
+                                                    </h3>
+                                                </div>
+                                            </Card>
+                                        </div>
+                                    </i-col>
+                                    <i-col span="10" offset="1">
+                                        <div style="margin:20px">
+                                            <Card style="width:100%">
+                                                <div style="text-align:center;margin-bottom:15px;font-weight:bold;font-size:26px"
+                                                >Resources
+                                                </div>
+                                                <div style="text-align:center; width:40%; float:left">
+                                                    <img src="/GeoProblemSolving/Images/data.png"/>
+                                                </div>
+                                                <div style="width:60%; float:left; min-height: 90px">
+                                                    <ul>
+                                                        <li>Collect different types of resources</li>
+                                                        <li>Support context understanding</li>
+                                                        <li>Support data processing</li>
+                                                        <li>Support modeling and analysis</li>
+                                                    </ul>
+                                                </div>
+                                                <div style="text-align:center">
+                                                    <h3>
+                                                        <a @click="changeMenuItem('resource')">Click to check it</a>
+                                                    </h3>
+                                                </div>
+                                            </Card>
+                                        </div>
+                                    </i-col>
+                                    <i-col span="24">
+                                        <div style="text-align: center">
+                                            <span style="margin:25px 0; font-size:24px">Project</span>
+                                            <span style="margin: 0px 10px; font-size: 14px;"> is created for dealing with geo-problems in a participatory manner. </span>
+                                        </div>
+                                    </i-col>
+                                </vue-scroll>
                             </Row>
                         </Card>
                     </div>
                 </div>
-                <div v-show="activeMenu=='projectDetail'" style="height: inherit;min-height: fit-content;">
-                    <div style="background:#eee;padding: 10px;height: inherit;min-height: fit-content;">
+                <div v-show="activeMenu=='info'" :style="{height: contentPageCSS + 'px'}">
+                    <div style="background:#eee;padding: 10px;">
                         <Card :bordered="false" dis-hover
                               style="height: -webkit-fill-available;flex-flow: column;min-height: fit-content;">
                             <div slot="title">
@@ -430,25 +434,27 @@
                                     <strong style="font-size:1rem;">Introduction</strong>
                                 </div>
                                 <div style="display:flex;align-items:center;justify-content:center;">
-                                    <span class="project_title title_mw">{{projectInfo.title}}</span>
+                                    <span class="project_title title_mw">{{projectInfo.name}}</span>
                                 </div>
                             </div>
                             <div slot="extra">
                                 <div>
-                                    <Poptip trigger="hover" content="Edit project information" placement="left" v-if="permissionIdentity('project_edit_info')">
+                                    <Poptip trigger="hover" content="Edit project information" placement="left"
+                                            v-if="detailPermissionIdentity(projectInfo.permission, userRole, 'edit_info')">
                                         <i-button style="margin: 0 5px;" class="changeEditColor"
                                                   @click="editModelShow()">
                                             <Icon type="ios-create" :size="20"></Icon>
                                         </i-button>
                                     </Poptip>
-                                    <Poptip trigger="hover" content="Remove project" placement="left" v-if="projectInfo.managerId == userInfo.userId">
+                                    <Poptip trigger="hover" content="Remove project" placement="left"
+                                            v-if="userRole == 'manager'">
                                         <i-button style="margin: 0 5px;" class="changeRemoveColor"
                                                   @click="deleteProjectShow()">
                                             <Icon type="md-close" :size="20"></Icon>
                                         </i-button>
                                     </Poptip>
                                 </div>
-                                <div v-if="!managerIdentity(projectInfo.managerId)&&!memberIdentity(projectInfo.members)">
+                                <div v-if="userRole == 'visitor'">
                                     <i-button
                                             type="success"
                                             @click="joinApplyModalShow()"
@@ -468,8 +474,8 @@
                                                              style="height: inherit;width: inherit;"
                                                              v-if="projectInfo.picture!=''&&projectInfo.picture!=undefined"
                                                         />
-                                                        <avatar :username="projectInfo.title" :size="200"
-                                                                :title="projectInfo.title" :rounded="false"
+                                                        <avatar :username="projectInfo.name" :size="200"
+                                                                :title="projectInfo.name" :rounded="false"
                                                                 v-else></avatar>
                                                     </div>
                                                 </i-col>
@@ -478,13 +484,16 @@
                                                         <div class="statistics">
                                                             <div style="text-align: left;padding: 5px;">
                                                                 <p><strong>Title: </strong><span id="projectTitle"
-                                                                                                 th:text="${projectInfo.title}">Project title</span>
+                                                                                                 th:text="${projectInfo.name}">Project name</span>
                                                                 </p>
                                                                 <p><strong>Privacy: </strong><span id="projectPrivacy"
                                                                                                    th:text="${projectInfo.privacy}">Project privacy</span>
-                                                                    <span style="margin-left: 10px; cursor: pointer" title="Modify the permission of participants"
-                                                                          v-if="projectInfo.managerId == userInfo.userId" @click="modifyPermission">
-                                                                       <Icon type="md-cog" size="16" color="grey"></Icon>
+                                                                    <span style="margin-left: 10px; cursor: pointer"
+                                                                          title="Modify the permission of participants"
+                                                                          v-if="userRole == 'manager'"
+                                                                          @click="modifyPermission">
+                                                                       <Icon type="md-cog" size="16"
+                                                                             color="grey"></Icon>
                                                                     </span>
                                                                 </p>
                                                                 <p><strong>Category: </strong><span id="projectCategory"
@@ -496,45 +505,42 @@
                                                                                                th:text="${projectInfo.tag}"
                                                                                                th:attr="title=${projectInfo.tag}">Project tag</span>
                                                                 </p>
-                                                                <p><strong>Manager: </strong>
-                                                                    {{projectInfo.managerName}}
-                                                                </p>
+                                                                <!--                                                                <p><strong>Manager: </strong>-->
+                                                                <!--                                                                    {{projectInfo.managerName}}-->
+                                                                <!--                                                                </p>-->
                                                                 <p><strong>Create time: </strong>
-                                                                    {{projectInfo.createTime}}</p>
+                                                                    {{projectInfo.createdTime}}</p>
                                                             </div>
                                                         </div>
                                                         <div style="position: absolute;right: 5px;bottom: 5px;">
                                                             <div>
                                                                 <Icon type="md-git-branch" size="30"></Icon>
-                                                                <span class="showCount">{{SubProjectCount()}}</span>
+                                                                <span class="showCount">{{projectInfo.children.length}}</span>
                                                             </div>
                                                             <div>
                                                                 <Icon type="md-contacts" size="30"></Icon>
-                                                                <span class="showCount">{{ParticipantsCount()}}</span>
+                                                                <span class="showCount">{{projectInfo.members.length}}</span>
                                                             </div>
+                                                        </div>
+                                                        <div style="position: absolute;right: 15px;top: -65px;">
+                                                            <i-button class="enterWorkspaceColor"
+                                                                      @click="changeMenuItem('workspace')">
+                                                                <Icon type="md-git-branch" :size="25"></Icon>
+                                                                <strong>Enter Workspace</strong>
+                                                            </i-button>
                                                         </div>
                                                     </div>
                                                 </i-col>
                                             </Row>
                                             <div class="flex1" style="margin-top: 10px;">
-                                                <div style="padding: 5px;min-height: 80px;max-height: 100px;border: #e8eaec 0.1px dashed;">
+                                                <div style="flex: 1;padding: 5px;min-height: 100px;border: #e8eaec 0.1px dashed;">
                                                     <h3>Description:</h3>
-                                                    <div class="projectDescriptionContent">
+                                                    <div class="projectDescriptionContent"
+                                                         :style="{height: contentPageCSS - 393 + 'px'}">
                                                         <vue-scroll :ops="scrollOps">
                                                             <div id="projectDescription" style="white-space: pre-line;"
                                                                  th:text="${projectInfo.description}">
                                                                 Project description
-                                                            </div>
-                                                        </vue-scroll>
-                                                    </div>
-                                                </div>
-                                                <div style="flex: 1;min-height: 130px;padding: 5px;border: #e8eaec 0.1px dashed;margin-top: 10px;">
-                                                    <h3>Introduction:</h3>
-                                                    <div class="projectIntroductionContent">
-                                                        <vue-scroll :ops="scrollOps">
-                                                            <div id="projectIntroduction" style="white-space: pre-line;"
-                                                                 th:text="${projectInfo.introduction}">
-                                                                Project introduction
                                                             </div>
                                                         </vue-scroll>
                                                     </div>
@@ -550,14 +556,16 @@
                                                 </div>
                                                 <div slot="extra">
                                                     <div>
-                                                        <Poptip trigger="hover" content="Invite members" v-if="permissionIdentity('project_invite_member')"
-                                                                placement="bottom">
+                                                        <Poptip trigger="hover" content="Invite members"
+                                                                v-if="detailPermissionIdentity(projectInfo.permission, userRole, 'invite_member')"
+                                                                placement="left">
                                                             <i-button class="changeInviteColor"
                                                                       @click="inviteModalShow()">
                                                                 <Icon type="md-person-add" :size="20"></Icon>
                                                             </i-button>
                                                         </Poptip>
-                                                        <Poptip trigger="hover" content="Remove members" v-if="permissionIdentity('project_remove_member')"
+                                                        <Poptip trigger="hover" content="Remove members"
+                                                                v-if="detailPermissionIdentity(projectInfo.permission, userRole, 'manage_member')"
                                                                 placement="left">
                                                             <i-button style="margin-left:5px;"
                                                                       class="changeRemoveColor"
@@ -567,20 +575,14 @@
                                                         </Poptip>
                                                     </div>
                                                 </div>
-                                                <div :style="{height: membersContentCSS}" style="overflow-y:auto;">
+                                                <div :style="{height: contentPageCSS - 200 + 'px'}"
+                                                     style="overflow-y:auto;">
                                                     <vue-scroll :ops="scrollOps">
-                                                        <Card style="background-color: #dcdee2;border-color: #c5c8ce;cursor: pointer;"
-                                                              @click.native=goPersonalPage(projectInfo.managerId)>
-                                                            <div title="Manager">
-                                                                <h2 style="color: white" class="overEllipsis">
-                                                                    {{projectInfo.managerName}}</h2>
-                                                            </div>
-                                                        </Card>
-                                                        <Card v-for="member in projectInfo.members"
+                                                        <Card v-for="member in participants"
                                                               style="margin-top: 5px;cursor: pointer;"
                                                               @click.native=goPersonalPage(member.userId)>
                                                             <div title="Member">
-                                                                <h2 class="overEllipsis">{{member.userName}}</h2>
+                                                                <h2 class="overEllipsis">{{member.name}}</h2>
                                                             </div>
                                                         </Card>
                                                     </vue-scroll>
@@ -593,119 +595,17 @@
                         </Card>
                     </div>
                 </div>
-                <div v-show="activeMenu=='subProjects'" style="height: inherit;min-height: fit-content;">
-                    <div style="background:#eee;padding: 10px;height: inherit;min-height: fit-content;">
-                        <Card v-if="projectInfo.type=='type0'" :bordered="false" dis-hover
-                              style="height: -webkit-fill-available;min-height: fit-content;">
-                              <div slot="title">
-<!--                                <h1 class="projectMenuItemTitle">Subprojects</h1>-->
-                                  <div style="margin-left:20px;top: 15px; position:absolute;left:50px;">
-                                      <strong style="font-size:1.5rem;">Project</strong>
-                                      <Divider type="vertical"></Divider>
-                                      <strong style="font-size:1rem;">Subprojects</strong>
-                                  </div>
-                                  <div style="display:flex;align-items:center;justify-content:center;">
-                                      <span class="project_title title_mw">{{projectInfo.title}}</span>
-                                  </div>
-                              </div>
-                            <div slot="extra" v-if="taskRole!='Visitor'">
-                                <Poptip trigger="hover" content="Create subproject" placement="left">
-                                    <i-button style="margin: 0 5px;" class="changeInviteColor"
-                                              @click="showSubProjectCreateModel">
-                                        <Icon type="md-add-circle" :size="20"></Icon>
-                                    </i-button>
-                                </Poptip>
-                            </div>
-                            <div :style="{height:subProjectsCSS}">
-                                <vue-scroll :ops="scrollOps">
-                                    <div v-if="!subProjectList.length" style="text-align:center">
-                                        <div style="color:lightgray;font-size:4em; font-weight:bold">No subprojects
-                                            have been created.
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div v-for="(subProject,index) in subProjectList"
-                                             style="width: 25%;display: inline-block;padding: 5px;">
-                                            <Card style="height: 300px;" class="subProjectCard">
-                                                <div slot="title" style="cursor: pointer;"
-                                                     @click="goSubProjectPage(subProject)">
-                                                    <strong style="width: 160px;display: inline-block;"
-                                                            class="overEllipsis"
-                                                            :title="subProject.title">
-                                                        {{subProject.title}}
-                                                    </strong>
-                                                </div>
-                                                <template v-if="taskRole!='Visitor'">
-                                                    <div slot="extra" v-if="permissionIdentity('subprojects_manage', subProject)">
-                                                        <Poptip trigger="hover" content="Change manager" placement="bottom">
-                                                            <i-button class="changeInviteColor" icon="ios-people"
-                                                                      size="small"
-                                                                      shape="circle"
-                                                                      @click="handOverModalShow(index)"></i-button>
-                                                        </Poptip>
-                                                        <Poptip trigger="hover" content="Edit information"
-                                                                placement="bottom">
-                                                            <i-button class="changeEditColor" icon="ios-create" size="small"
-                                                                      shape="circle"
-                                                                      @click="editSubProjectModalShow(index)"></i-button>
-                                                        </Poptip>
-                                                        <Poptip trigger="hover" content="Remove subproject"
-                                                                placement="bottom">
-                                                            <i-button class="changeRemoveColor" icon="md-close" size="small"
-                                                                      shape="circle"
-                                                                      @click="deleteSubProjectModalShow(index)"></i-button>
-                                                        </Poptip>
-                                                    </div>
-                                                    <div slot="extra" v-else-if="memberIdentity(subProject.members)">
-                                                        <Icon type="ios-person" :size="20"></Icon>
-                                                    </div>
-                                                    <div slot="extra" v-else>
-                                                        <Poptip trigger="hover" content="Apply to Join"
-                                                                placement="left">
-                                                            <i-button class="changeInviteColor" icon="md-add"
-                                                                      size="small"
-                                                                      shape="circle"
-                                                                      @click="applyJoinSubProjectModalShow(index)"></i-button>
-                                                        </Poptip>
-                                                    </div>
-                                                </template>
-                                                <div class="subProjectDes" :title="subProject.description"
-                                                     style="cursor: pointer;" @click="goSubProjectPage(subProject)" >
-                                                    {{subProject.description}}
-                                                </div>
-                                                <div style="height: 75px;padding: 5px;">
-                                                    <p class="subProjectExtraP">
-                                                        <strong style="display: inline-block">Manager: </strong>
-                                                        <span class="subProjectExtraSpan">{{subProject.managerName}}</span>
-                                                    </p>
-                                                    <p class="subProjectExtraP">
-                                                        <strong style="display: inline-block">Members: </strong>
-                                                        <span class="subProjectExtraSpan">{{memberListStr(subProject.members)}}</span>
-                                                    </p>
-                                                    <p class="subProjectExtraP">
-                                                        <strong style="display: inline-block">Create time: </strong>
-                                                        <span class="subProjectExtraSpan">{{subProject.createTime}}</span>
-                                                    </p>
-                                                </div>
-                                            </Card>
-                                        </div>
-                                    </div>
-                                    <div style="margin:5px 0 5px 80px;text-align:center">
-                                        <i-button class="btnHoverRed" @click="resetProjectTypeModalShow()" v-if="permissionIdentity('project_workspace_type_manage')">Reset
-                                            workspace type
-                                        </i-button>
-                                    </div>
-                                </vue-scroll>
-                            </div>
-                        </Card>
-                        <div v-else style="width: -webkit-fill-available;height: -webkit-fill-available;">
-                            <iframe style="width: -webkit-fill-available;height: -webkit-fill-available;border-width:0"
-                                    :src="ipPort+'/projectTypeContent/' + projectInfo.projectId"></iframe>
+                <div v-show="activeMenu=='workspace'" :style="{height: contentPageCSS + 'px'}">
+                    <div style="background:#eee;padding: 10px;">
+                        <div style="width: -webkit-fill-available;height: -webkit-fill-available;">
+                            <iframe style="width: -webkit-fill-available;border-width:0"
+                                    :style="{height: contentPageCSS - 20 + 'px'}"
+                                    :src="ipPort+'/activityInfo/' + projectInfo.aid"></iframe>
                         </div>
                     </div>
                 </div>
-                <div v-show="activeMenu=='resources'" style="height: inherit;min-height: fit-content;">
-                    <div style="background:#eee;padding: 10px;height: inherit;min-height: fit-content;">
+                <div v-show="activeMenu=='resource'" :style="{height: contentPageCSS + 'px'}">
+                    <div style="background:#eee;padding: 10px;">
                         <Card :bordered="false" dis-hover
                               style="height: -webkit-fill-available;min-height: 565px;min-height: fit-content;">
                             <!--                            <h1 slot="title" class="projectMenuItemTitle">Resources</h1>-->
@@ -716,27 +616,33 @@
                                     <strong style="font-size:1rem;">Resources</strong>
                                 </div>
                                 <div style="display:flex;align-items:center;justify-content:center;">
-                                    <span class="project_title title_mw">{{projectInfo.title}}</span>
+                                    <span class="project_title title_mw">{{projectInfo.name}}</span>
                                 </div>
                             </div>
                             <div slot="extra">
+                                <Tooltip content="Enter Workspace">
+                                    <i-button class="enterWorkspaceColor"
+                                              @click="changeMenuItem('workspace')">
+                                        <Icon type="md-git-branch" :size="20"></Icon>
+                                    </i-button>
+                                </Tooltip>
                                 <Tooltip content="Resources center" placement="left" class="fileBtn">
-                                    <i-button @click="goResourceCenter" class="fileBtnHoverBlue">
+                                    <i-button @click="goResourceCenter" class="fileBtnHoverYellow">
                                         <Icon type="ios-albums" size="20"></Icon>
                                     </i-button>
                                 </Tooltip>
                             </div>
-                            <div :style="{height:subProjectsCSS}">
+                            <div :style="{height: contentPageCSS - 105 + 'px'}">
                                 <child-folder
-                                        :role="taskRole"
+                                        :user-role="userRole"
                                         :project-info="projectInfo"
                                         ref="folderTreeEl"></child-folder>
                             </div>
                         </Card>
                     </div>
                 </div>
-                <div v-show="activeMenu=='tasks'" style="height: inherit;min-height: fit-content;">
-                    <div style="background:#eee;padding: 10px;height: inherit;min-height: fit-content;">
+                <div v-show="activeMenu=='task'" style="height: inherit;min-height: fit-content;">
+                    <div style="background:#eee;padding: 10px">
                         <Card :bordered="false" dis-hover
                               style="height: -webkit-fill-available;min-height: 565px;min-height: fit-content;">
                             <!--                            <h1 slot="title" class="projectMenuItemTitle">Task assignment</h1>-->
@@ -747,13 +653,20 @@
                                     <strong style="font-size:1rem;">Task assignment</strong>
                                 </div>
                                 <div style="display:flex;align-items:center;justify-content:center;">
-                                    <span class="project_title title_mw">{{projectInfo.title}}</span>
+                                    <span class="project_title title_mw">{{projectInfo.name}}</span>
                                 </div>
                             </div>
-                            <div>
+                            <div slot="extra">
+                                <i-button class="enterWorkspaceColor"
+                                          @click="changeMenuItem('workspace')">
+                                    <Icon type="md-git-branch" :size="20"></Icon>
+                                    <strong>Enter Workspace</strong>
+                                </i-button>
+                            </div>
+                            <div :style="{height: contentPageCSS - 105 + 'px'}">
                                 <child-task
                                         :project-info="projectInfo"
-                                        :user-role="taskRole"
+                                        :user-role="userRole"
                                         ref="taskTreeEl"></child-task>
                             </div>
                         </Card>
@@ -761,7 +674,7 @@
                 </div>
                 <Modal
                         v-model="editProjectModal"
-                        title="Edit project"
+                        title="Edit project information"
                         :mask-closable="false"
                         width="900"
                 >
@@ -773,13 +686,10 @@
                                 :label-width="100"
                         >
                             <Form-item label="Title" prop="title">
-                                <i-input v-model="projectEditForm.title" placeholder="Enter something..."></i-input>
+                                <i-input v-model="projectEditForm.name" placeholder="Enter something..."></i-input>
                             </Form-item>
                             <Form-item label="Description" prop="description">
                                 <i-input v-model="projectEditForm.description"></i-input>
-                            </Form-item>
-                            <Form-item label="Introduction" prop="introduction">
-                                <i-input v-model="projectEditForm.introduction" type="textarea" :rows="4"></i-input>
                             </Form-item>
                             <Form-item label="Tag" prop="tag">
                                 <i-input
@@ -839,7 +749,7 @@
                                                 id="choosePicture"
                                         />
                                     </div>
-                                    <Modal title="View Image" v-model="visible">
+                                    <Modal title="View image" v-model="visible">
                                         <img :src="pictureUrl" v-if="visible" style="width: 100%"/>
                                     </Modal>
                                 </div>
@@ -863,7 +773,7 @@
                 </Modal>
                 <Modal
                         v-model="inviteModal"
-                        title="Invite others join the Project"
+                        title="Invite others to join the project"
                         :mask-closable="false"
                         width="800">
                     <i-form ref="emailInfo" :model="emailInfo" :rules="emailInfoRule" :label-width="200" inline>
@@ -889,23 +799,25 @@
                         </Form-item>
                     </i-form>
                     <div slot="footer" style="display: inline-block">
-                        <i-button type="primary" @click="invite('emailInfo')" style="float:right;">Assure</i-button>
+                        <i-button type="primary" @click="invite('emailInfo')" style="float:right;">Confirm</i-button>
                         <i-button @click="closeInviteModel()" style="float:right;margin-right: 15px;">Cancel</i-button>
                     </div>
                 </Modal>
                 <Modal
                         v-model="deleteMemberModel"
-                        title="Remove members from project"
+                        title="Remove a member from the project"
                         :mask-closable="false"
                         width="600">
                     <Radio-group v-model="removeMemberName">
-                        <div v-for="(member,index) in projectInfo.members" :key="index"
-                             @click="getRemoveMemberId(member.userId)">
-                            <Radio :label="member.userName"></Radio>
-                        </div>
+                        <span v-for="member in participants" :key="member.name"
+                              @click="getRemoveMemberId(member.userId)">
+                            <Radio :label="member.name" style="margin-right: 30px"
+                                   v-if="member.userId != userInfo.userId">
+                            </Radio>
+                        </span>
                     </Radio-group>
                     <div slot="footer" style="display: inline-block">
-                        <i-button type="primary" @click="removeMembersAlertShow()" style="float:right;">Assure
+                        <i-button type="primary" @click="removeMembersAlertShow()" style="float:right;">Confirm
                         </i-button>
                         <i-button @click="closeDeleteMembersModel()" style="float:right;margin-right: 15px;">Cancel
                         </i-button>
@@ -913,184 +825,50 @@
                 </Modal>
                 <Modal
                         v-model="removeMemberAlertModel"
-                        title="Remove Member alert"
+                        title="Remove the member"
                         @on-ok="removeMember"
                         ok-text="OK"
                         cancel-text="Cancel">
                     <p>Do you sure to remove {{removeMemberName}} from this project?</p>
                 </Modal>
-                <Modal
-                        v-model="createSubProjectModel"
-                        title="Create a new subproject"
-                        width="800"
-                        :mask-closable="false">
-                    <i-form
-                            ref="createSubProjectForm"
-                            :model="createSubProjectForm"
-                            :rules="createSubprojectRuleValidate"
-                            :label-width="120">
-                        <Form-item label="Name" prop="subProjectTitle">
+                <Modal v-model="applyJoinModal" title="Apply to join the project">
+                    <i-form ref="applyValidate" :model="applyValidate" :rules="applyRuleValidate" :label-width="80">
+                        <form-item label="Reason" prop="reason">
                             <i-input
-                                    type="text"
-                                    v-model="createSubProjectForm.subProjectTitle"
-                                    placeholder="Enter subproject name (less than 60 characters) ...">
-                            </i-input>
-                        </Form-item>
-                        <Form-item label="Description" prop="subProjectDescription">
-                            <i-input
-                                    v-model="createSubProjectForm.subProjectDescription"
-                                    placeholder="Enter subproject description..."
-                                    :rows="4"
-                                    type="textarea">
-                            </i-input>
-                        </Form-item>
-                    </i-form>
-                    <div slot="footer" style="display: inline-block">
-                        <i-button type="primary" @click="createSubProject('createSubProjectForm')" style="float:right;">
-                            OK
-                        </i-button>
-                        <i-button @click="closeCreateSubProjectModel()" style="float:right;margin-right: 15px;">Cancel
-                        </i-button>
-                    </div>
-                </Modal>
-                <Modal
-                        v-model="handOverModal"
-                        title="Appoint a new manager"
-                        with="500"
-                        :mask-closable="false">
-                    <h3>Please choose the new manager for this subproject.</h3>
-                    <Radio-group v-model="newManagerId">
-                        <Radio v-for="member in subProjectMembers" :label="member.userId">
-                            {{member.userName}}
-                        </Radio>
-                    </Radio-group>
-                    <div slot="footer" style="display: inline-block">
-                        <i-button type="primary" @click="handOverAuthority()" style="float:right;">OK</i-button>
-                        <i-button @click="closeHandOverModel()" style="float:right;margin-right: 15px;">Cancel
-                        </i-button>
-                    </div>
-                </Modal>
-                <Modal
-                        v-model="editSubProjectModal"
-                        title="Edit the information of this subproject"
-                        width="800px"
-                        :mask-closable="false"
-                >
-                    <div>
-                        <i-form
-                                ref="editSubProjectForm"
-                                :model="editSubProjectForm"
-                                :rules="editSubProjectFormRuleValidate"
-                                :label-width="120"
-                        >
-                            <Form-item label="Name" prop="subProjectTitleEdit">
-                                <i-input v-model="editSubProjectForm.subProjectTitleEdit"></i-input>
-                            </Form-item>
-                            <Form-item label="Description" prop="subProjectDescriptionEdit">
-                                <i-input
-                                        v-model="editSubProjectForm.subProjectDescriptionEdit"
-                                        :rows="4"
-                                        type="textarea"
-                                ></i-input>
-                            </Form-item>
-                        </i-form>
-                    </div>
-                    <div slot="footer" style="display: inline-block">
-                        <i-button type="primary" @click="editSubProject('editSubProjectForm')" style="float:right;">OK
-                        </i-button>
-                        <i-button @click="closeEditSubProjectModel()" style="float:right;margin-right: 15px;">Cancel
-                        </i-button>
-                    </div>
-                </Modal>
-                <Modal
-                        v-model="deleteSubProjectModal"
-                        title="Delete the subproject"
-                        ok-text="OK"
-                        cancel-text="Cancel"
-                        @on-ok="deleteSubProject()"
-                        width="600px"
-                        :mask-closable="false"
-                >
-                    <h2>Are you sure to remove this subproject?</h2>
-                    <small style="color:#03A9F4">* Once you delete the subproject, all resources and others in it will
-                        disappear.
-                    </small>
-            </div>
-            </Modal>
-            <Modal
-                    v-model="applyJoinSubProjectModal"
-                    title="Apply to join the subproject"
-                    width="800px"
-                    :mask-closable="false">
-                <div>
-                    <i-form
-                            ref="applyJoinForm"
-                            :model="applyJoinForm"
-                            :rules="editSubProjectFormRuleValidate"
-                            :label-width="120"
-                    >
-                        <Form-item label="Reason" prop="reasonDescription">
-                            <i-input
-                                    v-model="applyJoinForm.reasonDescription"
-                                    :rows="4"
+                                    v-model="applyValidate.reason"
                                     type="textarea"
+                                    :rows="4"
+                                    placeholder="Enter The Reason For Application ..."
                             ></i-input>
-                        </Form-item>
+                        </form-item>
                     </i-form>
-                </div>
-                <div slot="footer" style="display: inline-block">
-                    <i-button type="primary" @click="applyJoin('applyJoinForm')" style="float:right;">OK</i-button>
-                    <i-button @click="closeApplyJoinModel()" style="float:right;margin-right: 15px;">Cancel
-                    </i-button>
-                </div>
-            </Modal>
-            <Modal v-model="applyJoinModal" title="Apply to join the project">
-                <i-form ref="applyValidate" :model="applyValidate" :rules="applyRuleValidate" :label-width="80">
-                    <form-item label="Reason" prop="reason">
-                        <i-input
-                                v-model="applyValidate.reason"
-                                type="textarea"
-                                :rows="4"
-                                placeholder="Enter The Reason For Application ..."
-                        ></i-input>
-                    </form-item>
-                </i-form>
-                <div slot="footer">
-                    <i-button @click="applyJoinModal=false">Cancel</i-button>
-                    <i-button type="success" @click="joinApply('applyValidate')">Apply</i-button>
-                </div>
-            </Modal>
-            <Modal
-                    v-model="resetProjectTypeNotice"
-                    title="Reset workspace type"
-            >
-                <h2>Please confirm that all subprojects have been deleted.</h2>
-                <div slot="footer">
-                    <i-button type="primary" @click="resetProjectTypeNotice=false">OK</i-button>
-                </div>
-            </Modal>
-            <Modal
-                    v-model="resetProjectTypeModel"
-                    title="Reset workspace type"
-            >
-                <h2>Are you sure to reset the workspace type?</h2>
-                <div slot="footer">
-                    <i-button type="primary" @click="resetProjectType()">Submit</i-button>
-                </div>
-            </Modal>
-            <Modal
-                    v-model="joinProjectNotice"
-                    title="Permission restrictions"
-            >
-                <h2 style="color: #2db7f5">Please join this project before getting more information.</h2>
-                <div slot="footer">
-                    <i-button type="primary" @click="joinProjectNotice=false">OK</i-button>
-                </div>
-            </Modal>
+                    <div slot="footer">
+                        <i-button @click="applyJoinModal=false">Cancel</i-button>
+                        <i-button type="success" @click="joinApply('applyValidate')">Apply</i-button>
+                    </div>
+                </Modal>
+                <Modal
+                        v-model="resetProjectTypeNotice"
+                        title="Reset workspace type"
+                >
+                    <h2>Please confirm that all subprojects have been deleted.</h2>
+                    <div slot="footer">
+                        <i-button type="primary" @click="resetProjectTypeNotice=false">OK</i-button>
+                    </div>
+                </Modal>
+                <Modal
+                        v-model="resetProjectTypeModel"
+                        title="Reset workspace type"
+                >
+                    <h2>Are you sure to reset the workspace type?</h2>
+                    <div slot="footer">
+                        <i-button type="primary" @click="resetProjectType()">Submit</i-button>
+                    </div>
+                </Modal>
+            </div>
         </div>
-</div>
-</template>
-<div th:replace="navigation::commonFooter"></div>
+    </template>
+    <div th:replace="navigation::commonFooter"></div>
 </div>
 <script th:inline="javascript">
     var projectInfo = [[${projectInfo}]];
@@ -1103,13 +881,6 @@
                 'avatar': VueAvatar.Avatar
             },
             created() {
-                var userInfo = {
-                    userState: false,
-                    userName: 'Visitor',
-                    userId: '',
-                    avatar: ''
-                };
-                sessionStorage.setItem('userInfo', JSON.stringify(userInfo));
                 this.tokenStr = this.getURLParameter("token");
                 if (this.tokenStr != null) {
                     $.ajax({
@@ -1118,14 +889,13 @@
                         async: false,
                         success: data => {
                             if (data) {
-                                this.taskRole = 'Token';
+                                this.userRole = 'Token';
                             }
                         },
                         error: function (err) {
                             console.log("Check token info fail.");
                         }
                     });
-
                 }
                 $.ajax({
                     url: "/GeoProblemSolving/user/state",
@@ -1137,7 +907,7 @@
                             sessionStorage.setItem('userInfo', JSON.stringify(data));
                         } else {
                             console.log("Not logged in");
-                            if (this.taskRole != "Token") {
+                            if (this.userRole != "Token") {
                                 window.location.href = '/GeoProblemSolving/login';
                             }
                         }
@@ -1153,41 +923,42 @@
                 if (window.location.host == "localhost:8080") {
                     this.ipPort = 'http://localhost:8080';
                 }
+                this.roleIdentity();
+                this.getParticipants();
             },
             mounted() {
-                this.getProjectInfo();
                 this.userEnter();
                 this.resizeContent();
-                this.getAllSubProjects();
-                this.roleIdentity();
                 this.changeMenuByUrl();
             },
             data() {
                 return {
-                    ipPort: "/GeoProblemSolving",
-                    tokenStr: '',
-                    userInfo: {
-                        userState: false,
-                        userName: 'Visitor',
-                        userId: '',
-                        avatar: '',
-                    },
-                    projectInfo: projectInfo,
-                    activeMenu: "projectOverview",
-                    contentPageCSS: '',
-                    membersContentCSS: '',
-                    subProjectsCSS: '',
+                    contentPageCSS: 0,
                     scrollOps: {
                         bar: {
                             background: "#808695"
                         }
                     },
-                    subProjectList: [],
+                    workspaceUrl: '/GeoProblemSolving/projectInfo/' + projectInfo.aid + "?content=workspace",
+                    ipPort: "/GeoProblemSolving",
+                    tokenStr: '',
+                    activeMenu: "overview",
+                    //user
+                    userInfo: {
+                        userState: false,
+                        name: 'visitor',
+                        userId: '',
+                        avatar: '',
+                    },
+                    userRole: "visitor",
+                    creatorInfo: {},
+                    participants: [],
+                    // project
+                    projectInfo: projectInfo,
                     editProjectModal: false,
                     projectEditForm: {
                         description: "",
-                        introduction: "",
-                        title: "",
+                        name: "",
                         privacy: "",
                         editTags: ""
                     },
@@ -1199,10 +970,10 @@
                                 trigger: "blur"
                             }
                         ],
-                        title: [
+                        name: [
                             {
                                 required: true,
-                                message: "The title cannot be empty and no more than 60 characters",
+                                message: "The name cannot be empty and no more than 60 characters",
                                 trigger: "blur",
                                 max: 60
                             }
@@ -1259,80 +1030,18 @@
                         ]
                     },
                     emailAddStr:
-                    "<br>Please copy the url and access it to join us: <br>" +
-                    "http://" +
-                    window.location.host +
-                    "/GeoProblemSolving/join/" +
-                    projectInfo.projectId +
-                    "/",
+                        "<br>Please copy the url and access it to join us: <br>" +
+                        "http://" +
+                        window.location.host +
+                        "/GeoProblemSolving/join/" +
+                        projectInfo.aid +
+                        "/",
                     prompt: [],
                     deleteMemberModel: false,
                     removeMemberName: "",
                     removeMemberAlertModel: false,
                     removeMemberId: "",
-                    createSubProjectModel: false,
-                    createSubProjectForm: {
-                        subProjectTitle: "",
-                        subProjectDescription: ""
-                    },
-                    createSubprojectRuleValidate: {
-                        subProjectTitle: [
-                            {
-                                required: true,
-                                message: "The title can't be empty and no more than 60 characters",
-                                trigger: "blur",
-                                type: "string",
-                                max: 60
-                            }
-                        ],
-                        subProjectDescription: [
-                            {
-                                required: true,
-                                message: "The description can't be empty",
-                                trigger: "blur"
-                            }
-                        ]
-                    },
-                    selectSubProjectIndex: 0,
-                    subProjectMembers: [],
-                    handOverModal: false,
                     newManagerId: "",
-                    editSubProjectModal: false,
-                    editSubProjectForm: {
-                        subProjectTitleEdit: "",
-                        subProjectDescriptionEdit: ""
-                    },
-                    editSubProjectFormRuleValidate: {
-                        subProjectTitleEdit: [
-                            {
-                                required: true,
-                                message: "The title can't be empty and no more than 60 characters",
-                                trigger: "blur",
-                                max: 60
-                            }
-                        ],
-                        subProjectDescriptionEdit: [
-                            {
-                                required: true,
-                                message: "The description can't be empty",
-                                trigger: "blur"
-                            }
-                        ]
-                    },
-                    deleteSubProjectModal: false,
-                    applyJoinSubProjectModal: false,
-                    applyJoinForm: {
-                        reasonDescription: ""
-                    },
-                    applyJoinFormRuleValidate: {
-                        reasonDescription: [
-                            {
-                                required: true,
-                                message: "The description can't be empty",
-                                trigger: "blur"
-                            }
-                        ]
-                    },
                     //加入项目
                     applyProjectInfo: {},
                     applyValidate: {
@@ -1346,401 +1055,15 @@
                     },
                     applyJoinModal: false,
                     haveApplied: false,
-                    taskRole: "",
                     resetProjectTypeNotice: false,
                     resetProjectTypeModel: false,
-                    joinProjectNotice: false,
+                    // tool
                     workPanels: [],
-                    // 权限的具体功能
-                    defaultPublic: {
-                        observe: {
-                            project_manager: null,
-                            subproject_manager: null,
-                            member: null,
-                            visitor: "All"
-                        },
-                        auto_join: {
-                            project_manager: null,
-                            subproject_manager: null,
-                            member: null,
-                            visitor: true
-                        },
-                        project_edit_info: {
-                            project_manager: true,
-                            subproject_manager: null,
-                            member: false,
-                            visitor: null
-                        },
-                        project_invite_member: {
-                            project_manager: true,
-                            subproject_manager: null,
-                            member: true,
-                            visitor: null
-                        },
-                        project_remove_member: {
-                            project_manager: true,
-                            subproject_manager: null,
-                            member: false,
-                            visitor: null
-                        },
-                        project_task_create: {
-                            project_manager: true,
-                            subproject_manager: null,
-                            member: true,
-                            visitor: null
-                        },
-                        project_task_manage: {
-                            project_manager: true,
-                            subproject_manager: null,
-                            member: "Yes, partly",
-                            visitor: null
-                        },
-                        project_resource_manage: {
-                            project_manager: true,
-                            subproject_manager: null,
-                            member: "Yes, partly",
-                            visitor: null
-                        },
-                        project_workspace_type_manage: {
-                            project_manager: true,
-                            subproject_manager: null,
-                            member: false,
-                            visitor: null
-                        },
-                        subprojects_manage: {
-                            project_manager: true,
-                            subproject_manager: null,
-                            member: "Yes, partly",
-                            visitor: null
-                        },
-                        subproject_edit_info: {
-                            project_manager: true,
-                            subproject_manager: true,
-                            member: false,
-                            visitor: null
-                        },
-                        subproject_invite_member: {
-                            project_manager: true,
-                            subproject_manager: true,
-                            member: true,
-                            visitor: null
-                        },
-                        subproject_remove_member: {
-                            project_manager: true,
-                            subproject_manager: true,
-                            member: false,
-                            visitor: null
-                        },
-                        subproject_task_create: {
-                            project_manager: true,
-                            subproject_manager: true,
-                            member: true,
-                            visitor: null
-                        },
-                        subproject_task_manage: {
-                            project_manager: true,
-                            subproject_manager: true,
-                            member: "Yes, partly",
-                            visitor: null
-                        },
-                        subproject_resource_manage: {
-                            project_manager: "Yes, partly",
-                            subproject_manager: true,
-                            member: "Yes, partly",
-                            visitor: null
-                        },
-                        subproject_workspace_type_manage: {
-                            project_manager: true,
-                            subproject_manager: true,
-                            member: false,
-                            visitor: null
-                        },
-                        activity_manage: {
-                            project_manager: true,
-                            subproject_manager: true,
-                            member: true,
-                            visitor: null
-                        },
-                        workspace_resource: {
-                            project_manager: true,
-                            subproject_manager: true,
-                            member: true,
-                            visitor: null
-                        },
-                        workspace_tool: {
-                            project_manager: true,
-                            subproject_manager: true,
-                            member: true,
-                            visitor: null
-                        },
-                        workspace_edit: {
-                            project_manager: true,
-                            subproject_manager: true,
-                            member: true,
-                            visitor: null
-                        }
-                    },
-                    defaultPrivate: {
-                        observe: {
-                            project_manager: null,
-                            subproject_manager: null,
-                            member: null,
-                            visitor: "No"
-                        },
-                        auto_join: {
-                            project_manager: null,
-                            subproject_manager: null,
-                            member: null,
-                            visitor: null
-                        },
-                        project_edit_info: {
-                            project_manager: true,
-                            subproject_manager: null,
-                            member: false,
-                            visitor: null
-                        },
-                        project_invite_member: {
-                            project_manager: true,
-                            subproject_manager: null,
-                            member: false,
-                            visitor: null
-                        },
-                        project_remove_member: {
-                            project_manager: true,
-                            subproject_manager: null,
-                            member: false,
-                            visitor: null
-                        },
-                        project_task_create: {
-                            project_manager: true,
-                            subproject_manager: null,
-                            member: true,
-                            visitor: null
-                        },
-                        project_task_manage: {
-                            project_manager: true,
-                            subproject_manager: null,
-                            member: "Yes, partly",
-                            visitor: null
-                        },
-                        project_resource_manage: {
-                            project_manager: true,
-                            subproject_manager: null,
-                            member: "Yes, partly",
-                            visitor: null
-                        },
-                        project_workspace_type_manage: {
-                            project_manager: true,
-                            subproject_manager: null,
-                            member: false,
-                            visitor: null
-                        },
-                        subprojects_manage: {
-                            project_manager: true,
-                            subproject_manager: null,
-                            member: "Yes, partly",
-                            visitor: null
-                        },
-                        subproject_edit_info: {
-                            project_manager: false,
-                            subproject_manager: true,
-                            member: false,
-                            visitor: null
-                        },
-                        subproject_invite_member: {
-                            project_manager: false,
-                            subproject_manager: true,
-                            member: false,
-                            visitor: null
-                        },
-                        subproject_remove_member: {
-                            project_manager: false,
-                            subproject_manager: true,
-                            member: false,
-                            visitor: null
-                        },
-                        subproject_task_create: {
-                            project_manager: true,
-                            subproject_manager: true,
-                            member: true,
-                            visitor: null
-                        },
-                        subproject_task_manage: {
-                            project_manager: false,
-                            subproject_manager: true,
-                            member: "Yes, partly",
-                            visitor: null
-                        },
-                        subproject_resource_manage: {
-                            project_manager: "Yes, partly",
-                            subproject_manager: true,
-                            member: "Yes, partly",
-                            visitor: null
-                        },
-                        subproject_workspace_type_manage: {
-                            project_manager: true,
-                            subproject_manager: true,
-                            member: false,
-                            visitor: null
-                        },
-                        activity_manage: {
-                            project_manager: false,
-                            subproject_manager: true,
-                            member: false,
-                            visitor: null
-                        },
-                        workspace_resource: {
-                            project_manager: "Yes, partly",
-                            subproject_manager: true,
-                            member: "Yes, partly",
-                            visitor: null
-                        },
-                        workspace_tool: {
-                            project_manager: true,
-                            subproject_manager: true,
-                            member: true,
-                            visitor: null
-                        },
-                        workspace_edit: {
-                            project_manager: false,
-                            subproject_manager: true,
-                            member: false,
-                            visitor: null
-                        }
-                    },
-                    defaultDiscoverable: {
-                        observe: {
-                            project_manager: null,
-                            subproject_manager: null,
-                            member: null,
-                            visitor: "No"
-                        },
-                        auto_join: {
-                            project_manager: null,
-                            subproject_manager: null,
-                            member: null,
-                            visitor: null
-                        },
-                        project_edit_info: {
-                            project_manager: true,
-                            subproject_manager: null,
-                            member: false,
-                            visitor: null
-                        },
-                        project_invite_member: {
-                            project_manager: true,
-                            subproject_manager: null,
-                            member: false,
-                            visitor: null
-                        },
-                        project_remove_member: {
-                            project_manager: true,
-                            subproject_manager: null,
-                            member: false,
-                            visitor: null
-                        },
-                        project_task_create: {
-                            project_manager: true,
-                            subproject_manager: null,
-                            member: true,
-                            visitor: null
-                        },
-                        project_task_manage: {
-                            project_manager: true,
-                            subproject_manager: null,
-                            member: "Yes, partly",
-                            visitor: null
-                        },
-                        project_resource_manage: {
-                            project_manager: true,
-                            subproject_manager: null,
-                            member: "Yes, partly",
-                            visitor: null
-                        },
-                        project_workspace_type_manage: {
-                            project_manager: true,
-                            subproject_manager: null,
-                            member: false,
-                            visitor: null
-                        },
-                        subprojects_manage: {
-                            project_manager: true,
-                            subproject_manager: null,
-                            member: "Yes, partly",
-                            visitor: null
-                        },
-                        subproject_edit_info: {
-                            project_manager: false,
-                            subproject_manager: true,
-                            member: false,
-                            visitor: null
-                        },
-                        subproject_invite_member: {
-                            project_manager: false,
-                            subproject_manager: true,
-                            member: false,
-                            visitor: null
-                        },
-                        subproject_remove_member: {
-                            project_manager: false,
-                            subproject_manager: true,
-                            member: false,
-                            visitor: null
-                        },
-                        subproject_task_create: {
-                            project_manager: true,
-                            subproject_manager: true,
-                            member: true,
-                            visitor: null
-                        },
-                        subproject_task_manage: {
-                            project_manager: "Yes, partly",
-                            subproject_manager: true,
-                            member: "Yes, partly",
-                            visitor: null
-                        },
-                        subproject_resource_manage: {
-                            project_manager: "Yes, partly",
-                            subproject_manager: true,
-                            member: "Yes, partly",
-                            visitor: null
-                        },
-                        subproject_workspace_type_manage: {
-                            project_manager: false,
-                            subproject_manager: true,
-                            member: false,
-                            visitor: null
-                        },
-                        activity_manage: {
-                            project_manager: false,
-                            subproject_manager: true,
-                            member: false,
-                            visitor: null
-                        },
-                        workspace_resource: {
-                            project_manager: true,
-                            subproject_manager: true,
-                            member: "Yes, partly",
-                            visitor: null
-                        },
-                        workspace_tool: {
-                            project_manager: true,
-                            subproject_manager: true,
-                            member: true,
-                            visitor: null
-                        },
-                        workspace_edit: {
-                            project_manager: false,
-                            subproject_manager: true,
-                            member: false,
-                            visitor: null
-                        }
-                    }
                 }
             },
             watch: {
                 activeMenu(val) {
-                    if (val == "subProjects" && this.projectInfo.type != "" && this.projectInfo.type != "type0") {
+                    if (val == "workspace" && this.projectInfo.type != "" && this.projectInfo.type != "Activity_Unit") {
                         this.workPanels.forEach(function (e) {
                             e.normalize();
                         });
@@ -1752,10 +1075,40 @@
                 }
             },
             methods: {
+                roleIdentity() {
+                    this.userRole = roleIdentify(
+                        this.projectInfo.members,
+                        this.userInfo.userId
+                    );
+                },
+                detailPermissionIdentity(permission, role, operation) {
+                    return permissionIdentity(
+                        JSON.parse(permission),
+                        role,
+                        operation
+                    );
+                },
+                getParticipants() {
+                    let url = "/GeoProblemSolving/project/" + this.projectInfo.aid + "/user";
+                    //callback setTimeBack
+                    axios
+                        .get(url)
+                        .then((res) => {
+                            if (res.data.code == 0) {
+                                this.creatorInfo = res.data.data.creator;
+                                this.participants = res.data.data.members;
+                            } else {
+                                console.log(res.data.msg);
+                            }
+                        })
+                        .catch((err) => {
+                            console.log(err);
+                        });
+                },
                 changeMenuByUrl() {
                     var content = this.getURLParameter("content");
                     if (content != null) {
-                        var array = ["projectOverview", "projectDetail", "tasks", "subProjects", "resources"];
+                        var array = ["overview", "info", "task", "workspace", "resource"];
                         if (array.includes(content)) {
                             this.activeMenu = content;
                         }
@@ -1769,72 +1122,23 @@
                     }
                     return null;
                 },
-                getProjectInfo() {
-                    if (this.projectInfo == {} || this.projectInfo == undefined) {
-                        $.ajax({
-                            url:
-                            "/GeoProblemSolving/project/inquiry" +
-                            "?key=projectId" +
-                            "&value=" +
-                            this.projectId,
-                            type: "GET",
-                            async: false,
-                            success: data => {
-                                if (data == "Offline") {
-                                    parent.location.href = "/GeoProblemSolving/login"
-                                }
-                                if (data != "None" && data != "Fail") {
-                                    this.projectInfo = data[0];
-                                } else {
-                                    console.log(data);
-                                }
-                            }
-                        });
-                    }
-                },
                 userEnter() {
-                    if (this.taskRole != "Token") {
-                        if (this.projectInfo.privacy == "Public") {
-                            if (!this.userInfo.userState) {
-                                window.location.href = "/GeoProblemSolving/projectList";
-                            }
-                        } else if (this.projectInfo.privacy == "Discoverable") {
-                            let isManager = this.managerIdentity(this.projectInfo.managerId);
-                            let isMember = this.memberIdentity(this.projectInfo.members);
-                            if (!this.userInfo.userState || !(isManager || isMember)) {
-                                window.location.href = "/GeoProblemSolving/projectList";
-                            }
-                        } else if (this.projectInfo.privacy == "Private") {
-                            let isManager = this.managerIdentity(this.projectInfo.managerId);
-                            let isMember = this.memberIdentity(this.projectInfo.members);
-                            if (!this.userInfo.userState || !(isManager || isMember)) {
+                    if (this.userRole != "Token") {
+                        if (!this.userInfo.userState) {
+                            window.location.href = "/GeoProblemSolving/login";
+                        } else {
+                            if (this.projectInfo.privacy != "Public" && this.userRole == "visitor") {
                                 window.location.href = "/GeoProblemSolving/projectList";
                             }
                         }
-                    }
-                },
-                roleIdentity() {
-                    if (this.managerIdentity(this.projectInfo.managerId)) {
-                        this.taskRole = 'PManager';
-                    }
-                    else if (this.memberIdentity(this.projectInfo.members)) {
-                        this.taskRole = 'Member';
-                    }
-                    else {
-                        if (this.taskRole != 'Token') {
-                            this.taskRole = 'Visitor';
-                        }
+
                     }
                 },
                 resizeContent() {
                     if (window.innerHeight > 735) {
-                        this.membersContentCSS = window.innerHeight - 330 + 'px';
-                        this.contentPageCSS = window.innerHeight - 130 + 'px';
-                        this.subProjectsCSS = window.innerHeight - 240 + 'px';
+                        this.contentPageCSS = window.innerHeight - 120;
                     } else {
-                        this.membersContentCSS = '407px';
-                        this.contentPageCSS = 'fit-content';
-                        this.subProjectsCSS = '495px';
+                        this.contentPageCSS = 610;
                     }
                     window.onresize = () => {
                         return (() => {
@@ -1846,141 +1150,34 @@
                         })()
                     }
                 },
-                SubProjectCount() {
-                    return this.subProjectList.length;
-                },
-                ParticipantsCount() {
-                    return (this.projectInfo.members.length + 1);
-                },
-                sendNotice(recipientId) {
-                    this.$refs.navigationEl.sendMessage(recipientId);
-                },
                 changeMenuItem(name) {
-                    this.activeMenu = name;
-                    var projectId = this.projectInfo.projectId;
-                    var tokenParam = '';
-                    if (this.tokenStr != null) {
-                        tokenParam = "&token=" + this.tokenStr;
-                    }
-                    window.history.replaceState(null, null, '/GeoProblemSolving/projectDetail/' + projectId + "?content=" + name + tokenParam);
-                },
-                gotoIntroduction() {
-                    this.changeMenuItem("projectDetail");
-                },
-                gotoResource() {
-                    if (this.taskRole == "Visitor") {
-                        this.joinProjectNotice = true;
-                    }
-                    else {
-                        this.changeMenuItem("resources");
-                    }
-                },
-                gotoWorking() {
-                    if (this.taskRole == "Visitor") {
-                        this.joinProjectNotice = true;
-                    }
-                    else {
-                        this.changeMenuItem("subProjects");
-                    }
-                },
-                gotoTaskassignment() {
-                    this.changeMenuItem("tasks");
-                },
-                getAllSubProjects() {
-                    if (this.projectInfo.type == "type0") {
-                        axios
-                            .get(
-                                "/GeoProblemSolving/subProject/inquiry" + "?key=projectId" + "&value=" + this.projectInfo.projectId
-                            )
-                            .then(res => {
-                                if (res.data == "Offline") {
-                                    this.$refs.navigationEl.logout("login");
-                                } else if (res.data == "None" || res.data == "Fail") {
-                                    console.log(res.data);
-                                } else {
-                                    this.subProjectList = res.data;
-                                }
-                            })
-                            .catch(err => {
-                                console.log(err.data)
-                            });
-                    }
-                },
-                managerIdentity(managerId) {
-                    if (managerId == this.userInfo.userId) {
-                        return true;
-                    } else {
-                        return false;
-                    }
-                },
-                memberIdentity(members) {
-                    let isMember = false;
-                    for (let i = 0; i < members.length; i++) {
-                        if (members[i].userId == this.userInfo.userId) {
-                            isMember = true;
-                            break;
+                    if(name == 'workspace') {
+                        if (this.userState == false) {
+                            window.location.href = "/GeoProblemSolving/login"
+                        } else {
+                            window.location.href = "/GeoProblemSolving/activityInfo/" + this.projectInfo.aid
                         }
-                    }
-                    if (isMember) {
-                        return true;
-                    } else {
-                        return false;
-                    }
-                },
-                permissionIdentity(operation, subproject){
-                    if(this.projectInfo.permissionManager != undefined && operation === "project_edit_info"){
-                        if (this.projectInfo.managerId === this.userInfo.userId && this.projectInfo.permissionManager.project_edit_info.project_manager){
-                            return true;
+                    }else{
+                        this.activeMenu = name;
+                        var tokenParam = '';
+                        if (this.tokenStr != null) {
+                            tokenParam = "&token=" + this.tokenStr;
                         }
-                        else if(this.memberIdentity(this.projectInfo.members) && this.projectInfo.permissionManager.project_edit_info.member){
-                            return true;
-                        }
-                    } else if (this.projectInfo.permissionManager != undefined && operation === "project_invite_member"){
-                        if(this.projectInfo.managerId === this.userInfo.userId && this.projectInfo.permissionManager.project_invite_member.project_manager){
-                            return true;
-                        }
-                        else if (this.memberIdentity(this.projectInfo.members) && this.projectInfo.permissionManager.project_invite_member.member){
-                            return true;
-                        }
-                    } else if (this.projectInfo.permissionManager != undefined && operation === "project_remove_member"){
-                        if(this.projectInfo.managerId === this.userInfo.userId && this.projectInfo.permissionManager.project_remove_member.project_manager){
-                            return true;
-                        }
-                        else if (this.memberIdentity(this.projectInfo.members) && this.projectInfo.permissionManager.project_remove_member.member){
-                            return true;
-                        }
-                    } else if (this.projectInfo.permissionManager != undefined && operation === "project_workspace_type_manage"){
-                        if(this.projectInfo.managerId === this.userInfo.userId && this.projectInfo.permissionManager.project_workspace_type_manage.project_manager){
-                            return true;
-                        }
-                        else if (this.memberIdentity(this.projectInfo.members) && this.projectInfo.permissionManager.project_workspace_type_manage.member){
-                            return true;
-                        }
-                    } else if (this.projectInfo.permissionManager != undefined && operation === "subprojects_manage"){
-                        if(this.projectInfo.managerId === this.userInfo.userId && this.projectInfo.permissionManager.subprojects_manage.project_manager){
-                            return true;
-                        }
-                        else if (this.memberIdentity(this.projectInfo.members)){
-                            if(this.projectInfo.permissionManager.subprojects_manage.member === "Yes") {
-                                return true;
-                            }
-                            else if(this.projectInfo.permissionManager.subprojects_manage.member === "Yes, partly" && subproject.managerId === this.userInfo.userId){
-                                return true;
-                            }
-                        }
-                    }
-                    else {
-                        return false;
+                        window.history.replaceState(null, null, '/GeoProblemSolving/projectInfo/' + this.projectInfo.aid + "?content=" + name + tokenParam);
+                        // if (name == "workspace") {
+                        //     window.history.replaceState(null, null, this.workspaceUrl);
+                        // } else {
+                        //     window.history.replaceState(null, null, '/GeoProblemSolving/projectInfo/' + this.projectInfo.aid + "?content=" + name + tokenParam);
+                        // }
                     }
                 },
                 memberListStr(members) {
                     let membersStr = '';
                     for (let i = 0; i < members.length; i++) {
                         if (i == 0) {
-                            membersStr += members[i].userName;
-                        }
-                        else {
-                            membersStr += ',' + members[i].userName;
+                            membersStr += members[i].name;
+                        } else {
+                            membersStr += ',' + members[i].name;
                         }
                     }
                     return membersStr;
@@ -1988,8 +1185,7 @@
                 editModelShow() {
                     this.editProjectModal = true;
                     let editProjectInfo = this.projectInfo;
-                    this.projectEditForm.title = editProjectInfo.title;
-                    this.projectEditForm.introduction = editProjectInfo.introduction;
+                    this.projectEditForm.name = editProjectInfo.name;
                     this.projectEditForm.description = editProjectInfo.description;
                     this.projectEditForm.category = editProjectInfo.category;
                     this.projectEditForm.privacy = editProjectInfo.privacy;
@@ -2021,16 +1217,18 @@
                             let formData = new FormData();
                             formData.append("picture", file);
                             axios
-                                .post("/GeoProblemSolving/project/picture", formData)
+                                .post("/GeoProblemSolving/resource/image", formData)
                                 .then(res => {
-                                    if (res.data != "Fail") {
-                                        this.pictureUrl = res.data;
+                                    if (res.data.code === 0) {
+                                        this.pictureUrl = res.data.data;
                                         $('#choosePicture').val('');
                                     } else {
-                                        this.$Message.error("upload picture Fail!");
+                                        this.$Message.error("Upload picture fail!");
                                     }
                                 })
-                                .catch();
+                                .catch(err => {
+                                    throw err;
+                                });
                         };
                     }
                 },
@@ -2050,44 +1248,33 @@
                     this.projectEditForm.editTags.splice(index, 1);
                 },
                 editProjectSubmit(form) {
-
-                    let permission;
-                    if (this.projectEditForm.privacy === "Public") {
-                        permission = this.defaultPublic;
-                    } else if (this.projectEditForm.privacy === "Discoverable") {
-                        permission = this.defaultDiscoverable;
-                    } else if (this.projectEditForm.privacy === "Private") {
-                        permission = this.defaultPrivate;
-                    }
-
                     this.$refs[form].validate(valid => {
                         if (valid) {
-                            let form = new URLSearchParams();
-                            form.append("title", this.projectEditForm.title);
-                            form.append("category", this.projectEditForm.category);
-                            form.append("introduction", this.projectEditForm.introduction);
-                            form.append("description", this.projectEditForm.description);
-                            form.append("tag", this.projectEditForm.editTags);
-                            form.append("privacy", this.projectEditForm.privacy);
-                            form.append("projectId", this.projectInfo.projectId);
-                            form.append("managerId", this.userInfo.userId);
-                            form.append("picture", this.pictureUrl);
-                            form.append("permissionManager", JSON.stringify(permission));
+                            let form = {
+                                aid: this.projectInfo.aid,
+                                name: this.projectEditForm.name,
+                                category: this.projectEditForm.category,
+                                description: this.projectEditForm.description,
+                                tag: this.projectEditForm.editTags.toString(),
+                                privacy: this.projectEditForm.privacy,
+                                picture: this.pictureUrl,
+                            };
                             axios
-                                .post("/GeoProblemSolving/project/update ", form)
+                                .put("/GeoProblemSolving/project/" + this.projectInfo.aid, form)
                                 .then(res => {
                                     if (res.data == "Offline") {
                                         this.$refs.navigationEl.logout("login");
-                                    } else if (res.data != "Fail") {
-                                        var newProjectInfo = res.data;
+                                    } else if (res.data.code == 0) {
+                                        var newProjectInfo = res.data.data;
                                         this.editProjectModal = false;
                                         this.projectInfo = newProjectInfo;
-                                        $('#projectTitle').html(newProjectInfo.title);
+                                        $('#projectTitle').html(newProjectInfo.name);
                                         $('#projectDescription').html(newProjectInfo.description);
-                                        $('#projectIntroduction').html(newProjectInfo.introduction);
                                         $('#projectPrivacy').html(newProjectInfo.privacy);
                                         $('#projectCategory').html(newProjectInfo.category);
                                         $('#projectTag').html(newProjectInfo.tag);
+                                    } else {
+                                        this.$Message.error(res.data.msg);
                                     }
                                 })
                                 .catch(err => {
@@ -2103,36 +1290,36 @@
                 },
                 deleteProject() {
                     axios
-                        .get(
-                            "/GeoProblemSolving/project/delete?" +
+                        .delete(
+                            "/GeoProblemSolving/project?" +
                             "projectId=" +
-                            this.projectInfo.projectId
+                            this.projectInfo.aid
                         )
                         .then(res => {
                             if (res.data == "Offline") {
                                 this.$refs.navigationEl.logout("login");
-                            } else if (res.data == "Fail") {
-                                this.$Notice.error({
-                                    title: "Error",
-                                    desc: "Delete project fail."
-                                });
-                            }
-                            if (res.data == "Success") {
+                            } else if (res.data.code === 0) {
                                 this.$Notice.success({
                                     title: "Success",
                                     desc: "Delete project successfully."
                                 });
                                 window.location.href = '/GeoProblemSolving/projectList';
+                            } else {
+                                this.$Notice.error({
+                                    title: "Error",
+                                    desc: "Fail to remove the project."
+                                });
                             }
                         })
                         .catch(err => {
+                            throw err
                         });
                 },
                 inviteModalShow() {
                     this.inviteModal = true;
                     this.emailInfo.emailContent =
                         "hello, it's my pleasure to invite you join in the project called " +
-                        this.projectInfo.title +
+                        this.projectInfo.name +
                         ".";
                 },
                 invite(name) {
@@ -2191,6 +1378,7 @@
                 },
                 removeMembersAlertShow() {
                     if (this.removeMemberName != '') {
+                        this.deleteMemberModel = false;
                         this.removeMemberAlertModel = true;
                     } else {
                         this.$Message.warning("There are no member be selected.");
@@ -2200,364 +1388,88 @@
                     this.removeMemberId = userId;
                 },
                 removeMember() {
+                    this.deleteMemberModel = false;
                     axios
-                        .get(
-                            "/GeoProblemSolving/project/quit" +
-                            "?projectId=" +
-                            this.projectInfo.projectId +
-                            "&userId=" +
-                            this.removeMemberId
-                        )
+                        .delete("/GeoProblemSolving/project/" + this.projectInfo.aid + "/user?userId=" + this.removeMemberId)
                         .then(res => {
-                            if (res.data == "Offline") {
+                            if (res.data === "Offline") {
                                 this.$refs.navigationEl.logout("login");
-                            } else if (res.data == "None") {
+                            } else if (res.data.code === -1) {
                                 this.$Notice.warning({
-                                    title: "Operate result",
-                                    desc: "The project doesn't exist."
+                                    title: "Result",
+                                    desc: "The person is not the member of this project."
                                 });
-                            } else {
+                            } else if (res.data.code === 0) {
                                 this.$Notice.success({
-                                    title: "Operate result",
-                                    desc: "The member has been removed from the project successfully."
+                                    title: "Result",
+                                    desc: "The member has been removed from the project."
                                 });
-                                this.deleteMemberModel = false;
-                                var members = this.projectInfo.members;
-                                for (var i = 0; i < members.length; i++) {
-                                    if (members[i].userId == this.removeMemberId) {
-                                        this.projectInfo.members.splice(i, 1);
-                                        break;
+                                for (let i = 0; i < this.participants.length; i++){
+                                    if (this.participants[i].userId == this.removeMemberId){
+                                        this.participants.splice(i, 1);
                                     }
                                 }
+                                //被T出项目，发送站内信
+                                let notice = {};
+                                notice["recipientId"] = this.removeMemberId;
+                                notice["type"] = "notice";
+                                notice["content"] = {
+                                    title: "Project Deleted",
+                                    description:
+                                        "you has been removed from this project: " + this.projectInfo.name
+                                };
+                                axios
+                                    .post("/GeoProblemSolving/notice/save", notice)
+                                    .then(res => {
+                                        if (res.data == "Success") {
+                                            this.$refs.navigationEl.sendMessage({"type": "Notice", "receiver": this.removeMemberId});
+                                        }
+                                    })
+                                    .catch(err => {
+                                        console.log("失败原因：" + err.data);
+                                    });
+
+                                // for (var i = 0; i < this.projectInfo.members.length; i++) {
+                                //     if (this.projectInfo.members[i].userId == this.removeMemberId) {
+                                //         this.projectInfo.members.splice(i, 1);
+                                //         break;
+                                //     }
+                                // }
                             }
                         })
                         .catch(err => {
+                            throw err;
                         });
                 },
                 goPersonalPage(userId) {
                     if (userId == this.userInfo.userId) {
-                        window.location.href = "/GeoProblemSolving/personalPage";
-                    }
-                    else {
+                        window.location.href = "/GeoProblemSolving/newPersonalPage/overView";
+                    } else {
                         window.location.href = "/GeoProblemSolving/memberPage/" + userId;
                     }
                 },
-                modifyPermission(){
-                    window.location.href = "/GeoProblemSolving/project/" + this.projectInfo.projectId + "/permission";
-                },
-                resetProjectTypeModalShow() {
-                    if (this.subProjectList.length > 0) {
-                        this.resetProjectTypeNotice = true;
-                    } else {
-                        this.resetProjectTypeModel = true;
-                    }
+                modifyPermission() {
+                    window.location.href = "/GeoProblemSolving/permission/" + this.projectInfo.level + "/" + this.projectInfo.aid;
                 },
                 resetProjectType() {
-                    let obj = new URLSearchParams();
-                    obj.append("projectId", this.projectInfo.projectId);
-                    obj.append("type", "");
-                    obj.append("stepId", "");
+                    this.projectInfo.type = "";
                     axios
-                        .post("/GeoProblemSolving/project/update", obj)
+                        .put("/GeoProblemSolving/project", this.projectInfo)
                         .then(res => {
                             this.resetProjectTypeModel = false;
                             if (res.data == "Offline") {
                                 window.location.href = "/GeoProblemSolving/login"
-                            } else if (res.data != "Fail") {
+                            } else if (res.data.code == 0) {
                                 // sessionStorage.setItem("projectInfo", JSON.stringify(res.data));
-                                sessionStorage.setItem("projectInfo", this.encrypto(res.data));
-                                this.projectInfo = res.data;
+                                // sessionStorage.setItem("projectInfo", this.encrypto(res.data));
+                                this.projectInfo = res.data.data;
                             } else {
-                                this.$Message.error("Set type failed.");
+                                this.$Message.error(res.data.msg);
                             }
                         })
                         .catch(err => {
                             console.log(err.data);
                         });
-                },
-                showSubProjectCreateModel() {
-                    this.createSubProjectModel = true;
-                },
-                closeCreateSubProjectModel() {
-                    this.createSubProjectModel = false;
-                },
-                createSubProject(form) {
-                    this.$refs[form].validate(valid => {
-                        if (valid) {
-                            let SubProject = {};
-                            SubProject[
-                                "description"
-                                ] = this.createSubProjectForm.subProjectDescription;
-                            SubProject["title"] = this.createSubProjectForm.subProjectTitle;
-                            SubProject["projectId"] = this.projectInfo.projectId;
-                            SubProject["managerId"] = this.userInfo.userId;
-                            SubProject["type"] = "";
-                            SubProject["stepId"] = "";
-                            axios
-                                .post("/GeoProblemSolving/subProject/create", SubProject)
-                                .then(res => {
-                                    if (res.data == "Offline") {
-                                        this.$refs.navigationEl.logout("login");
-                                    } else if (res.data != "Fail") {
-                                        this.$Notice.success({
-                                            title: "Create result",
-                                            desc: "Subproject has been created successfully."
-                                        });
-                                        this.createSubProjectForm.subProjectTitle = "";
-                                        this.createSubProjectForm.subProjectDescription = "";
-                                        this.subProjectList.push(res.data);
-                                        this.createSubProjectModel = false;
-                                    } else {
-                                        this.$Message.info("fail");
-                                    }
-                                })
-                                .catch(err => {
-                                });
-                        } else {
-                            this.$Message.error("Please check your form again!");
-                        }
-                    });
-                },
-                handOverModalShow(index) {
-                    this.selectSubProjectIndex = index;
-                    this.subProjectMembers = this.subProjectList[index].members;
-                    this.handOverModal = true;
-                },
-                closeHandOverModel() {
-                    this.handOverModal = false;
-                },
-                handOverAuthority() {
-                    axios
-                        .get(
-                            "/GeoProblemSolving/subProject/manager?" +
-                            "subProjectId=" +
-                            this.subProjectList[this.selectSubProjectIndex].subProjectId +
-                            "&userId=" +
-                            this.newManagerId
-                        )
-                        .then(res => {
-                            if (res.data == "Offline") {
-                                this.$refs.navigationEl.logout("login");
-                            } else if (res.data != "Fail") {
-                                this.subProjectList.splice(this.selectSubProjectIndex, 1, res.data);
-                                this.$Message.success("Handover management authority success!");
-                                //此处缺少权限移交后的通知
-                                let replyNotice = {};
-                                replyNotice["recipientId"] = this.newManagerId;
-                                replyNotice["type"] = "notice";
-                                replyNotice["content"] = {
-                                    title: "Subproject manager",
-                                    description:
-                                    "You have already become the manager of subproject: " +
-                                    this.subProjectList[this.selectSubProjectIndex].title +
-                                    "."
-                                };
-                                axios
-                                    .post("/GeoProblemSolving/notice/save", replyNotice)
-                                    .then(result => {
-                                        if (result.data == "Success") {
-                                            this.sendNotice(this.newManagerId);
-                                            this.handOverModal = false;
-                                        } else {
-                                            this.$Message.error("notice fail.");
-                                        }
-                                    })
-                                    .catch(err => {
-                                        this.$Message.error("notice fail.");
-                                    });
-                            } else {
-                                this.$Message.error("Handover management authority failed.");
-                            }
-                        })
-                        .catch(err => {
-                            console.log(err.data);
-                        });
-                },
-                editSubProjectModalShow(index) {
-                    this.selectSubProjectIndex = index;
-                    this.editSubProjectModal = true;
-                    this.editSubProjectForm.subProjectTitleEdit = this.subProjectList[index].title;
-                    this.editSubProjectForm.subProjectDescriptionEdit = this.subProjectList[index].description;
-                },
-                closeEditSubProjectModel() {
-                    this.editSubProjectModal = false;
-                },
-                editSubProject(form) {
-                    this.$refs[form].validate(valid => {
-                        if (valid) {
-                            this.editSubProjectModal = false;
-                            let obj = new URLSearchParams();
-                            obj.append(
-                                "subProjectId",
-                                this.subProjectList[this.selectSubProjectIndex].subProjectId
-                            );
-                            obj.append("title", this.editSubProjectForm.subProjectTitleEdit);
-                            obj.append(
-                                "description",
-                                this.editSubProjectForm.subProjectDescriptionEdit
-                            );
-                            axios
-                                .post("/GeoProblemSolving/subProject/update", obj)
-                                .then(res => {
-                                    if (res.data == "Offline") {
-                                        this.$refs.navigationEl.logout("login");
-                                    } else if (res.data != "Fail") {
-                                        this.subProjectList.splice(this.selectSubProjectIndex, 1, res.data);
-                                    } else {
-                                        this.$Message.error("Update subproject failed.");
-                                    }
-                                })
-                                .catch(err => {
-                                    console.log(err.data);
-                                });
-                        } else {
-                            this.$Message.warning("Please check your form again!");
-                        }
-                    });
-                },
-                deleteSubProjectModalShow(index) {
-                    this.selectSubProjectIndex = index;
-                    this.deleteSubProjectModal = true;
-                },
-                deleteSubProject() {
-                    var deletedSubProjectId = this.subProjectList[this.selectSubProjectIndex].subProjectId;
-                    axios
-                        .get(
-                            "/GeoProblemSolving/subProject/delete?" +
-                            "subProjectId=" +
-                            deletedSubProjectId
-                        )
-                        .then(res => {
-                            if (res.data == "Offline") {
-                                this.$refs.navigationEl.logout("login");
-                            } else if (res.data == "Success") {
-                                this.subProjectList.splice(this.selectSubProjectIndex, 1);
-                                this.$Message.success("Delete subproject success!");
-                            } else {
-                                this.$Message.error("Delete subproject failed.");
-                            }
-                        })
-                        .catch(err => {
-                            console.log(err.data);
-                        });
-                },
-                applyJoinSubProjectModalShow(index) {
-                    this.selectSubProjectIndex = index;
-                    this.applyJoinSubProjectModal = true;
-                },
-                closeApplyJoinModel() {
-                    this.applyJoinSubProjectModal = false;
-                },
-                joinSubProject(index) {
-                    let subProject = this.subProjectList[index];
-                    this.axios.get("/GeoProblemSolving/subProject/join?subProjectId=" + subProject.subProjectId + '&userId=' + this.userInfo.userId)
-                        .then(res => {
-                            if (res.data !== "Fail" && res.data !== "None") {
-                                this.$Notice.success({
-                                    title: 'Success notice',
-                                    desc: 'Now you are a member of this subproject.',
-                                });
-                                window.location.href = "/GeoProblemSolving/project/" + subProject.subProjectId + "/subproject";
-                            }
-                        })
-                        .catch(err => {
-                            console.log(err.data);
-                        })
-                },
-                applyJoin(form) {
-                    this.$refs[form].validate(valid => {
-                        if (valid) {
-                            this.applyJoinSubProjectModal = false;
-                            var subProject = this.subProjectList[this.selectSubProjectIndex];
-                            let joinSubPForm = {};
-                            joinSubPForm["recipientId"] = subProject.managerId;
-                            joinSubPForm["type"] = "apply";
-                            let userDetail = this.userInfo;
-                            joinSubPForm["content"] = {
-                                userEmail: userDetail.email,
-                                userName: userDetail.userName,
-                                userId: userDetail.userId,
-                                title: "Group application",
-                                description:
-                                "User " +
-                                userDetail.userName +
-                                " apply to join in your subproject: " +
-                                subProject.title +
-                                " of project: " +
-                                this.projectInfo.title +
-                                " .",
-                                projectId: subProject.subProjectId,
-                                projectTitle: subProject.title,
-                                scope: "subProject",
-                                approve: "unknow"
-                            };
-                            axios
-                                .post("/GeoProblemSolving/notice/save", joinSubPForm)
-                                .then(res => {
-                                    this.$Message.info("Apply Successfully");
-                                    this.sendNotice(subProject.managerId);
-                                })
-                                .catch(err => {
-                                    console.log("申请失败的原因是：" + err.data);
-                                });
-                            let joinSubProjectEmail = {};
-                            joinSubProjectEmail["recipient"] = subProject.managerId;
-                            joinSubProjectEmail["mailTitle"] = "Join sub project application";
-                            joinSubProjectEmail["mailContent"] =
-                                "User " +
-                                userDetail.userName +
-                                " apply to join in your subproject: " +
-                                subProject.title +
-                                " of project: " +
-                                this.projectInfo.title +
-                                " ." +
-                                " And you can access the subproject from this platform. " +
-                                "The url is " +
-                                "http://" +
-                                window.location.host +
-                                "/GeoProblemSolving/home";
-
-                            axios
-                                .post("/GeoProblemSolving/project/applyByMail", joinSubProjectEmail)
-                                .then(res => {
-                                    if (res.data == "Success") {
-                                        this.$Notice.success({
-                                            title: "Email send title",
-                                            desc:
-                                                "The join email has been sent,if he/she doesn't online,the email will remind the mamnager in time."
-                                        });
-                                    } else {
-                                        this.$Notice.error({
-                                            title: "Email send fail",
-                                            desc: "The invitation isn't be sent successfully."
-                                        });
-                                    }
-                                })
-                                .catch(err => {
-                                    console.log(err.data);
-                                });
-                        }
-                    });
-                },
-                goSubProjectPage(subProject) {
-                    if(this.projectInfo.permissionManager != undefined
-                        && (this.projectInfo.permissionManager.observe.visitor == "All"
-                            || this.projectInfo.permissionManager.observe.visitor == "At subproject level")){
-                        window.location.href = "/GeoProblemSolving/project/" + subProject.subProjectId + "/subproject/info";
-                    } else {
-                        if (this.managerIdentity(subProject.managerId) || this.memberIdentity(subProject.members)) {
-                            window.location.href = "/GeoProblemSolving/project/" + subProject.subProjectId + "/subproject/info";
-                        } else {
-                            this.$Message.warning({
-                                render: h => {
-                                    return h('div', [
-                                        h('p', 'Sorry, you are not allowed to enter this subproject.'),
-                                        h('h3', 'Please apply to join first.'),
-                                    ])
-                                }
-                            });
-                        }
-                    }
                 },
                 goResourceCenter() {
                     window.location.href = "/GeoProblemSolving/resourceCenter";
@@ -2566,25 +1478,22 @@
                     if (this.userInfo.userState) {
                         this.applyProjectInfo = Object.assign([], this.projectInfo);
 
-                        if( this.applyProjectInfo.permissionManager != undefined && this.applyProjectInfo.permissionManager.auto_join.visitor) {
-
-                            // join the project directly
+                        // join the project directly
+                        if (this.applyProjectInfo.permission != "" && JSON.parse(this.applyProjectInfo.permission).auto_join.visitor) {
                             axios
-                                .get("/GeoProblemSolving/project/join?"+"projectId="+  this.applyProjectInfo.projectId+"&userId=" +this.userInfo.userId)
+                                .post("/GeoProblemSolving/project/" + this.applyProjectInfo.aid + "/user?" + "userId=" + this.userInfo.userId)
                                 .then(res => {
-                                    if (res.data === "Success") {
-                                        this.$Message.info("Join the project successfuly");
-
-                                        window.location.href="/GeoProblemSolving/projectDetail/" + this.applyProjectInfo.projectId;
-                                    } else if (res.data === "Fail") {
-                                        this.$Message.info("Fail to join in this project");
+                                    if (res.data.code == 0) {
+                                        this.$Message.info("Join this project successfully");
+                                        window.location.href = "/GeoProblemSolving/projectInfo/" + this.applyProjectInfo.aid;
+                                    } else {
+                                        this.$Message.info(res.data.msg);
                                     }
                                 })
                                 .catch(err => {
                                     console.log(err.data);
                                 });
-                        }
-                        else {
+                        } else {
                             this.applyValidate.reason = "";
                             this.applyJoinModal = true;
                         }
@@ -2596,82 +1505,79 @@
                     this.$refs[name].validate(valid => {
                         if (valid) {
                             this.applyJoinModal = false;
-                            var data = this.applyProjectInfo;
                             if (
                                 this.haveApplied == true &&
-                                data.projectId == sessionStorage.getItem("applyId")
+                                this.applyProjectInfo.aid == sessionStorage.getItem("applyId")
                             ) {
-                                this.$Notice.warning({
-                                    title: "repeat apply warning",
-                                    desc: "You have applied successfully, no need to click again!"
-                                });
+                                return;
                             } else {
                                 let userDetail = this.userInfo;
-                                let joinForm = {};
-                                sessionStorage.setItem("applyId", data.projectId);
-                                joinForm["recipientId"] = data.managerId;
-                                joinForm["type"] = "apply";
-                                joinForm["content"] = {
-                                    userEmail: userDetail.email,
-                                    userName: this.userInfo.userName,
-                                    userId: this.userInfo.userId,
-                                    title: "Group application",
-                                    description:
-                                    "User " +
-                                    this.userInfo.userName +
+                                let description = "User " +
+                                    userDetail.name +
                                     " apply to join your project: " +
-                                    data.title +
+                                    this.applyProjectInfo.name +
                                     " ." +
                                     " The reason for application is: " +
-                                    this.applyValidate.reason,
-                                    projectId: data.projectId,
-                                    projectTitle: data.title,
-                                    scope: "project",
-                                    approve: "unknow"
-                                };
-                                axios
-                                    .post("/GeoProblemSolving/notice/save", joinForm)
-                                    .then(res => {
-                                        if (res.data == "Success") {
-                                            this.$Notice.open({
-                                                title: "Apply Successfully",
-                                                desc:
-                                                    "The project's manager will process your apply in time,you can get a notification later to tell you the result."
+                                    this.applyValidate.reason;
+                                for (var i = 0; i < this.applyProjectInfo.members.length; i++) {
+                                    if (this.applyProjectInfo.members[i].role == "manager") {
+                                        let managerId = this.applyProjectInfo.members[i].userId;
+                                        let joinForm = {};
+                                        joinForm["recipientId"] = managerId;
+                                        joinForm["type"] = "apply";
+                                        joinForm["content"] = {
+                                            title: "Project application",
+                                            activityId: this.applyProjectInfo.aid,
+                                            activityName: this.applyProjectInfo.name,
+                                            activityLevel: this.applyProjectInfo.level,
+                                            userEmail: userDetail.email,
+                                            userName: userDetail.name,
+                                            userId: userDetail.userId,
+                                            description: description,
+                                            approve: "unknow"
+                                        };
+
+                                        axios
+                                            .post("/GeoProblemSolving/notice/save", joinForm)
+                                            .then(res => {
+                                                if (res.data == "Success") {
+                                                    this.$Notice.open({
+                                                        title: "Apply Successfully",
+                                                        desc:
+                                                            "The application has been sent to managers of the project."
+                                                    });
+                                                    this.$refs.navigationEl.sendMessage({"type": "Notice", "receiver": managerId});
+
+                                                    this.haveApplied = true;
+                                                } else {
+                                                    this.$Notice.open({
+                                                        desc: "Apply failed."
+                                                    });
+                                                }
+                                            })
+                                            .catch(err => {
+                                                console.log("申请失败的原因是：" + err.data);
                                             });
-                                            this.$emit("sendNotice", data.managerId);
-                                            this.haveApplied = true;
-                                        } else {
-                                            this.$Notice.open({
-                                                desc: "Apply failed"
-                                            });
-                                        }
-                                    })
-                                    .catch(err => {
-                                        console.log("申请失败的原因是：" + err.data);
-                                    });
+                                    }
+                                }
+                                sessionStorage.setItem("applyId", this.applyProjectInfo.aid);
 
                                 let emailObject = {
-                                    recipient: joinForm.recipientId,
-                                    mailTitle: "Group application",
+                                    mailTitle: "Project application",
                                     mailContent:
-                                    joinForm.content.description +
-                                    "<br>" +
-                                    "You can click this url and enter the site to process this application: " +
-                                    "http://" +
-                                    window.location.host +
-                                    "/GeoProblemSolving/home"
+                                        description + "<br>" +
+                                        "You can click this url and enter the site to process this application: " +
+                                        "http://" + window.location.host + "/GeoProblemSolving/home"
                                 };
                                 axios
-                                    .post("/GeoProblemSolving/project/applyByMail", emailObject)
+                                    .post("/GeoProblemSolving/project/" + this.applyProjectInfo.aid + "/application", emailObject)
                                     .then(res => {
-                                        if (res.data == "Success") {
-                                            console.log("Email Success.");
-                                        } else {
-                                            console.log("Email fail.");
+                                        if (res.data.code !== 0) {
+                                            console.log(res.data.msg);
                                         }
                                     })
                                     .catch(err => {
-                                        console.log("Email fail.");
+                                        console.log(err.data);
                                     });
                             }
                         } else {
@@ -2704,22 +1610,6 @@
                     $(".jsPanel-content").css("font-size", "0");//防止出现滚动条
                     $(".jsPanel").css("position", "fixed");
                     this.workPanels.push(panel);
-                },
-                encrypto(context) {
-                    var key = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
-                    var iv = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
-                    var encrypted = "";
-                    if (typeof context == "string") {
-                    } else if (typeof context == "object") {
-                        context = JSON.stringify(context);
-                    }
-                    var srcs = CryptoJS.enc.Utf8.parse(context);
-                    encrypted = CryptoJS.AES.encrypt(srcs, key, {
-                        iv: iv,
-                        mode: CryptoJS.mode.CBC,
-                        padding: CryptoJS.pad.Pkcs7
-                    });
-                    return encrypted.toString();
                 },
             }
         }
