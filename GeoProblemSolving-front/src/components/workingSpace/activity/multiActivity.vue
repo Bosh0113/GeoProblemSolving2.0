@@ -36,9 +36,9 @@
       ></folder-tree>
     </div>
     <div v-show="activeMenu=='Tasks'">
-      <task-manager :activityInfo="activityInfo" :childActivities="childActivities" :userInfo="userInfo" ></task-manager>
+      <task-manager :activityInfo="activityInfo" :projectInfo="projectInfo" :childActivities="childActivities" :userInfo="userInfo" ></task-manager>
     </div>
-    <div v-show="activeMenu=='Activities'">
+    <div v-if="activeMenu=='Activities'">
       <process-manager :activityInfo="activityInfo" :childActivities="childActivities" :userInfo="userInfo" ></process-manager>
     </div>
     <mini-chatroom
@@ -57,6 +57,7 @@ export default {
   props: [
       "activityInfo",
       "userInfo",
+      "projectInfo",
       "childActivities",
       "nameConfirm"
     ],

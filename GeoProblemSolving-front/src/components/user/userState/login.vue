@@ -352,8 +352,7 @@
       goRegister() {
         this.$router.push({name: "Register"});
       },
-      sendResetEmail() {
-        this.$Notice.success({title: "Waiting", desc: "The email is sending."})
+      sendResetEmail() {   
         this.axios
           .get(
             "/GeoProblemSolving/user/sendEmail/" +
@@ -361,6 +360,7 @@
           )
           .then((res) => {
             if (res.data.code == 0) {
+              this.$Notice.success({title: "Waiting", desc: "The email is sending."});
               this.$router.push({
                 name: "resetPassword",
                 params: {email: this.loginForm.user},
@@ -381,10 +381,9 @@
             throw err;
           });
       },
-      register() {
-        this.$router.push({name: "Register"});
-      },
+      // register() {
+      //   this.$router.push({name: "Register"});
+      // },
     },
   };
 </script>
-

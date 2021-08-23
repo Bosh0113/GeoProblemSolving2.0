@@ -161,6 +161,7 @@
           .get("/GeoProblemSolving/user/changePwd/" + this.formValidate.email + "/" + this.formValidate.code + "/" + encodePwd)
           .then(res => {
             if (res.data.code == 0){
+              this.$Notice.success({title: "Reset password successfully,", desc: "please try to log in again"});
               this.$router.replace({name: "Login"})
             }else {
               this.$Message.info("Verification code error.")

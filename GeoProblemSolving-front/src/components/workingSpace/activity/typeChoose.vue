@@ -105,18 +105,27 @@
         </Select>
       </div>
     </Modal>
+    <login-modal :tempLoginModal="tempLoginModal" @changeLoginModal="changeLoginModal"></login-modal>
   </Row>
 </template>
 <script>
+
+import loginModal from "../../user/userState/loginModal.vue";
+
 export default {
   props: [
     "activityInfo",
     "userInfo"
   ],
+  components:{
+    loginModal,
+  },
   data() {
     return {
       selectType: "Activity_Default",
       selectTypeModal: false,
+      //恢复登录的模态框
+      tempLoginModal: false,
       userRole: "visitor",
       purposes: [
         "Context definition & resource collection",
@@ -148,6 +157,9 @@ export default {
         role,
         operation
       );
+    },
+    changeLoginModal(status){
+      this.tempLoginModal = status;
     },
     selectTypeModalShow(type) {
       this.selectType = type;
@@ -183,9 +195,11 @@ export default {
       this.axios
         .put(url, data)
         .then((res) => {
+          console.log(res);
           if (res.data == "Offline") {
             this.$store.commit("userLogout");
-            this.$router.push({ name: "Login" });
+            // this.$router.push({ name: "Login" });
+            this.tempLoginModal = true;
           } else if (res.data.code == 0) {
             if(res.data.data.level == 0){
               parent.vm.projectInfo = res.data.data;

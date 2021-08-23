@@ -21,7 +21,7 @@
                     :username="userDetail.name"
                     :size="200"
                     :rounded="true"
-
+                    v-else
                   >
                   </avatar>
               </div>
@@ -228,13 +228,13 @@
                           </h2>
                         </div>
                       </Card>
-                      <div v-for="item in joinedProjectsList" :key="item">
+                      <div v-for="(item,index) in joinedProjectsList" :key="index">
                         <Col
                           :lg="{ span: 11, offset: 1 }"
                           :md="{ span: 22, offset: 1 }"
                         >
                           <div>
-                            <Card style="height: 320px; margin-top: 20px" class="projectCard">
+                            <Card style="height: 320px; margin-top: 20px" class="projectCard" @click="enterProject(item)">
                               <p
                                 slot="title"
                                 style="height: 40x"
@@ -296,15 +296,15 @@
                         </div>
                       </Card>
                       <div
-                        v-for="mProject in createdProjectList"
-                        :key="mProject"
+                        v-for="(mProject,index) in createdProjectList"
+                        :key="index"
                       >
                         <Col
                           :lg="{ span: 11, offset: 1 }"
                           :md="{ span: 22, offset: 1 }"
                         >
                           <div>
-                            <Card style="height: 320px; margin-top: 20px" class="projectCard">
+                            <Card style="height: 320px; margin-top: 20px" class="projectCard" @click="enterProject(mProject)">
                               <p slot="title" class="projectsTitle">
                                 {{ mProject.name }}
                               </p>
@@ -379,6 +379,9 @@ export default {
       let avatarUrl = this.$store.state.UserServer + url;
       return avatarUrl;
     },
+		enterProject(project){
+			console.log(project);
+		},
     getMemberDetail() {
       this.$axios
         .get(url, {
@@ -400,7 +403,6 @@ export default {
         .then((res) => {
           if (res.data.code == 0) {
             this.userDetail = res.data.data;
-            console.log(this.userDetail)
             let joinedProjectsArray = this.userDetail.joinedProjects;
             if (
               joinedProjectsArray != null &&
@@ -431,13 +433,11 @@ export default {
             this.$route.params.id
         )
         .then((res) => {
-          console.log(res)
           if (res.data == "Offline") {
             this.$store.commit("userLogout");
             this.$router.push({ name: "Login" });
           } else if (res.data != "None" && res.data != "Fail") {
             this.memberEventList = res.data;
-            console.log(this.memberEventList)
           }
         })
         .catch((err) => {
