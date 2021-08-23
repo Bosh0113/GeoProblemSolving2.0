@@ -960,26 +960,29 @@
         >
       </div>
     </Modal>
+    <login-modal :tempLoginModal="tempLoginModal" @changeLoginModal="changeLoginModal"></login-modal>
   </div>
 </template>
 <script>
 import dayjs from "dayjs";
 import draggable from "vuedraggable";
 import GanttElastic from "gantt-elastic";
+import loginModal from "../../../user/userState/loginModal.vue"
 export default {
   components: {
     draggable,
     dayjs,
     ganttElastic: GanttElastic,
+    loginModal,
   },
   props: [
     "activityInfo",
+    "projectInfo",
     "childActivities",
     "userInfo"
   ],
   data() {
     return {
-      projectInfo: {},
       // userInfo: JSON.parse(sessionStorage.getItem("userInfo")),
       userRole: "visitor",
       todoLoading: true,
@@ -1011,6 +1014,8 @@ export default {
       // 编辑任务的模态框
       editTaskModal: false,
       taskDetailModal: false,
+      //恢复登录的模态框
+      tempLoginModal: false,
       //task相关
       taskInfo: {},
       taskTodo: [],
@@ -1152,6 +1157,9 @@ export default {
         operation
       );
     },
+    changeLoginModal(status){
+      this.tempLoginModal = status;
+    },
     //创建任务
     createTaskModalShow() {
       let taskDefult = {
@@ -1188,7 +1196,8 @@ export default {
             .then((res) => {
               if (res.data == "Offline") {
                 this.$store.commit("userLogout");
-                this.$router.push({ name: "Login" });
+                // this.$router.push({ name: "Login" });
+                this.tempLoginModal = true;
               } else if (res.data != "Fail") {
                 this.addNewTask(res.data);
 
@@ -1224,7 +1233,8 @@ export default {
         .then((res) => {
           if (res.data == "Offline") {
             this.$store.commit("userLogout");
-            this.$router.push({ name: "Login" });
+            // this.$router.push({ name: "Login" });
+            this.tempLoginModal = true;
           } else if (res.data != "None" && res.data != "Fail") {
             this.$Message.info("Changed the importance of one task.");
           } else {
@@ -1341,7 +1351,8 @@ export default {
             .then((res) => {
               if (res.data == "Offline") {
                 this.$store.commit("userLogout");
-                this.$router.push({ name: "Login" });
+                // this.$router.push({ name: "Login" });
+                this.tempLoginModal = true;
               } else if (res.data != "None" && res.data != "Fail") {
                 // update activity doc
                 this.operationApi.taskUpdate(
@@ -1383,7 +1394,10 @@ export default {
         )
         .then((res) => {
           this.todoLoading = false;
-          if (res.data != "None" && res.data != "Fail") {
+          if (res.data == "Offline") {
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
+          }else if (res.data != "None" && res.data != "Fail") {
             this.$set(this, "taskTodo", res.data);
           } else {
             this.$Message.error("Fail!");
@@ -1403,7 +1417,9 @@ export default {
         )
         .then((res) => {
           this.doingLoading = false;
-          if (res.data != "None" && res.data != "Fail") {
+          if (res.data == "Offline") {
+            
+          }else if (res.data != "None" && res.data != "Fail") {
             this.$set(this, "taskDoing", res.data);
           } else {
             this.$Message.error("Fail!");
@@ -1423,7 +1439,9 @@ export default {
         )
         .then((res) => {
           this.doneLoading = false;
-          if (res.data != "None" && res.data != "Fail") {
+          if (res.data == "Offline") {
+            
+          }else if (res.data != "None" && res.data != "Fail") {
             this.$set(this, "taskDone", res.data);
           } else {
             this.$Message.error("Fail!");
@@ -1470,7 +1488,8 @@ export default {
                 count--;
                 if (res.data == "Offline") {
                   this.$store.commit("userLogout");
-                  this.$router.push({ name: "Login" });
+                  // this.$router.push({ name: "Login" });
+                  this.tempLoginModal = true;
                 } else if (res.data != "Fail") {
                   //更新数组
                   taskList[stateChangeIndex].managerName = thisUserName;
@@ -1490,7 +1509,8 @@ export default {
                 count--;
                 if (res.data == "Offline") {
                   this.$store.commit("userLogout");
-                  this.$router.push({ name: "Login" });
+                  // this.$router.push({ name: "Login" });
+                  this.tempLoginModal = true;
                 } else if (res.data != "Fail") {
                 }
               })
@@ -1508,14 +1528,19 @@ export default {
       this.taskList = taskList;
     },
     taskRemove() {
-      this.axios
+      this.$axios
         .get(
           "/GeoProblemSolving/task/delete" +
             "?taskId=" +
             this.taskList[this.selectTaskIndex]["taskId"]
         )
         .then((res) => {
-          if (res.data == "Success") {
+          console.log(res);
+          if (res.data == "Offline") {
+            this.$store.commit("userLogout");
+            // this.$router.push({ name: "Login" });
+            this.tempLoginModal = true;
+          } else if (res.data == "Success") {
             // update activity doc
             this.operationApi.taskUpdate(
               this.activityInfo.aid,
@@ -1536,8 +1561,8 @@ export default {
     go2Activity(aid) {
       for (let i = 0; i < this.childActivities.length; i++) {
         if (this.childActivities[i].aid == aid) {
-          parent.location.href =
-            "/GeoProblemSolving/projectInfo/" +
+          window.location.href =
+            "/activityInfo/" +
             this.projectInfo.aid +
             "?content=workspace&aid=" +
             this.childActivities[i].aid +
