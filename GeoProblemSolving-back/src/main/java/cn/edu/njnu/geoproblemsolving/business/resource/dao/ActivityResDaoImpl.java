@@ -57,4 +57,14 @@ public class ActivityResDaoImpl implements ActivityResDao {
         Query query = new Query(Criteria.where("uid").is(uid));
         return mongoTemplate.findOne(query, ResourceEntity.class);
     }
+
+    @Override
+    public ResourceEntity queryByAidAndName(String aid, String folderName) {
+        Query query = new Query();
+        Criteria criteria = new Criteria("activityId").is(aid);
+        Criteria criteria1 = new Criteria("name").is(folderName);
+        query.addCriteria(criteria);
+        query.addCriteria(criteria1);
+        return mongoTemplate.findOne(query, ResourceEntity.class);
+    }
 }

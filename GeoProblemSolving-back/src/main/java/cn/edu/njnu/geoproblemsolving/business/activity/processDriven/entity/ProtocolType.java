@@ -1,4 +1,4 @@
-package cn.edu.njnu.geoproblemsolving.business.activity.entity;
+package cn.edu.njnu.geoproblemsolving.business.activity.processDriven.entity;
 
 public enum ProtocolType {
     Convergence,

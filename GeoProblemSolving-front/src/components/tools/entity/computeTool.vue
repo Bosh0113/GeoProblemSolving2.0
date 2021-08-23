@@ -61,7 +61,7 @@
 </template>
 
 <script>
-  import resourceList from "../../common/resource/resourceList-copy";
+  import resourceList from "../../common/resource/UserAndActivityResourceList";
 
   export default {
     components: {

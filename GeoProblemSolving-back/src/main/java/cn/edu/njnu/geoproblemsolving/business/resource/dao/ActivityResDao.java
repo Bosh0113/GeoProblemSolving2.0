@@ -20,4 +20,6 @@ public interface ActivityResDao {
     String updateRes(Query query, Update update);
 
     ResourceEntity queryByUid(String uid);
+
+    ResourceEntity queryByAidAndName(String aid, String folderName);
 }

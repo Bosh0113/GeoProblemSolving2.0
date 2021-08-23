@@ -253,7 +253,6 @@
         :destroy-on-close="true"
       >
         <resource-list
-          :pageParams="pageParams"
           @selectData="selectData"
         ></resource-list>
       </el-dialog>
@@ -273,8 +272,7 @@
 <!--协同工具 zhngzhng-->
 <script>
   import {get, post} from "@/axios";
-  import resourceList from "../../common/resource/resourceList-copy";
-  import multiActivity from "../../workingSpace/activity/multiActivity";
+  import resourceList from "../common/resource/UserAndActivityResourceList";
 
   export default {
     components: {
@@ -294,11 +292,6 @@
         record: {},
         selectDataDialogShow: false,
         url: "",
-        /*
-         page info
-         pageId: aid
-        */
-        pageParams: {pageId: "", userId: "", userName: ""},
         inputIndex: "",
         showMask: false,
         zoomOutPicDialogShow: false,
@@ -341,10 +334,6 @@
           //读取信息
           this.aid = activityInfo.aid;
           this.userInfo = userInfo;
-          this.pageParams.pageId = this.aid;
-          this.pageParams.userId = userInfo.userId;
-          this.pageParams.userName = userInfo.name;
-          console.log(this.pageParams)
 
           // 绑定函数
           buildSocketChannel(this.getSocketOperation, null, this.getSocketComputation);
@@ -487,13 +476,13 @@
           type: "data",
           userUpload: false,
           address: event.url,
-          uploaderId: this.pageParams.userId,
-          uploaderName: this.pageParams.userName,
+          uploaderId: userInfo.userId,
+          uploaderName: userInfo.name,
           privacy: "private"
         };
 
 
-        let data = await post("/GeoProblemSolving/rip/file/bind/" + this.pageParams.pageId, json);
+        let data = await post("/GeoProblemSolving/rip/file/bind/" + activityInfo.aid, json);
 
         // let data = await post("/GeoProblemSolving/resource/bind", json);
         event.bind = true;

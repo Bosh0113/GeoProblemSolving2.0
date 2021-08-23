@@ -239,9 +239,7 @@
         :close-on-click-modal="false"
         :destroy-on-close="true"
       >
-        <!--              :pageParams="pageParams"-->
         <resource-list
-          :pageParams="pageParams"
           @selectData="selectData"
         ></resource-list>
       </el-dialog>
@@ -251,10 +249,9 @@
 </template>
 
 <script>
-  import file from "./../dataTemplate/File";
-  import resourceList from "../../common/resource/resourceList-copy";
+  import file from "./dataTemplate/File";
+  import resourceList from "../common/resource/UserAndActivityResourceList";
   import {get, del, post, put, patch} from "@/axios";
-  import ResourceList from "../../common/resource/resourceList.vue";
 
   export default {
     components: {
@@ -266,9 +263,6 @@
       return {
         doi: this.$route.params.doi,
         modelIntroduction: {},
-        pageParams: {
-          aid: ""
-        },
         stateList: {},
         modelInstance: {},
         datasetItem: {},
@@ -338,8 +332,8 @@
     },
 
     methods: {
-      getStepInfo: function(){
-        if (componentStatus){
+      getStepInfo: function () {
+        if (componentStatus) {
           //从协同组件中获取需要的数据
           this.activityResource = resources;
           this.userId = userInfo.userId;
@@ -348,7 +342,7 @@
           // 绑定函数
           buildSocketChannel(this.getSocketOperation, null, this.getSocketComputation);
 
-        }else {
+        } else {
           //避免this指向问题
           let _this = this;
           setTimeout(function () {
@@ -357,7 +351,7 @@
         }
       },
 
-      getSocketOperation: function(data){
+      getSocketOperation: function (data) {
         console.log(data)
       },
 
@@ -370,9 +364,8 @@
         });
       },
 
-      getSocketComputation: function(data){
-        console.log("socketComputation", data)
-        if (data != undefined && data != null){
+      getSocketComputation: function (data) {
+        if (data != undefined && data != null) {
           this.getStateEventOut(data.computeOutputs)
         }
 
@@ -407,48 +400,27 @@
         this.fullscreenLoading.close();
       },
 
-
-      getUserInfo() {
-        this.userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
-        if (this.userInfo == {}) {
-          this.axios
-            .get(
-              "/GeoProblemSolving/user" +
-              "?key=userId" +
-              "&value=" +
-              this.pageParams.userId
-            )
-            .then((res) => {
-              if (res.data.code == 0) {
-                this.$set(this, "userInfo", res.data).data;
-              }
-            })
-            .catch((err) => {
-            });
-        }
-      },
-
       /*
       初始化任务(mounted 阶段)
       获取是否有部署好的模型
       若有则生成 invoke 界面
       若无则 init failed
        */
-      initTask: function() {
+      initTask: function () {
         setTimeout(() => {
-          this.axios.get("/GeoProblemSolving/modelTask/createTask/" + this.md5 + "/" + this.userId)
-            .then(res=>{
+          this.axios.get("/GeoProblemSolving/modelTask/createTask/" + this.md5 + "/" + userInfo.userId)
+            .then(res => {
               console.log("initTaskResponse", res.data)
-              if (res.data.code == 0){
-                let data2 =res.data.data;
+              if (res.data.code == 0) {
+                let data2 = res.data.data;
                 this.invokeInfo.serviceIp = data2.ip;
                 this.invokeInfo.servicePort = data2.port;
                 this.invokeInfo.serviceId = this.md5;
-              }else {
+              } else {
                 this.$Notice.error({title: "Tool initialization failed."})
               }
             })
-            .catch(err=>{
+            .catch(err => {
               this.$Notice.error({title: "Tool initialization failed."})
             })
         }, 1500)
@@ -466,6 +438,7 @@
             let detail = {};
             detail["statename"] = stateList[i].name;
             detail["event"] = events[j].name;
+            //文件
             if (events[j].type == "response") {
               if (events[j].hasOwnProperty("url")) {
                 detail["tag"] = events[j].name;
@@ -475,6 +448,7 @@
                 continue;
               }
             } else if (events[j].type == "noresponse") {
+              //参数
               let template = {};
               let outputTemplate = events[j].datasetItem;
               console.log(outputTemplate);
@@ -496,8 +470,8 @@
           }
         }
         //将链接与state 对应起来
-        this.invokeForm.inputs = input;
-        this.invokeForm.outputs = output;
+        // this.invokeForm.inputs = input;
+        // this.invokeForm.outputs = output;
         this.invokeInfo.inputs = input;
         this.invokeInfo.ouputs = output;
       },
@@ -589,7 +563,7 @@
       },
 
       //动态绑定 更新outputs部分
-      getStateEventOut: function(outputs) {
+      getStateEventOut: function (outputs) {
         // console.log(outputs);
         let outList = this.stateList;
         outList.forEach((state, index) => {
@@ -638,8 +612,6 @@
       },
 
       async bind(event) {
-        console.log(event);
-        // await this.dataURItoBlob(event);
         let address = event.url.split("?")[0];
         let json = {
           name: event.urlName,
@@ -647,8 +619,8 @@
           type: "data",
           userUpload: false,
           address: address,
-          uploaderId: this.pageParams.userId,
-          uploaderName: this.pageParams.userName,
+          uploaderId: this.userId,
+          uploaderName: userInfo.name,
           privacy: "private"
         };
 
@@ -738,6 +710,7 @@
       // },
 
       selectData(val) {
+        let dataContainer = this.$store.state.DataServer;
         let stateIndex = this.stateList.findIndex(
           (state) => state.name == this.currentEvent.stateName
         );

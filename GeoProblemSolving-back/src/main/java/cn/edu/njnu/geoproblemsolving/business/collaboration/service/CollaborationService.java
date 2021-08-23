@@ -65,7 +65,10 @@ public class CollaborationService {
     @Value("${managerServerIpAndPort}")
     String mangeServiceLocation;
 
-//    private CollaborationConfig collaborationConfig;
+    @Value("${dataMethodProxyServerLocation}")
+    String dataProxyServer;
+
+    private CollaborationConfig collaborationConfig;
     private static final Map<String, CollaborationConfig> groups = new ConcurrentHashMap<>(); // collaboration groups
 
     public void msgStart(String groupKey, Session session, EndpointConfig config) {
@@ -218,7 +221,7 @@ public class CollaborationService {
         CollaborationConfig collaborationConfig;
         try {
             String groupKey = toolId + aid;
-            collaborationConfig = groups.get(groupKey);
+            CollaborationConfig collaborationConfig = groups.get(groupKey);
 
             JSONObject messageObject = JSONObject.parseObject(message);
             String messageType = messageObject.getString("type");
@@ -377,7 +380,7 @@ public class CollaborationService {
                         //md5 值，直接前端传过来好了
                         invokeJson.put("pid", serviceMd5);
                         //invokeName
-                        invokeJson.put("username", "zhengzhong");
+                        invokeJson.put("username", sender.getName());
 
                         //invoke 起来获得taskId，由此可将计算任务存入队列
                         HttpHeaders headers = new HttpHeaders();
@@ -409,14 +412,14 @@ public class CollaborationService {
                         refreshJson.put("ip", serviceIp);
                         refreshJson.put("port", servicePort);
                         refreshJson.put("tid", taskId);
-
+                        System.out.println("start: " + groupKey);
+                        System.out.println(collaborationConfig);
                         /*
                         新开 Callable 线程轮询获取模型运行状态
                         数据方法的话，新开线程阻塞等待计算结果即可
                          */
                         Callable<JSONObject> callable = new Callable<JSONObject>() {
                             int index = 0;
-
                             @Override
                             public JSONObject call() throws Exception {
                                 int refreshStatus = 0;
@@ -459,6 +462,8 @@ public class CollaborationService {
                         在同一个 websocket 下，每个子线程对应一个高速缓存进行自己计算
                         返回结果到主线程的话，主线程（单个websocket）对应一个的内存池
                          */
+                        System.out.println("end: " + groupKey);
+                        System.out.println(collaborationConfig);
                         String sucTaskTid = resJson.getString("tid");
                         HashMap<String, ComputeMsg> computeList = computeTasks.getCache(groupKey);
                         ComputeMsg sucMessage = computeList.get(sucTaskTid);
@@ -474,6 +479,7 @@ public class CollaborationService {
                             resourceEntity.setUserUpload(false);
                             resourceEntity.setSuffix("." + suffix);
                             resourceEntity.setUid(UUID.randomUUID().toString());
+                            resourceEntity.setUploadTime(new Date());
                             resourceEntity.setName(fileName);
                             resourceEntity.setAddress(address);
                             resourceEntity.setDescription(fileName);
@@ -507,7 +513,7 @@ public class CollaborationService {
                             }
                         }
 
-                        String dataMethodUrl = "http://111.229.14.128:8898/invokeUrlsDataPcsWithKey";
+                        String dataMethodUrl = "http://"+ dataProxyServer +"/invokeUrlsDataPcsWithKey";
                         JSONObject invokeJson = new JSONObject();
                         invokeJson.put("token", URLEncoder.encode(token));
                         invokeJson.put("pcsId", serviceId);

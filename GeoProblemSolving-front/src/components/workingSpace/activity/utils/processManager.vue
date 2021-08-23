@@ -496,6 +496,7 @@
             v-model="roleProtocol"
             style="width: 200px"
             placeholder="Select"
+            @on-change="roleProtocolChange"
           >
             <Option value="None">None</Option>
             <Option value="All">All</Option>
@@ -526,12 +527,21 @@
           </div>
           <div style="display: flex">
             <div style="margin-top: 5px; width: 72px">Domains:</div>
-            <vue-tags-input
-              class="domain"
-              v-model="domain_tag"
-              :tags="linkDomains"
-              @tags-changed="(newTags) => (linkDomains = newTags)"
-            />
+<!--            <vue-tags-input-->
+<!--              class="domain"-->
+<!--              v-model="domain_tag"-->
+<!--              :tags="linkDomains"-->
+<!--              @tags-changed="(newTags) => (linkDomains = newTags)"-->
+<!--            />-->
+            <Select v-model="selectUserDomain" multiple :max-tag-count = 4>
+              <Option v-for="(item, index) in userDomain" :value="item" :key="index"></Option>
+            </Select>
+          </div>
+          <div style="display: flex">
+            <div style="margin-top: 5px; width: 72px">Organizations:</div>
+            <Select v-model="selectUserOrg" multiple :max-tag-count = 4>
+              <Option v-for="(item, index) in userOrganizations" :value="item" :key="index"></Option>
+            </Select>
           </div>
         </template>
       </div>
@@ -549,6 +559,7 @@
             v-model="resProtocol"
             style="width: 200px"
             placeholder="Select"
+            @on-change="resProtocolChange"
           >
             <Option value="None">None</Option>
             <Option value="All">All</Option>
@@ -561,6 +572,7 @@
             <Select
               v-model="resProtocolForm.types"
               multiple
+              :max-tag-count = 2
               placeholder="Type of resources"
               style="width: 267px"
             >
@@ -646,6 +658,9 @@ export default {
       // user
       // userInfo: JSON.parse(sessionStorage.getItem("userInfo")),
       userRole: "visitor",
+      //userTag
+      selectUserDomain: [],
+      selectUserOrg: [],
       //button
       linkBtn: false,
       removeLinkBtn: false,
@@ -731,6 +746,10 @@ export default {
       // activity 结构信息
       procedureDrag: true,
       nodeData: [],
+      userDomain: [],
+      userOrganizations: [],
+      resTypes: [],
+      resSuffixes: []
     };
   },
   created() {
@@ -1168,7 +1187,7 @@ export default {
           ),
         });
       } catch (ex) {
-        this.$Nothis.info({
+        this.$Notice.info({
           desc: "ERROR!",
         });
         tice;
@@ -1398,57 +1417,70 @@ export default {
         }
       }
     },
-    buildLink() {
+    buildLink: function () {
       //** front link */
       this.processUpdate();
 
       //*** save protocol */
 
       //// normalize protocol
-      // let protocol = {
-      //   resProtocol: this.resProtocol,
-      //   autoUpdate: this.autoUpdate,
-      //   types: this.resProtocolForm.types,
-      //   formats: this.filterTags(this.resProtocolForm.formats),
-      //   concepts: this.filterTags(this.resProtocolForm.concepts),
-      //   scales: this.filterTags(this.resProtocolForm.scales),
-      //   references: this.filterTags(this.resProtocolForm.references),
-      //   units: this.filterTags(this.resProtocolForm.units),
+      let relation  = {
+        graphId: this.activityInfo.aid,
+        type: this.protocalType,
+        nodes: this.activityLinks
+      };
 
-      //   roleProtocol: this.roleProtocol,
-      //   roles: this.linkRoles,
-      //   domains: this.filterTags(this.linkDomains),
-      // };
+      let restriction = {
+        resProtocol: this.resProtocol,
+        autoUpdate: this.autoUpdate,
+        types: this.resProtocolForm.types,
+        formats: this.filterTags(this.resProtocolForm.formats),
+        concepts: this.filterTags(this.resProtocolForm.concepts),
+        scales: this.filterTags(this.resProtocolForm.scales),
+        references: this.filterTags(this.resProtocolForm.references),
+        units: this.filterTags(this.resProtocolForm.units),
+
+        roleProtocol: this.roleProtocol,
+        roles: this.linkRoles,
+        domains: this.selectUserDomain,
+        organizations: this.selectUserOrg
+      };
+
+      let protocolForm = {
+        relation: relation,
+        restriction: restriction
+      }
+
 
       //// save protocol
-      // this.axios
-      //   .post("/GeoProblemSolving/protocol", protocol)
-      //   .then((res) => {
-      //     if (res.data == "Offline") {
-      //       if (this.activityInfo.level == 1) {
-      //         this.$store.commit("userLogout");
-      //         this.$router.push({ name: "Login" });
-      //       } else {
-      //         parent.location.href = "/GeoProblemSolving/login";
-      //       }
-      //     } else if (res.data.code == 0) {
-      //       // 重新渲染
-      //       this.updateStepchart();
-      //       // link in the activity document
-      //       let protocolId = res.data.data.pid;
-      //       this.newLinkStore(this.beginNode.aid, this.endNode.aid, protocolId);
-      //       // clear
-      //       this.selectedActivities = [];
-      //       this.beginNode = {};
-      //       this.endNode = {};
-      //     } else {
-      //       this.$Message.error("Fail to link activities.");
-      //       console.log(res.data.msg);
-      //     }
-      //   })
-      //   .catch((err) => {
-      //     throw err;
-      //   });
+      this.axios
+        .post("/GeoProblemSolving/activityDriven", protocolForm)
+        .then((res) => {
+          if (res.data == "Offline") {
+            if (this.activityInfo.level == 1) {
+              this.$store.commit("userLogout");
+              this.$router.push({ name: "Login" });
+            } else {
+              parent.location.href = "/GeoProblemSolving/login";
+            }
+          } else if (res.data.code == 0) {
+            // 重新渲染
+            this.updateStepchart();
+            // link in the activity document
+            let protocolId = res.data.data.pid;
+            this.newLinkStore(this.beginNode.aid, this.endNode.aid, protocolId);
+            // clear
+            this.selectedActivities = [];
+            this.beginNode = {};
+            this.endNode = {};
+          } else {
+            this.$Message.error("Fail to link activities.");
+            console.log(res.data.msg);
+          }
+        })
+        .catch((err) => {
+          throw err;
+        });
 
       // if save protocol success, update the avtivity document
       // link in the activity document
@@ -1649,6 +1681,58 @@ export default {
         }
       }
     },
+    roleProtocolChange(val){
+      let aidList = [];
+      this.selectedActivities.forEach(activity => {
+        aidList.push(activity.aid);
+      })
+      if (val == "Constraints") {
+        this.axios.get("/GeoProblemSolving/activityDriven/user/tag/" + aidList.toString())
+          .then(res => {
+            let code = res.data.code;
+            if (code != 0){
+              this.$Notice.info({
+                desc: "ERROR!",
+              });
+            }else {
+              let data = res.data.data;
+              this.userDomain = data.domains;
+              this.userOrganizations = data.organizations;
+            }
+          })
+          .catch(e => {
+            this.$Notice.info({
+              desc: "ERROR!",
+            });
+          })
+      }
+    },
+    resProtocolChange(val){
+      let aidList = [];
+      this.selectedActivities.forEach(activity => {
+        aidList.push(activity.aid);
+      })
+      if (val == "Constraints") {
+        this.axios.get("/GeoProblemSolving/activityDriven/res/tag/" + aidList.toString())
+          .then(res => {
+            let code = res.data.code;
+            if (code != 0){
+              this.$Notice.info({
+                desc: "ERROR!",
+              });
+            }else {
+              let data = res.data.data;
+              this.resTypes = data.types;
+              this.resSuffixes = data.suffixes;
+            }
+          })
+          .catch(e => {
+            this.$Notice.info({
+              desc: "ERROR!",
+            });
+          })
+      }
+    }
   },
 };
 </script>
