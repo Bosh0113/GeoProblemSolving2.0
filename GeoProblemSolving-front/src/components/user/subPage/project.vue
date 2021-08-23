@@ -118,88 +118,90 @@
 
                     <!--               项目内容显示        -->
                     <div v-show="userProjectCount.length != 0">
-                      <div
-                        v-if="selectedProjectType.indexOf('createdProject') != -1"
+                      <div v-if="selectedProjectType.indexOf('createdProject') != -1">
+                        <div
                         v-for="(mProject,index) in createdProjectList"
                         v-show="createdProjectList!='None'"
                         :key="'create'+index"
-                      >
-                        <Col span="7" style="margin-left: 3.5%">
-                          <div class="projectItem" @click="goSingleProject(mProject)">
-                            <Card style="height:320px;margin-top:20px;" class="projectCard">
-                              <p slot="title" class="projectsTitle">{{mProject.name}}</p>
-                              <Button
-                                class="authorBtn"
-                                type="default"
-                                slot="extra"
-                                title="Privilege change"
-                                @click.stop="authorizeModalShow(mProject.aid)"
-                                icon="md-happy"
-                              ></Button>
-                              <Button
-                                class="deleteBtn"
-                                type="default"
-                                slot="extra"
-                                style="margin:0 0 0 5px"
-                                @click.stop="deleteProjectModalShow(mProject.aid, mProject.name, mProject.members)"
-                                icon="md-close"
-                                title="remove"
-                              ></Button>
+                        >
+                          <Col span="7" style="margin-left: 3.5%">
+                            <div class="projectItem" @click="goSingleProject(mProject)">
+                              <Card style="height:320px;margin-top:20px;" class="projectCard">
+                                <p slot="title" class="projectsTitle">{{mProject.name}}</p>
+                                <Button
+                                  class="authorBtn"
+                                  type="default"
+                                  slot="extra"
+                                  title="Privilege change"
+                                  @click.stop="authorizeModalShow(mProject.aid)"
+                                  icon="md-happy"
+                                ></Button>
+                                <Button
+                                  class="deleteBtn"
+                                  type="default"
+                                  slot="extra"
+                                  style="margin:0 0 0 5px"
+                                  @click.stop="deleteProjectModalShow(mProject.aid, mProject.name, mProject.members)"
+                                  icon="md-close"
+                                  title="remove"
+                                ></Button>
 
-                              <!--  @click.stop="deleteProjectModalShow(mProject.projectId)" -->
-                              <!-- 表头结束 -->
-                              <!--              200px  -->
-                              <p style="height:200px;" >
-                                <span style="font-weight: bold;">Description</span>
-                                <vue-scroll :ops="ops" style="text-indent:2em;word-break:break-word;white-space: pre-line;">
-                                  {{mProject.description}}
-                                </vue-scroll>
-                              </p>
-                              <br/>
-                              <div>
-                                <span style="float:left">CreateTime:</span>
-                                <span style="float:right">{{mProject.createdTime}}</span>
-                              </div>
-                            </Card>
-                          </div>
-                        </Col>
+                                <!--  @click.stop="deleteProjectModalShow(mProject.projectId)" -->
+                                <!-- 表头结束 -->
+                                <!--              200px  -->
+                                <p style="height:200px;" >
+                                  <span style="font-weight: bold;">Description</span>
+                                  <vue-scroll :ops="ops" style="text-indent:2em;word-break:break-word;white-space: pre-line;">
+                                    {{mProject.description}}
+                                  </vue-scroll>
+                                </p>
+                                <br/>
+                                <div>
+                                  <span style="float:left">CreateTime:</span>
+                                  <span style="float:right">{{mProject.createdTime}}</span>
+                                </div>
+                              </Card>
+                            </div>
+                          </Col>
+                        </div>
                       </div>
+                      
 
-
-                      <div
-                        v-if="selectedProjectType.indexOf('joinedProject') != -1"
+                      <div v-if="selectedProjectType.indexOf('joinedProject') != -1">
+                        <div
                         v-for="(item,Index) in joinedProjectsList"
                         :key="'join'+ Index"
                         v-show="joinedProjectsList!=[]"
-                      >
-                        <Col span="7" style="margin-left: 3.5%">
-                          <div @click="goSingleProject(item)" class="projectItem">
-                            <Card style="height:320px;margin-top:20px;" class="projectCard">
-                              <p
-                                slot="title"
-                                class="projectsTitle"
-                              >{{item.name}}</p>
-      <!--                        @click.stop="quitModalShow(item)"-->
-                              <Button
-                                class="fileBtnHoverRed"
-                                slot="extra"
-                                @click.stop="quitModalShow(item)"
-                              >Quit
-                              </Button>
-                              <p
-                                style="height:200px;"
-                              >
-                                <span style="font-weight: bold">Description</span>
-                                <vue-scroll :ops="ops" style="text-indent:2em;word-break:break-word;white-space: pre-line;">{{item.description}}</vue-scroll>
-                              </p>
-                              <br/>
-                              <div style="height:40px">
-                                <span style="float:left">CreateTime:</span>
-                                <span style="float:right">{{item.createdTime}}</span>
-                              </div>
-                            </Card>
-                          </div>
-                        </Col>
+                        >
+                          <Col span="7" style="margin-left: 3.5%">
+                            <div @click="goSingleProject(item)" class="projectItem">
+                              <Card style="height:320px;margin-top:20px;" class="projectCard">
+                                <p
+                                  slot="title"
+                                  class="projectsTitle"
+                                >{{item.name}}</p>
+        <!--                        @click.stop="quitModalShow(item)"-->
+                                <Button
+                                  class="fileBtnHoverRed"
+                                  slot="extra"
+                                  @click.stop="quitModalShow(item)"
+                                >Quit
+                                </Button>
+                                <p
+                                  style="height:200px;"
+                                >
+                                  <span style="font-weight: bold">Description</span>
+                                  <vue-scroll :ops="ops" style="text-indent:2em;word-break:break-word;white-space: pre-line;">{{item.description}}</vue-scroll>
+                                </p>
+                                <br/>
+                                <div style="height:40px">
+                                  <span style="float:left">CreateTime:</span>
+                                  <span style="float:right">{{item.createdTime}}</span>
+                                </div>
+                              </Card>
+                            </div>
+                          </Col>
+                        </div>
                       </div>
                     </div>
                   </vue-scroll>
@@ -244,7 +246,7 @@
             <Modal
               v-model="deleteProjectModal"
               @on-ok="deleteProject"
-              @on-cancel
+             
               ok-text="Assure"
               cancel-text="Cancel"
             >
@@ -255,7 +257,7 @@
               title="Quit Project"
               v-model="quitModal"
               @on-ok="quitProject()"
-              @on-cancel
+             
               ok-text="Ok"
               cancel-text="Cancel"
             >
@@ -354,89 +356,93 @@
 
                     <!--               项目内容显示        -->
                     <div v-show="userProjectCount.length != 0">
-                      <div
-                        v-if="selectedProjectType.indexOf('createdProject') != -1"
+                      <div v-if="selectedProjectType.indexOf('createdProject') != -1">
+                        <div
                         v-for="(mProject,index) in createdProjectList"
                         v-show="createdProjectList!='None'"
                         :key="'create'+index"
-                      >
-                        <Col span="10" style="margin-left: 3.5%">
-                          <div class="projectItem" @click="goSingleProject(mProject)">
-                            <Card style="height:320px;margin-top:20px;" class="projectCard">
-                              <p slot="title" class="projectsTitle">{{mProject.name}}</p>
-                              <Button
-                                class="authorBtn"
-                                type="default"
-                                slot="extra"
-                                title="Privilege change"
-                                @click.stop="authorizeModalShow(mProject.aid)"
-                                icon="md-happy"
-                              ></Button>
-                              <Button
-                                class="deleteBtn"
-                                type="default"
-                                slot="extra"
-                                style="margin:0 0 0 5px"
-                                @click.stop="deleteProjectModalShow(mProject.aid, mProject.name, mProject.members)"
-                                icon="md-close"
-                                title="remove"
-                              ></Button>
+                        >
+                          <Col span="10" style="margin-left: 3.5%">
+                            <div class="projectItem" @click="goSingleProject(mProject)">
+                              <Card style="height:320px;margin-top:20px;" class="projectCard">
+                                <p slot="title" class="projectsTitle">{{mProject.name}}</p>
+                                <Button
+                                  class="authorBtn"
+                                  type="default"
+                                  slot="extra"
+                                  title="Privilege change"
+                                  @click.stop="authorizeModalShow(mProject.aid)"
+                                  icon="md-happy"
+                                ></Button>
+                                <Button
+                                  class="deleteBtn"
+                                  type="default"
+                                  slot="extra"
+                                  style="margin:0 0 0 5px"
+                                  @click.stop="deleteProjectModalShow(mProject.aid, mProject.name, mProject.members)"
+                                  icon="md-close"
+                                  title="remove"
+                                ></Button>
 
-                              <!--  @click.stop="deleteProjectModalShow(mProject.projectId)" -->
-                              <!-- 表头结束 -->
-                              <!--              200px  -->
-                              <p style="height:200px;" >
-                                <span style="font-weight: bold;">Description</span>
-                                <vue-scroll :ops="ops" style="text-indent:2em;word-break:break-word;white-space: pre-line;">
-                                  {{mProject.description}}
-                                </vue-scroll>
-                              </p>
-                              <br/>
-                              <div>
-                                <span style="float:left">CreateTime:</span>
-                                <span style="float:right">{{mProject.createdTime}}</span>
-                              </div>
-                            </Card>
-                          </div>
-                        </Col>
+                                <!--  @click.stop="deleteProjectModalShow(mProject.projectId)" -->
+                                <!-- 表头结束 -->
+                                <!--              200px  -->
+                                <p style="height:200px;" >
+                                  <span style="font-weight: bold;">Description</span>
+                                  <vue-scroll :ops="ops" style="text-indent:2em;word-break:break-word;white-space: pre-line;">
+                                    {{mProject.description}}
+                                  </vue-scroll>
+                                </p>
+                                <br/>
+                                <div>
+                                  <span style="float:left">CreateTime:</span>
+                                  <span style="float:right">{{mProject.createdTime}}</span>
+                                </div>
+                              </Card>
+                            </div>
+                          </Col>
+                        </div>
+
                       </div>
-
-
-                      <div
-                        v-if="selectedProjectType.indexOf('joinedProject') != -1"
+                      
+                      <div v-if="selectedProjectType.indexOf('joinedProject') != -1">
+                        <div
+                      
                         v-for="(item,Index) in joinedProjectsList"
                         :key="'join'+ Index"
                         v-show="joinedProjectsList!=[]"
-                      >
-                        <Col span="10" style="margin-left: 3.5%">
-                          <div @click="goSingleProject(item)" class="projectItem">
-                            <Card style="height:320px;margin-top:20px;" class="projectCard">
-                              <p
-                                slot="title"
-                                class="projectsTitle"
-                              >{{item.name}}</p>
-      <!--                        @click.stop="quitModalShow(item)"-->
-                              <Button
-                                class="fileBtnHoverRed"
-                                slot="extra"
-                                @click.stop="quitModalShow(item)"
-                              >Quit
-                              </Button>
-                              <p
-                                style="height:200px;"
-                              >
-                                <span style="font-weight: bold">Description</span>
-                                <vue-scroll :ops="ops" style="text-indent:2em;word-break:break-word;white-space: pre-line;">{{item.description}}</vue-scroll>
-                              </p>
-                              <br/>
-                              <div style="height:40px">
-                                <span style="float:left">CreateTime:</span>
-                                <span style="float:right">{{item.createdTime}}</span>
-                              </div>
-                            </Card>
-                          </div>
-                        </Col>
+                        >
+                          <Col span="10" style="margin-left: 3.5%">
+                            <div @click="goSingleProject(item)" class="projectItem">
+                              <Card style="height:320px;margin-top:20px;" class="projectCard">
+                                <p
+                                  slot="title"
+                                  class="projectsTitle"
+                                >{{item.name}}</p>
+        <!--                        @click.stop="quitModalShow(item)"-->
+                                <Button
+                                  class="fileBtnHoverRed"
+                                  slot="extra"
+                                  @click.stop="quitModalShow(item)"
+                                >Quit
+                                </Button>
+                                <p
+                                  style="height:200px;"
+                                >
+                                  <span style="font-weight: bold">Description</span>
+                                  <vue-scroll :ops="ops" style="text-indent:2em;word-break:break-word;white-space: pre-line;">{{item.description}}</vue-scroll>
+                                </p>
+                                <br/>
+                                <div style="height:40px">
+                                  <span style="float:left">CreateTime:</span>
+                                  <span style="float:right">{{item.createdTime}}</span>
+                                </div>
+                              </Card>
+                            </div>
+                          </Col>
+                        </div>
                       </div>
+                      
                     </div>
                   </vue-scroll>
                 </div>
@@ -480,7 +486,7 @@
             <Modal
               v-model="deleteProjectModal"
               @on-ok="deleteProject"
-              @on-cancel
+              
               ok-text="Assure"
               cancel-text="Cancel"
             >
@@ -491,7 +497,7 @@
               title="Quit Project"
               v-model="quitModal"
               @on-ok="quitProject()"
-              @on-cancel
+              
               ok-text="Ok"
               cancel-text="Cancel"
             >
@@ -608,14 +614,13 @@
       },
       getUserProject: function () {
         let userInfo = this.$store.getters.userInfo;
-
         if (userInfo.createdProjects != null) {
           let createdProjectIds = userInfo.createdProjects.toString();
           // project/getProjects?aids=  用户获取项目
           this.$axios.get("/GeoProblemSolving/project/getProjects?aids=" + createdProjectIds)
             .then(res => {
               this.$set(this, "createdProjectList", res.data.data)
-              console.log(res.data.data)
+              
             })
             .catch(err => {
               this.$Message.error("Loading project failed.")
@@ -628,7 +633,7 @@
           this.$axios.get("/GeoProblemSolving/project/getProjects?aids=" + joinedProjectIds)
             .then(res => {
               this.$set(this, "joinedProjectsList", res.data.data)
-              console.log(res.data.data)
+              
             })
             .catch(err => {
               this.$Message.error("Loading project failed.")
