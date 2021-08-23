@@ -726,7 +726,6 @@
           return this.avatar;
         }
         let temp = this.userInfo.avatar;
-        console.log(temp);
         if (this.avatar != undefined && this.avatar != null && this.avatar != '' && this.avatar.indexOf("/avatar/") != -1) {
           this.avatar = this.$store.getters.userServer + this.avatar;
         } else if (temp != undefined & temp != null && temp != '' && temp.indexOf("/avatar/") != -1){

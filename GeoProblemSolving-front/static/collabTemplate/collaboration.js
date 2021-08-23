@@ -428,7 +428,7 @@ var taskList = [];
             async: false,
             success: function (result) {
                 if (result == "Offline") {
-                    confirm("You are offline, please login.")
+                    // confirm("You are offline, please login.")
                 } else if (result.code == 0) {
                     let rootRes = result.data;
                     resources = resToCurrentFolder(rootRes);
@@ -590,7 +590,7 @@ var taskList = [];
             async: false,
             success: function (result) {
                 if (result == "Offline") {
-                    confirm("You are offline, please login.")
+                    // confirm("You are offline, please login.")
                 } else if (result.code == 0) {
                     let rootRes = result.data;
                     resources = resToCurrentFolder(rootRes);

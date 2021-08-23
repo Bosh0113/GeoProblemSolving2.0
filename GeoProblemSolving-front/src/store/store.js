@@ -105,6 +105,7 @@ export default new Vuex.Store({
       state.userInfo = userInfo;
     },
     updateProject: (state, projectId) => {
+      //删除某项project
       let index = state.userInfo.createdProjects.indexOf(projectId);
       state.userInfo.createdProjects.splice(index, 1);
     },

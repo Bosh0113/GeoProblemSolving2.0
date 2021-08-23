@@ -35,7 +35,7 @@ import toolBox from "../utils/toolBox";
 import actionContainer from "../utils/taskflow/actionContainer";
 import infoBtn from "../utils/infoBtn";
 export default {
-  props: ["activityInfo"],
+  props: ["activityInfo","participants"],
   components: {
     resList,
     toolBox,

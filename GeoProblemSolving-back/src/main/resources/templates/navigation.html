@@ -105,7 +105,7 @@
     </style>
     <template th:fragment="commonHeader-html" id="navigation">
         <div style="position: fixed;z-index: 99;">
-            <header style="position:inherit;min-width: -webkit-fill-available;">
+            <header style="position:inherit;">
                 <img :src='window.location.origin+"/GeoProblemSolving/Images/OGMS.png"' id="logo" class="pic" @click="goHome" style="cursor:pointer;margin-left:5%">
                 <div v-if="useMenuCSS">
                     <div class="navPart">
@@ -236,7 +236,7 @@
                     if(this.userInfo.userState){
                         this.userInfoNav = this.userInfo;
                         if (this.userInfoNav.avatar != null && this.userInfoNav.avatar != undefined && this.userInfoNav.avatar!= ''){
-                            this.avatarUrl =  "http://94.191.49.160:8080/userServer" + this.userInfoNav.avatar;
+                            this.avatarUrl =  "http://172.21.212.103:8088/userServer" + this.userInfoNav.avatar;
                             // this.avatarUrl =  "http://172.21.212.103:8088/userServer" + this.userInfoNav.avatar;
                         }
                         this.setTimer();
