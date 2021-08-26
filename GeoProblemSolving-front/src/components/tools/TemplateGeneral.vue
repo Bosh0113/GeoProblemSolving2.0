@@ -402,7 +402,7 @@ export default {
       },
       modelItemLoading: false,
       stepList: [
-        "General step",
+        "All",
         "Context definition & resource collection",
         "Data processing",
         "Data visualization",

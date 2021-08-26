@@ -182,7 +182,7 @@
                         <!-- 反射面信息 -->
                         <div id="reflectInfo" style="display:none;margin-bottom: 1em">
                             <label><input id="hasReflect" type="checkbox" style="width:1em" value=""
-                                    onclick="onHasReflectChanged()">Have reflective surface?</label>
+                                    onclick="onHasReflectChanged(this.id)"> Have reflective surface?</label>
                             <div class="panel panel-default" style="margin-bottom: 0;">
                                 <div id="reflect" class="panel-body">
                                     <div class="form-group has-feedback">
@@ -222,7 +222,7 @@
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close
                         </button>
 
-                        <button type="button" class="btn btn-primary" onclick="onSetRoadInfoClick()">
+                        <button type="button" class="btn btn-primary" onclick="onSetRoadInfoClick()" id="roadInfoSubmit">
                             Submit
                         </button>
                     </div>
@@ -262,7 +262,7 @@
                         <button type="button" class="btn btn-default" data-dismiss="modal">
                             Close
                         </button>
-                        <button type="button" class="btn btn-primary" onclick="onSetBuildingInfoClick()">
+                        <button type="button" class="btn btn-primary" onclick="onSetBuildingInfoClick()"  id="buildingInfoSubmit">
                             Submit
                         </button>
                     </div>
@@ -302,7 +302,7 @@
                         <button type="button" class="btn btn-default" data-dismiss="modal">
                             Close
                         </button>
-                        <button type="button" class="btn btn-primary" onclick="onSetBarrierInfoClick()">
+                        <button type="button" class="btn btn-primary" onclick="onSetBarrierInfoClick()" id="barrierInfoSubmit">
                             Submit
                         </button>
                     </div>
@@ -319,19 +319,19 @@
 
                         <div class="form-group has-feedback">
                             <label class="control-label">Sample Size</label>
-                            <input type="text" class="form-control" id="sampleSize">
+                            <input type="text" class="form-control" id="sampleSize"  onchange="paramChanged(this.id, this.value)">
                             <span class="form-control-feedback">m</span>
                         </div>
 
                         <div class="form-group has-feedback">
                             <label class="control-label">Height of ROI</label>
-                            <input type="text" class="form-control" id="ROIHeight">
+                            <input type="text" class="form-control" id="ROIHeight"  onchange="paramChanged(this.id, this.value)">
                             <span class="form-control-feedback">m</span>
                         </div>
                         <div style="margin-left: 50%;">
                             <button type="button" class="btn btn-default" data-dismiss="modal">Close
                             </button>
-                            <button type="button" class="btn btn-primary" onclick="onRunModel()">
+                            <button type="button" class="btn btn-primary" onclick="onRunModel()" id="runModelBtn">
                                 Run
                             </button>
                         </div>
@@ -348,31 +348,31 @@
 
             <tr>
                 <td>
-                    <input type="button" class="imgButton" style="background:  url(./img/ico/Mouse.png);" title="鼠标"
+                    <input type="button" class="imgButton" style="background:  url(./img/ico/Mouse.png);" title="Pointer"
                         onclick="onMouseClick()">
                 </td>
             </tr>
             <tr>
                 <td>
-                    <input type="button" class="imgButton" style="background:  url(./img/ico/Info.png);" title="编辑属性"
+                    <input type="button" class="imgButton" style="background:  url(./img/ico/Info.png);" title="Edit information"
                         onclick="onEditInfoClick()">
                 </td>
             </tr>
             <tr>
                 <td>
-                    <input type="button" class="imgButton" style="background: url(./img/ico/Select.png);" title="选择计算区域"
+                    <input type="button" class="imgButton" style="background: url(./img/ico/Select.png);" title="Select the simulation area"
                         onclick="onSelectClick()">
                 </td>
             </tr>
             <tr>
                 <td>
-                    <input type="button" class="imgButton" style="background: url(./img/ico/Run.png);" title="运行"
+                    <input type="button" class="imgButton" style="background: url(./img/ico/Run.png);" title="Run"
                         onclick="onBeforeRun()">
                 </td>
             </tr>
             <tr>
                 <td>
-                    <input type="button" class="imgButton" style="background: url(./img/ico/Clean.png);" title="清除结果数据"
+                    <input type="button" class="imgButton" style="background: url(./img/ico/Clean.png);" title="Clear"
                         onclick="onCleanClick()">
                 </td>
             </tr>

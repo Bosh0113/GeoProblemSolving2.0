@@ -6,7 +6,7 @@
     <div id="collab-tool-content" class="scrollbar">
       <div v-if="toolBackendType == 'modelItem'">
         <!--        循环多个state-->
-        <Row v-for="(modelState,index) in stateList" :key="modelState.id">
+        <Row v-for="modelState in stateList" :key="modelState.id">
           <!--          左侧 state 简介-->
           <Col span="5"></Col>
           <!--          右侧数据、参数界面-->

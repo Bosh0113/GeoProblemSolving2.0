@@ -8,35 +8,40 @@
       :resources="resources"
       v-on:resourceUrl="selecetResource"
     ></toolStyle>
-    <div style="width: 300px; padding:30px;margin-left:60px; float:left">
+    <div style="width: 300px; padding: 30px; margin-left: 60px; float: left">
       <h3>Select data:</h3>
       <RadioGroup v-model="SelectAxis">
-        <Radio label="Name" style="padding:20px 0 10px 0"></Radio>
-        <Input v-model="SelectX" style="width:200px" readonly />
-        <Radio label="Value" style="padding:20px 0 10px 0"></Radio>
-        <Input v-model="SelectY" style="width:200px" readonly />
+        <Radio label="Name" style="padding: 20px 0 10px 0"></Radio>
+        <Input v-model="SelectX" style="width: 200px" readonly />
+        <Radio label="Value" style="padding: 20px 0 10px 0"></Radio>
+        <Input v-model="SelectY" style="width: 200px" readonly />
       </RadioGroup>
       <RadioGroup v-model="sort">
-        <Radio label="ascending" style="padding:20px 20px 10px 0"></Radio>
-        <Radio label="descending" style="padding:20px 20px 10px 0"></Radio>
+        <Radio label="ascending" style="padding: 20px 20px 10px 0"></Radio>
+        <Radio label="descending" style="padding: 20px 20px 10px 0"></Radio>
       </RadioGroup>
-      <Button @click="Visualize" style="margin-top:30px">Visualization</Button>
-      <Button v-if="visualization" @click="back2Table" style="margin-top:30px">Select data</Button>
+      <Button @click="Visualize" style="margin-top: 30px">Visualization</Button>
+      <Button v-if="visualization" @click="back2Table" style="margin-top: 30px"
+        >Select data</Button
+      >
     </div>
-    <div style="padding-top:30px; float:left; width: calc(100vw - 400px)">
+    <div style="padding-top: 30px; float: left; width: calc(100vw - 400px)">
       <div
         v-show="visualization"
         id="visualization"
-        style="width: calc(100vw - 400px); height:calc(90vh);background-color:#f8f8f9"
+        style="
+          width: calc(100vw - 400px);
+          height: calc(90vh);
+          background-color: #f8f8f9;
+        "
       ></div>
       <div v-show="!visualization">
-        <div id="mytable" style="height:calc(90vh)"></div>
+        <div id="mytable" style="height: calc(90vh)"></div>
       </div>
     </div>
   </Row>
 </template>
 <script>
-import * as socketApi from "@/api/socket.js";
 import csv from "@static/js/jquery.csv.min.js";
 import jexcel from "@static/js/jquery.jexcel.js";
 import XLSX from "xlsx";
@@ -67,22 +72,49 @@ export default {
       pageParams: { pageId: "", userId: "", userName: "" },
       userInfo: {},
       //协同消息
-      socket_content: {},
+      send_content: {},
       participants: [],
-      olParticipants: [],
       resources: [],
-      dataUrl: ""
+      loadData: "",
     };
   },
   beforeDestroy() {
     // this.socketApi.close();
   },
   mounted() {
+    // 加载协同组件
+    loadCollabComponent();
+    this.getStepInfo();
+
     this.init();
-    this.getResources();
-    this.startWebSocket();
   },
   methods: {
+    getStepInfo() {
+      if (componentStatus) {
+        // 获取数据
+        this.activityInfo = activityInfo;
+        this.userInfo = userInfo;
+        this.resources = resources.files;
+
+        this.participants.push(userInfo);
+        this.pageParams.pageId = activityInfo.aid;
+        this.pageParams.userId = userInfo.userId;
+        this.pageParams.userName = userInfo.userName;
+
+        // 绑定函数
+        buildSocketChannel(
+          this.getSocketOperation,
+          null,
+          null,
+          this.getSocketParticipants
+        );
+      } else {
+        let _this = this;
+        setTimeout(function () {
+          _this.getStepInfo();
+        }, 1000);
+      }
+    },
     init() {
       $("#app").css("min-width", "0");
       $("#app").css("min-height", "0");
@@ -90,68 +122,18 @@ export default {
       $("#mytable").jexcel({
         data: this.testData,
         minDimensions: [20, 20],
-        onselection: this.selectData
+        onselection: this.selectData,
       });
-      this.getStepInfo();
-      this.getUserInfo();
-    },
-    getStepInfo() {
-      if (
-        this.$route.params.groupID == undefined ||
-        this.$route.params.groupID == ""
-      ) {
-        var href = window.location.href;
-        var url = href.split("&");
-
-        for (var i = 0; i < url.length; i++) {
-          if (/groupID/.test(url[i])) {
-            this.pageParams.pageId = url[i].match(/groupID=(\S*)/)[1];
-            continue;
-          }
-
-          if (/userID/.test(url[i])) {
-            this.pageParams.userId = url[i].match(/userID=(\S*)/)[1];
-            continue;
-          }
-
-          if (/userName/.test(url[i])) {
-            this.pageParams.userName = url[i].match(/userName=(\S*)/)[1];
-            continue;
-          }
-        }
-      } else {
-        this.pageParams.pageId = this.$route.params.groupID;
-        this.pageParams.userId = this.$route.params.userID;
-        this.pageParams.userName = this.$route.params.userName;
-      }
-    },
-    getUserInfo() {
-      this.userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
-      if (this.userInfo == {}) {
-        this.axios
-          .get(
-            "/GeoProblemSolving/user" +
-            "?key=userId" +
-            "&value=" +
-              this.pageParams.userId
-          )
-          .then(res => {
-            if (res.data.code == 0) {
-              this.$set(this, "userInfo", res.data.data);
-            }
-          })
-          .catch(err => {});
-      }
     },
     fillTable(file) {
       var that = this;
       var fileReader = new FileReader();
       fileReader.readAsBinaryString(file);
-      fileReader.onload = ev => {
+      fileReader.onload = (ev) => {
         try {
           const data = ev.target.result;
           const workbook = XLSX.read(data, {
-            type: "binary"
+            type: "binary",
           });
           const wsname = workbook.SheetNames[0]; //取第一张表
           const ws = XLSX.utils.sheet_to_json(workbook.Sheets[wsname]);
@@ -176,14 +158,14 @@ export default {
             tableOverflow: false,
             minDimensions: [20, 20],
             csvHeaders: true,
-            onselection: that.selectData
+            onselection: that.selectData,
           });
           that.$refs.upload.value = "";
         } catch (e) {
           return false;
         }
       };
-      fileReader.onerror = function() {
+      fileReader.onerror = function () {
         this.$Message.error("Input data error.");
         that.showFile = false;
         that.uploadGeoJson = null;
@@ -208,13 +190,13 @@ export default {
       } catch (e) {}
 
       if (this.SelectAxis == "Name") {
-        this.socket_content["startX"] = startXY;
-        this.socket_content["endX"] = endXY;
+        this.send_content["startX"] = startXY;
+        this.send_content["endX"] = endXY;
         this.SelectX = start + "->" + end;
         this.DataX = this.getData(startXY, endXY);
       } else if (this.SelectAxis == "Value") {
-        this.socket_content["startY"] = startXY;
-        this.socket_content["endY"] = endXY;
+        this.send_content["startY"] = startXY;
+        this.send_content["endY"] = endXY;
         this.SelectY = start + "->" + end;
         this.DataY = this.getData(startXY, endXY);
       }
@@ -264,15 +246,15 @@ export default {
       var option = {
         tooltip: {
           trigger: "item",
-          formatter: "{a} <br/>{b} : {c}%"
+          formatter: "{a} <br/>{b} : {c}%",
         },
         toolbox: {
           feature: {
-            saveAsImage: {}
-          }
+            saveAsImage: {},
+          },
         },
         legend: {
-          data:[]
+          data: [],
         },
         series: [
           {
@@ -281,25 +263,25 @@ export default {
             sort: this.sort,
             label: {
               show: true,
-              position: "inside"
+              position: "inside",
             },
             itemStyle: {
               borderColor: "#fff",
-              borderWidth: 1
+              borderWidth: 1,
             },
             emphasis: {
               label: {
-                fontSize: 20
-              }
-            }
-          }
-        ]
+                fontSize: 20,
+              },
+            },
+          },
+        ],
       };
       for (let i = 1; i < dataLength; i++) {
         option.legend.data.push(this.DataX[0][i]);
         option.series[0].data.push({
           value: this.DataY[0][i],
-          name: this.DataX[0][i]
+          name: this.DataX[0][i],
         });
       }
       if (this.Charts == null) {
@@ -311,130 +293,104 @@ export default {
       if (this.DataX.length == 0 || this.DataY.length == 0) {
         return;
       }
-      this.socket_content["chartType"] = this.chooseType;
-      this.socket_content["operate"] = "visualize";
-      this.socketApi.sendSock(this.socket_content, this.getSocketConnect);
-      // this.socket_content = {};
+
+      this.send_content = {
+        type: "operation",
+        sender: this.userInfo.userId,
+        behavior: "visualize",
+        content: {
+          chartType: this.chooseType,
+        },
+      };
+      sendCustomOperation(this.send_content);
 
       this.showCharts();
     },
-    getSocketConnect(data) {
+    getSocketParticipants(data) {
+      if (data.type === "members") {
+        if (data.behavior == "on") {
+          this.participants = [];
+          for (let i = 0; i < data.participants.length; i++) {
+            this.participants.push(data.participants[i]);
+          }
+        } else if (data.behavior == "off") {
+           for(let i = 0; i < this.participants.length; i++) {
+             if(this.participants[i].userId === data.activeUser.userId) {
+               this.participants.splice(i,1);
+             }
+           }
+        }
+      }
+    },
+    getSocketOperation(data) {
       let socketData = data;
 
-      if (socketData.from === "Test") {
-      } else if (socketData.type === "members") {
-        let members = data.message
-          .replace("[", "")
-          .replace("]", "")
-          .replace(/\s/g, "")
-          .split(",");
-        this.olParticipants = members;
-        this.olParticipantChange();
-      } else {
-        if (socketData.operate === "visualize") {
-          this.chooseType = socketData.chartType;
+      if (socketData.type === "operation") {
+        if (socketData.behavior === "visualize") {
+          this.chooseType = socketData.content.chartType;
           try {
             let start =
               String.fromCharCode(
-                parseInt(socketData.startX[0]) + "A".charCodeAt()
+                parseInt(socketData.content.startX[0]) + "A".charCodeAt()
               ) +
-              (parseInt(socketData.startX[1]) + 1);
+              (parseInt(socketData.content.startX[1]) + 1);
             let end =
               String.fromCharCode(
-                parseInt(socketData.endX[0]) + "A".charCodeAt()
+                parseInt(socketData.content.endX[0]) + "A".charCodeAt()
               ) +
-              (parseInt(socketData.endX[1]) + 1);
+              (parseInt(socketData.content.endX[1]) + 1);
             this.SelectX = start + "->" + end;
-            this.DataX = this.getData(socketData.startX, socketData.endX);
+            this.DataX = this.getData(
+              socketData.content.startX,
+              socketData.content.endX
+            );
 
             start =
               String.fromCharCode(
-                parseInt(socketData.startY[0]) + "A".charCodeAt()
+                parseInt(socketData.content.startY[0]) + "A".charCodeAt()
               ) +
-              (parseInt(socketData.startY[1]) + 1);
+              (parseInt(socketData.content.startY[1]) + 1);
             end =
               String.fromCharCode(
-                parseInt(socketData.endY[0]) + "A".charCodeAt()
+                parseInt(socketData.content.endY[0]) + "A".charCodeAt()
               ) +
-              (parseInt(socketData.endY[1]) + 1);
+              (parseInt(socketData.content.endY[1]) + 1);
             this.SelectY = start + "->" + end;
-            this.DataY = this.getData(socketData.startY, socketData.endY);
+            this.DataY = this.getData(
+              socketData.content.startY,
+              socketData.content.endY
+            );
           } catch (e) {}
           this.showCharts();
-        } else if (socketData.operate === "selectdata") {
-          this.dataUrl = socketData.pathURL;
+        } else if (socketData.behavior === "selectdata") {
+          this.loadData = socketData.content.data;
           this.viewData();
         }
       }
     },
-    startWebSocket() {
-      if (this.pageParams.pageId == undefined || this.pageParams.pageId == "") {
-        this.$Message.error("Lose the information of current step.");
-        return false;
-      }
-
-      let roomId = this.pageParams.pageId;
-      this.socketApi.initWebSocket(
-        "ChartsServer/" + "funnel" + roomId,
-        this.$store.state.IP_Port
-      );
-
-      this.send_msg = {
-        type: "test",
-        from: "Test",
-        content: "TestChat"
-      };
-      this.socketApi.sendSock(this.send_msg, this.getSocketConnect);
-    },
-    getResources() {
-      if (this.pageParams.pageId == undefined || this.pageParams.pageId == "") {
-        this.$Message.error("Lose the information of current step.");
-        return false;
-      }
-
-      this.resources = [];
-      this.axios
-        .get(
-          "/GeoProblemSolving/folder/inquiry?folderId=" + this.pageParams.pageId
-        )
-        .then(res => {
-          // 写渲染函数，取到所有资源
-          if (res.data !== "None") {
-            for (let i = 0; i < res.data.files.length; i++) {
-              if (
-                res.data.files[i].type == "data" &&
-                /\.(xls|xlsx|csv)$/.test(res.data.files[i].name.toLowerCase())
-              ) {
-                this.resources.push(res.data.files[i]);
-              }
-            }
-          } else {
-            this.resources = [];
-          }
-        })
-        .catch(err => {
-          console.log(err.data);
-        });
-    },
-    selecetResource(url) {
-      this.dataUrl = url;
+    selecetResource(data) {
+      this.loadData = data;
 
       // 协同
       this.send_content = {
-        operate: "selectdata",
-        pathURL: this.dataUrl
+        type: "operation",
+        sender: this.userInfo.userId,
+        behavior: "selectdata",
+        content: {
+          data: this.loadData,
+        },
       };
-      this.socketApi.sendSock(this.send_content, this.getSocketConnect);
+      sendCustomOperation(this.send_content);
 
       this.viewData();
     },
     viewData() {
-      if (/\.(csv|xls|xlsx)$/.test(this.dataUrl.toLowerCase())) {
+      if (/\.(csv|xls|xlsx)$/.test(this.loadData.suffix.toLowerCase())) {
         var that = this;
         var xhr = new XMLHttpRequest();
-        xhr.open("GET", this.dataUrl, true);
+        xhr.open("GET", this.loadData.address, true);
         xhr.responseType = "blob";
-        xhr.onload = function(e) {
+        xhr.onload = function (e) {
           if (this.status == 200) {
             var file = this.response;
             that.fillTable(file);
@@ -447,75 +403,7 @@ export default {
 
       this.showFile = false;
     },
-    olParticipantChange() {
-      let userIndex = -1;
-
-      // 自己刚上线，olParticipants空
-      if (this.participants.length == 0) {
-        for (let i = 0; i < this.olParticipants.length; i++) {
-          this.axios
-            .get(
-              "/GeoProblemSolving/user" +
-            "?key=userId" +
-            "&value=" +
-                this.olParticipants[i]
-            )
-            .then(res => {
-              if (res.data.code == 0) {
-                this.participants.push(res.data.data);
-              } else if (res.data == "None") {
-              }
-            });
-        }
-      } else {
-        // members大于olParticipants，有人上线；小于olParticipants，离线
-        if (this.olParticipants.length > this.participants.length) {
-          for (var i = 0; i < this.olParticipants.length; i++) {
-            for (var j = 0; j < this.participants.length; j++) {
-              if (this.olParticipants[i] == this.participants[j].userId) {
-                break;
-              }
-            }
-            if (j == this.participants.length) {
-              userIndex = i;
-              break;
-            }
-          }
-
-          // 人员渲染
-          var that = this;
-          this.axios
-            .get(
-              "/GeoProblemSolving/user" +
-            "?key=userId" +
-            "&value=" +
-                this.olParticipants[userIndex]
-            )
-            .then(res => {
-              if (res.data.code == 0) {
-                that.participants.push(res.data.data);
-                if (userIndex != -1) {
-                }
-              } else {
-              }
-            });
-        } else if (this.olParticipants.length < this.participants.length) {
-          for (var i = 0; i < this.participants.length; i++) {
-            for (var j = 0; j < this.olParticipants.length; j++) {
-              if (this.participants[i].userId == this.olParticipants[j]) {
-                break;
-              }
-            }
-            if (j == this.olParticipants.length) {
-              userIndex = i;
-              break;
-            }
-          }
-          this.participants.splice(userIndex, 1);
-        }
-      }
-    }
-  }
+  },
 };
 </script>
 

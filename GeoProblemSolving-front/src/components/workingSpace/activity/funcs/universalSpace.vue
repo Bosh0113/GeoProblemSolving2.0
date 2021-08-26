@@ -3,7 +3,7 @@
     <div
       style="
         width: 100%;
-        height: calc(100vh - 115px);
+        height: calc(100vh - 225px);
         float: left
       "
     >

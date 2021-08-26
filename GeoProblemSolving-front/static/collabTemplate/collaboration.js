@@ -761,7 +761,7 @@ var taskList = [];
 
     function resaveFile(file, info) {
 
-        var formData = new FormData();
+        let formData = new FormData();
         formData.append("file", file);
         formData.append("resInfo", info);
 
@@ -769,8 +769,9 @@ var taskList = [];
         if (temp.length == 0) {
             temp = ["0"];
         }
-        let paths = temp.toString();
+        let paths = temp.toString()
 
+        let result = null;
         $.ajax({
             url: `/GeoProblemSolving/rip/file/${activityInfo.aid}/${paths}`,
             type: "PUT",
@@ -780,7 +781,7 @@ var taskList = [];
             contentType: false,
             cache: false,
             async: false,
-            success: function (data) {                
+            success: function (data) {
                 let result;
                 try {
                     result = JSON.parse(data);
@@ -798,7 +799,7 @@ var taskList = [];
                 throw err;
             }
         });
-        return "success";
+        return resultData;
     }
 
     function deleteResource() { }
@@ -1066,16 +1067,18 @@ var taskList = [];
     var operationChannel = null;
     var dataChannel = null;
     var computationChannel = null;
+    var participantChannel = null;
 
     var CollabSocket = {
         websock: null,
         timer: null,
         websockLinked: false,
 
-        initSocketChannel: function (opeChannel, dataChannel, compChannel) {
+        initSocketChannel: function (opeChannel, dataChannel, compChannel, peopleChannel) {
             operationChannel = opeChannel;
             dataChannel = dataChannel;
             computationChannel = compChannel;
+            participantChannel = peopleChannel;
         },
 
         initWebSocket: function (aid, toolId) { //初始化websocket
@@ -1137,7 +1140,11 @@ var taskList = [];
                         if (data.behavior == "on") {
                             personOnline(data.participants);
                         } else if (data.behavior == "off") {
-                            personOffline(activeUser);
+                            personOffline(data.activeUser);
+                        }
+
+                        if (participantChannel != undefined && typeof participantChannel == "function") {
+                            participantChannel(data);
                         }
                         break;
                     }
@@ -1398,8 +1405,18 @@ var taskList = [];
             }
         },
 
-        reciveParametersOperation(domId, inputType, style, value, attributes) {
-
+        reciveElementChangeOperation(paramsMsg) {
+            if (this.websock.readyState === this.websock.OPEN) {
+                this.websocketSend(paramsMsg);
+            } else if (this.websock.readyState === this.websock.CONNECTING) {
+                setTimeout(function () {
+                    this.reciveElementChangeOperation(inputParams);
+                }, 1000)
+            } else {
+                setTimeout(function () {
+                    this.reciveElementChangeOperation(inputParams);
+                }, 1000)
+            }
         },
 
 
@@ -1523,8 +1540,20 @@ var taskList = [];
      * @param value
      * @param attributes
      */
-    function sendInputParamsOperation(domId, inputType, style, value, attributes) {
-        CollabSocket.reciveParametersOperation(domId, inputType, style, value, attributes);
+    function sendElementChangeOperation(elemId, behavior, type, value, style, attributes) {
+        var change = {
+                type: "operation",
+                behavior: behavior,
+                content: {
+                    id: elemId,
+                    type: type,
+                    value: value,
+                    style: style,
+                    attributes: attributes
+                },
+                sender: userInfo.userId
+        }
+        CollabSocket.reciveElementChangeOperation(change);
     }
 
     function sendInputParams(inputParams) {
@@ -1549,8 +1578,8 @@ var taskList = [];
      * 建立协同数据通道
      * build call back channel
      */
-    function buildSocketChannel(opeChannel, dataChannel, compChannel) {
-        CollabSocket.initSocketChannel(opeChannel, dataChannel, compChannel);
+    function buildSocketChannel(opeChannel, dataChannel, compChannel, peopleChannel) {
+        CollabSocket.initSocketChannel(opeChannel, dataChannel, compChannel, peopleChannel);
     }
 
     //

@@ -1067,16 +1067,18 @@ var taskList = [];
     var operationChannel = null;
     var dataChannel = null;
     var computationChannel = null;
+    var participantChannel = null;
 
     var CollabSocket = {
         websock: null,
         timer: null,
         websockLinked: false,
 
-        initSocketChannel: function (opeChannel, dataChannel, compChannel) {
+        initSocketChannel: function (opeChannel, dataChannel, compChannel, peopleChannel) {
             operationChannel = opeChannel;
             dataChannel = dataChannel;
             computationChannel = compChannel;
+            participantChannel = peopleChannel;
         },
 
         initWebSocket: function (aid, toolId) { //初始化websocket
@@ -1138,7 +1140,11 @@ var taskList = [];
                         if (data.behavior == "on") {
                             personOnline(data.participants);
                         } else if (data.behavior == "off") {
-                            personOffline(activeUser);
+                            personOffline(data.activeUser);
+                        }
+
+                        if (participantChannel != undefined && typeof participantChannel == "function") {
+                            participantChannel(data);
                         }
                         break;
                     }
@@ -1534,12 +1540,13 @@ var taskList = [];
      * @param value
      * @param attributes
      */
-    function sendElementChangeOperation(elemId, behavior, value, style, attributes) {
+    function sendElementChangeOperation(elemId, behavior, type, value, style, attributes) {
         var change = {
                 type: "operation",
                 behavior: behavior,
                 content: {
                     id: elemId,
+                    type: type,
                     value: value,
                     style: style,
                     attributes: attributes
@@ -1571,8 +1578,8 @@ var taskList = [];
      * 建立协同数据通道
      * build call back channel
      */
-    function buildSocketChannel(opeChannel, dataChannel, compChannel) {
-        CollabSocket.initSocketChannel(opeChannel, dataChannel, compChannel);
+    function buildSocketChannel(opeChannel, dataChannel, compChannel, peopleChannel) {
+        CollabSocket.initSocketChannel(opeChannel, dataChannel, compChannel, peopleChannel);
     }
 
     //

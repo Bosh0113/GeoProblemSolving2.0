@@ -676,7 +676,7 @@
                       .post("/GeoProblemSolving/notice/save", notice)
                       .then(res => {
                         if (res.data == "Success") {
-                          this.$emit("sendNotice", {"type": "Notice", "receiver": item.userId});
+                          this.$emit("sendNotice", {"type": "Notice", "recipientId": item.userId});
                         }
                       })
                       .catch(err => {
@@ -760,7 +760,7 @@
                 .post("/GeoProblemSolving/notice/save", notice)
                 .then(res => {
                   if (res.data == "Success") {
-                    this.$emit("sendNotice", recipientId);
+                    this.$emit("sendNotice", {"type": "Notice", "recipientId": recipientId});
                   }
                 })
                 .catch(err => {
@@ -814,7 +814,7 @@
                 .then(res => {
                   if (res.data == "Success") {
                     //调用父组件（Navigation.vue）websocket推送信息给对象
-                    this.$emit("sendNotice", {"type": "Notice", "receiver": creatorId});
+                    this.$emit("sendNotice", {"type": "Notice", "recipientId": creatorId});
                   }
                 })
                 .catch(err => {

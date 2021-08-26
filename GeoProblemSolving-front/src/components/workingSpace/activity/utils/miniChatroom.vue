@@ -425,7 +425,7 @@ export default {
         sender: this.$store.getters.userId,
         receivers: [this.$store.getters.userId],
       };
-      this.socketApi.sendSock(send_msg, this.getSocketConnect);
+      this.socketApi.sendSock("MsgServer/" + this.activityInfo.aid, send_msg, this.getSocketConnect);
     },
     getSocketConnect(data) {
       this.receivedChatMsgs = [];
@@ -495,14 +495,14 @@ export default {
       let current_time = myDate.toLocaleString(); //获取日期与时间
       // 消息不为空
       if (!this.typingMsg.match(/^[ ]*$/)) {
-        if (this.socketApi.getSocketInfo().linked) {
+        if (this.socketApi.getSocketInfo("MsgServer/" + this.activityInfo.aid).linked) {
           let send_msg = {
             type: "message",
             sender: this.$store.getters.userId,
             content: this.typingMsg,
             time: current_time,
           };
-          this.socketApi.sendSock(send_msg, this.getSocketConnect);
+          this.socketApi.sendSock("MsgServer/" + this.activityInfo.aid, send_msg, this.getSocketConnect);
           send_msg["status"] = "sending";
           send_msg["sender"] = {
             userId: this.$store.getters.userId,

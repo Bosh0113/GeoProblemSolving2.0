@@ -136,7 +136,7 @@ export default {
         "Geographical simulation",
         "Data analysis",
         "Decision making",
-        "Others",
+        "Other purpose",
       ],
       purpose: "",
     };
@@ -204,6 +204,7 @@ export default {
             if(res.data.data.level == 0){
               this.activityInfo = res.data.data;
             }
+            this.operationApi.activityUpdate("type", this.activityInfo);
             this.$emit("typeChanged", this.selectType);
           } else {
             this.$Notice.info({ title: "Result", desc: res.data.msg });
