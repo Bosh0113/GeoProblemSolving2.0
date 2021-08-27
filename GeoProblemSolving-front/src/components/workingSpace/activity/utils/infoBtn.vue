@@ -481,7 +481,7 @@ export default {
         });
     },
     modifyPermission() {
-      parent.location.href =
+      window.location.href =
         "/GeoProblemSolving/permission/" +
         this.activityInfo.level +
         "/" +
@@ -510,6 +510,7 @@ export default {
           userId: candidates[i].userId,
           name: candidates[i].name,
           role: candidates[i].role,
+          domain: candidates[i].domain,
           disabled: this.participants.contains(candidates[i]),
         });
       }
@@ -809,10 +810,10 @@ export default {
               };
               this.sendNotice(notice);
 
-              parent.location.href =
-                "/GeoProblemSolving/projectInfo/" +
+              window.location.href =
+                "/GeoProblemSolving/activityInfo/" +
                 this.projectInfo.aid +
-                "?content=workspace&aid=" +
+                "?aid=" +
                 activity.parent +
                 "&level=" +
                 (activity.level - 1).toString();
@@ -830,10 +831,11 @@ export default {
         .post("/GeoProblemSolving/notice/save", notice)
         .then((result) => {
           if (result.data == "Success") {
-            parent.vm.$emit("sendNotice", notice.recipientId);
-            this.$Notice.info({ desc: "Send application successfully" });
+            this.$store.commit("addNotification", notice);
+            // this.$emit("sendNotice", notice);
+            // this.$Notice.info({ desc: "Send notice successfully" });
           } else {
-            this.$Notice.error({ desc: "Fail to send application" });
+            // this.$Notice.error({ desc: "Fail to send notice" });
           }
         })
         .catch((err) => {
@@ -842,10 +844,10 @@ export default {
     },
     gotoPersonalSpace(id) {
       if (id == this.$store.getters.userId) {
-        parent.location.href = "/newPersonalPage/overView";
+        window.location.href = "/GeoProblemSolving/newPersonalPage/overView";
         // this.$router.push({name: "overView"})
       } else {
-        parent.location.href = "/GeoProblemSolving/memberPage/" + id;
+        window.location.href = "/GeoProblemSolving/memberPage/" + id;
       }
     },
   },

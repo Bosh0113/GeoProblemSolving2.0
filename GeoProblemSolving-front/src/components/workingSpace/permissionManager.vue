@@ -655,7 +655,6 @@ export default {
         .then((res) => {
           this.resetProjectTypeModal = false;
           if (res.data == "Offline") {
-            // parent.location.href = "/GeoProblemSolving/login";
             this.$store.commit("userLogout");
             this.$router.push({ name: "Login" });
           } else if (res.data.code == 0) {

@@ -124,13 +124,6 @@ h1 {
             <Radio label="Private" title="Other users can not find this group."></Radio>
           </RadioGroup>
         </FormItem>
-        <FormItem prop="scope" label="Scope" :label-width="100">
-          <Select v-model="formInline.scope" style="width:80%;margin-left:10px">
-            <Option value="inner" key="0">inner</Option>
-            <Option value="outer" key="1">outer</Option>
-          </Select>
-        </FormItem>
-
         <FormItem prop="tag" label="Tag" :label-width="100">
           <Input
             v-model="inputTag"
@@ -237,7 +230,6 @@ export default {
       formInline: {
         name: "",
         category: "",
-        scope: "inner",
         privacy: "Public",
         description: "",
         //tag列表

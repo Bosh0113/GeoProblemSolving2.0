@@ -314,7 +314,7 @@ export default {
       //step
       currentStep: 0,
       stepList: [
-        "General step",
+        "All",
         "Context definition & resource collection",
         "Data processing",
         "Data analysis",

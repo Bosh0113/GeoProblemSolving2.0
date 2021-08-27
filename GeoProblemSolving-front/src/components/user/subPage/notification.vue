@@ -603,7 +603,7 @@
                 .post("/GeoProblemSolving/notice/save", replyNotice)
                 .then((result) => {
                   if (result.data == "Success") {
-                    this.$emit("sendNotice", apply.content.userId);
+                    this.$emit("sendNotice", {"type": "Notice", "recipientId": apply.content.userId});
                   } else {
                     this.$Message.error("reply fail.");
                   }
@@ -646,7 +646,7 @@
               replyNotice["content"] = {
                 title: "Result for application",
                 description:
-                  "Congratulations for joining the activity: " +
+                  "Welcome to join the activity: " +
                   apply.content.activityName +
                   " .",
               };
@@ -654,14 +654,14 @@
                 .post("/GeoProblemSolving/notice/save", replyNotice)
                 .then((result) => {
                   if (result.data == "Success") {
-                    this.$emit("sendNotice", {"type": "Notice", "receiver": apply.content.userId });
+                    this.$emit("sendNotice", {"type": "Notice", "recipientId": apply.content.userId });
                     let resultEmailBody = {};
                     resultEmailBody["recipient"] = apply.content.userEmail;
                     resultEmailBody["mailTitle"] = "Join project result";
                     resultEmailBody["mailContent"] =
                       "Hello, " +
                       apply.content.userName +
-                      ", Congratulations for joining the activity: " +
+                      ", Welcome to join the activity: " +
                       apply.content.activityName +
                       " .";
                     this.axios
@@ -673,7 +673,7 @@
                             desc:
                               "The process result email has been sent,if he/she doesn't online,the email will remind the joiner in time.",
                           });
-                          this.$emit("sendNotice", apply.content.userId);
+                          this.$emit("sendNotice", {"type": "Notice", "recipientId": apply.content.userId});
                         } else {
                           this.$Notice.error({
                             title: "Email send fail",

@@ -257,9 +257,9 @@ public class ActivityResServiceImpl implements ActivityResService {
                     uploadInfos.failed.add(part.getSubmittedFileName());
                 }
             }
-            //资源自动更新
-            String graphId = req.getParameter("graphId");
-            geoAnalysisProcess.batchResFlowAutoUpdate(graphId, aid, resTagMap);
+//            //资源自动更新
+//            String graphId = req.getParameter("graphId");
+//            geoAnalysisProcess.batchResFlowAutoUpdate(graphId, aid, resTagMap);
             return uploadInfos;
 
         } catch (Exception e) {

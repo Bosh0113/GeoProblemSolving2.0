@@ -354,6 +354,7 @@ public class ActivityServiceImpl implements ActivityService {
                 userInfo.put("avatar", user.getAvatar());
                 userInfo.put("email", user.getEmail());
                 userInfo.put("title", user.getTitle());
+                userInfo.put("domain", user.getDomain());
                 memberInfos.add(userInfo);
             }
             participants.put("members", memberInfos);

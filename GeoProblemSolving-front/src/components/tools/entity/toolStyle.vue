@@ -86,8 +86,8 @@
         placement="left"
       >
         <Card
-          v-for="(participant,index) in participants"
-          :key="index"
+          v-for="participant in participants"
+          :key="participant.userId"
           style="cursor:pointer"
           :padding="5"
           class="memberPanel"
@@ -127,12 +127,12 @@
       </span>
       <Drawer title="Resources" :closable="false" v-model="resourceDrawer" placement="left">
         <Card
-          v-for="(resource,index) in resources"
-          :key="index"
+          v-for="resource in resources"
+          :key="resource.uid"
           style="cursor:pointer"
           :padding="5"
         >
-          <div class="resourcePanel" :title="resource.description" @click="selectResource(resource.pathURL)"><span>{{resource.name}}</span></div>
+          <div class="resourcePanel" :title="resource.description" @click="selectResource(resource)"><span>{{resource.name + resource.suffix}}</span></div>
         </Card>
       </Drawer>
     </div>
@@ -159,8 +159,8 @@ export default {
   beforeDestroy: function() {
   },
   methods:{
-    selectResource(url){
-      this.$emit("resourceUrl",url);
+    selectResource(data){
+      this.$emit("resourceUrl", data);
     },
   }
 };

@@ -206,9 +206,9 @@ export default {
     },
     gotoPersonalSpace(id) {
       if (id == this.$store.getters.userId) {
-        parent.location.href = "/newPersonalPage/overView";
+        window.location.href = "/GeoProblemSolving/newPersonalPage/overView";
       } else {
-        parent.location.href = "/GeoProblemSolving/memberPage/" + id;
+        window.location.href = "/GeoProblemSolving/memberPage/" + id;
       }
     },
   },

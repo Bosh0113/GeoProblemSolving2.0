@@ -250,7 +250,14 @@
             />
           </FormItem>
 
-          <FormItem label="tag:" prop="categoryTag">
+          <FormItem prop="scope" label="Scope" :label-width="100">
+          <Select v-model="toolInfo.scope" style="width:80%;margin-left:10px">
+            <Option value="inner" key="0">Internal tools (*Use this tool on this platform)</Option>
+            <Option value="outer" key="1">External tools (*Go to another page to use his tool)</Option>
+          </Select>
+        </FormItem>
+
+          <FormItem label="Tag:" prop="categoryTag">
             <Input
               v-model="inputToolTag"
               placeholder="Enter some tag to classify your tools"
@@ -391,6 +398,7 @@ export default {
         description: "",
         toolUrl: "",
         recomStep: [],
+        scope: "inner",
         categoryTag: [],
         privacy: "Private",
         detail: "",
@@ -402,7 +410,7 @@ export default {
       },
       modelItemLoading: false,
       stepList: [
-        "General step",
+        "All",
         "Context definition & resource collection",
         "Data processing",
         "Data visualization",

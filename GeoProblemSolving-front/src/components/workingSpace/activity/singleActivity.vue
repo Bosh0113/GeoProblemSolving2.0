@@ -27,7 +27,7 @@
         <div v-show="activeMenu == 'Workspace'">
           <vue-scroll
             :ops="scrollOps"
-            style="height: calc(100vh - 105px); margin-top: 5px"
+            style="height: calc(100vh - 225px); margin-top: 5px"
           >
             <context-res
               v-if="
@@ -296,6 +296,7 @@ export default {
           userId: candidates[i].userId,
           name: candidates[i].name,
           role: candidates[i].role,
+          domain: candidates[i].domain,
           disabled: this.participants.contains(candidates[i]),
         });
       }
@@ -375,7 +376,7 @@ export default {
                   approve: "unknow",
                 },
               };
-              this.sendNotice(activity, notice);
+              this.sendNotice(notice);
             } else {
               console.log(res.data.msg);
             }
@@ -521,7 +522,7 @@ export default {
                 approve: "unknow",
               },
             };
-            this.sendNotice(activity, notice);
+            this.sendNotice(notice);
           } else {
             console.log(res.data.msg);
           }
@@ -586,12 +587,12 @@ export default {
                   approve: "unknow",
                 },
               };
-              this.sendNotice(activity, notice);
+              this.sendNotice(notice);
 
-              parent.location.href =
+              window.location.href =
                 "/GeoProblemSolving/projectInfo/" +
                 this.projectInfo.aid +
-                "?content=workspace&aid=" +
+                "?aid=" +
                 activity.parent +
                 "&level=" +
                 (activity.level - 1).toString();
@@ -604,12 +605,12 @@ export default {
           throw err;
         });
     },
-    sendNotice(activity, notice) {
+    sendNotice(notice) {
       this.axios
         .post("/GeoProblemSolving/notice/save", notice)
         .then((result) => {
           if (result.data == "Success") {
-            parent.vm.$emit("sendNotice", notice.recipientId);
+            this.$emit("sendNotice", notice);
           } else {
             this.$Message.error("Notice fail.");
           }

@@ -824,10 +824,10 @@ export default {
           time: current_time,
           targetUserId: this.$store.getters.userId,
         };
-        if (this.socketApi.getSocketInfo().linked) {
+        if (this.socketApi.getSocketInfo("ChatServer/" + id).linked) {
           this.msglist.push(this.send_msg);
           this.msgRecords.push(this.send_msg);
-          this.socketApi.sendSock(this.send_msg, this.getSocketConnect); //连接后台onopen方法
+          this.socketApi.sendSock("ChatServer/" + id, this.send_msg, this.getSocketConnect); //连接后台onopen方法
         } else {
           let chatMsg = {
             type: "notice",
@@ -849,7 +849,7 @@ export default {
         from: "Test",
         content: "TestChat",
       };
-      this.socketApi.sendSock(this.send_msg, this.getSocketConnect);
+      this.socketApi.sendSock("ChatServer/" + id, this.send_msg, this.getSocketConnect);
     },
 
     getSocketConnect(data) {
@@ -1090,7 +1090,7 @@ export default {
   // },
 
   beforeDestroy() {
-    this.socketApi.close();
+    this.socketApi.close("ChatServer/" + id);
     window.removeEventListener("resize", this.initSize);
   },
   beforeRouteEnter: (to, from, next) => {

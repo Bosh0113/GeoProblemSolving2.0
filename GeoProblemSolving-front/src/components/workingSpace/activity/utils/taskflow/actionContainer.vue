@@ -479,7 +479,7 @@ export default {
 
 #background2 {
   width: 100%;
-  height: calc(100vh - 205px);
+  height: calc(100vh - 325px);
   background-image: url("/static/Images/logogrey.png");
   background-repeat: no-repeat;
   position: absolute;
@@ -490,7 +490,7 @@ export default {
 
 #backmask {
   width: 100%;
-  height: calc(100vh - 105px);
+  height: calc(100vh - 225px);
   position: absolute;
   background-color: rgba(252, 251, 251, 0.8);
 }
@@ -499,7 +499,7 @@ export default {
   border-bottom: 1px solid lightgray;
   border-right: 1px solid lightgray;
   width: 100%;
-  height: calc(100vh - 105px);
+  height: calc(100vh - 225px);
 
   background: var(--dfBackgroundColor);
   background-size: var(--dfBackgroundSize) var(--dfBackgroundSize);

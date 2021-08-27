@@ -81,7 +81,7 @@ function isLogin() {
 }
 
 window.addEventListener('message', function (e) {
-    console.log(e.data);
+    // console.log(e.data);
     var from = e.data.from;
     switch (from) {
         case "login.html":

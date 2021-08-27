@@ -17,6 +17,7 @@ export default new Vuex.Store({
     // activityTree:[],
     tempOperationChange: [],
     activityTaskChange: [],
+    notifications: [],
     IP_Port: window.location.host,
     //用于当前选择的页面内容
     // IP_Port:"172.21.213.185:8080",
@@ -59,6 +60,9 @@ export default new Vuex.Store({
     },
     activityTaskChange: state => {
       return state.activityTaskChange;
+    }, 
+    notifications: state => {
+      return state.notifications;
     }
   },
   mutations: {
@@ -123,5 +127,11 @@ export default new Vuex.Store({
     updateActivityTasks: (state, data) => {
       state.activityTaskChange.push(data);
     },
+    addNotification: (state, notice) => {
+      state.notifications.push(notice);
+    },
+    cleanNotification: (state) => {
+      state.notifications = [];
+    }
   }
 })

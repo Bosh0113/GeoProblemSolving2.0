@@ -121,7 +121,7 @@
                                <span class="toolTypeSpan">
                                   {{tool.backendType}}
                                </span>
-                               <span v-for="(tag,index) in tool.tags" class="toolTagSpan">
+                               <span v-for="(tag, index) in tool.tags" :key="tag" class="toolTagSpan">
                                  {{tool.tags[index]}}
                                </span>
                              </div>

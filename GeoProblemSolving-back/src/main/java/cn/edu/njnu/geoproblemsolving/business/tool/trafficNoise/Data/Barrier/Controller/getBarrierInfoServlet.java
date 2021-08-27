@@ -42,9 +42,9 @@ public class getBarrierInfoServlet extends HttpServlet {
         // 获取文件
         String zipUrl = "data" + File.separator + "TrafficNoise" + File.separator + uid + File.separator;
         String localDir = req.getServletContext().getRealPath("./") + zipUrl;
-        String roadFile = localDir + BARRIER_FILE_NAME + ".shp";
+        String barrierFile = localDir + BARRIER_FILE_NAME + ".shp";
 
-        DataSource dSource = getDataSource(roadFile);
+        DataSource dSource = getDataSource(barrierFile);
         if (dSource == null) {
             return respJson.toString();
         }

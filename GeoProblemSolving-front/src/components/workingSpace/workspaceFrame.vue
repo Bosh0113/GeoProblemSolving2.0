@@ -302,7 +302,7 @@ export default {
         level: -1,
         permission: JSON.stringify(this.userRoleApi.getDefault()),
         type: "Activity_Default",
-        purpose: "Multi-purpose",
+        purpose: "Other purpose",
       },
       activityEditRule: {
         name: [
@@ -332,7 +332,6 @@ export default {
       activityDeleteModal: false,
       contentType: -1,
       purposes: [
-        "Multi-purpose",
         "Context definition & resource collection",
         "Data processing",
         "Data analysis",
@@ -341,6 +340,7 @@ export default {
         "Model effectiveness evaluation",
         "Geographical simulation",
         "Decision making",
+        "Other purpose",
       ],
       // spinShow: false,
     };
@@ -543,7 +543,7 @@ export default {
         ]
       );
     },
-    enterChildActivity(activity) {
+    enterActivity(activity) {
       this.slctActivity = activity;
       this.locateActivity();
     },
@@ -782,7 +782,7 @@ export default {
       // load activity doc
       let result = this.operationApi.getActivityDoc(activity.aid);
       if (result === "empty") {
-        this.operationApi.rebuildActivityDoc(activity);
+        this.operationApi.activityDocInit(activity, this.userInfo.userId);
       }
 
       if (
@@ -821,9 +821,10 @@ export default {
     editActivity(name) {
       this.$refs[name].validate((valid) => {
         if (valid) {
+          // Update the activity type
           if (this.editActivityForm.type != this.slctActivity.type) {
             if (this.slctActivity.type == "Activity_Unit") {
-              this.editActivityForm.purpose = "Multi-purpose";
+              this.editActivityForm.purpose = "Other purpose";
             } else if (this.slctActivity.type == "Activity_Group") {
               if (
                 this.slctActivity.children != undefined &&
@@ -840,10 +841,17 @@ export default {
             }
             // update activity doc
             this.operationApi.activityUpdate("type", this.editActivityForm);
+            this.updatePathway("type", this.editActivityForm.type);
           } else {
             // update activity doc
             this.operationApi.activityUpdate("other", this.editActivityForm);
           }
+
+          // Update the activity name
+          if (this.editActivityForm.name != this.slctActivity.name) {
+            this.updatePathway("name", this.editActivityForm.name);
+          }
+
           // url
           let url = "";
           if (this.slctActivity.level == 1) {
@@ -888,6 +896,116 @@ export default {
             });
         }
       });
+    },
+    updatePathway(type, content) {
+      if (type === "name") {
+        for (let i = 0; i < this.parentActivity.pathway.length; i++) {
+          if (this.parentActivity.pathway[i].aid === this.slctActivity.aid) {
+            this.parentActivity.pathway[i].name = content;
+          }
+        }
+      } else if (type === "type") {
+        for (let i = 0; i < this.parentActivity.pathway.length; i++) {
+          if (this.parentActivity.pathway[i].aid === this.slctActivity.aid) {
+            this.parentActivity.pathway[i].category =
+              this.getStepCategroy(content);
+          }
+        }
+      } else if(type === "delete") {
+        this.removePathwayNode(content);
+      }
+
+      // url
+      let url = "";
+      if (this.parentActivity.level == 1) {
+        url = "/GeoProblemSolving/subproject/" + this.parentActivity.aid;
+      } else if (this.parentActivity.level > 1) {
+        url = "/GeoProblemSolving/activity/" + this.parentActivity.aid;
+      } else {
+        url = "/GeoProblemSolving/project/" + this.parentActivity.aid;
+      }
+      let data = {
+        aid: this.parentActivity.aid,
+        pathway: this.parentActivity.pathway,
+      };
+      this.axios
+        .put(url, data)
+        .then((res) => {
+          if (res.data == "Offline") {
+            this.$store.commit("userLogout");
+            // this.$router.push({ name: "Login" });
+            this.tempLoginModal = true;
+          } else if (res.data.code !== 0) {
+            this.$Notice.info({
+              desc: "Fail to update the pathway in the parent activity!",
+            });
+          }
+        })
+        .catch((err) => {
+          throw err;
+        });
+    },
+    // remove
+    removePathwayNode(aid) {
+      if (this.parentActivity.pathway != undefined) {
+        let nodeId = -1;
+        for (var i = 0; i < this.parentActivity.pathway.length; i++) {
+          if (this.parentActivity.pathway[i].aid == aid) {
+            nodeId = this.parentActivity.pathway[i].id;
+            // remove mode
+            this.parentActivity.pathway.splice(i, 1);
+          }
+        }
+        // normalize
+        if (nodeId != -1) {
+          for (var i = 0; i < this.parentActivity.pathway.length; i++) {
+            let node = this.parentActivity.pathway[i];
+            // node
+            if (node.id > nodeId) {
+              node.id = node.id - 1;
+            }
+            // last
+            for (var j = 0; j < node.last.length; j++) {
+              if (node.last[j].id == nodeId) {
+                node.last.splice(j, 1);
+              } else if (node.last[j].id > nodeId) {
+                node.last[j].id = node.last[j].id - 1;
+              }
+            }
+            // next
+            for (var j = 0; j < node.next.length; j++) {
+              if (node.next[j].id == nodeId) {
+                node.next.splice(j, 1);
+              } else if (node.next[j].id > nodeId) {
+                node.next[j].id = node.next[j].id - 1;
+              }
+            }
+          }
+        }
+      }
+    },
+    getStepCategroy(purpose) {
+      let category;
+      if (purpose == "Context definition & resource collection") {
+        category = 0;
+      } else if (purpose == "Data processing") {
+        category = 1;
+      } else if (purpose == "Data visualization") {
+        category = 2;
+      } else if (purpose == "Geo-analysis model construction") {
+        category = 3;
+      } else if (purpose == "Model effectiveness evaluation") {
+        category = 4;
+      } else if (purpose == "Geographical simulation") {
+        category = 5;
+      } else if (purpose == "Data analysis") {
+        category = 6;
+      } else if (purpose == "Decision making") {
+        category = 7;
+      } else {
+        category = 8;
+      }
+      return category;
     },
     preApplication() {
       //判断活动权限，如果无需申请许可，则直接加入；如果需要其他成员批准，则通过apply请求
@@ -968,22 +1086,22 @@ export default {
             approve: "unknow",
           },
         };
-        this.sendNotice(this.slctActivity, notice);
+        this.sendNotice(notice);
       }
     },
-    sendNotice(activity, notice) {
+    sendNotice(notice) {
       this.axios
         .post("/GeoProblemSolving/notice/save", notice)
         .then((result) => {
           //offline model
-          if (res.data == "Offline") {
+          if (result.data == "Offline") {
             this.$store.commit("userLogout");
             // this.$router.push({ name: "Login" });
             this.tempLoginModal = true;
           } else if (result.data == "Success") {
-            this.$Notice.info({ desc: "Send application successfully." });
+            this.$Notice.info({ desc: "Send notice successfully." });
             this.applyJoinActivityModal = false;
-            this.$emit("sendNotice", notice.recipientId);
+            this.$emit("sendNotice", notice);
           } else {
             this.$Message.error("Notice fail.");
           }
@@ -1012,6 +1130,7 @@ export default {
             this.tempLoginModal = true;
           } else if (res.data.code == 0) {
             this.$Notice.info({ title: "Delete", desc: "Success!" });
+            // activity document
             this.operationApi.activityRecord(
               "",
               "remove",
@@ -1019,10 +1138,11 @@ export default {
               this.slctActivity
             );
             this.operationApi.deleteActivityDoc(this.slctActivity.aid);
+            // update pathway
+            this.updatePathway("delete", aid)
             this.activityDeleteModal = false;
             //更新activityTree
-            // this.delTempActivityTree(this.slctActivity);
-            this.enterRootActivity();
+            this.enterActivity(this.parentActivity);
           } else {
             console.log(res.data.msg);
           }

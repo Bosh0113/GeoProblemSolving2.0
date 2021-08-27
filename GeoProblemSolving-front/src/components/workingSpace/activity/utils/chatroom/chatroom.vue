@@ -370,7 +370,7 @@ export default {
         receivers: [this.$store.getters.userId],
         geoConcepts: false,
       };
-      this.socketApi.sendSock(send_msg, this.getSocketConnect);
+      this.socketApi.sendSock("MsgServer/" + this.activityInfo.aid, send_msg, this.getSocketConnect);
     },
 
     sendMsg() {
@@ -419,8 +419,8 @@ export default {
       }
 
       // send
-      if (this.socketApi.getSocketInfo().linked) {
-        this.socketApi.sendSock(message, this.getSocketConnect); //连接后台onopen方法
+      if (this.socketApi.getSocketInfo("MsgServer/" + this.activityInfo.aid).linked) {
+        this.socketApi.sendSock("MsgServer/" + this.activityInfo.aid, message, this.getSocketConnect); //连接后台onopen方法
 
         message["status"] = "sending";
         message["sender"] = {
@@ -631,7 +631,7 @@ export default {
   },
 
   beforeDestroy() {
-    this.socketApi.close();
+    this.socketApi.close("MsgServer/" + this.activityInfo.aid);
     window.removeEventListener("resize", this.initSize);
     window.removeEventListener("blur", this.winBlur, true); //监听浏览器失焦事件
     window.removeEventListener("focus", this.winFocus, true); //监听浏览器失焦事件

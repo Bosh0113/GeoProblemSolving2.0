@@ -607,7 +607,7 @@ function updateActivityDoc(aid) {
         success: function (result) {
             if (result.code === 0) {
                 return "success";
-            } else {
+            } else if (result.code === -1) {
                 alert(result.msg);
             }
         },
@@ -645,7 +645,7 @@ export function activityUpdate(updateType, activityInfo) {
 
             } else if (xmlDoc.getElementsByTagName('ToolBox').length > 0) {
 
-                node = xmlDoc.getElementsByTagName('ToolBox')[0];
+                let node = xmlDoc.getElementsByTagName('ToolBox')[0];
                 xmlDoc.documentElement.removeChild(node);
 
                 node = xmlDoc.getElementsByTagName('OperationRecords')[0];
@@ -1394,6 +1394,7 @@ function clearTempOperations(aid) {
     let Operations = xmlDoc.getElementsByTagName("Operation");
     if (Operations == undefined) return [];
 
+    let isRemoved = false;
     for (var i = Operations.length - 1; i >= 0; i--) {
 
         let operationNode = Operations[i];
@@ -1404,10 +1405,13 @@ function clearTempOperations(aid) {
             let threshold = 1000 * 60 * 60 * 48;
             if (current - time > threshold) {
                 operationNode.parentNode.removeChild(operationNode);
+                isRemoved = true;
             }
         }
     }
-    updateActivityDoc(aid);
+    if(isRemoved) {
+        updateActivityDoc(aid);
+    }
 }
 
 
