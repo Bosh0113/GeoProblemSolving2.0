@@ -74,7 +74,7 @@
                   <Table :columns="resourceColumn" :data="showList" border no-data-text="No data">
                     <template slot-scope="{ row, index }" slot="action" v-show="showList.length>0">
                       <a
-                        :href="showList[index].pathURL"
+                        :href="showList[index].address"
                         :download="showList[index].name"
                         title="Download"
                       >
@@ -237,23 +237,23 @@ export default {
     },
     readResource() {
       this.allResourceList = [];
-      this.axios.get("/GeoProblemSolving/resource/allPublic").then(res => {
-        if (res.data != "None") {
-          var tempResourceList = res.data;
+      this.axios.get("/GeoProblemSolving/rip/file/allPublic").then(res => {
+        if (res.data.code == 0){
+          let tempResourceList = res.data.data;
           tempResourceList.reverse();
           tempResourceList.forEach(function(list) {
             var time = list.uploadTime;
             list.uploadTime = time;
           });
-          this.dataCount = tempResourceList.length;
           this.$set(this, "allResourceList", tempResourceList);
-          this.$set(this, "allSelectedList", tempResourceList);
+          this.dataCount = tempResourceList.length;
+          this.allSelectedList = tempResourceList;
           this.sliceList();
         }
       });
     },
     sliceList() {
-      var tempResourceList = this.allSelectedList;
+      let tempResourceList = this.allSelectedList;
       if (this.dataCount < this.pageSize) {
         this.$set(this, "showList", tempResourceList);
       } else {
@@ -299,8 +299,8 @@ export default {
             var url =
               "http://view.officeapps.live.com/op/view.aspx?src=" +
               "http://" +
-              this.$store.state.IP_Port +
-              res.pathURL;
+              this.$store.state.DataServer +
+              res.address;
             var toolURL =
               "<iframe src=" +
               url +
@@ -337,7 +337,7 @@ export default {
           this.panel.close();
         }
         var url =
-          "http://" + this.$store.state.IP_Port + this.showList[index].pathURL;
+          "http://" + this.$store.state.DataServer + this.showList[index].address;
         var toolURL =
           "<video src=" +
           url +
