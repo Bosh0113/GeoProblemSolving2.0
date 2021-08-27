@@ -664,11 +664,15 @@ import VueTagsInput from "@johmun/vue-tags-input";
 import loginModal from "../../../user/userState/loginModal.vue";
 // import Driver from "driver.js";
 export default {
-  components: { VueTagsInput, loginModal },
-  props: ["activityInfo", "childActivities", "userInfo"],
+  components: { VueTagsInput,loginModal },
+  props: [
+    "activityInfo",
+    "childActivities",
+    "userInfo",
+    "projectInfo"
+  ],
   data() {
     return {
-      projectInfo: {},
       // driver
       // driver: new Driver(),
       // user

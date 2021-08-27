@@ -559,7 +559,8 @@ export default {
   props: [
     "activityInfo",
     "nameConfirm",
-    "userInfo"
+    "userInfo",
+    "projectInfo"
    ],
   data() {
     return {
@@ -568,7 +569,6 @@ export default {
           background: "lightgrey",
         },
       },
-      projectInfo: {},
       // userInfo: {},
       userRole: "visitor",
       // Members
@@ -858,6 +858,7 @@ export default {
             title:
               "Application of joining the activity: " +
               this.appliedActivity.name,
+            projectId: this.projectInfo.aid,
             activityId: this.appliedActivity.aid,
             activityName: this.appliedActivity.name,
             activityLevel: this.appliedActivity.level,
@@ -974,6 +975,13 @@ export default {
                     this.projectInfo.name +
                     " , and now you are a member in this activity!",
                   approve: "unknow",
+                  projectId: this.projectInfo.aid,
+                  projectName: this.projectInfo.name,
+                  activityId: activity.aid,
+                  activityName: activity.name,
+                  activityLevel: activity.level,
+                  invitorName: this.userInfo.name,
+                  invitorId: this.userInfo.userId,
                 },
               };
               this.sendNotice(notice);
@@ -1045,6 +1053,13 @@ export default {
                   this.projectInfo.name +
                   ".",
                 approve: "unknow",
+                projectId: this.projectInfo.aid,
+                projectName: this.projectInfo.name,
+                activityId: activity.aid,
+                activityName: activity.name,
+                activityLevel: activity.level,
+                removerName: this.userInfo.name,
+                removerId: this.userInfo.userId,
               },
             };
             this.sendNotice(notice);
@@ -1121,6 +1136,13 @@ export default {
                   role +
                   ".",
                 approve: "unknow",
+                projectId: this.projectInfo.aid,
+                projectName: this.projectInfo.name,
+                activityId: activity.aid,
+                activityName: activity.name,
+                activityLevel: activity.level,
+                // removerName: this.userInfo.name,
+                // removerId: this.userInfo.userId,
               },
             };
             this.sendNotice(notice);
@@ -1188,6 +1210,13 @@ export default {
                     this.projectInfo.name +
                     ".",
                   approve: "unknow",
+                  projectId: this.projectInfo.aid,
+                  projectName: this.projectInfo.name,
+                  activityId: activity.aid,
+                  activityName: activity.name,
+                  activityLevel: activity.level,
+                  leaverName: this.userInfo.name,
+                  leaverId: this.userInfo.userId,
                 },
               };
               this.sendNotice(notice);

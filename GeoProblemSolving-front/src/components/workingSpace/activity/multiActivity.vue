@@ -24,6 +24,7 @@
         :activityInfo="activityInfo"
         :nameConfirm="nameConfirm"
         :userInfo="userInfo"
+        :projectInfo="projectInfo"
         v-on:enterActivity="enterActivity"
         v-on:enterRootActivity="enterRootActivity"
       ></activity-show>
@@ -39,7 +40,7 @@
       <task-manager :activityInfo="activityInfo" :projectInfo="projectInfo" :childActivities="childActivities" :userInfo="userInfo" ></task-manager>
     </div>
     <div v-if="activeMenu=='Activities'">
-      <process-manager :activityInfo="activityInfo" :childActivities="childActivities" :userInfo="userInfo" ></process-manager>
+      <process-manager :activityInfo="activityInfo" :childActivities="childActivities" :projectInfo="projectInfo" :userInfo="userInfo" ></process-manager>
     </div>
     <mini-chatroom
       :activityInfo="activityInfo"

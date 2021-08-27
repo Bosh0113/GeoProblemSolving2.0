@@ -352,6 +352,7 @@ public class UserResServiceImpl implements UserResService {
             resInfo.put("type", res.getType());
             resInfo.put("privacy", res.getPrivacy());
             resInfo.put("description", res.getDescription());
+            resInfo.put("fileSize", res.getFileSize());
         }
         //请求地址
         String url = "";

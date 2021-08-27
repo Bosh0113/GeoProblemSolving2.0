@@ -12,6 +12,7 @@ export default new Vuex.Store({
       name: 'Visitor',
       userId: '',
       avatar: '',
+      state: '',
     },
     projectImg: '',
     // activityTree:[],
@@ -36,6 +37,9 @@ export default new Vuex.Store({
     },
     userName: state => {
       return state.userInfo.name;
+    },
+    userProvince:state => {
+      return state.userInfo.state;
     },
     userId: state => {
       return state.userInfo.userId;
@@ -74,7 +78,8 @@ export default new Vuex.Store({
           async: false,
           success: function (data) {
             if (data) {
-              var userInfo = data;
+              let userInfo = {};
+              userInfo = data;
               userInfo.userState = true;
               state.userInfo = userInfo;
             }
@@ -109,6 +114,7 @@ export default new Vuex.Store({
       state.userInfo = userInfo;
     },
     updateProject: (state, projectId) => {
+      //删除某项project
       let index = state.userInfo.createdProjects.indexOf(projectId);
       state.userInfo.createdProjects.splice(index, 1);
     },

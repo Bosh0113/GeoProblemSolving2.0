@@ -214,7 +214,7 @@ import manageTools from "@/components/tools/toolToStepModal";
 import Avatar from "vue-avatar";
 import { get, del, post, put } from "@/axios";
 export default {
-  props: ["activityInfo"],
+  props: ["activityInfo","projectInfo"],
   components: {
     manageTools,
     Avatar,
@@ -251,6 +251,7 @@ export default {
   },
   created() {
     this.roleIdentity();
+    // thie.getProjectInfo();
   },
   mounted() {
     this.getAllTools();
@@ -294,6 +295,29 @@ export default {
         operation
       );
     },
+    // getProjectInfo(){
+    //   let url = window.location.href;
+    //   let result = {};
+    //   if(url.indexOf("/activityInfo/") != -1){
+    //     let urlStr = url.split("/activityInfo/");
+    //     if(urlStr[1].indexOf("?") != -1){
+    //       result.aid = urlStr[1].split("?")[0];
+    //     }else{
+    //       result.aid = urlStr[1];
+    //     }
+    //   }
+    //   this.$axios.get("/GeoProblemSolving/project/" + result.aid)
+    //     .then(res => {
+    //       if(res.data.code == 0){
+    //         this.projectInfo = res.data.data;
+    //       } else {
+    //         console.log(res.data.msg);
+    //       }
+    //     })
+    //     .catch(err => {
+    //       this.$Message.error("Loading project failed.")
+    //     })
+    // },
     getAllTools() {
       this.toolIdList = this.operationApi.getToollist();
       if (this.toolIdList != undefined && this.toolIdList.length !== 0) {
@@ -504,7 +528,7 @@ export default {
       this.axios
         .get(
           "/GeoProblemSolving/jupyter/inquiry?projectId=" +
-            this.projectInfo.projectId
+            this.projectInfo.aid
         )
         .then((res) => {
           if (res.data == "None") {
@@ -529,7 +553,7 @@ export default {
       let loginInfo = {
         JupyterUser: jupyterUserId,
         userId: this.userInfo.userId,
-        projectId: this.projectInfo.projectId,
+        projectId: this.projectInfo.aid,
       };
       let info = JSON.stringify(loginInfo);
 
@@ -557,7 +581,7 @@ export default {
         jupyterUrl = "http://118.190.246.198:8000";
       }
 
-      let name_jupyterhub = this.projectInfo.projectId;
+      let name_jupyterhub = this.projectInfo.aid;
       name_jupyterhub = name_jupyterhub.replace(/[-]/g, "");
 
       this.axios
@@ -579,7 +603,7 @@ export default {
     },
     createJupyterUser(name_jupyterhub) {
       let data = {
-        projectId: this.projectInfo.projectId,
+        projectId: this.projectInfo.aid,
         jupyterUserId: name_jupyterhub,
       };
       this.axios

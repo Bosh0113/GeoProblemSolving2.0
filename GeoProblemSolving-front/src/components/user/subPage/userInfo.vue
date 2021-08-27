@@ -4,7 +4,7 @@
       <!-- 用户上传照片作为头像 图片显示失败 -->
      <img
         :src="avatarUrl"
-        v-if="avatarUrl != null && avatarUrl != '' && avatarUrl != undefined"
+        v-if="userInfo.avatar != null && userInfo.avatar != '' && userInfo.avatar != undefined"
         :title="userInfo.name"
         style="vertical-align:middle;width: 80px;height: 80px;"
       />
@@ -81,7 +81,7 @@
                <ListItem >
                   <span class="uTitle">State/Province</span>
                   <div class="uAlign">
-                    <span class="uContent">{{userInfo.province}}</span>
+                    <span class="uContent">{{userInfo.state}}</span>
                   </div>
                 </ListItem>
                 <ListItem >
@@ -197,7 +197,7 @@
                <ListItem >
                   <span class="uTitle">State/Province</span>
                   <div class="uAlign">
-                    <span class="uContentElse">{{userInfo.province}}</span>
+                    <span class="uContentElse">{{userInfo.state}}</span>
                   </div>
                 </ListItem>
                 <ListItem >
@@ -291,8 +291,8 @@
             <Input v-model="userInfoFormItems.country" placeholder="Country"> </Input>
           </FormItem>
 
-          <FormItem label="Province">
-            <Input v-model="userInfoFormItems.province" placeholder="province"> </Input>
+          <FormItem label="State/province">
+            <Input v-model="userInfoFormItems.state" placeholder="state/province"> </Input>
           </FormItem>
 
           <FormItem label="City">
@@ -438,7 +438,7 @@
           domain: [],
           phone: "",
           country: "",
-          province: "",
+          state: "",
           city: "",
           homepage: "",
           introduction: "",
@@ -561,7 +561,6 @@
         document.getElementById("choosePicture").click();
       },
       uploadPhoto(e) {
-        this.reUpload = true;
         // 利用fileReader对象获取file
         let file = e.target.files[0];
         let filesize = file.size;
@@ -577,7 +576,7 @@
           reader.onload = e => {
             // 读取到的图片base64 数据编码 将此编码字符串传给后台即可
             imgcode = e.target.result;
-            console.log(imgcode);
+            this.reUpload = true;
             this.userInfoFormItems.avatar = imgcode;
             $("#choosePicture").val("");
           };
@@ -594,17 +593,34 @@
         for (let i = 0; i < tags.length; i++) {
           orgs.push(tags[i].text);
         }
-        this.userInfoFormItems.organizations = orgs;
+        // this.userInfoFormItems.organizations = orgs;
+        this.restoreFormat(orgs,"org");
+      },
+      orgTagsUpload: function (tags) {
+        let orgs = [];
+        for (let i = 0; i < tags.length; i++) {
+          orgs.push(tags[i].text);
+        }
+        return orgs;
       },
       domainTags: function (tags) {
         let domainTags = [];
         for (let i = 0; i < tags.length; i++) {
           domainTags.push(tags[i].text);
         }
-        this.userInfoFormItems.domain = domainTags;
+        // this.userInfoFormItems.domain = domainTags;
+        this.restoreFormat(domainTags,"dom");
+      },
+      domainTagsUpload: function (tags) {
+        let domainTags = [];
+        for (let i = 0; i < tags.length; i++) {
+          domainTags.push(tags[i].text);
+        }
+        return domainTags;
       },
       initInfo: function () {
         this.userInfo = this.$store.getters.userInfo;
+        this.userInfo.state = this.$store.getters.userProvince;
         if (this.userInfo.organizations == null) {
           this.userInfo.organizations = [];
         }
@@ -614,25 +630,58 @@
         // this.avatar = this.userInfo.avatar;
       },
       showEditUserInfoModal: function () {
-        this.editUserInfoModal = true;
         this.userInfoFormItems = this.userInfo;
+        if(this.userInfoFormItems.organizations.length > 0 && this.userInfoFormItems.organizations[0].text == undefined){
+          this.restoreFormat(this.userInfoFormItems.organizations,"org");
+        }
+        if(this.userInfoFormItems.domain.length > 0 && this.userInfoFormItems.domain[0].text == undefined){
+          this.restoreFormat(this.userInfoFormItems.domain,"dom");
+        }
+        this.editUserInfoModal = true;
+      },
+      restoreFormat:function(arr,str){
+        let restoreFormatArr = [];
+        for (let i = 0; i < arr.length; i++) {
+          restoreFormatArr.push({ text: arr[i] });    //必须将它还原成[{text:'data1'},{text:'data2}]这种格式
+        }
+        if(str == "org"){
+          this.userInfoFormItems.organizations = restoreFormatArr;
+        } else if(str == "dom"){
+          this.userInfoFormItems.domain = restoreFormatArr;
+        }
       },
       updateUserInfo: function () {
         //在上传图片的时候使用 imageToBase64.js 转换为base64 即可
         // "avatar": avatarBase64,
-        let updateInfo = {
-          "userId": this.$store.getters.userId,
-          "name": this.userInfoFormItems.name,
-          "title": this.userInfoFormItems.title,
-          "organizations": this.userInfoFormItems.organizations,
-          "domain": this.userInfoFormItems.domain,
-          "phone": this.userInfoFormItems.phone,
-          "city": this.userInfoFormItems.city,
-          "province": this.userInfoFormItems.province,
-          "homepage": this.userInfoFormItems.homepage,
-          "introduction": this.userInfoFormItems.introduction,
-          "avatar": this.userInfoFormItems.avatar
-        };
+        let updateInfo =  {};
+        if (this.reUpload == true || this.userInfoFormItems.avatar == ""){
+          updateInfo = {
+            "userId": this.$store.getters.userId,
+            "name": this.userInfoFormItems.name,
+            "title": this.userInfoFormItems.title,
+            "organizations": this.orgTagsUpload(this.userInfoFormItems.organizations),
+            "domain": this.domainTagsUpload(this.userInfoFormItems.domain),
+            "phone": this.userInfoFormItems.phone,
+            "city": this.userInfoFormItems.city,
+            "state": this.userInfoFormItems.state,
+            "homepage": this.userInfoFormItems.homepage,
+            "introduction": this.userInfoFormItems.introduction,
+            "avatar": this.userInfoFormItems.avatar
+          };
+        } else if (this.reUpload == false){
+          updateInfo = {
+            "userId": this.$store.getters.userId,
+            "name": this.userInfoFormItems.name,
+            "title": this.userInfoFormItems.title,
+            "organizations": this.orgTagsUpload(this.userInfoFormItems.organizations),
+            "domain": this.domainTagsUpload(this.userInfoFormItems.domain),
+            "phone": this.userInfoFormItems.phone,
+            "city": this.userInfoFormItems.city,
+            "state": this.userInfoFormItems.state,
+            "homepage": this.userInfoFormItems.homepage,
+            "introduction": this.userInfoFormItems.introduction
+          };
+        }
         // let avatarBase64 = this.userInfoFormItems.avatar;
         // if (avatarBase64.indexOf("base64") != -1){
         //   updateInfo["avatar"] = avatarBase64;
@@ -645,10 +694,12 @@
             if (res.data.code == 0) {
               // this.userInfo = this.userInfoFormItems;
               this.editUserInfoModal = false;
-              console.log(res)
-              if (this.avatar != res.data.data){
+              if (this.userInfoFormItems.avatar == ""){
+                this.avatar = "";
+                this.$emit("changeAvatar", this.avatar);
+              } else if (this.avatar != res.data.data){
                 this.avatar = res.data.data;
-                this.$emit("changeAvatar", this.avatar)
+                this.$emit("changeAvatar", this.avatar);
               }
               //更新成功是否需要将新的内容返回给前端？
               this.$Notice.success({title: "Update Success."})
@@ -698,18 +749,28 @@
     computed: {
       myOrganizations: function () {
         let orgTemp = "";
-        if (this.userInfo.organizations != null) {
+        if (this.userInfo.organizations != null  && this.userInfo.organizations.length > 0 && this.userInfo.organizations[0].text == undefined) {
           for (let i = 0; i < this.userInfo.organizations.length; i++) {
             orgTemp += this.userInfo.organizations[i] + "  ";
           }
+        } else if(this.userInfo.organizations != null  && this.userInfo.organizations.length > 0 && this.userInfo.organizations[0].text != undefined){
+          for (let i = 0; i < this.userInfo.organizations.length; i++) {
+            orgTemp += this.userInfo.organizations[i].text + "  ";
+          }
+        } else {
+          orgTemp = "";
         }
         return orgTemp;
       },
       myDomain: function () {
         let domainTemp = "";
-        if (this.userInfo.domain != null) {
+        if (this.userInfo.domain != null && this.userInfo.domain.length > 0 && this.userInfo.domain[0].text == undefined) {
           for (let i = 0; i < this.userInfo.domain.length; i++) {
             domainTemp += this.userInfo.domain[i] + "  ";
+          }
+        }else if(this.userInfo.domain != null && this.userInfo.domain.length > 0 && this.userInfo.domain[0].text != undefined){
+          for (let i = 0; i < this.userInfo.domain.length; i++) {
+            domainTemp += this.userInfo.domain[i].text + "  ";
           }
         }
         return domainTemp;
@@ -722,12 +783,12 @@
         return this.userInfoFormItems.organizations;
       },
       avatarUrl: function () {
-        if (this.avatar != undefined && this.avatar != null && this.avatar != '' && this.avatar.indexOf("base64") != -1){
-          return this.avatar;
-        }
         let temp = this.userInfo.avatar;
-        console.log(temp);
-        if (this.avatar != undefined && this.avatar != null && this.avatar != '' && this.avatar.indexOf("/avatar/") != -1) {
+        if(this.avatar != undefined && this.avatar != null && this.avatar != '' && this.avatar.indexOf("/userServer/") != -1){
+          return this.avatar;
+        } else if (this.avatar != undefined && this.avatar != null && this.avatar != '' && this.avatar.indexOf("base64") != -1){
+          return this.avatar;
+        } else if (this.avatar != undefined && this.avatar != null && this.avatar != '' && this.avatar.indexOf("/avatar/") != -1) {
           this.avatar = this.$store.getters.userServer + this.avatar;
         } else if (temp != undefined & temp != null && temp != '' && temp.indexOf("/avatar/") != -1){
           this.avatar  = this.$store.getters.userServer + temp;

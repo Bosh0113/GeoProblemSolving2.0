@@ -58,7 +58,7 @@ public class Tool {
     String backendType;
     ArrayList<String> tags;
     //采用和 avatar 一样的存储策略
-    String toolImage;
+    String toolImg;
     /*
     适用于panel打开的内部工具和不适用panel打开的外部工具：inner/outer
     ????? 有点问题

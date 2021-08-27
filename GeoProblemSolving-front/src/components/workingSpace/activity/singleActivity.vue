@@ -80,11 +80,12 @@
               v-else
               :activityInfo="activityInfo"
               :participants="participants"
+              :projectInfo="projectInfo"
             ></universal-space>
           </vue-scroll>
         </div>
         <div v-show="activeMenu == 'Task'">
-          <task-manager :activityInfo="activityInfo" :userInfo="userInfo"></task-manager>
+          <task-manager :activityInfo="activityInfo" :userInfo="userInfo" :projectInfo="projectInfo"></task-manager>
         </div>
       </div>
     </div>
@@ -197,7 +198,7 @@ import geoSimulation from "./funcs/geoSimulation.vue";
 import geoAnalysis from "./funcs/geoAnalysis.vue";
 import decisionMaking from "./funcs/decisionMaking.vue";
 export default {
-  props: ["activityInfo","userInfo"],
+  props: ["activityInfo","userInfo","projectInfo"],
   components: {
     Avatar,
     // activityShow,
@@ -219,7 +220,6 @@ export default {
           background: "lightgrey",
         },
       },
-      projectInfo: {},
       activeMenu: "Workspace",
       // userInfo: JSON.parse(sessionStorage.getItem("userInfo")),
       userRole: "visitor",
@@ -374,6 +374,13 @@ export default {
                     this.projectInfo.name +
                     " , and now you are a member in this activity!",
                   approve: "unknow",
+                  projectId: this.projectInfo.aid,
+                  projectName: this.projectInfo.name,
+                  activityId: activity.aid,
+                  activityName: activity.name,
+                  activityLevel: activity.level,
+                  invitorName: this.userInfo.name,
+                  invitorId: this.userInfo.userId,
                 },
               };
               this.sendNotice(notice);
@@ -451,6 +458,13 @@ export default {
                   role +
                   ".",
                 approve: "unknow",
+                projectId: this.projectInfo.aid,
+                projectName: this.projectInfo.name,
+                activityId: activity.aid,
+                activityName: activity.name,
+                activityLevel: activity.level,
+                // removerName: this.userInfo.name,
+                // removerId: this.userInfo.userId,
               },
             };
             this.sendNotice(notice);
@@ -520,6 +534,13 @@ export default {
                   this.projectInfo.name +
                   ".",
                 approve: "unknow",
+                projectId: this.projectInfo.aid,
+                projectName: this.projectInfo.name,
+                activityId: activity.aid,
+                activityName: activity.name,
+                activityLevel: activity.level,
+                removerName: this.userInfo.name,
+                removerId: this.userInfo.userId,
               },
             };
             this.sendNotice(notice);
@@ -585,6 +606,13 @@ export default {
                     this.projectInfo.name +
                     ".",
                   approve: "unknow",
+                  projectId: this.projectInfo.aid,
+                  projectName: this.projectInfo.name,
+                  activityId: activity.aid,
+                  activityName: activity.name,
+                  activityLevel: activity.level,
+                  leaverName: this.userInfo.name,
+                  leaverId: this.userInfo.userId,
                 },
               };
               this.sendNotice(notice);

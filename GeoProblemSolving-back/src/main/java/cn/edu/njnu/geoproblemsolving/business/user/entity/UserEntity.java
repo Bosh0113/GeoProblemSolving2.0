@@ -35,7 +35,7 @@ public class UserEntity {
     private String phone;
     private UserTitle title;
     private String country;
-    private String province;    // County / State / Province
+    private String State;    // County / State / Province
     private String city;
     private String homepage;
     private String introduction;

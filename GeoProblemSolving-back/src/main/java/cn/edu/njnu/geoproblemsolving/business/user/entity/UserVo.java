@@ -32,7 +32,7 @@ public class UserVo {
     private String phone;
     private UserTitle title;
     private String country;
-    private String province;
+    private String State;
     private String city;
     private String homepage;
     private String introduction;
