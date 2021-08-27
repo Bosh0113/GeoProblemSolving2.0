@@ -67,4 +67,9 @@ public class ActivityResDaoImpl implements ActivityResDao {
         query.addCriteria(criteria1);
         return mongoTemplate.findOne(query, ResourceEntity.class);
     }
+
+    @Override
+    public List<ResourceEntity> findAll() {
+        return mongoTemplate.findAll(ResourceEntity.class);
+    }
 }

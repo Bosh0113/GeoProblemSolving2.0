@@ -407,6 +407,16 @@ public class UserResServiceImpl implements UserResService {
             //restTemplate工具类
             RestTemplateUtil httpUtil = new RestTemplateUtil();
             for (Part part : parts) {
+                //添加容量限制机制
+                long size = part.getSize();
+                String capacityCheckUrl = "http://" + userServerIpAndPort + "/auth/res/upload/" + size;
+                JSONObject checkResult = httpUtil.getRequestToServer(capacityCheckUrl, access_token).getBody();
+                if (checkResult.getInteger("code") != 0){
+                    uploadInfos.sizeOver.add(part.getSubmittedFileName());
+                    continue;
+                }
+                //获取上传标记，用于已知上传失败时候将预检容量删除
+                String uploadingId = checkResult.getString("uploadId");
                 try {
                     if (part.getName().equals("file")) {
                         LinkedMultiValueMap<String, Object> valueMap = new LinkedMultiValueMap<>();
@@ -473,6 +483,9 @@ public class UserResServiceImpl implements UserResService {
                                 continue;
                             }
                             uploadInfos.uploaded.add(res);
+                            //删除预检接口
+                            String delUploadingUrl = "http://" + userServerIpAndPort + "/auth/res/uploadFlag/" + uploadingId;
+                            httpUtil.getRequestToServer(delUploadingUrl, access_token).getBody();
                             //更新本地用户
                             if (fileNum > 0) {
                                 continue;
@@ -490,6 +503,9 @@ public class UserResServiceImpl implements UserResService {
                     }
                 } catch (Exception e) {
                     uploadInfos.failed.add(part.getSubmittedFileName());
+                    //删除容量预检查标记
+                    String delUploadingUrl = "http://" + userServerIpAndPort + "/auth/res/uploadFlag/" + uploadingId;
+                    httpUtil.getRequestToServer(delUploadingUrl, access_token).getBody();
                 }
             }
             return uploadInfos;

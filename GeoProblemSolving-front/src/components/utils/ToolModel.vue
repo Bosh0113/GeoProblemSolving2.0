@@ -25,6 +25,7 @@
             >
             <el-divider class="stateTitleDivider"></el-divider>
             <div class="events">
+              <!--              获取 state 中的输入 event-->
               <el-row
                 v-for="(modelInEvent, inEventIndex) in inEventList(state)"
                 :key="inEventIndex"
@@ -45,6 +46,7 @@
                     </p>
                   </el-col>
 
+                  <!--                  输入 event 为参数-->
                   <el-row v-if="modelInEvent.datasetItem.type == `internal`">
                     <div v-if="filterUdxNode(modelInEvent)">
                       <el-table
@@ -70,7 +72,9 @@
                             <el-input
                               v-model="scope.row.value"
                               @focus="sendInputTyping(inEventIndex, 'in')"
-                              @change="sendInputParams(inEventIndex)"
+                              @change="sendInputParams(modelInEvent, index, inEventIndex)"
+                              @blur="sendInputTyping(inEventIndex, 'out')"
+                              :ref="'input' + inEventIndex"
                             ></el-input>
                           </template>
                         </el-table-column>
@@ -98,7 +102,7 @@
                             icon="el-icon-close"
                             size="mini"
                             circle
-                            @click="remove(modelInEvent)"
+                            @click="remove(modelInEvent, index)"
                           ></el-button>
                           <!-- <i
                             class="el-icon-close"
@@ -141,7 +145,7 @@
                           icon="el-icon-close"
                           size="mini"
                           circle
-                          @click="remove(modelInEvent)"
+                          @click="remove(modelInEvent, index)"
                         ></el-button>
                       </div>
                     </div>
@@ -321,6 +325,10 @@
         mdlJson: {},
         //活动id
         aid: "",
+
+        inputEventList: [],
+        outputEventList: []
+
       };
     },
 
@@ -352,7 +360,62 @@
       },
 
       getSocketOperation: function (data) {
-        console.log(data)
+        let behavior = data.behavior;
+        let content = JSON.parse(data.content);
+        if (behavior == "message") {
+          //有人进入的提示
+          let index = content.inputNum;
+          if (content.inOrOut == "in") {
+            this.$refs['input' + index][0].$el.firstElementChild.style.borderColor = 'red';
+          } else {
+            this.$refs['input' + index][0].$el.firstElementChild.style.borderColor = '#4caf50';
+          }
+        } else if (behavior == "data") {
+          let type = content.addOrRemove;
+          if (type == "add") {
+            //输入文件
+            let stateIndex = content.inputs.stateIndex;
+            let eventIndex = content.inputs.eventIndex;
+            let url = content.inputs.url;
+            let urlName = content.inputs.urlName;
+            this.$set(
+              this.stateList[stateIndex].Event[eventIndex],
+              "url",
+              url
+            );
+            this.$set(
+              this.stateList[stateIndex].Event[eventIndex],
+              "urlName",
+              urlName
+            );
+          } else {
+            let eventId = content.inputs.eventId;
+            let stateIndex1 = content.inputs.stateIndex;
+            let events = this.stateList[stateIndex1].Event;
+            let findIndex = events.findIndex((item) => item.eventId == eventId);
+            this.$set(
+              this.stateList[stateIndex1].Event[findIndex],
+              "url",
+              ""
+            );
+            this.$set(
+              this.stateList[stateIndex1].Event[findIndex],
+              "urlName",
+              ""
+            );
+          }
+
+        } else if (behavior == "params") {
+          //输入参数
+          let inEvent = content.inputs;
+          let eventIndex = this.stateList[content.stateIndex].Event.findIndex(
+            (event) => event.eventId == inEvent.eventId
+          );
+          this.$set(this.stateList[content.stateIndex].Event[eventIndex], "datasetItem", inEvent.datasetItem);
+
+        }else if (behavior == "run"){
+          this.loading();
+        }
       },
 
       initLoading: function () {
@@ -368,9 +431,7 @@
         if (data != undefined && data != null) {
           this.getStateEventOut(data.computeOutputs)
         }
-
       },
-
 
       getModelInfo: function () {
         this.$axios.get("/GeoProblemSolving/tool/" + this.toolId)
@@ -378,7 +439,6 @@
             if (res.data.code == 0) {
               this.$set(this, "toolInfo", res.data.data);
               let tool = res.data.data;
-              console.log("modelInfo", tool)
               this.mdlJson = tool.mdlJson;
               this.datasetItem = tool.mdlJson.ModelClass[0].Behavior[0].RelatedDatasets[0].DatasetItem;
               this.md5 = tool.computableModelMd5;
@@ -480,14 +540,9 @@
         this.loading();
         await this.createFilefromParam();
         this.getStateEvent();
+        //传递开始运行信息
+        runTool();
         //测试数据没有弄 直接运行 根据ip+id
-        //invoke
-        // let data = await post(
-        //   `/GeoProblemSolving/modelTask/invoke`,
-        //   this.invokeForm
-        // );
-        // let invokeResultId = data;
-        // aid, serviceId, serviceLocation, computeModel, userName, inputs, outputs, callback
         sendModelOperation(
           this.aid,
           this.invokeInfo.serviceId,
@@ -496,6 +551,7 @@
           this.invokeInfo.inputs,
           this.invokeInfo.outputs
         );
+
         // refreshForm["ip"] = this.invokeForm.ip;
         // refreshForm["port"] = this.invokeForm.port;
         // refreshForm["tid"] = data;
@@ -564,7 +620,6 @@
 
       //动态绑定 更新outputs部分
       getStateEventOut: function (outputs) {
-        // console.log(outputs);
         let outList = this.stateList;
         outList.forEach((state, index) => {
           state.Event.forEach((event, eventIndex) => {
@@ -581,7 +636,6 @@
           });
         });
         this.fullscreenLoading.close();
-        console.log(this.stateList);
       },
 
       download(event) {
@@ -675,11 +729,11 @@
       },
 
 
-      sendInputTyping: function () {
-        sendTypingInfo();
+      sendInputTyping: function (index, inOrOut) {
+        sendTypingInfo(index, inOrOut);
       },
-      sendInputParams: function () {
-        sendInputParams();
+      sendInputParams: function (modelInEvent, stateIndex, index) {
+        sendInputParams(modelInEvent, stateIndex);
       },
 
 
@@ -730,17 +784,31 @@
         );
 
         this.selectDataDialogShow = false;
+        //将stateIndex 与 eventIndex
+        let content = {
+          stateIndex: stateIndex,
+          eventIndex: eventIndex,
+          url: val.address,
+          urlName: val.name
+        };
+
+        selectDataOperation(content, "add");
       },
       selectDataDialog(event) {
         this.currentEvent = event;
         this.selectDataDialogShow = true;
       },
-      remove(event) {
+      remove(event, stateIndex) {
         event.url == "";
         event.urlName = "";
+        let content = {
+          stateIndex: stateIndex,
+          eventId: event.eventId
+        };
+
+        selectDataOperation(content, "remove")
       },
     },
-
     beforeDestroy() {
       clearInterval(this.timer);
     },

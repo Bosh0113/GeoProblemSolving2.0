@@ -4,49 +4,6 @@
     <div id="collab-tool-sidebar"></div>
     <div id="collab-tool-content" class="scrollbar" style="margin-top: 20px">
       <el-row>
-        <!--        <el-col :sm="{ span: 10 }" :lg="{ span: 8 }" :xl="{ span: 6 }">-->
-        <!--          <el-card class="left-card">-->
-        <!--            <div style="float:left;font-size:60px;color:#409EFF;margin-left:50px">-->
-        <!--              <i class="el-icon-s-tools" />-->
-        <!--            </div>-->
-        <!--            <div style="float:left;margin-left:40px">-->
-        <!--              <div class="title">{{ dataService.name }}</div>-->
-        <!--              <div style="float:left;margin:3px 15px 0 0">-->
-        <!--                Contributed by-->
-        <!--              </div>-->
-        <!--              <div style=" font-weight: 600;font-size: 16px;float:left">-->
-        <!--                {{ dataService.authorship }}-->
-        <!--              </div>-->
-        <!--            </div>-->
-
-        <!--            <div style="clear:both">-->
-        <!--              <el-button-->
-        <!--                type="primary"-->
-        <!--                @click="invokeTest"-->
-        <!--                style="float:left;width:100px;margin-left:30px"-->
-        <!--              >-->
-        <!--                <i class="el-icon-setting"></i>&nbsp;Invoke-->
-        <!--              </el-button>-->
-        <!--              <el-button-->
-        <!--                type="primary"-->
-        <!--                @click="getRemoteData"-->
-        <!--                style="float:right;width:140px;margin-right:30px"-->
-        <!--              >-->
-        <!--                <i class="el-icon-setting"></i>&nbsp;Remote Data-->
-        <!--              </el-button>-->
-        <!--            </div>-->
-
-        <!--            <div class="des" style="clear:both;margin-top:20px">-->
-        <!--              <el-divider class="left-divider"></el-divider>-->
-        <!--              <div style="font-weight: 600;font-size: 16px;">Description</div>-->
-        <!--              <div v-if="dataService.hasOwnProperty('metaDetail')">-->
-        <!--                {{ dataService.metaDetail.description }}-->
-        <!--              </div>-->
-        <!--            </div>-->
-        <!--            <div class="des">{{ dataService.date }}</div>-->
-        <!--          </el-card>-->
-        <!--        </el-col>-->
-
         <el-col
           v-if="dataService.hasOwnProperty('metaDetail')"
         >
@@ -142,7 +99,8 @@
                     v-model="parameter.value"
                     placeholder="Enter the parameter"
                     @focus="sendInputTyping(index, 'in')"
-                    @change="sendInputParams(index)"
+                    @change="sendToolInputParams(index)"
+                    @blur="sendInputTyping(index, 'out')"
                     class="typing"
                     :ref="'input'+index"
                   ></el-input>
@@ -167,9 +125,6 @@
                 <span class="event_name" :title="output.name">{{
                   output.name
                 }}</span>
-                  <!--                  <p class="event_desc" :title="output.description">-->
-                  <!--                    {{ output.description }}-->
-                  <!--                  </p>-->
                 </el-col>
                 <div>
                   <div class="_btn-group" v-if="type == 'Processing' || type == 'Conversion'">
@@ -408,11 +363,13 @@
       },
 
       async invokeTest() {
+        this.initLoading();
         let inputs = this.inputData;
         let urls = {};
         inputs.forEach((input) => {
           urls[input.name] = input.url
         })
+
 
         let paramList = "";
         let params = this.dataService.metaDetail.parameter;
@@ -422,18 +379,14 @@
             paramList += ",";
           }
         }
-
-        console.log("urlList", urls)
-        console.log("paramList", paramList)
-
+        runTool();
         sendDataOperation(this.aid, this.id, this.dataToken, urls, paramList)
+
       },
       // webSocket 回调函数
       getSocketComputation: function (data) {
-        console.log(data)
         let output = data.computeOutputs;
         let keys = Object.keys(output);
-        console.log("outputData1", this.outputData)
         keys.forEach((key)=>{
           this.outputData.forEach((item, index)=>{
             if (item.name == key){
@@ -442,8 +395,7 @@
           })
         })
         this.$refs.invokeButton.$el.innerHTML = null;
-        console.log("outputData2", this.outputData)
-
+        this.fullscreenLoading.close();
         // if (data.behavior == "data") {
         //   this.inputData = data.content.inputs;
         // } else if (data.behavior == "message") {
@@ -463,9 +415,19 @@
             this.$refs['input' + index][index].$el.firstElementChild.style.borderColor = '#4caf50';
           }
         } else if (behavior == "data") {
-          this.inputData = content.inputs;
+          let type = content.addOrRemove;
+          if (type != "add") {
+            let index1 = content.inputs.index;
+            let event = content.inputs.event;
+            this.$set(this.inputData, index1, event)
+          } else {
+            this.inputData = content.inputs;
+          }
+
         } else if (behavior == "params") {
           this.inputParameter = content.inputs;
+        }else if (behavior == "run"){
+          this.initLoading();
         }
       },
 
@@ -499,7 +461,6 @@
       },
 
       selectData(val) {
-        console.log("selectData", val)
         //从resourceList传过来
         let index = this.inputIndex;
         this.dataService.metaDetail.input[index].url = val.address;
@@ -508,7 +469,7 @@
 
         this.inputData = this.dataService.metaDetail.input;
         //  直接将selectData 发过去就可以
-        selectDataOperation(this.inputData);
+        selectDataOperation(this.inputData, "add");
       },
 
       download(event) {
@@ -518,6 +479,11 @@
         event.url = "";
         event.urlName = "";
         this.$set(this.inputData, index, event);
+        let content = {
+          index: index,
+          event: event
+        };
+        selectDataOperation(event, "remove")
       },
       maskVisible() {
         this.showMask = true;
@@ -538,9 +504,8 @@
       sendInputTyping: function (index, inOrOut) {
         sendTypingInfo(index, inOrOut);
       },
-      sendInputParams: function (index) {
-        sendTypingInfo(index, "out");
-        sendInputParams(this.inputParameter);
+      sendToolInputParams: function (index) {
+        sendInputParams(this.inputParameter, "0");
       }
 
     },

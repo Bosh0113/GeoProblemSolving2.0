@@ -44,4 +44,7 @@ public interface ActivityResService {
 
     ArrayList<ResourceEntity> getFilesByIds(String aid, HashSet<String> uids);
 
+    //获取项目项目资源资源中的所有 public
+    List<ResourceEntity> getAllPublicService();
+
 }

@@ -22,4 +22,6 @@ public interface ActivityResDao {
     ResourceEntity queryByUid(String uid);
 
     ResourceEntity queryByAidAndName(String aid, String folderName);
+
+    List<ResourceEntity> findAll();
 }

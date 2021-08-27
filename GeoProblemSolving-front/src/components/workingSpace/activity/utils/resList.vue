@@ -616,7 +616,6 @@ export default {
         ],
         description: [
           {
-            required: true,
             message: "file description cannot be empty",
             trigger: "blur",
           },
