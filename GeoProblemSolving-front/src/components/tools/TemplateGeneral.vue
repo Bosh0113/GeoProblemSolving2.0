@@ -146,7 +146,7 @@
           <!--              enter the ... first-->
           <!--            </p>-->
           <!--          </FormItem>-->
-          <FormItem label="Service Type" prop="">
+          <FormItem label="Service Type" prop="backendType">
             <Select
               v-model="toolInfo.backendType"
               @on-change="queryServiceByEmail"
@@ -554,12 +554,12 @@ export default {
       this.toolInfo.categoryTag.splice(index, 1);
     },
 
-    async handleBeforeUpload(file) {
-      let formData = new FormData();
-      formData.append("toolImg", file);
-      let data = await post("/GeoProblemSolving/tool/picture", formData);
-      this.toolInfo.toolImg = data;
-    },
+    // async handleBeforeUpload(file) {
+    //   let formData = new FormData();
+    //   formData.append("toolImg", file);
+    //   let data = await post("/GeoProblemSolving/tool/picture", formData);
+    //   this.toolInfo.toolImg = data;
+    // },
 
     uploadPhoto(e) {
       // 利用fileReader对象获取file
@@ -575,23 +575,25 @@ export default {
         reader.readAsDataURL(file);
         reader.onload = (e) => {
           // 读取到的图片base64 数据编码 将此编码字符串传给后台即可
-          let formData = new FormData();
-          formData.append("toolImg", file);
-          this.axios
-            .post("/GeoProblemSolving/tool/picture", formData)
-            .then((res) => {
-              if (res.data.code == 0) {
-                console.log(res);
-                //上传图片返回的res.data.data为空
-                this.pictureUrl = res.data.data; //null
-                this.toolInfo.toolImg = this.pictureUrl;
-                this.img = e.target.result;
-                $("#choosePicture").val("");
-              } else {
-                this.$Message.error("upload picture Fail!");
-              }
-            })
-            .catch();
+          // let formData = new FormData();
+          // formData.append("toolImg", file);
+          // this.axios
+          //   .post("/GeoProblemSolving/tool/picture", formData)
+          //   .then((res) => {
+          //     if (res.data.code == 0) {
+          //       console.log(res);
+          //       //上传图片返回的res.data.data为空
+          //       this.pictureUrl = res.data.data; //null
+          //       this.toolInfo.toolImg = this.pictureUrl;
+          //       this.img = e.target.result;
+          //       $("#choosePicture").val("");
+          //     } else {
+          //       this.$Message.error("upload picture Fail!");
+          //     }
+          //   })
+          //   .catch();
+          this.img = e.target.result;
+          this.toolInfo.toolImg = this.img;
         };
       }
     },

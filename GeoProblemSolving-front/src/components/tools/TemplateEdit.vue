@@ -8,9 +8,6 @@
   box-shadow: 0px 0px 3px 1px #2d72f1;
 }
 
-.modelTitle {
-  /* margin-bottom: 5px; */
-}
 .modelName {
   font-weight: 600;
   overflow: hidden;
@@ -57,8 +54,8 @@
   margin-right: 4px;
 }
 .demo-upload-list img {
-  width: 110%;
-  height: 110%;
+  width: 100%;
+  height: 100%;
 }
 .demo-upload-list-cover {
   display: none;
@@ -77,6 +74,16 @@
   font-size: 20px;
   cursor: pointer;
   margin: 0 2px;
+}
+.uploadBox {
+  display: inline-block;
+  width: 58px;
+  height: 58px;
+  line-height: 58px;
+  overflow: hidden;
+  border-width: 0.75px;
+  border-style: dashed;
+  border-color: lightslategray;
 }
 .uploadAvatar {
   position: relative;
@@ -141,9 +148,9 @@
 <!--          </FormItem>-->
 
 <!--          :label-width="140"-->
-          <FormItem label="Step:" prop="recomStep" >
+          <FormItem label="Step:" prop="recommendation" >
             <Select
-              v-model="selectedTool.recomStep"
+              v-model="selectedTool.recommendation"
               multiple
               placeholder="Select the recommended step of your tool"
             >
@@ -164,7 +171,7 @@
             />
           </FormItem>
 
-          <FormItem label="tag:" prop="categoryTag">
+          <FormItem label="tag:" prop="tags">
             <Input
               v-model="inputToolTag"
               placeholder="Enter some tag to classify your tools"
@@ -182,7 +189,7 @@
             <div>
               <Tag
                 color="primary"
-                v-for="(item, index) in this.selectedTool.categoryTag"
+                v-for="(item, index) in this.selectedTool.tags"
                 :key="index"
                 closable
                 @on-close="deleteCreateToolTag(index)"
@@ -222,7 +229,23 @@
                 </template>
               </div>
               <div class="uploadBox">
-                <Upload
+                <Icon
+                  type="ios-camera"
+                  size="20"
+                  style="position: absolute; margin: 18px"
+                ></Icon>
+                <input
+                  id="choosePicture"
+                  @change="uploadPhoto($event)"
+                  type="file"
+                  class="uploadAvatar"
+                  accept="image/*"
+                />
+              </div>
+              <Modal title="View Image" v-model="visible">
+                <img :src="img" v-if="visible" style="width: 100%" />
+              </Modal>
+                <!-- <Upload
                   ref="upload"
                   :show-upload-list="false"
                   :format="['jpg', 'jpeg', 'png', 'gif']"
@@ -235,15 +258,7 @@
                   <div style="width: 58px; height: 58px; line-height: 58px">
                     <Icon type="ios-camera" size="20"></Icon>
                   </div>
-                </Upload>
-              </div>
-              <Modal title="View Image" v-model="visible">
-                <img
-                  :src="selectedTool.toolImg"
-                  v-if="visible"
-                  style="width: 100%"
-                />
-              </Modal>
+                </Upload> -->      
             </div>
           </FormItem>
         </div>
@@ -329,23 +344,32 @@ export default {
   methods: {
     addCreateToolTag(tag) {
       if (tag != "") {
-        this.selectedTool.categoryTag.push(tag);
+        this.selectedTool.tags.push(tag);
         this.inputToolTag = "";
       }
     },
 
     deleteCreateToolTag(index) {
-      this.selectedTool.categoryTag.splice(index, 1);
+      this.selectedTool.tags.splice(index, 1);
     },
 
-    async handleBeforeUpload(file) {
-      let formData = new FormData();
-      formData.append("toolImg", file);
-      let { data } = await this.axios.post(
-        "/GeoProblemSolving/tool/picture",
-        formData
-      );
-      this.selectedTool.toolImg = data.data;
+    uploadPhoto(e) {
+      // 利用fileReader对象获取file
+      var file = e.target.files[0];
+      var filesize = file.size;
+      // 2,621,440   2M
+
+      if (filesize > 2101440) {
+        // 图片大于2MB
+        this.$Message.error("size > 2MB");
+      } else {
+        var reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (e) => {
+          this.img = e.target.result;
+          this.selectedTool.toolImg = this.img;
+        };
+      }
     },
 
     handleView() {
@@ -353,17 +377,18 @@ export default {
     },
 
     handleRemove() {
+      this.img = "";
       this.selectedTool.toolImg = "";
     },
 
     addEditToolTag(tag) {
       if (tag != "") {
-        this.selectedTool.categoryTag.push(tag);
+        this.selectedTool.tags.push(tag);
         this.inputToolTag = "";
       }
     },
     deleteEditToolTag(index) {
-      this.selectedTool.categoryTag.splice(index, 1);
+      this.selectedTool.tags.splice(index, 1);
     },
   },
 
@@ -378,7 +403,6 @@ export default {
     selectTool: {
       handler(val) {
         this.selectedTool = val;
-        console.log("val", val)
       },
       deep: true,
     },

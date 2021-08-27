@@ -1,7 +1,8 @@
 package cn.edu.njnu.geoproblemsolving.business.tool.trafficNoise.Data.Dao;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
+//import org.apache.commons.lang.StringUtils;
+import org.springframework.util.StringUtils;
 
 import java.io.*;
 import java.net.URL;

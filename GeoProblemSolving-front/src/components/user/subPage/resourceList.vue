@@ -151,10 +151,10 @@
                           dis-hover
                         >
                           <Checkbox :label="file.address">&nbsp;</Checkbox>
-                          <Icon v-if="file.type === 'data'" type="ios-document-outline" class="itemIcon" size="25"/>
+                          <Icon v-if="file.type === 'data'" type="ios-podium-outline" class="itemIcon" size="25"/>
                           <Icon v-else-if="file.type === 'image'" type="ios-image-outline" class="itemIcon" size="25"/>
                           <Icon v-else-if="file.type === 'paper'" type="ios-paper-outline" class="itemIcon" size="25"/>
-                          <Icon v-else-if="file.type === 'document'" type="ios-albums-outline" class="itemIcon" size="25"/>
+                          <Icon v-else-if="file.type === 'document'" type="ios-document-outline" class="itemIcon" size="25"/>
                           <Icon v-else-if="file.type === 'model'" type="ios-construct-outline" class="itemIcon" size="25"/>
                           <Icon v-else-if="file.type === 'video'" type="ios-videocam-outline" class="itemIcon" size="25"/>
                           <Icon v-else type="ios-create-outline" class="itemIcon" size="25"/>
@@ -164,7 +164,7 @@
                             :title="file.name"
                           >{{ file.name }}</span
                           >
-                          <span v-if="useFileItemSize" class="fileItemSize">{{file.fileSize}}</span>
+                          <span v-if="useFileItemSize" class="fileItemSize">{{file.fileSize | filterSizeType}}</span>
                           <!-- <span style="width: 20%; margin-left: 20%; ">
                             {{
                             // file.uploadTime
@@ -658,6 +658,7 @@
               this.$router.push({ name: "Login" });
             } else if (res.data.code == 0) {
               let rootRes = res.data.data;
+              console.log(rootRes);
               this.resToCurrentFolder(rootRes);
             }
           })
@@ -720,7 +721,7 @@
           },
           {
             key: "File size",
-            value: file.fileSize,
+            value: this.$options.filters['filterSizeType'](file.fileSize),
           },
           // {
           //   key: "Uploader",
@@ -730,10 +731,10 @@
             key: "Upload Time",
             value: file.uploadTime,
           },
-          {
-            key: "Path",
-            value: file.path,
-          }
+          // {
+          //   key: "Path",
+          //   value: file.path,
+          // }
         ];
         this.fileInfoModal = true;
       },
@@ -1001,7 +1002,11 @@
                 },
                 data: formData
               }).then(res => {
-                if (res.data != "Fail") {
+                console.log(res);
+                if (res.data == "Offline"){
+                  this.$store.commit("userLogout");
+                  this.$router.push({ name: "Login" });
+                } else if (res.data != "Fail" && res.data != "Offline") {
                   let uploadedList = res.data.uploaded;
                   let failedList = res.data.failed;
                   let sizeOverList = res.data.sizeOver;
@@ -1123,6 +1128,7 @@
         this.editFileValidate.name = fileInfo.name;
         this.editFileValidate.type = fileInfo.type;
         this.editFileValidate.description = fileInfo.description;
+        this.editFileValidate.privacy = fileInfo.privacy;
         this.editFileModel = true;
       },
       editFileInfo: function (fileInfo) {
@@ -1133,7 +1139,8 @@
               name: this.editFileValidate.name,
               privacy: this.editFileValidate.privacy,
               type: this.editFileValidate.type,
-              description: this.editFileValidate.description
+              description: this.editFileValidate.description,
+              fileSize: this.putFileInfo.fileSize,
             }
             this.reversePathToStr(this.folderIdStack)
             this.axios
@@ -1164,35 +1171,7 @@
               })
           }
         })
-
-        // this.reversePathToStr(this.folderPath);
-        // this.axios
-        //   .put("/GeoProblemSolving/" + this.pathStr, this.renameForeInfo)
-        //   .then(res => {
-        //     if (res.data == "Offline") {
-        //       confirm("You are offline, please login again.");
-        //     } else if (res.data.code == 0) {
-        //       let newFileInfo = Object.assign({}, this.renameForeInfo);
-        //       newFileInfo.name = this.editFileValidate.name;
-        //       newFileInfo.type = this.editFileValidate.type;
-        //       newFileInfo.description = this.editFileValidate.description;
-        //       //替换内容
-        //       for (let i = 0; i < this.currentFolder.files.length; i++) {
-        //         if (this.currentFolder.folders[i].uid == fileInfo.uid) {
-        //           this.currentFolder.files.splice(i, i, newFileInfo);
-        //           break;
-        //         }
-        //       }
-        //     } else {
-        //       this.$Message.warning("Rename fail.");
-        //     }
-        //   })
-        //   .catch(err => {
-        //     this.$Message.warning("Rename fail.");
-        //   })
-        this.renameFolderModal = false;
       }
-
     },
     mounted() {
       this.resizeContent();
@@ -1205,7 +1184,15 @@
     beforeDestroy: function () {
       window.removeEventListener("resize", this.reSize);
     },
-    computed: {},
+    filters: {
+      filterSizeType(value){
+        if(value === 0) return "0 B";
+        let k = 1024;
+        let sizes = ["B","KB","MB","GB"];
+        let i = Math.floor(Math.log(value) / Math.log(k));
+        return (value / Math.pow(k,i)).toPrecision(3) + " " + sizes[i];
+      }
+    },
   }
 </script>
 

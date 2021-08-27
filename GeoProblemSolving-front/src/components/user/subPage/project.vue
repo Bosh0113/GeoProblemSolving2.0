@@ -4,6 +4,7 @@
     border-radius: 3px;
     border:1px solid #dadce0;
     box-shadow:  0 3.2px 7.2px 0 rgb(0 0 0 / 13%), 0 0.6px 1.8px 0 rgb(0 0 0 / 11%);
+    position: relative;
   }
 
   .customCard{
@@ -125,8 +126,8 @@
                         :key="'create'+index"
                         >
                           <Col span="7" style="margin-left: 3.5%">
-                            <div class="projectItem" @click="goSingleProject(mProject)">
-                              <Card style="height:320px;margin-top:20px;" class="projectCard">
+                            <div class="projectItem" @click="goSingleProject(mProject)" >
+                              <Card style="height:320px;margin-top:20px; z-index: 0;" class="projectCard" >
                                 <p slot="title" class="projectsTitle">{{mProject.name}}</p>
                                 <Button
                                   class="authorBtn"
@@ -146,15 +147,23 @@
                                   title="remove"
                                 ></Button>
 
+                                <!-- project显示图片 -->
+                                <!-- <Poptip trigger="hover" title="Description" :content="mProject.description" style="position:absolute;  top:50px; left:1%;">
+                                  <img 
+                                    :src="mProject.picture" 
+                                    style="width:287%; height:230px; opacity: 1;"
+                                  >
+                                </Poptip> -->
+                                
+
                                 <!--  @click.stop="deleteProjectModalShow(mProject.projectId)" -->
                                 <!-- 表头结束 -->
                                 <!--              200px  -->
-                                <p style="height:200px;" >
-                                  <span style="font-weight: bold;">Description</span>
-                                  <vue-scroll :ops="ops" style="text-indent:2em;word-break:break-word;white-space: pre-line;">
-                                    {{mProject.description}}
+                                <div style="height:200px; z-index: 2;" >
+                                  <span style="font-weight: bold;">Description：</span>
+                                  <vue-scroll :ops="ops" style="text-indent:2em;word-break:break-word;white-space: pre-line;">{{mProject.description}}
                                   </vue-scroll>
-                                </p>
+                                </div>
                                 <br/>
                                 <div>
                                   <span style="float:left">CreateTime:</span>
@@ -175,7 +184,7 @@
                         >
                           <Col span="7" style="margin-left: 3.5%">
                             <div @click="goSingleProject(item)" class="projectItem">
-                              <Card style="height:320px;margin-top:20px;" class="projectCard">
+                              <Card style="height:320px;margin-top:20px;  z-index: 0;" class="projectCard">
                                 <p
                                   slot="title"
                                   class="projectsTitle"
@@ -187,12 +196,12 @@
                                   @click.stop="quitModalShow(item)"
                                 >Quit
                                 </Button>
-                                <p
-                                  style="height:200px;"
-                                >
-                                  <span style="font-weight: bold">Description</span>
-                                  <vue-scroll :ops="ops" style="text-indent:2em;word-break:break-word;white-space: pre-line;">{{item.description}}</vue-scroll>
-                                </p>
+                                <!-- <img :src="item.picture" style="position:absolute; width:98%; height:230px; top:50px; left:1%; opacity: 0.5;z-index: -1;"> -->
+                                <div style="height:200px;  z-index: 2;">
+                                  <span style="font-weight: bold">Description：</span>
+                                  <vue-scroll :ops="ops" style="text-indent:2em;word-break:break-word;white-space: pre-line;">{{item.description}}
+                                  </vue-scroll>
+                                </div>
                                 <br/>
                                 <div style="height:40px">
                                   <span style="float:left">CreateTime:</span>
@@ -620,7 +629,6 @@
           this.$axios.get("/GeoProblemSolving/project/getProjects?aids=" + createdProjectIds)
             .then(res => {
               this.$set(this, "createdProjectList", res.data.data)
-              
             })
             .catch(err => {
               this.$Message.error("Loading project failed.")
@@ -633,7 +641,6 @@
           this.$axios.get("/GeoProblemSolving/project/getProjects?aids=" + joinedProjectIds)
             .then(res => {
               this.$set(this, "joinedProjectsList", res.data.data)
-              
             })
             .catch(err => {
               this.$Message.error("Loading project failed.")
@@ -671,7 +678,8 @@
                   notice["content"] = {
                     title: "Project Deleted",
                     description:
-                      this.delProjectName + " has been deleted by manager " + this.$store.getters.userName + " !"
+                      this.delProjectName + " has been deleted by manager " + this.$store.getters.userName + " !",
+                    projectId: this.deleteProjectId,
                   };
 
 
@@ -759,7 +767,8 @@
                 description:
                   "You have been the manager of project " +
                   this.currentProject.title +
-                  " !"
+                  " !",
+                projectId: this.currentProject.projectId,
               };
               this.axios
                 .post("/GeoProblemSolving/notice/save", notice)
@@ -806,13 +815,16 @@
               notice["recipientId"] = creatorId;
               notice["type"] = "notice";
               notice["content"] = {
-                title: "Manager change",
+                title: "Project member change",
                 description:
                   "The member called " +
                   this.$store.getters.userInfo.name +
                   " had quited from your project " +
                   this.currentProject.name +
-                  "!"
+                  "!",
+                projectId: quitProjectId,
+                projectName: this.currentProject.name,
+
               };
               this.axios
                 .post("/GeoProblemSolving/notice/save", notice)

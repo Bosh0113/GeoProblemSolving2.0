@@ -104,6 +104,16 @@
           @click="activityDeleteModal = true"
           >Delete</Button
         >
+        <Button
+          v-if="slctActivity.level == 0 && slctActivity.type != 'Activity_Default'"
+          type="primary"
+          icon="ios-bookmark"
+          size="small"
+          style="margin-top: -10px; margin-right: 10px"
+          title="Back to project page"
+          @click="backToProject()"
+          >Back</Button
+        >
       </div>
       <!-- <Spin size="large" fix v-if="spinShow"></Spin> -->
       <!--      默认contentType为0，根据contType编号进行模块显示-->
@@ -118,6 +128,7 @@
         v-else-if="contentType == 1"
         :activityInfo="slctActivity"
         :userInfo="userInfo"
+        :projectInfo="projectInfo"
         :key="slctActivity.aid"
       ></single-activity>
       <multi-activity
@@ -543,7 +554,7 @@ export default {
         ]
       );
     },
-    enterChildActivity(activity) {
+    enterActivity(activity) {
       this.slctActivity = activity;
       this.locateActivity();
     },
@@ -573,6 +584,9 @@ export default {
         document.getElementById("ActivityContent").style.width =
           window.innerWidth - 260 + "px";
       }
+    },
+    backToProject(){
+      window.location.href = '/GeoProblemSolving/projectInfo/' + this.projectInfo.aid + '?content=overview'
     },
     locateActivity() {
       // let content = this.getURLParameter("content");
@@ -958,6 +972,7 @@ export default {
           content: {
             title:
               "Application of joining the activity: " + this.slctActivity.name,
+            projectId: this.projectInfo.aid,
             activityId: this.slctActivity.aid,
             activityName: this.slctActivity.name,
             activityLevel: this.slctActivity.level,
@@ -974,13 +989,13 @@ export default {
     sendNotice(activity, notice) {
       this.axios
         .post("/GeoProblemSolving/notice/save", notice)
-        .then((result) => {
+        .then((res) => {
           //offline model
           if (res.data == "Offline") {
             this.$store.commit("userLogout");
             // this.$router.push({ name: "Login" });
             this.tempLoginModal = true;
-          } else if (result.data == "Success") {
+          } else if (res.data == "Success") {
             this.$Notice.info({ desc: "Send application successfully." });
             this.applyJoinActivityModal = false;
             this.$emit("sendNotice", notice.recipientId);

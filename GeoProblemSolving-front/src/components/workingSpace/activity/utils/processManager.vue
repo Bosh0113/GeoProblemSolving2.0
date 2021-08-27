@@ -650,11 +650,11 @@ export default {
   props: [
     "activityInfo",
     "childActivities",
-    "userInfo"
+    "userInfo",
+    "projectInfo"
   ],
   data() {
     return {
-      projectInfo: {},
       // driver
       // driver: new Driver(),
       // user
