@@ -259,7 +259,7 @@ public class ActivityResServiceImpl implements ActivityResService {
             }
             //资源自动更新
             String graphId = req.getParameter("graphId");
-            geoAnalysisProcess.batchResFlowAutoUpdate(graphId, aid, resTagMap);
+            // geoAnalysisProcess.batchResFlowAutoUpdate(graphId, aid, resTagMap);
             return uploadInfos;
 
         } catch (Exception e) {
@@ -820,5 +820,26 @@ public class ActivityResServiceImpl implements ActivityResService {
         return activityResDao.queryByAidAndName(aid, folderName);
     }
 
+    @Override
+    public List<ResourceEntity> getAllPublicService() {
+        ArrayList<ResourceEntity> allResource = (ArrayList<ResourceEntity>)activityResDao.findAll();
+        List<ResourceEntity> publicResource = new ArrayList<>();
+        gAllPublicResource(allResource, publicResource);
+        return publicResource;
+    }
+
+    private List<ResourceEntity> gAllPublicResource(ArrayList<ResourceEntity> resource, List<ResourceEntity> publicResource){
+        for (ResourceEntity item : resource){
+            if (item.getFolder()){
+                gAllPublicResource(item.getChildren(), publicResource);
+            }else {
+                if (item.getPrivacy().equals("public")){
+                    publicResource.add(item);
+                }
+            }
+        }
+        return publicResource;
+    }
 
 }
+

@@ -96,7 +96,7 @@
                              />
                            </div>
                            <!--                       内容    -->
-                           <div @click="toToolPage(tool)" style="cursor: pointer;position: relative;">
+                           <div style="cursor: pointer;position: relative;">
                              <div style="position: absolute;margin-top: 5px;">
                                <img
                                  :src="tool.toolImg"
@@ -652,28 +652,6 @@
             this.$Message.error("Update Fail.Try again!");
           });
       },
-      //需要改一下
-      toToolPage: function (tool) {
-        if (tool.backendType == "dataMethod") {
-          let type = "";
-          switch (tool.dataMethodType) {
-            case "process":
-              type = "Processing";
-              break;
-            case "":
-              break;
-            case "":
-              break;
-          }
-          let encodeToken = encodeURIComponent(tool.token);
-          window.open("/dataService/" + tool.dataMethodId + "/" + encodeToken + "/" + type)
-        } else if (tool.backendType == "modelItem") {
-          window.open("/modelItem/" + tool.computableModelMd5);
-        }else if (tool.backendType == "webTool"){
-          window.open()
-        }
-        console.log("toolPage", tool)
-      }
     },
     computed: {
       userToolCount: function () {

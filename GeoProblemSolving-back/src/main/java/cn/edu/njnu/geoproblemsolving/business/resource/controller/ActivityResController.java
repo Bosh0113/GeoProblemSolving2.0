@@ -225,4 +225,9 @@ public class ActivityResController {
         return resService.changeResEntity(aid, uid, paths, req);
     }
 
+    @RequestMapping(value = "/file/allPublic", method = RequestMethod.GET)
+    public JsonResult getAllPublicRes(){
+        return ResultUtils.success(resService.getAllPublicService());
+    }
+
 }

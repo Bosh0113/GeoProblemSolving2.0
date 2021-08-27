@@ -129,6 +129,7 @@ public class UserController {
      * 通过session判断
      * 这个比较关键（判断用户登录状态）
      * 若有的话则返回指定字段到前端即可
+     * 前端用于获取用户信息
      * @param req
      * @return
      */

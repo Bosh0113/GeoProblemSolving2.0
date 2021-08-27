@@ -27,11 +27,11 @@ public class ResourceController {
         return resourceDao.readResource(key, value);
     }
 
-    @RequestMapping(value = "/allPublic", method = RequestMethod.GET)
-    public Object readAllPublic() {
-        ResourceDaoImpl resourceDao = new ResourceDaoImpl(mongoTemplate);
-        return resourceDao.readPublicResource();
-    }
+    // @RequestMapping(value = "/allPublic", method = RequestMethod.GET)
+    // public Object readAllPublic() {
+    //     ResourceDaoImpl resourceDao = new ResourceDaoImpl(mongoTemplate);
+    //     return resourceDao.readPublicResource();
+    // }
 
     @RequestMapping(value = "/update",method = RequestMethod.POST)
     public Object updateResource(HttpServletRequest request){

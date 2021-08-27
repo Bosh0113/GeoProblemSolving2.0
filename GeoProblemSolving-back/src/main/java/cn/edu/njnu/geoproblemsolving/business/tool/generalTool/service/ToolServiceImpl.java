@@ -185,6 +185,7 @@ public class ToolServiceImpl implements ToolService {
         String creator = toolJson.getString("creator");
         String privacy = toolJson.getString("privacy");
         JSONArray recomSteps = toolJson.getJSONArray("recomStep");
+        String toolImg = toolJson.getString("toolImg");
         ArrayList<String> recommendation = Lists.newArrayList();
         if (recomSteps != null){
             for (int i =0; i< recomSteps.size(); i++){
@@ -209,6 +210,7 @@ public class ToolServiceImpl implements ToolService {
         tool.setCreatedTime(createDate);
         tool.setRecommendation(recommendation);
         tool.setTags(tags);
+        tool.setToolImage(toolImg);
 
         //toolImage暂时先不放
 

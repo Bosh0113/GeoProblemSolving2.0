@@ -109,9 +109,7 @@
                   >
                     <Card>
                       <!--                  <h4 style="font-size: 13px">{{item.content.title}}</h4>-->
-                      <Badge dot>
                         <h4 style="font-size: 15px" @click="getReadNoticeInfo(item)">{{item.content.title}}</h4>
-                      </Badge>
                       <br/>
                       <p style="font-weight: 400; font-size: 17px">{{item.content.description}}</p>
                       <small style="font-size: 13px">{{item.createTime}}</small>

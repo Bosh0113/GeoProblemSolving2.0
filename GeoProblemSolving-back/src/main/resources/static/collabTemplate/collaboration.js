@@ -1399,6 +1399,28 @@ var taskList = [];
             }
         },
 
+        receiveRunToolOperation: function () {
+            let msg = {
+                type: "operation",
+                behavior: "run",
+                content: {
+                    toolRun: "run"
+                },
+                sender: userInfo.userId
+            };
+            if (this.websock.readyState === this.websock.OPEN) {
+                this.websocketSend(msg);
+            } else if (this.websock.readyState === this.websock.CONNECTING) {
+                setTimeout(function () {
+                    this.receiveRunToolOperation();
+                }, 1000)
+            } else {
+                setTimeout(function () {
+                    this.receiveRunToolOperation();
+                }, 1000)
+            }
+        },
+
         reciveElementChangeOperation(paramsMsg) {
             if (this.websock.readyState === this.websock.OPEN) {
                 this.websocketSend(paramsMsg);
@@ -1578,5 +1600,9 @@ var taskList = [];
     //
     function selectDataOperation(value) {
         CollabSocket.receiveDataInputDataOperation(value);
+    }
+
+    function runTool() {
+        CollabSocket.receiveRunToolOperation();
     }
 }

@@ -483,6 +483,7 @@ export default {
         return this.parentActivity.members.contains(this.userInfo);
       }
     },
+    //设置限制内容
     renderStyle(h, { root, node, data }) {
       let props = {};
       let style = {};

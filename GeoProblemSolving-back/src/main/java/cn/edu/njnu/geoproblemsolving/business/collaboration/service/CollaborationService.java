@@ -221,7 +221,7 @@ public class CollaborationService {
         CollaborationConfig collaborationConfig;
         try {
             String groupKey = toolId + aid;
-            CollaborationConfig collaborationConfig = groups.get(groupKey);
+            collaborationConfig = groups.get(groupKey);
 
             JSONObject messageObject = JSONObject.parseObject(message);
             String messageType = messageObject.getString("type");
