@@ -10,7 +10,7 @@
   margin-top: 20px;
   padding: 15px;
   background-color: #f8f8f9;
-  height: calc(100vh - 200px);
+  height: calc(100vh - 300px);
   width: calc(100vw - 400px);
 }
 .domain >>> .ti-input {
@@ -55,7 +55,14 @@
     <Col span="24" style="margin-top: 20px">
       <div>
         <Row type="flex" justify="space-around">
-          <div style="width: 80%; height: 25px; text-align: center; margin-left: 10%;">
+          <div
+            style="
+              width: 80%;
+              height: 25px;
+              text-align: center;
+              margin-left: 10%;
+            "
+          >
             <span style="font-weight: bold; font-size: 16px"
               >Procedure of the current activity</span
             >
@@ -527,20 +534,28 @@
           </div>
           <div style="display: flex">
             <div style="margin-top: 5px; width: 72px">Domains:</div>
-<!--            <vue-tags-input-->
-<!--              class="domain"-->
-<!--              v-model="domain_tag"-->
-<!--              :tags="linkDomains"-->
-<!--              @tags-changed="(newTags) => (linkDomains = newTags)"-->
-<!--            />-->
-            <Select v-model="selectUserDomain" multiple :max-tag-count = 4>
-              <Option v-for="(item, index) in userDomain" :value="item" :key="index"></Option>
+            <!--            <vue-tags-input-->
+            <!--              class="domain"-->
+            <!--              v-model="domain_tag"-->
+            <!--              :tags="linkDomains"-->
+            <!--              @tags-changed="(newTags) => (linkDomains = newTags)"-->
+            <!--            />-->
+            <Select v-model="selectUserDomain" multiple :max-tag-count="4">
+              <Option
+                v-for="(item, index) in userDomain"
+                :value="item"
+                :key="index"
+              ></Option>
             </Select>
           </div>
           <div style="display: flex">
             <div style="margin-top: 5px; width: 72px">Organizations:</div>
-            <Select v-model="selectUserOrg" multiple :max-tag-count = 4>
-              <Option v-for="(item, index) in userOrganizations" :value="item" :key="index"></Option>
+            <Select v-model="selectUserOrg" multiple :max-tag-count="4">
+              <Option
+                v-for="(item, index) in userOrganizations"
+                :value="item"
+                :key="index"
+              ></Option>
             </Select>
           </div>
         </template>
@@ -572,7 +587,7 @@
             <Select
               v-model="resProtocolForm.types"
               multiple
-              :max-tag-count = 2
+              :max-tag-count="2"
               placeholder="Type of resources"
               style="width: 267px"
             >
@@ -636,25 +651,28 @@
         </template>
       </div>
     </Modal>
-    <login-modal :tempLoginModal="tempLoginModal" @changeLoginModal="changeLoginModal"></login-modal>
+    <login-modal
+      :tempLoginModal="tempLoginModal"
+      @changeLoginModal="changeLoginModal"
+    ></login-modal>
   </Row>
 </template>
 <script>
 // import "driver.js/dist/driver.min.css";
 import echarts from "echarts";
 import VueTagsInput from "@johmun/vue-tags-input";
-import loginModal from "../../../user/userState/loginModal.vue"
+import loginModal from "../../../user/userState/loginModal.vue";
 // import Driver from "driver.js";
 export default {
   components: { VueTagsInput,loginModal },
   props: [
     "activityInfo",
     "childActivities",
-    "userInfo"
+    "userInfo",
+    "projectInfo"
   ],
   data() {
     return {
-      projectInfo: {},
       // driver
       // driver: new Driver(),
       // user
@@ -732,7 +750,7 @@ export default {
         "Model effectiveness evaluation",
         "Geographical simulation",
         "Decision making",
-        "Multi-purpose",
+        "Other purpose",
       ],
       // 步骤逻辑图
       stepChart: null,
@@ -754,7 +772,7 @@ export default {
       userDomain: [],
       userOrganizations: [],
       resTypes: [],
-      resSuffixes: []
+      resSuffixes: [],
     };
   },
   created() {
@@ -787,7 +805,7 @@ export default {
         operation
       );
     },
-    changeLoginModal(status){
+    changeLoginModal(status) {
       this.tempLoginModal = status;
     },
     updateStepchart() {
@@ -940,7 +958,7 @@ export default {
               icon: "circle",
             },
             {
-              name: "Multi-purpose",
+              name: "Other purpose",
               icon: "circle",
             },
           ],
@@ -987,7 +1005,7 @@ export default {
                 name: "Decision making",
               },
               {
-                name: "Multi-purpose",
+                name: "Other purpose",
               },
             ],
             links: [],
@@ -1102,7 +1120,7 @@ export default {
       } else if (category == 7) {
         purpose = "Decision making";
       } else {
-        purpose = "Multi-purpose";
+        purpose = "Other purpose";
       }
       return purpose;
     },
@@ -1222,15 +1240,7 @@ export default {
         .then((res) => {
           if (res.data == "Offline") {
             this.$store.commit("userLogout");
-            // this.$router.push({ name: "Login" });
             this.tempLoginModal = true;
-            // if (this.activityInfo.level == 1) {
-            //   this.$store.commit("userLogout");
-            //   // this.$router.push({ name: "Login" });
-            //   this.tempLoginModal = true;
-            // } else {
-            //   parent.location.href = "/GeoProblemSolving/login";
-            // }
           } else if (res.data.code == 0) {
             this.updateStepchart();
             this.selectedActivities = [];
@@ -1428,6 +1438,7 @@ export default {
           }
         }
       }
+      this.updatePathway();
     },
     buildLink: function () {
       //** front link */
@@ -1436,10 +1447,10 @@ export default {
       //*** save protocol */
 
       //// normalize protocol
-      let relation  = {
+      let relation = {
         graphId: this.activityInfo.aid,
         type: this.protocalType,
-        nodes: this.activityLinks
+        nodes: this.activityLinks,
       };
 
       let restriction = {
@@ -1455,14 +1466,13 @@ export default {
         roleProtocol: this.roleProtocol,
         roles: this.linkRoles,
         domains: this.selectUserDomain,
-        organizations: this.selectUserOrg
+        organizations: this.selectUserOrg,
       };
 
       let protocolForm = {
         relation: relation,
-        restriction: restriction
-      }
-
+        restriction: restriction,
+      };
 
       //// save protocol
       this.axios
@@ -1470,15 +1480,7 @@ export default {
         .then((res) => {
           if (res.data == "Offline") {
             this.$store.commit("userLogout");
-            // this.$router.push({ name: "Login" });
             this.tempLoginModal = true;
-            // if (this.activityInfo.level == 1) {
-            //   this.$store.commit("userLogout");
-            //   // this.$router.push({ name: "Login" });
-            //   this.tempLoginModal = true;
-            // } else {
-            //   parent.location.href = "/GeoProblemSolving/login";
-            // }
           } else if (res.data.code == 0) {
             // 重新渲染
             this.updateStepchart();
@@ -1572,15 +1574,7 @@ export default {
         .then((res) => {
           if (res.data == "Offline") {
             this.$store.commit("userLogout");
-            // this.$router.push({ name: "Login" });
             this.tempLoginModal = true;
-            // if (this.activityInfo.level == 1) {
-            //   this.$store.commit("userLogout");
-            //   // this.$router.push({ name: "Login" });
-            //   this.tempLoginModal = true;
-            // } else {
-            //   parent.location.href = "/GeoProblemSolving/login";
-            // }
           } else if (res.data.code == 0) {
             this.operationApi.processRecord(
               this.activityInfo.aid,
@@ -1661,15 +1655,7 @@ export default {
         .then((res) => {
           if (res.data == "Offline") {
             this.$store.commit("userLogout");
-            // this.$router.push({ name: "Login" });
             this.tempLoginModal = true;
-            // if (this.activityInfo.level == 1) {
-            //   this.$store.commit("userLogout");
-            //   // this.$router.push({ name: "Login" });
-            //   this.tempLoginModal = true;
-            // } else {
-            //   parent.location.href = "/GeoProblemSolving/login";
-            // }
           } else if (res.data.code == 0) {
             this.operationApi.processRecord(
               this.activityInfo.aid,
@@ -1695,68 +1681,75 @@ export default {
     gotoActivity(aid) {
       for (let i = 0; i < this.childActivities.length; i++) {
         if (this.childActivities[i].aid == aid) {
-          parent.location.href =
-            "/GeoProblemSolving/projectInfo/" +
+          
+          window.location.href =
+            "/GeoProblemSolving/activityInfo/" +
             this.projectInfo.aid +
-            "?content=workspace&aid=" +
+            "?aid=" +
             this.childActivities[i].aid +
             "&level=" +
             this.childActivities[i].level;
         }
       }
     },
-    roleProtocolChange(val){
+    roleProtocolChange(val) {
       let aidList = [];
-      this.selectedActivities.forEach(activity => {
+      this.selectedActivities.forEach((activity) => {
         aidList.push(activity.aid);
-      })
+      });
       if (val == "Constraints") {
-        this.axios.get("/GeoProblemSolving/activityDriven/user/tag/" + aidList.toString())
-          .then(res => {
+        this.axios
+          .get(
+            "/GeoProblemSolving/activityDriven/user/tag/" + aidList.toString()
+          )
+          .then((res) => {
             let code = res.data.code;
-            if (code != 0){
+            if (code != 0) {
               this.$Notice.info({
                 desc: "ERROR!",
               });
-            }else {
+            } else {
               let data = res.data.data;
               this.userDomain = data.domains;
               this.userOrganizations = data.organizations;
             }
           })
-          .catch(e => {
+          .catch((e) => {
             this.$Notice.info({
               desc: "ERROR!",
             });
-          })
+          });
       }
     },
-    resProtocolChange(val){
+    resProtocolChange(val) {
       let aidList = [];
-      this.selectedActivities.forEach(activity => {
+      this.selectedActivities.forEach((activity) => {
         aidList.push(activity.aid);
-      })
+      });
       if (val == "Constraints") {
-        this.axios.get("/GeoProblemSolving/activityDriven/res/tag/" + aidList.toString())
-          .then(res => {
+        this.axios
+          .get(
+            "/GeoProblemSolving/activityDriven/res/tag/" + aidList.toString()
+          )
+          .then((res) => {
             let code = res.data.code;
-            if (code != 0){
+            if (code != 0) {
               this.$Notice.info({
                 desc: "ERROR!",
               });
-            }else {
+            } else {
               let data = res.data.data;
               this.resTypes = data.types;
               this.resSuffixes = data.suffixes;
             }
           })
-          .catch(e => {
+          .catch((e) => {
             this.$Notice.info({
               desc: "ERROR!",
             });
-          })
+          });
       }
-    }
+    },
   },
 };
 </script>

@@ -1,7 +1,10 @@
-var websock = null;
-var global_callback = null;
+var websockets = {};
+var callbacks = {};
+var websockLinked = {};
+
+var socketSites = []
+
 var timer = null;
-var websockLinked = false;
 
 
 function initWebSocket(para) { //初始化websocket
@@ -11,56 +14,58 @@ function initWebSocket(para) { //初始化websocket
         wsurl = `ws://localhost:8081/GeoProblemSolving/${para}`;
     }
     //switch 使用时提供一个参数type
-    websock = new WebSocket(wsurl);
+    let websock = new WebSocket(wsurl);
     websock.onmessage = function (e) {
-        websocketonmessage(e);
-        websockLinked = true;
+        websocketonmessage(e, para);
+        websockLinked[para] = true;
     }
     websock.onclose = function (e) {
         websocketclose(e);
         removeTimer();
-        websockLinked = false;
+        websockLinked[para] = false;
     }
     websock.onopen = function () {
         websocketOpen();
         setTimer();
-        websockLinked = true;
+        websockLinked[para] = true;
     }
 
     //连接发生错误的回调方法
     websock.onerror = function () {
         console.log("WebSocket error");
         removeTimer();
-        websockLinked = false;
+        websockLinked[para] = false;
     }
 
+    socketSites.push[para];
+    websockets[para] = websock;
 }
 
-function close() {
-    websock.close();
+function close(param) {
+    websockets[param].close();
 }
 
-function getSocketInfo() {
+function getSocketInfo(param) {
     return {
-        linked: websockLinked
+        linked: websockLinked[param]
     }
 }
 
 // 实际调用的方法
-function sendSock(agentData, callback) {
-    global_callback = callback;
-    if (websock.readyState === websock.OPEN) {
+function sendSock(param, agentData, callback) {
+    callbacks[param] = callback;
+    if (websockets[param].readyState === websockets[param].OPEN) {
         // 若是ws开启状态
-        websocketsend(agentData);
-    } else if (websock.readyState === websock.CONNECTING) {
+        websocketsend(param, agentData);
+    } else if (websockets[param].readyState === websockets[param].CONNECTING) {
         // 若是 正在开启状态，则等待1s后重新调用
         setTimeout(function () {
-            sendSock(agentData, callback);
+            sendSock(param, agentData, callback);
         }, 1000);
     } else {
         // 若未开启 ，则等待1s后重新调用
         setTimeout(function () {
-            sendSock(agentData, callback);
+            sendSock(param, agentData, callback);
         }, 1000);
     }
 }
@@ -68,20 +73,21 @@ function sendSock(agentData, callback) {
 //
 
 //数据接收
-function websocketonmessage(e) {
+function websocketonmessage(e, param) {
+    let socketCallback = callbacks[param];
     try {
         var data = JSON.parse(e.data);
         if (data.type != "ping") {
-            if (global_callback != null && global_callback != "" && global_callback != undefined) {
-                global_callback(data);
+            if (socketCallback != null && socketCallback != "" && socketCallback != undefined) {
+                socketCallback(data);
             }
         }
     } catch (err) { };
 }
 
 //数据发送
-function websocketsend(agentData) {
-    websock.send(JSON.stringify(agentData));
+function websocketsend(param, agentData) {
+    websockets[param].send(JSON.stringify(agentData));
 }
 
 //关闭
@@ -96,7 +102,9 @@ function websocketOpen(e) {
 function setTimer() {
     timer = setInterval(() => {
         var messageJson = {type: "ping"};
-        websocketsend(messageJson);
+        for(let i = 0; i < socketSites.length; i++){
+            websocketsend(socketSites[i], messageJson);
+        }
     }, 20000);
 }
 

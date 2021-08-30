@@ -342,7 +342,7 @@
 import { get, del, post, put } from "@/axios";
 import Avatar from "vue-avatar";
 export default {
-  props: ["activityInfo"],
+  props: ["activityInfo","projectInfo"],
   components: {
     Avatar,
   },
@@ -354,7 +354,7 @@ export default {
           background: "lightgrey",
         },
       },
-      projectInfo:{},
+      // projectInfo:{},
       userInfo: JSON.parse(sessionStorage.getItem("userInfo")),
       userRole: "visitor",
       // Members
@@ -387,7 +387,7 @@ export default {
   },
   created() {
     this.userRole = this.roleIdentity(this.activityInfo);
-    this.getProjectInfo();
+    // this.getProjectInfo(); //通过传值代替
     this.getParticipants();
   },
   mounted() {},
@@ -432,29 +432,29 @@ export default {
         return parent.members.contains(this.userInfo);
       }
     },
-    getProjectInfo(){
-      let url = window.location.href;
-      let result = {};
-      if(url.indexOf("/activityInfo/") != -1){
-        let urlStr = url.split("/activityInfo/");
-        if(urlStr[1].indexOf("?") != -1){
-          result.aid = urlStr[1].split("?")[0];
-        }else{
-          result.aid = urlStr[1];
-        }
-      }
-      this.$axios.get("/GeoProblemSolving/project/" + result.aid)
-        .then(res => {
-          if(res.data.code == 0){
-            this.projectInfo = res.data.data;
-          } else {
-            console.log(res.data.msg);
-          }
-        })
-        .catch(err => {
-          this.$Message.error("Loading project failed.")
-        })
-    },
+    // getProjectInfo(){
+    //   let url = window.location.href;
+    //   let result = {};
+    //   if(url.indexOf("/activityInfo/") != -1){
+    //     let urlStr = url.split("/activityInfo/");
+    //     if(urlStr[1].indexOf("?") != -1){
+    //       result.aid = urlStr[1].split("?")[0];
+    //     }else{
+    //       result.aid = urlStr[1];
+    //     }
+    //   }
+    //   this.$axios.get("/GeoProblemSolving/project/" + result.aid)
+    //     .then(res => {
+    //       if(res.data.code == 0){
+    //         this.projectInfo = res.data.data;
+    //       } else {
+    //         console.log(res.data.msg);
+    //       }
+    //     })
+    //     .catch(err => {
+    //       this.$Message.error("Loading project failed.")
+    //     })
+    // },
     getParticipants() {
       let url = "";
       let activity = this.activityInfo;
@@ -481,7 +481,7 @@ export default {
         });
     },
     modifyPermission() {
-      parent.location.href =
+      window.location.href =
         "/GeoProblemSolving/permission/" +
         this.activityInfo.level +
         "/" +
@@ -510,6 +510,7 @@ export default {
           userId: candidates[i].userId,
           name: candidates[i].name,
           role: candidates[i].role,
+          domain: candidates[i].domain,
           disabled: this.participants.contains(candidates[i]),
         });
       }
@@ -590,6 +591,13 @@ export default {
                     this.projectInfo.name +
                     " , and now you are a member in this activity!",
                   approve: "unknow",
+                  projectId: this.projectInfo.aid,
+                  projectName: this.projectInfo.name,
+                  activityId: activity.aid,
+                  activityName: activity.name,
+                  activityLevel: activity.level,
+                  invitorName: this.userInfo.name,
+                  invitorId: this.userInfo.userId,
                 },
               };
               this.sendNotice(notice);
@@ -668,6 +676,13 @@ export default {
                   role +
                   ".",
                 approve: "unknow",
+                projectId: this.projectInfo.aid,
+                projectName: this.projectInfo.name,
+                activityId: activity.aid,
+                activityName: activity.name,
+                activityLevel: activity.level,
+                // removerName: this.userInfo.name,
+                // removerId: this.userInfo.userId,
               },
             };
             this.sendNotice(notice);
@@ -740,6 +755,13 @@ export default {
                   this.projectInfo.name +
                   ".",
                 approve: "unknow",
+                projectId: this.projectInfo.aid,
+                projectName: this.projectInfo.name,
+                activityId: activity.aid,
+                activityName: activity.name,
+                activityLevel: activity.level,
+                removerName: this.userInfo.name,
+                removerId: this.userInfo.userId,
               },
             };
             this.sendNotice(notice);
@@ -805,14 +827,21 @@ export default {
                     this.projectInfo.name +
                     ".",
                   approve: "unknow",
+                  projectId: this.projectInfo.aid,
+                  projectName: this.projectInfo.name,
+                  activityId: activity.aid,
+                  activityName: activity.name,
+                  activityLevel: activity.level,
+                  leaverName: this.userInfo.name,
+                  leaverId: this.userInfo.userId,
                 },
               };
               this.sendNotice(notice);
 
-              parent.location.href =
-                "/GeoProblemSolving/projectInfo/" +
+              window.location.href =
+                "/GeoProblemSolving/activityInfo/" +
                 this.projectInfo.aid +
-                "?content=workspace&aid=" +
+                "?aid=" +
                 activity.parent +
                 "&level=" +
                 (activity.level - 1).toString();
@@ -830,10 +859,11 @@ export default {
         .post("/GeoProblemSolving/notice/save", notice)
         .then((result) => {
           if (result.data == "Success") {
-            parent.vm.$emit("sendNotice", notice.recipientId);
-            this.$Notice.info({ desc: "Send application successfully" });
+            this.$store.commit("addNotification", notice);
+            // this.$emit("sendNotice", notice);
+            // this.$Notice.info({ desc: "Send notice successfully" });
           } else {
-            this.$Notice.error({ desc: "Fail to send application" });
+            // this.$Notice.error({ desc: "Fail to send notice" });
           }
         })
         .catch((err) => {
@@ -842,10 +872,10 @@ export default {
     },
     gotoPersonalSpace(id) {
       if (id == this.$store.getters.userId) {
-        parent.location.href = "/newPersonalPage/overView";
+        window.location.href = "/GeoProblemSolving/newPersonalPage/overView";
         // this.$router.push({name: "overView"})
       } else {
-        parent.location.href = "/GeoProblemSolving/memberPage/" + id;
+        window.location.href = "/GeoProblemSolving/memberPage/" + id;
       }
     },
   },

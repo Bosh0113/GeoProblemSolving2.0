@@ -557,7 +557,6 @@ export default {
       typeSelected: "All",
       typeOptions: [
         "All",
-        "General",
         "Context definition & resource collection",
         "Data processing",
         "Data analysis",
@@ -592,18 +591,18 @@ export default {
   },
   created() {},
   mounted() {
-    Array.prototype.contains = function (obj) {
-      var i = this.length;
-      while (i--) {
-        if (
-          (this[i].tid != undefined && this[i].tid === obj) ||
-          (this[i] != undefined && this[i] === obj)
-        ) {
-          return true;
-        }
-      }
-      return false;
-    };
+    // Array.prototype.contains = function (obj) {
+    //   var i = this.length;
+    //   while (i--) {
+    //     if (
+    //       (this[i].tid != undefined && this[i].tid === obj) ||
+    //       (this[i] != undefined && this[i] === obj)
+    //     ) {
+    //       return true;
+    //     }
+    //   }
+    //   return false;
+    // };
   },
   methods: {
     stepToolModalShow() {
@@ -698,7 +697,6 @@ export default {
           case "All": {
             return item;
           }
-          case "General":
           case "Context definition & resource collection":
           case "Data processing":
           case "Data analysis":
@@ -857,7 +855,7 @@ export default {
     changeMenuItem(name) {
       if (name == "diyTools") {
         this.stepToolModal = false;
-        parent.location.href = "/GeoProblemSolving/newPersonalPage/tool";
+        window.location.href = "/GeoProblemSolving/newPersonalPage/tool";
       }
       this.showMenuItem = name;
     },

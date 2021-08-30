@@ -124,13 +124,6 @@ h1 {
             <Radio label="Private" title="Other users can not find this group."></Radio>
           </RadioGroup>
         </FormItem>
-        <FormItem prop="scope" label="Scope" :label-width="100">
-          <Select v-model="formInline.scope" style="width:80%;margin-left:10px">
-            <Option value="inner" key="0">inner</Option>
-            <Option value="outer" key="1">outer</Option>
-          </Select>
-        </FormItem>
-
         <FormItem prop="tag" label="Tag" :label-width="100">
           <Input
             v-model="inputTag"
@@ -207,6 +200,8 @@ h1 {
     </div>
   </div>
 </template>
+
+
 <script>
 export default {
   beforeRouteEnter: (to, from, next) => {
@@ -237,7 +232,6 @@ export default {
       formInline: {
         name: "",
         category: "",
-        scope: "inner",
         privacy: "Public",
         description: "",
         //tag列表
@@ -280,8 +274,8 @@ export default {
       inputTag: "",
       visible: false,
       //表示图片
-      img: "",
-      pictureUrl: "",
+      img: "", //使用img来在新建页面临时显示图片
+      pictureUrl: "", //使用pictureUrl来保留新建页面添加图片的url，用来上传
       createProjectInfo: {},
     };
   },
@@ -355,7 +349,7 @@ export default {
         this.formInline.category +
         " project named " +
         this.formInline.name;
-      form["description"] = description;
+      form["description"] = description; //此处的description可能有问题，应该使用createProjectInfo中的description
       form["scopeId"] = scopeId;
       form["eventType"] = "project";
       form["userId"] = this.$store.getters.userId;
@@ -387,7 +381,6 @@ export default {
       var file = e.target.files[0];
       var filesize = file.size;
       // 2,621,440   2M
-
       if (filesize > 2101440) {
         // 图片大于2MB
         this.$Message.error("size > 2MB");
@@ -402,6 +395,7 @@ export default {
             .post("/GeoProblemSolving/res/image", formData)
             .then((res) => {
               if (res.data.code == 0) {
+                console.log(res);
                 this.pictureUrl = res.data.data;
                 this.img = e.target.result;
                 $("#choosePicture").val("");

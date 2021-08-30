@@ -258,7 +258,7 @@ public class ActivityResServiceImpl implements ActivityResService {
                 }
             }
             //资源自动更新
-            String graphId = req.getParameter("graphId");
+            // String graphId = req.getParameter("graphId");
             // geoAnalysisProcess.batchResFlowAutoUpdate(graphId, aid, resTagMap);
             return uploadInfos;
 

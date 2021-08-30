@@ -209,6 +209,7 @@ function getSocketOperation(data) {
                     $("#isAbsorb").prop("disabled", true);
                 }
                 $("#roadConfigModal").modal("show");
+                $("#roadInfoSubmit").hide();
 
                 break;
             }
@@ -231,6 +232,7 @@ function getSocketOperation(data) {
                 $("#buildingHeight").val(result.Height);
                 $("#buildingConfigModal").modal("show");
 
+                $("#buildingInfoSubmit").hide();
                 break;
             }
             case "barrier-edit-start": {
@@ -251,6 +253,7 @@ function getSocketOperation(data) {
                 $("#barrierHeight").val(result.Height);
                 $("#barrierConfigModal").modal("show");
 
+                $("#barrierInfoSubmit").hide();
                 break;
             }
             case "edit-end": {
@@ -261,28 +264,46 @@ function getSocketOperation(data) {
                 }
                 break;
             }
-            case "select-on": {
+            case "select-start": {
                 cancelAllState();
                 if (selectROI.isSelect) {
                     if (selectROI.ROI)
                         selectROI.rlayer.removeLayer(selectROI.ROI);
-                    mymap.dragging.enable();
-                    $("#mapid").css("cursor", "-webkit-grab");
                     mymap.off("mousedown", selectROI.mousedown).off("mousemove", selectROI.mousemove).off("mouseup", selectROI.mouseup);
                 }
+                selectROI.isSelect = false;
+
+                break;
+            }
+            case "select-end": {
+                mymap.dragging.disable();
+                selectROI.isSelect = true;
 
                 var layar = L.geoJSON(content.layer, {});
                 layar.addTo(selectROI.rlayer);
                 break;
             }
-            case "run-start": {
-                // 通知模型正在运行
+            case "before-run": {
+                cancelAllState();
+
+                $("#sampleSize").val(10);
+                $("#ROIHeight").val(10);
+                $("#brforeRunModal").modal("show");
+                $("#mapid").css("cursor", "-webkit-grab");
+
+                $("#runModelBtn").hide();
                 break;
             }
-            // case "run-success": {
-            //     getModelState(content.userId, content.runningId);
-            //     break;
-            // }
+            case "run-start": {
+                alert("RLS90 model start running.");
+                $("#waitting").show();
+                break;
+            }
+            case "run-success": {
+                loadResultTiff(content.result);
+                $("#waitting").hide();
+                break;
+            }
             case "clean": {
                 cancelAllState();
                 if (selectROI.ROI)
@@ -321,7 +342,32 @@ function getSocketOperation(data) {
                 break;
             }
             case "value-change": {
-                $("#" + content.id).val(content.value);
+                if(content.type === "text") {
+                    $("#" + content.id).val(content.value);
+                    $("#" + content.id).css("border-color", "lightgreen");
+                } else if (content.type === "checkbox") {
+                    $("#" + content.id).prop(content.attributes);
+
+                    if (content.attributes) {
+                        $("#reflectHeight").prop("disabled", false);
+                        $("#reflectHeight").val(30);
+                        $("#reflectWidth").prop("disabled", false);
+                        $("#reflectWidth").val(40);
+                        $("#isAbsorb").prop("disabled", false);
+                        $("#isAbsorb").val(0);
+                    } else {
+                        $("#reflectHeight").val("");
+                        $("#reflectHeight").prop("disabled", true);
+                        $("#reflectWidth").val("");
+                        $("#reflectWidth").prop("disabled", true);
+                        $("#isAbsorb").val(-1);
+                        $("#isAbsorb").prop("disabled", true);
+                    }
+                }
+                break;
+            }
+            case "": {
+                reflectiveSurface
                 break;
             }
         }
@@ -389,7 +435,7 @@ function getSocketComputation(data) {
 }
 
 function paramChanged(id, value) {
-    window.parent.sendElementChangeOperation(id, "value-change", value, "", "");
+    window.parent.sendElementChangeOperation(id, "value-change", "text", value, "", "");
 }
 
 var selectedData = {}
@@ -490,7 +536,7 @@ function importData() {
                         sender: userId,
                         behavior: "data-import",
                         content: {
-                            data: roadData,
+                            data: selectedData,
                             featureType: selectedDataType,
                             result: result
                         },
@@ -518,8 +564,17 @@ var selectROI = {
     color: "#0D82D7",
     mousedown: function (e) {
         selectROI.startPoint = e.latlng;
-        console.log(selectROI.startPoint)
+        // console.log(selectROI.startPoint)
         mymap.on("mousemove", selectROI.mousemove);
+
+        if (selectROI.isSelect) {
+            window.parent.sendCustomOperation({
+                type: "operation",
+                sender: userId,
+                behavior: "select-start",
+                content: {},
+            });
+        }
     },
     mousemove: function (e) {
         //移动时删掉上一次生成的矩形
@@ -542,7 +597,7 @@ var selectROI = {
             window.parent.sendCustomOperation({
                 type: "operation",
                 sender: userId,
-                behavior: "select-on",
+                behavior: "select-end",
                 content: selectROI.rlayer.toGeoJSON(),
             });
         }
@@ -890,6 +945,14 @@ function onBeforeRun() {
     $("#ROIHeight").val(10);
     $("#brforeRunModal").modal("show");
     $("#mapid").css("cursor", "-webkit-grab");
+    $("#runModelBtn").show();
+
+    window.parent.sendCustomOperation({
+        type: "operation",
+        sender: userId,
+        behavior: "before-run",
+        content: "before-run",
+    });
 }
 
 function onEditFeatureClick() {
@@ -953,12 +1016,12 @@ function onRunModel() {
         },
         dataType: "text",
         beforeSend: function () {
-            console.log({
-                maxLat: upperLeftPoint[1],
-                maxLon: lowerRightPoint[0],
-                minLat: lowerRightPoint[1],
-                minLon: upperLeftPoint[0]
-            });
+            // console.log({
+            //     maxLat: upperLeftPoint[1],
+            //     maxLon: lowerRightPoint[0],
+            //     minLat: lowerRightPoint[1],
+            //     minLon: upperLeftPoint[0]
+            // });
             $("#waitting").show();
         },
         success: function (resp) {
@@ -1122,15 +1185,15 @@ function getModelState() {
                     loadResultTiff(result.url);
                     $("#waitting").hide();
 
-                    // window.parent.sendCustomOperation({
-                    //     type: "operation",
-                    //     sender: userId,
-                    //     behavior: "run-success",
-                    //     content: {
-                    //         userId: userId,
-                    //         runningId: runningId
-                    //     },
-                    // });
+                    window.parent.sendCustomOperation({
+                        type: "operation",
+                        sender: userId,
+                        behavior: "run-success",
+                        content: {
+                            userId: userId,
+                            result: result.url
+                        },
+                    });
                 }
             }
         },
@@ -1142,7 +1205,7 @@ function getModelState() {
     });
 }
 
-function onHasReflectChanged() {
+function onHasReflectChanged(id) {
     var isChecked = $("#hasReflect").prop("checked");
     if (isChecked == true) {
         $("#reflectHeight").prop("disabled", false);
@@ -1159,6 +1222,9 @@ function onHasReflectChanged() {
         $("#isAbsorb").val(-1);
         $("#isAbsorb").prop("disabled", true);
     }
+
+    // send message
+    window.parent.sendElementChangeOperation(id, "value-change", "checkbox", "", "",  isChecked);
 }
 
 
@@ -1217,6 +1283,7 @@ function onRoadClick(prop) {
                         behavior: "road-edit-start",
                         content: {propInfo: prop, resultInfo: result},
                     });
+                    $("#roadInfoSubmit").show();
 
                 } else {
                     alert("Fail to Set the property of this road.");
@@ -1298,7 +1365,7 @@ function onSetRoadInfoClick() {
     roadConfig.reflectWidth = $("#reflectWidth").val();
     roadConfig.reflectAbsorb = $("#isAbsorb").val();
 
-    console.log(roadConfig);
+    // console.log(roadConfig);
 
     $.ajax({
         type: "post",
@@ -1381,7 +1448,7 @@ function onBuildingClick(prop) {
             processData: false,
             contentType: 'application/json',
             success: function (data) {
-                console.log(data);
+                // console.log(data);
                 var result = JSON.parse(data);
                 if (result.respCode === 1) {
                     $("#buildingID").text(prop.OBJECTID);
@@ -1398,6 +1465,7 @@ function onBuildingClick(prop) {
                         behavior: "building-edit-start",
                         content: {propInfo: prop, resultInfo: result}
                     });
+                    $("#buildingInfoSubmit").show();
                 } else {
                     alert("Fail to get the information of this building.");
                 }
@@ -1419,7 +1487,7 @@ function onSetBuildingInfoClick() {
     buildingConfig.id = $("#buildingID").text();
     buildingConfig.storey = $("#buildingStorey").val();
     buildingConfig.height = $("#buildingHeight").val();
-    console.log(buildingConfig);
+    // console.log(buildingConfig);
 
     $.ajax({
         type: "post",
@@ -1475,7 +1543,7 @@ $("#buildingConfigModal").on("hidden.bs.modal", function () {
 
 // 道路声屏障信息
 function onBarrierClick(prop) {
-    console.log(prop)
+    // console.log(prop)
     if (infoEditState == true) {
         $.ajax({
             type: "post",
@@ -1487,7 +1555,7 @@ function onBarrierClick(prop) {
             processData: false,
             contentType: 'application/json',
             success: function (data) {
-                console.log(data);
+                // console.log(data);
                 var result = JSON.parse(data);
                 if (result.respCode == 1) {
                     $("#barrierID").text(prop.OBJECTID);
@@ -1504,6 +1572,7 @@ function onBarrierClick(prop) {
                         behavior: "barrier-edit-start",
                         content: {propInfo: prop, resultInfo: result},
                     });
+                    $("#barrierInfoSubmit").show();
                 } else {
                     alert("Fail to set the property of this barrier.");
                 }
@@ -1525,7 +1594,7 @@ function onSetBarrierInfoClick() {
     barrierConfig.id = $("#barrierID").text();
     barrierConfig.length = $("#barrierLength").val();
     barrierConfig.height = $("#barrierHeight").val();
-    console.log(barrierConfig);
+    // console.log(barrierConfig);
 
     $.ajax({
         type: "post",
@@ -1649,7 +1718,7 @@ function saveEdit(editType, layer) {
         // }
     }
 
-    console.log(prjPoints);
+    // console.log(prjPoints);
 
     $.ajax({
         type: "post",
@@ -1678,7 +1747,7 @@ var buildingLayer = L.Proj.geoJson(null, {
 
     style(feature) {
         if (!feature || !feature.properties) {
-            console.log(feature);
+            // console.log(feature);
             return {
                 fillColor: "#AAAAAA",
                 weight: 2,

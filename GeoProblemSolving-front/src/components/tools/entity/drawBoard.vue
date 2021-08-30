@@ -374,7 +374,7 @@ export default {
   },
   created() {},
   beforeDestroy() {
-    this.socketApi.close();
+    this.socketApi.close("DrawServer/" + roomId);
     window.removeEventListener("resize", this.initSize);
     this.canvas_bak.removeEventListener("click", this.falseColor);
   },
@@ -507,7 +507,7 @@ export default {
           whoId: this.$store.getters.userId,
           content: "clear"
         };
-        this.socketApi.sendSock(this.send_msg, this.getSocketConnect);
+        this.socketApi.sendSock("DrawServer/" + roomId, this.send_msg, this.getSocketConnect);
       } else if (fun === "save") {
         this.downloadImage();
       } else if (fun === "resource") {
@@ -617,6 +617,7 @@ export default {
                   pathURL: "/GeoProblemSolving/resource/upload/" + dataName
                 };
                 that.socketApi.sendSock(
+                  "DrawServer/" + roomId, 
                   that.send_content,
                   that.getSocketConnect
                 );
@@ -706,7 +707,7 @@ export default {
           content: line,
           whoId: this.$store.getters.userId
         };
-        this.socketApi.sendSock(this.send_line, this.getSocketConnect);
+        this.socketApi.sendSock("DrawServer/" + roomId, this.send_line, this.getSocketConnect);
         this.lines.push(line);
       };
       // 鼠标移动
@@ -1059,7 +1060,7 @@ export default {
           whoId: this.$store.getters.userId,
           content: "last"
         };
-        this.socketApi.sendSock(this.send_msg, this.getSocketConnect);
+        this.socketApi.sendSock("DrawServer/" + roomId, this.send_msg, this.getSocketConnect);
         this.storeLines.push(this.lines.pop());
       }
     },
@@ -1071,7 +1072,7 @@ export default {
           whoId: this.$store.getters.userId,
           content: this.storeLines[this.storeLines.length - 1]
         };
-        this.socketApi.sendSock(this.send_msg, this.getSocketConnect);
+        this.socketApi.sendSock("DrawServer/" + roomId, this.send_msg, this.getSocketConnect);
 
         this.lines.push(this.storeLines.pop());
       }
@@ -1203,7 +1204,7 @@ export default {
         from: "Test",
         content: "TestChat"
       };
-      this.socketApi.sendSock(this.send_msg, this.getSocketConnect);
+      this.socketApi.sendSock("DrawServer/" + roomId, this.send_msg, this.getSocketConnect);
     },
     //toolStyle 组件
     olParticipantChange() {
@@ -1315,7 +1316,7 @@ export default {
         type: "selectdata",
         pathURL: this.dataUrl
       };
-      this.socketApi.sendSock(this.send_content, this.getSocketConnect);
+      this.socketApi.sendSock("DrawServer/" + roomId, this.send_content, this.getSocketConnect);
     },
     viewData() {
       if (/\.(jpg|jpeg|png|bmp|gif)$/.test(this.dataUrl.toLowerCase())) {

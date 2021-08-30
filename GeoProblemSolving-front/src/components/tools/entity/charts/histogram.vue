@@ -85,7 +85,7 @@ export default {
     };
   },
   beforeDestroy() {
-    // this.socketApi.close();
+    this.socketApi.close("ChartsServer/" + "histogram" + roomId);
   },
   mounted() {
     this.init();
@@ -354,7 +354,7 @@ export default {
       }
       this.socket_content["chartType"] = this.chooseType;
       this.socket_content["operate"] = "visualize";
-      this.socketApi.sendSock(this.socket_content, this.getSocketConnect);
+      this.socketApi.sendSock("ChartsServer/" + "histogram" + roomId, this.socket_content, this.getSocketConnect);
       // this.socket_content = {};
 
       this.showCharts();
@@ -425,7 +425,7 @@ export default {
         from: "Test",
         content: "TestChat"
       };
-      this.socketApi.sendSock(this.send_msg, this.getSocketConnect);
+      this.socketApi.sendSock("ChartsServer/" + "histogram" + roomId, this.send_msg, this.getSocketConnect);
     },
     getResources() {
       if (this.pageParams.pageId == undefined || this.pageParams.pageId == "") {
@@ -465,7 +465,7 @@ export default {
         operate: "selectdata",
         pathURL: this.dataUrl
       };
-      this.socketApi.sendSock(this.send_content, this.getSocketConnect);
+      this.socketApi.sendSock("ChartsServer/" + "histogram" + roomId, this.send_content, this.getSocketConnect);
 
       this.viewData();
     },

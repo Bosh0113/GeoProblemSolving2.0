@@ -955,7 +955,6 @@ export default {
       typeSelected: "All",
       typeOptions: [
         "All",
-        "General step",
         "Context definition & resource collection",
         "Data processing",
         "Data analysis",
@@ -963,8 +962,7 @@ export default {
         "Geo-analysis model construction",
         "Model effectiveness evaluation",
         "Geographical simulation",
-        "Decision making",
-        "Others"
+        "Decision making"
       ],
       toolInfoRule: {
         toolName: [
@@ -997,7 +995,7 @@ export default {
         ]
       },
       stepList: [
-        "General step",
+        "All",
         "Context definition & resource collection",
         "Data processing",
         "Data analysis",

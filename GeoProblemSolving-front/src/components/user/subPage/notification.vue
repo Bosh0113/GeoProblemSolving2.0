@@ -49,73 +49,51 @@
                   reply: 只有回复按钮  不需要更新对方
                   apply: 有同意与拒绝按钮 需要实时更新对象通知数量
                      -->
-                  <div
-                    v-if="readOrUnread.includes('unRead')"
-                    v-for="(item, unreadIndex) in unReadNoteList"
-                    :key="unreadIndex"
-                  >
-                    <!--                未读apply    -->
+                  <div v-if="readOrUnread.includes('unRead')">
                     <div
-                      v-if="item.type=='apply'"
+                      v-for="(item, unreadIndex) in unReadNoteList"
+                      :key="unreadIndex"
                     >
-                      <Card style="position: relative;">
-                        <Badge dot>
-                          <h4 style="font-size: 15px" @click="getNoticeInfo(item)">{{item.content.title}}</h4>
-                        </Badge>
-                        <br/>
-                        <p style="font-weight: 400; font-size: 17px">{{item.content.description}}</p>
-                        <small style="font-size: 13px">{{item.createTime}}</small>
-                        <!-- <button type="button"  class="applyBtn" style="color: #ff9900;position: absolute;top: 30px;right: 10%;" @click="refuseApply(item)">refuse</button>
-                        <button type="button"  class="applyBtn" style="color: #47cb89;position: absolute;top: 30px;right: 3%;" @click="approveApply(item)">approve</button> -->
-                        <Icon type="md-close" class="applyBtn" style="color: #ff9900;" @click="refuseApply(item)"/>
-                        <Icon type="md-checkmark" class="applyBtn" style="color: #47cb89" @click="approveApply(item)"/>
-                      </Card>
-                    </div>
-                    <!--                未读 Notice    -->
-                    <div
-                      v-if="item.type=='notice'"
-                    >
-                      <Card>
-                        <Badge dot>
-                          <h4 style="font-size: 15px" @click="getNoticeInfo(item)">{{item.content.title}}</h4>
-                        </Badge>
-                        <br/>
-                        <p style="font-weight: 400; font-size: 17px">{{item.content.description}}</p>
-                        <small style="font-size: 13px">{{item.createTime}}</small>
-                        <Icon type="md-checkmark" class="applyBtn" style="color: #47cb89" @click="readNotice(item.noticeId)"/>
-                      </Card>
-                    </div>
-                    <!--               未读 Reply  -->
-                    <div
-                      v-if="item.type=='reply'"
-                    >
-                      <Card>
-                        <Badge dot>
-                          <h4 style="font-size: 15px" @click="getNoticeInfo(item)">{{item.content.title}}</h4>
-                        </Badge>
-                        <br/>
-                        <p style="font-weight: 400; font-size: 17px">{{item.content.description}}</p>
-                        <small style="font-size: 13px">{{item.createTime}}</small>
-                        <Icon type="md-checkmark" class="applyBtn" style="color: #47cb89"/>
-                      </Card>
+                      <div>
+                        <Card style="position: relative;">
+                          <Badge dot>
+                            <h4 style="font-size: 15px" @click="getNoticeInfo(item)">{{item.content.title}}</h4>
+                          </Badge>
+                          <br/>
+                          <span style="font-weight: 400; font-size: 17px;display:-moz-inline-box; display:inline-block; width:90%;">{{item.content.description}}</span> 
+                          <small style="font-size: 13px; position: absolute; right:120px; bottom:5px">{{item.createdTime}}</small>
+                          <div style="position:absolute; border-left: 1px solid lightgray; right:10px; top:10px; height:60px; width:80px">
+                            <Icon  v-if="item.type=='apply'" type="md-close" title="refuse" class="applyBtn" style="color: #ff9900;" @click="refuseApply(item)"/>
+                            <Icon  v-if="item.type=='apply'" type="md-checkmark" title="approve" class="applyBtn" style="color: #47cb89" @click="approveApply(item)"/>
+                            <Icon  v-if="item.type=='notice'" type="md-checkmark" title="read" class="applyBtn" style="color: #47cb89" @click="readNotice(item.noticeId)"/>
+                            <Icon  v-if="item.type=='reply'" type="md-checkmark" class="applyBtn" style="color: #47cb89"/>
+                          </div>
+                        </Card>
+                      </div>   
                     </div>
                   </div>
+                  
 
                   <!--            已读消息不区分具体类型   仅有删除按钮    -->
-                  <div
-                    v-if="readOrUnread.includes('read')"
+                  <div v-if="readOrUnread.includes('read')">
+                    <div
                     v-for="(item, readIndex) in readNoteList"
                     :key="readIndex"
-                  >
-                    <Card>
-                      <!--                  <h4 style="font-size: 13px">{{item.content.title}}</h4>-->
-                        <h4 style="font-size: 15px" @click="getReadNoticeInfo(item)">{{item.content.title}}</h4>
-                      <br/>
-                      <p style="font-weight: 400; font-size: 17px">{{item.content.description}}</p>
-                      <small style="font-size: 13px">{{item.createTime}}</small>
-                      <Icon slot="extra" type="md-close" class="applyBtn" style="color: #ed4014" @click="deleteNotice(item)" />
-                    </Card>
-                  </div>
+                    >
+                      <Card>
+                        <!--                  <h4 style="font-size: 13px">{{item.content.title}}</h4>-->
+                        <Badge dot>
+                          <h4 style="font-size: 15px" @click="getReadNoticeInfo(item)">{{item.content.title}}</h4>
+                        </Badge>
+                        <br/>
+                        <p style="font-weight: 400; font-size: 17px">{{item.content.description}}</p>
+                        <small style="font-size: 13px; position: absolute; right:120px; bottom:5px">{{item.createdTime}}</small>
+                        <div style="position:absolute; border-left: 1px solid lightgray; right:10px; top:10px; height:60px; width:80px">
+                          <Icon slot="extra" type="md-close" title="delete" class="applyBtn" style="color: #ed4014" @click="deleteNotice(item)" />
+                        </div>
+                      </Card>
+                    </div>
+                  </div>  
                 </div>
 
                 <!--          无通知消息  -->
@@ -131,6 +109,16 @@
             <!-- 消息展示 -->
             <Modal v-model="noticeInfoModal" title="Message Info">
               <Table
+                v-if="slctMessage.type == 'apply'"
+                :columns="selectedNoticeColumns"
+                :data="selectedApplyData"
+                stripe
+                border
+                @on-row-click="tableRowClick"
+                :show-header="false"
+              ></Table>
+              <Table
+                v-if="slctMessage.type == 'notice'"
                 :columns="selectedNoticeColumns"
                 :data="selectedNoticeData"
                 stripe
@@ -147,6 +135,16 @@
             </Modal>
             <Modal v-model="readNoticeInfoModal" title="Message Info">
               <Table
+                v-if="slctMessage.type == 'apply'"
+                :columns="selectedReadNoticeColumns"
+                :data="selectedReadApplyData"
+                stripe
+                border
+                @on-row-click="tableRowClick"
+                :show-header="false"
+              ></Table>
+              <Table
+                v-if="slctMessage.type == 'notice'"
                 :columns="selectedReadNoticeColumns"
                 :data="selectedReadNoticeData"
                 stripe
@@ -192,6 +190,7 @@
         readNoticeInfoModal: false,
         slctMessage: {},
         selectedNoticeData: [],
+        selectedApplyData: [],
         selectedNoticeColumns: [
           {
             title: "key",
@@ -202,8 +201,14 @@
           {
             title: "value",
             key: "value",
+            render: (h, params) => {
+              return h("span",{
+                domProps:{innerHTML:this.operateFormatter(h,params)}
+              }) 
+            }
           },
         ],
+        selectedReadApplyData: [],
         selectedReadNoticeData: [],
         selectedReadNoticeColumns: [
           {
@@ -215,6 +220,11 @@
           {
             title: "value",
             key: "value",
+            render: (h, params) => {
+              return h("span",{
+                domProps:{innerHTML:this.operateFormatter(h,params)}
+              }) 
+            }
           },
         ],
         readOrUnread: ["unRead"],
@@ -277,6 +287,13 @@
         if (selectedType.includes("noticeList")) {
           readList = readList.concat(this.readNoticeList);
         }
+        //将所有read消息按照时间降序排序
+        for(let i = 0 ; i < readList.length ; i++){
+          readList[i].createdTimeNew = (new Date(readList[i].createdTime.replace(/-/g,'/'))).getTime();
+        }
+        readList.sort( function( a , b ){
+           return b.createdTimeNew> a.createdTimeNew ? 1 : -1;
+        });
         return readList;
       },
       unReadNoteList: function () {
@@ -291,6 +308,13 @@
         if (selectedType.includes("noticeList")) {
           unreadList = unreadList.concat(this.unreadNoticeList);
         }
+        //将所有unread消息按照时间降序排序
+        for(let i = 0 ; i < unreadList.length ; i++){
+          unreadList[i].createdTimeNew = (new Date(unreadList[i].createdTime.replace(/-/g,'/'))).getTime();
+        }
+        unreadList.sort( function( a , b ){
+           return b.createdTimeNew> a.createdTimeNew ? 1 : -1;
+        });
         return unreadList;
       }
     },
@@ -307,106 +331,169 @@
           })();
         };
       },
+      //table样式
+      operateFormatter(h,params){
+        let key=params.row.key;
+        if( key == "Activity Name" || key == "Applicant"){
+          let result = '<a style="text-decoration: underline; font-weight:bold;">' + params.row.value + '</a>'
+          return result;
+        } else {
+          return params.row.value;
+        } 
+      },
       tableRowClick(data){
         //根据key判断类型，选择跳转用户界面或activity界面
-        if(data.key == "Messager" && data.aid != null){
+        if(data.key == "Applicant" && data.aid != null){
           this.$router.push("/memberPage/" + data.aid);
         }else if (data.key == "Activity Name" && data.aid != null){
           let url ="";
           if (data.level == 0){
             this.$router.push("/activityInfo/" + data.aid);
-          } else if (data.level == 1) {
-            url = "/GeoProblemSolving/subproject?aid=" + data.aid;
-          } else if (data.level > 1) {
-            url = "/GeoProblemSolving/activity?aid=" + data.aid;
-          }
-          if (url != ""){
-            this.$axios.get(url)
-              .then((res) => {
-                if (res.data == "Offline") {
-                  this.$store.commit("userLogout");
-                  this.$router.push({ name: "Login" });
-                }else if(res.data.code == 0){
-                  this.$router.push("/activityInfo/" + res.data.data.parent);
-                }
-              }).catch((err) => {
-                throw err;
-              });
+          } else {
+            this.$router.push("/activityInfo/" + data.projectId + "?aid=" + data.aid + "&level=" + data.level);
           }
         }
       },
       //点选通知信息显示
       getNoticeInfo(file) {
         this.slctMessage = file;
-        this.selectedNoticeData = [
-          {
-            key: "Message Title",
-            value: file.content.title,
-          },
-          {
-            key: "Message Type",
-            value: file.type,
-          },
-          {
-            key: "Activity Name",
-            value: file.content.activityName,
-            aid: file.content.activityId,
-            level: file.content.activityLevel,
-          },
-          {
-            key: "Description",
-            value: file.content.description,
-          },
-          {
-            key: "Messager",
-            value: file.content.userName,
-            aid: file.content.userId
-          },
-          // {
-          //   key: "Uploader",
-          //   value: file.uploaderName,
-          // },
-          {
-            key: "Message Time",
-            value: file.createdTime,
-          },
-
-        ];
+        if (this.slctMessage.type == "apply"){
+          this.selectedApplyData = [
+            {
+              key: "Message Title",
+              value: file.content.title,
+            },
+            {
+              key: "Message Type",
+              value: file.type,
+            },
+            {
+              key: "Activity Name",
+              value: file.content.activityName,
+              aid: file.content.activityId,
+              level: file.content.activityLevel,
+              projectId: file.content.projectId,
+            },
+            {
+              key: "Description",
+              value: file.content.description,
+            },
+            {
+              key: "Applicant",
+              value: file.content.userName,
+              aid: file.content.userId
+            },
+            // {
+            //   key: "Uploader",
+            //   value: file.uploaderName,
+            // },
+            {
+              key: "Message Time",
+              value: file.createdTime,
+            },
+          ];
+        } else if (this.slctMessage.type == "notice"){
+          this.selectedNoticeData = [
+            {
+              key: "Message Title",
+              value: file.content.title,
+            },
+            {
+              key: "Message Type",
+              value: file.type,
+            },
+            {
+              key: "Description",
+              value: file.content.description,
+            },
+            {
+              key: "Activity Name",
+              value: file.content.activityName,
+              aid: file.content.activityId,
+              level: file.content.activityLevel,
+              projectId: file.content.projectId,
+            },
+            // {
+            //   key: "Sender",
+            //   value: file.content.userName,
+            //   aid: file.content.userId
+            // },
+            // {
+            //   key: "Uploader",
+            //   value: file.uploaderName,
+            // },
+            {
+              key: "Message Time",
+              value: file.createdTime,
+            },
+          ];
+        }
         this.noticeInfoModal = true;
       },
       getReadNoticeInfo(file) {
         this.slctMessage = file;
-        this.selectedReadNoticeData = [
-          {
-            key: "Message Title",
-            value: file.content.title,
-          },
-          {
-            key: "Message Type",
-            value: file.type,
-          },
-          {
-            key: "Activity Name",
-            value: file.content.activityName,
-          },
-          {
-            key: "Description",
-            value: file.content.description,
-          },
-          {
-            key: "Messager",
-            value: file.content.userName,
-          },
-          // {
-          //   key: "Uploader",
-          //   value: file.uploaderName,
-          // },
-          {
-            key: "Message Time",
-            value: file.createdTime,
-          },
-
-        ];
+        if (this.slctMessage.type == "apply"){
+          this.selectedReadApplyData = [
+            {
+              key: "Message Title",
+              value: file.content.title,
+            },
+            {
+              key: "Message Type",
+              value: file.type,
+            },
+            {
+              key: "Activity Name",
+              value: file.content.activityName,
+              aid: file.content.activityId,
+              level: file.content.activityLevel,
+              projectId: file.content.projectId,
+            },
+            {
+              key: "Description",
+              value: file.content.description,
+            },
+            {
+              key: "Applicant",
+              value: file.content.userName,
+              aid: file.content.userId
+            },
+            // {
+            //   key: "Uploader",
+            //   value: file.uploaderName,
+            // },
+            {
+              key: "Message Time",
+              value: file.createdTime,
+            },
+          ];
+        } else if(this.slctMessage.type == "notice"){
+          this.selectedReadNoticeData = [
+            {
+              key: "Message Title",
+              value: file.content.title,
+            },
+            {
+              key: "Message Type",
+              value: file.type,
+            },
+            {
+              key: "Description",
+              value: file.content.description,
+            },
+            {
+              key: "Activity Name",
+              value: file.content.activityName,
+              aid: file.content.activityId,
+              level: file.content.activityLevel,
+              projectId: file.content.projectId,
+            },
+            {
+              key: "Message Time",
+              value: file.createdTime,
+            },
+          ];
+        }
         this.readNoticeInfoModal = true;
       },
       loadNotifications() {
@@ -596,12 +683,16 @@
                   "Sorry, you were refused to join the activity: " +
                   apply.content.activityName +
                   " .",
+                projectId: apply.content.projectId,
+                activityId: apply.content.activityId,
+                activityName: apply.content.activityName,
+                activityLevel: apply.content.activityLevel,
               };
               this.axios
                 .post("/GeoProblemSolving/notice/save", replyNotice)
                 .then((result) => {
                   if (result.data == "Success") {
-                    this.$emit("sendNotice", apply.content.userId);
+                    this.$emit("sendNotice", {"type": "Notice", "recipientId": apply.content.userId});
                   } else {
                     this.$Message.error("reply fail.");
                   }
@@ -644,22 +735,26 @@
               replyNotice["content"] = {
                 title: "Result for application",
                 description:
-                  "Congratulations for joining the activity: " +
+                  "Welcome to join the activity: " +
                   apply.content.activityName +
                   " .",
+                projectId: apply.content.projectId,
+                activityId: apply.content.activityId,
+                activityName: apply.content.activityName,
+                activityLevel: apply.content.activityLevel,
               };
               this.axios
                 .post("/GeoProblemSolving/notice/save", replyNotice)
                 .then((result) => {
                   if (result.data == "Success") {
-                    this.$emit("sendNotice", {"type": "Notice", "receiver": apply.content.userId });
+                    this.$emit("sendNotice", {"type": "Notice", "recipientId": apply.content.userId });
                     let resultEmailBody = {};
                     resultEmailBody["recipient"] = apply.content.userEmail;
                     resultEmailBody["mailTitle"] = "Join project result";
                     resultEmailBody["mailContent"] =
                       "Hello, " +
                       apply.content.userName +
-                      ", Congratulations for joining the activity: " +
+                      ", Welcome to join the activity: " +
                       apply.content.activityName +
                       " .";
                     this.axios
@@ -671,7 +766,7 @@
                             desc:
                               "The process result email has been sent,if he/she doesn't online,the email will remind the joiner in time.",
                           });
-                          this.$emit("sendNotice", apply.content.userId);
+                          this.$emit("sendNotice", {"type": "Notice", "recipientId": apply.content.userId});
                         } else {
                           this.$Notice.error({
                             title: "Email send fail",
@@ -783,8 +878,8 @@
 
   .applyBtn {
     float: right;
-    margin: 0 10px;
+    margin: 25px 10px;
     cursor: pointer;
-    size: 25px;
+    size: 35px;
   }
 </style>

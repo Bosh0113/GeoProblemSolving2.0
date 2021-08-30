@@ -210,8 +210,7 @@ public class ToolServiceImpl implements ToolService {
         tool.setCreatedTime(createDate);
         tool.setRecommendation(recommendation);
         tool.setTags(tags);
-        tool.setToolImage(toolImg);
-        tool.setPresent(true);
+        tool.setToolImg(toolImg);
 
         //toolImage暂时先不放
 

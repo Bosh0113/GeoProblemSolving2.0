@@ -101,7 +101,7 @@
                                <img
                                  :src="tool.toolImg"
                                  v-if="tool.toolImg!='' && tool.toolImg!=null"
-                                 style="height:100%;max-height:50px;width: 50%"
+                                 style="height:70px; width:70px; border-radius:50%"
                                />
                                <avatar
                                  :username="tool.toolName"
@@ -121,7 +121,7 @@
                                <span class="toolTypeSpan">
                                   {{tool.backendType}}
                                </span>
-                               <span v-for="(tag,index) in tool.tags" class="toolTagSpan">
+                               <span v-for="(tag, index) in tool.tags" :key="tag" class="toolTagSpan">
                                  {{tool.tags[index]}}
                                </span>
                              </div>
@@ -180,7 +180,7 @@
                               <img
                                 :src="tool.toolImg"
                                 v-if="tool.toolImg!='' && tool.toolImg!=null"
-                                style="height:100%;max-height:50px;width: 50%"
+                                style="height:70px; width:70px; border-radius:50%"
                               />
                               <avatar
                                 :username="tool.toolName"
@@ -200,7 +200,7 @@
                               <span class="toolTypeSpan">
                                  {{tool.backendType}}
                               </span>
-                              <span v-for="(tag,index) in tool.tags" class="toolTagSpan">
+                              <span v-for="(tag,index) in tool.tags" :key="index" class="toolTagSpan">
                                 {{tool.tags[index]}}
                               </span>
                             </div>
@@ -474,12 +474,12 @@
       },
       //与TemplateGeneral 双向绑定，子组件向夫组件传值使用方法
       getEditInfo: function (form) {
-        console.log("editToolInfo", form)
         this.editToolInfo = form;
       },
       editTool: function (item) {
         this.editToolModal = true;
         this.editToolInfo = item;
+        console.log(this.editToolInfo);
       },
       getPersonalTools: function () {
         // "/GeoProblemSolving/tool/findByProvider/" + this.$store.getters.userId
@@ -488,12 +488,17 @@
             "/GeoProblemSolving/tool/provider/" + this.$store.getters.userId
           )
           .then((res) => {
-            let tempTools = res.data.data;
-            for (let i = 0; i < tempTools.length; i++) {
-              if (tempTools[i].privacy == "Public") {
-                this.publicTools.push(tempTools[i]);
-              } else {
-                this.privateTools.push(tempTools[i]);
+            if (res.data == "Offline") {
+              this.$store.commit("userLogout");
+              this.$router.push({ name: "Login" });
+            } else if (res.data.code == 0){
+              let tempTools = res.data.data;
+              for (let i = 0; i < tempTools.length; i++) {
+                if (tempTools[i].privacy == "Public") {
+                  this.publicTools.push(tempTools[i]);
+                } else {
+                  this.privateTools.push(tempTools[i]);
+                }
               }
             }
           })
@@ -513,6 +518,7 @@
       },
       createTool: async function () {
         let createToolForm = this.toolInfo;
+        console.log(createToolForm);
         this.loading = true;
         setTimeout(()=>{
           this.loading = false;
@@ -522,22 +528,24 @@
         this.axios.post("/GeoProblemSolving/tool", createToolForm)
           .then(res=>{
             // ？？？ 判断返回值，进行下一步操作
-            this.createToolModal = false;
-            this.editToolInfo = {};
-            this.toolInfo = {};
-            let toolData = res.data.data;
-            console.log(res)
-            console.log(toolData);
-            if (toolData != null){
-              if (toolData.privacy == "Public"){
-                this.publicTools.push(toolData);
-              }else if (toolData.privacy == "Private"){
-                this.privateTools.push(toolData);
+            if (res.data.code == 0){
+              this.createToolModal = false;
+              this.editToolInfo = {};
+              this.toolInfo = {};
+              let toolData = res.data.data;
+              console.log(res);
+              console.log(toolData);
+              if (toolData != null){
+                if (toolData.privacy == "Public"){
+                  this.publicTools.push(toolData);
+                }else if (toolData.privacy == "Private"){
+                  this.privateTools.push(toolData);
+                }
+                this.currentStep = 0;
+                this.$Notice.success({title: "Create successfully"});
+              }else {
+                this.$Notice.error({title: "Crate failed", desc: "No Corresponding service"});
               }
-              this.currentStep = 0;
-              this.$Notice.success({title: "Create successfully"});
-            }else {
-              this.$Notice.error({title: "Crate failed", desc: "No Corresponding service"});
             }
           })
           .catch(err=>{

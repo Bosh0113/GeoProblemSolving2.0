@@ -38,7 +38,9 @@ public class NoticeSocket {
             JSONObject messageJson = JSONObject.parseObject(message);
             if(!messageJson.getString("type").equals("ping")){
                 for(Map.Entry<String,NoticeSocket> server:servers.entrySet()){
-                    if(server.getKey().equals(messageJson.getString("receiver"))){
+                    String serverKey = server.getKey();
+                    String recipientId = messageJson.getString("recipientId");
+                    if(serverKey.equals(recipientId)){
                         JSONObject noticeRes = new JSONObject();
                         noticeRes.put("type", messageJson.getString("type"));
                         noticeRes.put("msg", "Notice");

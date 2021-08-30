@@ -761,7 +761,7 @@ var taskList = [];
 
     function resaveFile(file, info) {
 
-        let formData = new FormData();
+        var formData = new FormData();
         formData.append("file", file);
         formData.append("resInfo", info);
 
@@ -769,9 +769,8 @@ var taskList = [];
         if (temp.length == 0) {
             temp = ["0"];
         }
-        let paths = temp.toString()
+        let paths = temp.toString();
 
-        let result = null;
         $.ajax({
             url: `/GeoProblemSolving/rip/file/${activityInfo.aid}/${paths}`,
             type: "PUT",
@@ -785,8 +784,7 @@ var taskList = [];
                 let result;
                 try {
                     result = JSON.parse(data);
-                }
-                catch (e) {
+                } catch (e) {
                     result = data;
                 }
                 if (result.code == 0) {
@@ -799,10 +797,11 @@ var taskList = [];
                 throw err;
             }
         });
-        return resultData;
+        return "success";
     }
 
-    function deleteResource() { }
+    function deleteResource() {
+    }
 
     /**
      * when resources changed
@@ -1067,16 +1066,18 @@ var taskList = [];
     var operationChannel = null;
     var dataChannel = null;
     var computationChannel = null;
+    var participantChannel = null;
 
     var CollabSocket = {
         websock: null,
         timer: null,
         websockLinked: false,
 
-        initSocketChannel: function (opeChannel, dataChannel, compChannel) {
+        initSocketChannel: function (opeChannel, dataChannel, compChannel, peopleChannel) {
             operationChannel = opeChannel;
             dataChannel = dataChannel;
             computationChannel = compChannel;
+            participantChannel = peopleChannel;
         },
 
         initWebSocket: function (aid, toolId) { //初始化websocket
@@ -1139,6 +1140,10 @@ var taskList = [];
                             personOnline(data.participants);
                         } else if (data.behavior == "off") {
                             personOffline(activeUser);
+                        }
+
+                        if (participantChannel != undefined && typeof participantChannel == "function") {
+                            participantChannel(data);
                         }
                         break;
                     }
@@ -1277,7 +1282,6 @@ var taskList = [];
                 outputs: outputs,
                 sender: userInfo.userId
             };
-            console.log("invokeForm", invokeForm)
             if (this.websock.readyState === this.websock.OPEN) {
                 this.websocketSend(invokeForm);
             } else if (this.websock.readyState === this.websock.CONNECTING) {
@@ -1351,12 +1355,12 @@ var taskList = [];
             }
         },
         //协同工具---输入文件
-        receiveDataInputDataOperation: function (inputMdl) {
-            console.log(inputMdl)
+        receiveDataInputDataOperation: function (inputMdl, addOrRemove) {
             let msg = {
                 type: "operation",
                 behavior: "data",
                 content: {
+                    addOrRemove: addOrRemove,
                     inputs: inputMdl
                 },
                 sender: userInfo.userId
@@ -1373,15 +1377,17 @@ var taskList = [];
                 }, 1000)
             }
         },
+
         /*
         协同工具---输入参数
          */
-        receiveParamsOperation: function (inputParams) {
+        receiveParamsOperation: function (inputParams, stateIndex) {
             let paramsMsg = {
                 type: "operation",
                 behavior: "params",
                 content: {
-                    inputs: inputParams
+                    inputs: inputParams,
+                    stateIndex: stateIndex
                 },
                 sender: userInfo.userId
             };
@@ -1390,11 +1396,25 @@ var taskList = [];
                 this.websocketSend(paramsMsg);
             } else if (this.websock.readyState === this.websock.CONNECTING) {
                 setTimeout(function () {
-                    this.receiveParamsOperation(inputParams);
+                    this.receiveParamsOperation(inputParams, stateIndex);
                 }, 1000)
             } else {
                 setTimeout(function () {
-                    this.receiveParamsOperation(inputParams);
+                    this.receiveParamsOperation(inputParams, stateIndex);
+                }, 1000)
+            }
+        },
+
+        reciveElementChangeOperation(paramsMsg) {
+            if (this.websock.readyState === this.websock.OPEN) {
+                this.websocketSend(paramsMsg);
+            } else if (this.websock.readyState === this.websock.CONNECTING) {
+                setTimeout(function () {
+                    this.reciveElementChangeOperation(inputParams);
+                }, 1000)
+            } else {
+                setTimeout(function () {
+                    this.reciveElementChangeOperation(inputParams);
                 }, 1000)
             }
         },
@@ -1421,20 +1441,6 @@ var taskList = [];
             }
         },
 
-        reciveElementChangeOperation(paramsMsg) {
-            if (this.websock.readyState === this.websock.OPEN) {
-                this.websocketSend(paramsMsg);
-            } else if (this.websock.readyState === this.websock.CONNECTING) {
-                setTimeout(function () {
-                    this.reciveElementChangeOperation(inputParams);
-                }, 1000)
-            } else {
-                setTimeout(function () {
-                    this.reciveElementChangeOperation(inputParams);
-                }, 1000)
-            }
-        },
-
 
         socketInfo: function () {
             return {
@@ -1456,6 +1462,7 @@ var taskList = [];
     function loadCollabComponent() {
         initComponent();
     }
+
 
     /**
      * 使用组件基础功能：获取基本信息;协同功能
@@ -1556,23 +1563,24 @@ var taskList = [];
      * @param value
      * @param attributes
      */
-    function sendElementChangeOperation(elemId, behavior, value, style, attributes) {
+    function sendElementChangeOperation(elemId, behavior, type, value, style, attributes) {
         var change = {
-                type: "operation",
-                behavior: behavior,
-                content: {
-                    id: elemId,
-                    value: value,
-                    style: style,
-                    attributes: attributes
-                },
-                sender: userInfo.userId
+            type: "operation",
+            behavior: behavior,
+            content: {
+                id: elemId,
+                type: type,
+                value: value,
+                style: style,
+                attributes: attributes
+            },
+            sender: userInfo.userId
         }
         CollabSocket.reciveElementChangeOperation(change);
     }
 
-    function sendInputParams(inputParams) {
-        CollabSocket.receiveParamsOperation(inputParams);
+    function sendInputParams(inputParams, stateIndex) {
+        CollabSocket.receiveParamsOperation(inputParams, stateIndex);
     }
 
     /**
@@ -1593,13 +1601,13 @@ var taskList = [];
      * 建立协同数据通道
      * build call back channel
      */
-    function buildSocketChannel(opeChannel, dataChannel, compChannel) {
-        CollabSocket.initSocketChannel(opeChannel, dataChannel, compChannel);
+    function buildSocketChannel(opeChannel, dataChannel, compChannel, peopleChannel) {
+        CollabSocket.initSocketChannel(opeChannel, dataChannel, compChannel, peopleChannel);
     }
 
     //
-    function selectDataOperation(value) {
-        CollabSocket.receiveDataInputDataOperation(value);
+    function selectDataOperation(value, addOrRemove) {
+        CollabSocket.receiveDataInputDataOperation(value, addOrRemove);
     }
 
     function runTool() {

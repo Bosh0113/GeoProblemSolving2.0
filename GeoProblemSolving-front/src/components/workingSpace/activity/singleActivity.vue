@@ -27,7 +27,7 @@
         <div v-show="activeMenu == 'Workspace'">
           <vue-scroll
             :ops="scrollOps"
-            style="height: calc(100vh - 105px); margin-top: 5px"
+            style="height: calc(100vh - 225px); margin-top: 5px"
           >
             <context-res
               v-if="
@@ -80,11 +80,12 @@
               v-else
               :activityInfo="activityInfo"
               :participants="participants"
+              :projectInfo="projectInfo"
             ></universal-space>
           </vue-scroll>
         </div>
         <div v-show="activeMenu == 'Task'">
-          <task-manager :activityInfo="activityInfo" :userInfo="userInfo"></task-manager>
+          <task-manager :activityInfo="activityInfo" :userInfo="userInfo" :projectInfo="projectInfo"></task-manager>
         </div>
       </div>
     </div>
@@ -197,7 +198,7 @@ import geoSimulation from "./funcs/geoSimulation.vue";
 import geoAnalysis from "./funcs/geoAnalysis.vue";
 import decisionMaking from "./funcs/decisionMaking.vue";
 export default {
-  props: ["activityInfo","userInfo"],
+  props: ["activityInfo","userInfo","projectInfo"],
   components: {
     Avatar,
     // activityShow,
@@ -219,7 +220,6 @@ export default {
           background: "lightgrey",
         },
       },
-      projectInfo: {},
       activeMenu: "Workspace",
       // userInfo: JSON.parse(sessionStorage.getItem("userInfo")),
       userRole: "visitor",
@@ -296,6 +296,7 @@ export default {
           userId: candidates[i].userId,
           name: candidates[i].name,
           role: candidates[i].role,
+          domain: candidates[i].domain,
           disabled: this.participants.contains(candidates[i]),
         });
       }
@@ -373,9 +374,16 @@ export default {
                     this.projectInfo.name +
                     " , and now you are a member in this activity!",
                   approve: "unknow",
+                  projectId: this.projectInfo.aid,
+                  projectName: this.projectInfo.name,
+                  activityId: activity.aid,
+                  activityName: activity.name,
+                  activityLevel: activity.level,
+                  invitorName: this.userInfo.name,
+                  invitorId: this.userInfo.userId,
                 },
               };
-              this.sendNotice(activity, notice);
+              this.sendNotice(notice);
             } else {
               console.log(res.data.msg);
             }
@@ -450,6 +458,13 @@ export default {
                   role +
                   ".",
                 approve: "unknow",
+                projectId: this.projectInfo.aid,
+                projectName: this.projectInfo.name,
+                activityId: activity.aid,
+                activityName: activity.name,
+                activityLevel: activity.level,
+                // removerName: this.userInfo.name,
+                // removerId: this.userInfo.userId,
               },
             };
             this.sendNotice(notice);
@@ -519,9 +534,16 @@ export default {
                   this.projectInfo.name +
                   ".",
                 approve: "unknow",
+                projectId: this.projectInfo.aid,
+                projectName: this.projectInfo.name,
+                activityId: activity.aid,
+                activityName: activity.name,
+                activityLevel: activity.level,
+                removerName: this.userInfo.name,
+                removerId: this.userInfo.userId,
               },
             };
-            this.sendNotice(activity, notice);
+            this.sendNotice(notice);
           } else {
             console.log(res.data.msg);
           }
@@ -584,14 +606,21 @@ export default {
                     this.projectInfo.name +
                     ".",
                   approve: "unknow",
+                  projectId: this.projectInfo.aid,
+                  projectName: this.projectInfo.name,
+                  activityId: activity.aid,
+                  activityName: activity.name,
+                  activityLevel: activity.level,
+                  leaverName: this.userInfo.name,
+                  leaverId: this.userInfo.userId,
                 },
               };
-              this.sendNotice(activity, notice);
+              this.sendNotice(notice);
 
-              parent.location.href =
+              window.location.href =
                 "/GeoProblemSolving/projectInfo/" +
                 this.projectInfo.aid +
-                "?content=workspace&aid=" +
+                "?aid=" +
                 activity.parent +
                 "&level=" +
                 (activity.level - 1).toString();
@@ -604,12 +633,12 @@ export default {
           throw err;
         });
     },
-    sendNotice(activity, notice) {
+    sendNotice(notice) {
       this.axios
         .post("/GeoProblemSolving/notice/save", notice)
         .then((result) => {
           if (result.data == "Success") {
-            parent.vm.$emit("sendNotice", notice.recipientId);
+            this.$emit("sendNotice", notice);
           } else {
             this.$Message.error("Notice fail.");
           }

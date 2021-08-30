@@ -12,11 +12,13 @@ export default new Vuex.Store({
       name: 'Visitor',
       userId: '',
       avatar: '',
+      state: '',
     },
     projectImg: '',
     // activityTree:[],
     tempOperationChange: [],
     activityTaskChange: [],
+    notifications: [],
     IP_Port: window.location.host,
     //用于当前选择的页面内容
     // IP_Port:"172.21.213.185:8080",
@@ -35,6 +37,9 @@ export default new Vuex.Store({
     },
     userName: state => {
       return state.userInfo.name;
+    },
+    userProvince:state => {
+      return state.userInfo.state;
     },
     userId: state => {
       return state.userInfo.userId;
@@ -59,6 +64,9 @@ export default new Vuex.Store({
     },
     activityTaskChange: state => {
       return state.activityTaskChange;
+    }, 
+    notifications: state => {
+      return state.notifications;
     }
   },
   mutations: {
@@ -70,7 +78,8 @@ export default new Vuex.Store({
           async: false,
           success: function (data) {
             if (data) {
-              var userInfo = data;
+              let userInfo = {};
+              userInfo = data;
               userInfo.userState = true;
               state.userInfo = userInfo;
             }
@@ -105,6 +114,7 @@ export default new Vuex.Store({
       state.userInfo = userInfo;
     },
     updateProject: (state, projectId) => {
+      //删除某项project
       let index = state.userInfo.createdProjects.indexOf(projectId);
       state.userInfo.createdProjects.splice(index, 1);
     },
@@ -123,5 +133,11 @@ export default new Vuex.Store({
     updateActivityTasks: (state, data) => {
       state.activityTaskChange.push(data);
     },
+    addNotification: (state, notice) => {
+      state.notifications.push(notice);
+    },
+    cleanNotification: (state) => {
+      state.notifications = [];
+    }
   }
 })

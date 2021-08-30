@@ -97,7 +97,6 @@ export default {
       typeSelected: "All",
       typeOptions: [
         "All",
-        "General step",
         "Context definition & resource collection",
         "Data processing",
         "Data visualization",
@@ -105,8 +104,7 @@ export default {
         "Model effectiveness evaluation",
         "Geographical simulation",
         "Quantitative and qualitative analysis",
-        "Decision-making for management",
-        "Others"
+        "Decision-making for management"
       ],
       switchValue: true
       // selectTools: []

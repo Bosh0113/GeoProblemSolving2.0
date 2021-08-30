@@ -559,7 +559,8 @@ export default {
   props: [
     "activityInfo",
     "nameConfirm",
-    "userInfo"
+    "userInfo",
+    "projectInfo"
    ],
   data() {
     return {
@@ -568,7 +569,6 @@ export default {
           background: "lightgrey",
         },
       },
-      projectInfo: {},
       // userInfo: {},
       userRole: "visitor",
       // Members
@@ -605,7 +605,7 @@ export default {
         level: -1,
         permission: JSON.stringify(this.userRoleApi.getDefault()),
         type: "Activity_Default",
-        purpose: "Multi-purpose",
+        purpose: "Other purpose",
       },
       activityCreateRule: {
         name: [
@@ -633,7 +633,6 @@ export default {
         ],
       },
       purposes: [
-        "Multi-purpose",
         "Context definition & resource collection",
         "Data processing",
         "Data visualization",
@@ -642,6 +641,7 @@ export default {
         "Geographical simulation",
         "Data analysis",
         "Decision making",
+        "Other purpose",
       ],
       listStyle: { width: "280px", height: "360px" },
     };
@@ -722,7 +722,7 @@ export default {
         });
     },
     modifyPermission() {
-      parent.location.href =
+      window.location.href =
         "/GeoProblemSolving/permission/" +
         this.activityInfo.level +
         "/" +
@@ -776,13 +776,6 @@ export default {
                   this.userInfo.userId
                 );
 
-                // parent.location.href =
-                //   "/GeoProblemSolving/projectInfo/" +
-                //   this.projectInfo.aid +
-                //   "?content=workspace&aid=" +
-                //   res.data.data.aid +
-                //   "&level=" +
-                //   res.data.data.level;
                 this.$emit('enterActivity', res.data.data);
               } else {
                 console.log(res.data.msg);
@@ -799,13 +792,6 @@ export default {
       if (this.roleIdentity(activity) == "visitor"){
          this.$Message.info("Please join this activity.");
       }
-      // parent.location.href =
-      //   "/GeoProblemSolving/projectInfo/" +
-      //   this.projectInfo.aid +
-      //   "?content=workspace&aid=" +
-      //   activity.aid +
-      //   "&level=" +
-      //   activity.level;
       this.$emit('enterActivity', activity);
     },
     preApplication(activity) {
@@ -840,10 +826,10 @@ export default {
         .post(url)
         .then((res) => {
           if (res.data.code == 0) {
-            parent.location.href =
-              "/GeoProblemSolving/projectInfo/" +
+            window.location.href =
+              "/GeoProblemSolving/activityInfo/" +
               this.projectInfo.aid +
-              "?content=workspace&aid=" +
+              "?aid=" +
               this.appliedActivity.aid +
               "&level=" +
               this.appliedActivity.level;
@@ -872,6 +858,7 @@ export default {
             title:
               "Application of joining the activity: " +
               this.appliedActivity.name,
+            projectId: this.projectInfo.aid,
             activityId: this.appliedActivity.aid,
             activityName: this.appliedActivity.name,
             activityLevel: this.appliedActivity.level,
@@ -909,6 +896,7 @@ export default {
           userId: candidates[i].userId,
           name: candidates[i].name,
           role: candidates[i].role,
+          domain: candidates[i].domain,
           disabled: this.participants.contains(candidates[i]),
         });
       }
@@ -987,6 +975,13 @@ export default {
                     this.projectInfo.name +
                     " , and now you are a member in this activity!",
                   approve: "unknow",
+                  projectId: this.projectInfo.aid,
+                  projectName: this.projectInfo.name,
+                  activityId: activity.aid,
+                  activityName: activity.name,
+                  activityLevel: activity.level,
+                  invitorName: this.userInfo.name,
+                  invitorId: this.userInfo.userId,
                 },
               };
               this.sendNotice(notice);
@@ -1039,7 +1034,7 @@ export default {
               member.userId,
               member.name,
               member.role,
-              user.domain
+              member.domain
             );
             let index = this.participants.indexOf(member);
             this.participants.splice(index, 1);
@@ -1058,6 +1053,13 @@ export default {
                   this.projectInfo.name +
                   ".",
                 approve: "unknow",
+                projectId: this.projectInfo.aid,
+                projectName: this.projectInfo.name,
+                activityId: activity.aid,
+                activityName: activity.name,
+                activityLevel: activity.level,
+                removerName: this.userInfo.name,
+                removerId: this.userInfo.userId,
               },
             };
             this.sendNotice(notice);
@@ -1134,6 +1136,13 @@ export default {
                   role +
                   ".",
                 approve: "unknow",
+                projectId: this.projectInfo.aid,
+                projectName: this.projectInfo.name,
+                activityId: activity.aid,
+                activityName: activity.name,
+                activityLevel: activity.level,
+                // removerName: this.userInfo.name,
+                // removerId: this.userInfo.userId,
               },
             };
             this.sendNotice(notice);
@@ -1201,6 +1210,13 @@ export default {
                     this.projectInfo.name +
                     ".",
                   approve: "unknow",
+                  projectId: this.projectInfo.aid,
+                  projectName: this.projectInfo.name,
+                  activityId: activity.aid,
+                  activityName: activity.name,
+                  activityLevel: activity.level,
+                  leaverName: this.userInfo.name,
+                  leaverId: this.userInfo.userId,
                 },
               };
               this.sendNotice(notice);
@@ -1217,11 +1233,11 @@ export default {
       this.axios
         .post("/GeoProblemSolving/notice/save", notice)
         .then((result) => {
-          if (result.data == "Success") {
-            this.$emit("sendNotice", notice.recipientId);
-            this.$Notice.info({ desc: "Send application successfully" });
+          if (result.data == "Success") {            
+            this.$store.commit("addNotification", notice);
+            // this.$Notice.info({ desc: "Send notice successfully" });
           } else {
-            this.$Notice.error({ desc: "Fail to send application" });
+            // this.$Notice.error({ desc: "Fail to send notice" });
           }
         })
         .catch((err) => {
@@ -1230,10 +1246,9 @@ export default {
     },
     gotoPersonalSpace(id) {
       if (id == this.$store.getters.userId) {
-        parent.location.href = "/newPersonalPage/overView";
-        // this.$router.push({name: "overView"})
+        window.location.href = "/GeoProblemSolving/newPersonalPage/overView";
       } else {
-        parent.location.href = "/GeoProblemSolving/memberPage/" + id;
+        window.location.href = "/GeoProblemSolving/memberPage/" + id;
       }
     },
   },

@@ -146,7 +146,7 @@
           <!--              enter the ... first-->
           <!--            </p>-->
           <!--          </FormItem>-->
-          <FormItem label="Service Type" prop="">
+          <FormItem label="Service Type" prop="backendType">
             <Select
               v-model="toolInfo.backendType"
               @on-change="queryServiceByEmail"
@@ -250,7 +250,14 @@
             />
           </FormItem>
 
-          <FormItem label="tag:" prop="categoryTag">
+          <FormItem prop="scope" label="Scope" :label-width="100">
+          <Select v-model="toolInfo.scope" style="width:80%;margin-left:10px">
+            <Option value="inner" key="0">Internal tools (*Use this tool on this platform)</Option>
+            <Option value="outer" key="1">External tools (*Go to another page to use his tool)</Option>
+          </Select>
+        </FormItem>
+
+          <FormItem label="Tag:" prop="categoryTag">
             <Input
               v-model="inputToolTag"
               placeholder="Enter some tag to classify your tools"
@@ -391,6 +398,7 @@ export default {
         description: "",
         toolUrl: "",
         recomStep: [],
+        scope: "inner",
         categoryTag: [],
         privacy: "Private",
         detail: "",
@@ -402,7 +410,7 @@ export default {
       },
       modelItemLoading: false,
       stepList: [
-        "General step",
+        "All",
         "Context definition & resource collection",
         "Data processing",
         "Data visualization",
@@ -554,12 +562,12 @@ export default {
       this.toolInfo.categoryTag.splice(index, 1);
     },
 
-    async handleBeforeUpload(file) {
-      let formData = new FormData();
-      formData.append("toolImg", file);
-      let data = await post("/GeoProblemSolving/tool/picture", formData);
-      this.toolInfo.toolImg = data;
-    },
+    // async handleBeforeUpload(file) {
+    //   let formData = new FormData();
+    //   formData.append("toolImg", file);
+    //   let data = await post("/GeoProblemSolving/tool/picture", formData);
+    //   this.toolInfo.toolImg = data;
+    // },
 
     uploadPhoto(e) {
       // 利用fileReader对象获取file
@@ -575,23 +583,25 @@ export default {
         reader.readAsDataURL(file);
         reader.onload = (e) => {
           // 读取到的图片base64 数据编码 将此编码字符串传给后台即可
-          let formData = new FormData();
-          formData.append("toolImg", file);
-          this.axios
-            .post("/GeoProblemSolving/tool/picture", formData)
-            .then((res) => {
-              if (res.data.code == 0) {
-                console.log(res);
-                //上传图片返回的res.data.data为空
-                this.pictureUrl = res.data.data; //null
-                this.toolInfo.toolImg = this.pictureUrl;
-                this.img = e.target.result;
-                $("#choosePicture").val("");
-              } else {
-                this.$Message.error("upload picture Fail!");
-              }
-            })
-            .catch();
+          // let formData = new FormData();
+          // formData.append("toolImg", file);
+          // this.axios
+          //   .post("/GeoProblemSolving/tool/picture", formData)
+          //   .then((res) => {
+          //     if (res.data.code == 0) {
+          //       console.log(res);
+          //       //上传图片返回的res.data.data为空
+          //       this.pictureUrl = res.data.data; //null
+          //       this.toolInfo.toolImg = this.pictureUrl;
+          //       this.img = e.target.result;
+          //       $("#choosePicture").val("");
+          //     } else {
+          //       this.$Message.error("upload picture Fail!");
+          //     }
+          //   })
+          //   .catch();
+          this.img = e.target.result;
+          this.toolInfo.toolImg = this.img;
         };
       }
     },
