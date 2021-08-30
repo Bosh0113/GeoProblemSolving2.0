@@ -566,7 +566,6 @@
         this.delToolInfo.delToolName = toolName;
       },
       confirmDelTool: function () {
-        // "/GeoProblemSolving/tool/delete?tid=" + this.delToolInfo.delToolId
         this.$axios
           .delete(
             "/GeoProblemSolving/tool/" + this.delToolInfo.delToolId

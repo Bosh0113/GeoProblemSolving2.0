@@ -34,9 +34,11 @@ public interface ToolService {
 
     Tool updateToolService(Tool putTool);
 
-    long delToolService(String tid);
+    //将工具标记为删除
+    void delToolService(String tid);
 
     List<Tool> getToolByIds(ArrayList<String> ids);
 
     Object emptyProviderService(String tid);
+
 }
