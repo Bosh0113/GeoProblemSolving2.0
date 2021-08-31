@@ -120,13 +120,31 @@
           </FormItem>
 
           <FormItem label="Service Type">
-            <Input  v-if="selectedTool.backendType == 'modelItem'" value="Computable Model" disabled> </Input>
-            <Input v-if="selectedTool.backendType == 'dataMethod'" value="Data Method" disabled> </Input>
-            <Input v-if="selectedTool.backendType == 'webTool'" value="Web Tool" disabled> </Input>
+            <Input
+              v-if="selectedTool.backendType == 'modelItem'"
+              value="Computable Model"
+              disabled
+            >
+            </Input>
+            <Input
+              v-if="selectedTool.backendType == 'dataMethod'"
+              value="Data Method"
+              disabled
+            >
+            </Input>
+            <Input
+              v-if="selectedTool.backendType == 'webTool'"
+              value="Web Tool"
+              disabled
+            >
+            </Input>
           </FormItem>
 
-          <FormItem v-if="selectedTool.backendType != 'webTool'" label="Service Name">
-            <Input  v-model="selectedTool.backendName" disabled> </Input>
+          <FormItem
+            v-if="selectedTool.backendType != 'webTool'"
+            label="Service Name"
+          >
+            <Input v-model="selectedTool.backendName" disabled> </Input>
           </FormItem>
 
           <FormItem v-else label="Url">
@@ -136,19 +154,19 @@
             />
           </FormItem>
 
-<!--          <FormItem label="Url:" prop="toolUrl">-->
-<!--            <Input-->
-<!--              v-model="selectedTool.toolUrl"-->
-<!--              placeholder="Enter the url of your tool"-->
-<!--            />-->
-<!--            <p style="font-style: italic">-->
-<!--              If you copy the doi from Open Geographic Modeling System, please-->
-<!--              enter the ... first-->
-<!--            </p>-->
-<!--          </FormItem>-->
+          <!--          <FormItem label="Url:" prop="toolUrl">-->
+          <!--            <Input-->
+          <!--              v-model="selectedTool.toolUrl"-->
+          <!--              placeholder="Enter the url of your tool"-->
+          <!--            />-->
+          <!--            <p style="font-style: italic">-->
+          <!--              If you copy the doi from Open Geographic Modeling System, please-->
+          <!--              enter the ... first-->
+          <!--            </p>-->
+          <!--          </FormItem>-->
 
-<!--          :label-width="140"-->
-          <FormItem label="Step:" prop="recommendation" >
+          <!--          :label-width="140"-->
+          <FormItem label="Step:" prop="recommendation">
             <Select
               v-model="selectedTool.recommendation"
               multiple
@@ -171,10 +189,24 @@
             />
           </FormItem>
 
-          <FormItem label="tag:" prop="tags">
+          <FormItem prop="scope" label="Scope" :label-width="100">
+            <Select
+              v-model="selectedTool.scope"
+              style="width: 80%; margin-left: 10px"
+            >
+              <Option value="inner" key="0"
+                >Internal tools (*Use this tool on this platform)</Option
+              >
+              <Option value="outer" key="1"
+                >External tools (*Go to another page to use his tool)</Option
+              >
+            </Select>
+          </FormItem>
+
+          <FormItem label="Tag:" prop="tags">
             <Input
               v-model="inputToolTag"
-              placeholder="Enter some tag to classify your tools"
+              placeholder="Enter some tag to identify your tools"
               style="width: 400px"
               @keyup.enter.native="addCreateToolTag(inputToolTag)"
             />
@@ -245,7 +277,7 @@
               <Modal title="View Image" v-model="visible">
                 <img :src="img" v-if="visible" style="width: 100%" />
               </Modal>
-                <!-- <Upload
+              <!-- <Upload
                   ref="upload"
                   :show-upload-list="false"
                   :format="['jpg', 'jpeg', 'png', 'gif']"
@@ -258,7 +290,7 @@
                   <div style="width: 58px; height: 58px; line-height: 58px">
                     <Icon type="ios-camera" size="20"></Icon>
                   </div>
-                </Upload> -->      
+                </Upload> -->
             </div>
           </FormItem>
         </div>

@@ -78,13 +78,17 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public JSONObject findProjectsByPage(int page, int size) {
-        Pageable pageable = PageRequest.of(page - 1, size);
-        Page<Project> projects = projectRepository.findAll(pageable);
-        JSONObject result = new JSONObject();
-        result.put("totalPage", projects.getTotalPages());
-        result.put("count", projects.getTotalElements());
-        result.put("projectList", projects.getContent());
-        return result;
+        try {
+            Pageable pageable = PageRequest.of(page - 1, size);
+            Page<Project> projects = projectRepository.findAll(pageable);
+            JSONObject result = new JSONObject();
+            result.put("totalPage", projects.getTotalPages());
+            result.put("count", projects.getTotalElements());
+            result.put("projectList", projects.getContent());
+            return result;
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
     @Override
@@ -233,7 +237,7 @@ public class ProjectServiceImpl implements ProjectService {
     private Boolean isUpdateProjectListStaticPage(String projectId, Boolean noPrivate) {
         JsonResult result = inquiryByConditions("", "", "", "", 1, 18);
         try {
-            List<Project> projects = (List<Project>)((JSONObject) result.getData()).get("projectList");
+            List<Project> projects = (List<Project>) ((JSONObject) result.getData()).get("projectList");
             long count = projects.size();
             if (count < 18 && noPrivate) { //如果首页数量少于页面数量规格且有新的可见条目，则更新
                 return true;
@@ -557,7 +561,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public JsonResult linkActivities(UpdateActivityDTO update, String aid1, String aid2, String pid){
+    public JsonResult linkActivities(UpdateActivityDTO update, String aid1, String aid2, String pid) {
         try {
             // Confirm aid
             Optional optional = projectRepository.findById(update.getAid());
@@ -582,13 +586,13 @@ public class ProjectServiceImpl implements ProjectService {
             projectRepository.save(project);
 
             return ResultUtils.success(project);
-        } catch (Exception ex){
+        } catch (Exception ex) {
             return ResultUtils.error(-2, ex.toString());
         }
     }
 
     @Override
-    public JsonResult separateActivities(UpdateActivityDTO update, String lastAid, String nextAid){
+    public JsonResult separateActivities(UpdateActivityDTO update, String lastAid, String nextAid) {
         try {
             // Confirm aid
             Optional optional = projectRepository.findById(update.getAid());
@@ -632,7 +636,7 @@ public class ProjectServiceImpl implements ProjectService {
             subprojectRepository.save(activity2);
 
             return ResultUtils.success(project);
-        } catch (Exception ex){
+        } catch (Exception ex) {
             return ResultUtils.error(-2, ex.toString());
         }
     }
@@ -643,7 +647,7 @@ public class ProjectServiceImpl implements ProjectService {
         nextInfo.put("protocolId", pid);
 
         JSONArray nextActivities = last.getNext();
-        if(nextActivities == null) nextActivities = new JSONArray();
+        if (nextActivities == null) nextActivities = new JSONArray();
         nextActivities.add(nextInfo);
         last.setNext(nextActivities);
 
@@ -656,7 +660,7 @@ public class ProjectServiceImpl implements ProjectService {
         lastInfo.put("protocolId", pid);
 
         JSONArray lastActivities = next.getLast();
-        if(lastActivities == null) lastActivities = new JSONArray();
+        if (lastActivities == null) lastActivities = new JSONArray();
         lastActivities.add(lastInfo);
         next.setLast(lastActivities);
 

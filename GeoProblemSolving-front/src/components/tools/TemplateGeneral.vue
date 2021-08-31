@@ -251,11 +251,18 @@
           </FormItem>
 
           <FormItem prop="scope" label="Scope" :label-width="100">
-          <Select v-model="toolInfo.scope" style="width:80%;margin-left:10px">
-            <Option value="inner" key="0">Internal tools (*Use this tool on this platform)</Option>
-            <Option value="outer" key="1">External tools (*Go to another page to use his tool)</Option>
-          </Select>
-        </FormItem>
+            <Select
+              v-model="toolInfo.scope"
+              style="width: 80%; margin-left: 10px"
+            >
+              <Option value="inner" key="0"
+                >Internal tools (*Use this tool on this platform)</Option
+              >
+              <Option value="outer" key="1"
+                >External tools (*Go to another page to use his tool)</Option
+              >
+            </Select>
+          </FormItem>
 
           <FormItem label="Tag:" prop="categoryTag">
             <Input

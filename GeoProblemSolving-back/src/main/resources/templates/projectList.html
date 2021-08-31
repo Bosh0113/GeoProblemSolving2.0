@@ -278,14 +278,14 @@
                 this.userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
                 if (this.userInfo != null && this.userInfo.userState) {
                     this.userState = true;
-                    this.showPageList();
                 }
                 else {
                     this.userState = false;
-                    this.judgeMember(projectsInfo.projectList);
-                    this.tabPageData = Object.assign([], projectsInfo.projectList);
+                    // this.judgeMember(projectsInfo.projectList);
+                    // this.tabPageData = Object.assign([], projectsInfo.projectList);
                     this.freshEle++;
                 }
+                this.showPageList();
                 window.onresize = () => {
                     return (() => {
                         this.$refs.navigationEl.identityMenuCSS();
@@ -310,14 +310,12 @@
                     }
 
                     if (type == "All" && !this.userState) {
-                        this.judgeMember(projectsInfo.projectList);
-                        this.tabPageData = Object.assign([], this.currentProjectList);
+                        // this.judgeMember(projectsInfo.projectList);
+                        // this.tabPageData = Object.assign([], this.currentProjectList);
                         this.freshEle++;
-                        this.totalCount = projectsInfo.count;
+                        // this.totalCount = projectsInfo.count;
                     }
-                    else {
-                        this.showPageList();
-                    }
+                    this.showPageList();
                     if (type == "All") {
                         this.selectCatalog = this.projectCatalog[0];
                     }
@@ -417,8 +415,8 @@
                         }
                     }
                     else {
-                        if (projectList.length != 0) {
-                            for (var i = 0; i < projectList.length; i++) {
+                        if (projectList.length !== 0) {
+                            for (let i = 0; i < projectList.length; i++) {
                                 projectList[i]["isManager"] = false;
                                 projectList[i]["isMember"] = false;
                             }

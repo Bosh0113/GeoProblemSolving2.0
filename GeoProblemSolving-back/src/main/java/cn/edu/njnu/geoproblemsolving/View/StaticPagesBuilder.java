@@ -43,29 +43,31 @@ public class StaticPagesBuilder {
     }
 
     public void projectListPageBuilder(JSONObject projects) {
-        ClassLoaderTemplateResolver resolver = new ClassLoaderTemplateResolver();
-        resolver.setPrefix("templates/");//模板所在目录，相对于当前classloader的classpath。
-        resolver.setSuffix(".html");//模板文件后缀
-        TemplateEngine templateEngine = new TemplateEngine();
-        templateEngine.setTemplateResolver(resolver);
+        if(projects != null) {
+            ClassLoaderTemplateResolver resolver = new ClassLoaderTemplateResolver();
+            resolver.setPrefix("templates/");//模板所在目录，相对于当前classloader的classpath。
+            resolver.setSuffix(".html");//模板文件后缀
+            TemplateEngine templateEngine = new TemplateEngine();
+            templateEngine.setTemplateResolver(resolver);
 
-        Context context = new Context();
-        context.setVariable("projectsInfo", projects);
+            Context context = new Context();
+            context.setVariable("projectsInfo", projects);
 
-        //渲染模板
-        String servicePath = getServicePath();
-        String htmlPath = servicePath + "/staticPage";
-        File temp = new File(htmlPath);
-        if (!temp.exists()) {
-            temp.mkdirs();
-        }
-        String htmlFile = htmlPath + "/projectList.html";
-        try {
-            OutputStreamWriter write = new OutputStreamWriter(new FileOutputStream(htmlFile), "UTF-8");
-            templateEngine.process("projectList", context, write);
-            write.flush();
-            write.close();
-        } catch (Exception ignored) {
+            //渲染模板
+            String servicePath = getServicePath();
+            String htmlPath = servicePath + "/staticPage";
+            File temp = new File(htmlPath);
+            if (!temp.exists()) {
+                temp.mkdirs();
+            }
+            String htmlFile = htmlPath + "/projectList.html";
+            try {
+                OutputStreamWriter write = new OutputStreamWriter(new FileOutputStream(htmlFile), "UTF-8");
+                templateEngine.process("projectList", context, write);
+                write.flush();
+                write.close();
+            } catch (Exception ignored) {
+            }
         }
     }
 

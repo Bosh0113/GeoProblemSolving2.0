@@ -99,7 +99,7 @@
                 <!--          无通知消息  -->
                 <div v-else>
                   <Card dis-hover style="border:transparent">
-                    <h1 style="color: darkgray; text-align: center;">No Notifications</h1>
+                    <h1 style="color: darkgray; text-align: center;">No notifications</h1>
                   </Card>
 
                 </div>

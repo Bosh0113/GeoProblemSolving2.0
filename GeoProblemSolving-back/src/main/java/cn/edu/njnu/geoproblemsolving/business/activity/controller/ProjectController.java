@@ -189,7 +189,7 @@ public class ProjectController {
         if(result.getCode() == 0) {
             JsonResult project = projectService.findProject(aid);
             staticPagesBuilder.projectDetailPageBuilder((Project) project.getData());
-            staticPagesBuilder.projectListPageBuilder(projectService.findProjectsByPage(0, 18));
+            staticPagesBuilder.projectListPageBuilder(projectService.findProjectsByPage(1, 18));
         }
         return result;
     }

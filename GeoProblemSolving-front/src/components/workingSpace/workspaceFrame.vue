@@ -376,8 +376,10 @@ export default {
       var i = this.length;
       while (i--) {
         if (
+          (this[i] != undefined && this[i] === obj) ||
           (this[i].userId != undefined && this[i].userId === obj.userId) ||
           (this[i].tid != undefined && this[i].tid === obj.tid) ||
+          (this[i].tid != undefined && this[i].tid === obj) ||
           (this[i].tsId != undefined && this[i].tsId === obj.tsId) ||
           (this[i].id != undefined && this[i].id === obj.id) ||
           (this[i].aid != undefined && this[i].aid === obj.aid)

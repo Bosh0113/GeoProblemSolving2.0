@@ -677,7 +677,9 @@ export default {
           if (!this.toolIdList.contains(this.personalTools[i].tid)) {
             tools.push(this.personalTools[i]);
           } else {
-            this.stepToolsShow.push(this.personalTools[i]);
+            if (!this.stepToolsShow.contains(this.personalTools[i])) {
+              this.stepToolsShow.push(this.personalTools[i]);
+            }
           }
         }
       }
@@ -809,7 +811,6 @@ export default {
       // add
       for (var i = 0; i < this.stepToolsetsShow.length; i++) {
         if (!this.toolIdList.contains(this.stepToolsetsShow[i].tid)) {
-
           this.operationApi.toolOperationRecord(
             this.activityInfo.aid,
             "",
@@ -822,7 +823,6 @@ export default {
       }
       for (var i = 0; i < this.stepToolsShow.length; i++) {
         if (!this.toolIdList.contains(this.stepToolsShow[i].tid)) {
-
           this.operationApi.toolOperationRecord(
             this.activityInfo.aid,
             "",
@@ -835,8 +835,10 @@ export default {
       }
       // remove
       for (var i = 0; i < this.toolIdList.length; i++) {
-        if (!this.stepToolsetsShow.contains(this.toolIdList[i]) && !this.stepToolsShow.contains(this.toolIdList[i])) {
-
+        if (
+          !this.stepToolsetsShow.contains(this.toolIdList[i]) &&
+          !this.stepToolsShow.contains(this.toolIdList[i])
+        ) {
           this.operationApi.toolOperationRecord(
             this.activityInfo.aid,
             "",

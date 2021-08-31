@@ -518,7 +518,7 @@ export default {
         userId: this.userInfo.userId,
         groupID: this.activityInfo.aid,
       };
-      var toolURL = window.location.origin + `${toolInfo.toolUrl}`;
+      var toolURL = `${toolInfo.toolUrl}`;
       window["pageParams"] = params;
 
       // open

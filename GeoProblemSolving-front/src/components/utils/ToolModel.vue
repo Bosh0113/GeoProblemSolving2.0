@@ -253,7 +253,7 @@
 </template>
 
 <script>
-  import file from "./dataTemplate/File";
+  import file from "./File";
   import resourceList from "../common/resource/UserAndActivityResourceList";
   import {get, del, post, put, patch} from "@/axios";
 

@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -37,9 +38,14 @@ public class ActivityResDaoImpl implements ActivityResDao {
 
     @Override
     public List<ResourceEntity> queryByAid(String aid) {
-        Query query = new Query(Criteria.where("activityId").is(aid));
-        List<ResourceEntity> resourceEntityList = mongoTemplate.find(query, ResourceEntity.class);
-        return resourceEntityList;
+        try {
+            Query query = new Query(Criteria.where("activityId").is(aid));
+            List<ResourceEntity> resourceEntityList = mongoTemplate.find(query, ResourceEntity.class);
+            return resourceEntityList;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return new ArrayList<>();
+        }
     }
 
     @Override

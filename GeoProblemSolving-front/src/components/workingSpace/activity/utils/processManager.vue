@@ -512,7 +512,7 @@
         </div>
         <template v-if="roleProtocol === 'Constraints'">
           <div style="display: flex; margin-bottom: 15px">
-            <div style="margin-top: 5px; width: 80px">Role:</div>
+            <div style="margin-top: 5px; width: 100px">Role:</div>
             <Select
               v-model="linkRoles"
               multiple
@@ -532,8 +532,8 @@
               <Option value="ordinary-member">Ordinary-member</Option>
             </Select>
           </div>
-          <div style="display: flex">
-            <div style="margin-top: 5px; width: 72px">Domains:</div>
+          <div style="margin-bottom: 15px; display: flex">
+            <div style="margin-top: 5px; width: 100px">Domains:</div>
             <!--            <vue-tags-input-->
             <!--              class="domain"-->
             <!--              v-model="domain_tag"-->
@@ -549,7 +549,7 @@
             </Select>
           </div>
           <div style="display: flex">
-            <div style="margin-top: 5px; width: 72px">Organizations:</div>
+            <div style="margin-top: 5px; width: 100px">Organizations:</div>
             <Select v-model="selectUserOrg" multiple :max-tag-count="4">
               <Option
                 v-for="(item, index) in userOrganizations"

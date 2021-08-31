@@ -184,6 +184,7 @@ public class ToolServiceImpl implements ToolService {
         String description = toolJson.getString("description");
         String creator = toolJson.getString("creator");
         String privacy = toolJson.getString("privacy");
+        String scope = toolJson.getString("scope");
         JSONArray recomSteps = toolJson.getJSONArray("recomStep");
         String toolImg = toolJson.getString("toolImg");
         ArrayList<String> recommendation = Lists.newArrayList();
@@ -207,6 +208,7 @@ public class ToolServiceImpl implements ToolService {
         tool.setDescription(description);
         tool.setProvider(creator);
         tool.setPrivacy(privacy);
+        tool.setScope(scope);
         tool.setCreatedTime(createDate);
         tool.setRecommendation(recommendation);
         tool.setTags(tags);
