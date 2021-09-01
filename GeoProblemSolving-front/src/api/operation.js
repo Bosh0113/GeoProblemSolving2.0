@@ -333,7 +333,7 @@ export function getOperationInfo(oid) {
         operation["operator"] = operationNode.getAttribute("operator");
         operation["time"] = operationNode.getAttribute("time");
 
-        // resources        
+        // resources
         let resources = {
             inputs: [],
             outputs: [],
@@ -405,6 +405,9 @@ export function getTaskList() {
             startTime: time[0],
             endTime: time[1],
             operations: []
+        }
+        if(taskDoc[i].getAttribute("state") === "removed"){
+          continue;
         }
         let operations = taskDoc[i].childNodes;
         for (var j = 0; j < operations.length; j++) {
@@ -542,7 +545,7 @@ export function getTempOperations() {
                 operation["resesRef"] = resources;
                 operation["personRef"] = participants;
             } else if (operationNode.getAttribute("type") === "resource") {
-    
+
                 operation["behavior"] = operationNode.getAttribute("behavior");
                 operation["resRef"] = operationNode.getAttribute("resRef");
                 operation["operator"] = operationNode.getAttribute("operator");

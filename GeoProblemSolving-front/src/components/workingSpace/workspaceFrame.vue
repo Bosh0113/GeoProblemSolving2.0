@@ -595,9 +595,15 @@ export default {
       // let content = this.getURLParameter("content");
       // let aid = this.getURLParameter("aid");
       // let level = this.getURLParameter("level");
-
       let level = this.slctActivity.level;
       let aid = this.slctActivity.aid;
+
+      // load activity doc
+      let result = this.operationApi.getActivityDoc(aid);
+      if (result === "empty") {
+        this.operationApi.activityDocInit(activity, this.userInfo.userId);
+      }
+
       if (level > 1) {
         this.getActivityBranch(aid);
       } else if (level == 1) {
@@ -776,6 +782,12 @@ export default {
       this.activityTree.push(root);
       this.slctActivity = ancestors[0];
       this.parentActivity = ancestors[1];
+
+      // load activity doc
+      let result = this.operationApi.getActivityDoc(this.slctActivity.aid);
+      if (result === "empty") {
+        this.operationApi.activityDocInit(this.slctActivity, this.userInfo.userId);
+      }
       this.setContent(this.slctActivity);
 
       // Cascader names
@@ -796,11 +808,6 @@ export default {
         null,
         valiable + "?aid=" + activity.aid + "&level=" + activity.level + ""
       );
-      // load activity doc
-      let result = this.operationApi.getActivityDoc(activity.aid);
-      if (result === "empty") {
-        this.operationApi.activityDocInit(activity, this.userInfo.userId);
-      }
 
       if (
         this.roleIdentity(activity) == "visitor" &&

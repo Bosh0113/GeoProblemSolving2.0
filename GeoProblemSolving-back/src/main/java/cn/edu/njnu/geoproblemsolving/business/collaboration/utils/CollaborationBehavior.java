@@ -70,7 +70,6 @@ public class CollaborationBehavior {
     public void sendParticipantsInfo(HashMap<String, CollaborationUser> participants, CollaborationUser user, String behavior) {
         try {
             if (user == null) return;
-
             JSONObject messageObject = new JSONObject();
             messageObject.put("type", "members");
 

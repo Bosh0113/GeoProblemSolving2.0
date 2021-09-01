@@ -17,4 +17,6 @@ public interface ToolDao {
 
     Tool updateTool(Tool putTool, String[] nullPropertyNames);
 
+    Tool saveTool(Tool tool);
+
 }

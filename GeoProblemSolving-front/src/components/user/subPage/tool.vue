@@ -658,7 +658,7 @@ export default {
           if (res.data.code == 0) {
             if (this.checkedType.length == 2) {
               if (this.delToolInfo.delToolType == "Public") {
-                console.log("publicDel", this.delToolInfo.delToolIndex);
+                // console.log("publicDel", this.delToolInfo.delToolIndex);
                 this.publicTools.splice(this.delToolInfo.delToolIndex, 1);
               } else if (this.delToolInfo.delToolType == "Private") {
                 console.log("privateDel", this.delToolInfo.delToolIndex);

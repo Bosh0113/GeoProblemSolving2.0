@@ -318,8 +318,13 @@ public class ToolServiceImpl implements ToolService {
     }
 
     @Override
-    public long delToolService(String tid) {
-        return toolDao.deleteById(tid);
+    public void delToolService(String tid) {
+        Tool tool = toolDao.findToolById(tid);
+        if (tool != null){
+            //将工具标记为删除
+            tool.setPresent(false);
+            toolDao.saveTool(tool);
+        }
     }
 
     @Override

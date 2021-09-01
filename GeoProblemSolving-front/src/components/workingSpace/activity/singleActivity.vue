@@ -13,7 +13,7 @@
           <MenuItem name="Workspace">
             <Icon type="ios-globe" />Workspace
           </MenuItem>
-          <MenuItem name="Task">
+          <MenuItem name="Task" @click="initTaskSocket">
             <Icon type="ios-git-network" />Task management
           </MenuItem>
           <!-- <MenuItem name="Introduction">
@@ -197,6 +197,7 @@ import modelEvaluation from "./funcs/modelEvaluation.vue";
 import geoSimulation from "./funcs/geoSimulation.vue";
 import geoAnalysis from "./funcs/geoAnalysis.vue";
 import decisionMaking from "./funcs/decisionMaking.vue";
+import * as socketApi from "../../../api/socket";
 export default {
   props: ["activityInfo","userInfo","projectInfo"],
   components: {
@@ -682,6 +683,103 @@ export default {
           throw err;
         });
     },
+    initTaskSocket(){
+      this.socketId = "OperationServer/task/vueTask";
+      socketApi.initWebSocket(this.socketId);
+      socketApi.sendSock(this.socketId, {"type":"test"}, this.socketOnMessage);
+    },
+    socketOnMessage(messageJson){
+      let behavior = messageJson.behavior;
+      let content = messageJson.content;
+      if (messageJson.type == "task"){
+        if(behavior == "create"){
+          let task = content.newTask;
+          this.taskTodo.push(task);
+        } else if (behavior == "importance") {
+          let taskState = content.state;
+          let taskId = content.taskId;
+          let importance = content.importance;
+          switch (taskState) {
+            case "todo":
+              this.taskTodo.forEach(item => {
+                if (item.taskId == taskId) {
+                  item.importance = importance;
+                }
+              })
+              break;
+            case "doing":
+              this.taskDoing.forEach(item => {
+                if (item.taskId == taskId) {
+                  item.importance = importance;
+                }
+              })
+              break;
+            case "done":
+              this.taskDone.forEach(item => {
+                if (item.taskId == taskId) {
+                  item.importance = importance;
+                }
+              })
+              break;
+          }
+        } else if (behavior == "updateTask") {
+          let taskState = content.state;
+          let putTask = content.editedTask;
+          let taskId = putTask.taskId;
+          switch (taskState) {
+            case "todo":
+              this.taskTodo.forEach(item => {
+                if (item.taskId == taskId) {
+                  Object.assign(item, putTask);
+                }
+              })
+              break;
+            case "doing":
+              this.taskDoing.forEach(item => {
+                if (item.taskId == taskId) {
+                  Object.assign(item, putTask);
+                }
+              })
+              break;
+            case "done":
+              this.taskDone.forEach(item => {
+                if (item.taskId == taskId) {
+                  Object.assign(item, putTask);
+                }
+              })
+              break;
+          }
+        } else if (behavior == "order") {
+          let taskState = content.state;
+          let taskList = content.taskList;
+          switch (taskState) {
+            case "todo":
+              this.$set(this, "taskTodo", taskList);
+              break;
+            case "doing":
+              this.$set(this, "taskDoing", taskList);
+              break;
+            case "done":
+              this.$set(this, "taskDone", taskList);
+              break;
+          }
+        }else if (behavior == "remove"){
+          let taskState = content.state;
+          let index = content.removeIndex;
+          switch (taskState) {
+            case "todo":
+              this.taskTodo.splice(index, 1);
+              break;
+            case "doing":
+              this.taskDoing.splice(index, 1);
+              break;
+            case "done":
+              this.taskDone.splice(index, 1);
+              break;
+          }
+        }
+      }
+    }
   },
 };
 </script>

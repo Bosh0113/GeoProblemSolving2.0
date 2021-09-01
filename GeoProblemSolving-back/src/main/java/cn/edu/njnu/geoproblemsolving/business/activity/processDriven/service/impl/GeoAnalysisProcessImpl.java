@@ -24,9 +24,9 @@ import com.google.common.collect.Lists;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import sun.nio.cs.ext.MacArabic;
 
 import java.util.*;
 
@@ -104,11 +104,11 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
      * (可能还并不使用)还可以使用关系进行简化存储，现在的邻接表存储的是0->(1,constraint) 可以简化为 => 0 ->
      * todo 集合框架的传值的问题
      *
-     * @param rootAid         协议所依附于的活动
-     * @param linkProtocol    链接协议，包含如下内容
-     *  type            协议的关系
-     *  nodeIdList      协议中节点的id,即相关联的活动 id
-     *  linkRestriction 协议设置的资源与用户的限制条件
+     * @param rootAid      协议所依附于的活动
+     * @param linkProtocol 链接协议，包含如下内容
+     *                     type            协议的关系
+     *                     nodeIdList      协议中节点的id,即相关联的活动 id
+     *                     linkRestriction 协议设置的资源与用户的限制条件
      * @return 参数很多 restFul 风格是 hold 不住的
      */
     @Override
@@ -746,9 +746,9 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
         HashMap<String, HashSet<String>> flowNode = new HashMap<>();
         HashSet<HashMap<String, LinkRestriction>> endNodes;
         while (true) {
-            for (Map.Entry<String, LinkRestriction> entry : endNodeAndRestriction.entrySet()){
+            for (Map.Entry<String, LinkRestriction> entry : endNodeAndRestriction.entrySet()) {
                 LinkRestriction restriction = entry.getValue();
-                for (Map.Entry<String, String> item : resTag.entrySet()){
+                for (Map.Entry<String, String> item : resTag.entrySet()) {
 
                 }
 
@@ -761,7 +761,7 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
 
     private HashMap<String, HashSet<String>> rAutoUpdate(HashMap<String, LinkRestriction> linkRestriction,
                                                          HashMap<String, String> resTag,
-                                                         HashMap<String, HashSet<String>> flowNode){
+                                                         HashMap<String, HashSet<String>> flowNode) {
 
 
         return flowNode;
@@ -1578,4 +1578,95 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
         return null;
     }
 
+
+    //==================================================================================================================
+
+
+    @Override
+    public void updateGraphByProtocol(String rootId, ActivityLinkProtocol protocol) {
+        Optional<ActivityGraph> byId = graphRepository.findById(rootId);
+        if (byId.get() == null) {
+            return;
+        }
+        HashMap<String, HashMap<String, LinkRestriction>> adjacencyMap = byId.get().getAdjacencyMap();
+        String relationType = protocol.getType();
+        ArrayList<String> nodeIds = protocol.getNodes();
+        LinkRestriction restriction = protocol.getRestriction();
+        String keyNodeId = nodeIds.get(0);
+        switch (relationType) {
+            case "Merger":
+                for (int i = 1; i < nodeIds.size(); i++) {
+                    String startId = nodeIds.get(i);
+                    HashMap<String, LinkRestriction> endNodeAndRestriction = adjacencyMap.get(startId);
+                    //替换新的限制性条件
+                    endNodeAndRestriction.put(keyNodeId, restriction);
+                }
+                break;
+            case "Branch":
+                HashMap<String, LinkRestriction> endNodeAndRestriction = adjacencyMap.get(keyNodeId);
+                for (int i = 1; i < nodeIds.size(); i++) {
+                    endNodeAndRestriction.put(keyNodeId, restriction);
+                }
+                break;
+            case "Loop":
+                for (int i = 0; i < nodeIds.size(); i++) {
+                    String startId = nodeIds.get(i);
+                    HashMap<String, LinkRestriction> endNodeAndRestriction1 = adjacencyMap.get(startId);
+                    String endNodeId = i == nodeIds.size() - 1 ? keyNodeId : nodeIds.get(i + 1);
+                    endNodeAndRestriction1.put(endNodeId, restriction);
+                }
+                break;
+            case "Sequence":
+                for (int i = 0; i < nodeIds.size() - 1; i++) {
+                    String startId = nodeIds.get(i);
+                    String endId = nodeIds.get(i + 1);
+                    HashMap<String, LinkRestriction> endNodeAndRestriction2 = adjacencyMap.get(startId);
+                    endNodeAndRestriction2.put(endId, restriction);
+                }
+                break;
+        }
+
+    }
+
+    @Override
+    public void delGraphByProtocol(String rootId, String protocolId) {
+        HashMap<String, HashMap<String, LinkRestriction>> adjacencyMap = graphRepository.findById(rootId).get().getAdjacencyMap();
+        ActivityLinkProtocol activityLinkProtocol = protocolRepository.findById(protocolId).get();
+        String relationType = activityLinkProtocol.getType();
+        ArrayList<String> nodeIds = activityLinkProtocol.getNodes();
+        String keyNodeId = nodeIds.get(0);
+        switch (relationType) {
+            case "Merger":
+                for (int i = 1; i < nodeIds.size(); i++) {
+                    String startId = nodeIds.get(i);
+                    HashMap<String, LinkRestriction> endNodeAndRestriction = adjacencyMap.get(startId);
+                    //替换新的限制性条件
+                    endNodeAndRestriction.remove(keyNodeId);
+                }
+                break;
+            case "Branch":
+                HashMap<String, LinkRestriction> endNodeAndRestriction = adjacencyMap.get(keyNodeId);
+                for (int i = 1; i < nodeIds.size(); i++) {
+                    endNodeAndRestriction.remove(keyNodeId);
+                }
+                break;
+            case "Loop":
+                for (int i = 0; i < nodeIds.size(); i++) {
+                    String startId = nodeIds.get(i);
+                    HashMap<String, LinkRestriction> endNodeAndRestriction1 = adjacencyMap.get(startId);
+                    String endNodeId = i == nodeIds.size() - 1 ? keyNodeId : nodeIds.get(i + 1);
+                    endNodeAndRestriction1.remove(endNodeId);
+                }
+                break;
+            case "Sequence":
+                for (int i = 0; i < nodeIds.size() - 1; i++) {
+                    String startId = nodeIds.get(i);
+                    String endId = nodeIds.get(i + 1);
+                    HashMap<String, LinkRestriction> endNodeAndRestriction2 = adjacencyMap.get(startId);
+                    endNodeAndRestriction2.remove(endId);
+                }
+                break;
+        }
+
+    }
 }

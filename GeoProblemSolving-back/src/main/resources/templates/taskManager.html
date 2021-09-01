@@ -494,10 +494,11 @@
             this.userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
         },
         mounted() {
-            this.intWebSocket();
             this.inquiryTask();
-            // this.getProjectInfo();
             window.addEventListener("resize", this.initSize);
+        },
+        beforeRouteEnter(to, from, next){
+            this.initWebSocket();
         },
         beforeRouteLeave(to, from, next) {
             this.taskSocket.close();

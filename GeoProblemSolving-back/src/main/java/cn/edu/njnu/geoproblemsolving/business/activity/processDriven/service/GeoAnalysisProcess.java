@@ -12,11 +12,10 @@ public interface GeoAnalysisProcess {
     ActivityGraph initActivityGraph(String rootAid);
     /**
      * 新建协议
-     * @param rootAid 根活动的 aid
-     * @param linkProtocol 协议
+     * @param graphId 根活动的 aid
      * @return
      */
-    ActivityLinkProtocol setLinkProtocol(String rootAid, ActivityLinkProtocol linkProtocol);
+    ActivityLinkProtocol setLinkProtocol(String graphId, ActivityLinkProtocol linkProtocol);
 
     HashMap<String, HashMap<String, LinkRestriction>> deleteEdge(String graphId, String startId, String endId);
 
@@ -29,6 +28,10 @@ public interface GeoAnalysisProcess {
     void resFlowAutoUpdate(String graphId, String nodeId, String uid);
 
     void batchResFlowAutoUpdate(String graphId, String nodeId, HashMap<String, String> resTag);
+
+    void updateGraphByProtocol(String rootId, ActivityLinkProtocol protocol);
+
+    void delGraphByProtocol(String rootId, String protocolId);
 
 
     //协议已经变成了一系列的字符串

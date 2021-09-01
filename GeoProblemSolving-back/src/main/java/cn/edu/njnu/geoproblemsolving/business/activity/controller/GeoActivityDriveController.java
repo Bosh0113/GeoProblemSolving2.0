@@ -2,14 +2,15 @@ package cn.edu.njnu.geoproblemsolving.business.activity.controller;
 
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.entity.ActivityGraph;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.entity.ActivityLinkProtocol;
-import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.entity.ActivityRelation;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.entity.LinkRestriction;
+import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.ProtocolService;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.impl.GeoAnalysisProcessImpl;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.impl.ResourceDispatchImpl;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.impl.UserDispatchImpl;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import cn.edu.njnu.geoproblemsolving.common.utils.ResultUtils;
 import com.alibaba.fastjson.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -34,14 +35,17 @@ public class GeoActivityDriveController {
 
     private final ResourceDispatchImpl resDispatch;
 
+    private final ProtocolService protocolService;
+
 
     public GeoActivityDriveController(GeoAnalysisProcessImpl geoAnalysisProcess,
                                       UserDispatchImpl userDispatch,
-                                      ResourceDispatchImpl resourceDispatch
-                                      ) {
+                                      ResourceDispatchImpl resourceDispatch,
+                                      ProtocolService protocolService) {
         this.geoAnalysisProcess = geoAnalysisProcess;
         this.userDispatch = userDispatch;
         this.resDispatch = resourceDispatch;
+        this.protocolService = protocolService;
     }
 
     @RequestMapping(value = "/graph/{rootId}", method = RequestMethod.GET)
@@ -132,6 +136,18 @@ public class GeoActivityDriveController {
         }
         return ResultUtils.error(-2, "No such graph, Check you activity id.");
     }
+
+//=================================节点操作相关===========================================================================
+    @RequestMapping(value = "/protocol/{graphId}", method = RequestMethod.PUT)
+    public JsonResult updateProtocol(@PathVariable String graphId, @RequestBody ActivityLinkProtocol protocol){
+        ActivityLinkProtocol activityLinkProtocol = protocolService.putProtocol(graphId, protocol);
+        if (activityLinkProtocol != null){
+            return ResultUtils.success(activityLinkProtocol);
+        }
+        return ResultUtils.error(-2, "Fail.");
+
+    }
+
 
 
 }
