@@ -1,8 +1,11 @@
 package cn.edu.njnu.geoproblemsolving.business.activity.processDriven.entity;
 
+/**
+ * 暂时还未使用
+ */
 public enum ProtocolType {
-    Convergence,
-    Dispersed,
-    loop,
-    order
+    Merger,
+    Branch,
+    Loop,
+    Sequence
 }

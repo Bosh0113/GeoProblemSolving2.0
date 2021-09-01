@@ -1,7 +1,7 @@
 package cn.edu.njnu.geoproblemsolving.business.activity.dao.Impl;
 
 import cn.edu.njnu.geoproblemsolving.business.activity.dao.ActivityLinkProtocolDao;
-import cn.edu.njnu.geoproblemsolving.business.activity.entity.ActivityLinkProtocol;
+import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.entity.ActivityLinkProtocol;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import org.springframework.beans.factory.annotation.Autowired;

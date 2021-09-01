@@ -34,7 +34,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/notice/**"
                 )//拦截的请求
                 .excludePathPatterns(
-                        "/rip/file/allPublic"
+                        "/rip/file/allPublic",
+                        "/activityDriven/**"
                 );//不拦截的请求
     }
     /*

@@ -1,4 +1,4 @@
-package cn.edu.njnu.geoproblemsolving.business.activity.entity;
+package cn.edu.njnu.geoproblemsolving.business.activity.processDriven.entity;
 
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.entity.LinkRestriction;
 import lombok.Data;
@@ -24,16 +24,13 @@ import java.util.ArrayList;
  * @Date 2021/7/23
  **/
 @Data
-// @Document(collection = "ActivityLinkProtocol")
+@Document(collection = "activityLinkProtocol")
 //使用这个对象去接收前端传过来的数据，就不做具体的存储了
 public class ActivityLinkProtocol {
-    @Id
-    String id;
-
     /**
      * Description the node relation.
      * 下面内容用于描述协议关系
-     * graphId: 对应的图中的Id, 对协议的操作会涉及到对图进行修改，通过type与 nodes 可以构造边然后进行修改
+     * graphId: root activity's id.
      * type: 汇聚(n:1)、分散(1:n)、环状(n)、顺序(n)
      * nodes: 用于存储与协议相关联的节点，存储形式如下：
      * 汇聚与分散：第一个元素均存 1 节点，其他节点无关顺序
@@ -43,6 +40,8 @@ public class ActivityLinkProtocol {
      * 双向就不考虑进来了，只考虑上述的四种类型
      * 后台可以考虑进行优化存储
      */
+    @Id
+    String id;
     private String graphId;
     private String type;
     private ArrayList<String> nodes;
