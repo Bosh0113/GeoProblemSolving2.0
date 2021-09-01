@@ -1,6 +1,7 @@
 package cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service;
 
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.entity.ActivityGraph;
+import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.entity.ActivityLinkProtocol;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.entity.LinkRestriction;
 
 import java.util.ArrayList;
@@ -11,12 +12,11 @@ public interface GeoAnalysisProcess {
     ActivityGraph initActivityGraph(String rootAid);
     /**
      * 新建协议
-     * @param graphId 根活动的 aid
-     * @param type 协议关系类型
-     * @param nodeList
+     * @param rootAid 根活动的 aid
+     * @param linkProtocol 协议
      * @return
      */
-    HashMap<String, HashMap<String, LinkRestriction>> setLinkProtocol(String graphId, String type, ArrayList<String> nodeList, LinkRestriction linkRestriction);
+    ActivityLinkProtocol setLinkProtocol(String rootAid, ActivityLinkProtocol linkProtocol);
 
     HashMap<String, HashMap<String, LinkRestriction>> deleteEdge(String graphId, String startId, String endId);
 

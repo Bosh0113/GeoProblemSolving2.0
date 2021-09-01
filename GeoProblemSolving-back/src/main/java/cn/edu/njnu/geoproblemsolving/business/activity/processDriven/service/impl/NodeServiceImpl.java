@@ -137,11 +137,11 @@ public class NodeServiceImpl implements NodeService{
                 return null;
             }
             HashMap<String, String> userTagMap = new HashMap<>();
-            HashMap<String, HashMap<String, ArrayList<String>>> usersTags = JSONObject.parseObject(response.getJSONObject("Data").toJSONString(), HashMap.class);
+            HashMap<String, HashMap<String, ArrayList<String>>> usersTags = JSONObject.parseObject(response.getJSONObject("data").toJSONString(), HashMap.class);
             for (Map.Entry<String, HashMap<String, ArrayList<String>>> item : usersTags.entrySet()){
                 String userId = item.getKey();
                 String role = idRoleMap.get(userId);
-                HashMap<String, ArrayList<String>> value = item.getValue();
+                HashMap<String, ArrayList<String>> value = JSONObject.parseObject(JSONObject.toJSONString(item.getValue()), HashMap.class);
                 JSONArray domain = JSONObject.parseObject(JSONObject.toJSONString(value.get("domain")), JSONArray.class);
                 JSONArray organization = JSONObject.parseObject(JSONObject.toJSONString(value.get("organization")), JSONArray.class);
                 String tags = TagUtil.setUserTag(role, domain, organization);

@@ -664,13 +664,8 @@ import VueTagsInput from "@johmun/vue-tags-input";
 import loginModal from "../../../user/userState/loginModal.vue";
 // import Driver from "driver.js";
 export default {
-  components: { VueTagsInput,loginModal },
-  props: [
-    "activityInfo",
-    "childActivities",
-    "userInfo",
-    "projectInfo"
-  ],
+  components: { VueTagsInput, loginModal },
+  props: ["activityInfo", "childActivities", "userInfo", "projectInfo"],
   data() {
     return {
       // driver
@@ -1412,12 +1407,14 @@ export default {
           if (this.selectedActivities[j].aid == relations[i].last) {
             lastnode = {
               name: this.selectedActivities[j].name,
+              aid: this.selectedActivities[j].aid,
               id: this.selectedActivities[j].id,
             };
           }
           if (this.selectedActivities[j].aid == relations[i].next) {
             nextnode = {
               name: this.selectedActivities[j].name,
+              aid: this.selectedActivities[j].aid,
               id: this.selectedActivities[j].id,
             };
           }
@@ -1425,13 +1422,13 @@ export default {
 
         for (let k = 0; k < this.processStructure.length; k++) {
           // 后继节点
-          if (this.processStructure[k].aid == this.endNode.aid) {
+          if (this.processStructure[k].aid == nextnode.aid) {
             if (!this.processStructure[k].last.contains(lastnode)) {
               this.processStructure[k].last.push(lastnode);
             }
           }
           // 前驱节点
-          if (this.processStructure[k].aid == this.beginNode.aid) {
+          if (this.processStructure[k].aid == lastnode.aid) {
             if (!this.processStructure[k].next.contains(nextnode)) {
               this.processStructure[k].next.push(nextnode);
             }
@@ -1439,10 +1436,11 @@ export default {
         }
       }
       this.updatePathway();
+      return relations;
     },
     buildLink: function () {
       //** front link */
-      this.processUpdate();
+      let relations = this.processUpdate();
 
       //*** save protocol */
 
@@ -1482,13 +1480,22 @@ export default {
             this.$store.commit("userLogout");
             this.tempLoginModal = true;
           } else if (res.data.code == 0) {
-            // 重新渲染
-            this.updateStepchart();
             // link in the activity document
-            let protocolId = res.data.data.pid;
-            this.newLinkStore(this.beginNode.aid, this.endNode.aid, protocolId);
+            let protocolId = res.data.data.graphId;
+            
+            for (let i = 0; i < relations.length; i++) {
+              this.operationApi.processRecord(
+                this.activityInfo.aid,
+                "",
+                "link",
+                this.userInfo.userId,
+                relations[i].last,
+                relations[i].next,
+                protocolId
+              );
+            }
+            // this.newLinkStore(this.beginNode.aid, this.endNode.aid, protocolId);
             // clear
-            this.selectedActivities = [];
             this.beginNode = {};
             this.endNode = {};
           } else {
@@ -1499,11 +1506,6 @@ export default {
         .catch((err) => {
           throw err;
         });
-
-      // if save protocol success, update the avtivity document
-      // link in the activity document
-      let protocolId = res.data.data.pid;
-      this.newLinkStore(this.beginNode.aid, this.endNode.aid, protocolId);
     },
     clearProtocolSetting() {
       this.roleProtocol = "";
@@ -1535,69 +1537,69 @@ export default {
       }
       return newtags;
     },
-    newLinkStore(begin, end, pid) {
-      let updateurl = "";
-      if (this.activityInfo.level == 0) {
-        updateurl =
-          "/GeoProblemSolving/project/link/" +
-          begin +
-          "/" +
-          end +
-          "?pid=" +
-          pid;
-      } else if (this.activityInfo.level == 1) {
-        updateurl =
-          "/GeoProblemSolving/subproject/link/" +
-          begin +
-          "/" +
-          end +
-          "?pid=" +
-          pid;
-      } else if (this.activityInfo.level > 1) {
-        updateurl =
-          "/GeoProblemSolving/activity/link/" +
-          begin +
-          "/" +
-          end +
-          "?pid=" +
-          pid;
-      } else {
-        return;
-      }
-      let data = {
-        aid: this.activityInfo.aid,
-        pathway: this.processStructure,
-      };
+    // newLinkStore(begin, end, pid) {
+    //   let updateurl = "";
+    //   if (this.activityInfo.level == 0) {
+    //     updateurl =
+    //       "/GeoProblemSolving/project/link/" +
+    //       begin +
+    //       "/" +
+    //       end +
+    //       "?pid=" +
+    //       pid;
+    //   } else if (this.activityInfo.level == 1) {
+    //     updateurl =
+    //       "/GeoProblemSolving/subproject/link/" +
+    //       begin +
+    //       "/" +
+    //       end +
+    //       "?pid=" +
+    //       pid;
+    //   } else if (this.activityInfo.level > 1) {
+    //     updateurl =
+    //       "/GeoProblemSolving/activity/link/" +
+    //       begin +
+    //       "/" +
+    //       end +
+    //       "?pid=" +
+    //       pid;
+    //   } else {
+    //     return;
+    //   }
+    //   let data = {
+    //     aid: this.activityInfo.aid,
+    //     pathway: this.processStructure,
+    //   };
 
-      this.axios
-        .post(updateurl, data)
-        .then((res) => {
-          if (res.data == "Offline") {
-            this.$store.commit("userLogout");
-            this.tempLoginModal = true;
-          } else if (res.data.code == 0) {
-            this.operationApi.processRecord(
-              this.activityInfo.aid,
-              "",
-              "link",
-              this.userInfo.userId,
-              begin,
-              end,
-              pid
-            );
+    //   this.axios
+    //     .post(updateurl, data)
+    //     .then((res) => {
+    //       if (res.data == "Offline") {
+    //         this.$store.commit("userLogout");
+    //         this.tempLoginModal = true;
+    //       } else if (res.data.code == 0) {
+    //         this.operationApi.processRecord(
+    //           this.activityInfo.aid,
+    //           "",
+    //           "link",
+    //           this.userInfo.userId,
+    //           begin,
+    //           end,
+    //           pid
+    //         );
 
-            this.$Notice.info({
-              desc: "Link activities successfully!",
-            });
-          } else {
-            this.$Message.error("Fail to link activities.");
-            console.log(res.data.msg);
-          }
-        })
-        .catch((err) => {
-          throw err;
-        });
-    },
+    //         this.$Notice.info({
+    //           desc: "Link activities successfully!",
+    //         });
+    //       } else {
+    //         this.$Message.error("Fail to link activities.");
+    //         console.log(res.data.msg);
+    //       }
+    //     })
+    //     .catch((err) => {
+    //       throw err;
+    //     });
+    // },
     // seperate
     removeLink() {
       this.beginNode = this.selectedActivities[0];
@@ -1681,7 +1683,6 @@ export default {
     gotoActivity(aid) {
       for (let i = 0; i < this.childActivities.length; i++) {
         if (this.childActivities[i].aid == aid) {
-          
           window.location.href =
             "/GeoProblemSolving/activityInfo/" +
             this.projectInfo.aid +

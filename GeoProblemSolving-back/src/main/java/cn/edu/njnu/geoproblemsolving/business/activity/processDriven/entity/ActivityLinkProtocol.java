@@ -1,4 +1,4 @@
-package cn.edu.njnu.geoproblemsolving.business.activity.entity;
+package cn.edu.njnu.geoproblemsolving.business.activity.processDriven.entity;
 
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.entity.LinkRestriction;
 import lombok.Data;
@@ -24,7 +24,7 @@ import java.util.ArrayList;
  * @Date 2021/7/23
  **/
 @Data
-// @Document(collection = "ActivityLinkProtocol")
+@Document(collection = "activityLinkProtocol")
 //使用这个对象去接收前端传过来的数据，就不做具体的存储了
 public class ActivityLinkProtocol {
     @Id

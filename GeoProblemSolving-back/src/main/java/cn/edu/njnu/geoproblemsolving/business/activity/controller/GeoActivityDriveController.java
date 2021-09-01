@@ -1,6 +1,7 @@
 package cn.edu.njnu.geoproblemsolving.business.activity.controller;
 
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.entity.ActivityGraph;
+import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.entity.ActivityLinkProtocol;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.entity.ActivityRelation;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.entity.LinkRestriction;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.impl.GeoAnalysisProcessImpl;
@@ -106,15 +107,21 @@ public class GeoActivityDriveController {
     public JsonResult setActivityRelation(@RequestBody JSONObject protocolJson) {
         JSONObject relation = protocolJson.getJSONObject("relation");
         JSONObject restriction = protocolJson.getJSONObject("restriction");
-        ActivityRelation activityRelation = JSONObject.parseObject(JSONObject.toJSONString(relation), ActivityRelation.class);
+        ActivityLinkProtocol activityRelation = JSONObject.parseObject(JSONObject.toJSONString(relation), ActivityLinkProtocol.class);
         LinkRestriction linkRestriction = JSONObject.parseObject(JSONObject.toJSONString(restriction), LinkRestriction.class);
         String id = activityRelation.getGraphId();
-        ArrayList<String> nodeList = activityRelation.getNodes();
-        String type = activityRelation.getType();
-        HashMap<String, HashMap<String, LinkRestriction>> graphicLinkList = geoAnalysisProcess.setLinkProtocol(id, type, nodeList, linkRestriction);
-        return ResultUtils.success(graphicLinkList);
+        activityRelation.setRestriction(linkRestriction);
+        ActivityLinkProtocol linkProtocol = geoAnalysisProcess.setLinkProtocol(id, activityRelation);
+        return ResultUtils.success(linkProtocol);
     }
 
+    /**
+     * 删除连接
+     * @param graphId
+     * @param startNodeId
+     * @param endNodeId
+     * @return
+     */
     @RequestMapping(value = "/{graphId}/{startNodeId}/{endNodeId}", method = RequestMethod.DELETE)
     public JsonResult delEdge(@PathVariable String graphId,
                               @PathVariable String startNodeId,

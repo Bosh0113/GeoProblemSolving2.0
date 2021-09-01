@@ -32,7 +32,7 @@ public class ResourceEntity {
     //缩略图路径
     private String thumbnail;
     private String editToolInfo;
-    private long fileSize;
+    private Object fileSize;
     //存储父资源的 uuid
     private String parent;
     private String md5;

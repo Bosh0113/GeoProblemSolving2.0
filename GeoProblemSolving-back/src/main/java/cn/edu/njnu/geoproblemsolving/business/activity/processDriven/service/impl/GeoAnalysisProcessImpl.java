@@ -5,12 +5,14 @@ import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
 import cn.edu.njnu.geoproblemsolving.business.activity.enums.ResProtocol;
 import cn.edu.njnu.geoproblemsolving.business.activity.enums.RoleProtocol;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.entity.ActivityGraph;
+import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.entity.ActivityLinkProtocol;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.entity.ActivityNode;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.GeoAnalysisProcess;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.entity.LinkRestriction;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.NodeService;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.TagUtil;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityGraphRepository;
+import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityLinkProtocolRepository;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityNodeRepository;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityRepository;
 import cn.edu.njnu.geoproblemsolving.business.resource.dao.ActivityResDaoImpl;
@@ -47,6 +49,9 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
 
     @Autowired
     ActivityRepository activityRepository;
+
+    @Autowired
+    ActivityLinkProtocolRepository protocolRepository;
 
     @Autowired
     ActivityGraphRepository graphRepository;
@@ -100,13 +105,17 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
      * todo 集合框架的传值的问题
      *
      * @param rootAid         协议所依附于的活动
-     * @param type            协议的关系
-     * @param nodeIdList      协议中节点的id,即相关联的活动 id
-     * @param linkRestriction 协议设置的资源与用户的限制条件
+     * @param linkProtocol    链接协议，包含如下内容
+     *  type            协议的关系
+     *  nodeIdList      协议中节点的id,即相关联的活动 id
+     *  linkRestriction 协议设置的资源与用户的限制条件
      * @return 参数很多 restFul 风格是 hold 不住的
      */
     @Override
-    public HashMap<String, HashMap<String, LinkRestriction>> setLinkProtocol(String rootAid, String type, ArrayList<String> nodeIdList, LinkRestriction linkRestriction) {
+    public ActivityLinkProtocol setLinkProtocol(String rootAid, ActivityLinkProtocol linkProtocol) {
+        String type = linkProtocol.getType();
+        ArrayList<String> nodeIdList = linkProtocol.getNodes();
+        LinkRestriction linkRestriction = linkProtocol.getRestriction();
         Optional<ActivityGraph> graphOptional = graphRepository.findById(rootAid);
         ActivityGraph activityGraph = graphOptional.isPresent() ? graphOptional.get() : initActivityGraph(rootAid);
         // Acquiring the graph's adjacency list.
@@ -129,7 +138,9 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
         resFlowInLowerNode(rootAid, nodeIdList);
 
         // 将添加后的图给用户
-        return protocolByRelation;
+        linkProtocol.setId(UUID.randomUUID().toString());
+        protocolRepository.save(linkProtocol);
+        return linkProtocol;
     }
 
     /**

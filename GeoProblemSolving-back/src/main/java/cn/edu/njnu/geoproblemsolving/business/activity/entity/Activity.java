@@ -76,6 +76,7 @@ public class Activity implements Serializable {
     private JSONArray last;
     private JSONArray next;
     private String protocolId;
+
     // // Temp
     // private List<String> toolList;
     // private List<String> toolsetList;
