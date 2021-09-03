@@ -27,7 +27,7 @@ public class LinkProtocolServiceImpl implements ProtocolService {
 
     @Override
     public ActivityLinkProtocol putProtocol(String rootId, ActivityLinkProtocol protocol) {
-        Optional<ActivityLinkProtocol> byId = protocolRepository.findById(protocol.getId());
+        Optional<ActivityLinkProtocol> byId = protocolRepository.findById(protocol.getProtocolId());
         if (byId.get() == null){
             return null;
         }

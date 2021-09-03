@@ -32,7 +32,7 @@
           <!-- <Option value="toolData">Results</Option> -->
         </Select>
         <Button
-          v-if="userRole != 'Visitor'"
+          v-if="userRole != 'visitor'"
           shape="circle"
           size="small"
           icon="md-cloud-outline"
@@ -41,7 +41,7 @@
           title="Get resources from your personal space"
         ></Button>
         <Button
-          v-if="userRole != 'Visitor'"
+          v-if="userRole != 'visitor'"
           shape="circle"
           size="small"
           icon="md-shuffle"
@@ -50,7 +50,7 @@
           title="Get resources from the previous activities"
         ></Button>
         <Button
-          v-if="userRole != 'Visitor'"
+          v-if="userRole != 'visitor'"
           shape="circle"
           size="small"
           icon="md-cloud-upload"
@@ -58,7 +58,7 @@
           @click="dataUploadModalShow"
           title="Upload resources"
         ></Button>
-        <template v-if="userRole != 'Visitor'">
+        <template v-if="userRole != 'visitor'">
           <Button
             v-if="!resEdit"
             shape="circle"
@@ -838,10 +838,9 @@ export default {
           .get("/GeoProblemSolving/rip/" + this.activityInfo.aid + "/0")
           .then((res) => {
             if (res.data == "Offline") {
-              // confirm("You are offline, please login again.");
               this.$store.commit("userLogout");
-              this.$router.push({ name: "Login" });
-              // this.tempLoginModal = true;
+              // this.$router.push({ name: "Login" });
+              this.tempLoginModal = true;
             } else if (res.data.code == 0) {
               let list = res.data.data;
               this.$set(this, "activityResList", list);
@@ -1040,9 +1039,7 @@ export default {
           .post("/GeoProblemSolving/rip/del", formData)
           .then((res) => {
             if (res.data == "Offline") {
-              // confirm("You are offline, please login again.");
               this.$store.commit("userLogout");
-              // this.$router.push({ name: "Login" });
               this.tempLoginModal = true;
             } else if (res.data.code == 0) {
               this.$Notice.success({

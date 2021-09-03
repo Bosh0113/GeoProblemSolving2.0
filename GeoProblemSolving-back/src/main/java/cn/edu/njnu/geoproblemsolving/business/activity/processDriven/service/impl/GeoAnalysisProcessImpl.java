@@ -138,7 +138,7 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
         resFlowInLowerNode(rootAid, nodeIdList);
 
         // 将添加后的图给用户
-        linkProtocol.setId(UUID.randomUUID().toString());
+        linkProtocol.setProtocolId(UUID.randomUUID().toString());
         protocolRepository.save(linkProtocol);
         return linkProtocol;
     }

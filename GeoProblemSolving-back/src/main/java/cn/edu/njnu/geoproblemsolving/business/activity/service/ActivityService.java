@@ -3,7 +3,6 @@ package cn.edu.njnu.geoproblemsolving.business.activity.service;
 import cn.edu.njnu.geoproblemsolving.business.activity.dto.UpdateActivityDTO;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
-import cn.edu.njnu.geoproblemsolving.business.activity.entity.LinkProtocol;
 
 public interface ActivityService {
 
@@ -30,10 +29,6 @@ public interface ActivityService {
     JsonResult findLast(String aid);
 
     JsonResult findNext(String aid);
-
-    JsonResult createNext(String aid, String nextId, LinkProtocol protocol);
-
-    JsonResult createLast(String aid, String lastId, LinkProtocol protocol);
 
     JsonResult linkActivities(UpdateActivityDTO update, String aid1, String aid2, String pid);
 

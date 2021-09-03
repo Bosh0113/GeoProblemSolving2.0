@@ -105,7 +105,9 @@
           >Delete</Button
         >
         <Button
-          v-if="slctActivity.level == 0 && slctActivity.type != 'Activity_Default'"
+          v-if="
+            slctActivity.level == 0 && slctActivity.type != 'Activity_Default'
+          "
           type="primary"
           icon="ios-bookmark"
           size="small"
@@ -588,8 +590,11 @@ export default {
           window.innerWidth - 260 + "px";
       }
     },
-    backToProject(){
-      window.location.href = '/GeoProblemSolving/projectInfo/' + this.projectInfo.aid + '?content=overview'
+    backToProject() {
+      window.location.href =
+        "/GeoProblemSolving/projectInfo/" +
+        this.projectInfo.aid +
+        "?content=overview";
     },
     locateActivity() {
       // let content = this.getURLParameter("content");
@@ -786,7 +791,10 @@ export default {
       // load activity doc
       let result = this.operationApi.getActivityDoc(this.slctActivity.aid);
       if (result === "empty") {
-        this.operationApi.activityDocInit(this.slctActivity, this.userInfo.userId);
+        this.operationApi.activityDocInit(
+          this.slctActivity,
+          this.userInfo.userId
+        );
       }
       this.setContent(this.slctActivity);
 
@@ -889,10 +897,8 @@ export default {
             .put(url, this.editActivityForm)
             .then((res) => {
               //offline model
-
               if (res.data == "Offline") {
                 this.$store.commit("userLogout");
-                // this.$router.push({ name: "Login" });
                 this.tempLoginModal = true;
               } else if (res.data.code == 0) {
                 this.$Notice.info({ title: "Result", desc: "Success!" });
@@ -935,7 +941,7 @@ export default {
               this.getStepCategroy(content);
           }
         }
-      } else if(type === "delete") {
+      } else if (type === "delete") {
         this.removePathwayNode(content);
       }
 
@@ -1033,17 +1039,33 @@ export default {
     },
     preApplication() {
       //判断活动权限，如果无需申请许可，则直接加入；如果需要其他成员批准，则通过apply请求
-      if (
-        this.permissionIdentity(
-          this.slctActivity.permission,
-          "visitor",
-          "auto_join"
+      this.axios
+        .get(
+          `/GeoProblemSolving/activityDriven/user/${this.slctActivity.parent}/${this.slctActivity.aid}`
         )
-      ) {
-        this.joinActivity();
-      } else {
-        this.applyJoinActivityModal = true;
-      }
+        .then((res) => {
+          if (res.data == "Offline") {
+            this.$store.commit("userLogout");
+            this.tempLoginModal = true;
+          } else if (res.data.code === 0) {
+            if (res.data.data) {
+              this.joinActivity();
+            } else {
+              if (
+                this.permissionIdentity(
+                  this.slctActivity.permission,
+                  "visitor",
+                  "auto_join"
+                )
+              ) {
+                this.joinActivity();
+              } else {
+                this.applyJoinActivityModal = true;
+              }
+            }
+          }
+        })
+        .catch((err) => {});
     },
     joinActivity() {
       //无需批准，直接加入
@@ -1070,7 +1092,6 @@ export default {
           //offline model
           if (res.data == "Offline") {
             this.$store.commit("userLogout");
-            // this.$router.push({ name: "Login" });
             this.tempLoginModal = true;
           } else if (res.data.code == 0) {
             this.$Notice.info({ title: "Join the activity", desc: "Success!" });
@@ -1121,7 +1142,6 @@ export default {
           //offline model
           if (res.data == "Offline") {
             this.$store.commit("userLogout");
-            // this.$router.push({ name: "Login" });
             this.tempLoginModal = true;
           } else if (res.data == "Success") {
             this.$Notice.info({ desc: "Send application successfully." });
@@ -1151,7 +1171,6 @@ export default {
 
           if (res.data == "Offline") {
             this.$store.commit("userLogout");
-            // this.$router.push({ name: "Login" });
             this.tempLoginModal = true;
           } else if (res.data.code == 0) {
             this.$Notice.info({ title: "Delete", desc: "Success!" });
@@ -1164,7 +1183,7 @@ export default {
             );
             this.operationApi.deleteActivityDoc(this.slctActivity.aid);
             // update pathway
-            this.updatePathway("delete", aid)
+            this.updatePathway("delete", aid);
             this.activityDeleteModal = false;
             //更新activityTree
             this.enterActivity(this.parentActivity);

@@ -198,7 +198,6 @@ export default {
           console.log(res);
           if (res.data == "Offline") {
             this.$store.commit("userLogout");
-            // this.$router.push({ name: "Login" });
             this.tempLoginModal = true;
           } else if (res.data.code == 0) {
             if(res.data.data.level == 0){

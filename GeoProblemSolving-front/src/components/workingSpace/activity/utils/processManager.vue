@@ -695,9 +695,6 @@ export default {
       // relationCount: 1,
       // relationIndex: 0,
       linkBuildModal: false,
-      beginNode: {},
-      endNode: {},
-      linkBuildModal: false,
       //恢复登录的模态框
       tempLoginModal: false,
 
@@ -1344,8 +1341,6 @@ export default {
       this.updateStepchart();
       // clear
       this.selectedActivities = [];
-      this.beginNode = {};
-      this.endNode = {};
       this.clearProtocolSetting();
       this.activityLinks = [];
     },
@@ -1481,8 +1476,8 @@ export default {
             this.tempLoginModal = true;
           } else if (res.data.code == 0) {
             // link in the activity document
-            let protocolId = res.data.data.graphId;
-            
+            let protocolId = res.data.data.protocolId;
+
             for (let i = 0; i < relations.length; i++) {
               this.operationApi.processRecord(
                 this.activityInfo.aid,
@@ -1495,9 +1490,6 @@ export default {
               );
             }
             // this.newLinkStore(this.beginNode.aid, this.endNode.aid, protocolId);
-            // clear
-            this.beginNode = {};
-            this.endNode = {};
           } else {
             this.$Message.error("Fail to link activities.");
             console.log(res.data.msg);
@@ -1602,23 +1594,23 @@ export default {
     // },
     // seperate
     removeLink() {
-      this.beginNode = this.selectedActivities[0];
-      this.endNode = this.selectedActivities[1];
+      let beginNode = this.selectedActivities[0];
+      let endNode = this.selectedActivities[1];
 
       for (let i = 0; i < this.processStructure.length; i++) {
         // 前驱节点
-        if (this.processStructure[i].aid == this.beginNode.aid) {
+        if (this.processStructure[i].aid == beginNode.aid) {
           for (let j = 0; j < this.processStructure[i].next.length; j++) {
-            if (this.processStructure[i].next[j].name == this.endNode.name) {
+            if (this.processStructure[i].next[j].name == endNode.name) {
               this.processStructure[i].next.splice(j, 1);
               break;
             }
           }
         }
         // 后继节点
-        if (this.processStructure[i].aid == this.endNode.aid) {
+        if (this.processStructure[i].aid == endNode.aid) {
           for (let j = 0; j < this.processStructure[i].last.length; j++) {
-            if (this.processStructure[i].last[j].name == this.beginNode.name) {
+            if (this.processStructure[i].last[j].name == beginNode.name) {
               this.processStructure[i].last.splice(j, 1);
               break;
             }
@@ -1629,50 +1621,24 @@ export default {
       // 重新渲染
       this.updateStepchart();
       // 更新pathway
-      this.delLinkStore(this.beginNode.aid, this.endNode.aid);
+      this.breakLink(beginNode.aid, endNode.aid);
+      // this.delLinkStore(beginNode.aid, endNode.aid);
       this.selectedActivities = [];
-      this.beginNode = {};
-      this.endNode = {};
       this.removeLinkBtn = false;
     },
-    delLinkStore(begin, end) {
-      let updateurl = "";
-      if (this.activityInfo.level == 0) {
-        updateurl = "/GeoProblemSolving/project/separate/" + begin + "/" + end;
-      } else if (this.activityInfo.level == 1) {
-        updateurl =
-          "/GeoProblemSolving/subproject/separate/" + begin + "/" + end;
-      } else if (this.activityInfo.level > 1) {
-        updateurl = "/GeoProblemSolving/activity/separate/" + begin + "/" + end;
-      } else {
-        return;
-      }
-      let data = {
-        aid: this.activityInfo.aid,
-        pathway: this.processStructure,
-      };
-
+    breakLink(beginNode, endNode) {
       this.axios
-        .post(updateurl, data)
+        .post(`/GeoProblemSolving/activityDriven/${this.activityInfo.aid}/${beginNode}/${endNode}`)
         .then((res) => {
           if (res.data == "Offline") {
             this.$store.commit("userLogout");
             this.tempLoginModal = true;
           } else if (res.data.code == 0) {
-            this.operationApi.processRecord(
-              this.activityInfo.aid,
-              "",
-              "break",
-              this.userInfo.userId,
-              begin,
-              end,
-              ""
-            );
             this.$Notice.info({
-              desc: "Seperate activities successfully!",
+              desc: "Break the link successfully!",
             });
           } else {
-            this.$Message.error("Fail to seperate activities.");
+            this.$Message.error("Fail to unlink.");
             console.log(res.data.msg);
           }
         })
@@ -1680,6 +1646,51 @@ export default {
           throw err;
         });
     },
+    // delLinkStore(begin, end) {
+    //   let updateurl = "";
+    //   if (this.activityInfo.level == 0) {
+    //     updateurl = "/GeoProblemSolving/project/separate/" + begin + "/" + end;
+    //   } else if (this.activityInfo.level == 1) {
+    //     updateurl =
+    //       "/GeoProblemSolving/subproject/separate/" + begin + "/" + end;
+    //   } else if (this.activityInfo.level > 1) {
+    //     updateurl = "/GeoProblemSolving/activity/separate/" + begin + "/" + end;
+    //   } else {
+    //     return;
+    //   }
+    //   let data = {
+    //     aid: this.activityInfo.aid,
+    //     pathway: this.processStructure,
+    //   };
+
+    //   this.axios
+    //     .post(updateurl, data)
+    //     .then((res) => {
+    //       if (res.data == "Offline") {
+    //         this.$store.commit("userLogout");
+    //         this.tempLoginModal = true;
+    //       } else if (res.data.code == 0) {
+    //         this.operationApi.processRecord(
+    //           this.activityInfo.aid,
+    //           "",
+    //           "break",
+    //           this.userInfo.userId,
+    //           begin,
+    //           end,
+    //           ""
+    //         );
+    //         this.$Notice.info({
+    //           desc: "Seperate activities successfully!",
+    //         });
+    //       } else {
+    //         this.$Message.error("Fail to seperate activities.");
+    //         console.log(res.data.msg);
+    //       }
+    //     })
+    //     .catch((err) => {
+    //       throw err;
+    //     });
+    // },
     gotoActivity(aid) {
       for (let i = 0; i < this.childActivities.length; i++) {
         if (this.childActivities[i].aid == aid) {

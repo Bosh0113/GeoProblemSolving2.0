@@ -4,38 +4,58 @@
 <template>
   <Row>
     <toolStyle
-      :style="{height:sidebarHeight}"
+      :style="{ height: sidebarHeight }"
       :resources="resources"
       v-on:resourceUrl="selecetResource"
     ></toolStyle>
-    <Col span="4" style="padding:30px;margin-left:60px">
-      <Upload :before-upload="handleUpload" action="-" accept=".csv, .xls, .xlsx">
-        <Button icon="ios-cloud-upload-outline">Upload to resource center</Button>
+    <Col span="4" style="padding: 30px; margin-left: 60px">
+      <Upload
+        :before-upload="handleUpload"
+        action="-"
+        accept=".csv, .xls, .xlsx"
+      >
+        <Button icon="ios-cloud-upload-outline"
+          >Upload to resource center</Button
+        >
       </Upload>
       <RadioGroup v-model="SelectAxis">
-        <Radio label="X-Axis" style="padding:20px 0 10px 0"></Radio>
-        <Input v-model="SelectX" style="width:200px" readonly />
-        <Radio label="Y-Axis" style="padding:20px 0 10px 0"></Radio>
-        <Input v-model="SelectY" style="width:200px" readonly />
+        <Radio label="X-Axis" style="padding: 20px 0 10px 0"></Radio>
+        <Input v-model="SelectX" style="width: 200px" readonly />
+        <Radio label="Y-Axis" style="padding: 20px 0 10px 0"></Radio>
+        <Input v-model="SelectY" style="width: 200px" readonly />
       </RadioGroup>
-      <h3 style="padding-top:20px">Type of chart:</h3>
+      <h3 style="padding-top: 20px">Type of chart:</h3>
       <Select
         v-model="chooseType"
-        style="width:200px;padding-top:10px"
+        style="width: 200px; padding-top: 10px"
         :placeholder="chartTypePlaceholder"
       >
-        <Option v-for="item in normalChart" :value="item.value" :key="item.value">{{ item.label }}</Option>
+        <Option
+          v-for="item in normalChart"
+          :value="item.value"
+          :key="item.value"
+          >{{ item.label }}</Option
+        >
       </Select>
-      <Button @click="Visualize" style="margin-top:30px">Visualization</Button>
-      <Button v-if="visualization" @click="back2Table" style="margin-top:30px">Select data</Button>
+      <Button @click="Visualize" style="margin-top: 30px">Visualization</Button>
+      <Button v-if="visualization" @click="back2Table" style="margin-top: 30px"
+        >Select data</Button
+      >
     </Col>
-    <Col span="17" offset="1" style="padding-top:30px">
-      <div v-if="visualization" title="Data visualization" style="padding-right:20px">
-        <ve-scatter v-if="chooseType == 'scatter'" :data="chartData"></ve-scatter>
+    <Col span="17" offset="1" style="padding-top: 30px">
+      <div
+        v-if="visualization"
+        title="Data visualization"
+        style="padding-right: 20px"
+      >
+        <ve-scatter
+          v-if="chooseType == 'scatter'"
+          :data="chartData"
+        ></ve-scatter>
         <ve-chart v-else :data="chartData" :settings="chartSettings"></ve-chart>
       </div>
       <div v-show="!visualization">
-        <div id="mytable" style="height:400px"></div>
+        <div id="mytable" style="height: 400px"></div>
       </div>
     </Col>
   </Row>
@@ -67,7 +87,7 @@ export default {
         { value: "waterfall", label: "waterfall" },
         { value: "radar", label: "radar" },
         { value: "funnel", label: "funnel" },
-        { value: "scatter", label: "scatter" }
+        { value: "scatter", label: "scatter" },
       ],
       chartTypePlaceholder: "Choose one type of charts",
       DataX: [],
@@ -79,7 +99,7 @@ export default {
       chooseType: "",
       chartSettings: {},
       pageParams: { pageId: "", userId: "", userName: "" },
-      userInfo: {}
+      userInfo: {},
     };
   },
   beforeDestroy() {},
@@ -97,7 +117,7 @@ export default {
       $("#mytable").jexcel({
         data: this.testData,
         minDimensions: [20, 20],
-        onselection: this.selectData
+        onselection: this.selectData,
       });
     },
     getStepInfo() {
@@ -136,16 +156,16 @@ export default {
         this.axios
           .get(
             "/GeoProblemSolving/user" +
-            "?key=userId" +
-            "&value=" +
+              "?key=userId" +
+              "&value=" +
               this.pageParams.userId
           )
-          .then(res => {
+          .then((res) => {
             if (res.data.code == 0) {
               this.$set(this, "userInfo", res.data.data);
             }
           })
-          .catch(err => {});
+          .catch((err) => {});
       }
     },
     handleUpload(file) {
@@ -169,14 +189,14 @@ export default {
       formData.append("folderId", this.pageParams.pageId);
       this.axios
         .post("/GeoProblemSolving/folder/uploadToFolder", formData)
-        .then(res => {
+        .then((res) => {
           if (
             res.data.sizeOver.length > 0 ||
-              res.data.failed.length > 0 ||
-              res.data == "Offline"
-            ) {
-              console.log(res.data);
-            } else if (res.data.uploaded.length > 0) {
+            res.data.failed.length > 0 ||
+            res.data == "Offline"
+          ) {
+            confirm("You are offline, please login.");
+          } else if (res.data.uploaded.length > 0) {
             let dataName = res.data.uploaded[0].name;
 
             this.dataUrl = "/GeoProblemSolving/resource/upload/" + dataName;
@@ -184,12 +204,12 @@ export default {
             let dataItem = {
               name: file.name,
               description: "charts tool data",
-              pathURL: "/GeoProblemSolving/resource/upload/" + dataName
+              pathURL: "/GeoProblemSolving/resource/upload/" + dataName,
             };
             this.resources.push(dataItem);
           }
         })
-        .catch(err => {});
+        .catch((err) => {});
 
       // 渲染表格
       this.fillTable(file);
@@ -200,11 +220,11 @@ export default {
       var that = this;
       var fileReader = new FileReader();
       fileReader.readAsBinaryString(file);
-      fileReader.onload = ev => {
+      fileReader.onload = (ev) => {
         try {
           const data = ev.target.result;
           const workbook = XLSX.read(data, {
-            type: "binary"
+            type: "binary",
           });
           const wsname = workbook.SheetNames[0]; //取第一张表
           const ws = XLSX.utils.sheet_to_json(workbook.Sheets[wsname]);
@@ -229,14 +249,14 @@ export default {
             tableOverflow: false,
             minDimensions: [20, 20],
             csvHeaders: true,
-            onselection: that.selectData
+            onselection: that.selectData,
           });
           that.$refs.upload.value = "";
         } catch (e) {
           return false;
         }
       };
-      fileReader.onerror = function() {
+      fileReader.onerror = function () {
         this.$Message.error("Input data error.");
         that.showFile = false;
         that.uploadGeoJson = null;
@@ -334,7 +354,7 @@ export default {
         }
         //排序
         var that = this;
-        rows.sort(function(a, b) {
+        rows.sort(function (a, b) {
           return a[that.DataX[0][0]] - b[that.DataX[0][0]];
         });
 
@@ -344,21 +364,21 @@ export default {
             metrics: metrics,
             dimension: dimension,
             ascending: true,
-            useDefaultOrder: true
+            useDefaultOrder: true,
           };
           this.chartData = {
             columns: columns,
-            rows: rows
+            rows: rows,
           };
         } else {
           this.chartSettings = {
             type: this.chooseType,
             metrics: metrics,
-            dimension: dimension
+            dimension: dimension,
           };
           this.chartData = {
             columns: columns,
-            rows: rows
+            rows: rows,
           };
         }
       } else {
@@ -378,7 +398,7 @@ export default {
         }
         //排序
         var that = this;
-        rows.sort(function(a, b) {
+        rows.sort(function (a, b) {
           return a[that.DataX[0][0]] - b[that.DataX[0][0]];
         });
 
@@ -386,21 +406,21 @@ export default {
           this.chartSettings = {
             type: this.chooseType,
             metrics: metrics,
-            dimension: dimension
+            dimension: dimension,
           };
           this.chartData = {
             columns: columns,
-            rows: rows
+            rows: rows,
           };
         } else {
           this.chartSettings = {
             type: this.chooseType,
             metrics: metrics,
-            dimension: dimension
+            dimension: dimension,
           };
           this.chartData = {
             columns: columns,
-            rows: rows
+            rows: rows,
           };
         }
       }
@@ -422,7 +442,7 @@ export default {
         .get(
           "/GeoProblemSolving/folder/inquiry?folderId=" + this.pageParams.pageId
         )
-        .then(res => {
+        .then((res) => {
           // 写渲染函数，取到所有资源
           if (res.data !== "None") {
             for (let i = 0; i < res.data.files.length; i++) {
@@ -437,7 +457,7 @@ export default {
             this.resources = [];
           }
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err.data);
         });
     },
@@ -451,7 +471,7 @@ export default {
         var xhr = new XMLHttpRequest();
         xhr.open("GET", this.dataUrl, true);
         xhr.responseType = "blob";
-        xhr.onload = function(e) {
+        xhr.onload = function (e) {
           if (this.status == 200) {
             var file = this.response;
             that.fillTable(file);
@@ -462,8 +482,8 @@ export default {
         this.$Message.error("Worry data format!");
       }
       this.showFile = false;
-    }
-  }
+    },
+  },
 };
 </script>
 

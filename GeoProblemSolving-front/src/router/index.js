@@ -297,12 +297,12 @@ const routes = [
     component: resolve =>
       require(["@/components/tools/entity/singleUtils/ncCharts"], resolve)
   },
-  {
-    path: "/nc/taskManager",
-    name: "taskManager",
-    component: resolve =>
-      require(["@/components/tools/entity/singleUtils/taskManager"], resolve)
-  },
+  // {
+  //   path: "/nc/taskManager",
+  //   name: "taskManager",
+  //   component: resolve =>
+  //     require(["@/components/tools/entity/singleUtils/taskManager"], resolve)
+  // },
   {
     path: "/video",
     name: "videoViewer",

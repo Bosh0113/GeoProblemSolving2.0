@@ -7,12 +7,10 @@ import cn.edu.njnu.geoproblemsolving.business.activity.repository.ProjectReposit
 import cn.edu.njnu.geoproblemsolving.business.user.entity.UserEntity;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
-import cn.edu.njnu.geoproblemsolving.business.activity.entity.LinkProtocol;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Subproject;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.SubprojectRepository;
 import cn.edu.njnu.geoproblemsolving.business.activity.service.ActivityService;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityRepository;
-import cn.edu.njnu.geoproblemsolving.business.activity.repository.ProtocolRepository;
 import cn.edu.njnu.geoproblemsolving.business.user.repository.UserRepository;
 import cn.edu.njnu.geoproblemsolving.common.utils.ResultUtils;
 import com.alibaba.fastjson.JSONArray;
@@ -30,7 +28,6 @@ import java.util.stream.IntStream;
 public class ActivityServiceImpl implements ActivityService {
 
     private final ActivityRepository activityRepository;
-    private final ProtocolRepository protocolRepository;
     private final UserRepository userRepository;
     //    private final MongoTemplate mongoTemplate;
     private final FolderDaoImpl folderDao;
@@ -39,13 +36,11 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Autowired
     public ActivityServiceImpl(ActivityRepository activityRepository,
-                               ProtocolRepository protocolRepository,
                                UserRepository userRepository,
                                SubprojectRepository subprojectRepository,
                                MongoTemplate mongoTemplate,
                                FolderDaoImpl folderDao, ProjectRepository projectRepository) {
         this.activityRepository = activityRepository;
-        this.protocolRepository = protocolRepository;
         this.userRepository = userRepository;
 //        this.mongoTemplate = mongoTemplate;
         this.folderDao = folderDao;
@@ -469,62 +464,6 @@ public class ActivityServiceImpl implements ActivityService {
 
     }
 
-    @Override
-    public JsonResult createNext(String aid, String nextId, LinkProtocol protocol) {
-        try {
-            // Confirm aid
-            Activity current = findActivityById(aid);
-            if (current == null) return ResultUtils.error(-1, "Fail: current activity does not exist.");
-            Activity next = findActivityById(nextId);
-            if (next == null) return ResultUtils.error(-1, "Fail: next activity does not exist.");
-
-            // Save the protocol
-            String pid = UUID.randomUUID().toString();
-            protocol.setPid(pid);
-
-            next = saveNextActivityInfo(aid, pid, next);
-            current = saveLastActivityInfo(nextId, pid, current);
-
-
-            // Update active time
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            current.setActiveTime(dateFormat.format(new Date()));
-
-            protocolRepository.save(protocol);
-            activityRepository.save(next);
-            activityRepository.save(current);
-
-            return ResultUtils.success(current);
-        } catch (Exception ex) {
-            return ResultUtils.error(-2, ex.toString());
-        }
-    }
-
-    @Override
-    public JsonResult createLast(String aid, String lastId, LinkProtocol protocol) {
-        try {
-            // Confirm aid
-            Activity current = findActivityById(aid);
-            if (current == null) return ResultUtils.error(-1, "Fail: activity does not exist.");
-            Activity last = findActivityById(lastId);
-            if (last == null) return ResultUtils.error(-1, "Fail: next activity does not exist.");
-
-            // Save the protocol
-            String pid = UUID.randomUUID().toString();
-            protocol.setPid(pid);
-
-            last = saveLastActivityInfo(aid, pid, last);
-            current = saveNextActivityInfo(lastId, pid, current);
-
-            protocolRepository.save(protocol);
-            activityRepository.save(last);
-            activityRepository.save(current);
-
-            return ResultUtils.success(current);
-        } catch (Exception ex) {
-            return ResultUtils.error(-2, ex.toString());
-        }
-    }
 
     @Override
     public JsonResult linkActivities(UpdateActivityDTO update, String aid1, String aid2, String pid) {

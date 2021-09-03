@@ -10,11 +10,17 @@
 }
 </style>
 <template>
-  <div style="display: flex;background-color:lightgrey">
+  <div style="display: flex; background-color: lightgrey">
     <Card
       class="paramsCard"
       dis-hover
-      style="width: 290px; height: calc(100vh - 10px); background-color: white; margin: 5px;overflow-y: auto"
+      style="
+        width: 290px;
+        height: calc(100vh - 10px);
+        background-color: white;
+        margin: 5px;
+        overflow-y: auto;
+      "
     >
       <p slot="title">Parameters of SEIR model</p>
       <div id="parameters">
@@ -24,7 +30,7 @@
           :max="1000"
           :min="1"
           v-model="total_popu"
-          style="margin: 5px 0 10px 0; width:200px; display:block"
+          style="margin: 5px 0 10px 0; width: 200px; display: block"
           title="Population"
         ></InputNumber>
         <Label>Number of initial exposed people:</Label>
@@ -33,7 +39,7 @@
           :max="1000"
           :min="0"
           v-model="exposed_popu"
-          style="margin: 5px 0 10px 0; width:200px; display:block"
+          style="margin: 5px 0 10px 0; width: 200px; display: block"
           title="Population"
         ></InputNumber>
         <Label>Number of initial infected people:</Label>
@@ -42,7 +48,7 @@
           :max="1000"
           :min="0"
           v-model="infectious_popu"
-          style="margin: 5px 0 10px 0; width:200px; display:block"
+          style="margin: 5px 0 10px 0; width: 200px; display: block"
           title="Population"
         ></InputNumber>
         <Label>Number of initial recovered people:</Label>
@@ -51,7 +57,7 @@
           :max="1000"
           :min="0"
           v-model="recovered_popu"
-          style="margin: 5px 0 10px 0; width:200px; display:block"
+          style="margin: 5px 0 10px 0; width: 200px; display: block"
           title="Population"
         ></InputNumber>
         <Label>Number of initial dead people:</Label>
@@ -60,48 +66,59 @@
           :max="1000"
           :min="0"
           v-model="death_popu"
-          style="margin: 5px 0 10px 0; width:200px; display:block"
+          style="margin: 5px 0 10px 0; width: 200px; display: block"
           title="Population"
         ></InputNumber>
-        <Divider style="margin: 10px 0;" />
-        <Label style="display:block">Infectiousness in exposed duration:</Label>
-        <RadioGroup v-model="exposed_infect" style="margin: 5px 0 10px 0; width:200px">
+        <Divider style="margin: 10px 0" />
+        <Label style="display: block"
+          >Infectiousness in exposed duration:</Label
+        >
+        <RadioGroup
+          v-model="exposed_infect"
+          style="margin: 5px 0 10px 0; width: 200px"
+        >
           <Radio label="Yes"></Radio>
           <Radio label="No"></Radio>
         </RadioGroup>
-        <Label style="display:block">Mean incubation period(days):</Label>
+        <Label style="display: block">Mean incubation period(days):</Label>
         <InputNumber
           size="small"
           :max="30"
           :min="0"
           v-model="exposedTime"
-          style="margin: 5px 0 10px 0; width:200px"
+          style="margin: 5px 0 10px 0; width: 200px"
         ></InputNumber>
-        <Label style="display:block">The probability of transmission(person to person) (%):</Label>
+        <Label style="display: block"
+          >The probability of transmission(person to person) (%):</Label
+        >
         <InputNumber
           size="small"
           :max="30"
           :min="0"
           v-model="transmission_rate"
-          style="margin: 5px 0 10px 0; width:200px"
+          style="margin: 5px 0 10px 0; width: 200px"
         ></InputNumber>
-        <Label style="display:block">The probability of recovery(%/day):</Label>
+        <Label style="display: block"
+          >The probability of recovery(%/day):</Label
+        >
         <InputNumber
           size="small"
           :max="30"
           :min="0"
           v-model="recovery_rate"
-          style="margin: 5px 0 10px 0; width:200px"
+          style="margin: 5px 0 10px 0; width: 200px"
         ></InputNumber>
-        <Label style="display:block">The probability of death(%/day):</Label>
+        <Label style="display: block">The probability of death(%/day):</Label>
         <InputNumber
           size="small"
           :max="1"
           :min="0"
           v-model="death_rate"
-          style="margin: 5px 0 10px 0; width:200px"
+          style="margin: 5px 0 10px 0; width: 200px"
         ></InputNumber>
-        <Button @click="setSEIRParem()" style="margin-right:60px">Submit</Button>
+        <Button @click="setSEIRParem()" style="margin-right: 60px"
+          >Submit</Button
+        >
         <Button @click="resetSEIRParem()">Reset</Button>
       </div>
     </Card>
@@ -109,29 +126,44 @@
       <Card
         class="mapCard"
         dis-hover
-        style="width: calc(100vw - 310px); height: calc(100vh - 280px); background-color: white; margin: 5px;overflow-x: auto"
+        style="
+          width: calc(100vw - 310px);
+          height: calc(100vh - 280px);
+          background-color: white;
+          margin: 5px;
+          overflow-x: auto;
+        "
       >
-        <div id="map" style="width:100%; height:100%; position: absolute;"></div>
+        <div
+          id="map"
+          style="width: 100%; height: 100%; position: absolute"
+        ></div>
       </Card>
       <Card
         dis-hover
         class="agentConsole"
-        style="width: calc(100vw - 310px); height: 265px; background-color: white; margin: 5px; overflow-x: auto"
+        style="
+          width: calc(100vw - 310px);
+          height: 265px;
+          background-color: white;
+          margin: 5px;
+          overflow-x: auto;
+        "
       >
         <p slot="title">Simulation console</p>
         <div
           slot="extra"
-          style="margin-top: -7px; color: grey; cursor:pointer"
+          style="margin-top: -7px; color: grey; cursor: pointer"
           v-show="collaborative && !showMembers"
           @click="showMembers = true"
         >
           Status:
           <span v-if="simulator.Name == undefined">Wait for a simulation.</span>
-          <span v-else>{{simulator.Name}} is conducting the simulation.</span>
+          <span v-else>{{ simulator.Name }} is conducting the simulation.</span>
         </div>
         <div
           slot="extra"
-          style="margin-top: -7px; color: grey; cursor:pointer"
+          style="margin-top: -7px; color: grey; cursor: pointer"
           v-show="collaborative && showMembers"
           @click="showMembers = false"
         >
@@ -147,23 +179,25 @@
               size="large"
               v-model="collaborative"
               @on-change="changeCollab"
-              style="margin-right:20px"
+              style="margin-right: 20px"
             >
               <span slot="open">ON</span>
               <span slot="close">OFF</span>
             </i-switch>
-            <Button size="small" style="margin-right:20px" @click="addAgents()">Set agents</Button>
+            <Button size="small" style="margin-right: 20px" @click="addAgents()"
+              >Set agents</Button
+            >
             <Button size="small" @click="removeAgents()">Remove agents</Button>
           </div>
-          <Divider style="margin: 20px 0;" />
-          <div style="margin-top:10px">
+          <Divider style="margin: 20px 0" />
+          <div style="margin-top: 10px">
             <Label>Outside activities(per day):</Label>
             <InputNumber
               size="small"
               :max="5"
               :min="0"
               v-model="numActivity"
-              style="margin-right:20px"
+              style="margin-right: 20px"
             ></InputNumber>
             <Label>Infective distance(m):</Label>
             <InputNumber
@@ -171,7 +205,7 @@
               :max="5"
               :min="0"
               v-model="infectiveDist"
-              style="margin-right:20px"
+              style="margin-right: 20px"
             ></InputNumber>
             <Label>Simulation duration(days):</Label>
             <InputNumber
@@ -179,44 +213,66 @@
               :max="100"
               :min="1"
               v-model="totalSimuDays"
-              style="margin-right:20px"
+              style="margin-right: 20px"
             ></InputNumber>
-            <Button size="small" style="margin-right:40px" @click="submitAgents()">Submit</Button>
+            <Button
+              size="small"
+              style="margin-right: 40px"
+              @click="submitAgents()"
+              >Submit</Button
+            >
             <Label>Quarantine:</Label>
-            <Select style="width:100px" @on-change="changeIsolate" size="small" v-model="quarantine">
-              <Option v-for="item in quaraObjs" :value="item" :key="item">{{ item }}</Option>
+            <Select
+              style="width: 100px"
+              @on-change="changeIsolate"
+              size="small"
+              v-model="quarantine"
+            >
+              <Option v-for="item in quaraObjs" :value="item" :key="item">{{
+                item
+              }}</Option>
             </Select>
           </div>
-          <Divider style="margin: 20px 0;" />
+          <Divider style="margin: 20px 0" />
           <Slider v-model="simuTime" :marks="simuDays" disabled></Slider>
-          <div style="margin-top:40px">
-            <Button size="small" icon="md-play" style="margin-right:20px" @click="startSimu()">Start</Button>
+          <div style="margin-top: 40px">
+            <Button
+              size="small"
+              icon="md-play"
+              style="margin-right: 20px"
+              @click="startSimu()"
+              >Start</Button
+            >
             <Button
               size="small"
               icon="md-pause"
-              style="margin-right:20px"
+              style="margin-right: 20px"
               :disabled="colSimu"
               @click="pauseSimu()"
-            >Pause</Button>
+              >Pause</Button
+            >
             <Button
               size="small"
               icon="ios-play-outline"
-              style="margin-right:20px"
+              style="margin-right: 20px"
               @click="continueSimu()"
               :disabled="colSimu"
-            >Continue</Button>
+              >Continue</Button
+            >
             <Button
               size="small"
               icon="md-square"
-              style="margin-right:60px"
+              style="margin-right: 60px"
               @click="endSimu()"
               :disabled="colSimu"
-            >End</Button>
+              >End</Button
+            >
             <Button
               size="small"
-              @click="saveSimuModal=true"
+              @click="saveSimuModal = true"
               v-show="simu_results.length > 0"
-            >Save simulation data</Button>
+              >Save simulation data</Button
+            >
           </div>
         </div>
       </Card>
@@ -228,17 +284,19 @@
       ok-text="OK"
       cancel-text="Cancel"
     >
-      <div style="height:300px">
+      <div style="height: 300px">
         <vue-scroll :ops="ops">
-          <CheckboxGroup v-model="selectedResIds" style="margin-left:10px">
+          <CheckboxGroup v-model="selectedResIds" style="margin-left: 10px">
             <Checkbox
               v-for="item in dataResList"
               :key="item.index"
               :label="item.resourceId"
-              style="display:block; margin-bottom:5px"
+              style="display: block; margin-bottom: 5px"
             >
-              <span style="margin-left: 10px;">{{item.name}}</span>
-              <div style="margin: 5px 0 5px 25px" title="Description">{{item.description}}</div>
+              <span style="margin-left: 10px">{{ item.name }}</span>
+              <div style="margin: 5px 0 5px 25px" title="Description">
+                {{ item.description }}
+              </div>
             </Checkbox>
           </CheckboxGroup>
         </vue-scroll>
@@ -247,7 +305,7 @@
     <Modal v-model="saveSimuModal" title="Save the simulation result">
       <Label style="margin-left: 20px">File name:</Label>
       <Input
-        style="margin-left: 10px;width: 300px"
+        style="margin-left: 10px; width: 300px"
         v-model="resultName"
         placeholder="Enter file name (*.csv)"
       />
@@ -268,8 +326,8 @@ export default {
       //样式
       ops: {
         bar: {
-          background: "#808695"
-        }
+          background: "#808695",
+        },
       },
       split: 0.5,
       // page info
@@ -308,7 +366,7 @@ export default {
         exposedNum: 0,
         infectiousNum: 1,
         recoveredNum: 0,
-        deathNum: 0
+        deathNum: 0,
       },
       //agent 数据
       agentState: "stop",
@@ -328,7 +386,7 @@ export default {
         60: "30 days",
         70: "35 days",
         80: "40 days",
-        90: "45 days"
+        90: "45 days",
       },
       contact_agentId_list: [],
       // 模拟数据
@@ -344,11 +402,11 @@ export default {
       participants: [],
       abseirSocket: null,
       simulator: {},
-      colSimu: false
+      colSimu: false,
     };
   },
   beforeRouteEnter: (to, from, next) => {
-    next(vm => {
+    next((vm) => {
       if (!vm.$store.getters.userState || vm.$store.getters.userId == "") {
         vm.$router.push({ name: "Login" });
       }
@@ -395,24 +453,24 @@ export default {
       if (this.userInfo == {}) {
         this.axios
           .get(
-          "/GeoProblemSolving/user" +
-            "?key=userId" +
-            "&value=" +
+            "/GeoProblemSolving/user" +
+              "?key=userId" +
+              "&value=" +
               this.pageParams.userId
           )
-          .then(res => {
+          .then((res) => {
             if (res.data.code == 0) {
               this.$set(this, "userInfo", res.data.data);
             }
           })
-          .catch(err => {});
+          .catch((err) => {});
       }
     },
     initMap() {
       this.map = L.map("map", {
         crs: L.CRS.EPSG3857,
         center: L.latLng(32.07, 118.78),
-        zoom: 13
+        zoom: 13,
       });
 
       let tdtVectorMap =
@@ -427,7 +485,7 @@ export default {
       var vectorMap = L.tileLayer(tdtVectorMap, {
         maxZoom: 20,
         attribution:
-          '&copy; <a href="http://map.tianditu.gov.cn/">tianditu</a> contributors'
+          '&copy; <a href="http://map.tianditu.gov.cn/">tianditu</a> contributors',
       });
       var vectorAno = L.tileLayer(tdtVectorAno, { maxZoom: 20 });
       var vector = L.layerGroup([vectorMap, vectorAno]).addTo(this.map);
@@ -435,7 +493,7 @@ export default {
       // 比例尺
       L.control
         .scale({
-          position: "bottomleft"
+          position: "bottomleft",
         })
         .addTo(this.map);
 
@@ -450,11 +508,11 @@ export default {
       L.Control.Data = L.Control.extend({
         //在此定义参数
         options: {
-          position: "topright"
+          position: "topright",
         },
         //在此初始化
-        initialize: function(map) {},
-        onAdd: function(map) {
+        initialize: function (map) {},
+        onAdd: function (map) {
           this._container = L.DomUtil.create("div", "leaflet-exportData");
           this._container.style =
             "border:2px solid rgba(128,128,128,0.5);border-radius:6px;background-color:white";
@@ -474,9 +532,9 @@ export default {
         _importData() {
           that.modalImport = true;
           that.getMapData();
-        }
+        },
       });
-      L.control.data = function() {
+      L.control.data = function () {
         return new L.Control.Data();
       };
       L.control.data().addTo(this.map);
@@ -492,7 +550,7 @@ export default {
         .get(
           "/GeoProblemSolving/folder/inquiry?folderId=" + this.pageParams.pageId
         )
-        .then(res => {
+        .then((res) => {
           // 写渲染函数，取到所有资源
           if (res.data !== "None") {
             for (let i = 0; i < res.data.files.length; i++) {
@@ -507,7 +565,7 @@ export default {
             this.dataResList = [];
           }
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err.data);
         });
     },
@@ -524,7 +582,7 @@ export default {
                 let messageJson = {
                   type: "operation",
                   operation: "import_data",
-                  data: dataUrl
+                  data: dataUrl,
                 };
                 this.sendMessage(JSON.stringify(messageJson));
               }
@@ -548,13 +606,13 @@ export default {
       }
       this.agentMap = L.A.agentmap(this.map);
 
-      this.axios.get(dataUrl).then(res => {
+      this.axios.get(dataUrl).then((res) => {
         let mapdata = res.data;
         let geoJsonLayer = L.geoJSON(mapdata, {
-          style: function(feature) {
+          style: function (feature) {
             return { color: "green" };
-          }
-        }).bindPopup(function(layer) {
+          },
+        }).bindPopup(function (layer) {
           return layer.feature.properties.description;
         });
         //平移至数据位置
@@ -584,7 +642,7 @@ export default {
             let messageJson = {
               type: "operation",
               operation: "SEIR_params",
-              data: this.seirParams
+              data: this.seirParams,
             };
             this.sendMessage(JSON.stringify(messageJson));
           }
@@ -605,7 +663,7 @@ export default {
       } else {
         this.$Notice.open({
           title:
-            "A simulation has already been run. Please stop the simulation before."
+            "A simulation has already been run. Please stop the simulation before.",
         });
       }
     },
@@ -634,7 +692,7 @@ export default {
           exposedNum: 0,
           infectiousNum: 1,
           recoveredNum: 0,
-          deathNum: 0
+          deathNum: 0,
         };
         // 易感转为暴露、暴露转为感染、感染转为康复(个体)
         this.seirParams.exposedRate = this.transmission_rate / 100;
@@ -647,14 +705,14 @@ export default {
           let messageJson = {
             type: "operation",
             operation: "SEIR_params",
-            data: this.seirParams
+            data: this.seirParams,
           };
           this.sendMessage(JSON.stringify(messageJson));
         }
       } else {
         this.$Notice.open({
           title:
-            "A simulation has already been run. Please stop the simulation before."
+            "A simulation has already been run. Please stop the simulation before.",
         });
       }
     },
@@ -672,19 +730,19 @@ export default {
         properties: {
           place: {
             type: "unit",
-            id: random_unit_id
+            id: random_unit_id,
           },
           layer_options: {
             color: "green",
-            radius: 0.5
+            radius: 0.5,
           },
           infect_state: "Susceptible",
-          contact: false
+          contact: false,
         },
         geometry: {
           type: "Point",
-          coordinates: agent_coords
-        }
+          coordinates: agent_coords,
+        },
       };
 
       return feature;
@@ -703,18 +761,18 @@ export default {
         properties: {
           place: {
             type: "unit",
-            id: random_unit_id
+            id: random_unit_id,
           },
           layer_options: {
             color: "orange",
-            radius: 0.5
+            radius: 0.5,
           },
-          infect_state: "Exposed"
+          infect_state: "Exposed",
         },
         geometry: {
           type: "Point",
-          coordinates: agent_coords
-        }
+          coordinates: agent_coords,
+        },
       };
 
       return feature;
@@ -733,18 +791,18 @@ export default {
         properties: {
           place: {
             type: "unit",
-            id: random_unit_id
+            id: random_unit_id,
           },
           layer_options: {
             color: "red",
-            radius: 0.5
+            radius: 0.5,
           },
-          infect_state: "Infected"
+          infect_state: "Infected",
         },
         geometry: {
           type: "Point",
-          coordinates: agent_coords
-        }
+          coordinates: agent_coords,
+        },
       };
 
       return feature;
@@ -763,18 +821,18 @@ export default {
         properties: {
           place: {
             type: "unit",
-            id: random_unit_id
+            id: random_unit_id,
           },
           layer_options: {
             color: "blue",
-            radius: 0.5
+            radius: 0.5,
           },
-          infect_state: "Recovered"
+          infect_state: "Recovered",
         },
         geometry: {
           type: "Point",
-          coordinates: agent_coords
-        }
+          coordinates: agent_coords,
+        },
       };
 
       return feature;
@@ -799,7 +857,7 @@ export default {
               exposed: this.currentState.exposed,
               infectious: this.currentState.infectious,
               recovered: this.currentState.recovered,
-              death: this.currentState.death
+              death: this.currentState.death,
             });
           }
           if (this.simuTime == 100) {
@@ -808,7 +866,7 @@ export default {
         }
 
         //智能体状态
-        this.agentMap.agents.eachLayer(agent => {
+        this.agentMap.agents.eachLayer((agent) => {
           let random_index = Math.floor(
               _this.agentMap.units.count() * Math.random()
             ),
@@ -824,7 +882,7 @@ export default {
             let agent_coords = [random_unit_center.lng, random_unit_center.lat];
             agent.geometry = {
               type: "Point",
-              coordinates: agent_coords
+              coordinates: agent_coords,
             };
           } else if (
             _this.quarantine == "Exposed and infected people" &&
@@ -834,7 +892,7 @@ export default {
             let agent_coords = [random_unit_center.lng, random_unit_center.lat];
             agent.geometry = {
               type: "Point",
-              coordinates: agent_coords
+              coordinates: agent_coords,
             };
           } else {
             // 智能体运动
@@ -856,7 +914,7 @@ export default {
               agent.infect_state = "Infected";
               agent.setStyle({
                 color: "red",
-                radius: 0.5
+                radius: 0.5,
               });
               this.currentState.infectious++;
               this.currentState.exposed--;
@@ -868,7 +926,7 @@ export default {
               agent.infect_state = "Recovered";
               agent.setStyle({
                 color: "blue",
-                radius: 0.5
+                radius: 0.5,
               });
               this.currentState.recovered++;
               this.currentState.infectious--;
@@ -886,7 +944,7 @@ export default {
               .getLayer(this.contact_agentId_list[i])
               .setStyle({
                 color: "orange",
-                radius: 0.5
+                radius: 0.5,
               });
             this.currentState.exposed++;
             this.currentState.susceptible--;
@@ -898,7 +956,7 @@ export default {
         }
         this.contact_agentId_list = [];
       } else {
-        this.agentMap.agents.eachLayer(agent => {
+        this.agentMap.agents.eachLayer((agent) => {
           // 如果未被隔离
           // 接触感染个体
           // 如果暴露期(潜伏期)具有传染性，接触暴露期个体
@@ -908,7 +966,7 @@ export default {
               _this.quarantine != "Exposed and infected people" &&
               agent.infect_state == "Exposed")
           ) {
-            _this.agentMap.agents.eachLayer(_agent => {
+            _this.agentMap.agents.eachLayer((_agent) => {
               if (_agent.infect_state == "Susceptible") {
                 let dist = agent._latlng.distanceTo(_agent._latlng);
                 if (
@@ -936,7 +994,7 @@ export default {
             let messageJson = {
               type: "operation",
               operation: "end",
-              simulator: this.simulator
+              simulator: this.simulator,
             };
             this.sendMessage(JSON.stringify(messageJson));
           } else {
@@ -982,14 +1040,14 @@ export default {
         if (this.collaborative && origin == undefined) {
           let messageJson = {
             type: "operation",
-            operation: "add_agents"
+            operation: "add_agents",
           };
           this.sendMessage(JSON.stringify(messageJson));
         }
       } else {
         this.$Notice.open({
           title:
-            "A simulation has already been run. Please stop the simulation before."
+            "A simulation has already been run. Please stop the simulation before.",
         });
       }
     },
@@ -1002,7 +1060,7 @@ export default {
           if (this.collaborative && origin == undefined) {
             let messageJson = {
               type: "operation",
-              operation: "remove_agents"
+              operation: "remove_agents",
             };
             this.sendMessage(JSON.stringify(messageJson));
           }
@@ -1010,7 +1068,7 @@ export default {
       } else {
         this.$Notice.open({
           title:
-            "A simulation has already been run. Please stop the simulation before."
+            "A simulation has already been run. Please stop the simulation before.",
         });
       }
     },
@@ -1028,7 +1086,7 @@ export default {
           60: offset * 6 + " days",
           70: offset * 7 + " days",
           80: offset * 8 + " days",
-          90: offset * 9 + " days"
+          90: offset * 9 + " days",
         };
 
         // websocket 同步
@@ -1039,15 +1097,15 @@ export default {
             data: {
               numActivity: this.numActivity,
               agentInteractDist: this.agentInteractDist,
-              totalSimuDays: this.totalSimuDays
-            }
+              totalSimuDays: this.totalSimuDays,
+            },
           };
           this.sendMessage(JSON.stringify(messageJson));
         }
       } else {
         this.$Notice.open({
           title:
-            "A simulation has already been run. Please stop the simulation before."
+            "A simulation has already been run. Please stop the simulation before.",
         });
       }
     },
@@ -1059,7 +1117,7 @@ export default {
         let messageJson = {
           type: "operation",
           operation: "quarantine",
-          data: status
+          data: status,
         };
         this.sendMessage(JSON.stringify(messageJson));
       }
@@ -1083,7 +1141,7 @@ export default {
           exposed: this.seirParams.exposedNum,
           infectious: this.seirParams.infectiousNum,
           recovered: this.seirParams.recoveredNum,
-          death: this.seirParams.deathNum
+          death: this.seirParams.deathNum,
         };
 
         this.agentMap.run();
@@ -1093,20 +1151,20 @@ export default {
           // 模拟者
           this.simulator = {
             Id: this.pageParams.userId,
-            Name: this.pageParams.userName
+            Name: this.pageParams.userName,
           };
 
           let messageJson = {
             type: "operation",
             operation: "run",
-            simulator: this.simulator
+            simulator: this.simulator,
           };
           this.sendMessage(JSON.stringify(messageJson));
         }
       } else {
         this.$Notice.open({
           title:
-            "A simulation has already been run. Please stop the simulation before."
+            "A simulation has already been run. Please stop the simulation before.",
         });
       }
     },
@@ -1119,7 +1177,7 @@ export default {
         if (this.collaborative && origin == undefined) {
           let messageJson = {
             type: "operation",
-            operation: "pause"
+            operation: "pause",
           };
           this.sendMessage(JSON.stringify(messageJson));
         }
@@ -1134,7 +1192,7 @@ export default {
         if (this.collaborative && origin == undefined) {
           let messageJson = {
             type: "operation",
-            operation: "continue"
+            operation: "continue",
           };
           this.sendMessage(JSON.stringify(messageJson));
         }
@@ -1167,7 +1225,7 @@ export default {
           let messageJson = {
             type: "operation",
             operation: "end",
-            simulator: this.simulator
+            simulator: this.simulator,
           };
           this.sendMessage(JSON.stringify(messageJson));
         }
@@ -1191,7 +1249,7 @@ export default {
 
           //创建blob
           let blob = new Blob(["\ufeff" + result], {
-            type: "text/csv,charset=UTF-8"
+            type: "text/csv,charset=UTF-8",
           });
           var resultBlob = new File([blob], this.resultName + ".csv");
 
@@ -1208,20 +1266,20 @@ export default {
 
           this.axios
             .post("/GeoProblemSolving/folder/uploadToFolder", resultForm)
-            .then(res => {
+            .then((res) => {
               if (
                 res.data.sizeOver.length > 0 ||
                 res.data.failed.length > 0 ||
                 res.data == "Offline"
               ) {
-                console.log(res.data);
+                confirm("You are offline, please login.");
               } else if (res.data.uploaded.length > 0) {
                 this.$Notice.open({
-                  title: "Save the simulation result successfully."
+                  title: "Save the simulation result successfully.",
                 });
               }
             })
-            .catch(err => {});
+            .catch((err) => {});
         } else {
           this.$Message.error("Please fill in the file name.");
         }
@@ -1293,7 +1351,7 @@ export default {
             this.startSimu(1);
             this.simulator = {
               Id: msg.simulator.Id,
-              Name: msg.simulator.Name
+              Name: msg.simulator.Name,
             };
             this.colSimu = true;
             break;
@@ -1352,7 +1410,7 @@ export default {
     },
     removeTimer() {
       clearInterval(this.timer);
-    }
-  }
+    },
+  },
 };
 </script>

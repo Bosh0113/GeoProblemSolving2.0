@@ -41,7 +41,7 @@ public class ActivityLinkProtocol {
      * 后台可以考虑进行优化存储
      */
     @Id
-    String id;
+    private String protocolId;
     private String graphId;
     private String type;
     private ArrayList<String> nodes;

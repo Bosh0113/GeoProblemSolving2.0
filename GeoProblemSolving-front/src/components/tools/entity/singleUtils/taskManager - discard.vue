@@ -42,17 +42,20 @@
 <template>
   <div>
     <Row>
-      <Col span="4" offset="20" style="margin-top:8px">
+      <Col span="4" offset="20" style="margin-top: 8px">
         <span
           id="todoPanel"
-          style="cursor:pointer;color:#57a3f3"
+          style="cursor: pointer; color: #57a3f3"
           @click="switch2Manager"
-        >Task manager</span>
+          >Task manager</span
+        >
         <Divider type="vertical" />
-        <span id="ganttPanel" style="cursor:pointer" @click="switch2Gantt">Gantt chart</span>
+        <span id="ganttPanel" style="cursor: pointer" @click="switch2Gantt"
+          >Gantt chart</span
+        >
       </Col>
       <Col id="taskPage" span="23" offset="1">
-        <div id="taskContainer" :style="{height:contentHeight+'px'}">
+        <div id="taskContainer" :style="{ height: contentHeight + 'px' }">
           <template v-if="!chartSwitch">
             <Row type="flex" justify="space-around">
               <Col span="7">
@@ -62,78 +65,111 @@
                     slot="extra"
                     type="default"
                     class="createTaskBtn"
-                    style="margin-top:-8px"
+                    style="margin-top: -8px"
                     v-if="permissionIdentity('subproject_task_create')"
                     @click="createTaskModalShow()"
-                  >Add</Button>
-                  <vue-scroll :ops="ops" :style="{height:contentHeight-80+'px'}">
+                    >Add</Button
+                  >
+                  <vue-scroll
+                    :ops="ops"
+                    :style="{ height: contentHeight - 80 + 'px' }"
+                  >
                     <draggable
                       :disabled="taskItemDraggable()"
                       class="taskList"
                       element="ul"
-                      :options="{group:'task'}"
+                      :options="{ group: 'task' }"
                       v-model="taskTodo"
-                      :style="{height:contentHeight-80+'px'}"
+                      :style="{ height: contentHeight - 80 + 'px' }"
                       @start="setMoveCount()"
-                      @update="updateMoveTask(taskTodo,'todo')"
-                      @add="addMoveTask(taskTodo,'todo')"
-                      @remove="removeMoveTask(taskTodo,'todo')"
+                      @update="updateMoveTask(taskTodo, 'todo')"
+                      @add="addMoveTask(taskTodo, 'todo')"
+                      @remove="removeMoveTask(taskTodo, 'todo')"
                     >
                       <Card
-                        v-for="(item,index) in taskTodo"
+                        v-for="(item, index) in taskTodo"
                         :key="index"
                         :padding="3"
-                        style="margin:5px"
+                        style="margin: 5px"
                       >
                         <div>
-                          <span style="float:left;padding:0 2.5px">
+                          <span style="float: left; padding: 0 2.5px">
                             <Icon type="ios-list" color="gray" :size="20" />
                           </span>
-                          <span style="padding:5px">
+                          <span style="padding: 5px">
                             <strong
-                              style="color:#57a3f3"
+                              style="color: #57a3f3"
                               class="taskName"
                               :title="item.taskName"
-                            >{{item.taskName}}</strong>
+                              >{{ item.taskName }}</strong
+                            >
                           </span>
-                          <div style="float:right">
+                          <div style="float: right">
                             <Rate
-                              :disabled="!(permissionIdentity('subproject_task_manage', item))"
+                              :disabled="
+                                !permissionIdentity(
+                                  'subproject_task_manage',
+                                  item
+                                )
+                              "
                               v-model="item.importance"
                               :count="1"
                               clearable
                               title="Importance"
                               @on-change="changeImportance(item)"
                             />
-                            <template v-if="permissionIdentity('subproject_task_manage', item)">
+                            <template
+                              v-if="
+                                permissionIdentity(
+                                  'subproject_task_manage',
+                                  item
+                                )
+                              "
+                            >
                               <span title="Edit">
                                 <Icon
                                   type="ios-create"
                                   color="gray"
                                   :size="20"
-                                  style="cursor:pointer"
+                                  style="cursor: pointer"
                                   @click="editOneTask(index, taskTodo)"
                                 />
                               </span>
                               <span
-                                style="margin-left:5px;margin-right:3px;cursor: pointer;color:gray;"
+                                style="
+                                  margin-left: 5px;
+                                  margin-right: 3px;
+                                  cursor: pointer;
+                                  color: gray;
+                                "
                                 title="Delete"
-                                @click="taskRemoveAssure(index,taskTodo)"
+                                @click="taskRemoveAssure(index, taskTodo)"
                               >
-                                <Icon type="ios-trash" :size="20" color="gray" />
+                                <Icon
+                                  type="ios-trash"
+                                  :size="20"
+                                  color="gray"
+                                />
                               </span>
                             </template>
                           </div>
                           <p
-                            style="word-break:break-word;padding:5px;cursor:pointer"
+                            style="
+                              word-break: break-word;
+                              padding: 5px;
+                              cursor: pointer;
+                            "
                             @click="showTask(index, taskTodo)"
-                          >{{item.description}}</p>
-                          <div style="display:flex;justify-content:flex-end">
+                          >
+                            {{ item.description }}
+                          </p>
+                          <div style="display: flex; justify-content: flex-end">
                             <Tag
                               color="default"
-                              style="cursor:default"
+                              style="cursor: default"
                               title="Creator"
-                            >{{item.creatorName}}</Tag>
+                              >{{ item.creatorName }}</Tag
+                            >
                           </div>
                         </div>
                       </Card>
@@ -145,75 +181,114 @@
               <Col span="7">
                 <Card :padding="0" :border="false" dis-hover>
                   <h3 slot="title">Doing</h3>
-                  <vue-scroll :ops="ops" :style="{height:contentHeight-80+'px'}">
+                  <vue-scroll
+                    :ops="ops"
+                    :style="{ height: contentHeight - 80 + 'px' }"
+                  >
                     <draggable
                       :disabled="taskItemDraggable()"
                       class="taskList"
                       element="ul"
-                      :options="{group:'task'}"
+                      :options="{ group: 'task' }"
                       v-model="taskDoing"
-                      :style="{height:contentHeight-80+'px'}"
+                      :style="{ height: contentHeight - 80 + 'px' }"
                       @start="setMoveCount()"
-                      @update="updateMoveTask(taskDoing,'doing')"
-                      @add="addMoveTask(taskDoing,'doing')"
-                      @remove="removeMoveTask(taskDoing,'doing')"
+                      @update="updateMoveTask(taskDoing, 'doing')"
+                      @add="addMoveTask(taskDoing, 'doing')"
+                      @remove="removeMoveTask(taskDoing, 'doing')"
                     >
                       <Card
-                        v-for="(item,index)  in taskDoing"
+                        v-for="(item, index) in taskDoing"
                         :key="index"
                         :padding="3"
-                        style="margin:5px"
+                        style="margin: 5px"
                       >
                         <div>
-                          <span style="float:left;padding:0 2.5px">
-                            <Icon type="ios-information-circle-outline" color="gray" :size="20" />
+                          <span style="float: left; padding: 0 2.5px">
+                            <Icon
+                              type="ios-information-circle-outline"
+                              color="gray"
+                              :size="20"
+                            />
                           </span>
-                          <span style="padding:5px">
+                          <span style="padding: 5px">
                             <strong
-                              style="color:#57a3f3"
+                              style="color: #57a3f3"
                               class="taskName"
                               :title="item.taskName"
-                            >{{item.taskName}}</strong>
+                              >{{ item.taskName }}</strong
+                            >
                           </span>
-                          <div style="float:right" v-show="userRole != 'Visitor'">
+                          <div
+                            style="float: right"
+                            v-show="userRole != 'visitor'"
+                          >
                             <Rate
-                              :disabled="!(permissionIdentity('subproject_task_manage', item))"
+                              :disabled="
+                                !permissionIdentity(
+                                  'subproject_task_manage',
+                                  item
+                                )
+                              "
                               v-model="item.importance"
                               :count="1"
                               clearable
                               title="Importance"
                               @on-change="changeImportance(item)"
                             />
-                            <template v-if="permissionIdentity('subproject_task_manage', item)">
+                            <template
+                              v-if="
+                                permissionIdentity(
+                                  'subproject_task_manage',
+                                  item
+                                )
+                              "
+                            >
                               <span title="Edit">
                                 <Icon
                                   type="ios-create"
                                   color="gray"
                                   :size="20"
-                                  style="cursor:pointer"
-                                  @click="editOneTask(index,taskDoing)"
+                                  style="cursor: pointer"
+                                  @click="editOneTask(index, taskDoing)"
                                 />
                               </span>
                               <span
-                                style="margin-left:5px;margin-right:3px;cursor: pointer;color:gray;"
+                                style="
+                                  margin-left: 5px;
+                                  margin-right: 3px;
+                                  cursor: pointer;
+                                  color: gray;
+                                "
                                 title="Delete"
-                                @click="taskRemoveAssure(index,taskDoing)"
+                                @click="taskRemoveAssure(index, taskDoing)"
                               >
-                                <Icon type="ios-trash" :size="20" color="gray" />
+                                <Icon
+                                  type="ios-trash"
+                                  :size="20"
+                                  color="gray"
+                                />
                               </span>
                             </template>
                           </div>
                         </div>
                         <p
-                          style="word-break:break-word;padding:5px;cursor:pointer"
-                          @click="showTask(index,taskDoing)"
-                        >{{item.description}}</p>
-                        <div style="display:flex;justify-content:flex-end">
+                          style="
+                            word-break: break-word;
+                            padding: 5px;
+                            cursor: pointer;
+                          "
+                          @click="showTask(index, taskDoing)"
+                        >
+                          {{ item.description }}
+                        </p>
+                        <div style="display: flex; justify-content: flex-end">
                           <Tag
                             color="default"
-                            style="cursor:default"
+                            style="cursor: default"
                             title="Executor"
-                          >{{item.managerName}}</Tag>
+                            >{{ item.managerName }}</Tag
+                          >
                         </div>
                       </Card>
                       <Spin size="large" fix v-if="doingLoading"></Spin>
@@ -224,74 +299,109 @@
               <Col span="7">
                 <Card :padding="0" :border="false" dis-hover>
                   <h3 slot="title">Done</h3>
-                  <vue-scroll :ops="ops" :style="{height:contentHeight-80+'px'}">
+                  <vue-scroll
+                    :ops="ops"
+                    :style="{ height: contentHeight - 80 + 'px' }"
+                  >
                     <draggable
                       :disabled="taskItemDraggable()"
                       class="taskList"
                       element="ul"
-                      :options="{group:'task'}"
+                      :options="{ group: 'task' }"
                       v-model="taskDone"
-                      :style="{height:contentHeight-80+'px'}"
+                      :style="{ height: contentHeight - 80 + 'px' }"
                       @start="setMoveCount()"
-                      @update="updateMoveTask(taskDone,'done')"
-                      @add="addMoveTask(taskDone,'done')"
-                      @remove="removeMoveTask(taskDone,'done')"
+                      @update="updateMoveTask(taskDone, 'done')"
+                      @add="addMoveTask(taskDone, 'done')"
+                      @remove="removeMoveTask(taskDone, 'done')"
                     >
                       <Card
-                        v-for="(item,index) in taskDone"
+                        v-for="(item, index) in taskDone"
                         :key="index"
                         :padding="3"
-                        style="margin:5px"
+                        style="margin: 5px"
                       >
                         <div>
-                          <span style="float:left;padding:0 2.5px">
+                          <span style="float: left; padding: 0 2.5px">
                             <Icon type="md-checkmark-circle-outline" />
                           </span>
-                          <span style="padding:5px">
+                          <span style="padding: 5px">
                             <strong
-                              style="color:#57a3f3"
+                              style="color: #57a3f3"
                               class="taskName"
                               :title="item.taskName"
-                            >{{item.taskName}}</strong>
+                              >{{ item.taskName }}</strong
+                            >
                           </span>
-                          <div style="float:right" v-show="userRole != 'Visitor'">
+                          <div
+                            style="float: right"
+                            v-show="userRole != 'visitor'"
+                          >
                             <Rate
-                              :disabled="!(permissionIdentity('subproject_task_manage', item))"
+                              :disabled="
+                                !permissionIdentity(
+                                  'subproject_task_manage',
+                                  item
+                                )
+                              "
                               v-model="item.importance"
                               :count="1"
                               clearable
                               title="Importance"
                               @on-change="changeImportance(item)"
                             />
-                            <template v-if="permissionIdentity('subproject_task_manage', item)">
+                            <template
+                              v-if="
+                                permissionIdentity(
+                                  'subproject_task_manage',
+                                  item
+                                )
+                              "
+                            >
                               <span title="Edit">
                                 <Icon
                                   type="ios-create"
                                   color="gray"
                                   :size="20"
-                                  style="cursor:pointer"
-                                  @click="editOneTask(index,taskDone)"
+                                  style="cursor: pointer"
+                                  @click="editOneTask(index, taskDone)"
                                 />
                               </span>
                               <span
-                                style="margin-left:5px;margin-right:3px;cursor: pointer;color:gray;"
+                                style="
+                                  margin-left: 5px;
+                                  margin-right: 3px;
+                                  cursor: pointer;
+                                  color: gray;
+                                "
                                 title="Delete"
-                                @click="taskRemoveAssure(index,taskDone)"
+                                @click="taskRemoveAssure(index, taskDone)"
                               >
-                                <Icon type="ios-trash" :size="20" color="gray" />
+                                <Icon
+                                  type="ios-trash"
+                                  :size="20"
+                                  color="gray"
+                                />
                               </span>
                             </template>
                           </div>
                           <p
-                            style="word-break:break-word;padding:5px;cursor:pointer"
-                            @click="showTask(index,taskDone)"
-                          >{{item.description}}</p>
-                          <div style="display:flex;justify-content:flex-end">
+                            style="
+                              word-break: break-word;
+                              padding: 5px;
+                              cursor: pointer;
+                            "
+                            @click="showTask(index, taskDone)"
+                          >
+                            {{ item.description }}
+                          </p>
+                          <div style="display: flex; justify-content: flex-end">
                             <Tag
                               color="default"
-                              style="cursor:default"
+                              style="cursor: default"
                               title="Executor"
-                            >{{item.managerName}}</Tag>
+                              >{{ item.managerName }}</Tag
+                            >
                           </div>
                         </div>
                       </Card>
@@ -303,8 +413,14 @@
             </Row>
           </template>
           <div v-show="chartSwitch">
-            <vue-scroll :ops="scrollOps" :style="{height:contentHeight - 15 +'px'}">
-              <gantt-elastic :tasks="ganttTasks" :options="ganttOptions"></gantt-elastic>
+            <vue-scroll
+              :ops="scrollOps"
+              :style="{ height: contentHeight - 15 + 'px' }"
+            >
+              <gantt-elastic
+                :tasks="ganttTasks"
+                :options="ganttOptions"
+              ></gantt-elastic>
             </vue-scroll>
           </div>
         </div>
@@ -319,7 +435,12 @@
     >
       <p>Do yout want to delete this task?</p>
     </Modal>
-    <Modal v-model="createTaskModal" title="Create Task" width="800px" :closable="false">
+    <Modal
+      v-model="createTaskModal"
+      title="Create Task"
+      width="800px"
+      :closable="false"
+    >
       <Form
         ref="formValidate"
         :model="formValidate"
@@ -340,7 +461,7 @@
             type="textarea"
             placeholder="Fill in the description of task..."
             style="width: 560px"
-            :autosize="{minRows: 6}"
+            :autosize="{ minRows: 6 }"
           />
         </FormItem>
         <FormItem label="Start time" prop="startTime">
@@ -362,12 +483,16 @@
           ></DatePicker>
         </FormItem>
         <FormItem label prop="importance">
-          <Checkbox v-model="formValidate.importanceCheck">Important Task</Checkbox>
+          <Checkbox v-model="formValidate.importanceCheck"
+            >Important Task</Checkbox
+          >
         </FormItem>
       </Form>
       <div slot="footer">
-        <Button type="text" @click="createTaskModal=false">Cancel</Button>
-        <Button type="primary" @click="createTask('formValidate')">Create</Button>
+        <Button type="text" @click="createTaskModal = false">Cancel</Button>
+        <Button type="primary" @click="createTask('formValidate')"
+          >Create</Button
+        >
       </div>
     </Modal>
     <Modal
@@ -398,8 +523,8 @@
             v-model="formValidate.description"
             type="textarea"
             placeholder="Fill in the description of task..."
-            style="width:560px"
-            :autosize="{minRows: 6}"
+            style="width: 560px"
+            :autosize="{ minRows: 6 }"
           />
         </FormItem>
         <FormItem label="Start time" prop="startTime">
@@ -421,17 +546,21 @@
           ></DatePicker>
         </FormItem>
         <FormItem label prop="importance">
-          <Checkbox v-model="formValidate.importanceCheck">Important Task</Checkbox>
+          <Checkbox v-model="formValidate.importanceCheck"
+            >Important Task</Checkbox
+          >
         </FormItem>
       </Form>
       <div slot="footer">
-        <Button type="text" @click="editTaskModal=false">Cancel</Button>
-        <Button type="primary" @click="updateTask('formValidate')">Update</Button>
+        <Button type="text" @click="editTaskModal = false">Cancel</Button>
+        <Button type="primary" @click="updateTask('formValidate')"
+          >Update</Button
+        >
       </div>
     </Modal>
     <Modal v-model="taskDetailModal" title="Task Detail" width="800px">
       <div class="taskFormItem">
-        <span style="width:15%">Task name</span>
+        <span style="width: 15%">Task name</span>
         <Input
           style="width: 600px"
           :placeholder="this.taskPlaceHolder.name"
@@ -440,19 +569,19 @@
         />
       </div>
       <div class="taskFormItem">
-        <span style="width:15%">Description</span>
+        <span style="width: 15%">Description</span>
         <Input
           style="width: 600px"
           :placeholder="this.taskPlaceHolder.description"
           type="textarea"
           :rows="4"
           v-model="taskInfo.description"
-          :autosize="{minRows: 6}"
+          :autosize="{ minRows: 6 }"
           readonly
         />
       </div>
       <div class="taskFormItem">
-        <span style="width:15%">Start time</span>
+        <span style="width: 15%">Start time</span>
         <DatePicker
           type="datetime"
           format="yyyy-MM-dd HH:mm:ss"
@@ -462,8 +591,8 @@
           readonly
         ></DatePicker>
       </div>
-      <div class="taskFormItem" style="margin-bottom:10px">
-        <span style="width:15%">End time</span>
+      <div class="taskFormItem" style="margin-bottom: 10px">
+        <span style="width: 15%">End time</span>
         <DatePicker
           type="datetime"
           format="yyyy-MM-dd HH:mm:ss"
@@ -481,35 +610,37 @@
 import dayjs from "dayjs";
 import draggable from "vuedraggable";
 import GanttElastic from "gantt-elastic";
+import loginModal from "../../../user/userState/loginModal.vue";
 export default {
   components: {
     draggable,
     dayjs,
-    ganttElastic: GanttElastic
+    ganttElastic: GanttElastic,
+    loginModal,
   },
   data() {
     return {
-      pageParams:{},
-      userRole:"Manager",
+      pageParams: {},
+      userRole: "Manager",
       todoLoading: true,
       doingLoading: true,
       doneLoading: true,
       ops: {
         bar: {
-          background: "#808695"
-        }
+          background: "#808695",
+        },
       },
       scrollOps: {
         bar: {
           background: "#808080",
           keepShow: true,
-          size: "8px"
+          size: "8px",
         },
         rail: {
           background: "#d7d7d7",
           opacity: 0.8,
-          size: "10px"
-        }
+          size: "10px",
+        },
       },
       // 后台获取的subproject下的task列表
       taskList: [],
@@ -525,7 +656,7 @@ export default {
         description: "Please input the task description.",
         name: "Please input the task name",
         startTime: "Choose the start time of task",
-        endTime: "Choose the end time of task"
+        endTime: "Choose the end time of task",
       },
       //task相关
       taskInfo: {},
@@ -539,17 +670,17 @@ export default {
         description: "",
         startTime: "",
         endTime: "",
-        importanceCheck: false
+        importanceCheck: false,
       },
       ruleValidate: {
         taskName: [
-          { required: true, message: "Please enter name...", trigger: "blur" }
+          { required: true, message: "Please enter name...", trigger: "blur" },
         ],
         description: [
-          { required: true, message: "Please select type...", trigger: "blur" }
+          { required: true, message: "Please select type...", trigger: "blur" },
         ],
         startTime: [{ required: true, type: "date", trigger: "blur" }],
-        endTime: [{ required: true, type: "date", trigger: "blur" }]
+        endTime: [{ required: true, type: "date", trigger: "blur" }],
       },
       contentHeight: "",
       chartSwitch: false, // 切换至甘特图
@@ -562,67 +693,67 @@ export default {
           start: new Date(),
           end: new Date(),
           progress: 0,
-          type: "task"
-        }
+          type: "task",
+        },
       ],
       ganttOptions: {
         maxRows: 100,
         maxHeight: this.contentHeight - 60,
         row: {
-          height: 24
+          height: 24,
         },
         calendar: {
           hour: {
-            display: false
-          }
+            display: false,
+          },
         },
         chart: {
           progress: {
-            bar: false
+            bar: false,
           },
           expander: {
-            display: true
-          }
+            display: true,
+          },
         },
         taskList: {
           expander: {
-            straight: false
+            straight: false,
           },
           columns: [
             {
               id: 1,
               label: "ID",
               value: "id",
-              width: 40
+              width: 40,
             },
             {
               id: 2,
               label: "Name",
               value: "name",
               width: 200,
-              expander: true
+              expander: true,
             },
             {
               id: 3,
               label: "Assigned to",
               value: "user",
-              width: 100
+              width: 100,
             },
             {
               id: 4,
               label: "Start",
-              value: task => dayjs(task.start).format("YYYY-MM-DD"),
-              width: 90
+              value: (task) => dayjs(task.start).format("YYYY-MM-DD"),
+              width: 90,
             },
             {
               id: 5,
               label: "End",
-              value: task => dayjs(task.end).format("YYYY-MM-DD"),
-              width: 90
-            }
-          ]
-        }
-      }
+              value: (task) => dayjs(task.end).format("YYYY-MM-DD"),
+              width: 90,
+            },
+          ],
+        },
+      },
     };
   },
   created() {
@@ -636,30 +767,30 @@ export default {
   beforeRouteLeave(to, from, next) {
     next();
   },
-  beforeDestroy: function() {
+  beforeDestroy: function () {
     window.removeEventListener("resize", this.initSize);
   },
   methods: {
-    getPageInfo(){
-        var href = window.location.href;
-        var url = href.split("&");
+    getPageInfo() {
+      var href = window.location.href;
+      var url = href.split("&");
 
-        for (var i = 0; i < url.length; i++) {
-            if (/groupID/.test(url[i])) {
-                this.pageParams.pageId = url[i].match(/groupID=(\S*)/)[1];
-                continue;
-            }
-
-            if (/userID/.test(url[i])) {
-                this.pageParams.userId = url[i].match(/userID=(\S*)/)[1];
-                continue;
-            }
-
-            if (/userName/.test(url[i])) {
-                this.pageParams.userName = url[i].match(/userName=(\S*)/)[1];
-                continue;
-            }
+      for (var i = 0; i < url.length; i++) {
+        if (/groupID/.test(url[i])) {
+          this.pageParams.pageId = url[i].match(/groupID=(\S*)/)[1];
+          continue;
         }
+
+        if (/userID/.test(url[i])) {
+          this.pageParams.userId = url[i].match(/userID=(\S*)/)[1];
+          continue;
+        }
+
+        if (/userName/.test(url[i])) {
+          this.pageParams.userName = url[i].match(/userName=(\S*)/)[1];
+          continue;
+        }
+      }
     },
     initSize() {
       this.contentHeight = window.innerHeight - 210;
@@ -675,14 +806,14 @@ export default {
         description: "",
         startTime: "",
         endTime: "",
-        state: "todo"
+        state: "todo",
       };
       this.$set(this, "taskInfo", taskDefult);
       this.$set(this, "formValidate", taskDefult);
       this.createTaskModal = true;
     },
     createTask(name) {
-      this.$refs[name].validate(valid => {
+      this.$refs[name].validate((valid) => {
         if (valid) {
           let taskForm = {};
           taskForm["taskName"] = this.formValidate.taskName;
@@ -698,16 +829,15 @@ export default {
           taskForm["order"] = this.taskTodo.length;
           this.axios
             .post("/GeoProblemSolving/task/save", taskForm)
-            .then(res => {
+            .then((res) => {
               if (res.data == "Offline") {
-                this.$store.commit("userLogout");
-                this.$router.push({ name: "Login" });
+                confirm("You are offline, please login.");
               } else if (res.data != "Fail") {
                 this.addNewTask(res.data);
                 this.createTaskModal = false;
               }
             })
-            .catch(err => {});
+            .catch((err) => {});
         } else {
           this.$Message.error("Please enter the necessary information!");
         }
@@ -722,17 +852,16 @@ export default {
       taskForm.append("importance", task.importance);
       this.axios
         .post("/GeoProblemSolving/task/update", taskForm)
-        .then(res => {
+        .then((res) => {
           if (res.data == "Offline") {
-            this.$store.commit("userLogout");
-            this.$router.push({ name: "Login" });
+            confirm("You are offline, please login.");
           } else if (res.data != "None" && res.data != "Fail") {
             this.$Message.info("Changed the importance of one task.");
           } else {
             this.$Message.error("Fail!");
           }
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err.data);
         });
     },
@@ -745,7 +874,7 @@ export default {
             "&value=" +
             taskList[index]["taskId"]
         )
-        .then(res => {
+        .then((res) => {
           if (res.data != "Fail") {
             let taskInfoRes = res.data[0];
             taskInfoRes.startTime = new Date(taskInfoRes.startTime);
@@ -757,7 +886,7 @@ export default {
             this.$Message.error("Fail!");
           }
         })
-        .catch(err => {
+        .catch((err) => {
           this.$Message.error("Fail!");
         });
     },
@@ -769,7 +898,7 @@ export default {
             "&value=" +
             taskList[index]["taskId"]
         )
-        .then(res => {
+        .then((res) => {
           if (res.data != "Fail") {
             let taskInfoRes = res.data[0];
             taskInfoRes.startTime = new Date(taskInfoRes.startTime);
@@ -780,7 +909,7 @@ export default {
             this.$Message.error("Fail!");
           }
         })
-        .catch(err => {
+        .catch((err) => {
           this.$Message.error("Fail!");
         });
     },
@@ -821,7 +950,7 @@ export default {
     },
     //更新某个task
     updateTask(name) {
-      this.$refs[name].validate(valid => {
+      this.$refs[name].validate((valid) => {
         if (valid) {
           let taskForm = new URLSearchParams();
           taskForm.append("taskId", this.formValidate.taskId);
@@ -833,10 +962,9 @@ export default {
           taskForm.append("importance", importance);
           this.axios
             .post("/GeoProblemSolving/task/update", taskForm)
-            .then(res => {
+            .then((res) => {
               if (res.data == "Offline") {
-                this.$store.commit("userLogout");
-                this.$router.push({ name: "Login" });
+                confirm("You are offline, please login.");
               } else if (res.data != "None" && res.data != "Fail") {
                 this.updateTaskList(res.data); // 只更新单个任务
                 this.editTaskModal = false;
@@ -844,7 +972,7 @@ export default {
                 this.$Message.error("Fail!");
               }
             })
-            .catch(err => {
+            .catch((err) => {
               console.log(err.data);
             });
         } else {
@@ -865,7 +993,7 @@ export default {
             "subProjectId=" +
             this.pageParams.pageId
         )
-        .then(res => {
+        .then((res) => {
           this.todoLoading = false;
           if (res.data != "None" && res.data != "Fail") {
             this.$set(this, "taskTodo", res.data);
@@ -873,7 +1001,7 @@ export default {
             this.$Message.error("Fail!");
           }
         })
-        .catch(err => {
+        .catch((err) => {
           this.todoLoading = false;
           console.log(err.data);
         });
@@ -885,7 +1013,7 @@ export default {
             "subProjectId=" +
             this.pageParams.pageId
         )
-        .then(res => {
+        .then((res) => {
           this.doingLoading = false;
           if (res.data != "None" && res.data != "Fail") {
             this.$set(this, "taskDoing", res.data);
@@ -893,7 +1021,7 @@ export default {
             this.$Message.error("Fail!");
           }
         })
-        .catch(err => {
+        .catch((err) => {
           this.doingLoading = false;
           console.log(err.data);
         });
@@ -905,7 +1033,7 @@ export default {
             "subProjectId=" +
             this.pageParams.pageId
         )
-        .then(res => {
+        .then((res) => {
           this.doneLoading = false;
           if (res.data != "None" && res.data != "Fail") {
             this.$set(this, "taskDone", res.data);
@@ -913,7 +1041,7 @@ export default {
             this.$Message.error("Fail!");
           }
         })
-        .catch(err => {
+        .catch((err) => {
           this.doneLoading = false;
           console.log(err.data);
         });
@@ -934,7 +1062,7 @@ export default {
       this.taskOrderUpdate(taskList, type);
     },
     taskOrderUpdate(taskList, type) {
-      if (this.userRole != "Visitor") {
+      if (this.userRole != "visitor") {
         let thisUserName = this.$store.getters.userName;
         let stateChangeIndex = 0;
         let count = taskList.length;
@@ -950,17 +1078,16 @@ export default {
               taskUpdateObj.append("managerName", thisUserName);
               this.axios
                 .post("/GeoProblemSolving/task/update", taskUpdateObj)
-                .then(res => {
+                .then((res) => {
                   count--;
                   if (res.data == "Offline") {
-                    this.$store.commit("userLogout");
-                    this.$router.push({ name: "Login" });
+                    confirm("You are offline, please login.");
                   } else if (res.data != "Fail") {
                     //更新数组
                     taskList[stateChangeIndex].managerName = thisUserName;
                   }
                 })
-                .catch(err => {
+                .catch((err) => {
                   console.log(err.data);
                 });
             } else {
@@ -970,15 +1097,14 @@ export default {
               taskUpdateObj.append("state", type);
               this.axios
                 .post("/GeoProblemSolving/task/update", taskUpdateObj)
-                .then(res => {
+                .then((res) => {
                   count--;
                   if (res.data == "Offline") {
-                    this.$store.commit("userLogout");
-                    this.$router.push({ name: "Login" });
+                    confirm("You are offline, please login.");
                   } else if (res.data != "Fail") {
                   }
                 })
-                .catch(err => {
+                .catch((err) => {
                   console.log(err.data);
                 });
             }
@@ -998,14 +1124,14 @@ export default {
             "?taskId=" +
             this.taskList[this.selectTaskIndex]["taskId"]
         )
-        .then(res => {
+        .then((res) => {
           if (res.data == "Success") {
             this.taskList.splice(this.selectTaskIndex, 1);
           } else {
             this.$Message.error("Fail!");
           }
         })
-        .catch(err => {
+        .catch((err) => {
           this.$Message.error("Fail!");
         });
     },
@@ -1044,9 +1170,9 @@ export default {
           progress: 100,
           style: {
             base: {
-              fill: "#1EBC61"
-            }
-          }
+              fill: "#1EBC61",
+            },
+          },
         };
         this.ganttTasks.push(gantttask);
       }
@@ -1061,9 +1187,9 @@ export default {
           progress: 100,
           style: {
             base: {
-              fill: "#F90"
-            }
-          }
+              fill: "#F90",
+            },
+          },
         };
         this.ganttTasks.push(gantttask);
       }
@@ -1078,9 +1204,9 @@ export default {
           progress: 100,
           style: {
             base: {
-              fill: "#57A3F3"
-            }
-          }
+              fill: "#57A3F3",
+            },
+          },
         };
         this.ganttTasks.push(gantttask);
       }
@@ -1096,7 +1222,7 @@ export default {
       this.chartSwitch = true;
 
       this.initGantt();
-    }
-  }
+    },
+  },
 };
 </script>

@@ -1,7 +1,6 @@
 package cn.edu.njnu.geoproblemsolving.business.activity.controller;
 
 import cn.edu.njnu.geoproblemsolving.business.activity.dto.UpdateActivityDTO;
-import cn.edu.njnu.geoproblemsolving.business.activity.entity.LinkProtocol;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Subproject;
 import cn.edu.njnu.geoproblemsolving.business.activity.service.SubprojectService;

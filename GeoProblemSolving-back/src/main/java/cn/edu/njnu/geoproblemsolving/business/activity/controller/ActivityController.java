@@ -3,7 +3,6 @@ package cn.edu.njnu.geoproblemsolving.business.activity.controller;
 import cn.edu.njnu.geoproblemsolving.business.activity.dto.UpdateActivityDTO;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
-import cn.edu.njnu.geoproblemsolving.business.activity.entity.LinkProtocol;
 import cn.edu.njnu.geoproblemsolving.business.activity.service.ActivityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -149,23 +148,10 @@ public class ActivityController {
         return activityService.findNext(aid);
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/{aid}/next")
-    public JsonResult createNextActivity(@PathVariable("aid") String aid, @RequestParam("nextId") String nextId, @RequestBody LinkProtocol protocol) {
-        logger.info("createNextActivity");
-        return activityService.createNext(aid, nextId, protocol);
-
-    }
-
     @RequestMapping(method = RequestMethod.GET, value = "/{aid}/last")
     public JsonResult getLastActivities(@PathVariable("aid") String aid) {
         logger.info("getLastActivities");
         return activityService.findLast(aid);
-    }
-
-    @RequestMapping(method = RequestMethod.POST, value = "/{aid}/last")
-    public JsonResult createLastActivity(@PathVariable("aid") String aid, @RequestParam("lastId") String lastId, @RequestBody LinkProtocol protocol) {
-        logger.info("createLastActivity");
-        return activityService.createLast(aid, lastId, protocol);
     }
 
     /**

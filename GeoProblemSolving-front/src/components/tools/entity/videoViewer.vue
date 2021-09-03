@@ -17,28 +17,51 @@
 </style>
 <template>
   <div>
-    <div class="sidebar" style="width:60px;float:left" :style="{height:windowHeight+'px'}">
-      <div style="display:flex;justify-content:center;margin-top:20px" title="Resources">
-        <span @click="resourceDrawer=true" style="cursor:pointer">
+    <div
+      class="sidebar"
+      style="width: 60px; float: left"
+      :style="{ height: windowHeight + 'px' }"
+    >
+      <div
+        style="display: flex; justify-content: center; margin-top: 20px"
+        title="Resources"
+      >
+        <span @click="resourceDrawer = true" style="cursor: pointer">
           <Icon type="md-folder" :size="40" color="white" />
         </span>
-        <Drawer title="Resources" :closable="false" v-model="resourceDrawer" placement="left">
-          <div style="height:45%;overflow-y:auto">
+        <Drawer
+          title="Resources"
+          :closable="false"
+          v-model="resourceDrawer"
+          placement="left"
+        >
+          <div style="height: 45%; overflow-y: auto">
             <ul>
               <li
-                v-for="(resource,index) in videoList"
+                v-for="(resource, index) in videoList"
                 :key="index"
                 @click="selectVideo(resource.pathURL)"
-                style="cursor:pointer;margin-bottom:10px"
+                style="cursor: pointer; margin-bottom: 10px"
                 :title="resource.description"
-              >{{resource.name}}</li>
+              >
+                {{ resource.name }}
+              </li>
             </ul>
           </div>
         </Drawer>
       </div>
     </div>
-    <div :style="{height:windowHeight+'px'}" style="float:left;padding-left:100px;padding-top:40px">
-      <video :width="videoWidth" :height="videoHeight" :src="videoUrl" controls class="videoPanel"></video>
+    <div
+      :style="{ height: windowHeight + 'px' }"
+      style="float: left; padding-left: 100px; padding-top: 40px"
+    >
+      <video
+        :width="videoWidth"
+        :height="videoHeight"
+        :src="videoUrl"
+        controls
+        class="videoPanel"
+      ></video>
     </div>
   </div>
 </template>
@@ -54,11 +77,11 @@ export default {
       activeItem: 0,
       resourceDrawer: false,
       pageParams: { pageId: "", userId: "", userName: "" },
-      userInfo: {}
+      userInfo: {},
     };
   },
   beforeRouteEnter: (to, from, next) => {
-    next(vm => {
+    next((vm) => {
       if (!vm.$store.getters.userState) {
         next("/login");
       } else {
@@ -73,7 +96,7 @@ export default {
     this.getUserInfo();
     this.getVideoResource();
   },
-  beforeDestroy: function() {
+  beforeDestroy: function () {
     window.removeEventListener("resize", this.initSize);
   },
   methods: {
@@ -120,16 +143,16 @@ export default {
         this.axios
           .get(
             "/GeoProblemSolving/user" +
-            "?key=userId" +
-            "&value=" +
+              "?key=userId" +
+              "&value=" +
               this.pageParams.userId
           )
-          .then(res => {
+          .then((res) => {
             if (res.data.code == 0) {
               this.$set(this, "userInfo", res.data.data);
             }
           })
-          .catch(err => {});
+          .catch((err) => {});
       }
     },
     getVideoResource() {
@@ -143,7 +166,7 @@ export default {
         .get(
           "/GeoProblemSolving/folder/inquiry?folderId=" + this.pageParams.pageId
         )
-        .then(res => {
+        .then((res) => {
           // 写渲染函数，取到所有资源
           if (res.data !== "None") {
             for (let i = 0; i < res.data.files.length; i++) {
@@ -155,7 +178,7 @@ export default {
             this.videoList = [];
           }
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err.data);
         });
     },
@@ -183,13 +206,13 @@ export default {
       formData.append("folderId", this.pageParams.pageId);
       this.axios
         .post("/GeoProblemSolving/folder/uploadToFolder", formData)
-        .then(res => {
+        .then((res) => {
           if (
             res.data.sizeOver.length > 0 ||
             res.data.failed.length > 0 ||
             res.data == "Offline"
           ) {
-            console.log(res.data);
+            confirm("You are offline, please login.");
           } else if (res.data.uploaded.length > 0) {
             let videoName = res.data.uploaded[0].name;
             this.videoUrl = "/GeoProblemSolving/resource/upload/" + videoName;
@@ -197,15 +220,15 @@ export default {
             let videoItem = {
               name: file.name,
               description: "video viewer tool",
-              pathURL: "/GeoProblemSolving/resource/upload/" + videoName
+              pathURL: "/GeoProblemSolving/resource/upload/" + videoName,
             };
             this.videoList.push(videoItem);
             this.activeItem = this.videoList.length - 1;
           }
         })
-        .catch(err => {});
+        .catch((err) => {});
       return false;
-    }
-  }
+    },
+  },
 };
 </script>

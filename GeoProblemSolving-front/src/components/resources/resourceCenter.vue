@@ -278,7 +278,7 @@ export default {
         }
       },
       filesToPackage: [],
-      userRole: "Visitor"
+      userRole: "visitor"
     };
   },
   beforeRouteEnter: (to, from, next) => {
@@ -421,7 +421,7 @@ export default {
       this.getResourceInfo();
     },
     userRoleIdentity(level) {
-      this.userRole = "Visitor";
+      this.userRole = "visitor";
       if (this.$store.getters.userState) {
         if (level == "subproject") {
           // 是否是子项目管理员
@@ -448,7 +448,7 @@ export default {
           }
         }
       } else {
-        this.userRole = "Visitor";
+        this.userRole = "visitor";
       }
     },
     changeStep(stepId) {

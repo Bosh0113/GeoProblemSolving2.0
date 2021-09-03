@@ -960,14 +960,17 @@
         >
       </div>
     </Modal>
-    <login-modal :tempLoginModal="tempLoginModal" @changeLoginModal="changeLoginModal"></login-modal>
+    <login-modal
+      :tempLoginModal="tempLoginModal"
+      @changeLoginModal="changeLoginModal"
+    ></login-modal>
   </div>
 </template>
 <script>
 import dayjs from "dayjs";
 import draggable from "vuedraggable";
 import GanttElastic from "gantt-elastic";
-import loginModal from "../../../user/userState/loginModal.vue"
+import loginModal from "../../../user/userState/loginModal.vue";
 import * as socketApi from "../../../../api/socket";
 export default {
   components: {
@@ -976,12 +979,7 @@ export default {
     ganttElastic: GanttElastic,
     loginModal,
   },
-  props: [
-    "activityInfo",
-    "projectInfo",
-    "childActivities",
-    "userInfo"
-  ],
+  props: ["activityInfo", "projectInfo", "childActivities", "userInfo"],
   data() {
     return {
       // userInfo: JSON.parse(sessionStorage.getItem("userInfo")),
@@ -989,8 +987,8 @@ export default {
       todoLoading: true,
       doingLoading: true,
       editTaskState: "",
-      removeTaskState:"",
-      socketId:"",
+      removeTaskState: "",
+      socketId: "",
       doneLoading: true,
       ops: {
         bar: {
@@ -1155,11 +1153,11 @@ export default {
     //     socketApi.sendSock(this.socketId, {"type":"test"}, this.socketOnMessage);
     //   }
     // },
-    socketOnMessage(messageJson){
+    socketOnMessage(messageJson) {
       let behavior = messageJson.behavior;
       let content = messageJson.content;
-      if (messageJson.type == "task"){
-        if(behavior == "create"){
+      if (messageJson.type == "task") {
+        if (behavior == "create") {
           let task = content.newTask;
           this.taskTodo.push(task);
         } else if (behavior == "importance") {
@@ -1168,25 +1166,25 @@ export default {
           let importance = content.importance;
           switch (taskState) {
             case "todo":
-              this.taskTodo.forEach(item => {
+              this.taskTodo.forEach((item) => {
                 if (item.taskId == taskId) {
                   item.importance = importance;
                 }
-              })
+              });
               break;
             case "doing":
-              this.taskDoing.forEach(item => {
+              this.taskDoing.forEach((item) => {
                 if (item.taskId == taskId) {
                   item.importance = importance;
                 }
-              })
+              });
               break;
             case "done":
-              this.taskDone.forEach(item => {
+              this.taskDone.forEach((item) => {
                 if (item.taskId == taskId) {
                   item.importance = importance;
                 }
-              })
+              });
               break;
           }
         } else if (behavior == "updateTask") {
@@ -1195,25 +1193,25 @@ export default {
           let taskId = putTask.taskId;
           switch (taskState) {
             case "todo":
-              this.taskTodo.forEach(item => {
+              this.taskTodo.forEach((item) => {
                 if (item.taskId == taskId) {
                   Object.assign(item, putTask);
                 }
-              })
+              });
               break;
             case "doing":
-              this.taskDoing.forEach(item => {
+              this.taskDoing.forEach((item) => {
                 if (item.taskId == taskId) {
                   Object.assign(item, putTask);
                 }
-              })
+              });
               break;
             case "done":
-              this.taskDone.forEach(item => {
+              this.taskDone.forEach((item) => {
                 if (item.taskId == taskId) {
                   Object.assign(item, putTask);
                 }
-              })
+              });
               break;
           }
         } else if (behavior == "order") {
@@ -1230,7 +1228,7 @@ export default {
               this.$set(this, "taskDone", taskList);
               break;
           }
-        }else if (behavior == "remove"){
+        } else if (behavior == "remove") {
           let taskState = content.state;
           let index = content.removeIndex;
           switch (taskState) {
@@ -1260,7 +1258,7 @@ export default {
         operation
       );
     },
-    changeLoginModal(status){
+    changeLoginModal(status) {
       this.tempLoginModal = status;
     },
     //创建任务
@@ -1299,7 +1297,6 @@ export default {
             .then((res) => {
               if (res.data == "Offline") {
                 this.$store.commit("userLogout");
-                // this.$router.push({ name: "Login" });
                 this.tempLoginModal = true;
               } else if (res.data != "Fail") {
                 this.addNewTask(res.data);
@@ -1321,10 +1318,14 @@ export default {
                 sockMsg["type"] = "task";
                 sockMsg["behavior"] = "create";
                 sockMsg["content"] = {
-                  "newTask": res.data,
+                  newTask: res.data,
                 };
                 sockMsg["sender"] = this.userInfo.userId;
-                socketApi.sendSock(this.socketId, sockMsg, this.socketOnMessage);
+                socketApi.sendSock(
+                  this.socketId,
+                  sockMsg,
+                  this.socketOnMessage
+                );
               }
             })
             .catch((err) => {});
@@ -1353,19 +1354,18 @@ export default {
             sockMsg["type"] = "task";
             sockMsg["behavior"] = "importance";
             sockMsg["content"] = {
-              "taskId": task.taskId,
-              "state": task.state,
-              "importance": task.importance
+              taskId: task.taskId,
+              state: task.state,
+              importance: task.importance,
             };
             sockMsg["sender"] = this.userInfo.userId;
             socketApi.sendSock(this.socketId, sockMsg, this.socketOnMessage);
-
           } else {
             this.$Message.error("Fail!");
           }
         })
         .catch((err) => {
-        console.log(err.data);
+          console.log(err.data);
         });
     },
     //打开task编辑器
@@ -1494,11 +1494,15 @@ export default {
                 sockMsg["type"] = "task";
                 sockMsg["behavior"] = "updateTask";
                 sockMsg["content"] = {
-                  "state": this.editTaskState,
-                  "editedTask": taskForm
+                  state: this.editTaskState,
+                  editedTask: taskForm,
                 };
                 sockMsg["sender"] = this.userInfo.userId;
-                socketApi.sendSock(this.socketId, sockMsg, this.socketOnMessage);
+                socketApi.sendSock(
+                  this.socketId,
+                  sockMsg,
+                  this.socketOnMessage
+                );
 
                 this.editTaskModal = false;
               } else {
@@ -1530,8 +1534,8 @@ export default {
           this.todoLoading = false;
           if (res.data == "Offline") {
             this.$store.commit("userLogout");
-            this.$router.push({ name: "Login" });
-          }else if (res.data != "None" && res.data != "Fail") {
+            this.tempLoginModal = true;
+          } else if (res.data != "None" && res.data != "Fail") {
             this.$set(this, "taskTodo", res.data);
           } else {
             this.$Message.error("Fail!");
@@ -1551,8 +1555,9 @@ export default {
         .then((res) => {
           this.doingLoading = false;
           if (res.data == "Offline") {
-
-          }else if (res.data != "None" && res.data != "Fail") {
+            this.$store.commit("userLogout");
+            this.tempLoginModal = true;
+          } else if (res.data != "None" && res.data != "Fail") {
             this.$set(this, "taskDoing", res.data);
           } else {
             this.$Message.error("Fail!");
@@ -1572,8 +1577,9 @@ export default {
         .then((res) => {
           this.doneLoading = false;
           if (res.data == "Offline") {
-
-          }else if (res.data != "None" && res.data != "Fail") {
+            this.$store.commit("userLogout");
+            this.tempLoginModal = true;
+          } else if (res.data != "None" && res.data != "Fail") {
             this.$set(this, "taskDone", res.data);
           } else {
             this.$Message.error("Fail!");
@@ -1658,8 +1664,8 @@ export default {
       sockMsg["type"] = "task";
       sockMsg["behavior"] = "order";
       sockMsg["content"] = {
-        "state": type,
-        "taskList": taskList
+        state: type,
+        taskList: taskList,
       };
       sockMsg["sender"] = this.userInfo.userId;
       socketApi.sendSock(this.socketId, sockMsg, this.socketOnMessage);
@@ -1685,13 +1691,12 @@ export default {
             // this.$router.push({ name: "Login" });
             this.tempLoginModal = true;
           } else if (res.data == "Success") {
-
             let sockMsg = {};
             sockMsg["type"] = "task";
             sockMsg["behavior"] = "remove";
             sockMsg["content"] = {
-              "state": this.removeTaskState,
-              "removeIndex": this.selectTaskIndex
+              state: this.removeTaskState,
+              removeIndex: this.selectTaskIndex,
             };
             sockMsg["sender"] = this.userInfo.userId;
             socketApi.sendSock(this.socketId, sockMsg, this.socketOnMessage);
@@ -1701,8 +1706,10 @@ export default {
               "remove",
               this.taskList[this.selectTaskIndex]
             );
-            this.$store.commit("updateActivityTasks", {behavior: "remove", task: this.taskList.splice(this.selectTaskIndex, 1)});
-
+            this.$store.commit("updateActivityTasks", {
+              behavior: "remove",
+              task: this.taskList.splice(this.selectTaskIndex, 1),
+            });
           } else {
             this.$Message.error("Fail!");
           }
@@ -1723,7 +1730,7 @@ export default {
             this.childActivities[i].level;
         }
       }
-  },
+    },
     initGantt() {
       let taskNum =
         this.taskDoing.length + this.taskTodo.length + this.taskDone.length;

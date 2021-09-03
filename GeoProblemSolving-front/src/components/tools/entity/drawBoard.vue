@@ -593,7 +593,7 @@ export default {
               res.data.failed.length > 0 ||
               res.data == "Offline"
             ) {
-              console.log(res.data);
+                confirm("You are offline, please login.");
             } else if (res.data.uploaded.length > 0) {
                 that.$Notice.open({
                   title: "Upload notification title",

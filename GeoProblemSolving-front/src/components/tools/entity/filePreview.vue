@@ -263,7 +263,7 @@ export default {
             res.data.failed.length > 0 ||
             res.data == "Offline"
           ) {
-            console.log(res.data);
+                confirm("You are offline, please login.");
           } else if (res.data.uploaded.length > 0) {
             let fileName = res.data.uploaded[0].name;
             this.fileURL = "/GeoProblemSolving/resource/upload/" + fileName;
