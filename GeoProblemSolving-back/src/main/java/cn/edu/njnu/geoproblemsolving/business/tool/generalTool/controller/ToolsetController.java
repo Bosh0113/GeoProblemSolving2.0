@@ -48,6 +48,11 @@ public class ToolsetController {
     //     }
     // }
 
+    /**
+     * 创建工具集
+     * @param toolSet
+     * @return
+     */
     @RequestMapping(method = RequestMethod.POST, produces = {"application/json;charset=UTF-8"})
     public JsonResult createToolSet(@RequestBody Tool toolSet){
         ToolSetVo toolSetVo = toolService.createToolSet(toolSet);
@@ -65,6 +70,14 @@ public class ToolsetController {
     //     }
     // }
 
+
+    /**
+     * 根据字段查询
+     * 支持同时满足多字段
+     * @param key
+     * @param value
+     * @return
+     */
     @RequestMapping(value = "/{key}/{value}", method = RequestMethod.GET)
     public JsonResult queryToolSet(@PathVariable ArrayList<String> key, @PathVariable ArrayList<String> value){
         List<Tool> toolSets = toolService.queryTool(key, value);
@@ -73,18 +86,22 @@ public class ToolsetController {
     }
 
 
+    /**
+     * 工具与工具集统一，使用 tool 的接口即可。
+     */
     // @RequestMapping(value = "/inquiryAll", method = RequestMethod.GET)
     // public Object readAllProject(@RequestParam("provider") String provider) {
     //     ToolsetDaoImpl toolsetDao = new ToolsetDaoImpl(mongoTemplate);
     //     return toolsetDao.readAccessibleToolsets(provider);
     // }
 
-    @RequestMapping(value = "/{provider}", method = RequestMethod.GET)
-    public JsonResult readUserToolsets(@PathVariable String provider){
-        List<Tool> toolByProviderService = toolService.getToolByProviderService(provider);
-        if (toolByProviderService != null) return ResultUtils.success(toolByProviderService);
-        return ResultUtils.error(-2, "Fail");
-    }
+    //
+    // @RequestMapping(value = "/{provider}", method = RequestMethod.GET)
+    // public JsonResult readUserToolsets(@PathVariable String provider){
+    //     List<Tool> toolByProviderService = toolService.getToolByProviderService(provider);
+    //     if (toolByProviderService != null) return ResultUtils.success(toolByProviderService);
+    //     return ResultUtils.error(-2, "Fail");
+    // }
 
     // @RequestMapping(value = "/delete", method = RequestMethod.GET)
     // public String deleteToolset(@RequestParam("tsId") String tsId){
@@ -97,6 +114,11 @@ public class ToolsetController {
     //     }
     // }
 
+    /**
+     * 删除数据集
+     * @param tid
+     * @return
+     */
     @RequestMapping(value = "/{tid}", method = RequestMethod.DELETE)
     public JsonResult deleteToolSet(@PathVariable String tid){
         toolService.delToolService(tid);
@@ -106,6 +128,11 @@ public class ToolsetController {
 
     /**
      * 上传工具集图片
+     * 1.应用步骤传入（这个接口），返回图片地址
+     * 2.调用更新接口，将图片地址存入
+     *
+     * 第二种方式：
+     * 直接将图片 base64 地址存入字段
      * @param request
      * @return 图片地址
      * @throws IOException
@@ -128,7 +155,7 @@ public class ToolsetController {
      * 必须携带 toolSetId
      * 将需要修改的字段携带过来即可
      * @param putToolSet
-     * @return
+     * @return 修改后的工具集
      */
     @RequestMapping(method = RequestMethod.PUT, produces = {"application/json;charset=UTF-8"})
     public JsonResult updateToolSet(@RequestBody Tool putToolSet){
@@ -156,9 +183,9 @@ public class ToolsetController {
     /**
      * 处理工具集的工具
      * 添加工具
-     * @param toolSetId
-     * @param tids
-     * @return
+     * @param toolSetId 工具集 id
+     * @param tids 要添加的工具 id，若有多个则用 “,” 分开
+     * @return 工具集
      */
     @RequestMapping(value = "/tool/{toolSetId}/{tids}", method = RequestMethod.POST)
     public JsonResult addTool(@PathVariable String toolSetId, @PathVariable ArrayList<String> tids){
@@ -168,8 +195,10 @@ public class ToolsetController {
     }
 
     /**
+     *
      * 处理工具集的工具
      * 删除工具
+     * 参数说明与上相同
      * @param toolSetId
      * @param tids
      * @return

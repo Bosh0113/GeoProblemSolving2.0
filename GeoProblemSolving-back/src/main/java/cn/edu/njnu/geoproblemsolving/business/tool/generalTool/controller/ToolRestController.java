@@ -145,16 +145,4 @@ public class ToolRestController {
         List<Tool> toolList = toolService.getToolByIds(ids);
         return ResultUtils.success(toolList);
     }
-
-    /**
-     * 上传工具图片
-     * @param request
-     * @return 图片地址
-     * @throws IOException
-     * @throws ServletException
-     */
-    @RequestMapping(value = "/img", method = RequestMethod.POST)
-    public JsonResult uploadPicture(HttpServletRequest request) throws IOException, ServletException {
-        return toolService.uploadToolImg(request);
-    }
 }
