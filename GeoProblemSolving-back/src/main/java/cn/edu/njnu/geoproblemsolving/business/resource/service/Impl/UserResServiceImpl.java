@@ -558,6 +558,23 @@ public class UserResServiceImpl implements UserResService {
         return getAllResult.getJSONArray("data");
     }
 
+    @Override
+    public JsonResult changeFileLocation(String userId, String oldPath, String newPath, ResourceEntity resourceEntity) {
+        String access_token = userDao.findUserByIdOrEmail(userId).getTokenInfo().getAccess_token();
+        String url = "http://" + userServerIpAndPort + "/auth/res/" + newPath + "/" + oldPath;
+        JSONObject resInfo = JSONObject.parseObject(JSONObject.toJSONString(resourceEntity));
+        RestTemplateUtil httpUtil = new RestTemplateUtil();
+        JSONObject uploadResult = httpUtil.putRequestToServer(url, access_token, resInfo).getBody();
+        if (uploadResult.getInteger("code") != 0){
+            return ResultUtils.error(-2, "fail");
+        }
+        ArrayList<ResourceEntity> userRes = uploadResult.getObject("data", UserEntity.class).getResource();
+        //这有问题,转过去转过来的会导致某些数据类型失去原有属性
+        Update update = new Update();
+        update.set("resource", userRes);
+        return ResultUtils.success(userDao.updateInfo(userId, update).getResource());
+    }
+
     //
     @Override
     public Object searchResService(String userId, String key, String value) {

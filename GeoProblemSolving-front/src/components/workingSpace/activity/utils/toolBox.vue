@@ -53,8 +53,11 @@
           style="text-align: center"
         >
           <h2 style="color: #808695">No tools</h2>
-          <small style="color: #dcdee2"
-            >*Click the button on the top right to add tools.</small
+          <small style="color: #dcdee2" v-if="permissionIdentity(activityInfo.permission, userRole, 'manage_tool')"
+            >*Click the button to add tools.</small
+          >
+          <small style="color: #dcdee2" v-else
+            >*You do not have permission to manage tools.</small
           >
         </div>
         <div
@@ -136,7 +139,7 @@
               style="text-align: center; cursor: pointer"
               @click="useTool(tool)"
             >
-              <Tooltip placement="bottom" max-width="600">
+              <Tooltip placement="bottom" max-width="600" >
                 <img
                   :src="tool.toolImg"
                   v-if="tool.toolImg != '' && tool.toolImg != null"

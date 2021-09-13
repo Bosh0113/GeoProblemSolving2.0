@@ -20,4 +20,5 @@ public class ToolsetEntity {
     private String privacy;
     private String toolsetImg;
     private String createdTime;
+    private  boolean toolSet = true;
 }

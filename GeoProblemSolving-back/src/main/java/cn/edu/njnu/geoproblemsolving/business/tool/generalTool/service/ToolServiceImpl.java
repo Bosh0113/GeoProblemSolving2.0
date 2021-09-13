@@ -182,7 +182,7 @@ public class ToolServiceImpl implements ToolService {
         String tid = UUID.randomUUID().toString();
         String toolName = toolJson.getString("toolName");
         String description = toolJson.getString("description");
-        String creator = toolJson.getString("creator");
+        String provider = toolJson.getString("provider");
         String privacy = toolJson.getString("privacy");
         JSONArray recomSteps = toolJson.getJSONArray("recomStep");
         String toolImg = toolJson.getString("toolImg");
@@ -205,7 +205,7 @@ public class ToolServiceImpl implements ToolService {
         tool.setTid(tid);
         tool.setToolName(toolName);
         tool.setDescription(description);
-        tool.setProvider(creator);
+        tool.setProvider(provider);
         tool.setPrivacy(privacy);
         tool.setCreatedTime(createDate);
         tool.setRecommendation(recommendation);

@@ -54,7 +54,7 @@ public class ToolsetController {
     public String deleteToolset(@RequestParam("tsId") String tsId){
         ToolsetDaoImpl toolsetDao = new ToolsetDaoImpl(mongoTemplate);
         try {
-            toolsetDao.deleteToolset("tsId",tsId);
+            toolsetDao.deleteToolset("tsid",tsId);
             return "Success";
         }catch (Exception e){
             return "Fail";

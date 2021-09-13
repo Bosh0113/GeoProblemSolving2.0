@@ -218,6 +218,16 @@ public class UserResController {
         return ResultUtils.error(-2, "fail");
     }
 
+    @RequestMapping(value = "/file/{newPath}/{oldPath}", method = RequestMethod.PUT)
+    public JsonResult changeFileFolder(@PathVariable String newPath,
+                                       @PathVariable String oldPath,
+                                       @RequestBody ResourceEntity resourceEntity,
+                                       HttpServletRequest req){
+        String userId = (String) req.getSession().getAttribute("userId");
+//        String userId = "d174bf5a-e17e-4c5a-b840-1bf624c9e465";
+        return resService.changeFileLocation(userId, oldPath, newPath, resourceEntity);
+    }
+
     @RequestMapping(value = "/file/all", method = RequestMethod.GET)
     public JsonResult getAllFileList(HttpServletRequest req) {
         String userId = (String) req.getSession().getAttribute("userId");

@@ -361,6 +361,7 @@ export default {
           this.axios
             .post("/GeoProblemSolving/user", userData)
             .then((res) => {
+              console.log(res);
               if (res.data.code == -3) {
                 this.$Message.error("This email has been registered!");
                 this.registerForm.email = "";

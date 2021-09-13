@@ -276,6 +276,7 @@
                               v-if="
                                 tool.toolImg != undefined && tool.toolImg != ''
                               "
+                              style="height: 100%; max-height: 50px"
                             />
                             <avatar
                               :username="tool.toolName"
