@@ -33,7 +33,7 @@ public class OperationSocketServer {
         HttpSession httpSession = ((HttpSession) config.getUserProperties().get(HttpSession.class.getName()));
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String nowDate = dateFormat.format(new Date());
-        System.out.println("Operation已连接："+"用户名-"+httpSession.getAttribute("name") + "-----" + "连接时间："+ nowDate);
+        System.out.println("Operation已连接："+"用户名-"+httpSession.getAttribute("name") + "-----" + nowDate);
 
     }
 
@@ -46,7 +46,8 @@ public class OperationSocketServer {
      * @throws IOException
      */
     @OnMessage
-    public void onMessage(@PathParam("toolId") String toolId, @PathParam("aid") String aid, String message) throws IOException {String groupKey = toolId + aid;
+    public void onMessage(@PathParam("toolId") String toolId, @PathParam("aid") String aid, String message) throws IOException {
+        String groupKey = toolId + aid;
         collaborationService.operationTransfer(toolId, aid, message);
     }
 

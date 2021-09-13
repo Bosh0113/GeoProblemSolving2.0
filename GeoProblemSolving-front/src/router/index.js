@@ -13,7 +13,7 @@ const routes = [
     name: "Navigation",
     component: resolve => require(["@/components/navigation"], resolve),
     children: [
-      { path: "", redirect: "staticPage" },
+      {path: "", redirect: "staticPage"},
       {
         path: "staticPage",
         name: "StaticPage",
@@ -187,7 +187,7 @@ const routes = [
             component: resolve =>
               require([
                 "@/components/workingSpace/activity/singleActivity"
-              ], resolve)
+              ], resolve),
           },
           {
             path: "info",
@@ -341,7 +341,7 @@ export default new Router({
     if (savedPosition) {
       return savedPosition;
     } else {
-      return { x: 0, y: 0 };
+      return {x: 0, y: 0};
     }
   }
 });

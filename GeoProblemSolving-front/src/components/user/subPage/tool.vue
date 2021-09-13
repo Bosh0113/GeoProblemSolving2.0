@@ -427,7 +427,7 @@
             </div>
           </Card>
         </Col>
-      </Row>    
+      </Row>
     </Modal>
 
     <Modal v-model="createToolsetModal" title="Create toolset" width="800">
@@ -679,7 +679,7 @@
           </Card>
         </Col>
       </Row>
-      
+
       <div slot="footer">
         <Button type="warning" @click="manageToolModal = false">Cancel</Button>
         <Button type="success" @click="confirmManageTool">Ok</Button>
@@ -912,7 +912,7 @@
         // "/GeoProblemSolving/tool/findByProvider/" + this.$store.getters.userId
         this.$axios
           .get(
-            "/GeoProblemSolving/toolset/inquiryAll?provider=" + this.$store.getters.userId 
+            "/GeoProblemSolving/toolset/inquiryAll?provider=" + this.$store.getters.userId
           )
           .then((res) => {
             if (res.data == "Offline") {
@@ -1055,7 +1055,7 @@
             this.$Message.error("Delete Fail.");
           });
         }
-        
+
       },
       delCurrentTool(){
         let id = this.delToolInfo.delToolId;
@@ -1108,7 +1108,7 @@
         let toolList = this.toolsetToolList;
         console.log(toolList);
         this.$axios.post("/GeoProblemSolving/toolset/updateTools",toolList)
-          .then((res) => { 
+          .then((res) => {
             this.$Notice.success({title: "Update successfully."});
           })
           .catch((err) => {
@@ -1152,7 +1152,7 @@
             "/GeoProblemSolving/toolset/update",
             formData
           )
-          .then((res) => { 
+          .then((res) => {
             this.$Notice.success({title: "Update successfully."});
             this.currentStep = 0;
             this.editToolInfo = {};
@@ -1162,7 +1162,7 @@
             this.$Message.error("Update Fail.Try again!");
           });
         }
-        
+
       },
       shareTool: function (tool) {
         this.shareToolModal = true;

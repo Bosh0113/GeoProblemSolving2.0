@@ -595,6 +595,7 @@
                         </Card>
                     </div>
                 </div>
+
                 <div v-show="activeMenu=='workspace'" :style="{height: contentPageCSS + 'px'}">
                     <div style="background:#eee;padding: 10px;">
                         <div >
@@ -1076,6 +1077,29 @@
                 }
             },
             methods: {
+                initTaskSocket(){
+                    if (this.$refs.taskTreeEl.taskSocket != null){
+                        return;
+                    }
+                    this.$refs.taskTreeEl.taskSocket = null;
+                    let taskSocketURL = `${window.location.protocol === 'https:' ? 'wss://' : 'ws://'}` + window.location.host + "/GeoProblemSolving/OperationServer/task/" + this.projectInfo.aid;
+                    if (window.location.host == "localhost:8080") {
+                        taskSocketURL = "ws://localhost:8081/GeoProblemSolving/OperationServer/task/" + this.projectInfo.aid;
+                    }
+                    //实例化webSocket，然后绑定方法
+                    this.$refs.taskTreeEl.taskSocket = new WebSocket(taskSocketURL);
+                    this.$refs.taskTreeEl.taskSocket.onopen = this.$refs.taskTreeEl.onOpen;
+                    this.$refs.taskTreeEl.taskSocket.onmessage = this.$refs.taskTreeEl.onMessage;
+                    this.$refs.taskTreeEl.taskSocket.onclose = this.$refs.taskTreeEl.onClose;
+                    this.$refs.taskTreeEl.taskSocket.onerror = this.$refs.taskTreeEl.onError;
+
+                    this.$refs.taskTreeEl.sendMessage({"type": "test"});
+                },
+                closeTaskSocket(){
+                    if (this.$refs.taskTreeEl.taskSocket != null && this.$refs.taskTreeEl.taskSocket.readyState == this.$refs.taskTreeEl.taskSocket.OPEN){
+                        this.$refs.taskTreeEl.taskSocket.close();
+                    }
+                },
                 roleIdentity() {
                     this.userRole = roleIdentify(
                         this.projectInfo.members,
@@ -1152,6 +1176,11 @@
                     }
                 },
                 changeMenuItem(name) {
+                    if (name == "task"){
+                        this.initTaskSocket();
+                    }else {
+                        this.closeTaskSocket();
+                    }
                     if(name == 'workspace') {
                         if (this.userState == false) {
                             window.location.href = "/GeoProblemSolving/login"

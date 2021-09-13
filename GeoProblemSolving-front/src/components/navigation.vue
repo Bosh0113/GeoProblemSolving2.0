@@ -371,7 +371,7 @@ export default {
       if (this.$store.getters.userState) {
         this.initWebSocket();
         this.getUnreadNoticeCount();
-      }
+    }
     },
     setMenuTitle(newVal) {
       switch (newVal) {

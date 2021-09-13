@@ -1,6 +1,7 @@
 package cn.edu.njnu.geoproblemsolving.business.tool.generalTool.controller;
 
 import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.entity.Tool;
+import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.service.ToolService;
 import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.service.ToolServiceImpl;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import cn.edu.njnu.geoproblemsolving.common.utils.ResultUtils;
@@ -8,7 +9,9 @@ import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,8 +30,15 @@ import java.util.List;
 @RequestMapping(value = "/tool")
 public class ToolRestController {
     @Autowired
-    ToolServiceImpl toolService;
+    ToolService toolService;
 
+    /**
+     * 从管理服务器获取公开的计算模型/数据方法用于创建工具
+     * @param req
+     * @param page
+     * @param size
+     * @return
+     */
     @RequestMapping(value = "/computableModel/public/{page}/{size}", method = RequestMethod.GET)
     public JsonResult getPublicModel(HttpServletRequest req, @PathVariable int page, @PathVariable int size){
         String email = (String)req.getSession().getAttribute("email");
@@ -49,6 +59,12 @@ public class ToolRestController {
         return ResultUtils.success(dataMethodList);
     }
 
+    /**
+     * 从管理服务器搜索计算模型/数据方法
+     * @param searchText
+     * @param page
+     * @return
+     */
     @RequestMapping(value = "/computableModel/public/{searchText}/{page}/{size}", method = RequestMethod.GET)
     public JsonResult queryPublicComputableModelByName(@PathVariable String searchText, @PathVariable int page){
         JSONObject modelData = toolService.queryPublicComputeModelByName(searchText, page);
@@ -99,18 +115,8 @@ public class ToolRestController {
 
     @RequestMapping(value = "/{tid}", method = RequestMethod.DELETE)
     public JsonResult delTool(@PathVariable String tid){
-        // long delNum = toolService.delToolService(tid);
-        // if (delNum == 1){
-        //     return ResultUtils.success();
-        // }else {
-        //     return ResultUtils.error(-2, "Fail");
-        // }
-        String delResult = toolService.emptyProviderService(tid);
-        if (delResult.equals("suc")){
-            return ResultUtils.success();
-        }else {
-            return ResultUtils.error(-2, "Fail");
-        }
+        toolService.delToolService(tid);
+        return ResultUtils.success();
     }
 
     @RequestMapping(method = RequestMethod.PUT, produces = "application/json;charset=utf-8")
@@ -119,6 +125,11 @@ public class ToolRestController {
     }
 
 
+    /**
+     * 返回该用户未删除的工具
+     * @param providerId
+     * @return
+     */
     @RequestMapping(value = "/provider/{providerId}", method = RequestMethod.GET)
     public JsonResult queryToolByUserId(@PathVariable String providerId){
         return ResultUtils.success(toolService.getToolByProviderService(providerId));
@@ -134,11 +145,4 @@ public class ToolRestController {
         List<Tool> toolList = toolService.getToolByIds(ids);
         return ResultUtils.success(toolList);
     }
-
-
-
-
-
-
-
 }

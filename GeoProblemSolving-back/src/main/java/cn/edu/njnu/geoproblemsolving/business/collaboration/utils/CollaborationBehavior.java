@@ -41,7 +41,7 @@ public class CollaborationBehavior {
 
         CollaborationUser collaborationUser = new CollaborationUser();
 
-        if (userInfo.getCode() != 0){
+        if (userInfo.getCode() != 0) {
             return collaborationUser;
         }
         collaborationUser.setUserId(userId);
@@ -70,7 +70,7 @@ public class CollaborationBehavior {
     public void sendParticipantsInfo(HashMap<String, CollaborationUser> participants, CollaborationUser user, String behavior) {
         try {
             if (user == null) return;
-
+            if (participants == null || participants.size() == 0) return;
             JSONObject messageObject = new JSONObject();
             messageObject.put("type", "members");
 
@@ -82,13 +82,10 @@ public class CollaborationBehavior {
 
             for (Map.Entry<String, CollaborationUser> participant : participants.entrySet()) {
                 CollaborationUser receiver = participant.getValue();
-                if (!receiver.getUserId().equals(user.getUserId())) {
-                    messageObject.put("behavior", behavior);
-                    messageObject.put("activeUser", user.getUserInfo());
-                    receiver.getSession().getBasicRemote().sendText(messageObject.toString());
-                }
-                //没必要发给自己
-                // receiver.getSession().getBasicRemote().sendText(messageObject.toString());
+                messageObject.put("behavior", behavior);
+                //发送者
+                messageObject.put("activeUser", user.getUserInfo());
+                receiver.getSession().getBasicRemote().sendText(messageObject.toString());
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -186,7 +183,7 @@ public class CollaborationBehavior {
     public MsgRecords msgCacheStore(String aid, ArrayList<ChatMsg> records) {
         // save each message
         ArrayList<String> msgList = new ArrayList<>();
-        ArrayList<String> memberIds= new ArrayList<>();
+        ArrayList<String> memberIds = new ArrayList<>();
         ArrayList<JSONObject> participants = new ArrayList<>();
 
         for (ChatMsg message : records) {
@@ -200,7 +197,7 @@ public class CollaborationBehavior {
             chatMsgRepository.save(message);
         }
         // save message records
-        MsgRecords msgRecords =  (MsgRecords) msgRecordsService.msgRecordsCreate(aid, msgList, participants).getData();
+        MsgRecords msgRecords = (MsgRecords) msgRecordsService.msgRecordsCreate(aid, msgList, participants).getData();
         return msgRecords;
     }
 
@@ -277,6 +274,7 @@ public class CollaborationBehavior {
 
     /**
      * 发送控制信息
+     *
      * @param config
      * @param queue
      * @param sender
@@ -315,23 +313,22 @@ public class CollaborationBehavior {
     }
 
     /**
-     *
      * @param participants  //当前的协同者
-     * @param oldReceivers //invoke时的协同者
+     * @param oldReceivers  //invoke时的协同者
      * @param computeResult //计算结果
      * @throws IOException
      */
     public void sendComputeResult(HashMap<String, CollaborationUser> participants, HashMap<String, CollaborationUser> oldReceivers, ComputeMsg computeResult) throws IOException {
         ArrayList<String> oldReceiverStr = Lists.newArrayList();
-        for (Map.Entry<String, CollaborationUser> oldReceiver: oldReceivers.entrySet()){
+        for (Map.Entry<String, CollaborationUser> oldReceiver : oldReceivers.entrySet()) {
             oldReceiverStr.add(oldReceiver.getKey());
         }
         JSONObject messageObject = new JSONObject();
         messageObject.put("type", "computation");
         messageObject.put("computeOutputs", computeResult.getOutputs());
-        for (Map.Entry<String, CollaborationUser> participant: participants.entrySet()){
+        for (Map.Entry<String, CollaborationUser> participant : participants.entrySet()) {
             for (int i = 0; i < oldReceiverStr.size(); i++) {
-                if (oldReceiverStr.get(i).equals(participant.getValue().getUserId())){
+                if (oldReceiverStr.get(i).equals(participant.getValue().getUserId())) {
                     participant.getValue().getSession().getBasicRemote().sendText(messageObject.toString());
                 }
             }
@@ -341,11 +338,9 @@ public class CollaborationBehavior {
     public void sendTasKAssignment(HashMap<String, CollaborationUser> participants, CollaborationUser sender, JSONObject msgJson) throws IOException {
         try {
 
-            for (Map.Entry<String, CollaborationUser> participant: participants.entrySet()){
+            for (Map.Entry<String, CollaborationUser> participant : participants.entrySet()) {
                 //发送者的就不需要 webSocket 进行广播通知，在页面上有相应的处理逻辑
-                if (participant.getValue().getUserId().equals(sender.getUserId())){
-                    continue;
-                }
+                if (participant.getValue().getUserId().equals(sender.getUserId())) continue;
                 participant.getValue().getSession().getBasicRemote().sendText(msgJson.toString());
             }
         } catch (Exception ex) {

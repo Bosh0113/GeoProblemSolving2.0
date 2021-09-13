@@ -14,7 +14,7 @@
             <Icon type="ios-globe" />Workspace
           </MenuItem>
           <MenuItem name="Task">
-            <Icon type="ios-git-network" />Task management
+            <Icon type="ios-git-network"/>Task management
           </MenuItem>
           <!-- <MenuItem name="Introduction">
             <Icon type="ios-paper" />About
@@ -85,7 +85,7 @@
           </vue-scroll>
         </div>
         <div v-show="activeMenu == 'Task'">
-          <task-manager :activityInfo="activityInfo" :userInfo="userInfo" :projectInfo="projectInfo"></task-manager>
+          <task-manager :activityInfo="activityInfo" :userInfo="userInfo" :projectInfo="projectInfo" ref="task"></task-manager>
         </div>
       </div>
     </div>
@@ -197,6 +197,7 @@ import modelEvaluation from "./funcs/modelEvaluation.vue";
 import geoSimulation from "./funcs/geoSimulation.vue";
 import geoAnalysis from "./funcs/geoAnalysis.vue";
 import decisionMaking from "./funcs/decisionMaking.vue";
+import * as socketApi from "../../../api/socket";
 export default {
   props: ["activityInfo","userInfo","projectInfo"],
   components: {
@@ -240,11 +241,23 @@ export default {
       memberRoleModal: false,
       userRoleBtn: false,
       roleSelected: "",
+      socketId: "OperationServer/task/vueTask"
     };
   },
   created() {
     this.userRole = this.roleIdentity(this.activityInfo);
     this.getParticipants();
+  },
+  watch: {
+    activityInfo: {
+      immediate: true,
+      handler(){
+        this.socketId = `OperationServer/${this.projectInfo.aid}/${this.activityInfo.aid}`;
+      }
+    }
+  },
+  beforeDestroy() {
+    this.closeTaskSocket();
   },
   methods: {
     roleIdentity(activity) {
@@ -656,6 +669,11 @@ export default {
     },
     changeMenuItem(name) {
       this.activeMenu = name;
+      if (name == "Task"){
+        this.initTaskSocket();
+      }else {
+        this.closeTaskSocket();
+      }
     },
     getParticipants() {
       let url = "";
@@ -681,6 +699,23 @@ export default {
         .catch((err) => {
           throw err;
         });
+    },
+    initTaskSocket(){
+      if (!socketApi.getSocketInfo(this.socketId).linked){
+        socketApi.initWebSocket(this.socketId);
+        let sockMsg = {
+          type: "test",
+          sender: this.userInfo.userId
+        };
+        socketApi.sendSock(this.socketId, sockMsg, this.$refs.task.socketOnMessage);
+      }else {
+        console.log(`${this.projectInfo.name}: ${this.activityInfo.name}task has connected.`);
+      }
+    },
+    closeTaskSocket(){
+      if (socketApi.getSocketInfo(this.socketId).linked){
+        socketApi.close(this.socketId);
+      }
     },
   },
 };

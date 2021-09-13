@@ -1,6 +1,7 @@
 package cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service;
 
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.entity.ActivityGraph;
+import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.entity.ActivityLinkProtocol;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.entity.LinkRestriction;
 
 import java.util.ArrayList;
@@ -12,11 +13,9 @@ public interface GeoAnalysisProcess {
     /**
      * 新建协议
      * @param graphId 根活动的 aid
-     * @param type 协议关系类型
-     * @param nodeList
      * @return
      */
-    HashMap<String, HashMap<String, LinkRestriction>> setLinkProtocol(String graphId, String type, ArrayList<String> nodeList, LinkRestriction linkRestriction);
+    ActivityLinkProtocol setLinkProtocol(String graphId, ActivityLinkProtocol linkProtocol);
 
     HashMap<String, HashMap<String, LinkRestriction>> deleteEdge(String graphId, String startId, String endId);
 
@@ -29,6 +28,10 @@ public interface GeoAnalysisProcess {
     void resFlowAutoUpdate(String graphId, String nodeId, String uid);
 
     void batchResFlowAutoUpdate(String graphId, String nodeId, HashMap<String, String> resTag);
+
+    void updateGraphByProtocol(String rootId, ActivityLinkProtocol protocol);
+
+    void delGraphByProtocol(String rootId, String protocolId);
 
 
     //协议已经变成了一系列的字符串

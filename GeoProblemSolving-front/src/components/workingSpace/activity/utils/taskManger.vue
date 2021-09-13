@@ -968,6 +968,7 @@ import dayjs from "dayjs";
 import draggable from "vuedraggable";
 import GanttElastic from "gantt-elastic";
 import loginModal from "../../../user/userState/loginModal.vue"
+import * as socketApi from "../../../../api/socket";
 export default {
   components: {
     draggable,
@@ -987,6 +988,9 @@ export default {
       userRole: "visitor",
       todoLoading: true,
       doingLoading: true,
+      editTaskState: "",
+      removeTaskState:"",
+      socketId:"",
       doneLoading: true,
       ops: {
         bar: {
@@ -1129,6 +1133,14 @@ export default {
     this.initSize();
     this.roleIdentity();
   },
+  watch:{
+    activityInfo: {
+      immediate: true,
+      handler(){
+        this.socketId = `OperationServer/task${this.projectInfo.aid}/${this.activityInfo.aid}`;
+      }
+    }
+  },
   mounted() {
     this.inquiryTask();
     window.addEventListener("resize", this.initSize);
@@ -1143,7 +1155,98 @@ export default {
     initSize() {
       this.contentHeight = window.innerHeight - 140;
     },
-    cancel() {},
+    socketOnMessage(messageJson){
+      let behavior = messageJson.behavior;
+      let content = messageJson.content;
+      if (messageJson.type == "task"){
+        if(behavior == "create"){
+          let task = content.newTask;
+          this.taskTodo.push(task);
+        } else if (behavior == "importance") {
+          let taskState = content.state;
+          let taskId = content.taskId;
+          let importance = content.importance;
+          switch (taskState) {
+            case "todo":
+              this.taskTodo.forEach(item => {
+                if (item.taskId == taskId) {
+                  item.importance = importance;
+                }
+              })
+              break;
+            case "doing":
+              this.taskDoing.forEach(item => {
+                if (item.taskId == taskId) {
+                  item.importance = importance;
+                }
+              })
+              break;
+            case "done":
+              this.taskDone.forEach(item => {
+                if (item.taskId == taskId) {
+                  item.importance = importance;
+                }
+              })
+              break;
+          }
+        } else if (behavior == "updateTask") {
+          let taskState = content.state;
+          let putTask = content.editedTask;
+          let taskId = putTask.taskId;
+          switch (taskState) {
+            case "todo":
+              this.taskTodo.forEach(item => {
+                if (item.taskId == taskId) {
+                  Object.assign(item, putTask);
+                }
+              })
+              break;
+            case "doing":
+              this.taskDoing.forEach(item => {
+                if (item.taskId == taskId) {
+                  Object.assign(item, putTask);
+                }
+              })
+              break;
+            case "done":
+              this.taskDone.forEach(item => {
+                if (item.taskId == taskId) {
+                  Object.assign(item, putTask);
+                }
+              })
+              break;
+          }
+        } else if (behavior == "order") {
+          let taskState = content.state;
+          let taskList = content.taskList;
+          switch (taskState) {
+            case "todo":
+              this.$set(this, "taskTodo", taskList);
+              break;
+            case "doing":
+              this.$set(this, "taskDoing", taskList);
+              break;
+            case "done":
+              this.$set(this, "taskDone", taskList);
+              break;
+          }
+        }else if (behavior == "remove"){
+          let taskState = content.state;
+          let index = content.removeIndex;
+          switch (taskState) {
+            case "todo":
+              this.taskTodo.splice(index, 1);
+              break;
+            case "doing":
+              this.taskDoing.splice(index, 1);
+              break;
+            case "done":
+              this.taskDone.splice(index, 1);
+              break;
+          }
+        }
+      }
+    },
     roleIdentity() {
       this.userRole = this.userRoleApi.roleIdentify(
         this.activityInfo.members,
@@ -1213,6 +1316,15 @@ export default {
                 });
 
                 this.createTaskModal = false;
+
+                let sockMsg = {};
+                sockMsg["type"] = "task";
+                sockMsg["behavior"] = "create";
+                sockMsg["content"] = {
+                  "newTask": res.data,
+                };
+                sockMsg["sender"] = this.userInfo.userId;
+                socketApi.sendSock(this.socketId, sockMsg, this.socketOnMessage);
               }
             })
             .catch((err) => {});
@@ -1237,12 +1349,23 @@ export default {
             this.tempLoginModal = true;
           } else if (res.data != "None" && res.data != "Fail") {
             this.$Message.info("Changed the importance of one task.");
+            let sockMsg = {};
+            sockMsg["type"] = "task";
+            sockMsg["behavior"] = "importance";
+            sockMsg["content"] = {
+              "taskId": task.taskId,
+              "state": task.state,
+              "importance": task.importance
+            };
+            sockMsg["sender"] = this.userInfo.userId;
+            socketApi.sendSock(this.socketId, sockMsg, this.socketOnMessage);
+
           } else {
             this.$Message.error("Fail!");
           }
         })
         .catch((err) => {
-          console.log(err.data);
+        console.log(err.data);
         });
     },
     //打开task编辑器
@@ -1264,6 +1387,7 @@ export default {
             taskInfoRes.importance = taskInfoRes.importance ? true : false;
             this.$set(this, "formValidate", taskInfoRes);
             this.editTaskModal = true;
+            this.editTaskState = taskInfoRes.state;
           } else {
             this.$Message.error("Fail!");
           }
@@ -1337,15 +1461,22 @@ export default {
       this.$refs[name].validate((valid) => {
         if (valid) {
           let importance = this.formValidate.importance ? 1 : 0;
-          let taskForm = {
-            taskId: this.formValidate.taskId,
-            name: this.formValidate.name,
-            description: this.formValidate.description,
-            startTime: new Date(this.formValidate.timeRange[0]),
-            endTime: new Date(this.formValidate.timeRange[1]),
-            importance: importance,
-          };
+          let taskForm = new URLSearchParams();
+          taskForm.append("taskId", this.formValidate.taskId);
+          taskForm.append("name", this.formValidate.name);
+          taskForm.append("description", this.formValidate.description);
+          taskForm.append("startTime", new Date(this.formValidate.timeRange[0]));
+          taskForm.append("endTime", new Date(this.formValidate.timeRange[1]));
+          taskForm.append("importance", importance);
 
+          let tempTaskForm = {
+            "taskId": this.formValidate.taskId,
+            "name": this.formValidate.name,
+            "description": this.formValidate.description,
+            "startTime": new Date(this.formValidate.timeRange[0]),
+            "endTime": new Date(this.formValidate.timeRange[1]),
+            "importance": importance
+          };
           this.axios
             .post("/GeoProblemSolving/task/update", taskForm)
             .then((res) => {
@@ -1354,6 +1485,7 @@ export default {
                 // this.$router.push({ name: "Login" });
                 this.tempLoginModal = true;
               } else if (res.data != "None" && res.data != "Fail") {
+                this.editTaskModal = false;
                 // update activity doc
                 this.operationApi.taskUpdate(
                   this.activityInfo.aid,
@@ -1366,7 +1498,17 @@ export default {
                 });
 
                 this.updateTaskList(res.data); // 只更新单个任务
-                this.editTaskModal = false;
+                let sockMsg = {};
+                sockMsg["type"] = "task";
+                sockMsg["behavior"] = "updateTask";
+                sockMsg["content"] = {
+                  "state": this.editTaskState,
+                  "editedTask": tempTaskForm
+                };
+                sockMsg["sender"] = this.userInfo.userId;
+                socketApi.sendSock(this.socketId, sockMsg, this.socketOnMessage);
+
+
               } else {
                 this.$Message.error("Fail!");
               }
@@ -1405,7 +1547,6 @@ export default {
         })
         .catch((err) => {
           this.todoLoading = false;
-          console.log(err.data);
         });
     },
     inquiryDoingTask() {
@@ -1418,7 +1559,7 @@ export default {
         .then((res) => {
           this.doingLoading = false;
           if (res.data == "Offline") {
-            
+
           }else if (res.data != "None" && res.data != "Fail") {
             this.$set(this, "taskDoing", res.data);
           } else {
@@ -1427,7 +1568,6 @@ export default {
         })
         .catch((err) => {
           this.doingLoading = false;
-          console.log(err.data);
         });
     },
     inquiryDoneTask() {
@@ -1440,7 +1580,7 @@ export default {
         .then((res) => {
           this.doneLoading = false;
           if (res.data == "Offline") {
-            
+
           }else if (res.data != "None" && res.data != "Fail") {
             this.$set(this, "taskDone", res.data);
           } else {
@@ -1468,7 +1608,6 @@ export default {
       this.taskOrderUpdate(taskList, type);
     },
     taskOrderUpdate(taskList, type) {
-      // if (this.userRole != "visitor") {
       let thisUserName = this.$store.getters.userName;
       let stateChangeIndex = 0;
       let count = taskList.length;
@@ -1482,17 +1621,21 @@ export default {
             taskUpdateObj.append("order", i);
             taskUpdateObj.append("state", type);
             taskUpdateObj.append("managerName", thisUserName);
+            taskList[stateChangeIndex].order = stateChangeIndex;
+            taskList[stateChangeIndex].managerName = thisUserName;
+            taskList[stateChangeIndex].state = type;
             this.axios
               .post("/GeoProblemSolving/task/update", taskUpdateObj)
               .then((res) => {
                 count--;
                 if (res.data == "Offline") {
                   this.$store.commit("userLogout");
-                  // this.$router.push({ name: "Login" });
                   this.tempLoginModal = true;
                 } else if (res.data != "Fail") {
                   //更新数组
-                  taskList[stateChangeIndex].managerName = thisUserName;
+                  // taskList[stateChangeIndex].order = stateChangeIndex;
+                  // taskList[stateChangeIndex].managerName = thisUserName;
+                  // taskList[stateChangeIndex].state = type;
                 }
               })
               .catch((err) => {
@@ -1512,6 +1655,7 @@ export default {
                   // this.$router.push({ name: "Login" });
                   this.tempLoginModal = true;
                 } else if (res.data != "Fail") {
+                  taskList[i].order = i;
                 }
               })
               .catch((err) => {
@@ -1520,11 +1664,20 @@ export default {
           }
         }
       }
-      // }
+      let sockMsg = {};
+      sockMsg["type"] = "task";
+      sockMsg["behavior"] = "order";
+      sockMsg["content"] = {
+        "state": type,
+        "taskList": taskList
+      };
+      sockMsg["sender"] = this.userInfo.userId;
+      socketApi.sendSock(this.socketId, sockMsg, this.socketOnMessage);
     },
     taskRemoveAssure(index, taskList) {
       this.taskDeleteModal = true;
       this.selectTaskIndex = index;
+      this.removeTaskState = taskList[index].state;
       this.taskList = taskList;
     },
     taskRemove() {
@@ -1535,21 +1688,30 @@ export default {
             this.taskList[this.selectTaskIndex]["taskId"]
         )
         .then((res) => {
-          console.log(res);
+          // console.log(res);
           if (res.data == "Offline") {
             this.$store.commit("userLogout");
             // this.$router.push({ name: "Login" });
             this.tempLoginModal = true;
           } else if (res.data == "Success") {
+
+            let sockMsg = {};
+            sockMsg["type"] = "task";
+            sockMsg["behavior"] = "remove";
+            sockMsg["content"] = {
+              "state": this.removeTaskState,
+              "removeIndex": this.selectTaskIndex
+            };
+            sockMsg["sender"] = this.userInfo.userId;
+            socketApi.sendSock(this.socketId, sockMsg, this.socketOnMessage);
             // update activity doc
             this.operationApi.taskUpdate(
               this.activityInfo.aid,
               "remove",
               this.taskList[this.selectTaskIndex]
             );
-            this.$store.commit("updateActivityTasks", {behavior: "remove", task: this.taskList[this.selectTaskIndex]});
+            this.$store.commit("updateActivityTasks", {behavior: "remove", task: this.taskList.splice(this.selectTaskIndex, 1)});
 
-            this.taskList.splice(this.selectTaskIndex, 1);
           } else {
             this.$Message.error("Fail!");
           }
@@ -1570,7 +1732,7 @@ export default {
             this.childActivities[i].level;
         }
       }
-    },
+  },
     initGantt() {
       let taskNum =
         this.taskDoing.length + this.taskTodo.length + this.taskDone.length;

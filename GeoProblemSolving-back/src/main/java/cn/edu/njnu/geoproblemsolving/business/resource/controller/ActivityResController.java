@@ -159,7 +159,7 @@ public class ActivityResController {
     }
 
     /**
-     * 将用户资源分享到
+     * 将用户资源分享到项目中
      *
      * @param req
      * @param uids
@@ -184,6 +184,12 @@ public class ActivityResController {
         return ResultUtils.success(res);
     }
 
+    /**
+     * 将模型生成的资源绑定的到项目中
+     * @param modelOutput
+     * @param aid
+     * @return
+     */
     @RequestMapping(value = "/file/bind/{aid}", method = RequestMethod.POST)
     public JsonResult bindProject(@RequestBody ResourceEntity modelOutput, @PathVariable String aid) {
         String bindResult = resService.bindResToProject(modelOutput, aid);

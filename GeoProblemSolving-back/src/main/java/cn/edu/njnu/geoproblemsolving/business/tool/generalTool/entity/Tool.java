@@ -45,6 +45,8 @@ public class Tool {
     @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
     Date createdTime;
     Boolean toolSet = false;
+    //标记该工具是否存在，若为 false 则表示被删除
+    boolean present = true;
 
     //工具集特有，里面存储ids
     ArrayList<String> toolList;

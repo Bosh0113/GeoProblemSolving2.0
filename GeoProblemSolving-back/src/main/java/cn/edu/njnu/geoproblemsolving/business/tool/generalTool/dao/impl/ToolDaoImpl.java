@@ -33,7 +33,9 @@ public class ToolDaoImpl implements ToolDao {
 
     @Override
     public List<Tool> findAllByToolCreator(String providerId) {
-        Query query = new Query(Criteria.where("provider").is(providerId));
+        Query query = new Query();
+        query.addCriteria(Criteria.where("provider").is(providerId));
+        query.addCriteria(Criteria.where("present").is(true));
         return mongoTemplate.find(query, Tool.class);
     }
 
@@ -69,4 +71,13 @@ public class ToolDaoImpl implements ToolDao {
         return createTool(localTool);
     }
 
+    @Override
+    public Tool saveTool(Tool tool) {
+        return mongoTemplate.save(tool);
+    }
+
+    @Override
+    public List<Tool> findByFields(Query query) {
+        return mongoTemplate.find(query, Tool.class);
+    }
 }

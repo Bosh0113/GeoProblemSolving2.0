@@ -494,17 +494,12 @@
             this.userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
         },
         mounted() {
-            this.intWebSocket();
             this.inquiryTask();
-            // this.getProjectInfo();
             window.addEventListener("resize", this.initSize);
         },
-        beforeRouteLeave(to, from, next) {
-            this.taskSocket.close();
-            this.removeTimer();
-            next();
-        },
         beforeDestroy: function () {
+            this.removeTimer();
+            this.taskSocket.close();
             window.removeEventListener("resize", this.initSize);
         },
         methods: {
@@ -523,22 +518,8 @@
                 }
             },
             //webSocket 相关内容
-            intWebSocket: function () {
-                this.taskSocket = null;
-                let taskSocketURL = `${window.location.protocol === 'https:' ? 'wss://' : 'ws://'}` + window.location.host + "/GeoProblemSolving/OperationServer/task/" + this.projectInfo.aid;
-                if (window.location.host == "localhost:8080") {
-                    taskSocketURL = "ws://localhost:8081/GeoProblemSolving/OperationServer/task/" + this.projectInfo.aid;
-                }
-                //实例化webSocket，然后绑定方法
-                this.taskSocket = new WebSocket(taskSocketURL);
-                this.taskSocket.onopen = this.onOpen;
-                this.taskSocket.onmessage = this.onMessage;
-                this.taskSocket.onclose = this.onClose;
-                this.taskSocket.onerror = this.onError;
-            },
             onOpen: function() {
-                this.sendMessage({"type": "test"})
-                console.log("Connection successfully.");
+                console.log("Static page task manage socket Connection successfully.");
             },
             onMessage: function(e) {
                 let messageJson = JSON.parse(e.data);
@@ -655,16 +636,28 @@
             },
             onClose: function(e) {
                 this.removeTimer();
-                console.log("WebSocket disconnected");
+                console.log("Static page task manage socket WebSocket disconnected");
             },
             onError: function(e) {
                 this.removeTimer();
                 console.log("WebSocket throw a exception and has disconnected. Exception: " + e.toString());
             },
             sendMessage: function (agentData) {
-                agentData.sender = this.userInfo.userId;
-                if (this.taskSocket != null) {
-                    this.taskSocket.send(JSON.stringify(agentData));
+                let that = this;
+                if (this.taskSocket.readyState == 1){
+                    agentData.sender = this.userInfo.userId;
+                    if (this.taskSocket != null) {
+                        this.taskSocket.send(JSON.stringify(agentData));
+                    }
+                }else if (this.taskSocket.readyState == 0){
+                    //Connecting
+                    setTimeout(function (){
+                        that.sendMessage(agentData);
+                    }, 1000);
+                }else {
+                    setTimeout(function (){
+                        that.sendMessage(agentData);
+                    }, 1000);
                 }
             },
             //ping
@@ -889,8 +882,8 @@
                                         "state": this.editTaskState,
                                         "editedTask": taskForm
                                     };
-
                                     this.sendMessage(sockMsg);
+                                    this.editTaskModal = false;
                                 } else {
                                     this.$Message.error("Fail!");
                                 }
@@ -1005,6 +998,11 @@
                                 taskUpdateObj.append("order", i);
                                 taskUpdateObj.append("state", type);
                                 taskUpdateObj.append("managerName", thisUserName);
+                                taskList[stateChangeIndex].order = stateChangeIndex;
+                                taskList[stateChangeIndex].managerName = thisUserName;
+                                taskList[stateChangeIndex].order = stateChangeIndex;
+                                taskList[stateChangeIndex].managerName = thisUserName;
+                                taskList[stateChangeIndex].state = type;
                                 axios
                                     .post("/GeoProblemSolving/task/update", taskUpdateObj)
                                     .then(res => {

@@ -7,16 +7,20 @@
       @on-select="changeMenuItem"
     >
       <MenuItem name="Introduction">
-        <Icon type="ios-paper" />Introduction
+        <Icon type="ios-paper"/>
+        Introduction
       </MenuItem>
       <MenuItem name="Tasks">
-        <Icon type="ios-construct" />Task
+        <Icon type="ios-construct"/>
+        Task
       </MenuItem>
       <MenuItem name="Activities">
-        <Icon type="logo-steam" />Pathway
+        <Icon type="logo-steam"/>
+        Pathway
       </MenuItem>
       <MenuItem name="Resources">
-        <Icon type="ios-albums" />Resource
+        <Icon type="ios-albums"/>
+        Resource
       </MenuItem>
     </Menu>
     <div v-show="activeMenu=='Introduction'">
@@ -37,10 +41,12 @@
       ></folder-tree>
     </div>
     <div v-show="activeMenu=='Tasks'">
-      <task-manager :activityInfo="activityInfo" :projectInfo="projectInfo" :childActivities="childActivities" :userInfo="userInfo" ></task-manager>
+      <task-manager :activityInfo="activityInfo" :projectInfo="projectInfo" :childActivities="childActivities"
+                    :userInfo="userInfo" ref="task"></task-manager>
     </div>
-    <div v-if="activeMenu=='Activities'">
-      <process-manager :activityInfo="activityInfo" :childActivities="childActivities" :projectInfo="projectInfo" :userInfo="userInfo" ></process-manager>
+    <div v-show="activeMenu=='Activities'">
+      <process-manager :activityInfo="activityInfo" :childActivities="childActivities" :projectInfo="projectInfo"
+                       :userInfo="userInfo" ref="processLink"></process-manager>
     </div>
     <mini-chatroom
       :activityInfo="activityInfo"
@@ -48,51 +54,121 @@
   </div>
 </template>
 <script>
-import activityShow from "./activityShow.vue";
-import folderTree from "../../resources/folderTree";
-import taskManager from "./utils/taskManger.vue";
-import processManager from "./utils/processManager.vue";
-import miniChatroom from "./utils/miniChatroom";
+  import activityShow from "./activityShow.vue";
+  import folderTree from "../../resources/folderTree";
+  import taskManager from "./utils/taskManger.vue";
+  import processManager from "./utils/processManager.vue";
+  import miniChatroom from "./utils/miniChatroom";
+  import * as socketApi from "../../../api/socket";
 
-export default {
-  props: [
+  export default {
+    props: [
       "activityInfo",
       "userInfo",
       "projectInfo",
       "childActivities",
       "nameConfirm"
     ],
-  components: {
-    activityShow,
-    folderTree,
-    taskManager,
-    processManager,
-    miniChatroom
-  },
-  data() {
-    return {
-      activeMenu: "Introduction",
-      userRole: "visitor",
-    };
-  },
-  created(){
-  },
-  mounted() {},
-  methods: {
-    enterActivity(activity){
-      this.$emit('enterActivity', activity);
+    components: {
+      activityShow,
+      folderTree,
+      taskManager,
+      processManager,
+      miniChatroom
     },
-    enterRootActivity(){
-      this.$emit('enterRootActivity');
+    data() {
+      return {
+        activeMenu: "Introduction",
+        userRole: "visitor",
+        processSocketId: "",
+        taskSocketId: "",
+        lastMenuName: "Introduction"
+      };
     },
-    listenToolPanel(data) {
-      this.panel = data;
+    created() {
     },
-    changeMenuItem(name) {
-      this.activeMenu = name;
+    mounted() {
     },
-  },
-};
+    beforeDestroy() {
+      this.closeTaskSocket();
+    },
+    watch: {
+      activityInfo: {
+        immediate: true,
+        handler(){
+          this.taskSocketId = `OperationServer/task${this.projectInfo.aid}/${this.activityInfo.aid}`;
+          this.processSocketId = `OperationServer/process${this.projectInfo.aid}/${this.activityInfo.aid}`;
+        }
+      }
+    },
+    methods: {
+      enterActivity(activity) {
+        this.$emit('enterActivity', activity);
+      },
+      enterRootActivity() {
+        this.$emit('enterRootActivity');
+      },
+      listenToolPanel(data) {
+        this.panel = data;
+      },
+      changeMenuItem(name) {
+        this.activeMenu = name;
+        if (this.lastMenuName == "Tasks"){
+          this.closeTaskSocket(this.taskSocketId);
+        }
+        if (this.lastMenuName == "Activities"){
+          this.closeTaskSocket(this.processSocketId);
+          this.$refs.processLink.collaboratingInfoList = [];
+          this.$refs.processLink.collaboratingId = [];
+          this.$refs.processLink.collaIndex = -1;
+          this.$refs.processLink.participants = [];
+          this.$refs.processLink.collLinkUser = [];
+        }
+        if (name == "Tasks"){
+          this.initTaskSocket(this.taskSocketId, name);
+        }
+        if (name == "Activities"){
+          this.initTaskSocket(this.processSocketId, name)
+        }
+        this.lastMenuName = name;
+      },
+      initTaskSocket(socketId, name) {
+        if (socketApi.getSocketInfo(this.socketId).linked) {
+          console.log(`${this.projectInfo.name}: ${this.activityInfo.name} task has connected.`);
+          return;
+        }
+        socketApi.initWebSocket(socketId);
+        let sockMsg = {
+          type: "test",
+          sender: this.userInfo.userId
+        };
+        if (name == "Activities") {
+          socketApi.sendSock(socketId, sockMsg, this.$refs.processLink.socketOnMessage);
+          let inProcessLinkSock = {
+            sender: this.userInfo.userId,
+            senderName: this.userInfo.name,
+            type: "general",
+            content: {
+              behavior: "inActivities"
+            }
+          };
+          //进入 Activities 页面
+          socketApi.sendSock(socketId, inProcessLinkSock, this.$refs.processLink.socketOnMessage);
+
+        } else if (name == "Tasks") {
+          socketApi.sendSock(socketId, sockMsg, this.$refs.task.socketOnMessage);
+        }
+      },
+      closeTaskSocket(socketId) {
+        if (socketApi.getSocketInfo(socketId).linked) {
+          socketApi.close(socketId);
+          if (!socketApi.getSocketInfo(socketId).linked) {
+            console.log("Closed successfully")
+          }
+        }
+      },
+    },
+  };
 </script>
 <style scoped>
 </style>
