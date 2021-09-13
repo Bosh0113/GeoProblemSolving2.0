@@ -1133,9 +1133,16 @@ export default {
     this.initSize();
     this.roleIdentity();
   },
+  watch:{
+    activityInfo: {
+      immediate: true,
+      handler(){
+        this.socketId = `OperationServer/task${this.projectInfo.aid}/${this.activityInfo.aid}`;
+      }
+    }
+  },
   mounted() {
     this.inquiryTask();
-    // this.linkSocket();
     window.addEventListener("resize", this.initSize);
   },
   beforeRouteLeave(to, from, next) {
@@ -1148,13 +1155,6 @@ export default {
     initSize() {
       this.contentHeight = window.innerHeight - 140;
     },
-    // linkSocket() {
-    //   if (this.$store.getters.userState){
-    //     this.socketId = "OperationServer/task/vueTask";
-    //     socketApi.initWebSocket(this.socketId);
-    //     socketApi.sendSock(this.socketId, {"type":"test"}, this.socketOnMessage);
-    //   }
-    // },
     socketOnMessage(messageJson){
       let behavior = messageJson.behavior;
       let content = messageJson.content;
@@ -1461,15 +1461,22 @@ export default {
       this.$refs[name].validate((valid) => {
         if (valid) {
           let importance = this.formValidate.importance ? 1 : 0;
-          let taskForm = {
-            taskId: this.formValidate.taskId,
-            name: this.formValidate.name,
-            description: this.formValidate.description,
-            startTime: new Date(this.formValidate.timeRange[0]),
-            endTime: new Date(this.formValidate.timeRange[1]),
-            importance: importance,
-          };
+          let taskForm = new URLSearchParams();
+          taskForm.append("taskId", this.formValidate.taskId);
+          taskForm.append("name", this.formValidate.name);
+          taskForm.append("description", this.formValidate.description);
+          taskForm.append("startTime", new Date(this.formValidate.timeRange[0]));
+          taskForm.append("endTime", new Date(this.formValidate.timeRange[1]));
+          taskForm.append("importance", importance);
 
+          let tempTaskForm = {
+            "taskId": this.formValidate.taskId,
+            "name": this.formValidate.name,
+            "description": this.formValidate.description,
+            "startTime": new Date(this.formValidate.timeRange[0]),
+            "endTime": new Date(this.formValidate.timeRange[1]),
+            "importance": importance
+          };
           this.axios
             .post("/GeoProblemSolving/task/update", taskForm)
             .then((res) => {
@@ -1478,6 +1485,7 @@ export default {
                 // this.$router.push({ name: "Login" });
                 this.tempLoginModal = true;
               } else if (res.data != "None" && res.data != "Fail") {
+                this.editTaskModal = false;
                 // update activity doc
                 this.operationApi.taskUpdate(
                   this.activityInfo.aid,
@@ -1495,12 +1503,12 @@ export default {
                 sockMsg["behavior"] = "updateTask";
                 sockMsg["content"] = {
                   "state": this.editTaskState,
-                  "editedTask": taskForm
+                  "editedTask": tempTaskForm
                 };
                 sockMsg["sender"] = this.userInfo.userId;
                 socketApi.sendSock(this.socketId, sockMsg, this.socketOnMessage);
 
-                this.editTaskModal = false;
+
               } else {
                 this.$Message.error("Fail!");
               }
@@ -1600,7 +1608,6 @@ export default {
       this.taskOrderUpdate(taskList, type);
     },
     taskOrderUpdate(taskList, type) {
-      // if (this.userRole != "visitor") {
       let thisUserName = this.$store.getters.userName;
       let stateChangeIndex = 0;
       let count = taskList.length;
@@ -1614,18 +1621,21 @@ export default {
             taskUpdateObj.append("order", i);
             taskUpdateObj.append("state", type);
             taskUpdateObj.append("managerName", thisUserName);
+            taskList[stateChangeIndex].order = stateChangeIndex;
+            taskList[stateChangeIndex].managerName = thisUserName;
+            taskList[stateChangeIndex].state = type;
             this.axios
               .post("/GeoProblemSolving/task/update", taskUpdateObj)
               .then((res) => {
                 count--;
                 if (res.data == "Offline") {
                   this.$store.commit("userLogout");
-                  // this.$router.push({ name: "Login" });
                   this.tempLoginModal = true;
                 } else if (res.data != "Fail") {
                   //更新数组
-                  taskList[stateChangeIndex].order = stateChangeIndex;
-                  taskList[stateChangeIndex].managerName = thisUserName;
+                  // taskList[stateChangeIndex].order = stateChangeIndex;
+                  // taskList[stateChangeIndex].managerName = thisUserName;
+                  // taskList[stateChangeIndex].state = type;
                 }
               })
               .catch((err) => {
@@ -1663,7 +1673,6 @@ export default {
       };
       sockMsg["sender"] = this.userInfo.userId;
       socketApi.sendSock(this.socketId, sockMsg, this.socketOnMessage);
-      // }
     },
     taskRemoveAssure(index, taskList) {
       this.taskDeleteModal = true;

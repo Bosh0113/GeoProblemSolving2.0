@@ -734,7 +734,7 @@ export function taskUpdate(aid, behavior, taskInfo) {
         let operations = Task.childNodes;
         for (var i = 0; i < operations.length; i++) {
 
-            let oid = operations[i].getAttribute("id");
+            let oid = operations[i].getAttribute("idRef");
             let operationNode = xmlDoc.getElementById(oid);
             if (operationNode != null && operationNode.localName != "Operation") {
                 operationNode.setAttribute("task", "");
@@ -743,7 +743,7 @@ export function taskUpdate(aid, behavior, taskInfo) {
 
     } else if (behavior === "update") {
         let Task = xmlDoc.getElementById(taskInfo.taskId);
-        if (operationNode != null && operationNode.localName == "Operation") {
+        if (Task != null && Task.localName == "Task") {
             Task.setAttribute("name", taskInfo.name);
             Task.setAttribute("purpose", taskInfo.description);
             Task.setAttribute("timerange", timerange);

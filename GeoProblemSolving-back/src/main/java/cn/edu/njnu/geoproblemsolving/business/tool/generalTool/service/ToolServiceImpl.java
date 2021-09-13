@@ -1,22 +1,36 @@
 package cn.edu.njnu.geoproblemsolving.business.tool.generalTool.service;
 
+import ch.qos.logback.core.joran.util.beans.BeanUtil;
+import cn.edu.njnu.geoproblemsolving.business.CommonUtil;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.compute.entity.ToolTestData;
-import cn.edu.njnu.geoproblemsolving.business.collaboration.compute.util.CommonUtil;
 import cn.edu.njnu.geoproblemsolving.business.modeltask.Utils;
 import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.dao.impl.ToolDaoImpl;
 import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.entity.Tool;
+import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.entity.ToolSetVo;
+import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
+import cn.edu.njnu.geoproblemsolving.common.utils.ResultUtils;
 import com.alibaba.fastjson.JSONArray;
 import com.google.common.collect.Lists;
 import com.alibaba.fastjson.JSONObject;
+import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ResourceUtils;
 import org.springframework.web.client.RestTemplate;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.Part;
+import java.io.File;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.*;
@@ -304,14 +318,38 @@ public class ToolServiceImpl implements ToolService {
     }
 
     @Override
+    public ToolSetVo createToolSet(Tool toolSet) {
+        toolSet.setTid(UUID.randomUUID().toString());
+        toolSet.setToolSet(true);
+        toolSet.setCreatedTime(new Date());
+        Tool tool = toolDao.saveTool(toolSet);
+        if (tool == null) return null;
+        ToolSetVo toolSetVo = new ToolSetVo();
+        BeanUtils.copyProperties(tool, toolSetVo);
+        return toolSetVo;
+    }
+
+    @Override
+    public List<Tool> queryTool(ArrayList<String> keys, ArrayList<String> values) {
+        if (keys.size() != values.size()) return null;
+        Query query = new Query();
+        for (int i = 0; i < keys.size(); i++) {
+            String key = keys.get(i);
+            String value = values.get(i);
+            Criteria criteria = new Criteria(key).is(value);
+            query.addCriteria(criteria);
+        }
+        return toolDao.findByFields(query);
+    }
+
+    @Override
     public List<Tool> getToolByProviderService(String provider) {
         return toolDao.findAllByToolCreator(provider);
     }
 
     @Override
     public Tool updateToolService(Tool putTool) {
-        CommonUtil commonUtil = new CommonUtil();
-        String[] nullPropertyNames = commonUtil.getNullPropertyNames(putTool);
+        String[] nullPropertyNames = CommonUtil.getNullPropertyNames(putTool);
         return toolDao.updateTool(putTool, nullPropertyNames);
     }
 
@@ -319,9 +357,13 @@ public class ToolServiceImpl implements ToolService {
     public void delToolService(String tid) {
         Tool tool = toolDao.findToolById(tid);
         if (tool != null){
-            //将工具标记为删除
-            tool.setPresent(false);
-            toolDao.saveTool(tool);
+            if (tool.getToolSet()){
+                toolDao.deleteById(tid);
+            }else {
+                //将工具标记为删除
+                tool.setPresent(false);
+                toolDao.saveTool(tool);
+            }
         }
     }
 
@@ -343,5 +385,68 @@ public class ToolServiceImpl implements ToolService {
     @Override
     public Tool getToolByTid(String tid) {
         return toolDao.findToolById(tid);
+    }
+
+    @Override
+    public ToolSetVo addToolInToolSet(String tid, ArrayList<String> tids) {
+        Tool toolSet = toolDao.findToolById(tid);
+        if (toolSet == null) return null;
+        ArrayList<String> toolList = toolSet.getToolList();
+        toolList.removeAll(tids);
+        toolList.addAll(tids);
+        Tool tool = toolDao.saveTool(toolSet);
+        ToolSetVo toolSetVo = new ToolSetVo();
+        BeanUtils.copyProperties(tool, toolSetVo);
+        return toolSetVo;
+    }
+
+    @Override
+    public ToolSetVo delToolInToolSet(String tid, ArrayList<String> tids){
+        Tool toolSet = toolDao.findToolById(tid);
+        if (toolSet == null) return null;
+        toolSet.getToolList().removeAll(tids);
+        Tool tool = toolDao.saveTool(toolSet);
+        ToolSetVo toolSetVo = new ToolSetVo();
+        BeanUtils.copyProperties(tool, toolSetVo);
+        return toolSetVo;
+    }
+
+    @Override
+    public JsonResult uploadToolImg(HttpServletRequest req) throws IOException, ServletException {
+        //确认是否有文件
+        if (!ServletFileUpload.isMultipartContent(req)){
+            System.out.println("File is not multimedia.");
+            return ResultUtils.error(-2, "File is not multimedia.");
+        }
+
+        //新建存储文件夹
+        File path = new File(ResourceUtils.getURL("classpath:").getPath());
+        if (!path.exists()){
+            path = new File("");
+        }
+        File toolImgLocation = new File(path.getAbsolutePath(), "static/images");
+        if (!toolImgLocation.exists()){
+            toolImgLocation.mkdirs();
+        }
+        try {
+            Collection<Part> parts = req.getParts();
+            String pathURL = "Fail";
+            String newFileName = "";
+            for (Part part : parts){
+                if (part.getName().equals("img")){
+                    String filePath = part.getSubmittedFileName();
+                    String folderPath = toolImgLocation.getPath();
+
+                    JsonResult storeResult = CommonUtil.fileStore(part, filePath, folderPath);
+                    if (storeResult.getCode() == 0) newFileName = storeResult.getData().toString();
+                    else return storeResult;
+                    pathURL = "/GeoProblemSolving/images/" + newFileName;
+                    break;
+                }
+            }
+            return ResultUtils.success(pathURL);
+        }catch (Exception e){
+            return ResultUtils.error(-2, e.toString());
+        }
     }
 }

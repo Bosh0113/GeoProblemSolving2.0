@@ -48,5 +48,7 @@ public interface UserResService {
 
     Object searchResService(String userId, String key, String value);
 
+    JsonResult changeFileLocation(String userId, String oldPath, String newPath, ResourceEntity resourceEntity);
+
 
 }

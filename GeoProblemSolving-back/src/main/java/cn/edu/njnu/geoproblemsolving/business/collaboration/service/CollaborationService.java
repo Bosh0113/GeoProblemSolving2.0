@@ -134,7 +134,7 @@ public class CollaborationService {
             }
             participants.put(userId, collaborationUser);
             collaborationConfig.setParticipants(participants);
-            groups.put(groupKey, collaborationConfig);
+            // groups.put(groupKey, collaborationConfig);
 
             // 发布当前协同操作模式
             if (participants.size() > 1) {
@@ -567,6 +567,11 @@ public class CollaborationService {
                     HashMap<String, CollaborationUser> participants = collaborationConfig.getParticipants();
                     collaborationBehavior.sendTasKAssignment(participants, sender, messageObject);
                 }
+                case "general": {
+                    //做消息转发
+                    HashMap<String, CollaborationUser> participants = collaborationConfig.getParticipants();
+                    collaborationBehavior.sendTasKAssignment(participants, sender, messageObject);
+                }
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -626,10 +631,13 @@ public class CollaborationService {
             for (Map.Entry<String, CollaborationUser> user : participants.entrySet()) {
                 if (user.getValue().getSession().equals(session)) {
                     collaborationUser = user.getValue();
-
                     participants.remove(user.getKey());
-                    collaborationConfig.setParticipants(participants);
-                    groups.put(groupKey, collaborationConfig);
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    String nowDate = dateFormat.format(new Date());
+                    System.out.println("Operation已断开连接："+"用户名-"+user.getValue().getName() + "-----"+ nowDate);
+                    //在同一地址内进行操作，不用再做set
+                    // collaborationConfig.setParticipants(participants);
+                    // groups.put(groupKey, collaborationConfig);
                     break;
                 }
             }

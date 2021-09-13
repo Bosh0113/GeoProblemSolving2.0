@@ -9,7 +9,9 @@ import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
@@ -144,10 +146,15 @@ public class ToolRestController {
         return ResultUtils.success(toolList);
     }
 
-
-
-
-
-
-
+    /**
+     * 上传工具图片
+     * @param request
+     * @return 图片地址
+     * @throws IOException
+     * @throws ServletException
+     */
+    @RequestMapping(value = "/img", method = RequestMethod.POST)
+    public JsonResult uploadPicture(HttpServletRequest request) throws IOException, ServletException {
+        return toolService.uploadToolImg(request);
+    }
 }

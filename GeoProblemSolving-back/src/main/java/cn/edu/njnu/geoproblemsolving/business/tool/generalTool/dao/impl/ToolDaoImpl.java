@@ -75,4 +75,9 @@ public class ToolDaoImpl implements ToolDao {
     public Tool saveTool(Tool tool) {
         return mongoTemplate.save(tool);
     }
+
+    @Override
+    public List<Tool> findByFields(Query query) {
+        return mongoTemplate.find(query, Tool.class);
+    }
 }

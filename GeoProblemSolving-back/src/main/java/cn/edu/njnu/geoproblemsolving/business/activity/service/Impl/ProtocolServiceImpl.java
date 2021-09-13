@@ -1,9 +1,9 @@
 package cn.edu.njnu.geoproblemsolving.business.activity.service.Impl;
 
+import cn.edu.njnu.geoproblemsolving.business.CommonUtil;
 import cn.edu.njnu.geoproblemsolving.business.activity.dao.Impl.LinkProtocolDaoImpl;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.LinkProtocol;
 import cn.edu.njnu.geoproblemsolving.business.activity.service.ProtocolService;
-import cn.edu.njnu.geoproblemsolving.business.collaboration.compute.util.CommonUtil;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,8 +82,7 @@ public class ProtocolServiceImpl implements ProtocolService {
 
     @Override
     public LinkProtocol updateProtocolService(String pid, HashMap<String, Object> putInfo) {
-        CommonUtil commonUtil = new CommonUtil();
-        Update update = commonUtil.setUpdate(putInfo);
+        Update update = CommonUtil.setUpdate(putInfo);
         UpdateResult updateResult = protocolDao.updateLinkProtocol(pid, update);
         if (updateResult.getMatchedCount() > 0){
             return protocolDao.findProtocolById(pid);

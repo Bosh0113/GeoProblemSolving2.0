@@ -1,6 +1,7 @@
 package cn.edu.njnu.geoproblemsolving.business.activity.service.Impl;
 
 import cn.edu.njnu.geoproblemsolving.Dao.Folder.FolderDaoImpl;
+import cn.edu.njnu.geoproblemsolving.business.activity.ProjectUtil;
 import cn.edu.njnu.geoproblemsolving.business.activity.dto.UpdateActivityDTO;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
 import cn.edu.njnu.geoproblemsolving.business.activity.enums.ActivityType;
@@ -31,13 +32,15 @@ public class SubprojectServiceImpl implements SubprojectService {
     private final ActivityRepository activityRepository;
     private final UserRepository userRepository;
     private final FolderDaoImpl folderDao;
+    private final ProjectUtil projectUtil;
 
-    public SubprojectServiceImpl(SubprojectRepository subprojectRepository, ProjectRepository projectRepository, ActivityRepository activityRepository, UserRepository userRepository, FolderDaoImpl folderDao) {
+    public SubprojectServiceImpl(SubprojectRepository subprojectRepository, ProjectRepository projectRepository, ActivityRepository activityRepository, UserRepository userRepository, FolderDaoImpl folderDao, ProjectUtil projectUtil) {
         this.subprojectRepository = subprojectRepository;
         this.projectRepository = projectRepository;
         this.activityRepository = activityRepository;
         this.userRepository = userRepository;
         this.folderDao = folderDao;
+        this.projectUtil = projectUtil;
     }
 
     private UserEntity findByUserId(String userId) {
@@ -328,6 +331,7 @@ public class SubprojectServiceImpl implements SubprojectService {
             Optional optional = subprojectRepository.findById(aid);
             if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: subproject does not exist.");
             UserEntity user = findByUserId(userId);
+            // UserEntity user = projectUtil.getUserInfoFromUserServer(userId);
             if (user == null) return ResultUtils.error(-1, "Fail: user does not exist.");
 
             // add user info to subproject
@@ -423,11 +427,15 @@ public class SubprojectServiceImpl implements SubprojectService {
 
             subprojectRepository.save(subproject);
 
+            //退出activity
+            projectUtil.quitSubProject(aid, userId, 1);
+
             return ResultUtils.success("Success");
         } catch (Exception ex) {
             return ResultUtils.error(-2, ex.toString());
         }
     }
+
 
     @Override
     public JsonResult linkActivities(UpdateActivityDTO update, String aid1, String aid2, String pid){

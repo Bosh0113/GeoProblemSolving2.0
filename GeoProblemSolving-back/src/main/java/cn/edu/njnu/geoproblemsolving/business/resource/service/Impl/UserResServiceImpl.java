@@ -1,5 +1,6 @@
 package cn.edu.njnu.geoproblemsolving.business.resource.service.Impl;
 
+import cn.edu.njnu.geoproblemsolving.business.CommonUtil;
 import cn.edu.njnu.geoproblemsolving.business.resource.entity.*;
 import cn.edu.njnu.geoproblemsolving.business.resource.service.UserResService;
 import cn.edu.njnu.geoproblemsolving.business.resource.util.RestTemplateUtil;
@@ -134,7 +135,7 @@ public class UserResServiceImpl implements UserResService {
                     String filePath = part.getSubmittedFileName();
                     String folderPath = imgLocation.getPath();
 
-                    JsonResult storeResult = fileStore(part, filePath, folderPath);
+                    JsonResult storeResult = CommonUtil.fileStore(part, filePath, folderPath);
                     if (storeResult.getCode() == 0)
                         newFileName = storeResult.getData().toString();
                     else
@@ -180,40 +181,40 @@ public class UserResServiceImpl implements UserResService {
         return size;
     }
 
-    private JsonResult fileStore(Part part, String filePath, String folderPath) {
-        try {
-            String fileName = filePath.substring(0, filePath.lastIndexOf("."));
-            String suffix = filePath.substring(filePath.lastIndexOf(".") + 1);
-            String regexp = "[^A-Za-z_0-9\\u4E00-\\u9FA5]";
-            String saveName = fileName.replaceAll(regexp, "");
-
-            File temp = new File(folderPath);
-            if (!temp.exists()) {
-                temp.mkdirs();
-            }
-            int randomNum = (int) (Math.random() * 10 + 1);
-            for (int i = 0; i < 5; i++) {
-                randomNum = randomNum * 10 + (int) (Math.random() * 10 + 1);
-            }
-            String newFileTitle = saveName + "_" + randomNum + "." + suffix;
-            String localPath = temp + "/" + newFileTitle;
-
-            File file = new File(localPath);
-            FileOutputStream fileOutputStream = new FileOutputStream(file);
-            InputStream inputStream = part.getInputStream();
-            byte[] buffer = new byte[1024 * 1024];
-            int byteRead;
-            while ((byteRead = inputStream.read(buffer)) != -1) {
-                fileOutputStream.write(buffer, 0, byteRead);
-            }
-            fileOutputStream.close();
-            inputStream.close();
-
-            return ResultUtils.success(newFileTitle);
-        } catch (Exception ex) {
-            return ResultUtils.error(-2, ex.toString());
-        }
-    }
+    // private JsonResult fileStore(Part part, String filePath, String folderPath) {
+    //     try {
+    //         String fileName = filePath.substring(0, filePath.lastIndexOf("."));
+    //         String suffix = filePath.substring(filePath.lastIndexOf(".") + 1);
+    //         String regexp = "[^A-Za-z_0-9\\u4E00-\\u9FA5]";
+    //         String saveName = fileName.replaceAll(regexp, "");
+    //
+    //         File temp = new File(folderPath);
+    //         if (!temp.exists()) {
+    //             temp.mkdirs();
+    //         }
+    //         int randomNum = (int) (Math.random() * 10 + 1);
+    //         for (int i = 0; i < 5; i++) {
+    //             randomNum = randomNum * 10 + (int) (Math.random() * 10 + 1);
+    //         }
+    //         String newFileTitle = saveName + "_" + randomNum + "." + suffix;
+    //         String localPath = temp + "/" + newFileTitle;
+    //
+    //         File file = new File(localPath);
+    //         FileOutputStream fileOutputStream = new FileOutputStream(file);
+    //         InputStream inputStream = part.getInputStream();
+    //         byte[] buffer = new byte[1024 * 1024];
+    //         int byteRead;
+    //         while ((byteRead = inputStream.read(buffer)) != -1) {
+    //             fileOutputStream.write(buffer, 0, byteRead);
+    //         }
+    //         fileOutputStream.close();
+    //         inputStream.close();
+    //
+    //         return ResultUtils.success(newFileTitle);
+    //     } catch (Exception ex) {
+    //         return ResultUtils.error(-2, ex.toString());
+    //     }
+    // }
 
 
     /**
@@ -556,6 +557,23 @@ public class UserResServiceImpl implements UserResService {
         RestTemplateUtil httpUtil = new RestTemplateUtil();
         JSONObject getAllResult = httpUtil.getRequestToServer(url, access_token).getBody();
         return getAllResult.getJSONArray("data");
+    }
+
+    @Override
+    public JsonResult changeFileLocation(String userId, String oldPath, String newPath, ResourceEntity resourceEntity) {
+        String access_token = userDao.findUserByIdOrEmail(userId).getTokenInfo().getAccess_token();
+        String url = "http://" + userServerIpAndPort + "/auth/res/" + newPath + "/" + oldPath;
+        JSONObject resInfo = JSONObject.parseObject(JSONObject.toJSONString(resourceEntity));
+        RestTemplateUtil httpUtil = new RestTemplateUtil();
+        JSONObject uploadResult = httpUtil.putRequestToServer(url, access_token, resInfo).getBody();
+        if (uploadResult.getInteger("code") != 0){
+            return ResultUtils.error(-2, "fail");
+        }
+        ArrayList<ResourceEntity> userRes = uploadResult.getObject("data", UserEntity.class).getResource();
+        //这有问题,转过去转过来的会导致某些数据类型失去原有属性
+        Update update = new Update();
+        update.set("resource", userRes);
+        return ResultUtils.success(userDao.updateInfo(userId, update).getResource());
     }
 
     //

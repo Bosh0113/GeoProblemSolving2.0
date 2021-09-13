@@ -26,7 +26,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/modelTask/**",
                         "/dataContainer/**",
                         "/msgRecords/**",
-                        "/activity/**",
                         "/activityDoc/**",
                         "/activityDriven/**",
                         "/subproject/**",
@@ -35,7 +34,12 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 )//拦截的请求
                 .excludePathPatterns(
                         "/rip/file/allPublic",
-                        "/activityDriven/**"
+
+                        //测试用
+                        "/activityDriven/**",
+                        "/activity/**",
+                        "/subproject/**",
+                        "/res/**"
                 );//不拦截的请求
     }
     /*

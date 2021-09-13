@@ -3,6 +3,7 @@ package cn.edu.njnu.geoproblemsolving.business.activity.service.Impl;
 import cn.edu.njnu.geoproblemsolving.Dao.Email.EmailDaoImpl;
 import cn.edu.njnu.geoproblemsolving.Dao.Folder.FolderDaoImpl;
 import cn.edu.njnu.geoproblemsolving.View.StaticPagesBuilder;
+import cn.edu.njnu.geoproblemsolving.business.activity.ProjectUtil;
 import cn.edu.njnu.geoproblemsolving.business.activity.dto.UpdateActivityDTO;
 import cn.edu.njnu.geoproblemsolving.business.activity.dto.UpdateProjectDTO;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Subproject;
@@ -21,6 +22,7 @@ import cn.edu.njnu.geoproblemsolving.common.utils.ResultUtils;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -39,13 +41,15 @@ public class ProjectServiceImpl implements ProjectService {
     private final ActivityRepository activityRepository;
     private final UserRepository userRepository;
     private final FolderDaoImpl folderDao;
+    private final ProjectUtil projectUtil;
 
-    public ProjectServiceImpl(ProjectRepository projectRepository, SubprojectRepository subprojectRepository, ActivityRepository activityRepository, UserRepository userRepository, FolderDaoImpl folderDao) {
+    public ProjectServiceImpl(ProjectRepository projectRepository, SubprojectRepository subprojectRepository, ActivityRepository activityRepository, UserRepository userRepository, FolderDaoImpl folderDao, ProjectUtil projectUtil) {
         this.projectRepository = projectRepository;
         this.subprojectRepository = subprojectRepository;
         this.activityRepository = activityRepository;
         this.userRepository = userRepository;
         this.folderDao = folderDao;
+        this.projectUtil = projectUtil;
     }
 
     private UserEntity findByUserId(String userId) {
@@ -496,6 +500,9 @@ public class ProjectServiceImpl implements ProjectService {
             //save
             projectRepository.save(project);
             userRepository.save(user);
+
+            //退出子活动
+            projectUtil.quitSubProject(aid, userId, 0);
 
             return ResultUtils.success("Success");
         } catch (Exception ex) {
