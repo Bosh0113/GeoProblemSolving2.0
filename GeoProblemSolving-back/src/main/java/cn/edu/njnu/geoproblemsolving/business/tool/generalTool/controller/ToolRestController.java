@@ -1,11 +1,13 @@
 package cn.edu.njnu.geoproblemsolving.business.tool.generalTool.controller;
 
 import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.entity.Tool;
+import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.entity.ToolSetVo;
 import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.service.ToolService;
 import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.service.ToolServiceImpl;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import cn.edu.njnu.geoproblemsolving.common.utils.ResultUtils;
 import com.alibaba.fastjson.JSONObject;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -145,4 +147,101 @@ public class ToolRestController {
         List<Tool> toolList = toolService.getToolByIds(ids);
         return ResultUtils.success(toolList);
     }
+
+
+//================toolSet 操作==========================================================================================/
+
+    /**
+     * 创建工具集
+     * @param toolSet
+     * @return
+     */
+    @RequestMapping(value = "/toolset", method = RequestMethod.POST, produces = {"application/json;charset=UTF-8"})
+    public JsonResult createToolSet(@RequestBody Tool toolSet){
+        ToolSetVo toolSetVo = toolService.createToolSet(toolSet);
+        if (toolSetVo == null) return ResultUtils.error(-2, "Fail");
+        return ResultUtils.success(toolSetVo);
+    }
+
+
+
+    /**
+     * 根据字段查询
+     * 支持同时满足多字段
+     * @param key
+     * @param value
+     * @return
+     */
+    @RequestMapping(value = "/toolSet/{key}/{value}", method = RequestMethod.GET)
+    public JsonResult queryToolSet(@PathVariable ArrayList<String> key, @PathVariable ArrayList<String> value){
+        List<Tool> toolSets = toolService.queryTool(key, value);
+        if (toolSets != null) return ResultUtils.success(toolSets);
+        return ResultUtils.error(-2, "Fail");
+    }
+
+
+    /**
+     * 删除数据集
+     * @param tid
+     * @return
+     */
+    @RequestMapping(value = "/toolSet/{tid}", method = RequestMethod.DELETE)
+    public JsonResult deleteToolSet(@PathVariable String tid){
+        toolService.delToolService(tid);
+        return ResultUtils.success();
+    }
+
+
+    /**
+     * 更新工具集
+     * 必须携带 toolSetId
+     * 将需要修改的字段携带过来即可
+     * @param putToolSet
+     * @return 修改后的工具集
+     */
+    @RequestMapping(method = RequestMethod.PUT, produces = {"application/json;charset=UTF-8"})
+    public JsonResult updateToolSet(@RequestBody Tool putToolSet){
+        Tool tool = toolService.updateToolService(putToolSet);
+        if (tool == null) return ResultUtils.error(-2, "Fail");
+        ToolSetVo toolSetVo = new ToolSetVo();
+        BeanUtils.copyProperties(tool, toolSetVo);
+        return ResultUtils.success(toolSetVo);
+    }
+
+
+    /**
+     * 处理工具集的工具
+     * 添加工具
+     * @param toolSetId 工具集 id
+     * @param tids 要添加的工具 id，若有多个则用 “,” 分开
+     * @return 工具集
+     */
+    @RequestMapping(value = "/toolSet/tool/{toolSetId}/{tids}", method = RequestMethod.POST)
+    public JsonResult addTool(@PathVariable String toolSetId, @PathVariable ArrayList<String> tids){
+        ToolSetVo toolSetVo = toolService.addToolInToolSet(toolSetId, tids);
+        if (toolSetVo == null) return ResultUtils.error(-2, "Toolset id is incorrect");
+        return ResultUtils.success(toolSetVo);
+    }
+
+    /**
+     *
+     * 处理工具集的工具
+     * 删除工具
+     * 参数说明与上相同
+     * @param toolSetId
+     * @param tids
+     * @return
+     */
+    @RequestMapping(value = "/toolSet/tool/{toolSetId}/{tids}", method = RequestMethod.DELETE)
+    public JsonResult delTool(@PathVariable String toolSetId, @PathVariable ArrayList<String> tids){
+        ToolSetVo toolSetVo = toolService.delToolInToolSet(toolSetId, tids);
+        if (toolSetVo == null) return ResultUtils.error(-2, "Toolset id is incorrect");
+        return ResultUtils.success(toolSetVo);
+    }
+
+
+
+
+
+
 }

@@ -841,5 +841,25 @@ public class ActivityResServiceImpl implements ActivityResService {
         return publicResource;
     }
 
+
+    @Override
+    public Map<String, ArrayList<ResourceEntity>>  getAllFileInProjects(HashSet<String> aids) {
+        HashMap<String, ArrayList<ResourceEntity>> projectFile = new HashMap<>();
+        try {
+            Iterator<String> iterator = aids.iterator();
+            while (iterator.hasNext()){
+                String aid = iterator.next();
+                List<ResourceEntity> resList = activityResDao.queryByAid(aid);
+                ArrayList<ResourceEntity> fileList = Lists.newArrayList();
+                if (resList != null) gallFileInProject(resList, fileList);
+                projectFile.put(aid, fileList);
+            }
+            return projectFile;
+        }catch (Exception e){
+            System.out.println(e.toString());
+            return null;
+        }
+
+    }
 }
 

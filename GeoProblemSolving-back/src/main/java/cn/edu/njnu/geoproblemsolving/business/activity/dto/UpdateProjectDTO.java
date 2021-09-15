@@ -35,6 +35,5 @@ public class UpdateProjectDTO implements ToDomainConverter<Project> {
     /**
      * MIMI
      */
-    List<String> toolsetList;
     List<String> toolList;
 }

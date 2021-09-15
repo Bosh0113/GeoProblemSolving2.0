@@ -854,7 +854,9 @@
         collaIndex: -1,
         // 正在进行 link 的活动
         linkingId: "",
+        //processActivity 页面的成员
         participants: [],
+        //正在 link 页面的成员
         collLinkUser: []
       };
     },
@@ -922,7 +924,16 @@
           userId: this.userInfo.userId
         };
         this.sendLinkSock(content);
-        this.initLinkForm();
+        //去除当前页面 collaborationInfoList 中的内容
+        this.computeCollIndex(this.linkingId);
+        if (this.collaIndex == -1){
+          return;
+        }
+        this.collaboratingInfoList[this.collaIndex].collLinkUser =
+          this.collaboratingInfoList[this.collaIndex].collLinkUser.filter(item => item.userId != tempUserId);
+        if (this.collaboratingInfoList[this.collaIndex].collLinkUser.length == 0){
+          this.collaboratingInfoList.splice(this.collaIndex, 1);
+        }        this.initLinkForm();
       },
 
     },
@@ -971,21 +982,27 @@
               let senderId = messageJson.sender;
               let initLinkInfo = {
                 behavior: "inLinkActivitiesInfo",
-                receiver: senderId,
                 linkingId: this.linkingId,
                 activityLinks: this.activityLinks,
                 otherNodes: this.otherNodes,
                 selectActivities: this.selectedActivities,
                 linkRestriction: this.restriction,
-                participants: this.participants
+                collLinkUser: this.collLinkUser,
               };
-              this.sendLinkSock(initLinkInfo);
+              let sockMsg = {
+                sender: this.userInfo.userId,
+                senderName: this.userInfo.name,
+                type: "general",
+                receivers: [senderId],
+                content: initLinkInfo
+              };
+              socketApi.sendSock(this.socketId, sockMsg, this.socketOnMessage);
             }
           } else if (behavior == "inLinkActivitiesInfo") {
             let tempLinkId = content.linkingId;
             delete content.linkingId;
             delete content.behavior;
-            delete content.receiver;
+            delete content.receivers;
             content["linkId"]  = tempLinkId;
 
             this.computeCollIndex(tempLinkId);
@@ -1015,6 +1032,7 @@
               }
             }
           }else if (behavior == "joinCollLink"){
+            //加入协同
             let tempCollLinker = content.collLinkUser;
             if (this.linkingId == content.linkingId){
               this.collLinkUser = tempCollLinker;

@@ -449,4 +449,15 @@ public class ToolServiceImpl implements ToolService {
             return ResultUtils.error(-2, e.toString());
         }
     }
+
+
+    @Override
+    public List<Tool> getRelevantPurposeTool(String purpose) {
+        Query query = new Query();
+        Criteria criteria = new Criteria("privacy").is("Public");
+        Criteria orOperator = new Criteria().orOperator(Criteria.where("recommendation").is("All"), Criteria.where("recommendation").is(purpose));
+        query.addCriteria(criteria);
+        query.addCriteria(orOperator);
+        return toolDao.findByFields(query);
+    }
 }

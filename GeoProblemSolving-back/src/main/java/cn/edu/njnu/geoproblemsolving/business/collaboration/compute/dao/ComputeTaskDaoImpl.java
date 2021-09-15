@@ -1,10 +1,8 @@
 package cn.edu.njnu.geoproblemsolving.business.collaboration.compute.dao;
 
+import cn.edu.njnu.geoproblemsolving.business.CommonUtil;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.compute.entity.ComputeTask;
-import cn.edu.njnu.geoproblemsolving.business.collaboration.compute.util.CommonUtil;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.BeanWrapper;
-import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -36,8 +34,7 @@ public class ComputeTaskDaoImpl implements ComputeTaskDao{
         String taskId = putTask.getTaskId();
         Query query = new Query(Criteria.where("taskId").is(taskId));
         ComputeTask localTask = mongoTemplate.findOne(query, ComputeTask.class);
-        CommonUtil commonUtil = new CommonUtil();
-        String[] nullPropertyNames = commonUtil.getNullPropertyNames(putTask);
+        String[] nullPropertyNames = CommonUtil.getNullPropertyNames(putTask);
         BeanUtils.copyProperties(putTask, localTask, nullPropertyNames);
         return createTask(localTask);
     }

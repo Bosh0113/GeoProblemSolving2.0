@@ -5,8 +5,6 @@ import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityDocRep
 import cn.edu.njnu.geoproblemsolving.business.activity.service.ActivityDocService;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import cn.edu.njnu.geoproblemsolving.common.utils.ResultUtils;
-import com.alibaba.fastjson.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
