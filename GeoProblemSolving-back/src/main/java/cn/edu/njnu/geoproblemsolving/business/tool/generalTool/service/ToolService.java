@@ -56,4 +56,6 @@ public interface ToolService {
 
     JsonResult uploadToolImg(HttpServletRequest req) throws IOException, ServletException;
 
+
+    List<Tool> getRelevantPurposeTool(String purpose);
 }

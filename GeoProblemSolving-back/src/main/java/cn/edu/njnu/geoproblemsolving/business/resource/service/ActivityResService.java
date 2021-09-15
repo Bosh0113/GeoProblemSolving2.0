@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 public interface ActivityResService {
     Object createFolder(String folderName, String aid, ArrayList<String> paths, String userId);
@@ -38,6 +39,9 @@ public interface ActivityResService {
     //资源权限控制
     ArrayList<ResourceEntity> getAllFileInProject(String aid);
 
+    //获取节点的所有文件
+    Map<String, ArrayList<ResourceEntity>> getAllFileInProjects(HashSet<String> aids);
+
     JsonResult changeResEntity(String aid, String uid, ArrayList<String> paths, HttpServletRequest req) throws IOException, ServletException;
 
     ResourceEntity getFlowFolder(String aid, String folderName);
@@ -46,5 +50,7 @@ public interface ActivityResService {
 
     //获取项目项目资源资源中的所有 public
     List<ResourceEntity> getAllPublicService();
+
+
 
 }

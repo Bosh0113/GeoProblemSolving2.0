@@ -141,7 +141,7 @@ export default {
   },
   mounted() {
     this.taskList = this.operationApi.getTaskList();
-    this.relaions = this.operationApi.getTaksDependencies();
+    this.relaions = this.operationApi.getTaskDependencies();
     this.operations = this.operationApi.getTempOperations();
 
     const id = document.getElementById("drawflow");

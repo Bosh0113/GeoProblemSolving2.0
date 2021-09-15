@@ -418,7 +418,7 @@ export function getTaskList() {
     return tasks;
 }
 
-export function getTaksDependencies() {
+export function getTaskDependencies() {
     if (xmlDoc === null) {
         alert("Failed to record operation. Please load activity document first!");
         return;
