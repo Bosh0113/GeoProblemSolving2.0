@@ -1,10 +1,5 @@
 package cn.edu.njnu.geoproblemsolving.business.tool.generalTool.controller;
 
-import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.dao.impl.ToolsetDaoImpl;
-
-import cn.edu.njnu.geoproblemsolving.Entity.ToolReq.AddToolReq;
-import cn.edu.njnu.geoproblemsolving.Entity.ToolReq.UpdateToolListReq;
-import cn.edu.njnu.geoproblemsolving.Entity.ToolsetEntity;
 import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.entity.Tool;
 import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.entity.ToolSetVo;
 import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.service.ToolService;
@@ -94,17 +89,26 @@ public class ToolsetController {
     //     ToolsetDaoImpl toolsetDao = new ToolsetDaoImpl(mongoTemplate);
     //     return toolsetDao.readAccessibleToolsets(provider);
     // }
-
-    @RequestMapping(value = "/delete", method = RequestMethod.GET)
-    public String deleteToolset(@RequestParam("tsId") String tsId){
-        ToolsetDaoImpl toolsetDao = new ToolsetDaoImpl(mongoTemplate);
-        try {
-            toolsetDao.deleteToolset("tsId",tsId);
-            return "Success";
-        }catch (Exception e){
-            return "Fail";
-        }
+    /**
+     * 删除数据集
+     * @param tid
+     * @return
+     */
+    @RequestMapping(value = "/{tid}", method = RequestMethod.DELETE)
+    public JsonResult deleteToolSet(@PathVariable String tid){
+        toolService.delToolService(tid);
+        return ResultUtils.success();
     }
+//    @RequestMapping(value = "/delete", method = RequestMethod.GET)
+//    public String deleteToolset(@RequestParam("tsId") String tsId){
+//        ToolsetDaoImpl toolsetDao = new ToolsetDaoImpl(mongoTemplate);
+//        try {
+//            toolsetDao.deleteToolset("tsId",tsId);
+//            return "Success";
+//        }catch (Exception e){
+//            return "Fail";
+//        }
+//    }
 
 
     /**

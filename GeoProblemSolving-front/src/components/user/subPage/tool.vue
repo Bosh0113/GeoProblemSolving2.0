@@ -131,13 +131,13 @@
                              <p
                                class="ellipsis"
                                style="width:50%;display:inline-block;font-size: 16px;"
-                               :title="tool.toolsetName"
-                             >{{tool.toolsetName}}</p>
+                               :title="tool.toolName"
+                             >{{tool.toolName}}</p>
                            </div>
                            <div slot="extra">
                              <Icon
                                type="ios-settings"
-                               title="Edit"
+                               title="Manage tools"
                                size="25"
                                class="icon"
                                @click="manageTool(tool)"
@@ -164,19 +164,19 @@
                                size="25"
                                class="icon"
                                title="Delete"
-                               @click="delTool(tool.tsid, tool.privacy, index, tool.toolsetName, tool.toolSet)"
+                               @click="delTool(tool.tid, tool.privacy, index, tool.toolName, tool.toolSet)"
                              />
                            </div>
                            <!--                       内容    -->
                            <div style="cursor: pointer;position: relative;">
                              <div style="position: absolute;margin-top: 5px;">
                                <img
-                                 :src="tool.toolsetImg"
-                                 v-if="tool.toolsetImg != '' && tool.toolsetImg!=null"
+                                 :src="tool.toolImg"
+                                 v-if="tool.toolImg != '' && tool.toolImg!=null"
                                  style="height:70px; width:70px; border-radius:50%"
                                />
                                <avatar
-                                 :username="tool.toolsetName"
+                                 :username="tool.toolName"
                                  :size="70"
                                  style="margin-bottom:6px;"
                                  v-else
@@ -201,8 +201,8 @@
                                <span class="toolsetTypeSpan">
                                   Toolset
                                </span>
-                               <span v-for="(tag, index) in tool.categoryTag" :key="tag" class="toolTagSpan">
-                                 {{tool.categoryTag[index]}}
+                               <span v-for="(tag, index) in tool.tags" :key="tag" class="toolTagSpan">
+                                 {{tool.tags[index]}}
                                </span>
                              </div>
                            </div>
@@ -280,13 +280,13 @@
                              <p
                                class="ellipsis"
                                style="width:50%;display:inline-block;font-size: 16px;"
-                               :title="tool.toolsetName"
-                             >{{tool.toolsetName}}</p>
+                               :title="tool.toolName"
+                             >{{tool.toolName}}</p>
                            </div>
                            <div slot="extra">
                              <Icon
                                type="ios-settings"
-                               title="Edit"
+                               title="Manage tools"
                                size="25"
                                class="icon"
                                @click="manageTool(tool)"
@@ -313,19 +313,19 @@
                                size="25"
                                class="icon"
                                title="Delete"
-                               @click="delTool(tool.tsid, tool.privacy, index, tool.toolsetName, tool.toolSet)"
+                               @click="delTool(tool.tid, tool.privacy, index, tool.toolName, tool.toolSet)"
                              />
                            </div>
                            <!--                       内容    -->
                            <div style="cursor: pointer;position: relative;">
                              <div style="position: absolute;margin-top: 5px;">
                                <img
-                                 :src="tool.toolsetImg"
-                                 v-if="tool.toolsetImg != '' && tool.toolsetImg!=null"
+                                 :src="tool.toolImg"
+                                 v-if="tool.toolImg != '' && tool.toolImg!=null"
                                  style="height:70px; width:70px; border-radius:50%"
                                />
                                <avatar
-                                 :username="tool.toolsetName"
+                                 :username="tool.toolName"
                                  :size="70"
                                  style="margin-bottom:6px;"
                                  v-else
@@ -350,8 +350,8 @@
                                <span class="toolsetTypeSpan">
                                   Toolset
                                </span>
-                               <span v-for="(tag, index) in tool.categoryTag" :key="tag" class="toolTagSpan">
-                                 {{tool.categoryTag[index]}}
+                               <span v-for="(tag, index) in tool.tags" :key="tag" class="toolTagSpan">
+                                 {{tool.tags[index]}}
                                </span>
                              </div>
                            </div>
@@ -784,7 +784,6 @@
     },
     mounted() {
       this.getPersonalTools();
-      this.getPersonalToolsets();
       this.resizeContent();
       this.reSize();
       window.addEventListener("resize", this.reSize);
@@ -866,20 +865,20 @@
         console.log(this.editToolInfo);
       },
       manageTool(item){
-        this.tempPersonalToolsList = this.personalToolsList;
-        for(let i = 0 ; i < item.toolList.length ; i++){
-          let tid = item.toolList[i].tid;
-          for(let j = 0 ; j < this.tempPersonalToolsList.length ; j++){
-            if(this.tempPersonalToolsList[j].tid == tid){
-              this.tempPersonalToolsList.splice(j,1);
+        this.manageToolInfo = item;
+        this.toolsetToolList = this.getToolList(item.toolList);
+        let allToolList = JSON.parse(JSON.stringify(this.personalToolsList));
+        if(item.toolList){
+          for(let i = 0 ; i < item.toolList.length ; i++){
+            for(let j = 0 ; j < allToolList.length ; j++){
+              if(allToolList[j].tid == item.toolList[i]){
+                allToolList.splice(j,1);
+              }
             }
           }
         }
+        this.tempPersonalToolsList = allToolList;
         this.manageToolModal = true;
-        console.log(item);
-        this.manageToolInfo = item;
-        this.toolsetToolList = item.toolList;
-        console.log(this.toolsetToolList);
       },
       getPersonalTools: function () {
         // "/GeoProblemSolving/tool/findByProvider/" + this.$store.getters.userId
@@ -894,12 +893,18 @@
             } else if (res.data.code == 0){
               let tempTools = res.data.data;
               console.log(res.data.data);
-              this.personalToolsList = res.data.data;
+              
               for (let i = 0; i < tempTools.length; i++) {
-                if (tempTools[i].privacy == "Public") {
+                if (tempTools[i].privacy == "Public" && tempTools[i].toolSet == false) {
                   this.publicTools.push(tempTools[i]);
-                } else {
+                  this.personalToolsList.push(tempTools[i]);
+                } else if(tempTools[i].privacy == "Private" && tempTools[i].toolSet == false) {
                   this.privateTools.push(tempTools[i]);
+                  this.personalToolsList.push(tempTools[i]);
+                } else if(tempTools[i].privacy == "Public" && tempTools[i].toolSet == true) {
+                  this.publicToolsets.push(tempTools[i]);
+                } else if(tempTools[i].privacy == "Private" && tempTools[i].toolSet == true) {
+                  this.privateToolsets.push(tempTools[i]);
                 }
               }
             }
@@ -908,32 +913,7 @@
             this.$Message.error("Loading Fail.");
           });
       },
-      getPersonalToolsets: function () {
-        // "/GeoProblemSolving/tool/findByProvider/" + this.$store.getters.userId
-        this.$axios
-          .get(
-            "/GeoProblemSolving/toolset/inquiryAll?provider=" + this.$store.getters.userId
-          )
-          .then((res) => {
-            if (res.data == "Offline") {
-              this.$store.commit("userLogout");
-              this.$router.push({ name: "Login" });
-            } else {
-              console.log(res.data);
-              let tempToolset = res.data;
-              for( let i = 0 ; i < tempToolset.length ; i++){
-                if(tempToolset[i].privacy == "Public"){
-                  this.publicToolsets.push(tempToolset[i]);
-                } else {
-                  this.privateToolsets.push(tempToolset[i]);
-                }
-              }
-            }
-          })
-          .catch((err) => {
-            this.$Message.error("Loading Fail.");
-          });
-      },
+      
       nextStep: function () {
         if (this.currentStep == 0) {
           this.currentStep = 1;
@@ -946,23 +926,33 @@
       },
       createTool: async function () {
         let createToolForm = this.toolInfo;
-        console.log(createToolForm);
         this.loading = true;
         setTimeout(()=>{
           this.loading = false;
         }, 2000)
         createToolForm["provider"] = this.$store.getters.userId;
-        console.log(createToolForm);
         // let data = await post("/GeoProblemSolving/tool", createToolForm);
         if(createToolForm.toolSet == true){
-          this.axios.post("/GeoProblemSolving/toolset/create", createToolForm)
+          let formData = {};
+          formData.toolName = createToolForm.toolsetName;
+          formData.toolImg = createToolForm.toolsetImg;
+          formData.recommendation = createToolForm.recomStep;
+          formData.toolList = [];
+          for(let i = 0 ; i < createToolForm.toolList.length ; i++){
+            formData.toolList.push(createToolForm.toolList[i].tid);
+          }
+          formData.toolSet = true;
+          formData.provider = createToolForm.provider;
+          formData.privacy = createToolForm.privacy;
+          formData.description = createToolForm.description;
+          formData.tags = createToolForm.categoryTag;
+          this.axios.post("/GeoProblemSolving/toolset",formData)
           .then(res=>{
-            console.log(res);
-            if (res.data.tsid != ""){
+            if (res.data.code == 0){
               this.createToolsetModal = false;
               this.editToolInfo = {};
               this.toolInfo = {};
-              let toolData = res.data;
+              let toolData = res.data.data;
               if (toolData != null){
                 if (toolData.privacy == "Public"){
                   this.publicToolsets.push(toolData);
@@ -988,8 +978,6 @@
               this.editToolInfo = {};
               this.toolInfo = {};
               let toolData = res.data.data;
-              console.log(res);
-              console.log(toolData);
               this.personalToolsList.push(toolData);
               if (toolData != null){
                 if (toolData.privacy == "Public"){
@@ -1038,12 +1026,11 @@
           });
         } else if(this.delToolInfo.delToolSet == true){
           this.$axios
-          .get(
-            "/GeoProblemSolving/toolset/delete?tsId=" + this.delToolInfo.delToolId
+          .delete(
+            "/GeoProblemSolving/toolset/" + this.delToolInfo.delToolId
           )
           .then((res) => {
-            console.log(res);
-            if (res.data == "Success") {
+            if (res.data.code == 0) {
               this.delCurrentTool();
               this.$Notice.success({title: "Delete Success."});
               this.confirmDelModal = false;
@@ -1065,7 +1052,6 @@
         if(type == "Public"){
            if(toolset == true){
              index = this.getIndex(this.publicToolsets,id);
-             console.log(index);
              this.publicToolsets.splice(index,1);
            } else if(toolset == false){
              index = this.getIndex(this.publicTools,id);
@@ -1082,10 +1068,8 @@
         }
       },
       getIndex(list,id){
-        console.log(list);
         for(let i = 0 ; i < list.length ; i++){
           if(list[i].tid == id || list[i].tsid == id){
-            console.log(i);
             return i;
           }
         }
@@ -1106,10 +1090,34 @@
       },
       confirmManageTool(){
         let toolList = this.toolsetToolList;
-        console.log(toolList);
-        this.$axios.post("/GeoProblemSolving/toolset/updateTools",toolList)
+        let formData = {};
+        formData.tid = this.manageToolInfo.tid;
+        formData.toolList = [];
+        formData.toolSet = true;
+        for(let i = 0 ; i < toolList.length ; i++){
+          formData.toolList.push(toolList[i].tid);
+        }
+        this.$axios.put("/GeoProblemSolving/toolset/", formData)
           .then((res) => {
-            this.$Notice.success({title: "Update successfully."});
+            if(res.data.code == 0){
+              let toolsetInfo = res.data.data;
+              this.manageToolModal = false;
+              if(toolsetInfo.privacy == "Public"){
+                for(let i = 0 ; i < this.publicToolsets.length ; i++){
+                  if(this.publicToolsets[i].tid == toolsetInfo.tid){
+                    this.publicToolsets[i].toolList = toolsetInfo.toolList;
+                  }
+                }
+              } else {
+                for(let i = 0 ; i < this.privateToolsets.length ; i++){
+                  if(this.privateToolsets[i].tid == toolsetInfo.tid){
+                    this.privateToolsets[i].toolList = toolsetInfo.toolList;
+                  }
+                }
+              }
+              this.$Notice.success({title: "Update successfully."});
+            }
+            
           })
           .catch((err) => {
             this.$Message.error("Update Fail.Try again!");
@@ -1119,7 +1127,6 @@
         // "/GeoProblemSolving/tool/update/" + this.editToolInfo.tid,
         //   this.editToolInfo
         if(this.editToolInfo.toolSet == false){
-          console.log(this.editToolInfo);
           this.$axios
           .put(
             "/GeoProblemSolving/tool",
@@ -1135,22 +1142,10 @@
             this.$Message.error("Update Fail.Try again!");
           });
         } else {
-          console.log(this.editToolInfo);
-          let formData = new URLSearchParams();
-          formData.append("tsid",this.editToolInfo.tsid);
-          formData.append("toolsetName",this.editToolInfo.toolsetName);
-          formData.append("toolsetImg",this.editToolInfo.toolsetImg);
-          formData.append("toolSet",this.editToolInfo.toolSet);
-          formData.append("recomStep",this.editToolInfo.recomStep);
-          formData.append("provider",this.editToolInfo.provider);
-          formData.append("privacy",this.editToolInfo.privacy);
-          formData.append("description",this.editToolInfo.description);
-          formData.append("createdTime",this.editToolInfo.createdTime);
-          formData.append("categoryTag",this.editToolInfo.categoryTag);
           this.$axios
-          .post(
-            "/GeoProblemSolving/toolset/update",
-            formData
+          .put(
+            "/GeoProblemSolving/toolset/",
+            this.editToolInfo
           )
           .then((res) => {
             this.$Notice.success({title: "Update successfully."});
@@ -1209,8 +1204,22 @@
         this.chooseCreateModal = false;
         this.createToolsetModal = true;
       },
+      getToolList(list){
+        let toolsInToolset = [];
+        if(list){
+          for(let i = 0 ; i < list.length ; i++){
+            for(let j = 0 ; j < this.personalToolsList.length ; j++){
+              if(list[i] == this.personalToolsList[j].tid){
+                toolsInToolset.push(this.personalToolsList[j]);
+              }
+            }
+          }
+        }
+        return toolsInToolset;
+      },
     },
     computed: {
+      
       userToolCount: function () {
         if (this.checkedType.length == 0 || this.toolAndToolset.length == 0) {
           this.personalTools = [];

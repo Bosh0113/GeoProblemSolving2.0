@@ -623,67 +623,94 @@ export default {
     },
     async getPublicTools() {
       let data = await get(
-        "/GeoProblemSolving/tool/inquiry?key=privacy&value=Public"
+        "/GeoProblemSolving/toolset/privacy/Public"
       );
       this.$set(this, "publicTools", data);
     },
     async getPersonalTools() {
       let data = await get(
-        `/GeoProblemSolving/tool/findByProvider/${this.userInfo.userId}`
+        `/GeoProblemSolving/tool/provider/${this.userInfo.userId}`
       );
+      
       this.$set(this, "personalTools", data);
     },
+    isToolIdList(tid){
+      for(let i = 0 ; i < this.toolIdList.length ; i++){
+        if(this.toolIdList[i] == tid){
+          return true;
+        }
+      }
+      return false;
+    },
+    isStepToolsetsShow(tid){
+      for(let i = 0 ; i < this.stepToolsetsShow.length ; i++){
+        if(this.stepToolsetsShow[i].tid == tid){
+          return true;
+        }
+      }
+      return false;
+    },
+    isStepToolsShow(tid){
+      for(let i = 0 ; i < this.stepToolsShow.length ; i++){
+        if(this.stepToolsShow[i].tid == tid){
+          return true;
+        }
+      }
+      return false;
+    },
     filterDuplicateTools() {
-      this.stepToolsetsShow = [];
-      this.stepToolsShow = [];
-
       // public tools and toolsets
-      let tools = [],
-        toolsets = [];
-      for (var i = this.publicTools.length - 1; i >= 0; i--) {
-        if (
-          this.publicTools[i].isToolset != undefined &&
-          this.publicTools[i].isToolset
-        ) {
-          if (!this.toolIdList.contains(this.publicTools[i].tid)) {
+      let tools = [];
+      let toolsets = [];
+      let toolsShow = [];
+      let toolsetsShow = [];
+      for (let i = 0; i < this.publicTools.length; i++) {
+        if ( this.publicTools[i].toolSet == true ) {
+          if (this.isToolIdList(this.publicTools[i].tid) == false) {
             toolsets.push(this.publicTools[i]);
           } else {
-            this.stepToolsetsShow.push(this.publicTools[i]);
+            toolsetsShow.push(this.publicTools[i]);
           }
         } else {
-          if (!this.toolIdList.contains(this.publicTools[i].tid)) {
+          if (this.isToolIdList(this.publicTools[i].tid) == false) {
             tools.push(this.publicTools[i]);
           } else {
-            this.stepToolsShow.push(this.publicTools[i]);
+            toolsShow.push(this.publicTools[i]);
           }
         }
       }
       this.publicTools = tools;
       this.publicToolsets = toolsets;
+      this.stepToolsetsShow = toolsetsShow;
+      this.stepToolsShow = toolsShow;
 
       // personal tools and toolsets
       tools = [];
       toolsets = [];
+      toolsShow = [];
+      toolsetsShow = [];
       for (var i = this.personalTools.length - 1; i >= 0; i--) {
         if (
-          this.personalTools[i].isToolset != undefined &&
-          this.personalTools[i].isToolset
+          this.personalTools[i].toolSet != undefined &&
+          this.personalTools[i].toolSet
         ) {
-          if (!this.toolIdList.contains(this.personalTools[i].tid)) {
+          if (this.isToolIdList(this.personalTools[i].tid) == false) {
             toolsets.push(this.personalTools[i]);
           } else {
-            this.stepToolsetsShow.push(this.personalTools[i]);
+            toolsetsShow.push(this.personalTools[i]);
           }
         } else {
-          if (!this.toolIdList.contains(this.personalTools[i].tid)) {
+          if (this.isToolIdList(this.personalTools[i].tid) == false) {
             tools.push(this.personalTools[i]);
           } else {
-            this.stepToolsShow.push(this.personalTools[i]);
+            toolsShow.push(this.personalTools[i]);
           }
         }
       }
       this.personalTools = tools;
       this.personalToolsets = toolsets;
+      this.stepToolsetsShow = toolsetsShow;
+      this.stepToolsShow = toolsShow;
     },
     filterShowListByType() {
       this.publicToolsetsShow = this.getFilterResult(this.publicToolsets);
@@ -721,7 +748,7 @@ export default {
       return resultList;
     },
     showInfo(item) {
-      this.itemInfo.name = item.name;
+      this.itemInfo.name = item.toolName;
       this.itemInfo.description = item.description;
       this.itemInfo.tags = item.tags;
       this.itemInfo.recommendation = item.recommendation;
@@ -809,7 +836,7 @@ export default {
       // 更新协同文档
       // add
       for (var i = 0; i < this.stepToolsetsShow.length; i++) {
-        if (!this.toolIdList.contains(this.stepToolsetsShow[i].tid)) {
+        if (this.isToolIdList(this.stepToolsetsShow[i].tid) == false) {
 
           this.operationApi.toolOperationRecord(
             this.activityInfo.aid,
@@ -822,7 +849,7 @@ export default {
         }
       }
       for (var i = 0; i < this.stepToolsShow.length; i++) {
-        if (!this.toolIdList.contains(this.stepToolsShow[i].tid)) {
+        if (this.isToolIdList(this.stepToolsShow[i].tid) == false) {
 
           this.operationApi.toolOperationRecord(
             this.activityInfo.aid,
@@ -835,8 +862,11 @@ export default {
         }
       }
       // remove
+      console.log(this.toolIdList);
+      console.log(this.stepToolsetsShow);
+      console.log(this.stepToolsShow);
       for (var i = 0; i < this.toolIdList.length; i++) {
-        if (!this.stepToolsetsShow.contains(this.toolIdList[i]) && !this.stepToolsShow.contains(this.toolIdList[i])) {
+        if (this.isStepToolsetsShow(this.toolIdList[i]) == false && this.isStepToolsShow(this.toolIdList[i]) == false) {
 
           this.operationApi.toolOperationRecord(
             this.activityInfo.aid,

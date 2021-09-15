@@ -387,7 +387,12 @@ export default {
               this.$store.commit("userLogout");
               this.$router.push({ name: "Login" });
           } else if (res.data.code == 0){
-            this.personalToolList = res.data.data;
+            let tools =  res.data.data;
+            for( let i = 0 ; i < tools.length ; i++){
+              if(tools[i].toolSet == false){
+                this.personalToolList.push(tools[i]);
+              }
+            }
           }
         })
         .catch((err) => {

@@ -116,7 +116,7 @@
                 @click="addFolderModalShow"
             /></Card>
             <div v-for="(item, index) in fileList" :key="index">
-              <Card class="res-content" v-if="!resEdit">
+              <Card class="res-content" v-if="!resEdit ">
                 <div
                   class="res-content-image"
                   v-if="item.folder"
@@ -805,6 +805,7 @@ export default {
   created() {},
   mounted() {
     this.getResList();
+    this.getParentActivities();
 
     Date.prototype.Format = function (fmt) {
       var o = {
@@ -898,6 +899,28 @@ export default {
       }
       return url;
     },
+    getParentActivities(){
+      if (this.activityInfo.aid != "" && this.activityInfo.aid != undefined){
+        let url = "";
+        let aid = this.activityInfo.aid;
+        if(this.activityInfo.level == 1){
+          url = "/GeoProblemSolving/subproject/" + aid + "/lineage";
+        } else if (this.activityInfo.level > 1){
+          url = "/GeoProblemSolving/activity/" + aid + "/lineage";
+        }
+        this.$axios.get(url)
+          .then((res) => {
+            if (res.data.code == 0) {
+              console.log(res.data.data);
+            } else {
+              console.log(res.data.msg);
+            }
+          })
+          .catch((err) => {
+            console.log(err.data);
+          });
+      }
+    },
     getResList() {
       if (this.activityInfo.aid != "" && this.activityInfo.aid != undefined) {
         this.axios
@@ -910,6 +933,7 @@ export default {
               // this.tempLoginModal = true;
             } else if (res.data.code == 0) {
               let list = res.data.data;
+              console.log(list);
               this.$set(this, "activityResList", list);
               this.filterData();
               this.filterRelatedRes();
@@ -1321,15 +1345,12 @@ export default {
               // this.$router.push({ name: "Login" });
               this.tempLoginModal = true;
             } else if (res.data.code == 0) {
+              console.log(res.data.data);
               selectedRes = res.data.data;
               for (var j = 0; j < selectedRes.length; j++) {
-                mockData.push({
-                  key: mockData.length.toString(),
-                  name: selectedRes[j].name,
-                  type: selectedRes[j].type,
-                  uid: selectedRes[j].uid,
-                  source: activityId,
-                });
+                selectedRes[j].key = mockData.length.toString();
+                selectedRes[j].source = activityId;
+                mockData.push(selectedRes[j]);
               }
             } else {
               selectedRes = [];
@@ -1346,13 +1367,7 @@ export default {
       let mockData = [];
       if (this.existingResources.length > 0) {
         for (var i = 0; i < this.targetKeys.length; i++) {
-          mockData.push({
-            key: this.targetKeys[i],
-            name: this.existingResources[this.targetKeys[i]].name,
-            type: this.existingResources[this.targetKeys[i]].type,
-            uid: this.existingResources[this.targetKeys[i]].uid,
-            source: this.existingResources[this.targetKeys[i]].source,
-          });
+          mockData.push(this.existingResources[this.targetKeys[i]]);
         }
       }
       return mockData;
@@ -1377,6 +1392,9 @@ export default {
       if (tempPath.length == 0) {
         tempPath = ["0"];
       }
+      console.log(selectResource);
+      console.log(addFileList);
+
       this.axios
         .get(
           "/GeoProblemSolving/rip/shareToProject/" +
@@ -1392,6 +1410,7 @@ export default {
             // this.$router.push({ name: "Login" });
             this.tempLoginModal = true;
           } else if (res.data.code == 0) {
+            console.log(res.data.data);
             this.inheritResModal = false;
             // this.getResList();
             let resList = res.data.data;
@@ -1762,7 +1781,6 @@ export default {
     canBeShare(fileId) {
       //判断项目中是否由此文件，如果有，则不能共享
       let result = true;
-      console.log(this.activityResList);
       for (let i = 0; i < this.activityResList.length; i++) {
         if (this.activityResList[i].uid == fileId) {
           result = false;

@@ -2,13 +2,13 @@ package cn.edu.njnu.geoproblemsolving.business.activity.entity;
 
 import cn.edu.njnu.geoproblemsolving.business.activity.enums.ActivityType;
 import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @Document(collection = "Activities")
@@ -76,8 +76,8 @@ public class Activity implements Serializable {
     private JSONArray last;
     private JSONArray next;
     private String protocolId;
-    // // Temp
-    // private List<String> toolList;
-    // private List<String> toolsetList;
+
+    // Temp
+     private List<String> toolList;
 }
 

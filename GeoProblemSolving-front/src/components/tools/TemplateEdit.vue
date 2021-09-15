@@ -267,8 +267,8 @@
         v-else
       >
         <div v-show="this.currentStep === 0">
-          <FormItem label="Name:" prop="toolsetName">
-            <Input v-model="selectedTool.toolsetName" disabled></Input>
+          <FormItem label="Name:" prop="toolName">
+            <Input v-model="selectedTool.toolName" disabled></Input>
           </FormItem>
           <FormItem label="Description:" prop="description" :label-width="110">
             <Input
@@ -278,19 +278,21 @@
             />
           </FormItem>
           <FormItem label="Tool List:" prop="toolList" >
-            <Card style="height:40px;" :padding="0" dis-hover>
-              <Tag
-                color="#ff9900"
-                style="margin-left: 7px"
-                v-for="(item, index) in selectedTool.toolList"
-                :key="index"
-                >{{ item.toolName }}</Tag
-              >
+            <Card style="height:70px;" :padding="0" dis-hover>
+              <vue-scroll :ops="ops" style="height:65px;">
+                <Tag
+                  color="#ff9900"
+                  style="margin-left: 7px"
+                  v-for="(item, index) in toolList"
+                  :key="index"
+                  >{{ item.toolName }}</Tag
+                >
+              </vue-scroll>
             </Card>
           </FormItem>
           <FormItem label="Step:" prop="recommendation" >
             <Select
-              v-model="selectedTool.recomStep"
+              v-model="selectedTool.recommendation"
               multiple
               placeholder="Select the recommended step of your tool"
             >
@@ -321,7 +323,7 @@
             <div>
               <Tag
                 color="primary"
-                v-for="(item, index) in this.selectedTool.categoryTag"
+                v-for="(item, index) in this.selectedTool.tags"
                 :key="index"
                 closable
                 @on-close="deleteCreateToolTag(index)"
@@ -345,9 +347,9 @@
 
           <FormItem label="Image:" prop="toolImg">
             <div class="inline_style">
-              <div class="demo-upload-list" v-if="selectedTool.toolsetImg != ''">
+              <div class="demo-upload-list" v-if="selectedTool.toolImg != ''">
                 <template>
-                  <img :src="selectedTool.toolsetImg" />
+                  <img :src="selectedTool.toolImg" />
                   <div class="demo-upload-list-cover">
                     <Icon
                       type="ios-eye-outline"
@@ -459,7 +461,7 @@ export default {
         ],
       },
       toolsetInfoRule: {
-        toolsetName: [
+        toolName: [
           {
             required: true,
             message: "The name cannot be empty",
@@ -515,7 +517,7 @@ export default {
         }
       } else {
         if (tag != "") {
-        this.selectedTool.categoryTag.push(tag);
+        this.selectedTool.tags.push(tag);
         this.inputToolTag = "";
         }
       }
@@ -525,7 +527,7 @@ export default {
       if(this.selectedTool.toolSet == false){
         this.selectedTool.tags.splice(index, 1); 
       } else {
-        this.selectedTool.categoryTag.splice(index, 1);
+        this.selectedTool.tags.splice(index, 1);
       }    
     },
     querryTools: function () {
@@ -536,14 +538,18 @@ export default {
               this.$store.commit("userLogout");
               this.$router.push({ name: "Login" });
           } else if (res.data.code == 0){
-            this.personalToolList = res.data.data;
+            let tools =  res.data.data;
+            for( let i = 0 ; i < tools.length ; i++){
+              if(tools[i].toolSet == false){
+                this.personalToolList.push(tools[i]);
+              }
+            } 
           }
         })
         .catch((err) => {
           this.$Message.error("Fail");
         });
     },
-
     uploadPhoto(e) {
       // 利用fileReader对象获取file
       var file = e.target.files[0];
@@ -561,7 +567,7 @@ export default {
           if(this.selectedTool.toolSet == false){
             this.selectedTool.toolImg = this.img; 
           } else {
-            this.selectedTool.toolsetImg = this.img;
+            this.selectedTool.toolImg = this.img;
           }
         };
       }
@@ -576,7 +582,7 @@ export default {
       if(this.selectedTool.toolSet == false){
         this.selectedTool.toolImg =""; 
       } else {
-        this.selectedTool.toolsetImg ="";
+        this.selectedTool.toolImg ="";
       }
     },
 
@@ -590,18 +596,20 @@ export default {
       this.selectedTool.tags.splice(index, 1);
     },
 
-    selectTools(indexList){
-      console.log(indexList);
-      console.log(this.selectedTool.toolList);
-      let list = this.selectTool.toolList;
-      this.selectTool.toolList = [];
-      for(let i = 0 ; i < list.length; i++){
-        this.selectedTool.toolList.push(list[i]);
+  },
+  computed:{
+    toolList(){
+      let toolsInToolset = [];
+      if(this.selectTool.toolList){
+        for(let i = 0 ; i < this.selectedTool.toolList.length ; i++){
+          for(let j = 0 ; j < this.personalToolList.length ; j++){
+            if(this.selectedTool.toolList[i] == this.personalToolList[j].tid){
+              toolsInToolset.push(this.personalToolList[j]);
+            }
+          }
+        }
       }
-      // this.selectedTool.toolList = [];
-      // for( let i = 0 ; i < indexList.length ; i++){
-      //   this.selectedTool.toolList.push(this.personalToolList[indexList[i]]);
-      // }
+      return toolsInToolset;
     }
   },
   watch: {
