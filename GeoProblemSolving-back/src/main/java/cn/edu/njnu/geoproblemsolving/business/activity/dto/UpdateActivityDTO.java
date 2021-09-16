@@ -5,6 +5,7 @@ import cn.edu.njnu.geoproblemsolving.business.activity.enums.ActivityType;
 import com.alibaba.fastjson.JSONArray;
 import lombok.Data;
 
+import java.util.HashSet;
 import java.util.List;
 
 
@@ -24,7 +25,6 @@ public class UpdateActivityDTO implements ToDomainConverter {
     /**
      * MIMI
      */
-    List<String> toolsetList;
-    List<String> toolList;
+    HashSet<String> toolList;
 
 }
